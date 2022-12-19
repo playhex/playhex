@@ -1,14 +1,11 @@
 import EventEmitter from 'events';
-import { Game } from '@shared/game-engine';
+import { Game, IllegalMove, Move } from '@shared/game-engine';
 import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
 import TypedEmitter from 'typed-emitter';
 import Hex from './Hex';
+import LocalPlayer from './LocalPlayer';
 
-type GameViewEvents = {
-    hexClicked: (coords: {row: number, col: number}) => void;
-}
-
-export default class GameView extends (EventEmitter as unknown as new () => TypedEmitter<GameViewEvents>)
+export default class GameView
 {
     private hexes: Hex[][];
     private size: number;
@@ -17,9 +14,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     public constructor(
         private game: Game,
     ) {
-        super();
-
-        this.size = game.getBoard().getSize();
+        this.size = game.getSize();
         this.view = new Container();
 
         this.drawBackground();
@@ -34,8 +29,12 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     private listenModel(): void
     {
-        this.game.on('move', (move, playerIndex) => {
+        this.game.on('played', (move, playerIndex) => {
             this.hexes[move.getRow()][move.getCol()].setPlayer(playerIndex);
+        });
+
+        this.game.on('ended', (winner) => {
+            console.log('GAME ENDED, winner:', winner);
         });
     }
 
@@ -54,7 +53,23 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
                 this.view.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    this.emit('hexClicked', {row, col});
+                    const move = new Move(row, col);
+                    const currentPlayer = this.game.getCurrentPlayer();
+
+                    if ('doMove' in currentPlayer) {
+                        try {
+                            this.game.checkMove(move);
+                            (currentPlayer as LocalPlayer).doMove(move);
+                        } catch (e) {
+                            if (e instanceof IllegalMove) {
+                                console.error(e.message);
+                            } else {
+                                throw e;
+                            }
+                        }
+                    } else {
+                        console.error('not your turn');
+                    }
                 });
             }
         }

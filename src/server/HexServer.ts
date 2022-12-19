@@ -1,10 +1,10 @@
+import { Game } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
-import GameInstance from './GameInstance';
 
 export class HexServer
 {
-    private gameInstances: {[key: string]: GameInstance} = {};
+    private games: {[key: string]: Game} = {};
 
     public constructor(
         private io: Server<EventsMap, EventsMap>,
@@ -22,28 +22,29 @@ export class HexServer
         });
     }
 
-    public getGameInstances()
+    public getGames()
     {
-        return this.gameInstances;
+        return this.games;
     }
 
-    public createGame(): GameInstance
+    public createGame(): Game
     {
-        const gameInstance = new GameInstance();
-        this.gameInstances[gameInstance.getId()] = gameInstance;
-        this.io.emit('game-created', gameInstance.getId());
+        const game = new Game();
+        this.games[game.getId()] = game;
+        this.io.emit('game-created', game.getId());
 
-        return gameInstance;
+        return game;
     }
 
     public joinGame(socket: Socket, gameId: string): boolean
     {
-        const gameInstance = this.gameInstances[gameId];
+        const game = this.games[gameId];
 
-        if (!gameInstance) {
+        if (!game) {
             return false;
         }
 
-        return gameInstance.playerJoin(socket);
+        return false;
+        //return game.playerJoin(socket);
     }
 }

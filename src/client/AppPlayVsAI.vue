@@ -18,7 +18,7 @@ import { Application } from 'pixi.js';
 import GameView from './GameView';
 import Hex from './Hex';
 import LocalPlayer from './LocalPlayer';
-import { Game, RandomAIPlayer } from '@shared/game-engine';
+import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
 
 export default {
     data() {
@@ -31,17 +31,19 @@ export default {
     },
 
     mounted() {
-        const localPlayer = new LocalPlayer();
-        const game = new Game([
-            localPlayer,
+        const SIZE = 13;
+
+        const game = new Game(SIZE, [
+            new LocalPlayer(),
             new RandomAIPlayer(),
+            //new LocalPlayer(),
         ]);
         const gameView = new GameView(game);
         const view = gameView.getView();
 
-        game.start();
+        GameLoop.run(game);
 
-        view.position = {x: 100, y: 250};
+        view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (SIZE + 1) * Math.sqrt(3) / 2};
         view.rotation = -1 * (Math.PI / 6);
 
         const app = new Application({

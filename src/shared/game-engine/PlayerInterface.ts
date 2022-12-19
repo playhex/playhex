@@ -1,4 +1,4 @@
-import BoardState from './BoardState';
+import BoardState from './GameInput';
 import Move from './Move';
 
 export default interface PlayerInterface
@@ -6,15 +6,10 @@ export default interface PlayerInterface
     /**
      * Whether this player is ready to start the game.
      */
-    isReady(): boolean;
+    isReady(): Promise<true>;
 
     /**
      * Player turn started. Return a promise of move.
      */
     playMove(boardState: BoardState): Promise<Move>;
-
-    /**
-     * Called when game has finished.
-     */
-    gameEnded(issue: string): void;
 }

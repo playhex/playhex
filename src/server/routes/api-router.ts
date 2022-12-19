@@ -7,7 +7,7 @@ export function apiRouter(hexServer: HexServer) {
     router.use(bodyParser.json());
 
     router.get('/api/games', (req, res) => {
-        res.send(Object.keys(hexServer.getGameInstances()));
+        res.send(Object.keys(hexServer.getGames()));
     });
 
     router.post('/api/games', (req, res) => {

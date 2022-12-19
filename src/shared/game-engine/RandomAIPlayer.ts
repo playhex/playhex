@@ -1,4 +1,4 @@
-import BoardState from './BoardState';
+import GameInput from './GameInput';
 import Move from './Move';
 import PlayerInterface from './PlayerInterface';
 
@@ -10,7 +10,14 @@ export default class RandomAIPlayer implements PlayerInterface
         private nickname: string = 'Bot',
     ) {}
 
-    public async playMove(boardState: BoardState): Promise<Move>
+    public isReady(): Promise<true>
+    {
+        return new Promise(resolve => {
+            resolve(true);
+        });
+    }
+
+    public async playMove(gameInput: GameInput): Promise<Move>
     {
         console.log('random AI player ' + this.nickname + ' is playing...');
 
@@ -20,9 +27,9 @@ export default class RandomAIPlayer implements PlayerInterface
 
         const possibleMoves: Move[] = [];
 
-        for (let row = 0; row < boardState.getSize(); ++row) {
-            for (let col = 0; col < boardState.getSize(); ++col) {
-                if (null === boardState.getHex(row, col)) {
+        for (let row = 0; row < gameInput.getSize(); ++row) {
+            for (let col = 0; col < gameInput.getSize(); ++col) {
+                if (null === gameInput.getHex(row, col)) {
                     possibleMoves.push(new Move(row, col));
                 }
             }
@@ -33,10 +40,5 @@ export default class RandomAIPlayer implements PlayerInterface
         console.log('random AI player ' + this.nickname + ' plays ' + move);
 
         return move;
-    }
-
-    public gameEnded(issue: string): void
-    {
-        console.log('game ended: ' + issue);
     }
 }

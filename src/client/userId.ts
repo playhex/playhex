@@ -1,4 +1,4 @@
-import randomId from '../shared/randomId';
+import randomId from '../shared/game-engine/randomId';
 
 let userId = localStorage.getItem('hex-user-id');
 

@@ -1,31 +1,31 @@
-import { Board, Move, PlayerIndex } from '.';
+import { Game, Move, PlayerIndex } from '.';
 
 /**
  * State of a game.
  * Provided as input to Player to make their move.
  */
-export default class BoardState
+export default class GameInput
 {
     private hexes: null|(null|PlayerIndex)[][] = null;
 
     public constructor(
-        private board: Board,
+        private game: Game,
     ) {}
 
     public getSize(): number
     {
-        return this.board.getSize();
+        return this.game.getSize();
     }
 
     public getHex(row: number, col: number): null|PlayerIndex
     {
-        return this.board.getCell(row, col);
+        return this.game.getCell(row, col);
     }
 
     public getHexes(): (null|PlayerIndex)[][]
     {
         if (null === this.hexes) {
-            this.hexes = this.board.getCellsClone();
+            this.hexes = this.game.getCellsClone();
         }
 
         return this.hexes;
@@ -33,6 +33,6 @@ export default class BoardState
 
     public checkMove(move: Move): void
     {
-        this.board.checkMove(move);
+        this.game.checkMove(move);
     }
 }

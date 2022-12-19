@@ -1,4 +1,4 @@
-import BoardState from './BoardState';
+import GameInput from './GameInput';
 import Move from './Move';
 import PlayerInterface from './PlayerInterface';
 
@@ -15,18 +15,13 @@ export default class NullPlayer implements PlayerInterface
         return NullPlayer.instance;
     }
 
-    public async playMove(boardState: BoardState): Promise<Move>
+    public isReady(): Promise<true>
+    {
+        throw new Error('NullPlayer cannot be ready');
+    }
+
+    public async playMove(gameInput: GameInput): Promise<Move>
     {
         throw new Error('Cannot play with a null player');
-    }
-
-    public isReady(): boolean
-    {
-        return false;
-    }
-
-    public gameEnded(issue: string): void
-    {
-        console.log('game ended: ' + issue);
     }
 }

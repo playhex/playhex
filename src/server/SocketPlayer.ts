@@ -15,6 +15,13 @@ export default class SocketPlayer implements PlayerInterface
         }
     }
 
+    public isReady(): Promise<true>
+    {
+        return new Promise(resolve => {
+            resolve(true);
+        });
+    }
+
     public accepts(socket: Socket): boolean
     {
         return null === this.userId

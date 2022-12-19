@@ -4,6 +4,12 @@ export default class LocalPlayer implements PlayerInterface
 {
     private movePromiseResolve: null|((move: Move) => void) = null;
 
+    public isReady(): Promise<true> {
+        return new Promise(resolve => {
+            resolve(true);
+        });
+    }
+
     public doMove(move: Move): void
     {
         if (null === this.movePromiseResolve) {
@@ -18,10 +24,5 @@ export default class LocalPlayer implements PlayerInterface
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;
         });
-    }
-
-    public gameEnded(issue: string): void
-    {
-        console.log('game ended: ' + issue);
     }
 }
