@@ -1,49 +1,32 @@
 import { Socket } from 'socket.io';
-import BoardState from './BoardState';
-import IllegalMove from './IllegalMove';
-import LobbySlotInterface from './LobbySlotInterface';
-import Move from './Move';
-import PlayerInterface from './PlayerInterface';
+import { BoardState, IllegalMove, Move, PlayerInterface } from '../shared/game-engine';
 
-export default class SocketPlayer implements PlayerInterface, LobbySlotInterface<Socket>
+export default class SocketPlayer implements PlayerInterface
 {
     private movePromiseResolve: null|((move: Move) => void) = null;
     private boardState: null|BoardState = null;
     private userId: null|string = null;
 
     public constructor(
-        private socket: null|Socket = null,
+        socket: null|Socket = null,
     ) {
         if (null !== socket) {
-            this.setSocket(socket);
+            this.playerJoin(socket);
         }
     }
 
-    public accepts(connection: Socket): boolean
+    public accepts(socket: Socket): boolean
     {
-        if (null === this.userId) {
-            return true;
-        }
-
-        return connection.handshake.auth.userId === this.userId;
+        return null === this.userId
+            || socket.handshake.auth.userId === this.userId;
     }
 
-    public playerJoin(connection: Socket): void
+    public playerJoin(socket: Socket): void
     {
-        this.setSocket(connection);
-    }
-
-    public setSocket(socket: Socket): void
-    {
-        this.socket = socket;
         this.userId = socket.handshake.auth.userId;
 
         socket.on('hexClicked', ({row, col}: {row: number, col: number}) => {
-            if (null === this.boardState) {
-                throw new Error('no BoardState');
-            }
-
-            if (null === this.movePromiseResolve) {
+            if (null === this.movePromiseResolve || null === this.boardState) {
                 socket.emit('illegalMove', 'Not your turn');
                 return;
             }

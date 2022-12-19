@@ -1,38 +1,62 @@
 import EventEmitter from 'events';
-import { Board, IllegalMove, PlayerInterface, PlayerIndex } from '.';
+import { Board, IllegalMove, PlayerInterface, PlayerIndex, Move } from '.';
+import TypedEmitter from 'typed-emitter';
 import BoardState from './BoardState';
 import { GameInfo } from './Types';
 
-export default class Game extends EventEmitter {
+type GameEvents = {
+    /**
+     * A move have been played by a player.
+     */
+    move: (move: Move, playerIndex: PlayerIndex) => void;
+
+    /**
+     * Game have been finished.
+     */
+    gameEnded: (winner: PlayerIndex) => void;
+}
+
+export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
+{
     public constructor(
-        private players: [PlayerInterface, PlayerInterface],
         private board: Board = new Board(),
     ) {
         super();
     }
 
-    public getPlayer(playerIndex: PlayerIndex): PlayerInterface {
-        return this.players[playerIndex];
+    public getPlayers()
+    {
+        return this.board.getPlayers();
     }
 
-    public getBoard(): Board {
+    public getPlayer(playerIndex: PlayerIndex): PlayerInterface
+    {
+        return this.board.getPlayers()[playerIndex];
+    }
+
+    public getBoard(): Board
+    {
         return this.board;
     }
 
     public async start(): Promise<void> {
+        if (!this.board.getPlayers().every(player => player.isReady())) {
+            throw new Error('Cannot start, not all players are ready');
+        }
+
         while (!this.board.isGameEnded()) {
             console.log('current player', this.board.getCurrentPlayerIndex());
 
             await this.makeCurrentPlayerPlay();
         }
 
-        this.emit('gameEnded', this.board.getWinner());
-        console.log('game ended, winner: ' + this.board.getWinner());
+        this.emit('gameEnded', this.board.getStrictWinner());
+        console.log('game ended, winner: ' + this.board.getStrictWinner());
     }
 
     public async makeCurrentPlayerPlay(): Promise<void> {
         const currentPlayerIndex = this.board.getCurrentPlayerIndex();
-        const currentPlayer = this.players[currentPlayerIndex];
+        const currentPlayer = this.board.getPlayers()[currentPlayerIndex];
 
         try {
             const move = await currentPlayer.playMove(new BoardState(this.board));
@@ -43,7 +67,7 @@ export default class Game extends EventEmitter {
         } catch (e) {
             if (e instanceof IllegalMove) {
                 this.board.abandon();
-                this.emit('gameEnded', this.board.getWinner());
+                this.emit('gameEnded', this.board.getStrictWinner());
                 console.log('you lose because provided an invalid move:', e.message);
             } else {
                 throw e;

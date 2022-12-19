@@ -1,4 +1,5 @@
-import { IllegalMove, Move, PlayerIndex, Side } from '.';
+import { IllegalMove, Move, PlayerIndex, PlayerInterface, Side } from '.';
+import NullPlayer from './NullPlayer';
 import { BoardInfo } from './Types';
 
 /**
@@ -13,6 +14,10 @@ export default class Board
 
     public constructor(
         private size: number = 11,
+        private players: [PlayerInterface, PlayerInterface] = [
+            NullPlayer.getInstance(),
+            NullPlayer.getInstance(),
+        ],
     ) {
         this.hexes = Array(this.size)
             .fill([])
@@ -27,6 +32,16 @@ export default class Board
         board.hexes = hexes;
 
         return board;
+    }
+
+    public getSize(): number
+    {
+        return this.size;
+    }
+
+    public getPlayers(): [PlayerInterface, PlayerInterface]
+    {
+        return this.players;
     }
 
     public getCurrentPlayerIndex(): PlayerIndex
@@ -44,8 +59,12 @@ export default class Board
         return null !== this.winner;
     }
 
-    public getWinner(): null|PlayerIndex
+    public getStrictWinner(): PlayerIndex
     {
+        if (null === this.winner) {
+            throw new Error('Trying to strictly get the winner but game not finished');
+        }
+
         return this.winner;
     }
 
@@ -57,11 +76,6 @@ export default class Board
     public getCellsClone(): (null|PlayerIndex)[][]
     {
         return this.hexes.map(row => row.slice());
-    }
-
-    public getSize(): number
-    {
-        return this.size;
     }
 
     public getCell(row: number, col: number): null|PlayerIndex

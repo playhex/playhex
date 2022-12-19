@@ -10,9 +10,9 @@
 </head>
 
 <body>
-    <div id="pixi-app"></div>
-
-    <p id="error-message"></p>
+    <div id="vue-app">
+        <p>Loading...</p>
+    </div>
 
     <% for(var jsLocation of Object.values(manifest)) {%>
         <script type="text/javascript" src="<%- jsLocation %>"></script>

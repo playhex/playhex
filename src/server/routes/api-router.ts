@@ -1,12 +1,19 @@
 import bodyParser from 'body-parser';
 import { Router } from 'express';
+import { HexServer } from '@server/HexServer';
 
-export function apiRouter() {
+export function apiRouter(hexServer: HexServer) {
     const router = Router();
     router.use(bodyParser.json());
 
-    router.post('/api/set-user', (req, res) => {
-        res.send(`ok`);
+    router.get('/api/games', (req, res) => {
+        res.send(Object.keys(hexServer.getGameInstances()));
+    });
+
+    router.post('/api/games', (req, res) => {
+        const game = hexServer.createGame();
+
+        res.send(JSON.stringify(game.getId()));
     });
 
     return router;

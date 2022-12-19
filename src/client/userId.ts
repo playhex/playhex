@@ -1,7 +1,9 @@
+import randomId from '../shared/randomId';
+
 let userId = localStorage.getItem('hex-user-id');
 
 if (null === userId) {
-    userId = (Math.random() + 1).toString(36).substring(2);
+    userId = randomId();
     localStorage.setItem('hex-user-id', userId);
 }
 

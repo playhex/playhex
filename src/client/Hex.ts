@@ -1,5 +1,5 @@
 import { Graphics, IPointData, Sprite } from 'pixi.js';
-import { Player } from './Types';
+import { PlayerIndex } from '@shared/game-engine';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -10,10 +10,9 @@ export default class Hex extends Sprite
 
     public static readonly COLOR_A = 0xff8888;
     public static readonly COLOR_B = 0x8888ff;
-    public static readonly COLOR_NONE = 0xcccccc;
+    public static readonly COLOR_EMPTY = 0xcccccc;
 
     private graphics: Graphics;
-    private player: Player;
 
     constructor()
     {
@@ -21,7 +20,7 @@ export default class Hex extends Sprite
 
         this.drawHexBackground();
         this.drawHex();
-        this.setPlayer('NONE');
+        this.setPlayer(null);
 
         this.interactive = true;
     }
@@ -79,25 +78,15 @@ export default class Hex extends Sprite
         };
     }
 
-    public switch(): void
+    public setPlayer(player: null|PlayerIndex): Hex
     {
-        const next: {[key in Player]: Player} = {
-            A: 'B',
-            B: 'NONE',
-            NONE: 'A',
-        };
-
-        this.setPlayer(next[this.player]);
-    }
-
-    public setPlayer(player: Player): Hex
-    {
-        this.player = player;
-        this.graphics.tint = {
-            A: Hex.COLOR_A,
-            B: Hex.COLOR_B,
-            NONE: Hex.COLOR_NONE,
-        }[player];
+        this.graphics.tint = null === player
+            ? Hex.COLOR_EMPTY
+            : [
+                Hex.COLOR_A,
+                Hex.COLOR_B,
+            ][player]
+        ;
 
         return this;
     }

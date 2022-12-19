@@ -1,11 +1,14 @@
 import path from 'path';
 import { Configuration } from 'webpack';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
-import cssnano from 'cssnano';
+import { VueLoaderPlugin } from 'vue-loader';
 
 import { SERVER_PORT, IS_DEV, WEBPACK_PORT } from './src/server/config';
 
-const plugins = [new WebpackManifestPlugin({})];
+const plugins = [
+  new WebpackManifestPlugin({}),
+  new VueLoaderPlugin(),
+];
 
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 // plugins.push(new BundleAnalyzerPlugin());
@@ -25,6 +28,11 @@ const config: Configuration = {
   },
   resolve: {
     extensions: ['.js', '.ts'],
+    alias: {
+      '@client': path.resolve(__dirname, 'src/client/'),
+      '@server': path.resolve(__dirname, 'src/server/'),
+      '@shared': path.resolve(__dirname, 'src/shared/'),
+    },
   },
   optimization: {
     minimize: !IS_DEV,
@@ -47,6 +55,10 @@ const config: Configuration = {
   },
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
       {
         test: /\.ts$/,
         exclude: [/node_modules/, nodeModulesPath],
@@ -78,18 +90,6 @@ const config: Configuration = {
           },
           {
             loader: 'css-loader',
-            options: {
-              modules: true,
-              localsConvention: 'camelCase',
-              sourceMap: IS_DEV,
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              sourceMap: IS_DEV,
-              plugins: IS_DEV ? [cssnano()] : [],
-            },
           },
         ],
       },

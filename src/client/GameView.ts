@@ -1,17 +1,42 @@
-import { Container, Graphics, IPointData } from 'pixi.js';
+import EventEmitter from 'events';
+import { Game } from '@shared/game-engine';
+import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
+import TypedEmitter from 'typed-emitter';
 import Hex from './Hex';
 
-export default class BoardView extends Container
+type GameViewEvents = {
+    hexClicked: (coords: {row: number, col: number}) => void;
+}
+
+export default class GameView extends (EventEmitter as unknown as new () => TypedEmitter<GameViewEvents>)
 {
     private hexes: Hex[][];
+    private size: number;
+    private view: Container;
 
     public constructor(
-        private size: number = 11,
+        private game: Game,
     ) {
         super();
 
+        this.size = game.getBoard().getSize();
+        this.view = new Container();
+
         this.drawBackground();
         this.createBoard();
+        this.listenModel();
+    }
+
+    public getView(): DisplayObject
+    {
+        return this.view;
+    }
+
+    private listenModel(): void
+    {
+        this.game.on('move', (move, playerIndex) => {
+            this.hexes[move.getRow()][move.getCol()].setPlayer(playerIndex);
+        });
     }
 
     private createBoard(): void
@@ -26,10 +51,10 @@ export default class BoardView extends Container
 
                 this.hexes[row][col] = hex;
 
-                this.addChild(hex);
+                this.view.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    this.emit<any>('hexClicked', {row, col});
+                    this.emit('hexClicked', {row, col});
                 });
             }
         }
@@ -72,7 +97,7 @@ export default class BoardView extends Container
             to(Hex.coords(this.size - i - 1, 0), Hex.cornerCoords(5));
         }
 
-        this.addChild(graphics);
+        this.view.addChild(graphics);
     }
 
     public getHex(rowCol: {row: number, col: number}): Hex

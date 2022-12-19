@@ -14,7 +14,12 @@
     "lib": ["ES2019", "DOM"],
     "types": [],
     "noImplicitAny": true,
-    "composite": true
+    "composite": true,
+    "paths": {
+      "@client/*": ["../client/*"],
+      "@server/*": ["../server/*"],
+      "@shared/*": ["../shared/*"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["**/*.test.ts"],

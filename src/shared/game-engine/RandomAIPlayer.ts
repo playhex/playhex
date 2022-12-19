@@ -7,7 +7,7 @@ const { floor, random } = Math;
 export default class RandomAIPlayer implements PlayerInterface
 {
     public constructor(
-        private nickname: string,
+        private nickname: string = 'Bot',
     ) {}
 
     public async playMove(boardState: BoardState): Promise<Move>
