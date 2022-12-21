@@ -1,5 +1,5 @@
 <template>
-  <button @click="createGame()">Create game</button>
+  <h3>Play 1v1</h3>
 
   <p v-if="null === activeGames">Loading active games...</p>
   <p v-else-if="0 === activeGames.length">No active game for now. Create a new one !</p>
@@ -8,6 +8,8 @@
       <router-link :to="`/games/${activeGame}`">{{ activeGame }}</router-link>
     </li>
   </ul>
+
+  <button @click="createGame()">Create game</button>
 </template>
 
 <script>
