@@ -1,5 +1,5 @@
 import { Game, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { GameData } from '@shared/Types';
+import { GameData, PlayerData } from '@shared/Types';
 import { defineStore } from 'pinia';
 import { Socket } from 'socket.io-client';
 import FrontPlayer from './FrontPlayer';
@@ -71,13 +71,18 @@ const useHexClient = defineStore('hexClient', {
             return gameClientSocket;
         },
 
+        joinRoom(socket: Socket, join: 'join' | 'leave', gameId: string): void
+        {
+            socket.emit('room', join, gameId);
+        },
+
         async joinGame(gameId: string, playerIndex: PlayerIndex): Promise<boolean>
         {
             return new Promise(resolve => {
                 socket.emit('joinGame', gameId, playerIndex, (answer: boolean) => {
                     resolve(answer);
                 });
-            })
+            });
         },
 
         listenSocket(socket: Socket): void
@@ -90,21 +95,23 @@ const useHexClient = defineStore('hexClient', {
                 }
             });
 
-            socket.on('gameJoined', (gameId: string, playerIndex: PlayerIndex, playerId: string) => {
-                // if (!this.gameClientSockets[gameId]) {
-                //     this.gameClientSockets[gameId] = new GameClientSocket(gameId);
-                // }
+            socket.on('gameJoined', (gameId: string, playerIndex: PlayerIndex, playerData: PlayerData) => {
+                if (!this.gameClientSockets[gameId]) {
+                    console.error('game joined event on not loaded game', arguments);
+                    return;
+                }
+
+                const player = this.gameClientSockets[gameId].game.getPlayers()[playerIndex];
+
+                if (!(player instanceof FrontPlayer)) {
+                    console.error('game joined event on a player which is not a FrontPlayer', player, arguments);
+                    return;
+                }
+
+                player.updatePlayerData(playerData);
             });
         },
     },
 });
-
-// const hexClient = useHexClient();
-
-// socket.on('gameCreated', (gameId: string) => {
-//     hexClient.gameCreated(gameId);
-
-//     console.log('HERE gameCreated', hexClient.gameClientSockets);
-// });
 
 export default useHexClient;

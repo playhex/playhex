@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="n9uMMdS0sM0NDuDs2vdY" name="Page-1">
-        <mxGraphModel dx="724" dy="732" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="546" dy="659" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -106,7 +106,7 @@
                 <mxCell id="bvI0IArzNIrlb63RfcCq-49" value="&lt;div&gt;server-&amp;gt;client messages:&lt;/div&gt;&lt;div&gt;game:ID:started&lt;/div&gt;&lt;div&gt;game:ID:moved&lt;/div&gt;&lt;div&gt;game:ID:ended&lt;br&gt;&lt;/div&gt;&lt;div&gt;game:ID:joined&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="745" y="685" width="150" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="bvI0IArzNIrlb63RfcCq-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="bvI0IArzNIrlb63RfcCq-52" edge="1" target="2">
+                <mxCell id="bvI0IArzNIrlb63RfcCq-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="bvI0IArzNIrlb63RfcCq-52" target="2" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="660" y="550" as="targetPoint"/>
                     </mxGeometry>
@@ -117,32 +117,32 @@
                 <mxCell id="bvI0IArzNIrlb63RfcCq-55" value="&lt;div align=&quot;left&quot;&gt;&lt;ul&gt;&lt;li&gt;AsyncPlayer (isControllable(): bool)&lt;br&gt;&lt;/li&gt;&lt;ul&gt;&lt;li&gt;RemotePlayer (front, not listen moves)&lt;br&gt;&lt;/li&gt;&lt;li&gt;LocalPlayer (front, accept moves)&lt;/li&gt;&lt;li&gt;SocketPlayer (back, io, socket can join slot, then ready)&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;&lt;div&gt;AIPlayer&lt;/div&gt;&lt;/li&gt;&lt;li&gt;RemoteAIPlayer (server, exec cmd)&lt;br&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="20" y="10" width="400" height="150" as="geometry"/>
                 </mxCell>
-                <mxCell id="2" value="HexServer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+                <mxCell id="2" value="HexServer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
                     <mxGeometry x="600" y="400" width="160" height="210" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="gameServerSockets&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="2">
+                <mxCell id="3" value="gameServerSockets&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="2" vertex="1">
                     <mxGeometry y="30" width="160" height="84" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="2">
+                <mxCell id="4" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="2" vertex="1">
                     <mxGeometry y="114" width="160" height="76" as="geometry"/>
                 </mxCell>
-                <mxCell id="15" value="createGame()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="2">
+                <mxCell id="15" value="createGame()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="2" vertex="1">
                     <mxGeometry y="190" width="160" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="bvI0IArzNIrlb63RfcCq-21">
+                <mxCell id="5" style="edgeStyle=none;html=1;" parent="1" source="3" target="bvI0IArzNIrlb63RfcCq-21" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="7" value="HexClient" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+                <mxCell id="7" value="HexClient" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
                     <mxGeometry x="545" y="811" width="160" height="122" as="geometry"/>
                 </mxCell>
-                <mxCell id="8" value="gameClientSockets&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="7">
+                <mxCell id="8" value="gameClientSockets&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="7" vertex="1">
                     <mxGeometry y="30" width="160" height="84" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="7">
+                <mxCell id="9" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="7" vertex="1">
                     <mxGeometry y="114" width="160" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="14" value="&lt;div&gt;emits:&lt;/div&gt;&lt;div&gt;gameCreated&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="790" y="220" width="60" height="30" as="geometry"/>
+                <mxCell id="14" value="&lt;div&gt;emits:&lt;/div&gt;&lt;div&gt;gameCreated&lt;/div&gt;&lt;div&gt;gameJoined&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="760" y="360" width="60" height="30" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

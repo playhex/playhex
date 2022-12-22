@@ -5,7 +5,7 @@ import GameView from './GameView';
 import Hex from './Hex';
 import useHexClient from './hexClient';
 import { onMounted, ref } from '@vue/runtime-core';
-import { reactive } from 'vue';
+import socket from './socket';
 
 const route = useRoute();
 const hexClient = useHexClient();
@@ -37,6 +37,8 @@ const app = new Application({
         game.value = hexClient.gameClientSockets[gameId].game;
     }
 
+    hexClient.joinRoom(socket, 'join', `games/${gameId}`);
+
     console.log('game loaded', game.value);
 
     const gameView = new GameView(game.value);
@@ -54,12 +56,14 @@ onMounted(async () => {
     pixiApp.value.appendChild(app.view);
 });
 
-const join = async (playerIndex) => {
-    console.log('join', playerIndex);
+const joinGame = async (playerIndex) => {
+    const joined = await hexClient.joinGame(gameId, playerIndex);
 
-    const answer = await hexClient.joinGame(game.value.id, playerIndex);
+    console.log('gameJoined', joined);
 
-    console.log('has joined:', answer);
+    if (!joined) {
+        console.error('could not join');
+    }
 };
 </script>
 
@@ -68,11 +72,11 @@ const join = async (playerIndex) => {
         <div v-if="game" class="game-info">
             <div class="player-a">
                 <p :style="{color: colorA}">{{ game.players[0].playerData.id }}</p>
-                <button @click="join(0)">Join</button>
+                <button @click="joinGame(0)">Join</button>
             </div>
             <div class="player-b">
                 <p :style="{color: colorB}">{{ game.players[1].playerData.id }}</p>
-                <button @click="join(1)">Join</button>
+                <button @click="joinGame(1)">Join</button>
             </div>
         </div>
         <p v-else>Loading game data...</p>

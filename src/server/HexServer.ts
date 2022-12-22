@@ -2,6 +2,8 @@ import { Game, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
 import GameServerSocket from './GameServerSocket';
+import { PlayerData } from '@shared/Types';
+import { ok } from 'assert';
 
 export class HexServer
 {
@@ -19,6 +21,11 @@ export class HexServer
             socket.on('joinGame', (gameId: string, playerIndex: PlayerIndex, answer: (joined: boolean) => void) => {
                 const joined = this.playerJoinGame(socket, gameId, playerIndex);
                 answer(joined);
+            });
+
+            socket.on('room', (join: 'join' | 'leave', room: string) => {
+                console.log(`Room: player ${socket.handshake.auth.playerId} ${join} room ${room}`);
+                socket[join](room);
             });
         });
     }
@@ -47,13 +54,20 @@ export class HexServer
     {
         const gameServerSocket = this.gameServerSockets[gameId];
 
-        console.log('playerJoinGame', arguments);
-        console.log(this.gameServerSockets, 'trying to join', gameServerSocket);
-
         if (!gameServerSocket) {
             return false;
         }
 
-        return gameServerSocket.playerJoin(socket, playerIndex);
+        const joined = gameServerSocket.playerJoin(socket, playerIndex);
+
+        if (joined) {
+            const playerData: PlayerData = {
+                id: socket.handshake.auth.playerId,
+            };
+
+            this.io.to(`games/${gameId}`).emit('gameJoined', gameId, playerIndex, playerData);
+        }
+
+        return joined;
     }
 }
