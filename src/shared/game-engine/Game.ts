@@ -23,11 +23,8 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private winner: null|PlayerIndex = null;
 
     public constructor(
+        private players: [PlayerInterface, PlayerInterface],
         private size: number = 11,
-        private players: [PlayerInterface, PlayerInterface] = [
-            NullPlayer.getInstance(),
-            NullPlayer.getInstance(),
-        ],
     ) {
         super();
 
@@ -35,15 +32,6 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             .fill([])
             .map(() => Array(this.size).fill(null))
         ;
-    }
-
-    public static createFromGrid(hexes: (null|PlayerIndex)[][]): Game
-    {
-        const board = new Game(hexes.length);
-
-        board.hexes = hexes;
-
-        return board;
     }
 
     public getSize(): number
@@ -54,6 +42,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     public getPlayers(): [PlayerInterface, PlayerInterface]
     {
         return this.players;
+    }
+
+    public getPlayer(playerIndex: PlayerIndex): PlayerInterface
+    {
+        return this.players[playerIndex];
     }
 
     public getCurrentPlayerIndex(): PlayerIndex

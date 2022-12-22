@@ -31,9 +31,7 @@ export default {
     },
 
     mounted() {
-        const SIZE = 11;
-
-        const game = new Game(SIZE, [
+        const game = new Game([
             new FrontPlayer(true),
             new FrontPlayer(true),
         ]);
@@ -42,7 +40,7 @@ export default {
 
         GameLoop.run(game);
 
-        view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (SIZE + 1) * Math.sqrt(3) / 2};
+        view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.getSize() + 1) * Math.sqrt(3) / 2};
         view.rotation = -1 * (Math.PI / 6);
 
         const app = new Application({

@@ -13,8 +13,6 @@ const colorA = '#' + Hex.COLOR_A.toString(16);
 const colorB = '#' + Hex.COLOR_B.toString(16);
 const pixiApp = ref(null);
 
-const SIZE = 11;
-
 const {gameId} = route.params;
 
 const game = ref(null);
@@ -46,7 +44,7 @@ const app = new Application({
 
     //GameLoop.run(game.value);
 
-    view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (SIZE + 1) * Math.sqrt(3) / 2};
+    view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2};
     view.rotation = -1 * (Math.PI / 6);
 
     app.stage.addChild(view);

@@ -18,9 +18,7 @@ export function apiRouter(hexServer: HexServer) {
     router.post('/api/games', (req, res) => {
         const game = hexServer.createGame();
 
-        res.send({
-            id: game.getId(),
-        });
+        res.send(game.toGameData());
     });
 
     router.get('/api/games/:id', (req, res) => {

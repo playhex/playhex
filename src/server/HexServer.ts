@@ -3,7 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
 import GameServerSocket from './GameServerSocket';
 import { PlayerData } from '@shared/Types';
-import { ok } from 'assert';
+import NullPlayer from '../shared/game-engine/NullPlayer';
 
 export class HexServer
 {
@@ -42,8 +42,7 @@ export class HexServer
 
     public createGame(): GameServerSocket
     {
-        const game = new Game();
-        const gameServerSocket = new GameServerSocket(this.io, game);
+        const gameServerSocket = new GameServerSocket();
         this.gameServerSockets[gameServerSocket.getId()] = gameServerSocket;
         this.io.emit('gameCreated', gameServerSocket.toGameData());
 

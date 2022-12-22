@@ -15,6 +15,11 @@ export default class NullPlayer implements PlayerInterface
         return NullPlayer.instance;
     }
 
+    public isReady(): boolean
+    {
+        throw new Error('Cannot play with a null player');
+    }
+
     public async playMove(gameInput: GameInput): Promise<Move>
     {
         throw new Error('Cannot play with a null player');

@@ -64,7 +64,7 @@ const useHexClient = defineStore('hexClient', {
                 new FrontPlayer(false, gameData.players[1]),
             ];
 
-            const gameClientSocket = new GameClientSocket(gameId, new Game(11, players));
+            const gameClientSocket = new GameClientSocket(gameId, new Game(players));
 
             this.gameClientSockets[gameId] = gameClientSocket;
 

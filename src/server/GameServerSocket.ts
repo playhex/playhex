@@ -1,23 +1,23 @@
 import { Game, GameLoop, PlayerIndex } from '../shared/game-engine';
-import { GameData } from '../shared/Types';
+import { GameData, PlayerData } from '../shared/Types';
 import { randomUUID } from 'crypto';
-import { Server, Socket } from 'socket.io';
-
-type PlayerSocket = {
-    playerId: string;
-    socket: Socket;
-};
+import { Socket } from 'socket.io';
+import NullPlayer from '../shared/game-engine/NullPlayer';
+import SocketPlayer from './SocketPlayer';
 
 export default class GameServerSocket
 {
     private id: string = randomUUID();
-    private playerSockets: [null|PlayerSocket, null|PlayerSocket] = [null, null];
+    private game: Game;
     private gameStarted: boolean = false;
 
-    public constructor(
-        private io: Server,
-        private game: Game,
-    ) {}
+    public constructor()
+    {
+        this.game = new Game([
+            new SocketPlayer(),
+            new SocketPlayer(),
+        ]);
+    }
 
     public getId(): string
     {
@@ -30,8 +30,8 @@ export default class GameServerSocket
             throw new Error('game already started');
         }
 
-        if (this.playerSockets.some(playerSocket => null === playerSocket)) {
-            throw new Error('cannot start, missing player');
+        if (!this.game.getPlayers().every(player => player.isReady())) {
+            throw new Error('cannot start, at least one player not ready');
         }
 
         this.gameStarted = true;
@@ -41,59 +41,82 @@ export default class GameServerSocket
 
     public playerJoin(socket: Socket, playerIndex: PlayerIndex): boolean
     {
-        const playerSocket = this.playerSockets[playerIndex];
+        const player = this.game.getPlayers()[playerIndex];
 
-        if (this.gameStarted && !playerSocket) {
-            throw new Error('game started but no socket');
+        if (this.gameStarted) {
+            console.log('Trying to join but game already started');
+            return false;
+        }
+
+        if (!(player instanceof SocketPlayer)) {
+            console.log('Trying to join a slot that is not a SocketPlayer:', player);
+            return false;
+        }
+
+        // Already joined by same socket (me), noop
+        if (null !== player.socket && player.socket.id === socket.id) {
+            return true;
         }
 
         // Joining a free slot
-        if (null === playerSocket) {
-            this.setPlayerSocket(socket, playerIndex);
+        if (null === player.playerData) {
+
+            // Prevent a player from joining as his own opponent
+            const opponent = this.game.getPlayers()[1 - playerIndex];
+
+            if (
+                opponent instanceof SocketPlayer
+                && null !== opponent.playerData
+                && opponent.playerData.id === socket.handshake.auth.playerId
+            ) {
+                console.log('Trying to join as own opponent');
+                return false;
+            }
+
+            this.setSocketPlayer(socket, playerIndex);
 
             return true;
         }
 
-        // Already joined by me currently, noop
-        if (playerSocket.socket.id === socket.id) {
-            return true;
-        }
-
-        const {playerId} = playerSocket;
+        const playerId = player.playerData.id;
 
         // Can join only if it's my slot
         if (playerId !== socket.handshake.auth.playerId) {
             return false;
         }
 
-        this.setPlayerSocket(socket, playerIndex);
+        this.setSocketPlayer(socket, playerIndex);
 
         return true;
     }
 
-    private setPlayerSocket(socket: Socket, playerIndex: PlayerIndex): void
+    private setSocketPlayer(socket: Socket, playerIndex: PlayerIndex): void
     {
-        const playerSocket = this.playerSockets[playerIndex];
+        const player = this.game.getPlayer(playerIndex);
 
-        if (null === playerSocket) {
-            this.playerSockets[playerIndex] = {
-                playerId: socket.handshake.auth.playerId,
-                socket,
-            };
-        } else {
-            playerSocket.playerId = socket.handshake.auth.playerId;
-            playerSocket.socket = socket;
+        if (!(player instanceof SocketPlayer)) {
+            throw new Error('Trying to set a socket on a non-SocketPlayer');
         }
+
+        player.socket = socket;
+        player.playerData = {
+            id: socket.handshake.auth.playerId,
+        };
     }
 
     public toGameData(): GameData
     {
         return {
             id: this.id,
-            players: [
-                {id: this.playerSockets[0]?.playerId || '...'},
-                {id: this.playerSockets[1]?.playerId || '...'},
-            ],
+            players: this.game.getPlayers().map(player => {
+                if (!(player instanceof SocketPlayer)) {
+                    throw new Error('non-SocketPlayer not yet supported');
+                }
+
+                return {
+                    id: player.playerData?.id ?? '(free slot)',
+                };
+            }) as [PlayerData, PlayerData],
         };
     }
 }

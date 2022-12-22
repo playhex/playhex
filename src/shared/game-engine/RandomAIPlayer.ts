@@ -30,4 +30,9 @@ export default class RandomAIPlayer implements PlayerInterface
 
         return move;
     }
+
+    public isReady(): boolean
+    {
+        return true;
+    }
 }

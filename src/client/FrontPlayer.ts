@@ -39,6 +39,12 @@ export default class FrontPlayer implements PlayerInterface
         this.movePromiseResolve(move);
     }
 
+    public isReady(): boolean
+    {
+        // If server tell ready, then ready
+        return true;
+    }
+
     public async playMove(boardState: BoardState): Promise<Move>
     {
         return new Promise(resolve => {
