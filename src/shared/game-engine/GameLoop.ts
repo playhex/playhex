@@ -10,8 +10,6 @@ export default class GameLoop
             return;
         }
 
-        await Promise.all(game.getPlayers().map(player => player.isReady()));
-
         while (!game.isEnded()) {
             await GameLoop.makeCurrentPlayerPlay(game);
         }

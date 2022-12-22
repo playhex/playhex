@@ -1,10 +1,11 @@
-import { Game } from '../shared/game-engine';
+import { Game, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
+import GameServerSocket from './GameServerSocket';
 
 export class HexServer
 {
-    private games: {[key: string]: Game} = {};
+    private gameServerSockets: {[key: string]: GameServerSocket} = {};
 
     public constructor(
         private io: Server<EventsMap, EventsMap>,
@@ -15,8 +16,8 @@ export class HexServer
                 answer(game.getId());
             });
 
-            socket.on('joinGame', (gameId: string, answer: (joined: boolean) => void) => {
-                const joined = this.joinGame(socket, gameId);
+            socket.on('joinGame', (gameId: string, playerIndex: PlayerIndex, answer: (joined: boolean) => void) => {
+                const joined = this.playerJoinGame(socket, gameId, playerIndex);
                 answer(joined);
             });
         });
@@ -24,27 +25,35 @@ export class HexServer
 
     public getGames()
     {
-        return this.games;
+        return this.gameServerSockets;
     }
 
-    public createGame(): Game
+    public getGame(id: string): null|GameServerSocket
+    {
+        return this.gameServerSockets[id] ?? null;
+    }
+
+    public createGame(): GameServerSocket
     {
         const game = new Game();
-        this.games[game.getId()] = game;
-        this.io.emit('game-created', game.getId());
+        const gameServerSocket = new GameServerSocket(this.io, game);
+        this.gameServerSockets[gameServerSocket.getId()] = gameServerSocket;
+        this.io.emit('gameCreated', gameServerSocket.toGameData());
 
-        return game;
+        return gameServerSocket;
     }
 
-    public joinGame(socket: Socket, gameId: string): boolean
+    public playerJoinGame(socket: Socket, gameId: string, playerIndex: PlayerIndex): boolean
     {
-        const game = this.games[gameId];
+        const gameServerSocket = this.gameServerSockets[gameId];
 
-        if (!game) {
+        console.log('playerJoinGame', arguments);
+        console.log(this.gameServerSockets, 'trying to join', gameServerSocket);
+
+        if (!gameServerSocket) {
             return false;
         }
 
-        return false;
-        //return game.playerJoin(socket);
+        return gameServerSocket.playerJoin(socket, playerIndex);
     }
 }

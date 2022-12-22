@@ -4,7 +4,7 @@ import PlayerInterface from './PlayerInterface';
 
 export default class NullPlayer implements PlayerInterface
 {
-    private static instance: null|NullPlayer;
+    private static instance: null|NullPlayer = null;
 
     public static getInstance(): NullPlayer
     {
@@ -13,11 +13,6 @@ export default class NullPlayer implements PlayerInterface
         }
 
         return NullPlayer.instance;
-    }
-
-    public isReady(): Promise<true>
-    {
-        throw new Error('NullPlayer cannot be ready');
     }
 
     public async playMove(gameInput: GameInput): Promise<Move>

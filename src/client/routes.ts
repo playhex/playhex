@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from 'vue-router';
 import AppHome from './AppHome.vue';
-import AppBoard from './AppBoard.vue';
+import App1v1 from './App1v1.vue';
 import AppPlayVsAI from './AppPlayVsAI.vue';
 import App1v1SameScreen from './App1v1SameScreen.vue';
 
@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/games/:gameId',
-        component: AppBoard,
+        component: App1v1,
     },
     {
         path: '/play-vs-ai',

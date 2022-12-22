@@ -1,3 +1,6 @@
+<script setup>
+</script>
+
 <template>
   <ul>
     <li>
@@ -12,10 +15,6 @@
   </ul>
   <router-view></router-view>
 </template>
-
-<script>
-export default {};
-</script>
 
 <style>
 </style>

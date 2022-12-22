@@ -17,7 +17,7 @@
 import { Application } from 'pixi.js';
 import GameView from './GameView';
 import Hex from './Hex';
-import LocalPlayer from './LocalPlayer';
+import FrontPlayer from './FrontPlayer';
 import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
 
 export default {
@@ -31,11 +31,11 @@ export default {
     },
 
     mounted() {
-        const SIZE = 13;
+        const SIZE = 11;
 
         const game = new Game(SIZE, [
-            new LocalPlayer(),
-            new LocalPlayer(),
+            new FrontPlayer(true),
+            new FrontPlayer(true),
         ]);
         const gameView = new GameView(game);
         const view = gameView.getView();

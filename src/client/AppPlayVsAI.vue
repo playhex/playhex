@@ -1,3 +1,53 @@
+<script setup>
+import { Application } from 'pixi.js';
+import GameView from './GameView';
+import Hex from './Hex';
+import FrontPlayer from './FrontPlayer';
+import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
+import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
+
+let errorMessage = '';
+let app = null;
+const colorA = '#' + Hex.COLOR_A.toString(16);
+const colorB = '#' + Hex.COLOR_B.toString(16);
+const pixiApp = ref(null);
+
+onMounted(() => {
+    const SIZE = 11;
+
+    const game = new Game(SIZE, [
+        new FrontPlayer(true),
+        new RandomAIPlayer(),
+        //new FrontPlayer(),
+    ]);
+    const gameView = new GameView(game);
+    const view = gameView.getView();
+
+    GameLoop.run(game);
+
+    view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (SIZE + 1) * Math.sqrt(3) / 2};
+    view.rotation = -1 * (Math.PI / 6);
+
+    const app = new Application({
+        antialias: true,
+        background: 0xffffff,
+    });
+
+    app.stage.addChild(view);
+
+    pixiApp.value.appendChild(app.view);
+});
+
+onUnmounted(() => {
+    if (null === app) {
+        return;
+    }
+
+    app.destroy(true);
+    app = null;
+});
+</script>
+
 <template>
     <div class="container">
         <div class="board" ref="pixiApp"></div>
@@ -12,62 +62,6 @@
         </div>
     </div>
 </template>
-
-<script>
-import { Application } from 'pixi.js';
-import GameView from './GameView';
-import Hex from './Hex';
-import LocalPlayer from './LocalPlayer';
-import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
-
-export default {
-    data() {
-        return {
-            errorMessage: '',
-            app: null,
-            colorA: '#' + Hex.COLOR_A.toString(16),
-            colorB: '#' + Hex.COLOR_B.toString(16),
-        };
-    },
-
-    mounted() {
-        const SIZE = 13;
-
-        const game = new Game(SIZE, [
-            new LocalPlayer(),
-            new RandomAIPlayer(),
-            //new LocalPlayer(),
-        ]);
-        const gameView = new GameView(game);
-        const view = gameView.getView();
-
-        GameLoop.run(game);
-
-        view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (SIZE + 1) * Math.sqrt(3) / 2};
-        view.rotation = -1 * (Math.PI / 6);
-
-        const app = new Application({
-            antialias: true,
-            background: 0xffffff,
-        });
-
-        app.stage.addChild(view);
-
-        this.$refs.pixiApp.appendChild(app.view);
-
-        this.app = app;
-    },
-
-    unmounted() {
-        if (null === this.app) {
-            return;
-        }
-
-        this.app.destroy(true);
-        this.app = null;
-    },
-};
-</script>
 
 <style scoped>
 .container {

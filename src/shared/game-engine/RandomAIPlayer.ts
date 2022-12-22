@@ -6,20 +6,9 @@ const { floor, random } = Math;
 
 export default class RandomAIPlayer implements PlayerInterface
 {
-    public constructor(
-        private nickname: string = 'Bot',
-    ) {}
-
-    public isReady(): Promise<true>
-    {
-        return new Promise(resolve => {
-            resolve(true);
-        });
-    }
-
     public async playMove(gameInput: GameInput): Promise<Move>
     {
-        console.log('random AI player ' + this.nickname + ' is playing...');
+        console.log('random AI player is playing...');
 
         await new Promise(resolve => {
             setTimeout(resolve, 100);
@@ -37,7 +26,7 @@ export default class RandomAIPlayer implements PlayerInterface
 
         const move = possibleMoves[floor(random() * possibleMoves.length)];
 
-        console.log('random AI player ' + this.nickname + ' plays ' + move);
+        console.log('random AI player plays ' + move);
 
         return move;
     }

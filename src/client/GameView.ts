@@ -1,20 +1,16 @@
-import EventEmitter from 'events';
 import { Game, IllegalMove, Move } from '@shared/game-engine';
 import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
-import TypedEmitter from 'typed-emitter';
 import Hex from './Hex';
-import LocalPlayer from './LocalPlayer';
+import FrontPlayer from './FrontPlayer';
 
 export default class GameView
 {
     private hexes: Hex[][];
-    private size: number;
     private view: Container;
 
     public constructor(
         private game: Game,
     ) {
-        this.size = game.getSize();
         this.view = new Container();
 
         this.drawBackground();
@@ -40,10 +36,10 @@ export default class GameView
 
     private createBoard(): void
     {
-        this.hexes = Array(this.size).fill(null).map(() => Array(this.size));
+        this.hexes = Array(this.game.getSize()).fill(null).map(() => Array(this.game.getSize()));
 
-        for (let row = 0; row < this.size; ++row) {
-            for (let col = 0; col < this.size; ++col) {
+        for (let row = 0; row < this.game.getSize(); ++row) {
+            for (let col = 0; col < this.game.getSize(); ++col) {
                 const hex = new Hex();
 
                 hex.position = Hex.coords(row, col);
@@ -53,22 +49,27 @@ export default class GameView
                 this.view.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    const move = new Move(row, col);
                     const currentPlayer = this.game.getCurrentPlayer();
 
-                    if ('doMove' in currentPlayer) {
-                        try {
-                            this.game.checkMove(move);
-                            (currentPlayer as LocalPlayer).doMove(move);
-                        } catch (e) {
-                            if (e instanceof IllegalMove) {
-                                console.error(e.message);
-                            } else {
-                                throw e;
-                            }
-                        }
-                    } else {
+                    if (
+                        !(currentPlayer instanceof FrontPlayer)
+                        || !currentPlayer.interactive
+                    ) {
                         console.error('not your turn');
+                        return;
+                    }
+
+                    const move = new Move(row, col);
+
+                    try {
+                        this.game.checkMove(move);
+                        currentPlayer.doMove(move);
+                    } catch (e) {
+                        if (e instanceof IllegalMove) {
+                            console.error(e.message);
+                        } else {
+                            throw e;
+                        }
                     }
                 });
             }
@@ -86,30 +87,30 @@ export default class GameView
 
         graphics.moveTo(Hex.cornerCoords(5).x, Hex.cornerCoords(5).y);
 
-        for (let i = 0; i < this.size; ++i) {
+        for (let i = 0; i < this.game.getSize(); ++i) {
             to(Hex.coords(0, i), Hex.cornerCoords(5));
             to(Hex.coords(0, i), Hex.cornerCoords(0));
         }
 
         graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_A);
 
-        for (let i = 0; i < this.size; ++i) {
-            to(Hex.coords(i, this.size - 1), Hex.cornerCoords(1));
-            to(Hex.coords(i, this.size - 1), Hex.cornerCoords(2));
+        for (let i = 0; i < this.game.getSize(); ++i) {
+            to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(1));
+            to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(2));
         }
 
         graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_B);
 
-        for (let i = 0; i < this.size; ++i) {
-            to(Hex.coords(this.size - 1, this.size - i - 1), Hex.cornerCoords(3));
-            to(Hex.coords(this.size - 1, this.size - i - 1), Hex.cornerCoords(4));
+        for (let i = 0; i < this.game.getSize(); ++i) {
+            to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(3));
+            to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(4));
         }
 
         graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_A);
 
-        for (let i = 0; i < this.size; ++i) {
-            if (i) to(Hex.coords(this.size - i - 1, 0), Hex.cornerCoords(4));
-            to(Hex.coords(this.size - i - 1, 0), Hex.cornerCoords(5));
+        for (let i = 0; i < this.game.getSize(); ++i) {
+            if (i) to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(4));
+            to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
 
         this.view.addChild(graphics);

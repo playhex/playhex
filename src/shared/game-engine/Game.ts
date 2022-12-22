@@ -3,7 +3,6 @@ import { IllegalMove, PlayerInterface, PlayerIndex, Move } from '.';
 import TypedEmitter from 'typed-emitter';
 import { Side } from './Types';
 import NullPlayer from './NullPlayer';
-import randomId from './randomId';
 
 type GameEvents = {
     /**
@@ -19,7 +18,6 @@ type GameEvents = {
 
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
-    private id: string;
     private hexes: (null|PlayerIndex)[][];
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
@@ -32,8 +30,6 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         ],
     ) {
         super();
-
-        this.id = randomId();
 
         this.hexes = Array(this.size)
             .fill([])
@@ -48,11 +44,6 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         board.hexes = hexes;
 
         return board;
-    }
-
-    public getId(): string
-    {
-        return this.id;
     }
 
     public getSize(): number

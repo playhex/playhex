@@ -7,13 +7,36 @@ export function apiRouter(hexServer: HexServer) {
     router.use(bodyParser.json());
 
     router.get('/api/games', (req, res) => {
-        res.send(Object.keys(hexServer.getGames()));
+        res.send(
+            Object
+                .keys(hexServer.getGames())
+                .map(id => ({id}))
+            ,
+        );
     });
 
     router.post('/api/games', (req, res) => {
         const game = hexServer.createGame();
 
-        res.send(JSON.stringify(game.getId()));
+        res.send({
+            id: game.getId(),
+        });
+    });
+
+    router.get('/api/games/:id', (req, res) => {
+        const {id} = req.params;
+        const game = hexServer.getGame(id)
+
+        if (null === game) {
+            res.sendStatus(404);
+            return;
+        }
+
+        res.send(game.toGameData());
+    });
+
+    router.all('/api/**', (req, res) => {
+        res.sendStatus(404);
     });
 
     return router;
