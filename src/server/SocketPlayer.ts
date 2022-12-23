@@ -5,6 +5,7 @@ import { BoardState, Move, PlayerInterface } from '../../dist/shared/game-engine
 export default class SocketPlayer implements PlayerInterface
 {
     private movePromiseResolve: null|((move: Move) => void) = null;
+    private readyPromiseResolve: ((ok: true) => void) = () => {};
 
     /**
      * Slot reserved for this player, or free if null.
@@ -15,13 +16,25 @@ export default class SocketPlayer implements PlayerInterface
      * Current socket connected to this slot.
      * Can be null if player disconnected (can join again).
      */
-    public socket: null|Socket = null;
+    private socket: null|Socket = null;
 
     public updatePlayerData(playerData: PlayerData): SocketPlayer
     {
         this.playerData = playerData;
 
         return this;
+    }
+
+    public getSocket(): null|Socket
+    {
+        return this.socket;
+    }
+
+    public setSocket(socket: Socket): void
+    {
+        this.socket = socket;
+
+        this.readyPromiseResolve(true);
     }
 
     public doMove(move: Move): void
@@ -33,9 +46,15 @@ export default class SocketPlayer implements PlayerInterface
         this.movePromiseResolve(move);
     }
 
-    public isReady(): boolean
+    public async isReady(): Promise<true>
     {
-        return null !== this.socket;
+        if (null !== this.socket) {
+            return true;
+        }
+
+        return new Promise(resolve => {
+            this.readyPromiseResolve = resolve;
+        });
     }
 
     public async playMove(boardState: BoardState): Promise<Move>

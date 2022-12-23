@@ -15,7 +15,7 @@ export default class NullPlayer implements PlayerInterface
         return NullPlayer.instance;
     }
 
-    public isReady(): boolean
+    public isReady(): Promise<true>
     {
         throw new Error('Cannot play with a null player');
     }

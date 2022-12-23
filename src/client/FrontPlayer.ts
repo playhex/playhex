@@ -11,7 +11,7 @@ export default class FrontPlayer implements PlayerInterface
          * If true, doMove should be called by view on click.
          * If false, doMove should be called after websocket event.
          */
-        public interactive = false,
+        public interactive = true,
 
         private playerData: null|PlayerData = null,
     ) {}
@@ -30,16 +30,19 @@ export default class FrontPlayer implements PlayerInterface
         return this;
     }
 
-    public doMove(move: Move): void
+    public doMove(move: Move): boolean
     {
         if (null === this.movePromiseResolve) {
-            return;
+            console.log('no move expected, noop');
+            return false;
         }
 
         this.movePromiseResolve(move);
+
+        return true;
     }
 
-    public isReady(): boolean
+    public async isReady(): Promise<true>
     {
         // If server tell ready, then ready
         return true;

@@ -7,7 +7,7 @@ export default interface PlayerInterface
      * Whether this player is ready to start the game.
      * Used to wait for a player connection, or any loading.
      */
-    isReady(): boolean;
+    isReady(): Promise<true>;
 
     /**
      * Player turn started. Return a promise of move.

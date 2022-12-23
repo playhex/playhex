@@ -1,6 +1,5 @@
-import { Game } from '@shared/game-engine';
-import NullPlayer from '@shared/game-engine/NullPlayer';
-import { GameData } from '@shared/Types';
+import { Game, Move, PlayerIndex } from '@shared/game-engine';
+import { PlayerData } from '@shared/Types';
 import FrontPlayer from './FrontPlayer';
 
 export default class GameClientSocket
@@ -20,16 +19,30 @@ export default class GameClientSocket
         return this.game;
     }
 
-    public updateGame(gameData: GameData): void
+    public playerJoined(playerIndex: PlayerIndex, playerData: PlayerData): void
     {
-        this.game.getPlayers().forEach((player, i) => {
-            if (!player || player instanceof NullPlayer) {
-                throw new Error('having a null player');
-            }
+        const player = this.game.getPlayers()[playerIndex];
 
-            if (player instanceof FrontPlayer) {
-                player.updatePlayerData(gameData.players[i]);
-            };
-        });
+        if (!(player instanceof FrontPlayer)) {
+            console.error('game joined event on a player which is not a FrontPlayer', player);
+            return;
+        }
+
+        player.updatePlayerData(playerData);
+    }
+
+    public gameStarted(): void
+    {
+        console.log('game started event');
+
+        this.game.start();
+    }
+
+    public gameMove(move: Move, byPlayerIndex: PlayerIndex): void
+    {
+        console.log('move received', move);
+
+        this.game.setCell(move, byPlayerIndex);
+        this.game.setCurrentPlayerIndex(byPlayerIndex ? 0 : 1);
     }
 }

@@ -10,9 +10,19 @@ export default class GameLoop
             return;
         }
 
+        console.log('waiting for all players ready...');
+
+        await Promise.all(game.getPlayers().map(player => player.isReady()));
+
+        console.log('all players ready.');
+
+        game.start();
+
         while (!game.isEnded()) {
             await GameLoop.makeCurrentPlayerPlay(game);
         }
+
+        console.log('game has ended, game loop stops.');
     }
 
     public static async makeCurrentPlayerPlay(game: Game): Promise<void>

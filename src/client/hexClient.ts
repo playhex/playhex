@@ -1,5 +1,5 @@
-import { Game, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { GameData, PlayerData } from '@shared/Types';
+import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
+import { GameData, MoveData, PlayerData } from '@shared/Types';
 import { defineStore } from 'pinia';
 import { Socket } from 'socket.io-client';
 import FrontPlayer from './FrontPlayer';
@@ -60,11 +60,15 @@ const useHexClient = defineStore('hexClient', {
             const gameData: GameData = await response.json();
 
             const players: [PlayerInterface, PlayerInterface] = [
-                new FrontPlayer(false, gameData.players[0]),
-                new FrontPlayer(false, gameData.players[1]),
+                new FrontPlayer(true, gameData.players[0]),
+                new FrontPlayer(true, gameData.players[1]),
             ];
 
-            const gameClientSocket = new GameClientSocket(gameId, new Game(players));
+            const game = new Game(players);
+
+            // if (gameData.started) game.start();
+
+            const gameClientSocket = new GameClientSocket(gameId, game);
 
             this.gameClientSockets[gameId] = gameClientSocket;
 
@@ -85,6 +89,15 @@ const useHexClient = defineStore('hexClient', {
             });
         },
 
+        async move(gameId: string, move: Move): Promise<boolean>
+        {
+            return new Promise(resolve => {
+                socket.emit('move', gameId, {row: move.getRow(), col: move.getCol()}, (answer: boolean) => {
+                    resolve(answer);
+                });
+            });
+        },
+
         listenSocket(socket: Socket): void
         {
             this.updateGames();
@@ -96,19 +109,36 @@ const useHexClient = defineStore('hexClient', {
             });
 
             socket.on('gameJoined', (gameId: string, playerIndex: PlayerIndex, playerData: PlayerData) => {
-                if (!this.gameClientSockets[gameId]) {
-                    console.error('game joined event on not loaded game', arguments);
+                const gameClientSocket = this.gameClientSockets[gameId];
+
+                if (!gameClientSocket) {
+                    console.error('game not found', gameId);
                     return;
                 }
 
-                const player = this.gameClientSockets[gameId].game.getPlayers()[playerIndex];
+                gameClientSocket.playerJoined(playerIndex, playerData);
+            });
 
-                if (!(player instanceof FrontPlayer)) {
-                    console.error('game joined event on a player which is not a FrontPlayer', player, arguments);
+            socket.on('gameStarted', (gameId: string) => {
+                const gameClientSocket = this.gameClientSockets[gameId];
+
+                if (!gameClientSocket) {
+                    console.error('game not found', gameId);
                     return;
                 }
 
-                player.updatePlayerData(playerData);
+                gameClientSocket.gameStarted();
+            });
+
+            socket.on('moved', (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => {
+                const gameClientSocket = this.gameClientSockets[gameId];
+
+                if (!gameClientSocket) {
+                    console.error('game not found', gameId);
+                    return;
+                }
+
+                gameClientSocket.gameMove(new Move(move.row, move.col), byPlayerIndex);
             });
         },
     },

@@ -2,23 +2,28 @@ import EventEmitter from 'events';
 import { IllegalMove, PlayerInterface, PlayerIndex, Move } from '.';
 import TypedEmitter from 'typed-emitter';
 import { Side } from './Types';
-import NullPlayer from './NullPlayer';
 
 type GameEvents = {
     /**
+     * A game started can accept moves.
+     */
+    started: () => void;
+
+    /**
      * A move have been played by a player. PlayerIndex is the player who made the move.
      */
-    played: (move: Move, playerIndex: PlayerIndex) => void;
+    played: (move: Move, byPlayerIndex: PlayerIndex) => void;
 
     /**
      * Game have been finished.
      */
     ended: (winner: PlayerIndex) => void;
-}
+};
 
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
     private hexes: (null|PlayerIndex)[][];
+    private started: boolean = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
 
@@ -52,6 +57,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     public getCurrentPlayerIndex(): PlayerIndex
     {
         return this.currentPlayerIndex;
+    }
+
+    public setCurrentPlayerIndex(currentPlayerIndex: PlayerIndex): void
+    {
+        this.currentPlayerIndex = currentPlayerIndex;
     }
 
     public getCurrentPlayer(): PlayerInterface
@@ -116,12 +126,31 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     /**
      * Set a cell to a value.
+     * Should be called after server update events.
      * Do not check the move nor change the game state.
      * Should call move() instead to play the game.
      */
-    public setCell(row: number, col: number, value: PlayerIndex): void
+    public setCell(move: Move, value: PlayerIndex): void
     {
-        this.hexes[row][col] = value;
+        this.hexes[move.getRow()][move.getCol()] = value;
+
+        this.emit('played', move, value);
+
+        if (this.hasPlayerConnection(this.currentPlayerIndex)) {
+            this.setWinner(this.currentPlayerIndex);
+            return;
+        }
+    }
+
+    public start(): void
+    {
+        if (this.started) {
+            throw new Error('Game already started');
+        }
+
+        this.started = true;
+
+        this.emit('started');
     }
 
     /**
@@ -129,6 +158,10 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      */
     public checkMove(move: Move): void
     {
+        if (!this.started) {
+            throw new IllegalMove('Game is not yet started');
+        }
+
         if (this.isEnded()) {
             throw new IllegalMove('Game is over');
         }
@@ -143,20 +176,15 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     }
 
     /**
+     * Validate and make current play move, and change player.
+     *
      * @throws IllegalMove on invalid move.
      */
     public move(move: Move): void
     {
         this.checkMove(move);
 
-        this.setCell(move.getRow(), move.getCol(), this.currentPlayerIndex);
-
-        this.emit('played', move, this.currentPlayerIndex);
-
-        if (this.hasPlayerConnection(this.currentPlayerIndex)) {
-            this.setWinner(this.currentPlayerIndex);
-            return;
-        }
+        this.setCell(move, this.currentPlayerIndex);
 
         this.changeCurrentPlayer();
     }

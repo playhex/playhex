@@ -6,6 +6,8 @@ import Hex from './Hex';
 import useHexClient from './hexClient';
 import { onMounted, ref } from '@vue/runtime-core';
 import socket from './socket';
+import { IllegalMove } from '../shared/game-engine';
+import FrontPlayer from './FrontPlayer';
 
 const route = useRoute();
 const hexClient = useHexClient();
@@ -39,10 +41,38 @@ const app = new Application({
 
     console.log('game loaded', game.value);
 
-    const gameView = new GameView(game.value);
+    const gameView = new GameView(game.value, (game, move) => {
+        const currentPlayer = game.getCurrentPlayer();
+
+        console.log('kik hex', currentPlayer.constructor.name, currentPlayer);
+
+        try {
+            if (
+                !(currentPlayer instanceof FrontPlayer)
+                || !currentPlayer.interactive
+            ) {
+                throw new IllegalMove('not your turn');
+            }
+
+            game.checkMove(move);
+
+            console.log('send move', move);
+
+            //game.setCell(move, game.getCurrentPlayerIndex());
+
+            hexClient.move(gameId, move);
+        } catch (e) {
+            if (e instanceof IllegalMove) {
+                console.error(e.message);
+            } else {
+                throw e;
+            }
+        }
+    });
+
     const view = gameView.getView();
 
-    //GameLoop.run(game.value);
+    //GameLoop.run(game.value); // maybe game loop should be run only server side ? yes
 
     view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2};
     view.rotation = -1 * (Math.PI / 6);

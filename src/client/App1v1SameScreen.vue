@@ -18,7 +18,8 @@ import { Application } from 'pixi.js';
 import GameView from './GameView';
 import Hex from './Hex';
 import FrontPlayer from './FrontPlayer';
-import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
+import { Game, GameLoop } from '@shared/game-engine';
+import { localPlay } from './onClick';
 
 export default {
     data() {
@@ -35,7 +36,7 @@ export default {
             new FrontPlayer(true),
             new FrontPlayer(true),
         ]);
-        const gameView = new GameView(game);
+        const gameView = new GameView(game, localPlay);
         const view = gameView.getView();
 
         GameLoop.run(game);

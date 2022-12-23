@@ -5,6 +5,7 @@ import Hex from './Hex';
 import FrontPlayer from './FrontPlayer';
 import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
+import { localPlay } from './onClick';
 
 let errorMessage = '';
 let app = null;
@@ -16,9 +17,8 @@ onMounted(() => {
     const game = new Game([
         new FrontPlayer(true),
         new RandomAIPlayer(),
-        //new FrontPlayer(),
     ]);
-    const gameView = new GameView(game);
+    const gameView = new GameView(game, localPlay);
     const view = gameView.getView();
 
     GameLoop.run(game);

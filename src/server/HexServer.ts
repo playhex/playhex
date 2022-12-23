@@ -1,9 +1,8 @@
-import { Game, PlayerIndex } from '../shared/game-engine';
+import { Move, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
 import GameServerSocket from './GameServerSocket';
-import { PlayerData } from '@shared/Types';
-import NullPlayer from '../shared/game-engine/NullPlayer';
+import { MoveData, PlayerData } from '@shared/Types';
 
 export class HexServer
 {
@@ -27,6 +26,10 @@ export class HexServer
                 console.log(`Room: player ${socket.handshake.auth.playerId} ${join} room ${room}`);
                 socket[join](room);
             });
+
+            socket.on('move', (gameId: string, move: MoveData, answer: (result: true|string) => void) => {
+                answer(this.playerMove(socket, gameId, move));
+            });
         });
     }
 
@@ -42,7 +45,7 @@ export class HexServer
 
     public createGame(): GameServerSocket
     {
-        const gameServerSocket = new GameServerSocket();
+        const gameServerSocket = new GameServerSocket(this.io);
         this.gameServerSockets[gameServerSocket.getId()] = gameServerSocket;
         this.io.emit('gameCreated', gameServerSocket.toGameData());
 
@@ -68,5 +71,16 @@ export class HexServer
         }
 
         return joined;
+    }
+
+    public playerMove(socket: Socket, gameId: string, move: MoveData): true|string
+    {
+        const gameServerSocket = this.gameServerSockets[gameId];
+
+        if (!gameServerSocket) {
+            return 'game not found';
+        }
+
+        return gameServerSocket.playerMove(socket, new Move(move.row, move.col)) || 'wrong move';
     }
 }

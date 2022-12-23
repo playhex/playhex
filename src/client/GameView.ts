@@ -10,6 +10,7 @@ export default class GameView
 
     public constructor(
         private game: Game,
+        private onClick: (game: Game, move: Move) => void = () => null,
     ) {
         this.view = new Container();
 
@@ -49,28 +50,7 @@ export default class GameView
                 this.view.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    const currentPlayer = this.game.getCurrentPlayer();
-
-                    if (
-                        !(currentPlayer instanceof FrontPlayer)
-                        || !currentPlayer.interactive
-                    ) {
-                        console.error('not your turn');
-                        return;
-                    }
-
-                    const move = new Move(row, col);
-
-                    try {
-                        this.game.checkMove(move);
-                        currentPlayer.doMove(move);
-                    } catch (e) {
-                        if (e instanceof IllegalMove) {
-                            console.error(e.message);
-                        } else {
-                            throw e;
-                        }
-                    }
+                    this.onClick(this.game, new Move(row, col));
                 });
             }
         }

@@ -1,22 +1,26 @@
-import { Game, GameLoop, PlayerIndex } from '../shared/game-engine';
+import { Game, GameLoop, Move, PlayerIndex, RandomAIPlayer } from '../shared/game-engine';
 import { GameData, PlayerData } from '../shared/Types';
 import { randomUUID } from 'crypto';
-import { Socket } from 'socket.io';
-import NullPlayer from '../shared/game-engine/NullPlayer';
+import { Server, Socket } from 'socket.io';
 import SocketPlayer from './SocketPlayer';
 
 export default class GameServerSocket
 {
     private id: string = randomUUID();
     private game: Game;
-    private gameStarted: boolean = false;
 
-    public constructor()
-    {
+    public constructor(
+        private io: Server,
+    ) {
         this.game = new Game([
             new SocketPlayer(),
             new SocketPlayer(),
+            //new RandomAIPlayer(),
         ]);
+
+        this.listenGame();
+
+        GameLoop.run(this.game);
     }
 
     public getId(): string
@@ -24,37 +28,30 @@ export default class GameServerSocket
         return this.id;
     }
 
-    public start(): void
+    public listenGame(): void
     {
-        if (this.gameStarted) {
-            throw new Error('game already started');
-        }
+        this.game.on('started', () => {
+            this.io.to(`games/${this.id}`).emit('gameStarted', this.id);
+        });
 
-        if (!this.game.getPlayers().every(player => player.isReady())) {
-            throw new Error('cannot start, at least one player not ready');
-        }
-
-        this.gameStarted = true;
-
-        GameLoop.run(this.game);
+        this.game.on('played', (move, byPlayerIndex) => {
+            this.io.to(`games/${this.id}`).emit('moved', this.id, move, byPlayerIndex);
+        });
     }
 
     public playerJoin(socket: Socket, playerIndex: PlayerIndex): boolean
     {
         const player = this.game.getPlayers()[playerIndex];
 
-        if (this.gameStarted) {
-            console.log('Trying to join but game already started');
-            return false;
-        }
-
         if (!(player instanceof SocketPlayer)) {
             console.log('Trying to join a slot that is not a SocketPlayer:', player);
             return false;
         }
 
+        const playerSocket = player.getSocket();
+
         // Already joined by same socket (me), noop
-        if (null !== player.socket && player.socket.id === socket.id) {
+        if (null !== playerSocket && playerSocket.id === socket.id) {
             return true;
         }
 
@@ -90,6 +87,28 @@ export default class GameServerSocket
         return true;
     }
 
+    public playerMove(socket: Socket, move: Move): boolean
+    {
+        const player = this.game.getPlayers().find(player => {
+            if (!(player instanceof SocketPlayer)) {
+                return false;
+            }
+
+            return player.playerData?.id === socket.handshake.auth.playerId;
+        });
+
+        if (!(player instanceof SocketPlayer)) {
+            console.log('A player not in the game tryed to make a move', socket.handshake.auth);
+            return false;
+        }
+
+        console.log('player', socket.handshake.auth.playerId, ' do move ', move);
+
+        player.doMove(move);
+
+        return true;
+    }
+
     private setSocketPlayer(socket: Socket, playerIndex: PlayerIndex): void
     {
         const player = this.game.getPlayer(playerIndex);
@@ -98,10 +117,11 @@ export default class GameServerSocket
             throw new Error('Trying to set a socket on a non-SocketPlayer');
         }
 
-        player.socket = socket;
         player.playerData = {
             id: socket.handshake.auth.playerId,
         };
+
+        player.setSocket(socket);
     }
 
     public toGameData(): GameData
@@ -109,13 +129,19 @@ export default class GameServerSocket
         return {
             id: this.id,
             players: this.game.getPlayers().map(player => {
-                if (!(player instanceof SocketPlayer)) {
-                    throw new Error('non-SocketPlayer not yet supported');
+                if (player instanceof SocketPlayer) {
+                    return {
+                        id: player.playerData?.id ?? '(free slot)',
+                    };
                 }
 
-                return {
-                    id: player.playerData?.id ?? '(free slot)',
-                };
+                if (player instanceof RandomAIPlayer) {
+                    return {
+                        id: 'bot',
+                    };
+                }
+
+                throw new Error('unhandled player type: ' + player.constructor.name);
             }) as [PlayerData, PlayerData],
         };
     }
