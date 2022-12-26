@@ -22,7 +22,18 @@ const useHexClient = defineStore('hexClient', {
     actions: {
         async createGame(): Promise<string>
         {
-            const response = await fetch('/api/games', {
+            const response = await fetch('/api/games/1v1', {
+                method: 'post',
+            });
+
+            const game = await response.json();
+
+            return game.id;
+        },
+
+        async createGameVsCPU(): Promise<string>
+        {
+            const response = await fetch('/api/games/cpu', {
                 method: 'post',
             });
 

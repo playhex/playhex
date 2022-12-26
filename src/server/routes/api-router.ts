@@ -1,6 +1,8 @@
 import bodyParser from 'body-parser';
 import { Router } from 'express';
 import { HexServer } from '@server/HexServer';
+import { Game, PlayerInterface, RandomAIPlayer } from '../../shared/game-engine';
+import SocketPlayer from '../SocketPlayer';
 
 export function apiRouter(hexServer: HexServer) {
     const router = Router();
@@ -15,10 +17,36 @@ export function apiRouter(hexServer: HexServer) {
         );
     });
 
-    router.post('/api/games', (req, res) => {
-        const game = hexServer.createGame();
+    router.post('/api/games/1v1', (req, res) => {
+        const players: [PlayerInterface, PlayerInterface] = [
+            new SocketPlayer(),
+            new SocketPlayer(),
+        ];
 
-        res.send(game.toGameData());
+        if (Math.random() < 0.5) {
+            players.reverse();
+        }
+
+        const game = new Game(players);
+        const gameServerSocket = hexServer.createGame(game);
+
+        res.send(gameServerSocket.toGameData());
+    });
+
+    router.post('/api/games/cpu', (req, res) => {
+        const players: [PlayerInterface, PlayerInterface] = [
+            new RandomAIPlayer(),
+            new SocketPlayer(),
+        ];
+
+        if (Math.random() < 0.5) {
+            players.reverse();
+        }
+
+        const game = new Game(players);
+        const gameServerSocket = hexServer.createGame(game);
+
+        res.send(gameServerSocket.toGameData());
     });
 
     router.get('/api/games/:id', (req, res) => {

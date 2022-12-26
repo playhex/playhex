@@ -15,6 +15,7 @@ const hexClient = useHexClient();
   </ul>
 
   <button @click="hexClient.createGame()">Create game</button>
+  <button @click="hexClient.createGameVsCPU()">Create game vs CPU</button>
 </template>
 
 <style scoped>

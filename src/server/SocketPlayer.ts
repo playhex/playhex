@@ -7,16 +7,18 @@ export default class SocketPlayer implements PlayerInterface
     private movePromiseResolve: null|((move: Move) => void) = null;
     private readyPromiseResolve: ((ok: true) => void) = () => {};
 
-    /**
-     * Slot reserved for this player, or free if null.
-     */
-    public playerData: null|PlayerData = null;
+    public constructor(
+        /**
+         * Slot reserved for this player, or free if null.
+         */
+        public playerData: null|PlayerData = null,
 
-    /**
-     * Current socket connected to this slot.
-     * Can be null if player disconnected (can join again).
-     */
-    private socket: null|Socket = null;
+        /**
+         * Current socket connected to this slot.
+         * Can be null if player disconnected (can join again).
+         */
+        private socket: null|Socket = null,
+    ) {}
 
     public updatePlayerData(playerData: PlayerData): SocketPlayer
     {

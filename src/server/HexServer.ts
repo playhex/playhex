@@ -1,8 +1,9 @@
-import { Move, PlayerIndex } from '../shared/game-engine';
+import { Game, Move, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
 import GameServerSocket from './GameServerSocket';
 import { MoveData, PlayerData } from '@shared/Types';
+import SocketPlayer from './SocketPlayer';
 
 export class HexServer
 {
@@ -43,9 +44,13 @@ export class HexServer
         return this.gameServerSockets[id] ?? null;
     }
 
-    public createGame(): GameServerSocket
-    {
-        const gameServerSocket = new GameServerSocket(this.io);
+    public createGame(
+        game: Game = new Game([
+            new SocketPlayer(),
+            new SocketPlayer(),
+        ]),
+    ): GameServerSocket {
+        const gameServerSocket = new GameServerSocket(this.io, game);
         this.gameServerSockets[gameServerSocket.getId()] = gameServerSocket;
         this.io.emit('gameCreated', gameServerSocket.toGameData());
 

@@ -28,8 +28,6 @@ export default class RandomAIPlayer implements PlayerInterface
 
         console.log('random AI player plays ' + move);
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         return move;
     }
 

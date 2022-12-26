@@ -7,17 +7,15 @@ import SocketPlayer from './SocketPlayer';
 export default class GameServerSocket
 {
     private id: string = randomUUID();
-    private game: Game;
 
     public constructor(
         private io: Server,
-    ) {
-        this.game = new Game([
+        private game = new Game([
             new SocketPlayer(),
             new SocketPlayer(),
             //new RandomAIPlayer(),
-        ]);
-
+        ]),
+    ) {
         this.listenGame();
 
         GameLoop.run(this.game);
