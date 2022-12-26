@@ -4,60 +4,54 @@ import GameView from './GameView';
 import Hex from './Hex';
 import FrontPlayer from './FrontPlayer';
 import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
-import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
+import { onMounted, ref } from '@vue/runtime-core';
 import { localPlay } from './onClick';
 
-let errorMessage = '';
 let app = null;
+const game = ref(null);
 const colorA = '#' + Hex.COLOR_A.toString(16);
 const colorB = '#' + Hex.COLOR_B.toString(16);
 const pixiApp = ref(null);
 
-onMounted(() => {
-    const game = new Game([
-        new FrontPlayer(true),
+(async () => {
+    game.value = new Game([
+        new FrontPlayer(true, {id: 'Player'}),
         new RandomAIPlayer(),
     ]);
-    const gameView = new GameView(game, localPlay);
+    const gameView = new GameView(game.value, localPlay);
     const view = gameView.getView();
 
-    GameLoop.run(game);
+    GameLoop.run(game.value);
 
-    view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.getSize() + 1) * Math.sqrt(3) / 2};
+    view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2};
     view.rotation = -1 * (Math.PI / 6);
 
-    const app = new Application({
+    app = new Application({
         antialias: true,
         background: 0xffffff,
     });
 
     app.stage.addChild(view);
+})();
 
+onMounted(() => {
     pixiApp.value.appendChild(app.view);
-});
-
-onUnmounted(() => {
-    if (null === app) {
-        return;
-    }
-
-    app.destroy(true);
-    app = null;
 });
 </script>
 
 <template>
     <div class="container">
+        <div v-if="game" class="game-info">
+            <div class="player-a">
+                <p :style="{color: colorA}">{{ game.players[0].toData().id }}</p>
+            </div>
+            <div class="player-b">
+                <p :style="{color: colorB}">{{ game.players[1].toData().id }}</p>
+            </div>
+        </div>
+        <p v-else>Initialize game...</p>
+
         <div class="board" ref="pixiApp"></div>
-        <div class="player player-a">
-            <p :style="{color: colorA}">Player</p>
-        </div>
-        <div class="player player-b">
-            <p :style="{color: colorB}">AI</p>
-        </div>
-        <div class="board-info">
-            <p ng-if="errorMessage">{{ errorMessage }}</p>
-        </div>
     </div>
 </template>
 
@@ -75,10 +69,5 @@ onUnmounted(() => {
 .player-b {
     right: 0;
     text-align: right;
-}
-.board-info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
 }
 </style>

@@ -1,7 +1,6 @@
-import { Game, IllegalMove, Move } from '@shared/game-engine';
+import { Game, Move } from '@shared/game-engine';
 import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
 import Hex from './Hex';
-import FrontPlayer from './FrontPlayer';
 
 export default class GameView
 {

@@ -66,8 +66,6 @@ const app = new Application({
 
     const view = gameView.getView();
 
-    //GameLoop.run(game.value); // maybe game loop should be run only server side ? yes
-
     view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2};
     view.rotation = -1 * (Math.PI / 6);
 
@@ -91,11 +89,11 @@ const joinGame = async (playerIndex) => {
     <div class="container">
         <div v-if="game" class="game-info">
             <div class="player-a">
-                <p :style="{color: colorA}">{{ game.players[0].playerData.id }}</p>
+                <p :style="{color: colorA}">{{ game.players[0].toData().id }}</p>
                 <button @click="joinGame(0)">Join</button>
             </div>
             <div class="player-b">
-                <p :style="{color: colorB}">{{ game.players[1].playerData.id }}</p>
+                <p :style="{color: colorB}">{{ game.players[1].toData().id }}</p>
                 <button @click="joinGame(1)">Join</button>
             </div>
         </div>
