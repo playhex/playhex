@@ -1,11 +1,11 @@
 <script setup>
 import { Application } from 'pixi.js';
-import GameView from './GameView';
-import Hex from './Hex';
-import FrontPlayer from './FrontPlayer';
-import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
+import GameView from '@client/GameView';
+import Hex from '@client/Hex';
+import FrontPlayer from '@client/FrontPlayer';
+import { Game, GameLoop } from '@shared/game-engine';
 import { onMounted, ref } from '@vue/runtime-core';
-import { localPlay } from './onClick';
+import { localPlay } from '@client/onClick';
 
 let app = null;
 const game = ref(null);
@@ -16,7 +16,7 @@ const pixiApp = ref(null);
 (async () => {
     game.value = new Game([
         new FrontPlayer(true, {id: 'Player'}),
-        new RandomAIPlayer(),
+        new FrontPlayer(true, {id: 'Player'}),
     ]);
     const gameView = new GameView(game.value, localPlay);
     const view = gameView.getView();
@@ -32,9 +32,12 @@ const pixiApp = ref(null);
     });
 
     app.stage.addChild(view);
+
+    console.log('init done');
 })();
 
 onMounted(() => {
+    console.log('onMounted', app);
     pixiApp.value.appendChild(app.view);
 });
 </script>

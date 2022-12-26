@@ -1,26 +1,39 @@
 {
-  "compilerOptions": {
-    "target": "ES2019",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    "strictNullChecks": true,
-    "outDir": "../../dist/client",
-    "lib": ["ES2019", "DOM"],
-    "types": [],
-    "noImplicitAny": true,
-    "composite": true,
-    "paths": {
-      "@client/*": ["../client/*"],
-      "@shared/*": ["../shared/*"]
-    }
-  },
-  "include": ["**/*.ts"],
-  "exclude": ["**/*.test.ts"],
-  "references": [{ "path": "../shared" }]
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "noEmit": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "outDir": "../../dist/client",
+        "lib": [
+            "ES2019",
+            "DOM"
+        ],
+        "types": [],
+        "composite": true,
+        "baseUrl": "./",
+        "paths": {
+            "@client/*": [
+                "../client/*"
+            ],
+            "@shared/*": [
+                "../shared/*"
+            ]
+        }
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.vue"
+    ],
+    "references": [
+        {
+            "path": "../shared"
+        }
+    ]
 }

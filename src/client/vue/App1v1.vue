@@ -1,13 +1,13 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { Application } from 'pixi.js';
-import GameView from './GameView';
-import Hex from './Hex';
-import useHexClient from './hexClient';
+import GameView from '@client/GameView';
+import Hex from '@client/Hex';
+import useHexClient from '@client/hexClient';
 import { onMounted, ref } from '@vue/runtime-core';
-import socket from './socket';
-import { IllegalMove } from '../shared/game-engine';
-import FrontPlayer from './FrontPlayer';
+import socket from '@client/socket';
+import { IllegalMove } from '@shared/game-engine';
+import FrontPlayer from '@client/FrontPlayer';
 
 const route = useRoute();
 const hexClient = useHexClient();

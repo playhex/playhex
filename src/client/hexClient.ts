@@ -1,11 +1,11 @@
-import { Game, GameLoop, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { GameData, MoveData, PlayerData } from '@shared/game-engine/Types';
+import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
+import { MoveData, PlayerData } from '@shared/game-engine/Types';
 import { GameInstanceData } from '@shared/Types';
 import { defineStore } from 'pinia';
 import { Socket } from 'socket.io-client';
-import FrontPlayer from './FrontPlayer';
+import FrontPlayer from '@client/FrontPlayer';
 import GameClientSocket from './GameClientSocket';
-import socket from './socket';
+import socket from '@client/socket';
 
 const useHexClient = defineStore('hexClient', {
     state: () => ({

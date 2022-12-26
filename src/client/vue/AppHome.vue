@@ -1,5 +1,5 @@
 <script setup>
-import useHexClient from './hexClient';
+import useHexClient from '@client/hexClient';
 
 const hexClient = useHexClient();
 </script>

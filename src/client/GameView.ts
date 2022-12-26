@@ -1,6 +1,6 @@
 import { Game, Move } from '@shared/game-engine';
 import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
-import Hex from './Hex';
+import Hex from '@client/Hex';
 
 export default class GameView
 {

@@ -1,5 +1,5 @@
-import { Game, IllegalMove, Move } from '../shared/game-engine';
-import FrontPlayer from './FrontPlayer';
+import { Game, IllegalMove, Move } from '@shared/game-engine';
+import FrontPlayer from '@client/FrontPlayer';
 
 const localPlay = (game: Game, move: Move) => {
     const currentPlayer = game.getCurrentPlayer();
