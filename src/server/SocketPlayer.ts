@@ -1,6 +1,6 @@
-import { PlayerData } from '../../dist/shared/Types';
 import { Socket } from 'socket.io';
 import { BoardState, Move, PlayerInterface } from '../../dist/shared/game-engine';
+import { PlayerData } from '@shared/game-engine/Types';
 
 export default class SocketPlayer implements PlayerInterface
 {
@@ -11,7 +11,7 @@ export default class SocketPlayer implements PlayerInterface
         /**
          * Slot reserved for this player, or free if null.
          */
-        public playerData: null|PlayerData = null,
+        private playerData: null|PlayerData = null,
 
         /**
          * Current socket connected to this slot.
@@ -20,7 +20,17 @@ export default class SocketPlayer implements PlayerInterface
         private socket: null|Socket = null,
     ) {}
 
-    public updatePlayerData(playerData: PlayerData): SocketPlayer
+    public isAssignedToPlayer(): boolean
+    {
+        return null !== this.playerData;
+    }
+
+    public getPlayerId(): null|string
+    {
+        return this.playerData?.id ?? null;
+    }
+
+    public setPlayerData(playerData: PlayerData): SocketPlayer
     {
         this.playerData = playerData;
 
@@ -64,5 +74,12 @@ export default class SocketPlayer implements PlayerInterface
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;
         });
+    }
+
+    public toData(): PlayerData
+    {
+        return this.playerData ?? {
+            id: '(free)',
+        };
     }
 }

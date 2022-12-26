@@ -3,6 +3,11 @@ import GameInput from './GameInput';
 
 export default class GameLoop
 {
+    /**
+     * Must be run where the game is hosted.
+     * So only server side for remote game,
+     * and only client side for offline game.
+     */
     public static async run(game: Game): Promise<void>
     {
         if (game.isEnded()) {

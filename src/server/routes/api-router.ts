@@ -30,7 +30,7 @@ export function apiRouter(hexServer: HexServer) {
         const game = new Game(players);
         const gameServerSocket = hexServer.createGame(game);
 
-        res.send(gameServerSocket.toGameData());
+        res.send(gameServerSocket.toData());
     });
 
     router.post('/api/games/cpu', (req, res) => {
@@ -46,7 +46,7 @@ export function apiRouter(hexServer: HexServer) {
         const game = new Game(players);
         const gameServerSocket = hexServer.createGame(game);
 
-        res.send(gameServerSocket.toGameData());
+        res.send(gameServerSocket.toData());
     });
 
     router.get('/api/games/:id', (req, res) => {
@@ -58,7 +58,7 @@ export function apiRouter(hexServer: HexServer) {
             return;
         }
 
-        res.send(game.toGameData());
+        res.send(game.toData());
     });
 
     router.all('/api/**', (req, res) => {

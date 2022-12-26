@@ -16,8 +16,6 @@ const localPlay = (game: Game, move: Move) => {
 
         game.checkMove(move);
 
-        console.log('do move', move);
-
         const moved = currentPlayer.doMove(move);
 
         if (!moved) {

@@ -1,5 +1,5 @@
 import { BoardState, Move, PlayerInterface } from '@shared/game-engine';
-import { PlayerData } from '@shared/Types';
+import { PlayerData } from '@shared/game-engine/Types';
 
 export default class FrontPlayer implements PlayerInterface
 {
@@ -15,13 +15,6 @@ export default class FrontPlayer implements PlayerInterface
 
         private playerData: null|PlayerData = null,
     ) {}
-
-    public getPlayerData(): PlayerData
-    {
-        return this.playerData ?? {
-            id: '...',
-        };
-    }
 
     public updatePlayerData(playerData: PlayerData): FrontPlayer
     {
@@ -53,5 +46,12 @@ export default class FrontPlayer implements PlayerInterface
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;
         });
+    }
+
+    public toData(): PlayerData
+    {
+        return this.playerData ?? {
+            id: '...',
+        };
     }
 }

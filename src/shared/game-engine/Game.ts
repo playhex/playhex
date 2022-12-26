@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { IllegalMove, PlayerInterface, PlayerIndex, Move } from '.';
 import TypedEmitter from 'typed-emitter';
-import { Side } from './Types';
+import { GameData, PlayerData, Side } from './Types';
 
 type GameEvents = {
     /**
@@ -37,6 +37,25 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             .fill([])
             .map(() => Array(this.size).fill(null))
         ;
+    }
+
+    public static createFromGameData(players: [PlayerInterface, PlayerInterface], gameData: GameData): Game
+    {
+        const game = new Game(players, gameData.size);
+
+        gameData.hexes.forEach((line, row) => {
+            line.split('').forEach((value, col) => {
+                if ('0' === value) {
+                    game.setCell(new Move(row, col), 0);
+                } else if ('1' === value) {
+                    game.setCell(new Move(row, col), 1);
+                }
+            });
+        });
+
+        // Do not handle gameData.started here. Let business logic handle the case.
+
+        return game;
     }
 
     public getSize(): number
@@ -305,5 +324,27 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return neighboors
             .filter(cell => this.inBoard(cell[0], cell[1]))
         ;
+    }
+
+    public toData(): GameData
+    {
+        return {
+            players: this.players.map(player => player.toData()) as [PlayerData, PlayerData],
+            size: this.size,
+            started: this.started,
+            hexes: this.hexes.map(
+                row => row
+                    .map(
+                        cell => null === cell
+                            ? '.' :
+                            (cell
+                                ? '1'
+                                : '0'
+                            ),
+                    )
+                    .join('')
+                ,
+            ),
+        };
     }
 }

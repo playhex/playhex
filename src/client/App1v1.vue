@@ -28,23 +28,19 @@ const app = new Application({
     game.value = hexClient.gameClientSockets[gameId]?.getGame();
 
     if (!game.value) {
-        const gameFound = await hexClient.retrieveGameClientSocket(gameId);
+        const gameClientSocket = await hexClient.retrieveGameClientSocket(gameId);
 
-        if (!gameFound) {
+        if (!gameClientSocket) {
             throw new Error('game not found');
         }
 
-        game.value = hexClient.gameClientSockets[gameId].game;
+        game.value = gameClientSocket.getGame();
     }
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    console.log('game loaded', game.value);
-
     const gameView = new GameView(game.value, (game, move) => {
         const currentPlayer = game.getCurrentPlayer();
-
-        console.log('kik hex', currentPlayer.constructor.name, currentPlayer);
 
         try {
             if (
@@ -55,8 +51,6 @@ const app = new Application({
             }
 
             game.checkMove(move);
-
-            console.log('send move', move);
 
             //game.setCell(move, game.getCurrentPlayerIndex());
 
@@ -86,8 +80,6 @@ onMounted(async () => {
 
 const joinGame = async (playerIndex) => {
     const joined = await hexClient.joinGame(gameId, playerIndex);
-
-    console.log('gameJoined', joined);
 
     if (!joined) {
         console.error('could not join');

@@ -1,5 +1,6 @@
-import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { GameData, MoveData, PlayerData } from '@shared/Types';
+import { Game, GameLoop, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
+import { GameData, MoveData, PlayerData } from '@shared/game-engine/Types';
+import { GameInstanceData } from '@shared/Types';
 import { defineStore } from 'pinia';
 import { Socket } from 'socket.io-client';
 import FrontPlayer from './FrontPlayer';
@@ -11,7 +12,7 @@ const useHexClient = defineStore('hexClient', {
         /**
          * List of games visible on lobby
          */
-        games: {} as {[key: string]: GameData},
+        games: {} as {[key: string]: GameInstanceData},
 
         /**
          * List of loaded games
@@ -26,9 +27,9 @@ const useHexClient = defineStore('hexClient', {
                 method: 'post',
             });
 
-            const game = await response.json();
+            const gameData: GameInstanceData = await response.json();
 
-            return game.id;
+            return gameData.id;
         },
 
         async createGameVsCPU(): Promise<string>
@@ -37,15 +38,15 @@ const useHexClient = defineStore('hexClient', {
                 method: 'post',
             });
 
-            const game = await response.json();
+            const gameData: GameInstanceData = await response.json();
 
-            return game.id;
+            return gameData.id;
         },
 
         async updateGames(): Promise<void>
         {
             const response = await fetch('/api/games');
-            const games: GameData[] = await response.json();
+            const games: GameInstanceData[] = await response.json();
 
             games.forEach(game => {
                 this.games[game.id] = game;
@@ -68,16 +69,18 @@ const useHexClient = defineStore('hexClient', {
                 return null;
             }
 
-            const gameData: GameData = await response.json();
+            const gameInstanceData: GameInstanceData = await response.json();
 
             const players: [PlayerInterface, PlayerInterface] = [
-                new FrontPlayer(true, gameData.players[0]),
-                new FrontPlayer(true, gameData.players[1]),
+                new FrontPlayer(true, gameInstanceData.game.players[0]),
+                new FrontPlayer(true, gameInstanceData.game.players[1]),
             ];
 
-            const game = new Game(players);
+            const game = Game.createFromGameData(players, gameInstanceData.game);
 
-            // if (gameData.started) game.start();
+            if (gameInstanceData.game.started) {
+                game.start();
+            }
 
             const gameClientSocket = new GameClientSocket(gameId, game);
 
@@ -113,7 +116,7 @@ const useHexClient = defineStore('hexClient', {
         {
             this.updateGames();
 
-            socket.on('gameCreated', (game: GameData) => {
+            socket.on('gameCreated', (game: GameInstanceData) => {
                 if (!this.games[game.id]) {
                     this.games[game.id] = game;
                 }

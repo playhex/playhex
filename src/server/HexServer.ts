@@ -2,7 +2,7 @@ import { Game, Move, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import { EventsMap } from 'socket.io/dist/typed-events';
 import GameServerSocket from './GameServerSocket';
-import { MoveData, PlayerData } from '@shared/Types';
+import { MoveData, PlayerData } from '../shared/game-engine/Types';
 import SocketPlayer from './SocketPlayer';
 
 export class HexServer
@@ -14,8 +14,8 @@ export class HexServer
     ) {
         io.on('connection', socket => {
             socket.on('createGame', (answer: (gameId: string) => void) => {
-                const game = this.createGame();
-                answer(game.getId());
+                const gameSocketServer = this.createGame();
+                answer(gameSocketServer.getId());
             });
 
             socket.on('joinGame', (gameId: string, playerIndex: PlayerIndex, answer: (joined: boolean) => void) => {
@@ -52,7 +52,7 @@ export class HexServer
     ): GameServerSocket {
         const gameServerSocket = new GameServerSocket(this.io, game);
         this.gameServerSockets[gameServerSocket.getId()] = gameServerSocket;
-        this.io.emit('gameCreated', gameServerSocket.toGameData());
+        this.io.emit('gameCreated', gameServerSocket.toData());
 
         return gameServerSocket;
     }

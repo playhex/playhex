@@ -14,13 +14,13 @@ export default class Hex extends Sprite
 
     private graphics: Graphics;
 
-    constructor()
+    constructor(initialValue: null | PlayerIndex = null)
     {
         super();
 
         this.drawHexBackground();
         this.drawHex();
-        this.setPlayer(null);
+        this.setPlayer(initialValue);
 
         this.interactive = true;
     }

@@ -1,6 +1,7 @@
 import GameInput from './GameInput';
 import Move from './Move';
 import PlayerInterface from './PlayerInterface';
+import { PlayerData } from './Types';
 
 const { floor, random } = Math;
 
@@ -34,5 +35,12 @@ export default class RandomAIPlayer implements PlayerInterface
     public async isReady(): Promise<true>
     {
         return true;
+    }
+
+    public toData(): PlayerData
+    {
+        return {
+            id: 'bot',
+        };
     }
 }

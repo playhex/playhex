@@ -1,5 +1,5 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
-import { PlayerData } from '@shared/Types';
+import { PlayerData } from '@shared/game-engine/Types';
 import FrontPlayer from './FrontPlayer';
 
 export default class GameClientSocket

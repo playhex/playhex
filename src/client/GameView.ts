@@ -41,7 +41,7 @@ export default class GameView
 
         for (let row = 0; row < this.game.getSize(); ++row) {
             for (let col = 0; col < this.game.getSize(); ++col) {
-                const hex = new Hex();
+                const hex = new Hex(this.game.getCell(row, col));
 
                 hex.position = Hex.coords(row, col);
 

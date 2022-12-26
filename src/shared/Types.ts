@@ -1,13 +1,6 @@
-export type PlayerData = {
-    id: string;
-};
+import { GameData } from './game-engine/Types';
 
-export type GameData = {
+export type GameInstanceData = {
     id: string;
-    players: [PlayerData, PlayerData];
-};
-
-export type MoveData = {
-    row: number,
-    col: number,
+    game: GameData;
 };

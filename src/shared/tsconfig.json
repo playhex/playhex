@@ -12,13 +12,8 @@
     "isolatedModules": true,
     "outDir": "../../dist/shared",
     "lib": ["ES2019"],
-    "composite": true,
-    "paths": {
-      "@client/*": ["../client/*"],
-      "@server/*": ["../server/*"],
-      "@shared/*": ["../shared/*"]
-    }
+    "composite": true
   },
-  "include": ["./**/*.ts"],
-  "exclude": ["./**/*.test.ts"],
+  "include": ["**/*.ts"],
+  "exclude": ["**/*.test.ts"],
 }

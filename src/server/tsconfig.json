@@ -20,7 +20,6 @@
     "noImplicitAny": true,
     "composite": true,
     "paths": {
-      "@client/*": ["../client/*"],
       "@server/*": ["../server/*"],
       "@shared/*": ["../shared/*"]
     }

@@ -1,5 +1,6 @@
 import BoardState from './GameInput';
 import Move from './Move';
+import { PlayerData } from './Types';
 
 export default interface PlayerInterface
 {
@@ -15,4 +16,6 @@ export default interface PlayerInterface
      * Use BoardState.checkMove() before returning it.
      */
     playMove(boardState: BoardState): Promise<Move>;
+
+    toData(): PlayerData;
 }
