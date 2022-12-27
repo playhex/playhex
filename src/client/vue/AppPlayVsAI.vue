@@ -5,7 +5,7 @@ import Hex from '@client/Hex';
 import FrontPlayer from '@client/FrontPlayer';
 import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
 import { onMounted, ref } from '@vue/runtime-core';
-import { localPlay } from '@client/onClick';
+import LocalPlayMoveController from '@client/MoveController/LocalPlayMoveController';
 
 let app = new Application({
     antialias: true,
@@ -22,7 +22,7 @@ const pixiApp = ref<HTMLElement>();
         new FrontPlayer(true, { id: 'Player' }),
         new RandomAIPlayer(),
     ]);
-    const gameView = new GameView(game.value, localPlay);
+    const gameView = new GameView(game.value, new LocalPlayMoveController());
     const view = gameView.getView();
 
     GameLoop.run(game.value);

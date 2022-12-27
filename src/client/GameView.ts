@@ -1,6 +1,7 @@
 import { Game, Move } from '@shared/game-engine';
 import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
 import Hex from '@client/Hex';
+import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 
 export default class GameView
 {
@@ -9,7 +10,7 @@ export default class GameView
 
     public constructor(
         private game: Game,
-        private onClick: (game: Game, move: Move) => void = () => null,
+        private moveController: MoveControllerInterface,
     ) {
         this.view = new Container();
 
@@ -49,7 +50,7 @@ export default class GameView
                 this.view.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    this.onClick(this.game, new Move(row, col));
+                    this.moveController.move(this.game, new Move(row, col));
                 });
             }
         }

@@ -6,8 +6,8 @@ import Hex from '@client/Hex';
 import useHexClient from '@client/hexClient';
 import { onMounted, ref } from '@vue/runtime-core';
 import socket from '@client/socket';
-import { Game, IllegalMove, PlayerIndex } from '@shared/game-engine';
-import FrontPlayer from '@client/FrontPlayer';
+import { Game, PlayerIndex } from '@shared/game-engine';
+import RemotePlayMoveController from '@client/MoveController/RemotePlayMoveController';
 
 const route = useRoute();
 const hexClient = useHexClient();
@@ -43,30 +43,7 @@ const app = new Application({
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    const gameView = new GameView(game.value, (game, move) => {
-        const currentPlayer = game.getCurrentPlayer();
-
-        try {
-            if (
-                !(currentPlayer instanceof FrontPlayer)
-                || !currentPlayer.interactive
-            ) {
-                throw new IllegalMove('not your turn');
-            }
-
-            game.checkMove(move);
-
-            //game.setCell(move, game.getCurrentPlayerIndex());
-
-            hexClient.move(gameId, move);
-        } catch (e) {
-            if (e instanceof IllegalMove) {
-                console.error(e.message);
-            } else {
-                throw e;
-            }
-        }
-    });
+    const gameView = new GameView(game.value, new RemotePlayMoveController(gameId, hexClient));
 
     const view = gameView.getView();
 
