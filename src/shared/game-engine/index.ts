@@ -1,6 +1,6 @@
 import Game from './Game';
 import GameLoop from './GameLoop';
-import BoardState from './GameInput';
+import GameInput from './GameInput';
 import IllegalMove from './IllegalMove';
 import Move from './Move';
 import PlayerInterface from './PlayerInterface';
@@ -10,7 +10,7 @@ import { PlayerIndex, Side } from './Types';
 export {
     Game,
     GameLoop,
-    BoardState,
+    GameInput,
     IllegalMove,
     Move,
     RandomAIPlayer,

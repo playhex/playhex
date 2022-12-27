@@ -1,12 +1,14 @@
 import { Game, IllegalMove, Move } from '@shared/game-engine';
 import FrontPlayer from '@client/FrontPlayer';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
+import useHexClient from 'hexClient';
 
 export default class RemotePlayMoveController implements MoveControllerInterface
 {
+    private hexClient = useHexClient();
+
     public constructor(
         private gameId: string,
-        private hexClient: any,
     ) {}
 
     public move(game: Game, move: Move): void

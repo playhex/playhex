@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { IS_DEV, WEBPACK_PORT } from '../config';
 
+/* eslint-disable */
+
 function getManifestFromWebpack(): Promise<any> {
     return new Promise((resolve, reject) => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -12,7 +14,7 @@ function getManifestFromWebpack(): Promise<any> {
     });
 }
 
-let manifestStrCache: any;
+let manifestStrCache: string;
 
 export async function getManifest() {
     let manifestStr: string;

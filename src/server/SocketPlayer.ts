@@ -1,11 +1,11 @@
 import { Socket } from 'socket.io';
-import { BoardState, Move, PlayerInterface } from '../../dist/shared/game-engine';
+import { Move, PlayerInterface } from '../../dist/shared/game-engine';
 import { PlayerData } from '@shared/game-engine/Types';
 
 export default class SocketPlayer implements PlayerInterface
 {
     private movePromiseResolve: null|((move: Move) => void) = null;
-    private readyPromiseResolve: ((ok: true) => void) = () => {};
+    private readyPromiseResolve: null|((ok: true) => void);
 
     public constructor(
         /**
@@ -46,7 +46,9 @@ export default class SocketPlayer implements PlayerInterface
     {
         this.socket = socket;
 
-        this.readyPromiseResolve(true);
+        if (null !== this.readyPromiseResolve) {
+            this.readyPromiseResolve(true);
+        }
     }
 
     public doMove(move: Move): void
@@ -69,7 +71,7 @@ export default class SocketPlayer implements PlayerInterface
         });
     }
 
-    public async playMove(boardState: BoardState): Promise<Move>
+    public async playMove(): Promise<Move>
     {
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;

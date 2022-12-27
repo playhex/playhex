@@ -1,4 +1,4 @@
-import BoardState from './GameInput';
+import GameInput from './GameInput';
 import Move from './Move';
 import { PlayerData } from './Types';
 
@@ -13,9 +13,9 @@ export default interface PlayerInterface
     /**
      * Player turn started. Return a promise of move.
      * If returned move is invalid, you lose.
-     * Use BoardState.checkMove() before returning it.
+     * Use GameInput.checkMove() before returning it.
      */
-    playMove(boardState: BoardState): Promise<Move>;
+    playMove(boardState: GameInput): Promise<Move>;
 
     toData(): PlayerData;
 }

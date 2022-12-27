@@ -1,4 +1,4 @@
-import { BoardState, Move, PlayerInterface } from '@shared/game-engine';
+import { Move, PlayerInterface } from '@shared/game-engine';
 import { PlayerData } from '@shared/game-engine/Types';
 
 export default class FrontPlayer implements PlayerInterface
@@ -41,7 +41,7 @@ export default class FrontPlayer implements PlayerInterface
         return true;
     }
 
-    public async playMove(boardState: BoardState): Promise<Move>
+    public async playMove(): Promise<Move>
     {
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;

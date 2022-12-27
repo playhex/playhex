@@ -43,7 +43,7 @@ const app = new Application({
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    const gameView = new GameView(game.value, new RemotePlayMoveController(gameId, hexClient));
+    const gameView = new GameView(game.value, new RemotePlayMoveController(gameId));
 
     const view = gameView.getView();
 

@@ -23,7 +23,7 @@ type GameEvents = {
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
     private hexes: (null|PlayerIndex)[][];
-    private started: boolean = false;
+    private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
 
@@ -268,7 +268,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
         let current: undefined|[number, number];
 
-        while (current = frontier.shift()) {
+        while ((current = frontier.shift())) {
             if (
                 0 === playerIndex && this.isCellOnSide(current[0], current[1], 'RIGHT') ||
                 1 === playerIndex && this.isCellOnSide(current[0], current[1], 'BOTTOM')

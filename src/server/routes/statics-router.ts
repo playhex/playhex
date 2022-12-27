@@ -3,6 +3,8 @@ import express from 'express';
 import { Router } from 'express';
 import { IS_DEV, WEBPACK_PORT } from '../config';
 
+/* eslint-disable */
+
 export function staticsRouter() {
     const router = Router();
 
