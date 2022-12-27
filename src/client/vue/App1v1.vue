@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { Application } from 'pixi.js';
 import GameView from '@client/GameView';
@@ -6,18 +6,22 @@ import Hex from '@client/Hex';
 import useHexClient from '@client/hexClient';
 import { onMounted, ref } from '@vue/runtime-core';
 import socket from '@client/socket';
-import { IllegalMove } from '@shared/game-engine';
+import { Game, IllegalMove, PlayerIndex } from '@shared/game-engine';
 import FrontPlayer from '@client/FrontPlayer';
 
 const route = useRoute();
 const hexClient = useHexClient();
 const colorA = '#' + Hex.COLOR_A.toString(16);
 const colorB = '#' + Hex.COLOR_B.toString(16);
-const pixiApp = ref(null);
+const pixiApp = ref<HTMLElement>();
 
-const {gameId} = route.params;
+const { gameId } = route.params;
 
-const game = ref(null);
+if (Array.isArray(gameId)) {
+    throw new Error('unexpected array param in gameId');
+}
+
+const game = ref<Game>();
 
 const app = new Application({
     antialias: true,
@@ -66,17 +70,21 @@ const app = new Application({
 
     const view = gameView.getView();
 
-    view.position = {x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2};
+    view.position = { x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2 };
     view.rotation = -1 * (Math.PI / 6);
 
     app.stage.addChild(view);
 })();
 
-onMounted(async () => {
-    pixiApp.value.appendChild(app.view);
+onMounted(() => {
+    if (!pixiApp.value) {
+        throw new Error('No element with ref="pixiApp"');
+    }
+
+    pixiApp.value.appendChild(app.view as unknown as Node);
 });
 
-const joinGame = async (playerIndex) => {
+const joinGame = async (playerIndex: PlayerIndex) => {
     const joined = await hexClient.joinGame(gameId, playerIndex);
 
     if (!joined) {
@@ -89,11 +97,11 @@ const joinGame = async (playerIndex) => {
     <div class="container">
         <div v-if="game" class="game-info">
             <div class="player-a">
-                <p :style="{color: colorA}">{{ game.players[0].toData().id }}</p>
+                <p :style="{ color: colorA }">{{ game.getPlayer(0).toData().id }}</p>
                 <button @click="joinGame(0)">Join</button>
             </div>
             <div class="player-b">
-                <p :style="{color: colorB}">{{ game.players[1].toData().id }}</p>
+                <p :style="{ color: colorB }">{{ game.getPlayer(1).toData().id }}</p>
                 <button @click="joinGame(1)">Join</button>
             </div>
         </div>
@@ -107,18 +115,21 @@ const joinGame = async (playerIndex) => {
 .container {
     position: relative;
 }
+
 .game-info {
     position: relative;
     top: 0;
 }
 
-.game-info > div {
+.game-info>div {
     position: absolute;
     top: 0;
 }
+
 .player-a {
     left: 0;
 }
+
 .player-b {
     right: 0;
     text-align: right;

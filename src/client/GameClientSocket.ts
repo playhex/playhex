@@ -33,15 +33,11 @@ export default class GameClientSocket
 
     public gameStarted(): void
     {
-        console.log('game started event');
-
         this.game.start();
     }
 
     public gameMove(move: Move, byPlayerIndex: PlayerIndex): void
     {
-        console.log('move received', move);
-
         this.game.setCell(move, byPlayerIndex);
         this.game.setCurrentPlayerIndex(byPlayerIndex ? 0 : 1);
     }

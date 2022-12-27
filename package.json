@@ -60,6 +60,7 @@
     "request": "^2.88.2",
     "rimraf": "^3.0.2",
     "style-loader": "^3.3.1",
+    "ts-loader": "^9.4.2",
     "ts-node": "^10.4.0",
     "tsc-watch": "^4.5.0",
     "tsconfig-paths": "^4.1.1",
