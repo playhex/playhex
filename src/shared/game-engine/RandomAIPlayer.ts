@@ -7,7 +7,7 @@ const { floor, random } = Math;
 
 export default class RandomAIPlayer implements PlayerInterface
 {
-    public async playMove(gameInput: GameInput): Promise<Move>
+    async playMove(gameInput: GameInput): Promise<Move>
     {
         console.log('random AI player is playing...');
 
@@ -32,12 +32,12 @@ export default class RandomAIPlayer implements PlayerInterface
         return move;
     }
 
-    public async isReady(): Promise<true>
+    async isReady(): Promise<true>
     {
         return true;
     }
 
-    public toData(): PlayerData
+    toData(): PlayerData
     {
         return {
             id: 'bot',

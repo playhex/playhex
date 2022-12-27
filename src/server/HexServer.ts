@@ -9,7 +9,7 @@ export class HexServer
 {
     private gameServerSockets: {[key: string]: GameServerSocket} = {};
 
-    public constructor(
+    constructor(
         private io: Server<EventsMap, EventsMap>,
     ) {
         io.on('connection', socket => {
@@ -34,17 +34,17 @@ export class HexServer
         });
     }
 
-    public getGames()
+    getGames()
     {
         return this.gameServerSockets;
     }
 
-    public getGame(id: string): null|GameServerSocket
+    getGame(id: string): null|GameServerSocket
     {
         return this.gameServerSockets[id] ?? null;
     }
 
-    public createGame(
+    createGame(
         game: Game = new Game([
             new SocketPlayer(),
             new SocketPlayer(),
@@ -57,7 +57,7 @@ export class HexServer
         return gameServerSocket;
     }
 
-    public playerJoinGame(socket: Socket, gameId: string, playerIndex: PlayerIndex): boolean
+    playerJoinGame(socket: Socket, gameId: string, playerIndex: PlayerIndex): boolean
     {
         const gameServerSocket = this.gameServerSockets[gameId];
 
@@ -78,7 +78,7 @@ export class HexServer
         return joined;
     }
 
-    public playerMove(socket: Socket, gameId: string, move: MoveData): true|string
+    playerMove(socket: Socket, gameId: string, move: MoveData): true|string
     {
         const gameServerSocket = this.gameServerSockets[gameId];
 

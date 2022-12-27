@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* eslint-env browser */
 import { Application } from 'pixi.js';
 import GameView from '@client/GameView';
 import Hex from '@client/Hex';

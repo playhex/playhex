@@ -5,7 +5,7 @@ export default class FrontPlayer implements PlayerInterface
 {
     private movePromiseResolve: null|((move: Move) => void) = null;
 
-    public constructor(
+    constructor(
         /**
          * Whether this player can play locally by clicking on view.
          * If true, doMove should be called by view on click.
@@ -16,14 +16,14 @@ export default class FrontPlayer implements PlayerInterface
         private playerData: null|PlayerData = null,
     ) {}
 
-    public updatePlayerData(playerData: PlayerData): FrontPlayer
+    updatePlayerData(playerData: PlayerData): FrontPlayer
     {
         this.playerData = playerData;
 
         return this;
     }
 
-    public doMove(move: Move): boolean
+    doMove(move: Move): boolean
     {
         if (null === this.movePromiseResolve) {
             console.log('no move expected, noop');
@@ -35,20 +35,20 @@ export default class FrontPlayer implements PlayerInterface
         return true;
     }
 
-    public async isReady(): Promise<true>
+    async isReady(): Promise<true>
     {
         // If server tell ready, then ready
         return true;
     }
 
-    public async playMove(): Promise<Move>
+    async playMove(): Promise<Move>
     {
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;
         });
     }
 
-    public toData(): PlayerData
+    toData(): PlayerData
     {
         return this.playerData ?? {
             id: '...',

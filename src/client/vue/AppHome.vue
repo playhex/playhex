@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* eslint-env browser */
 import useHexClient from '@client/hexClient';
 
 const hexClient = useHexClient();

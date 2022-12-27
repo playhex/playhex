@@ -6,11 +6,11 @@ const SQRT3 = sqrt(3);
 
 export default class Hex extends Sprite
 {
-    public static readonly RADIUS = 20;
+    static readonly RADIUS = 20;
 
-    public static readonly COLOR_A = 0xff8888;
-    public static readonly COLOR_B = 0x8888ff;
-    public static readonly COLOR_EMPTY = 0xcccccc;
+    static readonly COLOR_A = 0xff8888;
+    static readonly COLOR_B = 0x8888ff;
+    static readonly COLOR_EMPTY = 0xcccccc;
 
     private graphics: Graphics;
 
@@ -62,7 +62,7 @@ export default class Hex extends Sprite
         this.addChild(this.graphics);
     }
 
-    public static coords(row: number, col: number): IPointData
+    static coords(row: number, col: number): IPointData
     {
         return {
             x: col * Hex.RADIUS * SQRT3 + row * Hex.RADIUS * SQRT3 / 2,
@@ -70,7 +70,7 @@ export default class Hex extends Sprite
         };
     }
 
-    public static cornerCoords(i: number, dist: number = Hex.RADIUS): IPointData
+    static cornerCoords(i: number, dist: number = Hex.RADIUS): IPointData
     {
         return {
             x: dist * sin(2 * PI * i / 6),
@@ -78,7 +78,7 @@ export default class Hex extends Sprite
         };
     }
 
-    public setPlayer(player: null|PlayerIndex): Hex
+    setPlayer(player: null|PlayerIndex): Hex
     {
         this.graphics.tint = null === player
             ? Hex.COLOR_EMPTY

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* eslint-env browser */
 import { useRoute } from 'vue-router';
 import { Application } from 'pixi.js';
 import GameView from '@client/GameView';

@@ -8,7 +8,7 @@ export default class GameLoop
      * So only server side for remote game,
      * and only client side for offline game.
      */
-    public static async run(game: Game): Promise<void>
+    static async run(game: Game): Promise<void>
     {
         if (game.isEnded()) {
             console.log('Running an ended game, noop');
@@ -30,7 +30,7 @@ export default class GameLoop
         console.log('game has ended, game loop stops.');
     }
 
-    public static async makeCurrentPlayerPlay(game: Game): Promise<void>
+    static async makeCurrentPlayerPlay(game: Game): Promise<void>
     {
         const currentPlayerIndex = game.getCurrentPlayerIndex();
         const currentPlayer = game.getPlayers()[currentPlayerIndex];

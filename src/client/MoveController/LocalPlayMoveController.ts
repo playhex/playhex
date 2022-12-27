@@ -4,7 +4,7 @@ import MoveControllerInterface from '@client/MoveController/MoveControllerInterf
 
 export default class LocalPlayMoveController implements MoveControllerInterface
 {
-    public move(game: Game, move: Move): void
+    move(game: Game, move: Move): void
     {
         const currentPlayer = game.getCurrentPlayer();
 

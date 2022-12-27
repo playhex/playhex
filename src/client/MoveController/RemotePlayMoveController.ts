@@ -7,11 +7,11 @@ export default class RemotePlayMoveController implements MoveControllerInterface
 {
     private hexClient = useHexClient();
 
-    public constructor(
+    constructor(
         private gameId: string,
     ) {}
 
-    public move(game: Game, move: Move): void
+    move(game: Game, move: Move): void
     {
         const currentPlayer = game.getCurrentPlayer();
 

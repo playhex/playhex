@@ -8,7 +8,7 @@ export default class GameServerSocket
 {
     private id: string = randomUUID();
 
-    public constructor(
+    constructor(
         private io: Server,
         private game = new Game([
             new SocketPlayer(),
@@ -21,17 +21,17 @@ export default class GameServerSocket
         GameLoop.run(this.game);
     }
 
-    public getId(): string
+    getId(): string
     {
         return this.id;
     }
 
-    public getGame(): Game
+    getGame(): Game
     {
         return this.game;
     }
 
-    public listenGame(): void
+    listenGame(): void
     {
         this.game.on('started', () => {
             this.io.to(`games/${this.id}`).emit('gameStarted', this.id);
@@ -42,7 +42,7 @@ export default class GameServerSocket
         });
     }
 
-    public playerJoin(socket: Socket, playerIndex: PlayerIndex): boolean
+    playerJoin(socket: Socket, playerIndex: PlayerIndex): boolean
     {
         const player = this.game.getPlayers()[playerIndex];
 
@@ -90,7 +90,7 @@ export default class GameServerSocket
         return true;
     }
 
-    public playerMove(socket: Socket, move: Move): boolean
+    playerMove(socket: Socket, move: Move): boolean
     {
         const player = this.game.getPlayers().find(player => {
             if (!(player instanceof SocketPlayer)) {
@@ -127,7 +127,7 @@ export default class GameServerSocket
         player.setSocket(socket);
     }
 
-    public toData(): GameInstanceData
+    toData(): GameInstanceData
     {
         return {
             id: this.id,

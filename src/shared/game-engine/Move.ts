@@ -1,21 +1,21 @@
 export default class Move
 {
-    public constructor(
+    constructor(
         private row: number,
         private col: number,
     ) {}
 
-    public getRow(): number
+    getRow(): number
     {
         return this.row;
     }
 
-    public getCol(): number
+    getCol(): number
     {
         return this.col;
     }
 
-    public toString(): string
+    toString(): string
     {
         return String.fromCharCode(65 + this.row) + (this.col + 1);
     }

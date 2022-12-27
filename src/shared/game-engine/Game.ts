@@ -27,7 +27,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
 
-    public constructor(
+    constructor(
         private players: [PlayerInterface, PlayerInterface],
         private size: number = 11,
     ) {
@@ -39,7 +39,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         ;
     }
 
-    public static createFromGameData(players: [PlayerInterface, PlayerInterface], gameData: GameData): Game
+    static createFromGameData(players: [PlayerInterface, PlayerInterface], gameData: GameData): Game
     {
         const game = new Game(players, gameData.size);
 
@@ -58,47 +58,47 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return game;
     }
 
-    public getSize(): number
+    getSize(): number
     {
         return this.size;
     }
 
-    public getPlayers(): [PlayerInterface, PlayerInterface]
+    getPlayers(): [PlayerInterface, PlayerInterface]
     {
         return this.players;
     }
 
-    public getPlayer(playerIndex: PlayerIndex): PlayerInterface
+    getPlayer(playerIndex: PlayerIndex): PlayerInterface
     {
         return this.players[playerIndex];
     }
 
-    public getCurrentPlayerIndex(): PlayerIndex
+    getCurrentPlayerIndex(): PlayerIndex
     {
         return this.currentPlayerIndex;
     }
 
-    public setCurrentPlayerIndex(currentPlayerIndex: PlayerIndex): void
+    setCurrentPlayerIndex(currentPlayerIndex: PlayerIndex): void
     {
         this.currentPlayerIndex = currentPlayerIndex;
     }
 
-    public getCurrentPlayer(): PlayerInterface
+    getCurrentPlayer(): PlayerInterface
     {
         return this.players[this.currentPlayerIndex];
     }
 
-    public hasWinner(): boolean
+    hasWinner(): boolean
     {
         return null !== this.winner;
     }
 
-    public isEnded(): boolean
+    isEnded(): boolean
     {
         return null !== this.winner;
     }
 
-    public getStrictWinner(): PlayerIndex
+    getStrictWinner(): PlayerIndex
     {
         if (null === this.winner) {
             throw new Error('Trying to strictly get the winner but game not finished');
@@ -107,7 +107,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.winner;
     }
 
-    public setWinner(playerIndex: PlayerIndex): void
+    setWinner(playerIndex: PlayerIndex): void
     {
         if (null !== this.winner) {
             throw new Error('Cannot set a winner again, there is already a winner');
@@ -118,27 +118,27 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.emit('ended', playerIndex);
     }
 
-    public getCells(): (null|PlayerIndex)[][]
+    getCells(): (null|PlayerIndex)[][]
     {
         return this.hexes;
     }
 
-    public getCellsClone(): (null|PlayerIndex)[][]
+    getCellsClone(): (null|PlayerIndex)[][]
     {
         return this.hexes.map(row => row.slice());
     }
 
-    public getCell(row: number, col: number): null|PlayerIndex
+    getCell(row: number, col: number): null|PlayerIndex
     {
         return this.hexes[row][col];
     }
 
-    public isEmpty(row: number, col: number): boolean
+    isEmpty(row: number, col: number): boolean
     {
         return null === this.hexes[row][col];
     }
 
-    public isCellCoordsValid(row: number, col: number): boolean
+    isCellCoordsValid(row: number, col: number): boolean
     {
         return row >= 0 && row < this.size && col >= 0 && col < this.size;
     }
@@ -149,7 +149,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      * Do not check the move nor change the game state.
      * Should call move() instead to play the game.
      */
-    public setCell(move: Move, value: PlayerIndex): void
+    setCell(move: Move, value: PlayerIndex): void
     {
         this.hexes[move.getRow()][move.getCol()] = value;
 
@@ -161,7 +161,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         }
     }
 
-    public start(): void
+    start(): void
     {
         if (this.started) {
             throw new Error('Game already started');
@@ -175,7 +175,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     /**
      * @throws IllegalMove on invalid move.
      */
-    public checkMove(move: Move): void
+    checkMove(move: Move): void
     {
         if (!this.started) {
             throw new IllegalMove('Game is not yet started');
@@ -199,7 +199,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      *
      * @throws IllegalMove on invalid move.
      */
-    public move(move: Move): void
+    move(move: Move): void
     {
         this.checkMove(move);
 
@@ -211,13 +211,13 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     /**
      * Makes current player abandon
      */
-    public abandon(): void
+    abandon(): void
     {
         this.changeCurrentPlayer();
         this.setWinner(this.currentPlayerIndex);
     }
 
-    public otherPlayerIndex(): PlayerIndex
+    otherPlayerIndex(): PlayerIndex
     {
         return 0 === this.currentPlayerIndex
             ? 1
@@ -230,7 +230,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.currentPlayerIndex = this.otherPlayerIndex();
     }
 
-    public getConnection(): null|PlayerIndex
+    getConnection(): null|PlayerIndex
     {
         if (this.hasPlayerConnection(0)) {
             return 0;
@@ -243,7 +243,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return null;
     }
 
-    public hasPlayerConnection(playerIndex: PlayerIndex): boolean
+    hasPlayerConnection(playerIndex: PlayerIndex): boolean
     {
         const hash = (row: number, col: number): string => row + '_' + col;
 
@@ -291,14 +291,14 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return false;
     }
 
-    public inBoard(row: number, col: number): boolean
+    inBoard(row: number, col: number): boolean
     {
         return row >= 0 && row < this.size
             && col >= 0 && col < this.size
         ;
     }
 
-    public isCellOnSide(row: number, col: number, side: Side): boolean
+    isCellOnSide(row: number, col: number, side: Side): boolean
     {
         switch (side) {
             case 'TOP': return 0 === row;
@@ -308,7 +308,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         }
     }
 
-    public getNeighboors(row: number, col: number): [number, number][]
+    getNeighboors(row: number, col: number): [number, number][]
     {
         const neighboors: [number, number][] = [
             [row, col - 1],
@@ -326,7 +326,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         ;
     }
 
-    public toData(): GameData
+    toData(): GameData
     {
         return {
             players: this.players.map(player => player.toData()) as [PlayerData, PlayerData],

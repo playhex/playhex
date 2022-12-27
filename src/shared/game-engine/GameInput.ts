@@ -8,21 +8,21 @@ export default class GameInput
 {
     private hexes: null|(null|PlayerIndex)[][] = null;
 
-    public constructor(
+    constructor(
         private game: Game,
     ) {}
 
-    public getSize(): number
+    getSize(): number
     {
         return this.game.getSize();
     }
 
-    public getHex(row: number, col: number): null|PlayerIndex
+    getHex(row: number, col: number): null|PlayerIndex
     {
         return this.game.getCell(row, col);
     }
 
-    public getHexes(): (null|PlayerIndex)[][]
+    getHexes(): (null|PlayerIndex)[][]
     {
         if (null === this.hexes) {
             this.hexes = this.game.getCellsClone();
@@ -31,7 +31,7 @@ export default class GameInput
         return this.hexes;
     }
 
-    public checkMove(move: Move): void
+    checkMove(move: Move): void
     {
         this.game.checkMove(move);
     }

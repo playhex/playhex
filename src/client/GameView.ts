@@ -8,7 +8,7 @@ export default class GameView
     private hexes: Hex[][];
     private view: Container;
 
-    public constructor(
+    constructor(
         private game: Game,
         private moveController: MoveControllerInterface,
     ) {
@@ -19,7 +19,7 @@ export default class GameView
         this.listenModel();
     }
 
-    public getView(): DisplayObject
+    getView(): DisplayObject
     {
         return this.view;
     }
@@ -96,7 +96,7 @@ export default class GameView
         this.view.addChild(graphics);
     }
 
-    public getHex(rowCol: {row: number, col: number}): Hex
+    getHex(rowCol: {row: number, col: number}): Hex
     {
         return this.hexes[rowCol.row][rowCol.col];
     }

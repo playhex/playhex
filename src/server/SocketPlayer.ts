@@ -7,7 +7,7 @@ export default class SocketPlayer implements PlayerInterface
     private movePromiseResolve: null|((move: Move) => void) = null;
     private readyPromiseResolve: null|((ok: true) => void);
 
-    public constructor(
+    constructor(
         /**
          * Slot reserved for this player, or free if null.
          */
@@ -20,29 +20,29 @@ export default class SocketPlayer implements PlayerInterface
         private socket: null|Socket = null,
     ) {}
 
-    public isAssignedToPlayer(): boolean
+    isAssignedToPlayer(): boolean
     {
         return null !== this.playerData;
     }
 
-    public getPlayerId(): null|string
+    getPlayerId(): null|string
     {
         return this.playerData?.id ?? null;
     }
 
-    public setPlayerData(playerData: PlayerData): SocketPlayer
+    setPlayerData(playerData: PlayerData): SocketPlayer
     {
         this.playerData = playerData;
 
         return this;
     }
 
-    public getSocket(): null|Socket
+    getSocket(): null|Socket
     {
         return this.socket;
     }
 
-    public setSocket(socket: Socket): void
+    setSocket(socket: Socket): void
     {
         this.socket = socket;
 
@@ -51,7 +51,7 @@ export default class SocketPlayer implements PlayerInterface
         }
     }
 
-    public doMove(move: Move): void
+    doMove(move: Move): void
     {
         if (null === this.movePromiseResolve) {
             return;
@@ -60,7 +60,7 @@ export default class SocketPlayer implements PlayerInterface
         this.movePromiseResolve(move);
     }
 
-    public async isReady(): Promise<true>
+    async isReady(): Promise<true>
     {
         if (null !== this.socket) {
             return true;
@@ -71,14 +71,14 @@ export default class SocketPlayer implements PlayerInterface
         });
     }
 
-    public async playMove(): Promise<Move>
+    async playMove(): Promise<Move>
     {
         return new Promise(resolve => {
             this.movePromiseResolve = resolve;
         });
     }
 
-    public toData(): PlayerData
+    toData(): PlayerData
     {
         return this.playerData ?? {
             id: '(free)',
