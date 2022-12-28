@@ -60,13 +60,17 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     {
         const game = new Game(players, gameData.size);
 
+        const cellValues: {[key: string]: null | PlayerIndex} = {
+            '0': 0,
+            '1': 1,
+            '.': null,
+        };
+
         gameData.hexes.forEach((line, row) => {
             line.split('').forEach((value, col) => {
-                if ('0' === value) {
-                    game.setCell(new Move(row, col), 0);
-                } else if ('1' === value) {
-                    game.setCell(new Move(row, col), 1);
-                }
+                game.hexes[row][col] = cellValues[value];
+                game.currentPlayerIndex = gameData.currentPlayerIndex;
+                game.winner = gameData.winner;
             });
         });
 
@@ -432,6 +436,8 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             players: this.players.map(player => player.toData()) as [PlayerData, PlayerData],
             size: this.size,
             started: this.started,
+            currentPlayerIndex: this.currentPlayerIndex,
+            winner: this.winner,
             hexes: this.hexes.map(
                 row => row
                     .map(

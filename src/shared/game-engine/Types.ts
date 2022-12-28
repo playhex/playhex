@@ -25,6 +25,8 @@ export type GameData = {
     started: boolean;
 
     size: number;
+    currentPlayerIndex: PlayerIndex,
+    winner: null | PlayerIndex,
 
     /**
      * Serialized board:
