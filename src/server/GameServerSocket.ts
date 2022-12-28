@@ -40,6 +40,10 @@ export default class GameServerSocket
         this.game.on('played', (move, byPlayerIndex) => {
             this.io.to(`games/${this.id}`).emit('moved', this.id, move, byPlayerIndex);
         });
+
+        this.game.on('ended', (winner: PlayerIndex) => {
+            this.io.to(`games/${this.id}`).emit('ended', this.id, winner);
+        });
     }
 
     playerJoin(socket: Socket, playerIndex: PlayerIndex): boolean
@@ -104,8 +108,6 @@ export default class GameServerSocket
             console.log('A player not in the game tryed to make a move', socket.handshake.auth);
             return false;
         }
-
-        console.log('player', socket.handshake.auth.playerId, ' do move ', move);
 
         player.doMove(move);
 

@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { IllegalMove, PlayerInterface, PlayerIndex, Move } from '.';
 import TypedEmitter from 'typed-emitter';
-import { GameData, PlayerData, Side } from './Types';
+import { Coords, GameData, PathItem, PlayerData } from './Types';
 
 type GameEvents = {
     /**
@@ -20,6 +20,10 @@ type GameEvents = {
     ended: (winner: PlayerIndex) => void;
 };
 
+/**
+ * Player 0 must connect left to right
+ * Player 1 must connect top to bottom
+ */
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
     private hexes: (null|PlayerIndex)[][];
@@ -37,6 +41,19 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             .fill([])
             .map(() => Array(this.size).fill(null))
         ;
+    }
+
+    static createFromGrid(players: [PlayerInterface, PlayerInterface], hexes: (null|PlayerIndex)[][]): Game
+    {
+        const game = new Game(players, hexes.length);
+
+        hexes.forEach((line, row) => {
+            line.forEach((value, col) => {
+                game.hexes[row][col] = value;
+            });
+        });
+
+        return game;
     }
 
     static createFromGameData(players: [PlayerInterface, PlayerInterface], gameData: GameData): Game
@@ -149,9 +166,13 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      * Do not check the move nor change the game state.
      * Should call move() instead to play the game.
      */
-    setCell(move: Move, value: PlayerIndex): void
+    setCell(move: Move, value: null | PlayerIndex): void
     {
         this.hexes[move.getRow()][move.getCol()] = value;
+
+        if (null === value) {
+            return;
+        }
 
         this.emit('played', move, value);
 
@@ -230,7 +251,29 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.currentPlayerIndex = this.otherPlayerIndex();
     }
 
-    getConnection(): null|PlayerIndex
+    private updateWinner(): void
+    {
+        this.winner = this.calculateWinner();
+    }
+
+    getSideCells(playerIndex: PlayerIndex, sideIndex: 0 | 1): Coords[]
+    {
+        const z = this.size - 1;
+
+        return Array(this.size)
+            .fill(0)
+            .map((_, i) => playerIndex
+                ? sideIndex
+                    ? {row: z, col: i} // bottom
+                    : {row: 0, col: i} // top
+                : sideIndex
+                    ? {row: i, col: z} // right
+                    : {row: i, col: 0} // left
+            )
+        ;
+    }
+
+    calculateWinner(): null|PlayerIndex
     {
         if (this.hasPlayerConnection(0)) {
             return 0;
@@ -245,44 +288,31 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     hasPlayerConnection(playerIndex: PlayerIndex): boolean
     {
-        const hash = (row: number, col: number): string => row + '_' + col;
+        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
 
         const visited: {[key: string]: true} = {};
-        const frontier: [number, number][] = [];
+        const frontier: Coords[] = [];
 
-        if (0 === playerIndex) {
-            for (let i = 0; i < this.size; ++i) {
-                if (playerIndex === this.hexes[i][0]) {
-                    frontier.push([i, 0]);
-                    visited[hash(i, 0)] = true;
-                }
+        this.getSideCells(playerIndex, 0).forEach(cell => {
+            if (playerIndex === this.hexes[cell.row][cell.col]) {
+                frontier.push(cell);
+                visited[hash(cell)] = true;
             }
-        } else {
-            for (let i = 0; i < this.size; ++i) {
-                if (playerIndex === this.hexes[0][i]) {
-                    frontier.push([0, i]);
-                    visited[hash(0, i)] = true;
-                }
-            }
-        }
+        });
 
-        let current: undefined|[number, number];
+        let current: undefined|Coords;
 
         while ((current = frontier.shift())) {
-            if (
-                0 === playerIndex && this.isCellOnSide(current[0], current[1], 'RIGHT') ||
-                1 === playerIndex && this.isCellOnSide(current[0], current[1], 'BOTTOM')
-            ) {
+            if (this.isCellOnSide(current, playerIndex, 1)) {
                 return true;
             }
 
-            visited[hash(...current)] = true;
-
             this
-                .getNeighboors(...current)
+                .getNeighboors(current, playerIndex)
                 .forEach(cell => {
-                    if (this.hexes[cell[0]][cell[1]] === playerIndex && !visited[hash(...cell)]) {
+                    if (!visited[hash(cell)]) {
                         frontier.push(cell);
+                        visited[hash(cell)] = true;
                     }
                 })
             ;
@@ -291,38 +321,108 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return false;
     }
 
-    inBoard(row: number, col: number): boolean
+    private flattenPath(pathItem: PathItem): Coords[]
     {
-        return row >= 0 && row < this.size
-            && col >= 0 && col < this.size
+        const path: Coords[] = [];
+        let current: null | PathItem = pathItem;
+
+        while (current) {
+            path.unshift(current.cell);
+
+            current = current.parent;
+        }
+
+        return path;
+    }
+
+    getShortestWinningPath(): null | Coords[]
+    {
+        this.updateWinner();
+
+        const playerIndex = this.winner;
+
+        if (null === playerIndex) {
+            return null;
+        }
+
+        const visited: {[key: string]: true} = {};
+        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
+        const pathHeads: PathItem[] = this
+            .getSideCells(playerIndex, 0)
+            .filter(cell => this.hexes[cell.row][cell.col] === playerIndex)
+            .map<PathItem>(cell => {
+                visited[hash(cell)] = true;
+
+                return {
+                    parent: null,
+                    cell,
+                }
+            })
+        ;
+
+        let pathHead: undefined | PathItem;
+
+        while ((pathHead = pathHeads.shift())) {
+            if (this.isCellOnSide(pathHead.cell, playerIndex, 1)) {
+                return this.flattenPath(pathHead);
+            }
+
+            this.getNeighboors(pathHead.cell, playerIndex)
+                .forEach(cell => {
+                    if (!visited[hash(cell)]) {
+                        const pathItem: PathItem = {
+                            parent: pathHead as PathItem,
+                            cell,
+                        };
+
+                        pathHeads.push(pathItem);
+                        visited[hash(cell)] = true;
+                    }
+                })
+            ;
+        }
+
+        return null;
+    }
+
+    inBoard(cell: Coords): boolean
+    {
+        return cell.row >= 0 && cell.row < this.size
+            && cell.col >= 0 && cell.col < this.size
         ;
     }
 
-    isCellOnSide(row: number, col: number, side: Side): boolean
+    isCellOnSide(cell: Coords, playerIndex: PlayerIndex, sideIndex: 0 | 1): boolean
     {
-        switch (side) {
-            case 'TOP': return 0 === row;
-            case 'LEFT': return 0 === col;
-            case 'BOTTOM': return this.size - 1 === row;
-            case 'RIGHT': return this.size - 1 === col;
-        }
+        const z = this.size - 1;
+
+        return playerIndex
+            ? sideIndex
+                ? cell.row === z // bottom
+                : cell.row === 0 // top
+            : sideIndex
+                ? cell.col === z // right
+                : cell.col === 0 // left
     }
 
-    getNeighboors(row: number, col: number): [number, number][]
+    getNeighboors(cell: Coords, playerIndex: undefined | null | PlayerIndex = undefined): Coords[]
     {
-        const neighboors: [number, number][] = [
-            [row, col - 1],
-            [row, col + 1],
+        return [
+            {row: cell.row, col: cell.col - 1},
+            {row: cell.row, col: cell.col + 1},
 
-            [row - 1, col],
-            [row - 1, col + 1],
+            {row: cell.row - 1, col: cell.col},
+            {row: cell.row - 1, col: cell.col + 1},
 
-            [row + 1, col],
-            [row + 1, col - 1],
-        ];
-
-        return neighboors
-            .filter(cell => this.inBoard(cell[0], cell[1]))
+            {row: cell.row + 1, col: cell.col},
+            {row: cell.row + 1, col: cell.col - 1},
+        ]
+            .filter(cell => this.inBoard(cell)
+                && (
+                    playerIndex === undefined
+                    || playerIndex === this.hexes[cell.row][cell.col]
+                )
+            )
         ;
     }
 

@@ -5,7 +5,7 @@ import IllegalMove from './IllegalMove';
 import Move from './Move';
 import PlayerInterface from './PlayerInterface';
 import RandomAIPlayer from './RandomAIPlayer';
-import { PlayerIndex, Side } from './Types';
+import { PlayerIndex } from './Types';
 
 export {
     Game,
@@ -19,5 +19,4 @@ export {
 export type {
     PlayerInterface,
     PlayerIndex,
-    Side,
 }

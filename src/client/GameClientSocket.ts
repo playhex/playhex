@@ -41,4 +41,9 @@ export default class GameClientSocket
         this.game.setCell(move, byPlayerIndex);
         this.game.setCurrentPlayerIndex(byPlayerIndex ? 0 : 1);
     }
+
+    ended(winner: PlayerIndex): void
+    {
+        console.log('server said winner', winner);
+    }
 }

@@ -10,7 +10,7 @@ import LocalPlayMoveController from '@client/MoveController/LocalPlayMoveControl
 
 let app = new Application({
     antialias: true,
-    background: 0xffffff,
+    backgroundAlpha: 0,
 });
 
 const game = ref<Game>();

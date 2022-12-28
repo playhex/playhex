@@ -1,8 +1,10 @@
-export default class Move
+import { Coords } from './Types';
+
+export default class Move implements Coords
 {
     constructor(
-        private row: number,
-        private col: number,
+        public row: number,
+        public col: number,
     ) {}
 
     getRow(): number

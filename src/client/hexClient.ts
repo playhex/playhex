@@ -154,6 +154,17 @@ const useHexClient = defineStore('hexClient', {
 
                 gameClientSocket.gameMove(new Move(move.row, move.col), byPlayerIndex);
             });
+
+            socket.on('ended', (gameId: string, winner: PlayerIndex) => {
+                const gameClientSocket = this.gameClientSockets[gameId];
+
+                if (!gameClientSocket) {
+                    console.error('game not found', gameId);
+                    return;
+                }
+
+                gameClientSocket.ended(winner);
+            });
         },
     },
 });

@@ -26,7 +26,7 @@ const game = ref<Game>();
 
 const app = new Application({
     antialias: true,
-    background: 0xffffff,
+    backgroundAlpha: 0,
 });
 
 (async () => {

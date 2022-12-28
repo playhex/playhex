@@ -1,5 +1,14 @@
 export type PlayerIndex = 0 | 1;
-export type Side = 'TOP' | 'LEFT' | 'BOTTOM' | 'RIGHT';
+
+export type Coords = {
+    row: number,
+    col: number,
+};
+
+export type PathItem = {
+    parent: null | PathItem,
+    cell: Coords,
+};
 
 export type PlayerData = {
     id: string;

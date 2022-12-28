@@ -1,7 +1,8 @@
 import { Game, Move } from '@shared/game-engine';
-import { Container, DisplayObject, Graphics, IPointData } from 'pixi.js';
+import { Container, DisplayObject, Graphics, IPointData, Ticker } from 'pixi.js';
 import Hex from '@client/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
+import { Coords } from '@shared/game-engine/Types';
 
 export default class GameView
 {
@@ -30,9 +31,73 @@ export default class GameView
             this.hexes[move.getRow()][move.getCol()].setPlayer(playerIndex);
         });
 
-        this.game.on('ended', (winner) => {
-            console.log('GAME ENDED, winner:', winner);
+        this.game.on('ended', async (winner) => {
+            const winningPath = this.game.getShortestWinningPath();
+
+            if (null === winningPath) {
+                throw new Error('Winner but no winning path...');
+            }
+
+            await this.animateWinningPath(winningPath);
+
+            // Win box
         });
+    }
+
+    private async animateWinningPath(cells: Coords[]): Promise<true>
+    {
+        let animationOverResolve: (end: true) => void;
+        const animationOverPromise = new Promise<true>(resolve => animationOverResolve = () => resolve(true));
+
+        const animationDuration = 50;
+
+        const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
+            const x = i / animationDuration;
+
+            return 1 - (2 * (x - 1) ** 2 - 1) ** 2;
+        });
+
+        const hexes = cells.map(cell => ({
+            sprite: this.hexes[cell.row][cell.col],
+            initialValue: this.hexes[cell.row][cell.col].alpha,
+            animationStep: -1,
+        }));
+
+        const animationLoop = () => {
+            hexes.forEach(hex => {
+                if (hex.animationStep < 0) {
+                    return;
+                }
+
+                hex.sprite.alpha = hex.initialValue - animationCurve[hex.animationStep];
+
+                ++hex.animationStep;
+
+                if (hex.animationStep >= animationDuration) {
+                    hex.animationStep = -1;
+                    hex.sprite.alpha = hex.initialValue;
+                    hexes.splice(hexes.indexOf(hex), 1);
+
+                    if (0 === hexes.length) {
+                        Ticker.shared.remove(animationLoop);
+                    }
+                }
+            });
+        };
+
+        Ticker.shared.add(animationLoop);
+
+        hexes.forEach((hex, i) => {
+            setTimeout(() => {
+                hex.animationStep = 0;
+            }, i * 60);
+        });
+
+        setTimeout(() => {
+            animationOverResolve(true);
+        }, hexes.length * 60);
+
+        return animationOverPromise;
     }
 
     private createBoard(): void
