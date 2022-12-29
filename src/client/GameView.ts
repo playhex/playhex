@@ -1,5 +1,5 @@
 import { Game, Move } from '@shared/game-engine';
-import { Container, DisplayObject, Graphics, IPointData, Ticker } from 'pixi.js';
+import { Application, Container, Graphics, ICanvas, IPointData, Ticker } from 'pixi.js';
 import Hex from '@client/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { Coords } from '@shared/game-engine/Types';
@@ -7,22 +7,53 @@ import { Coords } from '@shared/game-engine/Types';
 export default class GameView
 {
     private hexes: Hex[][];
-    private view: Container;
+    private pixi: Application;
+    private container: Container = new Container();
 
     constructor(
         private game: Game,
         private moveController: MoveControllerInterface,
     ) {
-        this.view = new Container();
+        this.pixi = new Application({
+            antialias: true,
+            backgroundAlpha: 0,
+        });
+
+        this.container.position = Hex.coords(
+            this.game.getSize() / 2 + 1,
+            this.game.getSize() / 2 + 1,
+        );
+
+        this.setOrientation('vertical');
+
+        this.container.pivot = Hex.coords(
+            this.game.getSize() / 2 - 0.5,
+            this.game.getSize() / 2 - 0.5,
+        );
 
         this.drawBackground();
         this.createBoard();
         this.listenModel();
+
+        this.pixi.stage.addChild(this.container);
     }
 
-    getView(): DisplayObject
+    getView(): ICanvas
     {
-        return this.view;
+        return this.pixi.view;
+    }
+
+    setOrientation(orientation: 'horizontal' | 'vertical'): void
+    {
+        switch (orientation) {
+            case 'horizontal':
+                this.container.rotation = -1 * (Math.PI / 6);
+                break;
+
+            case 'vertical':
+                this.container.rotation = 2 * (Math.PI / 6);
+                break;
+        }
     }
 
     private listenModel(): void
@@ -112,7 +143,7 @@ export default class GameView
 
                 this.hexes[row][col] = hex;
 
-                this.view.addChild(hex);
+                this.container.addChild(hex);
 
                 hex.on('pointertap', () => {
                     this.moveController.move(this.game, new Move(row, col));
@@ -158,7 +189,7 @@ export default class GameView
             to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
 
-        this.view.addChild(graphics);
+        this.container.addChild(graphics);
     }
 
     getHex(rowCol: {row: number, col: number}): Hex

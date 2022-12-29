@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { useRoute } from 'vue-router';
-import { Application } from 'pixi.js';
 import GameView from '@client/GameView';
 import Hex from '@client/Hex';
 import useHexClient from '@client/hexClient';
@@ -24,12 +23,7 @@ if (Array.isArray(gameId)) {
 
 const game = ref<Game>();
 
-const app = new Application({
-    antialias: true,
-    backgroundAlpha: 0,
-});
-
-(async () => {
+const gameViewPromise = (async () => {
     game.value = hexClient.gameClientSockets[gameId]?.getGame();
 
     if (!game.value) {
@@ -44,22 +38,17 @@ const app = new Application({
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    const gameView = new GameView(game.value, new RemotePlayMoveController(gameId));
-
-    const view = gameView.getView();
-
-    view.position = { x: Hex.RADIUS * 2, y: Hex.RADIUS * (game.value.getSize() + 1) * Math.sqrt(3) / 2 };
-    view.rotation = -1 * (Math.PI / 6);
-
-    app.stage.addChild(view);
+    return new GameView(game.value, new RemotePlayMoveController(gameId));
 })();
 
-onMounted(() => {
+onMounted(async () => {
     if (!pixiApp.value) {
         throw new Error('No element with ref="pixiApp"');
     }
 
-    pixiApp.value.appendChild(app.view as unknown as Node);
+    const gameView = await gameViewPromise;
+
+    pixiApp.value.appendChild(gameView.getView() as unknown as Node);
 });
 
 const joinGame = async (playerIndex: PlayerIndex) => {
