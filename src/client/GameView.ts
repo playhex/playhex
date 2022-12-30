@@ -4,38 +4,61 @@ import Hex from '@client/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { Coords } from '@shared/game-engine/Types';
 
+const { min, max, sin, cos, sqrt, PI } = Math;
+const SQRT_3_2 = sqrt(3) / 2;
+const PI_3 = PI / 3;
+
+export type GameViewOptions = {
+    width: number;
+    height: number;
+};
+
+const defaultOptions: GameViewOptions = {
+    width: window.innerWidth * 0.98,
+    height: window.innerHeight * 0.6,
+}
+
 export default class GameView
 {
     private hexes: Hex[][];
     private pixi: Application;
-    private container: Container = new Container();
+    private gameContainer: Container = new Container();
 
     constructor(
         private game: Game,
         private moveController: MoveControllerInterface,
+        private options: GameViewOptions = defaultOptions,
     ) {
         this.pixi = new Application({
             antialias: true,
             backgroundAlpha: 0,
+            resolution: window.devicePixelRatio,
+            autoDensity: true,
+            width: options.width,
+            height: options.height,
         });
 
-        this.container.position = Hex.coords(
-            this.game.getSize() / 2 + 1,
-            this.game.getSize() / 2 + 1,
-        );
+        if (window.innerWidth > window.innerHeight) {
+            this.setOrientation('horizontal');
+        } else {
+            this.setOrientation('vertical');
+        }
 
-        this.setOrientation('vertical');
-
-        this.container.pivot = Hex.coords(
+        this.gameContainer.pivot = Hex.coords(
             this.game.getSize() / 2 - 0.5,
             this.game.getSize() / 2 - 0.5,
         );
+
+        this.gameContainer.position = {
+            x: options.width / 2,
+            y: options.height / 2,
+        };
 
         this.drawBackground();
         this.createBoard();
         this.listenModel();
 
-        this.pixi.stage.addChild(this.container);
+        this.pixi.stage.addChild(this.gameContainer);
     }
 
     getView(): ICanvas
@@ -43,17 +66,91 @@ export default class GameView
         return this.pixi.view;
     }
 
-    setOrientation(orientation: 'horizontal' | 'vertical'): void
+    /**
+     * Change orientation and rescale to fit screen.
+     *
+     * "bias" orientations allow to fit better screen,
+     * ans non-bias orientations are more symmetric but makes board smaller.
+     */
+    setOrientation(orientation: 'horizontal' | 'vertical' | 'horizontal_bias' | 'vertical_bias'): void
     {
         switch (orientation) {
             case 'horizontal':
-                this.container.rotation = -1 * (Math.PI / 6);
+                this.setBoardRotation(-1 * (Math.PI / 6));
                 break;
 
             case 'vertical':
-                this.container.rotation = 2 * (Math.PI / 6);
+                this.setBoardRotation(2 * (Math.PI / 6));
+                break;
+
+            case 'horizontal_bias':
+                this.setBoardRotation(0 * (Math.PI / 6));
+                break;
+
+            case 'vertical_bias':
+                this.setBoardRotation(3 * (Math.PI / 6));
                 break;
         }
+    }
+
+    setBoardRotation(radians: number): void
+    {
+        this.gameContainer.rotation = radians;
+        this.autoResize();
+    }
+
+    incrementBoardRotation(radians: number): void
+    {
+        this.gameContainer.rotation += radians;
+        this.autoResize();
+    }
+
+    autoResize(): void
+    {
+        const { rotation } = this.gameContainer;
+
+        const boardHeight = Hex.RADIUS * this.game.getSize() * 1.5 - 0.5;
+        const boardWidth = Hex.RADIUS * this.game.getSize() * SQRT_3_2;
+
+        const boardCorner0 = {
+            x: this.options.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
+            y: this.options.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
+        };
+
+        const boardCorner1 = {
+            x: this.options.width / 2 + boardWidth * cos(rotation - PI_3),
+            y: this.options.height / 2 + boardWidth * sin(rotation - PI_3),
+        };
+
+        const boardCorner2 = {
+            x: this.options.width - boardCorner0.x,
+            y: this.options.height - boardCorner0.y,
+        };
+
+        const boardCorner3 = {
+            x: this.options.width - boardCorner1.x,
+            y: this.options.height - boardCorner1.y,
+        };
+
+        const boardMaxCorner0 = {
+            x: min(boardCorner0.x, boardCorner1.x, boardCorner2.x, boardCorner3.x),
+            y: min(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
+        };
+
+        const boardMaxCorner1 = {
+            x: max(boardCorner0.x, boardCorner1.x, boardCorner2.x, boardCorner3.x),
+            y: max(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
+        };
+
+        const boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS;
+        const boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
+
+        const scale = min(
+            this.options.width / boxWidth,
+            this.options.height / boxHeight,
+        );
+
+        this.gameContainer.scale = {x: scale, y: scale};
     }
 
     private listenModel(): void
@@ -72,6 +169,7 @@ export default class GameView
             await this.animateWinningPath(winningPath);
 
             // Win box
+            console.log('winner is', winner);
         });
     }
 
@@ -143,7 +241,7 @@ export default class GameView
 
                 this.hexes[row][col] = hex;
 
-                this.container.addChild(hex);
+                this.gameContainer.addChild(hex);
 
                 hex.on('pointertap', () => {
                     this.moveController.move(this.game, new Move(row, col));
@@ -189,11 +287,41 @@ export default class GameView
             to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
 
-        this.container.addChild(graphics);
+        this.gameContainer.addChild(graphics);
     }
 
     getHex(rowCol: {row: number, col: number}): Hex
     {
         return this.hexes[rowCol.row][rowCol.col];
+    }
+
+    private displayDebug(): void
+    {
+        const debugContainer = new Container();
+        const g = new Graphics();
+
+        g.lineStyle({
+            color: 0x0000ff,
+            width: 4,
+        });
+
+        g.drawRect(0, 0, this.options.width, this.options.height);
+        this.p({x: this.options.width / 2, y: this.options.height / 2});
+
+        debugContainer.addChild(g);
+        this.pixi.stage.addChild(debugContainer);
+    }
+
+    private p(p: IPointData): void
+    {
+        const g = new Graphics();
+
+        g.lineStyle({
+            color: 0x0000ff,
+            width: 4,
+        });
+
+        g.drawCircle(p.x, p.y, 4);
+        this.pixi.stage.addChild(g);
     }
 }

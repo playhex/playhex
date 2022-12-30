@@ -41,7 +41,9 @@ onMounted(() => {
         </div>
         <p v-else>Initialize game...</p>
 
-        <div class="board" ref="pixiApp"></div>
+        <div class="board-container">
+            <div class="board" ref="pixiApp"></div>
+        </div>
     </div>
 </template>
 
@@ -50,7 +52,17 @@ onMounted(() => {
     position: relative;
 }
 
-.player {
+.board-container {
+    display: flex;
+    justify-content: center;
+}
+
+.game-info {
+    position: relative;
+    top: 0;
+}
+
+.game-info>div {
     position: absolute;
     top: 0;
 }

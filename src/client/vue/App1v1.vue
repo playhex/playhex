@@ -74,13 +74,20 @@ const joinGame = async (playerIndex: PlayerIndex) => {
         </div>
         <p v-else>Loading game data...</p>
 
-        <div class="board" ref="pixiApp"></div>
+        <div class="board-container">
+            <div class="board" ref="pixiApp"></div>
+        </div>
     </div>
 </template>
 
 <style scoped>
 .container {
     position: relative;
+}
+
+.board-container {
+    display: flex;
+    justify-content: center;
 }
 
 .game-info {
