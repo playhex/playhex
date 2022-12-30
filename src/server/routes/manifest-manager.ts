@@ -4,14 +4,10 @@ import { IS_DEV, WEBPACK_PORT } from '../config';
 
 /* eslint-disable */
 
-function getManifestFromWebpack(): Promise<any> {
-    return new Promise((resolve, reject) => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const request = require('request');
-        request.get(`http://localhost:${WEBPACK_PORT}/statics/manifest.json`, {}, (err: any, data: any) =>
-            err ? reject(err) : resolve(data.body),
-        );
-    });
+async function getManifestFromWebpack(): Promise<string> {
+    const response = await fetch(`http://localhost:${WEBPACK_PORT}/statics/manifest.json`);
+
+    return response.text();
 }
 
 let manifestStrCache: string;

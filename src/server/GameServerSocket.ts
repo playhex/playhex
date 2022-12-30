@@ -2,11 +2,11 @@ import { Game, GameLoop, Move, PlayerIndex } from '../shared/game-engine';
 import { GameInstanceData } from '../shared/Types';
 import { Server, Socket } from 'socket.io';
 import SocketPlayer from './SocketPlayer';
-import { randomUUID } from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class GameServerSocket
 {
-    private id: string = randomUUID();
+    private id: string = uuidv4();
 
     constructor(
         private io: Server,
