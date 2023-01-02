@@ -61,6 +61,11 @@ export default class GameView
         this.pixi.stage.addChild(this.gameContainer);
     }
 
+    getGame()
+    {
+        return this.game;
+    }
+
     getView(): ICanvas
     {
         return this.pixi.view;

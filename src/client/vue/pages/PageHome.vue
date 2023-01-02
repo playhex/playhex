@@ -1,0 +1,34 @@
+<script setup lang="ts">
+/* eslint-env browser */
+import useHexClient from '@client/hexClient';
+
+const hexClient = useHexClient();
+</script>
+
+<template>
+    <ul>
+        <li>
+            <router-link to="/">Home</router-link>
+        </li>
+        <li>
+            <router-link to="/play-vs-ai">Play vs AI</router-link>
+        </li>
+        <li>
+            <router-link to="/play-1v1-same-screen">Play 1v1 same screen</router-link>
+        </li>
+    </ul>
+    <h3>Play 1v1</h3>
+
+    <p v-if="0 === Object.keys(hexClient.games).length">No active game for now. Create a new one !</p>
+    <ul v-else>
+        <li v-for="game in hexClient.games" v-bind:key="game.id">
+            <router-link :to="`/games/${game.id}`">{{ game.id }}</router-link>
+        </li>
+    </ul>
+
+    <button @click="hexClient.createGame()">Create game</button>
+    <button @click="hexClient.createGameVsCPU()">Create game vs CPU</button>
+</template>
+
+<style scoped>
+</style>

@@ -2,30 +2,55 @@
 /* eslint-env browser */
 import GameView from '@client/GameView';
 import Hex from '@client/Hex';
-import FrontPlayer from '@client/FrontPlayer';
-import { Game, RandomAIPlayer, GameLoop } from '@shared/game-engine';
+import { PlayerIndex } from '@shared/game-engine';
 import { onMounted, ref } from '@vue/runtime-core';
-import LocalPlayMoveController from '@client/MoveController/LocalPlayMoveController';
-
-const game = new Game([
-    new FrontPlayer(true, { id: 'Player' }),
-    new RandomAIPlayer(),
-]);
+import { toRefs } from 'vue';
 
 const colorA = '#' + Hex.COLOR_A.toString(16);
 const colorB = '#' + Hex.COLOR_B.toString(16);
 const pixiApp = ref<HTMLElement>();
 
-const gameView = new GameView(game, new LocalPlayMoveController());
+const props = defineProps({
+    gameView: {
+        type: GameView,
+        required: true,
+    },
+    onJoin: {
+        type: Function,
+        default: null,
+        required: false,
+    },
+});
 
-GameLoop.run(game);
+const { gameView, onJoin } = toRefs(props);
+const game = gameView?.value?.getGame();
+
+if (!gameView || !game) {
+    throw new Error('gameView is required');
+}
+
+const displayJoin = (playerIndex: PlayerIndex): boolean => {
+    return Boolean(onJoin);
+}
+
+const joinGame = (playerIndex: PlayerIndex) => {
+    if (!onJoin.value) {
+        return;
+    }
+
+    onJoin.value(playerIndex);
+};
 
 onMounted(() => {
     if (!pixiApp.value) {
         throw new Error('No element with ref="pixiApp"');
     }
 
-    pixiApp.value.appendChild(gameView.getView() as unknown as Node);
+    if (!gameView.value) {
+        throw new Error('gameView has no value');
+    }
+
+    pixiApp.value.appendChild(gameView.value.getView() as unknown as Node);
 });
 </script>
 
@@ -34,9 +59,11 @@ onMounted(() => {
         <div v-if="game" class="game-info">
             <div class="player-a">
                 <p :style="{ color: colorA }">{{ game.getPlayer(0).toData().id }}</p>
+                <button v-if="displayJoin(0)" @click="joinGame(0)">Join</button>
             </div>
             <div class="player-b">
                 <p :style="{ color: colorB }">{{ game.getPlayer(1).toData().id }}</p>
+                <button v-if="displayJoin(1)" @click="joinGame(1)">Join</button>
             </div>
         </div>
         <p v-else>Initialize game...</p>

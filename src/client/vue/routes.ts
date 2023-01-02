@@ -1,25 +1,25 @@
 import { RouteRecordRaw } from 'vue-router';
-import AppHome from './AppHome.vue';
-import App1v1 from './App1v1.vue';
-import AppPlayVsAI from './AppPlayVsAI.vue';
-import App1v1SameScreen from './App1v1SameScreen.vue';
+import PageHome from './pages/PageHome.vue';
+import Page1v1 from './pages/Page1v1.vue';
+import PagePlayVsAI from './pages/PagePlayVsAI.vue';
+import Page1v1SameScreen from './pages/Page1v1SameScreen.vue';
 
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        component: AppHome,
+        component: PageHome,
     },
     {
         path: '/games/:gameId',
-        component: App1v1,
+        component: Page1v1,
     },
     {
         path: '/play-vs-ai',
-        component: AppPlayVsAI,
+        component: PagePlayVsAI,
     },
     {
         path: '/play-1v1-same-screen',
-        component: App1v1SameScreen,
+        component: Page1v1SameScreen,
     },
 ];
 
