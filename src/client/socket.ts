@@ -1,7 +1,8 @@
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import playerId from './playerId';
+import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/HexSocketEvents';
 
-const socket = io({
+const socket: Socket<HexServerToClientEvents, HexClientToServerEvents> = io({
     auth: {
         playerId,
     },

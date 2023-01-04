@@ -1,34 +1,34 @@
 import { Game, Move, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
-import { EventsMap } from 'socket.io/dist/typed-events';
 import GameServerSocket from './GameServerSocket';
 import { MoveData, PlayerData } from '../shared/game-engine/Types';
 import SocketPlayer from './SocketPlayer';
+import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/HexSocketEvents';
 
 export class HexServer
 {
     private gameServerSockets: {[key: string]: GameServerSocket} = {};
 
     constructor(
-        private io: Server<EventsMap, EventsMap>,
+        private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
     ) {
         io.on('connection', socket => {
-            socket.on('createGame', (answer: (gameId: string) => void) => {
+            socket.on('createGame', answer => {
                 const gameSocketServer = this.createGame();
                 answer(gameSocketServer.getId());
             });
 
-            socket.on('joinGame', (gameId: string, playerIndex: PlayerIndex, answer: (joined: boolean) => void) => {
+            socket.on('joinGame', (gameId, playerIndex, answer) => {
                 const joined = this.playerJoinGame(socket, gameId, playerIndex);
                 answer(joined);
             });
 
-            socket.on('room', (join: 'join' | 'leave', room: string) => {
+            socket.on('room', (join, room) => {
                 console.log(`Room: player ${socket.handshake.auth.playerId} ${join} room ${room}`);
                 socket[join](room);
             });
 
-            socket.on('move', (gameId: string, move: MoveData, answer: (result: true|string) => void) => {
+            socket.on('move', (gameId, move, answer) => {
                 answer(this.playerMove(socket, gameId, move));
             });
         });

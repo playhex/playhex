@@ -1,6 +1,6 @@
 import { GameData } from './game-engine/Types';
 
-export type GameInstanceData = {
+export type HostedGameData = {
     id: string;
     game: GameData;
 };

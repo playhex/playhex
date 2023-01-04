@@ -1,5 +1,5 @@
 import { Game, GameLoop, Move, PlayerIndex } from '../shared/game-engine';
-import { GameInstanceData } from '../shared/Types';
+import { HostedGameData } from '../shared/Types';
 import { Server, Socket } from 'socket.io';
 import SocketPlayer from './SocketPlayer';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,14 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 export default class GameServerSocket
 {
     private id: string = uuidv4();
+    private name = 'Game';
 
     constructor(
         private io: Server,
-        private game = new Game([
-            new SocketPlayer(),
-            new SocketPlayer(),
-            //new RandomAIPlayer(),
-        ]),
+        private game: Game,
     ) {
         this.listenGame();
 
@@ -24,6 +21,16 @@ export default class GameServerSocket
     getId(): string
     {
         return this.id;
+    }
+
+    getName()
+    {
+        return this.name;
+    }
+
+    setName(name: string)
+    {
+        this.name = name;
     }
 
     getGame(): Game
@@ -129,7 +136,7 @@ export default class GameServerSocket
         player.setSocket(socket);
     }
 
-    toData(): GameInstanceData
+    toData(): HostedGameData
     {
         return {
             id: this.id,
