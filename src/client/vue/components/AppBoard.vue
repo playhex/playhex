@@ -3,7 +3,7 @@
 import GameView from '@client/GameView';
 import Hex from '@client/Hex';
 import { PlayerIndex } from '@shared/game-engine';
-import { onMounted, ref } from '@vue/runtime-core';
+import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
 
 const colorA = '#' + Hex.COLOR_A.toString(16);
@@ -51,6 +51,10 @@ onMounted(() => {
     }
 
     pixiApp.value.appendChild(gameView.value.getView() as unknown as Node);
+});
+
+onUnmounted(() => {
+    gameView.value.destroy();
 });
 </script>
 

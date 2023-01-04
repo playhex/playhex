@@ -347,6 +347,11 @@ export default class GameView
         return this.hexes[rowCol.row][rowCol.col];
     }
 
+    destroy()
+    {
+        this.pixi.destroy();
+    }
+
     private displayDebug(): void
     {
         const debugContainer = new Container();
