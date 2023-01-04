@@ -8,14 +8,49 @@ const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 
+export type BoardOrientation =
+    /**
+     * Displayed as horizontal diamond.
+     * Recommended for large screen.
+     */
+    'horizontal'
+
+    /**
+     * Displayed as vertical diamond.
+     */
+    | 'vertical'
+
+    /**
+     * Displayed as horizontal,
+     * but not symmetric          __
+     * to optimize screen space: /_/
+     */
+    | 'horizontal_bias'
+
+    /**
+     * Displayed as vertical,
+     * but not symmetric         /|
+     * to optimize screen space. |/
+     * Recommended for mobile screens.
+     */
+    | 'vertical_bias_right_hand'
+
+    /**
+     * Same as right_hand, but board goes |\
+     * from top left to bottom right.     \|
+     */
+    | 'vertical_bias_left_hand'
+;
+
 export type GameViewOptions = {
     width: number;
     height: number;
 };
 
+const margin = min(window.innerWidth, window.innerHeight) * 0.1;
 const defaultOptions: GameViewOptions = {
-    width: window.innerWidth * 0.98,
-    height: window.innerHeight * 0.6,
+    width: window.innerWidth - margin,
+    height: window.innerHeight - margin,
 }
 
 export default class GameView
@@ -23,6 +58,7 @@ export default class GameView
     private hexes: Hex[][];
     private pixi: Application;
     private gameContainer: Container = new Container();
+    private orientation: BoardOrientation;
 
     constructor(
         private game: Game,
@@ -41,7 +77,7 @@ export default class GameView
         if (window.innerWidth > window.innerHeight) {
             this.setOrientation('horizontal');
         } else {
-            this.setOrientation('vertical');
+            this.setOrientation('vertical_bias_right_hand');
         }
 
         this.gameContainer.pivot = Hex.coords(
@@ -71,17 +107,24 @@ export default class GameView
         return this.pixi.view;
     }
 
+    getOrientation()
+    {
+        return this.orientation;
+    }
+
     /**
      * Change orientation and rescale to fit screen.
      *
      * "bias" orientations allow to fit better screen,
      * ans non-bias orientations are more symmetric but makes board smaller.
      */
-    setOrientation(orientation: 'horizontal' | 'vertical' | 'horizontal_bias' | 'vertical_bias'): void
+    setOrientation(orientation: BoardOrientation): void
     {
+        this.orientation = orientation;
+
         switch (orientation) {
             case 'horizontal':
-                this.setBoardRotation(-1 * (Math.PI / 6));
+                this.setBoardRotation(5 * (Math.PI / 6));
                 break;
 
             case 'vertical':
@@ -92,8 +135,12 @@ export default class GameView
                 this.setBoardRotation(0 * (Math.PI / 6));
                 break;
 
-            case 'vertical_bias':
+            case 'vertical_bias_right_hand':
                 this.setBoardRotation(3 * (Math.PI / 6));
+                break;
+
+            case 'vertical_bias_left_hand':
+                this.setBoardRotation(1 * (Math.PI / 6));
                 break;
         }
     }

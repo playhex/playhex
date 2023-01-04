@@ -56,50 +56,77 @@ onMounted(() => {
 
 <template>
     <div class="container">
-        <div v-if="game" class="game-info">
-            <div class="player-a">
+        <div class="board-container">
+            <div ref="pixiApp"></div>
+        </div>
+
+        <div v-if="game" :class="['game-info-overlay', `orientation-${gameView.getOrientation()}`]">
+            <div class="player player-a">
                 <p :style="{ color: colorA }">{{ game.getPlayer(0).toData().id }}</p>
                 <button v-if="displayJoin(0)" @click="joinGame(0)">Join</button>
             </div>
-            <div class="player-b">
+            <div class="player player-b">
                 <p :style="{ color: colorB }">{{ game.getPlayer(1).toData().id }}</p>
                 <button v-if="displayJoin(1)" @click="joinGame(1)">Join</button>
             </div>
         </div>
         <p v-else>Initialize game...</p>
-
-        <div class="board-container">
-            <div class="board" ref="pixiApp"></div>
-        </div>
     </div>
 </template>
 
-<style scoped>
-.container {
-    position: relative;
-}
+<style lang="stylus">
+.container
+    position relative
 
-.board-container {
-    display: flex;
-    justify-content: center;
-}
+.board-container
+    display flex
+    justify-content center
 
-.game-info {
-    position: relative;
-    top: 0;
-}
+.player
+    position absolute
+    height auto
+    max-width 35%
 
-.game-info>div {
-    position: absolute;
-    top: 0;
-}
+    p
+        margin-top 0
 
-.player-a {
-    left: 0;
-}
+.orientation-vertical_bias_right_hand
+    .player-a
+        left 0
+        top 0
+    .player-b
+        right 0
+        bottom 0
 
-.player-b {
-    right: 0;
-    text-align: right;
-}
+.orientation-vertical_bias_left_hand
+    .player-a
+        right 0
+        top 0
+    .player-b
+        left 0
+        bottom 0
+
+.orientation-horizontal
+    .player-a
+        left 0
+        top 0
+    .player-b
+        right 0
+        top 0
+
+.orientation-horizontal_bias
+    .player-a
+        left 0
+        bottom 0
+    .player-b
+        right 0
+        top 0
+
+.orientation-vertical
+    .player-a
+        left 0
+        top 0
+    .player-b
+        right 0
+        top 0
 </style>

@@ -60,6 +60,8 @@
     "http-proxy-middleware": "^2.0.1",
     "mocha": "^10.1.0",
     "style-loader": "^3.3.1",
+    "stylus": "^0.59.0",
+    "stylus-loader": "^7.1.0",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.4.0",
     "tsc-watch": "^4.5.0",
