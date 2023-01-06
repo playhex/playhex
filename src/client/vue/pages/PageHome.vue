@@ -5,6 +5,16 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const hexClient = useHexClient();
+
+const createAndJoinGame = async () => {
+    const gameId = await hexClient.createGame();
+    router.push({name: 'online-game', params: {gameId}});
+};
+
+const createAndJoinGameVsCPU = async () => {
+    const gameId = await hexClient.createGameVsCPU();
+    router.push({name: 'online-game', params: {gameId}});
+};
 </script>
 
 <template>
@@ -25,8 +35,8 @@ const hexClient = useHexClient();
         </ul>
 
         <div class="d-grid gap-2 d-sm-block">
-            <button type="button" class="btn btn-primary" @click="hexClient.createGame()">Create game</button>
-            <button type="button" class="btn btn-primary" @click="hexClient.createGameVsCPU()">Create game vs CPU</button>
+            <button type="button" class="btn btn-primary" @click="createAndJoinGame">Create game</button>
+            <button type="button" class="btn btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
         </div>
     </div>
 </template>
