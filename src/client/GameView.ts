@@ -3,6 +3,7 @@ import { Application, Container, Graphics, ICanvas, IPointData, Ticker } from 'p
 import Hex from '@client/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { Coords } from '@shared/game-engine/Types';
+import { currentTheme } from '@client/Themes';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -309,7 +310,7 @@ export default class GameView
             graphics.lineTo(a.x + b.x, a.y + b.y);
         };
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_B);
+        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
 
         graphics.moveTo(Hex.cornerCoords(5).x, Hex.cornerCoords(5).y);
 
@@ -318,21 +319,21 @@ export default class GameView
             to(Hex.coords(0, i), Hex.cornerCoords(0));
         }
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_A);
+        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(1));
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(2));
         }
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_B);
+        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(3));
             to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(4));
         }
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, Hex.COLOR_A);
+        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             if (i) to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(4));

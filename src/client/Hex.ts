@@ -1,5 +1,6 @@
 import { Graphics, IPointData, Sprite } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
+import { currentTheme } from '@client/Themes';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -7,10 +8,6 @@ const SQRT3 = sqrt(3);
 export default class Hex extends Sprite
 {
     static readonly RADIUS = 20;
-
-    static readonly COLOR_A = 0xff8888;
-    static readonly COLOR_B = 0x8888ff;
-    static readonly COLOR_EMPTY = 0xcccccc;
 
     private graphics: Graphics;
 
@@ -38,7 +35,7 @@ export default class Hex extends Sprite
         }
 
         background.lineStyle(0);
-        background.beginFill(0xffffff, 1);
+        background.beginFill(currentTheme.strokeColor, 1);
         background.drawPolygon(path);
         background.endFill();
 
@@ -81,10 +78,10 @@ export default class Hex extends Sprite
     setPlayer(player: null|PlayerIndex): Hex
     {
         this.graphics.tint = null === player
-            ? Hex.COLOR_EMPTY
+            ? currentTheme.colorEmpty
             : [
-                Hex.COLOR_A,
-                Hex.COLOR_B,
+                currentTheme.colorA,
+                currentTheme.colorB,
             ][player]
         ;
 

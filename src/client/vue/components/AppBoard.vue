@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '@client/GameView';
-import Hex from '@client/Hex';
+import { currentTheme } from '@client/Themes';
 import { PlayerIndex } from '@shared/game-engine';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
 
-const colorA = '#' + Hex.COLOR_A.toString(16);
-const colorB = '#' + Hex.COLOR_B.toString(16);
+const colorA = '#' + currentTheme.colorA.toString(16);
+const colorB = '#' + currentTheme.colorB.toString(16);
 const pixiApp = ref<HTMLElement>();
 
 const props = defineProps({
@@ -59,27 +59,27 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="container">
+    <div class="app-board">
         <div class="board-container">
             <div ref="pixiApp"></div>
         </div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${gameView.getOrientation()}`]">
             <div class="player player-a">
-                <p :style="{ color: colorA }">{{ game.getPlayer(0).toData().id }}</p>
-                <button v-if="displayJoin(0)" @click="joinGame(0)">Join</button>
+                <h4 :style="{ color: colorA }">{{ game.getPlayer(0).toData().id }}</h4>
+                <button class="btn btn-sm btn-primary" v-if="displayJoin(0)" @click="joinGame(0)">Join</button>
             </div>
             <div class="player player-b">
-                <p :style="{ color: colorB }">{{ game.getPlayer(1).toData().id }}</p>
-                <button v-if="displayJoin(1)" @click="joinGame(1)">Join</button>
+                <h4 :style="{ color: colorB }">{{ game.getPlayer(1).toData().id }}</h4>
+                <button class="btn btn-sm btn-primary" v-if="displayJoin(1)" @click="joinGame(1)">Join</button>
             </div>
         </div>
         <p v-else>Initialize game...</p>
     </div>
 </template>
 
-<style lang="stylus">
-.container
+<style scoped lang="stylus">
+.app-board
     position relative
 
 .board-container
