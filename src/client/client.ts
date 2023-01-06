@@ -4,7 +4,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import App from './vue/App.vue';
 import useHexClient from '@client/hexClient';
 import routes from './vue/routes';
-import socket from '@client/socket';
 
 const pinia = createPinia();
 const router = createRouter({
@@ -16,6 +15,6 @@ const vueApp = createApp(App);
 vueApp.use(router);
 vueApp.use(pinia);
 
-useHexClient().listenSocket(socket);
+useHexClient().listenSocket();
 
 vueApp.mount('#vue-app');

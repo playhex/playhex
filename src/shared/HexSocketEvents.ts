@@ -37,4 +37,19 @@ export type HexServerToClientEvents = {
      * A player joined gameId, at position playerIndex.
      */
     gameJoined: (gameId: string, playerIndex: PlayerIndex, playerData: PlayerData) => void;
+
+    /**
+     * Both player are ready and game has started.
+     */
+    gameStarted: (gameId: string) => void;
+
+    /**
+     * A move has been played by a player.
+     */
+    moved: (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => void;
+
+    /**
+     * A game has ended and there is a winner.
+     */
+    ended: (gameId: string, winner: PlayerIndex) => void;
 };

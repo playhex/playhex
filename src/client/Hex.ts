@@ -1,6 +1,6 @@
 import { Graphics, IPointData, Sprite } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
-import { currentTheme } from '@client/Themes';
+import { currentTheme } from '@shared/Themes';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '@client/GameView';
-import { currentTheme } from '@client/Themes';
+import { currentTheme } from '../../../shared/Themes';
 import { PlayerIndex } from '@shared/game-engine';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';

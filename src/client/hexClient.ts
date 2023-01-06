@@ -112,7 +112,7 @@ const useHexClient = defineStore('hexClient', {
             });
         },
 
-        listenSocket(socket: Socket): void
+        listenSocket(): void
         {
             this.updateGames();
 

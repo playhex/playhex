@@ -10,7 +10,6 @@
 
 <style scoped lang="stylus">
 .menu-top
-    background-color #000000
     padding 0.2em 0
 
     ul

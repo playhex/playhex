@@ -22,4 +22,5 @@ export const themes: {[key in ThemeName]: Theme} = {
     },
 };
 
-export const currentTheme: Theme = themes['dark'];
+export const currentThemeName: ThemeName = 'dark';
+export const currentTheme: Theme = themes[currentThemeName];

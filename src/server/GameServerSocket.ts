@@ -3,6 +3,7 @@ import { HostedGameData } from '../shared/Types';
 import { Server, Socket } from 'socket.io';
 import SocketPlayer from './SocketPlayer';
 import { v4 as uuidv4 } from 'uuid';
+import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/HexSocketEvents';
 
 export default class GameServerSocket
 {
@@ -10,7 +11,7 @@ export default class GameServerSocket
     private name = 'Game';
 
     constructor(
-        private io: Server,
+        private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
         private game: Game,
     ) {
         this.listenGame();
