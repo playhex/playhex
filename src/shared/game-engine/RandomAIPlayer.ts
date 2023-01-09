@@ -1,25 +1,43 @@
-import GameInput from './GameInput';
 import Move from './Move';
-import PlayerInterface from './PlayerInterface';
-import { PlayerData } from './Types';
+import Player from './Player';
 
 const { floor, random } = Math;
 
-export default class RandomAIPlayer implements PlayerInterface
+export default class RandomAIPlayer extends Player
 {
-    async playMove(gameInput: GameInput): Promise<Move>
+    private static WAIT_BEFORE_PLAY = 1;
+
+    constructor()
+    {
+        super();
+
+        this.on('myTurnToPlay', () => {
+            this.makeMove();
+        });
+
+        this.setReady();
+    }
+
+    getName(): string
+    {
+        return 'Bot';
+    }
+
+    async makeMove(): Promise<void>
     {
         console.log('random AI player is playing...');
 
-        await new Promise(resolve => {
-            setTimeout(resolve, 100);
-        });
+        if (RandomAIPlayer.WAIT_BEFORE_PLAY > 0) {
+            await new Promise(resolve => {
+                setTimeout(resolve, RandomAIPlayer.WAIT_BEFORE_PLAY);
+            });
+        }
 
         const possibleMoves: Move[] = [];
 
-        for (let row = 0; row < gameInput.getSize(); ++row) {
-            for (let col = 0; col < gameInput.getSize(); ++col) {
-                if (null === gameInput.getHex(row, col)) {
+        for (let row = 0; row < this.playerGameInput.getSize(); ++row) {
+            for (let col = 0; col < this.playerGameInput.getSize(); ++col) {
+                if (null === this.playerGameInput.getHex(row, col)) {
                     possibleMoves.push(new Move(row, col));
                 }
             }
@@ -29,18 +47,6 @@ export default class RandomAIPlayer implements PlayerInterface
 
         console.log('random AI player plays ' + move);
 
-        return move;
-    }
-
-    async isReady(): Promise<true>
-    {
-        return true;
-    }
-
-    toData(): PlayerData
-    {
-        return {
-            id: 'bot',
-        };
+        this.playerGameInput.move(move);
     }
 }

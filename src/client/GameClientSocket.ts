@@ -1,13 +1,25 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
-import { PlayerData } from '@shared/game-engine/Types';
-import FrontPlayer from '@client/FrontPlayer';
+import ClientPlayer from './ClientPlayer';
+import useHexClient from './hexClient';
+import { PlayerData } from '@shared/app/Types';
 
 export default class GameClientSocket
 {
+    private hexClient = useHexClient();
+
     constructor(
         private id: string,
         private game: Game,
-    ) {}
+    ) {
+        this.listenGame();
+    }
+
+    private listenGame(): void
+    {
+        this.game.on('played', move => {
+            this.hexClient.move(this.id, move);
+        });
+    }
 
     getId(): string
     {
@@ -23,12 +35,12 @@ export default class GameClientSocket
     {
         const player = this.game.getPlayers()[playerIndex];
 
-        if (!(player instanceof FrontPlayer)) {
-            console.error('game joined event on a player which is not a FrontPlayer', player);
+        if (!(player instanceof ClientPlayer)) {
+            console.error('game joined event on a player which is not a ClientPlayer', player);
             return;
         }
 
-        player.updatePlayerData(playerData);
+        player.setPlayerData(playerData);
     }
 
     gameStarted(): void
@@ -38,8 +50,14 @@ export default class GameClientSocket
 
     gameMove(move: Move, byPlayerIndex: PlayerIndex): void
     {
-        this.game.setCell(move, byPlayerIndex);
-        this.game.setCurrentPlayerIndex(byPlayerIndex ? 0 : 1);
+        if (this.game.getCell(move.getRow(), move.getCol()) === 1 - byPlayerIndex) {
+            throw new Error('This cell is already filled by other player...');
+        }
+
+        // If cell is not already pre-played locally by server response anticipation
+        if (this.game.isEmpty(move.getRow(), move.getCol())) {
+            this.game.move(move, byPlayerIndex);
+        }
     }
 
     ended(winner: PlayerIndex): void

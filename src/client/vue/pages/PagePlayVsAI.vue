@@ -1,19 +1,20 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '@client/GameView';
-import FrontPlayer from '@client/FrontPlayer';
-import { Game, GameLoop, RandomAIPlayer } from '@shared/game-engine';
-import LocalPlayMoveController from '@client/MoveController/LocalPlayMoveController';
+import PlayerGameInputMoveController from '../../MoveController/PlayerGameInputMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
+import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
+
+const player = new Player();
 
 const game = new Game([
-    new FrontPlayer(true, { id: 'Player' }),
+    player,
     new RandomAIPlayer(),
 ]);
 
-const gameView = new GameView(game, new LocalPlayMoveController());
+const gameView = new GameView(game, new PlayerGameInputMoveController(player));
 
-GameLoop.run(game);
+player.setReady();
 </script>
 
 <template>

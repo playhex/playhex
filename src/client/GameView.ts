@@ -3,7 +3,7 @@ import { Application, Container, Graphics, ICanvas, IPointData, Ticker } from 'p
 import Hex from '@client/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { Coords } from '@shared/game-engine/Types';
-import { currentTheme } from '@shared/Themes';
+import { currentTheme } from '@shared/app/Themes';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;

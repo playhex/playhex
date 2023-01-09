@@ -7,13 +7,13 @@ const router = useRouter();
 const hexClient = useHexClient();
 
 const createAndJoinGame = async () => {
-    const gameId = await hexClient.createGame();
-    router.push({name: 'online-game', params: {gameId}});
+    const hostedGame = await hexClient.createGame();
+    router.push({name: 'online-game', params: {gameId: hostedGame.id}});
 };
 
 const createAndJoinGameVsCPU = async () => {
-    const gameId = await hexClient.createGameVsCPU();
-    router.push({name: 'online-game', params: {gameId}});
+    const hostedGame = await hexClient.createGameVsCPU();
+    router.push({name: 'online-game', params: {gameId: hostedGame.id}});
 };
 </script>
 

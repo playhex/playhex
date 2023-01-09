@@ -1,24 +1,33 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Game, Move, PlayerInterface } from '../../game-engine';
-import { PlayerData } from '../../game-engine/Types';
+import { Game, Move, Player } from '..';
+
+/*
+
+const player0 = new Player();
+const player1 = new Player();
+
+const game = new Game(player0, player1);
+
+player0.setReady();
+player1.setReady(); // game dispatches started event
+
+player0.move(new Move(0, 2)); // game dispatches played event
+player0.move(new Move(0, 1)); // nope, throws Illegal move
+player1.move(new Move(0, 3));
+...
+player1.move(new Move(1, 3)); // game dispatches ended event, winner = 1
+
+
+// or, with chrono
+player0.move(new Move(0, 2));
+... wait too long
+// game dispatches ended event, winner = 0, by timeout
+
+*/
 
 const _ = null;
-const nullPlayer = new class implements PlayerInterface {
-    isReady(): Promise<true>
-    {
-        throw new Error();
-    }
-    playMove(): Promise<Move>
-    {
-        throw new Error();
-    }
-    toData(): PlayerData
-    {
-        throw new Error();
-    }
-};
-const players: [PlayerInterface, PlayerInterface] = [nullPlayer, nullPlayer];
+const players: [Player, Player] = [new Player(), new Player()];
 
 describe('Game', () => {
     describe('hasConnection', () => {

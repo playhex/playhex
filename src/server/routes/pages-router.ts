@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getManifest } from './manifest-manager';
-import { currentThemeName } from '../../shared/Themes';
+import { currentThemeName } from '../../shared/app/Themes';
 
 export function pagesRouter() {
     const router = Router();

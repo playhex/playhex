@@ -1,11 +1,15 @@
 import EventEmitter from 'events';
-import { IllegalMove, PlayerInterface, PlayerIndex, Move } from '.';
+import { IllegalMove, PlayerIndex, Move, PlayerGameInput } from '.';
 import TypedEmitter from 'typed-emitter';
-import { Coords, GameData, PathItem, PlayerData } from './Types';
+import { Coords, PathItem } from './Types';
+import Player from './Player';
+import { GameData } from 'app/Types';
 
 type GameEvents = {
     /**
-     * A game started can accept moves.
+     * Both players are ready,
+     * the game can now accept moves,
+     * chrono is started.
      */
     started: () => void;
 
@@ -32,7 +36,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private winner: null|PlayerIndex = null;
 
     constructor(
-        private players: [PlayerInterface, PlayerInterface],
+        private players: [Player, Player],
         private size: number = 11,
     ) {
         super();
@@ -41,9 +45,40 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             .fill([])
             .map(() => Array(this.size).fill(null))
         ;
+
+        players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
+        players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
+
+        this.on('started', () => players[0].emit('myTurnToPlay'));
+        this.on('played', () => {
+            if (!this.hasWinner()) {
+                players[this.currentPlayerIndex].emit('myTurnToPlay');
+            }
+        });
+
+        this.listenPlayersReady();
     }
 
-    static createFromGrid(players: [PlayerInterface, PlayerInterface], hexes: (null|PlayerIndex)[][]): Game
+    private listenPlayersReady(): void
+    {
+        const playerReadyListener = (ready: boolean): void => {
+            if (ready && this.players.every(player => player.isReady())) {
+                this.start();
+
+                this.players.forEach(player => {
+                    player.off('readyStateChanged', playerReadyListener);
+                });
+            }
+        };
+
+        this.players.forEach(player => {
+            player.on('readyStateChanged', playerReadyListener);
+        });
+
+        playerReadyListener(true);
+    }
+
+    static createFromGrid(players: [Player, Player], hexes: (null|PlayerIndex)[][]): Game
     {
         const game = new Game(players, hexes.length);
 
@@ -56,7 +91,8 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return game;
     }
 
-    static createFromGameData(players: [PlayerInterface, PlayerInterface], gameData: GameData): Game
+    // TODO should not be in engine, but mutliplayer
+    static createFromGameData(players: [Player, Player], gameData: GameData): Game
     {
         const game = new Game(players, gameData.size);
 
@@ -84,12 +120,12 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.size;
     }
 
-    getPlayers(): [PlayerInterface, PlayerInterface]
+    getPlayers(): [Player, Player]
     {
         return this.players;
     }
 
-    getPlayer(playerIndex: PlayerIndex): PlayerInterface
+    getPlayer(playerIndex: PlayerIndex): Player
     {
         return this.players[playerIndex];
     }
@@ -104,7 +140,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.currentPlayerIndex = currentPlayerIndex;
     }
 
-    getCurrentPlayer(): PlayerInterface
+    getCurrentPlayer(): Player
     {
         return this.players[this.currentPlayerIndex];
     }
@@ -117,6 +153,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     isEnded(): boolean
     {
         return null !== this.winner;
+    }
+
+    getWinner(): null | PlayerIndex
+    {
+        return this.winner;
     }
 
     getStrictWinner(): PlayerIndex
@@ -166,24 +207,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     /**
      * Set a cell to a value.
-     * Should be called after server update events.
-     * Do not check the move nor change the game state.
      * Should call move() instead to play the game.
      */
     setCell(move: Move, value: null | PlayerIndex): void
     {
         this.hexes[move.getRow()][move.getCol()] = value;
-
-        if (null === value) {
-            return;
-        }
-
-        this.emit('played', move, value);
-
-        if (this.hasPlayerConnection(this.currentPlayerIndex)) {
-            this.setWinner(this.currentPlayerIndex);
-            return;
-        }
     }
 
     start(): void
@@ -192,30 +220,41 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             throw new Error('Game already started');
         }
 
+        console.log('start game');
+
         this.started = true;
 
         this.emit('started');
     }
 
+    isStarted(): boolean
+    {
+        return this.started;
+    }
+
     /**
      * @throws IllegalMove on invalid move.
      */
-    checkMove(move: Move): void
+    checkMove(move: Move, playerIndex: PlayerIndex): void
     {
         if (!this.started) {
-            throw new IllegalMove('Game is not yet started');
+            throw new IllegalMove(move, 'Game is not yet started');
         }
 
         if (this.isEnded()) {
-            throw new IllegalMove('Game is over');
+            throw new IllegalMove(move, 'Game is over');
         }
 
         if (!this.isCellCoordsValid(move.getRow(), move.getCol())) {
-            throw new IllegalMove('Cell outside board');
+            throw new IllegalMove(move, 'Cell outside board');
         }
 
         if (!this.isEmpty(move.getRow(), move.getCol())) {
-            throw new IllegalMove('This cell is already occupied');
+            throw new IllegalMove(move, 'This cell is already occupied');
+        }
+
+        if (this.currentPlayerIndex !== playerIndex) {
+            throw new IllegalMove(move, 'Not your turn');
         }
     }
 
@@ -224,13 +263,19 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      *
      * @throws IllegalMove on invalid move.
      */
-    move(move: Move): void
+    move(move: Move, playerIndex: PlayerIndex): void
     {
-        this.checkMove(move);
+        this.checkMove(move, playerIndex);
+        this.setCell(move, playerIndex);
 
-        this.setCell(move, this.currentPlayerIndex);
+        // Naively check connection on every move played
+        if (this.hasPlayerConnection(playerIndex)) {
+            this.setWinner(playerIndex);
+        } else {
+            this.changeCurrentPlayer();
+        }
 
-        this.changeCurrentPlayer();
+        this.emit('played', move, playerIndex);
     }
 
     /**
@@ -428,29 +473,5 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
                 )
             )
         ;
-    }
-
-    toData(): GameData
-    {
-        return {
-            players: this.players.map(player => player.toData()) as [PlayerData, PlayerData],
-            size: this.size,
-            started: this.started,
-            currentPlayerIndex: this.currentPlayerIndex,
-            winner: this.winner,
-            hexes: this.hexes.map(
-                row => row
-                    .map(
-                        cell => null === cell
-                            ? '.' :
-                            (cell
-                                ? '1'
-                                : '0'
-                            ),
-                    )
-                    .join('')
-                ,
-            ),
-        };
     }
 }

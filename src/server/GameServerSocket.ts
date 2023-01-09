@@ -1,37 +1,28 @@
-import { Game, GameLoop, Move, PlayerIndex } from '../shared/game-engine';
-import { HostedGameData } from '../shared/Types';
+import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
+import { GameData, HostedGameData, PlayerData } from '../shared/app/Types';
 import { Server, Socket } from 'socket.io';
-import SocketPlayer from './SocketPlayer';
+import ServerPlayer from './ServerPlayer';
 import { v4 as uuidv4 } from 'uuid';
-import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/HexSocketEvents';
+import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/HexSocketEvents';
 
+/**
+ * Contains a game state,
+ * mutate this, and notify obervers in the room.
+ */
 export default class GameServerSocket
 {
     private id: string = uuidv4();
-    private name = 'Game';
 
     constructor(
         private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
         private game: Game,
     ) {
         this.listenGame();
-
-        GameLoop.run(this.game);
     }
 
     getId(): string
     {
         return this.id;
-    }
-
-    getName()
-    {
-        return this.name;
-    }
-
-    setName(name: string)
-    {
-        this.name = name;
     }
 
     getGame(): Game
@@ -58,8 +49,8 @@ export default class GameServerSocket
     {
         const player = this.game.getPlayers()[playerIndex];
 
-        if (!(player instanceof SocketPlayer)) {
-            console.log('Trying to join a slot that is not a SocketPlayer:', player);
+        if (!(player instanceof ServerPlayer)) {
+            console.log('Trying to join a slot that is not a ServerPlayer:', player);
             return false;
         }
 
@@ -79,7 +70,7 @@ export default class GameServerSocket
             let opponentId: null|string;
 
             if (
-                opponent instanceof SocketPlayer
+                opponent instanceof ServerPlayer
                 && (opponentId = opponent.getPlayerId())
                 && opponentId === socket.handshake.auth.playerId
             ) {
@@ -87,7 +78,7 @@ export default class GameServerSocket
                 return false;
             }
 
-            this.setSocketPlayer(socket, playerIndex);
+            this.setServerPlayer(socket, playerIndex);
 
             return true;
         }
@@ -97,37 +88,47 @@ export default class GameServerSocket
             return false;
         }
 
-        this.setSocketPlayer(socket, playerIndex);
+        this.setServerPlayer(socket, playerIndex);
 
         return true;
     }
 
-    playerMove(socket: Socket, move: Move): boolean
+    playerMove(socket: Socket, move: Move): true | string
     {
         const player = this.game.getPlayers().find(player => {
-            if (!(player instanceof SocketPlayer)) {
+            if (!(player instanceof ServerPlayer)) {
                 return false;
             }
 
             return player.getPlayerId() === socket.handshake.auth.playerId;
         });
 
-        if (!(player instanceof SocketPlayer)) {
-            console.log('A player not in the game tryed to make a move', socket.handshake.auth);
-            return false;
+        if (!(player instanceof Player)) {
+            console.log('A player not in the game tried to make a move', socket.handshake.auth);
+            return 'you are not a player of this game';
         }
 
-        player.doMove(move);
+        try {
+            player.move(move);
 
-        return true;
+            return true;
+        } catch (e) {
+            if (e instanceof IllegalMove) {
+                return e.message;
+            }
+
+            console.error(e.message);
+
+            return 'Unexpected error: ' + e.message;
+        }
     }
 
-    private setSocketPlayer(socket: Socket, playerIndex: PlayerIndex): void
+    private setServerPlayer(socket: Socket, playerIndex: PlayerIndex): void
     {
         const player = this.game.getPlayer(playerIndex);
 
-        if (!(player instanceof SocketPlayer)) {
-            throw new Error('Trying to set a socket on a non-SocketPlayer');
+        if (!(player instanceof ServerPlayer)) {
+            throw new Error('Trying to set a socket on a non-ServerPlayer');
         }
 
         player.setPlayerData({
@@ -141,7 +142,31 @@ export default class GameServerSocket
     {
         return {
             id: this.id,
-            game: this.game.toData(),
+            game: GameServerSocket.gameToData(this.game),
+        };
+    }
+
+    private static gameToData(game: Game): GameData
+    {
+        return {
+            players: game.getPlayers().map(player => ({id: player.getName()})) as [PlayerData, PlayerData],
+            size: game.getSize(),
+            started: game.isStarted(),
+            currentPlayerIndex: game.getCurrentPlayerIndex(),
+            winner: game.getWinner(),
+            hexes: game.getCells().map(
+                row => row
+                    .map(
+                        cell => null === cell
+                            ? '.' :
+                            (cell
+                                ? '1'
+                                : '0'
+                            ),
+                    )
+                    .join('')
+                ,
+            ),
         };
     }
 }

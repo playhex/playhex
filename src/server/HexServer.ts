@@ -1,10 +1,15 @@
 import { Game, Move, PlayerIndex } from '../shared/game-engine';
 import { Server, Socket } from 'socket.io';
 import GameServerSocket from './GameServerSocket';
-import { MoveData, PlayerData } from '../shared/game-engine/Types';
-import SocketPlayer from './SocketPlayer';
-import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/HexSocketEvents';
+import { MoveData, PlayerData } from '../shared/app/Types';
+import ServerPlayer from './ServerPlayer';
+import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/HexSocketEvents';
 
+/**
+ * Contains server state,
+ * listens all socket events,
+ * dispatch game events to dedicated GameServerSocket.
+ */
 export class HexServer
 {
     private gameServerSockets: {[key: string]: GameServerSocket} = {};
@@ -46,8 +51,8 @@ export class HexServer
 
     createGame(
         game: Game = new Game([
-            new SocketPlayer(),
-            new SocketPlayer(),
+            new ServerPlayer(),
+            new ServerPlayer(),
         ]),
     ): GameServerSocket {
         const gameServerSocket = new GameServerSocket(this.io, game);
@@ -86,6 +91,6 @@ export class HexServer
             return 'game not found';
         }
 
-        return gameServerSocket.playerMove(socket, new Move(move.row, move.col)) || 'wrong move';
+        return gameServerSocket.playerMove(socket, new Move(move.row, move.col));
     }
 }

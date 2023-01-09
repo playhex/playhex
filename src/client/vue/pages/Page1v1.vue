@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import GameView from '@client/GameView';
 import useHexClient from '@client/hexClient';
 import { ref } from '@vue/runtime-core';
@@ -10,6 +10,7 @@ import AppBoard from '@client/vue/components/AppBoard.vue';
 import { PlayerIndex } from '@shared/game-engine';
 
 const route = useRoute();
+const router = useRouter();
 const hexClient = useHexClient();
 const gameView = ref<GameView>();
 const { gameId } = route.params;
@@ -25,7 +26,9 @@ if (Array.isArray(gameId)) {
         const gameClientSocket = await hexClient.retrieveGameClientSocket(gameId);
 
         if (!gameClientSocket) {
-            throw new Error('game not found');
+            console.error(`Game ${gameId} no longer exists.`);
+            router.push({name: 'home'});
+            return;
         }
 
         game = gameClientSocket.getGame();
@@ -33,7 +36,7 @@ if (Array.isArray(gameId)) {
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    gameView.value = new GameView(game, new RemotePlayMoveController(gameId));
+    gameView.value = new GameView(game, new RemotePlayMoveController());
 })();
 
 const onJoin = async (playerIndex: PlayerIndex) => {

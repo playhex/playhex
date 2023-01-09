@@ -4,12 +4,13 @@ import { Game, Move, PlayerIndex } from '.';
  * State of a game.
  * Provided as input to Player to make their move.
  */
-export default class GameInput
+export default class PlayerGameInput
 {
     private hexes: null|(null|PlayerIndex)[][] = null;
 
     constructor(
         private game: Game,
+        private playerIndex: PlayerIndex,
     ) {}
 
     getSize(): number
@@ -31,8 +32,13 @@ export default class GameInput
         return this.hexes;
     }
 
-    checkMove(move: Move): void
+    /**
+     * @throws IllegalMove on invalid move.
+     */
+    move(move: Move): void
     {
-        this.game.checkMove(move);
+        this.game.move(move, this.playerIndex);
+
+        this.hexes = null;
     }
 }
