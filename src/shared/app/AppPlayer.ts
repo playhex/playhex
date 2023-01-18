@@ -11,7 +11,7 @@ export default class AppPlayer extends Player
             return '(free)';
         }
 
-        return this.playerData.id;
+        return this.playerData.pseudo;
     }
 
     getPlayerData(): null | PlayerData
@@ -19,7 +19,7 @@ export default class AppPlayer extends Player
         return this.playerData;
     }
 
-    setPlayerData(playerData: PlayerData): void
+    setPlayerData(playerData: null | PlayerData): void
     {
         this.playerData = playerData;
     }

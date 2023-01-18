@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import path from 'path';
+import session from 'express-session';
 import { apiRouter } from './routes/api-router';
 import { pagesRouter } from './routes/pages-router';
 import { staticsRouter } from './routes/statics-router';
@@ -16,6 +17,25 @@ console.log(`*******************************************`);
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+const sessionMiddleware = session({
+    secret: 'TODO secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 365 * 86400 * 1000,
+        //secure: true, // to enable from .env
+    },
+});
+app.use(sessionMiddleware);
+io.use((socket, next) => {
+    sessionMiddleware(socket.request as Request, {} as Response, next as NextFunction);
+});
+io.use((socket, next) => {
+    const session = socket.request.session;
+    console.log('hh', session);
+    next();
+});
 
 app.set('view engine', 'ejs');
 

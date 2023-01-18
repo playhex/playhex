@@ -9,6 +9,11 @@ import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 const useHexClient = defineStore('hexClient', {
     state: () => ({
         /**
+         * Current logged in user
+         */
+        loggedInUser: null as null | PlayerData,
+
+        /**
          * List of games visible on lobby
          */
         games: {} as {[key: string]: HostedGameData},
@@ -20,6 +25,19 @@ const useHexClient = defineStore('hexClient', {
     }),
 
     actions: {
+        async getUserOrLoginAsGuest(): Promise<PlayerData>
+        {
+            if (null !== this.loggedInUser) {
+                return this.loggedInUser;
+            }
+
+            const response = await fetch('/auth/guest', {
+                method: 'post',
+            });
+
+            return this.loggedInUser = await response.json();
+        },
+
         async createGame(): Promise<HostedGameData>
         {
             const response = await fetch('/api/games/1v1', {
@@ -81,22 +99,27 @@ const useHexClient = defineStore('hexClient', {
             socket.emit('room', join, gameId);
         },
 
-        async joinGame(gameId: string, playerIndex: PlayerIndex): Promise<boolean>
+        async joinGame(gameId: string, playerIndex: PlayerIndex): Promise<true | string>
         {
             return new Promise(resolve => {
-                socket.emit('joinGame', gameId, playerIndex, (answer: boolean) => {
+                socket.emit('joinGame', gameId, playerIndex, (answer: true | string) => {
                     resolve(answer);
                 });
             });
         },
 
-        async move(gameId: string, move: Move): Promise<boolean>
+        async move(gameId: string, move: Move): Promise<string | true>
         {
             return new Promise(resolve => {
                 socket.emit('move', gameId, move, result => {
-                    resolve(true === result);
+                    resolve(result);
                 });
             });
+        },
+
+        reconnectSocket(): void
+        {
+            socket.disconnect().connect();
         },
 
         listenSocket(): void

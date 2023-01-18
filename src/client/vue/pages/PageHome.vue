@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import useHexClient from '@client/hexClient';
+import { HostedGameData } from '@shared/app/Types';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -15,6 +16,9 @@ const createAndJoinGameVsCPU = async () => {
     const hostedGame = await hexClient.createGameVsCPU();
     router.push({name: 'online-game', params: {gameId: hostedGame.id}});
 };
+
+const isWaiting = (hostedGame: HostedGameData) => !hostedGame.game.started;
+const isPlaying = (hostedGame: HostedGameData) => hostedGame.game.started && null === hostedGame.game.winner;
 </script>
 
 <template>
@@ -25,12 +29,12 @@ const createAndJoinGameVsCPU = async () => {
             <button type="button" class="btn btn-primary" @click="router.push('/play-vs-ai')">Play vs AI</button>
         </div>
 
-        <h3>Online games</h3>
+        <h3>Join a game</h3>
 
-        <p v-if="0 === Object.keys(hexClient.games).length">No active game for now. Create a new one !</p>
+        <p v-if="0 === Object.values(hexClient.games).filter(isWaiting).length">No game for now. Create a new one !</p>
         <ul v-else>
-            <li v-for="game in hexClient.games" v-bind:key="game.id">
-                <router-link :to="`/games/${game.id}`">{{ game.id }}</router-link>
+            <li v-for="hostedGame in Object.values(hexClient.games).filter(isWaiting)" v-bind:key="hostedGame.id">
+                <router-link :to="`/games/${hostedGame.id}`">{{ hostedGame.id }}</router-link>
             </li>
         </ul>
 
@@ -38,5 +42,14 @@ const createAndJoinGameVsCPU = async () => {
             <button type="button" class="btn btn-primary" @click="createAndJoinGame">Create game</button>
             <button type="button" class="btn btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
         </div>
+
+        <h3>Watch a game</h3>
+
+        <p v-if="0 === Object.values(hexClient.games).filter(isPlaying).length">No game currently playing.</p>
+        <ul v-else>
+            <li v-for="hostedGame in Object.values(hexClient.games).filter(isPlaying)" v-bind:key="hostedGame.id">
+                <router-link :to="`/games/${hostedGame.id}`">{{ hostedGame.id }}</router-link>
+            </li>
+        </ul>
     </div>
 </template>

@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { HexServer } from '@server/HexServer';
 import { Game, Player, RandomAIPlayer } from '../../shared/game-engine';
 import ServerPlayer from '../ServerPlayer';
+import { PlayerData } from '@shared/app/Types';
 
 export function apiRouter(hexServer: HexServer) {
     const router = Router();
@@ -15,8 +16,15 @@ export function apiRouter(hexServer: HexServer) {
     });
 
     router.post('/api/games/1v1', (req, res) => {
-        const players: [Player, Player] = [
-            new ServerPlayer(),
+        let playerData: null | PlayerData;
+
+        if (!req.session.playerId || null === (playerData = hexServer.getPlayer(req.session.playerId))) {
+            res.status(403).send('not authenticated').end();
+            return;
+        }
+
+        const players: [ServerPlayer, ServerPlayer] = [
+            new ServerPlayer().setPlayerData(playerData),
             new ServerPlayer(),
         ];
 
@@ -31,9 +39,16 @@ export function apiRouter(hexServer: HexServer) {
     });
 
     router.post('/api/games/cpu', (req, res) => {
+        let playerData: null | PlayerData;
+
+        if (!req.session.playerId || null === (playerData = hexServer.getPlayer(req.session.playerId))) {
+            res.status(403).send('not authenticated').end();
+            return;
+        }
+
         const players: [Player, Player] = [
+            new ServerPlayer().setPlayerData(playerData),
             new RandomAIPlayer(),
-            new ServerPlayer(),
         ];
 
         if (Math.random() < 0.5) {
@@ -56,6 +71,22 @@ export function apiRouter(hexServer: HexServer) {
         }
 
         res.send(game.toData());
+    });
+
+    router.post('/auth/guest', (req, res) => {
+        let user: null | PlayerData = null;
+
+        if (req.session.playerId) {
+            user = hexServer.getPlayer(req.session.playerId);
+        }
+
+        if (null === user) {
+            user = hexServer.createGuest();
+        }
+
+        req.session.playerId = user.id;
+
+        res.send(user).end();
     });
 
     router.all('/api/**', (req, res) => {

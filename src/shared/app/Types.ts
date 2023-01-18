@@ -2,10 +2,12 @@ import { PlayerIndex } from "game-engine";
 
 export type PlayerData = {
     id: string;
+    pseudo: string;
+    isGuest: boolean;
 };
 
 export type GameData = {
-    players: [PlayerData, PlayerData];
+    players: [null | PlayerData, null | PlayerData];
 
     /**
      * Game created from data should not automatically start if this is true,

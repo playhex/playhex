@@ -40,10 +40,10 @@ if (Array.isArray(gameId)) {
 })();
 
 const onJoin = async (playerIndex: PlayerIndex) => {
-    const joined = await hexClient.joinGame(gameId, playerIndex);
+    const result = await hexClient.joinGame(gameId, playerIndex);
 
-    if (!joined) {
-        console.error('could not join');
+    if (true !== result) {
+        console.error('could not join:', result);
     }
 };
 </script>

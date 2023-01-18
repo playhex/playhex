@@ -12,7 +12,7 @@ export type HexClientToServerEvents = {
      * A player wants to join a game, at position 'playerIndex'.
      * Answer contains a boolean whether the player has joined or not.
      */
-    joinGame: (gameId: string, playerIndex: PlayerIndex, answer: (joined: boolean) => void) => void;
+    joinGame: (gameId: string, playerIndex: PlayerIndex, answer: (joined: true | string) => void) => void;
 
     /**
      * A player wants to join or leave a room.

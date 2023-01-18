@@ -1,10 +1,10 @@
 import AppPlayer from '@shared/app/AppPlayer';
 import { PlayerData } from '@shared/app/Types';
-import playerId from './playerId';
+import useHexClient from './hexClient';
 
 export default class ClientPlayer extends AppPlayer
 {
-    static fromPlayerData(playerData: PlayerData): ClientPlayer
+    static fromPlayerData(playerData: null | PlayerData): ClientPlayer
     {
         const player = new ClientPlayer();
 
@@ -19,6 +19,6 @@ export default class ClientPlayer extends AppPlayer
             return false;
         }
 
-        return this.playerData.id === playerId;
+        return this.playerData.id === useHexClient().loggedInUser?.id;
     }
 }

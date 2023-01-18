@@ -1,9 +1,10 @@
 import { Game, Move, PlayerIndex } from '../shared/game-engine';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import GameServerSocket from './GameServerSocket';
 import { MoveData, PlayerData } from '../shared/app/Types';
 import ServerPlayer from './ServerPlayer';
 import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/HexSocketEvents';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Contains server state,
@@ -13,30 +14,38 @@ import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/He
 export class HexServer
 {
     private gameServerSockets: {[key: string]: GameServerSocket} = {};
+    private players: {[key: string]: PlayerData} = {};
 
     constructor(
         private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
     ) {
         io.on('connection', socket => {
+            console.log('New socket connection', socket.request.session);
+
             socket.on('createGame', answer => {
                 const gameSocketServer = this.createGame();
                 answer(gameSocketServer.getId());
             });
 
             socket.on('joinGame', (gameId, playerIndex, answer) => {
-                const joined = this.playerJoinGame(socket, gameId, playerIndex);
+                const joined = this.playerJoinGame(socket.request.session.playerId, gameId, playerIndex);
                 answer(joined);
             });
 
             socket.on('room', (join, room) => {
-                console.log(`Room: player ${socket.handshake.auth.playerId} ${join} room ${room}`);
+                console.log(`Room: player ${socket.request.session.playerId} ${join} room ${room}`);
                 socket[join](room);
             });
 
             socket.on('move', (gameId, move, answer) => {
-                answer(this.playerMove(socket, gameId, move));
+                answer(this.playerMove(socket.request.session.playerId, gameId, move));
             });
         });
+    }
+
+    getPlayer(playerId: string): null | PlayerData
+    {
+        return this.players[playerId] || null;
     }
 
     getGames()
@@ -62,35 +71,54 @@ export class HexServer
         return gameServerSocket;
     }
 
-    playerJoinGame(socket: Socket, gameId: string, playerIndex: PlayerIndex): boolean
+    playerJoinGame(playerId: string, gameId: string, playerIndex: PlayerIndex): true | string
     {
         const gameServerSocket = this.gameServerSockets[gameId];
 
         if (!gameServerSocket) {
-            return false;
+            return 'no game ' + gameId;
         }
 
-        const joined = gameServerSocket.playerJoin(socket, playerIndex);
+        const playerData = this.players[playerId];
 
-        if (joined) {
-            const playerData: PlayerData = {
-                id: socket.handshake.auth.playerId,
-            };
+        if (!playerData) {
+            return 'no player ' + playerId;
+        }
 
+        const joined = gameServerSocket.playerJoin(playerData, playerIndex);
+
+        if (true === joined) {
             this.io.to(`games/${gameId}`).emit('gameJoined', gameId, playerIndex, playerData);
         }
 
         return joined;
     }
 
-    playerMove(socket: Socket, gameId: string, move: MoveData): true|string
+    playerMove(playerId: string, gameId: string, move: MoveData): true|string
     {
         const gameServerSocket = this.gameServerSockets[gameId];
 
         if (!gameServerSocket) {
-            return 'game not found';
+            return 'no game ' + gameId;
         }
 
-        return gameServerSocket.playerMove(socket, new Move(move.row, move.col));
+        const playerData = this.players[playerId];
+
+        if (!playerData) {
+            return 'no player' + playerId;
+        }
+
+        return gameServerSocket.playerMove(playerData, new Move(move.row, move.col));
+    }
+
+    createGuest(): PlayerData
+    {
+        const guest: PlayerData = {
+            id: uuidv4(),
+            isGuest: true,
+            pseudo: 'Guest ' + (1000 + Math.floor(Math.random() * 9000)),
+        };
+
+        return this.players[guest.id] = guest;
     }
 }

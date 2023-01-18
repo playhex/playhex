@@ -16,8 +16,14 @@ export default class GameClientSocket
 
     private listenGame(): void
     {
-        this.game.on('played', move => {
-            this.hexClient.move(this.id, move);
+        this.game.on('played', async (move) => {
+            // TODO do not call hexClient.move when move comes from opponent
+
+            const result = await this.hexClient.move(this.id, move);
+
+            if (true !== result) {
+                console.error('Error while doing move:', result);
+            }
         });
     }
 

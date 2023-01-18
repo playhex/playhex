@@ -17,4 +17,12 @@ vueApp.use(pinia);
 
 useHexClient().listenSocket();
 
+(async () => {
+    const user = await useHexClient().getUserOrLoginAsGuest();
+
+    useHexClient().reconnectSocket();
+
+    console.log('logged in as', user);
+})();
+
 vueApp.mount('#vue-app');
