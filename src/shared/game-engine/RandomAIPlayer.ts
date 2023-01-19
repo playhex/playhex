@@ -33,6 +33,10 @@ export default class RandomAIPlayer extends Player
             });
         }
 
+        if (null === this.playerGameInput) {
+            throw new Error('Cannot move, no player game input provided.');
+        }
+
         const possibleMoves: Move[] = [];
 
         for (let row = 0; row < this.playerGameInput.getSize(); ++row) {

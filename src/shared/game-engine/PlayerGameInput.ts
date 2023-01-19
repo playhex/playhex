@@ -20,13 +20,13 @@ export default class PlayerGameInput
 
     getHex(row: number, col: number): null|PlayerIndex
     {
-        return this.game.getCell(row, col);
+        return this.game.getBoard().getCell(row, col);
     }
 
     getHexes(): (null|PlayerIndex)[][]
     {
         if (null === this.hexes) {
-            this.hexes = this.game.getCellsClone();
+            this.hexes = this.game.getBoard().getCellsClone();
         }
 
         return this.hexes;

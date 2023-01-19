@@ -2,7 +2,6 @@
 /* eslint-env browser */
 import GameView from '@client/GameView';
 import { currentTheme } from '@shared/app/Themes';
-import AppPlayer from '@shared/app/AppPlayer';
 import { PlayerIndex } from '@shared/game-engine';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';

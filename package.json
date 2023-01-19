@@ -12,7 +12,7 @@
     "dev-server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps index.js\"",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run build-server\" \"npm run build-client\"",
-    "test": "mocha src/*/test/**/*.ts -n loader=ts-node/esm --extension ts"
+    "test": "mocha src/**/test/**/*.ts -n loader=ts-node/esm --extension ts"
   },
   "license": "MIT",
   "dependencies": {

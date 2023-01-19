@@ -213,7 +213,7 @@ export default class GameView
         });
 
         this.game.on('ended', async (winner) => {
-            const winningPath = this.game.getShortestWinningPath();
+            const winningPath = this.game.getBoard().getShortestWinningPath();
 
             if (null === winningPath) {
                 throw new Error('Winner but no winning path...');
@@ -288,7 +288,7 @@ export default class GameView
 
         for (let row = 0; row < this.game.getSize(); ++row) {
             for (let col = 0; col < this.game.getSize(); ++col) {
-                const hex = new Hex(this.game.getCell(row, col));
+                const hex = new Hex(this.game.getBoard().getCell(row, col));
 
                 hex.position = Hex.coords(row, col);
 

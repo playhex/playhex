@@ -4,7 +4,7 @@ import { Socket } from 'socket.io-client';
 import ClientPlayer from './ClientPlayer';
 import GameClientSocket from './GameClientSocket';
 import socket from '@client/socket';
-import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
+import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 
 const useHexClient = defineStore('hexClient', {
     state: () => ({
@@ -85,11 +85,7 @@ const useHexClient = defineStore('hexClient', {
                 ClientPlayer.fromPlayerData(gameInstanceData.game.players[1]),
             ];
 
-            const game = Game.createFromGameData(players, gameInstanceData.game);
-
-            if (gameInstanceData.game.started) {
-                game.start();
-            }
+            const game = createGameFromData(players, gameInstanceData.game);
 
             return this.gameClientSockets[gameId] = new GameClientSocket(gameId, game);
         },
@@ -178,5 +174,32 @@ const useHexClient = defineStore('hexClient', {
         },
     },
 });
+
+function createGameFromData(players: [Player, Player], gameData: GameData): Game {
+    const game = new Game(players, gameData.size);
+
+    const cellValues: {[key: string]: null | PlayerIndex} = {
+        '0': 0,
+        '1': 1,
+        '.': null,
+    };
+
+    gameData.hexes.forEach((line, row) => {
+        line.split('').forEach((value, col) => {
+            game.getBoard().setCell(row, col, cellValues[value]);
+            game.setCurrentPlayerIndex(gameData.currentPlayerIndex);
+
+            if (gameData.started && !game.isStarted()) {
+                game.start();
+            }
+
+            if (null !== gameData.winner) {
+                game.setWinner(gameData.winner);
+            }
+        });
+    });
+
+    return game;
+}
 
 export default useHexClient;

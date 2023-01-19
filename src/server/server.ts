@@ -31,11 +31,6 @@ app.use(sessionMiddleware);
 io.use((socket, next) => {
     sessionMiddleware(socket.request as Request, {} as Response, next as NextFunction);
 });
-io.use((socket, next) => {
-    const session = socket.request.session;
-    console.log('hh', session);
-    next();
-});
 
 app.set('view engine', 'ejs');
 

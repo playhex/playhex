@@ -1,9 +1,8 @@
 import EventEmitter from 'events';
 import { IllegalMove, PlayerIndex, Move, PlayerGameInput } from '.';
 import TypedEmitter from 'typed-emitter';
-import { Coords, PathItem } from './Types';
 import Player from './Player';
-import { GameData } from 'app/Types';
+import Board from './Board';
 
 type GameEvents = {
     /**
@@ -30,7 +29,7 @@ type GameEvents = {
  */
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
-    private hexes: (null|PlayerIndex)[][];
+    private board: Board;
     private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
@@ -41,10 +40,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     ) {
         super();
 
-        this.hexes = Array(this.size)
-            .fill([])
-            .map(() => Array(this.size).fill(null))
-        ;
+        this.board = new Board(size);
 
         players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
         players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
@@ -78,41 +74,9 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         playerReadyListener(true);
     }
 
-    static createFromGrid(players: [Player, Player], hexes: (null|PlayerIndex)[][]): Game
+    getBoard(): Board
     {
-        const game = new Game(players, hexes.length);
-
-        hexes.forEach((line, row) => {
-            line.forEach((value, col) => {
-                game.hexes[row][col] = value;
-            });
-        });
-
-        return game;
-    }
-
-    // TODO should not be in engine, but mutliplayer
-    static createFromGameData(players: [Player, Player], gameData: GameData): Game
-    {
-        const game = new Game(players, gameData.size);
-
-        const cellValues: {[key: string]: null | PlayerIndex} = {
-            '0': 0,
-            '1': 1,
-            '.': null,
-        };
-
-        gameData.hexes.forEach((line, row) => {
-            line.split('').forEach((value, col) => {
-                game.hexes[row][col] = cellValues[value];
-                game.currentPlayerIndex = gameData.currentPlayerIndex;
-                game.winner = gameData.winner;
-            });
-        });
-
-        // Do not handle gameData.started here. Let business logic handle the case.
-
-        return game;
+        return this.board;
     }
 
     getSize(): number
@@ -180,47 +144,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.emit('ended', playerIndex);
     }
 
-    getCells(): (null|PlayerIndex)[][]
-    {
-        return this.hexes;
-    }
-
-    getCellsClone(): (null|PlayerIndex)[][]
-    {
-        return this.hexes.map(row => row.slice());
-    }
-
-    getCell(row: number, col: number): null|PlayerIndex
-    {
-        return this.hexes[row][col];
-    }
-
-    isEmpty(row: number, col: number): boolean
-    {
-        return null === this.hexes[row][col];
-    }
-
-    isCellCoordsValid(row: number, col: number): boolean
-    {
-        return row >= 0 && row < this.size && col >= 0 && col < this.size;
-    }
-
-    /**
-     * Set a cell to a value.
-     * Should call move() instead to play the game.
-     */
-    setCell(move: Move, value: null | PlayerIndex): void
-    {
-        this.hexes[move.getRow()][move.getCol()] = value;
-    }
-
     start(): void
     {
         if (this.started) {
             throw new Error('Game already started');
         }
-
-        console.log('start game');
 
         this.started = true;
 
@@ -245,11 +173,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             throw new IllegalMove(move, 'Game is over');
         }
 
-        if (!this.isCellCoordsValid(move.getRow(), move.getCol())) {
+        if (!this.board.containsCoords(move.getRow(), move.getCol())) {
             throw new IllegalMove(move, 'Cell outside board');
         }
 
-        if (!this.isEmpty(move.getRow(), move.getCol())) {
+        if (!this.board.isEmpty(move.getRow(), move.getCol())) {
             throw new IllegalMove(move, 'This cell is already occupied');
         }
 
@@ -266,10 +194,10 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     move(move: Move, playerIndex: PlayerIndex): void
     {
         this.checkMove(move, playerIndex);
-        this.setCell(move, playerIndex);
+        this.board.setCell(move.getRow(), move.getCol(), playerIndex);
 
         // Naively check connection on every move played
-        if (this.hasPlayerConnection(playerIndex)) {
+        if (this.board.hasPlayerConnection(playerIndex)) {
             this.setWinner(playerIndex);
         } else {
             this.changeCurrentPlayer();
@@ -298,180 +226,5 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private changeCurrentPlayer(): void
     {
         this.currentPlayerIndex = this.otherPlayerIndex();
-    }
-
-    private updateWinner(): void
-    {
-        this.winner = this.calculateWinner();
-    }
-
-    getSideCells(playerIndex: PlayerIndex, sideIndex: 0 | 1): Coords[]
-    {
-        const z = this.size - 1;
-
-        return Array(this.size)
-            .fill(0)
-            .map((_, i) => playerIndex
-                ? sideIndex
-                    ? {row: z, col: i} // bottom
-                    : {row: 0, col: i} // top
-                : sideIndex
-                    ? {row: i, col: z} // right
-                    : {row: i, col: 0} // left
-            )
-        ;
-    }
-
-    calculateWinner(): null|PlayerIndex
-    {
-        if (this.hasPlayerConnection(0)) {
-            return 0;
-        }
-
-        if (this.hasPlayerConnection(1)) {
-            return 1;
-        }
-
-        return null;
-    }
-
-    hasPlayerConnection(playerIndex: PlayerIndex): boolean
-    {
-        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
-
-        const visited: {[key: string]: true} = {};
-        const frontier: Coords[] = [];
-
-        this.getSideCells(playerIndex, 0).forEach(cell => {
-            if (playerIndex === this.hexes[cell.row][cell.col]) {
-                frontier.push(cell);
-                visited[hash(cell)] = true;
-            }
-        });
-
-        let current: undefined|Coords;
-
-        while ((current = frontier.shift())) {
-            if (this.isCellOnSide(current, playerIndex, 1)) {
-                return true;
-            }
-
-            this
-                .getNeighboors(current, playerIndex)
-                .forEach(cell => {
-                    if (!visited[hash(cell)]) {
-                        frontier.push(cell);
-                        visited[hash(cell)] = true;
-                    }
-                })
-            ;
-        }
-
-        return false;
-    }
-
-    private flattenPath(pathItem: PathItem): Coords[]
-    {
-        const path: Coords[] = [];
-        let current: null | PathItem = pathItem;
-
-        while (current) {
-            path.unshift(current.cell);
-
-            current = current.parent;
-        }
-
-        return path;
-    }
-
-    getShortestWinningPath(): null | Coords[]
-    {
-        this.updateWinner();
-
-        const playerIndex = this.winner;
-
-        if (null === playerIndex) {
-            return null;
-        }
-
-        const visited: {[key: string]: true} = {};
-        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
-        const pathHeads: PathItem[] = this
-            .getSideCells(playerIndex, 0)
-            .filter(cell => this.hexes[cell.row][cell.col] === playerIndex)
-            .map<PathItem>(cell => {
-                visited[hash(cell)] = true;
-
-                return {
-                    parent: null,
-                    cell,
-                }
-            })
-        ;
-
-        let pathHead: undefined | PathItem;
-
-        while ((pathHead = pathHeads.shift())) {
-            if (this.isCellOnSide(pathHead.cell, playerIndex, 1)) {
-                return this.flattenPath(pathHead);
-            }
-
-            this.getNeighboors(pathHead.cell, playerIndex)
-                .forEach(cell => {
-                    if (!visited[hash(cell)]) {
-                        const pathItem: PathItem = {
-                            parent: pathHead as PathItem,
-                            cell,
-                        };
-
-                        pathHeads.push(pathItem);
-                        visited[hash(cell)] = true;
-                    }
-                })
-            ;
-        }
-
-        return null;
-    }
-
-    inBoard(cell: Coords): boolean
-    {
-        return cell.row >= 0 && cell.row < this.size
-            && cell.col >= 0 && cell.col < this.size
-        ;
-    }
-
-    isCellOnSide(cell: Coords, playerIndex: PlayerIndex, sideIndex: 0 | 1): boolean
-    {
-        const z = this.size - 1;
-
-        return playerIndex
-            ? sideIndex
-                ? cell.row === z // bottom
-                : cell.row === 0 // top
-            : sideIndex
-                ? cell.col === z // right
-                : cell.col === 0 // left
-    }
-
-    getNeighboors(cell: Coords, playerIndex: undefined | null | PlayerIndex = undefined): Coords[]
-    {
-        return [
-            {row: cell.row, col: cell.col - 1},
-            {row: cell.row, col: cell.col + 1},
-
-            {row: cell.row - 1, col: cell.col},
-            {row: cell.row - 1, col: cell.col + 1},
-
-            {row: cell.row + 1, col: cell.col},
-            {row: cell.row + 1, col: cell.col - 1},
-        ]
-            .filter(cell => this.inBoard(cell)
-                && (
-                    playerIndex === undefined
-                    || playerIndex === this.hexes[cell.row][cell.col]
-                )
-            )
-        ;
     }
 }

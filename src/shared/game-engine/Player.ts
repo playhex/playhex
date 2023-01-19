@@ -21,7 +21,7 @@ type PlayerEvents = {
 export default class Player extends (EventEmitter as unknown as new () => TypedEmitter<PlayerEvents>)
 {
     private ready = false;
-    protected playerGameInput: PlayerGameInput;
+    protected playerGameInput: null | PlayerGameInput = null;
 
     getName(): string
     {
@@ -54,6 +54,10 @@ export default class Player extends (EventEmitter as unknown as new () => TypedE
      */
     move(move: Move): void
     {
+        if (null === this.playerGameInput) {
+            throw new Error('Cannot move, no player game input provided.');
+        }
+
         this.playerGameInput.move(move);
     }
 }

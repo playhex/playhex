@@ -20,8 +20,6 @@ export class HexServer
         private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
     ) {
         io.on('connection', socket => {
-            console.log('New socket connection', socket.request.session);
-
             socket.on('createGame', answer => {
                 const gameSocketServer = this.createGame();
                 answer(gameSocketServer.getId());
@@ -33,7 +31,6 @@ export class HexServer
             });
 
             socket.on('room', (join, room) => {
-                console.log(`Room: player ${socket.request.session.playerId} ${join} room ${room}`);
                 socket[join](room);
             });
 

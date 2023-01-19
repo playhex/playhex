@@ -56,12 +56,12 @@ export default class GameClientSocket
 
     gameMove(move: Move, byPlayerIndex: PlayerIndex): void
     {
-        if (this.game.getCell(move.getRow(), move.getCol()) === 1 - byPlayerIndex) {
+        if (this.game.getBoard().getCell(move.getRow(), move.getCol()) === 1 - byPlayerIndex) {
             throw new Error('This cell is already filled by other player...');
         }
 
         // If cell is not already pre-played locally by server response anticipation
-        if (this.game.isEmpty(move.getRow(), move.getCol())) {
+        if (this.game.getBoard().isEmpty(move.getRow(), move.getCol())) {
             this.game.move(move, byPlayerIndex);
         }
     }

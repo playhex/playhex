@@ -129,7 +129,7 @@ export default class GameServerSocket
             started: game.isStarted(),
             currentPlayerIndex: game.getCurrentPlayerIndex(),
             winner: game.getWinner(),
-            hexes: game.getCells().map(
+            hexes: game.getBoard().getCells().map(
                 row => row
                     .map(
                         cell => null === cell

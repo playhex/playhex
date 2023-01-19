@@ -1,3 +1,4 @@
+import Board from './Board';
 import Game from './Game';
 import Player from './Player';
 import PlayerGameInput from './PlayerGameInput';
@@ -7,6 +8,7 @@ import RandomAIPlayer from './RandomAIPlayer';
 import { PlayerIndex } from './Types';
 
 export {
+    Board,
     Game,
     Player,
     PlayerGameInput,
