@@ -95,11 +95,15 @@ const useHexClient = defineStore('hexClient', {
             socket.emit('room', join, gameId);
         },
 
-        async joinGame(gameId: string, playerIndex: PlayerIndex): Promise<true | string>
+        async joinGame(gameId: string): Promise<true | string>
         {
-            return new Promise(resolve => {
-                socket.emit('joinGame', gameId, playerIndex, (answer: true | string) => {
-                    resolve(answer);
+            return new Promise((resolve, reject) => {
+                socket.emit('joinGame', gameId, (answer: true | string) => {
+                    if (true === answer) {
+                        resolve(answer);
+                    }
+
+                    reject(answer);
                 });
             });
         },
@@ -193,7 +197,7 @@ function createGameFromData(players: [Player, Player], gameData: GameData): Game
                 game.start();
             }
 
-            if (null !== gameData.winner) {
+            if (null !== gameData.winner && !game.hasWinner()) {
                 game.setWinner(gameData.winner);
             }
         });

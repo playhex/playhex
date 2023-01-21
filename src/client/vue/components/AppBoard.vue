@@ -2,7 +2,6 @@
 /* eslint-env browser */
 import GameView from '@client/GameView';
 import { currentTheme } from '@shared/app/Themes';
-import { PlayerIndex } from '@shared/game-engine';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
 
@@ -15,31 +14,14 @@ const props = defineProps({
         type: GameView,
         required: true,
     },
-    onJoin: {
-        type: Function,
-        default: null,
-        required: false,
-    },
 });
 
-const { gameView, onJoin } = toRefs(props);
+const { gameView } = toRefs(props);
 const game = gameView?.value?.getGame();
 
 if (!gameView || !game) {
     throw new Error('gameView is required');
 }
-
-const displayJoin = (playerIndex: PlayerIndex): boolean => {
-    return Boolean(onJoin);
-}
-
-const joinGame = (playerIndex: PlayerIndex) => {
-    if (!onJoin.value) {
-        return;
-    }
-
-    onJoin.value(playerIndex);
-};
 
 onMounted(() => {
     if (!pixiApp.value) {
@@ -67,11 +49,9 @@ onUnmounted(() => {
         <div v-if="game" :class="['game-info-overlay', `orientation-${gameView.getOrientation()}`]">
             <div class="player player-a">
                 <h4 :style="{ color: colorA }">{{ game.getPlayer(0).getName() }}</h4>
-                <button class="btn btn-sm btn-primary" v-if="displayJoin(0)" @click="joinGame(0)">Join</button>
             </div>
             <div class="player player-b">
                 <h4 :style="{ color: colorB }">{{ game.getPlayer(1).getName() }}</h4>
-                <button class="btn btn-sm btn-primary" v-if="displayJoin(1)" @click="joinGame(1)">Join</button>
             </div>
         </div>
         <p v-else>Initialize game...</p>

@@ -7,8 +7,10 @@ import { ref } from '@vue/runtime-core';
 import socket from '@client/socket';
 import RemotePlayMoveController from '@client/MoveController/RemotePlayMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
-import { PlayerIndex } from '@shared/game-engine';
+import { playerCanJoinGame } from '@shared/app/GameUtils';
+import { storeToRefs } from 'pinia';
 
+const { loggedInUser } = storeToRefs(useHexClient());
 const route = useRoute();
 const router = useRouter();
 const hexClient = useHexClient();
@@ -39,8 +41,23 @@ if (Array.isArray(gameId)) {
     gameView.value = new GameView(game, new RemotePlayMoveController());
 })();
 
-const onJoin = async (playerIndex: PlayerIndex) => {
-    const result = await hexClient.joinGame(gameId, playerIndex);
+const canJoin = (): boolean => {
+    const game = gameView.value?.getGame();
+    const loggedInUserValue = loggedInUser.value;
+
+    if (!game) {
+        return false;
+    }
+
+    if (null === loggedInUserValue) {
+        return false;
+    }
+
+    return playerCanJoinGame(game, loggedInUserValue.id);
+};
+
+const join = async () => {
+    const result = await hexClient.joinGame(gameId);
 
     if (true !== result) {
         console.error('could not join:', result);
@@ -49,10 +66,22 @@ const onJoin = async (playerIndex: PlayerIndex) => {
 </script>
 
 <template>
-    <app-board
-        v-if="gameView"
-        :game-view="gameView"
-        :on-join="onJoin"
-    ></app-board>
-    <p v-else>Loading game {{ gameId }}...</p>
+    <div class="position-relative">
+        <app-board
+            v-if="gameView"
+            :game-view="gameView"
+        ></app-board>
+        <p v-else>Loading game {{ gameId }}...</p>
+
+        <div v-if="canJoin()" class="position-absolute w-100 join-button-container">
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+            </div>
+        </div>
+    </div>
 </template>
+
+<style scoped lang="stylus">
+.join-button-container
+    top 0
+</style>

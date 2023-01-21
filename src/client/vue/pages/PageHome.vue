@@ -7,49 +7,90 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const hexClient = useHexClient();
 
+const goToGame = (gameId: string) => {
+    router.push({
+        name: 'online-game',
+        params: {
+            gameId,
+        },
+    });
+};
+
 const createAndJoinGame = async () => {
     const hostedGame = await hexClient.createGame();
-    router.push({name: 'online-game', params: {gameId: hostedGame.id}});
+    goToGame(hostedGame.id);
 };
 
 const createAndJoinGameVsCPU = async () => {
     const hostedGame = await hexClient.createGameVsCPU();
-    router.push({name: 'online-game', params: {gameId: hostedGame.id}});
+    goToGame(hostedGame.id);
 };
 
 const isWaiting = (hostedGame: HostedGameData) => !hostedGame.game.started;
 const isPlaying = (hostedGame: HostedGameData) => hostedGame.game.started && null === hostedGame.game.winner;
+
+const joinGame = (gameId: string) => {
+    hexClient.joinGame(gameId);
+};
 </script>
 
 <template>
     <div class="container-fluid">
-        <h3>Play offline</h3>
-
-        <div class="d-grid gap-2 d-sm-block">
-            <button type="button" class="btn btn-primary" @click="router.push('/play-vs-ai')">Play vs AI</button>
-        </div>
-
         <h3>Join a game</h3>
 
-        <p v-if="0 === Object.values(hexClient.games).filter(isWaiting).length">No game for now. Create a new one !</p>
-        <ul v-else>
-            <li v-for="hostedGame in Object.values(hexClient.games).filter(isWaiting)" v-bind:key="hostedGame.id">
-                <router-link :to="`/games/${hostedGame.id}`">{{ hostedGame.id }}</router-link>
-            </li>
-        </ul>
+        <table v-if="Object.values(hexClient.games).some(isWaiting)" class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Host</th>
+                    <th scope="col">Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    v-for="hostedGame in Object.values(hexClient.games).filter(isWaiting)"
+                    :key="hostedGame.id"
+                >
+                    <td class="ps-0">
+                        <button class="btn me-3 btn-sm btn-success" @click="joinGame(hostedGame.id); goToGame(hostedGame.id)">Accept</button>
+                        <button class="btn me-3 btn-sm btn-link" @click="goToGame(hostedGame.id)">Watch</button>
+                    </td>
+                    <td>{{ hostedGame.game.players.find(player => null !== player)?.pseudo ?? '(empty)' }}</td>
+                    <td>{{ hostedGame.game.size }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No game for now. Create a new one !</p>
 
-        <div class="d-grid gap-2 d-sm-block">
-            <button type="button" class="btn btn-primary" @click="createAndJoinGame">Create game</button>
-            <button type="button" class="btn btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
+        <div class="d-grid gap-2 d-sm-block mb-3">
+            <button type="button" class="btn me-3 btn-primary" @click="createAndJoinGame">Create game</button>
+            <button type="button" class="btn me-3 btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
+            <button type="button" class="btn me-3 btn-outline-primary" @click="router.push('/play-vs-ai')">Play vs offline AI</button>
         </div>
 
-        <h3>Watch a game</h3>
+        <h3>Watch current game</h3>
 
-        <p v-if="0 === Object.values(hexClient.games).filter(isPlaying).length">No game currently playing.</p>
-        <ul v-else>
-            <li v-for="hostedGame in Object.values(hexClient.games).filter(isPlaying)" v-bind:key="hostedGame.id">
-                <router-link :to="`/games/${hostedGame.id}`">{{ hostedGame.id }}</router-link>
-            </li>
-        </ul>
+        <table v-if="Object.values(hexClient.games).some(isPlaying)" class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Players</th>
+                    <th scope="col">Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    v-for="hostedGame in Object.values(hexClient.games).filter(isPlaying)"
+                    :key="hostedGame.id"
+                >
+                    <td>
+                        <button class="btn btn-sm btn-link" @click="goToGame(hostedGame.id)">Watch</button>
+                    </td>
+                    <td>{{ hostedGame.game.players.map(player => player?.pseudo ?? '(empty)').join(' vs ') }}</td>
+                    <td>{{ hostedGame.game.size }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No game currently playing.</p>
     </div>
 </template>

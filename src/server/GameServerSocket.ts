@@ -5,6 +5,7 @@ import ServerPlayer from './ServerPlayer';
 import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
 import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/HexSocketEvents';
+import { getNextFreeSlot } from '../shared/app/GameUtils';
 
 /**
  * Contains a game state,
@@ -46,8 +47,24 @@ export default class GameServerSocket
         });
     }
 
-    playerJoin(playerData: PlayerData, playerIndex: PlayerIndex): true | string
+    /**
+     * A player join this game.
+     *
+     * @param {PlayerData} playerData Player data containing player id.
+     * @param {null | PlayerIndex} playerIndex Join a specific slot. Let empty to join next free slot.
+     *
+     * @returns Slot joined (0 or 1), or a message containing the error reason if could not join.
+     */
+    playerJoin(playerData: PlayerData, playerIndex: null | PlayerIndex = null): PlayerIndex | string
     {
+        if (null === playerIndex) {
+            playerIndex = getNextFreeSlot(this.game);
+
+            if (null === playerIndex) {
+                return 'Game is full';
+            }
+        }
+
         const player = this.game.getPlayers()[playerIndex];
 
         if (!(player instanceof ServerPlayer)) {
@@ -70,7 +87,7 @@ export default class GameServerSocket
 
             player.setPlayerData(playerData);
 
-            return true;
+            return playerIndex;
         }
 
         // Cannot join someone else slot
@@ -80,7 +97,7 @@ export default class GameServerSocket
 
         player.setPlayerData(playerData);
 
-        return true;
+        return playerIndex;
     }
 
     playerMove(playerData: PlayerData, move: Move): true | string

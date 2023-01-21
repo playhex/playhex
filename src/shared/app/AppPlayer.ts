@@ -14,6 +14,16 @@ export default class AppPlayer extends Player
         return this.playerData.pseudo;
     }
 
+    getPlayerId(): null | string
+    {
+        return this.playerData?.id ?? null;
+    }
+
+    isFreeSlot(): boolean
+    {
+        return null === this.playerData;
+    }
+
     getPlayerData(): null | PlayerData
     {
         return this.playerData;

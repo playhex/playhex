@@ -1,4 +1,4 @@
-import { Game, Move, PlayerIndex } from '../shared/game-engine';
+import { Game, Move } from '../shared/game-engine';
 import { Server } from 'socket.io';
 import GameServerSocket from './GameServerSocket';
 import { MoveData, PlayerData } from '../shared/app/Types';
@@ -25,8 +25,8 @@ export class HexServer
                 answer(gameSocketServer.getId());
             });
 
-            socket.on('joinGame', (gameId, playerIndex, answer) => {
-                const joined = this.playerJoinGame(socket.request.session.playerId, gameId, playerIndex);
+            socket.on('joinGame', (gameId, answer) => {
+                const joined = this.playerJoinGame(socket.request.session.playerId, gameId);
                 answer(joined);
             });
 
@@ -68,7 +68,7 @@ export class HexServer
         return gameServerSocket;
     }
 
-    playerJoinGame(playerId: string, gameId: string, playerIndex: PlayerIndex): true | string
+    playerJoinGame(playerId: string, gameId: string): true | string
     {
         const gameServerSocket = this.gameServerSockets[gameId];
 
@@ -82,13 +82,15 @@ export class HexServer
             return 'no player ' + playerId;
         }
 
-        const joined = gameServerSocket.playerJoin(playerData, playerIndex);
+        const joinResult = gameServerSocket.playerJoin(playerData);
 
-        if (true === joined) {
-            this.io.to(`games/${gameId}`).emit('gameJoined', gameId, playerIndex, playerData);
+        if ('string' === typeof joinResult) {
+            return joinResult;
         }
 
-        return joined;
+        this.io.to(`games/${gameId}`).emit('gameJoined', gameId, joinResult, playerData);
+
+        return true;
     }
 
     playerMove(playerId: string, gameId: string, move: MoveData): true|string
