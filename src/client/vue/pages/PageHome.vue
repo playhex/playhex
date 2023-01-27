@@ -43,7 +43,7 @@ const joinGame = (gameId: string) => {
                 <tr>
                     <th scope="col"></th>
                     <th scope="col">Host</th>
-                    <th scope="col">Size</th>
+                    <th scope="col" class="text-end">Size</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,16 +56,16 @@ const joinGame = (gameId: string) => {
                         <button class="btn me-3 btn-sm btn-link" @click="goToGame(hostedGame.id)">Watch</button>
                     </td>
                     <td>{{ hostedGame.game.players.find(player => null !== player)?.pseudo ?? '(empty)' }}</td>
-                    <td>{{ hostedGame.game.size }}</td>
+                    <td class="text-end">{{ hostedGame.game.size }}</td>
                 </tr>
             </tbody>
         </table>
         <p v-else>No game for now. Create a new one !</p>
 
         <div class="d-grid gap-2 d-sm-block mb-3">
-            <button type="button" class="btn me-3 btn-primary" @click="createAndJoinGame">Create game</button>
-            <button type="button" class="btn me-3 btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
-            <button type="button" class="btn me-3 btn-outline-primary" @click="router.push('/play-vs-ai')">Play vs offline AI</button>
+            <button type="button" class="btn me-sm-3 btn-primary" @click="createAndJoinGame">Create game</button>
+            <button type="button" class="btn me-sm-3 btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
+            <button type="button" class="btn me-sm-3 btn-outline-primary" @click="router.push('/play-vs-ai')">Play vs offline AI</button>
         </div>
 
         <h3>Watch current game</h3>
@@ -75,7 +75,7 @@ const joinGame = (gameId: string) => {
                 <tr>
                     <th scope="col"></th>
                     <th scope="col">Players</th>
-                    <th scope="col">Size</th>
+                    <th scope="col" class="text-end">Size</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,11 +83,11 @@ const joinGame = (gameId: string) => {
                     v-for="hostedGame in Object.values(hexClient.games).filter(isPlaying)"
                     :key="hostedGame.id"
                 >
-                    <td>
+                    <td class="ps-0">
                         <button class="btn btn-sm btn-link" @click="goToGame(hostedGame.id)">Watch</button>
                     </td>
                     <td>{{ hostedGame.game.players.map(player => player?.pseudo ?? '(empty)').join(' vs ') }}</td>
-                    <td>{{ hostedGame.game.size }}</td>
+                    <td class="text-end">{{ hostedGame.game.size }}</td>
                 </tr>
             </tbody>
         </table>
