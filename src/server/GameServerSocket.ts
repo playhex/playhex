@@ -35,7 +35,7 @@ export default class GameServerSocket
     listenGame(): void
     {
         this.game.on('started', () => {
-            this.io.to(`games/${this.id}`).emit('gameStarted', this.id);
+            this.io.to('lobby').emit('gameStarted', this.id);
         });
 
         this.game.on('played', (move, byPlayerIndex) => {
@@ -43,7 +43,7 @@ export default class GameServerSocket
         });
 
         this.game.on('ended', (winner: PlayerIndex) => {
-            this.io.to(`games/${this.id}`).emit('ended', this.id, winner);
+            this.io.to('lobby').emit('ended', this.id, winner);
         });
     }
 

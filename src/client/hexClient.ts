@@ -127,53 +127,43 @@ const useHexClient = defineStore('hexClient', {
             this.updateGames();
 
             socket.on('gameCreated', (game: HostedGameData) => {
-                if (!this.games[game.id]) {
-                    this.games[game.id] = game;
-                }
+                this.games[game.id] = game;
             });
 
             socket.on('gameJoined', (gameId: string, playerIndex: PlayerIndex, playerData: PlayerData) => {
-                const gameClientSocket = this.gameClientSockets[gameId];
-
-                if (!gameClientSocket) {
-                    console.error('game not found', gameId);
-                    return;
+                if (this.games[gameId]) {
+                    this.games[gameId].game.players[playerIndex] = playerData;
                 }
 
-                gameClientSocket.playerJoined(playerIndex, playerData);
+                if (this.gameClientSockets[gameId]) {
+                    this.gameClientSockets[gameId].playerJoined(playerIndex, playerData);
+                }
             });
 
             socket.on('gameStarted', (gameId: string) => {
-                const gameClientSocket = this.gameClientSockets[gameId];
-
-                if (!gameClientSocket) {
-                    console.error('game not found', gameId);
-                    return;
+                if (this.games[gameId]) {
+                    this.games[gameId].game.started = true;
                 }
 
-                gameClientSocket.gameStarted();
+                if (this.gameClientSockets[gameId]) {
+                    this.gameClientSockets[gameId].gameStarted()
+                }
             });
 
             socket.on('moved', (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => {
-                const gameClientSocket = this.gameClientSockets[gameId];
-
-                if (!gameClientSocket) {
-                    console.error('game not found', gameId);
-                    return;
+                if (this.gameClientSockets[gameId]) {
+                    this.gameClientSockets[gameId].gameMove(new Move(move.row, move.col), byPlayerIndex);
                 }
-
-                gameClientSocket.gameMove(new Move(move.row, move.col), byPlayerIndex);
             });
 
             socket.on('ended', (gameId: string, winner: PlayerIndex) => {
-                const gameClientSocket = this.gameClientSockets[gameId];
-
-                if (!gameClientSocket) {
-                    console.error('game not found', gameId);
-                    return;
+                if (this.games[gameId]) {
+                    this.games[gameId].game.winner = winner;
                 }
 
-                gameClientSocket.ended(winner);
+                if (this.gameClientSockets[gameId]) {
+                    this.gameClientSockets[gameId].ended(winner);
+                }
             });
         },
     },

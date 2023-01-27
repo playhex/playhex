@@ -20,6 +20,8 @@ export class HexServer
         private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
     ) {
         io.on('connection', socket => {
+            socket.join('lobby');
+
             socket.on('createGame', answer => {
                 const gameSocketServer = this.createGame();
                 answer(gameSocketServer.getId());
@@ -63,7 +65,7 @@ export class HexServer
     ): GameServerSocket {
         const gameServerSocket = new GameServerSocket(this.io, game);
         this.gameServerSockets[gameServerSocket.getId()] = gameServerSocket;
-        this.io.emit('gameCreated', gameServerSocket.toData());
+        this.io.to('lobby').emit('gameCreated', gameServerSocket.toData());
 
         return gameServerSocket;
     }
