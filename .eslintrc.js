@@ -13,5 +13,6 @@ module.exports = {
     root: true,
     rules: {
         '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],
+        '@typescript-eslint/no-empty-function': 'off',
     },
 };

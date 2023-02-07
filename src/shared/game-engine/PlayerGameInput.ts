@@ -18,6 +18,11 @@ export default class PlayerGameInput
         return this.game.getSize();
     }
 
+    getPlayerIndex(): PlayerIndex
+    {
+        return this.playerIndex;
+    }
+
     getHex(row: number, col: number): null|PlayerIndex
     {
         return this.game.getBoard().getCell(row, col);
@@ -30,6 +35,16 @@ export default class PlayerGameInput
         }
 
         return this.hexes;
+    }
+
+    getMovesHistory(): Move[]
+    {
+        return this.game.getMovesHistory().map(move => move.clone());
+    }
+
+    getLastMove(): null | Move
+    {
+        return this.game.getLastMove()?.clone() ?? null;
     }
 
     /**

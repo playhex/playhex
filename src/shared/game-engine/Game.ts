@@ -33,6 +33,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
+    private movesHistory: Move[] = [];
 
     constructor(
         private players: [Player, Player],
@@ -144,6 +145,20 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.emit('ended', playerIndex);
     }
 
+    getMovesHistory(): Move[]
+    {
+        return this.movesHistory;
+    }
+
+    getLastMove(): null | Move
+    {
+        if (0 === this.movesHistory.length) {
+            return null;
+        }
+
+        return this.movesHistory[this.movesHistory.length - 1];
+    }
+
     start(): void
     {
         if (this.started) {
@@ -195,6 +210,8 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     {
         this.checkMove(move, playerIndex);
         this.board.setCell(move.getRow(), move.getCol(), playerIndex);
+
+        this.movesHistory.push(move);
 
         // Naively check connection on every move played
         if (this.board.hasPlayerConnection(playerIndex)) {

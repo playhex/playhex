@@ -1,9 +1,10 @@
 import bodyParser from 'body-parser';
 import { Router } from 'express';
 import { HexServer } from '@server/HexServer';
-import { Game, Player, RandomAIPlayer } from '../../shared/game-engine';
+import { Game, Player } from '../../shared/game-engine';
 import ServerPlayer from '../ServerPlayer';
 import { PlayerData } from '@shared/app/Types';
+import { createAIPlayer } from '../AIPlayersManager';
 
 export function apiRouter(hexServer: HexServer) {
     const router = Router();
@@ -48,7 +49,7 @@ export function apiRouter(hexServer: HexServer) {
 
         const players: [Player, Player] = [
             new ServerPlayer().setPlayerData(playerData),
-            new RandomAIPlayer(),
+            createAIPlayer(),
         ];
 
         if (Math.random() < 0.5) {

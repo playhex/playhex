@@ -3,7 +3,7 @@ import { Configuration } from 'webpack';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
 
-import { SERVER_PORT, IS_DEV, WEBPACK_PORT } from './src/server/config';
+import { IS_DEV, WEBPACK_PORT } from './src/server/config';
 
 const plugins = [
     new WebpackManifestPlugin({}),
@@ -118,7 +118,7 @@ const config: Configuration = {
     },
     devServer: {
         port: WEBPACK_PORT,
-        open: `http://localhost:${SERVER_PORT}`,
+        open: `http://localhost:${process.env.PORT || 3000}`,
         allowedHosts: ['all'],
     },
     plugins,

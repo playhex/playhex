@@ -1,7 +1,8 @@
 dist
 .env
-.idea
-.vscode
 node_modules
 yarn.lock
 yarn-error.log
+
+# Mohex
+default.log
