@@ -9,22 +9,35 @@ export default class Hex extends Sprite
 {
     static readonly RADIUS = 20;
 
-    private graphics: Graphics;
+    private graphics: null | Graphics = null;
+
+    private hexColor: Graphics;
+    private highlight: Graphics;
 
     constructor(initialValue: null | PlayerIndex = null)
     {
         super();
 
-        this.drawHexBackground();
-        this.drawHex();
+        this.redrawHex();
         this.setPlayer(initialValue);
 
         this.interactive = true;
     }
 
-    private drawHexBackground(): void
+    private redrawHex(): void
     {
-        const background = new Graphics();
+        this.removeChildren();
+
+        this.addChild(
+            this.createBackground(),
+            this.hexColor = this.createHexColor(),
+            this.highlight = this.createHighlight(),
+        );
+    }
+
+    private createBackground(): Graphics
+    {
+        const g = new Graphics();
         const path: IPointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
@@ -34,29 +47,48 @@ export default class Hex extends Sprite
             });
         }
 
-        background.lineStyle(0);
-        background.beginFill(currentTheme.strokeColor, 1);
-        background.drawPolygon(path);
-        background.endFill();
+        g.lineStyle(0);
+        g.beginFill(currentTheme.strokeColor, 1);
+        g.drawPolygon(path);
+        g.endFill();
 
-        this.addChild(background);
+        return g;
     }
 
-    private drawHex(): void
+    private createHexColor(): Graphics
     {
-        this.graphics = new Graphics();
+        const g = new Graphics();
         const path: IPointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
             path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.9));
         }
 
-        this.graphics.lineStyle(0);
-        this.graphics.beginFill(0xffffff, 1);
-        this.graphics.drawPolygon(path);
-        this.graphics.endFill();
+        g.lineStyle(0);
+        g.beginFill(0xffffff, 1);
+        g.drawPolygon(path);
+        g.endFill();
 
-        this.addChild(this.graphics);
+        return g;
+    }
+
+    private createHighlight(): Graphics
+    {
+        const g = new Graphics();
+        const path: IPointData[] = [];
+
+        for (let i = 0; i < 6; ++i) {
+            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.6));
+        }
+
+        g.lineStyle(0);
+        g.beginFill(0xffffff, 0.4);
+        g.drawPolygon(path);
+        g.endFill();
+
+        g.visible = false;
+
+        return g;
     }
 
     static coords(row: number, col: number): IPointData
@@ -77,13 +109,20 @@ export default class Hex extends Sprite
 
     setPlayer(player: null|PlayerIndex): Hex
     {
-        this.graphics.tint = null === player
+        this.hexColor.tint = null === player
             ? currentTheme.colorEmpty
             : [
                 currentTheme.colorA,
                 currentTheme.colorB,
             ][player]
         ;
+
+        return this;
+    }
+
+    setHighlighted(highlighted = true): Hex
+    {
+        this.highlight.visible = highlighted;
 
         return this;
     }

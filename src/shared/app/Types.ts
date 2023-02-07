@@ -1,9 +1,14 @@
-import { PlayerIndex } from "game-engine";
+import { PlayerIndex } from '../game-engine';
 
 export type PlayerData = {
     id: string;
     pseudo: string;
     isGuest: boolean;
+};
+
+export type MoveData = {
+    row: number;
+    col: number;
 };
 
 export type GameData = {
@@ -17,6 +22,7 @@ export type GameData = {
     started: boolean;
 
     size: number;
+    movesHistory: MoveData[],
     currentPlayerIndex: PlayerIndex,
     winner: null | PlayerIndex,
 
@@ -27,11 +33,6 @@ export type GameData = {
      *      ...
      */
     hexes: string[];
-};
-
-export type MoveData = {
-    row: number;
-    col: number;
 };
 
 

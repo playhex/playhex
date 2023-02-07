@@ -144,6 +144,7 @@ export default class GameServerSocket
             players: game.getPlayers().map<null | PlayerData>(GameServerSocket.playerToData) as [null | PlayerData, null | PlayerData],
             size: game.getSize(),
             started: game.isStarted(),
+            movesHistory: game.getMovesHistory(),
             currentPlayerIndex: game.getCurrentPlayerIndex(),
             winner: game.getWinner(),
             hexes: game.getBoard().getCells().map(

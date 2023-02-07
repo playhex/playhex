@@ -193,6 +193,13 @@ function createGameFromData(players: [Player, Player], gameData: GameData): Game
         });
     });
 
+    game.setMovesHistory(
+        gameData
+            .movesHistory
+            .map(moveData => new Move(moveData.row, moveData.col))
+        ,
+    );
+
     return game;
 }
 

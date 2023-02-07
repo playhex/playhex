@@ -209,7 +209,11 @@ export default class GameView
     private listenModel(): void
     {
         this.game.on('played', (move, playerIndex) => {
-            this.hexes[move.getRow()][move.getCol()].setPlayer(playerIndex);
+            this.resetHighlightedHexes();
+            this.hexes[move.row][move.col]
+                .setPlayer(playerIndex)
+                .setHighlighted()
+            ;
         });
 
         this.game.on('ended', async (winner) => {
@@ -223,6 +227,13 @@ export default class GameView
 
             // Win box
             console.log('winner is', winner);
+        });
+    }
+
+    resetHighlightedHexes(): void
+    {
+        this.game.getMovesHistory().forEach(move => {
+            this.hexes[move.row][move.col].setHighlighted(false);
         });
     }
 
@@ -300,6 +311,12 @@ export default class GameView
                     this.moveController.move(this.game, new Move(row, col));
                 });
             }
+        }
+
+        const lastMove = this.game.getLastMove();
+
+        if (null !== lastMove) {
+            this.hexes[lastMove.row][lastMove.col].setHighlighted();
         }
     }
 

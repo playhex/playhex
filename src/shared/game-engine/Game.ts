@@ -150,6 +150,13 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.movesHistory;
     }
 
+    setMovesHistory(movesHistory: Move[]): Game
+    {
+        this.movesHistory = movesHistory;
+
+        return this;
+    }
+
     getLastMove(): null | Move
     {
         if (0 === this.movesHistory.length) {
