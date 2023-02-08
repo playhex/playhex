@@ -5,6 +5,7 @@ import ClientPlayer from './ClientPlayer';
 import GameClientSocket from './GameClientSocket';
 import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
+import { apiPostGame1v1, apiPostGameVsCPU, getGame, getGames, loginAsGuest } from './apiClient';
 
 const useHexClient = defineStore('hexClient', {
     state: () => ({
@@ -31,35 +32,26 @@ const useHexClient = defineStore('hexClient', {
                 return this.loggedInUser;
             }
 
-            const response = await fetch('/auth/guest', {
-                method: 'post',
-            });
-
-            return this.loggedInUser = await response.json();
+            return this.loggedInUser = await loginAsGuest();
         },
 
         async createGame(): Promise<HostedGameData>
         {
-            const response = await fetch('/api/games/1v1', {
-                method: 'post',
+            return await apiPostGame1v1({
+                boardsize: 13,
             });
-
-            return await response.json();
         },
 
         async createGameVsCPU(): Promise<HostedGameData>
         {
-            const response = await fetch('/api/games/cpu', {
-                method: 'post',
+            return await apiPostGameVsCPU({
+                boardsize: 13,
             });
-
-            return await response.json();
         },
 
         async updateGames(): Promise<void>
         {
-            const response = await fetch('/api/games');
-            const games: HostedGameData[] = await response.json();
+            const games: HostedGameData[] = await getGames();
 
             games.forEach(game => {
                 this.games[game.id] = game;
@@ -72,13 +64,11 @@ const useHexClient = defineStore('hexClient', {
                 return this.gameClientSockets[gameId];
             }
 
-            const response = await fetch(`/api/games/${gameId}`);
+            const gameInstanceData: null | HostedGameData = await getGame(gameId);
 
-            if (!response.ok) {
+            if (null === gameInstanceData) {
                 return null;
             }
-
-            const gameInstanceData: HostedGameData = await response.json();
 
             const players: [Player, Player] = [
                 ClientPlayer.fromPlayerData(gameInstanceData.game.players[0]),

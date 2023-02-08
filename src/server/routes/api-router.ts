@@ -33,7 +33,7 @@ export function apiRouter(hexServer: HexServer) {
             players.reverse();
         }
 
-        const game = new Game(players);
+        const game = new Game(players, req.body.boardsize);
         const gameServerSocket = hexServer.createGame(game);
 
         res.send(gameServerSocket.toData());
@@ -56,7 +56,7 @@ export function apiRouter(hexServer: HexServer) {
             players.reverse();
         }
 
-        const game = new Game(players);
+        const game = new Game(players, req.body.boardsize);
         const gameServerSocket = hexServer.createGame(game);
 
         res.send(gameServerSocket.toData());

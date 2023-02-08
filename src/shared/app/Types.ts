@@ -40,3 +40,10 @@ export type HostedGameData = {
     id: string;
     game: GameData;
 };
+
+export type GameOptionsData = {
+    /**
+     * Defaults to 11
+     */
+    boardsize?: number;
+};
