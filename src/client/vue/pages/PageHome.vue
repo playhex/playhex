@@ -3,6 +3,9 @@
 import useHexClient from '@client/hexClient';
 import { HostedGameData } from '@shared/app/Types';
 import { useRouter } from 'vue-router';
+import { createOverlay } from 'unoverlay-vue';
+import GameOptionsOverlay from '../components/GameOptionsOverlay.vue';
+import { GameOptionsData } from '@shared/app/GameOptions';
 
 const router = useRouter();
 const hexClient = useHexClient();
@@ -16,13 +19,31 @@ const goToGame = (gameId: string) => {
     });
 };
 
+const gameOptionsOverlay = createOverlay<any, GameOptionsData>(GameOptionsOverlay);
+
 const createAndJoinGame = async () => {
-    const hostedGame = await hexClient.createGame();
+    let gameOptions: GameOptionsData;
+
+    try {
+        gameOptions = await gameOptionsOverlay();
+    } catch (e) {
+        return;
+    }
+
+    const hostedGame = await hexClient.createGame(gameOptions);
     goToGame(hostedGame.id);
 };
 
 const createAndJoinGameVsCPU = async () => {
-    const hostedGame = await hexClient.createGameVsCPU();
+    let gameOptions: GameOptionsData;
+
+    try {
+        gameOptions = await gameOptionsOverlay();
+    } catch (e) {
+        return;
+    }
+
+    const hostedGame = await hexClient.createGameVsCPU(gameOptions);
     goToGame(hostedGame.id);
 };
 

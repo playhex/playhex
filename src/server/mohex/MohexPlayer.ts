@@ -33,7 +33,7 @@ export default class MohexPlayer extends Player
     {
         console.log('Queuing move generation task...');
 
-        const mohexMove = await this.queueableMohex.queueCommand<string>(async (mohex) => {
+        const mohexMovePromise = this.queueableMohex.queueCommand<string>(async (mohex) => {
             console.log('Mohex is playing...');
 
             if (null === this.playerGameInput) {
@@ -47,6 +47,14 @@ export default class MohexPlayer extends Player
 
             return await mohex.generateMove(this.getColor());
         });
+
+        let mohexMove: string;
+
+        try {
+            mohexMove = await mohexMovePromise;
+        } catch (e) {
+            throw new Error('Mohex command error: ' + e);
+        }
 
         const match = mohexMove.match(/^([a-z])(\d+)$/);
 

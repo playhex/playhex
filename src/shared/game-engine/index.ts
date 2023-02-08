@@ -1,4 +1,4 @@
-import Board from './Board';
+import Board, { BOARD_DEFAULT_SIZE } from './Board';
 import Game from './Game';
 import Player from './Player';
 import PlayerGameInput from './PlayerGameInput';
@@ -9,6 +9,7 @@ import { PlayerIndex } from './Types';
 
 export {
     Board,
+    BOARD_DEFAULT_SIZE,
     Game,
     Player,
     PlayerGameInput,

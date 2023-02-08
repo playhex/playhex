@@ -5,6 +5,7 @@ import { Game, Player } from '../../shared/game-engine';
 import ServerPlayer from '../ServerPlayer';
 import { PlayerData } from '@shared/app/Types';
 import { createAIPlayer } from '../AIPlayersManager';
+import { sanitizeGameOptions } from '../../shared/app/GameOptions';
 
 export function apiRouter(hexServer: HexServer) {
     const router = Router();
@@ -24,6 +25,8 @@ export function apiRouter(hexServer: HexServer) {
             return;
         }
 
+        const gameOptions = sanitizeGameOptions(req.body);
+
         const players: [ServerPlayer, ServerPlayer] = [
             new ServerPlayer().setPlayerData(playerData),
             new ServerPlayer(),
@@ -33,7 +36,7 @@ export function apiRouter(hexServer: HexServer) {
             players.reverse();
         }
 
-        const game = new Game(players, req.body.boardsize);
+        const game = new Game(players, gameOptions.boardsize);
         const gameServerSocket = hexServer.createGame(game);
 
         res.send(gameServerSocket.toData());
@@ -47,16 +50,18 @@ export function apiRouter(hexServer: HexServer) {
             return;
         }
 
+        const gameOptions = sanitizeGameOptions(req.body);
+
         const players: [Player, Player] = [
             new ServerPlayer().setPlayerData(playerData),
-            createAIPlayer(),
+            createAIPlayer(gameOptions),
         ];
 
         if (Math.random() < 0.5) {
             players.reverse();
         }
 
-        const game = new Game(players, req.body.boardsize);
+        const game = new Game(players, gameOptions.boardsize);
         const gameServerSocket = hexServer.createGame(game);
 
         res.send(gameServerSocket.toData());

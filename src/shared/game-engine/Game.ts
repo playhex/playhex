@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { IllegalMove, PlayerIndex, Move, PlayerGameInput } from '.';
+import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE } from '.';
 import TypedEmitter from 'typed-emitter';
 import Player from './Player';
 import Board from './Board';
@@ -37,7 +37,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     constructor(
         private players: [Player, Player],
-        private size: number = 11,
+        private size: number = BOARD_DEFAULT_SIZE,
     ) {
         super();
 

@@ -20,7 +20,7 @@ export default class RandomAIPlayer extends Player
 
     getName(): string
     {
-        return 'Bot';
+        return 'Random bot';
     }
 
     async makeMove(): Promise<void>

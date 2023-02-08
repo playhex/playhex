@@ -1,14 +1,12 @@
-import { GameOptionsData, HostedGameData, PlayerData } from '@shared/app/Types';
+import { HostedGameData, PlayerData } from '@shared/app/Types';
+import { GameOptionsData } from '@shared/app/GameOptions';
 
-export const loginAsGuest = async (boardsize = 11): Promise<PlayerData> => {
+export const loginAsGuest = async (): Promise<PlayerData> => {
     const response = await fetch('/auth/guest', {
         method: 'post',
         headers: {
             'Accept': 'application/json',
         },
-        body: JSON.stringify({
-            boardsize,
-        }),
     });
 
     return response.json();

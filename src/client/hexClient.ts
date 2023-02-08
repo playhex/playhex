@@ -6,6 +6,7 @@ import GameClientSocket from './GameClientSocket';
 import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 import { apiPostGame1v1, apiPostGameVsCPU, getGame, getGames, loginAsGuest } from './apiClient';
+import { GameOptionsData } from '@shared/app/GameOptions';
 
 const useHexClient = defineStore('hexClient', {
     state: () => ({
@@ -35,18 +36,14 @@ const useHexClient = defineStore('hexClient', {
             return this.loggedInUser = await loginAsGuest();
         },
 
-        async createGame(): Promise<HostedGameData>
+        async createGame(gameOptions?: GameOptionsData): Promise<HostedGameData>
         {
-            return await apiPostGame1v1({
-                boardsize: 13,
-            });
+            return await apiPostGame1v1(gameOptions);
         },
 
-        async createGameVsCPU(): Promise<HostedGameData>
+        async createGameVsCPU(gameOptions?: GameOptionsData): Promise<HostedGameData>
         {
-            return await apiPostGameVsCPU({
-                boardsize: 13,
-            });
+            return await apiPostGameVsCPU(gameOptions);
         },
 
         async updateGames(): Promise<void>

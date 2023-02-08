@@ -1,11 +1,13 @@
 import { Coords, PathItem, PlayerIndex } from './Types';
 
+export const BOARD_DEFAULT_SIZE = 11;
+
 export default class Board
 {
     private hexes: (null | PlayerIndex)[][];
 
     constructor(
-        private size: number = 11,
+        private size: number = BOARD_DEFAULT_SIZE,
     ) {
         this.hexes = Array(this.size)
             .fill([])
