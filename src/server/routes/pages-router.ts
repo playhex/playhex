@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { getManifest } from './manifest-manager';
-import { currentThemeName } from '../../shared/app/Themes';
 
 export function pagesRouter() {
     const router = Router();
@@ -9,7 +8,6 @@ export function pagesRouter() {
         const manifest = await getManifest();
         res.render('page.ejs', {
             manifest,
-            currentThemeName,
         });
     });
 

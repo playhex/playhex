@@ -1,12 +1,9 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '@client/GameView';
-import { currentTheme } from '@shared/app/Themes';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
 
-const colorA = '#' + currentTheme.colorA.toString(16);
-const colorB = '#' + currentTheme.colorB.toString(16);
 const pixiApp = ref<HTMLElement>();
 
 const props = defineProps({
@@ -47,11 +44,11 @@ onUnmounted(() => {
         </div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${gameView.getOrientation()}`]">
-            <div class="player player-a">
-                <h4 :style="{ color: colorA }">{{ game.getPlayer(0).getName() }}</h4>
+            <div class="player player-a mx-2">
+                <h4 class="text-player-a">{{ game.getPlayer(0).getName() }}</h4>
             </div>
-            <div class="player player-b">
-                <h4 :style="{ color: colorB }">{{ game.getPlayer(1).getName() }}</h4>
+            <div class="player player-b mx-2">
+                <h4 class="text-player-b">{{ game.getPlayer(1).getName() }}</h4>
             </div>
         </div>
         <p v-else>Initialize game...</p>

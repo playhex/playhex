@@ -3,7 +3,8 @@ import { Application, Container, Graphics, ICanvas, IPointData, Ticker } from 'p
 import Hex from '@client/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { Coords } from '@shared/game-engine/Types';
-import { currentTheme } from '@shared/app/Themes';
+import { currentTheme } from './BoardTheme';
+import { themeSwitcherDispatcher } from './DarkThemeSwitcher';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -71,9 +72,21 @@ export default class GameView
             backgroundAlpha: 0,
             resolution: window.devicePixelRatio,
             autoDensity: true,
-            width: options.width,
-            height: options.height,
+            width: this.options.width,
+            height: this.options.height,
         });
+
+        this.pixi.stage.addChild(this.gameContainer);
+
+        this.redraw();
+        this.listenModel();
+
+        themeSwitcherDispatcher.on('themeSwitched', () => this.redraw());
+    }
+
+    private redraw(): void
+    {
+        this.gameContainer.removeChildren();
 
         if (window.innerWidth > window.innerHeight) {
             this.setOrientation('horizontal');
@@ -87,15 +100,15 @@ export default class GameView
         );
 
         this.gameContainer.position = {
-            x: options.width / 2,
-            y: options.height / 2,
+            x: this.options.width / 2,
+            y: this.options.height / 2,
         };
 
-        this.drawBackground();
-        this.createBoard();
-        this.listenModel();
+        this.gameContainer.addChild(
+            this.createBackground(),
+        );
 
-        this.pixi.stage.addChild(this.gameContainer);
+        this.createAndAddHexes();
     }
 
     getGame()
@@ -293,7 +306,7 @@ export default class GameView
         return animationOverPromise;
     }
 
-    private createBoard(): void
+    private createAndAddHexes(): void
     {
         this.hexes = Array(this.game.getSize()).fill(null).map(() => Array(this.game.getSize()));
 
@@ -320,7 +333,7 @@ export default class GameView
         }
     }
 
-    private drawBackground(): void
+    private createBackground(): Graphics
     {
         const graphics = new Graphics();
         const to = (a: IPointData, b: IPointData = {x: 0, y: 0}): void => {
@@ -357,7 +370,7 @@ export default class GameView
             to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
 
-        this.gameContainer.addChild(graphics);
+        return graphics;
     }
 
     getHex(rowCol: {row: number, col: number}): Hex
@@ -365,38 +378,8 @@ export default class GameView
         return this.hexes[rowCol.row][rowCol.col];
     }
 
-    destroy()
+    destroy(): void
     {
         this.pixi.destroy();
-    }
-
-    private displayDebug(): void
-    {
-        const debugContainer = new Container();
-        const g = new Graphics();
-
-        g.lineStyle({
-            color: 0x0000ff,
-            width: 4,
-        });
-
-        g.drawRect(0, 0, this.options.width, this.options.height);
-        this.p({x: this.options.width / 2, y: this.options.height / 2});
-
-        debugContainer.addChild(g);
-        this.pixi.stage.addChild(debugContainer);
-    }
-
-    private p(p: IPointData): void
-    {
-        const g = new Graphics();
-
-        g.lineStyle({
-            color: 0x0000ff,
-            width: 4,
-        });
-
-        g.drawCircle(p.x, p.y, 4);
-        this.pixi.stage.addChild(g);
     }
 }

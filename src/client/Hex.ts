@@ -1,6 +1,6 @@
 import { Graphics, IPointData, Sprite } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
-import { currentTheme } from '@shared/app/Themes';
+import { currentTheme } from './BoardTheme';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -8,8 +8,6 @@ const SQRT3 = sqrt(3);
 export default class Hex extends Sprite
 {
     static readonly RADIUS = 20;
-
-    private graphics: null | Graphics = null;
 
     private hexColor: Graphics;
     private highlight: Graphics;
