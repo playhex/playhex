@@ -1,4 +1,4 @@
-import { Game, PlayerIndex } from '../game-engine';
+import { Game, Player, PlayerIndex } from '../game-engine';
 import AppPlayer from './AppPlayer';
 
 export const getNextFreeSlot = (game: Game): null | PlayerIndex => {
@@ -43,4 +43,16 @@ export const playerCanJoinGame = (game: Game, playerId: string): boolean => {
     }
 
     return true;
+};
+
+export const shufflePlayers = (players: [Player, Player], firstPlayer?: null | PlayerIndex): void => {
+    if (0 === firstPlayer) {
+        // noop
+    } else if (1 === firstPlayer) {
+        players.reverse();
+    } else {
+        if (Math.random() < 0.5) {
+            players.reverse();
+        }
+    }
 };

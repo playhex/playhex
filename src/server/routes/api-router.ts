@@ -6,6 +6,7 @@ import ServerPlayer from '../ServerPlayer';
 import { PlayerData } from '@shared/app/Types';
 import { createAIPlayer } from '../AIPlayersManager';
 import { sanitizeGameOptions } from '../../shared/app/GameOptions';
+import { shufflePlayers } from '../../shared/app/GameUtils';
 
 export function apiRouter(hexServer: HexServer) {
     const router = Router();
@@ -32,9 +33,7 @@ export function apiRouter(hexServer: HexServer) {
             new ServerPlayer(),
         ];
 
-        if (Math.random() < 0.5) {
-            players.reverse();
-        }
+        shufflePlayers(players, gameOptions.firstPlayer);
 
         const game = new Game(players, gameOptions.boardsize);
         const gameServerSocket = hexServer.createGame(game);
@@ -57,9 +56,7 @@ export function apiRouter(hexServer: HexServer) {
             createAIPlayer(gameOptions),
         ];
 
-        if (Math.random() < 0.5) {
-            players.reverse();
-        }
+        shufflePlayers(players, gameOptions.firstPlayer);
 
         const game = new Game(players, gameOptions.boardsize);
         const gameServerSocket = hexServer.createGame(game);

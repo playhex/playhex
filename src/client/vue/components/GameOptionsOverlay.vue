@@ -2,18 +2,20 @@
 import { useOverlayMeta } from 'unoverlay-vue';
 import { ref } from 'vue';
 import { sanitizeGameOptions } from '@shared/app/GameOptions';
-import { BOARD_DEFAULT_SIZE } from '@shared/game-engine';
+import { BOARD_DEFAULT_SIZE, PlayerIndex } from '@shared/game-engine';
 const { confirm, cancel } = useOverlayMeta();
 
 let boardsize = ref(BOARD_DEFAULT_SIZE);
 let boardsizeCustom = ref(false);
+
+let firstPlayer = ref<null | PlayerIndex>(null);
 </script>
 
 <template>
     <div>
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit="confirm(sanitizeGameOptions({ boardsize }))">
+                <form class="modal-content" @submit="confirm(sanitizeGameOptions({ boardsize, firstPlayer }))">
                     <div class="modal-header">
                         <h5 class="modal-title">Game options</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
@@ -51,6 +53,21 @@ let boardsizeCustom = ref(false);
                                 max="25"
                                 class="form-control"
                             >
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="form-label">First player</p>
+
+                            <div class="btn-group" role="group">
+                                <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="null" id="first-random">
+                                <label class="btn btn-outline-primary" for="first-random">Random</label>
+
+                                <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="0" id="first-0">
+                                <label class="btn btn-outline-primary text-player-a" for="first-0">Me</label>
+
+                                <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="1" id="first-1">
+                                <label class="btn btn-outline-primary text-player-b" for="first-1">Opponent</label>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -4,6 +4,7 @@ import GameView from '@client/GameView';
 import PlayerGameInputMoveController from '../../MoveController/PlayerGameInputMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
+import { shufflePlayers } from '@shared/app/GameUtils';
 import { createOverlay } from 'unoverlay-vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import GameOptionsOverlay from '../components/GameOptionsOverlay.vue';
@@ -22,10 +23,14 @@ let gameView = ref<GameView>();
         gameOptions = {};
     }
 
-    const game = new Game([
+    const players: [Player, Player] = [
         player,
         new RandomAIPlayer(),
-    ], gameOptions.boardsize);
+    ];
+
+    shufflePlayers(players, gameOptions.firstPlayer);
+
+    const game = new Game(players, gameOptions.boardsize);
 
     gameView.value = new GameView(game, new PlayerGameInputMoveController(player));
 
