@@ -7,7 +7,6 @@
     "type-check-client": "tsc -p ./src/client/tsconfig.json",
     "build-client": "NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack --mode production",
     "build-server": "tsc -b src/server",
-    "build-index-html": "node renderIndexHtml.js",
     "dev-client": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack serve",
     "dev-server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps index.js\"",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
