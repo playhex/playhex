@@ -24,13 +24,13 @@ const colorFromCss = (color: string): number => {
 export const currentTheme: Theme = {
     colorA: colorFromCss('--player-a-color'),
     colorB: colorFromCss('--player-b-color'),
-    colorEmpty: colorFromCss('--bs-body-bg'),
-    strokeColor: colorFromCss('--bs-border-color'),
+    colorEmpty: colorFromCss('--bs-light-bg-subtle'),
+    strokeColor: colorFromCss('--bs-dark-bg-subtle'),
 };
 
 themeSwitcherDispatcher.on('themeSwitched', () => {
     currentTheme.colorA = colorFromCss('--player-a-color');
     currentTheme.colorB = colorFromCss('--player-b-color');
-    currentTheme.colorEmpty = colorFromCss('--bs-body-bg');
-    currentTheme.strokeColor = colorFromCss('--bs-border-color');
+    currentTheme.colorEmpty = colorFromCss('--bs-light-bg-subtle');
+    currentTheme.strokeColor = colorFromCss('--bs-dark-bg-subtle');
 });

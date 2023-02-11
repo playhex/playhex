@@ -59,7 +59,7 @@ export default class Hex extends Sprite
         const path: IPointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.9));
+            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.98));
         }
 
         g.lineStyle(0);
@@ -76,7 +76,7 @@ export default class Hex extends Sprite
         const path: IPointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.6));
+            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.3));
         }
 
         g.lineStyle(0);
