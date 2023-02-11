@@ -2,6 +2,8 @@
 
 Play Hex online.
 
+Currently hosted here: <https://hex.alcalyn.app/>
+
 ![Game screenshot](screenshots/game.png)
 
 ## Features
