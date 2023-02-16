@@ -23,7 +23,17 @@ export default class Mohex
 {
     private process: ChildProcessWithoutNullStreams;
 
-    private isWaitingForCommand = false;
+    /**
+     * Whether a command is currently running,
+     * so cannot run another command at same time.
+     */
+    private hasRunningCommand = false;
+
+    /**
+     * Contains chunks of data received from stderr during last command.
+     * Is reset before running a new command.
+     */
+    private lastStdErrChunks: string[] = [];
 
     /**
      * @param pathToBinary Path to mohex binary. I.e "/home/debian/benzene-vanilla-cmake/build/src/mohex/mohex".
@@ -41,6 +51,23 @@ export default class Mohex
 
         this.process = spawn(this.pathToBinary, args);
 
+        this.process.stderr.on('data', (data: Buffer) => {
+            this.lastStdErrChunks.push(data.toString());
+        });
+
+        this.showAllLogs();
+    }
+
+    private showAllLogs(): void
+    {
+        this.process.stdout.on('data', (data: Buffer) => {
+            console.log('STDOUT: ', data.toString());
+        });
+
+        this.process.stderr.on('data', (data: Buffer) => {
+            console.log('STDERR: ', data.toString());
+        });
+
         this.process.on('spawn', () => {
             console.log('spawn successfully, ready');
         });
@@ -52,14 +79,11 @@ export default class Mohex
         this.process.on('disconnect', () => {
             console.log('disconnected');
         });
+    }
 
-
-        this.process.stdout.on('data', (data: Buffer) => {
-            console.log('STDOUT: ', data.toString());
-        });
-        this.process.stderr.on('data', (data: Buffer) => {
-            console.log('STDERR: ', data.toString());
-        });
+    getLastStdErrChunks(): string[]
+    {
+        return this.lastStdErrChunks;
     }
 
     async sendCommand(command: string): Promise<string>
@@ -69,11 +93,12 @@ export default class Mohex
 
     private async doSendCommand(command: string): Promise<string>
     {
-        if (this.isWaitingForCommand) {
+        if (this.hasRunningCommand) {
             throw new Error('Cannot send command now, another command is already running');
         }
 
-        this.isWaitingForCommand = true;
+        this.lastStdErrChunks = [];
+        this.hasRunningCommand = true;
 
         const resultPromise = new Promise<string>((resolve, reject) => {
             this.process.stdout.once('data', (data: Buffer) => {
@@ -85,7 +110,7 @@ export default class Mohex
                     reject(result);
                 }
 
-                this.isWaitingForCommand = false;
+                this.hasRunningCommand = false;
             });
         });
 
