@@ -2,7 +2,7 @@
 import useHexClient from '@client/hexClient';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
-import { getOtherTheme, switchTheme, themeSwitcherDispatcher } from '../../DarkThemeSwitcher';
+import { getOtherTheme, switchTheme, themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 
 const { loggedInUser } = storeToRefs(useHexClient());
 

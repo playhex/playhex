@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '@client/GameView';
-import PlayerGameInputMoveController from '../../MoveController/PlayerGameInputMoveController';
+import GameView from '@client/pixi-board/GameView';
+import PlayerGameInputMoveController from '@client/MoveController/PlayerGameInputMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
 import { shufflePlayers } from '@shared/app/GameUtils';
 import { createOverlay } from 'unoverlay-vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import GameOptionsOverlay from '../components/GameOptionsOverlay.vue';
+import GameOptionsOverlay from '@client/vue/components/GameOptionsOverlay.vue';
 import { ref } from 'vue';
 
 let gameView = ref<GameView>();

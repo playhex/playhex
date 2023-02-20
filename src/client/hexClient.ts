@@ -1,11 +1,11 @@
 import { Game, Move, Player, PlayerIndex } from '@shared/game-engine';
 import { defineStore } from 'pinia';
 import { Socket } from 'socket.io-client';
-import ClientPlayer from './ClientPlayer';
-import GameClientSocket from './GameClientSocket';
+import ClientPlayer from '@client/ClientPlayer';
+import GameClientSocket from '@client/GameClientSocket';
 import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
-import { apiPostGame1v1, apiPostGameVsCPU, getGame, getGames, loginAsGuest } from './apiClient';
+import { apiPostGame1v1, apiPostGameVsCPU, getGame, getGames, loginAsGuest } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
 const useHexClient = defineStore('hexClient', {

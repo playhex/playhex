@@ -3,6 +3,7 @@ import { useOverlayMeta } from 'unoverlay-vue';
 import { ref } from 'vue';
 import { sanitizeGameOptions } from '@shared/app/GameOptions';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '@shared/game-engine';
+
 const { confirm, cancel } = useOverlayMeta();
 
 let boardsize = ref(BOARD_DEFAULT_SIZE);

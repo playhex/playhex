@@ -1,5 +1,5 @@
 import { Move, Player, PlayerGameInput } from '../../shared/game-engine';
-import QueueableMohex from '../mohex-cli/QueueableMohex';
+import QueueableMohex from '@server/mohex-cli/QueueableMohex';
 
 const noInputError = new Error('No player input, cannot continue');
 

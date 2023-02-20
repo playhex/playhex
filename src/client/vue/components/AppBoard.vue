@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '@client/GameView';
+import GameView from '@client/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
 

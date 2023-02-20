@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { useRoute, useRouter } from 'vue-router';
-import GameView from '@client/GameView';
+import GameView from '@client/pixi-board/GameView';
 import useHexClient from '@client/hexClient';
 import { ref } from '@vue/runtime-core';
 import socket from '@client/socket';

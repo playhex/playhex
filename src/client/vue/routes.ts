@@ -1,7 +1,7 @@
 import { RouteRecordRaw } from 'vue-router';
-import PageHome from './pages/PageHome.vue';
-import Page1v1 from './pages/Page1v1.vue';
-import PagePlayVsAI from './pages/PagePlayVsAI.vue';
+import PageHome from '@client/vue/pages/PageHome.vue';
+import Page1v1 from '@client/vue/pages/Page1v1.vue';
+import PagePlayVsAI from '@client/vue/pages/PagePlayVsAI.vue';
 
 const routes: RouteRecordRaw[] = [
     {

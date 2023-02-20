@@ -1,4 +1,4 @@
-import { themeSwitcherDispatcher } from './DarkThemeSwitcher';
+import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 
 export type Theme = {
     colorA: number;

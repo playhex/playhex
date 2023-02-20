@@ -1,5 +1,5 @@
 import { Game, Move } from '@shared/game-engine';
-import ClientPlayer from '../ClientPlayer';
+import ClientPlayer from '@client/ClientPlayer';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 
 export default class RemotePlayMoveController implements MoveControllerInterface

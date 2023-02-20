@@ -1,9 +1,9 @@
 import { Game, Move } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData } from 'pixi.js';
-import Hex from '@client/Hex';
+import Hex from '@client/pixi-board/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
-import { currentTheme } from './BoardTheme';
-import { themeSwitcherDispatcher } from './DarkThemeSwitcher';
+import { currentTheme } from '@client/pixi-board/BoardTheme';
+import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;

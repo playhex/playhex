@@ -1,4 +1,4 @@
-import { PlayerIndex } from 'game-engine';
+import { PlayerIndex } from '../game-engine';
 import { HostedGameData, MoveData, PlayerData } from './Types';
 
 export type HexClientToServerEvents = {

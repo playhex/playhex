@@ -4,7 +4,7 @@ import useHexClient from '@client/hexClient';
 import { HostedGameData } from '@shared/app/Types';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
-import GameOptionsOverlay from '../components/GameOptionsOverlay.vue';
+import GameOptionsOverlay from '@client/vue/components/GameOptionsOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
 const router = useRouter();
