@@ -4,6 +4,7 @@ import Hex from '@client/pixi-board/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
 import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
+import { EventEmitter } from 'events';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -43,16 +44,63 @@ export type BoardOrientation =
     | 'vertical_bias_left_hand'
 ;
 
-export type GameViewOptions = {
+export type GameViewSize = {
     width: number;
     height: number;
 };
 
-const margin = min(window.innerWidth, window.innerHeight) * 0.1;
-const defaultOptions: GameViewOptions = {
-    width: window.innerWidth - margin,
-    height: window.innerHeight - margin,
-}
+/**
+ * Calculate best board size depending on window size.
+ */
+const recalcCurrentSize = (): GameViewSize => {
+    const margin = min(window.innerWidth, window.innerHeight) * 0.1;
+
+    return {
+        width: window.innerWidth - margin,
+        height: window.innerHeight - margin,
+    };
+};
+
+/**
+ * Prevent redrawing board constantly while resizing window.
+ * This callback limits redraw to 1 per "cooldownTime" in milliseconds.
+ *
+ * But this callback is also giving flickering effect when resizing...
+ */
+const throttle = (callback: () => void, cooldownTime = 100): () => void => {
+    let cooldown: null | number = null;
+    let callFinally = false;
+
+    const startCooldown = () => {
+        cooldown = setTimeout(() => {
+            if (callFinally) {
+                callFinally = false;
+                startCooldown();
+                callback();
+            }
+
+            cooldown = null;
+        }, cooldownTime);
+    };
+
+    return () => {
+        if (null !== cooldown) {
+            callFinally = true;
+            return;
+        }
+
+        startCooldown();
+        callback();
+    };
+};
+
+let currentSize: GameViewSize = recalcCurrentSize();
+const resizeEventEmitter = new EventEmitter();
+
+window.addEventListener('resize', throttle(() => {
+    currentSize = recalcCurrentSize();
+    resizeEventEmitter.emit('resize');
+}));
 
 export default class GameView
 {
@@ -64,15 +112,14 @@ export default class GameView
     constructor(
         private game: Game,
         private moveController: MoveControllerInterface,
-        private options: GameViewOptions = defaultOptions,
     ) {
         this.pixi = new Application({
             antialias: true,
             backgroundAlpha: 0,
             resolution: window.devicePixelRatio,
             autoDensity: true,
-            width: this.options.width,
-            height: this.options.height,
+            width: currentSize.width,
+            height: currentSize.height,
         });
 
         this.pixi.stage.addChild(this.gameContainer);
@@ -80,6 +127,7 @@ export default class GameView
         this.redraw();
         this.listenModel();
 
+        resizeEventEmitter.on('resize', () => this.redrawAfterResize());
         themeSwitcherDispatcher.on('themeSwitched', () => this.redraw());
 
         if (this.game.isEnded()) {
@@ -103,8 +151,8 @@ export default class GameView
         );
 
         this.gameContainer.position = {
-            x: this.options.width / 2,
-            y: this.options.height / 2,
+            x: currentSize.width / 2,
+            y: currentSize.height / 2,
         };
 
         this.gameContainer.addChild(
@@ -112,6 +160,16 @@ export default class GameView
         );
 
         this.createAndAddHexes();
+    }
+
+    private redrawAfterResize(): void
+    {
+        if (!this.pixi.renderer) {
+            return;
+        }
+
+        this.pixi.renderer.resize(currentSize.width, currentSize.height);
+        this.redraw();
     }
 
     getGame()
@@ -182,23 +240,23 @@ export default class GameView
         const boardWidth = Hex.RADIUS * this.game.getSize() * SQRT_3_2;
 
         const boardCorner0 = {
-            x: this.options.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
-            y: this.options.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
+            x: currentSize.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
+            y: currentSize.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
         };
 
         const boardCorner1 = {
-            x: this.options.width / 2 + boardWidth * cos(rotation - PI_3),
-            y: this.options.height / 2 + boardWidth * sin(rotation - PI_3),
+            x: currentSize.width / 2 + boardWidth * cos(rotation - PI_3),
+            y: currentSize.height / 2 + boardWidth * sin(rotation - PI_3),
         };
 
         const boardCorner2 = {
-            x: this.options.width - boardCorner0.x,
-            y: this.options.height - boardCorner0.y,
+            x: currentSize.width - boardCorner0.x,
+            y: currentSize.height - boardCorner0.y,
         };
 
         const boardCorner3 = {
-            x: this.options.width - boardCorner1.x,
-            y: this.options.height - boardCorner1.y,
+            x: currentSize.width - boardCorner1.x,
+            y: currentSize.height - boardCorner1.y,
         };
 
         const boardMaxCorner0 = {
@@ -215,8 +273,8 @@ export default class GameView
         const boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
 
         const scale = min(
-            this.options.width / boxWidth,
-            this.options.height / boxHeight,
+            currentSize.width / boxWidth,
+            currentSize.height / boxHeight,
         );
 
         this.gameContainer.scale = {x: scale, y: scale};
