@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '@client/pixi-board/GameView';
+import GameView, { BoardOrientation } from '@client/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
 
@@ -35,6 +35,9 @@ onMounted(() => {
 onUnmounted(() => {
     gameView.value.destroy();
 });
+
+let orientation = ref<BoardOrientation>(gameView?.value?.getOrientation());
+window.addEventListener('resize', () => orientation.value = gameView?.value?.getOrientation());
 </script>
 
 <template>
@@ -43,7 +46,7 @@ onUnmounted(() => {
             <div ref="pixiApp"></div>
         </div>
 
-        <div v-if="game" :class="['game-info-overlay', `orientation-${gameView.getOrientation()}`]">
+        <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a mx-2">
                 <h4 class="text-player-a">{{ game.getPlayer(0).getName() }}</h4>
             </div>
