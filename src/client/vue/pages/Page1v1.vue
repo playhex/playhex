@@ -6,15 +6,25 @@ import useHexClient from '@client/hexClient';
 import { ref } from '@vue/runtime-core';
 import socket from '@client/socket';
 import RemotePlayMoveController from '@client/MoveController/RemotePlayMoveController';
+import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
+import NoopMoveController from '@client/MoveController/NoopMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
+import ConfirmationOverlay from '@client/vue/components/ConfirmationOverlay.vue';
 import { playerCanJoinGame } from '@shared/app/GameUtils';
 import { storeToRefs } from 'pinia';
+import GameClientSocket from 'GameClientSocket';
+import { Game } from '@shared/game-engine';
+import ClientPlayer from 'ClientPlayer';
+import { createOverlay } from 'unoverlay-vue';
 
 const { loggedInUser } = storeToRefs(useHexClient());
 const route = useRoute();
 const router = useRouter();
 const hexClient = useHexClient();
 const gameView = ref<GameView>();
+let gameClientSocket: null | GameClientSocket;
+let game: Game;
+let localPlayer: null | ClientPlayer = null;
 const { gameId } = route.params;
 
 if (Array.isArray(gameId)) {
@@ -22,23 +32,29 @@ if (Array.isArray(gameId)) {
 }
 
 (async () => {
-    let game = hexClient.gameClientSockets[gameId]?.getGame();
+    gameClientSocket = await hexClient.retrieveGameClientSocket(gameId);
 
-    if (!game) {
-        const gameClientSocket = await hexClient.retrieveGameClientSocket(gameId);
-
-        if (!gameClientSocket) {
-            console.error(`Game ${gameId} no longer exists.`);
-            router.push({name: 'home'});
-            return;
-        }
-
-        game = gameClientSocket.getGame();
+    if (!gameClientSocket) {
+        console.error(`Game ${gameId} no longer exists.`);
+        router.push({name: 'home'});
+        return;
     }
+
+    game = gameClientSocket.getGame();
+
+    // TMP
+    game.on('resign', (byPlayerIndex) => console.log('Game resign by ', byPlayerIndex));
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    gameView.value = new GameView(game, new RemotePlayMoveController());
+    localPlayer = gameClientSocket.getLocalPlayer();
+
+    const controller: MoveControllerInterface = localPlayer
+        ? new RemotePlayMoveController(localPlayer)
+        : new NoopMoveController()
+    ;
+
+    gameView.value = new GameView(game, controller);
 })();
 
 const canJoin = (): boolean => {
@@ -63,6 +79,28 @@ const join = async () => {
         console.error('could not join:', result);
     }
 };
+
+const confirmationOverlay = createOverlay(ConfirmationOverlay);
+
+const resign = async (): Promise<void> => {
+    if (null === localPlayer) {
+        return;
+    }
+
+    try {
+        await confirmationOverlay({
+            title: 'Resign game',
+            message: 'Are you sure you want to resign game?',
+            confirmLabel: 'Yes, resign',
+            confirmClass: 'btn-danger',
+            cancelLabel: 'No, continue playing',
+            cancelClass: 'btn-outline-primary',
+        });
+        localPlayer.resign();
+    } catch (e) {
+        // resignation cancelled
+    }
+};
 </script>
 
 <template>
@@ -76,6 +114,14 @@ const join = async () => {
         <div v-if="canJoin()" class="position-absolute w-100 join-button-container">
             <div class="d-flex justify-content-center">
                 <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-down-menu menu-game">
+        <div class="container-fluid">
+            <div class="d-flex">
+                <a v-if="localPlayer" href="#" @click="e => { e.preventDefault(); resign() }">Resign</a>
             </div>
         </div>
     </div>

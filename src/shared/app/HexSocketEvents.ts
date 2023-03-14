@@ -48,6 +48,11 @@ export type HexServerToClientEvents = {
     moved: (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => void;
 
     /**
+     * A player resigned.
+     */
+    resigned: (gameId: string, byPlayerIndex: PlayerIndex) => void;
+
+    /**
      * A game has ended and there is a winner.
      */
     ended: (gameId: string, winner: PlayerIndex) => void;

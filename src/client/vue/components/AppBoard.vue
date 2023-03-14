@@ -3,6 +3,8 @@
 import GameView, { BoardOrientation } from '@client/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { toRefs } from 'vue';
+import GameOverOverlay from '@client/vue/components/GameOverOverlay.vue';
+import { createOverlay } from 'unoverlay-vue';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -38,6 +40,14 @@ onUnmounted(() => {
 
 let orientation = ref<BoardOrientation>(gameView?.value?.getOrientation());
 window.addEventListener('resize', () => orientation.value = gameView?.value?.getOrientation());
+
+const gameOverOverlay = createOverlay(GameOverOverlay);
+
+gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
+    await gameOverOverlay({
+        winner: game.getPlayer(winnerPlayerIndex),
+    });
+});
 </script>
 
 <template>

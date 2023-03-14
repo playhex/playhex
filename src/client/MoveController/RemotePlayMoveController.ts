@@ -4,19 +4,12 @@ import MoveControllerInterface from '@client/MoveController/MoveControllerInterf
 
 export default class RemotePlayMoveController implements MoveControllerInterface
 {
+    constructor(
+        private player: ClientPlayer,
+    ) {}
+
     move(game: Game, move: Move): void
     {
-        const currentPlayer = game.getCurrentPlayer();
-
-        if (!(currentPlayer instanceof ClientPlayer)) {
-            throw new Error('Expected a ClientPlayer here');
-        }
-
-        // Ignore move if current player is not me
-        if (!currentPlayer.isLocal()) {
-            return;
-        }
-
-        currentPlayer.move(move);
+        this.player.move(move);
     }
 }

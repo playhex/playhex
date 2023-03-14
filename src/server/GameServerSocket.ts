@@ -42,6 +42,10 @@ export default class GameServerSocket
             this.io.to(`games/${this.id}`).emit('moved', this.id, move, byPlayerIndex);
         });
 
+        this.game.on('resign', (byPlayerIndex: PlayerIndex) => {
+            this.io.to(`games/${this.id}`).emit('resigned', this.id, byPlayerIndex);
+        });
+
         this.game.on('ended', (winner: PlayerIndex) => {
             this.io.to('lobby').emit('ended', this.id, winner);
         });
@@ -127,6 +131,30 @@ export default class GameServerSocket
             console.error(e.message);
 
             return 'Unexpected error: ' + e.message;
+        }
+    }
+
+    playerResign(playerData: PlayerData): true | string
+    {
+        const player = this.game.getPlayers().find(player => {
+            if (!(player instanceof ServerPlayer)) {
+                return false;
+            }
+
+            return player.getPlayerId() === playerData.id;
+        });
+
+        if (!(player instanceof Player)) {
+            console.log('A player not in the game tried to resign', playerData);
+            return 'you are not a player of this game';
+        }
+
+        try {
+            player.resign();
+
+            return true;
+        } catch (e) {
+            return e.message;
         }
     }
 

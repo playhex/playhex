@@ -5,9 +5,12 @@ import ClientPlayer from '@client/ClientPlayer';
 import GameClientSocket from '@client/GameClientSocket';
 import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
-import { apiPostGame1v1, apiPostGameVsCPU, getGame, getGames, loginAsGuest } from '@client/apiClient';
+import { apiPostGame1v1, apiPostGameVsCPU, apiPostResign, getGame, getGames, loginAsGuest } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
+/**
+ * State synced with server, and methods to handle games and user.
+ */
 const useHexClient = defineStore('hexClient', {
     state: () => ({
         /**
@@ -104,6 +107,11 @@ const useHexClient = defineStore('hexClient', {
             });
         },
 
+        async resign(gameId: string): Promise<string | true>
+        {
+            return apiPostResign(gameId);
+        },
+
         reconnectSocket(): void
         {
             socket.disconnect().connect();
@@ -140,6 +148,12 @@ const useHexClient = defineStore('hexClient', {
             socket.on('moved', (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => {
                 if (this.gameClientSockets[gameId]) {
                     this.gameClientSockets[gameId].gameMove(new Move(move.row, move.col), byPlayerIndex);
+                }
+            });
+
+            socket.on('resigned', (gameId: string, byPlayerIndex: PlayerIndex) => {
+                if (this.gameClientSockets[gameId]) {
+                    this.gameClientSockets[gameId].gameResign(byPlayerIndex);
                 }
             });
 

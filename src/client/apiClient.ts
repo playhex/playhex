@@ -63,3 +63,18 @@ export const apiPostGameVsCPU = async (gameOptions: GameOptionsData = {}): Promi
 
     return response.json();
 };
+
+export const apiPostResign = async (gameId: string): Promise<true | string> => {
+    const response = await fetch(`/api/games/${gameId}/resign`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (204 === response.status) {
+        return true;
+    }
+
+    return response.text();
+};

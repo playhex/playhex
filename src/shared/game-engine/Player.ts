@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 import Move from './Move';
 import PlayerGameInput from './PlayerGameInput';
+import { PlayerIndex } from './Types';
 
 type PlayerEvents = {
     /**
@@ -26,6 +27,15 @@ export default class Player extends (EventEmitter as unknown as new () => TypedE
     getName(): string
     {
         return 'Player';
+    }
+
+    getPlayerIndex(): PlayerIndex
+    {
+        if (null === this.playerGameInput) {
+            throw new Error('No player game input provided.');
+        }
+
+        return this.playerGameInput.getPlayerIndex();
     }
 
     setPlayerGameInput(playerGameInput: PlayerGameInput): void
@@ -59,5 +69,14 @@ export default class Player extends (EventEmitter as unknown as new () => TypedE
         }
 
         this.playerGameInput.move(move);
+    }
+
+    resign(): void
+    {
+        if (null === this.playerGameInput) {
+            throw new Error('Cannot resign, no player game input provided.');
+        }
+
+        this.playerGameInput.resign();
     }
 }

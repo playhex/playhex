@@ -112,6 +112,23 @@ export class HexServer
         return gameServerSocket.playerMove(playerData, new Move(move.row, move.col));
     }
 
+    playerResign(playerId: string, gameId: string): true|string
+    {
+        const gameServerSocket = this.gameServerSockets[gameId];
+
+        if (!gameServerSocket) {
+            return 'no game ' + gameId;
+        }
+
+        const playerData = this.players[playerId];
+
+        if (!playerData) {
+            return 'no player' + playerId;
+        }
+
+        return gameServerSocket.playerResign(playerData);
+    }
+
     createGuest(): PlayerData
     {
         const guest: PlayerData = {

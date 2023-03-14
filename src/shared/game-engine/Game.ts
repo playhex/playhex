@@ -18,6 +18,11 @@ type GameEvents = {
     played: (move: Move, byPlayerIndex: PlayerIndex) => void;
 
     /**
+     * A player resign. The ended event is also emitted.
+     */
+    resign: (byPlayerIndex: PlayerIndex) => void;
+
+    /**
      * Game have been finished.
      */
     ended: (winner: PlayerIndex) => void;
@@ -231,12 +236,20 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     }
 
     /**
-     * Makes current player abandon
+     * Makes playerIndex resign
      */
-    abandon(): void
+    resign(playerIndex: PlayerIndex): void
     {
-        this.changeCurrentPlayer();
-        this.setWinner(this.currentPlayerIndex);
+        if (!this.isStarted() || this.isEnded()) {
+            throw new Error('Cannot resign, game is not running');
+        }
+
+        this.emit('resign', playerIndex);
+
+        this.setWinner(0 === playerIndex
+            ? 1
+            : 0
+        );
     }
 
     otherPlayerIndex(): PlayerIndex

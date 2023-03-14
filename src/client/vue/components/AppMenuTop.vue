@@ -14,21 +14,13 @@ themeSwitcherDispatcher.on('themeSwitched', () => {
 </script>
 
 <template>
-    <div class="menu-top">
+    <div class="top-down-menu menu-top">
         <div class="container-fluid">
-            <ul class="list-inline">
-                <li class="list-inline-item"><router-link to="/">Home</router-link></li>
-                <li class="list-inline-item float-end ms-2 me-0"><a href="#" @click="switchTheme()">{{ otherTheme }}</a></li>
-                <li class="list-inline-item float-end">{{ loggedInUser?.pseudo || 'logging in...' }}</li>
-            </ul>
+            <div class="d-flex">
+                <router-link to="/">Home</router-link>
+                <p class="ms-auto me-2">{{ loggedInUser?.pseudo || 'logging in...' }}</p>
+                <a href="#" @click="switchTheme()">{{ otherTheme }}</a>
+            </div>
         </div>
     </div>
 </template>
-
-<style scoped lang="stylus">
-.menu-top
-    padding 0.2em 0
-
-    ul
-        margin 0
-</style>

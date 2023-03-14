@@ -1,10 +1,11 @@
-import { Game, Move } from '@shared/game-engine';
+import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
 import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
 import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 import { EventEmitter } from 'events';
+import TypedEventEmitter from 'typed-emitter';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -102,7 +103,15 @@ window.addEventListener('resize', throttle(() => {
     resizeEventEmitter.emit('resize');
 }));
 
-export default class GameView
+type GameViewEvents = {
+    /**
+     * Game has ended, and win animation is over.
+     * Used to display win message after animation, and not at same time.
+     */
+    endedAndWinAnimationOver: (winner: PlayerIndex) => void;
+};
+
+export default class GameView extends (EventEmitter as unknown as new () => TypedEventEmitter<GameViewEvents>)
 {
     private hexes: Hex[][];
     private pixi: Application;
@@ -113,6 +122,8 @@ export default class GameView
         private game: Game,
         private moveController: MoveControllerInterface,
     ) {
+        super();
+
         this.pixi = new Application({
             antialias: true,
             backgroundAlpha: 0,
@@ -293,8 +304,7 @@ export default class GameView
         this.game.on('ended', async (winner) => {
             await this.animateWinningPath();
 
-            // Win box
-            console.log('winner is', winner);
+            this.emit('endedAndWinAnimationOver', winner);
         });
     }
 

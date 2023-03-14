@@ -3,6 +3,13 @@ import ClientPlayer from './ClientPlayer';
 import useHexClient from './hexClient';
 import { PlayerData } from '@shared/app/Types';
 
+/**
+ * Listen game events triggered after local player actions,
+ * and re-dispatch them to server.
+ *
+ * Also provide front API to handle game,
+ * called by hexClient on server events.
+ */
 export default class GameClientSocket
 {
     private hexClient = useHexClient();
@@ -25,6 +32,16 @@ export default class GameClientSocket
                 console.error('Error while doing move:', result);
             }
         });
+
+        this.game.on('resign', async () => {
+            // TODO do not call hexClient.resign twice
+
+            const result = await this.hexClient.resign(this.id);
+
+            if (true !== result) {
+                console.error('Error while resign:', result);
+            }
+        });
     }
 
     getId(): string
@@ -35,6 +52,24 @@ export default class GameClientSocket
     getGame()
     {
         return this.game;
+    }
+
+    /**
+     * Get player that is current logged in player,
+     * or null if current player is not in the game
+     * (not yet joined, or game played by others).
+     */
+    getLocalPlayer(): null | ClientPlayer
+    {
+        const localPlayer = this.game
+            .getPlayers()
+            .find(player => player instanceof ClientPlayer && player.isLocal())
+        ;
+
+        return localPlayer instanceof ClientPlayer
+            ? localPlayer
+            : null
+        ;
     }
 
     playerJoined(playerIndex: PlayerIndex, playerData: PlayerData): void
@@ -64,6 +99,16 @@ export default class GameClientSocket
         if (this.game.getBoard().isEmpty(move.getRow(), move.getCol())) {
             this.game.move(move, byPlayerIndex);
         }
+    }
+
+    gameResign(byPlayerIndex: PlayerIndex): void
+    {
+        // If game is not already ended locally by server response anticipation
+        if (this.game.isEnded()) {
+            return;
+        }
+
+        this.game.resign(byPlayerIndex);
     }
 
     ended(winner: PlayerIndex): void

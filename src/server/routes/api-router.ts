@@ -76,6 +76,24 @@ export function apiRouter(hexServer: HexServer) {
         res.send(game.toData());
     });
 
+    router.post('/api/games/:id/resign', (req, res) => {
+        const {id} = req.params;
+        let playerData: null | PlayerData;
+
+        if (!req.session.playerId || null === (playerData = hexServer.getPlayer(req.session.playerId))) {
+            res.status(403).send('not authenticated').end();
+            return;
+        }
+
+        const result = hexServer.playerResign(playerData.id, id);
+
+        if (true !== result) {
+            res.status(400).send(result);
+        }
+
+        res.status(204).send();
+    });
+
     router.post('/auth/guest', (req, res) => {
         let user: null | PlayerData = null;
 

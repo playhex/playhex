@@ -6,8 +6,6 @@ import { Game, Move, PlayerIndex } from '.';
  */
 export default class PlayerGameInput
 {
-    private hexes: null|(null|PlayerIndex)[][] = null;
-
     constructor(
         private game: Game,
         private playerIndex: PlayerIndex,
@@ -30,11 +28,7 @@ export default class PlayerGameInput
 
     getHexes(): (null|PlayerIndex)[][]
     {
-        if (null === this.hexes) {
-            this.hexes = this.game.getBoard().getCellsClone();
-        }
-
-        return this.hexes;
+        return this.game.getBoard().getCellsClone();
     }
 
     getMovesHistory(): Move[]
@@ -53,7 +47,10 @@ export default class PlayerGameInput
     move(move: Move): void
     {
         this.game.move(move, this.playerIndex);
+    }
 
-        this.hexes = null;
+    resign(): void
+    {
+        this.game.resign(this.playerIndex);
     }
 }
