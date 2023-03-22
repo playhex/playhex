@@ -39,7 +39,7 @@ onUnmounted(() => {
 });
 
 let orientation = ref<BoardOrientation>(gameView?.value?.getOrientation());
-window.addEventListener('resize', () => orientation.value = gameView?.value?.getOrientation());
+window.addEventListener('resizeDebounced', () => orientation.value = gameView?.value?.getOrientation());
 
 const gameOverOverlay = createOverlay(GameOverOverlay);
 

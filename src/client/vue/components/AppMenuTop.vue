@@ -14,7 +14,7 @@ themeSwitcherDispatcher.on('themeSwitched', () => {
 </script>
 
 <template>
-    <div class="top-down-menu menu-top">
+    <div class="menu-top">
         <div class="container-fluid">
             <div class="d-flex">
                 <router-link to="/">Home</router-link>

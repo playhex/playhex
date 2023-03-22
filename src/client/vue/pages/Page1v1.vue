@@ -42,9 +42,6 @@ if (Array.isArray(gameId)) {
 
     game = gameClientSocket.getGame();
 
-    // TMP
-    game.on('resign', (byPlayerIndex) => console.log('Game resign by ', byPlayerIndex));
-
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
     localPlayer = gameClientSocket.getLocalPlayer();
@@ -118,7 +115,7 @@ const resign = async (): Promise<void> => {
         </div>
     </div>
 
-    <div class="top-down-menu menu-game">
+    <div class="menu-game">
         <div class="container-fluid">
             <div class="d-flex">
                 <a v-if="localPlayer" href="#" @click="e => { e.preventDefault(); resign() }">Resign</a>

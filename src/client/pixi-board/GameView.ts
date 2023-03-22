@@ -6,6 +6,7 @@ import { currentTheme } from '@client/pixi-board/BoardTheme';
 import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
+import { debounce } from 'debounce';
 
 const { min, max, sin, cos, sqrt, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -50,58 +51,9 @@ export type GameViewSize = {
     height: number;
 };
 
-/**
- * Calculate best board size depending on window size.
- */
-const recalcCurrentSize = (): GameViewSize => {
-    const margin = min(window.innerWidth, window.innerHeight) * 0.1;
-
-    return {
-        width: window.innerWidth - margin,
-        height: window.innerHeight - margin,
-    };
-};
-
-/**
- * Prevent redrawing board constantly while resizing window.
- * This callback limits redraw to 1 per "cooldownTime" in milliseconds.
- *
- * But this callback is also giving flickering effect when resizing...
- */
-const throttle = (callback: () => void, cooldownTime = 100): () => void => {
-    let cooldown: null | number = null;
-    let callFinally = false;
-
-    const startCooldown = () => {
-        cooldown = setTimeout(() => {
-            if (callFinally) {
-                callFinally = false;
-                startCooldown();
-                callback();
-            }
-
-            cooldown = null;
-        }, cooldownTime);
-    };
-
-    return () => {
-        if (null !== cooldown) {
-            callFinally = true;
-            return;
-        }
-
-        startCooldown();
-        callback();
-    };
-};
-
-let currentSize: GameViewSize = recalcCurrentSize();
-const resizeEventEmitter = new EventEmitter();
-
-window.addEventListener('resize', throttle(() => {
-    currentSize = recalcCurrentSize();
-    resizeEventEmitter.emit('resize');
-}));
+window.addEventListener('resize', debounce(() => {
+    window.dispatchEvent(new CustomEvent('resizeDebounced'));
+}, 60));
 
 type GameViewEvents = {
     /**
@@ -124,13 +76,15 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     ) {
         super();
 
+        const wrapperSize = this.getWrapperSize();
+
         this.pixi = new Application({
             antialias: true,
             backgroundAlpha: 0,
             resolution: window.devicePixelRatio,
             autoDensity: true,
-            width: currentSize.width,
-            height: currentSize.height,
+            width: wrapperSize.width,
+            height: wrapperSize.height,
         });
 
         this.pixi.stage.addChild(this.gameContainer);
@@ -138,7 +92,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.redraw();
         this.listenModel();
 
-        resizeEventEmitter.on('resize', () => this.redrawAfterResize());
+        window.addEventListener('resizeDebounced', () => this.resizeRendererAndRedraw());
         themeSwitcherDispatcher.on('themeSwitched', () => this.redraw());
 
         if (this.game.isEnded()) {
@@ -161,9 +115,11 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             this.game.getSize() / 2 - 0.5,
         );
 
+        const wrapperSize = this.getWrapperSize();
+
         this.gameContainer.position = {
-            x: currentSize.width / 2,
-            y: currentSize.height / 2,
+            x: wrapperSize.width / 2,
+            y: wrapperSize.height / 2,
         };
 
         this.gameContainer.addChild(
@@ -173,14 +129,24 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.createAndAddHexes();
     }
 
-    private redrawAfterResize(): void
+    private resizeRendererAndRedraw(): void
     {
         if (!this.pixi.renderer) {
             return;
         }
 
-        this.pixi.renderer.resize(currentSize.width, currentSize.height);
+        const wrapperSize = this.getWrapperSize();
+
+        this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
         this.redraw();
+    }
+
+    getWrapperSize(): GameViewSize
+    {
+        return {
+            width: min(window.innerWidth, screen.width),
+            height: min(window.innerHeight, screen.height) - 80,
+        };
     }
 
     getGame()
@@ -249,25 +215,26 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
         const boardHeight = Hex.RADIUS * this.game.getSize() * 1.5 - 0.5;
         const boardWidth = Hex.RADIUS * this.game.getSize() * SQRT_3_2;
+        const wrapperSize = this.getWrapperSize();
 
         const boardCorner0 = {
-            x: currentSize.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
-            y: currentSize.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
+            x: wrapperSize.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
+            y: wrapperSize.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
         };
 
         const boardCorner1 = {
-            x: currentSize.width / 2 + boardWidth * cos(rotation - PI_3),
-            y: currentSize.height / 2 + boardWidth * sin(rotation - PI_3),
+            x: wrapperSize.width / 2 + boardWidth * cos(rotation - PI_3),
+            y: wrapperSize.height / 2 + boardWidth * sin(rotation - PI_3),
         };
 
         const boardCorner2 = {
-            x: currentSize.width - boardCorner0.x,
-            y: currentSize.height - boardCorner0.y,
+            x: wrapperSize.width - boardCorner0.x,
+            y: wrapperSize.height - boardCorner0.y,
         };
 
         const boardCorner3 = {
-            x: currentSize.width - boardCorner1.x,
-            y: currentSize.height - boardCorner1.y,
+            x: wrapperSize.width - boardCorner1.x,
+            y: wrapperSize.height - boardCorner1.y,
         };
 
         const boardMaxCorner0 = {
@@ -280,12 +247,12 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             y: max(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
         };
 
-        const boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS;
+        const boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS * 2;
         const boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
 
         const scale = min(
-            currentSize.width / boxWidth,
-            currentSize.height / boxHeight,
+            wrapperSize.width / boxWidth,
+            wrapperSize.height / boxHeight,
         );
 
         this.gameContainer.scale = {x: scale, y: scale};
