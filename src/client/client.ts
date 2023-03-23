@@ -8,6 +8,16 @@ import useHexClient from '@client/hexClient';
 import routes from './vue/routes';
 import unoverlay from 'unoverlay-vue';
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+        .then((reg) => {
+            console.log('Registered successfully', reg);
+        }).catch((error) => {
+            console.log('Error', error);
+        })
+    ;
+}
+
 const pinia = createPinia();
 const router = createRouter({
     history: createWebHistory(),

@@ -10,7 +10,6 @@ export function staticsRouter() {
 
     if (IS_DEV) {
         const { createProxyMiddleware } = require('http-proxy-middleware');
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         // All the assets are hosted by Webpack on localhost:${config.WEBPACK_PORT} (Webpack-dev-server)
         router.use(
             '/statics',

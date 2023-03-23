@@ -36,6 +36,7 @@ app.set('view engine', 'ejs');
 const hexServer = new HexServer(io);
 
 app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
+app.use('/service-worker.js', express.static(path.join(process.cwd(), 'assets', 'service-worker.js')));
 app.use(apiRouter(hexServer));
 app.use(staticsRouter());
 app.use(pagesRouter());
