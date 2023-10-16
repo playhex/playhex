@@ -47,6 +47,23 @@ const createAndJoinGameVsCPU = async () => {
     goToGame(hostedGame.id);
 };
 
+const createAndJoinGameVsLocalAI = async () => {
+    let gameOptions: GameOptionsData;
+
+    try {
+        gameOptions = await gameOptionsOverlay();
+    } catch (e) {
+        return;
+    }
+
+    router.push({
+        name: 'play-vs-ai',
+        state: {
+            gameOptions,
+        },
+    });
+};
+
 const isWaiting = (hostedGame: HostedGameData) => !hostedGame.game.started;
 const isPlaying = (hostedGame: HostedGameData) => hostedGame.game.started && null === hostedGame.game.winner;
 
@@ -86,7 +103,7 @@ const joinGame = (gameId: string) => {
         <div class="d-grid gap-2 d-sm-block mb-3">
             <button type="button" class="btn me-sm-3 btn-primary" @click="createAndJoinGame">Create game</button>
             <button type="button" class="btn me-sm-3 btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
-            <button type="button" class="btn me-sm-3 btn-outline-primary" @click="router.push('/play-vs-ai')">Play vs offline AI</button>
+            <button type="button" class="btn me-sm-3 btn-outline-primary" @click="createAndJoinGameVsLocalAI">Play vs offline AI</button>
         </div>
 
         <h3>Watch current game</h3>

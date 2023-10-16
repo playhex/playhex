@@ -45,7 +45,7 @@ export default class Hex extends Sprite
         this.redrawHex();
         this.setPlayer(initialValue);
 
-        this.interactive = true;
+        this.eventMode = 'static';
     }
 
     private redrawHex(): void

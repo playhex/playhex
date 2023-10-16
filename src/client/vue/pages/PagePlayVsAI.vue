@@ -5,24 +5,14 @@ import PlayerGameInputMoveController from '@client/MoveController/PlayerGameInpu
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
 import { shufflePlayers } from '@shared/app/GameUtils';
-import { createOverlay } from 'unoverlay-vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import GameOptionsOverlay from '@client/vue/components/GameOptionsOverlay.vue';
 import { ref } from 'vue';
 
 let gameView = ref<GameView>();
 
 (async () => {
     const player = new Player();
-    let gameOptions: GameOptionsData;
-    const gameOptionsOverlay = createOverlay<any, GameOptionsData>(GameOptionsOverlay);
-
-    try {
-        gameOptions = await gameOptionsOverlay();
-    } catch (e) {
-        gameOptions = {};
-    }
-
+    const gameOptions: GameOptionsData = history.state.gameOptions || {};
     const players: [Player, Player] = [
         player,
         new RandomAIPlayer(),

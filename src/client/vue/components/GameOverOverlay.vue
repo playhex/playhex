@@ -3,7 +3,7 @@ import { Player, PlayerIndex } from '@shared/game-engine';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { PropType } from 'vue';
 
-const { confirm, cancel } = useOverlayMeta();
+const { visible, confirm, cancel } = useOverlayMeta();
 
 const props = defineProps({
     winner: {
@@ -14,7 +14,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div>
+    <div v-if="visible">
         <div class="modal d-block" @click="cancel()">
             <div class="modal-dialog" @click="e => e.stopPropagation()">
                 <form class="modal-content">

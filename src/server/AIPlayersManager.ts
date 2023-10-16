@@ -1,5 +1,5 @@
 import { Player, RandomAIPlayer } from '../shared/game-engine';
-import queueableMohexInstance from './mohex/queueableMohexInstance';
+import { getMohexInstance, isMohexEnabled } from './mohex/queueableMohexInstance';
 import MohexPlayer from './mohex/MohexPlayer';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
@@ -10,11 +10,11 @@ import { GameOptionsData } from '@shared/app/GameOptions';
  */
 const createAIPlayer = (gameOptions: GameOptionsData): Player => {
     if (
-        null !== queueableMohexInstance
+        isMohexEnabled()
         && gameOptions.boardsize
         && gameOptions.boardsize <= 13
     ) {
-        return new MohexPlayer(queueableMohexInstance);
+        return new MohexPlayer(getMohexInstance());
     }
 
     return new RandomAIPlayer();

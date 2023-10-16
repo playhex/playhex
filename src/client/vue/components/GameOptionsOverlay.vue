@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { sanitizeGameOptions } from '@shared/app/GameOptions';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '@shared/game-engine';
 
-const { confirm, cancel } = useOverlayMeta();
+const { visible, confirm, cancel } = useOverlayMeta();
 
 let boardsize = ref(BOARD_DEFAULT_SIZE);
 let boardsizeCustom = ref(false);
@@ -13,7 +13,7 @@ let firstPlayer = ref<null | PlayerIndex>(null);
 </script>
 
 <template>
-    <div>
+    <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
                 <form class="modal-content" @submit="confirm(sanitizeGameOptions({ boardsize, firstPlayer }))">
