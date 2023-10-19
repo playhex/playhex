@@ -26,6 +26,7 @@
     "remove": "^0.1.5",
     "socket.io": "^4.5.4",
     "socket.io-client": "^4.5.4",
+    "typedi": "^0.10.0",
     "unoverlay-vue": "^0.2.3",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",

@@ -1,15 +1,15 @@
-import bodyParser from 'body-parser';
+import { json } from 'body-parser';
 import { Router } from 'express';
-import { HexServer } from '../HexServer';
 import gamesRoutes from '../controllers/api/games';
 import authRoutes from '../controllers/api/auth';
 
-export function apiRouter(hexServer: HexServer) {
+export function apiRouter() {
     const router = Router();
-    router.use(bodyParser.json());
 
-    router.use(gamesRoutes(hexServer));
-    router.use(authRoutes(hexServer));
+    router.use(json());
+
+    router.use(gamesRoutes());
+    router.use(authRoutes());
 
     router.all('/api/**', (req, res) => {
         res.sendStatus(404);

@@ -1,5 +1,5 @@
 import './config';
-import express, { NextFunction, Request, Response } from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 import http from 'http';
 import path from 'path';
 import session from 'express-session';
@@ -8,6 +8,7 @@ import { pagesRouter } from './routes/pages-router';
 import { staticsRouter } from './routes/statics-router';
 import { Server } from 'socket.io';
 import { HexServer } from './HexServer';
+import Container from 'typedi';
 
 console.log(`*******************************************`);
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -33,11 +34,11 @@ io.use((socket, next) => {
 
 app.set('view engine', 'ejs');
 
-const hexServer = new HexServer(io);
+Container.set(HexServer, new HexServer(io));
 
 app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
 app.use('/service-worker.js', express.static(path.join(process.cwd(), 'assets', 'service-worker.js')));
-app.use(apiRouter(hexServer));
+app.use(apiRouter());
 app.use(staticsRouter());
 app.use(pagesRouter());
 

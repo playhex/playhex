@@ -1,4 +1,4 @@
-import bodyParser from 'body-parser';
+import { json } from 'body-parser';
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
 import { Game, Player } from '../../../shared/game-engine';
@@ -7,11 +7,11 @@ import { shufflePlayers } from '../../../shared/app/GameUtils';
 import { HexServer } from '../../HexServer';
 import ServerPlayer from '../../ServerPlayer';
 import { createAIPlayer } from '../../AIPlayersManager';
+import Container from 'typedi';
 
-export default (hexServer: HexServer): Router => {
+export default (): Router => {
     const router = Router();
-
-    router.use(bodyParser.json());
+    const hexServer = Container.get(HexServer);
 
     router.get('/api/games', (req, res) => {
         res.send(

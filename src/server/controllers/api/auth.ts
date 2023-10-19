@@ -1,12 +1,12 @@
-import bodyParser from 'body-parser';
+import { Container } from 'typedi';
+import { json } from 'body-parser';
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
 import { HexServer } from '../../HexServer';
 
-export default (hexServer: HexServer): Router => {
+export default (): Router => {
     const router = Router();
-
-    router.use(bodyParser.json());
+    const hexServer = Container.get(HexServer);
 
     router.post('/auth/guest', (req, res) => {
         let user: null | PlayerData = null;
