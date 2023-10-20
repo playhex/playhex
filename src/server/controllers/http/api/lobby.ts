@@ -1,28 +1,29 @@
-import { json } from 'body-parser';
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
-import { Game, Player } from '../../../shared/game-engine';
-import { sanitizeGameOptions } from '../../../shared/app/GameOptions';
-import { shufflePlayers } from '../../../shared/app/GameUtils';
-import { HexServer } from '../../HexServer';
-import ServerPlayer from '../../ServerPlayer';
-import { createAIPlayer } from '../../AIPlayersManager';
+import { Game, Player } from '../../../../shared/game-engine';
+import { sanitizeGameOptions } from '../../../../shared/app/GameOptions';
+import { shufflePlayers } from '../../../../shared/app/GameUtils';
+import ServerPlayer from '../../../ServerPlayer';
+import { createAIPlayer } from '../../../AIPlayersManager';
 import Container from 'typedi';
+import PlayerRepository from "../../../repositories/PlayerRepository";
+import HostedGameRepository from "../../../repositories/HostedGameRepository";
 
 export default (): Router => {
     const router = Router();
-    const hexServer = Container.get(HexServer);
+    const playerRepository = Container.get(PlayerRepository);
+    const hostedGameRepository = Container.get(HostedGameRepository);
 
     router.get('/api/games', (req, res) => {
         res.send(
-            Object.values(hexServer.getGames()).map(hostedGame => hostedGame.toData())
+            Object.values(hostedGameRepository.getGames()).map(hostedGame => hostedGame.toData())
         );
     });
 
     router.post('/api/games/1v1', (req, res) => {
         let playerData: null | PlayerData;
 
-        if (!req.session.playerId || null === (playerData = hexServer.getPlayer(req.session.playerId))) {
+        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();
             return;
         }
@@ -37,7 +38,7 @@ export default (): Router => {
         shufflePlayers(players, gameOptions.firstPlayer);
 
         const game = new Game(players, gameOptions.boardsize);
-        const gameServerSocket = hexServer.createGame(game);
+        const gameServerSocket = hostedGameRepository.createGame(game);
 
         res.send(gameServerSocket.toData());
     });
@@ -45,7 +46,7 @@ export default (): Router => {
     router.post('/api/games/cpu', (req, res) => {
         let playerData: null | PlayerData;
 
-        if (!req.session.playerId || null === (playerData = hexServer.getPlayer(req.session.playerId))) {
+        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();
             return;
         }
@@ -60,14 +61,14 @@ export default (): Router => {
         shufflePlayers(players, gameOptions.firstPlayer);
 
         const game = new Game(players, gameOptions.boardsize);
-        const gameServerSocket = hexServer.createGame(game);
+        const gameServerSocket = hostedGameRepository.createGame(game);
 
         res.send(gameServerSocket.toData());
     });
 
     router.get('/api/games/:id', (req, res) => {
         const {id} = req.params;
-        const game = hexServer.getGame(id)
+        const game = hostedGameRepository.getGame(id)
 
         if (null === game) {
             res.sendStatus(404);
@@ -75,24 +76,6 @@ export default (): Router => {
         }
 
         res.send(game.toData());
-    });
-
-    router.post('/api/games/:id/resign', (req, res) => {
-        const {id} = req.params;
-        let playerData: null | PlayerData;
-
-        if (!req.session.playerId || null === (playerData = hexServer.getPlayer(req.session.playerId))) {
-            res.status(403).send('not authenticated').end();
-            return;
-        }
-
-        const result = hexServer.playerResign(playerData.id, id);
-
-        if (true !== result) {
-            res.status(400).send(result);
-        }
-
-        res.status(204).send();
     });
 
     return router;

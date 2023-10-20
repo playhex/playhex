@@ -1,47 +1,8 @@
-import './config';
-import express, { NextFunction, Request, Response, Router } from 'express';
-import http from 'http';
-import path from 'path';
-import session from 'express-session';
-import { apiRouter } from './routes/api-router';
-import { pagesRouter } from './routes/pages-router';
-import { staticsRouter } from './routes/statics-router';
-import { Server } from 'socket.io';
-import { HexServer } from './HexServer';
-import Container from 'typedi';
+import { HexClientToServerEvents, HexServerToClientEvents } from "@shared/app/HexSocketEvents";
+import { Server, Socket } from "socket.io";
+import { Service } from "typedi";
 
-console.log(`*******************************************`);
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`*******************************************`);
+@Service()
+export class HexServer extends Server<HexClientToServerEvents, HexServerToClientEvents> {}
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-
-const sessionMiddleware = session({
-    secret: 'TODO secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 365 * 86400 * 1000,
-        //secure: true, // to enable from .env
-    },
-});
-app.use(sessionMiddleware);
-io.use((socket, next) => {
-    sessionMiddleware(socket.request as Request, {} as Response, next as NextFunction);
-});
-
-app.set('view engine', 'ejs');
-
-Container.set(HexServer, new HexServer(io));
-
-app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
-app.use('/service-worker.js', express.static(path.join(process.cwd(), 'assets', 'service-worker.js')));
-app.use(apiRouter());
-app.use(staticsRouter());
-app.use(pagesRouter());
-
-server.listen(process.env.PORT || 3000, () => {
-    console.log(`App listening on port ${process.env.PORT || 3000}!`);
-});
+export type HexSocket = Socket<HexClientToServerEvents, HexServerToClientEvents>;

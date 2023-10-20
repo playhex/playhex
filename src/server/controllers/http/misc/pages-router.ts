@@ -4,7 +4,7 @@ import { getManifest } from './manifest-manager';
 export function pagesRouter() {
     const router = Router();
 
-    router.get(`/**`, async (_, res) => {
+    router.get('/', async (_, res) => {
         const manifest = await getManifest();
         res.render('page.ejs', {
             manifest,

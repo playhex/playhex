@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { IS_DEV, WEBPACK_PORT } from '../config';
+import { IS_DEV, WEBPACK_PORT } from '../../../config';
 
 /* eslint-disable */
 

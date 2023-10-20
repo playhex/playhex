@@ -5,4 +5,4 @@ if (parseInt(major, 10) < versionRequired) {
     throw `Node >= ${versionRequired} required, actual version: ${v}.`;
 }
 
-require('./dist/server/server');
+require('./dist/server');

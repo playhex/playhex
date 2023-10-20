@@ -1,22 +1,21 @@
 import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
 import { GameData, HostedGameData, PlayerData } from '../shared/app/Types';
-import { Server } from 'socket.io';
 import ServerPlayer from './ServerPlayer';
 import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
-import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/HexSocketEvents';
 import { getNextFreeSlot } from '../shared/app/GameUtils';
+import { HexServer } from "server";
 
 /**
  * Contains a game state,
  * mutate this, and notify obervers in the room.
  */
-export default class GameServerSocket
+export default class HostedGame
 {
     private id: string = uuidv4();
 
     constructor(
-        private io: Server<HexClientToServerEvents, HexServerToClientEvents>,
+        private io: HexServer,
         private game: Game,
     ) {
         this.listenGame();
@@ -162,14 +161,14 @@ export default class GameServerSocket
     {
         return {
             id: this.id,
-            game: GameServerSocket.gameToData(this.game),
+            game: HostedGame.gameToData(this.game),
         };
     }
 
     private static gameToData(game: Game): GameData
     {
         return {
-            players: game.getPlayers().map<null | PlayerData>(GameServerSocket.playerToData) as [null | PlayerData, null | PlayerData],
+            players: game.getPlayers().map<null | PlayerData>(HostedGame.playerToData) as [null | PlayerData, null | PlayerData],
             size: game.getSize(),
             started: game.isStarted(),
             movesHistory: game.getMovesHistory(),

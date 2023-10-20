@@ -1,22 +1,21 @@
 import { Container } from 'typedi';
-import { json } from 'body-parser';
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
-import { HexServer } from '../../HexServer';
+import PlayerRepository from "../../../repositories/PlayerRepository";
 
 export default (): Router => {
     const router = Router();
-    const hexServer = Container.get(HexServer);
+    const playerRepository = Container.get(PlayerRepository);
 
     router.post('/auth/guest', (req, res) => {
         let user: null | PlayerData = null;
 
         if (req.session.playerId) {
-            user = hexServer.getPlayer(req.session.playerId);
+            user = playerRepository.getPlayer(req.session.playerId);
         }
 
         if (null === user) {
-            user = hexServer.createGuest();
+            user = playerRepository.createGuest();
         }
 
         req.session.playerId = user.id;
