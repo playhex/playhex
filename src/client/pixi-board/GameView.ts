@@ -1,7 +1,6 @@
-import { Game, Move, PlayerIndex } from '@shared/game-engine';
+import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
-import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
 import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 import { EventEmitter } from 'events';
@@ -57,6 +56,11 @@ window.addEventListener('resize', debounce(() => {
 
 type GameViewEvents = {
     /**
+     * A hex has been clicked on the view.
+     */
+    hexClicked: (move: Move) => void;
+
+    /**
      * Game has ended, and win animation is over.
      * Used to display win message after animation, and not at same time.
      */
@@ -69,10 +73,10 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     private pixi: Application;
     private gameContainer: Container = new Container();
     private orientation: BoardOrientation;
+    private sidesGraphics: [Graphics, Graphics];
 
     constructor(
         private game: Game,
-        private moveController: MoveControllerInterface,
     ) {
         super();
 
@@ -127,6 +131,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         );
 
         this.createAndAddHexes();
+        this.highlightSidesFromGame();
     }
 
     private resizeRendererAndRedraw(): void
@@ -139,6 +144,19 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
         this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
         this.redraw();
+    }
+
+    bindPlayer(player: null | PlayerInterface): this
+    {
+        this.on('hexClicked', move => {
+            try {
+                player?.move(move);
+            } catch (e) {
+                console.log('Move not played: ' + e);
+            }
+        });
+
+        return this;
     }
 
     getWrapperSize(): GameViewSize
@@ -260,15 +278,23 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     private listenModel(): void
     {
-        this.game.on('played', (move, playerIndex) => {
+        this.game.on('started', () => {
+            this.highlightSidesFromGame();
+        });
+
+        this.game.on('played', (move, byPlayerIndex) => {
             this.resetHighlightedHexes();
             this.hexes[move.row][move.col]
-                .setPlayer(playerIndex)
+                .setPlayer(byPlayerIndex)
                 .setHighlighted()
             ;
+
+            this.highlightSidesFromGame();
         });
 
         this.game.on('ended', async (winner) => {
+            this.highlightSidesFromGame();
+
             await this.animateWinningPath();
 
             this.emit('endedAndWinAnimationOver', winner);
@@ -315,7 +341,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
                 this.gameContainer.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    this.moveController.move(this.game, new Move(row, col));
+                    this.emit('hexClicked', new Move(row, col));
                 });
             }
         }
@@ -329,42 +355,78 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     private createBackground(): Graphics
     {
-        const graphics = new Graphics();
-        const to = (a: IPointData, b: IPointData = {x: 0, y: 0}): void => {
-            graphics.lineTo(a.x + b.x, a.y + b.y);
-        };
+        this.sidesGraphics = [new Graphics(), new Graphics()];
+        let g: Graphics = this.sidesGraphics[0];
+        const to = (a: IPointData, b: IPointData = {x: 0, y: 0}) => g.lineTo(a.x + b.x, a.y + b.y);
+        const m = (a: IPointData, b: IPointData = {x: 0, y: 0}) => g.moveTo(a.x + b.x, a.y + b.y);
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
+        this.sidesGraphics[0].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
+        this.sidesGraphics[1].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
 
-        graphics.moveTo(Hex.cornerCoords(5).x, Hex.cornerCoords(5).y);
+        g = this.sidesGraphics[1];
+        g.moveTo(Hex.cornerCoords(5).x, Hex.cornerCoords(5).y);
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             to(Hex.coords(0, i), Hex.cornerCoords(5));
             to(Hex.coords(0, i), Hex.cornerCoords(0));
         }
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
+        g = this.sidesGraphics[0];
+        m(Hex.coords(0, this.game.getSize() - 1), Hex.cornerCoords(0));
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(1));
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(2));
         }
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
+        g = this.sidesGraphics[1];
+        m(Hex.coords(this.game.getSize() - 1, this.game.getSize() - 1), Hex.cornerCoords(2));
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(3));
             to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(4));
         }
 
-        graphics.lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
+        g = this.sidesGraphics[0];
+        m(Hex.coords(this.game.getSize() - 1, 0), Hex.cornerCoords(4));
 
         for (let i = 0; i < this.game.getSize(); ++i) {
             if (i) to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(4));
             to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
 
+        const graphics = new Graphics();
+        graphics.addChild(...this.sidesGraphics);
         return graphics;
+    }
+
+    highlightSides(red: boolean, blue: boolean): void
+    {
+        this.sidesGraphics[0].alpha = red ? 1 : 0.25;
+        this.sidesGraphics[1].alpha = blue ? 1 : 0.25;
+    }
+
+    highlightSideForPlayer(playerIndex: PlayerIndex): void
+    {
+        this.highlightSides(
+            0 === playerIndex,
+            1 === playerIndex,
+        );
+    }
+
+    highlightSidesFromGame(): void
+    {
+        if (!this.game.isStarted()) {
+            this.highlightSides(true, true);
+            return;
+        }
+
+        if (!this.game.isEnded()) {
+            this.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
+            return;
+        }
+
+        this.highlightSideForPlayer(this.game.getStrictWinner());
     }
 
     getHex(rowCol: {row: number, col: number}): Hex

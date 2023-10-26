@@ -1,3 +1,4 @@
+import { TimeControlValues } from "time-control/TimeControlInterface";
 import { PlayerIndex } from '../game-engine';
 
 export type PlayerData = {
@@ -39,4 +40,5 @@ export type GameData = {
 export type HostedGameData = {
     id: string;
     game: GameData;
+    timeControl: TimeControlValues;
 };

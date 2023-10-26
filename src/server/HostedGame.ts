@@ -1,10 +1,14 @@
 import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
 import { GameData, HostedGameData, PlayerData } from '../shared/app/Types';
+import { TimeControlInterface, TimeControlValues } from '../shared/time-control/TimeControlInterface';
+import { AbsoluteTimeControl } from '../shared/time-control/time-controls/AbsoluteTimeControl';
 import ServerPlayer from './ServerPlayer';
 import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
 import { getNextFreeSlot } from '../shared/app/GameUtils';
+import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from "server";
+import { OutcomePrecision } from "@shared/game-engine/Game";
 
 /**
  * Contains a game state,
@@ -13,12 +17,14 @@ import { HexServer } from "server";
 export default class HostedGame
 {
     private id: string = uuidv4();
+    private timeControl: TimeControlInterface = new AbsoluteTimeControl(900);
 
     constructor(
         private io: HexServer,
         private game: Game,
     ) {
         this.listenGame();
+        this.bindTimeControl();
     }
 
     getId(): string
@@ -31,23 +37,32 @@ export default class HostedGame
         return this.game;
     }
 
+    getTimeControlValues(): TimeControlValues
+    {
+        return this.timeControl.getValues();
+    }
+
     listenGame(): void
     {
         this.game.on('started', () => {
-            this.io.to('lobby').emit('gameStarted', this.id);
+            this.io.to(['lobby', `games/${this.id}`]).emit('gameStarted', this.id);
+            this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
         this.game.on('played', (move, byPlayerIndex) => {
             this.io.to(`games/${this.id}`).emit('moved', this.id, move, byPlayerIndex);
+            this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
-        this.game.on('resign', (byPlayerIndex: PlayerIndex) => {
-            this.io.to(`games/${this.id}`).emit('resigned', this.id, byPlayerIndex);
+        this.game.on('ended', (winner: PlayerIndex, outcomePrecision: OutcomePrecision) => {
+            this.io.to(['lobby', `games/${this.id}`]).emit('ended', this.id, winner, outcomePrecision);
+            this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
+    }
 
-        this.game.on('ended', (winner: PlayerIndex) => {
-            this.io.to('lobby').emit('ended', this.id, winner);
-        });
+    bindTimeControl(): void
+    {
+        bindTimeControlToGame(this.game, this.timeControl);
     }
 
     /**
@@ -161,32 +176,28 @@ export default class HostedGame
     {
         return {
             id: this.id,
-            game: HostedGame.gameToData(this.game),
-        };
-    }
-
-    private static gameToData(game: Game): GameData
-    {
-        return {
-            players: game.getPlayers().map<null | PlayerData>(HostedGame.playerToData) as [null | PlayerData, null | PlayerData],
-            size: game.getSize(),
-            started: game.isStarted(),
-            movesHistory: game.getMovesHistory(),
-            currentPlayerIndex: game.getCurrentPlayerIndex(),
-            winner: game.getWinner(),
-            hexes: game.getBoard().getCells().map(
-                row => row
-                    .map(
-                        cell => null === cell
-                            ? '.' :
-                            (cell
-                                ? '1'
-                                : '0'
-                            ),
-                    )
-                    .join('')
-                ,
-            ),
+            timeControl: this.timeControl.getValues(),
+            game: {
+                players: this.game.getPlayers().map<null | PlayerData>(HostedGame.playerToData) as [null | PlayerData, null | PlayerData],
+                size: this.game.getSize(),
+                started: this.game.isStarted(),
+                movesHistory: this.game.getMovesHistory(),
+                currentPlayerIndex: this.game.getCurrentPlayerIndex(),
+                winner: this.game.getWinner(),
+                hexes: this.game.getBoard().getCells().map(
+                    row => row
+                        .map(
+                            cell => null === cell
+                                ? '.' :
+                                (cell
+                                    ? '1'
+                                    : '0'
+                                ),
+                        )
+                        .join('')
+                    ,
+                ),
+            },
         };
     }
 

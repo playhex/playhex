@@ -28,17 +28,14 @@ export const hasPlayerJoined = (game: Game, playerId: string): boolean => {
 
 export const playerCanJoinGame = (game: Game, playerId: string): boolean => {
     if (game.isStarted()) {
-        console.log('cannot join: started');
         return false;
     }
 
     if (null === getNextFreeSlot(game)) {
-        console.log('cannot join: full');
         return false;
     }
 
     if (hasPlayerJoined(game, playerId)) {
-        console.log('cannot join: already joined');
         return false;
     }
 

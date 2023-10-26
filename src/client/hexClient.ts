@@ -7,6 +7,8 @@ import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 import { apiPostGame1v1, apiPostGameVsCPU, apiPostResign, getGame, getGames, loginAsGuest } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
+import { OutcomePrecision } from "@shared/game-engine/Game";
+import { TimeControlValues } from "@shared/time-control/TimeControlInterface";
 
 /**
  * State synced with server, and methods to handle games and user.
@@ -77,7 +79,11 @@ const useHexClient = defineStore('hexClient', {
 
             const game = createGameFromData(players, gameInstanceData.game);
 
-            return this.gameClientSockets[gameId] = new GameClientSocket(gameId, game);
+            return this.gameClientSockets[gameId] = new GameClientSocket(
+                gameId,
+                gameInstanceData.timeControl,
+                game,
+            );
         },
 
         joinRoom(socket: Socket, join: 'join' | 'leave', gameId: string): void
@@ -151,19 +157,19 @@ const useHexClient = defineStore('hexClient', {
                 }
             });
 
-            socket.on('resigned', (gameId: string, byPlayerIndex: PlayerIndex) => {
+            socket.on('timeControlUpdate', (gameId: string, timeControlValues: TimeControlValues) => {
                 if (this.gameClientSockets[gameId]) {
-                    this.gameClientSockets[gameId].gameResign(byPlayerIndex);
+                    this.gameClientSockets[gameId].updateTimeControl(timeControlValues);
                 }
             });
 
-            socket.on('ended', (gameId: string, winner: PlayerIndex) => {
+            socket.on('ended', (gameId: string, winner: PlayerIndex, outcomePrecision: OutcomePrecision) => {
                 if (this.games[gameId]) {
                     this.games[gameId].game.winner = winner;
                 }
 
                 if (this.gameClientSockets[gameId]) {
-                    this.gameClientSockets[gameId].ended(winner);
+                    this.gameClientSockets[gameId].ended(winner, outcomePrecision);
                 }
             });
         },
@@ -172,6 +178,8 @@ const useHexClient = defineStore('hexClient', {
 
 function createGameFromData(players: [Player, Player], gameData: GameData): Game {
     const game = new Game(players, gameData.size);
+
+    console.log('createGameFromData', players, gameData);
 
     const cellValues: {[key: string]: null | PlayerIndex} = {
         '0': 0,

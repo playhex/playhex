@@ -9,6 +9,7 @@ export default class ClientPlayer extends AppPlayer
         const player = new ClientPlayer();
 
         player.setPlayerData(playerData);
+        player.setReady();
 
         return player;
     }

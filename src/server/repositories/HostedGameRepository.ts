@@ -36,6 +36,9 @@ export default class HostedGameRepository
         this.hostedGames[gameServerSocket.getId()] = gameServerSocket;
         this.io.to('lobby').emit('gameCreated', gameServerSocket.toData());
 
+        // listen start event now to let HostedGame above receive the event
+        game.startOnceAllPlayersReady();
+
         return gameServerSocket;
     }
 
@@ -59,7 +62,7 @@ export default class HostedGameRepository
             return joinResult;
         }
 
-        this.io.to(`games/${gameId}`).emit('gameJoined', gameId, joinResult, playerData);
+        this.io.to(['lobby', `games/${gameId}`]).emit('gameJoined', gameId, joinResult, playerData);
 
         return true;
     }

@@ -5,9 +5,6 @@ import GameView from '@client/pixi-board/GameView';
 import useHexClient from '@client/hexClient';
 import { ref } from '@vue/runtime-core';
 import socket from '@client/socket';
-import RemotePlayMoveController from '@client/MoveController/RemotePlayMoveController';
-import MoveControllerInterface from '@client/MoveController/MoveControllerInterface';
-import NoopMoveController from '@client/MoveController/NoopMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/ConfirmationOverlay.vue';
 import { playerCanJoinGame } from '@shared/app/GameUtils';
@@ -44,14 +41,15 @@ if (Array.isArray(gameId)) {
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
-    localPlayer = gameClientSocket.getLocalPlayer();
+    gameView.value = new GameView(game);
 
-    const controller: MoveControllerInterface = localPlayer
-        ? new RemotePlayMoveController(localPlayer)
-        : new NoopMoveController()
-    ;
-
-    gameView.value = new GameView(game, controller);
+    gameView.value.on('hexClicked', move => {
+        try {
+            gameClientSocket?.getLocalPlayer()?.move(move);
+        } catch (e) {
+            console.log('Move not played: ' + e);
+        }
+    });
 })();
 
 const canJoin = (): boolean => {
@@ -105,6 +103,7 @@ const resign = async (): Promise<void> => {
         <app-board
             v-if="gameView"
             :game-view="gameView"
+            :time-control-values="gameClientSocket?.getTimeControl()"
         ></app-board>
         <p v-else>Loading game {{ gameId }}...</p>
 

@@ -3,23 +3,11 @@ import TypedEmitter from 'typed-emitter';
 import Move from './Move';
 import PlayerGameInput from './PlayerGameInput';
 import { PlayerIndex } from './Types';
+import PlayerInterface, { PlayerEvents } from "./PlayerInterface";
 
-type PlayerEvents = {
-    /**
-     * Player changed ready status.
-     */
-    readyStateChanged: (ready: boolean) => void;
-
-    /**
-     * Your turn to play.
-     * Get board state with this.gameInput.getHexes().
-     * Send your move with this.move().
-     * this.move() throw IllegalMove on invalid move.
-     */
-    myTurnToPlay: () => void;
-};
-
-export default class Player extends (EventEmitter as unknown as new () => TypedEmitter<PlayerEvents>)
+export default class Player
+    extends (EventEmitter as unknown as new () => TypedEmitter<PlayerEvents>)
+    implements PlayerInterface
 {
     private ready = false;
     protected playerGameInput: null | PlayerGameInput = null;

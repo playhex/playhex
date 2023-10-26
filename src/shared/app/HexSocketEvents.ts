@@ -1,5 +1,7 @@
+import { OutcomePrecision } from "game-engine/Game";
 import { PlayerIndex } from '../game-engine';
 import { HostedGameData, MoveData, PlayerData } from './Types';
+import { TimeControlValues } from "time-control/TimeControlInterface";
 
 export type HexClientToServerEvents = {
     /**
@@ -48,12 +50,12 @@ export type HexServerToClientEvents = {
     moved: (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => void;
 
     /**
-     * A player resigned.
+     * Players remaining time should be updated.
      */
-    resigned: (gameId: string, byPlayerIndex: PlayerIndex) => void;
+    timeControlUpdate: (gameId: string, timeControlValues: TimeControlValues) => void;
 
     /**
      * A game has ended and there is a winner.
      */
-    ended: (gameId: string, winner: PlayerIndex) => void;
+    ended: (gameId: string, winner: PlayerIndex, outcomePrecision: OutcomePrecision) => void;
 };

@@ -7,6 +7,7 @@ import mainRouter from './controllers/http';
 import Container from 'typedi';
 import { registerWebsocketControllers } from "./controllers/websocket";
 import { HexServer } from "./server";
+import * as CustomParser from '../shared/app/socketCustomParser';
 
 console.log(`*******************************************`);
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -14,7 +15,9 @@ console.log(`*******************************************`);
 
 const app = express();
 const server = http.createServer(app);
-const io = new HexServer(server);
+const io = new HexServer(server, {
+    parser: CustomParser,
+});
 
 Container.set(HexServer, io);
 

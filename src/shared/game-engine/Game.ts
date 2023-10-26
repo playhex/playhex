@@ -1,7 +1,6 @@
 import EventEmitter from 'events';
-import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE } from '.';
+import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE, PlayerInterface } from '.';
 import TypedEmitter from 'typed-emitter';
-import Player from './Player';
 import Board from './Board';
 
 type GameEvents = {
@@ -18,15 +17,34 @@ type GameEvents = {
     played: (move: Move, byPlayerIndex: PlayerIndex) => void;
 
     /**
-     * A player resign. The ended event is also emitted.
-     */
-    resign: (byPlayerIndex: PlayerIndex) => void;
-
-    /**
      * Game have been finished.
      */
-    ended: (winner: PlayerIndex) => void;
+    ended: (winner: PlayerIndex, outcomePrecision: OutcomePrecision) => void;
 };
+
+export type OutcomePrecision =
+    /**
+     * No outcome precision, game should have been won by regular victory
+     */
+    null
+
+    /**
+     * Player who lost manually resigned the game, before or while playing.
+     */
+    | 'resign'
+
+    /**
+     * Player who lost ran out of time while playing.
+     * Assuming he already played at least one move.
+     */
+    | 'time'
+
+    /**
+     * Player who lost didn't played his first move,
+     * or has been foreited by an external reason.
+     */
+    | 'forfeit'
+;
 
 /**
  * Player 0 must connect left to right
@@ -35,13 +53,15 @@ type GameEvents = {
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
     private board: Board;
+    private startOnceReadyEnabled: boolean = false;
     private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
+    private outcomePrecision: OutcomePrecision = null;
     private movesHistory: Move[] = [];
 
     constructor(
-        private players: [Player, Player],
+        private players: [PlayerInterface, PlayerInterface],
         private size: number = BOARD_DEFAULT_SIZE,
     ) {
         super();
@@ -58,26 +78,9 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             }
         });
 
-        this.listenPlayersReady();
-    }
-
-    private listenPlayersReady(): void
-    {
-        const playerReadyListener = (ready: boolean): void => {
-            if (ready && this.players.every(player => player.isReady())) {
-                this.start();
-
-                this.players.forEach(player => {
-                    player.off('readyStateChanged', playerReadyListener);
-                });
-            }
-        };
-
-        this.players.forEach(player => {
-            player.on('readyStateChanged', playerReadyListener);
-        });
-
-        playerReadyListener(true);
+        // Called to early, no time to bind events (ie time control binding) after new Game(), started event already dispatched if both players are already ready
+        // should rename to "start once players ready"
+        //this.startOnceAllPlayersReady();
     }
 
     getBoard(): Board
@@ -90,12 +93,12 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.size;
     }
 
-    getPlayers(): [Player, Player]
+    getPlayers(): [PlayerInterface, PlayerInterface]
     {
         return this.players;
     }
 
-    getPlayer(playerIndex: PlayerIndex): Player
+    getPlayer(playerIndex: PlayerIndex): PlayerInterface
     {
         return this.players[playerIndex];
     }
@@ -110,7 +113,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.currentPlayerIndex = currentPlayerIndex;
     }
 
-    getCurrentPlayer(): Player
+    getCurrentPlayer(): PlayerInterface
     {
         return this.players[this.currentPlayerIndex];
     }
@@ -139,15 +142,21 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.winner;
     }
 
-    setWinner(playerIndex: PlayerIndex): void
+    setWinner(playerIndex: PlayerIndex, outcomePrecision: OutcomePrecision = null): void
     {
         if (null !== this.winner) {
             throw new Error('Cannot set a winner again, there is already a winner');
         }
 
         this.winner = playerIndex;
+        this.outcomePrecision = outcomePrecision;
 
-        this.emit('ended', playerIndex);
+        this.emit('ended', playerIndex, outcomePrecision);
+    }
+
+    getOutcomePrecision(): OutcomePrecision
+    {
+        return this.outcomePrecision;
     }
 
     getMovesHistory(): Move[]
@@ -171,15 +180,47 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.movesHistory[this.movesHistory.length - 1];
     }
 
+    arePlayersReady(): boolean
+    {
+        return this.players.every(p => p.isReady());
+    }
+
     start(): void
     {
         if (this.started) {
             throw new Error('Game already started');
         }
 
+        if (!this.arePlayersReady()) {
+            console.log(this);
+            throw new Error('Cannot start, not all players are ready: ' + this.players.map(p => p.isReady()));
+        }
+
         this.started = true;
 
         this.emit('started');
+    }
+
+    startOnceAllPlayersReady(): Game
+    {
+        if (this.startOnceReadyEnabled) {
+            return this;
+        }
+
+        this.startOnceReadyEnabled = true;
+
+        const playerReadyListener = (ready: boolean): void => {
+            if (ready && this.arePlayersReady()) {
+                this.start();
+                this.players.forEach(p => p.off('readyStateChanged', playerReadyListener));
+            }
+        };
+
+        this.players.forEach(p => p.on('readyStateChanged', playerReadyListener));
+
+        playerReadyListener(true);
+
+        return this;
     }
 
     isStarted(): boolean
@@ -240,16 +281,15 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      */
     resign(playerIndex: PlayerIndex): void
     {
-        if (!this.isStarted() || this.isEnded()) {
-            throw new Error('Cannot resign, game is not running');
-        }
+        this.setWinner(0 === playerIndex ? 1 : 0, 'resign');
+    }
 
-        this.emit('resign', playerIndex);
-
-        this.setWinner(0 === playerIndex
-            ? 1
-            : 0
-        );
+    /**
+     * Makes current player lose by time
+     */
+    loseByTime(): void
+    {
+        this.setWinner(this.otherPlayerIndex(), 'time');
     }
 
     otherPlayerIndex(): PlayerIndex

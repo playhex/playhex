@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '@client/pixi-board/GameView';
-import PlayerGameInputMoveController from '@client/MoveController/PlayerGameInputMoveController';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
 import { shufflePlayers } from '@shared/app/GameUtils';
@@ -22,9 +21,10 @@ let gameView = ref<GameView>();
 
     const game = new Game(players, gameOptions.boardsize);
 
-    gameView.value = new GameView(game, new PlayerGameInputMoveController(player));
+    gameView.value = new GameView(game).bindPlayer(player);
 
     player.setReady();
+    game.start();
 })();
 </script>
 

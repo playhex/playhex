@@ -2,9 +2,12 @@
 /* eslint-env browser */
 import GameView, { BoardOrientation } from '@client/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
-import { toRefs } from 'vue';
+import { PropType, toRefs } from 'vue';
 import GameOverOverlay from '@client/vue/components/GameOverOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
+import { TimeValue } from "@shared/time-control/types";
+import { TimeControlValues } from "@shared/time-control/TimeControlInterface";
+import { format } from 'date-fns';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -13,10 +16,48 @@ const props = defineProps({
         type: GameView,
         required: true,
     },
+    timeControlValues: {
+        type: Object as PropType<TimeControlValues>,
+    },
 });
-
-const { gameView } = toRefs(props);
+const { gameView, timeControlValues } = toRefs(props);
 const game = gameView?.value?.getGame();
+
+type Chrono = {
+    time: string;
+    ms?: string;
+};
+
+const toChrono = (timeValue: TimeValue): Chrono => {
+    let seconds = timeValue instanceof Date
+        ? (timeValue.getTime() - new Date().getTime()) / 1000
+        : timeValue
+    ;
+
+    const chrono: Chrono = {
+        time: format(seconds * 1000, 'm:ss'),
+    };
+
+    if (seconds < 10) {
+        chrono.ms = format(seconds * 1000, '.S')
+    }
+
+    return chrono;
+};
+
+const chronoPlayerA = ref<Chrono>({time: '00:00'});
+const chronoPlayerB = ref<Chrono>({time: '00:00'});
+
+if (timeControlValues?.value) {
+    setInterval(() => {
+        if (!timeControlValues.value) {
+            return;
+        }
+
+        chronoPlayerA.value = toChrono(timeControlValues.value?.players[0].totalRemainingTime);
+        chronoPlayerB.value = toChrono(timeControlValues.value?.players[1].totalRemainingTime);
+    }, 50);
+}
 
 if (!gameView || !game) {
     throw new Error('gameView is required');
@@ -58,9 +99,17 @@ gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a mx-2">
+                <p v-if="timeControlValues">
+                    <span class="chrono-time">{{ chronoPlayerA.time }}</span>
+                    <span v-if="chronoPlayerA.ms">{{  chronoPlayerA.ms }}</span>
+                </p>
                 <h4 class="text-player-a">{{ game.getPlayer(0).getName() }}</h4>
             </div>
             <div class="player player-b mx-2">
+                <p v-if="timeControlValues">
+                    <span class="chrono-time">{{ chronoPlayerB.time }}</span>
+                    <span v-if="chronoPlayerB.ms">{{  chronoPlayerB.ms }}</span>
+                </p>
                 <h4 class="text-player-b">{{ game.getPlayer(1).getName() }}</h4>
             </div>
         </div>
@@ -83,6 +132,9 @@ gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
 
     p
         margin-top 0
+
+.chrono-time
+    font-size 2em
 
 .orientation-vertical_bias_right_hand
     .player-a

@@ -1,6 +1,8 @@
 import Board, { BOARD_DEFAULT_SIZE } from './Board';
 import Game from './Game';
+import PlayerInterface, { PlayerEvents } from './PlayerInterface';
 import Player from './Player';
+import SimplePlayer from './SimplePlayer';
 import PlayerGameInput from './PlayerGameInput';
 import IllegalMove from './IllegalMove';
 import Move from './Move';
@@ -12,6 +14,7 @@ export {
     BOARD_DEFAULT_SIZE,
     Game,
     Player,
+    SimplePlayer,
     PlayerGameInput,
     IllegalMove,
     Move,
@@ -20,4 +23,6 @@ export {
 
 export type {
     PlayerIndex,
+    PlayerInterface,
+    PlayerEvents,
 }
