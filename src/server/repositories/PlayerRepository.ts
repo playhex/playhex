@@ -1,11 +1,11 @@
 import { PlayerData } from '@shared/app/Types';
-import { Service } from "typedi";
+import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 
 @Service()
 export default class PlayerRepository
 {
-    private players: {[key: string]: PlayerData} = {};
+    private players: { [key: string]: PlayerData } = {};
 
     getPlayer(playerId: string): null | PlayerData
     {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Player, PlayerIndex } from '@shared/game-engine';
+import { Player } from '@shared/game-engine';
 import { useOverlayMeta } from 'unoverlay-vue';
-import { PropType } from 'vue';
 
 const { visible, confirm, cancel } = useOverlayMeta();
 

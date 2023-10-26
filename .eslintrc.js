@@ -12,6 +12,9 @@ module.exports = {
     plugins: ['@typescript-eslint'],
     root: true,
     rules: {
+        'object-curly-spacing': 'off',
+        '@typescript-eslint/quotes': ['warn', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
+        '@typescript-eslint/object-curly-spacing': ['warn', 'always'],
         '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],
         '@typescript-eslint/no-empty-function': 'off',
     },

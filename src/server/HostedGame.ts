@@ -1,5 +1,5 @@
 import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
-import { GameData, HostedGameData, PlayerData } from '../shared/app/Types';
+import { HostedGameData, PlayerData } from '../shared/app/Types';
 import { TimeControlInterface, TimeControlValues } from '../shared/time-control/TimeControlInterface';
 import { AbsoluteTimeControl } from '../shared/time-control/time-controls/AbsoluteTimeControl';
 import ServerPlayer from './ServerPlayer';
@@ -7,8 +7,8 @@ import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
 import { getNextFreeSlot } from '../shared/app/GameUtils';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
-import { HexServer } from "server";
-import { OutcomePrecision } from "@shared/game-engine/Game";
+import { HexServer } from 'server';
+import { OutcomePrecision } from '@shared/game-engine/Game';
 
 /**
  * Contains a game state,
@@ -68,8 +68,8 @@ export default class HostedGame
     /**
      * A player join this game.
      *
-     * @param {PlayerData} playerData Player data containing player id.
-     * @param {null | PlayerIndex} playerIndex Join a specific slot. Let empty to join next free slot.
+     * @param { PlayerData } playerData Player data containing player id.
+     * @param { null | PlayerIndex } playerIndex Join a specific slot. Let empty to join next free slot.
      *
      * @returns Slot joined (0 or 1), or a message containing the error reason if could not join.
      */

@@ -7,8 +7,8 @@ import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 import { apiPostGame1v1, apiPostGameVsCPU, apiPostResign, getGame, getGames, loginAsGuest } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import { OutcomePrecision } from "@shared/game-engine/Game";
-import { TimeControlValues } from "@shared/time-control/TimeControlInterface";
+import { OutcomePrecision } from '@shared/game-engine/Game';
+import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 
 /**
  * State synced with server, and methods to handle games and user.
@@ -23,12 +23,12 @@ const useHexClient = defineStore('hexClient', {
         /**
          * List of games visible on lobby
          */
-        games: {} as {[key: string]: HostedGameData},
+        games: {} as { [key: string]: HostedGameData },
 
         /**
          * List of loaded games
          */
-        gameClientSockets: {} as {[key: string]: GameClientSocket},
+        gameClientSockets: {} as { [key: string]: GameClientSocket },
     }),
 
     actions: {
@@ -181,7 +181,7 @@ function createGameFromData(players: [Player, Player], gameData: GameData): Game
 
     console.log('createGameFromData', players, gameData);
 
-    const cellValues: {[key: string]: null | PlayerIndex} = {
+    const cellValues: { [key: string]: null | PlayerIndex } = {
         '0': 0,
         '1': 1,
         '.': null,

@@ -1,15 +1,15 @@
 import { Service } from 'typedi';
 import HostedGame from '../HostedGame';
-import { Game, Move } from "../../shared/game-engine";
-import ServerPlayer from "../ServerPlayer";
-import PlayerRepository from "./PlayerRepository";
-import { MoveData } from "../../shared/app/Types";
-import { HexServer } from "../server";
+import { Game, Move } from '../../shared/game-engine';
+import ServerPlayer from '../ServerPlayer';
+import PlayerRepository from './PlayerRepository';
+import { MoveData } from '../../shared/app/Types';
+import { HexServer } from '../server';
 
 @Service()
 export default class HostedGameRepository
 {
-    private hostedGames: {[key: string]: HostedGame} = {};
+    private hostedGames: { [key: string]: HostedGame } = {};
 
     constructor(
         private io: HexServer,

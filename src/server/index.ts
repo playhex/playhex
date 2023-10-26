@@ -5,8 +5,8 @@ import http from 'http';
 import session from 'express-session';
 import mainRouter from './controllers/http';
 import Container from 'typedi';
-import { registerWebsocketControllers } from "./controllers/websocket";
-import { HexServer } from "./server";
+import { registerWebsocketControllers } from './controllers/websocket';
+import { HexServer } from './server';
 import * as CustomParser from '../shared/app/socketCustomParser';
 
 console.log(`*******************************************`);

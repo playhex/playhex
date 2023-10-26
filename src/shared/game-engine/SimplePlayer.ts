@@ -1,8 +1,8 @@
-import { EventEmitter } from "events";
-import Move from "./Move";
-import PlayerGameInput from "./PlayerGameInput";
-import PlayerInterface, { PlayerEvents } from "./PlayerInterface";
-import TypedEventEmitter from "typed-emitter";
+import { EventEmitter } from 'events';
+import Move from './Move';
+import PlayerGameInput from './PlayerGameInput';
+import PlayerInterface, { PlayerEvents } from './PlayerInterface';
+import TypedEventEmitter from 'typed-emitter';
 
 export default class SimplePlayer
     extends (EventEmitter as unknown as new () => TypedEventEmitter<PlayerEvents>)

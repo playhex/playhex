@@ -189,14 +189,14 @@ export default class Hex extends Sprite
 
             const animationLoop = (): void => {
                 if (i >= animationDuration) {
-                    this.hexColor.scale = {x: 1, y: 1};
+                    this.hexColor.scale = { x: 1, y: 1 };
                     Ticker.shared.remove(animationLoop);
                     resolve();
                     return;
                 }
 
                 const coef = 1 - 0.75 * animationCurve[i];
-                this.hexColor.scale = {x: coef, y: coef};
+                this.hexColor.scale = { x: coef, y: coef };
                 ++i;
             };
 

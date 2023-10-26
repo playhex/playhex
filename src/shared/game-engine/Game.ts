@@ -53,7 +53,7 @@ export type OutcomePrecision =
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
     private board: Board;
-    private startOnceReadyEnabled: boolean = false;
+    private startOnceReadyEnabled = false;
     private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;

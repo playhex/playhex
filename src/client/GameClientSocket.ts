@@ -2,8 +2,8 @@ import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import ClientPlayer from './ClientPlayer';
 import useHexClient from './hexClient';
 import { PlayerData } from '@shared/app/Types';
-import { OutcomePrecision } from "@shared/game-engine/Game";
-import { TimeControlValues } from "@shared/time-control/TimeControlInterface";
+import { OutcomePrecision } from '@shared/game-engine/Game';
+import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 
 /**
  * Listen game events triggered after local player actions,

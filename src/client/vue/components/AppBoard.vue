@@ -5,8 +5,8 @@ import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
 import GameOverOverlay from '@client/vue/components/GameOverOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
-import { TimeValue } from "@shared/time-control/types";
-import { TimeControlValues } from "@shared/time-control/TimeControlInterface";
+import { TimeValue } from '@shared/time-control/types';
+import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 import { format } from 'date-fns';
 
 const pixiApp = ref<HTMLElement>();
@@ -45,8 +45,8 @@ const toChrono = (timeValue: TimeValue): Chrono => {
     return chrono;
 };
 
-const chronoPlayerA = ref<Chrono>({time: '00:00'});
-const chronoPlayerB = ref<Chrono>({time: '00:00'});
+const chronoPlayerA = ref<Chrono>({ time: '00:00' });
+const chronoPlayerB = ref<Chrono>({ time: '00:00' });
 
 if (timeControlValues?.value) {
     setInterval(() => {

@@ -6,9 +6,9 @@ import { shufflePlayers } from '../../../../shared/app/GameUtils';
 import ServerPlayer from '../../../ServerPlayer';
 import { createAIPlayer } from '../../../AIPlayersManager';
 import Container from 'typedi';
-import PlayerRepository from "../../../repositories/PlayerRepository";
-import HostedGameRepository from "../../../repositories/HostedGameRepository";
-import { serialize } from "../../../../shared/app/serializer";
+import PlayerRepository from '../../../repositories/PlayerRepository';
+import HostedGameRepository from '../../../repositories/HostedGameRepository';
+import { serialize } from '../../../../shared/app/serializer';
 
 export default (): Router => {
     const router = Router();
@@ -72,7 +72,7 @@ export default (): Router => {
     });
 
     router.get('/api/games/:id', (req, res) => {
-        const {id} = req.params;
+        const { id } = req.params;
         const game = hostedGameRepository.getGame(id)
 
         if (null === game) {

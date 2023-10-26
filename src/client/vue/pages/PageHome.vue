@@ -19,7 +19,7 @@ const goToGame = (gameId: string) => {
     });
 };
 
-const gameOptionsOverlay = createOverlay<any, GameOptionsData>(GameOptionsOverlay);
+const gameOptionsOverlay = createOverlay<unknown, GameOptionsData>(GameOptionsOverlay);
 
 const createAndJoinGame = async () => {
     let gameOptions: GameOptionsData;

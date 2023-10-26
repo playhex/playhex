@@ -1,6 +1,6 @@
-import TypedEventEmitter from "typed-emitter";
-import { PlayerIndex, TimeControlEvents, TimeControlInterface, TimeControlState, TimeControlValues } from "./TimeControlInterface";
-import EventEmitter from "events";
+import TypedEventEmitter from 'typed-emitter';
+import { PlayerIndex, TimeControlEvents, TimeControlInterface, TimeControlState, TimeControlValues } from './TimeControlInterface';
+import EventEmitter from 'events';
 
 export abstract class AbstractTimeControl
     extends (EventEmitter as unknown as new () => TypedEventEmitter<TimeControlEvents>)

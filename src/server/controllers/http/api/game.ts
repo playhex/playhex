@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
 import Container from 'typedi';
-import PlayerRepository from "../../../repositories/PlayerRepository";
-import HostedGameRepository from "../../../repositories/HostedGameRepository";
+import PlayerRepository from '../../../repositories/PlayerRepository';
+import HostedGameRepository from '../../../repositories/HostedGameRepository';
 
 export default (): Router => {
     const router = Router();
@@ -10,7 +10,7 @@ export default (): Router => {
     const hostedGameRepository = Container.get(HostedGameRepository);
 
     router.post('/api/games/:id/resign', (req, res) => {
-        const {id} = req.params;
+        const { id } = req.params;
         let playerData: null | PlayerData;
 
         if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {

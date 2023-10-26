@@ -1,12 +1,10 @@
-import EventEmitter from "events";
-import TypedEventEmitter from "typed-emitter";
-import { TimeValue } from "./types";
+import EventEmitter from 'events';
+import TypedEventEmitter from 'typed-emitter';
+import { TimeValue } from './types';
 
 type ChronoEvents = {
     elapsed: () => void;
 }
-
-class ChronoError extends Error {}
 
 export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmitter<ChronoEvents>)
 {
@@ -14,7 +12,7 @@ export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmit
 
     private timeout: null | NodeJS.Timeout = null;
 
-    constructor(initialTime: number = 0)
+    constructor(initialTime = 0)
     {
         super();
 

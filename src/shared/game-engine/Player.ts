@@ -3,7 +3,7 @@ import TypedEmitter from 'typed-emitter';
 import Move from './Move';
 import PlayerGameInput from './PlayerGameInput';
 import { PlayerIndex } from './Types';
-import PlayerInterface, { PlayerEvents } from "./PlayerInterface";
+import PlayerInterface, { PlayerEvents } from './PlayerInterface';
 
 export default class Player
     extends (EventEmitter as unknown as new () => TypedEmitter<PlayerEvents>)

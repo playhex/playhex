@@ -1,5 +1,5 @@
 import { Encoder as BaseEncoder, Decoder as BaseDecoder } from 'socket.io-parser';
-import SuperJSON from "superjson";
+import SuperJSON from 'superjson';
 
 export class Encoder extends BaseEncoder
 {

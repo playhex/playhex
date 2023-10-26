@@ -1,14 +1,14 @@
-import { Chrono } from "../Chrono";
-import { AbstractTimeControl } from "../AbstractTimeControl";
-import { TimeControlError, TimeControlState, TimeControlValues } from "../TimeControlInterface";
-import { PlayerIndex } from "../../game-engine";
+import { Chrono } from '../Chrono';
+import { AbstractTimeControl } from '../AbstractTimeControl';
+import { TimeControlError, TimeControlState, TimeControlValues } from '../TimeControlInterface';
+import { PlayerIndex } from '../../game-engine';
 
 /**
  * Players have same time for the whole game.
  */
 export class AbsoluteTimeControl extends AbstractTimeControl
 {
-    public static readonly type = 'absolute';
+    static readonly type = 'absolute';
 
     private state: TimeControlState = 'ready';
     private playerChronos: [Chrono, Chrono];
@@ -58,8 +58,8 @@ export class AbsoluteTimeControl extends AbstractTimeControl
             type: AbsoluteTimeControl.type,
             state: this.state,
             players: [
-                {totalRemainingTime: this.playerChronos[0].getValue()},
-                {totalRemainingTime: this.playerChronos[1].getValue()},
+                { totalRemainingTime: this.playerChronos[0].getValue() },
+                { totalRemainingTime: this.playerChronos[1].getValue() },
             ],
         };
     }

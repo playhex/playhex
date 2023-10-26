@@ -1,7 +1,7 @@
 import { Container } from 'typedi';
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
-import PlayerRepository from "../../../repositories/PlayerRepository";
+import PlayerRepository from '../../../repositories/PlayerRepository';
 
 export default (): Router => {
     const router = Router();

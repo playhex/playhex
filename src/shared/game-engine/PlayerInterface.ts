@@ -1,6 +1,6 @@
-import TypedEventEmitter from "typed-emitter";
-import PlayerGameInput from "./PlayerGameInput";
-import Move from "./Move";
+import TypedEventEmitter from 'typed-emitter';
+import PlayerGameInput from './PlayerGameInput';
+import Move from './Move';
 
 export type PlayerEvents = {
     /**

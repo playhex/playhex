@@ -33,7 +33,7 @@ if (Array.isArray(gameId)) {
 
     if (!gameClientSocket) {
         console.error(`Game ${gameId} no longer exists.`);
-        router.push({name: 'home'});
+        router.push({ name: 'home' });
         return;
     }
 

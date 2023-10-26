@@ -1,5 +1,5 @@
-import TypedEventEmitter from "typed-emitter";
-import { TimeValue } from "./types";
+import TypedEventEmitter from 'typed-emitter';
+import { TimeValue } from './types';
 
 export type PlayerIndex = 0 | 1;
 

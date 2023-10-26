@@ -1,9 +1,9 @@
-import HostedGameRepository from "../../repositories/HostedGameRepository";
-import { Service } from "typedi";
-import { WebsocketControllerInterface } from ".";
-import { HexSocket } from "server";
+import HostedGameRepository from '../../repositories/HostedGameRepository';
+import { Service } from 'typedi';
+import { WebsocketControllerInterface } from '.';
+import { HexSocket } from 'server';
 
-@Service({id: 'websocket_controller', multiple: true})
+@Service({ id: 'websocket_controller', multiple: true })
 export default class LobbyWebsocketController implements WebsocketControllerInterface
 {
     constructor(

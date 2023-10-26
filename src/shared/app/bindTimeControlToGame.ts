@@ -1,6 +1,5 @@
-import { Game, PlayerIndex } from "../game-engine";
-import { OutcomePrecision } from "../game-engine/Game";
-import { TimeControlInterface } from "../time-control/TimeControlInterface";
+import { Game, PlayerIndex } from '../game-engine';
+import { TimeControlInterface } from '../time-control/TimeControlInterface';
 
 /**
  * Connect a TimeControl to a Game
@@ -16,7 +15,7 @@ export const bindTimeControlToGame = (game: Game, timeControl: TimeControlInterf
         timeControl.push(byPlayerIndex);
     });
 
-    game.prependListener('ended', (winner: PlayerIndex, outcomePrecision: OutcomePrecision) => {
+    game.prependListener('ended', () => {
         timeControl.finish();
     });
 

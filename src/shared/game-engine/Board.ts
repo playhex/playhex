@@ -70,11 +70,11 @@ export default class Board
             .fill(0)
             .map((_, i) => playerIndex
                 ? sideIndex
-                    ? {row: z, col: i} // bottom
-                    : {row: 0, col: i} // top
+                    ? { row: z, col: i } // bottom
+                    : { row: 0, col: i } // top
                 : sideIndex
-                    ? {row: i, col: z} // right
-                    : {row: i, col: 0} // left
+                    ? { row: i, col: z } // right
+                    : { row: i, col: 0 } // left
             )
         ;
     }
@@ -96,7 +96,7 @@ export default class Board
     {
         const hash = (cell: Coords): string => cell.row + '_' + cell.col;
 
-        const visited: {[key: string]: true} = {};
+        const visited: { [key: string]: true } = {};
         const frontier: Coords[] = [];
 
         this.getSideCells(playerIndex, 0).forEach(cell => {
@@ -149,7 +149,7 @@ export default class Board
             return null;
         }
 
-        const visited: {[key: string]: true} = {};
+        const visited: { [key: string]: true } = {};
         const hash = (cell: Coords): string => cell.row + '_' + cell.col;
         const pathHeads: PathItem[] = this
             .getSideCells(winnerIndex, 0)
@@ -211,14 +211,14 @@ export default class Board
     getNeighboors(cell: Coords, playerIndex: undefined | null | PlayerIndex = undefined): Coords[]
     {
         return [
-            {row: cell.row, col: cell.col - 1},
-            {row: cell.row, col: cell.col + 1},
+            { row: cell.row, col: cell.col - 1 },
+            { row: cell.row, col: cell.col + 1 },
 
-            {row: cell.row - 1, col: cell.col},
-            {row: cell.row - 1, col: cell.col + 1},
+            { row: cell.row - 1, col: cell.col },
+            { row: cell.row - 1, col: cell.col + 1 },
 
-            {row: cell.row + 1, col: cell.col},
-            {row: cell.row + 1, col: cell.col - 1},
+            { row: cell.row + 1, col: cell.col },
+            { row: cell.row + 1, col: cell.col - 1 },
         ]
             .filter(cell => this.containsCoords(cell.row, cell.col)
                 && (

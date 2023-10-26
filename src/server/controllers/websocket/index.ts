@@ -1,7 +1,7 @@
-import { HexServer, HexSocket } from "../../server";
+import { HexServer, HexSocket } from '../../server';
 import Container from 'typedi';
-import LobbyWebsocketController from "./LobbyWebsocketController";
-import GameWebsocketController from "./GameWebsocketController";
+import LobbyWebsocketController from './LobbyWebsocketController';
+import GameWebsocketController from './GameWebsocketController';
 
 export interface WebsocketControllerInterface
 {

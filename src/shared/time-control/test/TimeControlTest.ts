@@ -1,7 +1,8 @@
 import assert from 'assert';
 import { it } from 'mocha';
-import { TimeControlError, TimeControlInterface } from "../TimeControlInterface";
-import { AbsoluteTimeControl } from "../time-controls/AbsoluteTimeControl";
+import { TimeControlError, TimeControlInterface } from '../TimeControlInterface';
+import { AbsoluteTimeControl } from '../time-controls/AbsoluteTimeControl';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const parallel = require('mocha.parallel');
 
 parallel('TimeControl', () => {
@@ -14,8 +15,6 @@ parallel('TimeControl', () => {
         this.timeout(4000);
 
         const timeControl: TimeControlInterface = new AbsoluteTimeControl(1, 0);
-        let elapsedEvent: null | 0 | 1 = null;
-        timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
         // 1s | 1s
         timeControl.start();
@@ -135,8 +134,6 @@ parallel('TimeControl', () => {
         this.timeout(4000);
 
         const timeControl: TimeControlInterface = new AbsoluteTimeControl(3, 0);
-        let elapsedEvent: null | 0 | 1 = null;
-        timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
         // 3s | 3s
         timeControl.start();

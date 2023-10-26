@@ -1,7 +1,7 @@
-import { OutcomePrecision } from "game-engine/Game";
+import { OutcomePrecision } from 'game-engine/Game';
 import { PlayerIndex } from '../game-engine';
 import { HostedGameData, MoveData, PlayerData } from './Types';
-import { TimeControlValues } from "time-control/TimeControlInterface";
+import { TimeControlValues } from 'time-control/TimeControlInterface';
 
 export type HexClientToServerEvents = {
     /**

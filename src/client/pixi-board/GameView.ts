@@ -273,7 +273,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             wrapperSize.height / boxHeight,
         );
 
-        this.gameContainer.scale = {x: scale, y: scale};
+        this.gameContainer.scale = { x: scale, y: scale };
     }
 
     private listenModel(): void
@@ -317,7 +317,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             return;
         }
 
-        const promises = winningPath.map(async ({row, col}, i): Promise<void> => {
+        const promises = winningPath.map(async ({ row, col }, i): Promise<void> => {
             await new Promise(resolve => setTimeout(resolve, i * 80));
             await this.hexes[row][col].animate();
             this.hexes[row][col].setHighlighted();
@@ -357,8 +357,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     {
         this.sidesGraphics = [new Graphics(), new Graphics()];
         let g: Graphics = this.sidesGraphics[0];
-        const to = (a: IPointData, b: IPointData = {x: 0, y: 0}) => g.lineTo(a.x + b.x, a.y + b.y);
-        const m = (a: IPointData, b: IPointData = {x: 0, y: 0}) => g.moveTo(a.x + b.x, a.y + b.y);
+        const to = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x, a.y + b.y);
+        const m = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
 
         this.sidesGraphics[0].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
         this.sidesGraphics[1].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
@@ -429,7 +429,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.highlightSideForPlayer(this.game.getStrictWinner());
     }
 
-    getHex(rowCol: {row: number, col: number}): Hex
+    getHex(rowCol: { row: number, col: number }): Hex
     {
         return this.hexes[rowCol.row][rowCol.col];
     }

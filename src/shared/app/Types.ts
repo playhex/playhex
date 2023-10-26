@@ -1,4 +1,4 @@
-import { TimeControlValues } from "time-control/TimeControlInterface";
+import { TimeControlValues } from 'time-control/TimeControlInterface';
 import { PlayerIndex } from '../game-engine';
 
 export type PlayerData = {

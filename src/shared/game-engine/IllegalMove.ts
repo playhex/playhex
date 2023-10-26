@@ -1,4 +1,4 @@
-import Move from "./Move";
+import Move from './Move';
 
 export default class IllegalMove extends Error
 {
