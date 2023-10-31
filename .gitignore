@@ -2,6 +2,3 @@ dist
 .env
 node_modules
 yarn-error.log
-
-# Mohex
-default.log

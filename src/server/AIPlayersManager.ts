@@ -1,7 +1,8 @@
+import RemoteApiPlayer from './RemoteApiPlayer';
 import { Player, RandomAIPlayer } from '../shared/game-engine';
-import { getMohexInstance, isMohexEnabled } from './mohex/queueableMohexInstance';
-import MohexPlayer from './mohex/MohexPlayer';
 import { GameOptionsData } from '@shared/app/GameOptions';
+
+const { MOHEX_API_ENDPOINT } = process.env;
 
 /**
  * Create an AI Player instance
@@ -10,11 +11,11 @@ import { GameOptionsData } from '@shared/app/GameOptions';
  */
 const createAIPlayer = (gameOptions: GameOptionsData): Player => {
     if (
-        isMohexEnabled()
+        MOHEX_API_ENDPOINT
         && gameOptions.boardsize
         && gameOptions.boardsize <= 13
     ) {
-        return new MohexPlayer(getMohexInstance());
+        return new RemoteApiPlayer('Mohex', MOHEX_API_ENDPOINT);
     }
 
     return new RandomAIPlayer();

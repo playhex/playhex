@@ -29,42 +29,24 @@ yarn install
 yarn dev
 ```
 
-### Mohex AI
+### Mohex API
 
-To enable Mohex and play with this challenging AI,
-you need to download the library and build it from source.
+To play against Mohex AI, see: <https://github.com/alcalyn/mohex-api>.
+This repository exposes Mohex AI through an http api.
 
-Here is Mohex source code: <https://github.com/cgao3/benzene-vanilla-cmake>
+You can run the Docker image:
 
 ``` bash
-# Install dependencies
-sudo apt update
-sudo apt install libboost-all-dev build-essential libdb-dev build-essential cmake
-
-# Download Mohex source code
-git clone https://github.com/cgao3/benzene-vanilla-cmake
-cd benzene-vanilla-cmake/
-
-# Go back to an older version, I get a strange AI behaviour on latest version.
-# See https://github.com/cgao3/benzene-vanilla-cmake/issues/14
-git checkout f888938bc7ab051a04034a9e19a31399a31d2429
-
-# Then follow the build steps, same as described in project readme
-mkdir build
-cd build/
-cmake ../
-make -j4
-cd ../
+docker run -p 3001:3000 alcalyn/mohex-api
 ```
 
-You now have the binary at path `./build/src/mohex/mohex`.
+Check if it responds with <http://localhost:3001/api/license>.
 
-Get the full path of this binary, and set it in your `.env` file, for example:
+Then enable Mohex locally by adding in your `.env`:
 
 ``` dotenv
-MOHEX_BINARY=/home/debian/develop/benzene-vanilla-cmake/build/src/mohex/mohex
+MOHEX_API_ENDPOINT=http://localhost:3001/api/calculate-move
 ```
-
 
 ## License
 
