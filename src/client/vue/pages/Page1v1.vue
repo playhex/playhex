@@ -19,9 +19,9 @@ const route = useRoute();
 const router = useRouter();
 const hexClient = useHexClient();
 const gameView = ref<GameView>();
-let gameClientSocket: null | GameClientSocket;
+let gameClientSocket = ref<null | GameClientSocket>(null);
 let game: Game;
-let localPlayer: null | ClientPlayer = null;
+let localPlayer = ref<null | ClientPlayer>(null);
 const { gameId } = route.params;
 
 if (Array.isArray(gameId)) {
@@ -29,15 +29,16 @@ if (Array.isArray(gameId)) {
 }
 
 (async () => {
-    gameClientSocket = await hexClient.retrieveGameClientSocket(gameId);
+    gameClientSocket.value = await hexClient.retrieveGameClientSocket(gameId);
 
-    if (!gameClientSocket) {
+    if (!gameClientSocket.value) {
         console.error(`Game ${gameId} no longer exists.`);
         router.push({ name: 'home' });
         return;
     }
 
-    game = gameClientSocket.getGame();
+    game = gameClientSocket.value.getGame();
+    localPlayer.value = gameClientSocket.value.getLocalPlayer();
 
     hexClient.joinRoom(socket, 'join', `games/${gameId}`);
 
@@ -45,7 +46,7 @@ if (Array.isArray(gameId)) {
 
     gameView.value.on('hexClicked', move => {
         try {
-            gameClientSocket?.getLocalPlayer()?.move(move);
+            gameClientSocket.value?.getLocalPlayer()?.move(move);
         } catch (e) {
             console.log('Move not played: ' + e);
         }
@@ -78,7 +79,7 @@ const join = async () => {
 const confirmationOverlay = createOverlay(ConfirmationOverlay);
 
 const resign = async (): Promise<void> => {
-    if (null === localPlayer) {
+    if (null === localPlayer.value) {
         return;
     }
 
@@ -91,7 +92,7 @@ const resign = async (): Promise<void> => {
             cancelLabel: 'No, continue playing',
             cancelClass: 'btn-outline-primary',
         });
-        localPlayer.resign();
+        localPlayer.value.resign();
     } catch (e) {
         // resignation cancelled
     }

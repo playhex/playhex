@@ -16,7 +16,7 @@ let firstPlayer = ref<null | PlayerIndex>(null);
     <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit="confirm(sanitizeGameOptions({ boardsize, firstPlayer }))">
+                <form class="modal-content" @submit="e => {e.preventDefault(); confirm(sanitizeGameOptions({ boardsize, firstPlayer }))}">
                     <div class="modal-header">
                         <h5 class="modal-title">Game options</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>

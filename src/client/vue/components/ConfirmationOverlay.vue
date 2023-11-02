@@ -35,7 +35,7 @@ const props = defineProps({
     <div v-if="visible">
         <div class="modal d-block" @click="cancel()">
             <div class="modal-dialog" @click="e => e.stopPropagation()">
-                <form class="modal-content">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ props.title }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
@@ -45,9 +45,9 @@ const props = defineProps({
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn" :class="cancelClass" @click="cancel()">{{ props.cancelLabel }}</button>
-                        <button type="submit" class="btn" :class="confirmClass" @click="confirm()">{{ props.confirmLabel }}</button>
+                        <button type="button" class="btn" :class="confirmClass" @click="confirm()">{{ props.confirmLabel }}</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
         <div class="modal-backdrop show d-fixed"></div>

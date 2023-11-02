@@ -2,3 +2,4 @@ dist
 .env
 node_modules
 yarn-error.log
+cypress/screenshots/
