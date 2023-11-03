@@ -42,3 +42,13 @@ export type HostedGameData = {
     game: GameData;
     timeControl: TimeControlValues;
 };
+
+export type OnlinePlayerData = {
+    playerData: PlayerData;
+    connected: boolean;
+};
+
+export type OnlinePlayersData = {
+    totalPlayers: number;
+    players: { [key: string]: OnlinePlayerData };
+};

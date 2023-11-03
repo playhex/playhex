@@ -58,4 +58,18 @@ export type HexServerToClientEvents = {
      * A game has ended and there is a winner.
      */
     ended: (gameId: string, winner: PlayerIndex, outcomePrecision: OutcomePrecision) => void;
+
+    /**
+     * A player just connected to server.
+     * player can be null in case player data were not in list.
+     * totalPlayers is the count of players connected now.
+     */
+    playerConnected: (player: PlayerData | null, totalPlayers: number) => void;
+
+    /**
+     * A player just disconnected from server.
+     * player can be null in case player data were not in list.
+     * totalPlayers is the count of players connected now.
+     */
+    playerDisconnected: (player: PlayerData | null, totalPlayers: number) => void;
 };

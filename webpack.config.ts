@@ -44,12 +44,6 @@ const config: Configuration = {
                     chunks: 'all',
                     priority: 10,
                 },
-                material: {
-                    test: /[\\/]node_modules[\\/]@material-ui[\\/]/,
-                    name: 'material-ui',
-                    chunks: 'all',
-                    priority: 20,
-                },
             },
         },
     },
@@ -111,8 +105,8 @@ const config: Configuration = {
                 ],
             },
             {
-                test: /.jpe?g$|.gif$|.png$|.svg$|.woff$|.woff2$|.ttf$|.eot$/,
-                use: 'url-loader?limit=10000',
+                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                type: 'asset/resource',
             },
         ],
     },

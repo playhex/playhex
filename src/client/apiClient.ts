@@ -1,4 +1,4 @@
-import { HostedGameData, PlayerData } from '@shared/app/Types';
+import { HostedGameData, OnlinePlayersData, PlayerData } from '@shared/app/Types';
 import { deserialize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
@@ -78,4 +78,15 @@ export const apiPostResign = async (gameId: string): Promise<true | string> => {
     }
 
     return response.text();
+};
+
+export const apiGetOnlinePlayers = async (): Promise<OnlinePlayersData> => {
+    const response = await fetch(`/api/online-players`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return response.json();
 };

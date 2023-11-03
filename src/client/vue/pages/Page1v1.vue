@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { useRoute, useRouter } from 'vue-router';
 import GameView from '@client/pixi-board/GameView';
-import useHexClient from '@client/hexClient';
+import useHexStore from '@client/stores/hexStore';
 import { ref } from '@vue/runtime-core';
 import socket from '@client/socket';
 import AppBoard from '@client/vue/components/AppBoard.vue';
@@ -14,10 +14,10 @@ import { Game } from '@shared/game-engine';
 import ClientPlayer from 'ClientPlayer';
 import { createOverlay } from 'unoverlay-vue';
 
-const { loggedInUser } = storeToRefs(useHexClient());
+const { loggedInUser } = storeToRefs(useHexStore());
 const route = useRoute();
 const router = useRouter();
-const hexClient = useHexClient();
+const hexStore = useHexStore();
 const gameView = ref<GameView>();
 let gameClientSocket = ref<null | GameClientSocket>(null);
 let game: Game;
@@ -29,7 +29,7 @@ if (Array.isArray(gameId)) {
 }
 
 (async () => {
-    gameClientSocket.value = await hexClient.retrieveGameClientSocket(gameId);
+    gameClientSocket.value = await hexStore.retrieveGameClientSocket(gameId);
 
     if (!gameClientSocket.value) {
         console.error(`Game ${gameId} no longer exists.`);
@@ -40,7 +40,7 @@ if (Array.isArray(gameId)) {
     game = gameClientSocket.value.getGame();
     localPlayer.value = gameClientSocket.value.getLocalPlayer();
 
-    hexClient.joinRoom(socket, 'join', `games/${gameId}`);
+    hexStore.joinRoom(socket, 'join', `games/${gameId}`);
 
     gameView.value = new GameView(game);
 
@@ -69,7 +69,7 @@ const canJoin = (): boolean => {
 };
 
 const join = async () => {
-    const result = await hexClient.joinGame(gameId);
+    const result = await hexStore.joinGame(gameId);
 
     if (true !== result) {
         console.error('could not join:', result);

@@ -12,6 +12,16 @@ export default class PlayerRepository
         return this.players[playerId] || null;
     }
 
+    getAllPlayers(): PlayerData[]
+    {
+        return Object.values(this.players);
+    }
+
+    getPlayersCount(): number
+    {
+        return Object.keys(this.players).length;
+    }
+
     createGuest(): PlayerData
     {
         const guest: PlayerData = {

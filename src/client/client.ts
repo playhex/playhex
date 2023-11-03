@@ -1,10 +1,12 @@
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './base.styl';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './vue/App.vue';
-import useHexClient from '@client/hexClient';
+import useHexStore from '@client/stores/hexStore';
 import routes from './vue/routes';
 import unoverlay from 'unoverlay-vue';
 
@@ -29,12 +31,12 @@ vueApp.use(router);
 vueApp.use(pinia);
 vueApp.use(unoverlay);
 
-useHexClient().listenSocket();
+useHexStore().listenSocket();
 
 (async () => {
-    await useHexClient().getUserOrLoginAsGuest();
+    await useHexStore().getUserOrLoginAsGuest();
 
-    useHexClient().reconnectSocket();
+    useHexStore().reconnectSocket();
 })();
 
 vueApp.mount('#vue-app');

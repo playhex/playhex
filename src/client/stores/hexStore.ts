@@ -13,7 +13,7 @@ import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 /**
  * State synced with server, and methods to handle games and user.
  */
-const useHexClient = defineStore('hexClient', {
+const useHexStore = defineStore('hexStore', {
     state: () => ({
         /**
          * Current logged in user
@@ -212,4 +212,4 @@ function createGameFromData(players: [Player, Player], gameData: GameData): Game
     return game;
 }
 
-export default useHexClient;
+export default useHexStore;

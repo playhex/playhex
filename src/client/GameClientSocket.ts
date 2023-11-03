@@ -1,6 +1,6 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import ClientPlayer from './ClientPlayer';
-import useHexClient from './hexClient';
+import useHexStore from './stores/hexStore';
 import { PlayerData } from '@shared/app/Types';
 import { OutcomePrecision } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
@@ -10,11 +10,11 @@ import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
  * and re-dispatch them to server.
  *
  * Also provide front API to handle game,
- * called by hexClient on server events.
+ * called by hexStore on server events.
  */
 export default class GameClientSocket
 {
-    private hexClient = useHexClient();
+    private hexStore = useHexStore();
 
     constructor(
         private id: string,
@@ -27,9 +27,9 @@ export default class GameClientSocket
     private listenGame(): void
     {
         this.game.on('played', async (move) => {
-            // TODO do not call hexClient.move when move comes from opponent
+            // TODO do not call hexStore.move when move comes from opponent
 
-            const result = await this.hexClient.move(this.id, move);
+            const result = await this.hexStore.move(this.id, move);
 
             if (true !== result) {
                 console.error('Error while doing move:', result);
@@ -37,10 +37,10 @@ export default class GameClientSocket
         });
 
         this.game.on('ended', async (winner, outcomePrecision) => {
-            // TODO do not call hexClient.resign twice
+            // TODO do not call hexStore.resign twice
 
             if (outcomePrecision === 'resign') {
-                const result = await this.hexClient.resign(this.id);
+                const result = await this.hexStore.resign(this.id);
 
                 if (true !== result) {
                     console.error('Error while resign:', result);
