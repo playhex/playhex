@@ -16,7 +16,7 @@ themeSwitcherDispatcher.on('themeSwitched', () => {
 <template>
     <div class="menu-top">
         <div class="container-fluid">
-            <div class="d-flex">
+            <nav class="d-flex">
                 <router-link to="/"><i class="bi-house-fill"></i> Home</router-link>
 
                 <p class="ms-auto me-4">
@@ -28,7 +28,7 @@ themeSwitcherDispatcher.on('themeSwitched', () => {
                 <a href="#" @click="switchTheme()" class="ms-1">
                     switch
                 </a>
-            </div>
+            </nav>
         </div>
     </div>
 </template>

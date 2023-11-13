@@ -13,11 +13,17 @@ const routes: RouteRecordRaw[] = [
         name: 'online-game',
         path: '/games/:gameId',
         component: Page1v1,
+        meta: {
+            displayFooter: false,
+        },
     },
     {
         name: 'play-vs-ai',
         path: '/play-vs-ai',
         component: PagePlayVsAI,
+        meta: {
+            displayFooter: false,
+        },
     },
 ];
 

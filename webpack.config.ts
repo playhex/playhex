@@ -1,13 +1,17 @@
 import path from 'path';
-import { Configuration } from 'webpack';
+import { Configuration, DefinePlugin } from 'webpack';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
+import { commitRef } from './src/server/lastCommitInfo';
 
 import { IS_DEV, WEBPACK_PORT } from './src/server/config';
 
 const plugins = [
     new WebpackManifestPlugin({}),
     new VueLoaderPlugin(),
+    new DefinePlugin({
+        LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
+    }),
 ];
 
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
