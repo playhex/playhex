@@ -26,7 +26,7 @@ This is a work in progress. Here is the unexhaustive list of implemented and pla
 
 ```
 yarn install
-yarn dev
+yarn serve
 ```
 
 ### Mohex API

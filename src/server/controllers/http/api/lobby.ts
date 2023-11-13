@@ -4,7 +4,7 @@ import { Game, Player } from '../../../../shared/game-engine';
 import { sanitizeGameOptions } from '../../../../shared/app/GameOptions';
 import { shufflePlayers } from '../../../../shared/app/GameUtils';
 import ServerPlayer from '../../../ServerPlayer';
-import { createAIPlayer } from '../../../AIPlayersManager';
+import { createAIPlayer } from '../../../services/AIManager';
 import Container from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';

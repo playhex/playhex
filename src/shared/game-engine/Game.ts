@@ -13,16 +13,21 @@ type GameEvents = {
 
     /**
      * A move have been played by a player. PlayerIndex is the player who made the move.
+     * At this time, game.getCurrentPlayer() is the current player after move have been played.
+     * If the move is winning, "winner" contains the actual winner. Otherwise contains null.
      */
-    played: (move: Move, byPlayerIndex: PlayerIndex) => void;
+    played: (move: Move, byPlayerIndex: PlayerIndex, winner: null | PlayerIndex) => void;
 
     /**
      * Game have been finished.
      */
-    ended: (winner: PlayerIndex, outcomePrecision: OutcomePrecision) => void;
+    ended: (winner: PlayerIndex, outcome: Outcome) => void;
 };
 
-export type OutcomePrecision =
+/**
+ * How a game has ended.
+ */
+export type Outcome =
     /**
      * No outcome precision, game should have been won by regular victory
      */
@@ -57,7 +62,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
     private winner: null|PlayerIndex = null;
-    private outcomePrecision: OutcomePrecision = null;
+    private outcome: Outcome = null;
     private movesHistory: Move[] = [];
 
     constructor(
@@ -142,21 +147,33 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.winner;
     }
 
-    setWinner(playerIndex: PlayerIndex, outcomePrecision: OutcomePrecision = null): void
+    /**
+     * Just update properties, do not emit "ended" event.
+     * Should be emitted manually.
+     */
+    private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
+    {
+        this.winner = playerIndex;
+        this.outcome = outcome;
+    }
+
+    /**
+     * Change game state by setting a winner and emitting "ended" event.
+     */
+    declareWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
     {
         if (null !== this.winner) {
             throw new Error('Cannot set a winner again, there is already a winner');
         }
 
-        this.winner = playerIndex;
-        this.outcomePrecision = outcomePrecision;
+        this.setWinner(playerIndex, outcome);
 
-        this.emit('ended', playerIndex, outcomePrecision);
+        this.emit('ended', playerIndex, outcome);
     }
 
-    getOutcomePrecision(): OutcomePrecision
+    getOutcome(): Outcome
     {
-        return this.outcomePrecision;
+        return this.outcome;
     }
 
     getMovesHistory(): Move[]
@@ -259,21 +276,26 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      *
      * @throws IllegalMove on invalid move.
      */
-    move(move: Move, playerIndex: PlayerIndex): void
+    move(move: Move, byPlayerIndex: PlayerIndex): void
     {
-        this.checkMove(move, playerIndex);
-        this.board.setCell(move.getRow(), move.getCol(), playerIndex);
+        this.checkMove(move, byPlayerIndex);
+        this.board.setCell(move.getRow(), move.getCol(), byPlayerIndex);
 
         this.movesHistory.push(move);
 
         // Naively check connection on every move played
-        if (this.board.hasPlayerConnection(playerIndex)) {
-            this.setWinner(playerIndex);
+        if (this.board.hasPlayerConnection(byPlayerIndex)) {
+            this.setWinner(byPlayerIndex, null);
         } else {
             this.changeCurrentPlayer();
         }
 
-        this.emit('played', move, playerIndex);
+        this.emit('played', move, byPlayerIndex, this.getWinner());
+
+        // Emit "ended" event after "played" event to keep order between events.
+        if (this.hasWinner()) {
+            this.emit('ended', this.getStrictWinner(), null);
+        }
     }
 
     /**
@@ -281,7 +303,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      */
     resign(playerIndex: PlayerIndex): void
     {
-        this.setWinner(0 === playerIndex ? 1 : 0, 'resign');
+        this.declareWinner(0 === playerIndex ? 1 : 0, 'resign');
     }
 
     /**
@@ -289,7 +311,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      */
     loseByTime(): void
     {
-        this.setWinner(this.otherPlayerIndex(), 'time');
+        this.declareWinner(this.otherPlayerIndex(), 'time');
     }
 
     otherPlayerIndex(): PlayerIndex

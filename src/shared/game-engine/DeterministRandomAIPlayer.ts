@@ -1,11 +1,16 @@
+import seedrandom from 'seedrandom';
 import Move from './Move';
 import Player from './Player';
 
-const { floor, random } = Math;
+const { floor } = Math;
 
-export default class RandomAIPlayer extends Player
+/**
+ * AI that plays randomly, but determinist:
+ * if you play same moves, AI will also responds with same moves.
+ */
+export default class DeterministRandomAIPlayer extends Player
 {
-    private static WAIT_BEFORE_PLAY = 200;
+    private static WAIT_BEFORE_PLAY = 40;
 
     constructor()
     {
@@ -20,16 +25,14 @@ export default class RandomAIPlayer extends Player
 
     getName(): string
     {
-        return 'Random bot';
+        return 'Determinist random bot';
     }
 
     async makeMove(): Promise<void>
     {
-        console.log('random AI player is playing...');
-
-        if (RandomAIPlayer.WAIT_BEFORE_PLAY > 0) {
+        if (DeterministRandomAIPlayer.WAIT_BEFORE_PLAY > 0) {
             await new Promise(resolve => {
-                setTimeout(resolve, RandomAIPlayer.WAIT_BEFORE_PLAY);
+                setTimeout(resolve, DeterministRandomAIPlayer.WAIT_BEFORE_PLAY);
             });
         }
 
@@ -47,9 +50,13 @@ export default class RandomAIPlayer extends Player
             }
         }
 
-        const move = possibleMoves[floor(random() * possibleMoves.length)];
+        const rng = seedrandom(this.playerGameInput
+            .getMovesHistory()
+            .map(m => m.toString())
+            .join(' ')
+        );
 
-        console.log('random AI player plays ' + move);
+        const move = possibleMoves[floor(rng() * possibleMoves.length)];
 
         this.playerGameInput.move(move);
     }

@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getNextFreeSlot } from '../shared/app/GameUtils';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from 'server';
-import { OutcomePrecision } from '@shared/game-engine/Game';
+import { Outcome } from '@shared/game-engine/Game';
 
 /**
  * Contains a game state,
@@ -54,8 +54,8 @@ export default class HostedGame
             this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
-        this.game.on('ended', (winner: PlayerIndex, outcomePrecision: OutcomePrecision) => {
-            this.io.to(['lobby', `games/${this.id}`]).emit('ended', this.id, winner, outcomePrecision);
+        this.game.on('ended', (winner: PlayerIndex, outcome: Outcome) => {
+            this.io.to(['lobby', `games/${this.id}`]).emit('ended', this.id, winner, outcome);
             this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
     }

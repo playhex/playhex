@@ -9,16 +9,29 @@ describe('Game', () => {
 
         const game = new Game([player0, player1], 3);
 
+        const emitted = {
+            started: false,
+            played: false,
+            ended: false,
+        };
+        game.on('started', () => emitted['started'] = true);
+        game.on('played', () => emitted['played'] = true);
+        game.on('ended', () => emitted['ended'] = true);
+
         assert.strictEqual(game.isStarted(), false);
         assert.strictEqual(game.getSize(), 3);
 
         game.start();
+
+        assert.strictEqual(emitted['started'], true);
 
         assert.strictEqual(game.isStarted(), true);
 
         // Players legal moves
         game.move(new Move(1, 1), 0);
         assert.strictEqual(game.getBoard().getCell(1, 1), 0);
+
+        assert.strictEqual(emitted['played'], true);
 
         game.move(new Move(2, 1), 1);
         assert.strictEqual(game.getBoard().getCell(2, 1), 1);
@@ -32,8 +45,10 @@ describe('Game', () => {
         game.move(new Move(1, 2), 0);
         game.move(new Move(0, 2), 1);
         assert.strictEqual(game.isEnded(), false, 'Game is not yet ended');
+        assert.strictEqual(emitted['ended'], false);
         game.move(new Move(1, 0), 0);
 
+        assert.strictEqual(emitted['ended'], true);
         assert.strictEqual(game.isEnded(), true, 'Game is now ended, player 0 won');
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner');
 

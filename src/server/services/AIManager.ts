@@ -1,5 +1,5 @@
-import RemoteApiPlayer from './RemoteApiPlayer';
-import { Player, RandomAIPlayer } from '../shared/game-engine';
+import RemoteApiPlayer from '../RemoteApiPlayer';
+import { Player, DeterministRandomAIPlayer } from '../../shared/game-engine';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
 const { MOHEX_API_ENDPOINT } = process.env;
@@ -7,7 +7,7 @@ const { MOHEX_API_ENDPOINT } = process.env;
 /**
  * Create an AI Player instance
  * depending on available AI engine available.
- * Returns RandomAIPlayer if none available.
+ * Returns DeterministRandomAIPlayer if none available.
  */
 const createAIPlayer = (gameOptions: GameOptionsData): Player => {
     if (
@@ -18,7 +18,7 @@ const createAIPlayer = (gameOptions: GameOptionsData): Player => {
         return new RemoteApiPlayer('Mohex', MOHEX_API_ENDPOINT);
     }
 
-    return new RandomAIPlayer();
+    return new DeterministRandomAIPlayer();
 };
 
 export {

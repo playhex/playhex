@@ -1,6 +1,6 @@
 describe('Resign a game', () => {
     it('displays button to resign a game', () => {
-        cy.visit('http://localhost:3000/');
+        cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
         cy.contains('Create game vs CPU').click();

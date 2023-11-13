@@ -18,7 +18,7 @@ export default class RemoteApiPlayer extends Player
         return this.name;
     }
 
-    private async fetchMove(): Promise<Move>
+    private async fetchMove(): Promise<null | Move>
     {
         if (!this.playerGameInput) {
             throw noInputError;
@@ -43,10 +43,11 @@ export default class RemoteApiPlayer extends Player
 
         const moveString = await response.text();
 
-        const match = moveString.match(/^([a-z])(\d+)$/);
+        const match = moveString.match(/^"?([a-z])(\d+)"?$/);
 
         if (null === match) {
-            throw new Error('Unexpected api output: ' + moveString);
+            console.error(`Unexpected api output: "${moveString}"`);
+            return null;
         }
 
         const [, letter, number] = match;
@@ -69,6 +70,12 @@ export default class RemoteApiPlayer extends Player
 
         if (!this.playerGameInput) {
             throw noInputError;
+        }
+
+        if (null === move) {
+            console.error('AI resigns because did not provided valid move');
+            this.playerGameInput.resign();
+            return;
         }
 
         this.playerGameInput.move(move);

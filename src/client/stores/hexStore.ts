@@ -7,7 +7,7 @@ import socket from '@client/socket';
 import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 import { apiPostGame1v1, apiPostGameVsCPU, apiPostResign, getGame, getGames, loginAsGuest } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import { OutcomePrecision } from '@shared/game-engine/Game';
+import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 
 /**
@@ -163,13 +163,13 @@ const useHexStore = defineStore('hexStore', {
                 }
             });
 
-            socket.on('ended', (gameId: string, winner: PlayerIndex, outcomePrecision: OutcomePrecision) => {
+            socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
                 if (this.games[gameId]) {
                     this.games[gameId].game.winner = winner;
                 }
 
                 if (this.gameClientSockets[gameId]) {
-                    this.gameClientSockets[gameId].ended(winner, outcomePrecision);
+                    this.gameClientSockets[gameId].ended(winner, outcome);
                 }
             });
         },
@@ -197,7 +197,7 @@ function createGameFromData(players: [Player, Player], gameData: GameData): Game
             }
 
             if (null !== gameData.winner && !game.hasWinner()) {
-                game.setWinner(gameData.winner);
+                game.declareWinner(gameData.winner);
             }
         });
     });

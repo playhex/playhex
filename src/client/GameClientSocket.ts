@@ -2,7 +2,7 @@ import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import ClientPlayer from './ClientPlayer';
 import useHexStore from './stores/hexStore';
 import { PlayerData } from '@shared/app/Types';
-import { OutcomePrecision } from '@shared/game-engine/Game';
+import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 
 /**
@@ -36,10 +36,10 @@ export default class GameClientSocket
             }
         });
 
-        this.game.on('ended', async (winner, outcomePrecision) => {
+        this.game.on('ended', async (winner, outcome) => {
             // TODO do not call hexStore.resign twice
 
-            if (outcomePrecision === 'resign') {
+            if (outcome === 'resign') {
                 const result = await this.hexStore.resign(this.id);
 
                 if (true !== result) {
@@ -116,14 +116,14 @@ export default class GameClientSocket
         }
     }
 
-    ended(winner: PlayerIndex, outcomePrecision: OutcomePrecision): void
+    ended(winner: PlayerIndex, outcome: Outcome): void
     {
         // If game is not already ended locally by server response anticipation
         if (this.game.isEnded()) {
             return;
         }
 
-        console.log('server said winner', winner, 'outcomePrecision', outcomePrecision);
-        this.game.setWinner(winner, outcomePrecision);
+        console.log('server said winner', winner, 'outcome', outcome);
+        this.game.declareWinner(winner, outcome);
     }
 }

@@ -27,5 +27,23 @@ export default (): Router => {
         res.status(204).send();
     });
 
+    router.post('/api/games/:id/move', (req, res) => {
+        const { id } = req.params;
+        let playerData: null | PlayerData;
+
+        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
+            res.status(403).send('not authenticated').end();
+            return;
+        }
+
+        const result = hostedGameRepository.playerMove(playerData.id, id, req.body);
+
+        if (true !== result) {
+            res.status(400).send(result);
+        }
+
+        res.status(204).send();
+    });
+
     return router;
 };

@@ -1,4 +1,4 @@
-import { OutcomePrecision } from 'game-engine/Game';
+import { Outcome } from 'game-engine/Game';
 import { PlayerIndex } from '../game-engine';
 import { HostedGameData, MoveData, PlayerData } from './Types';
 import { TimeControlValues } from 'time-control/TimeControlInterface';
@@ -57,7 +57,7 @@ export type HexServerToClientEvents = {
     /**
      * A game has ended and there is a winner.
      */
-    ended: (gameId: string, winner: PlayerIndex, outcomePrecision: OutcomePrecision) => void;
+    ended: (gameId: string, winner: PlayerIndex, outcome: Outcome) => void;
 
     /**
      * A player just connected to server.

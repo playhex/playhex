@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 const versionRequired = 18;
 const [v, major] = process.version.match(/(\d+)\.\d+\.\d+/);
 

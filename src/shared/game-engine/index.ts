@@ -7,6 +7,7 @@ import PlayerGameInput from './PlayerGameInput';
 import IllegalMove from './IllegalMove';
 import Move from './Move';
 import RandomAIPlayer from './RandomAIPlayer';
+import DeterministRandomAIPlayer from './DeterministRandomAIPlayer';
 import { PlayerIndex } from './Types';
 
 export {
@@ -19,6 +20,7 @@ export {
     IllegalMove,
     Move,
     RandomAIPlayer,
+    DeterministRandomAIPlayer,
 };
 
 export type {
