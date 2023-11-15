@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import seo from '../../../../shared/app/seo';
+import { seo } from '../../../../shared/app/seo';
 
 export function pwaRouter() {
     const router = Router();

@@ -16,3 +16,7 @@
 <meta property="twitter:title" content="<%= seo.title %>">
 <meta property="twitter:description" content="<%= seo.description %>">
 <meta property="twitter:image" content="<%= baseUrl %>/images/social-preview.jpg">
+
+<script type="application/ld+json">
+<%- JSON.stringify(jsonLd) %>
+</script>

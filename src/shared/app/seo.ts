@@ -4,4 +4,15 @@ const seo = {
     description: 'Play Hex board game with other players or with AI.',
 };
 
-export default seo;
+const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Hex online',
+    alternateName: seo.shortTitle,
+    url: process.env.BASE_URL,
+};
+
+export {
+    seo,
+    jsonLd,
+};

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getManifest } from './manifest-manager';
-import seo from '../../../../shared/app/seo';
+import { seo, jsonLd } from '../../../../shared/app/seo';
 
 export function pagesRouter() {
     const router = Router();
@@ -20,6 +20,7 @@ export function pagesRouter() {
             manifest,
             umami,
             seo,
+            jsonLd,
             baseUrl: process.env.BASE_URL,
         });
     });
