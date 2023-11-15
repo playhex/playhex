@@ -3,27 +3,14 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Hex</title>
-    <link rel="icon" href="/assets/favicon.ico" />
-    <link rel="manifest" href="/assets/pwa-manifest.json" />
-    <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
+    <title><%= seo.title %></title>
+
+    <link rel="manifest" href="/pwa-manifest.json" />
     <meta name="theme-color" content="#DC3545"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <% if (umami.websiteId) { %>
-    <script
-        async
-        src="<%= umami.src %>"
-        data-do-not-track="true"
-        data-website-id="<%= umami.websiteId %>"
-        <% if (umami.hostUrl) { %>
-            data-host-url="<%= umami.hostUrl %>"
-        <% } %>
-        <% if (umami.domains) { %>
-            data-domains="<%= umami.domains %>"
-        <% } %>
-    ></script>
-    <% } %>
+    <%- include('partials/seo-tags.ejs') %>
+    <% if (umami.websiteId) { %><%- include('partials/umami.ejs') %><% } %>
 </head>
 
 <body>
