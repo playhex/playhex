@@ -14,6 +14,8 @@ console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`*******************************************`);
 
 const app = express();
+app.disable('x-powered-by');
+
 const server = http.createServer(app);
 const io = new HexServer(server, {
     parser: CustomParser,
