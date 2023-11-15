@@ -3,10 +3,10 @@ describe('Play a game to the end', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Create game vs CPU').click();
+        cy.contains('Play vs AI').click();
 
         cy
-            .contains('Game options')
+            .contains('Play vs AI options')
             .closest('.modal-content')
             .contains('Custom')
             .click()
@@ -21,7 +21,7 @@ describe('Play a game to the end', () => {
             .click()
 
             .closest('.modal-content')
-            .contains('Create game')
+            .contains('Play!')
             .click()
         ;
 

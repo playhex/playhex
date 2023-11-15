@@ -26,7 +26,9 @@ const createAndJoinGame = async () => {
     let gameOptions: GameOptionsData;
 
     try {
-        gameOptions = await gameOptionsOverlay();
+        gameOptions = await gameOptionsOverlay({
+            title: '1v1 options',
+        });
     } catch (e) {
         return;
     }
@@ -39,7 +41,10 @@ const createAndJoinGameVsCPU = async () => {
     let gameOptions: GameOptionsData;
 
     try {
-        gameOptions = await gameOptionsOverlay();
+        gameOptions = await gameOptionsOverlay({
+            title: 'Play vs AI options',
+            confirmLabel: 'Play!',
+        });
     } catch (e) {
         return;
     }
@@ -52,7 +57,10 @@ const createAndJoinGameVsLocalAI = async () => {
     let gameOptions: GameOptionsData;
 
     try {
-        gameOptions = await gameOptionsOverlay();
+        gameOptions = await gameOptionsOverlay({
+            title: 'Play vs offline AI options',
+            confirmLabel: 'Play!',
+        });
     } catch (e) {
         return;
     }
@@ -77,7 +85,21 @@ const joinGame = (gameId: string) => {
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-9">
-                <h3>Join a game</h3>
+                <h3>New game</h3>
+
+                <div class="play-buttons row">
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        <button type="button" class="btn w-100 btn-primary" @click="createAndJoinGame"><i class="fs-3 bi bi-people"></i><br>1v1</button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        <button type="button" class="btn w-100 btn-primary" @click="createAndJoinGameVsCPU"><i class="fs-3 bi bi-robot"></i><br>Play vs AI</button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><i class="fs-3 bi bi-robot"></i><br>Play vs offline AI</button>
+                    </div>
+                </div>
+
+                <h4>Join a game</h4>
 
                 <table v-if="Object.values(hexStore.games).some(isWaiting)" class="table">
                     <thead>
@@ -103,13 +125,7 @@ const joinGame = (gameId: string) => {
                 </table>
                 <p v-else>No game for now. Create a new one !</p>
 
-                <div class="d-grid gap-2 d-sm-block mb-3">
-                    <button type="button" class="btn me-sm-3 btn-primary" @click="createAndJoinGame">Create game</button>
-                    <button type="button" class="btn me-sm-3 btn-primary" @click="createAndJoinGameVsCPU">Create game vs CPU</button>
-                    <button type="button" class="btn me-sm-3 btn-outline-primary" @click="createAndJoinGameVsLocalAI">Play vs offline AI</button>
-                </div>
-
-                <h3>Watch current game</h3>
+                <h3><i class="bi bi-eye"></i> Watch current game</h3>
 
                 <table v-if="Object.values(hexStore.games).some(isPlaying)" class="table">
                     <thead>
@@ -140,3 +156,9 @@ const joinGame = (gameId: string) => {
         </div>
     </div>
 </template>
+
+<style lang="stylus" scoped>
+.play-buttons
+    .btn
+        min-height 7em
+</style>

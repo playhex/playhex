@@ -10,6 +10,17 @@ let boardsize = ref(BOARD_DEFAULT_SIZE);
 let boardsizeCustom = ref(false);
 
 let firstPlayer = ref<null | PlayerIndex>(null);
+
+const props = defineProps({
+    title: {
+        type: String,
+        default: 'Game options',
+    },
+    confirmLabel: {
+        type: String,
+        default: 'Create game',
+    },
+});
 </script>
 
 <template>
@@ -18,7 +29,7 @@ let firstPlayer = ref<null | PlayerIndex>(null);
             <div class="modal-dialog">
                 <form class="modal-content" @submit="e => {e.preventDefault(); confirm(sanitizeGameOptions({ boardsize, firstPlayer }))}">
                     <div class="modal-header">
-                        <h5 class="modal-title">Game options</h5>
+                        <h5 class="modal-title">{{ props.title }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
@@ -59,21 +70,21 @@ let firstPlayer = ref<null | PlayerIndex>(null);
                         <div class="mb-3">
                             <p class="form-label">First player</p>
 
-                            <div class="btn-group" role="group">
+                            <div class="btn-group btn-group-min-width" role="group">
                                 <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="null" id="first-random">
-                                <label class="btn btn-outline-primary" for="first-random">Random</label>
+                                <label class="btn btn-outline-secondary" for="first-random">Random</label>
 
                                 <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="0" id="first-0">
-                                <label class="btn btn-outline-primary text-player-a" for="first-0">Me</label>
+                                <label class="btn btn-outline-danger" for="first-0">Me</label>
 
                                 <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="1" id="first-1">
-                                <label class="btn btn-outline-primary text-player-b" for="first-1">Opponent</label>
+                                <label class="btn btn-outline-primary" for="first-1">Opponent</label>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @click="cancel()">Cancel</button>
-                        <button type="submit" class="btn btn-success">Create game</button>
+                        <button type="submit" class="btn btn-success">{{ props.confirmLabel }}</button>
                     </div>
                 </form>
             </div>
@@ -81,3 +92,9 @@ let firstPlayer = ref<null | PlayerIndex>(null);
         <div class="modal-backdrop show d-fixed"></div>
     </div>
 </template>
+
+<style lang="stylus" scoped>
+.btn-group-min-width
+    .btn
+        min-width 6em
+</style>

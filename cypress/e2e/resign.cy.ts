@@ -3,11 +3,11 @@ describe('Resign a game', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Create game vs CPU').click();
+        cy.contains('Play vs AI').click();
 
-        cy.contains('Game options')
+        cy.contains('Play vs AI options')
             .closest('.modal-content')
-            .contains('Create game')
+            .contains('Play!')
             .click()
         ;
 
