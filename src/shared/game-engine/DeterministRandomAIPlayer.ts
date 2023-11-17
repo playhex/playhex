@@ -10,10 +10,9 @@ const { floor } = Math;
  */
 export default class DeterministRandomAIPlayer extends Player
 {
-    private static WAIT_BEFORE_PLAY = 40;
-
-    constructor()
-    {
+    constructor(
+        private waitBeforePlay = 40,
+    ) {
         super();
 
         this.on('myTurnToPlay', () => {
@@ -30,9 +29,9 @@ export default class DeterministRandomAIPlayer extends Player
 
     async makeMove(): Promise<void>
     {
-        if (DeterministRandomAIPlayer.WAIT_BEFORE_PLAY > 0) {
+        if (this.waitBeforePlay > 0) {
             await new Promise(resolve => {
-                setTimeout(resolve, DeterministRandomAIPlayer.WAIT_BEFORE_PLAY);
+                setTimeout(resolve, this.waitBeforePlay);
             });
         }
 

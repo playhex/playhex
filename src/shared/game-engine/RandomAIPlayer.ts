@@ -49,8 +49,6 @@ export default class RandomAIPlayer extends Player
 
         const move = possibleMoves[floor(random() * possibleMoves.length)];
 
-        console.log('random AI player plays ' + move);
-
         this.playerGameInput.move(move);
     }
 }
