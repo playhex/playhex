@@ -111,7 +111,10 @@ export class AbsoluteTimeControl extends AbstractTimeControl
 
     finish(): void
     {
-        this.playerChronos[this.currentPlayer].pause();
+        if (this.state === 'running') {
+            this.playerChronos[this.currentPlayer].pause();
+        }
+
         this.state = 'over';
     }
 

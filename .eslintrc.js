@@ -17,5 +17,6 @@ module.exports = {
         '@typescript-eslint/object-curly-spacing': ['warn', 'always'],
         '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],
         '@typescript-eslint/no-empty-function': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
     },
 };

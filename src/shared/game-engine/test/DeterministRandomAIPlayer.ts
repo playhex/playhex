@@ -3,7 +3,7 @@ import { DeterministRandomAIPlayer, Game, Move, Player } from '..';
 import assert from 'assert';
 
 describe('DeterministRandomAIPlayer', () => {
-    it.only('Do expected and valid moves', async () => {
+    it('Do expected and valid moves', async () => {
         const player = new Player();
         const ai = new DeterministRandomAIPlayer(1);
 

@@ -1,5 +1,5 @@
 import { HostedGameData, OnlinePlayersData, PlayerData } from '@shared/app/Types';
-import { deserialize } from '@shared/app/serializer';
+import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
 
 export const loginAsGuest = async (): Promise<PlayerData> => {
@@ -10,7 +10,7 @@ export const loginAsGuest = async (): Promise<PlayerData> => {
         },
     });
 
-    return deserialize(await response.text());
+    return denormalize(await response.json());
 };
 
 export const getGames = async (): Promise<HostedGameData[]> => {
@@ -21,7 +21,7 @@ export const getGames = async (): Promise<HostedGameData[]> => {
         },
     });
 
-    return deserialize(await response.text());
+    return denormalize(await response.json());
 };
 
 export const getGame = async (gameId: string): Promise<null | HostedGameData> => {
@@ -36,7 +36,7 @@ export const getGame = async (gameId: string): Promise<null | HostedGameData> =>
         return null;
     }
 
-    return deserialize(await response.text());
+    return denormalize(await response.json());
 };
 
 export const apiPostGame1v1 = async (gameOptions: GameOptionsData = {}): Promise<HostedGameData> => {
@@ -49,7 +49,7 @@ export const apiPostGame1v1 = async (gameOptions: GameOptionsData = {}): Promise
         body: JSON.stringify(gameOptions),
     });
 
-    return deserialize(await response.text());
+    return denormalize(await response.json());
 };
 
 export const apiPostGameVsCPU = async (gameOptions: GameOptionsData = {}): Promise<HostedGameData> => {
@@ -62,7 +62,7 @@ export const apiPostGameVsCPU = async (gameOptions: GameOptionsData = {}): Promi
         body: JSON.stringify(gameOptions),
     });
 
-    return deserialize(await response.text());
+    return denormalize(await response.json());
 };
 
 export const apiPostResign = async (gameId: string): Promise<true | string> => {

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+/* global LAST_COMMIT_DATE */
 // @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
 const lastCommitDate: string = LAST_COMMIT_DATE;
 </script>

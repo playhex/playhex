@@ -8,7 +8,7 @@ import { createAIPlayer } from '../../../services/AIManager';
 import Container from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import { serialize } from '../../../../shared/app/serializer';
+import { normalize } from '../../../../shared/app/serializer';
 
 export default (): Router => {
     const router = Router();
@@ -16,7 +16,7 @@ export default (): Router => {
     const hostedGameRepository = Container.get(HostedGameRepository);
 
     router.get('/api/games', (req, res) => {
-        res.send(serialize(
+        res.send(normalize(
             Object.values(hostedGameRepository.getGames()).map(hostedGame => hostedGame.toData())
         ));
     });
@@ -43,7 +43,7 @@ export default (): Router => {
 
         game.startOnceAllPlayersReady();
 
-        res.send(serialize(gameServerSocket.toData()));
+        res.send(normalize(gameServerSocket.toData()));
     });
 
     router.post('/api/games/cpu', (req, res) => {
@@ -68,7 +68,7 @@ export default (): Router => {
 
         game.startOnceAllPlayersReady();
 
-        res.send(serialize(gameServerSocket.toData()));
+        res.send(normalize(gameServerSocket.toData()));
     });
 
     router.get('/api/games/:id', (req, res) => {
@@ -80,7 +80,7 @@ export default (): Router => {
             return;
         }
 
-        res.send(serialize(game.toData()));
+        res.send(normalize(game.toData()));
     });
 
     return router;
