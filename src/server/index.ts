@@ -8,6 +8,7 @@ import Container from 'typedi';
 import { registerWebsocketControllers } from './controllers/websocket';
 import { HexServer } from './server';
 import * as CustomParser from '../shared/app/socketCustomParser';
+import socketIoAdminUi from './services/socketIoAdminUi';
 
 console.log(`*******************************************`);
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -19,7 +20,13 @@ app.disable('x-powered-by');
 const server = http.createServer(app);
 const io = new HexServer(server, {
     parser: CustomParser,
+    cors: {
+        origin: ['https://admin.socket.io'],
+        credentials: true,
+    },
 });
+
+socketIoAdminUi(io);
 
 Container.set(HexServer, io);
 
