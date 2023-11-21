@@ -37,7 +37,7 @@ export const denormalize = (data: any, root = true): any => {
         return data;
     }
 
-    if (!data.__meta) {
+    if (!data?.__meta) {
         return data;
     }
 
