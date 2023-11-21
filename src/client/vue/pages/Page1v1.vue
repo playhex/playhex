@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router';
 import GameView from '@client/pixi-board/GameView';
 import useHexStore from '@client/stores/hexStore';
 import { ref } from '@vue/runtime-core';
-import socket from '@client/socket';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/ConfirmationOverlay.vue';
 import { playerCanJoinGame } from '@shared/app/GameUtils';
@@ -13,6 +12,7 @@ import GameClientSocket from 'GameClientSocket';
 import { Game } from '@shared/game-engine';
 import ClientPlayer from 'ClientPlayer';
 import { createOverlay } from 'unoverlay-vue';
+import { onUnmounted } from 'vue';
 
 const { loggedInUser } = storeToRefs(useHexStore());
 const route = useRoute();
@@ -28,6 +28,9 @@ if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
 }
 
+hexStore.joinGameRoom(gameId);
+onUnmounted(() => hexStore.leaveGameRoom(gameId));
+
 (async () => {
     gameClientSocket.value = await hexStore.retrieveGameClientSocket(gameId);
 
@@ -39,8 +42,6 @@ if (Array.isArray(gameId)) {
 
     game = gameClientSocket.value.getGame();
     localPlayer.value = gameClientSocket.value.getLocalPlayer();
-
-    hexStore.joinRoom(socket, 'join', `games/${gameId}`);
 
     gameView.value = new GameView(game);
 

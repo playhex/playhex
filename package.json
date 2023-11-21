@@ -11,8 +11,6 @@
     "dev-server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps index.js\"",
     "serve": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev-server\" \"yarn dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
     "test:unit": "mocha src/**/test/**/*.ts -n loader=ts-node/esm --extension ts",
     "test:e2e": "cypress run",
     "test:all": "yarn test:unit && yarn test:e2e",

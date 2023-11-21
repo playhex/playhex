@@ -20,8 +20,11 @@ const props = defineProps({
         type: Object as PropType<TimeControlValues>,
     },
 });
+
+/*
+ * Chrono
+ */
 const { gameView, timeControlValues } = toRefs(props);
-const game = gameView?.value?.getGame();
 
 type Chrono = {
     time: string;
@@ -49,7 +52,7 @@ const chronoPlayerA = ref<Chrono>({ time: '00:00' });
 const chronoPlayerB = ref<Chrono>({ time: '00:00' });
 
 if (timeControlValues?.value) {
-    setInterval(() => {
+    const chronoThread = setInterval(() => {
         if (!timeControlValues.value) {
             return;
         }
@@ -57,7 +60,14 @@ if (timeControlValues?.value) {
         chronoPlayerA.value = toChrono(timeControlValues.value?.players[0].totalRemainingTime);
         chronoPlayerB.value = toChrono(timeControlValues.value?.players[1].totalRemainingTime);
     }, 50);
+
+    onUnmounted(() => clearInterval(chronoThread));
 }
+
+/*
+ * Add piwi view
+ */
+const game = gameView?.value?.getGame();
 
 if (!gameView || !game) {
     throw new Error('gameView is required');
@@ -79,9 +89,18 @@ onUnmounted(() => {
     gameView.value.destroy();
 });
 
+/*
+ * Orientation auto update on screen size change
+ */
 let orientation = ref<BoardOrientation>(gameView?.value?.getOrientation());
-window.addEventListener('resizeDebounced', () => orientation.value = gameView?.value?.getOrientation());
+const updateOrientation = () => orientation.value = gameView?.value?.getOrientation();
+window.addEventListener('resizeDebounced', updateOrientation);
 
+onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientation))
+
+/*
+ * Game end: win popin
+ */
 const gameOverOverlay = createOverlay(GameOverOverlay);
 
 gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
@@ -89,6 +108,8 @@ gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
         winner: game.getPlayer(winnerPlayerIndex),
     });
 });
+
+onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'));
 </script>
 
 <template>

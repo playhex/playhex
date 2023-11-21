@@ -29,6 +29,19 @@ yarn install
 yarn serve
 ```
 
+## Test
+
+``` bash
+# Unit tests (Mocha)
+yarn test
+
+# e2e tests (Cypress)
+yarn test:e2e
+
+# Open Cypress browser
+yarn cypress open
+```
+
 ### Mohex API
 
 To play against Mohex AI, see: <https://github.com/alcalyn/mohex-api>.

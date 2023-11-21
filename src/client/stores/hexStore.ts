@@ -1,6 +1,5 @@
 import { Game, Move, Player, PlayerIndex } from '@shared/game-engine';
 import { defineStore } from 'pinia';
-import { Socket } from 'socket.io-client';
 import ClientPlayer from '@client/ClientPlayer';
 import GameClientSocket from '@client/GameClientSocket';
 import socket from '@client/socket';
@@ -86,11 +85,26 @@ const useHexStore = defineStore('hexStore', {
             );
         },
 
-        joinRoom(socket: Socket, join: 'join' | 'leave', gameId: string): void
+        /**
+         * Join a game room to receive state updates.
+         * Does not join the game to play.
+         */
+        joinGameRoom(gameId: string): void
         {
-            socket.emit('room', join, gameId);
+            socket.emit('room', 'join', `games/${gameId}`);
         },
 
+        /**
+         * Leave a game room to no longer receive state updates.
+         */
+        leaveGameRoom(gameId: string): void
+        {
+            socket.emit('room', 'leave', `games/${gameId}`);
+        },
+
+        /**
+         * Join a game to play if there is a free slot.
+         */
         async joinGame(gameId: string): Promise<true | string>
         {
             return new Promise((resolve, reject) => {
