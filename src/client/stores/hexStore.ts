@@ -125,8 +125,6 @@ const useHexStore = defineStore('hexStore', {
 
         listenSocket(): void
         {
-            this.updateGames();
-
             socket.on('gameCreated', (game: HostedGameData) => {
                 this.games[game.id] = game;
             });

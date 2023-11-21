@@ -31,12 +31,14 @@ vueApp.use(router);
 vueApp.use(pinia);
 vueApp.use(unoverlay);
 
-useHexStore().listenSocket();
+// TODO move following lines this to store
+useHexStore().updateGames();
 
 (async () => {
     await useHexStore().getUserOrLoginAsGuest();
 
     useHexStore().reconnectSocket();
+    useHexStore().listenSocket();
 })();
 
 vueApp.mount('#vue-app');
