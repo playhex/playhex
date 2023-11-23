@@ -1,6 +1,6 @@
 import AppPlayer from '@shared/app/AppPlayer';
 import { PlayerData } from '@shared/app/Types';
-import useHexStore from './stores/hexStore';
+import useAuthStore from './stores/authStore';
 
 export default class ClientPlayer extends AppPlayer {
     static fromPlayerData(playerData: null | PlayerData): ClientPlayer
@@ -18,6 +18,6 @@ export default class ClientPlayer extends AppPlayer {
             return false;
         }
 
-        return this.playerData.id === useHexStore().loggedInUser?.id;
+        return this.playerData.id === useAuthStore().loggedInUser?.id;
     }
 }

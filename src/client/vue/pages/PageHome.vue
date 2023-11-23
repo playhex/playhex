@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import useHexStore from '@client/stores/hexStore';
+import useLobbyStore from '@client/stores/lobbyStore';
 import { HostedGameData } from '@shared/app/Types';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
@@ -9,7 +9,7 @@ import { GameOptionsData } from '@shared/app/GameOptions';
 import Sidebar from '@client/vue/components/Sidebar.vue';
 
 const router = useRouter();
-const hexStore = useHexStore();
+const lobbyStore = useLobbyStore();
 
 const goToGame = (gameId: string) => {
     router.push({
@@ -33,7 +33,7 @@ const createAndJoinGame = async () => {
         return;
     }
 
-    const hostedGame = await hexStore.createGame(gameOptions);
+    const hostedGame = await lobbyStore.createGame(gameOptions);
     goToGame(hostedGame.id);
 };
 
@@ -49,7 +49,7 @@ const createAndJoinGameVsCPU = async () => {
         return;
     }
 
-    const hostedGame = await hexStore.createGameVsCPU(gameOptions);
+    const hostedGame = await lobbyStore.createGameVsCPU(gameOptions);
     goToGame(hostedGame.id);
 };
 
@@ -77,7 +77,7 @@ const isWaiting = (hostedGame: HostedGameData) => !hostedGame.game.started;
 const isPlaying = (hostedGame: HostedGameData) => hostedGame.game.started && null === hostedGame.game.winner;
 
 const joinGame = (gameId: string) => {
-    hexStore.joinGame(gameId);
+    lobbyStore.joinGame(gameId);
 };
 </script>
 
@@ -101,7 +101,7 @@ const joinGame = (gameId: string) => {
 
                 <h4>Join a game</h4>
 
-                <table v-if="Object.values(hexStore.games).some(isWaiting)" class="table">
+                <table v-if="Object.values(lobbyStore.games).some(isWaiting)" class="table">
                     <thead>
                         <tr>
                             <th scope="col"></th>
@@ -111,7 +111,7 @@ const joinGame = (gameId: string) => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="hostedGame in Object.values(hexStore.games).filter(isWaiting)"
+                            v-for="hostedGame in Object.values(lobbyStore.games).filter(isWaiting)"
                             :key="hostedGame.id"
                         >
                             <td class="ps-0">
@@ -127,7 +127,7 @@ const joinGame = (gameId: string) => {
 
                 <h3><i class="bi bi-eye"></i> Watch current game</h3>
 
-                <table v-if="Object.values(hexStore.games).some(isPlaying)" class="table">
+                <table v-if="Object.values(lobbyStore.games).some(isPlaying)" class="table">
                     <thead>
                         <tr>
                             <th scope="col"></th>
@@ -137,7 +137,7 @@ const joinGame = (gameId: string) => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="hostedGame in Object.values(hexStore.games).filter(isPlaying)"
+                            v-for="hostedGame in Object.values(lobbyStore.games).filter(isPlaying)"
                             :key="hostedGame.id"
                         >
                             <td class="ps-0">

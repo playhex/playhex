@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import socket from '@client/socket';
 import { OnlinePlayerData } from '@shared/app/Types';
 import { apiGetOnlinePlayers } from '@client/apiClient';
+import useSocketStore from './socketStore';
 
 /**
  * Online players displayed on home sidebar.
  */
 const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     const players = ref<{ [key: string]: OnlinePlayerData }>({});
+    const { socket } = useSocketStore();
 
     /**
      * Null if not yet loaded

@@ -1,6 +1,6 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import ClientPlayer from './ClientPlayer';
-import useHexStore from './stores/hexStore';
+import useLobbyStore from './stores/lobbyStore';
 import { PlayerData } from '@shared/app/Types';
 import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
@@ -10,11 +10,11 @@ import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
  * and re-dispatch them to server.
  *
  * Also provide front API to handle game,
- * called by hexStore on server events.
+ * called by lobbyStore on server events.
  */
 export default class GameClientSocket
 {
-    private hexStore = useHexStore();
+    private lobbyStore = useLobbyStore();
 
     constructor(
         private id: string,
@@ -27,9 +27,9 @@ export default class GameClientSocket
     private listenGame(): void
     {
         this.game.on('played', async (move) => {
-            // TODO do not call hexStore.move when move comes from opponent
+            // TODO do not call lobbyStore.move when move comes from opponent
 
-            const result = await this.hexStore.move(this.id, move);
+            const result = await this.lobbyStore.move(this.id, move);
 
             if (true !== result) {
                 console.error('Error while doing move:', result);
@@ -37,10 +37,10 @@ export default class GameClientSocket
         });
 
         this.game.on('ended', async (winner, outcome) => {
-            // TODO do not call hexStore.resign twice
+            // TODO do not call lobbyStore.resign twice
 
             if (outcome === 'resign') {
-                const result = await this.hexStore.resign(this.id);
+                const result = await this.lobbyStore.resign(this.id);
 
                 if (true !== result) {
                     console.error('Error while resign:', result);

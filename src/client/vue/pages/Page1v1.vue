@@ -2,7 +2,8 @@
 /* eslint-env browser */
 import { useRoute, useRouter } from 'vue-router';
 import GameView from '@client/pixi-board/GameView';
-import useHexStore from '@client/stores/hexStore';
+import useLobbyStore from '@client/stores/lobbyStore';
+import useAuthStore from '@client/stores/authStore';
 import { ref } from '@vue/runtime-core';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/ConfirmationOverlay.vue';
@@ -13,11 +14,12 @@ import { Game } from '@shared/game-engine';
 import ClientPlayer from 'ClientPlayer';
 import { createOverlay } from 'unoverlay-vue';
 import { onUnmounted } from 'vue';
+import useSocketStore from '@client/stores/socketStore';
 
-const { loggedInUser } = storeToRefs(useHexStore());
+const { loggedInUser } = storeToRefs(useAuthStore());
 const route = useRoute();
 const router = useRouter();
-const hexStore = useHexStore();
+const lobbyStore = useLobbyStore();
 const gameView = ref<GameView>();
 let gameClientSocket = ref<null | GameClientSocket>(null);
 let game: Game;
@@ -28,11 +30,11 @@ if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
 }
 
-hexStore.joinGameRoom(gameId);
-onUnmounted(() => hexStore.leaveGameRoom(gameId));
+useSocketStore().joinGameRoom(gameId);
+onUnmounted(() => useSocketStore().leaveGameRoom(gameId));
 
 (async () => {
-    gameClientSocket.value = await hexStore.retrieveGameClientSocket(gameId);
+    gameClientSocket.value = await lobbyStore.retrieveGameClientSocket(gameId);
 
     if (!gameClientSocket.value) {
         console.error(`Game ${gameId} no longer exists.`);
@@ -70,7 +72,7 @@ const canJoin = (): boolean => {
 };
 
 const join = async () => {
-    const result = await hexStore.joinGame(gameId);
+    const result = await lobbyStore.joinGame(gameId);
 
     if (true !== result) {
         console.error('could not join:', result);

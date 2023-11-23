@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import useHexStore from '@client/stores/hexStore';
+import useAuthStore from '@client/stores/authStore';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { getOtherTheme, switchTheme, themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 
-const { loggedInUser } = storeToRefs(useHexStore());
+const { loggedInUser } = storeToRefs(useAuthStore());
 
 let otherTheme = ref(getOtherTheme());
 
