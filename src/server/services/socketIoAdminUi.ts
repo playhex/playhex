@@ -6,8 +6,21 @@ const socketIoAdminUi = (io: Server): void => {
         return;
     }
 
+    const {
+        SOCKET_IO_ADMIN_UI_USER: username,
+        SOCKET_IO_ADMIN_UI_PASS: password,
+    } = process.env;
+
+    if (!username !== !password) {
+        throw new Error('SOCKET_IO_ADMIN_UI_USER and SOCKET_IO_ADMIN_UI_PASS must be either both set, or both unset.');
+    }
+
     instrument(io, {
-        auth: false,
+        auth: username && password ? {
+            type: 'basic',
+            username,
+            password,
+        } : false,
         mode: 'development',
     });
 };
