@@ -8,6 +8,7 @@ import { GameOptionsData } from '@shared/app/GameOptions';
 import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 import useSocketStore from './socketStore';
+import { ref } from 'vue';
 
 /**
  * State synced with server, and methods to handle games and user.
@@ -19,7 +20,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     /**
      * List of games visible on lobby
      */
-    const games: { [key: string]: HostedGameData } =  {};
+    const games = ref<{ [key: string]: HostedGameData }>({});
 
     /**
      * List of loaded games
@@ -38,7 +39,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         const apiGames: HostedGameData[] = await getGames();
 
         apiGames.forEach(game => {
-            games[game.id] = game;
+            games.value[game.id] = game;
         });
     };
 
@@ -96,12 +97,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     const listenSocket = (): void => {
         socket.on('gameCreated', (game: HostedGameData) => {
-            games[game.id] = game;
+            games.value[game.id] = game;
         });
 
         socket.on('gameJoined', (gameId: string, playerIndex: PlayerIndex, playerData: PlayerData) => {
-            if (games[gameId]) {
-                games[gameId].game.players[playerIndex] = playerData;
+            if (games.value[gameId]) {
+                games.value[gameId].game.players[playerIndex] = playerData;
             }
 
             if (gameClientSockets[gameId]) {
@@ -110,8 +111,8 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
 
         socket.on('gameStarted', (gameId: string) => {
-            if (games[gameId]) {
-                games[gameId].game.started = true;
+            if (games.value[gameId]) {
+                games.value[gameId].game.started = true;
             }
 
             if (gameClientSockets[gameId]) {
@@ -132,8 +133,8 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
 
         socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
-            if (games[gameId]) {
-                games[gameId].game.winner = winner;
+            if (games.value[gameId]) {
+                games.value[gameId].game.winner = winner;
             }
 
             if (gameClientSockets[gameId]) {
@@ -142,7 +143,11 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
     };
 
+    // Listen lobby event to update state on change
     listenSocket();
+
+    // Load games on vue app open
+    updateGames();
 
     return {
         games,
