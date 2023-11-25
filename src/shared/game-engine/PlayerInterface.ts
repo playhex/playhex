@@ -19,10 +19,23 @@ export type PlayerEvents = {
 
 export default interface PlayerInterface extends TypedEventEmitter<PlayerEvents>
 {
+    /**
+     * How you should call me. Displayed on user interface.
+     */
     getName(): string;
 
+    /**
+     * If this player is ready to start playing.
+     * Both players must be ready to start the game.
+     * Can be false for example when a remote player still not joined.
+     */
     isReady(): boolean;
 
+    /**
+     * Used to receive a PlayerGameInput,
+     * which is used to make action from player.
+     * Provided when instanciating a Game with this player.
+     */
     setPlayerGameInput(playerGameInput: PlayerGameInput): void;
 
     /**

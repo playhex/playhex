@@ -34,6 +34,11 @@ export type GameData = {
      *      ...
      */
     hexes: string[];
+
+    createdAt: Date;
+    startedAt: null | Date;
+    lastMoveAt: null | Date;
+    endedAt: null | Date;
 };
 
 

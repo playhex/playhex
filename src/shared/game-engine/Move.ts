@@ -5,6 +5,7 @@ export default class Move implements Coords
     constructor(
         public row: number,
         public col: number,
+        private playedAt: Date = new Date(),
     ) {}
 
     getRow(): number
@@ -15,6 +16,11 @@ export default class Move implements Coords
     getCol(): number
     {
         return this.col;
+    }
+
+    getPlayedAt(): Date
+    {
+        return this.playedAt;
     }
 
     toString(): string

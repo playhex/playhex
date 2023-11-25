@@ -184,6 +184,10 @@ export default class HostedGame
                 movesHistory: this.game.getMovesHistory(),
                 currentPlayerIndex: this.game.getCurrentPlayerIndex(),
                 winner: this.game.getWinner(),
+                createdAt: this.game.getCreatedAt(),
+                startedAt: this.game.getStartedAt(),
+                lastMoveAt: this.game.getLastMoveAt(),
+                endedAt: this.game.getEndedAt(),
                 hexes: this.game.getBoard().getCells().map(
                     row => row
                         .map(

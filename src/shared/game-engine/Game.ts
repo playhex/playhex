@@ -3,6 +3,23 @@ import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE, Pl
 import TypedEmitter from 'typed-emitter';
 import Board from './Board';
 
+export type GameState =
+    /**
+     * Game has been created, waiting for both players ready.
+     */
+    'created'
+
+    /**
+     * Game has been started and is currently playing.
+     */
+    | 'playing'
+
+    /**
+     * Game has ended. Check winner and outcome.
+     */
+    | 'ended'
+;
+
 type GameEvents = {
     /**
      * Both players are ready,
@@ -57,13 +74,20 @@ export type Outcome =
  */
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
+    private state: GameState = 'created';
     private board: Board;
-    private startOnceReadyEnabled = false;
-    private started = false;
     private currentPlayerIndex: PlayerIndex = 0;
+    private movesHistory: Move[] = [];
+
     private winner: null|PlayerIndex = null;
     private outcome: Outcome = null;
-    private movesHistory: Move[] = [];
+
+    private startOnceReadyEnabled = false;
+
+    private createdAt: Date = new Date();
+    private startedAt: null | Date = null;
+    private lastMoveAt: null | Date = null;
+    private endedAt: null | Date = null;
 
     constructor(
         private players: [PlayerInterface, PlayerInterface],
@@ -130,7 +154,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     isEnded(): boolean
     {
-        return null !== this.winner;
+        return 'ended' === this.state;
     }
 
     getWinner(): null | PlayerIndex
@@ -153,8 +177,10 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      */
     private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
     {
+        this.state = 'ended';
         this.winner = playerIndex;
         this.outcome = outcome;
+        this.endedAt = new Date();
     }
 
     /**
@@ -204,7 +230,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     start(): void
     {
-        if (this.started) {
+        if ('created' !== this.state) {
             throw new Error('Game already started');
         }
 
@@ -213,7 +239,8 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             throw new Error('Cannot start, not all players are ready: ' + this.players.map(p => p.isReady()));
         }
 
-        this.started = true;
+        this.state = 'playing';
+        this.startedAt = new Date();
 
         this.emit('started');
     }
@@ -242,7 +269,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     isStarted(): boolean
     {
-        return this.started;
+        return 'created' !== this.state;
     }
 
     /**
@@ -250,11 +277,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
      */
     checkMove(move: Move, playerIndex: PlayerIndex): void
     {
-        if (!this.started) {
+        if ('created' === this.state) {
             throw new IllegalMove(move, 'Game is not yet started');
         }
 
-        if (this.isEnded()) {
+        if ('ended' === this.state) {
             throw new IllegalMove(move, 'Game is over');
         }
 
@@ -282,6 +309,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         this.board.setCell(move.getRow(), move.getCol(), byPlayerIndex);
 
         this.movesHistory.push(move);
+        this.lastMoveAt = new Date();
 
         // Naively check connection on every move played
         if (this.board.hasPlayerConnection(byPlayerIndex)) {
@@ -325,5 +353,25 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private changeCurrentPlayer(): void
     {
         this.currentPlayerIndex = this.otherPlayerIndex();
+    }
+
+    getCreatedAt(): Date
+    {
+        return this.createdAt;
+    }
+
+    getStartedAt(): null | Date
+    {
+        return this.startedAt;
+    }
+
+    getLastMoveAt(): null | Date
+    {
+        return this.lastMoveAt;
+    }
+
+    getEndedAt(): null | Date
+    {
+        return this.endedAt;
     }
 }
