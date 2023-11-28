@@ -4,7 +4,8 @@ export type Theme = {
     colorA: number;
     colorB: number;
     colorEmpty: number;
-    strokeColor: number,
+    strokeColor: number;
+    textColor: number;
 };
 
 const rootStyles = window.getComputedStyle(document.body);
@@ -26,6 +27,7 @@ export const currentTheme: Theme = {
     colorB: colorFromCss('--player-b-color'),
     colorEmpty: colorFromCss('--bs-light-bg-subtle'),
     strokeColor: colorFromCss('--bs-dark-bg-subtle'),
+    textColor: colorFromCss('--bs-body-color'),
 };
 
 themeSwitcherDispatcher.on('themeSwitched', () => {
@@ -33,4 +35,5 @@ themeSwitcherDispatcher.on('themeSwitched', () => {
     currentTheme.colorB = colorFromCss('--player-b-color');
     currentTheme.colorEmpty = colorFromCss('--bs-light-bg-subtle');
     currentTheme.strokeColor = colorFromCss('--bs-dark-bg-subtle');
+    currentTheme.textColor = colorFromCss('--bs-body-color');
 });

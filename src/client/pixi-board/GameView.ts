@@ -1,5 +1,5 @@
 import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { Application, Container, Graphics, ICanvas, IPointData } from 'pixi.js';
+import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
 import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
@@ -7,9 +7,10 @@ import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
 import { debounce } from 'debounce';
 
-const { min, max, sin, cos, sqrt, PI } = Math;
+const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
+const PI_6 = PI / 6;
 
 export type BoardOrientation =
     /**
@@ -45,6 +46,25 @@ export type BoardOrientation =
     | 'vertical_bias_left_hand'
 ;
 
+const orientationToRotation = (orientation: BoardOrientation): number => {
+    switch (orientation) {
+        case 'horizontal':
+            return 5 * PI_6;
+
+        case 'vertical':
+            return 2 * PI_6;
+
+        case 'horizontal_bias':
+            return 0 * PI_6;
+
+        case 'vertical_bias_right_hand':
+            return 3 * PI_6;
+
+        case 'vertical_bias_left_hand':
+            return 1 * PI_6;
+    }
+};
+
 export type GameViewSize = {
     width: number;
     height: number;
@@ -74,6 +94,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     private gameContainer: Container = new Container();
     private orientation: BoardOrientation;
     private sidesGraphics: [Graphics, Graphics];
+    private displayCoords = false;
 
     private themeSwitchedListener = () => this.redraw();
     private resizeDebouncedListener = () => this.resizeRendererAndRedraw();
@@ -88,7 +109,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.pixi = new Application({
             antialias: true,
             backgroundAlpha: 0,
-            resolution: window.devicePixelRatio,
+            resolution: ceil(window.devicePixelRatio),
             autoDensity: true,
             width: wrapperSize.width,
             height: wrapperSize.height,
@@ -132,6 +153,10 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.gameContainer.addChild(
             this.createBackground(),
         );
+
+        if (this.displayCoords) {
+            this.gameContainer.addChild(this.createCoords());
+        }
 
         this.createAndAddHexes();
         this.highlightSidesFromGame();
@@ -194,28 +219,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     setOrientation(orientation: BoardOrientation): void
     {
         this.orientation = orientation;
-
-        switch (orientation) {
-            case 'horizontal':
-                this.setBoardRotation(5 * (Math.PI / 6));
-                break;
-
-            case 'vertical':
-                this.setBoardRotation(2 * (Math.PI / 6));
-                break;
-
-            case 'horizontal_bias':
-                this.setBoardRotation(0 * (Math.PI / 6));
-                break;
-
-            case 'vertical_bias_right_hand':
-                this.setBoardRotation(3 * (Math.PI / 6));
-                break;
-
-            case 'vertical_bias_left_hand':
-                this.setBoardRotation(1 * (Math.PI / 6));
-                break;
-        }
+        this.setBoardRotation(orientationToRotation(orientation));
     }
 
     setBoardRotation(radians: number): void
@@ -268,8 +272,14 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             y: max(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
         };
 
-        const boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS * 2;
-        const boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
+        let boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS * 2;
+        let boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
+
+        // Add margin to display coords around the board
+        if (this.displayCoords) {
+            boxWidth += Hex.RADIUS * 2;
+            boxHeight += Hex.RADIUS * 2;
+        }
 
         const scale = min(
             wrapperSize.width / boxWidth,
@@ -316,7 +326,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         const winningPath = this.game.getBoard().getShortestWinningPath();
 
         if (null === winningPath) {
-            console.error('animateWinningPath called but no winner...');
+            // No winning path, winner has won by another outcome (opponent resigned, time out, ...)
             return;
         }
 
@@ -401,6 +411,61 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         const graphics = new Graphics();
         graphics.addChild(...this.sidesGraphics);
         return graphics;
+    }
+
+    getDisplayCoords(): boolean
+    {
+        return this.displayCoords;
+    }
+
+    setDisplayCoords(visible = true): GameView
+    {
+        this.displayCoords = visible;
+        this.redraw();
+
+        return this;
+    }
+
+    toggleDisplayCoords(): GameView
+    {
+        return this.setDisplayCoords(!this.displayCoords);
+    }
+
+    private createCoords(): Container
+    {
+        const container = new Container();
+
+        const coordsTextStyle = new TextStyle({
+            fontFamily: 'Arial',
+            fontSize: Hex.RADIUS * 0.6,
+            fill: currentTheme.textColor,
+        });
+
+        const createText = (string: string, x: number, y: number): Text => {
+            const text = new Text(string, coordsTextStyle);
+
+            console.log(window.devicePixelRatio);
+            text.resolution = window.devicePixelRatio * 2;
+            text.rotation = -orientationToRotation(this.orientation);
+            text.anchor.set(0.5, 0.5);
+
+            const hexCoords = Hex.coords(x, y);
+            text.position.set(hexCoords.x, hexCoords.y);
+
+            return text;
+        };
+
+        for (let i = 0; i < this.game.getSize(); ++i) {
+            const letter = String.fromCharCode(i + 'a'.charCodeAt(0));
+            container.addChild(createText(letter, i, -1));
+            container.addChild(createText(letter, i, this.game.getSize()));
+
+            const number = String(i + 1);
+            container.addChild(createText(number, -1, i));
+            container.addChild(createText(number, this.game.getSize(), i));
+        }
+
+        return container;
     }
 
     highlightSides(red: boolean, blue: boolean): void

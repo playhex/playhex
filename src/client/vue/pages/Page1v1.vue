@@ -20,7 +20,8 @@ const { loggedInUser } = storeToRefs(useAuthStore());
 const route = useRoute();
 const router = useRouter();
 const lobbyStore = useLobbyStore();
-const gameView = ref<GameView>();
+let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board
+const gameViewLoaded = ref(false);
 let gameClientSocket = ref<null | GameClientSocket>(null);
 let game: Game;
 let localPlayer = ref<null | ClientPlayer>(null);
@@ -45,19 +46,21 @@ onUnmounted(() => useSocketStore().leaveGameRoom(gameId));
     game = gameClientSocket.value.getGame();
     localPlayer.value = gameClientSocket.value.getLocalPlayer();
 
-    gameView.value = new GameView(game);
+    gameView = new GameView(game);
 
-    gameView.value.on('hexClicked', move => {
+    gameView.on('hexClicked', move => {
         try {
             gameClientSocket.value?.getLocalPlayer()?.move(move);
         } catch (e) {
             console.log('Move not played: ' + e);
         }
     });
+
+    gameViewLoaded.value = true;
 })();
 
 const canJoin = (): boolean => {
-    const game = gameView.value?.getGame();
+    const game = gameView?.getGame();
     const loggedInUserValue = loggedInUser.value;
 
     if (!game) {
@@ -100,12 +103,18 @@ const resign = async (): Promise<void> => {
         // resignation cancelled
     }
 };
+
+const toggleCoords = () => {
+    if (null !== gameView) {
+        gameView.toggleDisplayCoords();
+    }
+};
 </script>
 
 <template>
     <div class="position-relative">
         <app-board
-            v-if="gameView"
+            v-if="gameViewLoaded && gameView"
             :game-view="gameView"
             :time-control-values="gameClientSocket?.getTimeControlValues()"
         ></app-board>
@@ -120,8 +129,9 @@ const resign = async (): Promise<void> => {
 
     <div class="menu-game">
         <div class="container-fluid">
-            <div class="d-flex">
-                <a v-if="localPlayer" href="#" @click="e => { e.preventDefault(); resign() }">Resign</a>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-link" v-if="localPlayer" @click="resign()"><i class="bi-flag"></i> Resign</button>
+                <button type="button" class="btn btn-link" @click="toggleCoords()"><i class="bi-alphabet"></i> Coords</button>
             </div>
         </div>
     </div>

@@ -141,6 +141,11 @@ export default class Board
         return path;
     }
 
+    /**
+     * Get list of cells of the winning path.
+     * Can be null, even with a winner,
+     * when winner has won by time or resignation by example.
+     */
     getShortestWinningPath(): null | Coords[]
     {
         const winnerIndex = this.calculateWinner();
