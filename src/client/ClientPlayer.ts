@@ -12,6 +12,7 @@ export default class ClientPlayer extends AppPlayer {
 
         return player;
     }
+
     isLocal(): boolean
     {
         if (null === this.playerData) {

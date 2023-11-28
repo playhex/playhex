@@ -94,7 +94,7 @@ export default class GameClientSocket
         this.game.start();
     }
 
-    getTimeControl(): TimeControlValues
+    getTimeControlValues(): TimeControlValues
     {
         return this.timeControlValues;
     }

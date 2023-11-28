@@ -48,8 +48,8 @@ const toChrono = (timeValue: TimeValue): Chrono => {
     return chrono;
 };
 
-const chronoPlayerA = ref<Chrono>({ time: '00:00' });
-const chronoPlayerB = ref<Chrono>({ time: '00:00' });
+const chronoPlayerA = ref<Chrono>({ time: '…' });
+const chronoPlayerB = ref<Chrono>({ time: '…' });
 
 if (timeControlValues?.value) {
     const chronoThread = setInterval(() => {
@@ -57,8 +57,8 @@ if (timeControlValues?.value) {
             return;
         }
 
-        chronoPlayerA.value = toChrono(timeControlValues.value?.players[0].totalRemainingTime);
-        chronoPlayerB.value = toChrono(timeControlValues.value?.players[1].totalRemainingTime);
+        chronoPlayerA.value = toChrono(timeControlValues.value.players[0].totalRemainingTime);
+        chronoPlayerB.value = toChrono(timeControlValues.value.players[1].totalRemainingTime);
     }, 50);
 
     onUnmounted(() => clearInterval(chronoThread));

@@ -36,7 +36,7 @@ export default class Player
         return this.ready;
     }
 
-    setReady(ready = true): void
+    setReady(ready = true): Player
     {
         const changed = this.ready !== ready;
 
@@ -45,6 +45,8 @@ export default class Player
         if (changed) {
             this.emit('readyStateChanged', ready);
         }
+
+        return this;
     }
 
     /**

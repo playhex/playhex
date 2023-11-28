@@ -107,9 +107,12 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             }
         });
 
-        // Called to early, no time to bind events (ie time control binding) after new Game(), started event already dispatched if both players are already ready
-        // should rename to "start once players ready"
-        //this.startOnceAllPlayersReady();
+        // Do no call startOnceAllPlayersReady() here to allow adding other "start" listeners.
+    }
+
+    getState(): GameState
+    {
+        return this.state;
     }
 
     getBoard(): Board

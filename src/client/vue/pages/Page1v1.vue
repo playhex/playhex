@@ -107,7 +107,7 @@ const resign = async (): Promise<void> => {
         <app-board
             v-if="gameView"
             :game-view="gameView"
-            :time-control-values="gameClientSocket?.getTimeControl()"
+            :time-control-values="gameClientSocket?.getTimeControlValues()"
         ></app-board>
         <p v-else>Loading game {{ gameId }}...</p>
 

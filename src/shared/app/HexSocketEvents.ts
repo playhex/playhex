@@ -5,12 +5,6 @@ import { TimeControlValues } from 'time-control/TimeControlInterface';
 
 export type HexClientToServerEvents = {
     /**
-     * A player wants to create a game.
-     * Answer contains the created game id.
-     */
-    createGame: (answer: (gameId: string) => void) => void;
-
-    /**
      * A player wants to join a game, at position 'playerIndex'.
      * Answer contains a boolean whether the player has joined or not.
      */

@@ -1,4 +1,4 @@
-import { Game, Player, PlayerIndex } from '../game-engine';
+import { Game, PlayerIndex, PlayerInterface } from '../game-engine';
 import AppPlayer from './AppPlayer';
 
 export const getNextFreeSlot = (game: Game): null | PlayerIndex => {
@@ -15,6 +15,8 @@ export const getNextFreeSlot = (game: Game): null | PlayerIndex => {
         : null
     ;
 };
+
+export const isFull = (game: Game): boolean => null === getNextFreeSlot(game);
 
 export const hasPlayerJoined = (game: Game, playerId: string): boolean => {
     return game
@@ -42,7 +44,7 @@ export const playerCanJoinGame = (game: Game, playerId: string): boolean => {
     return true;
 };
 
-export const shufflePlayers = (players: [Player, Player], firstPlayer?: null | PlayerIndex): void => {
+export const shufflePlayers = (players: [PlayerInterface, PlayerInterface], firstPlayer?: null | PlayerIndex): void => {
     if (0 === firstPlayer) {
         // noop
     } else if (1 === firstPlayer) {

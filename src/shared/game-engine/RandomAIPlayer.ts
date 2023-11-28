@@ -5,7 +5,7 @@ const { floor, random } = Math;
 
 export default class RandomAIPlayer extends Player
 {
-    private static WAIT_BEFORE_PLAY = 200;
+    private static WAIT_BEFORE_PLAY = 80;
 
     constructor()
     {

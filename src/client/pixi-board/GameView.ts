@@ -75,6 +75,9 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     private orientation: BoardOrientation;
     private sidesGraphics: [Graphics, Graphics];
 
+    private themeSwitchedListener = () => this.redraw();
+    private resizeDebouncedListener = () => this.resizeRendererAndRedraw();
+
     constructor(
         private game: Game,
     ) {
@@ -96,8 +99,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.redraw();
         this.listenModel();
 
-        window.addEventListener('resizeDebounced', () => this.resizeRendererAndRedraw());
-        themeSwitcherDispatcher.on('themeSwitched', () => this.redraw());
+        window.addEventListener('resizeDebounced', this.resizeDebouncedListener);
+        themeSwitcherDispatcher.on('themeSwitched', this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
             this.animateWinningPath();
@@ -437,5 +440,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     destroy(): void
     {
         this.pixi.destroy();
+
+        window.removeEventListener('resizeDebounced', this.resizeDebouncedListener);
+        themeSwitcherDispatcher.off('themeSwitched', this.themeSwitchedListener);
     }
 }

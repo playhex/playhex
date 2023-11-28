@@ -12,11 +12,6 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
 
     onConnection(socket: HexSocket): void
     {
-        socket.on('createGame', answer => {
-            const gameSocketServer = this.hostedGameRepository.createGame();
-            answer(gameSocketServer.getId());
-        });
-
         socket.on('joinGame', (gameId, answer) => {
             const joined = this.hostedGameRepository.playerJoinGame(socket.request.session.playerId, gameId);
             answer(joined);
