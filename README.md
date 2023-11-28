@@ -42,6 +42,8 @@ yarn test:e2e
 yarn cypress open
 ```
 
+And see [manual tests](./manual-tests.md) to check also.
+
 ### Mohex API
 
 To play against Mohex AI, see: <https://github.com/alcalyn/mohex-api>.
