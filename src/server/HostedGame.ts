@@ -184,6 +184,7 @@ export default class HostedGame
                 movesHistory: this.game.getMovesHistory(),
                 currentPlayerIndex: this.game.getCurrentPlayerIndex(),
                 winner: this.game.getWinner(),
+                outcome: this.game.getOutcome(),
                 createdAt: this.game.getCreatedAt(),
                 startedAt: this.game.getStartedAt(),
                 lastMoveAt: this.game.getLastMoveAt(),

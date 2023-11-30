@@ -1,5 +1,6 @@
 import { TimeControlValues } from 'time-control/TimeControlInterface';
 import { PlayerIndex } from '../game-engine';
+import { Outcome } from 'game-engine/Game';
 
 export type PlayerData = {
     id: string;
@@ -26,6 +27,7 @@ export type GameData = {
     movesHistory: MoveData[],
     currentPlayerIndex: PlayerIndex,
     winner: null | PlayerIndex,
+    outcome: null | Outcome;
 
     /**
      * Serialized board:

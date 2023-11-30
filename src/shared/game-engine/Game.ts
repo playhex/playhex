@@ -46,7 +46,8 @@ type GameEvents = {
  */
 export type Outcome =
     /**
-     * No outcome precision, game should have been won by regular victory
+     * No outcome precision, game should have been won by regular victory,
+     * or game is still playing, check "winner" attribute.
      */
     null
 
