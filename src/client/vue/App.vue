@@ -18,7 +18,7 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
         </main>
 
         <footer v-if="displayFooter()">
-            <div class="footer-min-space">
+            <div class="footer-min-space bg-dark-subtle">
                 <app-footer></app-footer>
             </div>
         </footer>
@@ -36,6 +36,5 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
 
         .footer-min-space
             margin-top 4em
-            background-color rgba(0, 0, 0, 0.2)
             padding 0.75em 0
 </style>

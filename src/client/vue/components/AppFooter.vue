@@ -6,17 +6,18 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
 
 <template>
     <div class="container-fluid footer">
-        <div class="text-center">
+        <div class="d-flex justify-content-center gap-4">
             <p>Hex online board game</p>
+            <router-link :to="{ name: 'links' }">Useful Hex links</router-link>
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
             <a href="https://feedback.alcalyn.app" target="_blank">
-                <i class="bi-chat-dots"></i>
+                <i class="bi-chat-dots text-body"></i>
                 <br>
                 Feedback
             </a>
             <a href="https://github.com/alcalyn/hex" target="_blank">
-                <i class="bi-github"></i>
+                <i class="bi-github text-body"></i>
                 <br>
                 Github
             </a>
@@ -24,7 +25,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
         <p class="infos d-flex flex-column flex-md-row justify-content-center gap-md-4 text-center">
             <span>Project under development</span>
             <span v-if="lastCommitDate">Last&nbsp;change:&nbsp;{{ lastCommitDate }}</span>
-            <span>License AGPL-3.0</span>
+            <router-link :to="{ name: 'license' }">License AGPL-3.0</router-link>
         </p>
     </div>
 </template>
@@ -41,5 +42,4 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
 .link-icons
     i
         font-size 2em
-        color white
 </style>

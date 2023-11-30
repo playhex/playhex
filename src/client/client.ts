@@ -4,9 +4,8 @@ import './base.styl';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
 import App from './vue/App.vue';
-import routes from './vue/routes';
+import router from './vue/router';
 import unoverlay from 'unoverlay-vue';
 
 if ('serviceWorker' in navigator) {
@@ -20,10 +19,6 @@ if ('serviceWorker' in navigator) {
 }
 
 const pinia = createPinia();
-const router = createRouter({
-    history: createWebHistory(),
-    routes,
-});
 
 const vueApp = createApp(App);
 vueApp.use(router);
