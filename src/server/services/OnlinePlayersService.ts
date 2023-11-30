@@ -19,8 +19,8 @@ import EventEmitter from 'events';
 export default class OnlinePlayersService extends EventEmitter
 {
     private onlinePlayers: { [key: string]: {
-        playerData: PlayerData,
-        sockets: HexSocket[],
+        playerData: PlayerData;
+        sockets: HexSocket[];
     } } = {};
 
     constructor(
@@ -90,7 +90,7 @@ export default class OnlinePlayersService extends EventEmitter
             players[p.playerData.id] = {
                 playerData: p.playerData,
                 connected: true,
-            }
+            };
         });
 
         return {

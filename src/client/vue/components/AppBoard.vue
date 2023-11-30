@@ -42,7 +42,7 @@ const toChrono = (timeValue: TimeValue): Chrono => {
     };
 
     if (seconds < 10) {
-        chrono.ms = format(seconds * 1000, '.S')
+        chrono.ms = format(seconds * 1000, '.S');
     }
 
     return chrono;
@@ -96,7 +96,7 @@ let orientation = ref<BoardOrientation>(gameView?.value?.getOrientation());
 const updateOrientation = () => orientation.value = gameView?.value?.getOrientation();
 window.addEventListener('resizeDebounced', updateOrientation);
 
-onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientation))
+onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientation));
 
 /*
  * Game end: win popin

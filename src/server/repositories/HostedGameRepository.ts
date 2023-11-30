@@ -21,7 +21,7 @@ export default class HostedGameRepository
         return this.hostedGames;
     }
 
-    getGame(id: string): null|HostedGame
+    getGame(id: string): null | HostedGame
     {
         return this.hostedGames[id] ?? null;
     }
@@ -67,7 +67,7 @@ export default class HostedGameRepository
         return true;
     }
 
-    playerMove(playerId: string, gameId: string, move: MoveData): true|string
+    playerMove(playerId: string, gameId: string, move: MoveData): true | string
     {
         const gameServerSocket = this.hostedGames[gameId];
 
@@ -84,7 +84,7 @@ export default class HostedGameRepository
         return gameServerSocket.playerMove(playerData, new Move(move.row, move.col));
     }
 
-    playerResign(playerId: string, gameId: string): true|string
+    playerResign(playerId: string, gameId: string): true | string
     {
         const gameServerSocket = this.hostedGames[gameId];
 

@@ -27,4 +27,4 @@ export type {
     PlayerIndex,
     PlayerInterface,
     PlayerEvents,
-}
+};

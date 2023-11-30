@@ -24,9 +24,9 @@ export type GameData = {
     started: boolean;
 
     size: number;
-    movesHistory: MoveData[],
-    currentPlayerIndex: PlayerIndex,
-    winner: null | PlayerIndex,
+    movesHistory: MoveData[];
+    currentPlayerIndex: PlayerIndex;
+    winner: null | PlayerIndex;
     outcome: null | Outcome;
 
     /**

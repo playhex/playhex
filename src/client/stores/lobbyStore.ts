@@ -43,7 +43,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
     };
 
-    const retrieveGameClientSocket = async (gameId: string): Promise<null|GameClientSocket> => {
+    const retrieveGameClientSocket = async (gameId: string): Promise<null | GameClientSocket> => {
         if (gameClientSockets.value[gameId]) {
             return gameClientSockets.value[gameId];
         }
@@ -116,7 +116,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
 
             if (gameClientSockets.value[gameId]) {
-                gameClientSockets.value[gameId].gameStarted()
+                gameClientSockets.value[gameId].gameStarted();
             }
         });
 

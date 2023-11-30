@@ -21,12 +21,12 @@ export default class PlayerGameInput
         return this.playerIndex;
     }
 
-    getHex(row: number, col: number): null|PlayerIndex
+    getHex(row: number, col: number): null | PlayerIndex
     {
         return this.game.getBoard().getCell(row, col);
     }
 
-    getHexes(): (null|PlayerIndex)[][]
+    getHexes(): (null | PlayerIndex)[][]
     {
         return this.game.getBoard().getCellsClone();
     }

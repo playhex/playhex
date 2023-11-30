@@ -73,7 +73,7 @@ export default (): Router => {
 
     router.get('/api/games/:id', (req, res) => {
         const { id } = req.params;
-        const game = hostedGameRepository.getGame(id)
+        const game = hostedGameRepository.getGame(id);
 
         if (null === game) {
             res.sendStatus(404);

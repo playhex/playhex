@@ -12,11 +12,27 @@ module.exports = {
     plugins: ['@typescript-eslint'],
     root: true,
     rules: {
+        'no-empty': 'off',
         'object-curly-spacing': 'off',
-        '@typescript-eslint/quotes': ['warn', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
+        '@typescript-eslint/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
         '@typescript-eslint/object-curly-spacing': ['warn', 'always'],
         '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/ban-ts-comment': 'off',
+        'space-infix-ops': 'off',
+        '@typescript-eslint/space-infix-ops': 'warn',
+        'semi': 'off',
+        '@typescript-eslint/semi': 'error',
+        '@typescript-eslint/member-delimiter-style': ['warn', {
+            'multiline': {
+                'delimiter': 'semi',
+                'requireLast': true
+            },
+            'singleline': {
+                'delimiter': 'comma',
+                'requireLast': false
+            },
+            'multilineDetection': 'last-member',
+        }],
     },
 };

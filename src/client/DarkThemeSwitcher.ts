@@ -36,7 +36,7 @@ const getPreferredTheme = (): DarkOrLight => {
     }
 
     return getSystemPreferredTheme();
-}
+};
 
 export const getTheme = (): DarkOrLight => currentTheme;
 
@@ -49,7 +49,7 @@ export const setTheme = (theme: DarkOrLight | 'auto'): void => {
     document.documentElement.setAttribute('data-bs-theme', currentTheme);
     localStorage.setItem('theme', currentTheme);
     themeSwitcherDispatcher.emit('themeSwitched', currentTheme);
-}
+};
 
 export const getOtherTheme = (): DarkOrLight => currentTheme === 'dark'
     ? 'light'
@@ -58,6 +58,6 @@ export const getOtherTheme = (): DarkOrLight => currentTheme === 'dark'
 
 export const switchTheme = (): void => {
     setTheme(getOtherTheme());
-}
+};
 
 setTheme(getPreferredTheme());

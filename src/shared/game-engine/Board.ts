@@ -28,17 +28,17 @@ export default class Board
         return board;
     }
 
-    getCells(): (null|PlayerIndex)[][]
+    getCells(): (null | PlayerIndex)[][]
     {
         return this.hexes;
     }
 
-    getCellsClone(): (null|PlayerIndex)[][]
+    getCellsClone(): (null | PlayerIndex)[][]
     {
         return this.hexes.map(row => row.slice());
     }
 
-    getCell(row: number, col: number): null|PlayerIndex
+    getCell(row: number, col: number): null | PlayerIndex
     {
         return this.hexes[row][col];
     }
@@ -79,7 +79,7 @@ export default class Board
         ;
     }
 
-    calculateWinner(): null|PlayerIndex
+    calculateWinner(): null | PlayerIndex
     {
         if (this.hasPlayerConnection(0)) {
             return 0;
@@ -106,7 +106,7 @@ export default class Board
             }
         });
 
-        let current: undefined|Coords;
+        let current: undefined | Coords;
 
         while ((current = frontier.shift())) {
             if (this.isCellOnSide(current, playerIndex, 1)) {
@@ -204,7 +204,7 @@ export default class Board
                 : cell.row === 0 // top
             : sideIndex
                 ? cell.col === z // right
-                : cell.col === 0 // left
+                : cell.col === 0; // left
     }
 
     /**

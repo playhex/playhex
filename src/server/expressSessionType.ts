@@ -12,6 +12,6 @@ declare module 'http' {
         cookieHolder?: string;
         session: Session & {
             playerId: string;
-        }
+        };
     }
 }

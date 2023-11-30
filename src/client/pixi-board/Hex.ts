@@ -161,7 +161,7 @@ export default class Hex extends Sprite
         };
     }
 
-    setPlayer(player: null|PlayerIndex): Hex
+    setPlayer(player: null | PlayerIndex): Hex
     {
         this.hexColor.visible = null !== player;
 

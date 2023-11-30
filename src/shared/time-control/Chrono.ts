@@ -4,7 +4,7 @@ import { TimeValue } from './types';
 
 type ChronoEvents = {
     elapsed: () => void;
-}
+};
 
 export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmitter<ChronoEvents>)
 {

@@ -12,7 +12,7 @@ export default function () {
     router.use(express.static(path.join(process.cwd(), 'assets')));
     router.use(apiRouter());
     router.use(staticsRouter());
-    router.use(pwaRouter())
+    router.use(pwaRouter());
     router.use(seoRouter());
     router.use(pagesRouter());
 

@@ -50,6 +50,6 @@ export const sanitizeGameOptions = (gameOptions: GameOptionsData): GameOptionsDa
     return {
         boardsize: sanitizeBoardsize(gameOptions.boardsize ?? DEFAULT_BOARDSIZE),
         firstPlayer: sanitizeFirstPlayer(gameOptions.firstPlayer),
-    }
+    };
 };
 

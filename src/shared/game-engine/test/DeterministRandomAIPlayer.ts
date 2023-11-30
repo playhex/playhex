@@ -41,6 +41,6 @@ describe('DeterministRandomAIPlayer', () => {
         player.move(new Move(1, 2));
         await waitAITurn();
         assert.deepStrictEqual(game.getBoard().getCell(2, 0), 1);
-        assert.deepStrictEqual(game.getWinner(), 1)
+        assert.deepStrictEqual(game.getWinner(), 1);
     });
 });

@@ -80,7 +80,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private currentPlayerIndex: PlayerIndex = 0;
     private movesHistory: Move[] = [];
 
-    private winner: null|PlayerIndex = null;
+    private winner: null | PlayerIndex = null;
     private outcome: Outcome = null;
 
     private startOnceReadyEnabled = false;

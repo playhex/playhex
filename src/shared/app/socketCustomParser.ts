@@ -13,7 +13,7 @@ const shouldTransformPacket = (packet: Packet): packet is SerializablePacket => 
         packet.type === PacketType.EVENT ||
         packet.type === PacketType.ACK
     ) && Array.isArray(packet.data);
-}
+};
 
 export class Encoder extends BaseEncoder
 {
