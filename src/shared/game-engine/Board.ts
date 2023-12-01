@@ -2,6 +2,11 @@ import { Coords, PathItem, PlayerIndex } from './Types';
 
 export const BOARD_DEFAULT_SIZE = 11;
 
+/**
+ * Hex board.
+ * Can set any cell, no rule check.
+ * Check winning path.
+ */
 export default class Board
 {
     private hexes: (null | PlayerIndex)[][];
@@ -13,6 +18,11 @@ export default class Board
             .fill([])
             .map(() => Array(this.size).fill(null))
         ;
+    }
+
+    getSize(): number
+    {
+        return this.size;
     }
 
     static createFromGrid(hexes: (null | PlayerIndex)[][]): Board

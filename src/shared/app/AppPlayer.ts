@@ -1,36 +1,33 @@
 import { Player } from '../game-engine';
 import { PlayerData } from './Types';
 
+/**
+ * Base player that can be used both on client and server side.
+ * An AppPlayer take his identity from a Player instance (currently PlayerData).
+ *
+ * A PlayerData should be unique on whole server,
+ * but AppPlayer is meant to be used on one game only, and not another.
+ */
 export default class AppPlayer extends Player
 {
-    protected playerData: null | PlayerData = null;
+    constructor(
+        protected playerData: PlayerData,
+    ) {
+        super();
+    }
 
     getName(): string
     {
-        if (null === this.playerData) {
-            return '(free)';
-        }
-
         return this.playerData.pseudo;
     }
 
-    getPlayerId(): null | string
+    getPlayerId(): string
     {
-        return this.playerData?.id ?? null;
+        return this.playerData.id;
     }
 
-    isFreeSlot(): boolean
-    {
-        return null === this.playerData;
-    }
-
-    getPlayerData(): null | PlayerData
+    getPlayerData(): PlayerData
     {
         return this.playerData;
-    }
-
-    setPlayerData(playerData: null | PlayerData): void
-    {
-        this.playerData = playerData;
     }
 }

@@ -1,6 +1,7 @@
 import seedrandom from 'seedrandom';
 import Move from './Move';
-import Player from './Player';
+import AppPlayer from '../app/AppPlayer';
+import { v4 as uuidv4 } from 'uuid';
 
 const { floor } = Math;
 
@@ -8,23 +9,31 @@ const { floor } = Math;
  * AI that plays randomly, but determinist:
  * if you play same moves, AI will also responds with same moves.
  */
-export default class DeterministRandomAIPlayer extends Player
+export default class DeterministRandomAIPlayer extends AppPlayer
 {
+    private static NAME = 'Determinist random bot';
+
     constructor(
-        private waitBeforePlay = 40,
+        /**
+         * This bot plays instantly.
+         * 0 is good for testing race condition (emit started/moved events in good order).
+         * A higher value is good for user to see move happening.
+         */
+        private waitBeforePlay = 0,
     ) {
-        super();
+        super({
+            id: 'determinist-random-bot|' + uuidv4(),
+            pseudo: DeterministRandomAIPlayer.NAME,
+        });
 
         this.on('myTurnToPlay', () => {
             this.makeMove();
         });
-
-        this.setReady();
     }
 
     getName(): string
     {
-        return 'Determinist random bot';
+        return DeterministRandomAIPlayer.NAME;
     }
 
     async makeMove(): Promise<void>

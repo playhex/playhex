@@ -444,7 +444,6 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         const createText = (string: string, x: number, y: number): Text => {
             const text = new Text(string, coordsTextStyle);
 
-            console.log(window.devicePixelRatio);
             text.resolution = window.devicePixelRatio * 2;
             text.rotation = -orientationToRotation(this.orientation);
             text.anchor.set(0.5, 0.5);

@@ -1,11 +1,13 @@
 import { TimeControlValues } from 'time-control/TimeControlInterface';
 import { PlayerIndex } from '../game-engine';
-import { Outcome } from 'game-engine/Game';
+import { GameState, Outcome } from 'game-engine/Game';
+import { GameOptionsData } from './GameOptions';
+
+export type Tuple<T> = [T, T];
 
 export type PlayerData = {
     id: string;
     pseudo: string;
-    isGuest: boolean;
 };
 
 export type MoveData = {
@@ -14,7 +16,7 @@ export type MoveData = {
 };
 
 export type GameData = {
-    players: [null | PlayerData, null | PlayerData];
+    players: Tuple<PlayerData>;
 
     /**
      * Game created from data should not automatically start if this is true,
@@ -22,6 +24,8 @@ export type GameData = {
      * but is useful for game loaded while playing.
      */
     started: boolean;
+
+    state: GameState;
 
     size: number;
     movesHistory: MoveData[];
@@ -46,8 +50,15 @@ export type GameData = {
 
 export type HostedGameData = {
     id: string;
-    game: GameData;
-    timeControl: TimeControlValues;
+    host: PlayerData;
+    opponent: null | PlayerData;
+    gameOptions: GameOptionsData;
+    timeControlValues: TimeControlValues;
+
+    /**
+     * gameData is null on server when game is not yet started.
+     */
+    gameData: null | GameData;
 };
 
 export type OnlinePlayerData = {

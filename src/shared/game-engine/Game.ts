@@ -2,10 +2,12 @@ import EventEmitter from 'events';
 import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE, PlayerInterface } from '.';
 import TypedEmitter from 'typed-emitter';
 import Board from './Board';
+import { Tuple } from '../app/Types';
 
 export type GameState =
     /**
-     * Game has been created, waiting for both players ready.
+     * Game has been created, waiting for start() to be called.
+     * Before starting, time control can be initialized, players can join...
      */
     'created'
 
@@ -22,9 +24,8 @@ export type GameState =
 
 type GameEvents = {
     /**
-     * Both players are ready,
-     * the game can now accept moves,
-     * chrono is started.
+     * The game has started and can now accept moves.
+     * Chrono is started.
      */
     started: () => void;
 
@@ -83,32 +84,31 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private winner: null | PlayerIndex = null;
     private outcome: Outcome = null;
 
-    private startOnceReadyEnabled = false;
-
     private createdAt: Date = new Date();
     private startedAt: null | Date = null;
     private lastMoveAt: null | Date = null;
     private endedAt: null | Date = null;
 
+    /**
+     * @param boardOrSize
+     *  Board size to initialize game with an empty board,
+     *  or a pre-built board instance to play on.
+     *  Default to an empty board with a default size.
+     *
+     * @param players
+     *  If provided, players will receive an instance of game input on game start,
+     *  and will be notified when it is their turn.
+     */
     constructor(
-        private players: [PlayerInterface, PlayerInterface],
-        private size: number = BOARD_DEFAULT_SIZE,
+        boardOrSize: Board | number = BOARD_DEFAULT_SIZE,
+        private players: null | Tuple<PlayerInterface> = null,
     ) {
         super();
 
-        this.board = new Board(size);
-
-        players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
-        players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
-
-        this.on('started', () => players[0].emit('myTurnToPlay'));
-        this.on('played', () => {
-            if (!this.hasWinner()) {
-                players[this.currentPlayerIndex].emit('myTurnToPlay');
-            }
-        });
-
-        // Do no call startOnceAllPlayersReady() here to allow adding other "start" listeners.
+        this.board = boardOrSize instanceof Board
+            ? boardOrSize
+            : new Board(boardOrSize)
+        ;
     }
 
     getState(): GameState
@@ -123,16 +123,36 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     getSize(): number
     {
-        return this.size;
+        return this.board.getSize();
     }
 
-    getPlayers(): [PlayerInterface, PlayerInterface]
+    getPlayers(): Tuple<PlayerInterface>
     {
+        if (null === this.players) {
+            throw new Error('This game is not using players');
+        }
+
         return this.players;
+    }
+
+    setPlayers(players: Tuple<PlayerInterface>): void
+    {
+        if (this.state !== 'created') {
+            throw new Error(
+                'Cannot set players now, game is already started,'
+                + ' and previous players are already bind to this game.',
+            );
+        }
+
+        this.players = players;
     }
 
     getPlayer(playerIndex: PlayerIndex): PlayerInterface
     {
+        if (null === this.players) {
+            throw new Error('This game is not using players');
+        }
+
         return this.players[playerIndex];
     }
 
@@ -148,6 +168,10 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
 
     getCurrentPlayer(): PlayerInterface
     {
+        if (null === this.players) {
+            throw new Error('This game is not using players');
+        }
+
         return this.players[this.currentPlayerIndex];
     }
 
@@ -227,9 +251,18 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.movesHistory[this.movesHistory.length - 1];
     }
 
-    arePlayersReady(): boolean
+    private bindPlayers(players: Tuple<PlayerInterface>): void
     {
-        return this.players.every(p => p.isReady());
+        players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
+        players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
+
+        this.on('played', () => {
+            if (!this.hasWinner()) {
+                players[this.currentPlayerIndex].emit('myTurnToPlay');
+            }
+        });
+
+        this.on('started', () => players[0].emit('myTurnToPlay'));
     }
 
     start(): void
@@ -238,37 +271,14 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             throw new Error('Game already started');
         }
 
-        if (!this.arePlayersReady()) {
-            console.log(this);
-            throw new Error('Cannot start, not all players are ready: ' + this.players.map(p => p.isReady()));
-        }
-
         this.state = 'playing';
         this.startedAt = new Date();
 
-        this.emit('started');
-    }
-
-    startOnceAllPlayersReady(): Game
-    {
-        if (this.startOnceReadyEnabled) {
-            return this;
+        if (null !== this.players) {
+            this.bindPlayers(this.players);
         }
 
-        this.startOnceReadyEnabled = true;
-
-        const playerReadyListener = (ready: boolean): void => {
-            if (ready && this.arePlayersReady()) {
-                this.start();
-                this.players.forEach(p => p.off('readyStateChanged', playerReadyListener));
-            }
-        };
-
-        this.players.forEach(p => p.on('readyStateChanged', playerReadyListener));
-
-        playerReadyListener(true);
-
-        return this;
+        this.emit('started');
     }
 
     isStarted(): boolean

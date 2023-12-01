@@ -1,8 +1,7 @@
-import { Game, Move, Player, PlayerIndex } from '@shared/game-engine';
+import { Move, PlayerIndex } from '@shared/game-engine';
 import { defineStore } from 'pinia';
-import ClientPlayer from '@client/ClientPlayer';
-import GameClientSocket from '@client/GameClientSocket';
-import { GameData, HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
+import HostedGameClient from '@client/HostedGameClient';
+import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 import { apiPostGame1v1, apiPostGameVsCPU, apiPostResign, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { Outcome } from '@shared/game-engine/Game';
@@ -18,14 +17,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const { socket } = useSocketStore();
 
     /**
-     * List of games visible on lobby
+     * List of games.
      */
-    const games = ref<{ [key: string]: HostedGameData }>({});
-
-    /**
-     * List of loaded games
-     */
-    const gameClientSockets = ref<{ [key: string]: GameClientSocket }>({});
+    const hostedGameClients = ref<{ [key: string]: HostedGameClient }>({});
 
     const createGame = async (gameOptions?: GameOptionsData): Promise<HostedGameData> => {
         return await apiPostGame1v1(gameOptions);
@@ -35,37 +29,36 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         return await apiPostGameVsCPU(gameOptions);
     };
 
+    /**
+     * Load and update all games from server.
+     */
     const updateGames = async (): Promise<void> => {
         const apiGames: HostedGameData[] = await getGames();
 
-        apiGames.forEach(game => {
-            games.value[game.id] = game;
+        apiGames.forEach(hostedGameData => {
+            if (hostedGameClients.value[hostedGameData.id]) {
+                hostedGameClients.value[hostedGameData.id].updateFromHostedGameData(hostedGameData);
+            } else {
+                hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
+            }
         });
     };
 
-    const retrieveGameClientSocket = async (gameId: string): Promise<null | GameClientSocket> => {
-        if (gameClientSockets.value[gameId]) {
-            return gameClientSockets.value[gameId];
+    /**
+     * Get a game from store, or from server if not yet in store.
+     */
+    const retrieveHostedGameClient = async (gameId: string, forceReload = false): Promise<null | HostedGameClient> => {
+        if (hostedGameClients.value[gameId] && !forceReload) {
+            return hostedGameClients.value[gameId];
         }
 
-        const gameInstanceData: null | HostedGameData = await getGame(gameId);
+        const hostedGameData: null | HostedGameData = await getGame(gameId);
 
-        if (null === gameInstanceData) {
+        if (null === hostedGameData) {
             return null;
         }
 
-        const players: [Player, Player] = [
-            ClientPlayer.fromPlayerData(gameInstanceData.game.players[0]),
-            ClientPlayer.fromPlayerData(gameInstanceData.game.players[1]),
-        ];
-
-        const game = createGameFromData(players, gameInstanceData.game);
-
-        return gameClientSockets.value[gameId] = new GameClientSocket(
-            gameId,
-            gameInstanceData.timeControl,
-            game,
-        );
+        return hostedGameClients.value[gameId] = new HostedGameClient(hostedGameData);
     };
 
     /**
@@ -96,49 +89,37 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     };
 
     const listenSocket = (): void => {
-        socket.on('gameCreated', (game: HostedGameData) => {
-            games.value[game.id] = game;
+        socket.on('gameCreated', (hostedGameData: HostedGameData) => {
+            hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
         });
 
-        socket.on('gameJoined', (gameId: string, playerIndex: PlayerIndex, playerData: PlayerData) => {
-            if (games.value[gameId]) {
-                games.value[gameId].game.players[playerIndex] = playerData;
-            }
-
-            if (gameClientSockets.value[gameId]) {
-                gameClientSockets.value[gameId].playerJoined(playerIndex, playerData);
+        socket.on('gameJoined', (gameId: string, playerData: PlayerData) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].playerJoined(playerData);
             }
         });
 
-        socket.on('gameStarted', (gameId: string) => {
-            if (games.value[gameId]) {
-                games.value[gameId].game.started = true;
-            }
-
-            if (gameClientSockets.value[gameId]) {
-                gameClientSockets.value[gameId].gameStarted();
+        socket.on('gameStarted', (hostedGameData: HostedGameData) => {
+            if (hostedGameClients.value[hostedGameData.id]) {
+                hostedGameClients.value[hostedGameData.id].gameStarted(hostedGameData);
             }
         });
 
         socket.on('moved', (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => {
-            if (gameClientSockets.value[gameId]) {
-                gameClientSockets.value[gameId].gameMove(new Move(move.row, move.col), byPlayerIndex);
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].gameMoved(new Move(move.row, move.col), byPlayerIndex);
             }
         });
 
         socket.on('timeControlUpdate', (gameId: string, timeControlValues: TimeControlValues) => {
-            if (gameClientSockets.value[gameId]) {
-                gameClientSockets.value[gameId].updateTimeControl(timeControlValues);
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].updateTimeControl(timeControlValues);
             }
         });
 
         socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
-            if (games.value[gameId]) {
-                games.value[gameId].game.winner = winner;
-            }
-
-            if (gameClientSockets.value[gameId]) {
-                gameClientSockets.value[gameId].ended(winner, outcome);
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].gameEnded(winner, outcome);
             }
         });
     };
@@ -150,11 +131,11 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     updateGames();
 
     return {
-        games,
+        hostedGameClients,
         createGame,
         createGameVsCPU,
         updateGames,
-        retrieveGameClientSocket,
+        retrieveHostedGameClient,
         joinGame,
         move,
         resign,
@@ -162,37 +143,3 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 });
 
 export default useLobbyStore;
-
-function createGameFromData(players: [Player, Player], gameData: GameData): Game {
-    const game = new Game(players, gameData.size);
-
-    const cellValues: { [key: string]: null | PlayerIndex } = {
-        '0': 0,
-        '1': 1,
-        '.': null,
-    };
-
-    gameData.hexes.forEach((line, row) => {
-        line.split('').forEach((value, col) => {
-            game.getBoard().setCell(row, col, cellValues[value]);
-            game.setCurrentPlayerIndex(gameData.currentPlayerIndex);
-
-            if (gameData.started && !game.isStarted()) {
-                game.start();
-            }
-
-            if (null !== gameData.winner && !game.hasWinner()) {
-                game.declareWinner(gameData.winner);
-            }
-        });
-    });
-
-    game.setMovesHistory(
-        gameData
-            .movesHistory
-            .map(moveData => new Move(moveData.row, moveData.col))
-        ,
-    );
-
-    return game;
-}

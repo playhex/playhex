@@ -1,13 +1,10 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Game, Move, Player, SimplePlayer } from '..';
+import { Game, Move, Player } from '..';
 
 describe('Game', () => {
     it('Runs an entire game', () => {
-        const player0 = new SimplePlayer();
-        const player1 = new SimplePlayer();
-
-        const game = new Game([player0, player1], 3);
+        const game = new Game(3);
 
         const emitted = {
             started: false,
@@ -37,9 +34,9 @@ describe('Game', () => {
         assert.strictEqual(game.getBoard().getCell(2, 1), 1);
 
         // Illegal moves
-        assert.throws(() => player1.move(new Move(0, 0)), { message: 'Move a1: Not your turn' });
-        assert.throws(() => player0.move(new Move(0, 9)), { message: 'Move a10: Cell outside board' });
-        assert.throws(() => player0.move(new Move(1, 1)), { message: 'Move b2: This cell is already occupied' });
+        assert.throws(() => game.move(new Move(0, 0), 1), { message: 'Move a1: Not your turn' });
+        assert.throws(() => game.move(new Move(0, 9), 0), { message: 'Move a10: Cell outside board' });
+        assert.throws(() => game.move(new Move(1, 1), 0), { message: 'Move b2: This cell is already occupied' });
 
         // Game end
         game.move(new Move(1, 2), 0);
@@ -60,18 +57,14 @@ describe('Game', () => {
         const player0 = new Player();
         const player1 = new Player();
 
-        const game = new Game([player0, player1], 3);
-
-        game.startOnceAllPlayersReady();
+        const game = new Game(3, [player0, player1]);
 
         assert.strictEqual(game.isStarted(), false);
         assert.strictEqual(game.getSize(), 3);
 
-        // Players are ready, game starts
-        player0.setReady();
+        // Start game
         assert.strictEqual(game.isStarted(), false);
-
-        player1.setReady();
+        game.start();
         assert.strictEqual(game.isStarted(), true);
 
         // Players legal moves
@@ -103,13 +96,9 @@ describe('Game', () => {
         const player0 = new Player();
         const player1 = new Player();
 
-        const game = new Game([player0, player1], 3);
+        const game = new Game(3, [player0, player1]);
 
-        game.startOnceAllPlayersReady();
-
-        // Players are ready, game starts
-        player0.setReady();
-        player1.setReady();
+        game.start();
 
         // Players legal moves
         player0.move(new Move(1, 1));
@@ -120,5 +109,37 @@ describe('Game', () => {
 
         assert.strictEqual(game.isEnded(), true, 'Game is now finished after resign');
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner because p1 resigned');
+    });
+
+    it('receives well first move if first player plays instantly', () => {
+        const player0 = new class extends Player {
+            constructor() {
+                super();
+
+                this.on('myTurnToPlay', () => {
+                    this.move(new Move(1, 1));
+                });
+            }
+        };
+
+        let player1TurnToPlayEventReceived = false;
+
+        const player1 = new class extends Player {
+            constructor() {
+                super();
+
+                this.on('myTurnToPlay', () => {
+                    player1TurnToPlayEventReceived = true;
+                });
+            }
+        };
+
+        const game = new Game(3, [player0, player1]);
+
+        game.start();
+
+        assert.strictEqual(game.getBoard().getCell(1, 1), 0);
+        assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+        assert.strictEqual(player1TurnToPlayEventReceived, true);
     });
 });

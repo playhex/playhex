@@ -1,9 +1,7 @@
 import { Router } from 'express';
 import { PlayerData } from '@shared/app/Types';
-import { Game, Player } from '../../../../shared/game-engine';
 import { sanitizeGameOptions } from '../../../../shared/app/GameOptions';
-import { shufflePlayers } from '../../../../shared/app/GameUtils';
-import ServerPlayer from '../../../ServerPlayer';
+import AppPlayer from '../../../../shared/app/AppPlayer';
 import { createAIPlayer } from '../../../services/AIManager';
 import Container from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
@@ -29,21 +27,11 @@ export default (): Router => {
             return;
         }
 
+        const host = new AppPlayer(playerData);
         const gameOptions = sanitizeGameOptions(req.body);
+        const hostedGame = hostedGameRepository.createGame(host, gameOptions);
 
-        const players: [ServerPlayer, ServerPlayer] = [
-            new ServerPlayer().setPlayerData(playerData),
-            new ServerPlayer(),
-        ];
-
-        shufflePlayers(players, gameOptions.firstPlayer);
-
-        const game = new Game(players, gameOptions.boardsize);
-        const gameServerSocket = hostedGameRepository.createGame(game);
-
-        game.startOnceAllPlayersReady();
-
-        res.send(normalize(gameServerSocket.toData()));
+        res.send(normalize(hostedGame.toData()));
     });
 
     router.post('/api/games/cpu', (req, res) => {
@@ -54,21 +42,13 @@ export default (): Router => {
             return;
         }
 
+        const host = new AppPlayer(playerData);
         const gameOptions = sanitizeGameOptions(req.body);
+        const hostedGame = hostedGameRepository.createGame(host, gameOptions);
 
-        const players: [Player, Player] = [
-            new ServerPlayer().setPlayerData(playerData),
-            createAIPlayer(gameOptions),
-        ];
+        hostedGame.playerJoin(createAIPlayer(gameOptions));
 
-        shufflePlayers(players, gameOptions.firstPlayer);
-
-        const game = new Game(players, gameOptions.boardsize);
-        const gameServerSocket = hostedGameRepository.createGame(game);
-
-        game.startOnceAllPlayersReady();
-
-        res.send(normalize(gameServerSocket.toData()));
+        res.send(normalize(hostedGame.toData()));
     });
 
     router.get('/api/games/:id', (req, res) => {

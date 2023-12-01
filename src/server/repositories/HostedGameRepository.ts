@@ -1,10 +1,11 @@
 import { Service } from 'typedi';
 import HostedGame from '../HostedGame';
-import { Game, Move } from '../../shared/game-engine';
-import ServerPlayer from '../ServerPlayer';
+import { Move } from '../../shared/game-engine';
 import PlayerRepository from './PlayerRepository';
-import { MoveData } from '../../shared/app/Types';
+import { MoveData, PlayerData } from '../../shared/app/Types';
 import { HexServer } from '../server';
+import { GameOptionsData } from '@shared/app/GameOptions';
+import AppPlayer from '../../shared/app/AppPlayer';
 
 @Service()
 export default class HostedGameRepository
@@ -26,78 +27,60 @@ export default class HostedGameRepository
         return this.hostedGames[id] ?? null;
     }
 
-    createGame(
-        game: Game = new Game([
-            new ServerPlayer(),
-            new ServerPlayer(),
-        ]),
-    ): HostedGame {
-        const gameServerSocket = new HostedGame(this.io, game);
-        this.hostedGames[gameServerSocket.getId()] = gameServerSocket;
-        this.io.to('lobby').emit('gameCreated', gameServerSocket.toData());
+    createGame(host: AppPlayer, gameOptions: GameOptionsData): HostedGame
+    {
+        const hostedGame = new HostedGame(this.io, gameOptions, host);
+        this.hostedGames[hostedGame.getId()] = hostedGame;
+        this.io.to('lobby').emit('gameCreated', hostedGame.toData());
 
-        // listen start event now to let HostedGame above receive the event
-        game.startOnceAllPlayersReady();
-
-        return gameServerSocket;
+        return hostedGame;
     }
 
-    playerJoinGame(playerId: string, gameId: string): true | string
+    playerJoinGame(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string): true | string
     {
-        const gameServerSocket = this.hostedGames[gameId];
+        const hostedGame = this.hostedGames[gameId];
 
-        if (!gameServerSocket) {
+        if (!hostedGame) {
             return 'no game ' + gameId;
         }
 
-        const playerData = this.playerRepository.getPlayer(playerId);
-
-        if (!playerData) {
-            return 'no player ' + playerId;
-        }
-
-        const joinResult = gameServerSocket.playerJoin(playerData);
+        const joinResult = hostedGame.playerJoin(playerDataOrAppPlayer);
 
         if ('string' === typeof joinResult) {
             return joinResult;
         }
 
-        this.io.to(['lobby', `games/${gameId}`]).emit('gameJoined', gameId, joinResult, playerData);
+        this.io.to(['lobby', `games/${gameId}`]).emit(
+            'gameJoined',
+            gameId,
+            playerDataOrAppPlayer instanceof AppPlayer
+                ? playerDataOrAppPlayer.getPlayerData()
+                : playerDataOrAppPlayer
+            ,
+        );
 
         return true;
     }
 
-    playerMove(playerId: string, gameId: string, move: MoveData): true | string
+    playerMove(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string, move: MoveData): true | string
     {
-        const gameServerSocket = this.hostedGames[gameId];
+        const hostedGame = this.hostedGames[gameId];
 
-        if (!gameServerSocket) {
+        if (!hostedGame) {
             return 'no game ' + gameId;
         }
 
-        const playerData = this.playerRepository.getPlayer(playerId);
-
-        if (!playerData) {
-            return 'no player' + playerId;
-        }
-
-        return gameServerSocket.playerMove(playerData, new Move(move.row, move.col));
+        return hostedGame.playerMove(playerDataOrAppPlayer, new Move(move.row, move.col));
     }
 
-    playerResign(playerId: string, gameId: string): true | string
+    playerResign(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string): true | string
     {
-        const gameServerSocket = this.hostedGames[gameId];
+        const hostedGame = this.hostedGames[gameId];
 
-        if (!gameServerSocket) {
+        if (!hostedGame) {
             return 'no game ' + gameId;
         }
 
-        const playerData = this.playerRepository.getPlayer(playerId);
-
-        if (!playerData) {
-            return 'no player' + playerId;
-        }
-
-        return gameServerSocket.playerResign(playerData);
+        return hostedGame.playerResign(playerDataOrAppPlayer);
     }
 }

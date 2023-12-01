@@ -9,7 +9,6 @@ export default class Player
     extends (EventEmitter as unknown as new () => TypedEmitter<PlayerEvents>)
     implements PlayerInterface
 {
-    private ready = false;
     protected playerGameInput: null | PlayerGameInput = null;
 
     getName(): string
@@ -28,25 +27,11 @@ export default class Player
 
     setPlayerGameInput(playerGameInput: PlayerGameInput): void
     {
-        this.playerGameInput = playerGameInput;
-    }
-
-    isReady(): boolean
-    {
-        return this.ready;
-    }
-
-    setReady(ready = true): Player
-    {
-        const changed = this.ready !== ready;
-
-        this.ready = ready;
-
-        if (changed) {
-            this.emit('readyStateChanged', ready);
+        if (null !== this.playerGameInput && playerGameInput !== this.playerGameInput) {
+            throw new Error('This player has aready a PlayerGameInput from another game');
         }
 
-        return this;
+        this.playerGameInput = playerGameInput;
     }
 
     /**

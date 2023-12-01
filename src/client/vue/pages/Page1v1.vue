@@ -1,77 +1,118 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import { useRoute, useRouter } from 'vue-router';
 import GameView from '@client/pixi-board/GameView';
 import useLobbyStore from '@client/stores/lobbyStore';
-import useAuthStore from '@client/stores/authStore';
 import { ref } from '@vue/runtime-core';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/ConfirmationOverlay.vue';
-import { playerCanJoinGame } from '@shared/app/GameUtils';
-import { storeToRefs } from 'pinia';
-import GameClientSocket from 'GameClientSocket';
-import { Game } from '@shared/game-engine';
-import ClientPlayer from 'ClientPlayer';
+import HostedGameClient from 'HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
 import { onUnmounted } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
+import useAuthStore from '@client/stores/authStore';
+import AppPlayer from '@shared/app/AppPlayer';
+import { useRoute, useRouter } from 'vue-router';
 
-const { loggedInUser } = storeToRefs(useAuthStore());
-const route = useRoute();
-const router = useRouter();
-const lobbyStore = useLobbyStore();
+const { gameId } = useRoute().params;
+
+let hostedGameClient = ref<null | HostedGameClient>(null);
+
 let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board
-const gameViewLoaded = ref(false);
-let gameClientSocket = ref<null | GameClientSocket>(null);
-let game: Game;
-let localPlayer = ref<null | ClientPlayer>(null);
-const { gameId } = route.params;
+const gameViewLoaded = ref(0);
 
 if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
 }
 
+const lobbyStore = useLobbyStore();
+const router = useRouter();
+
+/*
+ * Join/leave game room
+ */
 useSocketStore().joinGameRoom(gameId);
 onUnmounted(() => useSocketStore().leaveGameRoom(gameId));
 
-(async () => {
-    gameClientSocket.value = await lobbyStore.retrieveGameClientSocket(gameId);
+const getLocalAppPlayer = (): null | AppPlayer => {
+    const { loggedInUser } = useAuthStore();
 
-    if (!gameClientSocket.value) {
-        console.error(`Game ${gameId} no longer exists.`);
-        router.push({ name: 'home' });
-        return;
+    if (null === loggedInUser || !hostedGameClient.value) {
+        return null;
     }
 
-    game = gameClientSocket.value.getGame();
-    localPlayer.value = gameClientSocket.value.getLocalPlayer();
+    return hostedGameClient.value.getLocalAppPlayer(loggedInUser);
+};
 
-    gameView = new GameView(game);
+const listenHexClick = () => {
+    if (null === gameView) {
+        throw new Error('no game view');
+    }
 
     gameView.on('hexClicked', move => {
         try {
-            gameClientSocket.value?.getLocalPlayer()?.move(move);
+            // Must get local player again in case player joined after (click "Watch", then "Join")
+            const localAppPlayer = getLocalAppPlayer();
+
+            if (!localAppPlayer) {
+                return;
+            }
+
+            localAppPlayer.move(move);
         } catch (e) {
             console.log('Move not played: ' + e);
         }
     });
+};
 
-    gameViewLoaded.value = true;
+const initGameView = () => {
+    if (!hostedGameClient.value) {
+        throw new Error('Cannot init game view now, no hostedGameClient');
+    }
+
+    const game = hostedGameClient.value.loadGame();
+
+    gameView = new GameView(game);
+
+    if (game.isStarted()) {
+        listenHexClick();
+    } else {
+        game.on('started', () => listenHexClick());
+    }
+};
+
+/*
+ * Load game
+ */
+(async () => {
+    hostedGameClient.value = await lobbyStore.retrieveHostedGameClient(gameId, true);
+
+    if (!hostedGameClient.value) {
+        router.push({ name: 'home' });
+        return;
+    }
+
+    initGameView();
 })();
 
 const canJoin = (): boolean => {
-    const game = gameView?.getGame();
-    const loggedInUserValue = loggedInUser.value;
+    const hostedGameData = hostedGameClient.value?.getHostedGameData();
+    const { loggedInUser } = useAuthStore();
 
-    if (!game) {
+    if (!hostedGameData || !loggedInUser) {
         return false;
     }
 
-    if (null === loggedInUserValue) {
+    // Cannot join as my own opponent
+    if (null !== loggedInUser && hostedGameData.host.id === loggedInUser.id) {
         return false;
     }
 
-    return playerCanJoinGame(game, loggedInUserValue.id);
+    // Cannot join if game is full
+    if (null !== hostedGameData.opponent) {
+        return false;
+    }
+
+    return true;
 };
 
 const join = async () => {
@@ -85,7 +126,9 @@ const join = async () => {
 const confirmationOverlay = createOverlay(ConfirmationOverlay);
 
 const resign = async (): Promise<void> => {
-    if (null === localPlayer.value) {
+    const localPlayer = getLocalAppPlayer();
+
+    if (null === localPlayer) {
         return;
     }
 
@@ -98,7 +141,8 @@ const resign = async (): Promise<void> => {
             cancelLabel: 'No, continue playing',
             cancelClass: 'btn-outline-primary',
         });
-        localPlayer.value.resign();
+
+        localPlayer.resign();
     } catch (e) {
         // resignation cancelled
     }
@@ -114,9 +158,10 @@ const toggleCoords = () => {
 <template>
     <div class="position-relative">
         <app-board
-            v-if="gameViewLoaded && gameView"
+            v-if="gameView"
             :game-view="gameView"
-            :time-control-values="gameClientSocket?.getTimeControlValues()"
+            :time-control-values="hostedGameClient?.getTimeControlValues()"
+            :key="gameViewLoaded"
         ></app-board>
         <p v-else>Loading game {{ gameId }}...</p>
 
@@ -130,7 +175,7 @@ const toggleCoords = () => {
     <div class="menu-game">
         <div class="container-fluid">
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-link" v-if="localPlayer" @click="resign()"><i class="bi-flag"></i> Resign</button>
+                <button type="button" class="btn btn-link" v-if="getLocalAppPlayer()" @click="resign()"><i class="bi-flag"></i> Resign</button>
                 <button type="button" class="btn btn-link" @click="toggleCoords()"><i class="bi-alphabet"></i> Coords</button>
             </div>
         </div>

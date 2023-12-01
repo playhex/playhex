@@ -7,13 +7,11 @@ describe('DeterministRandomAIPlayer', () => {
         const player = new Player();
         const ai = new DeterministRandomAIPlayer(1);
 
-        player.setReady();
-
         const waitAITurn = async (): Promise<void> => new Promise(resolve => game.once('played', () => resolve()));
 
-        const game = new Game([player, ai], 3);
+        const game = new Game(3, [player, ai]);
 
-        game.startOnceAllPlayersReady();
+        game.start();
 
         /*
             [SERVER] 0 do move Move { row: 2, col: 1 }

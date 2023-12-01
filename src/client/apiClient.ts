@@ -39,7 +39,7 @@ export const getGame = async (gameId: string): Promise<null | HostedGameData> =>
     return denormalize(await response.json());
 };
 
-export const apiPostGame1v1 = async (gameOptions: GameOptionsData = {}): Promise<HostedGameData> => {
+export const apiPostGame1v1 = async (gameOptions: Partial<GameOptionsData> = {}): Promise<HostedGameData> => {
     const response = await fetch('/api/games/1v1', {
         method: 'post',
         headers: {
@@ -52,7 +52,7 @@ export const apiPostGame1v1 = async (gameOptions: GameOptionsData = {}): Promise
     return denormalize(await response.json());
 };
 
-export const apiPostGameVsCPU = async (gameOptions: GameOptionsData = {}): Promise<HostedGameData> => {
+export const apiPostGameVsCPU = async (gameOptions: Partial<GameOptionsData> = {}): Promise<HostedGameData> => {
     const response = await fetch('/api/games/cpu', {
         method: 'post',
         headers: {

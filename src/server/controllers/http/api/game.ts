@@ -18,7 +18,7 @@ export default (): Router => {
             return;
         }
 
-        const result = hostedGameRepository.playerResign(playerData.id, id);
+        const result = hostedGameRepository.playerResign(playerData, id);
 
         if (true !== result) {
             res.status(400).send(result);
@@ -36,7 +36,7 @@ export default (): Router => {
             return;
         }
 
-        const result = hostedGameRepository.playerMove(playerData.id, id, req.body);
+        const result = hostedGameRepository.playerMove(playerData, id, req.body);
 
         if (true !== result) {
             res.status(400).send(result);

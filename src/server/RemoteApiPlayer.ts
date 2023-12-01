@@ -1,14 +1,19 @@
-import { Move, Player, PlayerGameInput } from '../shared/game-engine';
+import AppPlayer from '../shared/app/AppPlayer';
+import { Move } from '../shared/game-engine';
+import { v4 as uuidv4 } from 'uuid';
 
 const noInputError = new Error('No player input, cannot continue');
 
-export default class RemoteApiPlayer extends Player
+export default class RemoteApiPlayer extends AppPlayer
 {
     constructor(
         private name: string,
         private endpoint: string,
     ) {
-        super();
+        super({
+            id: 'remote-api|' + uuidv4(),
+            pseudo: name,
+        });
 
         this.on('myTurnToPlay', () => this.makeMove());
     }
@@ -56,12 +61,6 @@ export default class RemoteApiPlayer extends Player
             letter.charCodeAt(0) - 97, // "a" is 0
             parseInt(number, 10) - 1, // "1" is 0
         );
-    }
-
-    setPlayerGameInput(playerGameInput: PlayerGameInput): void
-    {
-        super.setPlayerGameInput(playerGameInput);
-        this.setReady();
     }
 
     private async makeMove(): Promise<void>

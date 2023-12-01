@@ -9,10 +9,11 @@ import { registerWebsocketControllers } from './controllers/websocket';
 import { HexServer } from './server';
 import * as CustomParser from '../shared/app/socketCustomParser';
 import socketIoAdminUi from './services/socketIoAdminUi';
+import logger from './services/logger';
 
-console.log(`*******************************************`);
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`*******************************************`);
+logger.info(`*******************************************`);
+logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
+logger.info(`*******************************************`);
 
 const app = express();
 app.disable('x-powered-by');
@@ -48,5 +49,5 @@ app.use(mainRouter());
 registerWebsocketControllers();
 
 server.listen(process.env.PORT || 3000, () => {
-    console.log(`App listening on port ${process.env.PORT || 3000}!`);
+    logger.info(`App listening on port ${process.env.PORT || 3000}!`);
 });

@@ -4,11 +4,6 @@ import Move from './Move';
 
 export type PlayerEvents = {
     /**
-     * Player changed ready status.
-     */
-    readyStateChanged: (ready: boolean) => void;
-
-    /**
      * Your turn to play.
      * Get board state with this.gameInput.getHexes().
      * Send your move with this.move().
@@ -25,13 +20,6 @@ export default interface PlayerInterface extends TypedEventEmitter<PlayerEvents>
     getName(): string;
 
     /**
-     * If this player is ready to start playing.
-     * Both players must be ready to start the game.
-     * Can be false for example when a remote player still not joined.
-     */
-    isReady(): boolean;
-
-    /**
      * Used to receive a PlayerGameInput,
      * which is used to make action from player.
      * Provided when instanciating a Game with this player.
@@ -39,7 +27,16 @@ export default interface PlayerInterface extends TypedEventEmitter<PlayerEvents>
     setPlayerGameInput(playerGameInput: PlayerGameInput): void;
 
     /**
+     * This player makes a move.
+     * Move must be sent through playerGameInput instance.
+     *
      * @throws IllegalMove on invalid move.
      */
     move(move: Move): void;
+
+    /**
+     * This player resigns.
+     * Must be sent through playerGameInput instance.
+     */
+    resign(): void;
 }

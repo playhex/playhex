@@ -15,11 +15,6 @@ export default class SimplePlayer
         return 'Player';
     }
 
-    isReady(): boolean
-    {
-       return true;
-    }
-
     setPlayerGameInput(playerGameInput: PlayerGameInput): void
     {
         this.playerGameInput = playerGameInput;
@@ -32,5 +27,14 @@ export default class SimplePlayer
         }
 
         this.playerGameInput.move(move);
+    }
+
+    resign(): void
+    {
+        if (null === this.playerGameInput) {
+            throw new Error('Cannot resign, no player game input provided.');
+        }
+
+        this.playerGameInput.resign();
     }
 }

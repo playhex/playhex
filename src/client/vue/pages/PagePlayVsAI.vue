@@ -3,27 +3,33 @@
 import GameView from '@client/pixi-board/GameView';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
-import { shufflePlayers } from '@shared/app/GameUtils';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
 import { ref } from 'vue';
+import { Tuple } from '@shared/app/Types';
 
 let gameView = ref<GameView>();
 
 (async () => {
     const player = new Player();
-    const gameOptions: GameOptionsData = history.state.gameOptions || {};
-    const players: [Player, Player] = [
+    const selectedGameOptions: Partial<GameOptionsData> = history.state.gameOptions || {};
+    const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
+    const players: Tuple<Player> = [
         player,
         new RandomAIPlayer(),
     ];
 
-    shufflePlayers(players, gameOptions.firstPlayer);
+    if (1 === gameOptions.firstPlayer) {
+        players.reverse();
+    } else if (null === gameOptions.firstPlayer) {
+        if (Math.random() < 0.5) {
+            players.reverse();
+        }
+    }
 
-    const game = new Game(players, gameOptions.boardsize);
+    const game = new Game(gameOptions.boardsize, players);
 
     gameView.value = new GameView(game).bindPlayer(player);
 
-    player.setReady();
     game.start();
 })();
 </script>

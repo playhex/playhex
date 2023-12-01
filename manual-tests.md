@@ -20,3 +20,5 @@ These tests are either not yet automated, or too hard to automate.
     - Create a game vs remote AI
     - Lose the game
     - I should see the last move from AI, and the lose popin.
+
+- I cannot play against myself, join my own game twice

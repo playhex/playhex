@@ -6,7 +6,7 @@ export type GameOptionsData = {
     /**
      * Defaults to Board.
      */
-    boardsize?: number;
+    boardsize: number;
 
     /**
      * Who plays first.
@@ -14,7 +14,12 @@ export type GameOptionsData = {
      * 0: Host begins
      * 1: Opponent or bot begins
      */
-    firstPlayer?: null | PlayerIndex;
+    firstPlayer: null | PlayerIndex;
+};
+
+export const defaultGameOptions: GameOptionsData = {
+    boardsize: 11,
+    firstPlayer: null,
 };
 
 const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import useLobbyStore from '@client/stores/lobbyStore';
-import { HostedGameData } from '@shared/app/Types';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
 import GameOptionsOverlay from '@client/vue/components/GameOptionsOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Sidebar from '@client/vue/components/Sidebar.vue';
+import HostedGameClient from 'HostedGameClient';
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
@@ -73,8 +73,8 @@ const createAndJoinGameVsLocalAI = async () => {
     });
 };
 
-const isWaiting = (hostedGame: HostedGameData) => !hostedGame.game.started;
-const isPlaying = (hostedGame: HostedGameData) => hostedGame.game.started && null === hostedGame.game.winner;
+const isWaiting = (hostedGameClients: HostedGameClient) => null === hostedGameClients.getHostedGameData().opponent;
+const isPlaying = (hostedGameClients: HostedGameClient) => hostedGameClients.getHostedGameData().gameData?.state === 'playing';
 
 const joinGame = (gameId: string) => {
     lobbyStore.joinGame(gameId);
@@ -101,7 +101,7 @@ const joinGame = (gameId: string) => {
 
                 <h4>Join a game</h4>
 
-                <table v-if="Object.values(lobbyStore.games).some(isWaiting)" class="table">
+                <table v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table">
                     <thead>
                         <tr>
                             <th scope="col"></th>
@@ -111,15 +111,15 @@ const joinGame = (gameId: string) => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="hostedGame in Object.values(lobbyStore.games).filter(isWaiting)"
-                            :key="hostedGame.id"
+                            v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isWaiting)"
+                            :key="hostedGameClient.getId()"
                         >
                             <td class="ps-0">
-                                <button class="btn me-3 btn-sm btn-success" @click="joinGame(hostedGame.id); goToGame(hostedGame.id)">Accept</button>
-                                <button class="btn me-3 btn-sm btn-link" @click="goToGame(hostedGame.id)">Watch</button>
+                                <button class="btn me-3 btn-sm btn-success" @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())">Accept</button>
+                                <button class="btn me-3 btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Watch</button>
                             </td>
-                            <td>{{ hostedGame.game.players.find(player => null !== player)?.pseudo ?? '(empty)' }}</td>
-                            <td class="text-end">{{ hostedGame.game.size }}</td>
+                            <td>{{ hostedGameClient.getHostedGameData().host.pseudo }}</td>
+                            <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -127,7 +127,7 @@ const joinGame = (gameId: string) => {
 
                 <h3><i class="bi bi-eye"></i> Watch current game</h3>
 
-                <table v-if="Object.values(lobbyStore.games).some(isPlaying)" class="table">
+                <table v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table">
                     <thead>
                         <tr>
                             <th scope="col"></th>
@@ -137,14 +137,14 @@ const joinGame = (gameId: string) => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="hostedGame in Object.values(lobbyStore.games).filter(isPlaying)"
-                            :key="hostedGame.id"
+                            v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isPlaying)"
+                            :key="hostedGameClient.getId()"
                         >
                             <td class="ps-0">
-                                <button class="btn btn-sm btn-link" @click="goToGame(hostedGame.id)">Watch</button>
+                                <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Watch</button>
                             </td>
-                            <td>{{ hostedGame.game.players.map(player => player?.pseudo ?? '(empty)').join(' vs ') }}</td>
-                            <td class="text-end">{{ hostedGame.game.size }}</td>
+                            <td>{{ hostedGameClient.getHostedGameData().gameData?.players.map(player => player.pseudo).join(' vs ') }}</td>
+                            <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
                     </tbody>
                 </table>

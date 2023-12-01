@@ -1,14 +1,14 @@
 import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
-import { HostedGameData, PlayerData } from '../shared/app/Types';
+import { HostedGameData, PlayerData, Tuple } from '../shared/app/Types';
 import { TimeControlInterface, TimeControlValues } from '../shared/time-control/TimeControlInterface';
 import { AbsoluteTimeControl } from '../shared/time-control/time-controls/AbsoluteTimeControl';
-import ServerPlayer from './ServerPlayer';
 import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
-import { getNextFreeSlot } from '../shared/app/GameUtils';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from 'server';
 import { Outcome } from '@shared/game-engine/Game';
+import logger from './services/logger';
+import { GameOptionsData } from '@shared/app/GameOptions';
 
 /**
  * Contains a game state,
@@ -18,13 +18,15 @@ export default class HostedGame
 {
     private id: string = uuidv4();
     private timeControl: TimeControlInterface = new AbsoluteTimeControl(900);
+    private game: null | Game = null;
 
     constructor(
         private io: HexServer,
-        private game: Game,
+        private gameOptions: GameOptionsData,
+        private host: AppPlayer,
+        private opponent: null | AppPlayer = null,
     ) {
-        this.listenGame();
-        this.bindTimeControl();
+        logger.info('Hosted game created.', { hostedGameId: this.id, host: host.getPlayerData().pseudo });
     }
 
     getId(): string
@@ -32,7 +34,7 @@ export default class HostedGame
         return this.id;
     }
 
-    getGame(): Game
+    getGame(): null | Game
     {
         return this.game;
     }
@@ -44,8 +46,13 @@ export default class HostedGame
 
     listenGame(): void
     {
+        if (!this.game) {
+            logger.error('Cannot call listenGame() now, game is not yet created.');
+            return;
+        }
+
         this.game.on('started', () => {
-            this.io.to(['lobby', `games/${this.id}`]).emit('gameStarted', this.id);
+            this.io.to(['lobby', `games/${this.id}`]).emit('gameStarted', this.toData());
             this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
@@ -62,79 +69,117 @@ export default class HostedGame
 
     bindTimeControl(): void
     {
+        if (!this.game) {
+            logger.error('Cannot call bindTimeControl() now, game is not yet created.');
+            return;
+        }
+
         bindTimeControlToGame(this.game, this.timeControl);
+    }
+
+    isPlayerInGame(appPlayer: AppPlayer): boolean
+    {
+        return appPlayer === this.host || appPlayer === this.opponent;
+    }
+
+    private createAndStartGame(): void
+    {
+        if (null !== this.game) {
+            logger.warn('Cannot init game, already started', { hostedGameId: this.id });
+            return;
+        }
+
+        if (null === this.opponent) {
+            logger.warn('Cannot init game, no opponent', { hostedGameId: this.id });
+            return;
+        }
+
+        const players: Tuple<AppPlayer> = [this.host, this.opponent];
+
+        if (null === this.gameOptions.firstPlayer) {
+            if (Math.random() < 0.5) {
+                players.reverse();
+            }
+        } else if (1 === this.gameOptions.firstPlayer) {
+            players.reverse();
+        }
+
+        this.game = new Game(this.gameOptions.boardsize, players);
+
+        this.bindTimeControl();
+        this.listenGame();
+
+        this.game.start();
+
+        logger.info('Game Started.', { hostedGameId: this.id });
+    }
+
+    /**
+     * Returns AppPlayer from a PlayerData, same instance if player already in this game, or creating a new one.
+     */
+    findAppPlayer(playerDataOrAppPlayer: PlayerData | AppPlayer): AppPlayer
+    {
+        if (playerDataOrAppPlayer instanceof AppPlayer) {
+            return playerDataOrAppPlayer;
+        }
+
+        if (this.host.getPlayerId() === playerDataOrAppPlayer.id) {
+            return this.host;
+        }
+
+        if (null !== this.opponent && playerDataOrAppPlayer.id === this.opponent.getPlayerId()) {
+            return this.opponent;
+        }
+
+        return new AppPlayer(playerDataOrAppPlayer);
     }
 
     /**
      * A player join this game.
-     *
-     * @param { PlayerData } playerData Player data containing player id.
-     * @param { null | PlayerIndex } playerIndex Join a specific slot. Let empty to join next free slot.
-     *
-     * @returns Slot joined (0 or 1), or a message containing the error reason if could not join.
      */
-    playerJoin(playerData: PlayerData, playerIndex: null | PlayerIndex = null): PlayerIndex | string
+    playerJoin(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
     {
-        if (null === playerIndex) {
-            playerIndex = getNextFreeSlot(this.game);
+        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
-            if (null === playerIndex) {
-                return 'Game is full';
-            }
+        // Check whether game is full
+        if (null !== this.opponent) {
+            logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            return 'Game is full';
         }
 
-        const player = this.game.getPlayers()[playerIndex];
-
-        if (!(player instanceof ServerPlayer)) {
-            console.log('Trying to join a slot that is not a ServerPlayer:', player);
-            return 'This slot cannot be occupied by a player';
+        // Prevent a player from joining as his own opponent
+        if (appPlayer === this.host) {
+            logger.notice('Player tried to join as his own opponent', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            return 'You already joined this game. You cannot play vs yourself!';
         }
 
-        const currentPlayerId = player.getPlayerId();
+        this.opponent = appPlayer;
 
-        // Joining a free slot
-        if (null === currentPlayerId) {
+        logger.info('Player joined.', { hostedGameId: this.id, joiner: appPlayer.getName() });
 
-            // Prevent a player from joining as his own opponent
-            const opponent = this.game.getPlayers()[1 - playerIndex];
+        this.createAndStartGame();
 
-            if (opponent instanceof ServerPlayer && opponent.getPlayerId() === playerData.id) {
-                console.log('Trying to join as own opponent');
-                return 'You already joined this game. You cannot play vs yourself!';
-            }
-
-            player.setPlayerData(playerData);
-
-            return playerIndex;
-        }
-
-        // Cannot join someone else slot
-        if (currentPlayerId !== playerData.id) {
-            return 'Slot already occupied by someone else';
-        }
-
-        player.setPlayerData(playerData);
-
-        return playerIndex;
+        return true;
     }
 
-    playerMove(playerData: PlayerData, move: Move): true | string
+    playerMove(playerDataOrAppPlayer: PlayerData | AppPlayer, move: Move): true | string
     {
-        const player = this.game.getPlayers().find(player => {
-            if (!(player instanceof ServerPlayer)) {
-                return false;
-            }
+        logger.info('Move played', { hostedGameId: this.id, move, player: playerDataOrAppPlayer });
 
-            return player.getPlayerId() === playerData.id;
-        });
+        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
-        if (!(player instanceof Player)) {
-            console.log('A player not in the game tried to make a move', playerData);
+        if (!this.game) {
+            logger.warn('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'Game not yet started, cannot make a move';
+        }
+
+        if (!this.isPlayerInGame(appPlayer)) {
+            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: appPlayer.getName() });
             return 'you are not a player of this game';
         }
 
         try {
-            player.move(move);
+            appPlayer.move(move);
 
             return true;
         } catch (e) {
@@ -142,45 +187,52 @@ export default class HostedGame
                 return e.message;
             }
 
-            console.error(e.message);
-
+            logger.warn('Unexpected error from player.move', { hostedGameId: this.id, err: e.message });
             return 'Unexpected error: ' + e.message;
         }
     }
 
-    playerResign(playerData: PlayerData): true | string
+    playerResign(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
     {
-        const player = this.game.getPlayers().find(player => {
-            if (!(player instanceof ServerPlayer)) {
-                return false;
-            }
+        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
-            return player.getPlayerId() === playerData.id;
-        });
+        if (!this.game) {
+            logger.warn('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'Game not yet started, cannot resign';
+        }
 
-        if (!(player instanceof Player)) {
-            console.log('A player not in the game tried to resign', playerData);
+        if (!this.isPlayerInGame(appPlayer)) {
+            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: appPlayer.getName() });
             return 'you are not a player of this game';
         }
 
         try {
-            player.resign();
+            appPlayer.resign();
 
             return true;
         } catch (e) {
+            logger.warn('Unexpected error from player.resign', { hostedGameId: this.id, err: e.message });
             return e.message;
         }
     }
 
     toData(): HostedGameData
     {
-        return {
+        const hostedGameData: HostedGameData = {
             id: this.id,
-            timeControl: this.timeControl.getValues(),
-            game: {
-                players: this.game.getPlayers().map<null | PlayerData>(HostedGame.playerToData) as [null | PlayerData, null | PlayerData],
+            host: HostedGame.playerToData(this.host),
+            opponent: this.opponent ? HostedGame.playerToData(this.opponent) : null,
+            timeControlValues: this.timeControl.getValues(),
+            gameOptions: this.gameOptions,
+            gameData: null,
+        };
+
+        if (this.game) {
+            hostedGameData.gameData = {
+                players: this.game.getPlayers().map(HostedGame.playerToData) as Tuple<PlayerData>,
                 size: this.game.getSize(),
                 started: this.game.isStarted(),
+                state: this.game.getState(),
                 movesHistory: this.game.getMovesHistory(),
                 currentPlayerIndex: this.game.getCurrentPlayerIndex(),
                 winner: this.game.getWinner(),
@@ -202,20 +254,23 @@ export default class HostedGame
                         .join('')
                     ,
                 ),
-            },
-        };
+            };
+        }
+
+        return hostedGameData;
     }
 
-    private static playerToData(player: Player): null | PlayerData
+    private static playerToData(player: Player): PlayerData
     {
         if (player instanceof AppPlayer) {
             return player.getPlayerData();
         }
 
+        logger.warn('Raw Player still used. Should use only AppPlayer instances');
+
         return {
             id: 'unknown|' + uuidv4(),
             pseudo: player.getName(),
-            isGuest: false,
         };
     }
 }

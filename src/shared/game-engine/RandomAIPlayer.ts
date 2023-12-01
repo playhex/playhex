@@ -1,26 +1,29 @@
+import AppPlayer from '../app/AppPlayer';
 import Move from './Move';
-import Player from './Player';
+import { v4 as uuidv4 } from 'uuid';
 
 const { floor, random } = Math;
 
-export default class RandomAIPlayer extends Player
+export default class RandomAIPlayer extends AppPlayer
 {
+    private static NAME = 'Random bot';
     private static WAIT_BEFORE_PLAY = 80;
 
     constructor()
     {
-        super();
+        super({
+            id: 'random-bot|' + uuidv4(),
+            pseudo: RandomAIPlayer.NAME,
+        });
 
         this.on('myTurnToPlay', () => {
             this.makeMove();
         });
-
-        this.setReady();
     }
 
     getName(): string
     {
-        return 'Random bot';
+        return RandomAIPlayer.NAME;
     }
 
     async makeMove(): Promise<void>
