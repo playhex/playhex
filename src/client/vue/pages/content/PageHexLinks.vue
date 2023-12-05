@@ -17,7 +17,7 @@
                 <p v-for="p in resource.paragraph" class="card-text">
                     {{ p }}
                 </p>
-                <a :href="resource.link" class="stretched-link" target="_blank">{{ resource.link }}</a>
+                <a :href="resource.link" class="stretched-link" target="_blank">{{ resource.link_show }}</a>
             </div>
         </div>
     </div>
@@ -28,6 +28,7 @@ type Icon = { icon: string };
 type Image = { src: string, alt: string };
 type Resource = {
     link: string;
+    link_show: string;
     title: string;
     subTitle: string;
     illustration: Icon | Image;
@@ -39,6 +40,7 @@ const isIcon = (illustration: Icon | Image): illustration is Icon => !!(illustra
 const resources: Resource[] = [
     {
         link: 'http://www.mseymour.ca/hex_puzzle/',
+        link_show: 'mseymour.ca/hex_puzzle',
         title: '500 Hex puzzles',
         subTitle: 'Hex puzzles from beginner to expert',
         illustration: { src: '/images/links/500-puzzles.png', alt: '500 Hex puzzles by Matthew Seymour' },
@@ -52,6 +54,7 @@ const resources: Resource[] = [
     },
     {
         link: 'http://www.mseymour.ca/hex_book/hexstrat.html',
+        link_show: 'mseymour.ca/hex_book',
         title: 'Hex: A Strategy Guide',
         subTitle: 'Guide to learn Hex basics and advanced tactics',
         illustration: { icon: 'bi-file-earmark-text' },
@@ -66,6 +69,7 @@ const resources: Resource[] = [
     },
     {
         link: 'https://discord.gg/59SJ9KwvVq',
+        link_show: 'discord.gg/59SJ9KwvVq',
         title: 'Hex Discord Server',
         subTitle: 'Discord server with ~200 Hex players',
         illustration: { icon: 'bi-discord' },
@@ -75,6 +79,7 @@ const resources: Resource[] = [
     },
     {
         link: 'https://www.hexwiki.net',
+        link_show: 'hexwiki.net',
         title: 'HexWiki',
         subTitle: 'Still maintained wiki dedicated to Hex',
         illustration: { icon: 'bi-wikipedia' },
