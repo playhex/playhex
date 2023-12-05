@@ -7,6 +7,7 @@ import GameOptionsOverlay from '@client/vue/components/GameOptionsOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Sidebar from '@client/vue/components/Sidebar.vue';
 import HostedGameClient from 'HostedGameClient';
+import useAuthStore from '@client/stores/authStore';
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
@@ -115,8 +116,16 @@ const joinGame = (gameId: string) => {
                             :key="hostedGameClient.getId()"
                         >
                             <td class="ps-0">
-                                <button class="btn me-3 btn-sm btn-success" @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())">Accept</button>
-                                <button class="btn me-3 btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Watch</button>
+                                <button
+                                    v-if="hostedGameClient.canJoin(useAuthStore().loggedInUser)"
+                                    class="btn me-3 btn-sm btn-success"
+                                    @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
+                                >Accept</button>
+
+                                <button
+                                    class="btn me-3 btn-sm btn-link"
+                                    @click="goToGame(hostedGameClient.getId())"
+                                >Watch</button>
                             </td>
                             <td>{{ hostedGameClient.getHostedGameData().host.pseudo }}</td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>

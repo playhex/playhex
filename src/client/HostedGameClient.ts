@@ -149,6 +149,25 @@ export default class HostedGameClient
         ;
     }
 
+    canJoin(playerData: null | PlayerData): boolean
+    {
+        if (!playerData) {
+            return false;
+        }
+
+        // Cannot join as my own opponent
+        if (this.hostedGameData.host.id === playerData.id) {
+            return false;
+        }
+
+        // Cannot join if game is full
+        if (null !== this.hostedGameData.opponent) {
+            return false;
+        }
+
+        return true;
+    }
+
     playerJoined(playerData: PlayerData): void
     {
         this.hostedGameData.opponent = playerData;

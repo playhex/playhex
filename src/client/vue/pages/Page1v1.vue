@@ -94,27 +94,6 @@ const initGameView = () => {
     initGameView();
 })();
 
-const canJoin = (): boolean => {
-    const hostedGameData = hostedGameClient.value?.getHostedGameData();
-    const { loggedInUser } = useAuthStore();
-
-    if (!hostedGameData || !loggedInUser) {
-        return false;
-    }
-
-    // Cannot join as my own opponent
-    if (null !== loggedInUser && hostedGameData.host.id === loggedInUser.id) {
-        return false;
-    }
-
-    // Cannot join if game is full
-    if (null !== hostedGameData.opponent) {
-        return false;
-    }
-
-    return true;
-};
-
 const join = async () => {
     const result = await lobbyStore.joinGame(gameId);
 
@@ -165,7 +144,7 @@ const toggleCoords = () => {
         ></app-board>
         <p v-else>Loading game {{ gameId }}...</p>
 
-        <div v-if="canJoin()" class="position-absolute w-100 join-button-container">
+        <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInUser)" class="position-absolute w-100 join-button-container">
             <div class="d-flex justify-content-center">
                 <button class="btn btn-lg btn-success" @click="join()">Accept</button>
             </div>
