@@ -1,5 +1,6 @@
 import path from 'path';
 import { Configuration, DefinePlugin } from 'webpack';
+import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
 import { commitRef } from './src/server/lastCommitInfo';
@@ -11,6 +12,8 @@ const plugins = [
     new VueLoaderPlugin(),
     new DefinePlugin({
         LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
+        __VUE_OPTIONS_API__: false,
+        __VUE_PROD_DEVTOOLS__: false,
     }),
 ];
 
@@ -20,8 +23,14 @@ const plugins = [
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const targets = IS_DEV ? { chrome: '79', firefox: '72' } : '> 0.25%, not dead';
 
+const devServer: DevServerConfiguration = {
+    port: WEBPACK_PORT,
+    open: `http://localhost:${process.env.PORT || 3000}`,
+    allowedHosts: ['all'],
+};
+
 const config: Configuration = {
-    mode: IS_DEV ? 'development' : 'production',
+    mode: process.env.NODE_ENV as 'development' | 'production',
     devtool: IS_DEV ? 'inline-source-map' : false,
     entry: ['./src/client/client'],
     output: {
@@ -110,15 +119,11 @@ const config: Configuration = {
             },
             {
                 test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-                type: 'asset/resource',
+                type: 'asset/inline',
             },
         ],
     },
-    devServer: {
-        port: WEBPACK_PORT,
-        open: `http://localhost:${process.env.PORT || 3000}`,
-        allowedHosts: ['all'],
-    },
+    devServer,
     plugins,
 };
 
