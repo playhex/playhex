@@ -1,6 +1,7 @@
 {
   "main": "index.js",
   "scripts": {
+    "analyse-size": "DATE=$(date '+%Y%m%d-%H%M%S'); webpack --profile --json | grep -E '^{' | sed -E 's/Done in .+//' > size-stats-$DATE.json && webpack-bundle-analyzer size-stats-$DATE.json dist/statics/",
     "lint": "eslint src --ext .ts,.vue",
     "start": "node index.js",
     "start:prod": "NODE_ENV=production node index.js",

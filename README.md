@@ -63,6 +63,15 @@ Then enable Mohex locally by adding in your `.env`:
 MOHEX_API_ENDPOINT=http://localhost:3001/api/calculate-move
 ```
 
+### Optimize js size
+
+``` bash
+# See which dependencies take more size
+yarn analyse-size
+```
+
+Compare two json files with: <https://happy-water-0887b0b1e.azurestaticapps.net>.
+
 ## License
 
 This library is under [AGPL-3.0 license](LICENSE).
