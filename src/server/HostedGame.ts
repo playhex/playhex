@@ -85,12 +85,12 @@ export default class HostedGame
     private createAndStartGame(): void
     {
         if (null !== this.game) {
-            logger.warn('Cannot init game, already started', { hostedGameId: this.id });
+            logger.warning('Cannot init game, already started', { hostedGameId: this.id });
             return;
         }
 
         if (null === this.opponent) {
-            logger.warn('Cannot init game, no opponent', { hostedGameId: this.id });
+            logger.warning('Cannot init game, no opponent', { hostedGameId: this.id });
             return;
         }
 
@@ -169,7 +169,7 @@ export default class HostedGame
         const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
         if (!this.game) {
-            logger.warn('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
             return 'Game not yet started, cannot make a move';
         }
 
@@ -187,7 +187,7 @@ export default class HostedGame
                 return e.message;
             }
 
-            logger.warn('Unexpected error from player.move', { hostedGameId: this.id, err: e.message });
+            logger.warning('Unexpected error from player.move', { hostedGameId: this.id, err: e.message });
             return 'Unexpected error: ' + e.message;
         }
     }
@@ -197,7 +197,7 @@ export default class HostedGame
         const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
         if (!this.game) {
-            logger.warn('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
             return 'Game not yet started, cannot resign';
         }
 
@@ -211,7 +211,7 @@ export default class HostedGame
 
             return true;
         } catch (e) {
-            logger.warn('Unexpected error from player.resign', { hostedGameId: this.id, err: e.message });
+            logger.warning('Unexpected error from player.resign', { hostedGameId: this.id, err: e.message });
             return e.message;
         }
     }
@@ -266,7 +266,7 @@ export default class HostedGame
             return player.getPlayerData();
         }
 
-        logger.warn('Raw Player still used. Should use only AppPlayer instances');
+        logger.warning('Raw Player still used. Should use only AppPlayer instances');
 
         return {
             id: 'unknown|' + uuidv4(),

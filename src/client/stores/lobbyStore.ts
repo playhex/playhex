@@ -2,7 +2,7 @@ import { Move, PlayerIndex } from '@shared/game-engine';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
 import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
-import { apiPostGame1v1, apiPostGameVsCPU, apiPostResign, getGame, getGames } from '@client/apiClient';
+import { apiPostGame, apiPostResign, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
@@ -21,12 +21,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
      */
     const hostedGameClients = ref<{ [key: string]: HostedGameClient }>({});
 
-    const createGame = async (gameOptions?: GameOptionsData): Promise<HostedGameData> => {
-        return await apiPostGame1v1(gameOptions);
-    };
+    const createGame = async (gameOptions?: GameOptionsData): Promise<HostedGameClient> => {
+        const hostedGameData = await apiPostGame(gameOptions);
 
-    const createGameVsCPU = async (gameOptions?: GameOptionsData): Promise<HostedGameData> => {
-        return await apiPostGameVsCPU(gameOptions);
+        hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
+
+        return hostedGameClients.value[hostedGameData.id];
     };
 
     /**
@@ -133,7 +133,6 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     return {
         hostedGameClients,
         createGame,
-        createGameVsCPU,
         updateGames,
         retrieveHostedGameClient,
         joinGame,

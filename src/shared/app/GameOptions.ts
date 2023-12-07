@@ -2,6 +2,18 @@ import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../game-engine';
 
 const { min, max, floor } = Math;
 
+export type GameOptionsOpponentPlayerData = {
+    type: 'player';
+};
+
+export type GameOptionsOpponentAIData = {
+    type: 'ai';
+};
+
+export type GameOptionsOpponentLocalAIData = {
+    type: 'local_ai';
+};
+
 export type GameOptionsData = {
     /**
      * Defaults to Board.
@@ -15,11 +27,23 @@ export type GameOptionsData = {
      * 1: Opponent or bot begins
      */
     firstPlayer: null | PlayerIndex;
+
+    /**
+     * Which opponent I want. Can be:
+     *  - type: player, with elo restriction, or a friend...
+     *  - type: ai, with a engine, level...
+     *  - type: local_ai, play offline vs AI
+     */
+    opponent: GameOptionsOpponentPlayerData
+        | GameOptionsOpponentAIData
+        | GameOptionsOpponentLocalAIData
+    ;
 };
 
 export const defaultGameOptions: GameOptionsData = {
     boardsize: 11,
     firstPlayer: null,
+    opponent: { type: 'player' },
 };
 
 const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
@@ -55,6 +79,7 @@ export const sanitizeGameOptions = (gameOptions: GameOptionsData): GameOptionsDa
     return {
         boardsize: sanitizeBoardsize(gameOptions.boardsize ?? DEFAULT_BOARDSIZE),
         firstPlayer: sanitizeFirstPlayer(gameOptions.firstPlayer),
+        opponent: gameOptions.opponent,
     };
 };
 

@@ -132,6 +132,26 @@ const toggleCoords = () => {
         gameView.toggleDisplayCoords();
     }
 };
+
+/*
+ * Rematch
+ */
+const rematch = async (): Promise<void> => {
+    if (!hostedGameClient.value) {
+        throw new Error('Error while trying to rematch, no current game');
+    }
+
+    const hostedGameClientRematch = await lobbyStore.createGame(
+        hostedGameClient.value.getHostedGameData().gameOptions,
+    );
+
+    router.push({
+        name: 'online-game',
+        params: {
+            gameId: hostedGameClientRematch.getId(),
+        },
+    });
+};
 </script>
 
 <template>
@@ -141,6 +161,7 @@ const toggleCoords = () => {
             :game-view="gameView"
             :time-control-values="hostedGameClient?.getTimeControlValues()"
             :key="gameViewLoaded"
+            :rematch="rematch"
         ></app-board>
         <p v-else>Loading game {{ gameId }}...</p>
 

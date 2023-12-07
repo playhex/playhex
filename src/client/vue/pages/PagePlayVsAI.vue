@@ -7,12 +7,12 @@ import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
 import { ref } from 'vue';
 import { Tuple } from '@shared/app/Types';
 
-let gameView = ref<GameView>();
+const gameView = ref<GameView>();
+const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.gameOptionsJson ?? '{}');
+const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
 
-(async () => {
+const initGame = () => {
     const player = new Player();
-    const selectedGameOptions: Partial<GameOptionsData> = history.state.gameOptions || {};
-    const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
     const players: Tuple<Player> = [
         player,
         new RandomAIPlayer(),
@@ -31,9 +31,26 @@ let gameView = ref<GameView>();
     gameView.value = new GameView(game).bindPlayer(player);
 
     game.start();
-})();
+};
+
+initGame();
+
+/*
+ * Rematch
+ */
+const reload = ref(0);
+
+const rematch = () => {
+    initGame();
+    ++reload.value;
+};
 </script>
 
 <template>
-    <app-board v-if="gameView" :game-view="gameView"></app-board>
+    <app-board
+        :key="reload"
+        v-if="gameView"
+        :game-view="gameView"
+        :rematch="rematch"
+    ></app-board>
 </template>

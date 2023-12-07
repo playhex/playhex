@@ -6,6 +6,7 @@ import PageLicense from '@client/vue/pages/content/PageLicense.vue';
 import PageHexLinks from '@client/vue/pages/content/PageHexLinks.vue';
 import PageNotFound from '@client/vue/pages/PageNotFound.vue';
 import LayoutContent from '@client/vue/pages/content/LayoutContent.vue';
+import ReloadOnRouteChange from '@client/vue/ReloadOnRouteChange.vue';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -14,12 +15,18 @@ const routes: RouteRecordRaw[] = [
         component: PageHome,
     },
     {
-        name: 'online-game',
-        path: '/games/:gameId',
-        component: Page1v1,
-        meta: {
-            displayFooter: false,
-        },
+        path: '/',
+        component: ReloadOnRouteChange,
+        children: [
+            {
+                name: 'online-game',
+                path: '/games/:gameId',
+                component: Page1v1,
+                meta: {
+                    displayFooter: false,
+                },
+            },
+        ],
     },
     {
         name: 'play-vs-ai',

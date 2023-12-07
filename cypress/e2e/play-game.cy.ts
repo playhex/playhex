@@ -6,7 +6,7 @@ describe('Play a game to the end', () => {
         cy.contains('Play vs AI').click();
 
         cy
-            .contains('Play vs AI options')
+            .contains('Game options')
             .closest('.modal-content')
             .contains('Custom')
             .click()
@@ -21,7 +21,7 @@ describe('Play a game to the end', () => {
             .click()
 
             .closest('.modal-content')
-            .contains('Play!')
+            .contains('Play vs AI')
             .click()
         ;
 

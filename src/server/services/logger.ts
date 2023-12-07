@@ -1,4 +1,15 @@
-import winston from 'winston';
+import winston, { Logger } from 'winston';
+
+type SyslogLevels =
+    'debug'
+    | 'info'
+    | 'notice'
+    | 'warning'
+    | 'error'
+    | 'crit'
+    | 'alert'
+    | 'emerg'
+;
 
 /**
  * Which log level to use?
@@ -21,8 +32,7 @@ import winston from 'winston';
  *
  * See https://en.wikipedia.org/wiki/Syslog for base interpretation.
  */
-
-const logger = winston.createLogger({
+const logger: Pick<Logger, SyslogLevels> = winston.createLogger({
     levels: winston.config.syslog.levels,
     transports: [
         new winston.transports.Console({

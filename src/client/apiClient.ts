@@ -39,21 +39,8 @@ export const getGame = async (gameId: string): Promise<null | HostedGameData> =>
     return denormalize(await response.json());
 };
 
-export const apiPostGame1v1 = async (gameOptions: Partial<GameOptionsData> = {}): Promise<HostedGameData> => {
-    const response = await fetch('/api/games/1v1', {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify(gameOptions),
-    });
-
-    return denormalize(await response.json());
-};
-
-export const apiPostGameVsCPU = async (gameOptions: Partial<GameOptionsData> = {}): Promise<HostedGameData> => {
-    const response = await fetch('/api/games/cpu', {
+export const apiPostGame = async (gameOptions: Partial<GameOptionsData> = {}): Promise<HostedGameData> => {
+    const response = await fetch('/api/games', {
         method: 'post',
         headers: {
             'Content-Type': 'application/json',

@@ -5,9 +5,9 @@ describe('Resign a game', () => {
 
         cy.contains('Play vs AI').click();
 
-        cy.contains('Play vs AI options')
+        cy.contains('Game options')
             .closest('.modal-content')
-            .contains('Play!')
+            .contains('Play vs AI')
             .click()
         ;
 

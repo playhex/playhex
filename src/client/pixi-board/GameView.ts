@@ -503,7 +503,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     destroy(): void
     {
-        this.pixi.destroy();
+        this.pixi.destroy(true);
 
         window.removeEventListener('resizeDebounced', this.resizeDebouncedListener);
         themeSwitcherDispatcher.off('themeSwitched', this.themeSwitchedListener);

@@ -19,6 +19,10 @@ const props = defineProps({
     timeControlValues: {
         type: Object as PropType<TimeControlValues>,
     },
+    rematch: {
+        type: Function,
+        required: false,
+    },
 });
 
 /*
@@ -102,10 +106,12 @@ onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientatio
  * Game end: win popin
  */
 const gameOverOverlay = createOverlay(GameOverOverlay);
+const { rematch } = props;
 
 gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
     await gameOverOverlay({
         winner: game.getPlayer(winnerPlayerIndex),
+        rematch,
     });
 });
 

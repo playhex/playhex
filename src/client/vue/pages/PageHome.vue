@@ -3,7 +3,7 @@
 import useLobbyStore from '@client/stores/lobbyStore';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
-import GameOptionsOverlay from '@client/vue/components/GameOptionsOverlay.vue';
+import GameOptionsOverlay, { GameOptionsOverlayInput } from '@client/vue/components/GameOptionsOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Sidebar from '@client/vue/components/Sidebar.vue';
 import HostedGameClient from 'HostedGameClient';
@@ -21,57 +21,40 @@ const goToGame = (gameId: string) => {
     });
 };
 
-const gameOptionsOverlay = createOverlay<unknown, GameOptionsData>(GameOptionsOverlay);
+const gameOptionsOverlay = createOverlay<GameOptionsOverlayInput, GameOptionsData>(GameOptionsOverlay);
 
-const createAndJoinGame = async () => {
-    let gameOptions: GameOptionsData;
-
+const createAndJoinGame = async (opponentType: 'ai' | 'player') => {
     try {
-        gameOptions = await gameOptionsOverlay({
-            title: '1v1 options',
+        const gameOptions = await gameOptionsOverlay({
+            gameOptions: {
+                opponent: { type: opponentType },
+            },
         });
+
+        const hostedGameClient = await lobbyStore.createGame(gameOptions);
+        goToGame(hostedGameClient.getId());
     } catch (e) {
-        return;
+        // noop, player just closed popin
     }
-
-    const hostedGame = await lobbyStore.createGame(gameOptions);
-    goToGame(hostedGame.id);
-};
-
-const createAndJoinGameVsCPU = async () => {
-    let gameOptions: GameOptionsData;
-
-    try {
-        gameOptions = await gameOptionsOverlay({
-            title: 'Play vs AI options',
-            confirmLabel: 'Play!',
-        });
-    } catch (e) {
-        return;
-    }
-
-    const hostedGame = await lobbyStore.createGameVsCPU(gameOptions);
-    goToGame(hostedGame.id);
 };
 
 const createAndJoinGameVsLocalAI = async () => {
-    let gameOptions: GameOptionsData;
-
     try {
-        gameOptions = await gameOptionsOverlay({
-            title: 'Play vs offline AI options',
-            confirmLabel: 'Play!',
+        const gameOptions = await gameOptionsOverlay({
+            gameOptions: {
+                opponent: { type: 'local_ai' },
+            },
+        });
+
+        router.push({
+            name: 'play-vs-ai',
+            state: {
+                gameOptionsJson: JSON.stringify(gameOptions),
+            },
         });
     } catch (e) {
-        return;
+        // noop, player just closed popin
     }
-
-    router.push({
-        name: 'play-vs-ai',
-        state: {
-            gameOptions,
-        },
-    });
 };
 
 const isWaiting = (hostedGameClients: HostedGameClient) => null === hostedGameClients.getHostedGameData().opponent;
@@ -90,10 +73,10 @@ const joinGame = (gameId: string) => {
 
                 <div class="play-buttons row">
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="createAndJoinGame"><i class="fs-3 bi bi-people"></i><br>1v1</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('player')"><i class="fs-3 bi bi-people"></i><br>1v1</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="createAndJoinGameVsCPU"><i class="fs-3 bi bi-robot"></i><br>Play vs AI</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('ai')"><i class="fs-3 bi bi-robot"></i><br>Play vs AI</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
                         <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><i class="fs-3 bi bi-robot"></i><br>Play vs offline AI</button>
