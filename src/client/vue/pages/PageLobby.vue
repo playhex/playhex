@@ -3,9 +3,9 @@
 import useLobbyStore from '@client/stores/lobbyStore';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
-import GameOptionsOverlay, { GameOptionsOverlayInput } from '@client/vue/components/GameOptionsOverlay.vue';
+import GameOptionsOverlay, { GameOptionsOverlayInput } from '@client/vue/components/overlay/GameOptionsOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import Sidebar from '@client/vue/components/Sidebar.vue';
+import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import HostedGameClient from 'HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
 
@@ -143,7 +143,7 @@ const joinGame = (gameId: string) => {
                 <p v-else>No game currently playing.</p>
             </div>
             <div class="col-sm-3">
-                <sidebar></sidebar>
+                <app-sidebar></app-sidebar>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AppMenuTop from '@client/vue/components/AppMenuTop.vue';
-import AppFooter from './components/AppFooter.vue';
+import AppHeader from '@client/vue/components/layout/AppHeader.vue';
+import AppFooter from './components/layout/AppFooter.vue';
 import { useRouter } from 'vue-router';
 
 const { currentRoute } = useRouter();
@@ -10,7 +10,7 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
 <template>
     <div class="app-layout">
         <header>
-            <app-menu-top></app-menu-top>
+            <app-header></app-header>
         </header>
 
         <main>

@@ -3,7 +3,7 @@
 import GameView, { BoardOrientation } from '@client/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
-import GameOverOverlay from '@client/vue/components/GameOverOverlay.vue';
+import GameOverOverlay from '@client/vue/components/overlay/GameOverOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
 import { TimeValue } from '@shared/time-control/types';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';

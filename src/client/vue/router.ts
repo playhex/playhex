@@ -1,7 +1,7 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import PageHome from '@client/vue/pages/PageHome.vue';
-import Page1v1 from '@client/vue/pages/Page1v1.vue';
-import PagePlayVsAI from '@client/vue/pages/PagePlayVsAI.vue';
+import PageLobby from '@client/vue/pages/PageLobby.vue';
+import PagePlayRemote from '@client/vue/pages/PagePlayRemote.vue';
+import PagePlayOffline from '@client/vue/pages/PagePlayOffline.vue';
 import PageLicense from '@client/vue/pages/content/PageLicense.vue';
 import PageHexLinks from '@client/vue/pages/content/PageHexLinks.vue';
 import PageNotFound from '@client/vue/pages/PageNotFound.vue';
@@ -12,7 +12,7 @@ const routes: RouteRecordRaw[] = [
     {
         name: 'home',
         path: '/',
-        component: PageHome,
+        component: PageLobby,
     },
     {
         path: '/',
@@ -21,7 +21,7 @@ const routes: RouteRecordRaw[] = [
             {
                 name: 'online-game',
                 path: '/games/:gameId',
-                component: Page1v1,
+                component: PagePlayRemote,
                 meta: {
                     displayFooter: false,
                 },
@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
     {
         name: 'play-vs-ai',
         path: '/play-vs-ai',
-        component: PagePlayVsAI,
+        component: PagePlayOffline,
         meta: {
             displayFooter: false,
         },

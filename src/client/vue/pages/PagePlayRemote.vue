@@ -4,7 +4,7 @@ import GameView from '@client/pixi-board/GameView';
 import useLobbyStore from '@client/stores/lobbyStore';
 import { ref } from '@vue/runtime-core';
 import AppBoard from '@client/vue/components/AppBoard.vue';
-import ConfirmationOverlay from '@client/vue/components/ConfirmationOverlay.vue';
+import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from 'HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
 import { onUnmounted } from 'vue';

@@ -29,7 +29,7 @@ describe('Play a game to the end', () => {
     });
 
     /*
-        // Coordinates generated with this code placed on "Page1v1.vue" file:
+        // Coordinates generated with this code placed on "PagePlayRemote.vue" file:
 
         const clickHistory: { x: number, y: number }[] = [];
         window.onclick = ({ clientX, clientY }) => {
