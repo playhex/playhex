@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { WebsocketControllerInterface } from '.';
 import { HexServer, HexSocket } from '../../server';
 import OnlinePlayersService from '../../services/OnlinePlayersService';
+import Rooms from '../../../shared/app/Rooms';
 
 @Service({ id: 'websocket_controller', multiple: true })
 export default class OnlinePlayersController implements WebsocketControllerInterface
@@ -18,7 +19,7 @@ export default class OnlinePlayersController implements WebsocketControllerInter
         this.onlinePlayersService
 
             .on('playerConnected', player => {
-                this.hexServer.to('online-players').emit(
+                this.hexServer.to(Rooms.onlinePlayers).emit(
                     'playerConnected',
                     player,
                     this.onlinePlayersService.getOnlinePlayersCount(),
@@ -26,7 +27,7 @@ export default class OnlinePlayersController implements WebsocketControllerInter
             })
 
             .on('playerDisconnected', player => {
-                this.hexServer.to('online-players').emit(
+                this.hexServer.to(Rooms.onlinePlayers).emit(
                     'playerDisconnected',
                     player,
                     this.onlinePlayersService.getOnlinePlayersCount(),

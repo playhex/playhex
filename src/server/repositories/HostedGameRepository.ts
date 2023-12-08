@@ -1,11 +1,11 @@
 import { Service } from 'typedi';
 import HostedGame from '../HostedGame';
 import { Move } from '../../shared/game-engine';
-import PlayerRepository from './PlayerRepository';
 import { MoveData, PlayerData } from '../../shared/app/Types';
 import { HexServer } from '../server';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import AppPlayer from '../../shared/app/AppPlayer';
+import Rooms from '../../shared/app/Rooms';
 
 @Service()
 export default class HostedGameRepository
@@ -14,7 +14,6 @@ export default class HostedGameRepository
 
     constructor(
         private io: HexServer,
-        private playerRepository: PlayerRepository,
     ) {}
 
     getGames()
@@ -31,7 +30,7 @@ export default class HostedGameRepository
     {
         const hostedGame = new HostedGame(this.io, gameOptions, host);
         this.hostedGames[hostedGame.getId()] = hostedGame;
-        this.io.to('lobby').emit('gameCreated', hostedGame.toData());
+        this.io.to(Rooms.lobby).emit('gameCreated', hostedGame.toData());
 
         return hostedGame;
     }
@@ -50,7 +49,7 @@ export default class HostedGameRepository
             return joinResult;
         }
 
-        this.io.to(['lobby', `games/${gameId}`]).emit(
+        this.io.to([Rooms.lobby, Rooms.game(gameId)]).emit(
             'gameJoined',
             gameId,
             playerDataOrAppPlayer instanceof AppPlayer

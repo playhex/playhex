@@ -10,17 +10,13 @@ const useAuthStore = defineStore('authStore', () => {
      */
     const loggedInUser = ref<null | PlayerData>(null);
 
-    const getUserOrLoginAsGuest = async (): Promise<PlayerData> => {
-        if (null !== loggedInUser.value) {
-            return loggedInUser.value;
-        }
+    const loggedInUserPromise = loginAsGuest();
 
-        return loggedInUser.value = await loginAsGuest();
-    };
+    loggedInUserPromise.then(user => loggedInUser.value = user);
 
     return {
         loggedInUser,
-        getUserOrLoginAsGuest,
+        loggedInUserPromise,
     };
 });
 

@@ -10,6 +10,7 @@ import { createOverlay } from 'unoverlay-vue';
 import { onUnmounted } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
+import Rooms from '@shared/app/Rooms';
 import AppPlayer from '@shared/app/AppPlayer';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -28,10 +29,12 @@ const lobbyStore = useLobbyStore();
 const router = useRouter();
 
 /*
- * Join/leave game room
+ * Join/leave game room.
+ * Not required if player is already in game,
+ * but necessary for watchers to received game updates.
  */
-useSocketStore().joinGameRoom(gameId);
-onUnmounted(() => useSocketStore().leaveGameRoom(gameId));
+useSocketStore().joinRoom(Rooms.game(gameId));
+onUnmounted(() => useSocketStore().leaveRoom(Rooms.game(gameId)));
 
 const getLocalAppPlayer = (): null | AppPlayer => {
     const { loggedInUser } = useAuthStore();
@@ -84,7 +87,12 @@ const initGameView = () => {
  * Load game
  */
 (async () => {
-    hostedGameClient.value = await lobbyStore.retrieveHostedGameClient(gameId, true);
+    const [updated] = await Promise.all([
+        await lobbyStore.retrieveHostedGameClient(gameId),
+        new Promise(resolve => setTimeout(resolve, 1)), // add delay to fix "webgl context lost" error
+    ]);
+
+    hostedGameClient.value = updated;
 
     if (!hostedGameClient.value) {
         router.push({ name: 'home' });

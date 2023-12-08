@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import TypedEventEmitter from 'typed-emitter';
-import { TimeValue } from './types';
+import { TimeValue } from './TimeControlInterface';
 
 type ChronoEvents = {
     elapsed: () => void;

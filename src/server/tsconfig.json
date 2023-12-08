@@ -34,7 +34,7 @@
         }
     },
     "include": [
-        "**/*.ts", "../shared/app/socketCustomParser.ts",
+        "**/*.ts",
     ],
     "references": [
         {

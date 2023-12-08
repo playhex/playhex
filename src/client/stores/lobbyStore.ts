@@ -30,10 +30,16 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     };
 
     /**
+     * Promise of list of games loaded on app start.
+     * Can be reused.
+     */
+    const initialGamesPromise: Promise<HostedGameData[]> = getGames();
+
+    /**
      * Load and update all games from server.
      */
     const updateGames = async (): Promise<void> => {
-        const apiGames: HostedGameData[] = await getGames();
+        const apiGames: HostedGameData[] = await initialGamesPromise;
 
         apiGames.forEach(hostedGameData => {
             if (hostedGameClients.value[hostedGameData.id]) {
@@ -132,6 +138,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     return {
         hostedGameClients,
+        initialGamesPromise,
         createGame,
         updateGames,
         retrieveHostedGameClient,

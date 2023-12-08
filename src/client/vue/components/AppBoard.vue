@@ -5,8 +5,7 @@ import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
 import GameOverOverlay from '@client/vue/components/overlay/GameOverOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
-import { TimeValue } from '@shared/time-control/types';
-import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
+import { TimeControlValues, TimeValue, timeValueToSeconds } from '@shared/time-control/TimeControlInterface';
 import { format } from 'date-fns';
 
 const pixiApp = ref<HTMLElement>();
@@ -36,10 +35,7 @@ type Chrono = {
 };
 
 const toChrono = (timeValue: TimeValue): Chrono => {
-    let seconds = timeValue instanceof Date
-        ? (timeValue.getTime() - new Date().getTime()) / 1000
-        : timeValue
-    ;
+    let seconds = timeValueToSeconds(timeValue);
 
     const chrono: Chrono = {
         time: format(seconds * 1000, 'm:ss'),

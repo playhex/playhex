@@ -9,6 +9,7 @@ import { HexServer } from 'server';
 import { Outcome } from '@shared/game-engine/Game';
 import logger from './services/logger';
 import { GameOptionsData } from '@shared/app/GameOptions';
+import Rooms from '../shared/app/Rooms';
 
 /**
  * Contains a game state,
@@ -44,6 +45,24 @@ export default class HostedGame
         return this.timeControl.getValues();
     }
 
+    private gameRooms(withLobby = false): string[]
+    {
+        const rooms = [
+            Rooms.game(this.id),
+            Rooms.playerGames(this.host.getPlayerId()),
+        ];
+
+        if (withLobby) {
+            rooms.push(Rooms.lobby);
+        }
+
+        if (null !== this.opponent) {
+            rooms.push(Rooms.playerGames(this.opponent.getPlayerId()));
+        }
+
+        return rooms;
+    }
+
     listenGame(): void
     {
         if (!this.game) {
@@ -52,18 +71,18 @@ export default class HostedGame
         }
 
         this.game.on('started', () => {
-            this.io.to(['lobby', `games/${this.id}`]).emit('gameStarted', this.toData());
-            this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+            this.io.to(this.gameRooms(true)).emit('gameStarted', this.toData());
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
         this.game.on('played', (move, byPlayerIndex) => {
-            this.io.to(`games/${this.id}`).emit('moved', this.id, move, byPlayerIndex);
-            this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+            this.io.to(this.gameRooms()).emit('moved', this.id, move, byPlayerIndex);
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
         this.game.on('ended', (winner: PlayerIndex, outcome: Outcome) => {
-            this.io.to(['lobby', `games/${this.id}`]).emit('ended', this.id, winner, outcome);
-            this.io.to(`games/${this.id}`).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+            this.io.to(this.gameRooms(true)).emit('ended', this.id, winner, outcome);
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
     }
 

@@ -1,10 +1,29 @@
 import TypedEventEmitter from 'typed-emitter';
-import { TimeValue } from './types';
 
 export type PlayerIndex = 0 | 1;
 
 export type TimeControlEvents = {
     elapsed: (playerLostByTime: PlayerIndex) => void;
+};
+
+/**
+ * Time data to be displayed on chrono.
+ *
+ * Depending whether time is running or paused:
+ * - number: paused chrono
+ * - date: running chrono, date when chrono reaches 0:00.
+ *
+ * Depending whether time is countdown or incrementing:
+ * - positive number/future date: countdown timer.
+ * - negative number/past date: time is incrementing.
+ */
+export type TimeValue = Date | number;
+
+export const timeValueToSeconds = (timeValue: TimeValue): number => {
+    return timeValue instanceof Date
+        ? (timeValue.getTime() - new Date().getTime()) / 1000
+        : timeValue
+    ;
 };
 
 export type TimeControlState =

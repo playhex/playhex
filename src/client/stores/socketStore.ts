@@ -17,31 +17,16 @@ const useSocketStore = defineStore('socketStore', () => {
     const joinRoom = (room: string) => socket.emit('room', 'join', room);
     const leaveRoom = (room: string) => socket.emit('room', 'leave', room);
 
-    /**
-     * Join a game room to receive state updates.
-     * Does not join the game to play.
-     */
-    const joinGameRoom = (gameId: string): void => {
-        joinRoom(`games/${gameId}`);
-    };
-
-    /**
-     * Leave a game room to no longer receive state updates.
-     */
-    const leaveGameRoom = (gameId: string): void => {
-        leaveRoom(`games/${gameId}`);
-    };
-
     useAuthStore()
-        .getUserOrLoginAsGuest()
+        .loggedInUserPromise
         .then(() => reconnectSocket())
     ;
 
     return {
         socket,
+        joinRoom,
+        leaveRoom,
         reconnectSocket,
-        joinGameRoom,
-        leaveGameRoom,
     };
 });
 
