@@ -6,6 +6,11 @@ export const BOARD_DEFAULT_SIZE = 11;
  * Hex board.
  * Can set any cell, no rule check.
  * Check winning path.
+ *
+ * https://www.red-bean.com/sgf/hex.html
+ *
+ * Player 0 = red = black: must connect top to bottom
+ * Player 1 = blue = white: must connect left to right
  */
 export default class Board
 {
@@ -72,13 +77,17 @@ export default class Board
         this.hexes[row][col] = value;
     }
 
+    /**
+     * @param playerIndex Returns cell of side of which player
+     * @param sideIndex Returns top/left or bottom/right
+     */
     getSideCells(playerIndex: PlayerIndex, sideIndex: 0 | 1): Coords[]
     {
         const z = this.size - 1;
 
         return Array(this.size)
             .fill(0)
-            .map((_, i) => playerIndex
+            .map((_, i) => 0 === playerIndex
                 ? sideIndex
                     ? { row: z, col: i } // bottom
                     : { row: 0, col: i } // top
@@ -208,7 +217,7 @@ export default class Board
     {
         const z = this.size - 1;
 
-        return playerIndex
+        return 0 === playerIndex
             ? sideIndex
                 ? cell.row === z // bottom
                 : cell.row === 0 // top

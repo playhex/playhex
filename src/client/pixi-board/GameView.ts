@@ -49,7 +49,7 @@ export type BoardOrientation =
 const orientationToRotation = (orientation: BoardOrientation): number => {
     switch (orientation) {
         case 'horizontal':
-            return 5 * PI_6;
+            return -1 * PI_6;
 
         case 'vertical':
             return 2 * PI_6;
@@ -58,7 +58,7 @@ const orientationToRotation = (orientation: BoardOrientation): number => {
             return 0 * PI_6;
 
         case 'vertical_bias_right_hand':
-            return 3 * PI_6;
+            return -3 * PI_6;
 
         case 'vertical_bias_left_hand':
             return 1 * PI_6;
@@ -151,7 +151,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         };
 
         this.gameContainer.addChild(
-            this.createBackground(),
+            this.createColoredSides(),
         );
 
         if (this.displayCoords) {
@@ -366,17 +366,21 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         }
     }
 
-    private createBackground(): Graphics
+    private createColoredSides(): Container
     {
+        // Initialize both sides at class level to change them later (light on/off)
         this.sidesGraphics = [new Graphics(), new Graphics()];
-        let g: Graphics = this.sidesGraphics[0];
+
+        let g: Graphics;
         const to = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x, a.y + b.y);
         const m = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
 
+        // Set sides colors
         this.sidesGraphics[0].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
         this.sidesGraphics[1].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
 
-        g = this.sidesGraphics[1];
+        // From a1 to i1 (red)
+        g = this.sidesGraphics[0];
         g.moveTo(Hex.cornerCoords(5).x, Hex.cornerCoords(5).y);
 
         for (let i = 0; i < this.game.getSize(); ++i) {
@@ -384,7 +388,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             to(Hex.coords(0, i), Hex.cornerCoords(0));
         }
 
-        g = this.sidesGraphics[0];
+        // From i1 to i9 (blue)
+        g = this.sidesGraphics[1];
         m(Hex.coords(0, this.game.getSize() - 1), Hex.cornerCoords(0));
 
         for (let i = 0; i < this.game.getSize(); ++i) {
@@ -392,7 +397,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(2));
         }
 
-        g = this.sidesGraphics[1];
+        // From i9 to a9 (red)
+        g = this.sidesGraphics[0];
         m(Hex.coords(this.game.getSize() - 1, this.game.getSize() - 1), Hex.cornerCoords(2));
 
         for (let i = 0; i < this.game.getSize(); ++i) {
@@ -400,7 +406,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(4));
         }
 
-        g = this.sidesGraphics[0];
+        // From a9 to a1 (blue)
+        g = this.sidesGraphics[1];
         m(Hex.coords(this.game.getSize() - 1, 0), Hex.cornerCoords(4));
 
         for (let i = 0; i < this.game.getSize(); ++i) {
@@ -408,9 +415,11 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
 
-        const graphics = new Graphics();
-        graphics.addChild(...this.sidesGraphics);
-        return graphics;
+        // Add both sides into a single container
+        const sidesContainer = new Container();
+        sidesContainer.addChild(...this.sidesGraphics);
+
+        return sidesContainer;
     }
 
     getDisplayCoords(): boolean
@@ -455,13 +464,13 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         };
 
         for (let i = 0; i < this.game.getSize(); ++i) {
-            const letter = String.fromCharCode(i + 'a'.charCodeAt(0));
-            container.addChild(createText(letter, i, -1));
-            container.addChild(createText(letter, i, this.game.getSize()));
-
             const number = String(i + 1);
-            container.addChild(createText(number, -1, i));
-            container.addChild(createText(number, this.game.getSize(), i));
+            container.addChild(createText(number, i, -1));
+            container.addChild(createText(number, i, this.game.getSize()));
+
+            const letter = String.fromCharCode(i + 'a'.charCodeAt(0));
+            container.addChild(createText(letter, -1, i));
+            container.addChild(createText(letter, this.game.getSize(), i));
         }
 
         return container;

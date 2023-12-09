@@ -87,12 +87,9 @@ const initGameView = () => {
  * Load game
  */
 (async () => {
-    const [updated] = await Promise.all([
-        await lobbyStore.retrieveHostedGameClient(gameId),
-        new Promise(resolve => setTimeout(resolve, 1)), // add delay to fix "webgl context lost" error
-    ]);
-
-    hostedGameClient.value = updated;
+    // Must reload from server when I watch a game, I am not up to date
+    // Or when I come back on a game where I did not received events, again not up to date
+    hostedGameClient.value = await lobbyStore.retrieveHostedGameClient(gameId, true);
 
     if (!hostedGameClient.value) {
         router.push({ name: 'home' });

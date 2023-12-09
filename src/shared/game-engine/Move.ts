@@ -25,7 +25,7 @@ export default class Move implements Coords
 
     toString(): string
     {
-        return String.fromCharCode('a'.charCodeAt(0) + this.row) + (this.col + 1);
+        return String.fromCharCode('a'.charCodeAt(0) + this.col) + (this.row + 1);
     }
 
     clone(): Move

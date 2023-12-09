@@ -1,4 +1,4 @@
-import { Board, Game, Move, PlayerIndex } from '@shared/game-engine';
+import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import { HostedGameData, PlayerData } from '@shared/app/Types';
 import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
@@ -41,31 +41,21 @@ export default class HostedGameClient
             return this.game;
         }
 
-        const cellValues: { [key: string]: null | PlayerIndex } = {
-            '0': 0,
-            '1': 1,
-            '.': null,
-        };
-
-        const board = Board.createFromGrid(
-            gameData.hexes
-                .map(line => line.split('').map(c => cellValues[c]))
-            ,
-        );
-
-        this.game = new Game(board);
-
-        this.game.setPlayers([
+        this.game = new Game(gameData.size, [
             new AppPlayer(gameData.players[0]),
             new AppPlayer(gameData.players[1]),
         ]);
 
-        this.game.setCurrentPlayerIndex(gameData.currentPlayerIndex);
+        if (gameData.started) {
+            this.gameStarted(hostedGameData);
+        }
+
+        for (const move of gameData.movesHistory) {
+            this.game.move(new Move(move.row, move.col), this.game.getCurrentPlayerIndex());
+        }
 
         if (null !== gameData.winner) {
             this.game.declareWinner(gameData.winner, gameData.outcome);
-        } else if (gameData.started) {
-            this.gameStarted(hostedGameData);
         }
 
         return this.game;
@@ -228,6 +218,7 @@ export default class HostedGameClient
     gameEnded(winner: PlayerIndex, outcome: Outcome): void
     {
         if (this.hostedGameData.gameData) {
+            this.hostedGameData.gameData.state = 'ended';
             this.hostedGameData.gameData.winner = winner;
             this.hostedGameData.gameData.outcome = outcome;
         }

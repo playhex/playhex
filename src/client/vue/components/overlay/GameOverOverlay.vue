@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { Player } from '@shared/game-engine';
+/* eslint-env browser */
+import { Game } from '@shared/game-engine';
+import { gameToSGF } from '@shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
+import { downloadString } from '../../../services/fileDownload';
 
 const { visible, confirm } = useOverlayMeta();
 
 const props = defineProps({
-    winner: {
-        type: Player,
+    game: {
+        type: Game,
         required: true,
     },
     rematch: {
@@ -15,7 +18,28 @@ const props = defineProps({
     },
 });
 
-const { winner, rematch } = props;
+const { game, rematch } = props;
+const winner = game.getPlayer(game.getStrictWinner());
+
+/*
+ * SGF download
+ */
+const slugify = (string: string): string => string
+    .toLocaleLowerCase()
+    .replace(/[^a-z0-9]/g, '_')
+;
+
+const downloadSGF = (): void => {
+    const filename = [
+        'hex',
+        (game.getStartedAt() ?? game.getCreatedAt()).toISOString().substring(0, 10),
+        slugify(game.getPlayer(0).getName()),
+        'VS',
+        slugify(game.getPlayer(1).getName()),
+    ].join('-') + '.sgf';
+
+    downloadString(gameToSGF(game), filename);
+};
 </script>
 
 <template>
@@ -28,7 +52,7 @@ const { winner, rematch } = props;
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong :class="'text-player-' + (winner.getPlayerIndex() ? 'b' : 'a')">{{ winner.getName() }}</strong> won the game !</p>
+                        <p><strong :class="'text-player-' + (game.getStrictWinner() ? 'b' : 'a')">{{ winner.getName() }}</strong> won the game !</p>
                     </div>
                     <div class="modal-footer">
                         <button
@@ -37,6 +61,12 @@ const { winner, rematch } = props;
                             class="btn btn-primary"
                             @click="confirm(); rematch();"
                         ><i class="bi-repeat"></i> Rematch</button>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary"
+                            @click="downloadSGF();"
+                        ><i class="bi-download"></i> SGF</button>
 
                         <button
                             type="button"

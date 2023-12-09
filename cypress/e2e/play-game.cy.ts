@@ -48,10 +48,10 @@ describe('Play a game to the end', () => {
 
     it('wins vs cpu on board size 4', () => {
         cy.get('canvas')
-            .click(388, 448)
-            .click(400, 327)
-            .click(507, 259)
-            .click(502, 135)
+            .click(502, 257)
+            .click(504, 384)
+            .click(409, 203)
+            .click(616, 449)
         ;
 
         cy.contains('Game over');
@@ -60,13 +60,13 @@ describe('Play a game to the end', () => {
 
     it('loses vs cpu on board size 4', () => {
         cy.get('canvas')
-            .click(218, 329)
-            .click(260, 391)
-            .click(379, 458)
-            .click(491, 527)
-            .click(485, 138)
-            .click(716, 396)
-            .click(625, 336)
+            .click(289, 258)
+            .click(615, 454)
+            .click(721, 383)
+            .click(828, 320)
+            .click(179, 316)
+            .click(722, 259)
+            .click(395, 196)
         ;
 
         cy.contains('Game over');

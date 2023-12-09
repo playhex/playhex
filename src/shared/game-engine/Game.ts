@@ -70,10 +70,6 @@ export type Outcome =
     | 'forfeit'
 ;
 
-/**
- * Player 0 must connect left to right
- * Player 1 must connect top to bottom
- */
 export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
 {
     private state: GameState = 'created';
@@ -124,6 +120,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     getSize(): number
     {
         return this.board.getSize();
+    }
+
+    hasPlayers(): boolean
+    {
+        return null !== this.players;
     }
 
     getPlayers(): Tuple<PlayerInterface>
@@ -374,9 +375,23 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.createdAt;
     }
 
+    setCreatedAt(date: Date): this
+    {
+        this.createdAt = date;
+
+        return this;
+    }
+
     getStartedAt(): null | Date
     {
         return this.startedAt;
+    }
+
+    setStartedAt(date: Date): this
+    {
+        this.startedAt = date;
+
+        return this;
     }
 
     getLastMoveAt(): null | Date
@@ -384,8 +399,22 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this.lastMoveAt;
     }
 
+    setLastMoveAt(date: Date): this
+    {
+        this.lastMoveAt = date;
+
+        return this;
+    }
+
     getEndedAt(): null | Date
     {
         return this.endedAt;
+    }
+
+    setEndedAt(date: Date): this
+    {
+        this.endedAt = date;
+
+        return this;
     }
 }

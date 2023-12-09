@@ -104,9 +104,9 @@ onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientatio
 const gameOverOverlay = createOverlay(GameOverOverlay);
 const { rematch } = props;
 
-gameView.value.on('endedAndWinAnimationOver', async winnerPlayerIndex => {
+gameView.value.on('endedAndWinAnimationOver', async () => {
     await gameOverOverlay({
-        winner: game.getPlayer(winnerPlayerIndex),
+        game,
         rematch,
     });
 });

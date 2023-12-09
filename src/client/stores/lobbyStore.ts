@@ -8,13 +8,14 @@ import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 import useSocketStore from './socketStore';
 import { ref } from 'vue';
+import Rooms from '@shared/app/Rooms';
 
 /**
  * State synced with server, and methods to handle games and user.
  */
 const useLobbyStore = defineStore('lobbyStore', () => {
 
-    const { socket } = useSocketStore();
+    const { socket, joinRoom } = useSocketStore();
 
     /**
      * List of games.
@@ -132,6 +133,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     // Listen lobby event to update state on change
     listenSocket();
+
+    // Get lobby updates
+    joinRoom(Rooms.lobby);
 
     // Load games on vue app open
     updateGames();

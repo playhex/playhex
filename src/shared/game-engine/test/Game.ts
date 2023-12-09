@@ -30,20 +30,20 @@ describe('Game', () => {
 
         assert.strictEqual(emitted['played'], true);
 
-        game.move(new Move(2, 1), 1);
-        assert.strictEqual(game.getBoard().getCell(2, 1), 1);
+        game.move(new Move(1, 2), 1);
+        assert.strictEqual(game.getBoard().getCell(1, 2), 1);
 
         // Illegal moves
         assert.throws(() => game.move(new Move(0, 0), 1), { message: 'Move a1: Not your turn' });
-        assert.throws(() => game.move(new Move(0, 9), 0), { message: 'Move a10: Cell outside board' });
+        assert.throws(() => game.move(new Move(9, 0), 0), { message: 'Move a10: Cell outside board' });
         assert.throws(() => game.move(new Move(1, 1), 0), { message: 'Move b2: This cell is already occupied' });
 
         // Game end
-        game.move(new Move(1, 2), 0);
-        game.move(new Move(0, 2), 1);
+        game.move(new Move(2, 1), 0);
+        game.move(new Move(2, 0), 1);
         assert.strictEqual(game.isEnded(), false, 'Game is not yet ended');
         assert.strictEqual(emitted['ended'], false);
-        game.move(new Move(1, 0), 0);
+        game.move(new Move(0, 1), 0);
 
         assert.strictEqual(emitted['ended'], true);
         assert.strictEqual(game.isEnded(), true, 'Game is now ended, player 0 won');
@@ -71,19 +71,19 @@ describe('Game', () => {
         player0.move(new Move(1, 1));
         assert.strictEqual(game.getBoard().getCell(1, 1), 0);
 
-        player1.move(new Move(2, 1));
-        assert.strictEqual(game.getBoard().getCell(2, 1), 1);
+        player1.move(new Move(1, 2));
+        assert.strictEqual(game.getBoard().getCell(1, 2), 1);
 
         // Illegal moves
         assert.throws(() => player1.move(new Move(0, 0)), { message: 'Move a1: Not your turn' });
-        assert.throws(() => player0.move(new Move(0, 9)), { message: 'Move a10: Cell outside board' });
+        assert.throws(() => player0.move(new Move(9, 0)), { message: 'Move a10: Cell outside board' });
         assert.throws(() => player0.move(new Move(1, 1)), { message: 'Move b2: This cell is already occupied' });
 
         // Game end
-        player0.move(new Move(1, 2));
-        player1.move(new Move(0, 2));
+        player0.move(new Move(2, 1));
+        player1.move(new Move(2, 0));
         assert.strictEqual(game.isEnded(), false, 'Game is not yet ended');
-        player0.move(new Move(1, 0));
+        player0.move(new Move(0, 1));
 
         assert.strictEqual(game.isEnded(), true, 'Game is now ended, player 0 won');
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner');
