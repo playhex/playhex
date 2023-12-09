@@ -58,8 +58,8 @@ export default class RemoteApiPlayer extends AppPlayer
         const [, letter, number] = match;
 
         return new Move(
-            letter.charCodeAt(0) - 97, // "a" is 0
             parseInt(number, 10) - 1, // "1" is 0
+            letter.charCodeAt(0) - 97, // "a" is 0
         );
     }
 

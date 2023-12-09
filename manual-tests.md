@@ -24,3 +24,5 @@ These tests are either not yet automated, or too hard to automate.
 - I cannot play against myself, join my own game twice
 
 - Check if I can see game, last move and win popin as watcher
+
+- Play a real game VS Mohex (check whether coords are well interpreted)
