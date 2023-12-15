@@ -4,6 +4,25 @@ import { v4 as uuidv4 } from 'uuid';
 
 const noInputError = new Error('No player input, cannot continue');
 
+type HexAiApiPayload = {
+    game: {
+        size: number;
+        movesHistory: string;
+        currentPlayer: 'black' | 'white';
+        swapRule: boolean;
+    };
+
+    ai: {
+        engine: 'mohex';
+
+        /**
+         * Limit power.
+         * For Mohex, it is max_games.
+         */
+        maxGames: number;
+    };
+};
+
 export default class RemoteApiPlayer extends AppPlayer
 {
     constructor(
@@ -29,21 +48,30 @@ export default class RemoteApiPlayer extends AppPlayer
             throw noInputError;
         }
 
+        const payload: HexAiApiPayload = {
+            game: {
+                size: this.playerGameInput.getSize(),
+                movesHistory: this.playerGameInput
+                    .getMovesHistory()
+                    .map(move => move.toString())
+                    .join(' ')
+                ,
+                currentPlayer: this.playerGameInput.getPlayerIndex() ? 'white' : 'black',
+                swapRule: false,
+            },
+            ai: {
+                engine: 'mohex',
+                maxGames: 20,
+            },
+        };
+
         const response = await fetch(this.endpoint, {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
-            body: JSON.stringify({
-                size: this.playerGameInput.getSize(),
-                currentColor: this.playerGameInput.getPlayerIndex() ? 'white' : 'black',
-                movesHistory: this.playerGameInput
-                    .getMovesHistory()
-                    .map(move => move.toString())
-                    .join(' ')
-                ,
-            }),
+            body: JSON.stringify(payload),
         });
 
         const moveString = await response.text();

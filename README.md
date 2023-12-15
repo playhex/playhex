@@ -60,7 +60,7 @@ Check if it responds with <http://localhost:3001/api/license>.
 Then enable Mohex locally by adding in your `.env`:
 
 ``` dotenv
-MOHEX_API_ENDPOINT=http://localhost:3001/api/calculate-move
+HEX_AI_API_ENDPOINT=http://localhost:3001/api/calculate-move
 ```
 
 ### Optimize js size
