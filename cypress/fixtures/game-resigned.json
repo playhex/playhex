@@ -1,0 +1,124 @@
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "id": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
+        "pseudo": "The loser"
+    },
+    "opponent": {
+        "id": "winner-id",
+        "pseudo": "The winner"
+    },
+    "timeControlValues": {
+        "type": "absolute",
+        "state": "over",
+        "players": [
+            {
+                "totalRemainingTime": 899.996
+            },
+            {
+                "totalRemainingTime": 891.304
+            }
+        ]
+    },
+    "gameOptions": {
+        "boardsize": 9,
+        "firstPlayer": null,
+        "opponent": {
+            "type": "ai"
+        }
+    },
+    "gameData": {
+        "players": [
+            {
+                "id": "winner-id",
+                "pseudo": "The winner"
+            },
+            {
+                "id": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
+                "pseudo": "The loser"
+            }
+        ],
+        "size": 9,
+        "started": true,
+        "state": "ended",
+        "movesHistory": [
+            {
+                "row": 2,
+                "col": 0,
+                "playedAt": "2023-12-19T12:33:25.424Z"
+            },
+            {
+                "row": 3,
+                "col": 4,
+                "playedAt": "2023-12-19T12:33:26.443Z"
+            },
+            {
+                "row": 8,
+                "col": 3,
+                "playedAt": "2023-12-19T12:33:26.443Z"
+            },
+            {
+                "row": 5,
+                "col": 6,
+                "playedAt": "2023-12-19T12:33:26.934Z"
+            },
+            {
+                "row": 4,
+                "col": 7,
+                "playedAt": "2023-12-19T12:33:26.934Z"
+            },
+            {
+                "row": 6,
+                "col": 2,
+                "playedAt": "2023-12-19T12:33:27.903Z"
+            },
+            {
+                "row": 2,
+                "col": 8,
+                "playedAt": "2023-12-19T12:33:27.905Z"
+            }
+        ],
+        "currentPlayerIndex": 1,
+        "winner": 0,
+        "outcome": "resign",
+        "createdAt": "2023-12-19T12:33:25.423Z",
+        "startedAt": "2023-12-19T12:33:25.423Z",
+        "lastMoveAt": "2023-12-19T12:33:27.905Z",
+        "endedAt": "2023-12-19T12:33:34.123Z",
+        "hexes": [
+            ".........",
+            ".........",
+            "0.......0",
+            "....1....",
+            ".......0.",
+            "......1..",
+            "..1......",
+            ".........",
+            "...0....."
+        ]
+    },
+    "__meta": {
+        "values": {
+            "gameData.createdAt": [
+                "Date"
+            ],
+            "gameData.startedAt": [
+                "Date"
+            ],
+            "gameData.lastMoveAt": [
+                "Date"
+            ],
+            "gameData.endedAt": [
+                "Date"
+            ]
+        },
+        "referentialEqualities": {
+            "host": [
+                "gameData.players.1"
+            ],
+            "opponent": [
+                "gameData.players.0"
+            ]
+        }
+    }
+}

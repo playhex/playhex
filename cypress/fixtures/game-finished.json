@@ -1,12 +1,12 @@
 {
     "id": "00000000-0000-0000-0000-000000000000",
     "host": {
-        "id": "3166dd60-77aa-4aff-9fa4-6fa5ecd77744",
-        "pseudo": "Guest 7184"
+        "id": "player-id",
+        "pseudo": "Test player"
     },
     "opponent": {
-        "id": "determinist-random-bot|6632ed93-baee-47af-9c9d-6e8b5ee2fe3e",
-        "pseudo": "Determinist random bot"
+        "id": "bot-id",
+        "pseudo": "Bot"
     },
     "timeControlValues": {
         "type": "absolute",
@@ -30,12 +30,12 @@
     "gameData": {
         "players": [
             {
-                "id": "determinist-random-bot|6632ed93-baee-47af-9c9d-6e8b5ee2fe3e",
-                "pseudo": "Determinist random bot"
+                "id": "bot-id",
+                "pseudo": "Bot"
             },
             {
-                "id": "3166dd60-77aa-4aff-9fa4-6fa5ecd77744",
-                "pseudo": "Guest 7184"
+                "id": "player-id",
+                "pseudo": "Test player"
             }
         ],
         "size": 9,

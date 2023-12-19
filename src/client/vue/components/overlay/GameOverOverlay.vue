@@ -40,6 +40,15 @@ const downloadSGF = (): void => {
 
     downloadString(gameToSGF(game), filename);
 };
+
+const outcomeToString = (): string => {
+    switch (game.getOutcome()) {
+        case null: return 'the game';
+        case 'resign': return 'by resignation';
+        case 'time': return 'by time';
+        case 'forfeit': return 'by forfeit';
+    }
+};
 </script>
 
 <template>
@@ -52,7 +61,7 @@ const downloadSGF = (): void => {
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong :class="'text-player-' + (game.getStrictWinner() ? 'b' : 'a')">{{ winner.getName() }}</strong> won the game !</p>
+                        <p><strong :class="'text-player-' + (game.getStrictWinner() ? 'b' : 'a')">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
                     </div>
                     <div class="modal-footer">
                         <button
