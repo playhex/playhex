@@ -104,7 +104,10 @@ onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientatio
 const gameOverOverlay = createOverlay(GameOverOverlay);
 const { rematch } = props;
 
+console.log('LISTEN');
+
 gameView.value.on('endedAndWinAnimationOver', async () => {
+    console.log('EVENT', 'endedAndWinAnimationOver');
     await gameOverOverlay({
         game,
         rematch,
@@ -136,7 +139,7 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                 <h4 class="text-player-b">{{ game.getPlayer(1).getName() }}</h4>
             </div>
         </div>
-        <p v-else>Initialize game...</p>
+        <p v-else>Initialize game…</p>
     </div>
 </template>
 

@@ -1,5 +1,5 @@
 describe('Lobby', () => {
-    it.only('displays my game when I created one', () => {
+    it('displays my game when I created one', () => {
         cy.visit('/');
         cy
             .get('.menu-top')

@@ -21,7 +21,7 @@ export const bindTimeControlToGame = (game: Game, timeControl: TimeControlInterf
 
     timeControl.on('elapsed', (playerLostByTime: PlayerIndex) => {
         if (playerLostByTime !== game.getCurrentPlayerIndex()) {
-            throw new Error('player lose by time is not the one playing...');
+            throw new Error('player lose by time is not the one playing…');
         }
 
         game.loseByTime();

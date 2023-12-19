@@ -168,7 +168,7 @@ const rematch = async (): Promise<void> => {
             :key="gameViewLoaded"
             :rematch="rematch"
         ></app-board>
-        <p v-else>Loading game {{ gameId }}...</p>
+        <p v-else>Loading game {{ gameId }}…</p>
 
         <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInUser)" class="position-absolute w-100 join-button-container">
             <div class="d-flex justify-content-center">

@@ -124,7 +124,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         themeSwitcherDispatcher.on('themeSwitched', this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
-            this.animateWinningPath();
+            this.endedCallback(this.game.getStrictWinner());
         }
     }
 
@@ -289,6 +289,15 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.gameContainer.scale = { x: scale, y: scale };
     }
 
+    private async endedCallback(winner: PlayerIndex): Promise<void>
+    {
+        this.highlightSidesFromGame();
+
+        await this.animateWinningPath();
+
+        this.emit('endedAndWinAnimationOver', winner);
+    }
+
     private listenModel(): void
     {
         this.game.on('started', () => {
@@ -305,13 +314,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             this.highlightSidesFromGame();
         });
 
-        this.game.on('ended', async (winner) => {
-            this.highlightSidesFromGame();
-
-            await this.animateWinningPath();
-
-            this.emit('endedAndWinAnimationOver', winner);
-        });
+        this.game.on('ended', async (winner) => this.endedCallback(winner));
     }
 
     resetHighlightedHexes(): void

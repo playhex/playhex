@@ -28,7 +28,7 @@ export default class RandomAIPlayer extends AppPlayer
 
     async makeMove(): Promise<void>
     {
-        console.log('random AI player is playing...');
+        console.log('random AI player is playing…');
 
         if (RandomAIPlayer.WAIT_BEFORE_PLAY > 0) {
             await new Promise(resolve => {

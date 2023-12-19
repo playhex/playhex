@@ -33,7 +33,7 @@ export default class HostedGameClient
             const hostPlayer: AppPlayer = new AppPlayer(hostedGameData.host);
             const opponentPlayer: AppPlayer = new AppPlayer(hostedGameData.opponent ?? {
                 id: '',
-                pseudo: '(waiting...)',
+                pseudo: '(waiting…)',
             });
 
             this.game = new Game(hostedGameData.gameOptions.boardsize, [hostPlayer, opponentPlayer]);
@@ -50,11 +50,13 @@ export default class HostedGameClient
             this.gameStarted(hostedGameData);
         }
 
+        // Replay game and fill history
         for (const move of gameData.movesHistory) {
             this.game.move(new Move(move.row, move.col), this.game.getCurrentPlayerIndex());
         }
 
-        if (null !== gameData.winner) {
+        // Set a winner if not yet set because timeout or resignation
+        if (null !== gameData.winner && !this.game.isEnded()) {
             this.game.declareWinner(gameData.winner, gameData.outcome);
         }
 
@@ -206,7 +208,7 @@ export default class HostedGameClient
         }
 
         if (this.game.getBoard().getCell(move.getRow(), move.getCol()) === 1 - byPlayerIndex) {
-            throw new Error('This cell is already filled by other player...');
+            throw new Error('This cell is already filled by other player…');
         }
 
         // If cell is not already pre-played locally by server response anticipation
