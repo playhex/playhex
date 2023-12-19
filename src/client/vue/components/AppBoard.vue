@@ -7,6 +7,8 @@ import GameOverOverlay from '@client/vue/components/overlay/GameOverOverlay.vue'
 import { createOverlay } from 'unoverlay-vue';
 import { TimeControlValues, TimeValue, timeValueToSeconds } from '@shared/time-control/TimeControlInterface';
 import { format } from 'date-fns';
+import AppOnlineStatus from './AppOnlineStatus.vue';
+import AppPlayer from '@shared/app/AppPlayer';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -104,10 +106,7 @@ onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientatio
 const gameOverOverlay = createOverlay(GameOverOverlay);
 const { rematch } = props;
 
-console.log('LISTEN');
-
 gameView.value.on('endedAndWinAnimationOver', async () => {
-    console.log('EVENT', 'endedAndWinAnimationOver');
     await gameOverOverlay({
         game,
         rematch,
@@ -129,14 +128,26 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                     <span class="chrono-time">{{ chronoPlayerA.time }}</span>
                     <span v-if="chronoPlayerA.ms">{{  chronoPlayerA.ms }}</span>
                 </p>
-                <h4 class="text-player-a">{{ game.getPlayer(0).getName() }}</h4>
+                <p class="text-player-a h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
+                    <app-online-status
+                        v-if="(player instanceof AppPlayer)"
+                        :playerData="player.getPlayerData()"
+                    ></app-online-status>
+                    {{ game.getPlayer(0).getName() }}
+                </p>
             </div>
             <div class="player player-b mx-2">
                 <p v-if="timeControlValues">
                     <span class="chrono-time">{{ chronoPlayerB.time }}</span>
                     <span v-if="chronoPlayerB.ms">{{  chronoPlayerB.ms }}</span>
                 </p>
-                <h4 class="text-player-b">{{ game.getPlayer(1).getName() }}</h4>
+                <p class="text-player-b h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
+                    <app-online-status
+                        v-if="(player instanceof AppPlayer)"
+                        :playerData="player.getPlayerData()"
+                    ></app-online-status>
+                    {{ game.getPlayer(1).getName() }}
+                </p>
             </div>
         </div>
         <p v-else>Initialize game…</p>

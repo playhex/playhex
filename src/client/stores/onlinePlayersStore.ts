@@ -32,6 +32,8 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         }
     });
 
+    const isPlayerOnline = (playerId: string): boolean => playerId in players.value;
+
     apiGetOnlinePlayers().then(onlinePlayers => {
         totalPlayers.value = onlinePlayers.totalPlayers;
         players.value = onlinePlayers.players;
@@ -40,6 +42,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     return {
         players,
         totalPlayers,
+        isPlayerOnline,
     };
 });
 

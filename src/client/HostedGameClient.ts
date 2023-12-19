@@ -1,8 +1,9 @@
-import { Game, Move, PlayerIndex } from '@shared/game-engine';
+import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
 import { HostedGameData, PlayerData } from '@shared/app/Types';
 import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
 import AppPlayer from '@shared/app/AppPlayer';
+import EmptyPlayer from '@shared/app/EmptyPlayer';
 import useLobbyStore from './stores/lobbyStore';
 
 /**
@@ -31,10 +32,10 @@ export default class HostedGameClient
 
         if (null === gameData) {
             const hostPlayer: AppPlayer = new AppPlayer(hostedGameData.host);
-            const opponentPlayer: AppPlayer = new AppPlayer(hostedGameData.opponent ?? {
-                id: '',
-                pseudo: '(waiting…)',
-            });
+            const opponentPlayer: PlayerInterface = hostedGameData.opponent
+                ? new AppPlayer(hostedGameData.opponent)
+                : new EmptyPlayer()
+            ;
 
             this.game = new Game(hostedGameData.gameOptions.boardsize, [hostPlayer, opponentPlayer]);
 

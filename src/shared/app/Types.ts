@@ -8,6 +8,7 @@ export type Tuple<T> = [T, T];
 export type PlayerData = {
     id: string;
     pseudo: string;
+    isBot: boolean;
 };
 
 export type MoveData = {

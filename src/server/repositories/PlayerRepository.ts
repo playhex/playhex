@@ -27,6 +27,7 @@ export default class PlayerRepository
         const guest: PlayerData = {
             id: uuidv4(),
             pseudo: 'Guest ' + (1000 + Math.floor(Math.random() * 9000)),
+            isBot: false,
         };
 
         return this.players[guest.id] = guest;

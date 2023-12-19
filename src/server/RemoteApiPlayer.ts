@@ -32,6 +32,7 @@ export default class RemoteApiPlayer extends AppPlayer
         super({
             id: 'remote-api|' + uuidv4(),
             pseudo: name,
+            isBot: true,
         });
 
         this.on('myTurnToPlay', () => this.makeMove());

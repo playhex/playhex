@@ -24,6 +24,7 @@ export default class DeterministRandomAIPlayer extends AppPlayer
         super({
             id: 'determinist-random-bot|' + uuidv4(),
             pseudo: DeterministRandomAIPlayer.NAME,
+            isBot: true,
         });
 
         this.on('myTurnToPlay', () => {

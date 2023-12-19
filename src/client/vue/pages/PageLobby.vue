@@ -8,6 +8,7 @@ import { GameOptionsData } from '@shared/app/GameOptions';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import HostedGameClient from 'HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
+import AppOnlineStatus from '../components/AppOnlineStatus.vue';
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
@@ -110,7 +111,7 @@ const joinGame = (gameId: string) => {
                                     @click="goToGame(hostedGameClient.getId())"
                                 >Watch</button>
                             </td>
-                            <td>{{ hostedGameClient.getHostedGameData().host.pseudo }}</td>
+                            <td><app-online-status :playerData="hostedGameClient.getHostedGameData().host"></app-online-status> {{ hostedGameClient.getHostedGameData().host.pseudo }}</td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
                     </tbody>
@@ -135,7 +136,15 @@ const joinGame = (gameId: string) => {
                             <td class="ps-0">
                                 <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Watch</button>
                             </td>
-                            <td>{{ hostedGameClient.getHostedGameData().gameData?.players.map(player => player.pseudo).join(' vs ') }}</td>
+                            <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
+                                <template v-if="gameData">
+                                    <app-online-status :playerData="gameData.players[0]"></app-online-status>
+                                    {{ gameData.players[0].pseudo }}
+                                    <span class="mx-3">vs</span>
+                                    <app-online-status :playerData="gameData.players[1]"></app-online-status>
+                                    {{ gameData.players[1].pseudo }}
+                                </template>
+                            </td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
                     </tbody>

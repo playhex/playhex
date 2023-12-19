@@ -14,6 +14,7 @@ export default class RandomAIPlayer extends AppPlayer
         super({
             id: 'random-bot|' + uuidv4(),
             pseudo: RandomAIPlayer.NAME,
+            isBot: true,
         });
 
         this.on('myTurnToPlay', () => {

@@ -290,6 +290,7 @@ export default class HostedGame
         return {
             id: 'unknown|' + uuidv4(),
             pseudo: player.getName(),
+            isBot: false,
         };
     }
 }

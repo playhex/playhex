@@ -27,7 +27,7 @@ const {
             class="mb-1"
         >
             <i
-                class="bi-circle-fill me-1"
+                class="bi-circle-fill online-status-icon"
                 aria-hidden="true"
                 :class="player.connected ? 'text-success' : 'text-secondary'"
             ></i>
