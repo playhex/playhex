@@ -67,6 +67,21 @@ export const apiPostResign = async (gameId: string): Promise<true | string> => {
     return response.text();
 };
 
+export const apiPostCancel = async (gameId: string): Promise<true | string> => {
+    const response = await fetch(`/api/games/${gameId}/cancel`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (204 === response.status) {
+        return true;
+    }
+
+    return response.text();
+};
+
 export const apiGetOnlinePlayers = async (): Promise<OnlinePlayersData> => {
     const response = await fetch(`/api/online-players`, {
         method: 'get',

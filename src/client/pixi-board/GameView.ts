@@ -84,7 +84,7 @@ type GameViewEvents = {
      * Game has ended, and win animation is over.
      * Used to display win message after animation, and not at same time.
      */
-    endedAndWinAnimationOver: (winner: PlayerIndex) => void;
+    endedAndWinAnimationOver: () => void;
 };
 
 export default class GameView extends (EventEmitter as unknown as new () => TypedEventEmitter<GameViewEvents>)
@@ -124,7 +124,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         themeSwitcherDispatcher.on('themeSwitched', this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
-            this.endedCallback(this.game.getStrictWinner());
+            this.endedCallback();
         }
     }
 
@@ -289,13 +289,13 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.gameContainer.scale = { x: scale, y: scale };
     }
 
-    private async endedCallback(winner: PlayerIndex): Promise<void>
+    private async endedCallback(): Promise<void>
     {
         this.highlightSidesFromGame();
 
         await this.animateWinningPath();
 
-        this.emit('endedAndWinAnimationOver', winner);
+        this.emit('endedAndWinAnimationOver');
     }
 
     private listenModel(): void
@@ -314,7 +314,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             this.highlightSidesFromGame();
         });
 
-        this.game.on('ended', async (winner) => this.endedCallback(winner));
+        this.game.on('ended', () => this.endedCallback());
+        this.game.on('canceled', () => this.endedCallback());
     }
 
     resetHighlightedHexes(): void
@@ -495,7 +496,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     highlightSidesFromGame(): void
     {
-        if (!this.game.isStarted()) {
+        if (!this.game.isStarted() || this.game.isCanceled()) {
             this.highlightSides(true, true);
             return;
         }

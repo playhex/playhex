@@ -57,6 +57,14 @@ export type HostedGameData = {
     timeControlValues: TimeControlValues;
 
     /**
+     * Whether game has been canceled.
+     * We can guess a game is canceled also by checking gameData,
+     * but this attribute is still required when game is canceled
+     * before game started, and gameData is null.
+     */
+    canceled: boolean;
+
+    /**
      * gameData is null on server when game is not yet started.
      */
     gameData: null | GameData;

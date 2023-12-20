@@ -109,6 +109,17 @@ const join = async () => {
 
 const confirmationOverlay = createOverlay(ConfirmationOverlay);
 
+/*
+ * Resign
+ */
+const canResign = (): boolean => {
+    if (null === getLocalAppPlayer() || null === hostedGameClient.value) {
+        return false;
+    }
+
+    return hostedGameClient.value.canResign();
+};
+
 const resign = async (): Promise<void> => {
     const localPlayer = getLocalAppPlayer();
 
@@ -128,8 +139,37 @@ const resign = async (): Promise<void> => {
 
         localPlayer.resign();
     } catch (e) {
-        // resignation cancelled
+        // resignation canceled
     }
+};
+
+/*
+ * Cancel
+ */
+const canCancel = (): boolean => {
+    if (null === getLocalAppPlayer() || null === hostedGameClient.value) {
+        return false;
+    }
+
+    return hostedGameClient.value.canCancel();
+};
+
+const cancel = async (): Promise<void> => {
+    try {
+        await confirmationOverlay({
+            title: 'Cancel game',
+            message: 'Are you sure you want to cancel game?',
+            confirmLabel: 'Yes, cancel',
+            confirmClass: 'btn-success',
+            cancelLabel: 'No, keep game',
+            cancelClass: 'btn-outline-primary',
+        });
+    } catch (e) {
+        // cancelation canceled
+        return;
+    }
+
+    lobbyStore.cancel(gameId);
 };
 
 const toggleCoords = () => {
@@ -180,7 +220,8 @@ const rematch = async (): Promise<void> => {
     <div class="menu-game">
         <div class="container-fluid">
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-link" v-if="getLocalAppPlayer()" @click="resign()"><i class="bi-flag"></i> Resign</button>
+                <button type="button" class="btn btn-link" v-if="canResign()" @click="resign()"><i class="bi-flag"></i> Resign</button>
+                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><i class="bi-x"></i> Cancel</button>
                 <button type="button" class="btn btn-link" @click="toggleCoords()"><i class="bi-alphabet"></i> Coords</button>
             </div>
         </div>

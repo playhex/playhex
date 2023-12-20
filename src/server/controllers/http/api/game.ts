@@ -22,6 +22,26 @@ export default (): Router => {
 
         if (true !== result) {
             res.status(400).send(result);
+            return;
+        }
+
+        res.status(204).send();
+    });
+
+    router.post('/api/games/:id/cancel', (req, res) => {
+        const { id } = req.params;
+        let playerData: null | PlayerData;
+
+        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
+            res.status(403).send('not authenticated').end();
+            return;
+        }
+
+        const result = hostedGameRepository.playerCancel(playerData, id);
+
+        if (true !== result) {
+            res.status(400).send(result);
+            return;
         }
 
         res.status(204).send();

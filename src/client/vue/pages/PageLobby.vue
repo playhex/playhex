@@ -58,8 +58,15 @@ const createAndJoinGameVsLocalAI = async () => {
     }
 };
 
-const isWaiting = (hostedGameClients: HostedGameClient) => null === hostedGameClients.getHostedGameData().opponent;
-const isPlaying = (hostedGameClients: HostedGameClient) => hostedGameClients.getHostedGameData().gameData?.state === 'playing';
+const isWaiting = (hostedGameClient: HostedGameClient) =>
+    null === hostedGameClient.getHostedGameData().opponent
+    && !hostedGameClient.getHostedGameData().canceled
+;
+
+const isPlaying = (hostedGameClient: HostedGameClient) =>
+    hostedGameClient.getHostedGameData().gameData?.state === 'playing'
+    && !hostedGameClient.getHostedGameData().canceled
+;
 
 const joinGame = (gameId: string) => {
     lobbyStore.joinGame(gameId);

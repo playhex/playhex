@@ -145,6 +145,12 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         mostUrgentGame.value = getMostUrgentGame();
     });
 
+    socket.on('gameCanceled', (gameId: string) => {
+        delete myGames.value[gameId];
+
+        mostUrgentGame.value = getMostUrgentGame();
+    });
+
     /**
      * Initialize notification
      */

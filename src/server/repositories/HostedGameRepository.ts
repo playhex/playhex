@@ -82,4 +82,15 @@ export default class HostedGameRepository
 
         return hostedGame.playerResign(playerDataOrAppPlayer);
     }
+
+    playerCancel(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string): true | string
+    {
+        const hostedGame = this.hostedGames[gameId];
+
+        if (!hostedGame) {
+            return 'no game ' + gameId;
+        }
+
+        return hostedGame.playerCancel(playerDataOrAppPlayer);
+    }
 }

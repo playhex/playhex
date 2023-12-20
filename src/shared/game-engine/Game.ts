@@ -40,6 +40,11 @@ type GameEvents = {
      * Game have been finished.
      */
     ended: (winner: PlayerIndex, outcome: Outcome) => void;
+
+    /**
+     * Game has been canceled, so game is over, but no winner.
+     */
+    canceled: () => void;
 };
 
 /**
@@ -48,7 +53,7 @@ type GameEvents = {
 export type Outcome =
     /**
      * No outcome precision, game should have been won by regular victory,
-     * or game is still playing, check "winner" attribute.
+     * or game is still playing, or has been canceled.
      */
     null
 
@@ -194,7 +199,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     getStrictWinner(): PlayerIndex
     {
         if (null === this.winner) {
-            throw new Error('Trying to strictly get the winner but game not finished');
+            throw new Error('Trying to strictly get the winner but game not finished or canceled');
         }
 
         return this.winner;
@@ -221,9 +226,30 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             throw new Error('Cannot set a winner again, there is already a winner');
         }
 
+        if (this.state === 'ended') {
+            throw new Error('Cannot set a winner, game is already ended, probably canceled');
+        }
+
         this.setWinner(playerIndex, outcome);
 
         this.emit('ended', playerIndex, outcome);
+    }
+
+    cancel(): void
+    {
+        if (this.state === 'ended') {
+            throw new Error('Cannot cancel, game already ended');
+        }
+
+        this.state = 'ended';
+        this.endedAt = new Date();
+
+        this.emit('canceled');
+    }
+
+    isCanceled(): boolean
+    {
+        return this.state === 'ended' && null === this.winner;
     }
 
     getOutcome(): Outcome

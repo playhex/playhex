@@ -28,12 +28,16 @@ const gameToSGF = (game: Game): string => {
     }
 
     if (game.isEnded()) {
-        rootNode.RE = game.getStrictWinner() === 0 ? 'B' : 'W';
+        if (game.isCanceled()) {
+            rootNode.RE = 'Void';
+        } else {
+            rootNode.RE = game.getStrictWinner() === 0 ? 'B+' : 'W+';
 
-        switch (game.getOutcome()) {
-            case 'resign': rootNode.RE += '+Resign'; break;
-            case 'time': rootNode.RE += '+Time'; break;
-            case 'forfeit': rootNode.RE += '+Forfeit'; break;
+            switch (game.getOutcome()) {
+                case 'resign': rootNode.RE += 'Resign'; break;
+                case 'time': rootNode.RE += 'Time'; break;
+                case 'forfeit': rootNode.RE += 'Forfeit'; break;
+            }
         }
     }
 

@@ -2,7 +2,7 @@ import { Move, PlayerIndex } from '@shared/game-engine';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
 import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
-import { apiPostGame, apiPostResign, getGame, getGames } from '@client/apiClient';
+import { apiPostCancel, apiPostGame, apiPostResign, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { Outcome } from '@shared/game-engine/Game';
 import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
@@ -95,6 +95,10 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         return apiPostResign(gameId);
     };
 
+    const cancel = async (gameId: string): Promise<string | true> => {
+        return apiPostCancel(gameId);
+    };
+
     const listenSocket = (): void => {
         socket.on('gameCreated', (hostedGameData: HostedGameData) => {
             hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
@@ -109,6 +113,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         socket.on('gameStarted', (hostedGameData: HostedGameData) => {
             if (hostedGameClients.value[hostedGameData.id]) {
                 hostedGameClients.value[hostedGameData.id].gameStarted(hostedGameData);
+            }
+        });
+
+        socket.on('gameCanceled', (gameId: string) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].gameCanceled();
             }
         });
 
@@ -149,6 +159,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         joinGame,
         move,
         resign,
+        cancel,
     };
 });
 

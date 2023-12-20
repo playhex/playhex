@@ -20,6 +20,7 @@ export default class HostedGame
     private id: string = uuidv4();
     private timeControl: TimeControlInterface = new AbsoluteTimeControl(900);
     private game: null | Game = null;
+    private canceled = false;
 
     constructor(
         private io: HexServer,
@@ -84,6 +85,11 @@ export default class HostedGame
             this.io.to(this.gameRooms(true)).emit('ended', this.id, winner, outcome);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
+
+        this.game.on('canceled', () => {
+            this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id);
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+        });
     }
 
     bindTimeControl(): void
@@ -103,6 +109,11 @@ export default class HostedGame
 
     private createAndStartGame(): void
     {
+        if (this.canceled) {
+            logger.warning('Cannot init game, canceled', { hostedGameId: this.id });
+            return;
+        }
+
         if (null !== this.game) {
             logger.warning('Cannot init game, already started', { hostedGameId: this.id });
             return;
@@ -160,6 +171,11 @@ export default class HostedGame
     {
         const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
+        if (this.canceled) {
+            logger.notice('Player tried to join but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            return 'Game has been canceled';
+        }
+
         // Check whether game is full
         if (null !== this.opponent) {
             logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.id, joiner: appPlayer.getName() });
@@ -186,6 +202,11 @@ export default class HostedGame
         logger.info('Move played', { hostedGameId: this.id, move, player: playerDataOrAppPlayer });
 
         const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
+
+        if (this.canceled) {
+            logger.notice('Player tried to move but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            return 'Game has been canceled';
+        }
 
         if (!this.game) {
             logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
@@ -215,6 +236,11 @@ export default class HostedGame
     {
         const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
 
+        if (this.canceled) {
+            logger.notice('Player tried to resign but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            return 'Game has been canceled';
+        }
+
         if (!this.game) {
             logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
             return 'Game not yet started, cannot resign';
@@ -235,6 +261,60 @@ export default class HostedGame
         }
     }
 
+    private canCancel(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
+    {
+        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
+
+        if (!this.isPlayerInGame(appPlayer)) {
+            logger.notice('A player not in the game tried to cancel game', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'you are not a player of this game';
+        }
+
+        if (this.canceled) {
+            logger.notice('A player tried to cancel, but game already canceled', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'already canceled';
+        }
+
+        if (!this.game || this.game.getState() === 'created') {
+            return true;
+        }
+
+        if (this.game.getState() === 'ended') {
+            logger.notice('A player tried to cancel, but game has finished', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'game has finished';
+        }
+
+        if (this.game.getMovesHistory().length >= 2) {
+            logger.notice('A player tried to cancel, but too late, at least 2 moves have been played', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'cannot cancel now, each player has played at least one move';
+        }
+
+        return true;
+    }
+
+    playerCancel(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
+    {
+        const canCancel = this.canCancel(playerDataOrAppPlayer);
+
+        if (true !== canCancel) {
+            return canCancel;
+        }
+
+        this.canceled = true;
+        this.timeControl.finish();
+
+        if (null !== this.game) {
+            this.game.cancel();
+        } else {
+            this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id);
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+        }
+
+        logger.info('Game canceled.', { hostedGameId: this.id });
+
+        return true;
+    }
+
     toData(): HostedGameData
     {
         const hostedGameData: HostedGameData = {
@@ -244,6 +324,7 @@ export default class HostedGame
             timeControlValues: this.timeControl.getValues(),
             gameOptions: this.gameOptions,
             gameData: null,
+            canceled: this.canceled,
         };
 
         if (this.game) {

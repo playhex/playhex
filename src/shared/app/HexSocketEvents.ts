@@ -40,6 +40,11 @@ export type HexServerToClientEvents = {
     gameStarted: (hostedGameData: HostedGameData) => void;
 
     /**
+     * Game has been canceled.
+     */
+    gameCanceled: (gameId: string) => void;
+
+    /**
      * A move has been played by a player.
      */
     moved: (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => void;

@@ -56,6 +56,11 @@ export default class HostedGameClient
             this.game.move(new Move(move.row, move.col), this.game.getCurrentPlayerIndex());
         }
 
+        // Cancel game if canceled
+        if (hostedGameData.canceled && !this.game.isEnded()) {
+            this.game.cancel();
+        }
+
         // Set a winner if not yet set because timeout or resignation
         if (null !== gameData.winner && !this.game.isEnded()) {
             this.game.declareWinner(gameData.winner, gameData.outcome);
@@ -112,6 +117,10 @@ export default class HostedGameClient
                 }
             }
         });
+
+        this.game.on('canceled', async () => {
+            this.hostedGameData.canceled = true;
+        });
     }
 
     getGame(): Game
@@ -139,6 +148,27 @@ export default class HostedGameClient
                 ,
             ) as AppPlayer
             ?? null
+        ;
+    }
+
+    canResign(): boolean
+    {
+        if (null === this.game) {
+            return false;
+        }
+
+        return this.game.getState() === 'playing';
+    }
+
+    canCancel(): boolean
+    {
+        if (null === this.game) {
+            return true;
+        }
+
+        return !this.game.isCanceled()
+            && this.game.getState() !== 'ended'
+            && this.getGame().getMovesHistory().length < 2
         ;
     }
 
@@ -189,6 +219,17 @@ export default class HostedGameClient
         this.listenGameModel();
 
         this.game.start();
+    }
+
+    gameCanceled(): void
+    {
+        this.hostedGameData.canceled = true;
+
+        if (null !== this.game) {
+            this.game.cancel();
+        } else {
+            this.hostedGameData.canceled = true;
+        }
     }
 
     getTimeControlValues(): TimeControlValues

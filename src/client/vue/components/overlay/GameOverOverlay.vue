@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import { Game } from '@shared/game-engine';
+import { Game, PlayerInterface } from '@shared/game-engine';
 import { gameToSGF } from '@shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { downloadString } from '../../../services/fileDownload';
@@ -19,7 +19,11 @@ const props = defineProps({
 });
 
 const { game, rematch } = props;
-const winner = game.getPlayer(game.getStrictWinner());
+
+const winner: null | PlayerInterface = game.isCanceled()
+    ? null
+    : game.getPlayer(game.getStrictWinner())
+;
 
 /*
  * SGF download
@@ -61,7 +65,8 @@ const outcomeToString = (): string => {
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong :class="'text-player-' + (game.getStrictWinner() ? 'b' : 'a')">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
+                        <p v-if="null !== winner"><strong :class="'text-player-' + (game.getStrictWinner() ? 'b' : 'a')">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
+                        <p v-else>Game has been canceled.</p>
                     </div>
                     <div class="modal-footer">
                         <button
