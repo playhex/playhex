@@ -225,10 +225,12 @@ export default class HostedGameClient
     {
         this.hostedGameData.canceled = true;
 
+        if (this.hostedGameData.gameData) {
+            this.hostedGameData.gameData.endedAt = new Date();
+        }
+
         if (null !== this.game) {
             this.game.cancel();
-        } else {
-            this.hostedGameData.canceled = true;
         }
     }
 
@@ -265,6 +267,7 @@ export default class HostedGameClient
             this.hostedGameData.gameData.state = 'ended';
             this.hostedGameData.gameData.winner = winner;
             this.hostedGameData.gameData.outcome = outcome;
+            this.hostedGameData.gameData.endedAt = new Date();
         }
 
         // Do nothing if game not loaded

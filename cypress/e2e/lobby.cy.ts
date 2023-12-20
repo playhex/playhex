@@ -53,4 +53,43 @@ describe('Lobby', () => {
             ;
         });
     });
+
+    it('displays created, playing and some ended games', () => {
+        cy.intercept('/api/games', {
+            fixture: 'lobby-games.json',
+        });
+
+        cy.visit('/');
+
+        cy
+            // Waiting games
+            .contains('Join a game')
+            .next('table')
+            .contains('Player waiting')
+            .closest('tr')
+            .contains('Accept')
+        ;
+
+        cy
+            // Current games
+            .contains('Watch current game')
+            .next('table')
+            .contains('Player A vs Player B')
+            .closest('tr')
+            .contains('Watch')
+        ;
+
+        cy
+            // Last played games
+            .contains('Last played games')
+            .next('table')
+            .contains('Player C won against Player D')
+            .closest('tr')
+            .contains('See')
+
+            // should not display canceled games
+            .closest('table')
+            .contains(/Cancel A|Cancel B/).should('not.exist')
+        ;
+    });
 });

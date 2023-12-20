@@ -68,6 +68,22 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
     && !hostedGameClient.getHostedGameData().canceled
 ;
 
+const isLastPlayed = (hostedGameClient: HostedGameClient) =>
+    hostedGameClient.getHostedGameData().gameData?.state === 'ended'
+    && !hostedGameClient.getHostedGameData().canceled
+;
+
+const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
+    const gameDataA = a.getHostedGameData().gameData;
+    const gameDataB = b.getHostedGameData().gameData;
+
+    if (!gameDataA?.endedAt || !gameDataB?.endedAt) {
+        return 0;
+    }
+
+    return gameDataB.endedAt.getTime() - gameDataA.endedAt.getTime();
+};
+
 const joinGame = (gameId: string) => {
     lobbyStore.joinGame(gameId);
 };
@@ -91,7 +107,7 @@ const joinGame = (gameId: string) => {
                     </div>
                 </div>
 
-                <h4>Join a game</h4>
+                <h3>Join a game</h3>
 
                 <table v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table">
                     <thead>
@@ -125,7 +141,7 @@ const joinGame = (gameId: string) => {
                 </table>
                 <p v-else>No game for now. Create a new one !</p>
 
-                <h3><i class="bi bi-eye"></i> Watch current game</h3>
+                <h4><i class="bi bi-eye"></i> Watch current game</h4>
 
                 <table v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table">
                     <thead>
@@ -157,6 +173,36 @@ const joinGame = (gameId: string) => {
                     </tbody>
                 </table>
                 <p v-else>No game currently playing.</p>
+
+                <template v-if="Object.values(lobbyStore.hostedGameClients).some(isLastPlayed)">
+                    <h4><i class="bi bi-trophy"></i> Last played games</h4>
+
+                    <table class="table">
+                        <tbody>
+                            <tr
+                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isLastPlayed).sort(byEndedAt).slice(0, 32)"
+                                :key="hostedGameClient.getId()"
+                            >
+                                <td class="ps-0">
+                                    <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">See</button>
+                                </td>
+                                <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
+                                    <template v-if="null !== gameData && null !== gameData.winner">
+                                        <app-online-status :playerData="gameData.players[gameData.winner]"></app-online-status>
+                                        <strong>{{ gameData.players[gameData.winner].pseudo }}</strong>
+
+                                        <span v-if="null === gameData.outcome" class="mx-3"> won against</span>
+                                        <span v-else class="mx-3"> won by {{ gameData.outcome }} against</span>
+
+                                        <app-online-status :playerData="gameData.players[1 - gameData.winner]"></app-online-status>
+                                        {{ gameData.players[1 - gameData.winner].pseudo }}
+                                    </template>
+                                </td>
+                                <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
             </div>
             <div class="col-sm-3">
                 <app-sidebar></app-sidebar>
@@ -169,4 +215,7 @@ const joinGame = (gameId: string) => {
 .play-buttons
     .btn
         min-height 7em
+
+h4
+    margin-top 1em
 </style>
