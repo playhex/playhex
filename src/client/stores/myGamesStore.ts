@@ -108,9 +108,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     socket.on('gameStarted', (hostedGameData: HostedGameData) => {
-        const { gameData, id } = hostedGameData;
+        const { gameData, id, host, opponent } = hostedGameData;
+        const me = loggedInUser.value;
 
-        if (!gameData) {
+        if (null === me || null === gameData) {
+            return;
+        }
+
+        if (host.id !== me.id && (null === opponent || opponent.id !== me.id)) {
             return;
         }
 

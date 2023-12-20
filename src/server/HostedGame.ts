@@ -251,6 +251,11 @@ export default class HostedGame
             return 'you are not a player of this game';
         }
 
+        if (this.game.isEnded()) {
+            logger.notice('A player tried to resign, but game already ended', { hostedGameId: this.id, player: appPlayer.getName() });
+            return 'game already ended';
+        }
+
         try {
             appPlayer.resign();
 
