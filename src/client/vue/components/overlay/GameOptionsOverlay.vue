@@ -71,17 +71,17 @@ const showCustomBoardsize = ref(false);
                         </div>
 
                         <div class="mb-3">
-                            <p class="form-label">First player</p>
+                            <p class="form-label">I play</p>
 
                             <div class="btn-group btn-group-min-width" role="group">
                                 <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="gameOptions.firstPlayer" :value="null" id="first-random">
                                 <label class="btn btn-outline-secondary" for="first-random">Random</label>
 
                                 <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="gameOptions.firstPlayer" :value="0" id="first-0">
-                                <label class="btn btn-outline-danger" for="first-0">Me</label>
+                                <label class="btn btn-outline-danger" for="first-0">First</label>
 
                                 <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="gameOptions.firstPlayer" :value="1" id="first-1">
-                                <label class="btn btn-outline-primary" for="first-1">Opponent</label>
+                                <label class="btn btn-outline-primary" for="first-1">Second</label>
                             </div>
                         </div>
                     </div>

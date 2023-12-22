@@ -1,0 +1,963 @@
+[
+    {
+        "id": "40c551d0-e9a4-4e6d-9bf3-44a9e9523828",
+        "host": {
+            "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+            "pseudo": "Guest 8201",
+            "isBot": false
+        },
+        "opponent": null,
+        "timeControlValues": {
+            "type": "absolute",
+            "state": "over",
+            "players": [
+                {
+                    "totalRemainingTime": 900
+                },
+                {
+                    "totalRemainingTime": 900
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 11,
+            "firstPlayer": null,
+            "opponent": {
+                "type": "player"
+            }
+        },
+        "gameData": null,
+        "canceled": true
+    },
+    {
+        "id": "c1db33be-6134-4185-a8ac-3a02f0ae2376",
+        "host": {
+            "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+            "pseudo": "Guest 8201",
+            "isBot": false
+        },
+        "opponent": {
+            "id": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
+            "pseudo": "Mohex",
+            "isBot": true
+        },
+        "timeControlValues": {
+            "type": "absolute",
+            "state": "over",
+            "players": [
+                {
+                    "totalRemainingTime": 863.72
+                },
+                {
+                    "totalRemainingTime": 895.439
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 11,
+            "firstPlayer": 0,
+            "opponent": {
+                "type": "ai"
+            }
+        },
+        "gameData": {
+            "players": [
+                {
+                    "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+                    "pseudo": "Guest 8201",
+                    "isBot": false
+                },
+                {
+                    "id": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
+                    "pseudo": "Mohex",
+                    "isBot": true
+                }
+            ],
+            "size": 11,
+            "started": true,
+            "state": "ended",
+            "movesHistory": [
+                {
+                    "row": 4,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:18:25.706Z"
+                },
+                {
+                    "row": 3,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:18:26.597Z"
+                },
+                {
+                    "row": 3,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:18:27.835Z"
+                },
+                {
+                    "row": 2,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:18:28.418Z"
+                },
+                {
+                    "row": 2,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:18:29.504Z"
+                },
+                {
+                    "row": 3,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:18:30.100Z"
+                },
+                {
+                    "row": 7,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:18:37.434Z"
+                },
+                {
+                    "row": 6,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:18:38.080Z"
+                },
+                {
+                    "row": 7,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:18:41.420Z"
+                },
+                {
+                    "row": 6,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:18:41.843Z"
+                },
+                {
+                    "row": 6,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:18:43.613Z"
+                },
+                {
+                    "row": 5,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:18:44.002Z"
+                },
+                {
+                    "row": 4,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:18:46.069Z"
+                },
+                {
+                    "row": 5,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:18:46.783Z"
+                },
+                {
+                    "row": 3,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:18:52.745Z"
+                },
+                {
+                    "row": 4,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:18:52.878Z"
+                },
+                {
+                    "row": 3,
+                    "col": 9,
+                    "playedAt": "2023-12-20T22:18:56.529Z"
+                },
+                {
+                    "row": 5,
+                    "col": 8,
+                    "playedAt": "2023-12-20T22:18:56.644Z"
+                },
+                {
+                    "row": 4,
+                    "col": 10,
+                    "playedAt": "2023-12-20T22:18:58.863Z"
+                },
+                {
+                    "row": 6,
+                    "col": 9,
+                    "playedAt": "2023-12-20T22:18:58.967Z"
+                }
+            ],
+            "currentPlayerIndex": 0,
+            "winner": 1,
+            "outcome": "resign",
+            "createdAt": "2023-12-20T22:18:22.186Z",
+            "startedAt": "2023-12-20T22:18:22.189Z",
+            "lastMoveAt": "2023-12-20T22:18:58.967Z",
+            "endedAt": "2023-12-20T22:19:03.033Z",
+            "hexes": [
+                "...........",
+                "...........",
+                "....1.0....",
+                "...10.10.0.",
+                "...0.0.1..0",
+                "....11..1..",
+                "...101...1.",
+                "...0.0.....",
+                "...........",
+                "...........",
+                "..........."
+            ]
+        },
+        "canceled": false,
+        "__meta": {
+            "values": {
+                "gameData.createdAt": [
+                    "Date"
+                ],
+                "gameData.startedAt": [
+                    "Date"
+                ],
+                "gameData.lastMoveAt": [
+                    "Date"
+                ],
+                "gameData.endedAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "gameData.players.0"
+                ],
+                "opponent": [
+                    "gameData.players.1"
+                ]
+            }
+        }
+    },
+    {
+        "id": "a8a516cc-86e2-4057-bffd-4aef17f69cb3",
+        "host": {
+            "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+            "pseudo": "Guest 8201",
+            "isBot": false
+        },
+        "opponent": {
+            "id": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
+            "pseudo": "Mohex",
+            "isBot": true
+        },
+        "timeControlValues": {
+            "type": "absolute",
+            "state": "over",
+            "players": [
+                {
+                    "totalRemainingTime": 741.051
+                },
+                {
+                    "totalRemainingTime": 892.436
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 11,
+            "firstPlayer": 0,
+            "opponent": {
+                "type": "ai"
+            }
+        },
+        "gameData": {
+            "players": [
+                {
+                    "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+                    "pseudo": "Guest 8201",
+                    "isBot": false
+                },
+                {
+                    "id": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
+                    "pseudo": "Mohex",
+                    "isBot": true
+                }
+            ],
+            "size": 11,
+            "started": true,
+            "state": "ended",
+            "movesHistory": [
+                {
+                    "row": 4,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:19:15.945Z"
+                },
+                {
+                    "row": 3,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:19:16.521Z"
+                },
+                {
+                    "row": 3,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:17.354Z"
+                },
+                {
+                    "row": 2,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:17.921Z"
+                },
+                {
+                    "row": 2,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:19:18.608Z"
+                },
+                {
+                    "row": 0,
+                    "col": 8,
+                    "playedAt": "2023-12-20T22:19:19.207Z"
+                },
+                {
+                    "row": 1,
+                    "col": 9,
+                    "playedAt": "2023-12-20T22:19:20.328Z"
+                },
+                {
+                    "row": 3,
+                    "col": 8,
+                    "playedAt": "2023-12-20T22:19:20.897Z"
+                },
+                {
+                    "row": 6,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:19:23.946Z"
+                },
+                {
+                    "row": 7,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:19:24.229Z"
+                },
+                {
+                    "row": 7,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:19:29.581Z"
+                },
+                {
+                    "row": 8,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:19:29.874Z"
+                },
+                {
+                    "row": 8,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:19:30.531Z"
+                },
+                {
+                    "row": 10,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:19:30.818Z"
+                },
+                {
+                    "row": 9,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:19:31.876Z"
+                },
+                {
+                    "row": 10,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:19:32.155Z"
+                },
+                {
+                    "row": 8,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:39.640Z"
+                },
+                {
+                    "row": 9,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:19:39.907Z"
+                },
+                {
+                    "row": 9,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:42.202Z"
+                },
+                {
+                    "row": 8,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:19:42.467Z"
+                },
+                {
+                    "row": 7,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:43.372Z"
+                },
+                {
+                    "row": 6,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:19:43.623Z"
+                },
+                {
+                    "row": 5,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:19:57.407Z"
+                },
+                {
+                    "row": 6,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:19:57.682Z"
+                },
+                {
+                    "row": 6,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:58.762Z"
+                },
+                {
+                    "row": 4,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:19:58.833Z"
+                },
+                {
+                    "row": 10,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:13.406Z"
+                },
+                {
+                    "row": 9,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:13.496Z"
+                },
+                {
+                    "row": 9,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:14.136Z"
+                },
+                {
+                    "row": 8,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:14.197Z"
+                },
+                {
+                    "row": 8,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:14.707Z"
+                },
+                {
+                    "row": 7,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:15.025Z"
+                },
+                {
+                    "row": 7,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:15.624Z"
+                },
+                {
+                    "row": 6,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:15.935Z"
+                },
+                {
+                    "row": 6,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:16.358Z"
+                },
+                {
+                    "row": 5,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:16.649Z"
+                },
+                {
+                    "row": 5,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:17.060Z"
+                },
+                {
+                    "row": 4,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:17.329Z"
+                },
+                {
+                    "row": 4,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:17.757Z"
+                },
+                {
+                    "row": 3,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:18.018Z"
+                },
+                {
+                    "row": 3,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:18.502Z"
+                },
+                {
+                    "row": 2,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:18.590Z"
+                },
+                {
+                    "row": 2,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:20:19.323Z"
+                },
+                {
+                    "row": 0,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:19.424Z"
+                },
+                {
+                    "row": 1,
+                    "col": 1,
+                    "playedAt": "2023-12-20T22:20:21.575Z"
+                },
+                {
+                    "row": 0,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:20:21.665Z"
+                },
+                {
+                    "row": 1,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:20:23.689Z"
+                },
+                {
+                    "row": 0,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:20:23.785Z"
+                },
+                {
+                    "row": 2,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:20:39.135Z"
+                },
+                {
+                    "row": 1,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:20:39.230Z"
+                },
+                {
+                    "row": 2,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:20:40.283Z"
+                },
+                {
+                    "row": 1,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:20:40.379Z"
+                },
+                {
+                    "row": 3,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:20:53.799Z"
+                },
+                {
+                    "row": 3,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:20:53.886Z"
+                },
+                {
+                    "row": 1,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:21:14.477Z"
+                },
+                {
+                    "row": 2,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:21:14.542Z"
+                },
+                {
+                    "row": 2,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:21:15.593Z"
+                },
+                {
+                    "row": 3,
+                    "col": 9,
+                    "playedAt": "2023-12-20T22:21:15.683Z"
+                },
+                {
+                    "row": 9,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:21:40.397Z"
+                },
+                {
+                    "row": 10,
+                    "col": 3,
+                    "playedAt": "2023-12-20T22:21:40.479Z"
+                },
+                {
+                    "row": 9,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:21:50.601Z"
+                },
+                {
+                    "row": 10,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:21:50.662Z"
+                },
+                {
+                    "row": 7,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:21:52.305Z"
+                },
+                {
+                    "row": 8,
+                    "col": 4,
+                    "playedAt": "2023-12-20T22:21:52.380Z"
+                },
+                {
+                    "row": 4,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:21:53.902Z"
+                },
+                {
+                    "row": 3,
+                    "col": 7,
+                    "playedAt": "2023-12-20T22:21:53.980Z"
+                },
+                {
+                    "row": 4,
+                    "col": 10,
+                    "playedAt": "2023-12-20T22:21:54.673Z"
+                },
+                {
+                    "row": 3,
+                    "col": 2,
+                    "playedAt": "2023-12-20T22:21:54.764Z"
+                },
+                {
+                    "row": 3,
+                    "col": 10,
+                    "playedAt": "2023-12-20T22:21:56.367Z"
+                },
+                {
+                    "row": 2,
+                    "col": 10,
+                    "playedAt": "2023-12-20T22:21:56.450Z"
+                },
+                {
+                    "row": 5,
+                    "col": 6,
+                    "playedAt": "2023-12-20T22:21:57.329Z"
+                },
+                {
+                    "row": 5,
+                    "col": 5,
+                    "playedAt": "2023-12-20T22:21:57.406Z"
+                },
+                {
+                    "row": 0,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:22:00.615Z"
+                },
+                {
+                    "row": 1,
+                    "col": 0,
+                    "playedAt": "2023-12-20T22:22:00.697Z"
+                }
+            ],
+            "currentPlayerIndex": 1,
+            "winner": 1,
+            "outcome": null,
+            "createdAt": "2023-12-20T22:19:14.189Z",
+            "startedAt": "2023-12-20T22:19:14.189Z",
+            "lastMoveAt": "2023-12-20T22:22:00.698Z",
+            "endedAt": "2023-12-20T22:22:00.704Z",
+            "hexes": [
+                "0111....1..",
+                "100110...0.",
+                "01001010..1",
+                "01110101110",
+                "01...010..0",
+                "01...100...",
+                "01..0101...",
+                "01.0100....",
+                "0101110....",
+                "0100010....",
+                "01111......"
+            ]
+        },
+        "canceled": false,
+        "__meta": {
+            "values": {
+                "gameData.createdAt": [
+                    "Date"
+                ],
+                "gameData.startedAt": [
+                    "Date"
+                ],
+                "gameData.lastMoveAt": [
+                    "Date"
+                ],
+                "gameData.endedAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "gameData.players.0"
+                ],
+                "opponent": [
+                    "gameData.players.1"
+                ]
+            }
+        }
+    },
+    {
+        "id": "a668e147-fce0-48ea-8f22-c0d3c8b1b4e9",
+        "host": {
+            "id": "0808f397-9e12-45af-bd5b-42885fe36212",
+            "pseudo": "Guest 2810",
+            "isBot": false
+        },
+        "opponent": {
+            "id": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
+            "pseudo": "Mohex",
+            "isBot": true
+        },
+        "timeControlValues": {
+            "type": "absolute",
+            "state": "over",
+            "players": [
+                {
+                    "totalRemainingTime": 817.285
+                },
+                {
+                    "totalRemainingTime": 880.992
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 9,
+            "firstPlayer": 0,
+            "opponent": {
+                "type": "ai"
+            }
+        },
+        "gameData": {
+            "players": [
+                {
+                    "id": "0808f397-9e12-45af-bd5b-42885fe36212",
+                    "pseudo": "Guest 2810",
+                    "isBot": false
+                },
+                {
+                    "id": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
+                    "pseudo": "Mohex",
+                    "isBot": true
+                }
+            ],
+            "size": 9,
+            "started": true,
+            "state": "ended",
+            "movesHistory": [
+                {
+                    "row": 4,
+                    "col": 4,
+                    "playedAt": "2023-12-21T06:18:00.664Z"
+                },
+                {
+                    "row": 3,
+                    "col": 4,
+                    "playedAt": "2023-12-21T06:18:02.426Z"
+                },
+                {
+                    "row": 3,
+                    "col": 5,
+                    "playedAt": "2023-12-21T06:18:08.163Z"
+                },
+                {
+                    "row": 2,
+                    "col": 5,
+                    "playedAt": "2023-12-21T06:18:10.491Z"
+                },
+                {
+                    "row": 2,
+                    "col": 6,
+                    "playedAt": "2023-12-21T06:18:11.217Z"
+                },
+                {
+                    "row": 0,
+                    "col": 7,
+                    "playedAt": "2023-12-21T06:18:13.480Z"
+                },
+                {
+                    "row": 1,
+                    "col": 6,
+                    "playedAt": "2023-12-21T06:18:14.398Z"
+                },
+                {
+                    "row": 0,
+                    "col": 6,
+                    "playedAt": "2023-12-21T06:18:16.566Z"
+                },
+                {
+                    "row": 2,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:18:24.349Z"
+                },
+                {
+                    "row": 3,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:18:26.335Z"
+                },
+                {
+                    "row": 1,
+                    "col": 5,
+                    "playedAt": "2023-12-21T06:18:28.256Z"
+                },
+                {
+                    "row": 0,
+                    "col": 5,
+                    "playedAt": "2023-12-21T06:18:29.484Z"
+                },
+                {
+                    "row": 2,
+                    "col": 3,
+                    "playedAt": "2023-12-21T06:18:32.103Z"
+                },
+                {
+                    "row": 1,
+                    "col": 4,
+                    "playedAt": "2023-12-21T06:18:33.380Z"
+                },
+                {
+                    "row": 2,
+                    "col": 4,
+                    "playedAt": "2023-12-21T06:18:34.609Z"
+                },
+                {
+                    "row": 0,
+                    "col": 3,
+                    "playedAt": "2023-12-21T06:18:35.761Z"
+                },
+                {
+                    "row": 1,
+                    "col": 1,
+                    "playedAt": "2023-12-21T06:18:37.446Z"
+                },
+                {
+                    "row": 2,
+                    "col": 1,
+                    "playedAt": "2023-12-21T06:18:38.567Z"
+                },
+                {
+                    "row": 1,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:18:39.650Z"
+                },
+                {
+                    "row": 5,
+                    "col": 4,
+                    "playedAt": "2023-12-21T06:18:40.720Z"
+                },
+                {
+                    "row": 5,
+                    "col": 3,
+                    "playedAt": "2023-12-21T06:18:42.316Z"
+                },
+                {
+                    "row": 6,
+                    "col": 3,
+                    "playedAt": "2023-12-21T06:18:43.404Z"
+                },
+                {
+                    "row": 6,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:18:44.407Z"
+                },
+                {
+                    "row": 8,
+                    "col": 1,
+                    "playedAt": "2023-12-21T06:18:44.511Z"
+                },
+                {
+                    "row": 7,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:18:45.771Z"
+                },
+                {
+                    "row": 8,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:18:45.878Z"
+                },
+                {
+                    "row": 6,
+                    "col": 6,
+                    "playedAt": "2023-12-21T06:18:48.549Z"
+                },
+                {
+                    "row": 7,
+                    "col": 5,
+                    "playedAt": "2023-12-21T06:18:49.610Z"
+                },
+                {
+                    "row": 7,
+                    "col": 6,
+                    "playedAt": "2023-12-21T06:18:54.452Z"
+                },
+                {
+                    "row": 3,
+                    "col": 6,
+                    "playedAt": "2023-12-21T06:18:54.549Z"
+                },
+                {
+                    "row": 7,
+                    "col": 3,
+                    "playedAt": "2023-12-21T06:19:36.389Z"
+                },
+                {
+                    "row": 6,
+                    "col": 5,
+                    "playedAt": "2023-12-21T06:19:36.490Z"
+                },
+                {
+                    "row": 8,
+                    "col": 3,
+                    "playedAt": "2023-12-21T06:19:38.565Z"
+                },
+                {
+                    "row": 0,
+                    "col": 1,
+                    "playedAt": "2023-12-21T06:19:38.682Z"
+                },
+                {
+                    "row": 0,
+                    "col": 2,
+                    "playedAt": "2023-12-21T06:19:40.519Z"
+                }
+            ],
+            "currentPlayerIndex": 0,
+            "winner": 0,
+            "outcome": null,
+            "createdAt": "2023-12-21T06:17:58.800Z",
+            "startedAt": "2023-12-21T06:17:58.803Z",
+            "lastMoveAt": "2023-12-21T06:19:40.520Z",
+            "endedAt": "2023-12-21T06:19:40.523Z",
+            "hexes": [
+                ".101.111.",
+                ".00.100..",
+                ".100010..",
+                "..1.101..",
+                "....0....",
+                "...01....",
+                "..01.10..",
+                "..00.10..",
+                ".110....."
+            ]
+        },
+        "canceled": false,
+        "__meta": {
+            "values": {
+                "gameData.createdAt": [
+                    "Date"
+                ],
+                "gameData.startedAt": [
+                    "Date"
+                ],
+                "gameData.lastMoveAt": [
+                    "Date"
+                ],
+                "gameData.endedAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "gameData.players.0"
+                ],
+                "opponent": [
+                    "gameData.players.1"
+                ]
+            }
+        }
+    }
+]

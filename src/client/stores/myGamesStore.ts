@@ -42,7 +42,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      */
     const myTurnCount = computed((): number => {
         return Object.values(myGames.value)
-            .filter(game => game.isMyTurn)
+            .filter(game => isPlaying(game) && game.isMyTurn)
             .length
         ;
     });
@@ -58,53 +58,66 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         return timeValueToSeconds(time0) - timeValueToSeconds(time1);
     };
 
+    const isPlaying = (game: CurrentGame): boolean => {
+        return game.hostedGameData.gameData?.state === 'playing'
+            && !game.hostedGameData.canceled
+        ;
+    };
+
+    const isEmpty = (): boolean => {
+        for (const _ in myGames.value) {
+            return false;
+        }
+
+        return true;
+    };
+
     /**
      * Returns game id to redirect on when click on notification.
-     * Most urgent is game where I should play first,
-     * or should watch first if not game where I must play.
+     * Most urgent is game where I should play first.
+     * If there is no game where it is my turn to play,
+     * returns the game where I have less remaining time.
      *
      * Or null if I have 0 current game.
      */
     const getMostUrgentGame = (): null | CurrentGame => {
-        if (0 === Object.values(myGames.value).length) {
+        if (isEmpty()) {
             return null;
         }
 
-        const myTurnGames = Object.values(myGames.value)
-            .filter(game => game.isMyTurn)
+        const playingGames = Object.values(myGames.value)
+            .filter(game => isPlaying(game))
             .sort(byRemainingTime)
         ;
 
-        // My turn, less remaining time
-        if (myTurnGames.length > 0) {
-            return myTurnGames[0];
+        if (0 === playingGames.length) {
+            return null;
         }
 
-        // Not my turn, but game is playing and less remaining time
-        const notMyTurnLessTime = Object.values(myGames.value)
-            .filter(game => game.hostedGameData.gameData?.state === 'playing')
-            .sort(byRemainingTime)
+        return playingGames
+
+            // My turn, less remaining time
+            .find(game => game.isMyTurn)
+
+            // Not my turn, but game is playing and less remaining time
+            ?? playingGames[0]
         ;
-
-        if (notMyTurnLessTime.length > 0) {
-            return notMyTurnLessTime[0];
-        }
-
-        return Object.values(myGames.value)[0];
     };
 
 
     socket.on('gameCreated', (hostedGameData: HostedGameData) => {
-        if (hostedGameData.host.id === loggedInUser.value?.id) {
-            myGames.value[hostedGameData.id] = {
-                id: hostedGameData.id,
-                isMyTurn: false,
-                myColor: null,
-                hostedGameData,
-            };
-
-            mostUrgentGame.value = getMostUrgentGame();
+        if (hostedGameData.host.id !== loggedInUser.value?.id) {
+            return;
         }
+
+        myGames.value[hostedGameData.id] = {
+            id: hostedGameData.id,
+            isMyTurn: false,
+            myColor: null,
+            hostedGameData,
+        };
+
+        mostUrgentGame.value = getMostUrgentGame();
     });
 
     socket.on('gameStarted', (hostedGameData: HostedGameData) => {
@@ -130,6 +143,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         myGames.value[id].myColor = gameData.players[0].id === loggedInUser.value?.id ? 0 : 1;
         myGames.value[id].isMyTurn = gameData.players[gameData.currentPlayerIndex].id === loggedInUser.value?.id;
+        myGames.value[id].hostedGameData = hostedGameData;
 
         mostUrgentGame.value = getMostUrgentGame();
     });

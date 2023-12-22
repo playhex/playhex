@@ -1,0 +1,271 @@
+[
+    {
+        "id": "914ca90b-5e07-4dc4-9dbb-45e1b0ff84bf",
+        "host": {
+            "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+            "pseudo": "Guest 1817",
+            "isBot": false
+        },
+        "opponent": {
+            "id": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
+            "pseudo": "Determinist random bot",
+            "isBot": true
+        },
+        "timeControlValues": {
+            "type": "absolute",
+            "state": "over",
+            "players": [
+                {
+                    "totalRemainingTime": 899.98
+                },
+                {
+                    "totalRemainingTime": 896.275
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 7,
+            "firstPlayer": null,
+            "opponent": {
+                "type": "ai"
+            }
+        },
+        "gameData": {
+            "players": [
+                {
+                    "id": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
+                    "pseudo": "Determinist random bot",
+                    "isBot": true
+                },
+                {
+                    "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                    "pseudo": "Guest 1817",
+                    "isBot": false
+                }
+            ],
+            "size": 7,
+            "started": true,
+            "state": "ended",
+            "movesHistory": [
+                {
+                    "row": 1,
+                    "col": 4,
+                    "playedAt": "2023-12-22T15:14:36.973Z"
+                },
+                {
+                    "row": 2,
+                    "col": 6,
+                    "playedAt": "2023-12-22T15:14:38.671Z"
+                },
+                {
+                    "row": 0,
+                    "col": 2,
+                    "playedAt": "2023-12-22T15:14:38.675Z"
+                },
+                {
+                    "row": 2,
+                    "col": 5,
+                    "playedAt": "2023-12-22T15:14:38.930Z"
+                },
+                {
+                    "row": 6,
+                    "col": 1,
+                    "playedAt": "2023-12-22T15:14:38.932Z"
+                },
+                {
+                    "row": 2,
+                    "col": 4,
+                    "playedAt": "2023-12-22T15:14:39.186Z"
+                },
+                {
+                    "row": 6,
+                    "col": 2,
+                    "playedAt": "2023-12-22T15:14:39.188Z"
+                },
+                {
+                    "row": 2,
+                    "col": 3,
+                    "playedAt": "2023-12-22T15:14:39.433Z"
+                },
+                {
+                    "row": 2,
+                    "col": 1,
+                    "playedAt": "2023-12-22T15:14:39.435Z"
+                },
+                {
+                    "row": 2,
+                    "col": 2,
+                    "playedAt": "2023-12-22T15:14:39.700Z"
+                },
+                {
+                    "row": 5,
+                    "col": 4,
+                    "playedAt": "2023-12-22T15:14:39.702Z"
+                },
+                {
+                    "row": 3,
+                    "col": 1,
+                    "playedAt": "2023-12-22T15:14:40.118Z"
+                },
+                {
+                    "row": 2,
+                    "col": 0,
+                    "playedAt": "2023-12-22T15:14:40.120Z"
+                },
+                {
+                    "row": 3,
+                    "col": 0,
+                    "playedAt": "2023-12-22T15:14:40.710Z"
+                }
+            ],
+            "currentPlayerIndex": 1,
+            "winner": 1,
+            "outcome": null,
+            "createdAt": "2023-12-22T15:14:36.966Z",
+            "startedAt": "2023-12-22T15:14:36.967Z",
+            "lastMoveAt": "2023-12-22T15:14:40.711Z",
+            "endedAt": "2023-12-22T15:14:40.711Z",
+            "hexes": [
+                "..0....",
+                "....0..",
+                "0011111",
+                "11.....",
+                ".......",
+                "....0..",
+                ".00...."
+            ]
+        },
+        "canceled": false,
+        "__meta": {
+            "values": {
+                "gameData.createdAt": [
+                    "Date"
+                ],
+                "gameData.startedAt": [
+                    "Date"
+                ],
+                "gameData.lastMoveAt": [
+                    "Date"
+                ],
+                "gameData.endedAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "gameData.players.1"
+                ],
+                "opponent": [
+                    "gameData.players.0"
+                ]
+            }
+        }
+    },
+    {
+        "id": "0483ba90-2141-4d34-8272-94ecad8325a7",
+        "host": {
+            "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+            "pseudo": "Guest 1817",
+            "isBot": false
+        },
+        "opponent": {
+            "id": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
+            "pseudo": "Determinist random bot",
+            "isBot": true
+        },
+        "timeControlValues": {
+            "type": "absolute",
+            "state": "running",
+            "players": [
+                {
+                    "totalRemainingTime": 899.993
+                },
+                {
+                    "totalRemainingTime": "2023-12-22T15:29:43.801Z"
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 7,
+            "firstPlayer": null,
+            "opponent": {
+                "type": "ai"
+            }
+        },
+        "gameData": {
+            "players": [
+                {
+                    "id": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
+                    "pseudo": "Determinist random bot",
+                    "isBot": true
+                },
+                {
+                    "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                    "pseudo": "Guest 1817",
+                    "isBot": false
+                }
+            ],
+            "size": 7,
+            "started": true,
+            "state": "playing",
+            "movesHistory": [
+                {
+                    "row": 1,
+                    "col": 4,
+                    "playedAt": "2023-12-22T15:14:43.799Z"
+                },
+                {
+                    "row": 2,
+                    "col": 5,
+                    "playedAt": "2023-12-22T15:14:48.794Z"
+                },
+                {
+                    "row": 5,
+                    "col": 4,
+                    "playedAt": "2023-12-22T15:14:48.795Z"
+                }
+            ],
+            "currentPlayerIndex": 1,
+            "winner": null,
+            "outcome": null,
+            "createdAt": "2023-12-22T15:14:43.794Z",
+            "startedAt": "2023-12-22T15:14:43.794Z",
+            "lastMoveAt": "2023-12-22T15:14:48.796Z",
+            "endedAt": null,
+            "hexes": [
+                ".......",
+                "....0..",
+                ".....1.",
+                ".......",
+                ".......",
+                "....0..",
+                "......."
+            ]
+        },
+        "canceled": false,
+        "__meta": {
+            "values": {
+                "timeControlValues.players.1.totalRemainingTime": [
+                    "Date"
+                ],
+                "gameData.createdAt": [
+                    "Date"
+                ],
+                "gameData.startedAt": [
+                    "Date"
+                ],
+                "gameData.lastMoveAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "gameData.players.1"
+                ],
+                "opponent": [
+                    "gameData.players.0"
+                ]
+            }
+        }
+    }
+]

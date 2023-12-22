@@ -15,7 +15,7 @@ themeSwitcherDispatcher.on('themeSwitched', () => {
 });
 
 /*
- * My games
+ * My turn notification
  */
 const { myTurnCount, mostUrgentGame } = storeToRefs(useMyGamesStore());
 const router = useRouter();
@@ -42,6 +42,7 @@ const goToMostUrgentGame = (): void => {
 
                 <span class="my-turn-notif ms-auto me-1">
                     <i
+                        :data-most="JSON.stringify(mostUrgentGame)"
                         :class="[
                             myTurnCount > 0 ? 'bi-hexagon-fill' : 'bi-hexagon',
                             null === mostUrgentGame ? '' : (0 === mostUrgentGame.myColor
@@ -53,7 +54,7 @@ const goToMostUrgentGame = (): void => {
                     <a
                         href="#"
                         @click="goToMostUrgentGame()"
-                        class="text-white"
+                        class="text-body"
                     >{{ myTurnCount }}</a>
                 </span>
                 <p class="me-3">

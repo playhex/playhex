@@ -17,7 +17,7 @@ describe('Play a game to the end', () => {
             .type('4')
 
             .closest('.modal-content')
-            .contains(/^Me$/)
+            .contains(/^First$/)
             .click()
 
             .closest('.modal-content')
