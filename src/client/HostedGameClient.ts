@@ -39,6 +39,10 @@ export default class HostedGameClient
 
             this.game = new Game(hostedGameData.gameOptions.boardsize, [hostPlayer, opponentPlayer]);
 
+            if (hostedGameData.canceled) {
+                this.game.cancel();
+            }
+
             return this.game;
         }
 

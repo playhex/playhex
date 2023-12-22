@@ -37,4 +37,41 @@ describe('Page game over', () => {
         cy.contains('Game over');
         cy.contains('Game has been canceled.');
     });
+
+    it('displays win popin when game has been canceled before being started', () => {
+        cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
+            fixture: 'game-not-started-canceled.json',
+        });
+
+        cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+        cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
+
+        cy.contains('Cancel').should('not.exist');
+
+        cy.get('Accept').should('not.exist');
+
+        cy.contains('Game over');
+        cy.contains('Game has been canceled.');
+    });
+
+    it('as host, Cancel button no longer appears when game is already canceled', () => {
+        cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
+            fixture: 'game-not-started-canceled.json',
+        });
+        cy.intercept('/auth/guest', {
+            fixture: 'game-not-started-canceled-guest.json',
+        });
+
+        cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+        cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
+
+        cy.contains('Cancel').should('not.exist');
+
+        cy.get('Accept').should('not.exist');
+
+        cy.contains('Game over');
+        cy.contains('Game has been canceled.');
+    });
 });

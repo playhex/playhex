@@ -1,0 +1,30 @@
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "pseudo": "Me",
+        "isBot": false
+    },
+    "opponent": null,
+    "timeControlValues": {
+        "type": "absolute",
+        "state": "over",
+        "players": [
+            {
+                "totalRemainingTime": 900
+            },
+            {
+                "totalRemainingTime": 900
+            }
+        ]
+    },
+    "gameOptions": {
+        "boardsize": 11,
+        "firstPlayer": null,
+        "opponent": {
+            "type": "player"
+        }
+    },
+    "gameData": null,
+    "canceled": true
+}
