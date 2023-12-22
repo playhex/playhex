@@ -80,12 +80,12 @@ describe('Lobby', () => {
         ;
 
         cy
-            // Last played games
-            .contains('Last played games')
+            // Ended games
+            .contains('Ended games')
             .next('table')
             .contains('Player C won against Player D')
             .closest('tr')
-            .contains('See')
+            .contains('Review')
 
             // should not display canceled games
             .closest('table')

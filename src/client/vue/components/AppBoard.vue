@@ -133,7 +133,6 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                         v-if="(player instanceof AppPlayer)"
                         :playerData="player.getPlayerData()"
                     ></app-online-status>
-                    {{ game.getPlayer(0).getName() }}
                 </p>
             </div>
             <div class="player player-b mx-2">
@@ -146,7 +145,6 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                         v-if="(player instanceof AppPlayer)"
                         :playerData="player.getPlayerData()"
                     ></app-online-status>
-                    {{ game.getPlayer(1).getName() }}
                 </p>
             </div>
         </div>

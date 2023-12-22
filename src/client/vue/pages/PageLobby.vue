@@ -9,6 +9,7 @@ import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import HostedGameClient from 'HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
 import AppOnlineStatus from '../components/AppOnlineStatus.vue';
+import { ref } from 'vue';
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
@@ -68,6 +69,15 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
     && !hostedGameClient.getHostedGameData().canceled
 ;
 
+const joinGame = (gameId: string) => {
+    lobbyStore.joinGame(gameId);
+};
+
+/**
+ * Ended games
+ */
+const lastPlayedShowCount = ref(5);
+
 const isLastPlayed = (hostedGameClient: HostedGameClient) =>
     hostedGameClient.getHostedGameData().gameData?.state === 'ended'
     && !hostedGameClient.getHostedGameData().canceled
@@ -82,10 +92,6 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
     }
 
     return gameDataB.endedAt.getTime() - gameDataA.endedAt.getTime();
-};
-
-const joinGame = (gameId: string) => {
-    lobbyStore.joinGame(gameId);
 };
 </script>
 
@@ -134,7 +140,7 @@ const joinGame = (gameId: string) => {
                                     @click="goToGame(hostedGameClient.getId())"
                                 >Watch</button>
                             </td>
-                            <td><app-online-status :playerData="hostedGameClient.getHostedGameData().host"></app-online-status> {{ hostedGameClient.getHostedGameData().host.pseudo }}</td>
+                            <td><app-online-status :playerData="hostedGameClient.getHostedGameData().host"></app-online-status></td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
                     </tbody>
@@ -162,10 +168,8 @@ const joinGame = (gameId: string) => {
                             <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                 <template v-if="gameData">
                                     <app-online-status :playerData="gameData.players[0]"></app-online-status>
-                                    {{ gameData.players[0].pseudo }}
-                                    <span class="mx-3">vs</span>
+                                    <span class="mx-3"> vs </span>
                                     <app-online-status :playerData="gameData.players[1]"></app-online-status>
-                                    {{ gameData.players[1].pseudo }}
                                 </template>
                             </td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
@@ -175,30 +179,32 @@ const joinGame = (gameId: string) => {
                 <p v-else>No game currently playing.</p>
 
                 <template v-if="Object.values(lobbyStore.hostedGameClients).some(isLastPlayed)">
-                    <h4><i class="bi bi-trophy"></i> Last played games</h4>
+                    <h4><i class="bi bi-trophy"></i> Ended games</h4>
 
-                    <table class="table">
+                    <table class="table table-sm table-borderless">
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isLastPlayed).sort(byEndedAt).slice(0, 32)"
+                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isLastPlayed).sort(byEndedAt).slice(0, lastPlayedShowCount)"
                                 :key="hostedGameClient.getId()"
                             >
                                 <td class="ps-0">
-                                    <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">See</button>
+                                    <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Review</button>
                                 </td>
                                 <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                     <template v-if="null !== gameData && null !== gameData.winner">
-                                        <app-online-status :playerData="gameData.players[gameData.winner]"></app-online-status>
-                                        <strong>{{ gameData.players[gameData.winner].pseudo }}</strong>
-
-                                        <span v-if="null === gameData.outcome" class="mx-3"> won against</span>
-                                        <span v-else class="mx-3"> won by {{ gameData.outcome }} against</span>
-
-                                        <app-online-status :playerData="gameData.players[1 - gameData.winner]"></app-online-status>
-                                        {{ gameData.players[1 - gameData.winner].pseudo }}
+                                        <app-online-status :playerData="gameData.players[gameData.winner]" is="strong"></app-online-status>
+                                        <span class="mx-3"> won against </span>
+                                        <app-online-status :playerData="gameData.players[1 - gameData.winner]" classes="text-secondary"></app-online-status>
                                     </template>
                                 </td>
-                                <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
+                            </tr>
+                            <tr v-if="Object.values(lobbyStore.hostedGameClients).filter(isLastPlayed).sort(byEndedAt).length > lastPlayedShowCount">
+                                <td colspan="2">
+                                    <button
+                                        class="btn btn-sm btn-link"
+                                        @click="lastPlayedShowCount += 20"
+                                    >Show more ended games</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
