@@ -6,13 +6,20 @@ import { Game, RandomAIPlayer, Player } from '@shared/game-engine';
 import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
 import { ref } from 'vue';
 import { Tuple } from '@shared/app/Types';
+import AppPlayer from '@shared/app/AppPlayer';
+import useAuthStore from '../../stores/authStore';
 
 const gameView = ref<GameView>();
 const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.gameOptionsJson ?? '{}');
 const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
 
 const initGame = () => {
-    const player = new Player();
+    const player = new AppPlayer(useAuthStore().loggedInUser ?? {
+        id: '',
+        isBot: false,
+        pseudo: 'Player',
+    });
+
     const players: Tuple<Player> = [
         player,
         new RandomAIPlayer(),
