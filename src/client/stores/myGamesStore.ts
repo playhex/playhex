@@ -6,7 +6,7 @@ import { HostedGameData, MoveData } from '@shared/app/Types';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
 import useLobbyStore from './lobbyStore';
-import { timeValueToSeconds } from '@shared/time-control/TimeControlInterface';
+import { timeValueToSeconds } from '@shared/time-control/TimeValue';
 
 export type CurrentGame = {
     id: string;
@@ -52,8 +52,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return 0;
         }
 
-        const time0 = game0.hostedGameData.timeControlValues.players[game0.myColor].totalRemainingTime;
-        const time1 = game1.hostedGameData.timeControlValues.players[game1.myColor].totalRemainingTime;
+        const time0 = game0.hostedGameData.timeControl.values.players[game0.myColor].totalRemainingTime;
+        const time1 = game1.hostedGameData.timeControl.values.players[game1.myColor].totalRemainingTime;
 
         return timeValueToSeconds(time0) - timeValueToSeconds(time1);
     };

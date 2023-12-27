@@ -1,11 +1,15 @@
 import EventEmitter from 'events';
 import TypedEventEmitter from 'typed-emitter';
-import { TimeValue } from './TimeControlInterface';
+import TimeValue, { timeValueToSeconds } from './TimeValue';
 
 type ChronoEvents = {
     elapsed: () => void;
 };
 
+/**
+ * Simple chrono for a single player.
+ * Can be started or paused.
+ */
 export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmitter<ChronoEvents>)
 {
     private value: TimeValue;
@@ -40,6 +44,14 @@ export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmit
         return this.value;
     }
 
+    /**
+     * Set raw value of chrono.
+     *
+     * Careful: if setting a number while chrono is running,
+     * it will pause the chrono because a number is for a paused value.
+     *
+     * Same when setting a Date on a paused Chrono, it will go on a running state.
+     */
     setValue(value: TimeValue): void
     {
         this.value = value;
@@ -71,5 +83,10 @@ export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmit
         this.value = (this.value.getTime() - (new Date().getTime())) / 1000;
 
         this.resetTimeout();
+    }
+
+    toString(): string
+    {
+        return `${timeValueToSeconds(this.value)}s`;
     }
 }

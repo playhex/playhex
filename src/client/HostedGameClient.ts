@@ -1,7 +1,7 @@
 import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { HostedGameData, PlayerData } from '@shared/app/Types';
+import { HostedGameData, PlayerData, TimeControlOptionsValues } from '@shared/app/Types';
 import { Outcome } from '@shared/game-engine/Game';
-import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
+import { GameTimeData } from '@shared/time-control/TimeControl';
 import AppPlayer from '@shared/app/AppPlayer';
 import EmptyPlayer from '@shared/app/EmptyPlayer';
 import useLobbyStore from './stores/lobbyStore';
@@ -238,14 +238,19 @@ export default class HostedGameClient
         }
     }
 
-    getTimeControlValues(): TimeControlValues
+    getTimeControl(): TimeControlOptionsValues
     {
-        return this.hostedGameData.timeControlValues;
+        return this.hostedGameData.timeControl;
     }
 
-    updateTimeControl(timeControlValues: TimeControlValues): void
+    getGameTimeData(): GameTimeData
     {
-        Object.assign(this.hostedGameData.timeControlValues, timeControlValues);
+        return this.hostedGameData.timeControl.values;
+    }
+
+    updateTimeControl(gameTimeData: GameTimeData): void
+    {
+        Object.assign(this.hostedGameData.timeControl.values, gameTimeData);
     }
 
     gameMoved(move: Move, byPlayerIndex: PlayerIndex): void

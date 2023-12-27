@@ -6,7 +6,7 @@
         "isBot": false
     },
     "opponent": null,
-    "timeControlValues": {
+    "gameTimeData": {
         "type": "absolute",
         "state": "over",
         "players": [

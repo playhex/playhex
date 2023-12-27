@@ -17,6 +17,13 @@ describe('Play a game to the end', () => {
             .type('4')
 
             .closest('.modal-content')
+            .contains('More options')
+            .click()
+        ;
+
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
             .contains(/^First$/)
             .click()
 

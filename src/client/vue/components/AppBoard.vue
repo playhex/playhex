@@ -5,10 +5,10 @@ import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
 import GameOverOverlay from '@client/vue/components/overlay/GameOverOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
-import { TimeControlValues, TimeValue, timeValueToSeconds } from '@shared/time-control/TimeControlInterface';
-import { format } from 'date-fns';
 import AppOnlineStatus from './AppOnlineStatus.vue';
 import AppPlayer from '@shared/app/AppPlayer';
+import AppChrono from './AppChrono.vue';
+import { TimeControlOptionsValues } from '@shared/app/Types';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -17,8 +17,8 @@ const props = defineProps({
         type: GameView,
         required: true,
     },
-    timeControlValues: {
-        type: Object as PropType<TimeControlValues>,
+    gameTimeControl: {
+        type: Object as PropType<TimeControlOptionsValues>,
     },
     rematch: {
         type: Function,
@@ -26,45 +26,7 @@ const props = defineProps({
     },
 });
 
-/*
- * Chrono
- */
-const { gameView, timeControlValues } = toRefs(props);
-
-type Chrono = {
-    time: string;
-    ms?: string;
-};
-
-const toChrono = (timeValue: TimeValue): Chrono => {
-    let seconds = timeValueToSeconds(timeValue);
-
-    const chrono: Chrono = {
-        time: format(seconds * 1000, 'm:ss'),
-    };
-
-    if (seconds < 10) {
-        chrono.ms = format(seconds * 1000, '.S');
-    }
-
-    return chrono;
-};
-
-const chronoPlayerA = ref<Chrono>({ time: '…' });
-const chronoPlayerB = ref<Chrono>({ time: '…' });
-
-if (timeControlValues?.value) {
-    const chronoThread = setInterval(() => {
-        if (!timeControlValues.value) {
-            return;
-        }
-
-        chronoPlayerA.value = toChrono(timeControlValues.value.players[0].totalRemainingTime);
-        chronoPlayerB.value = toChrono(timeControlValues.value.players[1].totalRemainingTime);
-    }, 50);
-
-    onUnmounted(() => clearInterval(chronoThread));
-}
+const { gameView, gameTimeControl } = toRefs(props);
 
 /*
  * Add piwi view
@@ -124,10 +86,11 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a mx-2">
-                <p v-if="timeControlValues">
-                    <span class="chrono-time">{{ chronoPlayerA.time }}</span>
-                    <span v-if="chronoPlayerA.ms">{{  chronoPlayerA.ms }}</span>
-                </p>
+                <app-chrono
+                    v-if="gameTimeControl"
+                    :timeControlOptions="gameTimeControl.options"
+                    :playerTimeData="gameTimeControl.values.players[0]"
+                ></app-chrono>
                 <p class="text-player-a h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
                     <app-online-status
                         v-if="(player instanceof AppPlayer)"
@@ -137,10 +100,11 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                 </p>
             </div>
             <div class="player player-b mx-2">
-                <p v-if="timeControlValues">
-                    <span class="chrono-time">{{ chronoPlayerB.time }}</span>
-                    <span v-if="chronoPlayerB.ms">{{  chronoPlayerB.ms }}</span>
-                </p>
+                <app-chrono
+                    v-if="gameTimeControl"
+                    :timeControlOptions="gameTimeControl.options"
+                    :playerTimeData="gameTimeControl.values.players[1]"
+                ></app-chrono>
                 <p class="text-player-b h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
                     <app-online-status
                         v-if="(player instanceof AppPlayer)"
@@ -169,9 +133,6 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
 
     p
         margin-top 0
-
-.chrono-time
-    font-size 2em
 
 .orientation-vertical_bias_right_hand
     .player-a

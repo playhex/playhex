@@ -8,7 +8,7 @@
         "id": "winner-id",
         "pseudo": "The winner"
     },
-    "timeControlValues": {
+    "gameTimeData": {
         "type": "absolute",
         "state": "over",
         "players": [

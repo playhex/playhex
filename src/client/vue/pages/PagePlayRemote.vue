@@ -204,7 +204,7 @@ const rematch = async (): Promise<void> => {
         <app-board
             v-if="gameView"
             :game-view="gameView"
-            :time-control-values="hostedGameClient?.getTimeControlValues()"
+            :game-time-control="hostedGameClient?.getTimeControl()"
             :key="gameViewLoaded"
             :rematch="rematch"
         ></app-board>

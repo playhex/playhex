@@ -7,7 +7,7 @@
             "isBot": false
         },
         "opponent": null,
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -41,7 +41,7 @@
             "pseudo": "Mohex",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -237,7 +237,7 @@
             "pseudo": "Mohex",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -703,7 +703,7 @@
             "pseudo": "Mohex",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [

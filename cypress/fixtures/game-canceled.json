@@ -10,7 +10,7 @@
         "pseudo": "Kheops",
         "isBot": true
     },
-    "timeControlValues": {
+    "gameTimeData": {
         "type": "absolute",
         "state": "over",
         "players": [

@@ -8,7 +8,7 @@
         "id": "bot-id",
         "pseudo": "Bot"
     },
-    "timeControlValues": {
+    "gameTimeData": {
         "type": "absolute",
         "state": "over",
         "players": [

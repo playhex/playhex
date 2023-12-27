@@ -1,12 +1,12 @@
 import { Game, PlayerIndex } from '../game-engine';
-import { TimeControlInterface } from '../time-control/TimeControlInterface';
+import { AbstractTimeControl } from '../time-control/TimeControl';
 
 /**
  * Connect a TimeControl to a Game
  * to allow timeControl switch when player moved,
  * or make game end by time when timeControl emitted elapsed event.
  */
-export const bindTimeControlToGame = (game: Game, timeControl: TimeControlInterface) => {
+export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeControl) => {
     game.prependListener('started', () => {
         timeControl.start();
     });

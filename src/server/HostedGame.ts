@@ -1,7 +1,6 @@
 import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
 import { HostedGameData, PlayerData, Tuple } from '../shared/app/Types';
-import { TimeControlInterface, TimeControlValues } from '../shared/time-control/TimeControlInterface';
-import { AbsoluteTimeControl } from '../shared/time-control/time-controls/AbsoluteTimeControl';
+import { GameTimeData } from '../shared/time-control/TimeControl';
 import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
@@ -10,6 +9,8 @@ import { Outcome } from '@shared/game-engine/Game';
 import logger from './services/logger';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Rooms from '../shared/app/Rooms';
+import { AbstractTimeControl } from '../shared/time-control/TimeControl';
+import { createTimeControl } from '../shared/time-control/TimeControlType';
 
 /**
  * Contains a game state,
@@ -18,7 +19,7 @@ import Rooms from '../shared/app/Rooms';
 export default class HostedGame
 {
     private id: string = uuidv4();
-    private timeControl: TimeControlInterface = new AbsoluteTimeControl(900);
+    private timeControl: AbstractTimeControl;
     private game: null | Game = null;
     private canceled = false;
 
@@ -29,6 +30,8 @@ export default class HostedGame
         private opponent: null | AppPlayer = null,
     ) {
         logger.info('Hosted game created.', { hostedGameId: this.id, host: host.getPlayerData().pseudo });
+
+        this.timeControl = createTimeControl(gameOptions.timeControl);
     }
 
     getId(): string
@@ -41,7 +44,7 @@ export default class HostedGame
         return this.game;
     }
 
-    getTimeControlValues(): TimeControlValues
+    getGameTimeData(): GameTimeData
     {
         return this.timeControl.getValues();
     }
@@ -326,7 +329,10 @@ export default class HostedGame
             id: this.id,
             host: HostedGame.playerToData(this.host),
             opponent: this.opponent ? HostedGame.playerToData(this.opponent) : null,
-            timeControlValues: this.timeControl.getValues(),
+            timeControl: {
+                options: this.timeControl.getOptions(),
+                values: this.timeControl.getValues(),
+            },
             gameOptions: this.gameOptions,
             gameData: null,
             canceled: this.canceled,

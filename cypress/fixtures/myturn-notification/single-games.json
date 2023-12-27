@@ -11,7 +11,7 @@
             "pseudo": "Determinist random bot",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -173,7 +173,7 @@
             "pseudo": "Determinist random bot",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "running",
             "players": [
@@ -245,7 +245,7 @@
         "canceled": false,
         "__meta": {
             "values": {
-                "timeControlValues.players.1.totalRemainingTime": [
+                "gameTimeData.players.1.totalRemainingTime": [
                     "Date"
                 ],
                 "gameData.createdAt": [

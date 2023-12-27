@@ -11,7 +11,7 @@
             "pseudo": "Player B",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "running",
             "players": [
@@ -142,7 +142,7 @@
         "canceled": false,
         "__meta": {
             "values": {
-                "timeControlValues.players.0.totalRemainingTime": [
+                "gameTimeData.players.0.totalRemainingTime": [
                     "Date"
                 ],
                 "gameData.createdAt": [
@@ -173,7 +173,7 @@
             "isBot": false
         },
         "opponent": null,
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "ready",
             "players": [
@@ -207,7 +207,7 @@
             "pseudo": "Player D",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -406,7 +406,7 @@
             "pseudo": "Cancel B",
             "isBot": true
         },
-        "timeControlValues": {
+        "gameTimeData": {
             "type": "absolute",
             "state": "over",
             "players": [

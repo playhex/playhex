@@ -5,7 +5,7 @@ import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
 import { apiPostCancel, apiPostGame, apiPostResign, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { Outcome } from '@shared/game-engine/Game';
-import { TimeControlValues } from '@shared/time-control/TimeControlInterface';
+import { GameTimeData } from '@shared/time-control/TimeControl';
 import useSocketStore from './socketStore';
 import { ref } from 'vue';
 import Rooms from '@shared/app/Rooms';
@@ -128,9 +128,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
-        socket.on('timeControlUpdate', (gameId: string, timeControlValues: TimeControlValues) => {
+        socket.on('timeControlUpdate', (gameId: string, gameTimeData: GameTimeData) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].updateTimeControl(timeControlValues);
+                hostedGameClients.value[gameId].updateTimeControl(gameTimeData);
             }
         });
 

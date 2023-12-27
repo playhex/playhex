@@ -1,7 +1,8 @@
-import { TimeControlValues } from 'time-control/TimeControlInterface';
+import { GameTimeData } from '../time-control/TimeControl';
 import { PlayerIndex } from '../game-engine';
 import { GameState, Outcome } from 'game-engine/Game';
 import { GameOptionsData } from './GameOptions';
+import TimeControlType from '../time-control/TimeControlType';
 
 export type Tuple<T> = [T, T];
 
@@ -48,13 +49,17 @@ export type GameData = {
     endedAt: null | Date;
 };
 
+export type TimeControlOptionsValues = {
+    options: TimeControlType;
+    values: GameTimeData;
+};
 
 export type HostedGameData = {
     id: string;
     host: PlayerData;
     opponent: null | PlayerData;
     gameOptions: GameOptionsData;
-    timeControlValues: TimeControlValues;
+    timeControl: TimeControlOptionsValues;
 
     /**
      * Whether game has been canceled.

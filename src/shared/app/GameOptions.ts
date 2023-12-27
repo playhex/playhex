@@ -1,3 +1,4 @@
+import TimeControlType from '../../shared/time-control/TimeControlType';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../game-engine';
 
 const { min, max, floor } = Math;
@@ -38,12 +39,20 @@ export type GameOptionsData = {
         | GameOptionsOpponentAIData
         | GameOptionsOpponentLocalAIData
     ;
+
+    timeControl: TimeControlType;
 };
 
 export const defaultGameOptions: GameOptionsData = {
     boardsize: 11,
     firstPlayer: null,
     opponent: { type: 'player' },
+    timeControl: {
+        type: 'absolute',
+        options: {
+            secondsPerPlayer: 900,
+        },
+    },
 };
 
 const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
@@ -80,6 +89,7 @@ export const sanitizeGameOptions = (gameOptions: GameOptionsData): GameOptionsDa
         boardsize: sanitizeBoardsize(gameOptions.boardsize ?? DEFAULT_BOARDSIZE),
         firstPlayer: sanitizeFirstPlayer(gameOptions.firstPlayer),
         opponent: gameOptions.opponent,
+        timeControl: gameOptions.timeControl,
     };
 };
 
