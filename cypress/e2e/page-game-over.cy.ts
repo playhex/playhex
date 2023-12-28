@@ -10,6 +10,9 @@ describe('Page game over', () => {
 
         cy.contains('Game over');
         cy.contains('Test player won the game !');
+
+        // Winner appears in his color, blue
+        cy.get('strong.text-primary').contains('Test player');
     });
 
     it('displays win popin when a player resigned', () => {
@@ -23,6 +26,9 @@ describe('Page game over', () => {
 
         cy.contains('Game over');
         cy.contains('The winner won by resignation !');
+
+        // Winner appears in his color, red
+        cy.get('strong.text-danger').contains('The winner');
     });
 
     it('displays win popin when game has been canceled', () => {

@@ -88,7 +88,7 @@ describe('Time controls', () => {
         cy.contains('5:00 + 5x10s');
     });
 
-    it.only('create a game with custom time control, Fischer', () => {
+    it('create a game with custom time control, Fischer', () => {
         cy
             .contains('Game options')
             .closest('.modal-content')

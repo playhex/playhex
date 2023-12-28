@@ -65,7 +65,7 @@ const outcomeToString = (): string => {
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
                     <div class="modal-body">
-                        <p v-if="null !== winner"><strong :class="'text-player-' + (game.getStrictWinner() ? 'b' : 'a')">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
+                        <p v-if="null !== winner"><strong :class="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
                         <p v-else>Game has been canceled.</p>
                     </div>
                     <div class="modal-footer">
