@@ -4,6 +4,7 @@ import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
 import { commitRef } from './src/server/lastCommitInfo';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 
 import { IS_DEV, WEBPACK_PORT } from './src/server/config';
 
@@ -12,10 +13,22 @@ const plugins = [
     new VueLoaderPlugin(),
     new DefinePlugin({
         LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
+        SENTRY_DSN: JSON.stringify(process.env.SENTRY_DSN ?? null),
         __VUE_OPTIONS_API__: false,
         __VUE_PROD_DEVTOOLS__: false,
     }),
 ];
+
+const { SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT } = process.env;
+
+if (SENTRY_AUTH_TOKEN && SENTRY_ORG && SENTRY_PROJECT) {
+    // Put the Sentry Webpack plugin after all other plugins
+    plugins.push(sentryWebpackPlugin({
+        authToken: SENTRY_AUTH_TOKEN,
+        org: SENTRY_ORG,
+        project: SENTRY_PROJECT,
+    }));
+}
 
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 // plugins.push(new BundleAnalyzerPlugin());
@@ -31,7 +44,7 @@ const devServer: DevServerConfiguration = {
 
 const config: Configuration = {
     mode: process.env.NODE_ENV as 'development' | 'production',
-    devtool: IS_DEV ? 'inline-source-map' : false,
+    devtool: IS_DEV ? 'inline-source-map' : 'source-map',
     entry: ['./src/client/client'],
     output: {
         path: path.join(__dirname, 'dist', 'statics'),

@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './base.styl';
+import './sentry';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
