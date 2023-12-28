@@ -91,7 +91,7 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                     :timeControlOptions="gameTimeControl.options"
                     :playerTimeData="gameTimeControl.values.players[0]"
                 ></app-chrono>
-                <p class="text-player-a h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
+                <p class="text-danger h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
                     <app-online-status
                         v-if="(player instanceof AppPlayer)"
                         :playerData="player.getPlayerData()"
@@ -105,7 +105,7 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                     :timeControlOptions="gameTimeControl.options"
                     :playerTimeData="gameTimeControl.values.players[1]"
                 ></app-chrono>
-                <p class="text-player-b h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
+                <p class="text-primary h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
                     <app-online-status
                         v-if="(player instanceof AppPlayer)"
                         :playerData="player.getPlayerData()"
