@@ -50,8 +50,14 @@ const gameToSGF = (game: Game): string => {
 
     str += ';';
 
-    str += game.getMovesHistory()
-        .map((move, index) => `${colors[index % 2]}[${move.toString()}]`)
+    const movesStr = game.getMovesHistory().map(move => move.toString());
+
+    if (game.getAllowSwap() && movesStr.length >= 2 && movesStr[0] === movesStr[1]) {
+        movesStr[1] = 'swap-pieces';
+    }
+
+    str += movesStr
+        .map((moveStr, index) => `${colors[index % 2]}[${moveStr}]`)
         .join(';')
     ;
 

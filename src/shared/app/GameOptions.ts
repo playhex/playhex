@@ -30,6 +30,12 @@ export type GameOptionsData = {
     firstPlayer: null | PlayerIndex;
 
     /**
+     * Whether the swap rule is enabled or not.
+     * Should be true by default for 1v1 games.
+     */
+    swapRule: boolean;
+
+    /**
      * Which opponent I want. Can be:
      *  - type: player, with elo restriction, or a friend...
      *  - type: ai, with a engine, level...
@@ -46,6 +52,7 @@ export type GameOptionsData = {
 export const defaultGameOptions: GameOptionsData = {
     boardsize: 11,
     firstPlayer: null,
+    swapRule: true,
     opponent: { type: 'player' },
     timeControl: {
         type: 'absolute',
@@ -88,6 +95,7 @@ export const sanitizeGameOptions = (gameOptions: GameOptionsData): GameOptionsDa
     return {
         boardsize: sanitizeBoardsize(gameOptions.boardsize ?? DEFAULT_BOARDSIZE),
         firstPlayer: sanitizeFirstPlayer(gameOptions.firstPlayer),
+        swapRule: !!gameOptions.swapRule,
         opponent: gameOptions.opponent,
         timeControl: gameOptions.timeControl,
     };

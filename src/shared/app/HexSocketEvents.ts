@@ -47,7 +47,7 @@ export type HexServerToClientEvents = {
     /**
      * A move has been played by a player.
      */
-    moved: (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => void;
+    moved: (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => void;
 
     /**
      * Players remaining time should be updated.

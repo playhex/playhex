@@ -6,6 +6,9 @@ import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
 import { debounce } from 'debounce';
+import SwapableSprite from './SwapableSprite';
+import SwapedSprite from './SwapedSprite';
+import { Coords } from '@shared/game-engine/Types';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -95,6 +98,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
     private orientation: BoardOrientation;
     private sidesGraphics: [Graphics, Graphics];
     private displayCoords = false;
+    private swapable: SwapableSprite;
+    private swaped: SwapedSprite;
 
     private themeSwitchedListener = () => this.redraw();
     private resizeDebouncedListener = () => this.resizeRendererAndRedraw();
@@ -158,8 +163,16 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             this.gameContainer.addChild(this.createCoords());
         }
 
+        this.swapable = this.createSwapable();
+        this.swaped = this.createSwaped();
+
         this.createAndAddHexes();
         this.highlightSidesFromGame();
+
+        this.gameContainer.addChild(
+            this.swapable,
+            this.swaped,
+        );
     }
 
     private resizeRendererAndRedraw(): void
@@ -304,12 +317,41 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             this.highlightSidesFromGame();
         });
 
-        this.game.on('played', (move, byPlayerIndex) => {
+        this.game.on('played', (move, moveIndex, byPlayerIndex) => {
             this.resetHighlightedHexes();
-            this.hexes[move.row][move.col]
-                .setPlayer(byPlayerIndex)
-                .setHighlighted()
-            ;
+
+            this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
+
+            switch (this.game.getMovesHistory().length) {
+                case 1:
+                    if (this.game.canSwapNow()) {
+                        this.showSwapable(move);
+                    } else {
+                        this.hexes[move.row][move.col].setHighlighted();
+                    }
+
+                    break;
+
+                case 2: {
+                    const swapMove = this.game.isLastMoveSwapPieces();
+
+                    if (null === swapMove) {
+                        this.hexes[move.row][move.col].setHighlighted();
+                        break;
+                    }
+
+                    const { swapped, mirror } = swapMove;
+
+                    this.hexes[swapped.row][swapped.col].setPlayer(null);
+                    this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
+                    this.showSwaped(mirror);
+
+                    break;
+                }
+
+                default:
+                    this.hexes[move.row][move.col].setHighlighted();
+            }
 
             this.highlightSidesFromGame();
         });
@@ -320,9 +362,14 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     resetHighlightedHexes(): void
     {
-        this.game.getMovesHistory().forEach(move => {
+        this.game.getMovesHistory().forEach((move) => {
             this.hexes[move.row][move.col].setHighlighted(false);
         });
+
+        if (this.game.getAllowSwap()) {
+            this.showSwapable(false);
+            this.showSwaped(false);
+        }
     }
 
     private async animateWinningPath(): Promise<void>
@@ -363,11 +410,32 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
             }
         }
 
+        this.highlightLastMove();
+    }
+
+    private highlightLastMove(): void
+    {
         const lastMove = this.game.getLastMove();
 
-        if (null !== lastMove) {
-            this.hexes[lastMove.row][lastMove.col].setHighlighted();
+        if (null === lastMove) {
+            return;
         }
+
+        if (this.game.getAllowSwap()) {
+            if (1 === this.game.getMovesHistory().length) {
+                this.showSwapable(lastMove);
+                return;
+            }
+
+            const swapPieces = this.game.isLastMoveSwapPieces();
+
+            if (null !== swapPieces) {
+                this.showSwaped(swapPieces.mirror);
+                return;
+            }
+        }
+
+        this.hexes[lastMove.row][lastMove.col].setHighlighted();
     }
 
     private createColoredSides(): Container
@@ -507,6 +575,52 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         }
 
         this.highlightSideForPlayer(this.game.getStrictWinner());
+    }
+
+    private createSwapable(): SwapableSprite
+    {
+        const swapable = new SwapableSprite();
+
+        swapable.rotation = -orientationToRotation(this.orientation);
+        swapable.visible = false;
+
+        return swapable;
+    }
+
+    private createSwaped(): SwapedSprite
+    {
+        const swaped = new SwapedSprite();
+
+        swaped.rotation = -orientationToRotation(this.orientation);
+        swaped.visible = false;
+
+        return swaped;
+    }
+
+    showSwapable(swapable: Coords | false): this
+    {
+        if (false === swapable) {
+            this.swapable.visible = false;
+            return this;
+        }
+
+        this.swapable.position = Hex.coords(swapable.row, swapable.col);
+        this.swapable.visible = true;
+
+        return this;
+    }
+
+    showSwaped(swaped: Coords | false): this
+    {
+        if (false === swaped) {
+            this.swaped.visible = false;
+            return this;
+        }
+
+        this.swaped.position = Hex.coords(swaped.row, swaped.col);
+        this.swaped.visible = true;
+
+        return this;
     }
 
     getHex(rowCol: { row: number, col: number }): Hex

@@ -34,7 +34,6 @@ export default class Hex extends Sprite
      */
     static readonly OUTER_RADIUS = Hex.RADIUS * (1 + Hex.PADDING);
 
-    private emptyColor: Graphics;
     private hexColor: Graphics;
     private highlight: Graphics;
 
@@ -54,7 +53,7 @@ export default class Hex extends Sprite
 
         this.addChild(
             this.createBackground(),
-            this.emptyColor = this.createEmptyColor(),
+            this.createEmptyColor(),
             this.hexColor = this.createHexColor(),
             this.highlight = this.createHighlight(),
         );
@@ -161,7 +160,7 @@ export default class Hex extends Sprite
         };
     }
 
-    setPlayer(player: null | PlayerIndex): Hex
+    setPlayer(player: null | PlayerIndex): this
     {
         this.hexColor.visible = null !== player;
 
@@ -175,7 +174,7 @@ export default class Hex extends Sprite
         return this;
     }
 
-    setHighlighted(highlighted = true): Hex
+    setHighlighted(highlighted = true): this
     {
         this.highlight.visible = highlighted;
 

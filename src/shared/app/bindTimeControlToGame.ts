@@ -11,7 +11,7 @@ export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeContr
         timeControl.start();
     });
 
-    game.prependListener('played', (move, byPlayerIndex) => {
+    game.prependListener('played', (move, moveIndex, byPlayerIndex) => {
         timeControl.push(byPlayerIndex);
     });
 

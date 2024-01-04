@@ -13,7 +13,8 @@
         "outDir": "../../dist/shared",
         "baseUrl": "./",
         "lib": [
-            "ES2019"
+            "ES2019",
+            "dom"
         ],
         "composite": true
     },

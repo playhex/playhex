@@ -2,6 +2,7 @@ import seedrandom from 'seedrandom';
 import Move from './Move';
 import AppPlayer from '../app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
+import IllegalMove from './IllegalMove';
 
 const { floor } = Math;
 
@@ -27,8 +28,16 @@ export default class DeterministRandomAIPlayer extends AppPlayer
             isBot: true,
         });
 
-        this.on('myTurnToPlay', () => {
-            this.makeMove();
+        this.on('myTurnToPlay', async () => {
+            try {
+                await this.makeMove();
+            } catch (e) {
+                if (e instanceof IllegalMove) {
+                    console.warn(e.message);
+                } else {
+                    throw e;
+                }
+            }
         });
     }
 

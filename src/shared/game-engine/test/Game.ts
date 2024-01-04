@@ -142,4 +142,51 @@ describe('Game', () => {
         assert.strictEqual(game.getCurrentPlayerIndex(), 1);
         assert.strictEqual(player1TurnToPlayEventReceived, true);
     });
+
+    it('returns whether a move is actually a swap', () => {
+        const game = new Game(5);
+
+        game.start();
+
+        assert.strictEqual(game.isSwapPiecesMove(new Move(0, 0), 0), false);
+
+        game.move(new Move(1, 2), 0);
+
+        assert.strictEqual(game.isSwapPiecesMove(new Move(0, 0), 1), false);
+        assert.strictEqual(game.isSwapPiecesMove(new Move(1, 2), 1), true);
+
+        game.move(new Move(3, 4), 1);
+
+        assert.strictEqual(game.isSwapPiecesMove(new Move(0, 0), 0), false);
+        assert.strictEqual(game.isSwapPiecesMove(new Move(1, 2), 0), false);
+        assert.strictEqual(game.isSwapPiecesMove(new Move(3, 4), 0), false);
+    });
+
+    it('swap pieces', () => {
+        const game = new Game(5);
+
+        game.start();
+
+        game.move(new Move(1, 2), 0);
+        game.move(new Move(1, 2), 1);
+
+        assert.strictEqual(game.getBoard().getCell(1, 2), null);
+        assert.strictEqual(game.getBoard().getCell(2, 1), 1);
+        assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+    });
+
+    it('cannot swap pieces if rule has been disabled', () => {
+        const game = new Game(5);
+
+        game.setAllowSwap(false);
+
+        game.start();
+
+        game.move(new Move(1, 2), 0);
+        assert.throws(() => game.move(new Move(1, 2), 1), { message: 'Move c2: This cell is already occupied' });
+
+        assert.strictEqual(game.getBoard().getCell(1, 2), 0);
+        assert.strictEqual(game.getBoard().getCell(2, 1), null);
+        assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+    });
 });

@@ -148,7 +148,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         mostUrgentGame.value = getMostUrgentGame();
     });
 
-    socket.on('moved', (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => {
+    socket.on('moved', (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => {
         if (!myGames.value[gameId] || null === myGames.value[gameId].myColor) {
             return;
         }

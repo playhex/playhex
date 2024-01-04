@@ -16,6 +16,11 @@ export default class PlayerGameInput
         return this.game.getSize();
     }
 
+    getAllowSwap(): boolean
+    {
+        return this.game.getAllowSwap();
+    }
+
     getPlayerIndex(): PlayerIndex
     {
         return this.playerIndex;
@@ -36,9 +41,29 @@ export default class PlayerGameInput
         return this.game.getMovesHistory().map(move => move.clone());
     }
 
+    getMovesHistoryLength(): number
+    {
+        return this.game.getMovesHistory().length;
+    }
+
+    getFirstMove(): null | Move
+    {
+        return this.game.getFirstMove()?.clone() ?? null;
+    }
+
+    getSecondMove(): null | Move
+    {
+        return this.game.getSecondMove()?.clone() ?? null;
+    }
+
     getLastMove(): null | Move
     {
         return this.game.getLastMove()?.clone() ?? null;
+    }
+
+    hasSwapMove(): boolean
+    {
+        return this.game.hasSwapMove();
     }
 
     /**

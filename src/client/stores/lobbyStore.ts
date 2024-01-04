@@ -122,9 +122,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
-        socket.on('moved', (gameId: string, move: MoveData, byPlayerIndex: PlayerIndex) => {
+        socket.on('moved', (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].gameMoved(new Move(move.row, move.col), byPlayerIndex);
+                hostedGameClients.value[gameId].gameMoved(new Move(move.row, move.col), moveIndex, byPlayerIndex);
             }
         });
 

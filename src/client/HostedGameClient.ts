@@ -17,6 +17,24 @@ export default class HostedGameClient
      */
     private game: null | Game = null;
 
+    /**
+     * Last move index on server.
+     * Used to prevent re-emitting server moves.
+     *
+     * Updated once move is received from server,
+     * or when game is initialized.
+     */
+    private remoteLastMoveIndex = -1;
+
+    /**
+     * Whether game is already ended on server.
+     * Used to prevent re-emitting resignations.
+     *
+     * Updated once ended event is received from server,
+     * or when game is initialized.
+     */
+    private remoteIsEnded = false;
+
     constructor(
         private hostedGameData: HostedGameData,
     ) {}
@@ -39,6 +57,7 @@ export default class HostedGameClient
 
             this.game = new Game(hostedGameData.gameOptions.boardsize, [hostPlayer, opponentPlayer]);
 
+            // Cancel here in case game has been canceled before started
             if (hostedGameData.canceled) {
                 this.game.cancel();
             }
@@ -51,9 +70,14 @@ export default class HostedGameClient
             new AppPlayer(gameData.players[1]),
         ]);
 
+        this.game.setAllowSwap(gameData.allowSwap);
+
         if (gameData.started) {
             this.gameStarted(hostedGameData);
         }
+
+        this.remoteLastMoveIndex = gameData.movesHistory.length - 1;
+        this.remoteIsEnded = 'ended' === gameData.state;
 
         // Replay game and fill history
         for (const move of gameData.movesHistory) {
@@ -100,8 +124,10 @@ export default class HostedGameClient
             throw new Error('game must be initialized before listening to it');
         }
 
-        this.game.on('played', async (move) => {
-            // TODO do not call lobbyStore.move when move comes from opponent
+        this.game.on('played', async (move, moveIndex) => {
+            if (moveIndex <= this.remoteLastMoveIndex) {
+                return;
+            }
 
             const result = await useLobbyStore().move(this.getId(), move);
 
@@ -111,7 +137,9 @@ export default class HostedGameClient
         });
 
         this.game.on('ended', async (winner, outcome) => {
-            // TODO do not call lobbyStore.resign twice
+            if (this.remoteIsEnded) {
+                return;
+            }
 
             if (outcome === 'resign') {
                 const result = await useLobbyStore().resign(this.getId());
@@ -253,25 +281,27 @@ export default class HostedGameClient
         Object.assign(this.hostedGameData.timeControl.values, gameTimeData);
     }
 
-    gameMoved(move: Move, byPlayerIndex: PlayerIndex): void
+    gameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
     {
         // Do nothing if game not loaded
         if (null === this.game) {
             return;
         }
 
-        if (this.game.getBoard().getCell(move.getRow(), move.getCol()) === 1 - byPlayerIndex) {
-            throw new Error('This cell is already filled by other player…');
+        // Ignore server move because already played locally
+        if (moveIndex <= this.game.getLastMoveIndex()) {
+            return;
         }
 
-        // If cell is not already pre-played locally by server response anticipation
-        if (this.game.getBoard().isEmpty(move.getRow(), move.getCol())) {
-            this.game.move(move, byPlayerIndex);
-        }
+        this.remoteLastMoveIndex = moveIndex;
+
+        this.game.move(move, byPlayerIndex);
     }
 
     gameEnded(winner: PlayerIndex, outcome: Outcome): void
     {
+        this.remoteIsEnded = true;
+
         if (this.hostedGameData.gameData) {
             this.hostedGameData.gameData.state = 'ended';
             this.hostedGameData.gameData.winner = winner;

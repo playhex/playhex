@@ -1,4 +1,5 @@
 import AppPlayer from '../app/AppPlayer';
+import IllegalMove from './IllegalMove';
 import Move from './Move';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,8 +18,16 @@ export default class RandomAIPlayer extends AppPlayer
             isBot: true,
         });
 
-        this.on('myTurnToPlay', () => {
-            this.makeMove();
+        this.on('myTurnToPlay', async () => {
+            try {
+                await this.makeMove();
+            } catch (e) {
+                if (e instanceof IllegalMove) {
+                    console.warn(e.message);
+                } else {
+                    throw e;
+                }
+            }
         });
     }
 

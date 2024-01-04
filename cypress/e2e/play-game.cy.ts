@@ -21,17 +21,6 @@ describe('Play a game to the end', () => {
             .click()
         ;
 
-        cy
-            .contains('Game options')
-            .closest('.modal-content')
-            .contains(/^First$/)
-            .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
-        ;
-
         cy.contains('Determinist random bot');
     });
 
@@ -54,6 +43,17 @@ describe('Play a game to the end', () => {
     */
 
     it('wins vs cpu on board size 4', () => {
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
+            .contains(/^First$/)
+            .click()
+
+            .closest('.modal-content')
+            .contains('Play vs AI')
+            .click()
+        ;
+
         cy.get('canvas')
             .click(502, 257)
             .click(504, 384)
@@ -66,6 +66,17 @@ describe('Play a game to the end', () => {
     });
 
     it('loses vs cpu on board size 4', () => {
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
+            .contains(/^First$/)
+            .click()
+
+            .closest('.modal-content')
+            .contains('Play vs AI')
+            .click()
+        ;
+
         cy.get('canvas')
             .click(289, 258)
             .click(615, 454)
@@ -78,5 +89,28 @@ describe('Play a game to the end', () => {
 
         cy.contains('Game over');
         cy.contains('Determinist random bot won the game !');
+    });
+
+    it('uses swap rule and wins on board size 4', () => {
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
+            .contains(/^Second$/)
+            .click()
+
+            .closest('.modal-content')
+            .contains('Play vs AI')
+            .click()
+        ;
+
+        cy.get('canvas')
+            .click(503, 137)
+            .click(611, 322)
+            .click(609, 445)
+            .click(614, 202)
+        ;
+
+        cy.contains('Game over');
+        cy.contains(/Guest \d+ won the game !/);
     });
 });

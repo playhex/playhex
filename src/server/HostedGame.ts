@@ -79,8 +79,8 @@ export default class HostedGame
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
-        this.game.on('played', (move, byPlayerIndex) => {
-            this.io.to(this.gameRooms()).emit('moved', this.id, move, byPlayerIndex);
+        this.game.on('played', (move, moveIndex, byPlayerIndex) => {
+            this.io.to(this.gameRooms()).emit('moved', this.id, move, moveIndex, byPlayerIndex);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         });
 
@@ -138,6 +138,8 @@ export default class HostedGame
         }
 
         this.game = new Game(this.gameOptions.boardsize, players);
+
+        this.game.setAllowSwap(this.gameOptions.swapRule);
 
         this.bindTimeControl();
         this.listenGame();
@@ -345,6 +347,7 @@ export default class HostedGame
                 started: this.game.isStarted(),
                 state: this.game.getState(),
                 movesHistory: this.game.getMovesHistory(),
+                allowSwap: this.game.getAllowSwap(),
                 currentPlayerIndex: this.game.getCurrentPlayerIndex(),
                 winner: this.game.getWinner(),
                 outcome: this.game.getOutcome(),

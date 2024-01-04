@@ -1,39 +1,26 @@
+import logger from './services/logger';
 import AppPlayer from '../shared/app/AppPlayer';
-import { Move } from '../shared/game-engine';
+import { IllegalMove, Move } from '../shared/game-engine';
 import { v4 as uuidv4 } from 'uuid';
+import HexRemotePlayerClient, { CalculateMoveRequest } from '../shared/hex-remote-player-api-client';
 
 const noInputError = new Error('No player input, cannot continue');
 
-type HexAiApiPayload = {
-    game: {
-        size: number;
-        movesHistory: string;
-        currentPlayer: 'black' | 'white';
-        swapRule: boolean;
-    };
-
-    ai: {
-        engine: 'mohex';
-
-        /**
-         * Limit power.
-         * For Mohex, it is max_games.
-         */
-        maxGames: number;
-    };
-};
-
 export default class RemoteApiPlayer extends AppPlayer
 {
+    private hexRemotePlayerApi: HexRemotePlayerClient;
+
     constructor(
         private name: string,
-        private endpoint: string,
+        endpoint: string,
     ) {
         super({
             id: 'remote-api|' + uuidv4(),
             pseudo: name,
             isBot: true,
         });
+
+        this.hexRemotePlayerApi = new HexRemotePlayerClient(endpoint);
 
         this.on('myTurnToPlay', () => this.makeMove());
     }
@@ -43,22 +30,36 @@ export default class RemoteApiPlayer extends AppPlayer
         return this.name;
     }
 
-    private async fetchMove(): Promise<null | Move>
+    private gameHistoryToApi(): string
     {
         if (!this.playerGameInput) {
             throw noInputError;
         }
 
-        const payload: HexAiApiPayload = {
+        const moveHistory = this.playerGameInput
+            .getMovesHistory()
+            .map(move => move.toString())
+        ;
+
+        if (this.playerGameInput.hasSwapMove()) {
+            moveHistory[1] = 'swap-pieces';
+        }
+
+        return moveHistory.join(' ');
+    }
+
+    private async fetchMove(): Promise<Move>
+    {
+        if (!this.playerGameInput) {
+            throw noInputError;
+        }
+
+        const payload: CalculateMoveRequest = {
             game: {
                 size: this.playerGameInput.getSize(),
-                movesHistory: this.playerGameInput
-                    .getMovesHistory()
-                    .map(move => move.toString())
-                    .join(' ')
-                ,
-                currentPlayer: this.playerGameInput.getPlayerIndex() ? 'white' : 'black',
-                swapRule: false,
+                movesHistory: this.gameHistoryToApi(),
+                currentPlayer: 0 === this.playerGameInput.getPlayerIndex() ? 'black' : 'white',
+                swapRule: this.playerGameInput.getAllowSwap(),
             },
             ai: {
                 engine: 'mohex',
@@ -66,46 +67,48 @@ export default class RemoteApiPlayer extends AppPlayer
             },
         };
 
-        const response = await fetch(this.endpoint, {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+        const moveString = await this.hexRemotePlayerApi.calculateMove(payload);
 
-        const moveString = await response.text();
+        try {
+            if ('swap-pieces' === moveString) {
+                const swapedMove = this.playerGameInput.getFirstMove();
 
-        const match = moveString.match(/^"?([a-z])(\d+)"?$/);
+                if (null === swapedMove) {
+                    throw new Error('"swap-pieces" only available on first move');
+                }
 
-        if (null === match) {
-            console.error(`Unexpected api output: "${moveString}"`);
-            return null;
+                return swapedMove.clone();
+            }
+
+            if ('resign' === moveString) {
+                throw new Error('ok, remote player expressely resigned.');
+            }
+
+            return Move.fromString(moveString);
+        } catch (e) {
+            logger.error(`Unexpected remote player move: "${moveString}"`);
+            throw new Error(e);
         }
-
-        const [, letter, number] = match;
-
-        return new Move(
-            parseInt(number, 10) - 1, // "1" is 0
-            letter.charCodeAt(0) - 97, // "a" is 0
-        );
     }
 
     private async makeMove(): Promise<void>
     {
-        const move = await this.fetchMove();
-
         if (!this.playerGameInput) {
+            logger.error('Cannot call RemoteApiPlayer.makeMove(), not player game input.');
             throw noInputError;
         }
 
-        if (null === move) {
-            console.error('AI resigns because did not provided valid move');
+        try {
+            const move = await this.fetchMove();
+            this.playerGameInput.move(move);
+        } catch (e) {
             this.playerGameInput.resign();
-            return;
-        }
 
-        this.playerGameInput.move(move);
+            logger.error('AI resigned because remote api did not provided a valid move.');
+
+            if (e instanceof IllegalMove) {
+                logger.error(e.message);
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ type GameEvents = {
      * At this time, game.getCurrentPlayer() is the current player after move have been played.
      * If the move is winning, "winner" contains the actual winner. Otherwise contains null.
      */
-    played: (move: Move, byPlayerIndex: PlayerIndex, winner: null | PlayerIndex) => void;
+    played: (move: Move, moveIndex: number, byPlayerIndex: PlayerIndex, winner: null | PlayerIndex) => void;
 
     /**
      * Game have been finished.
@@ -81,6 +81,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     private board: Board;
     private currentPlayerIndex: PlayerIndex = 0;
     private movesHistory: Move[] = [];
+    private allowSwap = true;
 
     private winner: null | PlayerIndex = null;
     private outcome: Outcome = null;
@@ -269,6 +270,16 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         return this;
     }
 
+    getFirstMove(): null | Move
+    {
+        return this.movesHistory[0] ?? null;
+    }
+
+    getSecondMove(): null | Move
+    {
+        return this.movesHistory[1] ?? null;
+    }
+
     getLastMove(): null | Move
     {
         if (0 === this.movesHistory.length) {
@@ -276,6 +287,11 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
         }
 
         return this.movesHistory[this.movesHistory.length - 1];
+    }
+
+    getLastMoveIndex(): number
+    {
+        return this.movesHistory.length - 1;
     }
 
     private bindPlayers(players: Tuple<PlayerInterface>): void
@@ -316,7 +332,7 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     /**
      * @throws IllegalMove on invalid move.
      */
-    checkMove(move: Move, playerIndex: PlayerIndex): void
+    checkMove(move: Move, byPlayerIndex: PlayerIndex): void
     {
         if ('created' === this.state) {
             throw new IllegalMove(move, 'Game is not yet started');
@@ -330,12 +346,12 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             throw new IllegalMove(move, 'Cell outside board');
         }
 
-        if (!this.board.isEmpty(move.getRow(), move.getCol())) {
-            throw new IllegalMove(move, 'This cell is already occupied');
+        if (this.currentPlayerIndex !== byPlayerIndex) {
+            throw new IllegalMove(move, 'Not your turn');
         }
 
-        if (this.currentPlayerIndex !== playerIndex) {
-            throw new IllegalMove(move, 'Not your turn');
+        if (!this.board.isEmpty(move.getRow(), move.getCol()) && !this.isSwapPiecesMove(move, byPlayerIndex)) {
+            throw new IllegalMove(move, 'This cell is already occupied');
         }
     }
 
@@ -347,6 +363,12 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
     move(move: Move, byPlayerIndex: PlayerIndex): void
     {
         this.checkMove(move, byPlayerIndex);
+
+        if (this.isSwapPiecesMove(move, byPlayerIndex)) {
+            this.doSwapPieces(move, byPlayerIndex);
+            return;
+        }
+
         this.board.setCell(move.getRow(), move.getCol(), byPlayerIndex);
 
         this.movesHistory.push(move);
@@ -359,12 +381,86 @@ export default class Game extends (EventEmitter as unknown as new () => TypedEmi
             this.changeCurrentPlayer();
         }
 
-        this.emit('played', move, byPlayerIndex, this.getWinner());
+        this.emit('played', move, this.movesHistory.length - 1, byPlayerIndex, this.getWinner());
 
         // Emit "ended" event after "played" event to keep order between events.
         if (this.hasWinner()) {
             this.emit('ended', this.getStrictWinner(), null);
         }
+    }
+
+    getAllowSwap(): boolean
+    {
+        return this.allowSwap;
+    }
+
+    setAllowSwap(allowSwap: boolean): void
+    {
+        this.allowSwap = allowSwap;
+    }
+
+    canSwapNow(): boolean
+    {
+        return this.allowSwap
+            && 1 === this.movesHistory.length
+        ;
+    }
+
+    hasSwapMove(): boolean
+    {
+        return this.allowSwap
+            && this.movesHistory.length >= 2
+            && (this.getFirstMove() as Move).hasSameCoordsAs(this.getSecondMove() as Move)
+        ;
+    }
+
+    /**
+     * Whether a move is actually a swap-pieces move.
+     */
+    isSwapPiecesMove(move: Move, byPlayerIndex: PlayerIndex): boolean
+    {
+        return this.allowSwap
+            && 1 === byPlayerIndex
+            && this.movesHistory.length === 1
+            && this.getBoard().getCell(move.row, move.col) === 0
+        ;
+    }
+
+    /**
+     * Whether last played move was actually a swap move.
+     * Returns previous move and new move coords.
+     */
+    isLastMoveSwapPieces(): null | { swapped: Move, mirror: Move }
+    {
+        if (this.allowSwap
+            && this.movesHistory.length === 2
+            && this.movesHistory[0].hasSameCoordsAs(this.movesHistory[1])
+        ) {
+            const firstMove = this.getFirstMove() as Move;
+
+            return {
+                swapped: firstMove,
+                mirror: firstMove.cloneMirror(),
+            };
+        }
+
+        return null;
+    }
+
+    private doSwapPieces(move: Move, byPlayerIndex: PlayerIndex): void
+    {
+        const swappedMove = this.getFirstMove() as Move;
+        const swappedMoveMirrored = swappedMove.cloneMirror();
+
+        this.board.setCell(swappedMove.row, swappedMove.col, null);
+        this.board.setCell(swappedMoveMirrored.row, swappedMoveMirrored.col, byPlayerIndex);
+
+        this.movesHistory.push(move);
+        this.lastMoveAt = new Date();
+
+        this.changeCurrentPlayer();
+
+        this.emit('played', move, this.movesHistory.length - 1, byPlayerIndex, this.getWinner());
     }
 
     /**

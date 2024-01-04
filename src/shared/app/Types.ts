@@ -31,6 +31,7 @@ export type GameData = {
 
     size: number;
     movesHistory: MoveData[];
+    allowSwap: boolean;
     currentPlayerIndex: PlayerIndex;
     winner: null | PlayerIndex;
     outcome: null | Outcome;

@@ -308,6 +308,17 @@ const showSecondaryOptions = ref(false);
                                 <label class="btn btn-outline-primary" for="first-1">Second</label>
                             </div>
                         </div>
+
+                        <div class="mb-3">
+                            <h6>Swap rule</h6>
+
+                            <div class="form-check">
+                                <input class="form-check-input" v-model="gameOptions.swapRule" type="checkbox" id="swap-rule">
+                                <label class="form-check-label" for="swap-rule">
+                                    Allow swap pieces
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="cancel()">Cancel</button>
