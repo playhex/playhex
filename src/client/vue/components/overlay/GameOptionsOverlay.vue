@@ -129,7 +129,7 @@ const showSecondaryOptions = ref(false);
                                 v-model="gameOptions.boardsize"
                                 type="number"
                                 min="1"
-                                max="25"
+                                max="42"
                                 class="form-control"
                             >
                         </div>

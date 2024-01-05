@@ -536,11 +536,11 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         };
 
         for (let i = 0; i < this.game.getSize(); ++i) {
-            const number = String(i + 1);
+            const number = Move.rowToNumber(i);
             container.addChild(createText(number, i, -1));
             container.addChild(createText(number, i, this.game.getSize()));
 
-            const letter = String.fromCharCode(i + 'a'.charCodeAt(0));
+            const letter = Move.colToLetter(i);
             container.addChild(createText(letter, -1, i));
             container.addChild(createText(letter, this.game.getSize(), i));
         }

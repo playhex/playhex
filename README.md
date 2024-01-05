@@ -13,11 +13,11 @@ This is a work in progress. Here is the unexhaustive list of implemented and pla
 - [x] Play online multiplayer
 - [x] Play vs an AI (Mohex)
 - [x] Dark/light theme, mobile support
-- [x] Multiple board sizes, from 1x1 to 25x25
+- [x] Multiple board sizes, from 1x1 to 42x42
 - [x] Watch other games currently playing
-- [ ] Swap rule
+- [x] Swap rule
 - [ ] Let AI review my game, bad moves, better moves...
-- [ ] Chrono
+- [x] Chrono
 - [ ] Translations to other languages
 - [ ] Elo score, games history
 

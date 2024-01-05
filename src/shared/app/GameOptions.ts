@@ -64,7 +64,7 @@ export const defaultGameOptions: GameOptionsData = {
 
 const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 const MIN_BOARDSIZE = 1;
-const MAX_BOARDSIZE = 25;
+const MAX_BOARDSIZE = 42;
 
 const sanitizeBoardsize = (boardsize: unknown): number => {
     if (!boardsize) {
