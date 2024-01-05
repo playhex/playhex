@@ -22,6 +22,7 @@ export default class HostedGame
     private timeControl: AbstractTimeControl;
     private game: null | Game = null;
     private canceled = false;
+    private createdAt: Date = new Date();
 
     constructor(
         private io: HexServer,
@@ -338,6 +339,7 @@ export default class HostedGame
             gameOptions: this.gameOptions,
             gameData: null,
             canceled: this.canceled,
+            createdAt: this.createdAt,
         };
 
         if (this.game) {

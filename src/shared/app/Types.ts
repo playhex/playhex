@@ -74,6 +74,8 @@ export type HostedGameData = {
      * gameData is null on server when game is not yet started.
      */
     gameData: null | GameData;
+
+    createdAt: Date;
 };
 
 export type OnlinePlayerData = {
