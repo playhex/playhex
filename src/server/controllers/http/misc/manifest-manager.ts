@@ -16,12 +16,8 @@ const removeUnwantedJs = (manifest: ManifestType): void => {
             }
 
             // Remove lazy loaded vuejs routes
-            if (key.includes('src_client_vue')) {
-                delete manifest[key];
-            }
-
-            // Load pixijs only when required
-            if (key.includes('pixi')) {
+            // Remove pixi bundle, load it only when required
+            if (!key.includes('main') && !key.includes('vendors')) {
                 delete manifest[key];
             }
         })
