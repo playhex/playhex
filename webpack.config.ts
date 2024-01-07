@@ -67,7 +67,7 @@ const config: Configuration = {
         splitChunks: {
             cacheGroups: {
                 vendors: {
-                    test: /[\\/]node_modules[\\/]/,
+                    test: /[\\/]node_modules[\\/]|bootstrap/,
                     name: 'vendors',
                     chunks: 'all',
                     priority: 10,
@@ -119,6 +119,17 @@ const config: Configuration = {
                     'vue-style-loader',
                     'css-loader',
                     'stylus-loader',
+                ],
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                use: [
+                    // Creates `style` nodes from JS strings
+                    'style-loader',
+                    // Translates CSS into CommonJS
+                    'css-loader',
+                    // Compiles Sass to CSS
+                    'sass-loader',
                 ],
             },
             {

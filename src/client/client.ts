@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.css';
+import './bootstrap.scss';
 import './base.styl';
 
 import { createPinia } from 'pinia';
