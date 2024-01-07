@@ -4,6 +4,7 @@ import { PropType, Ref, ref } from 'vue';
 import { GameOptionsData, sanitizeGameOptions } from '@shared/app/GameOptions';
 import { defaultGameOptions } from '@shared/app/GameOptions';
 import TimeControlType from '@shared/time-control/TimeControlType';
+import { BIconAspectRatio, BIconHourglass, BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
 
 const { visible, confirm, cancel } = useOverlayMeta();
 
@@ -101,7 +102,7 @@ const showSecondaryOptions = ref(false);
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <h6><i class="bi-aspect-ratio"></i> Board size</h6>
+                            <h6><b-icon-aspect-ratio /> Board size</h6>
 
                             <div class="btn-group" role="group">
                                 <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="9" id="size-9">
@@ -135,7 +136,7 @@ const showSecondaryOptions = ref(false);
                         </div>
 
                         <div class="mb-3">
-                            <h6><i class="bi-hourglass"></i> Time control</h6>
+                            <h6><b-icon-hourglass /> Time control</h6>
 
                             <div class="btn-group" role="group">
                                 <template v-for="(timeControl, label) in defaultTimeControls" :key="label">
@@ -285,13 +286,13 @@ const showSecondaryOptions = ref(false);
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><i class="bi-caret-down-fill"></i> Less options</button>
+                        ><b-icon-caret-down-fill /> Less options</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><i class="bi-caret-right"></i> More options</button>
+                        ><b-icon-caret-right /> More options</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">

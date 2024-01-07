@@ -2,6 +2,7 @@
 /* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import useOnlinePlayersStore from '@client/stores/onlinePlayersStore';
+import { BIconChatDots, BIconCircleFill } from 'bootstrap-icons-vue';
 
 const {
     players,
@@ -11,7 +12,7 @@ const {
 
 <template>
     <div class="card card-bg-icon mb-3">
-        <i class="bi-chat-dots"></i>
+        <b-icon-chat-dots />
         <div class="card-body">
             <div class="feedback">
                 <p class="lead"><a href="https://feedback.alcalyn.app/" target="_blank">Give your feedback on this application!</a></p>
@@ -26,11 +27,11 @@ const {
             :key="player.playerData.id"
             class="mb-1"
         >
-            <i
-                class="bi-circle-fill online-status-icon"
+            <b-icon-circle-fill
+                class="online-status-icon"
                 aria-hidden="true"
                 :class="player.connected ? 'text-success' : 'text-secondary'"
-            ></i>
+            />
             {{ player.playerData.pseudo }}
         </p>
     </div>

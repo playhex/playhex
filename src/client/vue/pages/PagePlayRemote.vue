@@ -13,6 +13,7 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import AppPlayer from '@shared/app/AppPlayer';
 import { useRoute, useRouter } from 'vue-router';
+import { BIconFlag, BIconX, BIconAlphabet } from 'bootstrap-icons-vue';
 
 const { gameId } = useRoute().params;
 
@@ -220,9 +221,9 @@ const rematch = async (): Promise<void> => {
     <div class="menu-game">
         <div class="container-fluid">
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-link" v-if="canResign()" @click="resign()"><i class="bi-flag"></i> Resign</button>
-                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><i class="bi-x"></i> Cancel</button>
-                <button type="button" class="btn btn-link" @click="toggleCoords()"><i class="bi-alphabet"></i> Coords</button>
+                <button type="button" class="btn btn-link" v-if="canResign()" @click="resign()"><b-icon-flag /> Resign</button>
+                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
+                <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
             </div>
         </div>
     </div>

@@ -10,6 +10,7 @@ import HostedGameClient from 'HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
 import AppOnlineStatus from '../components/AppOnlineStatus.vue';
 import { ref } from 'vue';
+import { BIconEye, BIconTrophy, BIconPeople, BIconRobot } from 'bootstrap-icons-vue';
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
@@ -103,13 +104,13 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
                 <div class="play-buttons row">
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('player')"><i class="fs-3 bi bi-people"></i><br>1v1</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('player')"><b-icon-people class="fs-3" /><br>1v1</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('ai')"><i class="fs-3 bi bi-robot"></i><br>Play vs AI</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('ai')"><b-icon-robot class="fs-3" /><br>Play vs AI</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><i class="fs-3 bi bi-robot"></i><br>Play vs offline AI</button>
+                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><b-icon-robot class="fs-3" /><br>Play vs offline AI</button>
                     </div>
                 </div>
 
@@ -147,7 +148,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                 </table>
                 <p v-else>No game for now. Create a new one !</p>
 
-                <h4><i class="bi bi-eye"></i> Watch current game</h4>
+                <h4><b-icon-eye /> Watch current game</h4>
 
                 <table v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table">
                     <thead>
@@ -179,7 +180,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                 <p v-else>No game currently playing.</p>
 
                 <template v-if="Object.values(lobbyStore.hostedGameClients).some(isLastPlayed)">
-                    <h4><i class="bi bi-trophy"></i> Ended games</h4>
+                    <h4><b-icon-trophy /> Ended games</h4>
 
                     <table class="table table-sm table-borderless">
                         <tbody>

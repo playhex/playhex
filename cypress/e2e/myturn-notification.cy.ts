@@ -1,3 +1,7 @@
+const isEmptyHexagon = ($element: JQuery<HTMLElement>): boolean => {
+    return $element.find('path').attr('d')?.startsWith('M14 4.577v6.846L8 15l-6-3.577V4.577L8') ?? false;
+};
+
 describe('My turn notification', () => {
     it('displays 1 and my color when I must play on a game', () => {
         cy.intercept('/api/games', {
@@ -17,12 +21,12 @@ describe('My turn notification', () => {
             }
         });
 
-        cy.get('.my-turn-notif i').then($i => {
-            if ($i.hasClass('bi-hexagon') || !$i.hasClass('bi-hexagon-fill')) {
-                throw new Error('Notification should not be filled');
+        cy.get('.my-turn-notif svg').then($element => {
+            if (isEmptyHexagon($element)) {
+                throw new Error('Notification should be filled');
             }
 
-            if (!$i.hasClass('text-primary') || $i.hasClass('text-danger')) {
+            if (!$element.hasClass('text-primary') || $element.hasClass('text-danger')) {
                 throw new Error('Notification should be blue');
             }
         });
@@ -46,12 +50,12 @@ describe('My turn notification', () => {
             }
         });
 
-        cy.get('.my-turn-notif i').then($i => {
-            if (!$i.hasClass('bi-hexagon') || $i.hasClass('bi-hexagon-fill')) {
-                throw new Error('Notification should not be filled');
+        cy.get('.my-turn-notif svg').then($element => {
+            if (!isEmptyHexagon($element)) {
+                throw new Error('Notification should be empty');
             }
 
-            if ($i.hasClass('text-primary') || $i.hasClass('text-danger')) {
+            if ($element.hasClass('text-primary') || $element.hasClass('text-danger')) {
                 throw new Error('Notification should be white');
             }
         });

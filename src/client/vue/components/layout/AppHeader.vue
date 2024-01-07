@@ -5,6 +5,7 @@ import { ref } from 'vue';
 import { getOtherTheme, switchTheme, themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 import useMyGamesStore from '../../../stores/myGamesStore';
 import { useRouter } from 'vue-router';
+import { BIconHouseFill, BIconPersonFill, BIconHexagon, BIconHexagonFill, BIconMoonStarsFill, BIconBrightnessHighFill } from 'bootstrap-icons-vue';
 
 const { loggedInUser } = storeToRefs(useAuthStore());
 
@@ -38,19 +39,19 @@ const goToMostUrgentGame = (): void => {
     <div class="menu-top">
         <div class="container-fluid">
             <nav class="d-flex">
-                <router-link to="/"><i class="bi-house-fill"></i> Home</router-link>
+                <router-link to="/"><b-icon-house-fill /> Home</router-link>
 
                 <span class="my-turn-notif ms-auto me-1">
-                    <i
+                    <component
                         :data-most="JSON.stringify(mostUrgentGame)"
+                        :is="myTurnCount > 0 ? BIconHexagonFill : BIconHexagon"
                         :class="[
-                            myTurnCount > 0 ? 'bi-hexagon-fill' : 'bi-hexagon',
                             null === mostUrgentGame ? '' : (0 === mostUrgentGame.myColor
                                 ? 'text-danger'
                                 : 'text-primary'
                             ),
                         ]"
-                    ></i>
+                    />
                     <a
                         href="#"
                         @click="goToMostUrgentGame()"
@@ -58,12 +59,12 @@ const goToMostUrgentGame = (): void => {
                     >{{ myTurnCount }}</a>
                 </span>
                 <p class="me-3">
-                    <template v-if="loggedInUser"><i class="bi-person-fill"></i> {{ loggedInUser.pseudo }}</template>
+                    <template v-if="loggedInUser"><b-icon-person-fill /> {{ loggedInUser.pseudo }}</template>
                     <template v-else>logging in…</template>
                 </p>
 
-                <i :class="otherTheme === 'light' ? 'bi-moon-stars-fill' : 'bi-brightness-high-fill'"></i>
                 <a href="#" @click="switchTheme()" class="ms-1">
+                    <component :is="otherTheme === 'light' ? BIconMoonStarsFill : BIconBrightnessHighFill" />
                     switch
                 </a>
             </nav>
@@ -78,10 +79,11 @@ const goToMostUrgentGame = (): void => {
     font-size 1.1em
     width 2em
 
-    i, a
+    svg, a
         position absolute
         text-align center
         width 100%
+        margin-top 0.22em
 
     a
         font-size 0.8em

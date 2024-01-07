@@ -8,7 +8,7 @@
     <div class="links">
         <div v-for="resource in resources" class="link">
             <div class="illustration">
-                <i v-if="isIcon(resource.illustration)" :class="resource.illustration.icon"></i>
+                <component v-if="isIcon(resource.illustration)" :is="resource.illustration.icon" />
                 <img v-else :src="resource.illustration.src" class="rounded" :alt="resource.illustration.alt" />
             </div>
             <div class="details">
@@ -30,7 +30,10 @@
 </template>
 
 <script lang="ts" setup>
-type Icon = { icon: string };
+import { BIconFileEarmarkText, BIconDiscord, BIconWikipedia } from 'bootstrap-icons-vue';
+import { Component as ComponentType } from 'vue';
+
+type Icon = { icon: ComponentType };
 type Image = { src: string, alt: string };
 type Resource = {
     link: string;
@@ -63,7 +66,7 @@ const resources: Resource[] = [
         link_show: 'mseymour.ca/hex_book',
         title: 'Hex: A Strategy Guide',
         subTitle: 'Guide to learn Hex basics and advanced tactics',
-        illustration: { icon: 'bi-file-earmark-text' },
+        illustration: { icon: BIconFileEarmarkText },
         paragraph: [
             'By the same author of "500 Hex puzzles" above, a very exhaustive guide to learn Hex rules.',
             `
@@ -78,7 +81,7 @@ const resources: Resource[] = [
         link_show: 'discord.gg/59SJ9KwvVq',
         title: 'Hex Discord Server',
         subTitle: 'Discord server with ~200 Hex players',
-        illustration: { icon: 'bi-discord' },
+        illustration: { icon: BIconDiscord },
         paragraph: [
             'To talk to other Hex players, see tournaments or events related to Hex.',
         ],
@@ -88,7 +91,7 @@ const resources: Resource[] = [
         link_show: 'hexwiki.net',
         title: 'HexWiki',
         subTitle: 'Still maintained wiki dedicated to Hex',
-        illustration: { icon: 'bi-wikipedia' },
+        illustration: { icon: BIconWikipedia },
         paragraph: [
             'Detailled wiki on Hex. See main page to have a list of good pages to explore.',
         ],
@@ -118,7 +121,7 @@ const resources: Resource[] = [
                 max-height 100%
                 max-width 100%
 
-            i
+            svg
                 font-size 3em
 
         .details

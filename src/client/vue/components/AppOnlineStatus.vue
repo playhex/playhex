@@ -2,6 +2,7 @@
 import { PlayerData } from '@shared/app/Types';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore';
 import { PropType, toRefs } from 'vue';
+import { BIconCircleFill, BIconRobot } from 'bootstrap-icons-vue';
 
 const props = defineProps({
     playerData: {
@@ -22,16 +23,16 @@ const { playerData, is, classes } = toRefs(props);
 </script>
 
 <template>
-    <i
+    <b-icon-circle-fill
         v-if="!playerData.isBot"
-        class="bi-circle-fill online-status-icon"
+        class="online-status-icon"
         aria-hidden="true"
         :class="useOnlinePlayersStore().isPlayerOnline(playerData.id) ? 'text-success' : 'text-secondary'"
-    ></i>
-    <i
+    />
+    <b-icon-robot
         v-else
-        class="bi-robot me-1 text-success"
+        class="me-1 text-success"
         aria-hidden="true"
-    ></i>
+    />
     <component :is="is" :class="classes">{{ playerData.pseudo }}</component>
 </template>

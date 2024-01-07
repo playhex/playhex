@@ -4,6 +4,7 @@ import { Game, PlayerInterface } from '@shared/game-engine';
 import { gameToSGF } from '@shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { downloadString } from '../../../services/fileDownload';
+import { BIconRepeat, BIconDownload } from 'bootstrap-icons-vue';
 
 const { visible, confirm } = useOverlayMeta();
 
@@ -74,13 +75,13 @@ const outcomeToString = (): string => {
                             type="button"
                             class="btn btn-primary"
                             @click="confirm(); rematch();"
-                        ><i class="bi-repeat"></i> Rematch</button>
+                        ><b-icon-repeat /> Rematch</button>
 
                         <button
                             type="button"
                             class="btn btn-outline-primary"
                             @click="downloadSGF();"
-                        ><i class="bi-download"></i> SGF</button>
+                        ><b-icon-download /> SGF</button>
 
                         <button
                             type="button"

@@ -1,7 +1,7 @@
 {
   "main": "index.js",
   "scripts": {
-    "analyse-size": "DATE=$(date '+%Y%m%d-%H%M%S'); webpack --profile --json | grep -E '^{' | sed -E 's/Done in .+//' > size-stats-$DATE.json && webpack-bundle-analyzer size-stats-$DATE.json dist/statics/",
+    "analyse-size": "DATE=$(date '+%Y%m%d-%H%M%S'); NODE_ENV=production webpack --profile --json | grep -E '^{' | sed -E 's/Done in .+//' > size-stats-$DATE.json && webpack-bundle-analyzer size-stats-$DATE.json dist/statics/",
     "lint": "eslint src --ext .ts,.vue",
     "start": "node index.js",
     "start:prod": "NODE_ENV=production node index.js",
@@ -11,6 +11,7 @@
     "dev-client": "TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack serve",
     "dev-server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps index.js\"",
     "serve": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev-server\" \"yarn dev-client\"",
+    "serve:prod": "yarn build && yarn start:prod",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
     "test:unit": "mocha src/**/test/**/*.ts -n loader=ts-node/esm --extension ts",
     "test:e2e": "cypress run",
@@ -24,7 +25,7 @@
     "@socket.io/admin-ui": "^0.5.1",
     "body-parser": "^1.19.1",
     "bootstrap": "^5.3.2",
-    "bootstrap-icons": "^1.11.1",
+    "bootstrap-icons-vue": "^1.11.1",
     "date-fns": "^2.30.0",
     "debounce": "^1.2.1",
     "ejs": "^3.1.6",

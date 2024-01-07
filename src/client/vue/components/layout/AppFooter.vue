@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { BIconChatDots, BIconGithub } from 'bootstrap-icons-vue';
+
 /* global LAST_COMMIT_DATE */
 // @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
 const lastCommitDate: string = LAST_COMMIT_DATE;
@@ -12,12 +14,12 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
             <a href="https://feedback.alcalyn.app" target="_blank">
-                <i class="bi-chat-dots text-body"></i>
+                <b-icon-chat-dots class="text-body" />
                 <br>
                 Feedback
             </a>
             <a href="https://github.com/alcalyn/hex" target="_blank">
-                <i class="bi-github text-body"></i>
+                <b-icon-github class="text-body" />
                 <br>
                 Github
             </a>
@@ -40,6 +42,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
     text-align center
 
 .link-icons
-    i
+    svg
         font-size 2em
+        margin 0.25em 0
 </style>
