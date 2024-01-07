@@ -13,12 +13,14 @@ const plugins = [
     new VueLoaderPlugin(),
     new DefinePlugin({
         LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
-        SENTRY_DSN: JSON.stringify(process.env.SENTRY_DSN ?? null),
         __VUE_OPTIONS_API__: false,
         __VUE_PROD_DEVTOOLS__: false,
     }),
 ];
 
+/**
+ * Push release with map.js files to sentry.
+ */
 const { SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT } = process.env;
 
 if (SENTRY_AUTH_TOKEN && SENTRY_ORG && SENTRY_PROJECT) {

@@ -22,6 +22,7 @@ export function pagesRouter() {
             seo,
             jsonLd,
             baseUrl: process.env.BASE_URL,
+            sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,
         });
     });
 

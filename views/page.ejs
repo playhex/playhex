@@ -20,6 +20,8 @@
         >Loading…</p>
     </div>
 
+    <%- include('partials/sentry.ejs') %>
+
     <% for(var jsLocation of Object.values(manifest)) {%>
         <script type="text/javascript" src="<%- jsLocation %>"></script>
     <% } %>
