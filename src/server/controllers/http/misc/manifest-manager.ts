@@ -19,6 +19,11 @@ const removeUnwantedJs = (manifest: ManifestType): void => {
             if (key.includes('src_client_vue')) {
                 delete manifest[key];
             }
+
+            // Load pixijs only when required
+            if (key.includes('pixi')) {
+                delete manifest[key];
+            }
         })
     ;
 };

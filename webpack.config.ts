@@ -66,6 +66,12 @@ const config: Configuration = {
         minimize: !IS_DEV,
         splitChunks: {
             cacheGroups: {
+                pixi: {
+                    test: /node_modules.+pixi/,
+                    name: 'pixi',
+                    chunks: 'all',
+                    priority: 12,
+                },
                 vendors: {
                     test: /[\\/]node_modules[\\/]|bootstrap/,
                     name: 'vendors',
