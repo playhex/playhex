@@ -1,27 +1,19 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import PageLobby from '@client/vue/pages/PageLobby.vue';
-import PagePlayRemote from '@client/vue/pages/PagePlayRemote.vue';
-import PagePlayOffline from '@client/vue/pages/PagePlayOffline.vue';
-import PageLicense from '@client/vue/pages/content/PageLicense.vue';
-import PageHexLinks from '@client/vue/pages/content/PageHexLinks.vue';
-import PageNotFound from '@client/vue/pages/PageNotFound.vue';
-import LayoutContent from '@client/vue/pages/content/LayoutContent.vue';
-import ReloadOnRouteChange from '@client/vue/ReloadOnRouteChange.vue';
 
 const routes: RouteRecordRaw[] = [
     {
         name: 'home',
         path: '/',
-        component: PageLobby,
+        component: () => import('@client/vue/pages/PageLobby.vue'),
     },
     {
         path: '/',
-        component: ReloadOnRouteChange,
+        component: () => import('@client/vue/ReloadOnRouteChange.vue'),
         children: [
             {
                 name: 'online-game',
                 path: '/games/:gameId',
-                component: PagePlayRemote,
+                component: () => import('@client/vue/pages/PagePlayRemote.vue'),
                 meta: {
                     displayFooter: false,
                 },
@@ -31,31 +23,31 @@ const routes: RouteRecordRaw[] = [
     {
         name: 'play-vs-ai',
         path: '/play-vs-ai',
-        component: PagePlayOffline,
+        component: () => import('@client/vue/pages/PagePlayOffline.vue'),
         meta: {
             displayFooter: false,
         },
     },
     {
         path: '/',
-        component: LayoutContent,
+        component: () => import('@client/vue/pages/content/LayoutContent.vue'),
         children: [
             {
                 name: 'license',
                 path: 'about/license',
-                component: PageLicense,
+                component: () => import('@client/vue/pages/content/PageLicense.vue'),
             },
             {
                 name: 'links',
                 path: 'resources/hex-links',
-                component: PageHexLinks,
+                component: () => import('@client/vue/pages/content/PageHexLinks.vue'),
             },
         ],
     },
     {
         name: 'not-found',
         path: '/:pathMatch(.*)',
-        component: PageNotFound,
+        component: () => import('@client/vue/pages/PageNotFound.vue'),
     },
 ];
 

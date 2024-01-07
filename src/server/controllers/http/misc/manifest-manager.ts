@@ -7,10 +7,16 @@ type ManifestType = { [key: string]: string };
 /**
  * Do not include source maps in manifest to not load them as javascripts
  */
-const removeSourceMaps = (manifest: ManifestType): void => {
+const removeUnwantedJs = (manifest: ManifestType): void => {
     Object.keys(manifest)
         .forEach(key => {
+            // Remove source maps
             if (key.endsWith('.map')) {
+                delete manifest[key];
+            }
+
+            // Remove lazy loaded vuejs routes
+            if (key.includes('src_client_vue')) {
                 delete manifest[key];
             }
         })
@@ -21,7 +27,7 @@ const getManifestFromWebpack = async (): Promise<ManifestType> => {
     const response = await fetch(`http://localhost:${WEBPACK_PORT}/statics/manifest.json`);
     const manifest: ManifestType = await response.json();
 
-    removeSourceMaps(manifest);
+    removeUnwantedJs(manifest);
 
     return manifest;
 };
@@ -45,7 +51,7 @@ export async function getManifest(): Promise<ManifestType> {
         throw new Error('"manifest.json" file not found');
     }
 
-    removeSourceMaps(manifestCache);
+    removeUnwantedJs(manifestCache);
 
     return manifestCache;
 }
