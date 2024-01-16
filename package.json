@@ -20,6 +20,7 @@
   },
   "license": "AGPL-3.0",
   "dependencies": {
+    "@influxdata/influxdb3-client": "^0.5.0",
     "@sentry/webpack-plugin": "^2.10.2",
     "@socket.io/admin-ui": "^0.5.1",
     "body-parser": "^1.19.1",

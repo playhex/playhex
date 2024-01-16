@@ -3,6 +3,7 @@ import AppPlayer from '../shared/app/AppPlayer';
 import { IllegalMove, Move } from '../shared/game-engine';
 import { v4 as uuidv4 } from 'uuid';
 import HexRemotePlayerClient, { CalculateMoveRequest } from '../shared/hex-remote-player-api-client';
+import { TimeMeasureMetric } from './services/metrics';
 
 const noInputError = new Error('No player input, cannot continue');
 
@@ -98,9 +99,16 @@ export default class RemoteApiPlayer extends AppPlayer
             throw noInputError;
         }
 
+        const measure = new TimeMeasureMetric('ai_time_to_respond', {
+            engine: 'mohex',
+            level: 20,
+            boardsize: this.playerGameInput.getSize(),
+        });
+
         try {
             const move = await this.fetchMove();
             this.playerGameInput.move(move);
+            measure.finished();
         } catch (e) {
             this.playerGameInput.resign();
 
@@ -109,6 +117,8 @@ export default class RemoteApiPlayer extends AppPlayer
             if (e instanceof IllegalMove) {
                 logger.error(e.message);
             }
+
+            measure.finished(false);
         }
     }
 }
