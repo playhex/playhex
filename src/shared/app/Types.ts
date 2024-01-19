@@ -3,14 +3,33 @@ import { PlayerIndex } from '../game-engine';
 import { GameState, Outcome } from 'game-engine/Game';
 import { GameOptionsData } from './GameOptions';
 import TimeControlType from '../time-control/TimeControlType';
+import { Player } from '@prisma/client';
 
 export type Tuple<T> = [T, T];
 
-export type PlayerData = {
-    id: string;
-    pseudo: string;
-    isBot: boolean;
-};
+/**
+ * Player data required for AppPlayer,
+ * for display on game board.
+ */
+export type PlayerData = Pick<Player,
+    'pseudo'
+    | 'publicId'
+    | 'isGuest'
+    | 'isBot'
+>;
+
+/**
+ * All data about a player used on server and client side.
+ * Exclude password, email...
+ */
+export type PublicPlayerData = Pick<Player,
+    'pseudo'
+    | 'slug'
+    | 'publicId'
+    | 'isGuest'
+    | 'isBot'
+    | 'createdAt'
+>;
 
 export type MoveData = {
     row: number;

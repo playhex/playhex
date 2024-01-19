@@ -1,4 +1,6 @@
 import session from 'express-session';
+import RedisStore from 'connect-redis';
+import { createClient } from 'redis';
 
 const { SESSION_SECRET, SESSION_HTTPS_ONLY } = process.env;
 
@@ -6,7 +8,7 @@ if (!SESSION_SECRET || undefined === SESSION_HTTPS_ONLY) {
     throw new Error('Missing SESSION_SECRET or SESSION_HTTPS_ONLY in .env');
 }
 
-export const sessionMiddleware = session({
+const sessionOptions: session.SessionOptions = {
     secret: SESSION_SECRET.split(','),
     resave: false,
     saveUninitialized: false,
@@ -14,7 +16,21 @@ export const sessionMiddleware = session({
         maxAge: 365 * 86400 * 1000,
         secure: 'true' === SESSION_HTTPS_ONLY,
     },
-});
+};
 
+const { REDIS_URL } = process.env;
 
+if (REDIS_URL) {
+    const redisClient = createClient({
+        url: REDIS_URL,
+    });
 
+    redisClient.connect();
+
+    sessionOptions.store = new RedisStore({
+        client: redisClient,
+        prefix: 'hex-session:',
+    });
+}
+
+export const sessionMiddleware = session(sessionOptions);

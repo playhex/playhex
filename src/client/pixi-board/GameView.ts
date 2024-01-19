@@ -2,13 +2,14 @@ import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
-import { themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
 import { debounce } from 'debounce';
 import SwapableSprite from './SwapableSprite';
 import SwapedSprite from './SwapedSprite';
 import { Coords } from '@shared/game-engine/Types';
+import useDarkLightThemeStore from '../stores/darkLightThemeStore';
+import { WatchStopHandle, watch } from 'vue';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -90,6 +91,8 @@ type GameViewEvents = {
     endedAndWinAnimationOver: () => void;
 };
 
+const darkLightThemeStore = useDarkLightThemeStore();
+
 export default class GameView extends (EventEmitter as unknown as new () => TypedEventEmitter<GameViewEvents>)
 {
     private hexes: Hex[][];
@@ -103,6 +106,8 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     private themeSwitchedListener = () => this.redraw();
     private resizeDebouncedListener = () => this.resizeRendererAndRedraw();
+
+    private unwatchThemeSwitchedListener: WatchStopHandle;
 
     constructor(
         private game: Game,
@@ -126,7 +131,7 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.listenModel();
 
         window.addEventListener('resizeDebounced', this.resizeDebouncedListener);
-        themeSwitcherDispatcher.on('themeSwitched', this.themeSwitchedListener);
+        this.unwatchThemeSwitchedListener = watch(darkLightThemeStore.displayedTheme, this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
             this.endedCallback();
@@ -202,9 +207,13 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
 
     getWrapperSize(): GameViewSize
     {
+        const rem = parseFloat(getComputedStyle(document.documentElement).fontSize); // Browser rem size
+        const headerAndGameMenuRem = 8; // From base.styl, sum of header and game menu height in rem
+        const margin = 1.1; // Safe margin to prevent slight page height overflow
+
         return {
             width: min(window.innerWidth, screen.width),
-            height: min(window.innerHeight, screen.height) - 80,
+            height: min(window.innerHeight, screen.height) - headerAndGameMenuRem * rem * margin,
         };
     }
 
@@ -633,6 +642,6 @@ export default class GameView extends (EventEmitter as unknown as new () => Type
         this.pixi.destroy(true);
 
         window.removeEventListener('resizeDebounced', this.resizeDebouncedListener);
-        themeSwitcherDispatcher.off('themeSwitched', this.themeSwitchedListener);
+        this.unwatchThemeSwitchedListener();
     }
 }

@@ -65,7 +65,7 @@ describe('Page game over', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
             fixture: 'game-not-started-canceled.json',
         });
-        cy.intercept('/auth/guest', {
+        cy.intercept('/auth/me-or-guest', {
             fixture: 'game-not-started-canceled-guest.json',
         });
 

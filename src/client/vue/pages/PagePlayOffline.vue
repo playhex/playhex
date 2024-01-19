@@ -15,9 +15,10 @@ const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOpt
 
 const initGame = () => {
     const player = new AppPlayer(useAuthStore().loggedInUser ?? {
-        id: '',
+        publicId: '',
         isBot: false,
         pseudo: 'Player',
+        isGuest: false,
     });
 
     const players: Tuple<Player> = [

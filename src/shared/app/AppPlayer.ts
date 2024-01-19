@@ -23,7 +23,7 @@ export default class AppPlayer extends Player
 
     getPlayerId(): string
     {
-        return this.playerData.id;
+        return this.playerData.publicId;
     }
 
     getPlayerData(): PlayerData

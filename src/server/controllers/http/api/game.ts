@@ -9,11 +9,11 @@ export default (): Router => {
     const playerRepository = Container.get(PlayerRepository);
     const hostedGameRepository = Container.get(HostedGameRepository);
 
-    router.post('/api/games/:id/resign', (req, res) => {
+    router.post('/api/games/:id/resign', async (req, res) => {
         const { id } = req.params;
         let playerData: null | PlayerData;
 
-        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
+        if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();
             return;
         }
@@ -28,11 +28,11 @@ export default (): Router => {
         res.status(204).send();
     });
 
-    router.post('/api/games/:id/cancel', (req, res) => {
+    router.post('/api/games/:id/cancel', async (req, res) => {
         const { id } = req.params;
         let playerData: null | PlayerData;
 
-        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
+        if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();
             return;
         }
@@ -47,11 +47,11 @@ export default (): Router => {
         res.status(204).send();
     });
 
-    router.post('/api/games/:id/move', (req, res) => {
+    router.post('/api/games/:id/move', async (req, res) => {
         const { id } = req.params;
         let playerData: null | PlayerData;
 
-        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
+        if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();
             return;
         }

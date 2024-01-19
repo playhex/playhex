@@ -5,6 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 const { floor, random } = Math;
 
+/**
+ * TODO AppPlayer cannot be in game-engine package
+ */
 export default class RandomAIPlayer extends AppPlayer
 {
     private static NAME = 'Random bot';
@@ -13,9 +16,10 @@ export default class RandomAIPlayer extends AppPlayer
     constructor()
     {
         super({
-            id: 'random-bot|' + uuidv4(),
+            publicId: 'random-bot|' + uuidv4(),
             pseudo: RandomAIPlayer.NAME,
             isBot: true,
+            isGuest: false,
         });
 
         this.on('myTurnToPlay', async () => {

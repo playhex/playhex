@@ -2,13 +2,17 @@
     {
         "id": "914ca90b-5e07-4dc4-9dbb-45e1b0ff84bf",
         "host": {
-            "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+            "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
             "pseudo": "Guest 1817",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
+            "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
             "pseudo": "Determinist random bot",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -33,13 +37,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
+                    "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
                     "pseudo": "Determinist random bot",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 },
                 {
-                    "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
                     "pseudo": "Guest 1817",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 }
             ],
@@ -124,16 +132,7 @@
             "createdAt": "2023-12-22T15:14:36.966Z",
             "startedAt": "2023-12-22T15:14:36.967Z",
             "lastMoveAt": "2023-12-22T15:14:40.711Z",
-            "endedAt": "2023-12-22T15:14:40.711Z",
-            "hexes": [
-                "..0....",
-                "....0..",
-                "0011111",
-                "11.....",
-                ".......",
-                "....0..",
-                ".00...."
-            ]
+            "endedAt": "2023-12-22T15:14:40.711Z"
         },
         "canceled": false,
         "__meta": {
@@ -164,13 +163,17 @@
     {
         "id": "0483ba90-2141-4d34-8272-94ecad8325a7",
         "host": {
-            "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+            "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
             "pseudo": "Guest 1817",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
+            "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
             "pseudo": "Determinist random bot",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -195,13 +198,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
+                    "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
                     "pseudo": "Determinist random bot",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 },
                 {
-                    "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
                     "pseudo": "Guest 1817",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 }
             ],
@@ -231,16 +238,7 @@
             "createdAt": "2023-12-22T15:14:43.794Z",
             "startedAt": "2023-12-22T15:14:43.794Z",
             "lastMoveAt": "2023-12-22T15:14:48.796Z",
-            "endedAt": null,
-            "hexes": [
-                ".......",
-                "....0..",
-                ".....1.",
-                ".......",
-                ".......",
-                "....0..",
-                "......."
-            ]
+            "endedAt": null
         },
         "canceled": false,
         "__meta": {

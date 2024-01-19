@@ -2,8 +2,10 @@
     {
         "id": "40c551d0-e9a4-4e6d-9bf3-44a9e9523828",
         "host": {
-            "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+            "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
             "pseudo": "Guest 8201",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": null,
@@ -32,13 +34,17 @@
     {
         "id": "c1db33be-6134-4185-a8ac-3a02f0ae2376",
         "host": {
-            "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+            "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
             "pseudo": "Guest 8201",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
+            "publicId": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
             "pseudo": "Mohex",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -63,13 +69,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+                    "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
                     "pseudo": "Guest 8201",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 },
                 {
-                    "id": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
+                    "publicId": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
                     "pseudo": "Mohex",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 }
             ],
@@ -184,20 +194,7 @@
             "createdAt": "2023-12-20T22:18:22.186Z",
             "startedAt": "2023-12-20T22:18:22.189Z",
             "lastMoveAt": "2023-12-20T22:18:58.967Z",
-            "endedAt": "2023-12-20T22:19:03.033Z",
-            "hexes": [
-                "...........",
-                "...........",
-                "....1.0....",
-                "...10.10.0.",
-                "...0.0.1..0",
-                "....11..1..",
-                "...101...1.",
-                "...0.0.....",
-                "...........",
-                "...........",
-                "..........."
-            ]
+            "endedAt": "2023-12-20T22:19:03.033Z"
         },
         "canceled": false,
         "__meta": {
@@ -228,13 +225,17 @@
     {
         "id": "a8a516cc-86e2-4057-bffd-4aef17f69cb3",
         "host": {
-            "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+            "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
             "pseudo": "Guest 8201",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
+            "publicId": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
             "pseudo": "Mohex",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -259,13 +260,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "1f21396d-3848-4f59-825a-d53ca674a809",
+                    "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
                     "pseudo": "Guest 8201",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 },
                 {
-                    "id": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
+                    "publicId": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
                     "pseudo": "Mohex",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 }
             ],
@@ -650,20 +655,7 @@
             "createdAt": "2023-12-20T22:19:14.189Z",
             "startedAt": "2023-12-20T22:19:14.189Z",
             "lastMoveAt": "2023-12-20T22:22:00.698Z",
-            "endedAt": "2023-12-20T22:22:00.704Z",
-            "hexes": [
-                "0111....1..",
-                "100110...0.",
-                "01001010..1",
-                "01110101110",
-                "01...010..0",
-                "01...100...",
-                "01..0101...",
-                "01.0100....",
-                "0101110....",
-                "0100010....",
-                "01111......"
-            ]
+            "endedAt": "2023-12-20T22:22:00.704Z"
         },
         "canceled": false,
         "__meta": {
@@ -694,13 +686,17 @@
     {
         "id": "a668e147-fce0-48ea-8f22-c0d3c8b1b4e9",
         "host": {
-            "id": "0808f397-9e12-45af-bd5b-42885fe36212",
+            "publicId": "0808f397-9e12-45af-bd5b-42885fe36212",
             "pseudo": "Guest 2810",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
+            "publicId": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
             "pseudo": "Mohex",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -725,13 +721,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "0808f397-9e12-45af-bd5b-42885fe36212",
+                    "publicId": "0808f397-9e12-45af-bd5b-42885fe36212",
                     "pseudo": "Guest 2810",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 },
                 {
-                    "id": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
+                    "publicId": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
                     "pseudo": "Mohex",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 }
             ],
@@ -921,18 +921,7 @@
             "createdAt": "2023-12-21T06:17:58.800Z",
             "startedAt": "2023-12-21T06:17:58.803Z",
             "lastMoveAt": "2023-12-21T06:19:40.520Z",
-            "endedAt": "2023-12-21T06:19:40.523Z",
-            "hexes": [
-                ".101.111.",
-                ".00.100..",
-                ".100010..",
-                "..1.101..",
-                "....0....",
-                "...01....",
-                "..01.10..",
-                "..00.10..",
-                ".110....."
-            ]
+            "endedAt": "2023-12-21T06:19:40.523Z"
         },
         "canceled": false,
         "__meta": {

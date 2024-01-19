@@ -27,7 +27,7 @@ const { playerData, is, classes } = toRefs(props);
         v-if="!playerData.isBot"
         class="online-status-icon"
         aria-hidden="true"
-        :class="useOnlinePlayersStore().isPlayerOnline(playerData.id) ? 'text-success' : 'text-secondary'"
+        :class="useOnlinePlayersStore().isPlayerOnline(playerData.publicId) ? 'text-success' : 'text-secondary'"
     />
     <b-icon-robot
         v-else

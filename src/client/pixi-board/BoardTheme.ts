@@ -1,4 +1,5 @@
-import { getTheme, themeSwitcherDispatcher } from '@client/DarkThemeSwitcher';
+import useDarkLightThemeStore from '../stores/darkLightThemeStore';
+import { watch } from 'vue';
 
 export type Theme = {
     colorA: number; // --bs-danger
@@ -24,8 +25,8 @@ const lightTheme: Theme = {
     textColor: 0x212529,
 };
 
-export let currentTheme: Theme = getTheme() === 'dark' ? darkTheme : lightTheme;
+const darkLightThemeStore = useDarkLightThemeStore();
 
-themeSwitcherDispatcher.on('themeSwitched', () => {
-    currentTheme = getTheme() === 'dark' ? darkTheme : lightTheme;
-});
+export let currentTheme: Theme = darkLightThemeStore.displayedTheme() === 'dark' ? darkTheme : lightTheme;
+
+watch(useDarkLightThemeStore().displayedTheme, theme => currentTheme = theme === 'dark' ? darkTheme : lightTheme);

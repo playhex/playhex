@@ -1,7 +1,7 @@
-import { json } from 'body-parser';
-import { Router } from 'express';
+import { json, Router } from 'express';
 import lobbyRoutes from './lobby';
 import gameRoutes from './game';
+import playerRoutes from './player';
 import authRoutes from './auth';
 import onlinePlayersRoutes from './onlinePlayers';
 
@@ -10,6 +10,7 @@ export default function apiRouter() {
 
     router.use(json());
 
+    router.use(playerRoutes());
     router.use(gameRoutes());
     router.use(lobbyRoutes());
     router.use(authRoutes());

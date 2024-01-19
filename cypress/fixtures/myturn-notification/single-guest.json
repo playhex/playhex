@@ -1,5 +1,7 @@
 {
-    "id": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
     "pseudo": "Guest 1817",
+    "slug": "slug",
+    "isGuest": true,
     "isBot": false
 }

@@ -218,15 +218,13 @@ const rematch = async (): Promise<void> => {
         </div>
     </div>
 
-    <div class="menu-game">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-link" v-if="canResign()" @click="resign()"><b-icon-flag /> Resign</button>
-                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
-                <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
-            </div>
+    <nav class="menu-game navbar">
+        <div class="container-fluid justify-content-center">
+            <button type="button" class="btn btn-link" v-if="canResign()" @click="resign()"><b-icon-flag /> Resign</button>
+            <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
+            <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
         </div>
-    </div>
+    </nav>
 </template>
 
 <style scoped lang="stylus">

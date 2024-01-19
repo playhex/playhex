@@ -20,8 +20,6 @@ describe('Play a game to the end', () => {
             .contains('More options')
             .click()
         ;
-
-        cy.contains('Determinist random bot');
     });
 
     /*
@@ -32,11 +30,11 @@ describe('Play a game to the end', () => {
             clickHistory.push({ x: clientX, y: clientY });
 
             console.log(
-                "cy.get('canvas')\n"
+                "cy.get('canvas');\ncy.get('body')\n"
                     + clickHistory
                         .map(c => `    .click(${c.x}, ${c.y})`)
                         .join('\n')
-                    + "\n;\n"
+                    + '\n;\n'
                 ,
             );
         };
@@ -54,11 +52,13 @@ describe('Play a game to the end', () => {
             .click()
         ;
 
-        cy.get('canvas')
-            .click(502, 257)
-            .click(504, 384)
-            .click(409, 203)
-            .click(616, 449)
+        cy.get('canvas');
+        cy.get('body')
+            .click(409, 326)
+            .click(307, 270)
+            .click(603, 329)
+            .click(504, 279)
+            .click(605, 440)
         ;
 
         cy.contains('Game over');
@@ -77,14 +77,16 @@ describe('Play a game to the end', () => {
             .click()
         ;
 
-        cy.get('canvas')
-            .click(289, 258)
-            .click(615, 454)
-            .click(721, 383)
-            .click(828, 320)
-            .click(179, 316)
-            .click(722, 259)
-            .click(395, 196)
+        cy.get('canvas');
+        cy.get('body')
+            .click(210, 326)
+            .click(410, 209)
+            .click(509, 145)
+            .click(797, 328)
+            .click(506, 497)
+            .click(601, 205)
+            .click(510, 269)
+            .click(413, 326)
         ;
 
         cy.contains('Game over');
@@ -103,11 +105,12 @@ describe('Play a game to the end', () => {
             .click()
         ;
 
-        cy.get('canvas')
-            .click(503, 137)
-            .click(611, 322)
-            .click(609, 445)
-            .click(614, 202)
+        cy.get('canvas');
+        cy.get('body')
+            .click(504, 152)
+            .click(605, 323)
+            .click(607, 208)
+            .click(607, 439)
         ;
 
         cy.contains('Game over');

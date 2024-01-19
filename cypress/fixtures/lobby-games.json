@@ -2,13 +2,17 @@
     {
         "id": "549737f7-5a70-453a-b227-abb4f7906138",
         "host": {
-            "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player A",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
+            "publicId": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
             "pseudo": "Player B",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -33,13 +37,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player A",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 },
                 {
-                    "id": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
+                    "publicId": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
                     "pseudo": "Player B",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 }
             ],
@@ -124,20 +132,7 @@
             "createdAt": "2023-12-20T21:02:44.748Z",
             "startedAt": "2023-12-20T21:02:44.748Z",
             "lastMoveAt": "2023-12-20T21:02:46.999Z",
-            "endedAt": null,
-            "hexes": [
-                "...........",
-                "...........",
-                "...........",
-                ".....0.11..",
-                ".1..1.....1",
-                "0.....0....",
-                "...0...0...",
-                ".1..00.....",
-                "...1.......",
-                "...........",
-                "..........."
-            ]
+            "endedAt": null
         },
         "canceled": false,
         "__meta": {
@@ -168,8 +163,10 @@
     {
         "id": "969653f0-b874-404f-9b1b-6d3e66b52880",
         "host": {
-            "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player waiting",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": null,
@@ -198,13 +195,17 @@
     {
         "id": "e212910d-9422-482d-97e1-b4d1c60516ed",
         "host": {
-            "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player C",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
+            "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
             "pseudo": "Player D",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -229,13 +230,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player C",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 },
                 {
-                    "id": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
+                    "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
                     "pseudo": "Player D",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 }
             ],
@@ -355,18 +360,7 @@
             "createdAt": "2023-12-20T21:02:55.420Z",
             "startedAt": "2023-12-20T21:02:55.420Z",
             "lastMoveAt": "2023-12-20T21:02:58.926Z",
-            "endedAt": "2023-12-20T21:02:58.926Z",
-            "hexes": [
-                "..1..0...",
-                ".....00..",
-                "1...1.01.",
-                "1.....001",
-                "......10.",
-                "....1.0..",
-                "......0..",
-                "......01.",
-                "....1.0.."
-            ]
+            "endedAt": "2023-12-20T21:02:58.926Z"
         },
         "canceled": false,
         "__meta": {
@@ -397,13 +391,17 @@
     {
         "id": "c35d5279-ae07-4615-bacf-7b90ead71d71",
         "host": {
-            "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Cancel A",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": false
         },
         "opponent": {
-            "id": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
+            "publicId": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
             "pseudo": "Cancel B",
+            "slug": "slug",
+            "isGuest": true,
             "isBot": true
         },
         "gameTimeData": {
@@ -428,13 +426,17 @@
         "gameData": {
             "players": [
                 {
-                    "id": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
+                    "publicId": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
                     "pseudo": "Cancel B",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": true
                 },
                 {
-                    "id": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Cancel A",
+                    "slug": "slug",
+                    "isGuest": true,
                     "isBot": false
                 }
             ],
@@ -454,20 +456,7 @@
             "createdAt": "2023-12-20T21:05:58.591Z",
             "startedAt": "2023-12-20T21:05:58.591Z",
             "lastMoveAt": "2023-12-20T21:05:58.593Z",
-            "endedAt": "2023-12-20T21:06:01.908Z",
-            "hexes": [
-                "...........",
-                "...........",
-                "......0....",
-                "...........",
-                "...........",
-                "...........",
-                "...........",
-                "...........",
-                "...........",
-                "...........",
-                "..........."
-            ]
+            "endedAt": "2023-12-20T21:06:01.908Z"
         },
         "canceled": true,
         "__meta": {

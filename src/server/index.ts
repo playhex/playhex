@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import './config';
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import http from 'http';
 import mainRouter from './controllers/http';
 import Container from 'typedi';
@@ -9,7 +9,7 @@ import { HexServer } from './server';
 import * as CustomParser from '../shared/app/socketCustomParser';
 import socketIoAdminUi from './services/socketIoAdminUi';
 import logger from './services/logger';
-import { sessionMiddleware } from './services/sessionMiddleware';
+import { addSessionMiddlewares } from './services/security/middlewares';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -27,12 +27,10 @@ const io = new HexServer(server, {
     },
 });
 
+addSessionMiddlewares(app, io);
 socketIoAdminUi(io);
 
 Container.set(HexServer, io);
-
-app.use(sessionMiddleware);
-io.use((socket, next) => sessionMiddleware(socket.request as Request, {} as Response, next as NextFunction));
 
 app.set('view engine', 'ejs');
 

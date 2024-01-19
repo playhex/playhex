@@ -20,6 +20,10 @@ export function registerWebsocketControllers() {
     Container
         .get(HexServer)
         .on('connection', socket => {
+            socket.on('room', (join, room) => {
+                socket[join](room);
+            });
+
             socket.join('lobby');
             socket.join('online-players');
 

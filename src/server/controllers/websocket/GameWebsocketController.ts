@@ -2,27 +2,25 @@ import HostedGameRepository from '../../repositories/HostedGameRepository';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from '.';
 import { HexSocket } from 'server';
-import PlayerRepository from '../../repositories/PlayerRepository';
 
 @Service({ id: 'websocket_controller', multiple: true })
 export default class GameWebsocketController implements WebsocketControllerInterface
 {
     constructor(
         private hostedGameRepository: HostedGameRepository,
-        private playerRepository: PlayerRepository,
     ) {}
 
     onConnection(socket: HexSocket): void
     {
-        socket.on('move', (gameId, move, answer) => {
-            const playerData = this.playerRepository.getPlayer(socket.request.session.playerId);
+        socket.on('move', async (gameId, move, answer) => {
+            const { player } = socket.data;
 
-            if (null === playerData) {
+            if (null === player) {
                 answer('Player not found');
                 return;
             }
 
-            answer(this.hostedGameRepository.playerMove(playerData, gameId, move));
+            answer(this.hostedGameRepository.playerMove(player, gameId, move));
         });
     }
 }

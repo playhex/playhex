@@ -3,6 +3,7 @@ import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/He
 import * as CustomParser from '@shared/app/socketCustomParser';
 import { defineStore } from 'pinia';
 import useAuthStore from './authStore';
+import { watch } from 'vue';
 
 const useSocketStore = defineStore('socketStore', () => {
     const socket: Socket<HexServerToClientEvents, HexClientToServerEvents> = io({
@@ -10,17 +11,20 @@ const useSocketStore = defineStore('socketStore', () => {
         autoConnect: false, // connect once player is logged in at least as guest
     });
 
+    const joinRoom = (room: string) => socket.emit('room', 'join', room);
+    const leaveRoom = (room: string) => socket.emit('room', 'leave', room);
+
+    /*
+     * Reconnect socket when logged in player changed
+     */
     const reconnectSocket = (): void => {
         socket.disconnect().connect();
     };
 
-    const joinRoom = (room: string) => socket.emit('room', 'join', room);
-    const leaveRoom = (room: string) => socket.emit('room', 'leave', room);
-
-    useAuthStore()
-        .loggedInUserPromise
-        .then(() => reconnectSocket())
-    ;
+    watch(
+        () => useAuthStore().loggedInUser,
+        () => reconnectSocket(),
+    );
 
     return {
         socket,

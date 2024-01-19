@@ -1,5 +1,4 @@
-import { OnlinePlayerData, OnlinePlayersData, PlayerData } from '@shared/app/Types';
-import PlayerRepository from '../repositories/PlayerRepository';
+import { OnlinePlayerData, OnlinePlayersData, PublicPlayerData } from '@shared/app/Types';
 import { HexSocket } from '../server';
 import { Service } from 'typedi';
 import EventEmitter from 'events';
@@ -19,33 +18,26 @@ import EventEmitter from 'events';
 export default class OnlinePlayersService extends EventEmitter
 {
     private onlinePlayers: { [key: string]: {
-        playerData: PlayerData;
+        playerData: PublicPlayerData;
         sockets: HexSocket[];
     } } = {};
 
-    constructor(
-        private playerRepository: PlayerRepository,
-    ) {
-        super();
-    }
-
-    socketHasConnected(socket: HexSocket): void
+    async socketHasConnected(socket: HexSocket): Promise<void>
     {
-        const { playerId } = socket.request.session;
-        const player = this.playerRepository.getPlayer(playerId);
+        const { player } = socket.data;
 
         // socket not authenticated, ignoring
-        if (!player) {
+        if (null === player) {
             return;
         }
 
         // player already connected (probably on another tab)
-        if (this.onlinePlayers[playerId]) {
-            this.onlinePlayers[playerId].sockets.push(socket);
+        if (this.onlinePlayers[player.publicId]) {
+            this.onlinePlayers[player.publicId].sockets.push(socket);
             return;
         }
 
-        this.onlinePlayers[playerId] = {
+        this.onlinePlayers[player.publicId] = {
             playerData: player,
             sockets: [socket],
         };
@@ -53,31 +45,30 @@ export default class OnlinePlayersService extends EventEmitter
         this.emit('playerConnected', player);
     }
 
-    socketHasDisconnected(socket: HexSocket): void
+    async socketHasDisconnected(socket: HexSocket): Promise<void>
     {
-        const { playerId } = socket.request.session;
-        const player = this.playerRepository.getPlayer(playerId);
+        const { player } = socket.data;
 
         // socket not authenticated, ignoring
-        if (!player) {
+        if (null === player) {
             return;
         }
 
         // player was not listed... so ignoring
-        if (!this.onlinePlayers[playerId]) {
+        if (!this.onlinePlayers[player.publicId]) {
             return;
         }
 
-        this.onlinePlayers[playerId].sockets = this.onlinePlayers[playerId].sockets
+        this.onlinePlayers[player.publicId].sockets = this.onlinePlayers[player.publicId].sockets
             .filter(s => s.id !== socket.id && s.connected)
         ;
 
         // player still connected (probably on another tab)
-        if (this.onlinePlayers[playerId].sockets.length > 0) {
+        if (this.onlinePlayers[player.publicId].sockets.length > 0) {
             return;
         }
 
-        delete this.onlinePlayers[playerId];
+        delete this.onlinePlayers[player.publicId];
 
         this.emit('playerDisconnected', player);
     }
@@ -87,7 +78,7 @@ export default class OnlinePlayersService extends EventEmitter
         const players: { [key: string]: OnlinePlayerData } = {};
 
         Object.values(this.onlinePlayers).forEach(p => {
-            players[p.playerData.id] = {
+            players[p.playerData.publicId] = {
                 playerData: p.playerData,
                 connected: true,
             };

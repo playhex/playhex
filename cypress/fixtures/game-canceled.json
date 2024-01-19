@@ -1,13 +1,17 @@
 {
     "id": "00000000-0000-0000-0000-000000000000",
     "host": {
-        "id": "eeb48474-21c7-4fd1-97db-f4529d225ee5",
+        "publicId": "eeb48474-21c7-4fd1-97db-f4529d225ee5",
         "pseudo": "Hatchepsout",
+        "slug": "slug",
+        "isGuest": true,
         "isBot": false
     },
     "opponent": {
-        "id": "08618b21-296b-49ec-9266-1a00cf60500c",
+        "publicId": "08618b21-296b-49ec-9266-1a00cf60500c",
         "pseudo": "Kheops",
+        "slug": "slug",
+        "isGuest": true,
         "isBot": true
     },
     "gameTimeData": {
@@ -32,13 +36,17 @@
     "gameData": {
         "players": [
             {
-                "id": "08618b21-296b-49ec-9266-1a00cf60500c",
+                "publicId": "08618b21-296b-49ec-9266-1a00cf60500c",
                 "pseudo": "Kheops",
+                "slug": "slug",
+                "isGuest": true,
                 "isBot": true
             },
             {
-                "id": "eeb48474-21c7-4fd1-97db-f4529d225ee5",
+                "publicId": "eeb48474-21c7-4fd1-97db-f4529d225ee5",
                 "pseudo": "Hatchepsout",
+                "slug": "slug",
+                "isGuest": true,
                 "isBot": false
             }
         ],
@@ -58,20 +66,7 @@
         "createdAt": "2023-12-20T15:30:14.555Z",
         "startedAt": "2023-12-20T15:30:14.556Z",
         "lastMoveAt": "2023-12-20T15:30:14.562Z",
-        "endedAt": "2023-12-20T15:30:42.377Z",
-        "hexes": [
-            "...........",
-            "...........",
-            "......0....",
-            "...........",
-            "...........",
-            "...........",
-            "...........",
-            "...........",
-            "...........",
-            "...........",
-            "..........."
-        ]
+        "endedAt": "2023-12-20T15:30:42.377Z"
     },
     "canceled": true,
     "__meta": {

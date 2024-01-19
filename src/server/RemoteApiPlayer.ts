@@ -16,9 +16,10 @@ export default class RemoteApiPlayer extends AppPlayer
         endpoint: string,
     ) {
         super({
-            id: 'remote-api|' + uuidv4(),
+            publicId: 'remote-api|' + uuidv4(),
             pseudo: name,
             isBot: true,
+            isGuest: false,
         });
 
         this.hexRemotePlayerApi = new HexRemotePlayerClient(endpoint);

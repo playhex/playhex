@@ -9,6 +9,8 @@ const { floor } = Math;
 /**
  * AI that plays randomly, but determinist:
  * if you play same moves, AI will also responds with same moves.
+ *
+ * TODO AppPlayer cannot be in game-engine package
  */
 export default class DeterministRandomAIPlayer extends AppPlayer
 {
@@ -23,9 +25,10 @@ export default class DeterministRandomAIPlayer extends AppPlayer
         private waitBeforePlay = 0,
     ) {
         super({
-            id: 'determinist-random-bot|' + uuidv4(),
+            publicId: 'determinist-random-bot|' + uuidv4(),
             pseudo: DeterministRandomAIPlayer.NAME,
             isBot: true,
+            isGuest: false,
         });
 
         this.on('myTurnToPlay', async () => {

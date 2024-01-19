@@ -20,10 +20,10 @@ export default (): Router => {
         ));
     });
 
-    router.post('/api/games', (req, res) => {
+    router.post('/api/games', async (req, res) => {
         let playerData: null | PlayerData;
 
-        if (!req.session.playerId || null === (playerData = playerRepository.getPlayer(req.session.playerId))) {
+        if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();
             return;
         }

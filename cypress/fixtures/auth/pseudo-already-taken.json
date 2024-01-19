@@ -1,0 +1,5 @@
+{
+    "success": false,
+    "details": "This pseudo is already used by another player",
+    "type": "pseudo_already_taken"
+}

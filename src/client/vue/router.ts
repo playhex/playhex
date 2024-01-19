@@ -18,6 +18,11 @@ const routes: RouteRecordRaw[] = [
                     displayFooter: false,
                 },
             },
+            {
+                name: 'player',
+                path: '/@:slug(.{1,32})', // Regex to avoid matching players public ids
+                component: () => import('@client/vue/pages/player/PagePlayer.vue'),
+            },
         ],
     },
     {
@@ -27,6 +32,21 @@ const routes: RouteRecordRaw[] = [
         meta: {
             displayFooter: false,
         },
+    },
+    {
+        name: 'login',
+        path: '/login',
+        component: () => import('@client/vue/pages/player/PageLogin.vue'),
+    },
+    {
+        name: 'signup',
+        path: '/signup',
+        component: () => import('@client/vue/pages/player/PageSignup.vue'),
+    },
+    {
+        name: 'settings',
+        path: '/settings',
+        component: () => import('@client/vue/pages/player/PageSettings.vue'),
     },
     {
         path: '/',

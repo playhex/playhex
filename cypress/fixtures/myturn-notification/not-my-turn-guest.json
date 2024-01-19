@@ -1,0 +1,15 @@
+{
+    "pseudo": "Guest 3248",
+    "publicId": "1b883dae-1b53-4cc9-ac9d-0c36eac6e7a5",
+    "isGuest": true,
+    "isBot": false,
+    "slug": "guest-3248",
+    "createdAt": "2024-01-19T16:52:33.770Z",
+    "__meta": {
+        "values": {
+            "createdAt": [
+                "Date"
+            ]
+        }
+    }
+}

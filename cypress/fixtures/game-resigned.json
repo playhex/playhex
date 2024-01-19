@@ -1,12 +1,18 @@
 {
     "id": "00000000-0000-0000-0000-000000000000",
     "host": {
-        "id": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
-        "pseudo": "The loser"
+        "publicId": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
+        "pseudo": "The loser",
+        "slug": "slug",
+        "isGuest": true,
+        "isBot": false
     },
     "opponent": {
-        "id": "winner-id",
-        "pseudo": "The winner"
+        "publicId": "winner-id",
+        "pseudo": "The winner",
+        "slug": "slug",
+        "isGuest": true,
+        "isBot": false
     },
     "gameTimeData": {
         "type": "absolute",
@@ -30,12 +36,18 @@
     "gameData": {
         "players": [
             {
-                "id": "winner-id",
-                "pseudo": "The winner"
+                "publicId": "winner-id",
+                "pseudo": "The winner",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
             },
             {
-                "id": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
-                "pseudo": "The loser"
+                "publicId": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
+                "pseudo": "The loser",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
             }
         ],
         "size": 9,
@@ -84,18 +96,7 @@
         "createdAt": "2023-12-19T12:33:25.423Z",
         "startedAt": "2023-12-19T12:33:25.423Z",
         "lastMoveAt": "2023-12-19T12:33:27.905Z",
-        "endedAt": "2023-12-19T12:33:34.123Z",
-        "hexes": [
-            ".........",
-            ".........",
-            "0.......0",
-            "....1....",
-            ".......0.",
-            "......1..",
-            "..1......",
-            ".........",
-            "...0....."
-        ]
+        "endedAt": "2023-12-19T12:33:34.123Z"
     },
     "__meta": {
         "values": {

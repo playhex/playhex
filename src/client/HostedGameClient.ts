@@ -1,6 +1,6 @@
 import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
 import { HostedGameData, PlayerData, TimeControlOptionsValues } from '@shared/app/Types';
-import { Outcome } from '@shared/game-engine/Game';
+import { GameState, Outcome } from '@shared/game-engine/Game';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import AppPlayer from '@shared/app/AppPlayer';
 import EmptyPlayer from '@shared/app/EmptyPlayer';
@@ -14,6 +14,7 @@ export default class HostedGameClient
 {
     /**
      * Null if game data not fully loaded yet, i.e for lobby list display.
+     * Game data can still be retrieved in hostedGameData.
      */
     private game: null | Game = null;
 
@@ -102,6 +103,39 @@ export default class HostedGameClient
         return this.hostedGameData.id;
     }
 
+    getState(): GameState
+    {
+        return this.hostedGameData.gameData?.state ?? 'created';
+    }
+
+    hasPlayer(playerData: PlayerData): boolean
+    {
+        return this.hostedGameData.host.publicId === playerData.publicId
+            || (this.hostedGameData.opponent?.publicId ?? null) === playerData.publicId
+        ;
+    }
+
+    /**
+     * Returns player in this game who is playing against playerData.
+     * Or null if playerData is not in the game, or game has not yet 2 players.
+     */
+    getOtherPlayer(playerData: PlayerData): null | PlayerData
+    {
+        if (null === this.hostedGameData.opponent) {
+            return null;
+        }
+
+        if (this.hostedGameData.host.publicId === playerData.publicId) {
+            return this.hostedGameData.opponent;
+        }
+
+        if (this.hostedGameData.opponent.publicId === playerData.publicId) {
+            return this.hostedGameData.host;
+        }
+
+        return null;
+    }
+
     getHostedGameData(): HostedGameData
     {
         return this.hostedGameData;
@@ -176,7 +210,7 @@ export default class HostedGameClient
             .find(
                 player =>
                     player instanceof AppPlayer
-                    && player.getPlayerId() === playerData.id
+                    && player.getPlayerId() === playerData.publicId
                 ,
             ) as AppPlayer
             ?? null
@@ -211,7 +245,7 @@ export default class HostedGameClient
         }
 
         // Cannot join as my own opponent
-        if (this.hostedGameData.host.id === playerData.id) {
+        if (this.hostedGameData.host.publicId === playerData.publicId) {
             return false;
         }
 

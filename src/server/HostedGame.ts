@@ -5,7 +5,7 @@ import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from 'server';
-import { Outcome } from '@shared/game-engine/Game';
+import { GameState, Outcome } from '@shared/game-engine/Game';
 import logger from './services/logger';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Rooms from '../shared/app/Rooms';
@@ -48,6 +48,15 @@ export default class HostedGame
     getGameTimeData(): GameTimeData
     {
         return this.timeControl.getValues();
+    }
+
+    getState(): GameState
+    {
+        if (null === this.game) {
+            return 'created';
+        }
+
+        return this.game.getState();
     }
 
     private gameRooms(withLobby = false): string[]
@@ -106,8 +115,10 @@ export default class HostedGame
         bindTimeControlToGame(this.game, this.timeControl);
     }
 
-    isPlayerInGame(appPlayer: AppPlayer): boolean
+    isPlayerInGame(playerDataOrAppPlayer: PlayerData | AppPlayer): boolean
     {
+        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
+
         return appPlayer === this.host || appPlayer === this.opponent;
     }
 
@@ -159,11 +170,11 @@ export default class HostedGame
             return playerDataOrAppPlayer;
         }
 
-        if (this.host.getPlayerId() === playerDataOrAppPlayer.id) {
+        if (this.host.getPlayerId() === playerDataOrAppPlayer.publicId) {
             return this.host;
         }
 
-        if (null !== this.opponent && playerDataOrAppPlayer.id === this.opponent.getPlayerId()) {
+        if (null !== this.opponent && playerDataOrAppPlayer.publicId === this.opponent.getPlayerId()) {
             return this.opponent;
         }
 
@@ -385,9 +396,10 @@ export default class HostedGame
         logger.warning('Raw Player still used. Should use only AppPlayer instances');
 
         return {
-            id: 'unknown|' + uuidv4(),
+            publicId: 'unknown|' + uuidv4(),
             pseudo: player.getName(),
             isBot: false,
+            isGuest: false,
         };
     }
 }

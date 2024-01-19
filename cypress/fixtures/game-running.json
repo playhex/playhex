@@ -1,13 +1,17 @@
 {
     "id": "00000000-0000-0000-0000-000000000000",
     "host": {
-        "id": "a8a486fc-6204-4c15-8bd9-2562534dd7cf",
+        "publicId": "a8a486fc-6204-4c15-8bd9-2562534dd7cf",
         "pseudo": "Player A",
+        "slug": "slug",
+        "isGuest": true,
         "isBot": false
     },
     "opponent": {
-        "id": "e2c44094-1e64-42b3-9315-9105435093dd",
+        "publicId": "e2c44094-1e64-42b3-9315-9105435093dd",
         "pseudo": "Player B",
+        "slug": "slug",
+        "isGuest": true,
         "isBot": false
     },
     "gameTimeData": {
@@ -32,13 +36,17 @@
     "gameData": {
         "players": [
             {
-                "id": "e2c44094-1e64-42b3-9315-9105435093dd",
+                "publicId": "e2c44094-1e64-42b3-9315-9105435093dd",
                 "pseudo": "Player B",
+                "slug": "slug",
+                "isGuest": true,
                 "isBot": true
             },
             {
-                "id": "a8a486fc-6204-4c15-8bd9-2562534dd7cf",
+                "publicId": "a8a486fc-6204-4c15-8bd9-2562534dd7cf",
                 "pseudo": "Player A",
+                "slug": "slug",
+                "isGuest": true,
                 "isBot": false
             }
         ],
@@ -118,20 +126,7 @@
         "createdAt": "2023-12-20T20:39:02.020Z",
         "startedAt": "2023-12-20T20:39:02.020Z",
         "lastMoveAt": "2023-12-20T20:39:05.548Z",
-        "endedAt": null,
-        "hexes": [
-            "..0........",
-            "....0......",
-            "....1.0....",
-            "...........",
-            "...........",
-            "......1...0",
-            ".0......1..",
-            "........1..",
-            "...1.0...1.",
-            "...........",
-            ".........0."
-        ]
+        "endedAt": null
     },
     "canceled": false,
     "__meta": {
