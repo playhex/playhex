@@ -63,7 +63,7 @@ const color = (): string => null === mostUrgentGame.value
                 >{{ myTurnCount }}</a>
             </span>
 
-            <p v-if="loggedInPlayer" class="nav-player-item">
+            <p class="nav-player-item">
                 <template v-if="loggedInPlayer">
                     <b-icon-person-fill /> <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }">{{ loggedInPlayer.pseudo }}</router-link>
                 </template>
