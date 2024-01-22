@@ -1,8 +1,13 @@
 import { OnlinePlayerData, OnlinePlayersData, PublicPlayerData } from '@shared/app/Types';
 import { HexSocket } from '../server';
 import { Service } from 'typedi';
-import EventEmitter from 'events';
+import { TypedEmitter } from 'tiny-typed-emitter';
 
+interface OnlinePlayersServiceEvents
+{
+    playerConnected: (player: PublicPlayerData) => void;
+    playerDisconnected: (player: PublicPlayerData) => void;
+}
 
 /**
  * onConnection can be trigerred with a player already connected,
@@ -15,7 +20,7 @@ import EventEmitter from 'events';
  * and emit events only when a real player connection occured.
  */
 @Service()
-export default class OnlinePlayersService extends EventEmitter
+export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServiceEvents>
 {
     private onlinePlayers: { [key: string]: {
         playerData: PublicPlayerData;

@@ -10,6 +10,7 @@ import * as CustomParser from '../shared/app/socketCustomParser';
 import socketIoAdminUi from './services/socketIoAdminUi';
 import logger from './services/logger';
 import { addSessionMiddlewares } from './services/security/middlewares';
+import monitorConnectedSockets from './services/monitorConnectedSockets';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -29,6 +30,7 @@ const io = new HexServer(server, {
 
 addSessionMiddlewares(app, io);
 socketIoAdminUi(io);
+monitorConnectedSockets();
 
 Container.set(HexServer, io);
 

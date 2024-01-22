@@ -13,15 +13,39 @@ if (INFLUX_HOST && INFLUX_TOKEN && INFLUX_DATABASE) {
     });
 }
 
+export const isMonitoringEnabled = (): boolean => null !== influxDBClient;
+
 type MetricsTags = {
-    'ai_time_to_respond': {
+    ai_time_to_respond: {
         engine: string;
         level: number;
         boardsize: number;
     };
+
+    connected_sockets: {
+        count: number;
+    };
 };
 
-class TimeMeasureMetric<T extends keyof MetricsTags>
+export const sendConnectedSocketsPoint = (count: number): void => {
+    if (null === influxDBClient) {
+        return;
+    }
+
+    const point = Point.measurement('connected_sockets')
+        .setIntegerField('value', count)
+    ;
+
+    logger.debug('sending metric', {
+        lineProtocol: point.toLineProtocol(),
+    });
+
+    influxDBClient.write(point).catch(reason => {
+        logger.warning('Error while sending data to influxDB', { reason });
+    });
+};
+
+export class TimeMeasureMetric<T extends keyof MetricsTags>
 {
     private tStart: Date;
     private timeout: NodeJS.Timeout;
@@ -71,7 +95,3 @@ class TimeMeasureMetric<T extends keyof MetricsTags>
         });
     }
 }
-
-export {
-    TimeMeasureMetric,
-};
