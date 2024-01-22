@@ -35,10 +35,3 @@
 //     }
 //   }
 // }
-Cypress.on('uncaught:exception', err => {
-    // Js errors to ignore in cypress
-    return ![
-        'illegal character U+0000', // bootstrap icons font in firefox
-        'Invalid or unexpected token', // bootstrap icons font in chromium
-    ].some(ignored => err.message.includes(ignored));
-});
