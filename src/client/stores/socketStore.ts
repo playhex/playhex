@@ -22,7 +22,7 @@ const useSocketStore = defineStore('socketStore', () => {
     };
 
     watch(
-        () => useAuthStore().loggedInUser,
+        () => useAuthStore().loggedInPlayer,
         () => reconnectSocket(),
     );
 

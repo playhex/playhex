@@ -5,7 +5,7 @@ import useMyGamesStore from '../../../stores/myGamesStore';
 import { useRouter } from 'vue-router';
 import { BIconHouseFill, BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
 
-const { loggedInUser } = storeToRefs(useAuthStore());
+const { loggedInPlayer } = storeToRefs(useAuthStore());
 
 /*
  * My turn notification
@@ -63,9 +63,9 @@ const color = (): string => null === mostUrgentGame.value
                 >{{ myTurnCount }}</a>
             </span>
 
-            <p v-if="loggedInUser" class="nav-player-item">
-                <template v-if="loggedInUser">
-                    <b-icon-person-fill /> <router-link :to="{ name: 'player', params: { slug: loggedInUser.slug } }">{{ loggedInUser.pseudo }}</router-link>
+            <p v-if="loggedInPlayer" class="nav-player-item">
+                <template v-if="loggedInPlayer">
+                    <b-icon-person-fill /> <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }">{{ loggedInPlayer.pseudo }}</router-link>
                 </template>
                 <template v-else>logging in…</template>
             </p>

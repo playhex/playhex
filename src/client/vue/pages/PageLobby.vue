@@ -131,7 +131,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         >
                             <td class="ps-0">
                                 <button
-                                    v-if="hostedGameClient.canJoin(useAuthStore().loggedInUser)"
+                                    v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)"
                                     class="btn me-3 btn-sm btn-success"
                                     @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
                                 >Accept</button>

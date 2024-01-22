@@ -1,18 +1,18 @@
 describe('Profile page', () => {
     it('see my profile page', () => {
         cy.intercept('/api/auth/me-or-guest', {
-            fixture: 'profile-page/me-or-guest.json',
+            fixture: 'profile-page/player-test.json',
         });
         cy.intercept('/api/games', {
             fixture: 'profile-page/games.json',
         });
-        cy.intercept('/api/players/30d1227f-e318-45a6-a7fd-64f7671e561f/games?state=ended', {
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/games?state=ended', {
             fixture: 'profile-page/games-state-ended.json',
         });
 
-        cy.visit('/@ddd');
+        cy.visit('/@player-test');
 
-        cy.contains('h2', 'ddd');
+        cy.contains('h2', 'Player Test');
         cy.contains('Account created on 19 January 2024');
 
         cy.contains('Logout');
@@ -27,13 +27,16 @@ describe('Profile page', () => {
         cy.intercept('/api/games', {
             fixture: 'profile-page/games.json',
         });
-        cy.intercept('/api/players/30d1227f-e318-45a6-a7fd-64f7671e561f/games?state=ended', {
+        cy.intercept('/api/players?slug=player-test', {
+            fixture: 'profile-page/player-test.json',
+        });
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/games?state=ended', {
             fixture: 'profile-page/games-state-ended.json',
         });
 
-        cy.visit('/@ddd');
+        cy.visit('/@player-test');
 
-        cy.contains('h2', 'ddd');
+        cy.contains('h2', 'Player Test');
         cy.contains('Account created on 19 January 2024');
 
         cy.contains('Logout').should('not.exist');

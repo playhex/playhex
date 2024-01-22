@@ -22,7 +22,7 @@ export type CurrentGame = {
 const useMyGamesStore = defineStore('myGamesStore', () => {
 
     const { socket, joinRoom, leaveRoom } = useSocketStore();
-    const { loggedInUser } = storeToRefs(useAuthStore());
+    const { loggedInPlayer } = storeToRefs(useAuthStore());
     const { initialGamesPromise } = useLobbyStore();
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
@@ -104,7 +104,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
 
     socket.on('gameCreated', (hostedGameData: HostedGameData) => {
-        if (hostedGameData.host.publicId !== loggedInUser.value?.publicId) {
+        if (hostedGameData.host.publicId !== loggedInPlayer.value?.publicId) {
             return;
         }
 
@@ -120,7 +120,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
     socket.on('gameStarted', (hostedGameData: HostedGameData) => {
         const { gameData, id, host, opponent } = hostedGameData;
-        const me = loggedInUser.value;
+        const me = loggedInPlayer.value;
 
         if (null === me || null === gameData) {
             return;
@@ -139,8 +139,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             };
         }
 
-        myGames.value[id].myColor = gameData.players[0].publicId === loggedInUser.value?.publicId ? 0 : 1;
-        myGames.value[id].isMyTurn = gameData.players[gameData.currentPlayerIndex].publicId === loggedInUser.value?.publicId;
+        myGames.value[id].myColor = gameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
+        myGames.value[id].isMyTurn = gameData.players[gameData.currentPlayerIndex].publicId === loggedInPlayer.value?.publicId;
         myGames.value[id].hostedGameData = hostedGameData;
 
         mostUrgentGame.value = getMostUrgentGame();
@@ -173,7 +173,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      */
     let initialized = false;
 
-    watch(storeToRefs(useAuthStore()).loggedInUser, async (me, oldMe) => {
+    watch(storeToRefs(useAuthStore()).loggedInPlayer, async (me, oldMe) => {
         myGames.value = {};
         mostUrgentGame.value = null;
 

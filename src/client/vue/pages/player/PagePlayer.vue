@@ -20,11 +20,11 @@ if (Array.isArray(slug)) {
 /*
  * Player data
  */
-const { loggedInUser } = storeToRefs(useAuthStore());
-const isMe = (): boolean => null !== loggedInUser.value && loggedInUser.value.slug === slug;
+const { loggedInPlayer } = storeToRefs(useAuthStore());
+const isMe = (): boolean => null !== loggedInPlayer.value && loggedInPlayer.value.slug === slug;
 
 const player: Ref<null | PublicPlayerData> = isMe()
-    ? loggedInUser
+    ? loggedInPlayer
     : ref(null)
 ;
 

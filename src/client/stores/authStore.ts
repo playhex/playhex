@@ -6,26 +6,26 @@ import { ref } from 'vue';
 const useAuthStore = defineStore('authStore', () => {
 
     /**
-     * Current logged in user
+     * Current logged in player
      */
-    const loggedInUser = ref<null | PublicPlayerData>(null);
+    const loggedInPlayer = ref<null | PublicPlayerData>(null);
 
-    authMeOrSignupGuest().then(user => loggedInUser.value = user);
+    authMeOrSignupGuest().then(player => loggedInPlayer.value = player);
 
     const login = async (pseudo: string, password: string): Promise<PublicPlayerData> => {
-        return loggedInUser.value = await authLogin(pseudo, password);
+        return loggedInPlayer.value = await authLogin(pseudo, password);
     };
 
     const signup = async (pseudo: string, password: string): Promise<PublicPlayerData> => {
-        return loggedInUser.value = await authSignupFromGuest(pseudo, password);
+        return loggedInPlayer.value = await authSignupFromGuest(pseudo, password);
     };
 
     const logout = async (): Promise<PublicPlayerData> => {
-        return loggedInUser.value = await authLogout();
+        return loggedInPlayer.value = await authLogout();
     };
 
     return {
-        loggedInUser,
+        loggedInPlayer,
         login,
         signup,
         logout,

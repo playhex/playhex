@@ -9,7 +9,7 @@ const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     app.use(sessionMiddleware);
     io.use((socket, next) => sessionMiddleware(socket.request as Request, {} as Response, next as NextFunction));
 
-    // Load user and put it in socket instance on socket connection
+    // Load player and put it in socket instance on socket connection
     const playerRepository = Container.get(PlayerRepository);
 
     io.use(async (socket, next) => {

@@ -2,11 +2,11 @@
     {
         "id": "4d0ace85-5b7c-436e-b127-fd4e9edd32bf",
         "host": {
-            "pseudo": "ddd",
-            "publicId": "30d1227f-e318-45a6-a7fd-64f7671e561f",
+            "pseudo": "Player Test",
+            "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
             "isGuest": false,
             "isBot": false,
-            "slug": "ddd",
+            "slug": "player-test",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
         "opponent": {
@@ -62,11 +62,11 @@
                     "isGuest": false
                 },
                 {
-                    "pseudo": "ddd",
-                    "publicId": "30d1227f-e318-45a6-a7fd-64f7671e561f",
+                    "pseudo": "Player Test",
+                    "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
                     "isGuest": false,
                     "isBot": false,
-                    "slug": "ddd",
+                    "slug": "player-test",
                     "createdAt": "2024-01-19T10:23:11.600Z"
                 }
             ],
@@ -167,7 +167,7 @@
         "id": "e259618e-f477-4ade-8b86-d4287e0dce22",
         "host": {
             "pseudo": "Guest 8385",
-            "publicId": "30d1227f-e318-45a6-a7fd-64f7671e561f",
+            "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
             "isGuest": true,
             "isBot": false,
             "slug": "guest-8385",
@@ -221,7 +221,7 @@
             "players": [
                 {
                     "pseudo": "Guest 8385",
-                    "publicId": "30d1227f-e318-45a6-a7fd-64f7671e561f",
+                    "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
                     "isGuest": true,
                     "isBot": false,
                     "slug": "guest-8385",

@@ -15,7 +15,7 @@ export type PlayerEvents = {
 export default interface PlayerInterface extends TypedEventEmitter<PlayerEvents>
 {
     /**
-     * How you should call me. Displayed on user interface.
+     * How you should call me. Displayed on player interface.
      */
     getName(): string;
 

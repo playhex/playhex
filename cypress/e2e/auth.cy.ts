@@ -177,7 +177,7 @@ describe('Authentication', () => {
             .click()
         ;
 
-        cy.contains('Invalid password for this user');
+        cy.contains('Invalid password for this player');
     });
 
     it('requires a valid password on signup', () => {

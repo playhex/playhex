@@ -20,7 +20,7 @@ export default class DeterministRandomAIPlayer extends AppPlayer
         /**
          * This bot plays instantly.
          * 0 is good for testing race condition (emit started/moved events in good order).
-         * A higher value is good for having time while testing, or let user to see move happening.
+         * A higher value is good for having time while testing, or let player to see move happening.
          */
         private waitBeforePlay = 0,
     ) {

@@ -27,7 +27,7 @@ type SyslogLevels =
  *
  * Terminology:
  *
- *      a process:   handling a single user or game, not impacting other players or games
+ *      a process:   handling a single player or game, not impacting other players or games
  *      application: the whole server, players and games
  *
  * See https://en.wikipedia.org/wiki/Syslog for base interpretation.

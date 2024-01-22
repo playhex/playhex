@@ -45,7 +45,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
      * because I can't receive event as socket just disconnected
      */
     watch(
-        () => useAuthStore().loggedInUser,
+        () => useAuthStore().loggedInPlayer,
         (_, oldMe) => {
             if (null !== oldMe && players.value[oldMe.publicId]) {
                 delete players.value[oldMe.publicId];

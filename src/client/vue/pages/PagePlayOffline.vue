@@ -14,7 +14,7 @@ const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.g
 const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
 
 const initGame = () => {
-    const player = new AppPlayer(useAuthStore().loggedInUser ?? {
+    const player = new AppPlayer(useAuthStore().loggedInPlayer ?? {
         publicId: '',
         isBot: false,
         pseudo: 'Player',

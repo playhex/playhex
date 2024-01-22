@@ -38,13 +38,13 @@ useSocketStore().joinRoom(Rooms.game(gameId));
 onUnmounted(() => useSocketStore().leaveRoom(Rooms.game(gameId)));
 
 const getLocalAppPlayer = (): null | AppPlayer => {
-    const { loggedInUser } = useAuthStore();
+    const { loggedInPlayer } = useAuthStore();
 
-    if (null === loggedInUser || !hostedGameClient.value) {
+    if (null === loggedInPlayer || !hostedGameClient.value) {
         return null;
     }
 
-    return hostedGameClient.value.getLocalAppPlayer(loggedInUser);
+    return hostedGameClient.value.getLocalAppPlayer(loggedInPlayer);
 };
 
 const listenHexClick = () => {
@@ -211,7 +211,7 @@ const rematch = async (): Promise<void> => {
         ></app-board>
         <p v-else>Loading game {{ gameId }}…</p>
 
-        <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInUser)" class="position-absolute w-100 join-button-container">
+        <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="position-absolute w-100 join-button-container">
             <div class="d-flex justify-content-center">
                 <button class="btn btn-lg btn-success" @click="join()">Accept</button>
             </div>

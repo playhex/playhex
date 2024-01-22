@@ -11,7 +11,7 @@ import { ref } from 'vue';
 import Rooms from '@shared/app/Rooms';
 
 /**
- * State synced with server, and methods to handle games and user.
+ * State synced with server, and methods to handle games and players.
  */
 const useLobbyStore = defineStore('lobbyStore', () => {
 
