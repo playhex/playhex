@@ -1,5 +1,4 @@
-import EventEmitter from 'events';
-import TypedEventEmitter from 'typed-emitter';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import TimeValue, { timeValueToSeconds } from './TimeValue';
 
 type ChronoEvents = {
@@ -10,7 +9,7 @@ type ChronoEvents = {
  * Simple chrono for a single player.
  * Can be started or paused.
  */
-export class Chrono extends (EventEmitter as unknown as new () => TypedEventEmitter<ChronoEvents>)
+export class Chrono extends TypedEmitter<ChronoEvents>
 {
     private value: TimeValue;
 

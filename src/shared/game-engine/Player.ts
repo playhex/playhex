@@ -1,13 +1,10 @@
-import EventEmitter from 'events';
-import TypedEmitter from 'typed-emitter';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import Move from './Move';
 import PlayerGameInput from './PlayerGameInput';
 import { PlayerIndex } from './Types';
 import PlayerInterface, { PlayerEvents } from './PlayerInterface';
 
-export default class Player
-    extends (EventEmitter as unknown as new () => TypedEmitter<PlayerEvents>)
-    implements PlayerInterface
+export default class Player extends TypedEmitter<PlayerEvents> implements PlayerInterface
 {
     protected playerGameInput: null | PlayerGameInput = null;
 

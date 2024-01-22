@@ -1,5 +1,4 @@
-import TypedEventEmitter from 'typed-emitter';
-import EventEmitter from 'events';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import TimeValue from './TimeValue';
 import TimeControlType from './TimeControlType';
 
@@ -62,7 +61,7 @@ export class TimeControlError extends Error {}
 export abstract class AbstractTimeControl<
     T extends GameTimeData = GameTimeData,
 >
-    extends (EventEmitter as unknown as new () => TypedEventEmitter<TimeControlEvents>)
+    extends TypedEmitter<TimeControlEvents>
 {
     protected state: TimeControlState = 'ready';
     protected currentPlayer: PlayerIndex = 0;

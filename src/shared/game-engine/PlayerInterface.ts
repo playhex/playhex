@@ -1,4 +1,4 @@
-import TypedEventEmitter from 'typed-emitter';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import PlayerGameInput from './PlayerGameInput';
 import Move from './Move';
 
@@ -12,7 +12,7 @@ export type PlayerEvents = {
     myTurnToPlay: () => void;
 };
 
-export default interface PlayerInterface extends TypedEventEmitter<PlayerEvents>
+export default interface PlayerInterface extends TypedEmitter<PlayerEvents>
 {
     /**
      * How you should call me. Displayed on player interface.

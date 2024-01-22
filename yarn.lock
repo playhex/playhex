@@ -5939,7 +5939,7 @@ rxjs@^6.6.3:
   dependencies:
     tslib "^1.9.0"
 
-rxjs@^7.5.1, rxjs@^7.5.2:
+rxjs@^7.5.1:
   version "7.8.1"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.8.1.tgz#6f6f3d99ea8044291efd92e7c7fcf562c4057543"
   integrity sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==
@@ -6548,6 +6548,11 @@ thunky@^1.0.2:
   resolved "https://registry.yarnpkg.com/thunky/-/thunky-1.1.0.tgz#5abaf714a9405db0504732bbccd2cedd9ef9537d"
   integrity sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA==
 
+tiny-typed-emitter@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tiny-typed-emitter/-/tiny-typed-emitter-2.1.0.tgz#b3b027fdd389ff81a152c8e847ee2f5be9fad7b5"
+  integrity sha512-qVtvMxeXbVej0cQWKqVSSAHmKZEHAvxdF8HEUBFWts8h+xEo5m/lEiPakuyZ3BnCBjOD8i24kzNOiOLLgsSxhA==
+
 tmp@~0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.1.tgz#8457fc3037dcf4719c251367a1af6500ee1ccf14"
@@ -6724,13 +6729,6 @@ type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
-
-typed-emitter@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/typed-emitter/-/typed-emitter-2.1.0.tgz#ca78e3d8ef1476f228f548d62e04e3d4d3fd77fb"
-  integrity sha512-g/KzbYKbH5C2vPkaXGu8DJlHrGKHLsM25Zg9WuC9pMGfuvT+X25tZQWo5fK1BjBm8+UrVE9LDCvaY0CQk+fXDA==
-  optionalDependencies:
-    rxjs "^7.5.2"
 
 typedi@^0.10.0:
   version "0.10.0"

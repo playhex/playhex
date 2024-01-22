@@ -2,8 +2,7 @@ import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
-import { EventEmitter } from 'events';
-import TypedEventEmitter from 'typed-emitter';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import { debounce } from 'debounce';
 import SwapableSprite from './SwapableSprite';
 import SwapedSprite from './SwapedSprite';
@@ -93,7 +92,7 @@ type GameViewEvents = {
 
 const darkLightThemeStore = useDarkLightThemeStore();
 
-export default class GameView extends (EventEmitter as unknown as new () => TypedEventEmitter<GameViewEvents>)
+export default class GameView extends TypedEmitter<GameViewEvents>
 {
     private hexes: Hex[][];
     private pixi: Application;

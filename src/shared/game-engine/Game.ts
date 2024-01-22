@@ -1,6 +1,5 @@
-import EventEmitter from 'events';
 import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE, PlayerInterface } from '.';
-import TypedEmitter from 'typed-emitter';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board';
 import { Tuple } from '../app/Types';
 
@@ -75,7 +74,7 @@ export type Outcome =
     | 'forfeit'
 ;
 
-export default class Game extends (EventEmitter as unknown as new () => TypedEmitter<GameEvents>)
+export default class Game extends TypedEmitter<GameEvents>
 {
     private state: GameState = 'created';
     private board: Board;

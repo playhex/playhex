@@ -1,5 +1,4 @@
-import EventEmitter from 'events';
-import TypedEventEmitter from 'typed-emitter';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import { Chrono } from './Chrono';
 import TimeValue, { timeValueToSeconds } from './TimeValue';
 
@@ -11,7 +10,7 @@ type ChronoEvents = {
  * ByoYomi chrono for a single player.
  * Can be started or paused.
  */
-export class ByoYomiChrono extends (EventEmitter as unknown as new () => TypedEventEmitter<ChronoEvents>)
+export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
 {
     private chrono: Chrono;
     private remainingPeriods: number;
