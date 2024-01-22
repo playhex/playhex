@@ -23,7 +23,7 @@ describe('Resign a game', () => {
             .click()
         ;
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains(' won by resignation !');
     });
 });

@@ -1,5 +1,5 @@
-describe('Page game over', () => {
-    it('displays win popin', () => {
+describe('Page Game finished', () => {
+    it('displays win popin, and review options', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
             fixture: 'game-finished.json',
         });
@@ -8,11 +8,15 @@ describe('Page game over', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains('Test player won the game !');
 
         // Winner appears in his color, blue
         cy.get('strong.text-primary').contains('Test player');
+
+        // Assert review links. Download SGF and HexWorld link.
+        cy.contains('button', 'SGF');
+        cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#9,a3a6d9b6h8c6h1d6f1e6e7f6a2g6h4h6g1i6');
     });
 
     it('displays win popin when a player resigned', () => {
@@ -24,7 +28,7 @@ describe('Page game over', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains('The winner won by resignation !');
 
         // Winner appears in his color, red
@@ -40,7 +44,7 @@ describe('Page game over', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains('Game has been canceled.');
     });
 
@@ -57,7 +61,7 @@ describe('Page game over', () => {
 
         cy.get('Accept').should('not.exist');
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains('Game has been canceled.');
     });
 
@@ -77,7 +81,7 @@ describe('Page game over', () => {
 
         cy.get('Accept').should('not.exist');
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains('Game has been canceled.');
     });
 });

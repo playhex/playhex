@@ -61,7 +61,7 @@ describe('Play a game to the end', () => {
             .click(605, 440)
         ;
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game !/);
     });
 
@@ -89,7 +89,7 @@ describe('Play a game to the end', () => {
             .click(413, 326)
         ;
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains('Determinist random bot won the game !');
     });
 
@@ -113,7 +113,7 @@ describe('Play a game to the end', () => {
             .click(607, 439)
         ;
 
-        cy.contains('Game over');
+        cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game !/);
     });
 });

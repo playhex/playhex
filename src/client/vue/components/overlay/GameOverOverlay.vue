@@ -4,7 +4,9 @@ import { Game, PlayerInterface } from '@shared/game-engine';
 import { gameToSGF } from '@shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { downloadString } from '../../../services/fileDownload';
-import { BIconRepeat, BIconDownload } from 'bootstrap-icons-vue';
+import { gameToHexworldLink } from '../../../../shared/app/hexworld';
+import { pseudoSlug } from '../../../../shared/app/pseudoUtils';
+import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 
 const { visible, confirm } = useOverlayMeta();
 
@@ -29,18 +31,13 @@ const winner: null | PlayerInterface = game.isCanceled()
 /*
  * SGF download
  */
-const slugify = (string: string): string => string
-    .toLocaleLowerCase()
-    .replace(/[^a-z0-9]/g, '_')
-;
-
 const downloadSGF = (): void => {
     const filename = [
         'hex',
         (game.getStartedAt() ?? game.getCreatedAt()).toISOString().substring(0, 10),
-        slugify(game.getPlayer(0).getName()),
+        pseudoSlug(game.getPlayer(0).getName()),
         'VS',
-        slugify(game.getPlayer(1).getName()),
+        pseudoSlug(game.getPlayer(1).getName()),
     ].join('-') + '.sgf';
 
     downloadString(gameToSGF(game), filename);
@@ -62,14 +59,14 @@ const outcomeToString = (): string => {
             <div class="modal-dialog" @click="e => e.stopPropagation()">
                 <form class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Game over</h5>
+                        <h5 class="modal-title">Game finished</h5>
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body text-center lead">
                         <p v-if="null !== winner"><strong :class="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
                         <p v-else>Game has been canceled.</p>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer justify-content-center">
                         <button
                             v-if="rematch"
                             type="button"
@@ -80,14 +77,24 @@ const outcomeToString = (): string => {
                         <button
                             type="button"
                             class="btn btn-outline-primary"
-                            @click="downloadSGF();"
-                        ><b-icon-download /> SGF</button>
+                            @click="confirm()"
+                        >Ok, close</button>
+                    </div>
+                    <div class="modal-footer">
+                        <p>Review game:</p>
 
                         <button
                             type="button"
-                            class="btn btn-outline-primary"
-                            @click="confirm()"
-                        >Ok</button>
+                            class="btn btn-sm btn-outline-primary"
+                            @click="downloadSGF();"
+                        ><b-icon-download /> SGF</button>
+
+                        <a
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            target="_blank"
+                            :href="gameToHexworldLink(game)"
+                        ><b-icon-box-arrow-up-right/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
                     </div>
                 </form>
             </div>
