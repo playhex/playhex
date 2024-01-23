@@ -2,13 +2,15 @@
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'bootstrap-icons-vue';
-import { HostedGameData, PlayerData, PublicPlayerData } from '@shared/app/Types';
+import { HostedGameData, PlayerData } from '@shared/app/Types';
 import { getPlayerGames, getPlayerBySlug } from '../../../apiClient';
 import { Ref, ref } from 'vue';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore';
 import HostedGameClient from '../../../HostedGameClient';
+import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
+import AppPseudoWithOnlineStatusVue from '../../components/AppPseudoWithOnlineStatus.vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const { slug } = useRoute().params;
@@ -23,7 +25,7 @@ if (Array.isArray(slug)) {
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 const isMe = (): boolean => null !== loggedInPlayer.value && loggedInPlayer.value.slug === slug;
 
-const player: Ref<null | PublicPlayerData> = isMe()
+const player: Ref<null | PlayerData> = isMe()
     ? loggedInPlayer
     : ref(null)
 ;
@@ -119,12 +121,13 @@ const clickLogout = async () => {
 
 <template>
     <div class="container">
-        <div class="row">
-            <div class="col-4 col-sm-3 col-lg-2">
+        <div class="d-flex">
+            <div class="avatar-wrapper">
                 <b-icon-person class="icon img-thumbnail" />
+                <app-online-status v-if="player" :playerData="player" class="player-status" />
             </div>
-            <div class="col-8 col-sm-9 col-lg-10">
-                <h2>{{ player?.pseudo ?? '…' }}</h2>
+            <div>
+                <h2><app-pseudo v-if="player" :playerData="player" /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest">Account created on {{ player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
@@ -176,7 +179,9 @@ const clickLogout = async () => {
                     </td>
                     <td>
                         <span class="me-2">Game vs </span>
-                        <app-online-status :playerData="(game.getOtherPlayer(player) as PlayerData)"></app-online-status>
+                        <app-pseudo-with-online-status-vue
+                            :playerData="(game.getOtherPlayer(player) as PlayerData)"
+                        />
                     </td>
                     <td class="text-end">{{ game.getHostedGameData().gameOptions.boardsize }}</td>
                 </tr>
@@ -200,7 +205,9 @@ const clickLogout = async () => {
                     <td>
                         <span class="me-2 text-success" v-if="hasWon(game)">won against </span>
                         <span class="me-2 text-danger" v-else>lost against </span>
-                        <app-online-status :playerData="getOpponent(game)"></app-online-status>
+                        <app-pseudo-with-online-status-vue
+                            :playerData="getOpponent(game)"
+                        />
                     </td>
                 </tr>
             </tbody>
@@ -218,4 +225,15 @@ const clickLogout = async () => {
 .player-btns > *
     margin-bottom 0.5em
     margin-right 1em
+
+.avatar-wrapper
+    position relative
+    margin-right 1em
+    height 100%
+
+    .player-status
+        position absolute
+        top 79%
+        left 79%
+        font-size 1em
 </style>

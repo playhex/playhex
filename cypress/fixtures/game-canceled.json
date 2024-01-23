@@ -4,14 +4,14 @@
         "publicId": "eeb48474-21c7-4fd1-97db-f4529d225ee5",
         "pseudo": "Hatchepsout",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "opponent": {
         "publicId": "08618b21-296b-49ec-9266-1a00cf60500c",
         "pseudo": "Kheops",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": true
     },
     "gameTimeData": {
@@ -39,14 +39,14 @@
                 "publicId": "08618b21-296b-49ec-9266-1a00cf60500c",
                 "pseudo": "Kheops",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": true
             },
             {
                 "publicId": "eeb48474-21c7-4fd1-97db-f4529d225ee5",
                 "pseudo": "Hatchepsout",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": false
             }
         ],

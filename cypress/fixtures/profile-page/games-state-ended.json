@@ -166,7 +166,7 @@
     {
         "id": "e259618e-f477-4ade-8b86-d4287e0dce22",
         "host": {
-            "pseudo": "Guest 8385",
+            "pseudo": "8385",
             "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
             "isGuest": true,
             "isBot": false,
@@ -220,7 +220,7 @@
         "gameData": {
             "players": [
                 {
-                    "pseudo": "Guest 8385",
+                    "pseudo": "8385",
                     "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
                     "isGuest": true,
                     "isBot": false,

@@ -3,12 +3,12 @@
 import GameView, { BoardOrientation } from '@client/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
-import GameOverOverlay from '@client/vue/components/overlay/GameOverOverlay.vue';
+import GameFinishedOverlay from '@client/vue/components/overlay/GameFinishedOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
-import AppOnlineStatus from './AppOnlineStatus.vue';
 import AppPlayer from '@shared/app/AppPlayer';
 import AppChrono from './AppChrono.vue';
 import { TimeControlOptionsValues } from '@shared/app/Types';
+import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -65,11 +65,11 @@ onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientatio
 /*
  * Game end: win popin
  */
-const gameOverOverlay = createOverlay(GameOverOverlay);
+const gameFinishedOverlay = createOverlay(GameFinishedOverlay);
 const { rematch } = props;
 
 gameView.value.on('endedAndWinAnimationOver', () => {
-    gameOverOverlay({
+    gameFinishedOverlay({
         game,
         rematch,
     });
@@ -90,12 +90,13 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                     v-if="gameTimeControl"
                     :timeControlOptions="gameTimeControl.options"
                     :playerTimeData="gameTimeControl.values.players[0]"
-                ></app-chrono>
-                <p class="text-danger h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
-                    <app-online-status
+                />
+                <p class="h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
+                    <app-pseudo-with-online-status
                         v-if="(player instanceof AppPlayer)"
                         :playerData="player.getPlayerData()"
-                    ></app-online-status>
+                        classes="text-danger"
+                    />
                     <span v-else class="fst-italic">waiting…</span>
                 </p>
             </div>
@@ -104,12 +105,13 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
                     v-if="gameTimeControl"
                     :timeControlOptions="gameTimeControl.options"
                     :playerTimeData="gameTimeControl.values.players[1]"
-                ></app-chrono>
-                <p class="text-primary h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
-                    <app-online-status
+                />
+                <p class="h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
+                    <app-pseudo-with-online-status
                         v-if="(player instanceof AppPlayer)"
                         :playerData="player.getPlayerData()"
-                    ></app-online-status>
+                        classes="text-primary"
+                    />
                     <span v-else class="fst-italic">waiting…</span>
                 </p>
             </div>

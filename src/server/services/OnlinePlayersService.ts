@@ -1,12 +1,12 @@
-import { OnlinePlayerData, OnlinePlayersData, PublicPlayerData } from '@shared/app/Types';
+import { OnlinePlayersData, PlayerData } from '@shared/app/Types';
 import { HexSocket } from '../server';
 import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 interface OnlinePlayersServiceEvents
 {
-    playerConnected: (player: PublicPlayerData) => void;
-    playerDisconnected: (player: PublicPlayerData) => void;
+    playerConnected: (player: PlayerData) => void;
+    playerDisconnected: (player: PlayerData) => void;
 }
 
 /**
@@ -23,7 +23,7 @@ interface OnlinePlayersServiceEvents
 export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServiceEvents>
 {
     private onlinePlayers: { [key: string]: {
-        playerData: PublicPlayerData;
+        playerData: PlayerData;
         sockets: HexSocket[];
     } } = {};
 
@@ -80,13 +80,10 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
 
     getOnlinePlayers(): OnlinePlayersData
     {
-        const players: { [key: string]: OnlinePlayerData } = {};
+        const players: { [key: string]: PlayerData } = {};
 
         Object.values(this.onlinePlayers).forEach(p => {
-            players[p.playerData.publicId] = {
-                playerData: p.playerData,
-                connected: true,
-            };
+            players[p.playerData.publicId] = p.playerData;
         });
 
         return {

@@ -7,6 +7,8 @@ import { downloadString } from '../../../services/fileDownload';
 import { gameToHexworldLink } from '../../../../shared/app/hexworld';
 import { pseudoSlug } from '../../../../shared/app/pseudoUtils';
 import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
+import AppPseudo from '../AppPseudo.vue';
+import AppPlayer from '@shared/app/AppPlayer';
 
 const { visible, confirm } = useOverlayMeta();
 
@@ -63,7 +65,19 @@ const outcomeToString = (): string => {
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
                     <div class="modal-body text-center lead">
-                        <p v-if="null !== winner"><strong :class="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'">{{ winner.getName() }}</strong> won {{ outcomeToString() }} !</p>
+                        <p v-if="null !== winner">
+                            <app-pseudo
+                                v-if="(winner instanceof AppPlayer)"
+                                :player-data="winner.getPlayerData()"
+                                is="strong"
+                                :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
+                            />
+                            <strong
+                                v-else
+                                :class="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
+                            >{{ winner.getName() }}</strong>
+                            won {{ outcomeToString() }} !
+                        </p>
                         <p v-else>Game has been canceled.</p>
                     </div>
                     <div class="modal-footer justify-content-center">

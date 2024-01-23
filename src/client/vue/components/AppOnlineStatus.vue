@@ -9,17 +9,9 @@ const props = defineProps({
         type: Object as PropType<PlayerData>,
         required: true,
     },
-    is: {
-        type: String,
-        default: 'span',
-    },
-    classes: {
-        type: String,
-        default: null,
-    },
 });
 
-const { playerData, is, classes } = toRefs(props);
+const { playerData } = toRefs(props);
 </script>
 
 <template>
@@ -34,5 +26,4 @@ const { playerData, is, classes } = toRefs(props);
         class="me-1 text-success"
         aria-hidden="true"
     />
-    <component :is="is" :class="classes">{{ playerData.pseudo }}</component>
 </template>

@@ -50,7 +50,7 @@ describe('Game', () => {
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner');
 
         // Cannot move anymore
-        assert.throws(() => game.move(new Move(2, 2), 1), { message: 'Move c3: Game is over' });
+        assert.throws(() => game.move(new Move(2, 2), 1), { message: 'Move c3: Game is finished' });
     });
 
     it('Runs an entire game from players input', () => {
@@ -89,7 +89,7 @@ describe('Game', () => {
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner');
 
         // Cannot move anymore
-        assert.throws(() => player0.move(new Move(2, 2)), { message: 'Move c3: Game is over' });
+        assert.throws(() => player0.move(new Move(2, 2)), { message: 'Move c3: Game is finished' });
     });
 
     it('Resign', () => {

@@ -1,4 +1,4 @@
-import { PublicPlayerData } from '@shared/app/Types';
+import { PlayerData } from '@shared/app/Types';
 import prisma from '../services/prisma';
 import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,9 +26,9 @@ export default class PlayerRepository
     /**
      * Cached players indexed by publicId
      */
-    private playersCache: { [key: string]: PublicPlayerData } = {};
+    private playersCache: { [key: string]: PlayerData } = {};
 
-    async getPlayer(publicId: string): Promise<null | PublicPlayerData>
+    async getPlayer(publicId: string): Promise<null | PlayerData>
     {
         if (this.playersCache[publicId]) {
             return this.playersCache[publicId];
@@ -48,7 +48,7 @@ export default class PlayerRepository
         return player;
     }
 
-    async getPlayerBySlug(slug: string): Promise<null | PublicPlayerData>
+    async getPlayerBySlug(slug: string): Promise<null | PlayerData>
     {
         return await prisma.player.findUnique({
             select,
@@ -58,13 +58,13 @@ export default class PlayerRepository
         });
     }
 
-    async createGuest(): Promise<PublicPlayerData>
+    async createGuest(): Promise<PlayerData>
     {
         let exponent = 3;
 
         while (exponent < 12) {
             try {
-                const pseudo = 'Guest ' + (10 ** exponent + Math.floor(Math.random() * 9 * (10 ** exponent)));
+                const pseudo = String(10 ** exponent + Math.floor(Math.random() * 9 * (10 ** exponent)));
                 const publicId = uuidv4();
 
                 return this.playersCache[publicId] = await prisma.player.create({
@@ -95,7 +95,7 @@ export default class PlayerRepository
      * @throws {PseudoTooShortError}
      * @throws {PseudoTooLongError}
      */
-    async createPlayer(pseudo: string, password: string): Promise<PublicPlayerData>
+    async createPlayer(pseudo: string, password: string): Promise<PlayerData>
     {
         checkPseudo(pseudo);
 
@@ -126,7 +126,7 @@ export default class PlayerRepository
      * @throws {PseudoTooShortError}
      * @throws {PseudoTooLongError}
      */
-    async upgradeGuest(publicId: string, pseudo: string, password: string): Promise<PublicPlayerData>
+    async upgradeGuest(publicId: string, pseudo: string, password: string): Promise<PlayerData>
     {
         checkPseudo(pseudo);
 

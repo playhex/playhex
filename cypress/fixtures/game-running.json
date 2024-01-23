@@ -4,14 +4,14 @@
         "publicId": "a8a486fc-6204-4c15-8bd9-2562534dd7cf",
         "pseudo": "Player A",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "opponent": {
         "publicId": "e2c44094-1e64-42b3-9315-9105435093dd",
         "pseudo": "Player B",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "gameTimeData": {
@@ -39,14 +39,14 @@
                 "publicId": "e2c44094-1e64-42b3-9315-9105435093dd",
                 "pseudo": "Player B",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": true
             },
             {
                 "publicId": "a8a486fc-6204-4c15-8bd9-2562534dd7cf",
                 "pseudo": "Player A",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": false
             }
         ],

@@ -4,14 +4,14 @@
         "publicId": "player-id",
         "pseudo": "Test player",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "opponent": {
         "publicId": "bot-id",
         "pseudo": "Bot",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "gameTimeData": {
@@ -39,14 +39,14 @@
                 "publicId": "bot-id",
                 "pseudo": "Bot",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": false
             },
             {
                 "publicId": "player-id",
                 "pseudo": "Test player",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": false
             }
         ],

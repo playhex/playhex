@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-import { OnlinePlayerData } from '@shared/app/Types';
+import { PlayerData } from '@shared/app/Types';
 import { apiGetOnlinePlayers } from '@client/apiClient';
 import useSocketStore from './socketStore';
 import useAuthStore from './authStore';
@@ -9,11 +9,16 @@ import useAuthStore from './authStore';
  * Online players displayed on home sidebar.
  */
 const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
-    const players = ref<{ [key: string]: OnlinePlayerData }>({});
+
     const { socket } = useSocketStore();
 
     /**
-     * Null if not yet loaded
+     * List of connected players
+     */
+    const players = ref<{ [key: string]: PlayerData }>({});
+
+    /**
+     * Total connected players count. Null if not yet loaded
      */
     const totalPlayers = ref<null | number>(null);
 
@@ -21,7 +26,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         totalPlayers.value = totalPlayersUpdate;
 
         if (null !== player) {
-            players.value[player.publicId] = { playerData: player, connected: true };
+            players.value[player.publicId] = player;
         }
     });
 

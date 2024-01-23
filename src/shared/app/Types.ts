@@ -8,21 +8,10 @@ import { Player } from '@prisma/client';
 export type Tuple<T> = [T, T];
 
 /**
- * Player data required for AppPlayer,
- * for display on game board.
- */
-export type PlayerData = Pick<Player,
-    'pseudo'
-    | 'publicId'
-    | 'isGuest'
-    | 'isBot'
->;
-
-/**
  * All data about a player used on server and client side.
  * Exclude password, email...
  */
-export type PublicPlayerData = Pick<Player,
+export type PlayerData = Pick<Player,
     'pseudo'
     | 'slug'
     | 'publicId'
@@ -97,12 +86,7 @@ export type HostedGameData = {
     createdAt: Date;
 };
 
-export type OnlinePlayerData = {
-    playerData: PlayerData;
-    connected: boolean;
-};
-
 export type OnlinePlayersData = {
     totalPlayers: number;
-    players: { [key: string]: OnlinePlayerData };
+    players: { [key: string]: PlayerData };
 };

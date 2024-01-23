@@ -49,7 +49,7 @@ export default (): Router => {
 
     router.post('/api/games/:id/move', async (req, res) => {
         const { id } = req.params;
-        let playerData: null | PlayerData;
+        let playerData: null | PlayerData = null;
 
         if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
             res.status(403).send('not authenticated').end();

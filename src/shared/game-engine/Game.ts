@@ -338,7 +338,7 @@ export default class Game extends TypedEmitter<GameEvents>
         }
 
         if ('ended' === this.state) {
-            throw new IllegalMove(move, 'Game is over');
+            throw new IllegalMove(move, 'Game is finished');
         }
 
         if (!this.board.containsCoords(move.getRow(), move.getCol())) {

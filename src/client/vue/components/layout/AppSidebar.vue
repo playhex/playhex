@@ -3,6 +3,7 @@
 import { storeToRefs } from 'pinia';
 import useOnlinePlayersStore from '@client/stores/onlinePlayersStore';
 import { BIconCircleFill } from 'bootstrap-icons-vue';
+import AppPseudo from '../AppPseudo.vue';
 
 const {
     players,
@@ -16,15 +17,14 @@ const {
 
         <p
             v-for="player in players"
-            :key="player.playerData.publicId"
+            :key="player.publicId"
             class="mb-1"
         >
             <b-icon-circle-fill
-                class="online-status-icon"
+                class="online-status-icon text-success"
                 aria-hidden="true"
-                :class="player.connected ? 'text-success' : 'text-secondary'"
             />
-            {{ player.playerData.pseudo }}
+            <app-pseudo :player-data="player" />
         </p>
     </div>
 </template>

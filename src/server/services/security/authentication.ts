@@ -1,4 +1,4 @@
-import { PublicPlayerData } from '@shared/app/Types';
+import { PlayerData } from '@shared/app/Types';
 import prisma from '../prisma';
 import bcrypt from 'bcryptjs';
 import { Player } from '@prisma/client';
@@ -25,7 +25,7 @@ export const checkPassword = (player: Player, password: string): boolean => {
  * @throws {PseudoNotExistingError}
  * @throws {InvalidPasswordError}
  */
-export const authenticate = async (pseudo: string, password: string): Promise<PublicPlayerData> => {
+export const authenticate = async (pseudo: string, password: string): Promise<PlayerData> => {
     const player = await prisma.player.findUnique({
         where: {
             pseudo,

@@ -27,11 +27,16 @@ export default class HostedGameRepository
         return this.hostedGames[id] ?? null;
     }
 
-    createGame(host: AppPlayer, gameOptions: GameOptionsData): HostedGame
+    createGame(host: AppPlayer, gameOptions: GameOptionsData, opponent: null | AppPlayer = null): HostedGame
     {
         const hostedGame = new HostedGame(this.io, gameOptions, host);
         this.hostedGames[hostedGame.getId()] = hostedGame;
         this.io.to(Rooms.lobby).emit('gameCreated', hostedGame.toData());
+
+        if (null !== opponent) {
+            hostedGame.playerJoin(opponent);
+            this.io.to([Rooms.lobby, Rooms.game(hostedGame.getId())]).emit('gameJoined', hostedGame.getId(), opponent.getPlayerData());
+        }
 
         return hostedGame;
     }
@@ -64,7 +69,7 @@ export default class HostedGameRepository
         return hostedGameData;
     }
 
-    playerJoinGame(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string): true | string
+    playerJoinGame(playerData: PlayerData, gameId: string): true | string
     {
         const hostedGame = this.hostedGames[gameId];
 
@@ -72,25 +77,18 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        const joinResult = hostedGame.playerJoin(playerDataOrAppPlayer);
+        const joinResult = hostedGame.playerJoin(playerData);
 
         if ('string' === typeof joinResult) {
             return joinResult;
         }
 
-        this.io.to([Rooms.lobby, Rooms.game(gameId)]).emit(
-            'gameJoined',
-            gameId,
-            playerDataOrAppPlayer instanceof AppPlayer
-                ? playerDataOrAppPlayer.getPlayerData()
-                : playerDataOrAppPlayer
-            ,
-        );
+        this.io.to([Rooms.lobby, Rooms.game(gameId)]).emit('gameJoined', gameId, playerData);
 
         return true;
     }
 
-    playerMove(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string, move: MoveData): true | string
+    playerMove(playerData: PlayerData, gameId: string, move: MoveData): true | string
     {
         const hostedGame = this.hostedGames[gameId];
 
@@ -98,10 +96,10 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        return hostedGame.playerMove(playerDataOrAppPlayer, new Move(move.row, move.col));
+        return hostedGame.playerMove(playerData, new Move(move.row, move.col));
     }
 
-    playerResign(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string): true | string
+    playerResign(playerData: PlayerData, gameId: string): true | string
     {
         const hostedGame = this.hostedGames[gameId];
 
@@ -109,10 +107,10 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        return hostedGame.playerResign(playerDataOrAppPlayer);
+        return hostedGame.playerResign(playerData);
     }
 
-    playerCancel(playerDataOrAppPlayer: PlayerData | AppPlayer, gameId: string): true | string
+    playerCancel(playerData: PlayerData, gameId: string): true | string
     {
         const hostedGame = this.hostedGames[gameId];
 
@@ -120,6 +118,6 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        return hostedGame.playerCancel(playerDataOrAppPlayer);
+        return hostedGame.playerCancel(playerData);
     }
 }

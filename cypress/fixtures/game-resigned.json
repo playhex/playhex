@@ -4,14 +4,14 @@
         "publicId": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
         "pseudo": "The loser",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "opponent": {
         "publicId": "winner-id",
         "pseudo": "The winner",
         "slug": "slug",
-        "isGuest": true,
+        "isGuest": false,
         "isBot": false
     },
     "gameTimeData": {
@@ -39,14 +39,14 @@
                 "publicId": "winner-id",
                 "pseudo": "The winner",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": false
             },
             {
                 "publicId": "c4aafd6d-9db2-406a-ac58-c6ab3b2b019f",
                 "pseudo": "The loser",
                 "slug": "slug",
-                "isGuest": true,
+                "isGuest": false,
                 "isBot": false
             }
         ],

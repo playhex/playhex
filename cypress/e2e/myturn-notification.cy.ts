@@ -100,4 +100,51 @@ describe('My turn notification', () => {
             }
         });
     });
+
+    it('displays 1 and my color when I just created a game VS AI and I play first', () => {
+        cy.visit('/');
+        cy.get('.menu-top').contains(/Guest \d+/);
+
+        cy.contains('Play vs AI').click();
+
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
+            .contains('Custom')
+            .click()
+
+            .closest('.modal-content')
+            .contains('More options')
+            .click()
+        ;
+
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
+            .contains(/^First$/)
+            .click()
+
+            .closest('.modal-content')
+            .contains('Play vs AI')
+            .click()
+        ;
+
+        cy.contains('random bot');
+
+        cy.get('.my-turn-notif a').then($a => {
+            if ('1' !== $a.text()) {
+                throw new Error('I should have one game where I have to play');
+            }
+        });
+
+        cy.get('.my-turn-notif svg').then($element => {
+            if (!hasOnlyClass($element, 'text-danger')) {
+                throw new Error('Notification should be red');
+            }
+
+            if (isEmptyHexagon($element)) {
+                throw new Error('Hexagon should not be empty');
+            }
+        });
+    });
 });

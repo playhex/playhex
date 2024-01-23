@@ -18,8 +18,10 @@ export default class RandomAIPlayer extends AppPlayer
         super({
             publicId: 'random-bot|' + uuidv4(),
             pseudo: RandomAIPlayer.NAME,
+            slug: '',
             isBot: true,
             isGuest: false,
+            createdAt: new Date(),
         });
 
         this.on('myTurnToPlay', async () => {

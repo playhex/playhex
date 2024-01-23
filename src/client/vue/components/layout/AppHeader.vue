@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore';
 import { useRouter } from 'vue-router';
 import { BIconHouseFill, BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
+import AppPseudo from '../AppPseudo.vue';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -65,7 +66,7 @@ const color = (): string => null === mostUrgentGame.value
 
             <p class="nav-player-item">
                 <template v-if="loggedInPlayer">
-                    <b-icon-person-fill /> <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }">{{ loggedInPlayer.pseudo }}</router-link>
+                    <b-icon-person-fill /> <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }"><app-pseudo :player-data="loggedInPlayer" /></router-link>
                 </template>
                 <template v-else>logging in…</template>
             </p>

@@ -21,6 +21,8 @@ These tests are either not yet automated, or too hard to automate.
     - Lose the game
     - I should see the last move from AI, and the lose popin.
 
+- I can see AI first move when AI plays first with no delay
+
 - I cannot play against myself, join my own game twice
 
 - Check if I can see game, last move and win popin as watcher

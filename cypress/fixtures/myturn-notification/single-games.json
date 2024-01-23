@@ -3,7 +3,7 @@
         "id": "914ca90b-5e07-4dc4-9dbb-45e1b0ff84bf",
         "host": {
             "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-            "pseudo": "Guest 1817",
+            "pseudo": "1817",
             "slug": "slug",
             "isGuest": true,
             "isBot": false
@@ -12,7 +12,7 @@
             "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
             "pseudo": "Determinist random bot",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": true
         },
         "gameTimeData": {
@@ -40,12 +40,12 @@
                     "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
                     "pseudo": "Determinist random bot",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": true
                 },
                 {
                     "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-                    "pseudo": "Guest 1817",
+                    "pseudo": "1817",
                     "slug": "slug",
                     "isGuest": true,
                     "isBot": false
@@ -164,7 +164,7 @@
         "id": "0483ba90-2141-4d34-8272-94ecad8325a7",
         "host": {
             "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-            "pseudo": "Guest 1817",
+            "pseudo": "1817",
             "slug": "slug",
             "isGuest": true,
             "isBot": false
@@ -173,7 +173,7 @@
             "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
             "pseudo": "Determinist random bot",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": true
         },
         "gameTimeData": {
@@ -201,12 +201,12 @@
                     "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
                     "pseudo": "Determinist random bot",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": true
                 },
                 {
                     "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-                    "pseudo": "Guest 1817",
+                    "pseudo": "1817",
                     "slug": "slug",
                     "isGuest": true,
                     "isBot": false

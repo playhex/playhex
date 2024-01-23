@@ -1,4 +1,4 @@
-import { HostedGameData, OnlinePlayersData, PublicPlayerData } from '@shared/app/Types';
+import { HostedGameData, OnlinePlayersData, PlayerData } from '@shared/app/Types';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
@@ -32,7 +32,7 @@ const checkResponse = async (response: Response): Promise<void> => {
     }
 };
 
-export const authGetMe = async (): Promise<PublicPlayerData> => {
+export const authGetMe = async (): Promise<PlayerData> => {
     const response = await fetch('/api/auth/me', {
         method: 'get',
         headers: {
@@ -43,7 +43,7 @@ export const authGetMe = async (): Promise<PublicPlayerData> => {
     return denormalize(await response.json());
 };
 
-export const authLogin = async (pseudo: string, password: string): Promise<PublicPlayerData> => {
+export const authLogin = async (pseudo: string, password: string): Promise<PlayerData> => {
     const response = await fetch('/api/auth/login', {
         method: 'post',
         headers: {
@@ -61,7 +61,7 @@ export const authLogin = async (pseudo: string, password: string): Promise<Publi
     return denormalize(await response.json());
 };
 
-export const authSignup = async (pseudo: string, password: string): Promise<PublicPlayerData> => {
+export const authSignup = async (pseudo: string, password: string): Promise<PlayerData> => {
     const response = await fetch('/api/auth/signup', {
         method: 'post',
         headers: {
@@ -79,7 +79,7 @@ export const authSignup = async (pseudo: string, password: string): Promise<Publ
     return denormalize(await response.json());
 };
 
-export const authSignupFromGuest = async (pseudo: string, password: string): Promise<PublicPlayerData> => {
+export const authSignupFromGuest = async (pseudo: string, password: string): Promise<PlayerData> => {
     const response = await fetch('/api/auth/signup-from-guest', {
         method: 'post',
         headers: {
@@ -97,7 +97,7 @@ export const authSignupFromGuest = async (pseudo: string, password: string): Pro
     return denormalize(await response.json());
 };
 
-export const authMeOrSignupGuest = async (): Promise<PublicPlayerData> => {
+export const authMeOrSignupGuest = async (): Promise<PlayerData> => {
     const response = await fetch('/api/auth/me-or-guest', {
         method: 'post',
         headers: {
@@ -110,7 +110,7 @@ export const authMeOrSignupGuest = async (): Promise<PublicPlayerData> => {
     return denormalize(await response.json());
 };
 
-export const authLogout = async (): Promise<PublicPlayerData> => {
+export const authLogout = async (): Promise<PlayerData> => {
     const response = await fetch('/api/auth/logout', {
         method: 'delete',
         headers: {
@@ -135,7 +135,7 @@ export const getGames = async (): Promise<HostedGameData[]> => {
     return denormalize(await response.json());
 };
 
-export const getPlayer = async (publicId: string): Promise<PublicPlayerData> => {
+export const getPlayer = async (publicId: string): Promise<PlayerData> => {
     const response = await fetch(`/api/players/${publicId}`, {
         method: 'get',
         headers: {
@@ -146,7 +146,7 @@ export const getPlayer = async (publicId: string): Promise<PublicPlayerData> => 
     return denormalize(await response.json());
 };
 
-export const getPlayerBySlug = async (slug: string): Promise<PublicPlayerData> => {
+export const getPlayerBySlug = async (slug: string): Promise<PlayerData> => {
     const response = await fetch(`/api/players?slug=${slug}`, {
         method: 'get',
         headers: {

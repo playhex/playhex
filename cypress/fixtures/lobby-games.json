@@ -5,14 +5,14 @@
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player A",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": false
         },
         "opponent": {
             "publicId": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
             "pseudo": "Player B",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": true
         },
         "gameTimeData": {
@@ -40,14 +40,14 @@
                     "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player A",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": false
                 },
                 {
                     "publicId": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
                     "pseudo": "Player B",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": true
                 }
             ],
@@ -166,7 +166,7 @@
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player waiting",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": false
         },
         "opponent": null,
@@ -198,14 +198,14 @@
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player C",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": false
         },
         "opponent": {
             "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
             "pseudo": "Player D",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": true
         },
         "gameTimeData": {
@@ -233,14 +233,14 @@
                     "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player C",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": false
                 },
                 {
                     "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
                     "pseudo": "Player D",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": true
                 }
             ],
@@ -394,14 +394,14 @@
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Cancel A",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": false
         },
         "opponent": {
             "publicId": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
             "pseudo": "Cancel B",
             "slug": "slug",
-            "isGuest": true,
+            "isGuest": false,
             "isBot": true
         },
         "gameTimeData": {
@@ -429,14 +429,14 @@
                     "publicId": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
                     "pseudo": "Cancel B",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": true
                 },
                 {
                     "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Cancel A",
                     "slug": "slug",
-                    "isGuest": true,
+                    "isGuest": false,
                     "isBot": false
                 }
             ],

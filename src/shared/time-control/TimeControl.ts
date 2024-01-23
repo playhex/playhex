@@ -31,7 +31,7 @@ export type TimeControlState =
     | 'elapsed'
 
     /**
-     * Is stopped because Game is over,
+     * Is stopped because Game is finished,
      * 'elapsed' event won't be emitted.
      * Cannot be reused.
      */

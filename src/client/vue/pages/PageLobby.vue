@@ -8,7 +8,7 @@ import { GameOptionsData } from '@shared/app/GameOptions';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import HostedGameClient from 'HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
-import AppOnlineStatus from '../components/AppOnlineStatus.vue';
+import AppPseudoWithOnlineStatus from '../components/AppPseudoWithOnlineStatus.vue';
 import { ref } from 'vue';
 import { BIconEye, BIconTrophy, BIconPeople, BIconRobot } from 'bootstrap-icons-vue';
 
@@ -141,7 +141,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     @click="goToGame(hostedGameClient.getId())"
                                 >Watch</button>
                             </td>
-                            <td><app-online-status :playerData="hostedGameClient.getHostedGameData().host"></app-online-status></td>
+                            <td><app-pseudo-with-online-status :playerData="hostedGameClient.getHostedGameData().host" /></td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
                     </tbody>
@@ -168,9 +168,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                             </td>
                             <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                 <template v-if="gameData">
-                                    <app-online-status :playerData="gameData.players[0]"></app-online-status>
+                                    <app-pseudo-with-online-status :playerData="gameData.players[0]" />
                                     <span class="mx-3"> vs </span>
-                                    <app-online-status :playerData="gameData.players[1]"></app-online-status>
+                                    <app-pseudo-with-online-status :playerData="gameData.players[1]" />
                                 </template>
                             </td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
@@ -193,9 +193,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 </td>
                                 <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                     <template v-if="null !== gameData && null !== gameData.winner">
-                                        <app-online-status :playerData="gameData.players[gameData.winner]" is="strong"></app-online-status>
+                                        <app-pseudo-with-online-status :playerData="gameData.players[gameData.winner]" is="strong" />
                                         <span class="mx-3"> won against </span>
-                                        <app-online-status :playerData="gameData.players[1 - gameData.winner]" classes="text-secondary"></app-online-status>
+                                        <app-pseudo-with-online-status :playerData="gameData.players[1 - gameData.winner]" classes="text-secondary" />
                                     </template>
                                 </td>
                             </tr>

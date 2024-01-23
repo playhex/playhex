@@ -2,7 +2,7 @@
     {
         "id": "e259618e-f477-4ade-8b86-d4287e0dce22",
         "host": {
-            "pseudo": "Guest 8385",
+            "pseudo": "8385",
             "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
             "isGuest": true,
             "isBot": false,
@@ -56,7 +56,7 @@
         "gameData": {
             "players": [
                 {
-                    "pseudo": "Guest 8385",
+                    "pseudo": "8385",
                     "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
                     "isGuest": true,
                     "isBot": false,
@@ -146,7 +146,7 @@
     {
         "id": "e43daf3e-f787-46e4-aa48-56217d126501",
         "host": {
-            "pseudo": "Guest 2450",
+            "pseudo": "2450",
             "publicId": "aabfeee4-23c8-4d4a-8a88-8c485196b042",
             "isGuest": true,
             "isBot": false,
@@ -206,7 +206,7 @@
                     "isGuest": false
                 },
                 {
-                    "pseudo": "Guest 2450",
+                    "pseudo": "2450",
                     "publicId": "aabfeee4-23c8-4d4a-8a88-8c485196b042",
                     "isGuest": true,
                     "isBot": false,

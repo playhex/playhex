@@ -24,11 +24,12 @@ export default class HostedGame
     private canceled = false;
     private createdAt: Date = new Date();
 
+    private opponent: null | AppPlayer = null;
+
     constructor(
         private io: HexServer,
         private gameOptions: GameOptionsData,
         private host: AppPlayer,
-        private opponent: null | AppPlayer = null,
     ) {
         logger.info('Hosted game created.', { hostedGameId: this.id, host: host.getPlayerData().pseudo });
 
@@ -115,9 +116,9 @@ export default class HostedGame
         bindTimeControlToGame(this.game, this.timeControl);
     }
 
-    isPlayerInGame(playerDataOrAppPlayer: PlayerData | AppPlayer): boolean
+    isPlayerInGame(playerData: PlayerData): boolean
     {
-        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
+        const appPlayer = this.findAppPlayer(playerData);
 
         return appPlayer === this.host || appPlayer === this.opponent;
     }
@@ -164,29 +165,28 @@ export default class HostedGame
     /**
      * Returns AppPlayer from a PlayerData, same instance if player already in this game, or creating a new one.
      */
-    findAppPlayer(playerDataOrAppPlayer: PlayerData | AppPlayer): AppPlayer
+    findAppPlayer(playerData: PlayerData): AppPlayer
     {
-        if (playerDataOrAppPlayer instanceof AppPlayer) {
-            return playerDataOrAppPlayer;
-        }
-
-        if (this.host.getPlayerId() === playerDataOrAppPlayer.publicId) {
+        if (this.host.getPlayerId() === playerData.publicId) {
             return this.host;
         }
 
-        if (null !== this.opponent && playerDataOrAppPlayer.publicId === this.opponent.getPlayerId()) {
+        if (null !== this.opponent && playerData.publicId === this.opponent.getPlayerId()) {
             return this.opponent;
         }
 
-        return new AppPlayer(playerDataOrAppPlayer);
+        return new AppPlayer(playerData);
     }
 
     /**
      * A player join this game.
      */
-    playerJoin(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
+    playerJoin(playerData: PlayerData | AppPlayer): true | string
     {
-        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
+        const appPlayer = playerData instanceof AppPlayer
+            ? playerData
+            : this.findAppPlayer(playerData)
+        ;
 
         if (this.canceled) {
             logger.notice('Player tried to join but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
@@ -214,28 +214,28 @@ export default class HostedGame
         return true;
     }
 
-    playerMove(playerDataOrAppPlayer: PlayerData | AppPlayer, move: Move): true | string
+    playerMove(playerData: PlayerData, move: Move): true | string
     {
-        logger.info('Move played', { hostedGameId: this.id, move, player: playerDataOrAppPlayer });
-
-        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
+        logger.info('Move played', { hostedGameId: this.id, move, player: playerData });
 
         if (this.canceled) {
-            logger.notice('Player tried to move but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            logger.notice('Player tried to move but hosted game has been canceled', { hostedGameId: this.id, joiner: playerData.pseudo });
             return 'Game has been canceled';
         }
 
         if (!this.game) {
-            logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: playerData.pseudo });
             return 'Game not yet started, cannot make a move';
         }
 
-        if (!this.isPlayerInGame(appPlayer)) {
-            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: appPlayer.getName() });
+        if (!this.isPlayerInGame(playerData)) {
+            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: playerData.pseudo });
             return 'you are not a player of this game';
         }
 
         try {
+            const appPlayer = this.findAppPlayer(playerData);
+
             appPlayer.move(move);
 
             return true;
@@ -249,31 +249,31 @@ export default class HostedGame
         }
     }
 
-    playerResign(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
+    playerResign(playerData: PlayerData): true | string
     {
-        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
-
         if (this.canceled) {
-            logger.notice('Player tried to resign but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
+            logger.notice('Player tried to resign but hosted game has been canceled', { hostedGameId: this.id, joiner: playerData.pseudo });
             return 'Game has been canceled';
         }
 
         if (!this.game) {
-            logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: playerData.pseudo });
             return 'Game not yet started, cannot resign';
         }
 
-        if (!this.isPlayerInGame(appPlayer)) {
-            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: appPlayer.getName() });
+        if (!this.isPlayerInGame(playerData)) {
+            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: playerData.pseudo });
             return 'you are not a player of this game';
         }
 
         if (this.game.isEnded()) {
-            logger.notice('A player tried to resign, but game already ended', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.notice('A player tried to resign, but game already ended', { hostedGameId: this.id, player: playerData.pseudo });
             return 'game already ended';
         }
 
         try {
+            const appPlayer = this.findAppPlayer(playerData);
+
             appPlayer.resign();
 
             return true;
@@ -283,17 +283,15 @@ export default class HostedGame
         }
     }
 
-    private canCancel(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
+    private canCancel(playerData: PlayerData): true | string
     {
-        const appPlayer = this.findAppPlayer(playerDataOrAppPlayer);
-
-        if (!this.isPlayerInGame(appPlayer)) {
-            logger.notice('A player not in the game tried to cancel game', { hostedGameId: this.id, player: appPlayer.getName() });
+        if (!this.isPlayerInGame(playerData)) {
+            logger.notice('A player not in the game tried to cancel game', { hostedGameId: this.id, player: playerData.pseudo });
             return 'you are not a player of this game';
         }
 
         if (this.canceled) {
-            logger.notice('A player tried to cancel, but game already canceled', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.notice('A player tried to cancel, but game already canceled', { hostedGameId: this.id, player: playerData.pseudo });
             return 'already canceled';
         }
 
@@ -302,21 +300,21 @@ export default class HostedGame
         }
 
         if (this.game.getState() === 'ended') {
-            logger.notice('A player tried to cancel, but game has finished', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.notice('A player tried to cancel, but game has finished', { hostedGameId: this.id, player: playerData.pseudo });
             return 'game has finished';
         }
 
         if (this.game.getMovesHistory().length >= 2) {
-            logger.notice('A player tried to cancel, but too late, at least 2 moves have been played', { hostedGameId: this.id, player: appPlayer.getName() });
+            logger.notice('A player tried to cancel, but too late, at least 2 moves have been played', { hostedGameId: this.id, player: playerData.pseudo });
             return 'cannot cancel now, each player has played at least one move';
         }
 
         return true;
     }
 
-    playerCancel(playerDataOrAppPlayer: PlayerData | AppPlayer): true | string
+    playerCancel(playerData: PlayerData): true | string
     {
-        const canCancel = this.canCancel(playerDataOrAppPlayer);
+        const canCancel = this.canCancel(playerData);
 
         if (true !== canCancel) {
             return canCancel;
@@ -398,6 +396,8 @@ export default class HostedGame
         return {
             publicId: 'unknown|' + uuidv4(),
             pseudo: player.getName(),
+            createdAt: new Date(),
+            slug: '',
             isBot: false,
             isGuest: false,
         };

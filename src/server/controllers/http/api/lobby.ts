@@ -7,7 +7,6 @@ import Container from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
 import { normalize } from '../../../../shared/app/serializer';
-import logger from '../../../services/logger';
 
 export default (): Router => {
     const router = Router();
@@ -28,22 +27,15 @@ export default (): Router => {
             return;
         }
 
-        const host = new AppPlayer(playerData);
         const gameOptions = sanitizeGameOptions(req.body);
-        const hostedGame = hostedGameRepository.createGame(host, gameOptions);
+        const host = new AppPlayer(playerData);
+        let opponent: null | AppPlayer = null;
 
-        switch (gameOptions.opponent.type) {
-            case 'player':
-                // do nothing, let empty
-                break;
-
-            case 'ai':
-                hostedGame.playerJoin(createAIPlayer(gameOptions));
-                break;
-
-            default:
-                logger.error('Unexpected opponent type.', { type: gameOptions.opponent.type });
+        if ('ai' === gameOptions.opponent.type) {
+            opponent = createAIPlayer(gameOptions);
         }
+
+        const hostedGame = hostedGameRepository.createGame(host, gameOptions, opponent);
 
         res.send(normalize(hostedGame.toData()));
     });
