@@ -86,7 +86,7 @@
     "http-proxy-middleware": "^2.0.1",
     "mocha": "^10.1.0",
     "mocha.parallel": "^0.15.6",
-    "prisma": "^5.7.1",
+    "prisma": "^5.8.1",
     "sass": "^1.69.7",
     "sass-loader": "^13.3.3",
     "style-loader": "^3.3.1",
