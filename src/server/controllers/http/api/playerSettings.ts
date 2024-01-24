@@ -1,36 +1,20 @@
 import { Container } from 'typedi';
 import { Router, json } from 'express';
-import PlayerRepository from '../../../repositories/PlayerRepository';
 import PlayerSettingsRepository from '../../../repositories/PlayerSettingsRepository';
-import { PlayerData } from '@shared/app/Types';
+import { authenticated } from '../middlewares';
 
 export default (): Router => {
     const router = Router();
-    const playerRepository = Container.get(PlayerRepository);
     const playerSettingsRepository = Container.get(PlayerSettingsRepository);
 
-    router.get('/api/player-settings', async (req, res) => {
-        let playerData: null | PlayerData = null;
-
-        if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
-            res.status(403).send('not authenticated').end();
-            return;
-        }
-
-        const playerSettingsData = await playerSettingsRepository.getPlayerSettings(playerData.publicId);
+    router.get('/api/player-settings', authenticated, async (req, res) => {
+        const playerSettingsData = await playerSettingsRepository.getPlayerSettings(res.locals.playerData.publicId);
 
         res.send(playerSettingsData).end();
     });
 
-    router.patch('/api/player-settings', json(), async (req, res) => {
-        let playerData: null | PlayerData = null;
-
-        if (!req.session.playerId || null === (playerData = await playerRepository.getPlayer(req.session.playerId))) {
-            res.status(403).send('not authenticated').end();
-            return;
-        }
-
-        const playerSettingsData = await playerSettingsRepository.updatePlayerSettings(playerData.publicId, req.body);
+    router.patch('/api/player-settings', authenticated, json(), async (req, res) => {
+        const playerSettingsData = await playerSettingsRepository.updatePlayerSettings(res.locals.playerData.publicId, req.body);
 
         res.send(playerSettingsData).end();
     });

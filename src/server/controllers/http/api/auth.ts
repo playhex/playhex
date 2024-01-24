@@ -5,6 +5,7 @@ import { authenticate } from '../../../services/security/authentication';
 import { normalize } from '../../../../shared/app/serializer';
 import { PlayerData } from '@shared/app/Types';
 import { transformPlayer } from '../../../serialization/Player';
+import { authenticated } from '../middlewares';
 
 export default (): Router => {
     const router = Router();
@@ -63,22 +64,8 @@ export default (): Router => {
         res.send(normalize(transformPlayer(player))).end();
     });
 
-    router.get('/api/auth/me', async (req, res) => {
-        const { playerId } = req.session;
-
-        if (!playerId) {
-            res.sendStatus(403).end();
-            return;
-        }
-
-        const player = await playerRepository.getPlayer(playerId);
-
-        if (null === player) {
-            res.sendStatus(403).end();
-            return;
-        }
-
-        res.send(normalize(transformPlayer(player))).end();
+    router.get('/api/auth/me', authenticated, async (req, res) => {
+        res.send(normalize(transformPlayer(res.locals.playerData))).end();
     });
 
     router.delete('/api/auth/logout', async (req, res) => {
