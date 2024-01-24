@@ -366,19 +366,6 @@ export default class HostedGame
                 startedAt: this.game.getStartedAt(),
                 lastMoveAt: this.game.getLastMoveAt(),
                 endedAt: this.game.getEndedAt(),
-                hexes: this.game.getBoard().getCells().map(
-                    row => row
-                        .map(
-                            cell => null === cell
-                                ? '.' :
-                                (cell
-                                    ? '1'
-                                    : '0'
-                                ),
-                        )
-                        .join('')
-                    ,
-                ),
             };
         }
 

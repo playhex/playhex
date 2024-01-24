@@ -43,15 +43,6 @@ export type GameData = {
     currentPlayerIndex: PlayerIndex;
     winner: null | PlayerIndex;
     outcome: null | Outcome;
-
-    /**
-     * Serialized board:
-     *      '...1..0..',
-     *      '.110..000',
-     *      ...
-     */
-    hexes: string[];
-
     createdAt: Date;
     startedAt: null | Date;
     lastMoveAt: null | Date;

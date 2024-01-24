@@ -13,7 +13,7 @@ describe('Resign a game', () => {
 
         // Play at least one move to have Resign button
         cy.get('canvas');
-        cy.get('body').click(506, 497);
+        cy.get('body').click(409, 326);
 
         cy
             .contains('Resign')
