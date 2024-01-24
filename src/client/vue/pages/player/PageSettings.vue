@@ -80,7 +80,7 @@ watch(
     </div>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 h3
     margin 1em 0 0.5em 0
 </style>

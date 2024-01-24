@@ -216,7 +216,7 @@ const clickLogout = async () => {
     </div>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .icon
     font-size 8em
     border-radius 100%
