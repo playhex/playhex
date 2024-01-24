@@ -38,8 +38,18 @@ const router = useRouter();
 const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 const confirmMove: Ref<null | (() => void)> = ref(null);
 
-const shouldConfirmMove = (): boolean => {
-    if (null === playerSettings.value || null === hostedGameClient.value) {
+const shouldDisplayConfirmMove = (): boolean => {
+    if (null === hostedGameClient.value || null === playerSettings.value) {
+        return false;
+    }
+
+    // I am watcher
+    if (null === getLocalAppPlayer()) {
+        return false;
+    }
+
+    // Game has ended. Still display button when game is not yet started to make sure it works
+    if ('ended' === hostedGameClient.value.getState()) {
         return false;
     }
 
@@ -86,7 +96,7 @@ const listenHexClick = () => {
                 return;
             }
 
-            if (!shouldConfirmMove()) {
+            if (!shouldDisplayConfirmMove()) {
                 localAppPlayer.move(move);
                 return;
             }
@@ -258,7 +268,7 @@ const rematch = async (): Promise<void> => {
         <div class="container-fluid justify-content-center">
             <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
             <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
-            <button type="button" class="btn" v-if="shouldConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
+            <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
             <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
         </div>
     </nav>

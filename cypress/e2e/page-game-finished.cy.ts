@@ -72,7 +72,7 @@ describe('Page Game finished', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
             fixture: 'game-finished/game-not-started-canceled.json',
         });
-        cy.intercept('/auth/me-or-guest', {
+        cy.intercept('/api/auth/me-or-guest', {
             fixture: 'game-finished/game-not-started-canceled-guest.json',
         });
 

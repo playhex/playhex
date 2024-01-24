@@ -1,0 +1,154 @@
+{
+    "id": "dcd1701c-dd98-4d6e-8c05-efb887419e2f",
+    "host": {
+        "pseudo": "aa",
+        "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "aa",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "opponent": {
+        "publicId": "determinist-random-bot|ae05cfc9-4c4f-42f1-8d64-93b48f1a7f48",
+        "pseudo": "Determinist random bot",
+        "slug": "",
+        "isBot": true,
+        "isGuest": false,
+        "createdAt": "2024-01-25T10:32:11.323Z"
+    },
+    "timeControl": {
+        "options": {
+            "type": "fischer",
+            "options": {
+                "initialSeconds": 600,
+                "incrementSeconds": 5,
+                "maxSeconds": 600
+            }
+        },
+        "values": {
+            "state": "running",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": "2024-01-25T10:42:14.487Z"
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        }
+    },
+    "gameOptions": {
+        "boardsize": 11,
+        "firstPlayer": null,
+        "swapRule": true,
+        "opponent": {
+            "type": "ai"
+        },
+        "timeControl": {
+            "type": "fischer",
+            "options": {
+                "initialSeconds": 600,
+                "incrementSeconds": 5,
+                "maxSeconds": 600
+            }
+        }
+    },
+    "gameData": {
+        "players": [
+            {
+                "pseudo": "aa",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aa",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            },
+            {
+                "publicId": "determinist-random-bot|ae05cfc9-4c4f-42f1-8d64-93b48f1a7f48",
+                "pseudo": "Determinist random bot",
+                "slug": "",
+                "isBot": true,
+                "isGuest": false,
+                "createdAt": "2024-01-25T10:32:11.323Z"
+            }
+        ],
+        "size": 11,
+        "started": true,
+        "state": "playing",
+        "movesHistory": [
+            {
+                "row": 7,
+                "col": 4,
+                "playedAt": "2024-01-25T10:32:13.386Z"
+            },
+            {
+                "row": 3,
+                "col": 1,
+                "playedAt": "2024-01-25T10:32:13.386Z"
+            },
+            {
+                "row": 4,
+                "col": 5,
+                "playedAt": "2024-01-25T10:32:14.487Z"
+            },
+            {
+                "row": 6,
+                "col": 4,
+                "playedAt": "2024-01-25T10:32:14.487Z"
+            }
+        ],
+        "allowSwap": true,
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "createdAt": "2024-01-25T10:32:11.324Z",
+        "startedAt": "2024-01-25T10:32:11.324Z",
+        "lastMoveAt": "2024-01-25T10:32:14.487Z",
+        "endedAt": null
+    },
+    "canceled": false,
+    "createdAt": "2024-01-25T10:32:11.323Z",
+    "__meta": {
+        "values": {
+            "host.createdAt": [
+                "Date"
+            ],
+            "opponent.createdAt": [
+                "Date"
+            ],
+            "timeControl.values.players.0.totalRemainingTime": [
+                "Date"
+            ],
+            "gameData.players.0.createdAt": [
+                "Date"
+            ],
+            "gameData.players.1.createdAt": [
+                "Date"
+            ],
+            "gameData.createdAt": [
+                "Date"
+            ],
+            "gameData.startedAt": [
+                "Date"
+            ],
+            "gameData.lastMoveAt": [
+                "Date"
+            ],
+            "createdAt": [
+                "Date"
+            ]
+        },
+        "referentialEqualities": {
+            "host": [
+                "gameData.players.0"
+            ],
+            "opponent": [
+                "gameData.players.1"
+            ],
+            "timeControl.options.options": [
+                "gameOptions.timeControl.options"
+            ]
+        }
+    }
+}
