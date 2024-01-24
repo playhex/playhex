@@ -244,6 +244,11 @@ export default class HostedGameClient
             return false;
         }
 
+        // Cannot join if game has been canceled
+        if (this.hostedGameData.canceled) {
+            return false;
+        }
+
         // Cannot join as my own opponent
         if (this.hostedGameData.host.publicId === playerData.publicId) {
             return false;

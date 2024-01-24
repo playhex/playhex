@@ -37,12 +37,13 @@ export default class Hex extends Sprite
     private hexColor: Graphics;
     private highlight: Graphics;
 
-    constructor(initialValue: null | PlayerIndex = null)
-    {
+    constructor(
+        private playerIndex: null | PlayerIndex = null,
+    ) {
         super();
 
         this.redrawHex();
-        this.setPlayer(initialValue);
+        this.setPlayer(playerIndex);
 
         this.eventMode = 'static';
     }
@@ -160,16 +161,43 @@ export default class Hex extends Sprite
         };
     }
 
-    setPlayer(player: null | PlayerIndex): this
+    private updateColor(): void
     {
-        this.hexColor.visible = null !== player;
+        this.hexColor.visible = null !== this.playerIndex;
+        this.hexColor.alpha = 1;
 
-        if (null !== player) {
+        if (null !== this.playerIndex) {
             this.hexColor.tint = [
                 currentTheme.colorA,
                 currentTheme.colorB,
-            ][player];
+            ][this.playerIndex];
         }
+    }
+
+    setPlayer(playerIndex: null | PlayerIndex): this
+    {
+        this.playerIndex = playerIndex;
+        this.updateColor();
+
+        return this;
+    }
+
+    previewMove(playerIndex: PlayerIndex): this
+    {
+        this.hexColor.visible = true;
+        this.hexColor.alpha = 0.5;
+
+        this.hexColor.tint = [
+            currentTheme.colorA,
+            currentTheme.colorB,
+        ][playerIndex];
+
+        return this;
+    }
+
+    removePreviewMove(): this
+    {
+        this.updateColor();
 
         return this;
     }

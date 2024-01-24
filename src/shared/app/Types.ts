@@ -3,7 +3,7 @@ import { PlayerIndex } from '../game-engine';
 import { GameState, Outcome } from 'game-engine/Game';
 import { GameOptionsData } from './GameOptions';
 import TimeControlType from '../time-control/TimeControlType';
-import { Player } from '@prisma/client';
+import { Player, PlayerSettings } from '@prisma/client';
 
 export type Tuple<T> = [T, T];
 
@@ -90,3 +90,9 @@ export type OnlinePlayersData = {
     totalPlayers: number;
     players: { [key: string]: PlayerData };
 };
+
+export type PlayerSettingsData = Pick<PlayerSettings,
+    'confirmMoveBlitz'
+    | 'confirmMoveNormal'
+    | 'confirmMoveCorrespondance'
+>;

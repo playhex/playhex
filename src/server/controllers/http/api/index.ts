@@ -4,6 +4,7 @@ import gameRoutes from './game';
 import playerRoutes from './player';
 import authRoutes from './auth';
 import onlinePlayersRoutes from './onlinePlayers';
+import playerSettingsRoutes from './playerSettings';
 
 export default function apiRouter() {
     const router = Router();
@@ -15,6 +16,7 @@ export default function apiRouter() {
     router.use(lobbyRoutes());
     router.use(authRoutes());
     router.use(onlinePlayersRoutes());
+    router.use(playerSettingsRoutes());
 
     router.all('/api/**', (req, res) => {
         res.status(404).send({

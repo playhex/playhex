@@ -1,4 +1,4 @@
-import { Game, Move, PlayerIndex } from '.';
+import { Game, IllegalMove, Move, PlayerIndex } from '.';
 
 /**
  * State of a game.
@@ -64,6 +64,20 @@ export default class PlayerGameInput
     hasSwapMove(): boolean
     {
         return this.game.hasSwapMove();
+    }
+
+    checkMove(move: Move): true | string
+    {
+        try {
+            this.game.checkMove(move, this.playerIndex);
+            return true;
+        } catch (e) {
+            if (e instanceof IllegalMove) {
+                return e.message;
+            }
+
+            throw e;
+        }
     }
 
     /**

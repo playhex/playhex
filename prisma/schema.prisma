@@ -11,12 +11,21 @@ datasource db {
 }
 
 model Player {
-  id        Int      @id @default(autoincrement())
-  publicId  String   @unique @db.Char(36)
-  pseudo    String   @unique @db.VarChar(34)
-  slug      String   @unique @db.VarChar(34)
-  password  String?  @db.Char(60)
-  isGuest   Boolean  @default(false)
-  isBot     Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id        Int             @id @default(autoincrement())
+  publicId  String          @unique @db.Char(36)
+  pseudo    String          @unique @db.VarChar(34)
+  slug      String          @unique @db.VarChar(34)
+  password  String?         @db.Char(60)
+  isGuest   Boolean         @default(false)
+  isBot     Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  settings  PlayerSettings?
+}
+
+model PlayerSettings {
+  player                    Player  @relation(fields: [playerId], references: [id])
+  playerId                  Int     @unique
+  confirmMoveBlitz          Boolean @default(false)
+  confirmMoveNormal         Boolean @default(false)
+  confirmMoveCorrespondance Boolean @default(true)
 }

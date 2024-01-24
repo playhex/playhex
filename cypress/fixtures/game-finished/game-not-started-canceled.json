@@ -1,0 +1,68 @@
+{
+    "id": "b6c71361-dc9f-4952-8a05-f7b5b36984e1",
+    "host": {
+        "pseudo": "aa",
+        "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "aa",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "opponent": null,
+    "timeControl": {
+        "options": {
+            "type": "fischer",
+            "options": {
+                "initialSeconds": 600,
+                "incrementSeconds": 5,
+                "maxSeconds": 600
+            }
+        },
+        "values": {
+            "state": "over",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        }
+    },
+    "gameOptions": {
+        "boardsize": 11,
+        "firstPlayer": null,
+        "swapRule": true,
+        "opponent": {
+            "type": "player"
+        },
+        "timeControl": {
+            "type": "fischer",
+            "options": {
+                "initialSeconds": 600,
+                "incrementSeconds": 5,
+                "maxSeconds": 600
+            }
+        }
+    },
+    "gameData": null,
+    "canceled": true,
+    "createdAt": "2024-01-24T20:20:48.826Z",
+    "__meta": {
+        "values": {
+            "host.createdAt": [
+                "Date"
+            ],
+            "createdAt": [
+                "Date"
+            ]
+        },
+        "referentialEqualities": {
+            "timeControl.options.options": [
+                "gameOptions.timeControl.options"
+            ]
+        }
+    }
+}

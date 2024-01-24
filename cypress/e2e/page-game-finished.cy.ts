@@ -1,7 +1,7 @@
 describe('Page Game finished', () => {
     it('displays win popin, and review options', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'game-finished.json',
+            fixture: 'game-finished/game-finished.json',
         });
 
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
@@ -16,12 +16,12 @@ describe('Page Game finished', () => {
 
         // Assert review links. Download SGF and HexWorld link.
         cy.contains('button', 'SGF');
-        cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#9,a3a6d9b6h8c6h1d6f1e6e7f6a2g6h4h6g1i6');
+        cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#11,g3h6i3i8b8g6d5i5e7k5c9f6e8e6e3d7a6c6h2a7i10b7b6d6c2j4d4e10b11k4');
     });
 
     it('displays win popin when a player resigned', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'game-resigned.json',
+            fixture: 'game-finished/game-resigned.json',
         });
 
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
@@ -37,7 +37,7 @@ describe('Page Game finished', () => {
 
     it('displays win popin when game has been canceled', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'game-canceled.json',
+            fixture: 'game-finished/game-canceled.json',
         });
 
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
@@ -50,7 +50,7 @@ describe('Page Game finished', () => {
 
     it('displays win popin when game has been canceled before being started', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'game-not-started-canceled.json',
+            fixture: 'game-finished/game-not-started-canceled.json',
         });
 
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
@@ -63,14 +63,17 @@ describe('Page Game finished', () => {
 
         cy.contains('Game finished');
         cy.contains('Game has been canceled.');
+
+        cy.contains('Ok, close').click();
+        cy.contains('Accept').should('not.exist');
     });
 
     it('as host, Cancel button no longer appears when game is already canceled', () => {
         cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'game-not-started-canceled.json',
+            fixture: 'game-finished/game-not-started-canceled.json',
         });
         cy.intercept('/auth/me-or-guest', {
-            fixture: 'game-not-started-canceled-guest.json',
+            fixture: 'game-finished/game-not-started-canceled-guest.json',
         });
 
         cy.visit('/games/00000000-0000-0000-0000-000000000000');

@@ -1,4 +1,4 @@
-import { HostedGameData, OnlinePlayersData, PlayerData } from '@shared/app/Types';
+import { HostedGameData, OnlinePlayersData, PlayerData, PlayerSettingsData } from '@shared/app/Types';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
@@ -238,6 +238,30 @@ export const apiGetOnlinePlayers = async (): Promise<OnlinePlayersData> => {
         headers: {
             'Accept': 'application/json',
         },
+    });
+
+    return response.json();
+};
+
+export const apiGetPlayerSettings = async (): Promise<PlayerSettingsData> => {
+    const response = await fetch(`/api/player-settings`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return response.json();
+};
+
+export const apiPatchPlayerSettings = async (playerSettingsData: PlayerSettingsData): Promise<PlayerSettingsData> => {
+    const response = await fetch(`/api/player-settings`, {
+        method: 'PATCH',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(playerSettingsData),
     });
 
     return response.json();

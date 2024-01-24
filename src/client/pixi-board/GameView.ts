@@ -102,6 +102,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private displayCoords = false;
     private swapable: SwapableSprite;
     private swaped: SwapedSprite;
+    private previewedMove: null | { coords: Coords, playerIndex: PlayerIndex } = null;
 
     private themeSwitchedListener = () => this.redraw();
     private resizeDebouncedListener = () => this.resizeRendererAndRedraw();
@@ -172,6 +173,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.createAndAddHexes();
         this.highlightSidesFromGame();
+
+        if (null !== this.previewedMove) {
+            const { coords, playerIndex } = this.previewedMove;
+            this.hexes[coords.row][coords.col].previewMove(playerIndex);
+        }
 
         this.gameContainer.addChild(
             this.swapable,
@@ -631,9 +637,28 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this;
     }
 
-    getHex(rowCol: { row: number, col: number }): Hex
+    previewMove(coords: Coords, playerIndex: PlayerIndex): this
     {
-        return this.hexes[rowCol.row][rowCol.col];
+        this.removePreviewMove();
+
+        this.hexes[coords.row][coords.col].previewMove(playerIndex);
+        this.previewedMove = { coords, playerIndex };
+
+        return this;
+    }
+
+    removePreviewMove(): this
+    {
+        if (null === this.previewedMove) {
+            return this;
+        }
+
+        const { row, col } = this.previewedMove.coords;
+
+        this.hexes[row][col].removePreviewMove();
+        this.previewedMove = null;
+
+        return this;
     }
 
     destroy(): void

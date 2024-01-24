@@ -1,5 +1,5 @@
-describe('Resign a game', () => {
-    it('displays button to resign a game', () => {
+describe('Cancel a game', () => {
+    it('displays button to cancel a game', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 

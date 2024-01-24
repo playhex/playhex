@@ -31,6 +31,15 @@ export default class Player extends TypedEmitter<PlayerEvents> implements Player
         this.playerGameInput = playerGameInput;
     }
 
+    checkMove(move: Move): true | string
+    {
+        if (null === this.playerGameInput) {
+            throw new Error('Cannot move, no player game input provided.');
+        }
+
+        return this.playerGameInput.checkMove(move);
+    }
+
     /**
      * @throws IllegalMove on invalid move.
      */

@@ -1,0 +1,297 @@
+{
+    "id": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "pseudo": "Test player",
+        "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "test-player",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "opponent": {
+        "publicId": "determinist-random-bot|5cb5cf43-803e-422f-867d-9e751e5e3758",
+        "pseudo": "Determinist random bot",
+        "slug": "",
+        "isBot": true,
+        "isGuest": false,
+        "createdAt": "2024-01-24T20:18:49.470Z"
+    },
+    "timeControl": {
+        "options": {
+            "type": "fischer",
+            "options": {
+                "initialSeconds": 600,
+                "incrementSeconds": 5,
+                "maxSeconds": 600
+            }
+        },
+        "values": {
+            "state": "over",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        }
+    },
+    "gameOptions": {
+        "boardsize": 11,
+        "firstPlayer": 1,
+        "swapRule": true,
+        "opponent": {
+            "type": "ai"
+        },
+        "timeControl": {
+            "type": "fischer",
+            "options": {
+                "initialSeconds": 600,
+                "incrementSeconds": 5,
+                "maxSeconds": 600
+            }
+        }
+    },
+    "gameData": {
+        "players": [
+            {
+                "publicId": "determinist-random-bot|5cb5cf43-803e-422f-867d-9e751e5e3758",
+                "pseudo": "Determinist random bot",
+                "slug": "",
+                "isBot": true,
+                "isGuest": false,
+                "createdAt": "2024-01-24T20:18:49.470Z"
+            },
+            {
+                "pseudo": "Test player",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "test-player",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
+        ],
+        "size": 11,
+        "started": true,
+        "state": "ended",
+        "movesHistory": [
+            {
+                "row": 2,
+                "col": 6,
+                "playedAt": "2024-01-24T20:18:49.471Z"
+            },
+            {
+                "row": 5,
+                "col": 7,
+                "playedAt": "2024-01-24T20:18:50.124Z"
+            },
+            {
+                "row": 2,
+                "col": 8,
+                "playedAt": "2024-01-24T20:18:50.125Z"
+            },
+            {
+                "row": 7,
+                "col": 8,
+                "playedAt": "2024-01-24T20:18:50.736Z"
+            },
+            {
+                "row": 7,
+                "col": 1,
+                "playedAt": "2024-01-24T20:18:50.736Z"
+            },
+            {
+                "row": 5,
+                "col": 6,
+                "playedAt": "2024-01-24T20:18:51.384Z"
+            },
+            {
+                "row": 4,
+                "col": 3,
+                "playedAt": "2024-01-24T20:18:51.385Z"
+            },
+            {
+                "row": 4,
+                "col": 8,
+                "playedAt": "2024-01-24T20:18:51.761Z"
+            },
+            {
+                "row": 6,
+                "col": 4,
+                "playedAt": "2024-01-24T20:18:51.762Z"
+            },
+            {
+                "row": 4,
+                "col": 10,
+                "playedAt": "2024-01-24T20:18:52.227Z"
+            },
+            {
+                "row": 8,
+                "col": 2,
+                "playedAt": "2024-01-24T20:18:52.228Z"
+            },
+            {
+                "row": 5,
+                "col": 5,
+                "playedAt": "2024-01-24T20:18:53.420Z"
+            },
+            {
+                "row": 7,
+                "col": 4,
+                "playedAt": "2024-01-24T20:18:53.421Z"
+            },
+            {
+                "row": 5,
+                "col": 4,
+                "playedAt": "2024-01-24T20:18:53.650Z"
+            },
+            {
+                "row": 2,
+                "col": 4,
+                "playedAt": "2024-01-24T20:18:53.651Z"
+            },
+            {
+                "row": 6,
+                "col": 3,
+                "playedAt": "2024-01-24T20:18:54.106Z"
+            },
+            {
+                "row": 5,
+                "col": 0,
+                "playedAt": "2024-01-24T20:18:54.108Z"
+            },
+            {
+                "row": 5,
+                "col": 2,
+                "playedAt": "2024-01-24T20:18:55.250Z"
+            },
+            {
+                "row": 1,
+                "col": 7,
+                "playedAt": "2024-01-24T20:18:55.251Z"
+            },
+            {
+                "row": 6,
+                "col": 0,
+                "playedAt": "2024-01-24T20:18:55.640Z"
+            },
+            {
+                "row": 9,
+                "col": 8,
+                "playedAt": "2024-01-24T20:18:55.641Z"
+            },
+            {
+                "row": 6,
+                "col": 1,
+                "playedAt": "2024-01-24T20:18:55.975Z"
+            },
+            {
+                "row": 5,
+                "col": 1,
+                "playedAt": "2024-01-24T20:18:55.976Z"
+            },
+            {
+                "row": 5,
+                "col": 3,
+                "playedAt": "2024-01-24T20:18:56.375Z"
+            },
+            {
+                "row": 1,
+                "col": 2,
+                "playedAt": "2024-01-24T20:18:56.376Z"
+            },
+            {
+                "row": 3,
+                "col": 9,
+                "playedAt": "2024-01-24T20:18:57.565Z"
+            },
+            {
+                "row": 3,
+                "col": 3,
+                "playedAt": "2024-01-24T20:18:57.566Z"
+            },
+            {
+                "row": 9,
+                "col": 4,
+                "playedAt": "2024-01-24T20:18:58.833Z"
+            },
+            {
+                "row": 10,
+                "col": 1,
+                "playedAt": "2024-01-24T20:18:58.834Z"
+            },
+            {
+                "row": 3,
+                "col": 10,
+                "playedAt": "2024-01-24T20:18:59.585Z"
+            }
+        ],
+        "allowSwap": true,
+        "currentPlayerIndex": 1,
+        "winner": 1,
+        "outcome": null,
+        "createdAt": "2024-01-24T20:18:49.470Z",
+        "startedAt": "2024-01-24T20:18:49.470Z",
+        "lastMoveAt": "2024-01-24T20:18:59.586Z",
+        "endedAt": "2024-01-24T20:18:59.586Z",
+        "hexes": [
+            "...........",
+            "..0....0...",
+            "....0.0.0..",
+            "...0.....11",
+            "...0....1.1",
+            "00111111...",
+            "11.10......",
+            ".0..0...1..",
+            "..0........",
+            "....1...0..",
+            ".0........."
+        ]
+    },
+    "canceled": false,
+    "createdAt": "2024-01-24T20:18:49.470Z",
+    "__meta": {
+        "values": {
+            "host.createdAt": [
+                "Date"
+            ],
+            "opponent.createdAt": [
+                "Date"
+            ],
+            "gameData.players.0.createdAt": [
+                "Date"
+            ],
+            "gameData.players.1.createdAt": [
+                "Date"
+            ],
+            "gameData.createdAt": [
+                "Date"
+            ],
+            "gameData.startedAt": [
+                "Date"
+            ],
+            "gameData.lastMoveAt": [
+                "Date"
+            ],
+            "gameData.endedAt": [
+                "Date"
+            ],
+            "createdAt": [
+                "Date"
+            ]
+        },
+        "referentialEqualities": {
+            "host": [
+                "gameData.players.1"
+            ],
+            "opponent": [
+                "gameData.players.0"
+            ],
+            "timeControl.options.options": [
+                "gameOptions.timeControl.options"
+            ]
+        }
+    }
+}

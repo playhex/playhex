@@ -7,13 +7,16 @@ import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from 'HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
-import { onUnmounted } from 'vue';
+import { Ref, onUnmounted } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import AppPlayer from '@shared/app/AppPlayer';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconX, BIconAlphabet } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconX, BIconCheck, BIconAlphabet } from 'bootstrap-icons-vue';
+import usePlayerSettingsStore from '../../stores/playerSettingsStore';
+import { storeToRefs } from 'pinia';
 
 const { gameId } = useRoute().params;
 
@@ -28,6 +31,24 @@ if (Array.isArray(gameId)) {
 
 const lobbyStore = useLobbyStore();
 const router = useRouter();
+
+/*
+ * Confirm move
+ */
+const { playerSettings } = storeToRefs(usePlayerSettingsStore());
+const confirmMove: Ref<null | (() => void)> = ref(null);
+
+const shouldConfirmMove = (): boolean => {
+    if (null === playerSettings.value || null === hostedGameClient.value) {
+        return false;
+    }
+
+    return {
+        blitz: playerSettings.value.confirmMoveBlitz,
+        normal: playerSettings.value.confirmMoveNormal,
+        correspondance: playerSettings.value.confirmMoveCorrespondance,
+    }[timeControlToCadencyName(hostedGameClient.value.getHostedGameData())];
+};
 
 /*
  * Join/leave game room.
@@ -61,7 +82,22 @@ const listenHexClick = () => {
                 return;
             }
 
-            localAppPlayer.move(move);
+            if (true !== localAppPlayer.checkMove(move)) {
+                return;
+            }
+
+            if (!shouldConfirmMove()) {
+                localAppPlayer.move(move);
+                return;
+            }
+
+            confirmMove.value = () => {
+                gameView?.removePreviewMove();
+                localAppPlayer.move(move);
+                confirmMove.value = null;
+            };
+
+            gameView?.previewMove(move, localAppPlayer.getPlayerIndex());
         } catch (e) {
             console.log('Move not played: ' + e);
         }
@@ -220,8 +256,9 @@ const rematch = async (): Promise<void> => {
 
     <nav class="menu-game navbar">
         <div class="container-fluid justify-content-center">
-            <button type="button" class="btn btn-link" v-if="canResign()" @click="resign()"><b-icon-flag /> Resign</button>
+            <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
             <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
+            <button type="button" class="btn" v-if="shouldConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
             <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
         </div>
     </nav>
