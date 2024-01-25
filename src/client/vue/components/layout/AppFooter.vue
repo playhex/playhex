@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconChatDots, BIconGithub } from 'bootstrap-icons-vue';
+import { BIconBookmarks, BIconChatDots, BIconGithub } from 'bootstrap-icons-vue';
 
 /* global LAST_COMMIT_DATE */
 // @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
@@ -10,7 +10,6 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
     <div class="container-fluid footer">
         <div class="d-flex justify-content-center gap-4">
             <p>Hex online board game</p>
-            <router-link :to="{ name: 'links' }">Useful Hex links</router-link>
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
             <a href="https://feedback.alcalyn.app" target="_blank">
@@ -23,6 +22,11 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
                 <br>
                 Github
             </a>
+            <router-link :to="{ name: 'links' }">
+                <b-icon-bookmarks class="text-body" />
+                <br>
+                Hex links
+            </router-link>
         </div>
         <p class="infos d-flex flex-column flex-md-row justify-content-center gap-md-4 text-center">
             <span>Project under development</span>
