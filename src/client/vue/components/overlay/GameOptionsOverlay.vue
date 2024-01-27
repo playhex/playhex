@@ -39,7 +39,6 @@ const defaultTimeControls: { [key: string]: TimeControlType } = {
         options: {
             initialSeconds: 300,
             incrementSeconds: 2,
-            maxSeconds: 300,
         },
     },
     'Normal 10&nbsp;+&nbsp;5': {
@@ -47,7 +46,13 @@ const defaultTimeControls: { [key: string]: TimeControlType } = {
         options: {
             initialSeconds: 600,
             incrementSeconds: 5,
-            maxSeconds: 600,
+        },
+    },
+    'Long 30&nbsp;+&nbsp;15': {
+        type: 'fischer',
+        options: {
+            initialSeconds: 1800,
+            incrementSeconds: 15,
         },
     },
 };
@@ -55,47 +60,118 @@ const defaultTimeControls: { [key: string]: TimeControlType } = {
 // Must be different that predefined ones,
 // or "Custom" will be select first on Game option popin open
 const customTimeControl: Ref<TimeControlType> = ref({
-    type: 'byoyomi',
+    type: 'fischer',
     options: {
-        initialSeconds: 300,
-        periodSeconds: 10,
-        periodsCount: 5,
-
+        initialSeconds: 600,
         incrementSeconds: 5,
-        maxSeconds: 300,
-
-        secondsPerMove: 20,
-
-        secondsPerPlayer: 600,
     },
 });
 
 const showCustomTimeControl = ref(false);
-const timeControlTypes: { type: TimeControlType['type'], label: string }[] = [
-    { type: 'simple', label: 'Simple' },
-    { type: 'absolute', label: 'Absolute' },
-    { type: 'fischer', label: 'Fischer' },
-    { type: 'byoyomi', label: 'Byo Yomi' },
-];
 
 const preSelectedTimeControl = Object.values(defaultTimeControls).pop();
+
+const initialTimeSteps: { seconds: number, label: string }[] = [
+    { seconds: 5, label: '5s' },
+    { seconds: 10, label: '10s' },
+    { seconds: 15, label: '15s' },
+    { seconds: 30, label: '30s' },
+    { seconds: 45, label: '45s' },
+    { seconds: 60, label: '1min' },
+    { seconds: 90, label: '1min30s' },
+    { seconds: 60 * 2, label: '2min' },
+    { seconds: 60 * 3, label: '3min' },
+    { seconds: 60 * 4, label: '4min' },
+    { seconds: 60 * 5, label: '5min' },
+    { seconds: 60 * 7, label: '7min' },
+    { seconds: 60 * 10, label: '10min' },
+    { seconds: 60 * 12, label: '12min' },
+    { seconds: 60 * 15, label: '15min' },
+    { seconds: 60 * 20, label: '20min' },
+    { seconds: 60 * 25, label: '25min' },
+    { seconds: 60 * 30, label: '30min' },
+    { seconds: 60 * 40, label: '40min' },
+    { seconds: 60 * 45, label: '45min' },
+    { seconds: 60 * 60, label: '1h' },
+    { seconds: 60 * 75, label: '1h15' },
+    { seconds: 60 * 90, label: '1h30' },
+    { seconds: 60 * 120, label: '2h' },
+    { seconds: 60 * 150, label: '2h30' },
+    { seconds: 60 * 180, label: '3h' },
+];
+
+const secondaryTimeSteps: { seconds: number, label: string }[] = [
+    { seconds: 0, label: 'none' },
+    { seconds: 1, label: '1s' },
+    { seconds: 2, label: '2s' },
+    { seconds: 3, label: '3s' },
+    { seconds: 4, label: '4s' },
+    { seconds: 5, label: '5s' },
+    { seconds: 6, label: '6s' },
+    { seconds: 7, label: '7s' },
+    { seconds: 8, label: '8s' },
+    { seconds: 9, label: '9s' },
+    { seconds: 10, label: '10s' },
+    { seconds: 12, label: '12s' },
+    { seconds: 15, label: '15s' },
+    { seconds: 20, label: '20s' },
+    { seconds: 25, label: '25s' },
+    { seconds: 30, label: '30s' },
+    { seconds: 40, label: '40s' },
+    { seconds: 45, label: '45s' },
+    { seconds: 60, label: '1min' },
+    { seconds: 75, label: '1min15s' },
+    { seconds: 90, label: '1min30s' },
+    { seconds: 120, label: '2min' },
+    { seconds: 150, label: '2min30' },
+    { seconds: 180, label: '3min' },
+];
+
+const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t.seconds === 60 * 10));
+const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t => t.seconds === 5));
+const byoyomiPeriodsCount = ref(5);
 
 if (!preSelectedTimeControl) {
     throw new Error('No time control');
 }
 
 gameOptions.value.timeControl = preSelectedTimeControl;
+
 /*
  * Secondary options
  */
 const showSecondaryOptions = ref(false);
+
+/*
+ * Set data before sumbit form
+ */
+const submitForm = (gameOptions: GameOptionsData): void => {
+    if (showCustomTimeControl.value) {
+        if ('fischer' === gameOptions.timeControl.type) {
+            gameOptions.timeControl.options.initialSeconds = initialTimeSteps[initialTimeSelected.value].seconds;
+            gameOptions.timeControl.options.incrementSeconds = secondaryTimeSteps[secondaryTimeIncrementSelected.value].seconds;
+        }
+
+        if ('byoyomi' === gameOptions.timeControl.type) {
+            gameOptions.timeControl.options.initialSeconds = initialTimeSteps[initialTimeSelected.value].seconds;
+            gameOptions.timeControl.options.periodSeconds = secondaryTimeSteps[secondaryTimeIncrementSelected.value].seconds;
+            gameOptions.timeControl.options.periodsCount = byoyomiPeriodsCount.value;
+        }
+    }
+
+    if ('fischer' === gameOptions.timeControl.type) {
+        gameOptions.timeControl.options.maxSeconds = gameOptions.timeControl.options.initialSeconds;
+    }
+
+    confirm(sanitizeGameOptions(gameOptions));
+};
 </script>
 
 <template>
     <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit="e => {e.preventDefault(); confirm(sanitizeGameOptions(gameOptions))}">
+                <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ title }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
@@ -161,125 +237,28 @@ const showSecondaryOptions = ref(false);
                             </div>
                         </div>
 
-                        <div v-if="showCustomTimeControl" class="mb-3">
-                            <select v-model="customTimeControl.type" class="form-select">
-                                <option
-                                    v-for="timeControlType in timeControlTypes"
-                                    :value="timeControlType.type"
-                                >{{ timeControlType.label }}</option>
-                            </select>
-                        </div>
+                        <template v-if="showCustomTimeControl">
+                            <p v-if="'fischer' === gameOptions.timeControl.type"><strong class="min-w">Fischer</strong> <button @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">Use Byo-Yomi</button></p>
+                            <p v-else><strong class="min-w">Byo Yomi</strong> <button @click="() => gameOptions.timeControl.type = 'fischer'" class="btn btn-sm btn-link">Use Fischer</button></p>
 
-                        <div v-if="showCustomTimeControl && customTimeControl.type === 'simple'">
-                            <p class="mb-3">Players have a same time for every move.</p>
-                            <div class="mb-3">
-                                <label for="simple-time" class="form-label">Seconds per move</label>
-                                <input
-                                    v-model="customTimeControl.options.secondsPerMove"
-                                    type="number"
-                                    class="form-control"
-                                    id="simple-time"
-                                    min="10"
-                                    max="7200"
-                                >
-                            </div>
-                        </div>
+                            <div v-if="'fischer' === gameOptions.timeControl.type">
+                                <label for="custom-fischer-initial-time" class="form-label">Initial time: {{ initialTimeSteps[initialTimeSelected].label }}</label>
+                                <input type="range" class="form-range" id="custom-fischer-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
-                        <div v-if="showCustomTimeControl && customTimeControl.type === 'absolute'">
-                            <p class="mb-3">Players have a total time for the whole game.</p>
-                            <div class="mb-3">
-                                <label for="absolute-total-time" class="form-label">Total seconds per player</label>
-                                <input
-                                    v-model="customTimeControl.options.secondsPerPlayer"
-                                    type="number"
-                                    class="form-control"
-                                    id="absolute-total-time"
-                                    min="10"
-                                    max="7200"
-                                >
+                                <label for="custom-fischer-time-increment" class="form-label">Time increment: {{ secondaryTimeSteps[secondaryTimeIncrementSelected].label }}</label>
+                                <input type="range" class="form-range" id="custom-fischer-time-increment" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
                             </div>
-                        </div>
+                            <div v-if="'byoyomi' === gameOptions.timeControl.type">
+                                <label for="custom-byoyomi-initial-time" class="form-label">Initial time: {{ initialTimeSteps[initialTimeSelected].label }}</label>
+                                <input type="range" class="form-range" id="custom-byoyomi-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
-                        <div v-if="showCustomTimeControl && customTimeControl.type === 'fischer'">
-                            <p class="mb-3">
-                                Time control with an initial time for the whole game,
-                                and a time increment on every move played.
-                                Total time can me maxed to a given value.
-                            </p>
-                            <div class="mb-3">
-                                <label for="fischer-initial" class="form-label">Initial seconds per player</label>
-                                <input
-                                    v-model="customTimeControl.options.initialSeconds"
-                                    type="number"
-                                    class="form-control"
-                                    id="fischer-initial"
-                                    min="10"
-                                    max="7200"
-                                >
-                            </div>
-                            <div class="mb-3">
-                                <label for="fischer-increment" class="form-label">Seconds increment per move</label>
-                                <input
-                                    v-model="customTimeControl.options.incrementSeconds"
-                                    type="number"
-                                    class="form-control"
-                                    id="fischer-increment"
-                                    min="0"
-                                    max="120"
-                                >
-                            </div>
-                            <div class="mb-3">
-                                <label for="fischer-max" class="form-label">Max seconds</label>
-                                <input
-                                    v-model="customTimeControl.options.maxSeconds"
-                                    type="number"
-                                    class="form-control"
-                                    id="fischer-max"
-                                    min="0"
-                                    max="7200"
-                                >
-                            </div>
-                        </div>
+                                <label for="custom-byoyomi-perdiod-time" class="form-label">Period time: {{ secondaryTimeSteps[secondaryTimeIncrementSelected].label }}</label>
+                                <input type="range" class="form-range" id="custom-byoyomi-perdiod-time" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
 
-                        <div v-if="showCustomTimeControl && customTimeControl.type === 'byoyomi'">
-                            <p class="mb-3">
-                                Time control with an initial time, and then a fixed amound of time for every move.
-                                This last amount of time can be elapsed a few time.
-                            </p>
-                            <div class="mb-3">
-                                <label for="byoyomi-initial" class="form-label">Initial seconds per player</label>
-                                <input
-                                    v-model="customTimeControl.options.initialSeconds"
-                                    type="number"
-                                    class="form-control"
-                                    id="byoyomi-initial"
-                                    min="1"
-                                    max="7200"
-                                >
+                                <label for="custom-byoyomi-period-count" class="form-label">Periods count: {{ byoyomiPeriodsCount }}</label>
+                                <input type="range" class="form-range" id="custom-byoyomi-period-count" v-model="byoyomiPeriodsCount" min="0" max="15" step="1">
                             </div>
-                            <div class="mb-3">
-                                <label for="byoyomi-increment" class="form-label">Seconds of periods after initial time</label>
-                                <input
-                                    v-model="customTimeControl.options.periodSeconds"
-                                    type="number"
-                                    class="form-control"
-                                    id="byoyomi-periods-time"
-                                    min="1"
-                                    max="120"
-                                >
-                            </div>
-                            <div class="mb-3">
-                                <label for="byoyomi-max" class="form-label">Number of periods</label>
-                                <input
-                                    v-model="customTimeControl.options.periodsCount"
-                                    type="number"
-                                    class="form-control"
-                                    id="byoyomi-periods-count"
-                                    min="1"
-                                    max="50"
-                                >
-                            </div>
-                        </div>
+                        </template>
 
                         <button
                             v-if="showSecondaryOptions"
@@ -336,4 +315,8 @@ const showSecondaryOptions = ref(false);
 .btn-group-min-width
     .btn
         min-width 6em
+
+.min-w
+    display inline-block
+    min-width 6em
 </style>
