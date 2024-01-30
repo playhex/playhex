@@ -181,80 +181,52 @@ export default class Game extends TypedEmitter<GameEvents>
         return this.players[this.currentPlayerIndex];
     }
 
-    hasWinner(): boolean
+    otherPlayerIndex(): PlayerIndex
     {
-        return null !== this.winner;
+        return 0 === this.currentPlayerIndex
+            ? 1
+            : 0
+        ;
     }
 
-    isEnded(): boolean
+    private changeCurrentPlayer(): void
     {
-        return 'ended' === this.state;
+        this.currentPlayerIndex = this.otherPlayerIndex();
     }
 
-    getWinner(): null | PlayerIndex
+    private bindPlayers(players: Tuple<PlayerInterface>): void
     {
-        return this.winner;
+        players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
+        players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
+
+        this.on('played', () => {
+            if (!this.hasWinner()) {
+                players[this.currentPlayerIndex].emit('myTurnToPlay');
+            }
+        });
+
+        this.on('started', () => players[0].emit('myTurnToPlay'));
     }
 
-    getStrictWinner(): PlayerIndex
+    start(): void
     {
-        if (null === this.winner) {
-            throw new Error('Trying to strictly get the winner but game not finished or canceled');
+        if ('created' !== this.state) {
+            throw new Error('Game already started');
         }
 
-        return this.winner;
-    }
+        this.state = 'playing';
+        this.startedAt = new Date();
 
-    /**
-     * Just update properties, do not emit "ended" event.
-     * Should be emitted manually.
-     */
-    private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
-    {
-        this.state = 'ended';
-        this.winner = playerIndex;
-        this.outcome = outcome;
-        this.endedAt = new Date();
-    }
-
-    /**
-     * Change game state by setting a winner and emitting "ended" event.
-     */
-    declareWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
-    {
-        if (null !== this.winner) {
-            throw new Error('Cannot set a winner again, there is already a winner');
+        if (null !== this.players) {
+            this.bindPlayers(this.players);
         }
 
-        if (this.state === 'ended') {
-            throw new Error('Cannot set a winner, game is already ended, probably canceled');
-        }
-
-        this.setWinner(playerIndex, outcome);
-
-        this.emit('ended', playerIndex, outcome);
+        this.emit('started');
     }
 
-    cancel(): void
+    isStarted(): boolean
     {
-        if (this.state === 'ended') {
-            throw new Error('Cannot cancel, game already ended');
-        }
-
-        this.state = 'ended';
-        this.endedAt = new Date();
-
-        this.emit('canceled');
-    }
-
-    isCanceled(): boolean
-    {
-        return this.state === 'ended' && null === this.winner;
-    }
-
-    getOutcome(): Outcome
-    {
-        return this.outcome;
+        return 'created' !== this.state;
     }
 
     getMovesHistory(): Move[]
@@ -291,41 +263,6 @@ export default class Game extends TypedEmitter<GameEvents>
     getLastMoveIndex(): number
     {
         return this.movesHistory.length - 1;
-    }
-
-    private bindPlayers(players: Tuple<PlayerInterface>): void
-    {
-        players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
-        players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
-
-        this.on('played', () => {
-            if (!this.hasWinner()) {
-                players[this.currentPlayerIndex].emit('myTurnToPlay');
-            }
-        });
-
-        this.on('started', () => players[0].emit('myTurnToPlay'));
-    }
-
-    start(): void
-    {
-        if ('created' !== this.state) {
-            throw new Error('Game already started');
-        }
-
-        this.state = 'playing';
-        this.startedAt = new Date();
-
-        if (null !== this.players) {
-            this.bindPlayers(this.players);
-        }
-
-        this.emit('started');
-    }
-
-    isStarted(): boolean
-    {
-        return 'created' !== this.state;
     }
 
     /**
@@ -462,6 +399,82 @@ export default class Game extends TypedEmitter<GameEvents>
         this.emit('played', move, this.movesHistory.length - 1, byPlayerIndex, this.getWinner());
     }
 
+    hasWinner(): boolean
+    {
+        return null !== this.winner;
+    }
+
+    isEnded(): boolean
+    {
+        return 'ended' === this.state;
+    }
+
+    getWinner(): null | PlayerIndex
+    {
+        return this.winner;
+    }
+
+    getStrictWinner(): PlayerIndex
+    {
+        if (null === this.winner) {
+            throw new Error('Trying to strictly get the winner but game not finished or canceled');
+        }
+
+        return this.winner;
+    }
+
+    /**
+     * Just update properties, do not emit "ended" event.
+     * Should be emitted manually.
+     */
+    private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
+    {
+        this.state = 'ended';
+        this.winner = playerIndex;
+        this.outcome = outcome;
+        this.endedAt = new Date();
+    }
+
+    /**
+     * Change game state by setting a winner and emitting "ended" event.
+     */
+    declareWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
+    {
+        if (null !== this.winner) {
+            throw new Error('Cannot set a winner again, there is already a winner');
+        }
+
+        if (this.state === 'ended') {
+            throw new Error('Cannot set a winner, game is already ended, probably canceled');
+        }
+
+        this.setWinner(playerIndex, outcome);
+
+        this.emit('ended', playerIndex, outcome);
+    }
+
+    cancel(): void
+    {
+        if (this.state === 'ended') {
+            throw new Error('Cannot cancel, game already ended');
+        }
+
+        this.state = 'ended';
+        this.endedAt = new Date();
+
+        this.emit('canceled');
+    }
+
+    isCanceled(): boolean
+    {
+        return this.state === 'ended' && null === this.winner;
+    }
+
+    getOutcome(): Outcome
+    {
+        return this.outcome;
+    }
+
     /**
      * Makes playerIndex resign
      */
@@ -476,19 +489,6 @@ export default class Game extends TypedEmitter<GameEvents>
     loseByTime(): void
     {
         this.declareWinner(this.otherPlayerIndex(), 'time');
-    }
-
-    otherPlayerIndex(): PlayerIndex
-    {
-        return 0 === this.currentPlayerIndex
-            ? 1
-            : 0
-        ;
-    }
-
-    private changeCurrentPlayer(): void
-    {
-        this.currentPlayerIndex = this.otherPlayerIndex();
     }
 
     getCreatedAt(): Date
