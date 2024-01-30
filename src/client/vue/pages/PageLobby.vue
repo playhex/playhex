@@ -136,10 +136,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
                                 >Accept</button>
 
-                                <button
+                                <router-link
                                     class="btn me-3 btn-sm btn-link"
-                                    @click="goToGame(hostedGameClient.getId())"
-                                >Watch</button>
+                                    :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                >Watch</router-link>
                             </td>
                             <td><app-pseudo-with-online-status :playerData="hostedGameClient.getHostedGameData().host" /></td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
@@ -164,7 +164,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                             :key="hostedGameClient.getId()"
                         >
                             <td class="ps-0">
-                                <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Watch</button>
+                                <router-link
+                                    class="btn btn-sm btn-link"
+                                    :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                >Watch</router-link>
                             </td>
                             <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                 <template v-if="gameData">
@@ -189,7 +192,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 :key="hostedGameClient.getId()"
                             >
                                 <td class="ps-0">
-                                    <button class="btn btn-sm btn-link" @click="goToGame(hostedGameClient.getId())">Review</button>
+                                    <router-link
+                                        class="btn btn-sm btn-link"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                    >Review</router-link>
                                 </td>
                                 <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                     <template v-if="null !== gameData && null !== gameData.winner">
