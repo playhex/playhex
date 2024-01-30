@@ -62,14 +62,12 @@ const defaultTimeControls: { [key: string]: TimeControlType } = {
 const customTimeControl: Ref<TimeControlType> = ref({
     type: 'fischer',
     options: {
-        initialSeconds: 600,
+        initialSeconds: 480,
         incrementSeconds: 5,
     },
 });
 
 const showCustomTimeControl = ref(false);
-
-const preSelectedTimeControl = Object.values(defaultTimeControls).pop();
 
 const initialTimeSteps: { seconds: number, label: string }[] = [
     { seconds: 5, label: '5s' },
@@ -131,11 +129,7 @@ const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t
 const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t => t.seconds === 5));
 const byoyomiPeriodsCount = ref(5);
 
-if (!preSelectedTimeControl) {
-    throw new Error('No time control');
-}
-
-gameOptions.value.timeControl = preSelectedTimeControl;
+gameOptions.value.timeControl = defaultTimeControls['Normal 10&nbsp;+&nbsp;5'];
 
 /*
  * Secondary options
@@ -181,20 +175,10 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                             <h6><b-icon-aspect-ratio /> Board size</h6>
 
                             <div class="btn-group" role="group">
-                                <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="9" id="size-9">
-                                <label class="btn btn-outline-primary" for="size-9">9</label>
-
-                                <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="11" id="size-11">
-                                <label class="btn btn-outline-primary" for="size-11">11</label>
-
-                                <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="13" id="size-13">
-                                <label class="btn btn-outline-primary" for="size-13">13</label>
-
-                                <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="14" id="size-14">
-                                <label class="btn btn-outline-primary" for="size-14">14</label>
-
-                                <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="19" id="size-19">
-                                <label class="btn btn-outline-primary" for="size-19">19</label>
+                                <template v-for="size in [9, 11, 13, 14, 19]" :key="size">
+                                    <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="size" :id="'size-' + size">
+                                    <label class="btn btn-outline-primary" :for="'size-' + size">{{ size }}</label>
+                                </template>
 
                                 <input type="radio" name="boardsize-radio" class="btn-check" @click="showCustomBoardsize = true" id="size-custom">
                                 <label class="btn btn-outline-primary" for="size-custom">Custom</label>
@@ -238,8 +222,14 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                         </div>
 
                         <template v-if="showCustomTimeControl">
-                            <p v-if="'fischer' === gameOptions.timeControl.type"><strong class="min-w">Fischer</strong> <button @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">Use Byo-Yomi</button></p>
-                            <p v-else><strong class="min-w">Byo Yomi</strong> <button @click="() => gameOptions.timeControl.type = 'fischer'" class="btn btn-sm btn-link">Use Fischer</button></p>
+                            <div v-if="'fischer' === gameOptions.timeControl.type">
+                                <strong class="min-w">Fischer</strong>
+                                <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">Use Byo-Yomi</button>
+                            </div>
+                            <div v-else>
+                                <strong class="min-w">Byo Yomi</strong>
+                                <button type="button" @click="() => gameOptions.timeControl.type = 'fischer'" class="btn btn-sm btn-link">Use Fischer</button>
+                            </div>
 
                             <div v-if="'fischer' === gameOptions.timeControl.type">
                                 <label for="custom-fischer-initial-time" class="form-label">Initial time: {{ initialTimeSteps[initialTimeSelected].label }}</label>

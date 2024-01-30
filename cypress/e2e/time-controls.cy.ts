@@ -72,10 +72,16 @@ describe('Time controls', () => {
             .closest('div')
             .contains('Custom')
             .click()
-
-            .closest('.modal-content')
-            .get('select').select('Byo Yomi')
         ;
+
+        cy
+            .contains('Game options')
+            .closest('.modal-content')
+            .contains('Use Byo-Yomi')
+            .click()
+        ;
+
+        cy.contains('Periods count');
 
         cy
             .contains('Game options')
@@ -85,7 +91,7 @@ describe('Time controls', () => {
         ;
 
         cy.contains('Determinist random bot');
-        cy.contains('5:00 + 5x10s');
+        cy.contains('10:00 + 5x5s');
     });
 
     it('create a game with custom time control, Fischer', () => {
@@ -97,9 +103,6 @@ describe('Time controls', () => {
             .closest('div')
             .contains('Custom')
             .click()
-
-            .closest('.modal-content')
-            .get('select').select('Fischer')
         ;
 
         cy
@@ -110,6 +113,6 @@ describe('Time controls', () => {
         ;
 
         cy.contains('Determinist random bot');
-        cy.contains('5:00');
+        cy.contains('10:00');
     });
 });

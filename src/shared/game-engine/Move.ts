@@ -8,16 +8,6 @@ export default class Move implements Coords
         private playedAt: Date = new Date(),
     ) {}
 
-    getRow(): number
-    {
-        return this.row;
-    }
-
-    getCol(): number
-    {
-        return this.col;
-    }
-
     getPlayedAt(): Date
     {
         return this.playedAt;

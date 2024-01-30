@@ -341,7 +341,7 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new IllegalMove(move, 'Game is finished');
         }
 
-        if (!this.board.containsCoords(move.getRow(), move.getCol())) {
+        if (!this.board.containsCoords(move.row, move.col)) {
             throw new IllegalMove(move, 'Cell outside board');
         }
 
@@ -349,7 +349,7 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new IllegalMove(move, 'Not your turn');
         }
 
-        if (!this.board.isEmpty(move.getRow(), move.getCol()) && !this.isSwapPiecesMove(move, byPlayerIndex)) {
+        if (!this.board.isEmpty(move.row, move.col) && !this.isSwapPiecesMove(move, byPlayerIndex)) {
             throw new IllegalMove(move, 'This cell is already occupied');
         }
     }
@@ -368,7 +368,7 @@ export default class Game extends TypedEmitter<GameEvents>
             return;
         }
 
-        this.board.setCell(move.getRow(), move.getCol(), byPlayerIndex);
+        this.board.setCell(move.row, move.col, byPlayerIndex);
 
         this.movesHistory.push(move);
         this.lastMoveAt = new Date();
