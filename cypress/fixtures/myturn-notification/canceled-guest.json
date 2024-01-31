@@ -3,5 +3,13 @@
     "pseudo": "8201",
     "slug": "slug",
     "isGuest": true,
-    "isBot": false
+    "isBot": false,
+    "createdAt": "2024-01-19T12:00:00.000Z",
+    "__meta": {
+        "values": {
+            "createdAt": [
+                "Date"
+            ]
+        }
+    }
 }

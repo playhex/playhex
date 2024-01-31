@@ -3,9 +3,9 @@ import { Router } from 'express';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import { normalize } from '../../../../shared/app/serializer';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import { GameState } from '@shared/game-engine/Game';
 import { transformPlayer } from '../../../serialization/Player';
 import HttpError from '../HttpError';
+import { HostedGameState } from '@shared/app/Types';
 
 export default (): Router => {
     const router = Router();
@@ -49,7 +49,7 @@ export default (): Router => {
         }
 
         const { state: stateRaw } = req.query;
-        let state: null | GameState = null;
+        let state: null | HostedGameState = null;
 
         if ('string' === typeof stateRaw && (stateRaw === 'created' || stateRaw === 'playing' || stateRaw === 'ended')) {
             state = stateRaw;

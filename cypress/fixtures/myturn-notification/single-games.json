@@ -8,13 +8,22 @@
             "isGuest": true,
             "isBot": false
         },
-        "opponent": {
-            "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
-            "pseudo": "Determinist random bot",
-            "slug": "slug",
-            "isGuest": false,
-            "isBot": true
-        },
+        "players": [
+            {
+                "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
+                "pseudo": "Determinist random bot",
+                "slug": "slug",
+                "isGuest": false,
+                "isBot": true
+            },
+            {
+                "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                "pseudo": "1817",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
+            }
+        ],
         "gameTimeData": {
             "type": "absolute",
             "state": "over",
@@ -35,25 +44,7 @@
             }
         },
         "gameData": {
-            "players": [
-                {
-                    "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
-                    "pseudo": "Determinist random bot",
-                    "slug": "slug",
-                    "isGuest": false,
-                    "isBot": true
-                },
-                {
-                    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-                    "pseudo": "1817",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": false
-                }
-            ],
             "size": 7,
-            "started": true,
-            "state": "ended",
             "movesHistory": [
                 {
                     "row": 1,
@@ -134,12 +125,9 @@
             "lastMoveAt": "2023-12-22T15:14:40.711Z",
             "endedAt": "2023-12-22T15:14:40.711Z"
         },
-        "canceled": false,
+        "state": "ended",
         "__meta": {
             "values": {
-                "gameData.createdAt": [
-                    "Date"
-                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
@@ -148,14 +136,6 @@
                 ],
                 "gameData.endedAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "host": [
-                    "gameData.players.1"
-                ],
-                "opponent": [
-                    "gameData.players.0"
                 ]
             }
         }
@@ -169,13 +149,22 @@
             "isGuest": true,
             "isBot": false
         },
-        "opponent": {
-            "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
-            "pseudo": "Determinist random bot",
-            "slug": "slug",
-            "isGuest": false,
-            "isBot": true
-        },
+        "players": [
+            {
+                "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
+                "pseudo": "Determinist random bot",
+                "slug": "slug",
+                "isGuest": false,
+                "isBot": true
+            },
+            {
+                "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                "pseudo": "1817",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
+            }
+        ],
         "gameTimeData": {
             "type": "absolute",
             "state": "running",
@@ -196,25 +185,7 @@
             }
         },
         "gameData": {
-            "players": [
-                {
-                    "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
-                    "pseudo": "Determinist random bot",
-                    "slug": "slug",
-                    "isGuest": false,
-                    "isBot": true
-                },
-                {
-                    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-                    "pseudo": "1817",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": false
-                }
-            ],
             "size": 7,
-            "started": true,
-            "state": "playing",
             "movesHistory": [
                 {
                     "row": 1,
@@ -240,13 +211,10 @@
             "lastMoveAt": "2023-12-22T15:14:48.796Z",
             "endedAt": null
         },
-        "canceled": false,
+        "state": "playing",
         "__meta": {
             "values": {
                 "gameTimeData.players.1.totalRemainingTime": [
-                    "Date"
-                ],
-                "gameData.createdAt": [
                     "Date"
                 ],
                 "gameData.startedAt": [
@@ -254,14 +222,6 @@
                 ],
                 "gameData.lastMoveAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "host": [
-                    "gameData.players.1"
-                ],
-                "opponent": [
-                    "gameData.players.0"
                 ]
             }
         }

@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { sanitizeGameOptions } from '../../../../shared/app/GameOptions';
-import AppPlayer from '../../../../shared/app/AppPlayer';
 import { createAIPlayer } from '../../../services/AIManager';
 import Container from 'typedi';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
 import { normalize } from '../../../../shared/app/serializer';
 import { authenticated } from '../middlewares';
 import HttpError from '../HttpError';
+import { PlayerData } from '@shared/app/Types';
 
 export default (): Router => {
     const router = Router();
@@ -20,8 +20,8 @@ export default (): Router => {
 
     router.post('/api/games', authenticated, async (req, res) => {
         const gameOptions = sanitizeGameOptions(req.body);
-        const host = new AppPlayer(res.locals.playerData);
-        let opponent: null | AppPlayer = null;
+        const host = res.locals.playerData;
+        let opponent: null | PlayerData = null;
 
         if ('ai' === gameOptions.opponent.type) {
             opponent = createAIPlayer(gameOptions);

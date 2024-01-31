@@ -2,13 +2,15 @@ import { Move, PlayerIndex } from '@shared/game-engine';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
 import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
-import { apiPostCancel, apiPostGame, apiPostResign, getGame, getGames } from '@client/apiClient';
+import { apiPostGame, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { Outcome } from '@shared/game-engine/Game';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import useSocketStore from './socketStore';
 import { ref } from 'vue';
 import Rooms from '@shared/app/Rooms';
+import { Socket } from 'socket.io-client';
+import { HexClientToServerEvents, HexServerToClientEvents } from '../../shared/app/HexSocketEvents';
 
 /**
  * State synced with server, and methods to handle games and players.
@@ -25,7 +27,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const createGame = async (gameOptions?: GameOptionsData): Promise<HostedGameClient> => {
         const hostedGameData = await apiPostGame(gameOptions);
 
-        hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
+        hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
 
         return hostedGameClients.value[hostedGameData.id];
     };
@@ -46,7 +48,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             if (hostedGameClients.value[hostedGameData.id]) {
                 hostedGameClients.value[hostedGameData.id].updateFromHostedGameData(hostedGameData);
             } else {
-                hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
+                hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
             }
         });
     };
@@ -65,78 +67,47 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             return null;
         }
 
-        return hostedGameClients.value[gameId] = new HostedGameClient(hostedGameData);
-    };
-
-    /**
-     * Join a game to play if there is a free slot.
-     */
-    const joinGame = async (gameId: string): Promise<true | string> => {
-        return new Promise((resolve, reject) => {
-            socket.emit('joinGame', gameId, (answer: true | string) => {
-                if (true === answer) {
-                    resolve(answer);
-                }
-
-                reject(answer);
-            });
-        });
-    };
-
-    const move = async (gameId: string, move: Move): Promise<string | true> => {
-        return new Promise(resolve => {
-            socket.emit('move', gameId, move, result => {
-                resolve(result);
-            });
-        });
-    };
-
-    const resign = async (gameId: string): Promise<string | true> => {
-        return apiPostResign(gameId);
-    };
-
-    const cancel = async (gameId: string): Promise<string | true> => {
-        return apiPostCancel(gameId);
+        return hostedGameClients.value[gameId] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
     };
 
     const listenSocket = (): void => {
         socket.on('gameCreated', (hostedGameData: HostedGameData) => {
-            hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData);
+            hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         });
 
         socket.on('gameJoined', (gameId: string, playerData: PlayerData) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].playerJoined(playerData);
+                hostedGameClients.value[gameId].onServerPlayerJoined(playerData);
             }
         });
 
         socket.on('gameStarted', (hostedGameData: HostedGameData) => {
             if (hostedGameClients.value[hostedGameData.id]) {
-                hostedGameClients.value[hostedGameData.id].gameStarted(hostedGameData);
+                hostedGameClients.value[hostedGameData.id].onServerGameStarted(hostedGameData);
             }
         });
 
         socket.on('gameCanceled', (gameId: string) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].gameCanceled();
+                hostedGameClients.value[gameId].onServerGameCanceled();
             }
         });
 
         socket.on('moved', (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].gameMoved(new Move(move.row, move.col), moveIndex, byPlayerIndex);
+                hostedGameClients.value[gameId].onServerGameMoved(new Move(move.row, move.col), moveIndex, byPlayerIndex);
             }
         });
 
         socket.on('timeControlUpdate', (gameId: string, gameTimeData: GameTimeData) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].updateTimeControl(gameTimeData);
+                hostedGameClients.value[gameId].onServerUpdateTimeControl(gameTimeData);
             }
         });
 
         socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].gameEnded(winner, outcome);
+                hostedGameClients.value[gameId].onServerGameEnded(winner, outcome);
             }
         });
     };
@@ -156,10 +127,6 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         createGame,
         updateGames,
         retrieveHostedGameClient,
-        joinGame,
-        move,
-        resign,
-        cancel,
     };
 });
 

@@ -1,33 +1,8 @@
-import { IllegalMove, PlayerIndex, Move, PlayerGameInput, BOARD_DEFAULT_SIZE, PlayerInterface } from '.';
+import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from '.';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board';
-import { Tuple } from '../app/Types';
-
-export type GameState =
-    /**
-     * Game has been created, waiting for start() to be called.
-     * Before starting, time control can be initialized, players can join...
-     */
-    'created'
-
-    /**
-     * Game has been started and is currently playing.
-     */
-    | 'playing'
-
-    /**
-     * Game has ended. Check winner and outcome.
-     */
-    | 'ended'
-;
 
 type GameEvents = {
-    /**
-     * The game has started and can now accept moves.
-     * Chrono is started.
-     */
-    started: () => void;
-
     /**
      * A move have been played by a player. PlayerIndex is the player who made the move.
      * At this time, game.getCurrentPlayer() is the current player after move have been played.
@@ -76,7 +51,6 @@ export type Outcome =
 
 export default class Game extends TypedEmitter<GameEvents>
 {
-    private state: GameState = 'created';
     private board: Board;
     private currentPlayerIndex: PlayerIndex = 0;
     private movesHistory: Move[] = [];
@@ -85,8 +59,7 @@ export default class Game extends TypedEmitter<GameEvents>
     private winner: null | PlayerIndex = null;
     private outcome: Outcome = null;
 
-    private createdAt: Date = new Date();
-    private startedAt: null | Date = null;
+    private startedAt: Date = new Date();
     private lastMoveAt: null | Date = null;
     private endedAt: null | Date = null;
 
@@ -95,14 +68,9 @@ export default class Game extends TypedEmitter<GameEvents>
      *  Board size to initialize game with an empty board,
      *  or a pre-built board instance to play on.
      *  Default to an empty board with a default size.
-     *
-     * @param players
-     *  If provided, players will receive an instance of game input on game start,
-     *  and will be notified when it is their turn.
      */
     constructor(
         boardOrSize: Board | number = BOARD_DEFAULT_SIZE,
-        private players: null | Tuple<PlayerInterface> = null,
     ) {
         super();
 
@@ -110,11 +78,6 @@ export default class Game extends TypedEmitter<GameEvents>
             ? boardOrSize
             : new Board(boardOrSize)
         ;
-    }
-
-    getState(): GameState
-    {
-        return this.state;
     }
 
     getBoard(): Board
@@ -127,41 +90,6 @@ export default class Game extends TypedEmitter<GameEvents>
         return this.board.getSize();
     }
 
-    hasPlayers(): boolean
-    {
-        return null !== this.players;
-    }
-
-    getPlayers(): Tuple<PlayerInterface>
-    {
-        if (null === this.players) {
-            throw new Error('This game is not using players');
-        }
-
-        return this.players;
-    }
-
-    setPlayers(players: Tuple<PlayerInterface>): void
-    {
-        if (this.state !== 'created') {
-            throw new Error(
-                'Cannot set players now, game is already started,'
-                + ' and previous players are already bind to this game.',
-            );
-        }
-
-        this.players = players;
-    }
-
-    getPlayer(playerIndex: PlayerIndex): PlayerInterface
-    {
-        if (null === this.players) {
-            throw new Error('This game is not using players');
-        }
-
-        return this.players[playerIndex];
-    }
-
     getCurrentPlayerIndex(): PlayerIndex
     {
         return this.currentPlayerIndex;
@@ -170,15 +98,6 @@ export default class Game extends TypedEmitter<GameEvents>
     setCurrentPlayerIndex(currentPlayerIndex: PlayerIndex): void
     {
         this.currentPlayerIndex = currentPlayerIndex;
-    }
-
-    getCurrentPlayer(): PlayerInterface
-    {
-        if (null === this.players) {
-            throw new Error('This game is not using players');
-        }
-
-        return this.players[this.currentPlayerIndex];
     }
 
     otherPlayerIndex(): PlayerIndex
@@ -192,41 +111,6 @@ export default class Game extends TypedEmitter<GameEvents>
     private changeCurrentPlayer(): void
     {
         this.currentPlayerIndex = this.otherPlayerIndex();
-    }
-
-    private bindPlayers(players: Tuple<PlayerInterface>): void
-    {
-        players[0].setPlayerGameInput(new PlayerGameInput(this, 0));
-        players[1].setPlayerGameInput(new PlayerGameInput(this, 1));
-
-        this.on('played', () => {
-            if (!this.hasWinner()) {
-                players[this.currentPlayerIndex].emit('myTurnToPlay');
-            }
-        });
-
-        this.on('started', () => players[0].emit('myTurnToPlay'));
-    }
-
-    start(): void
-    {
-        if ('created' !== this.state) {
-            throw new Error('Game already started');
-        }
-
-        this.state = 'playing';
-        this.startedAt = new Date();
-
-        if (null !== this.players) {
-            this.bindPlayers(this.players);
-        }
-
-        this.emit('started');
-    }
-
-    isStarted(): boolean
-    {
-        return 'created' !== this.state;
     }
 
     getMovesHistory(): Move[]
@@ -270,11 +154,7 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     checkMove(move: Move, byPlayerIndex: PlayerIndex): void
     {
-        if ('created' === this.state) {
-            throw new IllegalMove(move, 'Game is not yet started');
-        }
-
-        if ('ended' === this.state) {
+        if (this.isEnded()) {
             throw new IllegalMove(move, 'Game is finished');
         }
 
@@ -406,7 +286,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
     isEnded(): boolean
     {
-        return 'ended' === this.state;
+        return null !== this.endedAt;
     }
 
     getWinner(): null | PlayerIndex
@@ -429,7 +309,6 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
     {
-        this.state = 'ended';
         this.winner = playerIndex;
         this.outcome = outcome;
         this.endedAt = new Date();
@@ -444,7 +323,7 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new Error('Cannot set a winner again, there is already a winner');
         }
 
-        if (this.state === 'ended') {
+        if (this.isEnded()) {
             throw new Error('Cannot set a winner, game is already ended, probably canceled');
         }
 
@@ -455,11 +334,10 @@ export default class Game extends TypedEmitter<GameEvents>
 
     cancel(): void
     {
-        if (this.state === 'ended') {
+        if (this.isEnded()) {
             throw new Error('Cannot cancel, game already ended');
         }
 
-        this.state = 'ended';
         this.endedAt = new Date();
 
         this.emit('canceled');
@@ -467,7 +345,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
     isCanceled(): boolean
     {
-        return this.state === 'ended' && null === this.winner;
+        return this.isEnded() && null === this.winner;
     }
 
     getOutcome(): Outcome
@@ -491,19 +369,7 @@ export default class Game extends TypedEmitter<GameEvents>
         this.declareWinner(this.otherPlayerIndex(), 'time');
     }
 
-    getCreatedAt(): Date
-    {
-        return this.createdAt;
-    }
-
-    setCreatedAt(date: Date): this
-    {
-        this.createdAt = date;
-
-        return this;
-    }
-
-    getStartedAt(): null | Date
+    getStartedAt(): Date
     {
         return this.startedAt;
     }

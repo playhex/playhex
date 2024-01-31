@@ -8,14 +8,24 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "opponent": {
-        "publicId": "determinist-random-bot|ab1aad0c-b90c-41ca-9bbd-664ff000fda8",
-        "pseudo": "Determinist random bot",
-        "slug": "",
-        "isBot": true,
-        "isGuest": false,
-        "createdAt": "2024-01-24T20:22:40.783Z"
-    },
+    "players": [
+        {
+            "publicId": "determinist-random-bot|ab1aad0c-b90c-41ca-9bbd-664ff000fda8",
+            "pseudo": "Determinist random bot",
+            "slug": "",
+            "isBot": true,
+            "isGuest": false,
+            "createdAt": "2024-01-24T20:22:40.783Z"
+        },
+        {
+            "pseudo": "aa",
+            "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "aa",
+            "createdAt": "2024-01-24T16:33:29.586Z"
+        }
+    ],
     "timeControl": {
         "options": {
             "type": "fischer",
@@ -55,27 +65,7 @@
         }
     },
     "gameData": {
-        "players": [
-            {
-                "publicId": "determinist-random-bot|ab1aad0c-b90c-41ca-9bbd-664ff000fda8",
-                "pseudo": "Determinist random bot",
-                "slug": "",
-                "isBot": true,
-                "isGuest": false,
-                "createdAt": "2024-01-24T20:22:40.783Z"
-            },
-            {
-                "pseudo": "aa",
-                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
-                "isGuest": false,
-                "isBot": false,
-                "slug": "aa",
-                "createdAt": "2024-01-24T16:33:29.586Z"
-            }
-        ],
         "size": 11,
-        "started": true,
-        "state": "ended",
         "movesHistory": [
             {
                 "row": 2,
@@ -87,12 +77,11 @@
         "currentPlayerIndex": 1,
         "winner": null,
         "outcome": null,
-        "createdAt": "2024-01-24T20:22:40.786Z",
         "startedAt": "2024-01-24T20:22:40.786Z",
         "lastMoveAt": "2024-01-24T20:22:40.787Z",
         "endedAt": "2024-01-24T20:22:42.864Z"
     },
-    "canceled": true,
+    "state": "canceled",
     "createdAt": "2024-01-24T20:22:40.783Z",
     "__meta": {
         "values": {
@@ -100,15 +89,6 @@
                 "Date"
             ],
             "opponent.createdAt": [
-                "Date"
-            ],
-            "gameData.players.0.createdAt": [
-                "Date"
-            ],
-            "gameData.players.1.createdAt": [
-                "Date"
-            ],
-            "gameData.createdAt": [
                 "Date"
             ],
             "gameData.startedAt": [

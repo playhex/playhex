@@ -1,21 +1,13 @@
 import { Service } from 'typedi';
 import HostedGame from '../HostedGame';
 import { Move } from '../../shared/game-engine';
-import { HostedGameData, MoveData, PlayerData } from '../../shared/app/Types';
-import { HexServer } from '../server';
+import { HostedGameData, HostedGameState, MoveData, PlayerData } from '../../shared/app/Types';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import AppPlayer from '../../shared/app/AppPlayer';
-import Rooms from '../../shared/app/Rooms';
-import { GameState } from '../../shared/game-engine/Game';
 
 @Service()
 export default class HostedGameRepository
 {
     private hostedGames: { [key: string]: HostedGame } = {};
-
-    constructor(
-        private io: HexServer,
-    ) {}
 
     getGames()
     {
@@ -27,21 +19,19 @@ export default class HostedGameRepository
         return this.hostedGames[id] ?? null;
     }
 
-    createGame(host: AppPlayer, gameOptions: GameOptionsData, opponent: null | AppPlayer = null): HostedGame
+    createGame(host: PlayerData, gameOptions: GameOptionsData, opponent: null | PlayerData = null): HostedGame
     {
-        const hostedGame = new HostedGame(this.io, gameOptions, host);
+        const hostedGame = new HostedGame(gameOptions, host);
         this.hostedGames[hostedGame.getId()] = hostedGame;
-        this.io.to(Rooms.lobby).emit('gameCreated', hostedGame.toData());
 
         if (null !== opponent) {
             hostedGame.playerJoin(opponent);
-            this.io.to([Rooms.lobby, Rooms.game(hostedGame.getId())]).emit('gameJoined', hostedGame.getId(), opponent.getPlayerData());
         }
 
         return hostedGame;
     }
 
-    getPlayerGames(playerData: PlayerData, state: null | GameState = null): HostedGameData[]
+    getPlayerGames(playerData: PlayerData, state: null | HostedGameState = null): HostedGameData[]
     {
         const hostedGameData: HostedGameData[] = [];
 
@@ -82,8 +72,6 @@ export default class HostedGameRepository
         if ('string' === typeof joinResult) {
             return joinResult;
         }
-
-        this.io.to([Rooms.lobby, Rooms.game(gameId)]).emit('gameJoined', gameId, playerData);
 
         return true;
     }

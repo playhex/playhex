@@ -1,16 +1,21 @@
-import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
-import { HostedGameData, PlayerData, TimeControlOptionsValues } from '@shared/app/Types';
-import { GameState, Outcome } from '@shared/game-engine/Game';
+import { Game, Move, PlayerIndex } from '@shared/game-engine';
+import { HostedGameData, HostedGameState, PlayerData, TimeControlOptionsValues } from '@shared/app/Types';
+import { Outcome } from '@shared/game-engine/Game';
 import { GameTimeData } from '@shared/time-control/TimeControl';
-import AppPlayer from '@shared/app/AppPlayer';
-import EmptyPlayer from '@shared/app/EmptyPlayer';
-import useLobbyStore from './stores/lobbyStore';
+import { TypedEmitter } from 'tiny-typed-emitter';
+import { Socket } from 'socket.io-client';
+import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
+import { apiPostCancel, apiPostResign } from './apiClient';
+
+type HostedGameClientEvents = {
+    started: () => void;
+};
 
 /**
  * Contains info to display in the games list on lobby (HostedGameData).
  * If needed, can also download full game data and start listening to game events (Game).
  */
-export default class HostedGameClient
+export default class HostedGameClient extends TypedEmitter<HostedGameClientEvents>
 {
     /**
      * Null if game data not fully loaded yet, i.e for lobby list display.
@@ -18,27 +23,22 @@ export default class HostedGameClient
      */
     private game: null | Game = null;
 
-    /**
-     * Last move index on server.
-     * Used to prevent re-emitting server moves.
-     *
-     * Updated once move is received from server,
-     * or when game is initialized.
-     */
-    private remoteLastMoveIndex = -1;
-
-    /**
-     * Whether game is already ended on server.
-     * Used to prevent re-emitting resignations.
-     *
-     * Updated once ended event is received from server,
-     * or when game is initialized.
-     */
-    private remoteIsEnded = false;
-
     constructor(
         private hostedGameData: HostedGameData,
-    ) {}
+        private socket: Socket<HexServerToClientEvents, HexClientToServerEvents>,
+    ) {
+        super();
+    }
+
+    getState(): HostedGameState
+    {
+        return this.hostedGameData.state;
+    }
+
+    getPlayerIndex(playerData: PlayerData): number
+    {
+        return this.hostedGameData.players.findIndex(p => p.publicId === playerData.publicId);
+    }
 
     loadGame(): Game
     {
@@ -49,36 +49,26 @@ export default class HostedGameClient
     {
         const { gameData } = hostedGameData;
 
+        /**
+         * No game server side, create an empty one to show client side
+         */
         if (null === gameData) {
-            const hostPlayer: AppPlayer = new AppPlayer(hostedGameData.host);
-            const opponentPlayer: PlayerInterface = hostedGameData.opponent
-                ? new AppPlayer(hostedGameData.opponent)
-                : new EmptyPlayer()
-            ;
-
-            this.game = new Game(hostedGameData.gameOptions.boardsize, [hostPlayer, opponentPlayer]);
+            this.game = new Game(hostedGameData.gameOptions.boardsize);
 
             // Cancel here in case game has been canceled before started
-            if (hostedGameData.canceled) {
+            if ('canceled' === hostedGameData.state) {
                 this.game.cancel();
             }
 
             return this.game;
         }
 
-        this.game = new Game(gameData.size, [
-            new AppPlayer(gameData.players[0]),
-            new AppPlayer(gameData.players[1]),
-        ]);
+        this.game = new Game(gameData.size);
 
         this.game.setAllowSwap(gameData.allowSwap);
+        this.game.setStartedAt(gameData.startedAt);
 
-        if (gameData.started) {
-            this.gameStarted(hostedGameData);
-        }
-
-        this.remoteLastMoveIndex = gameData.movesHistory.length - 1;
-        this.remoteIsEnded = 'ended' === gameData.state;
+        this.onServerGameStarted(hostedGameData);
 
         // Replay game and fill history
         for (const move of gameData.movesHistory) {
@@ -86,7 +76,7 @@ export default class HostedGameClient
         }
 
         // Cancel game if canceled
-        if (hostedGameData.canceled && !this.game.isEnded()) {
+        if ('canceled' === hostedGameData.state && !this.game.isEnded()) {
             this.game.cancel();
         }
 
@@ -103,16 +93,19 @@ export default class HostedGameClient
         return this.hostedGameData.id;
     }
 
-    getState(): GameState
+    getPlayers(): PlayerData[]
     {
-        return this.hostedGameData.gameData?.state ?? 'created';
+        return this.hostedGameData.players;
+    }
+
+    getPlayer(position: number): null | PlayerData
+    {
+        return this.hostedGameData.players[position] ?? null;
     }
 
     hasPlayer(playerData: PlayerData): boolean
     {
-        return this.hostedGameData.host.publicId === playerData.publicId
-            || (this.hostedGameData.opponent?.publicId ?? null) === playerData.publicId
-        ;
+        return this.hostedGameData.players.some(p => p.publicId === playerData.publicId);
     }
 
     /**
@@ -121,19 +114,15 @@ export default class HostedGameClient
      */
     getOtherPlayer(playerData: PlayerData): null | PlayerData
     {
-        if (null === this.hostedGameData.opponent) {
+        if (2 !== this.hostedGameData.players.length) {
             return null;
         }
 
-        if (this.hostedGameData.host.publicId === playerData.publicId) {
-            return this.hostedGameData.opponent;
+        if (this.hostedGameData.players[0].publicId === playerData.publicId) {
+            return this.hostedGameData.players[1];
         }
 
-        if (this.hostedGameData.opponent.publicId === playerData.publicId) {
-            return this.hostedGameData.host;
-        }
-
-        return null;
+        return this.hostedGameData.players[0];
     }
 
     getHostedGameData(): HostedGameData
@@ -149,46 +138,6 @@ export default class HostedGameClient
         this.hostedGameData = hostedGameData;
     }
 
-    /**
-     * Listens from game model to re-send events to server
-     */
-    private listenGameModel(): void
-    {
-        if (null === this.game) {
-            throw new Error('game must be initialized before listening to it');
-        }
-
-        this.game.on('played', async (move, moveIndex) => {
-            if (moveIndex <= this.remoteLastMoveIndex) {
-                return;
-            }
-
-            const result = await useLobbyStore().move(this.getId(), move);
-
-            if (true !== result) {
-                console.error('Error while doing move:', result);
-            }
-        });
-
-        this.game.on('ended', async (winner, outcome) => {
-            if (this.remoteIsEnded) {
-                return;
-            }
-
-            if (outcome === 'resign') {
-                const result = await useLobbyStore().resign(this.getId());
-
-                if (true !== result) {
-                    console.error('Error while resign:', result);
-                }
-            }
-        });
-
-        this.game.on('canceled', async () => {
-            this.hostedGameData.canceled = true;
-        });
-    }
-
     getGame(): Game
     {
         if (null === this.game) {
@@ -199,31 +148,9 @@ export default class HostedGameClient
         return this.game;
     }
 
-    getLocalAppPlayer(playerData: PlayerData): null | AppPlayer
-    {
-        if (null === this.game) {
-            return null;
-        }
-
-        return this.game
-            .getPlayers()
-            .find(
-                player =>
-                    player instanceof AppPlayer
-                    && player.getPlayerId() === playerData.publicId
-                ,
-            ) as AppPlayer
-            ?? null
-        ;
-    }
-
     canResign(): boolean
     {
-        if (null === this.game) {
-            return false;
-        }
-
-        return this.game.getState() === 'playing';
+        return this.hostedGameData.state === 'playing';
     }
 
     canCancel(): boolean
@@ -233,7 +160,7 @@ export default class HostedGameClient
         }
 
         return !this.game.isCanceled()
-            && this.game.getState() !== 'ended'
+            && this.hostedGameData.state !== 'ended'
             && this.getGame().getMovesHistory().length < 2
         ;
     }
@@ -245,29 +172,68 @@ export default class HostedGameClient
         }
 
         // Cannot join if game has been canceled
-        if (this.hostedGameData.canceled) {
+        if ('canceled' === this.hostedGameData.state) {
             return false;
         }
 
         // Cannot join as my own opponent
-        if (this.hostedGameData.host.publicId === playerData.publicId) {
+        if (this.hasPlayer(playerData)) {
             return false;
         }
 
         // Cannot join if game is full
-        if (null !== this.hostedGameData.opponent) {
+        if (this.hostedGameData.players.length >= 2) {
             return false;
         }
 
         return true;
     }
 
-    playerJoined(playerData: PlayerData): void
+    /**
+     * Join a game to play if there is a free slot.
+     */
+    async sendJoinGame(): Promise<true | string>
     {
-        this.hostedGameData.opponent = playerData;
+        return new Promise((resolve, reject) => {
+            this.socket.emit('joinGame', this.getId(), (answer: true | string) => {
+                if (true === answer) {
+                    resolve(answer);
+                }
+
+                reject(answer);
+            });
+        });
     }
 
-    gameStarted(hostedGameData: HostedGameData): void
+    async sendMove(move: Move): Promise<true | string>
+    {
+        return new Promise((resolve, reject) => {
+            this.socket.emit('move', this.getId(), move, answer => {
+                if (true === answer) {
+                    resolve(answer);
+                }
+
+                reject(answer);
+            });
+        });
+    }
+
+    async sendResign(): Promise<string | true>
+    {
+        return apiPostResign(this.getId());
+    }
+
+    async sendCancel(): Promise<string | true>
+    {
+        return apiPostCancel(this.getId());
+    }
+
+    onServerPlayerJoined(playerData: PlayerData): void
+    {
+        this.hostedGameData.players.push(playerData);
+    }
+
+    onServerGameStarted(hostedGameData: HostedGameData): void
     {
         this.updateFromHostedGameData(hostedGameData);
 
@@ -282,19 +248,14 @@ export default class HostedGameClient
             return;
         }
 
-        this.game.setPlayers([
-            new AppPlayer(gameData.players[0]),
-            new AppPlayer(gameData.players[1]),
-        ]);
+        this.hostedGameData.players = hostedGameData.players;
 
-        this.listenGameModel();
-
-        this.game.start();
+        this.emit('started');
     }
 
-    gameCanceled(): void
+    onServerGameCanceled(): void
     {
-        this.hostedGameData.canceled = true;
+        this.hostedGameData.state = 'canceled';
 
         if (this.hostedGameData.gameData) {
             this.hostedGameData.gameData.endedAt = new Date();
@@ -315,12 +276,12 @@ export default class HostedGameClient
         return this.hostedGameData.timeControl.values;
     }
 
-    updateTimeControl(gameTimeData: GameTimeData): void
+    onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
         Object.assign(this.hostedGameData.timeControl.values, gameTimeData);
     }
 
-    gameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
+    onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
     {
         // Do nothing if game not loaded
         if (null === this.game) {
@@ -332,17 +293,14 @@ export default class HostedGameClient
             return;
         }
 
-        this.remoteLastMoveIndex = moveIndex;
-
         this.game.move(move, byPlayerIndex);
     }
 
-    gameEnded(winner: PlayerIndex, outcome: Outcome): void
+    onServerGameEnded(winner: PlayerIndex, outcome: Outcome): void
     {
-        this.remoteIsEnded = true;
+        this.hostedGameData.state = 'ended';
 
         if (this.hostedGameData.gameData) {
-            this.hostedGameData.gameData.state = 'ended';
             this.hostedGameData.gameData.winner = winner;
             this.hostedGameData.gameData.outcome = outcome;
             this.hostedGameData.gameData.endedAt = new Date();

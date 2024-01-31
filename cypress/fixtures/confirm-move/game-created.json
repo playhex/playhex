@@ -8,7 +8,16 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "opponent": null,
+    "players": [
+        {
+            "pseudo": "aa",
+            "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "aa",
+            "createdAt": "2024-01-24T16:33:29.586Z"
+        }
+    ],
     "timeControl": {
         "options": {
             "type": "fischer",
@@ -48,11 +57,14 @@
         }
     },
     "gameData": null,
-    "canceled": false,
+    "state": "created",
     "createdAt": "2024-01-25T10:38:24.523Z",
     "__meta": {
         "values": {
             "host.createdAt": [
+                "Date"
+            ],
+            "players.0.createdAt": [
                 "Date"
             ],
             "createdAt": [
@@ -60,6 +72,9 @@
             ]
         },
         "referentialEqualities": {
+            "host": [
+                "players.0"
+            ],
             "timeControl.options.options": [
                 "gameOptions.timeControl.options"
             ]

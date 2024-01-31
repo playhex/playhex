@@ -1,69 +1,36 @@
 import logger from './services/logger';
-import AppPlayer from '../shared/app/AppPlayer';
-import { IllegalMove, Move } from '../shared/game-engine';
-import { v4 as uuidv4 } from 'uuid';
+import { Game, IllegalMove, Move, PlayerIndex } from '../shared/game-engine';
 import HexRemotePlayerClient, { CalculateMoveRequest } from '../shared/hex-remote-player-api-client';
 import { TimeMeasureMetric } from './services/metrics';
+import Container from 'typedi';
 
-const noInputError = new Error('No player input, cannot continue');
-
-export default class RemoteApiPlayer extends AppPlayer
+export default class RemoteApiPlayer
 {
     private hexRemotePlayerApi: HexRemotePlayerClient;
 
     constructor(
-        private name: string,
         endpoint: string,
     ) {
-        super({
-            publicId: 'remote-api|' + uuidv4(),
-            pseudo: name,
-            slug: '',
-            isBot: true,
-            isGuest: false,
-            createdAt: new Date(),
-        });
-
         this.hexRemotePlayerApi = new HexRemotePlayerClient(endpoint);
-
-        this.on('myTurnToPlay', () => this.makeMove());
     }
 
-    getName(): string
+    private async fetchMove(game: Game): Promise<Move>
     {
-        return this.name;
-    }
-
-    private gameHistoryToApi(): string
-    {
-        if (!this.playerGameInput) {
-            throw noInputError;
-        }
-
-        const moveHistory = this.playerGameInput
+        const moveHistory = game
             .getMovesHistory()
             .map(move => move.toString())
         ;
 
-        if (this.playerGameInput.hasSwapMove()) {
+        if (game.hasSwapMove()) {
             moveHistory[1] = 'swap-pieces';
-        }
-
-        return moveHistory.join(' ');
-    }
-
-    private async fetchMove(): Promise<Move>
-    {
-        if (!this.playerGameInput) {
-            throw noInputError;
         }
 
         const payload: CalculateMoveRequest = {
             game: {
-                size: this.playerGameInput.getSize(),
-                movesHistory: this.gameHistoryToApi(),
-                currentPlayer: 0 === this.playerGameInput.getPlayerIndex() ? 'black' : 'white',
-                swapRule: this.playerGameInput.getAllowSwap(),
+                size: game.getSize(),
+                movesHistory: moveHistory.join(' '),
+                currentPlayer: 0 === game.getCurrentPlayerIndex() ? 'black' : 'white',
+                swapRule: game.getAllowSwap(),
             },
             ai: {
                 engine: 'mohex',
@@ -75,7 +42,7 @@ export default class RemoteApiPlayer extends AppPlayer
 
         try {
             if ('swap-pieces' === moveString) {
-                const swapedMove = this.playerGameInput.getFirstMove();
+                const swapedMove = game.getFirstMove();
 
                 if (null === swapedMove) {
                     throw new Error('"swap-pieces" only available on first move');
@@ -95,25 +62,20 @@ export default class RemoteApiPlayer extends AppPlayer
         }
     }
 
-    private async makeMove(): Promise<void>
+    async makeMove(game: Game, playerIndex: PlayerIndex): Promise<void>
     {
-        if (!this.playerGameInput) {
-            logger.error('Cannot call RemoteApiPlayer.makeMove(), not player game input.');
-            throw noInputError;
-        }
-
         const measure = new TimeMeasureMetric('ai_time_to_respond', {
             engine: 'mohex',
             level: 20,
-            boardsize: this.playerGameInput.getSize(),
+            boardsize: game.getSize(),
         });
 
         try {
-            const move = await this.fetchMove();
-            this.playerGameInput.move(move);
+            const move = await this.fetchMove(game);
+            game.move(move, playerIndex);
             measure.finished();
         } catch (e) {
-            this.playerGameInput.resign();
+            game.resign(playerIndex);
 
             logger.error('AI resigned because remote api did not provided a valid move.');
 
@@ -124,4 +86,10 @@ export default class RemoteApiPlayer extends AppPlayer
             measure.finished(false);
         }
     }
+}
+
+const { HEX_AI_API_ENDPOINT } = process.env;
+
+if (HEX_AI_API_ENDPOINT) {
+    Container.set(RemoteApiPlayer, new RemoteApiPlayer(HEX_AI_API_ENDPOINT));
 }

@@ -5,8 +5,9 @@ import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
 import GameOptionsOverlay, { GameOptionsOverlayInput } from '@client/vue/components/overlay/GameOptionsOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
+import { PlayerData } from '@shared/app/Types';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
-import HostedGameClient from 'HostedGameClient';
+import HostedGameClient from '../../HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
 import AppPseudoWithOnlineStatus from '../components/AppPseudoWithOnlineStatus.vue';
 import { ref } from 'vue';
@@ -61,17 +62,21 @@ const createAndJoinGameVsLocalAI = async () => {
 };
 
 const isWaiting = (hostedGameClient: HostedGameClient) =>
-    null === hostedGameClient.getHostedGameData().opponent
-    && !hostedGameClient.getHostedGameData().canceled
+    'created' === hostedGameClient.getHostedGameData().state
 ;
 
 const isPlaying = (hostedGameClient: HostedGameClient) =>
-    hostedGameClient.getHostedGameData().gameData?.state === 'playing'
-    && !hostedGameClient.getHostedGameData().canceled
+    'playing' === hostedGameClient.getHostedGameData().state
 ;
 
-const joinGame = (gameId: string) => {
-    lobbyStore.joinGame(gameId);
+const joinGame = async (gameId: string) => {
+    const hostedGameClient = await lobbyStore.retrieveHostedGameClient(gameId);
+
+    if (null === hostedGameClient) {
+        throw new Error(`Cannot join game "${gameId}", game does not exists`);
+    }
+
+    hostedGameClient.sendJoinGame();
 };
 
 /**
@@ -80,8 +85,7 @@ const joinGame = (gameId: string) => {
 const lastPlayedShowCount = ref(5);
 
 const isLastPlayed = (hostedGameClient: HostedGameClient) =>
-    hostedGameClient.getHostedGameData().gameData?.state === 'ended'
-    && !hostedGameClient.getHostedGameData().canceled
+    hostedGameClient.getHostedGameData().state === 'ended'
 ;
 
 const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
@@ -169,12 +173,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                 >Watch</router-link>
                             </td>
-                            <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
-                                <template v-if="gameData">
-                                    <app-pseudo-with-online-status :playerData="gameData.players[0]" />
-                                    <span class="mx-3"> vs </span>
-                                    <app-pseudo-with-online-status :playerData="gameData.players[1]" />
-                                </template>
+                            <td>
+                                <app-pseudo-with-online-status :player-data="(hostedGameClient.getPlayer(0) as PlayerData)" />
+                                <span class="mx-3"> vs </span>
+                                <app-pseudo-with-online-status :player-data="(hostedGameClient.getPlayer(1) as PlayerData)" />
                             </td>
                             <td class="text-end">{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
@@ -199,9 +201,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 </td>
                                 <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                     <template v-if="null !== gameData && null !== gameData.winner">
-                                        <app-pseudo-with-online-status :playerData="gameData.players[gameData.winner]" is="strong" />
+                                        <app-pseudo-with-online-status :player-data="(hostedGameClient.getPlayer(0) as PlayerData)" is="strong" />
                                         <span class="mx-3"> won against </span>
-                                        <app-pseudo-with-online-status :playerData="gameData.players[1 - gameData.winner]" classes="text-secondary" />
+                                        <app-pseudo-with-online-status :player-data="(hostedGameClient.getPlayer(1) as PlayerData)" classes="text-secondary" />
                                     </template>
                                 </td>
                             </tr>

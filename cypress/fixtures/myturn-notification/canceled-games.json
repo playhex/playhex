@@ -8,7 +8,15 @@
             "isGuest": true,
             "isBot": false
         },
-        "opponent": null,
+        "players": [
+            {
+                "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
+                "pseudo": "8201",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
+            }
+        ],
         "gameTimeData": {
             "type": "absolute",
             "state": "over",
@@ -29,7 +37,7 @@
             }
         },
         "gameData": null,
-        "canceled": true
+        "state": "canceled"
     },
     {
         "id": "c1db33be-6134-4185-a8ac-3a02f0ae2376",
@@ -40,13 +48,22 @@
             "isGuest": true,
             "isBot": false
         },
-        "opponent": {
-            "publicId": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
-            "pseudo": "Mohex",
-            "slug": "slug",
-            "isGuest": true,
-            "isBot": true
-        },
+        "players": [
+            {
+                "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
+                "pseudo": "8201",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
+            },
+            {
+                "publicId": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
+                "pseudo": "Mohex",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": true
+            }
+        ],
         "gameTimeData": {
             "type": "absolute",
             "state": "over",
@@ -67,25 +84,7 @@
             }
         },
         "gameData": {
-            "players": [
-                {
-                    "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
-                    "pseudo": "8201",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": false
-                },
-                {
-                    "publicId": "remote-api|037ccabe-8aca-4f05-8828-cc41cf18f0c3",
-                    "pseudo": "Mohex",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": true
-                }
-            ],
             "size": 11,
-            "started": true,
-            "state": "ended",
             "movesHistory": [
                 {
                     "row": 4,
@@ -191,17 +190,13 @@
             "currentPlayerIndex": 0,
             "winner": 1,
             "outcome": "resign",
-            "createdAt": "2023-12-20T22:18:22.186Z",
             "startedAt": "2023-12-20T22:18:22.189Z",
             "lastMoveAt": "2023-12-20T22:18:58.967Z",
             "endedAt": "2023-12-20T22:19:03.033Z"
         },
-        "canceled": false,
+        "state": "ended",
         "__meta": {
             "values": {
-                "gameData.createdAt": [
-                    "Date"
-                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
@@ -210,14 +205,6 @@
                 ],
                 "gameData.endedAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "host": [
-                    "gameData.players.0"
-                ],
-                "opponent": [
-                    "gameData.players.1"
                 ]
             }
         }
@@ -231,13 +218,22 @@
             "isGuest": true,
             "isBot": false
         },
-        "opponent": {
-            "publicId": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
-            "pseudo": "Mohex",
-            "slug": "slug",
-            "isGuest": true,
-            "isBot": true
-        },
+        "players": [
+            {
+                "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
+                "pseudo": "8201",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
+            },
+            {
+                "publicId": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
+                "pseudo": "Mohex",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": true
+            }
+        ],
         "gameTimeData": {
             "type": "absolute",
             "state": "over",
@@ -258,25 +254,7 @@
             }
         },
         "gameData": {
-            "players": [
-                {
-                    "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
-                    "pseudo": "8201",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": false
-                },
-                {
-                    "publicId": "remote-api|0c8d8d83-926e-45dd-ba73-fd541bdb3ec7",
-                    "pseudo": "Mohex",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": true
-                }
-            ],
             "size": 11,
-            "started": true,
-            "state": "ended",
             "movesHistory": [
                 {
                     "row": 4,
@@ -652,17 +630,13 @@
             "currentPlayerIndex": 1,
             "winner": 1,
             "outcome": null,
-            "createdAt": "2023-12-20T22:19:14.189Z",
             "startedAt": "2023-12-20T22:19:14.189Z",
             "lastMoveAt": "2023-12-20T22:22:00.698Z",
             "endedAt": "2023-12-20T22:22:00.704Z"
         },
-        "canceled": false,
+        "state": "ended",
         "__meta": {
             "values": {
-                "gameData.createdAt": [
-                    "Date"
-                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
@@ -671,14 +645,6 @@
                 ],
                 "gameData.endedAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "host": [
-                    "gameData.players.0"
-                ],
-                "opponent": [
-                    "gameData.players.1"
                 ]
             }
         }
@@ -692,13 +658,22 @@
             "isGuest": true,
             "isBot": false
         },
-        "opponent": {
-            "publicId": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
-            "pseudo": "Mohex",
-            "slug": "slug",
-            "isGuest": false,
-            "isBot": true
-        },
+        "players": [
+            {
+                "publicId": "0808f397-9e12-45af-bd5b-42885fe36212",
+                "pseudo": "2810",
+                "slug": "slug",
+                "isGuest": true,
+                "isBot": false
+            },
+            {
+                "publicId": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
+                "pseudo": "Mohex",
+                "slug": "slug",
+                "isGuest": false,
+                "isBot": true
+            }
+        ],
         "gameTimeData": {
             "type": "absolute",
             "state": "over",
@@ -719,25 +694,7 @@
             }
         },
         "gameData": {
-            "players": [
-                {
-                    "publicId": "0808f397-9e12-45af-bd5b-42885fe36212",
-                    "pseudo": "2810",
-                    "slug": "slug",
-                    "isGuest": true,
-                    "isBot": false
-                },
-                {
-                    "publicId": "remote-api|db4a2c11-7cfb-409a-8872-1f4a5a5e6292",
-                    "pseudo": "Mohex",
-                    "slug": "slug",
-                    "isGuest": false,
-                    "isBot": true
-                }
-            ],
             "size": 9,
-            "started": true,
-            "state": "ended",
             "movesHistory": [
                 {
                     "row": 4,
@@ -918,17 +875,13 @@
             "currentPlayerIndex": 0,
             "winner": 0,
             "outcome": null,
-            "createdAt": "2023-12-21T06:17:58.800Z",
             "startedAt": "2023-12-21T06:17:58.803Z",
             "lastMoveAt": "2023-12-21T06:19:40.520Z",
             "endedAt": "2023-12-21T06:19:40.523Z"
         },
-        "canceled": false,
+        "state": "ended",
         "__meta": {
             "values": {
-                "gameData.createdAt": [
-                    "Date"
-                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
@@ -937,14 +890,6 @@
                 ],
                 "gameData.endedAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "host": [
-                    "gameData.players.0"
-                ],
-                "opponent": [
-                    "gameData.players.1"
                 ]
             }
         }

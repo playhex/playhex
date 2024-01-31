@@ -1,6 +1,6 @@
 import { GameTimeData } from '../time-control/TimeControl';
 import { PlayerIndex } from '../game-engine';
-import { GameState, Outcome } from 'game-engine/Game';
+import { Outcome } from 'game-engine/Game';
 import { GameOptionsData } from './GameOptions';
 import TimeControlType from '../time-control/TimeControlType';
 import { Player, PlayerSettings } from '@prisma/client';
@@ -12,11 +12,34 @@ export type Tuple<T> = [T, T];
  * Exclude password, email...
  */
 export type PlayerData = Pick<Player,
+    /**
+     * Used for displays
+     */
     'pseudo'
+
+    /**
+     * Used for link to profile page, SGF file name
+     */
     | 'slug'
+
+    /**
+     * Used to identify a player
+     */
     | 'publicId'
+
+    /**
+     * Show an italized "Guest" before pseudo
+     */
     | 'isGuest'
+
+    /**
+     * Used to know that we use an AI to generate moves. Show a robot icon before pseudo
+     */
     | 'isBot'
+
+    /**
+     * Displayed on profile page
+     */
     | 'createdAt'
 >;
 
@@ -26,25 +49,13 @@ export type MoveData = {
 };
 
 export type GameData = {
-    players: Tuple<PlayerData>;
-
-    /**
-     * Game created from data should not automatically start if this is true,
-     * because maybe should wait for players ready again for loaded game for example,
-     * but is useful for game loaded while playing.
-     */
-    started: boolean;
-
-    state: GameState;
-
     size: number;
     movesHistory: MoveData[];
     allowSwap: boolean;
     currentPlayerIndex: PlayerIndex;
     winner: null | PlayerIndex;
     outcome: null | Outcome;
-    createdAt: Date;
-    startedAt: null | Date;
+    startedAt: Date;
     lastMoveAt: null | Date;
     endedAt: null | Date;
 };
@@ -54,20 +65,20 @@ export type TimeControlOptionsValues = {
     values: GameTimeData;
 };
 
+export type HostedGameState =
+    'created'
+    | 'canceled'
+    | 'playing'
+    | 'ended'
+;
+
 export type HostedGameData = {
     id: string;
     host: PlayerData;
-    opponent: null | PlayerData;
+    players: PlayerData[];
     gameOptions: GameOptionsData;
     timeControl: TimeControlOptionsValues;
-
-    /**
-     * Whether game has been canceled.
-     * We can guess a game is canceled also by checking gameData,
-     * but this attribute is still required when game is canceled
-     * before game started, and gameData is null.
-     */
-    canceled: boolean;
+    state: HostedGameState;
 
     /**
      * gameData is null on server when game is not yet started.

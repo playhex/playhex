@@ -8,8 +8,6 @@ describe('hexworld', () => {
     it('generates review link from game', () => {
         const game = new Game(9);
 
-        game.start();
-
         game.move(Move.fromString('e5'), 0);
         game.move(Move.fromString('g6'), 1);
         game.move(Move.fromString('c6'), 0);
@@ -23,8 +21,6 @@ describe('hexworld', () => {
 
     it('generates review link from game having a swap pieces move', () => {
         const game = new Game(9);
-
-        game.start();
 
         game.move(Move.fromString('b3'), 0);
         game.move(Move.fromString('b3'), 1);

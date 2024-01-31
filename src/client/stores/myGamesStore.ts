@@ -57,9 +57,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     };
 
     const isPlaying = (game: CurrentGame): boolean => {
-        return game.hostedGameData.gameData?.state === 'playing'
-            && !game.hostedGameData.canceled
-        ;
+        return game.hostedGameData.state === 'playing';
     };
 
     const isEmpty = (): boolean => {
@@ -119,14 +117,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     socket.on('gameStarted', (hostedGameData: HostedGameData) => {
-        const { gameData, id, host, opponent } = hostedGameData;
+        const { gameData, id } = hostedGameData;
         const me = loggedInPlayer.value;
 
         if (null === me || null === gameData) {
             return;
         }
 
-        if (host.publicId !== me.publicId && (null === opponent || opponent.publicId !== me.publicId)) {
+        if (!hostedGameData.players.some(p => p.publicId === me.publicId)) {
             return;
         }
 
@@ -139,8 +137,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             };
         }
 
-        myGames.value[id].myColor = gameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
-        myGames.value[id].isMyTurn = gameData.players[gameData.currentPlayerIndex].publicId === loggedInPlayer.value?.publicId;
+        myGames.value[id].myColor = hostedGameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
+        myGames.value[id].isMyTurn = hostedGameData.players[gameData.currentPlayerIndex].publicId === loggedInPlayer.value?.publicId;
         myGames.value[id].hostedGameData = hostedGameData;
 
         mostUrgentGame.value = getMostUrgentGame();
@@ -194,15 +192,15 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         initialized = true;
 
         initialGames.forEach(hostedGameData => {
-            const { id, gameData, host, opponent } = hostedGameData;
+            const { id, gameData } = hostedGameData;
 
             // I'm not in the game
-            if (host.publicId !== me.publicId && (null === opponent || opponent.publicId !== me.publicId)) {
+            if (!hostedGameData.players.some(p => p.publicId === me.publicId)) {
                 return;
             }
 
             // Game finished
-            if (null !== gameData && gameData.state === 'ended') {
+            if ('ended' === hostedGameData.state) {
                 return;
             }
 
@@ -210,8 +208,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             let myColor: null | PlayerIndex = null;
 
             if (null !== gameData) {
-                myColor = gameData.players[0].publicId === me.publicId ? 0 : 1;
-                isMyTurn = gameData.players[gameData.currentPlayerIndex].publicId === me.publicId;
+                myColor = hostedGameData.players[0].publicId === me.publicId ? 0 : 1;
+                isMyTurn = hostedGameData.players[gameData.currentPlayerIndex].publicId === me.publicId;
             }
 
             myGames.value[hostedGameData.id] = { id, isMyTurn, myColor, hostedGameData };

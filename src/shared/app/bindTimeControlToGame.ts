@@ -7,9 +7,7 @@ import { AbstractTimeControl } from '../time-control/TimeControl';
  * or make game end by time when timeControl emitted elapsed event.
  */
 export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeControl) => {
-    game.prependListener('started', () => {
-        timeControl.start();
-    });
+    timeControl.start();
 
     game.prependListener('played', (move, moveIndex, byPlayerIndex) => {
         timeControl.push(byPlayerIndex);

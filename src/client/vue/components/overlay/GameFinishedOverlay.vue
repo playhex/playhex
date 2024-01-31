@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import { Game, PlayerInterface } from '@shared/game-engine';
-import { gameToSGF } from '@shared/game-engine/SGF';
+import { gameToSGF } from '../../../../shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { downloadString } from '../../../services/fileDownload';
 import { gameToHexworldLink } from '../../../../shared/app/hexworld';
-import { pseudoSlug } from '../../../../shared/app/pseudoUtils';
 import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
-import AppPlayer from '@shared/app/AppPlayer';
+import { PropType } from 'vue';
+import { PlayerData } from '../../../../shared/app/Types';
+import { Game } from '../../../../shared/game-engine';
 
 const { visible, confirm } = useOverlayMeta();
 
@@ -17,17 +17,21 @@ const props = defineProps({
         type: Game,
         required: true,
     },
+    players: {
+        type: Array as PropType<PlayerData[]>,
+        required: true,
+    },
     rematch: {
         type: Function,
         required: false,
     },
 });
 
-const { game, rematch } = props;
+const { players, game, rematch } = props;
 
-const winner: null | PlayerInterface = game.isCanceled()
+const winner: null | PlayerData = game.isCanceled()
     ? null
-    : game.getPlayer(game.getStrictWinner())
+    : players[game.getStrictWinner()]
 ;
 
 /*
@@ -36,13 +40,16 @@ const winner: null | PlayerInterface = game.isCanceled()
 const downloadSGF = (): void => {
     const filename = [
         'hex',
-        (game.getStartedAt() ?? game.getCreatedAt()).toISOString().substring(0, 10),
-        pseudoSlug(game.getPlayer(0).getName()),
+        game.getStartedAt().toISOString().substring(0, 10),
+        players[0].slug,
         'VS',
-        pseudoSlug(game.getPlayer(1).getName()),
+        players[1].slug,
     ].join('-') + '.sgf';
 
-    downloadString(gameToSGF(game), filename);
+    downloadString(gameToSGF(game, {
+        PB: players[0].pseudo,
+        PW: players[1].pseudo,
+    }), filename);
 };
 
 const outcomeToString = (): string => {
@@ -67,15 +74,10 @@ const outcomeToString = (): string => {
                     <div class="modal-body text-center lead">
                         <p v-if="null !== winner">
                             <app-pseudo
-                                v-if="(winner instanceof AppPlayer)"
-                                :player-data="winner.getPlayerData()"
+                                :player-data="winner"
                                 is="strong"
                                 :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
                             />
-                            <strong
-                                v-else
-                                :class="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
-                            >{{ winner.getName() }}</strong>
                             won {{ outcomeToString() }} !
                         </p>
                         <p v-else>Game has been canceled.</p>

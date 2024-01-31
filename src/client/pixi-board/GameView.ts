@@ -1,4 +1,4 @@
-import { Game, Move, PlayerIndex, PlayerInterface } from '@shared/game-engine';
+import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
 import { currentTheme } from '@client/pixi-board/BoardTheme';
@@ -197,19 +197,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.redraw();
     }
 
-    bindPlayer(player: null | PlayerInterface): this
-    {
-        this.on('hexClicked', move => {
-            try {
-                player?.move(move);
-            } catch (e) {
-                console.log('Move not played: ' + e);
-            }
-        });
-
-        return this;
-    }
-
     getWrapperSize(): GameViewSize
     {
         const rem = parseFloat(getComputedStyle(document.documentElement).fontSize); // Browser rem size
@@ -327,9 +314,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private listenModel(): void
     {
-        this.game.on('started', () => {
-            this.highlightSidesFromGame();
-        });
+        this.highlightSidesFromGame();
 
         this.game.on('played', (move, moveIndex, byPlayerIndex) => {
             this.resetHighlightedHexes();
@@ -578,7 +563,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     highlightSidesFromGame(): void
     {
-        if (!this.game.isStarted() || this.game.isCanceled()) {
+        if (this.game.isCanceled()) {
             this.highlightSides(true, true);
             return;
         }

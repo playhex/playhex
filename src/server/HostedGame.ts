@@ -1,16 +1,17 @@
-import { Game, IllegalMove, Move, Player, PlayerIndex } from '../shared/game-engine';
-import { HostedGameData, PlayerData, Tuple } from '../shared/app/Types';
+import { Game, IllegalMove, Move, PlayerIndex, calcRandomMove } from '../shared/game-engine';
+import { HostedGameData, HostedGameState, PlayerData } from '../shared/app/Types';
 import { GameTimeData } from '../shared/time-control/TimeControl';
-import AppPlayer from '../shared/app/AppPlayer';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
-import { HexServer } from 'server';
-import { GameState, Outcome } from '@shared/game-engine/Game';
+import { HexServer } from './server';
+import { Outcome } from '@shared/game-engine/Game';
 import logger from './services/logger';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Rooms from '../shared/app/Rooms';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl';
 import { createTimeControl } from '../shared/time-control/TimeControlType';
+import Container from 'typedi';
+import RemoteApiPlayer from './RemoteApiPlayer';
 
 /**
  * Contains a game state,
@@ -19,21 +20,34 @@ import { createTimeControl } from '../shared/time-control/TimeControlType';
 export default class HostedGame
 {
     private id: string = uuidv4();
-    private timeControl: AbstractTimeControl;
-    private game: null | Game = null;
-    private canceled = false;
-    private createdAt: Date = new Date();
 
-    private opponent: null | AppPlayer = null;
+    /**
+     * Null if not yet started, or ended and reloaded from database
+     */
+    private game: null | Game = null;
+
+    /**
+     * Players waiting in lobby including host,
+     * then when game is playing, players are ordered.
+     */
+    private players: PlayerData[];
+
+    private timeControl: AbstractTimeControl;
+    private state: HostedGameState = 'created';
+    private createdAt: Date = new Date();
+    private io: HexServer = Container.get(HexServer);
 
     constructor(
-        private io: HexServer,
         private gameOptions: GameOptionsData,
-        private host: AppPlayer,
+        private host: PlayerData,
     ) {
-        logger.info('Hosted game created.', { hostedGameId: this.id, host: host.getPlayerData().pseudo });
+        logger.info('Hosted game created.', { hostedGameId: this.id, host: host.pseudo });
+
+        this.players = [host];
 
         this.timeControl = createTimeControl(gameOptions.timeControl);
+
+        this.io.to(Rooms.lobby).emit('gameCreated', this.toData());
     }
 
     getId(): string
@@ -46,63 +60,120 @@ export default class HostedGame
         return this.game;
     }
 
+    getPlayers(): PlayerData[]
+    {
+        return this.players;
+    }
+
+    getPlayerIndex(playerData: PlayerData): null | number
+    {
+        const index = this.players.findIndex(p => p.publicId === playerData.publicId);
+
+        if (index < 0) {
+            return null;
+        }
+
+        return index;
+    }
+
     getGameTimeData(): GameTimeData
     {
         return this.timeControl.getValues();
     }
 
-    getState(): GameState
+    getState(): HostedGameState
     {
-        if (null === this.game) {
-            return 'created';
-        }
-
-        return this.game.getState();
+        return this.state;
     }
 
+    /**
+     * Returns rooms where a message from this hosted game should be emitted.
+     */
     private gameRooms(withLobby = false): string[]
     {
         const rooms = [
             Rooms.game(this.id),
-            Rooms.playerGames(this.host.getPlayerId()),
         ];
 
         if (withLobby) {
             rooms.push(Rooms.lobby);
         }
 
-        if (null !== this.opponent) {
-            rooms.push(Rooms.playerGames(this.opponent.getPlayerId()));
-        }
+        this.players.forEach(player =>
+            rooms.push(Rooms.playerGames(player.publicId))
+        );
 
         return rooms;
     }
 
-    listenGame(): void
+    /**
+     * Should be called when player turn changed.
+     * Check whether current player is a bot player, and request an AI move if true.
+     */
+    private async makeAIMoveIfApplicable(): Promise<void>
     {
-        if (!this.game) {
-            logger.error('Cannot call listenGame() now, game is not yet created.');
+        if (null === this.game || 'playing' !== this.state) {
+            logger.error('makeAIPlayIfApplicable() called but game is not playing or null');
             return;
         }
 
-        this.game.on('started', () => {
-            this.io.to(this.gameRooms(true)).emit('gameStarted', this.toData());
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
-        });
+        const playerData = this.players[this.game.getCurrentPlayerIndex()];
+        const playerIndex = this.getPlayerIndex(playerData) as PlayerIndex;
 
-        this.game.on('played', (move, moveIndex, byPlayerIndex) => {
+        if (!playerData.isBot) {
+            return;
+        }
+
+        try {
+            switch (playerData.slug) {
+                case 'determinist-random-bot':
+                    this.game.move(
+                        await calcRandomMove(this.game, 0, true),
+                        playerIndex,
+                    );
+                    break;
+
+                case 'mohex':
+                    await Container.get(RemoteApiPlayer).makeMove(this.game, playerIndex);
+                    break;
+
+                default:
+                    logger.error(`No AI play for bot with slug = "${playerData.slug}"`);
+            }
+        } catch (e) {
+            if (e instanceof IllegalMove) {
+                logger.error('From makeAIMoveIfApplicable(): an AI played an illegal move', { err: e.message, slug: playerData.slug });
+            } else {
+                logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { err: e.message, slug: playerData.slug });
+            }
+        }
+    }
+
+    private listenGame(game: Game): void
+    {
+        /**
+         * Listen on played event, move can come from AI
+         */
+        game.on('played', (move, moveIndex, byPlayerIndex) => {
             this.io.to(this.gameRooms()).emit('moved', this.id, move, moveIndex, byPlayerIndex);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+
+            if (!game.isEnded()) {
+                this.makeAIMoveIfApplicable();
+            }
         });
 
-        this.game.on('ended', (winner: PlayerIndex, outcome: Outcome) => {
+        /**
+         * Listen on ended event, can come from game that turned into a winning position,
+         * or time control that elapsed and made a winner.
+         */
+        game.on('ended', (winner: PlayerIndex, outcome: Outcome) => {
+            this.state = 'ended';
+
             this.io.to(this.gameRooms(true)).emit('ended', this.id, winner, outcome);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
-        });
 
-        this.game.on('canceled', () => {
-            this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id);
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+            logger.info('Game ended.', { hostedGameId: this.id, winner, outcome });
         });
     }
 
@@ -118,14 +189,12 @@ export default class HostedGame
 
     isPlayerInGame(playerData: PlayerData): boolean
     {
-        const appPlayer = this.findAppPlayer(playerData);
-
-        return appPlayer === this.host || appPlayer === this.opponent;
+        return this.players.some(p => p.publicId === playerData.publicId);
     }
 
     private createAndStartGame(): void
     {
-        if (this.canceled) {
+        if ('canceled' === this.state) {
             logger.warning('Cannot init game, canceled', { hostedGameId: this.id });
             return;
         }
@@ -135,81 +204,68 @@ export default class HostedGame
             return;
         }
 
-        if (null === this.opponent) {
+        if (this.players.length < 2) {
             logger.warning('Cannot init game, no opponent', { hostedGameId: this.id });
             return;
         }
 
-        const players: Tuple<AppPlayer> = [this.host, this.opponent];
-
         if (null === this.gameOptions.firstPlayer) {
             if (Math.random() < 0.5) {
-                players.reverse();
+                this.players.reverse();
             }
         } else if (1 === this.gameOptions.firstPlayer) {
-            players.reverse();
+            this.players.reverse();
         }
 
-        this.game = new Game(this.gameOptions.boardsize, players);
+        this.game = new Game(this.gameOptions.boardsize);
+
+        this.listenGame(this.game);
 
         this.game.setAllowSwap(this.gameOptions.swapRule);
+        this.state = 'playing';
 
         this.bindTimeControl();
-        this.listenGame();
 
-        this.game.start();
+        this.io.to(this.gameRooms(true)).emit('gameStarted', this.toData());
+        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
         logger.info('Game Started.', { hostedGameId: this.id });
-    }
 
-    /**
-     * Returns AppPlayer from a PlayerData, same instance if player already in this game, or creating a new one.
-     */
-    findAppPlayer(playerData: PlayerData): AppPlayer
-    {
-        if (this.host.getPlayerId() === playerData.publicId) {
-            return this.host;
-        }
-
-        if (null !== this.opponent && playerData.publicId === this.opponent.getPlayerId()) {
-            return this.opponent;
-        }
-
-        return new AppPlayer(playerData);
+        this.makeAIMoveIfApplicable();
     }
 
     /**
      * A player join this game.
      */
-    playerJoin(playerData: PlayerData | AppPlayer): true | string
+    playerJoin(playerData: PlayerData): true | string
     {
-        const appPlayer = playerData instanceof AppPlayer
-            ? playerData
-            : this.findAppPlayer(playerData)
-        ;
-
-        if (this.canceled) {
-            logger.notice('Player tried to join but hosted game has been canceled', { hostedGameId: this.id, joiner: appPlayer.getName() });
-            return 'Game has been canceled';
+        if ('created' !== this.state) {
+            logger.notice('Player tried to join but hosted game has started or ended', { hostedGameId: this.id, joiner: playerData.pseudo });
+            return 'Game has started or ended';
         }
 
         // Check whether game is full
-        if (null !== this.opponent) {
-            logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.id, joiner: appPlayer.getName() });
+        if (this.players.length >= 2) {
+            logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.id, joiner: playerData.pseudo });
             return 'Game is full';
         }
 
-        // Prevent a player from joining as his own opponent
-        if (appPlayer === this.host) {
-            logger.notice('Player tried to join as his own opponent', { hostedGameId: this.id, joiner: appPlayer.getName() });
-            return 'You already joined this game. You cannot play vs yourself!';
+        // Prevent a player from joining twice
+        if (this.isPlayerInGame(playerData)) {
+            logger.notice('Player tried to join twice', { hostedGameId: this.id, joiner: playerData.pseudo });
+            return 'You already joined this game.';
         }
 
-        this.opponent = appPlayer;
+        this.players.push(playerData);
 
-        logger.info('Player joined.', { hostedGameId: this.id, joiner: appPlayer.getName() });
+        this.io.to([Rooms.lobby, Rooms.game(this.id)]).emit('gameJoined', this.id, playerData);
 
-        this.createAndStartGame();
+        logger.info('Player joined.', { hostedGameId: this.id, joiner: playerData.pseudo });
+
+        // Starts automatically when game is full
+        if (2 === this.players.length) {
+            this.createAndStartGame();
+        }
 
         return true;
     }
@@ -218,9 +274,9 @@ export default class HostedGame
     {
         logger.info('Move played', { hostedGameId: this.id, move, player: playerData });
 
-        if (this.canceled) {
-            logger.notice('Player tried to move but hosted game has been canceled', { hostedGameId: this.id, joiner: playerData.pseudo });
-            return 'Game has been canceled';
+        if ('playing' !== this.state) {
+            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.id, joiner: playerData.pseudo });
+            return 'Game is not playing';
         }
 
         if (!this.game) {
@@ -234,9 +290,7 @@ export default class HostedGame
         }
 
         try {
-            const appPlayer = this.findAppPlayer(playerData);
-
-            appPlayer.move(move);
+            this.game.move(move, this.getPlayerIndex(playerData) as PlayerIndex);
 
             return true;
         } catch (e) {
@@ -251,9 +305,9 @@ export default class HostedGame
 
     playerResign(playerData: PlayerData): true | string
     {
-        if (this.canceled) {
-            logger.notice('Player tried to resign but hosted game has been canceled', { hostedGameId: this.id, joiner: playerData.pseudo });
-            return 'Game has been canceled';
+        if ('playing' !== this.state) {
+            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.id, joiner: playerData.pseudo });
+            return 'Game is not playing';
         }
 
         if (!this.game) {
@@ -266,15 +320,8 @@ export default class HostedGame
             return 'you are not a player of this game';
         }
 
-        if (this.game.isEnded()) {
-            logger.notice('A player tried to resign, but game already ended', { hostedGameId: this.id, player: playerData.pseudo });
-            return 'game already ended';
-        }
-
         try {
-            const appPlayer = this.findAppPlayer(playerData);
-
-            appPlayer.resign();
+            this.game.resign(this.getPlayerIndex(playerData) as PlayerIndex);
 
             return true;
         } catch (e) {
@@ -290,22 +337,17 @@ export default class HostedGame
             return 'you are not a player of this game';
         }
 
-        if (this.canceled) {
-            logger.notice('A player tried to cancel, but game already canceled', { hostedGameId: this.id, player: playerData.pseudo });
-            return 'already canceled';
+        if ('playing' !== this.state && 'created' !== this.state) {
+            logger.notice('Player tried to move but hosted game is not playing nor created', { hostedGameId: this.id, joiner: playerData.pseudo });
+            return 'Game is not playing nor created';
         }
 
-        if (!this.game || this.game.getState() === 'created') {
+        if (null === this.game) {
             return true;
         }
 
-        if (this.game.getState() === 'ended') {
-            logger.notice('A player tried to cancel, but game has finished', { hostedGameId: this.id, player: playerData.pseudo });
-            return 'game has finished';
-        }
-
-        if (this.game.getMovesHistory().length >= 2) {
-            logger.notice('A player tried to cancel, but too late, at least 2 moves have been played', { hostedGameId: this.id, player: playerData.pseudo });
+        if (this.game.getMovesHistory().length >= this.players.length) {
+            logger.notice('A player tried to cancel, but too late, every player played a move', { hostedGameId: this.id, player: playerData.pseudo });
             return 'cannot cancel now, each player has played at least one move';
         }
 
@@ -320,15 +362,15 @@ export default class HostedGame
             return canCancel;
         }
 
-        this.canceled = true;
+        this.state = 'canceled';
         this.timeControl.finish();
 
         if (null !== this.game) {
             this.game.cancel();
-        } else {
-            this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id);
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
         }
+
+        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id);
+        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
         logger.info('Game canceled.', { hostedGameId: this.id });
 
@@ -339,30 +381,26 @@ export default class HostedGame
     {
         const hostedGameData: HostedGameData = {
             id: this.id,
-            host: HostedGame.playerToData(this.host),
-            opponent: this.opponent ? HostedGame.playerToData(this.opponent) : null,
+            host: this.host,
+            players: this.players,
             timeControl: {
                 options: this.timeControl.getOptions(),
                 values: this.timeControl.getValues(),
             },
             gameOptions: this.gameOptions,
             gameData: null,
-            canceled: this.canceled,
+            state: this.state,
             createdAt: this.createdAt,
         };
 
         if (this.game) {
             hostedGameData.gameData = {
-                players: this.game.getPlayers().map(HostedGame.playerToData) as Tuple<PlayerData>,
                 size: this.game.getSize(),
-                started: this.game.isStarted(),
-                state: this.game.getState(),
                 movesHistory: this.game.getMovesHistory(),
                 allowSwap: this.game.getAllowSwap(),
                 currentPlayerIndex: this.game.getCurrentPlayerIndex(),
                 winner: this.game.getWinner(),
                 outcome: this.game.getOutcome(),
-                createdAt: this.game.getCreatedAt(),
                 startedAt: this.game.getStartedAt(),
                 lastMoveAt: this.game.getLastMoveAt(),
                 endedAt: this.game.getEndedAt(),
@@ -370,23 +408,5 @@ export default class HostedGame
         }
 
         return hostedGameData;
-    }
-
-    private static playerToData(player: Player): PlayerData
-    {
-        if (player instanceof AppPlayer) {
-            return player.getPlayerData();
-        }
-
-        logger.warning('Raw Player still used. Should use only AppPlayer instances');
-
-        return {
-            publicId: 'unknown|' + uuidv4(),
-            pseudo: player.getName(),
-            createdAt: new Date(),
-            slug: '',
-            isBot: false,
-            isGuest: false,
-        };
     }
 }

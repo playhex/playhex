@@ -13,18 +13,26 @@ const baseRootNode = {
     PL: 'B',
 };
 
+type Options = {
+    PB?: string;
+    PW?: string;
+};
+
 const colors = ['B', 'W'];
 
-const gameToSGF = (game: Game): string => {
+const gameToSGF = (game: Game, options: null | Options = null): string => {
     const rootNode: { [key: string]: string | number } = {
         ...baseRootNode,
         SZ: game.getSize(),
-        DT: (game.getStartedAt() ?? game.getCreatedAt()).toISOString().substring(0, 10),
+        DT: game.getStartedAt().toISOString().substring(0, 10),
     };
 
-    if (game.hasPlayers()) {
-        rootNode.PB = game.getPlayer(0).getName();
-        rootNode.PW = game.getPlayer(1).getName();
+    if (options?.PB) {
+        rootNode.PB = options.PB;
+    }
+
+    if (options?.PW) {
+        rootNode.PW = options.PW;
     }
 
     if (game.isEnded()) {

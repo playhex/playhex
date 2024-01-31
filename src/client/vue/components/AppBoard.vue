@@ -1,24 +1,26 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView, { BoardOrientation } from '@client/pixi-board/GameView';
+import GameView, { BoardOrientation } from '../../pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
-import GameFinishedOverlay from '@client/vue/components/overlay/GameFinishedOverlay.vue';
+import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
-import AppPlayer from '@shared/app/AppPlayer';
 import AppChrono from './AppChrono.vue';
-import { TimeControlOptionsValues } from '@shared/app/Types';
 import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
+import { PlayerData, TimeControlOptionsValues } from '../../../shared/app/Types';
 
 const pixiApp = ref<HTMLElement>();
 
 const props = defineProps({
+    players: {
+        type: Array as PropType<null | PlayerData[]>,
+    },
+    timeControl: {
+        type: Object as PropType<TimeControlOptionsValues>,
+    },
     gameView: {
         type: GameView,
         required: true,
-    },
-    gameTimeControl: {
-        type: Object as PropType<TimeControlOptionsValues>,
     },
     rematch: {
         type: Function,
@@ -26,12 +28,13 @@ const props = defineProps({
     },
 });
 
-const { gameView, gameTimeControl } = toRefs(props);
+const { players, gameView } = props;
+const { timeControl } = toRefs(props);
 
 /*
  * Add piwi view
  */
-const game = gameView?.value?.getGame();
+const game = gameView.getGame();
 
 if (!gameView || !game) {
     throw new Error('gameView is required');
@@ -42,22 +45,22 @@ onMounted(() => {
         throw new Error('No element with ref="pixiApp"');
     }
 
-    if (!gameView.value) {
+    if (!gameView) {
         throw new Error('gameView has no value');
     }
 
-    pixiApp.value.appendChild(gameView.value.getView() as unknown as Node);
+    pixiApp.value.appendChild(gameView.getView() as unknown as Node);
 });
 
 onUnmounted(() => {
-    gameView.value.destroy();
+    gameView.destroy();
 });
 
 /*
  * Orientation auto update on screen size change
  */
-let orientation = ref<BoardOrientation>(gameView?.value?.getOrientation());
-const updateOrientation = () => orientation.value = gameView?.value?.getOrientation();
+let orientation = ref<BoardOrientation>(gameView.getOrientation());
+const updateOrientation = () => orientation.value = gameView.getOrientation();
 window.addEventListener('resizeDebounced', updateOrientation);
 
 onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientation));
@@ -68,14 +71,15 @@ onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientatio
 const gameFinishedOverlay = createOverlay(GameFinishedOverlay);
 const { rematch } = props;
 
-gameView.value.on('endedAndWinAnimationOver', () => {
+gameView.on('endedAndWinAnimationOver', () => {
     gameFinishedOverlay({
         game,
+        players,
         rematch,
     });
 });
 
-onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'));
+onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
 </script>
 
 <template>
@@ -87,14 +91,14 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a mx-2">
                 <app-chrono
-                    v-if="gameTimeControl"
-                    :timeControlOptions="gameTimeControl.options"
-                    :playerTimeData="gameTimeControl.values.players[0]"
+                    v-if="timeControl"
+                    :timeControlOptions="timeControl.options"
+                    :playerTimeData="timeControl.values.players[0]"
                 />
-                <p class="h4" v-for="player in [game.getPlayer(0)]" :key="player.getName()">
+                <p class="h4" v-if="players">
                     <app-pseudo-with-online-status
-                        v-if="(player instanceof AppPlayer)"
-                        :playerData="player.getPlayerData()"
+                        v-if="players[0]"
+                        :playerData="players[0]"
                         classes="text-danger"
                     />
                     <span v-else class="fst-italic">waiting…</span>
@@ -102,14 +106,14 @@ onUnmounted(() => gameView.value.removeAllListeners('endedAndWinAnimationOver'))
             </div>
             <div class="player player-b mx-2">
                 <app-chrono
-                    v-if="gameTimeControl"
-                    :timeControlOptions="gameTimeControl.options"
-                    :playerTimeData="gameTimeControl.values.players[1]"
+                    v-if="timeControl"
+                    :timeControlOptions="timeControl.options"
+                    :playerTimeData="timeControl.values.players[1]"
                 />
-                <p class="h4" v-for="player in [game.getPlayer(1)]" :key="player.getName()">
+                <p class="h4" v-if="players">
                     <app-pseudo-with-online-status
-                        v-if="(player instanceof AppPlayer)"
-                        :playerData="player.getPlayerData()"
+                        v-if="players[1]"
+                        :playerData="players[1]"
                         classes="text-primary"
                     />
                     <span v-else class="fst-italic">waiting…</span>

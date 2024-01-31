@@ -5,25 +5,24 @@ import useLobbyStore from '@client/stores/lobbyStore';
 import { ref } from '@vue/runtime-core';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
-import HostedGameClient from 'HostedGameClient';
+import HostedGameClient from '../../HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
 import { Ref, onUnmounted } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
-import AppPlayer from '@shared/app/AppPlayer';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
 import { BIconFlag, BIconX, BIconCheck, BIconAlphabet } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import { storeToRefs } from 'pinia';
+import { PlayerIndex } from '@shared/game-engine';
 
 const { gameId } = useRoute().params;
 
-let hostedGameClient = ref<null | HostedGameClient>(null);
+const hostedGameClient = ref<null | HostedGameClient>(null);
 
 let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board
-const gameViewLoaded = ref(0);
 
 if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
@@ -44,7 +43,7 @@ const shouldDisplayConfirmMove = (): boolean => {
     }
 
     // I am watcher
-    if (null === getLocalAppPlayer()) {
+    if (-1 === getLocalPlayerIndex()) {
         return false;
     }
 
@@ -68,14 +67,14 @@ const shouldDisplayConfirmMove = (): boolean => {
 useSocketStore().joinRoom(Rooms.game(gameId));
 onUnmounted(() => useSocketStore().leaveRoom(Rooms.game(gameId)));
 
-const getLocalAppPlayer = (): null | AppPlayer => {
+const getLocalPlayerIndex = (): number => {
     const { loggedInPlayer } = useAuthStore();
 
     if (null === loggedInPlayer || !hostedGameClient.value) {
-        return null;
+        return -1;
     }
 
-    return hostedGameClient.value.getLocalAppPlayer(loggedInPlayer);
+    return hostedGameClient.value.getPlayerIndex(loggedInPlayer);
 };
 
 const listenHexClick = () => {
@@ -84,30 +83,36 @@ const listenHexClick = () => {
     }
 
     gameView.on('hexClicked', move => {
+        if (null === hostedGameClient.value) {
+            throw new Error('hex clicked but hosted game is null');
+        }
+
+        const game = hostedGameClient.value.getGame();
+
         try {
             // Must get local player again in case player joined after (click "Watch", then "Join")
-            const localAppPlayer = getLocalAppPlayer();
+            const localPlayerIndex = getLocalPlayerIndex();
 
-            if (!localAppPlayer) {
+            if (-1 === localPlayerIndex) {
                 return;
             }
 
-            if (true !== localAppPlayer.checkMove(move)) {
-                return;
-            }
+            hostedGameClient.value.getGame().checkMove(move, localPlayerIndex as PlayerIndex);
 
             if (!shouldDisplayConfirmMove()) {
-                localAppPlayer.move(move);
+                game.move(move, localPlayerIndex as PlayerIndex);
+                hostedGameClient.value.sendMove(move);
                 return;
             }
 
             confirmMove.value = () => {
                 gameView?.removePreviewMove();
-                localAppPlayer.move(move);
+                game.move(move, localPlayerIndex as PlayerIndex);
+                hostedGameClient.value?.sendMove(move);
                 confirmMove.value = null;
             };
 
-            gameView?.previewMove(move, localAppPlayer.getPlayerIndex());
+            gameView?.previewMove(move, localPlayerIndex as PlayerIndex);
         } catch (e) {
             console.log('Move not played: ' + e);
         }
@@ -123,10 +128,10 @@ const initGameView = () => {
 
     gameView = new GameView(game);
 
-    if (game.isStarted()) {
+    if ('playing' === hostedGameClient.value.getState()) {
         listenHexClick();
     } else {
-        game.on('started', () => listenHexClick());
+        hostedGameClient.value.on('started', () => listenHexClick());
     }
 };
 
@@ -147,7 +152,7 @@ const initGameView = () => {
 })();
 
 const join = async () => {
-    const result = await lobbyStore.joinGame(gameId);
+    const result = await hostedGameClient.value?.sendJoinGame();
 
     if (true !== result) {
         console.error('could not join:', result);
@@ -160,7 +165,7 @@ const confirmationOverlay = createOverlay(ConfirmationOverlay);
  * Resign
  */
 const canResign = (): boolean => {
-    if (null === getLocalAppPlayer() || null === hostedGameClient.value) {
+    if (-1 === getLocalPlayerIndex() || null === hostedGameClient.value) {
         return false;
     }
 
@@ -168,9 +173,9 @@ const canResign = (): boolean => {
 };
 
 const resign = async (): Promise<void> => {
-    const localPlayer = getLocalAppPlayer();
+    const localPlayerIndex = getLocalPlayerIndex();
 
-    if (null === localPlayer) {
+    if (-1 === localPlayerIndex) {
         return;
     }
 
@@ -184,7 +189,7 @@ const resign = async (): Promise<void> => {
             cancelClass: 'btn-outline-primary',
         });
 
-        localPlayer.resign();
+        hostedGameClient.value?.sendResign();
     } catch (e) {
         // resignation canceled
     }
@@ -194,7 +199,7 @@ const resign = async (): Promise<void> => {
  * Cancel
  */
 const canCancel = (): boolean => {
-    if (null === getLocalAppPlayer() || null === hostedGameClient.value) {
+    if (-1 === getLocalPlayerIndex() || null === hostedGameClient.value) {
         return false;
     }
 
@@ -216,7 +221,7 @@ const cancel = async (): Promise<void> => {
         return;
     }
 
-    lobbyStore.cancel(gameId);
+    hostedGameClient.value?.sendCancel();
 };
 
 const toggleCoords = () => {
@@ -249,10 +254,10 @@ const rematch = async (): Promise<void> => {
 <template>
     <div class="position-relative">
         <app-board
-            v-if="gameView"
+            v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView"
+            :players="hostedGameClient.getPlayers()"
+            :time-control="hostedGameClient.getTimeControl()"
             :game-view="gameView"
-            :game-time-control="hostedGameClient?.getTimeControl()"
-            :key="gameViewLoaded"
             :rematch="rematch"
         ></app-board>
         <p v-else>Loading game {{ gameId }}…</p>

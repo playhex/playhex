@@ -79,7 +79,7 @@ const hasWon = (game: HostedGameData): boolean => {
         return false;
     }
 
-    const winner = game.gameData.players[game.gameData.winner];
+    const winner = game.players[game.gameData.winner];
 
     return winner.publicId === player.value?.publicId;
 };
@@ -89,19 +89,22 @@ const getOpponent = (game: HostedGameData): PlayerData => {
         throw new Error('player must be set');
     }
 
-    if (null === game.opponent) {
-        throw new Error('No expected to have no opponent here');
+    let me: null | PlayerData = null;
+    let opponent: null | PlayerData = null;
+
+    for (const p of game.players) {
+        if (p.publicId === player.value.publicId) {
+            me = p;
+        } else {
+            opponent = p;
+        }
     }
 
-    if (game.host.publicId === player.value.publicId) {
-        return game.opponent;
+    if (null === me || null === opponent) {
+        throw new Error('Player not in the game, or no opponent');
     }
 
-    if (game.opponent.publicId === player.value.publicId) {
-        return game.host;
-    }
-
-    throw new Error('Player not in the game');
+    return opponent;
 };
 
 const router = useRouter();
