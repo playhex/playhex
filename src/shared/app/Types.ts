@@ -1,9 +1,8 @@
 import { GameTimeData } from '../time-control/TimeControl';
-import { PlayerIndex } from '../game-engine';
-import { Outcome } from 'game-engine/Game';
 import { GameOptionsData } from './GameOptions';
 import TimeControlType from '../time-control/TimeControlType';
 import { Player, PlayerSettings } from '@prisma/client';
+import { GameData } from '../game-engine/Types';
 
 export type Tuple<T> = [T, T];
 
@@ -42,23 +41,6 @@ export type PlayerData = Pick<Player,
      */
     | 'createdAt'
 >;
-
-export type MoveData = {
-    row: number;
-    col: number;
-};
-
-export type GameData = {
-    size: number;
-    movesHistory: MoveData[];
-    allowSwap: boolean;
-    currentPlayerIndex: PlayerIndex;
-    winner: null | PlayerIndex;
-    outcome: null | Outcome;
-    startedAt: Date;
-    lastMoveAt: null | Date;
-    endedAt: null | Date;
-};
 
 export type TimeControlOptionsValues = {
     options: TimeControlType;

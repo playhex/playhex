@@ -98,4 +98,85 @@ describe('Game', () => {
         assert.strictEqual(game.getBoard().getCell(2, 1), null);
         assert.strictEqual(game.getCurrentPlayerIndex(), 1);
     });
+
+    it('recreate a playing Game from raw data object', () => {
+        const game = new Game(5);
+
+        game.setAllowSwap(false);
+
+        game.move(new Move(1, 2), 0);
+        game.move(new Move(3, 1), 1);
+
+        const gameData = game.toData();
+
+        assert.strictEqual(gameData.size, 5);
+        assert.strictEqual(gameData.movesHistory.length, 2);
+        assert.match(gameData.movesHistory[0].playedAt, /\d+-\d+-\d+T\d+:\d+:\d+.*Z/);
+
+
+        const restoredGame = Game.fromData(gameData);
+
+        assert.strictEqual(game.getSize(), restoredGame.getSize());
+        assert.strictEqual(game.getMovesHistory().length, restoredGame.getMovesHistory().length);
+        assert.strictEqual(game.getMovesHistory()[0].getPlayedAt().toISOString(), restoredGame.getMovesHistory()[0].getPlayedAt().toISOString());
+        assert.strictEqual(game.getStartedAt(), restoredGame.getStartedAt());
+        assert.strictEqual(game.getLastMoveAt(), restoredGame.getLastMoveAt());
+        assert.strictEqual(game.isEnded(), restoredGame.isEnded());
+    });
+
+    it('recreate a resigned Game from raw data object', () => {
+        const game = new Game(5);
+
+        game.setAllowSwap(false);
+
+        game.move(new Move(1, 2), 0);
+        game.move(new Move(3, 1), 1);
+
+        game.resign(0);
+
+        const gameData = game.toData();
+        const restoredGame = Game.fromData(gameData);
+
+        assert.strictEqual(game.getWinner(), restoredGame.getWinner());
+        assert.strictEqual(game.getOutcome(), restoredGame.getOutcome());
+        assert.strictEqual(game.isEnded(), restoredGame.isEnded());
+    });
+
+    it('recreate a canceled Game from raw data object', () => {
+        const game = new Game(5);
+
+        game.setAllowSwap(false);
+
+        game.move(new Move(1, 2), 0);
+        game.move(new Move(3, 1), 1);
+
+        game.cancel();
+
+        const gameData = game.toData();
+        const restoredGame = Game.fromData(gameData);
+
+        assert.strictEqual(game.getWinner(), restoredGame.getWinner());
+        assert.strictEqual(game.getOutcome(), restoredGame.getOutcome());
+        assert.strictEqual(game.isEnded(), restoredGame.isEnded());
+        assert.strictEqual(game.isCanceled(), restoredGame.isCanceled());
+    });
+
+    it('recreates a won game from raw data object', () => {
+        const game = new Game(3);
+
+        game.move(new Move(1, 1), 0);
+        game.move(new Move(1, 2), 1);
+        game.move(new Move(2, 1), 0);
+        game.move(new Move(2, 0), 1);
+        game.move(new Move(0, 1), 0);
+
+        const gameData = game.toData();
+        const restoredGame = Game.fromData(gameData);
+
+        assert.strictEqual(game.getWinner(), restoredGame.getWinner());
+        assert.strictEqual(game.getOutcome(), restoredGame.getOutcome());
+        assert.strictEqual(game.isEnded(), restoredGame.isEnded());
+        assert.strictEqual(game.getEndedAt(), restoredGame.getEndedAt());
+        assert.strictEqual(game.isCanceled(), restoredGame.isCanceled());
+    });
 });

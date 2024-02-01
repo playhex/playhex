@@ -1,10 +1,10 @@
 import { Game, IllegalMove, Move, PlayerIndex, calcRandomMove } from '../shared/game-engine';
+import { Outcome } from '../shared/game-engine/Types';
 import { HostedGameData, HostedGameState, PlayerData } from '../shared/app/Types';
 import { GameTimeData } from '../shared/time-control/TimeControl';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
-import { Outcome } from '@shared/game-engine/Game';
 import logger from './services/logger';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Rooms from '../shared/app/Rooms';
@@ -155,7 +155,7 @@ export default class HostedGame
          * Listen on played event, move can come from AI
          */
         game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.io.to(this.gameRooms()).emit('moved', this.id, move, moveIndex, byPlayerIndex);
+            this.io.to(this.gameRooms()).emit('moved', this.id, move.toData(), moveIndex, byPlayerIndex);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
             if (!game.isEnded()) {
@@ -388,24 +388,10 @@ export default class HostedGame
                 values: this.timeControl.getValues(),
             },
             gameOptions: this.gameOptions,
-            gameData: null,
+            gameData: this.game?.toData() ?? null,
             state: this.state,
             createdAt: this.createdAt,
         };
-
-        if (this.game) {
-            hostedGameData.gameData = {
-                size: this.game.getSize(),
-                movesHistory: this.game.getMovesHistory(),
-                allowSwap: this.game.getAllowSwap(),
-                currentPlayerIndex: this.game.getCurrentPlayerIndex(),
-                winner: this.game.getWinner(),
-                outcome: this.game.getOutcome(),
-                startedAt: this.game.getStartedAt(),
-                lastMoveAt: this.game.getLastMoveAt(),
-                endedAt: this.game.getEndedAt(),
-            };
-        }
 
         return hostedGameData;
     }

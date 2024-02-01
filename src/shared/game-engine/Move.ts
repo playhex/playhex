@@ -1,4 +1,4 @@
-import { Coords } from './Types';
+import { Coords, MoveData } from './Types';
 
 export default class Move implements Coords
 {
@@ -70,5 +70,23 @@ export default class Move implements Coords
     cloneMirror(): Move
     {
         return new Move(this.col, this.row);
+    }
+
+    toData(): MoveData
+    {
+        return {
+            row: this.row,
+            col: this.col,
+            playedAt: this.playedAt.toISOString(),
+        };
+    }
+
+    static fromData(moveData: MoveData): Move
+    {
+        return new Move(
+            moveData.row,
+            moveData.col,
+            new Date(moveData.playedAt)
+        );
     }
 }

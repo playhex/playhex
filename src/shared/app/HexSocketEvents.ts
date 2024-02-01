@@ -1,6 +1,6 @@
-import { Outcome } from 'game-engine/Game';
+import { MoveData, Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
-import { HostedGameData, MoveData, PlayerData } from './Types';
+import { HostedGameData, PlayerData } from './Types';
 import { GameTimeData } from 'time-control/TimeControl';
 
 export type HexClientToServerEvents = {

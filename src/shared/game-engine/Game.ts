@@ -1,6 +1,7 @@
 import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from '.';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board';
+import { GameData, Outcome } from './Types';
 
 type GameEvents = {
     /**
@@ -20,34 +21,6 @@ type GameEvents = {
      */
     canceled: () => void;
 };
-
-/**
- * How a game has ended.
- */
-export type Outcome =
-    /**
-     * No outcome precision, game should have been won by regular victory,
-     * or game is still playing, or has been canceled.
-     */
-    null
-
-    /**
-     * Player who lost manually resigned the game, before or while playing.
-     */
-    | 'resign'
-
-    /**
-     * Player who lost ran out of time while playing.
-     * Assuming he already played at least one move.
-     */
-    | 'time'
-
-    /**
-     * Player who lost didn't played his first move,
-     * or has been foreited by an external reason.
-     */
-    | 'forfeit'
-;
 
 export default class Game extends TypedEmitter<GameEvents>
 {
@@ -403,5 +376,42 @@ export default class Game extends TypedEmitter<GameEvents>
         this.endedAt = date;
 
         return this;
+    }
+
+    toData(): GameData
+    {
+        return {
+            size: this.getSize(),
+            movesHistory: this.movesHistory.map(move => move.toData()),
+            allowSwap: this.allowSwap,
+            currentPlayerIndex: this.currentPlayerIndex,
+            winner: this.winner,
+            outcome: this.outcome,
+            startedAt: this.startedAt,
+            lastMoveAt: this.lastMoveAt,
+            endedAt: this.endedAt,
+        };
+    }
+
+    static fromData(gameData: GameData): Game
+    {
+        const game = new Game(gameData.size);
+
+        game.allowSwap = gameData.allowSwap;
+
+        gameData.movesHistory.forEach((moveData, index) => {
+            game.move(Move.fromData(moveData), index % 2 as PlayerIndex);
+        });
+
+        game.currentPlayerIndex = gameData.currentPlayerIndex;
+
+        game.winner = gameData.winner;
+        game.outcome = gameData.outcome;
+
+        game.startedAt = gameData.startedAt;
+        game.lastMoveAt = gameData.lastMoveAt;
+        game.endedAt = gameData.endedAt;
+
+        return game;
     }
 }

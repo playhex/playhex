@@ -1,8 +1,9 @@
 import { Service } from 'typedi';
 import HostedGame from '../HostedGame';
 import { Move } from '../../shared/game-engine';
-import { HostedGameData, HostedGameState, MoveData, PlayerData } from '../../shared/app/Types';
+import { HostedGameData, HostedGameState, PlayerData } from '../../shared/app/Types';
 import { GameOptionsData } from '@shared/app/GameOptions';
+import { MoveData } from '../../shared/game-engine/Types';
 
 @Service()
 export default class HostedGameRepository
