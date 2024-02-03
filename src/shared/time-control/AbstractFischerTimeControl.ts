@@ -53,6 +53,16 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
 
         this.playerChronos[0].setValue(values.players[0].totalRemainingTime);
         this.playerChronos[1].setValue(values.players[1].totalRemainingTime);
+
+        if (this.playerChronos[0].isElapsed()) {
+            this.playerChronos[0].setValue(0);
+            this.elapse(0);
+        }
+
+        if (this.playerChronos[1].isElapsed()) {
+            this.playerChronos[1].setValue(0);
+            this.elapse(1);
+        }
     }
 
     protected doStart(): void

@@ -91,7 +91,7 @@ describe('Time controls', () => {
         ;
 
         cy.contains('Determinist random bot');
-        cy.contains('10:00 + 5x5s');
+        cy.contains('10:00 + 5 × 5s');
     });
 
     it('create a game with custom time control, Fischer', () => {

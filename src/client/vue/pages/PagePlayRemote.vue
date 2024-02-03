@@ -56,7 +56,7 @@ const shouldDisplayConfirmMove = (): boolean => {
         blitz: playerSettings.value.confirmMoveBlitz,
         normal: playerSettings.value.confirmMoveNormal,
         correspondance: playerSettings.value.confirmMoveCorrespondance,
-    }[timeControlToCadencyName(hostedGameClient.value.getHostedGameData())];
+    }[timeControlToCadencyName(hostedGameClient.value.getHostedGameData().gameOptions)];
 };
 
 /*
@@ -256,7 +256,8 @@ const rematch = async (): Promise<void> => {
         <app-board
             v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView"
             :players="hostedGameClient.getPlayers()"
-            :time-control="hostedGameClient.getTimeControl()"
+            :time-control-options="hostedGameClient.getTimeControlOptions()"
+            :time-control-values="hostedGameClient.getTimeControlValues()"
             :game-view="gameView"
             :rematch="rematch"
         ></app-board>

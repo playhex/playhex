@@ -26,26 +26,16 @@
             }
         ],
         "timeControl": {
-            "options": {
-                "type": "fischer",
-                "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+            "state": "over",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 0
+                },
+                {
+                    "totalRemainingTime": 600
                 }
-            },
-            "values": {
-                "state": "over",
-                "currentPlayer": 0,
-                "players": [
-                    {
-                        "totalRemainingTime": 0
-                    },
-                    {
-                        "totalRemainingTime": 600
-                    }
-                ]
-            }
+            ]
         },
         "gameOptions": {
             "boardsize": 11,
@@ -150,26 +140,16 @@
             }
         ],
         "timeControl": {
-            "options": {
-                "type": "fischer",
-                "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+            "state": "over",
+            "currentPlayer": 1,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 599.427
                 }
-            },
-            "values": {
-                "state": "over",
-                "currentPlayer": 1,
-                "players": [
-                    {
-                        "totalRemainingTime": 600
-                    },
-                    {
-                        "totalRemainingTime": 599.427
-                    }
-                ]
-            }
+            ]
         },
         "gameOptions": {
             "boardsize": 11,
@@ -258,26 +238,16 @@
             }
         ],
         "timeControl": {
-            "options": {
-                "type": "fischer",
-                "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+            "state": "over",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 599.999
+                },
+                {
+                    "totalRemainingTime": 600
                 }
-            },
-            "values": {
-                "state": "over",
-                "currentPlayer": 0,
-                "players": [
-                    {
-                        "totalRemainingTime": 599.999
-                    },
-                    {
-                        "totalRemainingTime": 600
-                    }
-                ]
-            }
+            ]
         },
         "gameOptions": {
             "boardsize": 4,
@@ -401,26 +371,16 @@
             }
         ],
         "timeControl": {
-            "options": {
-                "type": "fischer",
-                "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+            "state": "running",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": "2024-01-19T12:52:47.201Z"
+                },
+                {
+                    "totalRemainingTime": 600
                 }
-            },
-            "values": {
-                "state": "running",
-                "currentPlayer": 0,
-                "players": [
-                    {
-                        "totalRemainingTime": "2024-01-19T12:52:47.201Z"
-                    },
-                    {
-                        "totalRemainingTime": 600
-                    }
-                ]
-            }
+            ]
         },
         "gameOptions": {
             "boardsize": 11,

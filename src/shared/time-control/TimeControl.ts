@@ -65,6 +65,7 @@ export abstract class AbstractTimeControl<
 {
     protected state: TimeControlState = 'ready';
     protected currentPlayer: PlayerIndex = 0;
+    protected elapsedPlayer: null | PlayerIndex = null;
 
     constructor(
         protected options: object,
@@ -102,7 +103,17 @@ export abstract class AbstractTimeControl<
         }
 
         this.state = 'elapsed';
+        this.elapsedPlayer = byPlayer;
         this.emit('elapsed', byPlayer);
+    }
+
+    getStrictElapsedPlayer(): PlayerIndex
+    {
+        if (null === this.elapsedPlayer) {
+            throw new Error('Trying to strictly get elapsed player, but there is not');
+        }
+
+        return this.elapsedPlayer;
     }
 
     protected mustBeState(expectedState: TimeControlState): void

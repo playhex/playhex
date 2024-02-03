@@ -27,26 +27,16 @@
         }
     ],
     "timeControl": {
-        "options": {
-            "type": "fischer",
-            "options": {
-                "initialSeconds": 600,
-                "incrementSeconds": 5,
-                "maxSeconds": 600
+        "state": "running",
+        "currentPlayer": 0,
+        "players": [
+            {
+                "totalRemainingTime": "2024-01-25T10:42:14.487Z"
+            },
+            {
+                "totalRemainingTime": 600
             }
-        },
-        "values": {
-            "state": "running",
-            "currentPlayer": 0,
-            "players": [
-                {
-                    "totalRemainingTime": "2024-01-25T10:42:14.487Z"
-                },
-                {
-                    "totalRemainingTime": 600
-                }
-            ]
-        }
+        ]
     },
     "gameOptions": {
         "boardsize": 11,

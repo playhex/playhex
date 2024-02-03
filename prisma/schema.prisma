@@ -11,15 +11,17 @@ datasource db {
 }
 
 model Player {
-  id        Int             @id @default(autoincrement())
-  publicId  String          @unique @db.Char(36)
-  pseudo    String          @unique @db.VarChar(34)
-  slug      String          @unique @db.VarChar(34)
-  password  String?         @db.Char(60)
-  isGuest   Boolean         @default(false)
-  isBot     Boolean         @default(false)
-  createdAt DateTime        @default(now())
-  settings  PlayerSettings?
+  id          Int                  @id @default(autoincrement())
+  publicId    String               @unique @db.Char(36)
+  pseudo      String               @unique @db.VarChar(34)
+  slug        String               @unique @db.VarChar(34)
+  password    String?              @db.Char(60)
+  isGuest     Boolean              @default(false)
+  isBot       Boolean              @default(false)
+  createdAt   DateTime             @default(now())
+  settings    PlayerSettings?
+  gamesAsHost HostedGame[]         @relation("GamesAsHost")
+  games       HostedGameToPlayer[]
 }
 
 model PlayerSettings {
@@ -28,4 +30,56 @@ model PlayerSettings {
   confirmMoveBlitz          Boolean @default(false)
   confirmMoveNormal         Boolean @default(false)
   confirmMoveCorrespondance Boolean @default(true)
+}
+
+model HostedGame {
+  id          Int                  @id @default(autoincrement())
+  publicId    String               @unique @db.Char(36)
+  state       String               @db.VarChar(15)
+  host        Player               @relation("GamesAsHost", fields: [hostId], references: [id])
+  hostId      Int
+  players     HostedGameToPlayer[]
+  options     HostedGameOptions?
+  game        Game?
+  timeControl Json
+  createdAt   DateTime
+
+  @@index([state, createdAt])
+}
+
+model HostedGameToPlayer {
+  hostedGame   HostedGame @relation(fields: [hostedGameId], references: [id])
+  hostedGameId Int
+  player       Player     @relation(fields: [playerId], references: [id])
+  playerId     Int
+  order        Int        @db.TinyInt()
+
+  @@id([hostedGameId, order])
+}
+
+model Game {
+  hostedGame         HostedGame @relation(fields: [hostedGameId], references: [id])
+  hostedGameId       Int        @unique
+  size               Int        @db.TinyInt()
+  allowSwap          Boolean
+  currentPlayerIndex Int        @db.TinyInt()
+  movesHistory       Json
+  winner             Int?       @db.TinyInt()
+  outcome            String?    @db.VarChar(15)
+  startedAt          DateTime
+  lastMoveAt         DateTime?
+  endedAt            DateTime?
+
+  @@index([endedAt])
+}
+
+model HostedGameOptions {
+  hostedGame         HostedGame @relation(fields: [hostedGameId], references: [id])
+  hostedGameId       Int        @unique
+  boardsize          Int        @db.TinyInt()
+  firstPlayer        Int?       @db.TinyInt()
+  swapRule           Boolean
+  opponentType       String     @db.VarChar(15)
+  timeControlType    String     @db.VarChar(15)
+  timeControlOptions Json
 }

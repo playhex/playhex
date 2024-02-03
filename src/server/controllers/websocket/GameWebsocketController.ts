@@ -20,7 +20,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(this.hostedGameRepository.playerMove(player, gameId, move));
+            answer(await this.hostedGameRepository.playerMove(player, gameId, move));
         });
     }
 }

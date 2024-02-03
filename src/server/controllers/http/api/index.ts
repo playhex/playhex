@@ -5,6 +5,7 @@ import playerRoutes from './player';
 import authRoutes from './auth';
 import onlinePlayersRoutes from './onlinePlayers';
 import playerSettingsRoutes from './playerSettings';
+import adminRoutes from './admin';
 import HttpError from '../HttpError';
 
 export default function apiRouter() {
@@ -18,6 +19,7 @@ export default function apiRouter() {
     router.use(authRoutes());
     router.use(onlinePlayersRoutes());
     router.use(playerSettingsRoutes());
+    router.use(adminRoutes());
 
     router.all('/api/**', req => {
         throw new HttpError(404, `Route ${req.method} ${req.originalUrl} not found.`);

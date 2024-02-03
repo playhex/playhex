@@ -17,7 +17,7 @@
                 "isBot": false
             }
         ],
-        "gameTimeData": {
+        "timeControl": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -34,6 +34,12 @@
             "firstPlayer": null,
             "opponent": {
                 "type": "player"
+            },
+            "timeControl": {
+                "type": "absolute",
+                "options": {
+                    "secondsPerPlayer": 900
+                }
             }
         },
         "gameData": null,
@@ -64,7 +70,7 @@
                 "isBot": true
             }
         ],
-        "gameTimeData": {
+        "timeControl": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -81,6 +87,12 @@
             "firstPlayer": 0,
             "opponent": {
                 "type": "ai"
+            },
+            "timeControl": {
+                "type": "absolute",
+                "options": {
+                    "secondsPerPlayer": 900
+                }
             }
         },
         "gameData": {
@@ -234,7 +246,7 @@
                 "isBot": true
             }
         ],
-        "gameTimeData": {
+        "timeControl": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -251,6 +263,12 @@
             "firstPlayer": 0,
             "opponent": {
                 "type": "ai"
+            },
+            "timeControl": {
+                "type": "absolute",
+                "options": {
+                    "secondsPerPlayer": 900
+                }
             }
         },
         "gameData": {
@@ -674,7 +692,7 @@
                 "isBot": true
             }
         ],
-        "gameTimeData": {
+        "timeControl": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -691,6 +709,12 @@
             "firstPlayer": 0,
             "opponent": {
                 "type": "ai"
+            },
+            "timeControl": {
+                "type": "absolute",
+                "options": {
+                    "secondsPerPlayer": 900
+                }
             }
         },
         "gameData": {

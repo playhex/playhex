@@ -7,7 +7,9 @@ import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
 import AppChrono from './AppChrono.vue';
 import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
-import { PlayerData, TimeControlOptionsValues } from '../../../shared/app/Types';
+import { PlayerData } from '../../../shared/app/Types';
+import TimeControlType from '../../../shared/time-control/TimeControlType';
+import { GameTimeData } from '../../../shared/time-control/TimeControl';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -15,8 +17,11 @@ const props = defineProps({
     players: {
         type: Array as PropType<null | PlayerData[]>,
     },
-    timeControl: {
-        type: Object as PropType<TimeControlOptionsValues>,
+    timeControlOptions: {
+        type: Object as PropType<TimeControlType>,
+    },
+    timeControlValues: {
+        type: Object as PropType<GameTimeData>,
     },
     gameView: {
         type: GameView,
@@ -29,7 +34,7 @@ const props = defineProps({
 });
 
 const { players, gameView } = props;
-const { timeControl } = toRefs(props);
+const { timeControlOptions, timeControlValues } = toRefs(props);
 
 /*
  * Add piwi view
@@ -91,9 +96,9 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a mx-2">
                 <app-chrono
-                    v-if="timeControl"
-                    :timeControlOptions="timeControl.options"
-                    :playerTimeData="timeControl.values.players[0]"
+                    v-if="timeControlOptions && timeControlValues"
+                    :timeControlOptions="timeControlOptions"
+                    :playerTimeData="timeControlValues.players[0]"
                 />
                 <p class="h4" v-if="players">
                     <app-pseudo-with-online-status
@@ -106,9 +111,9 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
             </div>
             <div class="player player-b mx-2">
                 <app-chrono
-                    v-if="timeControl"
-                    :timeControlOptions="timeControl.options"
-                    :playerTimeData="timeControl.values.players[1]"
+                    v-if="timeControlOptions && timeControlValues"
+                    :timeControlOptions="timeControlOptions"
+                    :playerTimeData="timeControlValues.players[1]"
                 />
                 <p class="h4" v-if="players">
                     <app-pseudo-with-online-status

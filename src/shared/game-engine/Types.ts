@@ -12,7 +12,7 @@ export type Coords = {
 export type MoveData = {
     row: number;
     col: number;
-    playedAt: string;
+    playedAt: Date;
 };
 
 export type PathItem = {

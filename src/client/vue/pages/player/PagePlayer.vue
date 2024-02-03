@@ -107,6 +107,19 @@ const getOpponent = (game: HostedGameData): PlayerData => {
     return opponent;
 };
 
+const loadMoreEndedGames = async (): Promise<void> => {
+    if (null === player.value || !Array.isArray(gamesHistory.value)) {
+        return;
+    }
+
+    const last = gamesHistory.value[gamesHistory.value.length - 1];
+    const games = await getPlayerGames(player.value.publicId, 'ended', last?.id ?? null);
+
+    for (let i = 0; i < games.length; ++i) {
+        gamesHistory.value.push(games[i]);
+    }
+};
+
 const router = useRouter();
 
 const clickLogout = async () => {
@@ -212,6 +225,13 @@ const clickLogout = async () => {
                             :playerData="getOpponent(game)"
                         />
                     </td>
+                </tr>
+                <tr colspan="2">
+                    <button
+                        role="button"
+                        class="btn btn-sm btn-link"
+                        @click="() => loadMoreEndedGames()"
+                    >Load more ended games</button>
                 </tr>
             </tbody>
         </table>

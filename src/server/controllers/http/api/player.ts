@@ -48,14 +48,14 @@ export default (): Router => {
             return;
         }
 
-        const { state: stateRaw } = req.query;
+        const { state: stateRaw, publicId } = req.query;
         let state: null | HostedGameState = null;
 
         if ('string' === typeof stateRaw && (stateRaw === 'created' || stateRaw === 'playing' || stateRaw === 'ended')) {
             state = stateRaw;
         }
 
-        res.send(normalize(hostedGameRepository.getPlayerGames(playerData, state))).end();
+        res.send(normalize(await hostedGameRepository.getPlayerGames(playerData, state, typeof publicId === 'string' ? publicId : null))).end();
     });
 
     return router;

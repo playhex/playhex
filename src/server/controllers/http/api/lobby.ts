@@ -12,10 +12,44 @@ export default (): Router => {
     const router = Router();
     const hostedGameRepository = Container.get(HostedGameRepository);
 
-    router.get('/api/games', (req, res) => {
-        res.send(normalize(
-            Object.values(hostedGameRepository.getGames()).map(hostedGame => hostedGame.toData())
-        ));
+    router.get('/api/games', async (req, res) => {
+        const { type } = req.query;
+
+        if (!type || type === 'lobby') {
+            res.send(normalize(await hostedGameRepository.getLobbyGames()));
+            return;
+        }
+
+        if (type === 'ended') {
+            let { take: rawTake, publicId: rawPublicId } = req.query;
+            let take: number = 20;
+            let publicId: undefined | string = undefined;
+
+            if (undefined !== rawTake) {
+                if (typeof rawTake !== 'string') {
+                    throw new HttpError(400, 'Expected ?take=Number');
+                }
+
+                take = parseInt(rawTake, 10);
+
+                if (take <= 0) {
+                    throw new HttpError(400, 'Expected ?take= to be > 0');
+                }
+            }
+
+            if (undefined !== rawPublicId) {
+                if (typeof rawPublicId !== 'string') {
+                    throw new HttpError(400, 'Expected ?publicId to be a single string');
+                }
+
+                publicId = rawPublicId;
+            }
+
+            res.send(normalize(await hostedGameRepository.getEndedGames(take, publicId)));
+            return;
+        }
+
+        throw new HttpError(400, 'Unexpected ?type= value');
     });
 
     router.post('/api/games', authenticated, async (req, res) => {
@@ -27,19 +61,19 @@ export default (): Router => {
             opponent = createAIPlayer(gameOptions);
         }
 
-        const hostedGame = hostedGameRepository.createGame(host, gameOptions, opponent);
+        const hostedGame = await hostedGameRepository.createGame(host, gameOptions, opponent);
 
         res.send(normalize(hostedGame.toData()));
     });
 
-    router.get('/api/games/:id', (req, res) => {
-        const game = hostedGameRepository.getGame(req.params.id);
+    router.get('/api/games/:id', async (req, res) => {
+        const game = await hostedGameRepository.getGame(req.params.id);
 
         if (null === game) {
             throw new HttpError(404, 'Game not found');
         }
 
-        res.send(normalize(game.toData()));
+        res.send(normalize(game));
     });
 
     return router;

@@ -6,6 +6,7 @@ import { PlayerTimeData } from '@shared/time-control/TimeControl';
 import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYomiTimeControl';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { ByoYomiChrono } from '@shared/time-control/ByoYomiChrono';
+import { secondsToDuration, secondsToTime } from '@shared/app/timeControlUtils';
 
 const props = defineProps({
     timeControlOptions: {
@@ -36,7 +37,7 @@ const toChrono = (timeValue: TimeValue): ChronoData => {
     }
 
     const chrono: ChronoData = {
-        time: `${sign}${floor(seconds / 60)}:${String(floor(seconds % 60)).padStart(2, '0')}`,
+        time: `${sign}${secondsToTime(seconds)}`,
     };
 
     if (seconds < 10) {
@@ -84,7 +85,7 @@ onUnmounted(() => clearInterval(chronoThread));
         <span class="chrono-time">{{ chronoDisplay.time }}</span>
         <span v-if="chronoDisplay.ms">{{ chronoDisplay.ms }}</span>
         <span v-if="timeControlOptions.type === 'byoyomi' && null !== byoYomiChrono">
-            + <strong>{{ byoYomiChrono.getRemainingPeriods() }}</strong>x{{ timeControlOptions.options.periodSeconds }}s</span>
+            + <strong>{{ byoYomiChrono.getRemainingPeriods() }}</strong> × {{ secondsToDuration(timeControlOptions.options.periodSeconds) }}</span>
     </p>
 </template>
 

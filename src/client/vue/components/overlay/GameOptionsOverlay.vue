@@ -5,6 +5,7 @@ import { GameOptionsData, sanitizeGameOptions } from '@shared/app/GameOptions';
 import { defaultGameOptions } from '@shared/app/GameOptions';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { BIconAspectRatio, BIconHourglass, BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
+import { secondsToDuration } from '@shared/app/timeControlUtils';
 
 const { visible, confirm, cancel } = useOverlayMeta();
 
@@ -69,64 +70,78 @@ const customTimeControl: Ref<TimeControlType> = ref({
 
 const showCustomTimeControl = ref(false);
 
-const initialTimeSteps: { seconds: number, label: string }[] = [
-    { seconds: 5, label: '5s' },
-    { seconds: 10, label: '10s' },
-    { seconds: 15, label: '15s' },
-    { seconds: 30, label: '30s' },
-    { seconds: 45, label: '45s' },
-    { seconds: 60, label: '1min' },
-    { seconds: 90, label: '1min30s' },
-    { seconds: 60 * 2, label: '2min' },
-    { seconds: 60 * 3, label: '3min' },
-    { seconds: 60 * 4, label: '4min' },
-    { seconds: 60 * 5, label: '5min' },
-    { seconds: 60 * 7, label: '7min' },
-    { seconds: 60 * 10, label: '10min' },
-    { seconds: 60 * 12, label: '12min' },
-    { seconds: 60 * 15, label: '15min' },
-    { seconds: 60 * 20, label: '20min' },
-    { seconds: 60 * 25, label: '25min' },
-    { seconds: 60 * 30, label: '30min' },
-    { seconds: 60 * 40, label: '40min' },
-    { seconds: 60 * 45, label: '45min' },
-    { seconds: 60 * 60, label: '1h' },
-    { seconds: 60 * 75, label: '1h15' },
-    { seconds: 60 * 90, label: '1h30' },
-    { seconds: 60 * 120, label: '2h' },
-    { seconds: 60 * 150, label: '2h30' },
-    { seconds: 60 * 180, label: '3h' },
+const initialTimeSteps: number[] = [
+    5,
+    10,
+    15,
+    30,
+    45,
+    60,
+    90,
+    60 * 2,
+    60 * 3,
+    60 * 4,
+    60 * 5,
+    60 * 7,
+    60 * 10,
+    60 * 12,
+    60 * 15,
+    60 * 20,
+    60 * 25,
+    60 * 30,
+    60 * 40,
+    60 * 45,
+    60 * 60,
+    60 * 75,
+    60 * 90,
+    60 * 120,
+    60 * 150,
+    60 * 180,
+    86400 * 1,
+    86400 * 3,
+    86400 * 7,
+    86400 * 14,
 ];
 
-const secondaryTimeSteps: { seconds: number, label: string }[] = [
-    { seconds: 0, label: 'none' },
-    { seconds: 1, label: '1s' },
-    { seconds: 2, label: '2s' },
-    { seconds: 3, label: '3s' },
-    { seconds: 4, label: '4s' },
-    { seconds: 5, label: '5s' },
-    { seconds: 6, label: '6s' },
-    { seconds: 7, label: '7s' },
-    { seconds: 8, label: '8s' },
-    { seconds: 9, label: '9s' },
-    { seconds: 10, label: '10s' },
-    { seconds: 12, label: '12s' },
-    { seconds: 15, label: '15s' },
-    { seconds: 20, label: '20s' },
-    { seconds: 25, label: '25s' },
-    { seconds: 30, label: '30s' },
-    { seconds: 40, label: '40s' },
-    { seconds: 45, label: '45s' },
-    { seconds: 60, label: '1min' },
-    { seconds: 75, label: '1min15s' },
-    { seconds: 90, label: '1min30s' },
-    { seconds: 120, label: '2min' },
-    { seconds: 150, label: '2min30' },
-    { seconds: 180, label: '3min' },
+const secondaryTimeSteps: number[] = [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    15,
+    20,
+    25,
+    30,
+    40,
+    45,
+    60,
+    75,
+    90,
+    120,
+    150,
+    180,
+    3600 * 4,
+    3600 * 8,
+    3600 * 12,
+    86400 * 1,
+    86400 * 2,
+    86400 * 3,
+    86400 * 5,
+    86400 * 7,
+    86400 * 10,
+    86400 * 14,
 ];
 
-const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t.seconds === 60 * 10));
-const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t => t.seconds === 5));
+const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t === 60 * 10));
+const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t => t === 5));
 const byoyomiPeriodsCount = ref(5);
 
 gameOptions.value.timeControl = defaultTimeControls['Normal 10&nbsp;+&nbsp;5'];
@@ -142,14 +157,14 @@ const showSecondaryOptions = ref(false);
 const submitForm = (gameOptions: GameOptionsData): void => {
     if (showCustomTimeControl.value) {
         if ('fischer' === gameOptions.timeControl.type) {
-            gameOptions.timeControl.options.initialSeconds = initialTimeSteps[initialTimeSelected.value].seconds;
-            gameOptions.timeControl.options.incrementSeconds = secondaryTimeSteps[secondaryTimeIncrementSelected.value].seconds;
+            gameOptions.timeControl.options.initialSeconds = initialTimeSteps[initialTimeSelected.value];
+            gameOptions.timeControl.options.incrementSeconds = secondaryTimeSteps[secondaryTimeIncrementSelected.value];
         }
 
         if ('byoyomi' === gameOptions.timeControl.type) {
-            gameOptions.timeControl.options.initialSeconds = initialTimeSteps[initialTimeSelected.value].seconds;
-            gameOptions.timeControl.options.periodSeconds = secondaryTimeSteps[secondaryTimeIncrementSelected.value].seconds;
-            gameOptions.timeControl.options.periodsCount = byoyomiPeriodsCount.value;
+            gameOptions.timeControl.options.initialSeconds = initialTimeSteps[initialTimeSelected.value];
+            gameOptions.timeControl.options.periodSeconds = secondaryTimeSteps[secondaryTimeIncrementSelected.value];
+            gameOptions.timeControl.options.periodsCount = Number(byoyomiPeriodsCount.value);
         }
     }
 
@@ -232,17 +247,17 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                             </div>
 
                             <div v-if="'fischer' === gameOptions.timeControl.type">
-                                <label for="custom-fischer-initial-time" class="form-label">Initial time: {{ initialTimeSteps[initialTimeSelected].label }}</label>
+                                <label for="custom-fischer-initial-time" class="form-label">Initial time: {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
                                 <input type="range" class="form-range" id="custom-fischer-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
-                                <label for="custom-fischer-time-increment" class="form-label">Time increment: {{ secondaryTimeSteps[secondaryTimeIncrementSelected].label }}</label>
+                                <label for="custom-fischer-time-increment" class="form-label">Time increment: {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
                                 <input type="range" class="form-range" id="custom-fischer-time-increment" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
                             </div>
                             <div v-if="'byoyomi' === gameOptions.timeControl.type">
-                                <label for="custom-byoyomi-initial-time" class="form-label">Initial time: {{ initialTimeSteps[initialTimeSelected].label }}</label>
+                                <label for="custom-byoyomi-initial-time" class="form-label">Initial time: {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
                                 <input type="range" class="form-range" id="custom-byoyomi-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
-                                <label for="custom-byoyomi-perdiod-time" class="form-label">Period time: {{ secondaryTimeSteps[secondaryTimeIncrementSelected].label }}</label>
+                                <label for="custom-byoyomi-perdiod-time" class="form-label">Period time: {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
                                 <input type="range" class="form-range" id="custom-byoyomi-perdiod-time" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
 
                                 <label for="custom-byoyomi-period-count" class="form-label">Periods count: {{ byoyomiPeriodsCount }}</label>

@@ -24,7 +24,7 @@
                 "isBot": false
             }
         ],
-        "gameTimeData": {
+        "timeControl": {
             "type": "absolute",
             "state": "over",
             "players": [
@@ -41,6 +41,12 @@
             "firstPlayer": null,
             "opponent": {
                 "type": "ai"
+            },
+            "timeControl": {
+                "type": "absolute",
+                "options": {
+                    "secondsPerPlayer": 900
+                }
             }
         },
         "gameData": {
@@ -165,7 +171,7 @@
                 "isBot": false
             }
         ],
-        "gameTimeData": {
+        "timeControl": {
             "type": "absolute",
             "state": "running",
             "players": [
@@ -182,6 +188,12 @@
             "firstPlayer": null,
             "opponent": {
                 "type": "ai"
+            },
+            "timeControl": {
+                "type": "absolute",
+                "options": {
+                    "secondsPerPlayer": 900
+                }
             }
         },
         "gameData": {
@@ -214,7 +226,7 @@
         "state": "playing",
         "__meta": {
             "values": {
-                "gameTimeData.players.1.totalRemainingTime": [
+                "timeControl.players.1.totalRemainingTime": [
                     "Date"
                 ],
                 "gameData.startedAt": [

@@ -2,7 +2,8 @@ import { defineStore, storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import useAuthStore from './authStore';
 import useSocketStore from './socketStore';
-import { HostedGameData, MoveData } from '@shared/app/Types';
+import { HostedGameData } from '@shared/app/Types';
+import { MoveData } from '@shared/game-engine/Types';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
 import useLobbyStore from './lobbyStore';
@@ -50,8 +51,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return 0;
         }
 
-        const time0 = game0.hostedGameData.timeControl.values.players[game0.myColor].totalRemainingTime;
-        const time1 = game1.hostedGameData.timeControl.values.players[game1.myColor].totalRemainingTime;
+        const time0 = game0.hostedGameData.timeControl.players[game0.myColor].totalRemainingTime;
+        const time1 = game1.hostedGameData.timeControl.players[game1.myColor].totalRemainingTime;
 
         return timeValueToSeconds(time0) - timeValueToSeconds(time1);
     };

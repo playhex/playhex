@@ -1,10 +1,10 @@
 import { Move, PlayerIndex } from '@shared/game-engine';
+import { MoveData, Outcome } from '@shared/game-engine/Types';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
-import { HostedGameData, MoveData, PlayerData } from '@shared/app/Types';
-import { apiPostGame, getGame, getGames } from '@client/apiClient';
+import { HostedGameData, PlayerData } from '@shared/app/Types';
+import { apiPostGame, getEndedGames, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import { Outcome } from '@shared/game-engine/Game';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import useSocketStore from './socketStore';
 import { ref } from 'vue';
@@ -70,6 +70,38 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         return hostedGameClients.value[gameId] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
     };
 
+    const loadMoreEndedGames = async (): Promise<void> => {
+        let oldestHostedGameClient: HostedGameClient | undefined = undefined;
+
+        for (let publicId in hostedGameClients.value) {
+            if (hostedGameClients.value[publicId].getState() !== 'ended') {
+                continue;
+            }
+
+            if (undefined === oldestHostedGameClient) {
+                oldestHostedGameClient = hostedGameClients.value[publicId];
+                continue;
+            }
+
+            const oldestDate = oldestHostedGameClient.getHostedGameData().gameData?.endedAt?.getTime();
+            const currentDate = hostedGameClients.value[publicId].getHostedGameData().gameData?.endedAt?.getTime();
+
+            if (undefined === oldestDate || undefined === currentDate) {
+                continue;
+            }
+
+            if (currentDate < oldestDate) {
+                oldestHostedGameClient = hostedGameClients.value[publicId];
+            }
+        }
+
+        const moreEndedGames = await getEndedGames(20, oldestHostedGameClient?.getId() ?? null);
+
+        moreEndedGames.forEach(endedGame => {
+            hostedGameClients.value[endedGame.id] = new HostedGameClient(endedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+        });
+    };
+
     const listenSocket = (): void => {
         socket.on('gameCreated', (hostedGameData: HostedGameData) => {
             hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
@@ -127,6 +159,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         createGame,
         updateGames,
         retrieveHostedGameClient,
+        loadMoreEndedGames,
     };
 });
 

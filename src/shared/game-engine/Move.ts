@@ -77,7 +77,7 @@ export default class Move implements Coords
         return {
             row: this.row,
             col: this.col,
-            playedAt: this.playedAt.toISOString(),
+            playedAt: this.playedAt,
         };
     }
 
@@ -86,7 +86,7 @@ export default class Move implements Coords
         return new Move(
             moveData.row,
             moveData.col,
-            new Date(moveData.playedAt)
+            moveData.playedAt,
         );
     }
 }

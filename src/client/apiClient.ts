@@ -1,8 +1,7 @@
-import { HostedGameData, OnlinePlayersData, PlayerData, PlayerSettingsData } from '@shared/app/Types';
+import { HostedGameData, HostedGameState, OnlinePlayersData, PlayerData, PlayerSettingsData } from '@shared/app/Types';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import { GameState } from '@shared/game-engine/Game';
 
 export class ApiClientError extends Error
 {
@@ -135,6 +134,26 @@ export const getGames = async (): Promise<HostedGameData[]> => {
     return denormalize(await response.json());
 };
 
+export const getEndedGames = async (take: number = 20, publicId: null | string = null): Promise<HostedGameData[]> => {
+    const params = new URLSearchParams({
+        type: 'ended',
+        take: String(take),
+    });
+
+    if (null !== publicId) {
+        params.append('publicId', publicId);
+    }
+
+    const response = await fetch(`/api/games?${params.toString()}`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return denormalize(await response.json());
+};
+
 export const getPlayer = async (publicId: string): Promise<PlayerData> => {
     const response = await fetch(`/api/players/${publicId}`, {
         method: 'get',
@@ -157,11 +176,27 @@ export const getPlayerBySlug = async (slug: string): Promise<PlayerData> => {
     return denormalize(await response.json());
 };
 
-export const getPlayerGames = async (playerPublicId: string, state: null | GameState = null): Promise<HostedGameData[]> => {
+/**
+ * @param publicId Cursor
+ */
+export const getPlayerGames = async (
+    playerPublicId: string,
+    state: null | HostedGameState = null,
+    publicId: null | string = null,
+): Promise<HostedGameData[]> => {
     let url = `/api/players/${playerPublicId}/games`;
+    const params = new URLSearchParams();
 
     if (null !== state) {
-        url += `?state=${state}`;
+        params.append('state', state);
+    }
+
+    if (null !== publicId) {
+        params.append('publicId', publicId);
+    }
+
+    if (params.size > 0) {
+        url += `?${params.toString()}`;
     }
 
     const response = await fetch(url, {

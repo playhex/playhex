@@ -32,8 +32,7 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
             }
 
             --this.remainingPeriods;
-            this.chrono.setValue(periodSeconds);
-            this.chrono.run();
+            this.chrono.increment(this.periodSeconds);
         });
     }
 
@@ -61,6 +60,17 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
     isInitialTimeElapsed(): boolean
     {
         return this.remainingPeriods < this.periodsCount;
+    }
+
+    setValues(timeValue: TimeValue, periods: number): void
+    {
+        this.remainingPeriods = periods;
+        this.chrono.setValue(timeValue);
+
+        while (this.chrono.isElapsed() && this.remainingPeriods > 0) {
+            --this.remainingPeriods;
+            this.chrono.increment(this.periodSeconds);
+        }
     }
 
     setMainValue(value: TimeValue): void
@@ -97,8 +107,18 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
         this.chrono.pause();
     }
 
+    /**
+     * Whether chrono has reached 0, and there is 0 periods, and time is now incrementing.
+     * Elapsed event should have been emited,
+     * except if an elapsed time has been set manually.
+     */
+    isElapsed(): boolean
+    {
+        return this.chrono.isElapsed() && this.remainingPeriods <= 0;
+    }
+
     toString(): string
     {
-        return `${timeValueToSeconds(this.getMainValue())}s + ${this.remainingPeriods} x ${this.periodSeconds}`;
+        return `${timeValueToSeconds(this.getMainValue())}s + ${this.remainingPeriods} x ${this.periodSeconds}s`;
     }
 }

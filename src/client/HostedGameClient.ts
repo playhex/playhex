@@ -1,11 +1,12 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
-import { HostedGameData, HostedGameState, PlayerData, TimeControlOptionsValues } from '@shared/app/Types';
-import { Outcome } from '@shared/game-engine/Game';
+import { HostedGameData, HostedGameState, PlayerData } from '@shared/app/Types';
+import { Outcome } from '@shared/game-engine/Types';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import { apiPostCancel, apiPostResign } from './apiClient';
+import TimeControlType from '@shared/time-control/TimeControlType';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -101,6 +102,24 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getPlayer(position: number): null | PlayerData
     {
         return this.hostedGameData.players[position] ?? null;
+    }
+
+    getWinnerPlayer(): null | PlayerData
+    {
+        if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
+            return null;
+        }
+
+        return this.hostedGameData.players[this.hostedGameData.gameData.winner];
+    }
+
+    getLoserPlayer(): null | PlayerData
+    {
+        if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
+            return null;
+        }
+
+        return this.hostedGameData.players[1 - this.hostedGameData.gameData.winner];
     }
 
     hasPlayer(playerData: PlayerData): boolean
@@ -208,7 +227,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     async sendMove(move: Move): Promise<true | string>
     {
         return new Promise((resolve, reject) => {
-            this.socket.emit('move', this.getId(), move, answer => {
+            this.socket.emit('move', this.getId(), move.toData(), answer => {
                 if (true === answer) {
                     resolve(answer);
                 }
@@ -266,19 +285,19 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
     }
 
-    getTimeControl(): TimeControlOptionsValues
+    getTimeControlOptions(): TimeControlType
+    {
+        return this.hostedGameData.gameOptions.timeControl;
+    }
+
+    getTimeControlValues(): GameTimeData
     {
         return this.hostedGameData.timeControl;
     }
 
-    getGameTimeData(): GameTimeData
-    {
-        return this.hostedGameData.timeControl.values;
-    }
-
     onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
-        Object.assign(this.hostedGameData.timeControl.values, gameTimeData);
+        Object.assign(this.hostedGameData.timeControl, gameTimeData);
     }
 
     onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void

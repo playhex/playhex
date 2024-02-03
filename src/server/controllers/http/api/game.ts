@@ -9,7 +9,7 @@ export default (): Router => {
     const hostedGameRepository = Container.get(HostedGameRepository);
 
     router.post('/api/games/:id/resign', authenticated, async (req, res) => {
-        const result = hostedGameRepository.playerResign(res.locals.playerData, req.params.id);
+        const result = await hostedGameRepository.playerResign(res.locals.playerData, req.params.id);
 
         if (true !== result) {
             throw new HttpError(400, result);
@@ -19,7 +19,7 @@ export default (): Router => {
     });
 
     router.post('/api/games/:id/cancel', authenticated, async (req, res) => {
-        const result = hostedGameRepository.playerCancel(res.locals.playerData, req.params.id);
+        const result = await hostedGameRepository.playerCancel(res.locals.playerData, req.params.id);
 
         if (true !== result) {
             throw new HttpError(400, result);
@@ -29,7 +29,7 @@ export default (): Router => {
     });
 
     router.post('/api/games/:id/move', authenticated, async (req, res) => {
-        const result = hostedGameRepository.playerMove(res.locals.playerData, req.params.id, req.body);
+        const result = await hostedGameRepository.playerMove(res.locals.playerData, req.params.id, req.body);
 
         if (true !== result) {
             throw new HttpError(400, result);

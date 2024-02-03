@@ -27,26 +27,16 @@
         }
     ],
     "timeControl": {
-        "options": {
-            "type": "fischer",
-            "options": {
-                "initialSeconds": 600,
-                "incrementSeconds": 5,
-                "maxSeconds": 600
+        "state": "over",
+        "currentPlayer": 0,
+        "players": [
+            {
+                "totalRemainingTime": 600
+            },
+            {
+                "totalRemainingTime": 600
             }
-        },
-        "values": {
-            "state": "over",
-            "currentPlayer": 0,
-            "players": [
-                {
-                    "totalRemainingTime": 600
-                },
-                {
-                    "totalRemainingTime": 600
-                }
-            ]
-        }
+        ]
     },
     "gameOptions": {
         "boardsize": 11,

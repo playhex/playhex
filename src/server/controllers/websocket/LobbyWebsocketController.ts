@@ -20,8 +20,7 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
                 return;
             }
 
-            const joined = this.hostedGameRepository.playerJoinGame(player, gameId);
-            answer(joined);
+            answer(await this.hostedGameRepository.playerJoinGame(player, gameId));
         });
     }
 }

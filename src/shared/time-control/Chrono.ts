@@ -33,7 +33,10 @@ export class Chrono extends TypedEmitter<ChronoEvents>
             now = now || new Date();
 
             if (this.value > now) {
-                this.timeout = setTimeout(() => this.emit('elapsed'), this.value.getTime() - now.getTime());
+                this.timeout = setTimeout(
+                    () => this.emit('elapsed'),
+                    this.value.getTime() - now.getTime(),
+                );
             }
         }
     }
@@ -56,6 +59,15 @@ export class Chrono extends TypedEmitter<ChronoEvents>
         this.value = value;
 
         this.resetTimeout();
+    }
+
+    increment(seconds: number): void
+    {
+        if (this.value instanceof Date) {
+            this.setValue(new Date(this.value.getTime() + seconds * 1000));
+        } else {
+            this.value += seconds;
+        }
     }
 
     run(): void
@@ -82,6 +94,20 @@ export class Chrono extends TypedEmitter<ChronoEvents>
         this.value = (this.value.getTime() - (new Date().getTime())) / 1000;
 
         this.resetTimeout();
+    }
+
+    /**
+     * Whether chrono has reached 0 and time is now incrementing.
+     * Elapsed event should have been emited,
+     * except if an elapsed time has been set manually.
+     */
+    isElapsed(): boolean
+    {
+        if (this.value instanceof Date) {
+            return this.value.getTime() <= new Date().getTime();
+        }
+
+        return this.value <= 0;
     }
 
     toString(): string

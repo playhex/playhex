@@ -23,3 +23,20 @@ export const authenticated = async (req: Request, res: Response, next: NextFunct
 
     next();
 };
+
+export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const authorization = req.get('Authorization');
+
+    if (undefined === authorization || !authorization.startsWith('Bearer ')) {
+        throw new HttpError(403, 'Restricted admin area. Add header Authorization: Bearer xxx');
+    }
+
+    const { ADMIN_PASSWORD } = process.env;
+    const token = authorization.substring('Bearer '.length);
+
+    if ('string' !== typeof ADMIN_PASSWORD || token !== ADMIN_PASSWORD) {
+        throw new HttpError(403, 'Invalid admin token');
+    }
+
+    next();
+};

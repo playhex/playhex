@@ -83,11 +83,18 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         this.state = values.state;
         this.currentPlayer = values.currentPlayer;
 
-        this.playerChronos[0].setMainValue(values.players[0].remainingMainTime);
-        this.playerChronos[0].setRemainingPeriods(values.players[0].remainingPeriods);
+        this.playerChronos[0].setValues(values.players[0].remainingMainTime, values.players[0].remainingPeriods);
+        this.playerChronos[1].setValues(values.players[1].remainingMainTime, values.players[1].remainingPeriods);
 
-        this.playerChronos[1].setMainValue(values.players[1].remainingMainTime);
-        this.playerChronos[1].setRemainingPeriods(values.players[1].remainingPeriods);
+        if (this.playerChronos[0].isElapsed()) {
+            this.playerChronos[0].setValues(0, 0);
+            this.elapse(0);
+        }
+
+        if (this.playerChronos[1].isElapsed()) {
+            this.playerChronos[1].setValues(0, 0);
+            this.elapse(1);
+        }
     }
 
     protected doStart(): void

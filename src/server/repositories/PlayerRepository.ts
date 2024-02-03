@@ -7,11 +7,12 @@ import logger from '../services/logger';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
+import { Prisma } from '@prisma/client';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
 
-const select = {
+const select: Prisma.PlayerSelect = {
     pseudo: true,
     publicId: true,
     isGuest: true,

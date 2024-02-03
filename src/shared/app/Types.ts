@@ -59,7 +59,7 @@ export type HostedGameData = {
     host: PlayerData;
     players: PlayerData[];
     gameOptions: GameOptionsData;
-    timeControl: TimeControlOptionsValues;
+    timeControl: GameTimeData;
     state: HostedGameState;
 
     /**

@@ -111,7 +111,7 @@ describe('Game', () => {
 
         assert.strictEqual(gameData.size, 5);
         assert.strictEqual(gameData.movesHistory.length, 2);
-        assert.match(gameData.movesHistory[0].playedAt, /\d+-\d+-\d+T\d+:\d+:\d+.*Z/);
+        assert.ok(gameData.movesHistory[0].playedAt instanceof Date);
 
 
         const restoredGame = Game.fromData(gameData);

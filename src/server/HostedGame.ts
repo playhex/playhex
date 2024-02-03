@@ -1,7 +1,6 @@
 import { Game, IllegalMove, Move, PlayerIndex, calcRandomMove } from '../shared/game-engine';
 import { Outcome } from '../shared/game-engine/Types';
 import { HostedGameData, HostedGameState, PlayerData } from '../shared/app/Types';
-import { GameTimeData } from '../shared/time-control/TimeControl';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
@@ -9,17 +8,41 @@ import logger from './services/logger';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import Rooms from '../shared/app/Rooms';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl';
-import { createTimeControl } from '../shared/time-control/TimeControlType';
+import { createTimeControl } from '../shared/time-control/createTimeControl';
 import Container from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer';
+import { TypedEmitter } from 'tiny-typed-emitter';
+
+type HostedGameEvents = {
+    played: () => void;
+    ended: () => void;
+    canceled: () => void;
+};
 
 /**
  * Contains a game state,
  * mutate this, and notify obervers in the room.
+ * Re-emits some game event.
+ *
+ * Can, and should be persisted for following purposes:
+ *  - archive games once finished (in database)
+ *  - before server restart (probably not applicable for blitz. Redis should be suffisant, as optional)
+ *  - at intervals to prevent game data loss on server crash (for long games, still playing but no players activity. Redis should be suffisant, as optional)
+ *  - someone create a correspondance game then logout: game should not be lost (on game create)
+ *  - tournament games: should be persisted more often (every move)
+ *
+ * Persisting is done on repository.
+ *
+ * Most of games should be played only in memory,
+ * and persisted only on game finished.
+ * Unless server restart, a player become temporarly inactive, or correspondace game.
  */
-export default class HostedGame
+export default class HostedGame extends TypedEmitter<HostedGameEvents>
 {
     private id: string = uuidv4();
+
+    private host: PlayerData;
+    private gameOptions: GameOptionsData;
 
     /**
      * Null if not yet started, or ended and reloaded from database
@@ -37,17 +60,25 @@ export default class HostedGame
     private createdAt: Date = new Date();
     private io: HexServer = Container.get(HexServer);
 
-    constructor(
-        private gameOptions: GameOptionsData,
-        private host: PlayerData,
-    ) {
-        logger.info('Hosted game created.', { hostedGameId: this.id, host: host.pseudo });
+    /**
+     * Officially creates a new hosted game, emit event to clients.
+     */
+    static hostNewGame(gameOptions: GameOptionsData, host: PlayerData): HostedGame
+    {
+        const hostedGame = new HostedGame();
 
-        this.players = [host];
+        hostedGame.gameOptions = gameOptions;
+        hostedGame.host = host;
 
-        this.timeControl = createTimeControl(gameOptions.timeControl);
+        logger.info('Hosted game created.', { hostedGameId: hostedGame.id, host: host.pseudo });
 
-        this.io.to(Rooms.lobby).emit('gameCreated', this.toData());
+        hostedGame.players = [host];
+
+        hostedGame.timeControl = createTimeControl(gameOptions.timeControl);
+
+        hostedGame.io.to(Rooms.lobby).emit('gameCreated', hostedGame.toData());
+
+        return hostedGame;
     }
 
     getId(): string
@@ -74,11 +105,6 @@ export default class HostedGame
         }
 
         return index;
-    }
-
-    getGameTimeData(): GameTimeData
-    {
-        return this.timeControl.getValues();
     }
 
     getState(): HostedGameState
@@ -113,7 +139,6 @@ export default class HostedGame
     private async makeAIMoveIfApplicable(): Promise<void>
     {
         if (null === this.game || 'playing' !== this.state) {
-            logger.error('makeAIPlayIfApplicable() called but game is not playing or null');
             return;
         }
 
@@ -161,6 +186,8 @@ export default class HostedGame
             if (!game.isEnded()) {
                 this.makeAIMoveIfApplicable();
             }
+
+            this.emit('played');
         });
 
         /**
@@ -174,6 +201,8 @@ export default class HostedGame
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
             logger.info('Game ended.', { hostedGameId: this.id, winner, outcome });
+
+            this.emit('ended');
         });
     }
 
@@ -225,6 +254,7 @@ export default class HostedGame
         this.state = 'playing';
 
         this.bindTimeControl();
+        this.timeControl.start();
 
         this.io.to(this.gameRooms(true)).emit('gameStarted', this.toData());
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
@@ -374,6 +404,8 @@ export default class HostedGame
 
         logger.info('Game canceled.', { hostedGameId: this.id });
 
+        this.emit('canceled');
+
         return true;
     }
 
@@ -383,10 +415,7 @@ export default class HostedGame
             id: this.id,
             host: this.host,
             players: this.players,
-            timeControl: {
-                options: this.timeControl.getOptions(),
-                values: this.timeControl.getValues(),
-            },
+            timeControl: this.timeControl.getValues(),
             gameOptions: this.gameOptions,
             gameData: this.game?.toData() ?? null,
             state: this.state,
@@ -394,5 +423,47 @@ export default class HostedGame
         };
 
         return hostedGameData;
+    }
+
+    static fromData(data: HostedGameData): HostedGame
+    {
+        // Check whether data.createdAt is an instance of Date and not a string,
+        // to check whether denormalization with superjson worked.
+        if (!(data.createdAt instanceof Date)) {
+            logger.error(
+                'HostedGameData.fromData(): Error while trying to recreate a HostedGameData from data,'
+                + ' createdAt is not an instance of Date.'
+            );
+        }
+
+        const hostedGame = new HostedGame();
+
+        hostedGame.id = data.id;
+        hostedGame.host = data.host;
+        hostedGame.gameOptions = data.gameOptions;
+
+        if (null !== data.gameData) {
+            try {
+                hostedGame.game = Game.fromData(data.gameData);
+                hostedGame.listenGame(hostedGame.game);
+            } catch (e) {
+                logger.error('Could not recreate game from data', { data });
+                throw e;
+            }
+        }
+
+        hostedGame.players = data.players;
+        hostedGame.state = data.state;
+
+        hostedGame.createdAt = data.createdAt;
+
+        hostedGame.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
+
+        if (null !== hostedGame.game) {
+            hostedGame.bindTimeControl();
+            hostedGame.makeAIMoveIfApplicable();
+        }
+
+        return hostedGame;
     }
 }
