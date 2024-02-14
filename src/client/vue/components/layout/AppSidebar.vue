@@ -22,9 +22,10 @@ const startsInStr = (): string => {
     return secondsToTime(seconds);
 };
 
-const tournamentStarts = new Date('2024-02-19T19:00:00Z');
+const tournamentStarts = new Date('2024-02-17T17:00:00Z');
 const tournamentStartsStr = ref(startsInStr());
 const started = (): boolean => new Date().getTime() > tournamentStarts.getTime();
+const finished = (): boolean => new Date().getTime() - tournamentStarts.getTime() > 2 * 3600 * 1000;
 
 if (!started()) {
     const thread = setInterval(() => {
@@ -37,13 +38,13 @@ if (!started()) {
 
 <template>
     <div>
-        <div class="card card-bg-icon border-warning mb-4">
+        <div v-if="!finished()" class="card card-bg-icon border-warning mb-4">
             <b-icon-trophy style="top: 1rem; right: 0.5rem; font-size: 8rem" class="text-warning" />
             <div class="card-body">
                 <h6 class="card-subtitle mb-2 text-body-secondary">Tournament</h6>
                 <h4 class="card-title">Hex Monthly 14</h4>
                 <p v-if="!started()" class="text-body-secondary">Starts in {{ tournamentStartsStr }}</p>
-                <p v-else>Now!</p>
+                <p v-else class="m-0">Now!</p>
                 <a v-if="!started()" href="https://challonge.com/hex_monthly_14" target="_blank" class="btn btn-warning">Register on Challonge</a>
             </div>
         </div>
