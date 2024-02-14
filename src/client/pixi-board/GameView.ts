@@ -15,24 +15,33 @@ const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 const PI_6 = PI / 6;
 
-export type BoardOrientation =
+/**
+ * Orientation names from
+ * https://www.hexwiki.net/index.php/Conventions
+ */
+export type OrientationName =
     /**
      * Displayed as horizontal diamond.
      * Recommended for large screen.
      */
-    'horizontal'
+    'diamond'
 
     /**
      * Displayed as vertical diamond.
      */
-    | 'vertical'
+    | 'vertical_diamond'
 
     /**
-     * Displayed as horizontal,
-     * but not symmetric          __
-     * to optimize screen space: /_/
+     *  __
+     *  \_\
      */
-    | 'horizontal_bias'
+    | 'flat'
+
+    /**
+     *   __
+     *  /_/
+     */
+    | 'flat_2'
 
     /**
      * Displayed as vertical,
@@ -40,33 +49,42 @@ export type BoardOrientation =
      * to optimize screen space. |/
      * Recommended for mobile screens.
      */
-    | 'vertical_bias_right_hand'
+    | 'vertical_flat'
 
     /**
      * Same as right_hand, but board goes |\
      * from top left to bottom right.     \|
      */
-    | 'vertical_bias_left_hand'
+    | 'vertical_flat_2'
 ;
 
-const orientationToRotation = (orientation: BoardOrientation): number => {
-    switch (orientation) {
-        case 'horizontal':
-            return -1 * PI_6;
+const orientationNameToRotation = (orientationName: OrientationName): number => {
+    switch (orientationName) {
+        case 'diamond':
+            return 11;
 
-        case 'vertical':
-            return 2 * PI_6;
+        case 'vertical_diamond':
+            return 2;
 
-        case 'horizontal_bias':
-            return 0 * PI_6;
+        case 'flat':
+            return 0;
 
-        case 'vertical_bias_right_hand':
-            return -3 * PI_6;
+        case 'flat_2':
+            return 10;
 
-        case 'vertical_bias_left_hand':
-            return 1 * PI_6;
+        case 'vertical_flat':
+            return 9;
+
+        case 'vertical_flat_2':
+            return 1;
     }
 };
+
+/**
+ * Integer, every PI/6.
+ * Or an orientation depending on screen orientation.
+ */
+type OrientationValue = number | { landscape: number, portrait: number };
 
 export type GameViewSize = {
     width: number;
@@ -88,6 +106,8 @@ type GameViewEvents = {
      * Used to display win message after animation, and not at same time.
      */
     endedAndWinAnimationOver: () => void;
+
+    orientationChanged: () => void;
 };
 
 const darkLightThemeStore = useDarkLightThemeStore();
@@ -97,7 +117,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private hexes: Hex[][];
     private pixi: Application;
     private gameContainer: Container = new Container();
-    private orientation: BoardOrientation;
+
+    private orientation: OrientationValue = {
+        landscape: orientationNameToRotation('diamond'),
+        portrait: orientationNameToRotation('vertical_flat'),
+    };
+
+    private currentOrientation: number;
+
     private sidesGraphics: [Graphics, Graphics];
     private displayCoords = false;
     private swapable: SwapableSprite;
@@ -142,11 +169,18 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         this.gameContainer.removeChildren();
 
-        if (window.innerWidth > window.innerHeight) {
-            this.setOrientation('horizontal');
+        if (typeof this.orientation === 'number') {
+            this.currentOrientation = this.orientation;
         } else {
-            this.setOrientation('vertical_bias_right_hand');
+            this.currentOrientation = window.innerWidth > window.innerHeight
+                ? this.orientation.landscape
+                : this.orientation.portrait
+            ;
         }
+
+        this.emit('orientationChanged');
+
+        this.gameContainer.rotation = this.currentOrientation * PI_6;
 
         this.gameContainer.pivot = Hex.coords(
             this.game.getSize() / 2 - 0.5,
@@ -159,6 +193,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             x: wrapperSize.width / 2,
             y: wrapperSize.height / 2,
         };
+
+        this.autoResize();
 
         this.gameContainer.addChild(
             this.createColoredSides(),
@@ -219,33 +255,24 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this.pixi.view;
     }
 
-    getOrientation()
+    getOrientation(): OrientationValue
     {
         return this.orientation;
     }
 
     /**
-     * Change orientation and rescale to fit screen.
-     *
-     * "bias" orientations allow to fit better screen,
-     * ans non-bias orientations are more symmetric but makes board smaller.
+     * Returns current orientation used to display board,
+     * in landscape or portrait if configured.
      */
-    setOrientation(orientation: BoardOrientation): void
+    getCurrentOrientation(): number
+    {
+        return (this.currentOrientation + 12) % 12;
+    }
+
+    setOrientation(orientation: OrientationValue): void
     {
         this.orientation = orientation;
-        this.setBoardRotation(orientationToRotation(orientation));
-    }
-
-    setBoardRotation(radians: number): void
-    {
-        this.gameContainer.rotation = radians;
-        this.autoResize();
-    }
-
-    incrementBoardRotation(radians: number): void
-    {
-        this.gameContainer.rotation += radians;
-        this.autoResize();
+        this.redraw();
     }
 
     autoResize(): void
@@ -288,6 +315,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         let boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS * 2;
         let boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
+
+        // Add margin to prevent cell top and bottom being slightly cropped
+        boxHeight += Hex.RADIUS;
 
         // Add margin to display coords around the board
         if (this.displayCoords) {
@@ -525,7 +555,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             const text = new Text(string, coordsTextStyle);
 
             text.resolution = window.devicePixelRatio * 2;
-            text.rotation = -orientationToRotation(this.orientation);
+            text.rotation = -this.gameContainer.rotation;
             text.anchor.set(0.5, 0.5);
 
             const hexCoords = Hex.coords(x, y);
@@ -576,11 +606,22 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightSideForPlayer(this.game.getStrictWinner());
     }
 
+    /**
+     * Returns opposite of board rotation to keep the top at the top,
+     * but fixes cases where cells are pointy-top oriented by removing PI/6 radians.
+     */
+    private fixedRotation(): number
+    {
+        const { ceil } = Math;
+
+        return -ceil(((this.gameContainer.rotation / PI_6) + 1) / 2) * PI_3 + PI_6;
+    }
+
     private createSwapable(): SwapableSprite
     {
         const swapable = new SwapableSprite();
 
-        swapable.rotation = -orientationToRotation(this.orientation);
+        swapable.rotation = this.fixedRotation();
         swapable.visible = false;
 
         return swapable;
@@ -590,7 +631,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         const swaped = new SwapedSprite();
 
-        swaped.rotation = -orientationToRotation(this.orientation);
+        swaped.rotation = -this.gameContainer.rotation;
         swaped.visible = false;
 
         return swaped;

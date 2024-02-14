@@ -75,8 +75,4 @@ export type OnlinePlayersData = {
     players: { [key: string]: PlayerData };
 };
 
-export type PlayerSettingsData = Pick<PlayerSettings,
-    'confirmMoveBlitz'
-    | 'confirmMoveNormal'
-    | 'confirmMoveCorrespondance'
->;
+export type PlayerSettingsData = Omit<PlayerSettings, 'playerId'>;

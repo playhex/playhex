@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView, { BoardOrientation } from '../../pixi-board/GameView';
+import GameView from '../../pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
 import { PropType, toRefs } from 'vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
@@ -64,11 +64,17 @@ onUnmounted(() => {
 /*
  * Orientation auto update on screen size change
  */
-let orientation = ref<BoardOrientation>(gameView.getOrientation());
-const updateOrientation = () => orientation.value = gameView.getOrientation();
-window.addEventListener('resizeDebounced', updateOrientation);
+let orientation = ref<number>(gameView.getCurrentOrientation());
 
-onUnmounted(() => window.removeEventListener('resizeDebounced', updateOrientation));
+const updateOrientation = () => orientation.value = gameView.getCurrentOrientation();
+
+window.addEventListener('resizeDebounced', updateOrientation);
+gameView.on('orientationChanged', updateOrientation);
+
+onUnmounted(() => {
+    window.removeEventListener('resizeDebounced', updateOrientation);
+    gameView.off('orientationChanged', updateOrientation);
+});
 
 /*
  * Game end: win popin
@@ -94,13 +100,8 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
         </div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
-            <div class="player player-a mx-2">
-                <app-chrono
-                    v-if="timeControlOptions && timeControlValues"
-                    :timeControlOptions="timeControlOptions"
-                    :playerTimeData="timeControlValues.players[0]"
-                />
-                <p class="h4" v-if="players">
+            <div class="player player-a">
+                <p class="h5" v-if="players">
                     <app-pseudo-with-online-status
                         v-if="players[0]"
                         :playerData="players[0]"
@@ -108,14 +109,14 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                     />
                     <span v-else class="fst-italic">waiting…</span>
                 </p>
-            </div>
-            <div class="player player-b mx-2">
                 <app-chrono
                     v-if="timeControlOptions && timeControlValues"
                     :timeControlOptions="timeControlOptions"
-                    :playerTimeData="timeControlValues.players[1]"
+                    :playerTimeData="timeControlValues.players[0]"
                 />
-                <p class="h4" v-if="players">
+            </div>
+            <div class="player player-b">
+                <p class="h5" v-if="players">
                     <app-pseudo-with-online-status
                         v-if="players[1]"
                         :playerData="players[1]"
@@ -123,6 +124,11 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                     />
                     <span v-else class="fst-italic">waiting…</span>
                 </p>
+                <app-chrono
+                    v-if="timeControlOptions && timeControlValues"
+                    :timeControlOptions="timeControlOptions"
+                    :playerTimeData="timeControlValues.players[1]"
+                />
             </div>
         </div>
         <p v-else>Initialize game…</p>
@@ -138,50 +144,43 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
     justify-content center
 
 .player
+    display flex
+    flex-direction column
     position absolute
     height auto
     max-width 35%
+    margin 0 0.75rem // To align with bootstrap navbar/container
 
     p
-        margin-top 0
+        margin 0
 
-.orientation-vertical_bias_right_hand
+// Default, top left, top right
+.player-a
+    left 0
+    top 0
+
+.player-b
+    text-align right
+    right 0
+    top 0
+
+// Put left player to bottom
+.orientation-0,
+.orientation-1,
+.orientation-6,
+.orientation-7
     .player-a
-        left 0
-        top 0
-    .player-b
-        right 0
+        flex-direction column-reverse
+        top auto
         bottom 0
 
-.orientation-vertical_bias_left_hand
-    .player-a
-        right 0
-        top 0
+// Put right player to bottom
+.orientation-3,
+.orientation-4,
+.orientation-9,
+.orientation-10
     .player-b
-        left 0
+        flex-direction column-reverse
+        top auto
         bottom 0
-
-.orientation-horizontal
-    .player-a
-        left 0
-        top 0
-    .player-b
-        right 0
-        top 0
-
-.orientation-horizontal_bias
-    .player-a
-        left 0
-        bottom 0
-    .player-b
-        right 0
-        top 0
-
-.orientation-vertical
-    .player-a
-        left 0
-        top 0
-    .player-b
-        right 0
-        top 0
 </style>

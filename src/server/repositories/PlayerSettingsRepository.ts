@@ -10,6 +10,9 @@ const defaultSettings: PlayerSettingsData = {
     confirmMoveBlitz: false,
     confirmMoveNormal: false,
     confirmMoveCorrespondance: true,
+    orientationLandscape: 11,
+    orientationPortrait: 9,
+    showCoords: false,
 };
 
 @Service()
@@ -27,6 +30,9 @@ export default class PlayerSettingsRepository
                 confirmMoveBlitz: true,
                 confirmMoveNormal: true,
                 confirmMoveCorrespondance: true,
+                orientationLandscape: true,
+                orientationPortrait: true,
+                showCoords: true,
             },
         });
 

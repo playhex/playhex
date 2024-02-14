@@ -1,6 +1,5 @@
 import TimeControlType from '../time-control/TimeControlType';
 import { GameOptionsData } from './GameOptions';
-import { HostedGameData } from './Types';
 
 /**
  * Returns average seconds per move
@@ -10,6 +9,9 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
     /**
      * "A typical hex game fills about one-third of the board."
      *      -- from https://trmph.com/hexwiki/Basic_strategy_guide.html
+     *
+     * Another relevant thread:
+     * https://littlegolem.net/jsp/forum/topic2.jsp?forum=50&topic=809
      */
     const averageMoves = boardsize ** 2 / 6;
 

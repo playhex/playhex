@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf } from 'bootstrap-icons-vue';
+import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet } from 'bootstrap-icons-vue';
 import useDarkLightThemeStore from '../../../stores/darkLightThemeStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
@@ -10,6 +10,7 @@ const playerSettingsStore = usePlayerSettingsStore();
 const { selectedTheme } = storeToRefs(useDarkLightThemeStore());
 const { playerSettings } = storeToRefs(playerSettingsStore);
 
+// Auto save when any setting changed
 watch(
     playerSettings,
     (settings, oldSettings) => {
@@ -22,6 +23,20 @@ watch(
     },
     { deep: true },
 );
+
+/*
+ * Board orientation
+ */
+const landscapeOrientations = [
+    { value: 0, label: 'Flat' },
+    { value: 10, label: 'Flat 2' },
+    { value: 11, label: 'Diamond' },
+];
+const portraitOrientations = [
+    { value: 1, label: 'Flat' },
+    { value: 9, label: 'Flat 2' },
+    { value: 2, label: 'Diamond' },
+];
 </script>
 
 <template>
@@ -50,7 +65,7 @@ watch(
 
         <template v-if="playerSettings">
             <div class="mb-3 row">
-                <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label">Blitz</label>
+                <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><b-icon-lightning-charge-fill /> Blitz</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
                         <option :value="false">Send immediately</option>
@@ -59,7 +74,7 @@ watch(
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label">Normal</label>
+                <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><b-icon-alarm-fill /> Normal</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
                         <option :value="false">Send immediately</option>
@@ -68,7 +83,7 @@ watch(
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label">Correspondance</label>
+                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><b-icon-calendar /> Correspondance</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveCorrespondance" class="form-select" id="confirm-move-correspondace">
                         <option :value="false">Send immediately</option>
@@ -77,10 +92,70 @@ watch(
                 </div>
             </div>
         </template>
+
+        <h3>Board orientation</h3>
+
+        <template v-if="playerSettings">
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-md-3 col-form-label"><b-icon-pc-display-horizontal /> Landscape</label>
+                <div class="col-sm-8 col-md-9">
+                    <div class="btn-group" role="group">
+                        <template v-for="orientation in landscapeOrientations" :key="i">
+                            <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation.value" :id="'landscape-radio-' + orientation.value" autocomplete="off">
+                            <label class="btn" :for="'landscape-radio-' + orientation.value">
+                                <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
+                                <br>
+                                {{ orientation.label }}
+                            </label>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-md-3 col-form-label"><b-icon-phone /> Portrait</label>
+                <div class="col-sm-8 col-md-9">
+                    <div class="btn-group" role="group">
+                        <template v-for="orientation in portraitOrientations" :key="i">
+                            <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation.value" :id="'portrait-radio-' + orientation.value" autocomplete="off">
+                            <label class="btn" :for="'portrait-radio-' + orientation.value">
+                                <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
+                                <br>
+                                {{ orientation.label }}
+                            </label>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <h3>Board</h3>
+
+        <template v-if="playerSettings">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
+                <label class="form-check-label" for="show-coords-checkbox"><b-icon-alphabet /> Show coords by default</label>
+            </div>
+        </template>
     </div>
 </template>
 
 <style lang="stylus" scoped>
 h3
     margin 1em 0 0.5em 0
+
+.rhombus::before
+    content ''
+    display block
+    border 0.5em solid
+    border-color #dc3545 #0d6efd
+    border-radius 0.2em
+    width 2.5em
+    height 2.5em
+    transform skew(30deg)
+
+.rhombus
+    display inline-block
+    margin 1em
+    transform rotate(150deg)
 </style>

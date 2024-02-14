@@ -7,7 +7,7 @@ import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
-import { Ref, onUnmounted } from 'vue';
+import { Ref, onUnmounted, watch } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
@@ -127,6 +127,26 @@ const initGameView = () => {
     const game = hostedGameClient.value.loadGame();
 
     gameView = new GameView(game);
+
+    if (null !== playerSettings.value) {
+        gameView.setDisplayCoords(playerSettings.value.showCoords);
+        gameView.setOrientation({
+            landscape: playerSettings.value.orientationLandscape,
+            portrait: playerSettings.value.orientationPortrait,
+        });
+    }
+
+    watch(playerSettings, settings => {
+        if (null === gameView || null === settings) {
+            return;
+        }
+
+        gameView.setDisplayCoords(settings.showCoords);
+        gameView.setOrientation({
+            landscape: settings.orientationLandscape,
+            portrait: settings.orientationPortrait,
+        });
+    });
 
     if ('playing' === hostedGameClient.value.getState()) {
         listenHexClick();

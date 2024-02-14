@@ -29,6 +29,7 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
         reloadPlayerSettings();
     }
 
+    // Update player settings when logged in player change
     watch(loggedInPlayer, player => {
         playerSettings.value = null;
 
