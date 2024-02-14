@@ -31,7 +31,7 @@ model PlayerSettings {
   confirmMoveNormal         Boolean @default(false)
   confirmMoveCorrespondance Boolean @default(true)
   orientationLandscape      Int     @default(11) @db.TinyInt()
-  orientationPortrait       Int     @default(0) @db.TinyInt()
+  orientationPortrait       Int     @default(9) @db.TinyInt()
   showCoords                Boolean @default(false)
 }
 
