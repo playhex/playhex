@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'bootstrap-icons-vue';
 import { HostedGameData, PlayerData } from '@shared/app/Types';
-import { getPlayerGames, getPlayerBySlug } from '../../../apiClient';
+import { getPlayerGames, getPlayerBySlug, ApiClientError } from '../../../apiClient';
 import { Ref, ref } from 'vue';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore';
@@ -31,13 +31,21 @@ const player: Ref<null | PlayerData> = isMe()
 ;
 
 const gamesHistory: Ref<null | HostedGameData[]> = ref(null);
+const playerNotFound = ref(false);
 
 (async () => {
     if (null === player.value) {
-        player.value = await getPlayerBySlug(slug);
-    }
+        try {
+            player.value = await getPlayerBySlug(slug);
+            gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
+        } catch (e) {
+            if (!(e instanceof ApiClientError)) {
+                throw e;
+            }
 
-    gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
+            playerNotFound.value = true;
+        }
+    }
 })();
 
 /*
@@ -136,7 +144,7 @@ const clickLogout = async () => {
 </script>
 
 <template>
-    <div class="container">
+    <div v-if="!playerNotFound" class="container">
         <div class="d-flex">
             <div class="avatar-wrapper">
                 <b-icon-person class="icon img-thumbnail" />
@@ -235,7 +243,10 @@ const clickLogout = async () => {
                 </tr>
             </tbody>
         </table>
+    </div>
 
+    <div v-else class="container">
+        <p class="text-center lead mt-2">Looks like this player does not exists…</p>
     </div>
 </template>
 

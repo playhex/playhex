@@ -22,8 +22,7 @@ export default (): Router => {
         const playerData = await playerRepository.getPlayerBySlug(slug);
 
         if (null === playerData) {
-            res.sendStatus(404).end();
-            return;
+            throw new HttpError(404, 'Player not found');
         }
 
         res.send(normalize(transformPlayer(playerData))).end();
@@ -33,8 +32,7 @@ export default (): Router => {
         const playerData = await playerRepository.getPlayer(req.params.publicId);
 
         if (null === playerData) {
-            res.sendStatus(404).end();
-            return;
+            throw new HttpError(404, 'Player not found');
         }
 
         res.send(normalize(transformPlayer(playerData))).end();
@@ -44,8 +42,7 @@ export default (): Router => {
         const playerData = await playerRepository.getPlayer(req.params.playerId);
 
         if (null === playerData) {
-            res.sendStatus(404).end();
-            return;
+            throw new HttpError(404, 'Player not found');
         }
 
         const { state: stateRaw, publicId } = req.query;

@@ -134,7 +134,7 @@ export const getGames = async (): Promise<HostedGameData[]> => {
     return denormalize(await response.json());
 };
 
-export const getEndedGames = async (take: number = 20, publicId: null | string = null): Promise<HostedGameData[]> => {
+export const getEndedGames = async (take = 20, publicId: null | string = null): Promise<HostedGameData[]> => {
     const params = new URLSearchParams({
         type: 'ended',
         take: String(take),
@@ -172,6 +172,8 @@ export const getPlayerBySlug = async (slug: string): Promise<PlayerData> => {
             'Accept': 'application/json',
         },
     });
+
+    await checkResponse(response);
 
     return denormalize(await response.json());
 };
