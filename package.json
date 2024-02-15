@@ -13,7 +13,7 @@
     "serve": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev-server\" \"yarn dev-client\"",
     "serve:prod": "yarn build && yarn start:prod",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
-    "test:unit": "mocha src/**/test/**/*.ts -n loader=ts-node/esm --extension ts",
+    "test:unit": "mocha src/**/test/**/*.ts -n import=ts-node/esm --extension ts",
     "test:e2e": "cypress run",
     "test:all": "yarn test:unit && yarn test:e2e",
     "test": "yarn test:unit"
