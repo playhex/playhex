@@ -73,7 +73,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const loadMoreEndedGames = async (): Promise<void> => {
         let oldestHostedGameClient: HostedGameClient | undefined = undefined;
 
-        for (let publicId in hostedGameClients.value) {
+        for (const publicId in hostedGameClients.value) {
             if (hostedGameClients.value[publicId].getState() !== 'ended') {
                 continue;
             }

@@ -1,4 +1,3 @@
-import { inspect } from 'util';
 import { Game, PlayerIndex } from '../game-engine';
 import { AbstractTimeControl } from '../time-control/TimeControl';
 

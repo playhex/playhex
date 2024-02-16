@@ -21,8 +21,8 @@ export default (): Router => {
         }
 
         if (type === 'ended') {
-            let { take: rawTake, publicId: rawPublicId } = req.query;
-            let take: number = 20;
+            const { take: rawTake, publicId: rawPublicId } = req.query;
+            let take = 20;
             let publicId: undefined | string = undefined;
 
             if (undefined !== rawTake) {

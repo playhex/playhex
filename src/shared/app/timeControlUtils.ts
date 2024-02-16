@@ -95,7 +95,7 @@ export const secondsToTime = (seconds: number): string => {
     if (parts[1] > 0) {
         return parts[2] > 0
             ? `${parts[1]}h${String(parts[2]).padStart(2, '0')}`
-            :`${parts[1]}h`
+            : `${parts[1]}h`
         ;
     }
 
@@ -123,7 +123,7 @@ export const secondsToDuration = (seconds: number, precision = 2): string => {
     seconds -= parts[2] * 60;
     parts.push(floor(seconds));
 
-    let tokens = [];
+    const tokens = [];
 
     if (parts[0] > 0) {
         tokens.push(parts[0] + 'd');
