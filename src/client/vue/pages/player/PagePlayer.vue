@@ -62,16 +62,14 @@ const gamesHistory: Ref<null | HostedGameData[]> = ref(null);
 const playerNotFound = ref(false);
 
 (async () => {
-    if (null !== player.value) {
-        updateMeta(player.value);
-        return;
-    }
-
     try {
-        player.value = await getPlayerBySlug(slug);
-        gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
+        if (null === player.value) {
+            player.value = await getPlayerBySlug(slug);
+        }
 
         updateMeta(player.value);
+
+        gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
     } catch (e) {
         if (!(e instanceof ApiClientError)) {
             throw e;
