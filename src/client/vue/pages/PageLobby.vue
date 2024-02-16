@@ -12,6 +12,11 @@ import useAuthStore from '@client/stores/authStore';
 import AppPseudoWithOnlineStatus from '../components/AppPseudoWithOnlineStatus.vue';
 import { BIconEye, BIconTrophy, BIconPeople, BIconRobot } from 'bootstrap-icons-vue';
 import AppTimeControlLabelVue from '../components/AppTimeControlLabel.vue';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    titleTemplate: title => `Lobby - ${title}`,
+});
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();

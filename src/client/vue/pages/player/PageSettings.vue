@@ -4,6 +4,12 @@ import useDarkLightThemeStore from '../../../stores/darkLightThemeStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
 import { watch } from 'vue';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    robots: 'noindex',
+    titleTemplate: title => `Settings - ${title}`,
+});
 
 const playerSettingsStore = usePlayerSettingsStore();
 

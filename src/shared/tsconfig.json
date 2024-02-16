@@ -25,5 +25,5 @@
     },
     "include": [
         "**/*.ts"
-    ]
+, "app/seo.ts"    ]
 }

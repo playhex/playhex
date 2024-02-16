@@ -1,5 +1,11 @@
 <script lang="ts" setup>
 import { BIconSignTurnLeft } from 'bootstrap-icons-vue';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    robots: 'noindex',
+    title: 'Page not found',
+});
 </script>
 
 <template>

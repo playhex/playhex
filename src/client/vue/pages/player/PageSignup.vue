@@ -4,6 +4,12 @@ import useAuthStore from '../../../stores/authStore';
 import { Ref, ref } from 'vue';
 import { ApiClientError } from '../../../apiClient';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    titleTemplate: title => `Signup - ${title}`,
+    description: 'Create an account to keep an history of Hex games you played.',
+});
 
 const pseudo = ref('');
 const password = ref('');

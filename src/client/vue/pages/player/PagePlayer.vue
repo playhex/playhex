@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+/* eslint-env browser */
 import { storeToRefs } from 'pinia';
+import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'bootstrap-icons-vue';
 import { HostedGameData, PlayerData } from '@shared/app/Types';
@@ -12,12 +14,38 @@ import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppPseudoWithOnlineStatusVue from '../../components/AppPseudoWithOnlineStatus.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useJsonLd } from '../../../services/head';
+import { useSeoMeta } from '@unhead/vue';
 
 const { slug } = useRoute().params;
 
 if (Array.isArray(slug)) {
     throw new Error('Unexpected array in "slug" param');
 }
+
+/*
+ * Player meta tags
+ */
+const updateMeta = (playerData: PlayerData): void => {
+    useSeoMeta({
+        title: `${playerData.pseudo} - Hex player`,
+        robots: playerData.isGuest ? 'noindex' : 'index',
+        ogTitle: `${playerData.pseudo} - Hex player`,
+        ogType: 'profile',
+        ogUrl: window.location.href,
+        twitterCard: 'summary',
+    });
+
+    const jsonLd: WithContext<Person> = {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: 'Guest ' + playerData.pseudo,
+        url: window.location.href,
+        identifier: 'guest-' + playerData.slug,
+    };
+
+    useJsonLd(jsonLd);
+};
 
 /*
  * Player data
@@ -34,17 +62,22 @@ const gamesHistory: Ref<null | HostedGameData[]> = ref(null);
 const playerNotFound = ref(false);
 
 (async () => {
-    if (null === player.value) {
-        try {
-            player.value = await getPlayerBySlug(slug);
-            gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
-        } catch (e) {
-            if (!(e instanceof ApiClientError)) {
-                throw e;
-            }
+    if (null !== player.value) {
+        updateMeta(player.value);
+        return;
+    }
 
-            playerNotFound.value = true;
+    try {
+        player.value = await getPlayerBySlug(slug);
+        gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
+
+        updateMeta(player.value);
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
         }
+
+        playerNotFound.value = true;
     }
 })();
 

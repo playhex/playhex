@@ -4,6 +4,12 @@ import useAuthStore from '../../../stores/authStore';
 import { Ref, ref } from 'vue';
 import { ApiClientError } from '../../../apiClient';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    titleTemplate: title => `Login - ${title}`,
+    description: 'Login to your Hex account.',
+});
 
 const pseudo = ref('');
 const password = ref('');

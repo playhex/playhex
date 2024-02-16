@@ -1,4 +1,5 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
+import { useHeadDefault } from '../services/head';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -74,6 +75,10 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+router.beforeEach(() => {
+    useHeadDefault();
 });
 
 export default router;

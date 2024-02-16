@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    titleTemplate : title => `License - ${title}`,
+});
+</script>
+
 <template>
     <h1>License</h1>
 

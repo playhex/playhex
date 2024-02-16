@@ -1,15 +1,18 @@
+import { WebSite, WithContext } from 'schema-dts';
+
 const seo = {
     shortTitle: 'Hex',
     title: 'Hex online board game',
     description: 'Play Hex board game with other players or with AI.',
 };
 
-const jsonLd = {
+const jsonLd: WithContext<WebSite> = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Hex online',
     alternateName: seo.shortTitle,
-    url: process.env.BASE_URL,
+    // @ts-ignore: BASE_URL replaced at build time by webpack if client side, or from process.env if server side.
+    url: typeof BASE_URL === 'undefined' ? process.env.BASE_URL : BASE_URL,
 };
 
 export {

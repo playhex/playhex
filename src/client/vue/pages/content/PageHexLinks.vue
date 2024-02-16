@@ -32,6 +32,11 @@
 <script lang="ts" setup>
 import { BIconFileEarmarkText, BIconDiscord, BIconWikipedia } from 'bootstrap-icons-vue';
 import { Component as ComponentType } from 'vue';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    title: 'Useful Hex links',
+});
 
 type Icon = { icon: ComponentType };
 type Image = { src: string, alt: string };

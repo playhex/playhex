@@ -7,6 +7,12 @@ import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
 import { Ref, ref } from 'vue';
 import { PlayerData } from '@shared/app/Types';
 import useAuthStore from '../../stores/authStore';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    title: 'Play offline',
+    robots: 'noindex',
+});
 
 const gameView = ref<GameView>();
 const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.gameOptionsJson ?? '{}');

@@ -17,6 +17,11 @@ import { BIconFlag, BIconX, BIconCheck, BIconAlphabet } from 'bootstrap-icons-vu
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    robots: 'noindex',
+});
 
 const { gameId } = useRoute().params;
 
@@ -169,6 +174,22 @@ const initGameView = () => {
     }
 
     initGameView();
+
+    const playerPseudos = hostedGameClient.value.getHostedGameData().players.map(p => p.pseudo);
+    const { state, host } = hostedGameClient.value.getHostedGameData();
+    const title = `Hex game - ${playerPseudos.join(' VS ')} - ${state}`;
+    const description = 'created' === state
+        ? `Hex game, hosted by ${host.pseudo}, waiting for an opponent.`
+        : `Hex ${state} game, ${playerPseudos.join(' versus ')}.`
+    ;
+
+    useSeoMeta({
+        robots: 'noindex',
+        title,
+        ogTitle: title,
+        description,
+        ogDescription: description,
+    });
 })();
 
 const join = async () => {
