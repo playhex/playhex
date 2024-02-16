@@ -11,10 +11,9 @@ import { head } from './services/head';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
-        .then((reg) => {
-            console.log('Registered successfully', reg);
-        }).catch((error) => {
-            console.log('Error', error);
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error('Error while worker registering', error);
         })
     ;
 }

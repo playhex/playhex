@@ -2,32 +2,32 @@
 import { denormalize, normalize } from '../serializer';
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { inspect } from 'util';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const debug = (input: any): any => {
-    console.log('=== input');
-    let data = input;
-    console.log(inspect(data, false, null, true));
+// import { inspect } from 'util';
 
-    console.log('=== normalized');
-    data = normalize(data);
-    console.log(inspect(data, false, null, true));
+// const debug = (input: any): any => {
+//     console.log('=== input');
+//     let data = input;
+//     console.log(inspect(data, false, null, true));
 
-    console.log('=== json');
-    data = JSON.stringify(data);
-    console.log(inspect(data, false, null, true));
+//     console.log('=== normalized');
+//     data = normalize(data);
+//     console.log(inspect(data, false, null, true));
 
-    console.log('=== parsed');
-    data = JSON.parse(data);
-    console.log(inspect(data, false, null, true));
+//     console.log('=== json');
+//     data = JSON.stringify(data);
+//     console.log(inspect(data, false, null, true));
 
-    console.log('=== denormalized');
-    data = denormalize(data);
-    console.log(inspect(data, false, null, true));
+//     console.log('=== parsed');
+//     data = JSON.parse(data);
+//     console.log(inspect(data, false, null, true));
 
-    return data;
-};
+//     console.log('=== denormalized');
+//     data = denormalize(data);
+//     console.log(inspect(data, false, null, true));
+
+//     return data;
+// };
 
 const transmit = (input: any): any => {
     let data = input;

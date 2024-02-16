@@ -96,7 +96,10 @@ export const denormalize = (data: any, root = true): any => {
     } catch (e) {
         // In case of error here, socket.io silently fails and packets are lost.
         // Prevent this by doing nothing and not trying to transform data.
+
+        // eslint-disable-next-line no-console
         console.error(e);
+
         return data;
     }
 };

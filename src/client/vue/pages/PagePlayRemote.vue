@@ -119,7 +119,7 @@ const listenHexClick = () => {
 
             gameView?.previewMove(move, localPlayerIndex as PlayerIndex);
         } catch (e) {
-            console.log('Move not played: ' + e);
+            // noop
         }
     });
 };
@@ -192,13 +192,7 @@ const initGameView = () => {
     });
 })();
 
-const join = async () => {
-    const result = await hostedGameClient.value?.sendJoinGame();
-
-    if (true !== result) {
-        console.error('could not join:', result);
-    }
-};
+const join = () => hostedGameClient.value?.sendJoinGame();
 
 const confirmationOverlay = createOverlay(ConfirmationOverlay);
 

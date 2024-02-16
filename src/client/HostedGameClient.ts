@@ -160,7 +160,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getGame(): Game
     {
         if (null === this.game) {
-            console.error('Game not loaded here, loading now');
             return this.loadGame();
         }
 

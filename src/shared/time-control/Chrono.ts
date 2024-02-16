@@ -73,7 +73,6 @@ export class Chrono extends TypedEmitter<ChronoEvents>
     run(): void
     {
         if (this.value instanceof Date) {
-            console.error('Chrono.run(): Already running');
             return;
         }
 
@@ -87,7 +86,6 @@ export class Chrono extends TypedEmitter<ChronoEvents>
     pause(): void
     {
         if (!(this.value instanceof Date)) {
-            console.error('Chrono.pause(): Already paused');
             return;
         }
 

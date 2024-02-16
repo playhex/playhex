@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 
 self.addEventListener('install', () => {
-    console.log('[Service Worker] Install');
+    // noop
 });
 
 // Offline handling. Just fallback on cache if no network.

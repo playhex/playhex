@@ -29,11 +29,6 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
                 + (options.incrementSeconds ?? 0);
 
         case 'byoyomi':
-            console.log(
-                options.initialSeconds / averageMoves
-                , (Math.max(options.periodsCount - 1, 0)) * options.periodSeconds / averageMoves
-                , (options.periodsCount > 0 ? options.periodSeconds : 0)
-            );
             return options.initialSeconds / averageMoves
                 + (options.periodsCount > 0
                     ? (options.periodsCount - 1) * options.periodSeconds / averageMoves + options.periodSeconds

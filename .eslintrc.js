@@ -36,5 +36,6 @@ module.exports = {
             },
             'multilineDetection': 'last-member',
         }],
+        'no-console': 'warn',
     },
 };
