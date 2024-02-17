@@ -14,6 +14,6 @@ export const gameToHexworldLink = (game: Game): string => game
 
             return link + move.toString();
         },
-        `https://hexworld.org/board/#${game.getSize()},`,
+        `https://hexworld.org/board/#${game.getSize()}r9c1,`,
     )
 ;
