@@ -16,7 +16,7 @@ describe('hexworld', () => {
 
         const link = gameToHexworldLink(game);
 
-        assert.strictEqual(link, 'https://hexworld.org/board/#9,e5g6c6i9b3');
+        assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,e5g6c6i9b3');
     });
 
     it('generates review link from game having a swap pieces move', () => {
@@ -30,6 +30,6 @@ describe('hexworld', () => {
 
         const link = gameToHexworldLink(game);
 
-        assert.strictEqual(link, 'https://hexworld.org/board/#9,b3:sc6i9c4');
+        assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6i9c4');
     });
 });

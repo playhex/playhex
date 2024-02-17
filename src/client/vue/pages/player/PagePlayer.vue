@@ -16,6 +16,7 @@ import AppPseudoWithOnlineStatusVue from '../../components/AppPseudoWithOnlineSt
 import { useRoute, useRouter } from 'vue-router';
 import { useJsonLd } from '../../../services/head';
 import { useSeoMeta } from '@unhead/vue';
+import { pseudoString } from '../../../../shared/app/pseudoUtils';
 
 const { slug } = useRoute().params;
 
@@ -28,9 +29,9 @@ if (Array.isArray(slug)) {
  */
 const updateMeta = (playerData: PlayerData): void => {
     useSeoMeta({
-        title: `${playerData.pseudo} - Hex player`,
+        title: `${pseudoString(playerData, 'pseudo')} - Hex player`,
         robots: playerData.isGuest ? 'noindex' : 'index',
-        ogTitle: `${playerData.pseudo} - Hex player`,
+        ogTitle: `${pseudoString(playerData, 'pseudo')} - Hex player`,
         ogType: 'profile',
         ogUrl: window.location.href,
         twitterCard: 'summary',
@@ -39,9 +40,9 @@ const updateMeta = (playerData: PlayerData): void => {
     const jsonLd: WithContext<Person> = {
         '@context': 'https://schema.org',
         '@type': 'Person',
-        name: 'Guest ' + playerData.pseudo,
+        name: pseudoString(playerData, 'pseudo'),
         url: window.location.href,
-        identifier: 'guest-' + playerData.slug,
+        identifier: pseudoString(playerData, 'slug'),
     };
 
     useJsonLd(jsonLd);

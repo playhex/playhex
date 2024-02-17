@@ -9,6 +9,7 @@ import AppPseudo from '../AppPseudo.vue';
 import { PropType } from 'vue';
 import { PlayerData } from '../../../../shared/app/Types';
 import { Game } from '../../../../shared/game-engine';
+import { pseudoString } from '../../../../shared/app/pseudoUtils';
 
 const { visible, confirm } = useOverlayMeta();
 
@@ -34,19 +35,6 @@ const winner: null | PlayerData = game.isCanceled()
     : players[game.getStrictWinner()]
 ;
 
-const prependGuest = (player: PlayerData, type: 'slug' | 'pseudo'): string => {
-    if (!player.isGuest) {
-        return player[type];
-    }
-
-    const prefix = {
-        slug: 'guest-',
-        pseudo: 'Guest ',
-    };
-
-    return prefix[type] + player[type];
-};
-
 /*
  * SGF download
  */
@@ -54,14 +42,14 @@ const downloadSGF = (): void => {
     const filename = [
         'hex',
         game.getStartedAt().toISOString().substring(0, 10),
-        prependGuest(players[0], 'slug'),
+        pseudoString(players[0], 'slug'),
         'VS',
-        prependGuest(players[1], 'slug'),
+        pseudoString(players[1], 'slug'),
     ].join('-') + '.sgf';
 
     downloadString(gameToSGF(game, {
-        PB: prependGuest(players[0], 'pseudo'),
-        PW: prependGuest(players[1], 'pseudo'),
+        PB: pseudoString(players[0], 'pseudo'),
+        PW: pseudoString(players[1], 'pseudo'),
     }), filename);
 };
 
