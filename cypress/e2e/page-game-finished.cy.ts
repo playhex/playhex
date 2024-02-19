@@ -16,7 +16,7 @@ describe('Page Game finished', () => {
 
         // Assert review links. Download SGF and HexWorld link.
         cy.contains('button', 'SGF');
-        cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#11,g3h6i3i8b8g6d5i5e7k5c9f6e8e6e3d7a6c6h2a7i10b7b6d6c2j4d4e10b11k4');
+        cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#11r9c1,g3h6i3i8b8g6d5i5e7k5c9f6e8e6e3d7a6c6h2a7i10b7b6d6c2j4d4e10b11k4');
     });
 
     it('displays win popin when a player resigned', () => {
