@@ -6,6 +6,7 @@ import { defaultGameOptions } from '@shared/app/GameOptions';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { BIconAspectRatio, BIconHourglass, BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
 import { secondsToDuration } from '@shared/app/timeControlUtils';
+import { MAX_BOARDSIZE } from '../../../../shared/app/GameOptions';
 
 const { visible, confirm, cancel } = useOverlayMeta();
 
@@ -205,7 +206,7 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                                 v-model="gameOptions.boardsize"
                                 type="number"
                                 min="1"
-                                max="42"
+                                :max="MAX_BOARDSIZE"
                                 class="form-control"
                             >
                         </div>
