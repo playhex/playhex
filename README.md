@@ -6,27 +6,12 @@ Currently hosted here: <https://hex.alcalyn.app/>
 
 ![Game screenshot](assets/images/screenshots/game.png)
 
-## Features
-
-This is a work in progress. Here is the unexhaustive list of implemented and planned features:
-
-- [x] Play online multiplayer
-- [x] Play vs an AI (Mohex)
-- [x] Dark/light theme, mobile support
-- [x] Multiple board sizes, from 1x1 to 42x42
-- [x] Watch other games currently playing
-- [x] Swap rule
-- [ ] Let AI review my game, bad moves, better moves...
-- [x] Chrono
-- [ ] Translations to other languages
-- [ ] Elo score, games history
-
 
 ## Install
 
 Requires:
 
-- node >= 18
+- node >= 18.18.2
 - yarn
 
 Create and `.env` file with at least your database access. Example:
@@ -69,25 +54,6 @@ yarn cypress open
 ```
 
 And see [manual tests](./manual-tests.md) to check also.
-
-### Mohex API
-
-To play against Mohex AI, see: <https://github.com/alcalyn/mohex-api>.
-This repository exposes Mohex AI through an http api.
-
-You can run the Docker image:
-
-``` bash
-docker run -p 3001:3000 alcalyn/mohex-api
-```
-
-Check if it responds with <http://localhost:3001/api/license>.
-
-Then enable Mohex locally by adding in your `.env`:
-
-``` dotenv
-HEX_AI_API_ENDPOINT=http://localhost:3001/api/calculate-move
-```
 
 ### Optimize js size
 
