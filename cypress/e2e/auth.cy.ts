@@ -250,4 +250,91 @@ describe('Authentication', () => {
 
         cy.contains('This pseudo is already used by another player');
     });
+
+    it('should not return password not player id in api results', () => {
+        cy.visit('/');
+
+        /*
+         * On player create response
+         */
+        cy.request('POST', '/api/auth/me-or-guest').as('playerResponse');
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cy.get('@playerResponse').then((playerResponse: any) => {
+            assert.strictEqual(playerResponse.isOkStatusCode, true);
+
+            const player = playerResponse.body;
+
+            assert.doesNotHaveAnyKeys(player, ['id', 'password']);
+
+            /*
+            * On player create response
+            */
+            cy.request('GET', `/api/players/${player.publicId}`).as('meResponse');
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cy.get('@meResponse').then((meResponse: any) => {
+                assert.strictEqual(meResponse.isOkStatusCode, true);
+
+                const player = meResponse.body;
+
+                assert.doesNotHaveAnyKeys(player, ['id', 'password']);
+            });
+        });
+
+        /*
+         * On game create (host, players)
+         */
+        cy.request('POST', '/api/games', {
+            opponent: {
+                type: 'ai',
+            },
+            timeControl: {
+                type: 'fischer',
+                options: {
+                    initialSeconds: 600,
+                    incrementSeconds: 5,
+                    maxSeconds: 600,
+                },
+            },
+        }).as('gameResponse');
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cy.get('@gameResponse').then((gameResponse: any) => {
+            assert.strictEqual(gameResponse.isOkStatusCode, true);
+
+            const game = gameResponse.body;
+
+            assert.doesNotHaveAnyKeys(game.host, ['id', 'password']);
+            assert.doesNotHaveAnyKeys(game.players[0], ['id', 'password']);
+            assert.doesNotHaveAnyKeys(game.players[1], ['id', 'password']);
+        });
+
+        /*
+         * On persisted games (host, players)
+         */
+        cy.request('GET', '/api/games?type=ended&take=5').as('persistedGamesResponse');
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cy.get('@persistedGamesResponse').then((persistedGamesResponse: any) => {
+            assert.strictEqual(persistedGamesResponse.isOkStatusCode, true);
+
+            const persistedGames = persistedGamesResponse.body;
+
+            if (0 === persistedGames.length) {
+                Cypress.log({
+                    displayName: '⚠ WARNING ⚠',
+                    message: 'No persisted game to make assertions. Cannot fully test this case.',
+                });
+
+                return;
+            }
+
+            for (let i = 0; i < persistedGames.length; ++i) {
+                assert.doesNotHaveAnyKeys(persistedGames[i].host, ['id', 'password']);
+                assert.doesNotHaveAnyKeys(persistedGames[i].players[0], ['id', 'password']);
+                assert.doesNotHaveAnyKeys(persistedGames[i].players[1], ['id', 'password']);
+            }
+        });
+    });
 });
