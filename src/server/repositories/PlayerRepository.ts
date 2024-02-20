@@ -7,19 +7,10 @@ import logger from '../services/logger';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
-import { Prisma } from '@prisma/client';
+import { select } from '../persistance/PlayerPersister';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
-
-const select: Prisma.PlayerSelect = {
-    pseudo: true,
-    publicId: true,
-    isGuest: true,
-    isBot: true,
-    slug: true,
-    createdAt: true,
-};
 
 @Service()
 export default class PlayerRepository

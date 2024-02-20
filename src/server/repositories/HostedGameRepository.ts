@@ -66,15 +66,24 @@ export default class HostedGameRepository
      * Persist in-memory games.
      * Should be called before server manual restart.
      */
-    async persistPlayingGames(): Promise<void>
+    async persistPlayingGames(): Promise<boolean>
     {
         logger.info('Persisting all playing games...');
 
+        let allSuccess = true;
+
         for (const key in this.activeGames) {
-            await this.hostedGamePersister.persist(this.activeGames[key].toData());
+            try {
+                await this.hostedGamePersister.persist(this.activeGames[key].toData());
+            } catch (e) {
+                allSuccess = false;
+                logger.error('Could not persist a game. Continue with others.', { gameId: key, e });
+            }
         }
 
         logger.info('Persisting done.');
+
+        return allSuccess;
     }
 
     /**

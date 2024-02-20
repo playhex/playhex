@@ -9,6 +9,7 @@ import { Service } from 'typedi';
 import { GameTimeData, PlayerTimeData } from '../../shared/time-control/TimeControl';
 import logger from '../services/logger';
 import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYomiTimeControl';
+import { select as playerSelect } from './PlayerPersister';
 
 export type HostedGameDBFull = Prisma.HostedGameGetPayload<{
     include: {
@@ -17,7 +18,9 @@ export type HostedGameDBFull = Prisma.HostedGameGetPayload<{
         options: true;
         players: {
             include: {
-                player: true;
+                player: {
+                    select: typeof playerSelect;
+                };
             };
         };
     };
@@ -28,10 +31,14 @@ const select: Prisma.HostedGameSelect = {
     createdAt: true,
     state: true,
     options: true,
-    host: true,
+    host: {
+        select: playerSelect,
+    },
     players: {
         select: {
-            player: true,
+            player: {
+                select: playerSelect,
+            },
         },
         orderBy: {
             order: 'asc',
