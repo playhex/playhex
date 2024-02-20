@@ -18,6 +18,10 @@ import { useJsonLd } from '../../../services/head';
 import { useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 
+useSeoMeta({
+    robots: 'noindex',
+});
+
 const { slug } = useRoute().params;
 
 if (Array.isArray(slug)) {
