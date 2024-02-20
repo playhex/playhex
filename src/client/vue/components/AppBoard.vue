@@ -15,7 +15,7 @@ const pixiApp = ref<HTMLElement>();
 
 const props = defineProps({
     players: {
-        type: Array as PropType<null | PlayerData[]>,
+        type: Array as PropType<null | (null | PlayerData)[]>,
     },
     timeControlOptions: {
         type: Object as PropType<TimeControlType>,
@@ -33,8 +33,8 @@ const props = defineProps({
     },
 });
 
-const { players, gameView } = props;
-const { timeControlOptions, timeControlValues } = toRefs(props);
+const { gameView } = props;
+const { players, timeControlOptions, timeControlValues } = toRefs(props);
 
 /*
  * Add piwi view
