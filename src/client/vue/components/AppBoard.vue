@@ -15,7 +15,8 @@ const pixiApp = ref<HTMLElement>();
 
 const props = defineProps({
     players: {
-        type: Array as PropType<null | (null | PlayerData)[]>,
+        type: Array as PropType<(null | PlayerData)[]>,
+        required: true,
     },
     timeControlOptions: {
         type: Object as PropType<TimeControlType>,
@@ -85,7 +86,7 @@ const { rematch } = props;
 gameView.on('endedAndWinAnimationOver', () => {
     gameFinishedOverlay({
         game,
-        players,
+        players: players.value,
         rematch,
     });
 });
