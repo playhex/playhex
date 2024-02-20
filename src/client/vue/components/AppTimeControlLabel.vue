@@ -19,11 +19,18 @@ const candency = timeControlToCadencyName(gameOptions.value);
 </script>
 
 <template>
-    <b-icon-lightning-charge-fill v-if="candency === 'blitz'" />
-    <b-icon-alarm-fill v-else-if="candency === 'normal'" />
-    <b-icon-calendar v-else-if="candency === 'correspondance'" />
+    <p>
+        <b-icon-lightning-charge-fill v-if="candency === 'blitz'" class="d-none d-sm-inline" />
+        <b-icon-alarm-fill v-else-if="candency === 'normal'" class="d-none d-sm-inline" />
+        <b-icon-calendar v-else-if="candency === 'correspondance'" class="d-none d-sm-inline" />
 
-    {{ timeControlToString(gameOptions.timeControl) }}
+        {{ timeControlToString(gameOptions.timeControl) }}
 
-    <small class="text-body-secondary d-none d-sm-inline">(~{{ secondsToDuration(Math.round(calcAverageSecondsPerMove(gameOptions.timeControl, gameOptions.boardsize)), 1) }}&nbsp;/&nbsp;move)</small>
+        <small class="text-body-secondary d-none d-sm-inline">(~{{ secondsToDuration(Math.round(calcAverageSecondsPerMove(gameOptions.timeControl, gameOptions.boardsize)), 1) }}&nbsp;/&nbsp;move)</small>
+    </p>
 </template>
+
+<style lang="stylus" scoped>
+p
+    margin 0
+</style>

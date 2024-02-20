@@ -7,6 +7,7 @@ import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import { apiPostCancel, apiPostResign } from './apiClient';
 import TimeControlType from '@shared/time-control/TimeControlType';
+import { GameOptionsData } from '@shared/app/GameOptions';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -147,6 +148,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getHostedGameData(): HostedGameData
     {
         return this.hostedGameData;
+    }
+
+    getGameOptions(): GameOptionsData
+    {
+        return this.hostedGameData.gameOptions;
     }
 
     /**

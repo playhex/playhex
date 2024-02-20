@@ -64,7 +64,7 @@ describe('Lobby', () => {
         cy
             // Waiting games
             .contains('Join a game')
-            .next('table')
+            .next('div')
             .contains('Player waiting')
             .closest('tr')
             .contains('Accept')
@@ -91,5 +91,20 @@ describe('Lobby', () => {
             .closest('table')
             .contains(/Cancel A|Cancel B/).should('not.exist')
         ;
+    });
+
+    it('warns when there is custom rules', () => {
+        cy.intercept('/api/games', {
+            fixture: 'lobby/custom-rules-games.json',
+        });
+
+        cy.visit('/');
+
+        cy.contains('table td', '11').should('not.have.class', 'text-warning');
+        cy.contains('table td', '25').should('have.class', 'text-warning');
+
+        cy.contains('table td', '11').closest('tr').contains('normal');
+        cy.contains('table td', '12').closest('tr').contains('no swap');
+        cy.contains('table td', '13').closest('tr').contains('no swap host plays first');
     });
 });

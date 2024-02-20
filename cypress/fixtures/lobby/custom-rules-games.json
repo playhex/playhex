@@ -1,0 +1,282 @@
+[
+    {
+        "id": "f45d0703-827b-4da7-b804-48ea6f5e276b",
+        "host": {
+            "pseudo": "Julien",
+            "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "julien",
+            "createdAt": "2024-02-17T21:49:13.621Z"
+        },
+        "players": [
+            {
+                "pseudo": "Julien",
+                "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "julien",
+                "createdAt": "2024-02-17T21:49:13.621Z"
+            }
+        ],
+        "timeControl": {
+            "state": "ready",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 11,
+            "firstPlayer": null,
+            "swapRule": true,
+            "opponent": {
+                "type": "player"
+            },
+            "timeControl": {
+                "type": "fischer",
+                "options": {
+                    "initialSeconds": 600,
+                    "incrementSeconds": 5,
+                    "maxSeconds": 600
+                }
+            }
+        },
+        "gameData": null,
+        "state": "created",
+        "createdAt": "2024-02-20T20:06:21.075Z",
+        "__meta": {
+            "values": {
+                "host.createdAt": [
+                    "Date"
+                ],
+                "players.0.createdAt": [
+                    "Date"
+                ],
+                "createdAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "players.0"
+                ]
+            }
+        }
+    },
+    {
+        "id": "02a9d462-afe2-46d9-9ab4-723f86b5b8be",
+        "host": {
+            "pseudo": "Julien",
+            "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "julien",
+            "createdAt": "2024-02-17T21:49:13.621Z"
+        },
+        "players": [
+            {
+                "pseudo": "Julien",
+                "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "julien",
+                "createdAt": "2024-02-17T21:49:13.621Z"
+            }
+        ],
+        "timeControl": {
+            "state": "ready",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 12,
+            "firstPlayer": null,
+            "swapRule": false,
+            "opponent": {
+                "type": "player"
+            },
+            "timeControl": {
+                "type": "fischer",
+                "options": {
+                    "initialSeconds": 600,
+                    "incrementSeconds": 5,
+                    "maxSeconds": 600
+                }
+            }
+        },
+        "gameData": null,
+        "state": "created",
+        "createdAt": "2024-02-20T20:06:28.192Z",
+        "__meta": {
+            "values": {
+                "host.createdAt": [
+                    "Date"
+                ],
+                "players.0.createdAt": [
+                    "Date"
+                ],
+                "createdAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "players.0"
+                ]
+            }
+        }
+    },
+    {
+        "id": "6cbc0c65-d20d-40d8-bcb0-8d93f8b08f05",
+        "host": {
+            "pseudo": "Julien",
+            "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "julien",
+            "createdAt": "2024-02-17T21:49:13.621Z"
+        },
+        "players": [
+            {
+                "pseudo": "Julien",
+                "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "julien",
+                "createdAt": "2024-02-17T21:49:13.621Z"
+            }
+        ],
+        "timeControl": {
+            "state": "ready",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 13,
+            "firstPlayer": 0,
+            "swapRule": false,
+            "opponent": {
+                "type": "player"
+            },
+            "timeControl": {
+                "type": "fischer",
+                "options": {
+                    "initialSeconds": 600,
+                    "incrementSeconds": 5,
+                    "maxSeconds": 600
+                }
+            }
+        },
+        "gameData": null,
+        "state": "created",
+        "createdAt": "2024-02-20T20:06:33.517Z",
+        "__meta": {
+            "values": {
+                "host.createdAt": [
+                    "Date"
+                ],
+                "players.0.createdAt": [
+                    "Date"
+                ],
+                "createdAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "players.0"
+                ]
+            }
+        }
+    },
+    {
+        "id": "56c8982b-3979-4368-b4f8-80f2e2771d34",
+        "host": {
+            "pseudo": "Julien",
+            "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "julien",
+            "createdAt": "2024-02-17T21:49:13.621Z"
+        },
+        "players": [
+            {
+                "pseudo": "Julien",
+                "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "julien",
+                "createdAt": "2024-02-17T21:49:13.621Z"
+            }
+        ],
+        "timeControl": {
+            "state": "ready",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600
+                },
+                {
+                    "totalRemainingTime": 600
+                }
+            ]
+        },
+        "gameOptions": {
+            "boardsize": 25,
+            "firstPlayer": null,
+            "swapRule": true,
+            "opponent": {
+                "type": "player"
+            },
+            "timeControl": {
+                "type": "fischer",
+                "options": {
+                    "initialSeconds": 600,
+                    "incrementSeconds": 5,
+                    "maxSeconds": 600
+                }
+            }
+        },
+        "gameData": null,
+        "state": "created",
+        "createdAt": "2024-02-20T20:06:41.429Z",
+        "__meta": {
+            "values": {
+                "host.createdAt": [
+                    "Date"
+                ],
+                "players.0.createdAt": [
+                    "Date"
+                ],
+                "createdAt": [
+                    "Date"
+                ]
+            },
+            "referentialEqualities": {
+                "host": [
+                    "players.0"
+                ]
+            }
+        }
+    }
+]

@@ -7,6 +7,7 @@ import GameOptionsOverlay, { GameOptionsOverlayInput } from '@client/vue/compone
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { PlayerData } from '@shared/app/Types';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
+import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
 import HostedGameClient from '../../HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
 import AppPseudoWithOnlineStatus from '../components/AppPseudoWithOnlineStatus.vue';
@@ -84,6 +85,12 @@ const joinGame = async (gameId: string) => {
     hostedGameClient.sendJoinGame();
 };
 
+const isUncommonBoardsize = (hostedGameClient: HostedGameClient): boolean => {
+    const { boardsize } = hostedGameClient.getGameOptions();
+
+    return boardsize < 9 || boardsize > 19;
+};
+
 /**
  * Ended games
  */
@@ -123,38 +130,42 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
                 <h3>Join a game</h3>
 
-                <table v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col">Host</th>
-                            <th scope="col">Size</th>
-                            <th scope="col">Time control</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isWaiting)"
-                            :key="hostedGameClient.getId()"
-                        >
-                            <td class="ps-0">
-                                <button
-                                    v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)"
-                                    class="btn me-3 btn-sm btn-success"
-                                    @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
-                                >Accept</button>
+                <div v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Host</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Time control</th>
+                                <th scope="col">Rules</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isWaiting)"
+                                :key="hostedGameClient.getId()"
+                            >
+                                <td>
+                                    <button
+                                        v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)"
+                                        class="btn me-3 btn-sm btn-success"
+                                        @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
+                                    >Accept</button>
 
-                                <router-link
-                                    class="btn me-3 btn-sm btn-link"
-                                    :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
-                                >Watch</router-link>
-                            </td>
-                            <td><app-pseudo-with-online-status :playerData="hostedGameClient.getHostedGameData().host" /></td>
-                            <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
-                            <td><app-time-control-label-vue :game-options="hostedGameClient.getHostedGameData().gameOptions" /></td>
-                        </tr>
-                    </tbody>
-                </table>
+                                    <router-link
+                                        class="btn me-3 btn-sm btn-link"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                    >Watch</router-link>
+                                </td>
+                                <td><app-pseudo-with-online-status :playerData="hostedGameClient.getHostedGameData().host" /></td>
+                                <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
+                                <td><app-time-control-label-vue :game-options="hostedGameClient.getGameOptions()" /></td>
+                                <td><app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <p v-else>No game for now. Create a new one !</p>
 
                 <h4><b-icon-eye /> Watch current game</h4>
@@ -238,4 +249,11 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
 h4
     margin-top 1em
+
+tr
+    td:first-child, th:first-child
+        padding-left 0
+
+    td:last-child, th:last-child
+        padding-right 0
 </style>
