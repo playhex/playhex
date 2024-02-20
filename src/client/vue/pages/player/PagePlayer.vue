@@ -18,10 +18,6 @@ import { useJsonLd } from '../../../services/head';
 import { useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 
-useSeoMeta({
-    robots: 'noindex',
-});
-
 const { slug } = useRoute().params;
 
 if (Array.isArray(slug)) {
@@ -34,7 +30,12 @@ if (Array.isArray(slug)) {
 const updateMeta = (playerData: PlayerData): void => {
     useSeoMeta({
         title: `${pseudoString(playerData, 'pseudo')} - Hex player`,
-        robots: playerData.isGuest ? 'noindex' : 'index',
+
+        // index only bots (Mohex) profile page.
+        // Guest should never be indexed,
+        // players only if they explicitely agree (settings)
+        robots: playerData.isBot ? 'index' : 'noindex',
+
         ogTitle: `${pseudoString(playerData, 'pseudo')} - Hex player`,
         ogType: 'profile',
         ogUrl: window.location.href,
