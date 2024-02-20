@@ -6,6 +6,10 @@ type SelectedTheme = DarkOrLight | 'auto';
 
 const useDarkLightThemeStore = defineStore('darkLightThemeStore', () => {
 
+    /**
+     * Selected theme in settings, can be "light" or "dark", but also "auto".
+     * See displayedTheme to get current theme used.
+     */
     const selectedTheme: Ref<SelectedTheme> = ref('auto');
 
     const displayedTheme = (): DarkOrLight => {

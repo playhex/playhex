@@ -1,7 +1,7 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
 import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
-import { currentTheme } from '@client/pixi-board/BoardTheme';
+import { Theme, themes } from '@client/pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { debounce } from 'debounce';
 import SwapableSprite from './SwapableSprite';
@@ -110,10 +110,10 @@ type GameViewEvents = {
     orientationChanged: () => void;
 };
 
-const darkLightThemeStore = useDarkLightThemeStore();
-
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
+    static currentTheme: Theme;
+
     private hexes: Hex[][];
     private pixi: Application;
     private gameContainer: Container = new Container();
@@ -141,6 +141,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     ) {
         super();
 
+        GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
+
         const wrapperSize = this.getWrapperSize();
 
         this.pixi = new Application({
@@ -158,7 +160,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.listenModel();
 
         window.addEventListener('resizeDebounced', this.resizeDebouncedListener);
-        this.unwatchThemeSwitchedListener = watch(darkLightThemeStore.displayedTheme, this.themeSwitchedListener);
+        this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
             this.endedCallback();
@@ -167,6 +169,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private redraw(): void
     {
+        GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
+
         this.gameContainer.removeChildren();
 
         if (typeof this.orientation === 'number') {
@@ -477,8 +481,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const m = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
 
         // Set sides colors
-        this.sidesGraphics[0].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorA);
-        this.sidesGraphics[1].lineStyle(Hex.RADIUS * 0.6, currentTheme.colorB);
+        this.sidesGraphics[0].lineStyle(Hex.RADIUS * 0.6, GameView.currentTheme.colorA);
+        this.sidesGraphics[1].lineStyle(Hex.RADIUS * 0.6, GameView.currentTheme.colorB);
 
         // From a1 to i1 (red)
         g = this.sidesGraphics[0];
@@ -548,7 +552,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const coordsTextStyle = new TextStyle({
             fontFamily: 'Arial',
             fontSize: Hex.RADIUS * 0.6,
-            fill: currentTheme.textColor,
+            fill: GameView.currentTheme.textColor,
         });
 
         const createText = (string: string, x: number, y: number): Text => {

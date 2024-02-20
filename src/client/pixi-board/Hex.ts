@@ -1,6 +1,6 @@
 import { Graphics, IPointData, Sprite, Ticker } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
-import { currentTheme } from './BoardTheme';
+import GameView from './GameView';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -73,7 +73,7 @@ export default class Hex extends Sprite
         }
 
         g.lineStyle(0);
-        g.beginFill(currentTheme.strokeColor, 1);
+        g.beginFill(GameView.currentTheme.strokeColor, 1);
         g.drawPolygon(path);
         g.endFill();
 
@@ -93,7 +93,7 @@ export default class Hex extends Sprite
         }
 
         g.lineStyle(0);
-        g.beginFill(currentTheme.colorEmpty);
+        g.beginFill(GameView.currentTheme.colorEmpty);
         g.drawPolygon(path);
         g.endFill();
 
@@ -168,8 +168,8 @@ export default class Hex extends Sprite
 
         if (null !== this.playerIndex) {
             this.hexColor.tint = [
-                currentTheme.colorA,
-                currentTheme.colorB,
+                GameView.currentTheme.colorA,
+                GameView.currentTheme.colorB,
             ][this.playerIndex];
         }
     }
@@ -188,8 +188,8 @@ export default class Hex extends Sprite
         this.hexColor.alpha = 0.5;
 
         this.hexColor.tint = [
-            currentTheme.colorA,
-            currentTheme.colorB,
+            GameView.currentTheme.colorA,
+            GameView.currentTheme.colorB,
         ][playerIndex];
 
         return this;

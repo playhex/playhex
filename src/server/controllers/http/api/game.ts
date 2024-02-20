@@ -8,6 +8,16 @@ export default (): Router => {
     const router = Router();
     const hostedGameRepository = Container.get(HostedGameRepository);
 
+    router.post('/api/games/:id/join', authenticated, async (req, res) => {
+        const result = await hostedGameRepository.playerJoinGame(res.locals.playerData, req.params.id);
+
+        if (true !== result) {
+            throw new HttpError(400, result);
+        }
+
+        res.status(204).send();
+    });
+
     router.post('/api/games/:id/resign', authenticated, async (req, res) => {
         const result = await hostedGameRepository.playerResign(res.locals.playerData, req.params.id);
 

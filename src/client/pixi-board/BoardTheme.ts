@@ -1,6 +1,3 @@
-import useDarkLightThemeStore from '../stores/darkLightThemeStore';
-import { watch } from 'vue';
-
 export type Theme = {
     colorA: number; // --bs-danger
     colorB: number; // --bs-primary
@@ -9,7 +6,7 @@ export type Theme = {
     textColor: number; // --bs-body-color
 };
 
-const darkTheme: Theme = {
+const dark: Theme = {
     colorA: 0xdc3545,
     colorB: 0x0d6efd,
     colorEmpty: 0x343a40,
@@ -17,7 +14,7 @@ const darkTheme: Theme = {
     textColor: 0xdee2e6,
 };
 
-const lightTheme: Theme = {
+const light: Theme = {
     colorA: 0xdc3545,
     colorB: 0x0d6efd,
     colorEmpty: 0xfcfcfd,
@@ -25,8 +22,7 @@ const lightTheme: Theme = {
     textColor: 0x212529,
 };
 
-const darkLightThemeStore = useDarkLightThemeStore();
-
-export let currentTheme: Theme = darkLightThemeStore.displayedTheme() === 'dark' ? darkTheme : lightTheme;
-
-watch(useDarkLightThemeStore().displayedTheme, theme => currentTheme = theme === 'dark' ? darkTheme : lightTheme);
+export const themes = {
+    dark,
+    light,
+};
