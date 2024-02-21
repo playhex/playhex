@@ -111,7 +111,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 </script>
 
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid my-3">
         <div class="row">
             <div class="col-sm-9">
                 <h3>New game</h3>

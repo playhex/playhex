@@ -46,7 +46,7 @@ const portraitOrientations = [
 </script>
 
 <template>
-    <div class="container">
+    <div class="container my-3">
         <h2>Settings</h2>
 
         <h3>Theme</h3>

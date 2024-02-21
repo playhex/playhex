@@ -7,7 +7,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
 </script>
 
 <template>
-    <div class="container-fluid footer">
+    <div class="container-fluid py-3 footer bg-dark-subtle">
         <div class="d-flex justify-content-center gap-4">
             <p>Hex online board game</p>
         </div>

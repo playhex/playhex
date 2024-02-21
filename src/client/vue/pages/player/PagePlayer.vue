@@ -181,7 +181,7 @@ const clickLogout = async () => {
 </script>
 
 <template>
-    <div v-if="!playerNotFound" class="container">
+    <div v-if="!playerNotFound" class="container my-3">
         <div class="d-flex">
             <div class="avatar-wrapper">
                 <b-icon-person class="icon img-thumbnail" />

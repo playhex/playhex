@@ -1,13 +1,13 @@
 <template>
     <div class="row g-0">
         <div class="col-12 col-sm-4 col-md-3 bg-dark-subtle">
-            <nav class="nav flex-sm-column mt-sm-4">
+            <nav class="nav flex-sm-column my-sm-3">
                 <router-link :to="{ name: 'links' }" class="nav-link">Hex resources</router-link>
                 <router-link :to="{ name: 'license' }" class="nav-link">License AGPL-3.0</router-link>
             </nav>
         </div>
         <div class="col-12 col-sm-8 col-md-9">
-            <div class="container">
+            <div class="container my-3">
                 <router-view></router-view>
             </div>
         </div>

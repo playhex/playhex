@@ -149,8 +149,8 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
     flex-direction column
     position absolute
     height auto
-    max-width 35%
-    margin 0 0.75rem // To align with bootstrap navbar/container
+    max-width 30%
+    margin 0.75rem // To align with bootstrap navbar/container
 
     p
         margin 0

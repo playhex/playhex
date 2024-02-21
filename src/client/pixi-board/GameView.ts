@@ -240,7 +240,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     getWrapperSize(): GameViewSize
     {
         const rem = parseFloat(getComputedStyle(document.documentElement).fontSize); // Browser rem size
-        const headerAndGameMenuRem = 8; // From base.styl, sum of header and game menu height in rem
+        const headerAndGameMenuRem = 6; // From base.styl, sum of header and game menu height in rem
         const margin = 1.1; // Safe margin to prevent slight page height overflow
 
         return {
@@ -317,16 +317,21 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             y: max(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
         };
 
-        let boxWidth = boardMaxCorner1.x - boardMaxCorner0.x + Hex.RADIUS * 2;
-        let boxHeight = boardMaxCorner1.y - boardMaxCorner0.y + Hex.RADIUS;
+        let boxWidth = boardMaxCorner1.x - boardMaxCorner0.x;
+        let boxHeight = boardMaxCorner1.y - boardMaxCorner0.y;
 
-        // Add margin to prevent cell top and bottom being slightly cropped
-        boxHeight += Hex.RADIUS;
+        // Add margin to prevent cells to be slightly cropped.
+        // Depending on orientation, either width or height margin is needed.
+        if ([1, 2, 3].includes(this.getCurrentOrientation() % 6)) {
+            boxWidth += 30;
+        } else {
+            boxHeight += 30;
+        }
 
         // Add margin to display coords around the board
         if (this.displayCoords) {
-            boxWidth += Hex.RADIUS * 2;
-            boxHeight += Hex.RADIUS * 2;
+            boxWidth += Hex.RADIUS * 1.8;
+            boxHeight += Hex.RADIUS * 1.8;
         }
 
         const scale = min(
