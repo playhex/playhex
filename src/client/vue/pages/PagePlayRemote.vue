@@ -13,7 +13,7 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconX, BIconCheck, BIconAlphabet } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconX, BIconCheck, BIconAlphabet, BIconChatRightText, BIconChatRight } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
@@ -200,6 +200,7 @@ const confirmationOverlay = createOverlay(ConfirmationOverlay);
  * set gameView container
  */
 const boardContainer = ref<HTMLElement>();
+let resizeObserver: null | ResizeObserver = null;
 
 onMounted(async () => {
     await loadGamePromise;
@@ -209,6 +210,13 @@ onMounted(async () => {
     }
 
     gameView.setContainerElement(boardContainer.value);
+
+    resizeObserver = new ResizeObserver(() => gameView?.redraw());
+    resizeObserver.observe(boardContainer.value);
+});
+
+onUnmounted(() => {
+    resizeObserver?.disconnect();
 });
 
 /*
@@ -299,34 +307,78 @@ const rematch = async (): Promise<void> => {
         },
     });
 };
+
+/*
+ * Sidebar
+ */
+const sidebarVisible = ref(false);
+const chatInput = ref('');
+const newMessages = ref(1);
+const chatMessages: Ref<string[]> = ref([]);
+
+const sendChat = () => {
+    if ('' === chatInput.value) {
+        return;
+    }
+
+    chatMessages.value.push(chatInput.value);
+    chatInput.value = '';
+};
 </script>
 
 <template>
     <template v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView">
-        <div class="position-relative board-container" ref="boardContainer">
-            <app-board
-                :players="hostedGameClient.getPlayers()"
-                :time-control-options="hostedGameClient.getTimeControlOptions()"
-                :time-control-values="hostedGameClient.getTimeControlValues()"
-                :game-view="gameView"
-                :rematch="rematch"
-            ></app-board>
+        <div class="row g-0 position-relative">
+            <div :class="sidebarVisible ? 'col-sm-7 col-md-8' : 'col-12'">
+                <div class="position-relative board-container" ref="boardContainer">
+                    <app-board
+                        :players="hostedGameClient.getPlayers()"
+                        :time-control-options="hostedGameClient.getTimeControlOptions()"
+                        :time-control-values="hostedGameClient.getTimeControlValues()"
+                        :game-view="gameView"
+                        :rematch="rematch"
+                    ></app-board>
 
-            <div v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="position-absolute w-100 join-button-container">
-                <div class="d-flex justify-content-center">
-                    <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+                    <div v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="position-absolute w-100 join-button-container">
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="menu-game navbar">
+                    <div class="buttons container-fluid">
+                        <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
+                        <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
+                        <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm <span class="d-none d-sm-inline">move</span></button>
+                        <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarVisible = !sidebarVisible; newMessages = 0">
+                            <b-icon-chat-right-text v-if="chatMessages.length > 0" />
+                            <b-icon-chat-right v-else />
+                            Chat
+                            <span v-if="newMessages > 0" class="position-absolute top-0 start-0 translate-middle badge rounded-circle bg-danger p-2"></span>
+                        </button>
+                        <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
+                    </div>
+                </nav>
+            </div>
+
+            <div v-if="sidebarVisible" class="col-10 col-sm-5 col-md-4 game-sidebar bg-body">
+                <div class="container-fluid my-2">
+                    <button type="button" class="btn-close" aria-label="Close" @click="sidebarVisible = false"></button>
+
+                    <h5>Chat</h5>
+
+                    <ul>
+                        <li v-for="message in chatMessages">{{ message }}</li>
+                    </ul>
+
+                    <form>
+                        <input v-model="chatInput" />
+                        <button type="submit" @click="e => { e.preventDefault(); sendChat() }">Submit</button>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <nav class="menu-game navbar">
-            <div class="container-fluid justify-content-center">
-                <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
-                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
-                <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
-                <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
-            </div>
-        </nav>
     </template>
 
     <div class="container-fluid my-3" v-else><p class="lead">Loading game…</p></div>
@@ -338,4 +390,20 @@ const rematch = async (): Promise<void> => {
 
 .board-container
     height calc(100vh - 6rem)
+
+.navbar .buttons
+    display flex
+    justify-content center
+    gap 0.5em
+
+.game-sidebar
+    position absolute
+    right 0
+    top 0
+    bottom 0
+    --bs-bg-opacity 0.85
+    border-left 1px solid var(--bs-border-color-translucent)
+
+    @media (min-width: 576px)
+        position static
 </style>

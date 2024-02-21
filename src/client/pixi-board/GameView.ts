@@ -166,7 +166,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    private redraw(): void
+    redraw(): void
     {
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
         const wrapperSize = this.getWrapperSize();
