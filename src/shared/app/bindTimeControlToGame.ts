@@ -8,6 +8,11 @@ import { AbstractTimeControl } from '../time-control/TimeControl';
  */
 export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeControl) => {
     game.prependListener('played', (move, moveIndex, byPlayerIndex) => {
+        // Start time control on first move
+        if (timeControl.getState() === 'ready') {
+            timeControl.start();
+        }
+
         timeControl.push(byPlayerIndex);
     });
 

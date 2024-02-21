@@ -254,7 +254,6 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         this.state = 'playing';
 
         this.bindTimeControl();
-        this.timeControl.start();
 
         this.io.to(this.gameRooms(true)).emit('gameStarted', this.toData());
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
