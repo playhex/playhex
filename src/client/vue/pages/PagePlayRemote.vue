@@ -7,7 +7,7 @@ import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
-import { Ref, onUnmounted, watch } from 'vue';
+import { Ref, onMounted, onUnmounted, watch } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
@@ -163,7 +163,7 @@ const initGameView = () => {
 /*
  * Load game
  */
-(async () => {
+const loadGamePromise = (async () => {
     // Must reload from server when I watch a game, I am not up to date
     // Or when I come back on a game where I did not received events, again not up to date
     hostedGameClient.value = await lobbyStore.retrieveHostedGameClient(gameId, true);
@@ -195,6 +195,21 @@ const initGameView = () => {
 const join = () => hostedGameClient.value?.sendJoinGame();
 
 const confirmationOverlay = createOverlay(ConfirmationOverlay);
+
+/*
+ * set gameView container
+ */
+const boardContainer = ref<HTMLElement>();
+
+onMounted(async () => {
+    await loadGamePromise;
+
+    if (!boardContainer.value || !gameView) {
+        return;
+    }
+
+    gameView.setContainerElement(boardContainer.value);
+});
 
 /*
  * Resign
@@ -287,35 +302,40 @@ const rematch = async (): Promise<void> => {
 </script>
 
 <template>
-    <div class="position-relative">
-        <app-board
-            v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView"
-            :players="hostedGameClient.getPlayers()"
-            :time-control-options="hostedGameClient.getTimeControlOptions()"
-            :time-control-values="hostedGameClient.getTimeControlValues()"
-            :game-view="gameView"
-            :rematch="rematch"
-        ></app-board>
-        <div class="container-fluid my-3" v-else><p class="lead">Loading game…</p></div>
+    <template v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView">
+        <div class="position-relative board-container" ref="boardContainer">
+            <app-board
+                :players="hostedGameClient.getPlayers()"
+                :time-control-options="hostedGameClient.getTimeControlOptions()"
+                :time-control-values="hostedGameClient.getTimeControlValues()"
+                :game-view="gameView"
+                :rematch="rematch"
+            ></app-board>
 
-        <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="position-absolute w-100 join-button-container">
-            <div class="d-flex justify-content-center">
-                <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+            <div v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="position-absolute w-100 join-button-container">
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <nav class="menu-game navbar">
-        <div class="container-fluid justify-content-center">
-            <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
-            <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
-            <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
-            <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
-        </div>
-    </nav>
+        <nav class="menu-game navbar">
+            <div class="container-fluid justify-content-center">
+                <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
+                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
+                <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
+                <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
+            </div>
+        </nav>
+    </template>
+
+    <div class="container-fluid my-3" v-else><p class="lead">Loading game…</p></div>
 </template>
 
 <style scoped lang="stylus">
 .join-button-container
     top 0
+
+.board-container
+    height calc(100vh - 6rem)
 </style>

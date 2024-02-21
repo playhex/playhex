@@ -114,6 +114,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 {
     static currentTheme: Theme;
 
+    private containerElement: HTMLElement = document.body;
+
     private hexes: Hex[][];
     private pixi: Application;
     private gameContainer: Container = new Container();
@@ -143,15 +145,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
 
-        const wrapperSize = this.getWrapperSize();
-
         this.pixi = new Application({
             antialias: true,
             backgroundAlpha: 0,
             resolution: ceil(window.devicePixelRatio),
             autoDensity: true,
-            width: wrapperSize.width,
-            height: wrapperSize.height,
+            ...this.getWrapperSize(),
         });
 
         this.pixi.stage.addChild(this.gameContainer);
@@ -170,13 +169,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private redraw(): void
     {
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
+        const wrapperSize = this.getWrapperSize();
 
         this.gameContainer.removeChildren();
 
         if (typeof this.orientation === 'number') {
             this.currentOrientation = this.orientation;
         } else {
-            this.currentOrientation = window.innerWidth > window.innerHeight
+            this.currentOrientation = wrapperSize.width > wrapperSize.height
                 ? this.orientation.landscape
                 : this.orientation.portrait
             ;
@@ -191,7 +191,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.game.getSize() / 2 - 0.5,
         );
 
-        const wrapperSize = this.getWrapperSize();
+        this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
 
         this.gameContainer.position = {
             x: wrapperSize.width / 2,
@@ -237,16 +237,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.redraw();
     }
 
+    setContainerElement(containerElement: HTMLElement): void
+    {
+        this.containerElement = containerElement;
+        this.redraw();
+    }
+
     getWrapperSize(): GameViewSize
     {
-        const rem = parseFloat(getComputedStyle(document.documentElement).fontSize); // Browser rem size
-        const headerAndGameMenuRem = 6; // From base.styl, sum of header and game menu height in rem
-        const margin = 1.1; // Safe margin to prevent slight page height overflow
-
-        return {
-            width: min(window.innerWidth, screen.width),
-            height: min(window.innerHeight, screen.height) - headerAndGameMenuRem * rem * margin,
-        };
+        return this.containerElement.getBoundingClientRect();
     }
 
     getGame()
@@ -279,6 +278,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.redraw();
     }
 
+    /**
+     * Rescale the game board to fit in the container,
+     * depending on board orientation.
+     */
     autoResize(): void
     {
         const { rotation } = this.gameContainer;
