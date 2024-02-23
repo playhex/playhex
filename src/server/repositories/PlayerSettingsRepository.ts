@@ -39,7 +39,7 @@ export default class PlayerSettingsRepository
         return playerSettings ?? defaultSettings;
     }
 
-    async updatePlayerSettings(publicId: string, playerSettings: PlayerSettingsData): Promise<PlayerSettingsData>
+    async updatePlayerSettings(publicId: string, playerSettings: Partial<PlayerSettingsData>): Promise<void>
     {
         const result = await prisma.playerSettings.updateMany({
             where: {
@@ -51,10 +51,10 @@ export default class PlayerSettingsRepository
         });
 
         if (result.count > 0) {
-            return playerSettings;
+            return;
         }
 
-        return await prisma.playerSettings.create({
+        await prisma.playerSettings.create({
             data: {
                 ...playerSettings,
                 player: {

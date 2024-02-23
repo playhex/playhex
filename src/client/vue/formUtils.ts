@@ -1,6 +1,6 @@
 export type InputValidation = null | {
     ok: boolean;
-    details?: string;
+    reason?: string;
 };
 
 export const toInputClass = (inputValidation: InputValidation): string => {

@@ -19,22 +19,28 @@ export default class HttpError extends Error
         /**
          * Can be displayed to player, although not translated.
          */
-        public details: string,
+        public reason: string,
 
         /**
          * Used for HandledErrors, to make the error identifiable front side.
          */
         public type?: HandledErrorType,
+
+        /**
+         * Contains any full object or array containing details. I.e fields validation
+         */
+        public details?: unknown,
     ) {
-        super(`HttpError ${status}: "${details}" (type="${type ?? 'none'}")`);
+        super(`HttpError ${status}: "${reason}" (type="${type ?? 'none'}")`);
     }
 
     normalize(): ErrorResponse
     {
         return {
             success: false,
-            details: this.details,
+            reason: this.reason,
             type: this.type,
+            details: this.details,
         };
     }
 

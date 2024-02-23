@@ -150,9 +150,9 @@ export default class HostedGameRepository
     }
 
     /**
-     * Take N ended games from publicId, or from start if not set.
+     * @param fromGamePublicId Take N ended games from fromGamePublicId, or from start if not set.
      */
-    async getEndedGames(take = 10, publicId?: string): Promise<HostedGameData[]>
+    async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGameData[]>
     {
         const args: Prisma.HostedGameFindManyArgs = {
             where: { state: 'ended' },
@@ -163,10 +163,10 @@ export default class HostedGameRepository
             take,
         };
 
-        if (undefined !== publicId) {
+        if (undefined !== fromGamePublicId) {
             args.skip = 1;
             args.cursor = {
-                publicId,
+                publicId: fromGamePublicId,
             };
         }
 
@@ -211,10 +211,13 @@ export default class HostedGameRepository
         return hostedGame;
     }
 
+    /**
+     * @param fromGamePublicId Cursor, retrieve games after this one.
+     */
     async getPlayerGames(
         playerData: PlayerData,
         state: null | HostedGameState = null,
-        publicId: null | string = null,
+        fromGamePublicId: null | string = null,
     ): Promise<HostedGameData[]> {
         const hostedGameDataList: HostedGameData[] = [];
 
@@ -249,8 +252,8 @@ export default class HostedGameRepository
             take: 20,
         };
 
-        if (null !== publicId) {
-            criteria.cursor = { publicId };
+        if (null !== fromGamePublicId) {
+            criteria.cursor = { publicId: fromGamePublicId };
             criteria.skip = 1;
         }
 

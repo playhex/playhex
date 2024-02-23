@@ -37,11 +37,11 @@ const onSubmit = async () => {
             case 'pseudo_too_short':
             case 'pseudo_too_long':
             case 'invalid_pseudo':
-                pseudoValidation.value = { ok: false, details: e.details };
+                pseudoValidation.value = { ok: false, reason: e.reason };
                 break;
 
             default:
-                globalError.value = e.details;
+                globalError.value = e.reason;
         }
     }
 };
@@ -58,7 +58,7 @@ const onSubmit = async () => {
                         <label for="form-pseudo" class="form-label">Pseudo</label>
                         <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="emailHelp">
                         <div class="invalid-feedback">
-                            {{ pseudoValidation?.details }}
+                            {{ pseudoValidation?.reason }}
                         </div>
                     </div>
 

@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import './config';
 import express from 'express';
 import http from 'http';
-import mainRouter from './controllers/http';
+import { registerHttpControllers } from './controllers/http';
 import Container from 'typedi';
 import { registerWebsocketControllers } from './controllers/websocket';
 import { HexServer } from './server';
@@ -36,7 +36,7 @@ Container.set(HexServer, io);
 
 app.set('view engine', 'ejs');
 
-app.use(mainRouter());
+registerHttpControllers(app);
 registerWebsocketControllers();
 
 server.listen(process.env.PORT || 3000, () => {

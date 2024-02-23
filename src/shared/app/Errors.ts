@@ -1,7 +1,8 @@
 export type ErrorResponse = {
     success: false;
     type?: HandledErrorType;
-    details: string;
+    reason: string;
+    details?: unknown;
 };
 
 /**

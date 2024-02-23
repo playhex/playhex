@@ -6,14 +6,14 @@ import { GameOptionsData } from '@shared/app/GameOptions';
 export class ApiClientError extends Error
 {
     type: HandledErrorType;
-    details: string;
+    reason: string;
 
     constructor(errorResponse: ErrorResponse)
     {
-        super(`${errorResponse.type}: ${errorResponse.details}`);
+        super(`${errorResponse.type}: ${errorResponse.reason}`);
 
         this.type = errorResponse.type as HandledErrorType;
-        this.details = errorResponse.details;
+        this.reason = errorResponse.reason;
     }
 }
 
@@ -123,6 +123,7 @@ export const authLogout = async (): Promise<PlayerData> => {
     return denormalize(await response.json());
 };
 
+// TODO see if no need to pass type=lobby
 export const getGames = async (): Promise<HostedGameData[]> => {
     const response = await fetch(`/api/games`, {
         method: 'get',
@@ -134,14 +135,14 @@ export const getGames = async (): Promise<HostedGameData[]> => {
     return denormalize(await response.json());
 };
 
-export const getEndedGames = async (take = 20, publicId: null | string = null): Promise<HostedGameData[]> => {
+export const getEndedGames = async (take = 20, fromGamePublicId: null | string = null): Promise<HostedGameData[]> => {
     const params = new URLSearchParams({
         type: 'ended',
         take: String(take),
     });
 
-    if (null !== publicId) {
-        params.append('publicId', publicId);
+    if (null !== fromGamePublicId) {
+        params.append('fromGamePublicId', fromGamePublicId);
     }
 
     const response = await fetch(`/api/games?${params.toString()}`, {
@@ -179,12 +180,12 @@ export const getPlayerBySlug = async (slug: string): Promise<PlayerData> => {
 };
 
 /**
- * @param publicId Cursor
+ * @param fromGamePublicId Cursor
  */
 export const getPlayerGames = async (
     playerPublicId: string,
     state: null | HostedGameState = null,
-    publicId: null | string = null,
+    fromGamePublicId: null | string = null,
 ): Promise<HostedGameData[]> => {
     let url = `/api/players/${playerPublicId}/games`;
     const params = new URLSearchParams();
@@ -193,8 +194,8 @@ export const getPlayerGames = async (
         params.append('state', state);
     }
 
-    if (null !== publicId) {
-        params.append('publicId', publicId);
+    if (null !== fromGamePublicId) {
+        params.append('fromGamePublicId', fromGamePublicId);
     }
 
     if (params.size > 0) {
@@ -291,7 +292,7 @@ export const apiGetPlayerSettings = async (): Promise<PlayerSettingsData> => {
     return response.json();
 };
 
-export const apiPatchPlayerSettings = async (playerSettingsData: PlayerSettingsData): Promise<PlayerSettingsData> => {
+export const apiPatchPlayerSettings = async (playerSettingsData: PlayerSettingsData): Promise<void> => {
     const response = await fetch(`/api/player-settings`, {
         method: 'PATCH',
         headers: {
@@ -301,5 +302,5 @@ export const apiPatchPlayerSettings = async (playerSettingsData: PlayerSettingsD
         body: JSON.stringify(playerSettingsData),
     });
 
-    return response.json();
+    await checkResponse(response);
 };
