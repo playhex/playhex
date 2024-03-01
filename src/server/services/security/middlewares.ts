@@ -15,8 +15,10 @@ const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     io.use(async (socket, next) => {
         const { playerId } = socket.request.session;
 
-        // socket not authenticated, ignoring
+        // socket not authenticated
         if (!playerId) {
+            socket.data.player = null;
+            next();
             return;
         }
 

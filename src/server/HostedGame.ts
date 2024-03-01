@@ -287,7 +287,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
         this.players.push(playerData);
 
-        this.io.to([Rooms.lobby, Rooms.game(this.id)]).emit('gameJoined', this.id, playerData);
+        this.io.to(this.gameRooms(true)).emit('gameJoined', this.id, playerData);
 
         logger.info('Player joined.', { hostedGameId: this.id, joiner: playerData.pseudo });
 
