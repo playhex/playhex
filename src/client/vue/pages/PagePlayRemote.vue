@@ -428,7 +428,7 @@ const unreadMessages = (): number => {
             top 0
             bottom 0
             --bs-bg-opacity 0.85
-            backdrop-filter blur(2px)
+            // backdrop-filter blur(2px) // laggy on mobile
 
 .sidebar-open
     .game
