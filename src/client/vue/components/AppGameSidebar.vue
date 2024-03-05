@@ -11,6 +11,7 @@ import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
 import { format, formatDistanceToNow } from 'date-fns';
+import { gameToHexworldLink } from '../../../shared/app/hexworld';
 
 const props = defineProps({
     hostedGameClient: {
@@ -69,6 +70,20 @@ const sendChat = () => {
 };
 
 onMounted(() => scrollChatToBottom());
+
+/*
+ * Show Hexworld link for other players.
+ * Should not display to players to prevent playing on an external board,
+ * or make cheating too easy.
+ * Also prevent display to guest, to prevent grabbing link in a new incognito window.
+ */
+const shouldDisplayHexworldLink = (): boolean => {
+    if (hostedGameClient.value.getState() === 'playing') {
+        return !hostedGameClient.value.hasPlayer(loggedInPlayer) && !loggedInPlayer.isGuest;
+    }
+
+    return hostedGameClient.value.getState() === 'ended';
+};
 </script>
 
 <template>
@@ -132,6 +147,13 @@ onMounted(() => scrollChatToBottom());
         <div class="block-controls">
             <div class="container-fluid">
                 <button type="button" class="btn btn-sm btn-outline-primary" @click="e => { e.preventDefault(); emits('toggleCoords') }"><b-icon-alphabet /> Toggle coords</button>
+                <a
+                    v-if="shouldDisplayHexworldLink()"
+                    type="button"
+                    class="btn btn-sm btn-outline-primary ms-2"
+                    target="_blank"
+                    :href="gameToHexworldLink(hostedGameClient.getGame())"
+                ><b-icon-box-arrow-up-right/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
             </div>
         </div>
 
