@@ -4,7 +4,7 @@ import GameView from '@client/pixi-board/GameView';
 import AppBoard from '../components/AppBoard.vue';
 import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '@shared/game-engine';
 import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
-import { Ref, ref } from 'vue';
+import { Ref, onMounted, ref } from 'vue';
 import { PlayerData } from '@shared/app/Types';
 import useAuthStore from '../../stores/authStore';
 import { useSeoMeta } from '@unhead/vue';
@@ -14,6 +14,7 @@ useSeoMeta({
     robots: 'noindex',
 });
 
+const offlineBoardContainer = ref<HTMLElement>();
 const gameView = ref<GameView>();
 const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.gameOptionsJson ?? '{}');
 const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
@@ -31,7 +32,7 @@ const makeAIMoveIfApplicable = async (game: Game, players: PlayerData[]): Promis
     game.move(move, game.getCurrentPlayerIndex());
 };
 
-const initGame = () => {
+const initGame = (gameContainer: HTMLElement) => {
     const player: PlayerData = useAuthStore().loggedInPlayer ?? {
         publicId: '',
         isBot: false,
@@ -69,7 +70,7 @@ const initGame = () => {
 
     const game = new Game(gameOptions.boardsize);
 
-    gameView.value = new GameView(game);
+    gameView.value = new GameView(game, gameContainer);
 
     gameView.value.on('hexClicked', move => {
         try {
@@ -85,7 +86,13 @@ const initGame = () => {
     game.on('played', () => makeAIMoveIfApplicable(game, players.value));
 };
 
-initGame();
+onMounted(() => {
+    if (!offlineBoardContainer.value) {
+        throw new Error('Missing element with ref="offlineBoardContainer"');
+    }
+
+    initGame(offlineBoardContainer.value);
+});
 
 /*
  * Rematch
@@ -93,17 +100,31 @@ initGame();
 const reload = ref(0);
 
 const rematch = () => {
-    initGame();
+    if (!offlineBoardContainer.value) {
+        throw new Error('Missing element with ref="offlineBoardContainer"');
+    }
+
+    initGame(offlineBoardContainer.value);
     ++reload.value;
 };
 </script>
 
 <template>
-    <app-board
-        :key="reload"
-        v-if="gameView"
-        :game-view="gameView"
-        :players="players"
-        :rematch="rematch"
-    ></app-board>
+    <div class="offline-board-container" ref="offlineBoardContainer">
+        <app-board
+            :key="reload"
+            v-if="gameView"
+            :game-view="gameView"
+            :players="players"
+            :rematch="rematch"
+        ></app-board>
+    </div>
 </template>
+
+<style lang="stylus" scoped>
+.offline-board-container
+    position relative
+    width 100vw
+    height calc(100vh - 3rem)
+    overflow hidden
+</style>

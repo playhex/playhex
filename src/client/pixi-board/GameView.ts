@@ -110,13 +110,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 {
     static currentTheme: Theme;
 
-    /**
-     * Element in which this gameView should fit.
-     * Game view will then auto fit when element size changes.
-     * Element should be fixed size.
-     */
-    private containerElement: HTMLElement;
-
     private hexes: Hex[][];
     private pixi: Application;
     private gameContainer: Container = new Container();
@@ -141,10 +134,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     constructor(
         private game: Game,
+
+        /**
+         * Element in which this gameView should fit.
+         * Game view will then auto fit when element size changes.
+         * Element should be fixed size.
+         */
+        private containerElement: HTMLElement,
     ) {
         super();
-
-        this.setContainerElement(document.body);
 
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
 
@@ -153,8 +151,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             backgroundAlpha: 0,
             resolution: ceil(window.devicePixelRatio),
             autoDensity: true,
+            resizeTo: containerElement,
             ...this.getWrapperSize(),
         });
+
+        this.listenContainerElementResize();
 
         this.pixi.stage.addChild(this.gameContainer);
 
@@ -249,14 +250,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    setContainerElement(containerElement: HTMLElement): void
+    private listenContainerElementResize(): void
     {
-        this.containerElement = containerElement;
-
-        if (this.pixi) {
-            this.resizeRendererAndRedraw();
-        }
-
+        this.resizeRendererAndRedraw();
         this.destroyResizeObserver();
 
         this.resizeObserver = new ResizeObserver(debounceFunction(() => this.resizeRendererAndRedraw(), {

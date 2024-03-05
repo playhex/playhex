@@ -28,6 +28,7 @@ const { gameId } = useRoute().params;
 
 const hostedGameClient = ref<null | HostedGameClient>(null);
 
+const boardContainer = ref<HTMLElement>();
 let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board
 
 if (Array.isArray(gameId)) {
@@ -132,7 +133,11 @@ const initGameView = () => {
 
     const game = hostedGameClient.value.loadGame();
 
-    gameView = new GameView(game);
+    if (!boardContainer.value) {
+        throw new Error('Missing element with ref="boardContainer"');
+    }
+
+    gameView = new GameView(game, boardContainer.value);
 
     if (null !== playerSettings.value) {
         gameView.setDisplayCoords(playerSettings.value.showCoords);
@@ -164,7 +169,7 @@ const initGameView = () => {
 /*
  * Load game
  */
-const loadGamePromise = (async () => {
+const loadGame = async () => {
     // Must reload from server when I watch a game, I am not up to date
     // Or when I come back on a game where I did not received events, again not up to date
     hostedGameClient.value = await lobbyStore.retrieveHostedGameClient(gameId, true);
@@ -191,28 +196,13 @@ const loadGamePromise = (async () => {
         description,
         ogDescription: description,
     });
+};
 
-    return hostedGameClient.value;
-})();
+onMounted(() => loadGame());
 
 const join = () => hostedGameClient.value?.sendJoinGame();
 
 const confirmationOverlay = createOverlay(ConfirmationOverlay);
-
-/*
- * set gameView container
- */
-const boardContainer = ref<HTMLElement>();
-
-onMounted(async () => {
-    await loadGamePromise;
-
-    if (!boardContainer.value || !gameView) {
-        return;
-    }
-
-    gameView.setContainerElement(boardContainer.value);
-});
 
 /*
  * Resign
@@ -308,18 +298,18 @@ const rematch = async (): Promise<void> => {
  */
 const sidebarOpen = ref(false);
 
-loadGamePromise.then(hostedGameClient => {
-    if (!hostedGameClient) {
+watch(hostedGameClient, game => {
+    if (null === game) {
         return;
     }
 
-    hostedGameClient.on('chatMessagePosted', () => {
+    game.on('chatMessagePosted', () => {
         if (sidebarOpen.value) {
-            hostedGameClient.markAllMessagesRead();
+            game.markAllMessagesRead();
         }
     });
 
-    watch(sidebarOpen, () => hostedGameClient.markAllMessagesRead());
+    watch(sidebarOpen, () => game.markAllMessagesRead());
 });
 
 const unreadMessages = (): number => {
@@ -334,56 +324,57 @@ const unreadMessages = (): number => {
 </script>
 
 <template>
-    <template v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView">
-        <div class="game-and-sidebar-container" :class="sidebarOpen ? 'sidebar-open' : ''">
-            <div class="game">
-                <div class="board-container" ref="boardContainer">
-                    <app-board
-                        :players="hostedGameClient.getPlayers()"
-                        :time-control-options="hostedGameClient.getTimeControlOptions()"
-                        :time-control-values="hostedGameClient.getTimeControlValues()"
-                        :game-view="gameView"
-                        :rematch="rematch"
-                    ></app-board>
+    <div v-show="null !== hostedGameClient" class="game-and-sidebar-container" :class="sidebarOpen ? 'sidebar-open' : ''">
+        <div class="game">
+            <div class="board-container" ref="boardContainer">
+                <app-board
+                    v-if="null !== hostedGameClient && null !== gameView"
+                    :players="hostedGameClient.getPlayers()"
+                    :time-control-options="hostedGameClient.getTimeControlOptions()"
+                    :time-control-values="hostedGameClient.getTimeControlValues()"
+                    :game-view="gameView"
+                    :rematch="rematch"
+                ></app-board>
 
-                    <div v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="join-button-container">
-                        <div class="d-flex justify-content-center">
-                            <button class="btn btn-lg btn-success" @click="join()">Accept</button>
-                        </div>
+                <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="join-button-container">
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-lg btn-success" @click="join()">Accept</button>
                     </div>
                 </div>
-
-                <nav class="menu-game navbar">
-                    <div class="buttons container-fluid">
-                        <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /><span class="btn-label"> Resign</span></button>
-                        <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><b-icon-x-lg /><span class="btn-label"> Cancel</span></button>
-                        <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm<span class="btn-label"> move</span></button>
-                        <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
-                            <b-icon-chat-right-text v-if="hostedGameClient.getChatMessages().length > 0" />
-                            <b-icon-chat-right v-else />
-                            <span class="btn-label"> Chat</span>
-                            <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ unreadMessages() }}
-                                <span class="d-none"> unread messages</span>
-                            </span>
-                        </button>
-
-                        <button v-if="!sidebarOpen" type="button" class="btn btn-outline-primary toggle-sidebar-btn" @click="sidebarOpen = true" aria-label="Open game sidebar and chat"><b-icon-arrow-bar-left /></button>
-                    </div>
-                </nav>
             </div>
 
-            <div class="sidebar bg-body">
-                <app-game-sidebar
-                    :hosted-game-client="hostedGameClient"
-                    @close="sidebarOpen = false"
-                    @toggle-coords="toggleCoords()"
-                />
-            </div>
+            <nav class="menu-game navbar" v-if="null !== hostedGameClient">
+                <div class="buttons container-fluid">
+                    <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /><span class="btn-label"> Resign</span></button>
+                    <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><b-icon-x-lg /><span class="btn-label"> Cancel</span></button>
+                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm<span class="btn-label"> move</span></button>
+                    <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
+                        <b-icon-chat-right-text v-if="hostedGameClient.getChatMessages().length > 0" />
+                        <b-icon-chat-right v-else />
+                        <span class="btn-label"> Chat</span>
+                        <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ unreadMessages() }}
+                            <span class="d-none"> unread messages</span>
+                        </span>
+                    </button>
+
+                    <button v-if="!sidebarOpen" type="button" class="btn btn-outline-primary toggle-sidebar-btn" @click="sidebarOpen = true" aria-label="Open game sidebar and chat"><b-icon-arrow-bar-left /></button>
+                </div>
+            </nav>
         </div>
-    </template>
 
-    <div class="container-fluid my-3" v-else><p class="lead">Loading game…</p></div>
+        <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
+            <app-game-sidebar
+                :hosted-game-client="hostedGameClient"
+                @close="sidebarOpen = false"
+                @toggle-coords="toggleCoords()"
+            />
+        </div>
+    </div>
+
+    <div v-if="null === hostedGameClient || null === gameView" class="container-fluid my-3">
+        <p class="lead text-center">Loading game…</p>
+    </div>
 </template>
 
 <style scoped lang="stylus">
