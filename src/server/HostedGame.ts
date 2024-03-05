@@ -12,6 +12,7 @@ import { createTimeControl } from '../shared/time-control/createTimeControl';
 import Container from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer';
 import { TypedEmitter } from 'tiny-typed-emitter';
+import ChatMessage from '../shared/app/models/ChatMessage';
 
 type HostedGameEvents = {
     played: () => void;
@@ -55,6 +56,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
      */
     private players: PlayerData[];
 
+    private chatMessages: ChatMessage[] = [];
     private timeControl: AbstractTimeControl;
     private state: HostedGameState = 'created';
     private createdAt: Date = new Date();
@@ -408,6 +410,12 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         return true;
     }
 
+    postChatMessage(chatMessage: ChatMessage)
+    {
+        this.chatMessages.push(chatMessage);
+        this.io.to(this.gameRooms()).emit('chat', { ...chatMessage });
+    }
+
     toData(): HostedGameData
     {
         const hostedGameData: HostedGameData = {
@@ -417,6 +425,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             timeControl: this.timeControl.getValues(),
             gameOptions: this.gameOptions,
             gameData: this.game?.toData() ?? null,
+            chatMessages: this.chatMessages.map(chat => ({ ...chat })),
             state: this.state,
             createdAt: this.createdAt,
         };
@@ -462,6 +471,8 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             hostedGame.bindTimeControl();
             hostedGame.makeAIMoveIfApplicable();
         }
+
+        hostedGame.chatMessages = data.chatMessages;
 
         return hostedGame;
     }

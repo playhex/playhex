@@ -8,9 +8,11 @@ import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/
 import { apiPostCancel, apiPostResign } from './apiClient';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { GameOptionsData } from '@shared/app/GameOptions';
+import ChatMessage from '../shared/app/models/ChatMessage';
 
 type HostedGameClientEvents = {
     started: () => void;
+    chatMessagePosted: () => void;
 };
 
 /**
@@ -25,11 +27,19 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
      */
     private game: null | Game = null;
 
+    /**
+     * Number of messages in chatMessages list
+     * on last time player open the chat.
+     */
+    private readMessages: number;
+
     constructor(
         private hostedGameData: HostedGameData,
         private socket: Socket<HexServerToClientEvents, HexClientToServerEvents>,
     ) {
         super();
+
+        this.readMessages = hostedGameData.chatMessages.length;
     }
 
     getState(): HostedGameState
@@ -114,6 +124,15 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGameData.players[this.hostedGameData.gameData.winner];
     }
 
+    getStrictWinnerPlayer(): PlayerData
+    {
+        if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
+            throw new Error('getStrictWinnerPlayer(): No winner');
+        }
+
+        return this.hostedGameData.players[this.hostedGameData.gameData.winner];
+    }
+
     getLoserPlayer(): null | PlayerData
     {
         if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
@@ -153,6 +172,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getGameOptions(): GameOptionsData
     {
         return this.hostedGameData.gameOptions;
+    }
+
+    getChatMessages(): ChatMessage[]
+    {
+        return this.hostedGameData.chatMessages;
     }
 
     /**
@@ -341,5 +365,39 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.game.declareWinner(winner, outcome);
+    }
+
+    async sendChatMessage(content: string): Promise<string | true>
+    {
+        return new Promise((resolve, reject) => {
+            this.socket.emit('sendChat', this.hostedGameData.id, content, (answer: true | string) => {
+                if (true === answer) {
+                    resolve(answer);
+                }
+
+                reject(answer);
+            });
+        });
+    }
+
+    onChatMessage(chatMessage: ChatMessage): void
+    {
+        this.hostedGameData.chatMessages.push(chatMessage);
+        this.emit('chatMessagePosted');
+    }
+
+    getUnreadMessages(): number
+    {
+        return this.readMessages - this.hostedGameData.chatMessages.length;
+    }
+
+    getReadMessages(): number
+    {
+        return this.readMessages;
+    }
+
+    markAllMessagesRead(): void
+    {
+        this.readMessages = this.hostedGameData.chatMessages.length;
     }
 }

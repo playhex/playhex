@@ -3,7 +3,7 @@ import { AuthenticatedPlayer } from '../middlewares';
 import HttpError from '../HttpError';
 import { Body, Get, JsonController, Param, Post, QueryParam } from 'routing-controllers';
 import { PlayerData } from '@shared/app/Types';
-import Move from '../../../models/Move';
+import Move from '../../../../shared/app/models/Move';
 import { Service } from 'typedi';
 import { normalize } from '../../../../shared/app/serializer';
 import { GameOptionsData, sanitizeGameOptions } from '../../../../shared/app/GameOptions';

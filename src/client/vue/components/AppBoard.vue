@@ -69,11 +69,9 @@ let orientation = ref<number>(gameView.getCurrentOrientation());
 
 const updateOrientation = () => orientation.value = gameView.getCurrentOrientation();
 
-window.addEventListener('resizeDebounced', updateOrientation);
 gameView.on('orientationChanged', updateOrientation);
 
 onUnmounted(() => {
-    window.removeEventListener('resizeDebounced', updateOrientation);
     gameView.off('orientationChanged', updateOrientation);
 });
 

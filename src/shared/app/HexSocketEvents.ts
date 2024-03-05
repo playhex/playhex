@@ -2,6 +2,7 @@ import { MoveData, Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
 import { HostedGameData, PlayerData } from './Types';
 import { GameTimeData } from 'time-control/TimeControl';
+import ChatMessage from './models/ChatMessage';
 
 export type HexClientToServerEvents = {
     /**
@@ -20,6 +21,11 @@ export type HexClientToServerEvents = {
      * Answer contains either true on success move, either a string containing an error message.
      */
     move: (gameId: string, move: MoveData, answer: (result: true | string) => void) => void;
+
+    /**
+     * A player send a chat message on a game
+     */
+    sendChat: (gameId: string, content: string, answer: (result: true | string) => void) => void;
 };
 
 export type HexServerToClientEvents = {
@@ -72,4 +78,9 @@ export type HexServerToClientEvents = {
      * totalPlayers is the count of players connected now.
      */
     playerDisconnected: (player: PlayerData | null, totalPlayers: number) => void;
+
+    /**
+     * A chat message has been posted in a game.
+     */
+    chat: (chatMessage: ChatMessage) => void;
 };

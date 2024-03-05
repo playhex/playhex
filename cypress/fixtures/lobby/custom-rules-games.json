@@ -48,6 +48,7 @@
             }
         },
         "gameData": null,
+        "chatMessages": [],
         "state": "created",
         "createdAt": "2024-02-20T20:06:21.075Z",
         "__meta": {
@@ -118,6 +119,7 @@
             }
         },
         "gameData": null,
+        "chatMessages": [],
         "state": "created",
         "createdAt": "2024-02-20T20:06:28.192Z",
         "__meta": {
@@ -188,6 +190,7 @@
             }
         },
         "gameData": null,
+        "chatMessages": [],
         "state": "created",
         "createdAt": "2024-02-20T20:06:33.517Z",
         "__meta": {
@@ -258,6 +261,7 @@
             }
         },
         "gameData": null,
+        "chatMessages": [],
         "state": "created",
         "createdAt": "2024-02-20T20:06:41.429Z",
         "__meta": {

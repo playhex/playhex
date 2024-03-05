@@ -11,6 +11,7 @@ import { ref } from 'vue';
 import Rooms from '@shared/app/Rooms';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../../shared/app/HexSocketEvents';
+import ChatMessage from '../../shared/app/models/ChatMessage';
 
 /**
  * State synced with server, and methods to handle games and players.
@@ -140,6 +141,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
             if (hostedGameClients.value[gameId]) {
                 hostedGameClients.value[gameId].onServerGameEnded(winner, outcome);
+            }
+        });
+
+        socket.on('chat', (chatMessage: ChatMessage) => {
+            if (hostedGameClients.value[chatMessage.gameId]) {
+                hostedGameClients.value[chatMessage.gameId].onChatMessage(chatMessage);
             }
         });
     };

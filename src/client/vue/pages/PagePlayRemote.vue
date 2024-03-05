@@ -13,11 +13,12 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconX, BIconCheck, BIconAlphabet } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
+import AppGameSidebar from '../components/AppGameSidebar.vue';
 
 useSeoMeta({
     robots: 'noindex',
@@ -190,6 +191,8 @@ const loadGamePromise = (async () => {
         description,
         ogDescription: description,
     });
+
+    return hostedGameClient.value;
 })();
 
 const join = () => hostedGameClient.value?.sendJoinGame();
@@ -262,7 +265,7 @@ const cancel = async (): Promise<void> => {
             title: 'Cancel game',
             message: 'Are you sure you want to cancel game?',
             confirmLabel: 'Yes, cancel',
-            confirmClass: 'btn-success',
+            confirmClass: 'btn-warning',
             cancelLabel: 'No, keep game',
             cancelClass: 'btn-outline-primary',
         });
@@ -299,34 +302,85 @@ const rematch = async (): Promise<void> => {
         },
     });
 };
+
+/*
+ * Sidebar
+ */
+const sidebarOpen = ref(false);
+
+loadGamePromise.then(hostedGameClient => {
+    if (!hostedGameClient) {
+        return;
+    }
+
+    hostedGameClient.on('chatMessagePosted', () => {
+        if (sidebarOpen.value) {
+            hostedGameClient.markAllMessagesRead();
+        }
+    });
+
+    watch(sidebarOpen, () => hostedGameClient.markAllMessagesRead());
+});
+
+const unreadMessages = (): number => {
+    if (null === hostedGameClient.value) {
+        return 0;
+    }
+
+    return hostedGameClient.value.getChatMessages().length
+        - hostedGameClient.value.getReadMessages()
+    ;
+};
 </script>
 
 <template>
     <template v-if="(hostedGameClient instanceof HostedGameClient) && null !== gameView">
-        <div class="position-relative board-container" ref="boardContainer">
-            <app-board
-                :players="hostedGameClient.getPlayers()"
-                :time-control-options="hostedGameClient.getTimeControlOptions()"
-                :time-control-values="hostedGameClient.getTimeControlValues()"
-                :game-view="gameView"
-                :rematch="rematch"
-            ></app-board>
+        <div class="game-and-sidebar-container" :class="sidebarOpen ? 'sidebar-open' : ''">
+            <div class="game">
+                <div class="board-container" ref="boardContainer">
+                    <app-board
+                        :players="hostedGameClient.getPlayers()"
+                        :time-control-options="hostedGameClient.getTimeControlOptions()"
+                        :time-control-values="hostedGameClient.getTimeControlValues()"
+                        :game-view="gameView"
+                        :rematch="rematch"
+                    ></app-board>
 
-            <div v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="position-absolute w-100 join-button-container">
-                <div class="d-flex justify-content-center">
-                    <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+                    <div v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="join-button-container">
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+                        </div>
+                    </div>
                 </div>
+
+                <nav class="menu-game navbar">
+                    <div class="buttons container-fluid">
+                        <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /><span class="btn-label"> Resign</span></button>
+                        <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><b-icon-x-lg /><span class="btn-label"> Cancel</span></button>
+                        <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm<span class="btn-label"> move</span></button>
+                        <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
+                            <b-icon-chat-right-text v-if="hostedGameClient.getChatMessages().length > 0" />
+                            <b-icon-chat-right v-else />
+                            <span class="btn-label"> Chat</span>
+                            <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ unreadMessages() }}
+                                <span class="d-none"> unread messages</span>
+                            </span>
+                        </button>
+
+                        <button v-if="!sidebarOpen" type="button" class="btn btn-outline-primary toggle-sidebar-btn" @click="sidebarOpen = true" aria-label="Open game sidebar and chat"><b-icon-arrow-bar-left /></button>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="sidebar bg-body">
+                <app-game-sidebar
+                    :hosted-game-client="hostedGameClient"
+                    @close="sidebarOpen = false"
+                    @toggle-coords="toggleCoords()"
+                />
             </div>
         </div>
-
-        <nav class="menu-game navbar">
-            <div class="container-fluid justify-content-center">
-                <button type="button" class="btn btn-link" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /> Resign</button>
-                <button type="button" class="btn btn-link" v-if="canCancel()" @click="cancel()"><b-icon-x /> Cancel</button>
-                <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm move</button>
-                <button type="button" class="btn btn-link" @click="toggleCoords()"><b-icon-alphabet /> Coords</button>
-            </div>
-        </nav>
     </template>
 
     <div class="container-fluid my-3" v-else><p class="lead">Loading game…</p></div>
@@ -335,7 +389,70 @@ const rematch = async (): Promise<void> => {
 <style scoped lang="stylus">
 .join-button-container
     top 0
+    position absolute
+    width 100%
+    margin-top 1em
 
 .board-container
-    height calc(100vh - 6rem)
+    position relative // center "Accept" button relative to this container
+    height calc(100vh - 6rem) // 6rem = header and bottom game menu height
+
+.buttons
+    position relative
+    display flex
+    justify-content center
+    gap 0.5em
+
+.btn-label
+    display none
+
+    @media (min-width: 768px)
+        display inline
+
+.game-and-sidebar-container
+    position relative
+    display flex
+
+    .game
+        width 100%
+
+    .sidebar
+        position relative
+        display none
+        width 75%
+
+        @media (max-width: 575px)
+            width 100%
+            position absolute
+            right 0
+            top 0
+            bottom 0
+            --bs-bg-opacity 0.85
+            backdrop-filter blur(2px)
+
+.sidebar-open
+    .game
+        width 100%
+
+        @media (min-width: 576px)
+            width 50%
+
+        @media (min-width: 992px)
+            width 67%
+
+    .sidebar
+        display flex
+        width 100%
+
+        @media (min-width: 576px)
+            width 50%
+
+        @media (min-width: 992px)
+            width 33%
+
+.buttons
+    .toggle-sidebar-btn
+        position absolute
+        right 0
+        margin-right 0.75em
 </style>

@@ -3,6 +3,7 @@ import { GameOptionsData } from './GameOptions';
 import TimeControlType from '../time-control/TimeControlType';
 import { Player, PlayerSettings } from '@prisma/client';
 import { GameData } from '../game-engine/Types';
+import ChatMessage from './models/ChatMessage';
 
 export type Tuple<T> = [T, T];
 
@@ -61,6 +62,7 @@ export type HostedGameData = {
     gameOptions: GameOptionsData;
     timeControl: GameTimeData;
     state: HostedGameState;
+    chatMessages: ChatMessage[];
 
     /**
      * gameData is null on server when game is not yet started.

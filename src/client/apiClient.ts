@@ -2,6 +2,7 @@ import { HostedGameData, HostedGameState, OnlinePlayersData, PlayerData, PlayerS
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
+import ChatMessage from '../shared/app/models/ChatMessage';
 
 export class ApiClientError extends Error
 {
@@ -300,6 +301,20 @@ export const apiPatchPlayerSettings = async (playerSettingsData: PlayerSettingsD
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(playerSettingsData),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content' | 'gameId'>): Promise<void> => {
+    const response = await fetch(`/api/games/${chatMessage.gameId}/chat-messages`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: chatMessage.content,
+        }),
     });
 
     await checkResponse(response);

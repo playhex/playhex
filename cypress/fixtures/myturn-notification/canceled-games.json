@@ -43,6 +43,7 @@
             }
         },
         "gameData": null,
+        "chatMessages": [],
         "state": "canceled"
     },
     {
@@ -206,6 +207,7 @@
             "lastMoveAt": "2023-12-20T22:18:58.967Z",
             "endedAt": "2023-12-20T22:19:03.033Z"
         },
+        "chatMessages": [],
         "state": "ended",
         "__meta": {
             "values": {
@@ -652,6 +654,7 @@
             "lastMoveAt": "2023-12-20T22:22:00.698Z",
             "endedAt": "2023-12-20T22:22:00.704Z"
         },
+        "chatMessages": [],
         "state": "ended",
         "__meta": {
             "values": {
@@ -903,6 +906,7 @@
             "lastMoveAt": "2023-12-21T06:19:40.520Z",
             "endedAt": "2023-12-21T06:19:40.523Z"
         },
+        "chatMessages": [],
         "state": "ended",
         "__meta": {
             "values": {

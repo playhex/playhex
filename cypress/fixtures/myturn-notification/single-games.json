@@ -131,6 +131,7 @@
             "lastMoveAt": "2023-12-22T15:14:40.711Z",
             "endedAt": "2023-12-22T15:14:40.711Z"
         },
+        "chatMessages": [],
         "state": "ended",
         "__meta": {
             "values": {
@@ -223,6 +224,7 @@
             "lastMoveAt": "2023-12-22T15:14:48.796Z",
             "endedAt": null
         },
+        "chatMessages": [],
         "state": "playing",
         "__meta": {
             "values": {

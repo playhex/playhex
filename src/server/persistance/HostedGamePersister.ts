@@ -9,13 +9,21 @@ import { Service } from 'typedi';
 import { GameTimeData, PlayerTimeData } from '../../shared/time-control/TimeControl';
 import logger from '../services/logger';
 import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYomiTimeControl';
-import { select as playerSelect } from './PlayerPersister';
+import PlayerPersister, { select as playerSelect } from './PlayerPersister';
+import ChatMessage from '@shared/app/models/ChatMessage';
 
 export type HostedGameDBFull = Prisma.HostedGameGetPayload<{
     include: {
         game: true;
         host: true;
         options: true;
+        chatMessages: {
+            include: {
+                player: {
+                    select: typeof playerSelect;
+                };
+            };
+        };
         players: {
             include: {
                 player: {
@@ -45,6 +53,16 @@ const select: Prisma.HostedGameSelect = {
         },
     },
     timeControl: true,
+    chatMessages: {
+        include: {
+            player: {
+                select: playerSelect,
+            },
+        },
+        orderBy: {
+            createdAt: 'asc',
+        },
+    },
     game: {
         select: {
             currentPlayerIndex: true,
@@ -68,10 +86,9 @@ export default class HostedGamePersister
 {
     private idFromPublicId: { [key: string]: number } = {};
 
-    constructor()
-    {
-        // this.importDump();
-    }
+    constructor(
+        private playerPersister: PlayerPersister,
+    ) {}
 
     private async getIdFromPublicId(publicId: string): Promise<null | number>
     {
@@ -222,6 +239,13 @@ export default class HostedGamePersister
                         ,
                     })) as [PlayerTimeData | ByoYomiPlayerTimeData, PlayerTimeData | ByoYomiPlayerTimeData],
                 },
+                chatMessages: dbData.chatMessages.map(chatMessage => ({
+                    persisted: true,
+                    author: chatMessage.player,
+                    content: chatMessage.content,
+                    createdAt: chatMessage.createdAt,
+                    gameId: dbData.publicId,
+                })),
             };
         } catch (e) {
             logger.error('Error while creating HostedGameData from db data', {
@@ -241,6 +265,30 @@ export default class HostedGamePersister
             },
             create: playerData,
         };
+    }
+
+    private async chatMessagesToData(chatMessages: ChatMessage[]): Promise<Prisma.ChatMessageCreateManyHostedGameInput[]>
+    {
+        const prismaChatMessages: Prisma.ChatMessageCreateManyHostedGameInput[] = [];
+
+        for (let i = 0; i < chatMessages.length; ++i) {
+            const chat = chatMessages[i];
+
+            if (chat.persisted) {
+                continue;
+            }
+
+            prismaChatMessages.push({
+                content: chat.content,
+                createdAt: chat.createdAt,
+                playerId: null === chat.author
+                    ? null
+                    : await this.playerPersister.getPlayerIdFromPublicId(chat.author.publicId)
+                ,
+            });
+        }
+
+        return prismaChatMessages;
     }
 
     private async doCreate(data: HostedGameData)
@@ -290,6 +338,11 @@ export default class HostedGamePersister
                     },
                 },
                 timeControl: data.timeControl as object,
+                chatMessages: {
+                    createMany: {
+                        data: await this.chatMessagesToData(data.chatMessages),
+                    },
+                },
             },
         });
     }
@@ -374,6 +427,11 @@ export default class HostedGamePersister
                     },
                 },
                 timeControl: data.timeControl as object,
+                chatMessages: {
+                    createMany: {
+                        data: await this.chatMessagesToData(data.chatMessages),
+                    },
+                },
             },
         });
     }

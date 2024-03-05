@@ -3,6 +3,7 @@ import Container from 'typedi';
 import LobbyWebsocketController from './LobbyWebsocketController';
 import GameWebsocketController from './GameWebsocketController';
 import OnlinePlayersController from './OnlinePlayersController';
+import ChatWebsocketController from './ChatWebsocketController';
 
 export interface WebsocketControllerInterface
 {
@@ -11,6 +12,7 @@ export interface WebsocketControllerInterface
 
 export function registerWebsocketControllers() {
     // Explicitely load all WebsocketControllerInterface here to make them available in container.
+    ChatWebsocketController;
     LobbyWebsocketController;
     GameWebsocketController;
     OnlinePlayersController;

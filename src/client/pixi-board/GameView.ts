@@ -3,7 +3,7 @@ import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle 
 import Hex from '@client/pixi-board/Hex';
 import { Theme, themes } from '@client/pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { debounce } from 'debounce';
+import debounceFunction from 'debounce-fn';
 import SwapableSprite from './SwapableSprite';
 import SwapedSprite from './SwapedSprite';
 import { Coords } from '@shared/game-engine/Types';
@@ -91,10 +91,6 @@ export type GameViewSize = {
     height: number;
 };
 
-window.addEventListener('resize', debounce(() => {
-    window.dispatchEvent(new CustomEvent('resizeDebounced'));
-}, 60));
-
 type GameViewEvents = {
     /**
      * A hex has been clicked on the view.
@@ -114,7 +110,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 {
     static currentTheme: Theme;
 
-    private containerElement: HTMLElement = document.body;
+    /**
+     * Element in which this gameView should fit.
+     * Game view will then auto fit when element size changes.
+     * Element should be fixed size.
+     */
+    private containerElement: HTMLElement;
 
     private hexes: Hex[][];
     private pixi: Application;
@@ -133,8 +134,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private swaped: SwapedSprite;
     private previewedMove: null | { coords: Coords, playerIndex: PlayerIndex } = null;
 
+    private resizeObserver: null | ResizeObserver = null;
     private themeSwitchedListener = () => this.redraw();
-    private resizeDebouncedListener = () => this.resizeRendererAndRedraw();
 
     private unwatchThemeSwitchedListener: WatchStopHandle;
 
@@ -142,6 +143,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         private game: Game,
     ) {
         super();
+
+        this.setContainerElement(document.body);
 
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
 
@@ -158,7 +161,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.redraw();
         this.listenModel();
 
-        window.addEventListener('resizeDebounced', this.resizeDebouncedListener);
         this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
@@ -173,6 +175,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.gameContainer.removeChildren();
 
+        const previousCurrentOrientation = this.currentOrientation;
+
         if (typeof this.orientation === 'number') {
             this.currentOrientation = this.orientation;
         } else {
@@ -182,7 +186,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             ;
         }
 
-        this.emit('orientationChanged');
+        if (previousCurrentOrientation !== this.currentOrientation) {
+            this.emit('orientationChanged');
+        }
 
         this.gameContainer.rotation = this.currentOrientation * PI_6;
 
@@ -190,8 +196,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.game.getSize() / 2 - 0.5,
             this.game.getSize() / 2 - 0.5,
         );
-
-        this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
 
         this.gameContainer.position = {
             x: wrapperSize.width / 2,
@@ -237,10 +241,31 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.redraw();
     }
 
+    private destroyResizeObserver(): void
+    {
+        if (null !== this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
+    }
+
     setContainerElement(containerElement: HTMLElement): void
     {
         this.containerElement = containerElement;
-        this.redraw();
+
+        if (this.pixi) {
+            this.resizeRendererAndRedraw();
+        }
+
+        this.destroyResizeObserver();
+
+        this.resizeObserver = new ResizeObserver(debounceFunction(() => this.resizeRendererAndRedraw(), {
+            wait: 60,
+            before: true,
+            after: true,
+        }));
+
+        this.resizeObserver.observe(this.containerElement);
     }
 
     getWrapperSize(): GameViewSize
@@ -703,7 +728,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         this.pixi.destroy(true);
 
-        window.removeEventListener('resizeDebounced', this.resizeDebouncedListener);
+        this.destroyResizeObserver();
         this.unwatchThemeSwitchedListener();
     }
 }

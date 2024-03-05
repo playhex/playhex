@@ -86,6 +86,7 @@
             "lastMoveAt": "2024-01-19T10:31:04.360Z",
             "endedAt": "2024-01-19T10:41:04.362Z"
         },
+        "chatMessages": [],
         "state": "ended",
         "createdAt": "2024-01-19T10:31:03.600Z",
         "__meta": {
@@ -184,6 +185,7 @@
             "lastMoveAt": "2024-01-19T10:33:20.812Z",
             "endedAt": "2024-01-19T10:33:21.385Z"
         },
+        "chatMessages": [],
         "state": "canceled",
         "createdAt": "2024-01-19T10:33:20.810Z",
         "__meta": {
@@ -317,6 +319,7 @@
             "lastMoveAt": "2024-01-19T12:42:42.223Z",
             "endedAt": "2024-01-19T12:42:42.223Z"
         },
+        "chatMessages": [],
         "state": "ended",
         "createdAt": "2024-01-19T12:42:40.005Z",
         "__meta": {
@@ -409,6 +412,7 @@
             "lastMoveAt": null,
             "endedAt": null
         },
+        "chatMessages": [],
         "state": "playing",
         "createdAt": "2024-01-19T12:42:47.198Z",
         "__meta": {

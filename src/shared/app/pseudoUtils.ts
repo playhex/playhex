@@ -54,7 +54,7 @@ export const pseudoSlug = (pseudo: string): string => {
  * - pseudoString(playerData, 'pseudo'); // 'Guest 1234', or 'Alcalyn', used i.e in page title
  * - pseudoString(playerData, 'slug'); // 'guest-1234', or 'alcalyn', used i.e for sgf filename
  */
-export const pseudoString = (player: PlayerData, type: 'slug' | 'pseudo'): string => {
+export const pseudoString = (player: PlayerData, type: 'slug' | 'pseudo' = 'pseudo'): string => {
     if (!player.isGuest) {
         return player[type];
     }

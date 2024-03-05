@@ -47,6 +47,7 @@
         }
     },
     "gameData": null,
+    "chatMessages": [],
     "state": "created",
     "createdAt": "2024-01-25T10:38:24.523Z",
     "__meta": {

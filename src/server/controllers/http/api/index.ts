@@ -10,6 +10,7 @@ import AdminController from './AdminController';
 import HttpError from '../HttpError';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import { PlayerData } from '@shared/app/Types';
+import ChatController from './ChatController';
 
 export const registerApi = (app: Express) => {
 
@@ -61,6 +62,7 @@ export const registerApi = (app: Express) => {
         controllers: [
             OnlinePlayersController,
             GameController,
+            ChatController,
             PlayerController,
             AuthController,
             PlayerSettingsController,

@@ -4,9 +4,16 @@ import { Move } from '../../shared/game-engine';
 import { HostedGameData, HostedGameState, PlayerData } from '../../shared/app/Types';
 import { GameOptionsData } from '../../shared/app/GameOptions';
 import { MoveData } from '../../shared/game-engine/Types';
+import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
 import HostedGamePersister from '../persistance/HostedGamePersister';
 import logger from '../services/logger';
 import { Prisma } from '@prisma/client';
+import ChatMessage from '../../shared/app/models/ChatMessage';
+import prisma from '../services/prisma';
+import { validateOrReject } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import Rooms from '../../shared/app/Rooms';
+import { HexServer } from '../server';
 
 const byRecentFirst = (game0: HostedGameData, game1: HostedGameData): number => {
     const date0 = game0.gameData?.endedAt ?? game0.createdAt;
@@ -36,6 +43,7 @@ export default class HostedGameRepository
 
     constructor(
         private hostedGamePersister: HostedGamePersister,
+        private io: HexServer,
     ) {
         this.loadActiveGamesFromMemory();
     }
@@ -140,6 +148,11 @@ export default class HostedGameRepository
     getActiveGames(): { [key: string]: HostedGame }
     {
         return this.activeGames;
+    }
+
+    getActiveGame(gameId: string): null | HostedGame
+    {
+        return this.activeGames[gameId] ?? null;
     }
 
     getActiveGamesData(): HostedGameData[]
@@ -318,5 +331,66 @@ export default class HostedGameRepository
         const result = hostedGame.playerCancel(playerData);
 
         return result;
+    }
+
+    async postChatMessage(chatMessage: ChatMessage): Promise<string | true>
+    {
+        try {
+            await validateOrReject(plainToInstance(ChatMessage, chatMessage), {
+                groups: ['post'],
+            });
+        } catch (e) {
+            logger.error({ validationError: e });
+            return e.message;
+        }
+
+        const { gameId } = chatMessage;
+        const hostedGame = this.activeGames[gameId];
+
+        // Game is in memory, push chat message
+        if (hostedGame) {
+            let error: true | string;
+            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGame.toData()))) {
+                return error;
+            }
+
+            hostedGame.postChatMessage(chatMessage);
+            return true;
+        }
+
+        // Game is not in memory, store chat message directly in database, on persisted game
+        const hostedGameData = await this.hostedGamePersister.findUnique(chatMessage.gameId);
+
+        if (null === hostedGameData) {
+            logger.notice('Tried to chat on a non-existant game', { chatMessage });
+            return `Game ${chatMessage.gameId} not found`;
+        }
+
+        let error: true | string;
+        if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameData))) {
+            return error;
+        }
+
+        // Game is in database, insert chat message into database
+        await prisma.chatMessage.create({
+            data: {
+                content: chatMessage.content,
+                createdAt: chatMessage.createdAt,
+                hostedGame: {
+                    connect: {
+                        publicId: hostedGameData.id,
+                    },
+                },
+                player: {
+                    connect: {
+                        publicId: chatMessage.author?.publicId,
+                    },
+                },
+            },
+        });
+
+        this.io.to(Rooms.game(chatMessage.gameId)).emit('chat', { ...chatMessage });
+
+        return true;
     }
 }

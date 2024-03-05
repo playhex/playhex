@@ -47,6 +47,7 @@
         }
     },
     "gameData": null,
+    "chatMessages": [],
     "state": "canceled",
     "createdAt": "2024-01-24T20:20:48.826Z",
     "__meta": {

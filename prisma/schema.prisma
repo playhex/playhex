@@ -11,17 +11,18 @@ datasource db {
 }
 
 model Player {
-  id          Int                  @id @default(autoincrement())
-  publicId    String               @unique @db.Char(36)
-  pseudo      String               @unique @db.VarChar(34)
-  slug        String               @unique @db.VarChar(34)
-  password    String?              @db.Char(60)
-  isGuest     Boolean              @default(false)
-  isBot       Boolean              @default(false)
-  createdAt   DateTime             @default(now())
-  settings    PlayerSettings?
-  gamesAsHost HostedGame[]         @relation("GamesAsHost")
-  games       HostedGameToPlayer[]
+  id           Int                  @id @default(autoincrement())
+  publicId     String               @unique @db.Char(36)
+  pseudo       String               @unique @db.VarChar(34)
+  slug         String               @unique @db.VarChar(34)
+  password     String?              @db.Char(60)
+  isGuest      Boolean              @default(false)
+  isBot        Boolean              @default(false)
+  createdAt    DateTime             @default(now())
+  settings     PlayerSettings?
+  gamesAsHost  HostedGame[]         @relation("GamesAsHost")
+  games        HostedGameToPlayer[]
+  chatMessages ChatMessage[]
 }
 
 model PlayerSettings {
@@ -36,16 +37,17 @@ model PlayerSettings {
 }
 
 model HostedGame {
-  id          Int                  @id @default(autoincrement())
-  publicId    String               @unique @db.Char(36)
-  state       String               @db.VarChar(15)
-  host        Player               @relation("GamesAsHost", fields: [hostId], references: [id])
-  hostId      Int
-  players     HostedGameToPlayer[]
-  options     HostedGameOptions?
-  game        Game?
-  timeControl Json
-  createdAt   DateTime
+  id           Int                  @id @default(autoincrement())
+  publicId     String               @unique @db.Char(36)
+  state        String               @db.VarChar(15)
+  host         Player               @relation("GamesAsHost", fields: [hostId], references: [id])
+  hostId       Int
+  players      HostedGameToPlayer[]
+  options      HostedGameOptions?
+  game         Game?
+  timeControl  Json
+  createdAt    DateTime
+  chatMessages ChatMessage[]
 
   @@index([state, createdAt])
 }
@@ -85,4 +87,16 @@ model HostedGameOptions {
   opponentType       String     @db.VarChar(15)
   timeControlType    String     @db.VarChar(15)
   timeControlOptions Json
+}
+
+model ChatMessage {
+  id           Int        @id @default(autoincrement())
+  hostedGame   HostedGame @relation(fields: [hostedGameId], references: [id])
+  hostedGameId Int
+  player       Player?    @relation(fields: [playerId], references: [id])
+  playerId     Int?
+  content      String     @db.VarChar(255)
+  createdAt    DateTime   @default(now())
+
+  @@index([hostedGameId, createdAt])
 }
