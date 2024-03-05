@@ -246,9 +246,6 @@
             ],
             "opponent": [
                 "gameData.players.0"
-            ],
-            "timeControl.options.options": [
-                "gameOptions.timeControl.options"
             ]
         }
     }

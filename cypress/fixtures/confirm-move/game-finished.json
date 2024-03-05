@@ -106,9 +106,6 @@
         "referentialEqualities": {
             "host": [
                 "players.1"
-            ],
-            "timeControl.options.options": [
-                "gameOptions.timeControl.options"
             ]
         }
     }

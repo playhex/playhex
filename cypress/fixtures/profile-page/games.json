@@ -106,11 +106,6 @@
                 "createdAt": [
                     "Date"
                 ]
-            },
-            "referentialEqualities": {
-                "timeControl.options.options": [
-                    "gameOptions.timeControl.options"
-                ]
             }
         }
     },
@@ -204,11 +199,6 @@
                 ],
                 "createdAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "timeControl.options.options": [
-                    "gameOptions.timeControl.options"
                 ]
             }
         }
@@ -339,11 +329,6 @@
                 "createdAt": [
                     "Date"
                 ]
-            },
-            "referentialEqualities": {
-                "timeControl.options.options": [
-                    "gameOptions.timeControl.options"
-                ]
             }
         }
     },
@@ -428,11 +413,6 @@
                 ],
                 "createdAt": [
                     "Date"
-                ]
-            },
-            "referentialEqualities": {
-                "timeControl.options.options": [
-                    "gameOptions.timeControl.options"
                 ]
             }
         }

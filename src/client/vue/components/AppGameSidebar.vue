@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 import useAuthStore from '../../stores/authStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
