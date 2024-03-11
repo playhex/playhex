@@ -17,7 +17,7 @@ describe('Lobby', () => {
             .click()
         ;
 
-        cy.contains('Hex online')
+        cy.contains('Play Hex')
             .click()
         ;
 

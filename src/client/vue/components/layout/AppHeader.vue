@@ -50,7 +50,7 @@ const color = (): string => null === mostUrgentGame.value
 <template>
     <nav class="menu-top navbar bg-body-tertiary">
         <div class="container-fluid justify-content-space-between">
-            <router-link to="/" class="navbar-brand"><b-icon-house-fill /><span class="d-none d-sm-inline"> Hex online</span></router-link>
+            <router-link to="/" class="navbar-brand"><b-icon-house-fill /><span class="d-none d-sm-inline"> Play Hex</span></router-link>
 
             <span class="my-turn-notif">
                 <component

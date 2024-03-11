@@ -14,9 +14,6 @@ import AppPseudoWithOnlineStatus from '../components/AppPseudoWithOnlineStatus.v
 import { BIconEye, BIconTrophy, BIconPeople, BIconRobot } from 'bootstrap-icons-vue';
 import AppTimeControlLabelVue from '../components/AppTimeControlLabel.vue';
 import { useSeoMeta } from '@unhead/vue';
-import { storeToRefs } from 'pinia';
-import { getPlayerGames } from '../../apiClient';
-import { ref, watch } from 'vue';
 
 useSeoMeta({
     titleTemplate: title => `Lobby - ${title}`,
@@ -111,73 +108,12 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
     return gameDataB.endedAt.getTime() - gameDataA.endedAt.getTime();
 };
-
-/*
- * Temporary alert
- */
-const hasHistory = ref(false);
-const { loggedInPlayer } = storeToRefs(useAuthStore());
-
-const shouldShowWarning = (): null | boolean => {
-    if (null === loggedInPlayer.value) {
-        return false;
-    }
-
-    // Do not show to non-guest players
-    if (!loggedInPlayer.value.isGuest) {
-        return false;
-    }
-
-    // If guest is here since at least one hour, show him
-    if (new Date().getTime() - loggedInPlayer.value.createdAt.getTime() > 3600000) {
-        return true;
-    }
-
-    // Or if guest has at least one playing game, or finished a game recently
-    const hasActiveOrRecentlyFinishedGame = Object
-        .values(lobbyStore.hostedGameClients)
-        .some(hostedGameClient => hostedGameClient.hasPlayer(loggedInPlayer.value as PlayerData))
-    ;
-
-    if (hasActiveOrRecentlyFinishedGame) {
-        return true;
-    }
-
-    return null;
-};
-
-watch(loggedInPlayer, p => {
-    if (p && null === shouldShowWarning()) {
-        getPlayerGames(p.publicId, 'ended')
-            .then(history => hasHistory.value = history.length > 0)
-        ;
-    }
-});
 </script>
 
 <template>
     <div class="container-fluid my-3">
         <div class="row">
             <div class="col-sm-9">
-
-                <div
-                    v-if="shouldShowWarning() || hasHistory"
-                    class="alert alert-warning"
-                    role="alert"
-                >
-                    <p>
-                        You are Guest ? You have current games and/or a game history ?
-                        Normally yes because I made this warning display only to you!
-                    </p>
-                    <p>
-                        <strong>You will lose your current games</strong> because this web application will move to a new domain name in few days.
-                        Thus you will lose your current guest session.
-                    </p>
-                    <p class="m-0">
-                        <router-link :to="{ name: 'signup' }" class="alert-link">Add a pseudo and a password to your account now</router-link> if you want to keep your current playing games and history.
-                    </p>
-                </div>
-
                 <h3>New game</h3>
 
                 <div class="play-buttons row">

@@ -12,6 +12,7 @@ const sessionOptions: session.SessionOptions = {
     secret: SESSION_SECRET.split(','),
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
         maxAge: 365 * 86400 * 1000,
         secure: 'true' === SESSION_HTTPS_ONLY,
