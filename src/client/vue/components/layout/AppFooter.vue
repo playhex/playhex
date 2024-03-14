@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { BIconBookmarks, BIconChatDots, BIconGithub, BIconDiscord } from 'bootstrap-icons-vue';
+import { seo } from '../../../../shared/app/seo';
 
 /* global LAST_COMMIT_DATE */
 // @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
@@ -9,7 +10,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
 <template>
     <div class="container-fluid py-3 footer bg-dark-subtle">
         <div class="d-flex justify-content-center gap-4">
-            <p>Hex online board game</p>
+            <p>{{ seo.title }}</p>
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
             <a href="https://feedback.alcalyn.app" target="_blank">
@@ -45,6 +46,9 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
 .footer
     opacity 0.8
     font-size 0.9em
+
+    a
+        color var(--bs-body-color-rgb)
 
 .infos
     margin 2em 0 0 0

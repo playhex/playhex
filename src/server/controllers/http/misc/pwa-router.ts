@@ -6,7 +6,7 @@ export function pwaRouter() {
 
     router.get('/pwa-manifest.json', async (_, res) => {
         const pwaManifest = {
-            short_name: seo.shortTitle,
+            short_name: seo.title,
             name: seo.title,
             description: seo.description,
             lang: 'en',

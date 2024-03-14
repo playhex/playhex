@@ -3,7 +3,7 @@ import useAuthStore from '@client/stores/authStore';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore';
 import { useRouter } from 'vue-router';
-import { BIconHouseFill, BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
+import { BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
@@ -50,7 +50,7 @@ const color = (): string => null === mostUrgentGame.value
 <template>
     <nav class="menu-top navbar bg-body-tertiary">
         <div class="container-fluid justify-content-space-between">
-            <router-link to="/" class="navbar-brand"><b-icon-house-fill /><span class="d-none d-sm-inline"> Play Hex</span></router-link>
+            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">Play<span class="text-danger">Hex</span></router-link>
 
             <span class="my-turn-notif">
                 <component
@@ -78,6 +78,9 @@ const color = (): string => null === mostUrgentGame.value
 nav
     a
         text-decoration none
+
+.navbar-brand
+    margin-right 0
 
 .nav-player-item
     font-size 1.1em
