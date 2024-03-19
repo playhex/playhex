@@ -386,7 +386,14 @@ const unreadMessages = (): number => {
 
 .board-container
     position relative // center "Accept" button relative to this container
-    height calc(100vh - 6rem) // 6rem = header and bottom game menu height
+    height calc(100vh - 6rem) // (fallback if dvh is not supported)
+    height calc(100dvh - 6rem) // 6rem = header and bottom game menu height
+
+.menu-game
+    // Mobile UI fix: add margin at bottom if url bar is present,
+    // so it is possible to scroll to hide url bar and set full height again,
+    // then the UI will fit 100vh again.
+    margin-bottom calc(100lvh - 100dvh)
 
 .buttons
     position relative

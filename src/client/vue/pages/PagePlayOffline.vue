@@ -126,5 +126,11 @@ const rematch = () => {
     position relative
     width 100vw
     height calc(100vh - 3rem)
+    height calc(100dvh - 3rem)
     overflow hidden
+
+    // Mobile UI fix: add margin at bottom if url bar is present,
+    // so it is possible to scroll to hide url bar and set full height again,
+    // then the UI will fit 100vh again.
+    margin-bottom calc(100lvh - 100dvh)
 </style>
