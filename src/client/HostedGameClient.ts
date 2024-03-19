@@ -1,5 +1,6 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
-import { HostedGameData, HostedGameState, PlayerData } from '@shared/app/Types';
+import { HostedGameData, HostedGameState } from '@shared/app/Types';
+import Player from '../shared/app/models/Player';
 import { Outcome } from '@shared/game-engine/Types';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -47,9 +48,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGameData.state;
     }
 
-    getPlayerIndex(playerData: PlayerData): number
+    getPlayerIndex(player: Player): number
     {
-        return this.hostedGameData.players.findIndex(p => p.publicId === playerData.publicId);
+        return this.hostedGameData.players.findIndex(p => p.publicId === player.publicId);
     }
 
     loadGame(): Game
@@ -105,17 +106,17 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGameData.id;
     }
 
-    getPlayers(): PlayerData[]
+    getPlayers(): Player[]
     {
         return this.hostedGameData.players;
     }
 
-    getPlayer(position: number): null | PlayerData
+    getPlayer(position: number): null | Player
     {
         return this.hostedGameData.players[position] ?? null;
     }
 
-    getWinnerPlayer(): null | PlayerData
+    getWinnerPlayer(): null | Player
     {
         if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
             return null;
@@ -124,7 +125,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGameData.players[this.hostedGameData.gameData.winner];
     }
 
-    getStrictWinnerPlayer(): PlayerData
+    getStrictWinnerPlayer(): Player
     {
         if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
             throw new Error('getStrictWinnerPlayer(): No winner');
@@ -133,7 +134,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGameData.players[this.hostedGameData.gameData.winner];
     }
 
-    getLoserPlayer(): null | PlayerData
+    getLoserPlayer(): null | Player
     {
         if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
             return null;
@@ -142,22 +143,22 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGameData.players[1 - this.hostedGameData.gameData.winner];
     }
 
-    hasPlayer(playerData: PlayerData): boolean
+    hasPlayer(player: Player): boolean
     {
-        return this.hostedGameData.players.some(p => p.publicId === playerData.publicId);
+        return this.hostedGameData.players.some(p => p.publicId === player.publicId);
     }
 
     /**
-     * Returns player in this game who is playing against playerData.
-     * Or null if playerData is not in the game, or game has not yet 2 players.
+     * Returns player in this game who is playing against player.
+     * Or null if player is not in the game, or game has not yet 2 players.
      */
-    getOtherPlayer(playerData: PlayerData): null | PlayerData
+    getOtherPlayer(player: Player): null | Player
     {
         if (2 !== this.hostedGameData.players.length) {
             return null;
         }
 
-        if (this.hostedGameData.players[0].publicId === playerData.publicId) {
+        if (this.hostedGameData.players[0].publicId === player.publicId) {
             return this.hostedGameData.players[1];
         }
 
@@ -213,9 +214,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         ;
     }
 
-    canJoin(playerData: null | PlayerData): boolean
+    canJoin(player: null | Player): boolean
     {
-        if (!playerData) {
+        if (!player) {
             return false;
         }
 
@@ -225,7 +226,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Cannot join as my own opponent
-        if (this.hasPlayer(playerData)) {
+        if (this.hasPlayer(player)) {
             return false;
         }
 
@@ -276,9 +277,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return apiPostCancel(this.getId());
     }
 
-    onServerPlayerJoined(playerData: PlayerData): void
+    onServerPlayerJoined(player: Player): void
     {
-        this.hostedGameData.players.push(playerData);
+        this.hostedGameData.players.push(player);
     }
 
     onServerGameStarted(hostedGameData: HostedGameData): void

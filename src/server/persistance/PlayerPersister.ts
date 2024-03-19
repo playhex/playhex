@@ -1,8 +1,7 @@
-import { Prisma } from '@prisma/client';
 import prisma from '../services/prisma';
 import { Service } from 'typedi';
 
-export const select: Prisma.PlayerSelect = {
+export const select = {
     pseudo: true,
     publicId: true,
     isGuest: true,

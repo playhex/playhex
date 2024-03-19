@@ -1,8 +1,10 @@
-import { HostedGameData, HostedGameState, OnlinePlayersData, PlayerData, PlayerSettingsData } from '@shared/app/Types';
+import { AIConfigStatusData, HostedGameData, HostedGameState, OnlinePlayersData, PlayerSettingsData } from '@shared/app/Types';
+import Player from '../shared/app/models/Player';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import ChatMessage from '../shared/app/models/ChatMessage';
+import AIConfig from '../shared/app/models/AIConfig';
 
 export class ApiClientError extends Error
 {
@@ -32,7 +34,7 @@ const checkResponse = async (response: Response): Promise<void> => {
     }
 };
 
-export const authGetMe = async (): Promise<PlayerData> => {
+export const authGetMe = async (): Promise<Player> => {
     const response = await fetch('/api/auth/me', {
         method: 'get',
         headers: {
@@ -43,7 +45,7 @@ export const authGetMe = async (): Promise<PlayerData> => {
     return denormalize(await response.json());
 };
 
-export const authLogin = async (pseudo: string, password: string): Promise<PlayerData> => {
+export const authLogin = async (pseudo: string, password: string): Promise<Player> => {
     const response = await fetch('/api/auth/login', {
         method: 'post',
         headers: {
@@ -61,7 +63,7 @@ export const authLogin = async (pseudo: string, password: string): Promise<Playe
     return denormalize(await response.json());
 };
 
-export const authSignup = async (pseudo: string, password: string): Promise<PlayerData> => {
+export const authSignup = async (pseudo: string, password: string): Promise<Player> => {
     const response = await fetch('/api/auth/signup', {
         method: 'post',
         headers: {
@@ -79,7 +81,7 @@ export const authSignup = async (pseudo: string, password: string): Promise<Play
     return denormalize(await response.json());
 };
 
-export const authSignupFromGuest = async (pseudo: string, password: string): Promise<PlayerData> => {
+export const authSignupFromGuest = async (pseudo: string, password: string): Promise<Player> => {
     const response = await fetch('/api/auth/signup-from-guest', {
         method: 'post',
         headers: {
@@ -97,7 +99,7 @@ export const authSignupFromGuest = async (pseudo: string, password: string): Pro
     return denormalize(await response.json());
 };
 
-export const authMeOrSignupGuest = async (): Promise<PlayerData> => {
+export const authMeOrSignupGuest = async (): Promise<Player> => {
     const response = await fetch('/api/auth/me-or-guest', {
         method: 'post',
         headers: {
@@ -110,7 +112,7 @@ export const authMeOrSignupGuest = async (): Promise<PlayerData> => {
     return denormalize(await response.json());
 };
 
-export const authLogout = async (): Promise<PlayerData> => {
+export const authLogout = async (): Promise<Player> => {
     const response = await fetch('/api/auth/logout', {
         method: 'delete',
         headers: {
@@ -156,7 +158,7 @@ export const getEndedGames = async (take = 20, fromGamePublicId: null | string =
     return denormalize(await response.json());
 };
 
-export const getPlayer = async (publicId: string): Promise<PlayerData> => {
+export const getPlayer = async (publicId: string): Promise<Player> => {
     const response = await fetch(`/api/players/${publicId}`, {
         method: 'get',
         headers: {
@@ -167,7 +169,7 @@ export const getPlayer = async (publicId: string): Promise<PlayerData> => {
     return denormalize(await response.json());
 };
 
-export const getPlayerBySlug = async (slug: string): Promise<PlayerData> => {
+export const getPlayerBySlug = async (slug: string): Promise<Player> => {
     const response = await fetch(`/api/players?slug=${slug}`, {
         method: 'get',
         headers: {
@@ -318,4 +320,30 @@ export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content
     });
 
     await checkResponse(response);
+};
+
+export const apiGetAiConfigs = async (): Promise<AIConfig<'withPlayerId'>[]> => {
+    const response = await fetch(`/api/ai-configs`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+export const apiGetAiConfigsStatus = async (): Promise<AIConfigStatusData> => {
+    const response = await fetch(`/api/ai-configs-status`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
 };

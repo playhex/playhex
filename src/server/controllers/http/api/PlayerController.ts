@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import { normalize } from '../../../../shared/app/serializer';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import { transformPlayer } from '../../../serialization/Player';
+import { transformPlayer } from '../../../../shared/app/models/Player';
 import HttpError from '../HttpError';
 import { HostedGameState } from '@shared/app/Types';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
@@ -24,26 +24,26 @@ export default class PlayerController
     async getAll(
         @QueryParam('slug', { required: true }) slug: string,
     ) {
-        const playerData = await this.playerRepository.getPlayerBySlug(slug);
+        const player = await this.playerRepository.getPlayerBySlug(slug);
 
-        if (null === playerData) {
+        if (null === player) {
             throw new HttpError(404, 'Player not found');
         }
 
-        return normalize(transformPlayer(playerData));
+        return normalize(transformPlayer(player));
     }
 
     @Get('/api/players/:publicId')
     async getOne(
         @Param('publicId') publicId: string,
     ) {
-        const playerData = await this.playerRepository.getPlayer(publicId);
+        const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === playerData) {
+        if (null === player) {
             throw new HttpError(404, 'Player not found');
         }
 
-        return normalize(transformPlayer(playerData));
+        return normalize(transformPlayer(player));
     }
 
     @Get('/api/players/:publicId/games')
@@ -52,9 +52,9 @@ export default class PlayerController
         @QueryParam('state') stateRaw: string,
         @QueryParam('fromGamePublicId') fromGamePublicId: string,
     ) {
-        const playerData = await this.playerRepository.getPlayer(publicId);
+        const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === playerData) {
+        if (null === player) {
             throw new HttpError(404, 'Player not found');
         }
 
@@ -64,6 +64,6 @@ export default class PlayerController
             state = stateRaw;
         }
 
-        return normalize(await this.hostedGameRepository.getPlayerGames(playerData, state, fromGamePublicId));
+        return normalize(await this.hostedGameRepository.getPlayerGames(player, state, fromGamePublicId));
     }
 }

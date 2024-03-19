@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../shared/app/models/Player';
 import { apiGetOnlinePlayers } from '@client/apiClient';
 import useSocketStore from './socketStore';
 import useAuthStore from './authStore';
@@ -15,7 +15,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     /**
      * List of connected players
      */
-    const players = ref<{ [key: string]: PlayerData }>({});
+    const players = ref<{ [key: string]: Player }>({});
 
     /**
      * Total connected players count. Null if not yet loaded

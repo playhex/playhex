@@ -9,8 +9,9 @@ import PlayerSettingsController from './PlayerSettingsController';
 import AdminController from './AdminController';
 import HttpError from '../HttpError';
 import PlayerRepository from '../../../repositories/PlayerRepository';
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../../shared/app/models/Player';
 import ChatController from './ChatController';
+import AIConfigController from './AIConfigController';
 
 export const registerApi = (app: Express) => {
 
@@ -24,20 +25,20 @@ export const registerApi = (app: Express) => {
         defaults: {
             undefinedResultCode: 204,
         },
-        currentUserChecker: async (action): Promise<null | PlayerData> => {
+        currentUserChecker: async (action): Promise<null | Player> => {
             const { playerId } = action.request.session;
 
             if (!playerId) {
                 return null;
             }
 
-            const playerData = await Container.get(PlayerRepository).getPlayer(playerId);
+            const player = await Container.get(PlayerRepository).getPlayer(playerId);
 
-            if (null === playerData) {
+            if (null === player) {
                 return null;
             }
 
-            return playerData;
+            return player;
         },
         authorizationChecker: (action, roles): boolean => {
             if (roles.includes('ADMIN')) {
@@ -67,6 +68,7 @@ export const registerApi = (app: Express) => {
             AuthController,
             PlayerSettingsController,
             AdminController,
+            AIConfigController,
         ],
     });
 

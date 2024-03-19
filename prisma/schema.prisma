@@ -23,6 +23,7 @@ model Player {
   gamesAsHost  HostedGame[]         @relation("GamesAsHost")
   games        HostedGameToPlayer[]
   chatMessages ChatMessage[]
+  aiConfig     AIConfig?
 }
 
 model PlayerSettings {
@@ -85,6 +86,7 @@ model HostedGameOptions {
   firstPlayer        Int?       @db.TinyInt()
   swapRule           Boolean
   opponentType       String     @db.VarChar(15)
+  opponentPublicId   String?    @db.Char(36)
   timeControlType    String     @db.VarChar(15)
   timeControlOptions Json
 }
@@ -99,4 +101,20 @@ model ChatMessage {
   createdAt    DateTime   @default(now())
 
   @@index([hostedGameId, createdAt])
+}
+
+model AIConfig {
+  player           Player  @relation(fields: [playerId], references: [id])
+  playerId         Int     @unique
+  engine           String
+  order            Int     @default(0)
+  label            String  @db.VarChar(32)
+  description      String? @db.VarChar(32)
+  boardsizeMin     Int?    @db.TinyInt()
+  boardsizeMax     Int?    @db.TinyInt()
+  requireMorePower Boolean @default(false) // Available only when there is powerful peers
+  isRemote         Boolean @default(false) // Available only when HEX_AI_API is provided
+  config           Json
+
+  @@index([order])
 }

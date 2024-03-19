@@ -4,7 +4,8 @@ import { storeToRefs } from 'pinia';
 import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'bootstrap-icons-vue';
-import { HostedGameData, PlayerData } from '@shared/app/Types';
+import { HostedGameData } from '@shared/app/Types';
+import Player from '../../../../shared/app/models/Player';
 import { getPlayerGames, getPlayerBySlug, ApiClientError } from '../../../apiClient';
 import { Ref, ref } from 'vue';
 import { format } from 'date-fns';
@@ -27,16 +28,16 @@ if (Array.isArray(slug)) {
 /*
  * Player meta tags
  */
-const updateMeta = (playerData: PlayerData): void => {
+const updateMeta = (player: Player): void => {
     useSeoMeta({
-        title: `${pseudoString(playerData, 'pseudo')} - Hex player`,
+        title: `${pseudoString(player, 'pseudo')} - Hex player`,
 
         // index only bots (Mohex) profile page.
         // Guest should never be indexed,
         // players only if they explicitely agree (settings)
-        robots: playerData.isBot ? 'index' : 'noindex',
+        robots: player.isBot ? 'index' : 'noindex',
 
-        ogTitle: `${pseudoString(playerData, 'pseudo')} - Hex player`,
+        ogTitle: `${pseudoString(player, 'pseudo')} - Hex player`,
         ogType: 'profile',
         ogUrl: window.location.href,
         twitterCard: 'summary',
@@ -45,9 +46,9 @@ const updateMeta = (playerData: PlayerData): void => {
     const jsonLd: WithContext<Person> = {
         '@context': 'https://schema.org',
         '@type': 'Person',
-        name: pseudoString(playerData, 'pseudo'),
+        name: pseudoString(player, 'pseudo'),
         url: window.location.href,
-        identifier: pseudoString(playerData, 'slug'),
+        identifier: pseudoString(player, 'slug'),
     };
 
     useJsonLd(jsonLd);
@@ -59,7 +60,7 @@ const updateMeta = (playerData: PlayerData): void => {
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 const isMe = (): boolean => null !== loggedInPlayer.value && loggedInPlayer.value.slug === slug;
 
-const player: Ref<null | PlayerData> = isMe()
+const player: Ref<null | Player> = isMe()
     ? loggedInPlayer
     : ref(null)
 ;
@@ -129,13 +130,13 @@ const hasWon = (game: HostedGameData): boolean => {
     return winner.publicId === player.value?.publicId;
 };
 
-const getOpponent = (game: HostedGameData): PlayerData => {
+const getOpponent = (game: HostedGameData): Player => {
     if (null === player.value) {
         throw new Error('player must be set');
     }
 
-    let me: null | PlayerData = null;
-    let opponent: null | PlayerData = null;
+    let me: null | Player = null;
+    let opponent: null | Player = null;
 
     for (const p of game.players) {
         if (p.publicId === player.value.publicId) {
@@ -185,10 +186,10 @@ const clickLogout = async () => {
         <div class="d-flex">
             <div class="avatar-wrapper">
                 <b-icon-person class="icon img-thumbnail" />
-                <app-online-status v-if="player" :playerData="player" class="player-status" />
+                <app-online-status v-if="player" :player="player" class="player-status" />
             </div>
             <div>
-                <h2><app-pseudo v-if="player" :playerData="player" /><template v-else>…</template></h2>
+                <h2><app-pseudo v-if="player" :player="player" /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest">Account created on {{ player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
@@ -241,7 +242,7 @@ const clickLogout = async () => {
                     <td>
                         <span class="me-2">Game vs </span>
                         <app-pseudo-with-online-status-vue
-                            :playerData="(game.getOtherPlayer(player) as PlayerData)"
+                            :player="(game.getOtherPlayer(player) as Player)"
                         />
                     </td>
                     <td class="text-end">{{ game.getHostedGameData().gameOptions.boardsize }}</td>
@@ -267,7 +268,7 @@ const clickLogout = async () => {
                         <span class="me-2 text-success" v-if="hasWon(game)">won against </span>
                         <span class="me-2 text-danger" v-else>lost against </span>
                         <app-pseudo-with-online-status-vue
-                            :playerData="getOpponent(game)"
+                            :player="getOpponent(game)"
                         />
                     </td>
                 </tr>

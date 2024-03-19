@@ -1,8 +1,8 @@
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../shared/app/models/Player';
 import prisma from '../prisma';
 import bcrypt from 'bcryptjs';
-import { Player } from '@prisma/client';
 import HandledError from '../../../shared/app/Errors';
+import { plainToInstance } from 'class-transformer';
 
 export class PseudoNotExistingError extends HandledError {}
 export class InvalidPasswordError extends HandledError {}
@@ -14,7 +14,7 @@ export const hashPassword = async (password: string): Promise<string> => {
 };
 
 export const checkPassword = (player: Player, password: string): boolean => {
-    if (null === player.password) {
+    if (!player.password) {
         return false;
     }
 
@@ -25,12 +25,14 @@ export const checkPassword = (player: Player, password: string): boolean => {
  * @throws {PseudoNotExistingError}
  * @throws {InvalidPasswordError}
  */
-export const authenticate = async (pseudo: string, password: string): Promise<PlayerData> => {
-    const player = await prisma.player.findUnique({
+export const authenticate = async (pseudo: string, password: string): Promise<Player> => {
+    const playerObject = await prisma.player.findUnique({
         where: {
             pseudo,
         },
     });
+
+    const player = plainToInstance(Player, playerObject);
 
     if (null === player) {
         throw new PseudoNotExistingError();
@@ -40,7 +42,7 @@ export const authenticate = async (pseudo: string, password: string): Promise<Pl
         throw new InvalidPasswordError();
     }
 
-    player.password = null;
+    player.password = undefined;
 
     return player;
 };

@@ -1,6 +1,7 @@
 import { MoveData, Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
-import { HostedGameData, PlayerData } from './Types';
+import { HostedGameData } from './Types';
+import Player from './models/Player';
 import { GameTimeData } from 'time-control/TimeControl';
 import ChatMessage from './models/ChatMessage';
 
@@ -37,7 +38,7 @@ export type HexServerToClientEvents = {
     /**
      * A player joined gameId.
      */
-    gameJoined: (gameId: string, playerData: PlayerData) => void;
+    gameJoined: (gameId: string, player: Player) => void;
 
     /**
      * Game has started.
@@ -70,14 +71,14 @@ export type HexServerToClientEvents = {
      * player can be null in case player data were not in list.
      * totalPlayers is the count of players connected now.
      */
-    playerConnected: (player: PlayerData | null, totalPlayers: number) => void;
+    playerConnected: (player: Player | null, totalPlayers: number) => void;
 
     /**
      * A player just disconnected from server.
      * player can be null in case player data were not in list.
      * totalPlayers is the count of players connected now.
      */
-    playerDisconnected: (player: PlayerData | null, totalPlayers: number) => void;
+    playerDisconnected: (player: Player | null, totalPlayers: number) => void;
 
     /**
      * A chat message has been posted in a game.

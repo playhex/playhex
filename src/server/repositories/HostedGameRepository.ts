@@ -1,7 +1,8 @@
 import { Service } from 'typedi';
 import HostedGame from '../HostedGame';
 import { Move } from '../../shared/game-engine';
-import { HostedGameData, HostedGameState, PlayerData } from '../../shared/app/Types';
+import { HostedGameData, HostedGameState } from '../../shared/app/Types';
+import Player from '../../shared/app/models/Player';
 import { GameOptionsData } from '../../shared/app/GameOptions';
 import { MoveData } from '../../shared/game-engine/Types';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
@@ -85,7 +86,7 @@ export default class HostedGameRepository
                 await this.hostedGamePersister.persist(this.activeGames[key].toData());
             } catch (e) {
                 allSuccess = false;
-                logger.error('Could not persist a game. Continue with others.', { gameId: key, e });
+                logger.error('Could not persist a game. Continue with others.', { gameId: key, e, errorMessage: e.message });
             }
         }
 
@@ -209,7 +210,7 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    async createGame(host: PlayerData, gameOptions: GameOptionsData, opponent: null | PlayerData = null): Promise<HostedGame>
+    async createGame(host: Player, gameOptions: GameOptionsData, opponent: null | Player = null): Promise<HostedGame>
     {
         const hostedGame = HostedGame.hostNewGame(gameOptions, host);
 
@@ -228,14 +229,14 @@ export default class HostedGameRepository
      * @param fromGamePublicId Cursor, retrieve games after this one.
      */
     async getPlayerGames(
-        playerData: PlayerData,
+        player: Player,
         state: null | HostedGameState = null,
         fromGamePublicId: null | string = null,
     ): Promise<HostedGameData[]> {
         const hostedGameDataList: HostedGameData[] = [];
 
         for (const key in this.activeGames) {
-            if (!this.activeGames[key].isPlayerInGame(playerData)) {
+            if (!this.activeGames[key].isPlayerInGame(player)) {
                 continue;
             }
 
@@ -254,7 +255,7 @@ export default class HostedGameRepository
                 players: {
                     some: {
                         player: {
-                            publicId: playerData.publicId,
+                            publicId: player.publicId,
                         },
                     },
                 },
@@ -277,7 +278,7 @@ export default class HostedGameRepository
         return hostedGameDataList;
     }
 
-    async playerJoinGame(playerData: PlayerData, gameId: string): Promise<string | true>
+    async playerJoinGame(player: Player, gameId: string): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -285,7 +286,7 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        const joinResult = hostedGame.playerJoin(playerData);
+        const joinResult = hostedGame.playerJoin(player);
 
         if ('string' === typeof joinResult) {
             return joinResult;
@@ -294,7 +295,7 @@ export default class HostedGameRepository
         return true;
     }
 
-    async playerMove(playerData: PlayerData, gameId: string, move: MoveData): Promise<string | true>
+    async playerMove(player: Player, gameId: string, move: MoveData): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -302,12 +303,12 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        const result = hostedGame.playerMove(playerData, new Move(move.row, move.col));
+        const result = hostedGame.playerMove(player, new Move(move.row, move.col));
 
         return result;
     }
 
-    async playerResign(playerData: PlayerData, gameId: string): Promise<string | true>
+    async playerResign(player: Player, gameId: string): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -315,12 +316,12 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        const result = hostedGame.playerResign(playerData);
+        const result = hostedGame.playerResign(player);
 
         return result;
     }
 
-    async playerCancel(playerData: PlayerData, gameId: string): Promise<string | true>
+    async playerCancel(player: Player, gameId: string): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -328,7 +329,7 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        const result = hostedGame.playerCancel(playerData);
+        const result = hostedGame.playerCancel(player);
 
         return result;
     }

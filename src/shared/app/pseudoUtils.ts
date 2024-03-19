@@ -1,6 +1,6 @@
 import slugify from 'slugify';
 import HandledError from './Errors';
-import { PlayerData } from './Types';
+import Player from './models/Player';
 
 export class InvalidPseudoError extends HandledError {}
 
@@ -51,10 +51,10 @@ export const pseudoSlug = (pseudo: string): string => {
 /**
  * Get a pseudo string, depending on if it is a guest or not, and so...
  *
- * - pseudoString(playerData, 'pseudo'); // 'Guest 1234', or 'Alcalyn', used i.e in page title
- * - pseudoString(playerData, 'slug'); // 'guest-1234', or 'alcalyn', used i.e for sgf filename
+ * - pseudoString(player, 'pseudo'); // 'Guest 1234', or 'Alcalyn', used i.e in page title
+ * - pseudoString(player, 'slug'); // 'guest-1234', or 'alcalyn', used i.e for sgf filename
  */
-export const pseudoString = (player: PlayerData, type: 'slug' | 'pseudo' = 'pseudo'): string => {
+export const pseudoString = (player: Player, type: 'slug' | 'pseudo' = 'pseudo'): string => {
     if (!player.isGuest) {
         return player[type];
     }

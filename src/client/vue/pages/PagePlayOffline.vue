@@ -5,7 +5,7 @@ import AppBoard from '../components/AppBoard.vue';
 import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '@shared/game-engine';
 import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
 import { Ref, onMounted, ref } from 'vue';
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../shared/app/models/Player';
 import useAuthStore from '../../stores/authStore';
 import { useSeoMeta } from '@unhead/vue';
 
@@ -18,9 +18,9 @@ const offlineBoardContainer = ref<HTMLElement>();
 const gameView = ref<GameView>();
 const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.gameOptionsJson ?? '{}');
 const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
-const players: Ref<PlayerData[]> = ref([]);
+const players: Ref<Player[]> = ref([]);
 
-const makeAIMoveIfApplicable = async (game: Game, players: PlayerData[]): Promise<void> => {
+const makeAIMoveIfApplicable = async (game: Game, players: Player[]): Promise<void> => {
     const player = players[game.getCurrentPlayerIndex()];
 
     if (!player.isBot || game.isEnded()) {
@@ -33,7 +33,7 @@ const makeAIMoveIfApplicable = async (game: Game, players: PlayerData[]): Promis
 };
 
 const initGame = (gameContainer: HTMLElement) => {
-    const player: PlayerData = useAuthStore().loggedInPlayer ?? {
+    const player: Player = useAuthStore().loggedInPlayer ?? {
         publicId: '',
         isBot: false,
         pseudo: 'Player',
@@ -69,6 +69,8 @@ const initGame = (gameContainer: HTMLElement) => {
     }
 
     const game = new Game(gameOptions.boardsize);
+
+    game.setAllowSwap(gameOptions.swapRule);
 
     gameView.value = new GameView(game, gameContainer);
 

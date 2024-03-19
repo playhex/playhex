@@ -31,7 +31,7 @@ const {
                 class="online-status-icon text-success"
                 aria-hidden="true"
             />
-            <app-pseudo :player-data="player" />
+            <app-pseudo :player="player" />
         </p>
     </div>
 </template>

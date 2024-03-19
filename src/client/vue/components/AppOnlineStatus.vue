@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../shared/app/models/Player';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore';
 import { PropType, toRefs } from 'vue';
 import { BIconCircleFill, BIconRobot } from 'bootstrap-icons-vue';
 
 const props = defineProps({
-    playerData: {
-        type: Object as PropType<PlayerData>,
+    player: {
+        type: Object as PropType<Player>,
         required: true,
     },
 });
 
-const { playerData } = toRefs(props);
+const { player } = toRefs(props);
 </script>
 
 <template>
     <b-icon-circle-fill
-        v-if="!playerData.isBot"
+        v-if="!player.isBot"
         class="online-status-icon"
         aria-hidden="true"
-        :class="useOnlinePlayersStore().isPlayerOnline(playerData.publicId) ? 'text-success' : 'text-secondary'"
+        :class="useOnlinePlayersStore().isPlayerOnline(player.publicId) ? 'text-success' : 'text-secondary'"
     />
     <b-icon-robot
         v-else

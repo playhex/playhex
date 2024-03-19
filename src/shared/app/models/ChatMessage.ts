@@ -1,4 +1,4 @@
-import { PlayerData } from '../Types';
+import Player from './Player';
 import { IsDate, IsNotEmpty, IsObject, IsString, Length } from 'class-validator';
 
 export default class ChatMessage
@@ -17,7 +17,7 @@ export default class ChatMessage
     gameId: string;
 
     @IsObject({ groups: ['post'] })
-    author: null | PlayerData;
+    author: null | Player;
 
     @IsDate({ groups: ['post'] })
     createdAt: Date;

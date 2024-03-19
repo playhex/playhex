@@ -1,43 +1,107 @@
 import { GameOptionsData } from '@shared/app/GameOptions';
-import { PlayerData } from '@shared/app/Types';
+import prisma from './prisma';
+import Player from '../../shared/app/models/Player';
+import { Move, calcRandomMove } from '../../shared/game-engine';
+import Container from 'typedi';
+import RemoteApiPlayer from './RemoteApiPlayer';
+import logger from './logger';
+import { select as playerSelect } from '../persistance/PlayerPersister';
+import { plainToInstance } from 'class-transformer';
+import HostedGame from '../HostedGame';
+import HexAiApiClient from './HexAiApiClient';
 
-const { HEX_AI_API_ENDPOINT } = process.env;
+export class FindAIError extends Error {}
 
-const mohexPlayerData: PlayerData = {
-    publicId: 'afe7a449-6980-4181-9754-41bbfa2b92bc',
-    isBot: true,
-    isGuest: false,
-    pseudo: 'Mohex',
-    slug: 'mohex',
-    createdAt: new Date('2009-06-01'),
+const findPlayerWithAIConfig = async (publicId: string): Promise<null | Player> => {
+    return plainToInstance(Player, await prisma.player.findUnique({
+        where: {
+            publicId,
+        },
+        select: {
+            ...playerSelect,
+            aiConfig: true,
+        },
+    }));
 };
 
-const deterministRandomBot: PlayerData = {
-    publicId: '77656f2d-0d80-48ba-b2d3-8f2816ced08c',
-    isBot: true,
-    isGuest: false,
-    pseudo: 'Determinist random bot',
-    slug: 'determinist-random-bot',
-    createdAt: new Date('2023-01-01'),
-};
+export const findAIOpponent = async (gameOptions: GameOptionsData): Promise<null | Player> => {
+    const { publicId } = gameOptions.opponent;
 
-/**
- * Create an AI Player instance
- * depending on available AI engine available.
- * Returns DeterministRandomAIPlayer if none available.
- */
-const createAIPlayer = (gameOptions: GameOptionsData): PlayerData => {
-    if (
-        HEX_AI_API_ENDPOINT
-        && gameOptions.boardsize
-        && gameOptions.boardsize <= 13
-    ) {
-        return mohexPlayerData;
+    if (!publicId) {
+        throw new FindAIError('ai player publicId must be specified');
     }
 
-    return deterministRandomBot;
+    const player = await findPlayerWithAIConfig(publicId);
+
+    if (null === player) {
+        return null;
+    }
+
+    if (!player.aiConfig) {
+        throw new FindAIError(`AI player with slug "${player.slug}" (publicId: ${player.publicId}) is missing its config in table AIConfig.`);
+    }
+
+    const aiConfigStatus = await Container.get(HexAiApiClient).getPeersStatus();
+
+    if (player.aiConfig.isRemote && 0 === aiConfigStatus.totalPeers) {
+        throw new FindAIError('Cannot use this remote AI player, AI api currently has no worker');
+    }
+
+    if (player.aiConfig.requireMorePower && 0 === aiConfigStatus.totalPeersPrimary) {
+        throw new FindAIError('Cannot use this remote AI player, AI api currently has no powerful enough worker');
+    }
+
+    return player;
 };
 
-export {
-    createAIPlayer,
+const validateConfigRandom = (config: unknown): config is { determinist: boolean } => {
+    return 'object' === typeof config
+        && null !== config
+        && 'determinist' in config
+        && 'boolean' === typeof config.determinist
+    ;
+};
+
+export const makeAIPlayerMove = async (player: Player, hostedGame: HostedGame): Promise<null | Move> => {
+    const { isBot } = player;
+    let { aiConfig } = player;
+
+    if (!isBot) {
+        throw new Error('makeAIPlayerMove() called with a non bot player');
+    }
+
+    if (!aiConfig) {
+        // Used when impersonating AI player to create AI vs AI games,
+        // player.aiConfig won't be loaded when fetching authenticated player.
+        const playerFull = await findPlayerWithAIConfig(player.publicId);
+
+        if (null === playerFull || !playerFull.aiConfig) {
+            throw new Error('makeAIPlayerMove() called with a ai player without ai config');
+        }
+
+        player = playerFull;
+        aiConfig = playerFull.aiConfig;
+    }
+
+    if (aiConfig.isRemote) {
+        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, hostedGame, aiConfig.config);
+    }
+
+    const game = hostedGame.getGame();
+
+    if (null === game) {
+        throw new Error('makeAIPlayerMove() called with a HostedGame without game');
+    }
+
+    switch (aiConfig.engine) {
+        case 'random':
+            if (!validateConfigRandom(aiConfig.config)) {
+                throw new Error('Invalid config for aiConfig');
+            }
+
+            return await calcRandomMove(game, 0, aiConfig.config.determinist);
+    }
+
+    logger.error(`No local AI play for bot with slug = "${player.slug}"`);
+    return null;
 };

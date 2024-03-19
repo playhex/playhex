@@ -7,7 +7,7 @@ import { gameToHexworldLink } from '../../../../shared/app/hexworld';
 import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
 import { PropType } from 'vue';
-import { PlayerData } from '../../../../shared/app/Types';
+import Player from '../../../../shared/app/models/Player';
 import { Game } from '../../../../shared/game-engine';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 
@@ -19,7 +19,7 @@ const props = defineProps({
         required: true,
     },
     players: {
-        type: Array as PropType<PlayerData[]>,
+        type: Array as PropType<Player[]>,
         required: true,
     },
     rematch: {
@@ -30,7 +30,7 @@ const props = defineProps({
 
 const { players, game, rematch } = props;
 
-const winner: null | PlayerData = game.isCanceled()
+const winner: null | Player = game.isCanceled()
     ? null
     : players[game.getStrictWinner()]
 ;
@@ -75,7 +75,7 @@ const outcomeToString = (): string => {
                     <div class="modal-body text-center lead">
                         <p v-if="null !== winner">
                             <app-pseudo
-                                :player-data="winner"
+                                :player="winner"
                                 is="strong"
                                 :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
                             />

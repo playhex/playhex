@@ -20,6 +20,7 @@ type MetricsTags = {
         engine: string;
         level: number;
         boardsize: number;
+        gameId: string;
     };
 
     connected_sockets: {

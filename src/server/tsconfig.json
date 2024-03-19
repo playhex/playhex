@@ -12,6 +12,7 @@
         "experimentalDecorators": true,
         "importHelpers": true,
         "skipLibCheck": true,
+        "noErrorTruncation": true,
         "outDir": "../../dist/server",
         "lib": [
             "dom",
@@ -34,7 +35,7 @@
         }
     },
     "include": [
-        "**/*.ts", "../shared/app/seo.ts",
+        "**/*.ts",
     ],
     "references": [
         {

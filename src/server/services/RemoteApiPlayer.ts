@@ -1,20 +1,18 @@
-import logger from './services/logger';
-import { Game, IllegalMove, Move, PlayerIndex } from '../shared/game-engine';
-import HexRemotePlayerClient, { CalculateMoveRequest } from '../shared/hex-remote-player-api-client';
-import { TimeMeasureMetric } from './services/metrics';
-import Container from 'typedi';
+import logger from './logger';
+import { Game, IllegalMove, Move } from '../../shared/game-engine';
+import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient';
+import { TimeMeasureMetric } from './metrics';
+import { Service } from 'typedi';
+import HostedGame from '../HostedGame';
 
+@Service()
 export default class RemoteApiPlayer
 {
-    private hexRemotePlayerApi: HexRemotePlayerClient;
-
     constructor(
-        endpoint: string,
-    ) {
-        this.hexRemotePlayerApi = new HexRemotePlayerClient(endpoint);
-    }
+        private hexRemotePlayerApi: HexAiApiClient,
+    ) {}
 
-    private async fetchMove(game: Game): Promise<Move>
+    private async fetchMove(engine: string, game: Game, config: { [key: string]: unknown }): Promise<Move>
     {
         const moveHistory = game
             .getMovesHistory()
@@ -33,8 +31,8 @@ export default class RemoteApiPlayer
                 swapRule: game.getAllowSwap(),
             },
             ai: {
-                engine: 'mohex',
-                maxGames: 20,
+                ...config,
+                engine,
             },
         };
 
@@ -62,34 +60,34 @@ export default class RemoteApiPlayer
         }
     }
 
-    async makeMove(game: Game, playerIndex: PlayerIndex): Promise<void>
+    async makeMove(engine: string, hostedGame: HostedGame, config: { [key: string]: unknown }): Promise<null | Move>
     {
+        const game = hostedGame.getGame();
+
+        if (null === game) {
+            throw new Error('Cannot send move request to api, no game');
+        }
+
         const measure = new TimeMeasureMetric('ai_time_to_respond', {
-            engine: 'mohex',
+            engine,
             level: 20,
             boardsize: game.getSize(),
+            gameId: hostedGame.getId(),
         });
 
         try {
-            const move = await this.fetchMove(game);
-            game.move(move, playerIndex);
+            const move = await this.fetchMove(engine, game, config);
             measure.finished();
+            return move;
         } catch (e) {
-            game.resign(playerIndex);
-
-            logger.error('AI resigned because remote api did not provided a valid move.');
+            logger.error('AI resigned because remote api did not provided a valid move.', { message: e.message });
 
             if (e instanceof IllegalMove) {
-                logger.error(e.message);
+                logger.error('Illegal move', { msg: e.message });
             }
 
             measure.finished(false);
+            return null;
         }
     }
-}
-
-const { HEX_AI_API_ENDPOINT } = process.env;
-
-if (HEX_AI_API_ENDPOINT) {
-    Container.set(RemoteApiPlayer, new RemoteApiPlayer(HEX_AI_API_ENDPOINT));
 }

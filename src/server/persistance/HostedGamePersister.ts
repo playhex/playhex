@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { HostedGameData, HostedGameState, PlayerData } from '../../shared/app/Types';
+import { HostedGameData, HostedGameState } from '../../shared/app/Types';
+import Player from '../../shared/app/models/Player';
 import { PlayerIndex } from '../../shared/game-engine';
 import { MoveData, Outcome } from '../../shared/game-engine/Types';
 import { defaultGameOptions } from '../../shared/app/GameOptions';
@@ -15,7 +16,9 @@ import ChatMessage from '@shared/app/models/ChatMessage';
 export type HostedGameDBFull = Prisma.HostedGameGetPayload<{
     include: {
         game: true;
-        host: true;
+        host: {
+            select: typeof playerSelect;
+        };
         options: true;
         chatMessages: {
             include: {
@@ -209,6 +212,7 @@ export default class HostedGamePersister
                     ...options,
                     opponent: {
                         type: options.opponentType as 'player' | 'ai' ?? defaultGameOptions.opponent.type,
+                        publicId: options.opponentPublicId ?? undefined,
                     },
                     firstPlayer: options.firstPlayer as PlayerIndex,
                     timeControl: {
@@ -257,13 +261,20 @@ export default class HostedGamePersister
         }
     }
 
-    private playerConnectOrCreate(playerData: PlayerData): Prisma.PlayerCreateOrConnectWithoutGamesAsHostInput
+    private playerConnectOrCreate(player: Player): Prisma.PlayerCreateOrConnectWithoutGamesAsHostInput
     {
         return {
             where: {
-                publicId: playerData.publicId,
+                publicId: player.publicId,
             },
-            create: playerData,
+            create: {
+                publicId: player.publicId,
+                pseudo: player.pseudo,
+                slug: player.slug,
+                isGuest: player.isGuest,
+                isBot: player.isBot,
+                createdAt: player.createdAt,
+            },
         };
     }
 
@@ -320,10 +331,10 @@ export default class HostedGamePersister
                     },
                 },
                 players: {
-                    create: data.players.map((playerData, order) => ({
+                    create: data.players.map((player, order) => ({
                         order,
                         player: {
-                            connectOrCreate: this.playerConnectOrCreate(playerData),
+                            connectOrCreate: this.playerConnectOrCreate(player),
                         },
                     })),
                 },
@@ -333,6 +344,7 @@ export default class HostedGamePersister
                         swapRule: gameOptions.swapRule,
                         firstPlayer: gameOptions.firstPlayer,
                         opponentType: gameOptions.opponent.type,
+                        opponentPublicId: gameOptions.opponent.publicId,
                         timeControlType: gameOptions.timeControl.type,
                         timeControlOptions: gameOptions.timeControl.options as object,
                     },
@@ -390,7 +402,7 @@ export default class HostedGamePersister
                     },
                 },
                 players: {
-                    upsert: data.players.map((playerData, order) => ({
+                    upsert: data.players.map((player, order) => ({
                         where: {
                             hostedGameId_order: {
                                 hostedGameId,
@@ -400,13 +412,13 @@ export default class HostedGamePersister
                         create: {
                             order,
                             player: {
-                                connectOrCreate: this.playerConnectOrCreate(playerData),
+                                connectOrCreate: this.playerConnectOrCreate(player),
                             },
                         },
                         update: {
                             order,
                             player: {
-                                connectOrCreate: this.playerConnectOrCreate(playerData),
+                                connectOrCreate: this.playerConnectOrCreate(player),
                             },
                         },
                     })),
@@ -421,6 +433,7 @@ export default class HostedGamePersister
                             swapRule: gameOptions.swapRule,
                             firstPlayer: gameOptions.firstPlayer,
                             opponentType: gameOptions.opponent.type,
+                            opponentPublicId: gameOptions.opponent.publicId,
                             timeControlType: gameOptions.timeControl.type,
                             timeControlOptions: gameOptions.timeControl.options as object,
                         },

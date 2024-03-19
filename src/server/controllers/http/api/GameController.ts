@@ -2,12 +2,12 @@ import HostedGameRepository from '../../../repositories/HostedGameRepository';
 import { AuthenticatedPlayer } from '../middlewares';
 import HttpError from '../HttpError';
 import { Body, Get, JsonController, Param, Post, QueryParam } from 'routing-controllers';
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../../shared/app/models/Player';
 import Move from '../../../../shared/app/models/Move';
 import { Service } from 'typedi';
 import { normalize } from '../../../../shared/app/serializer';
 import { GameOptionsData, sanitizeGameOptions } from '../../../../shared/app/GameOptions';
-import { createAIPlayer } from '../../../services/AIManager';
+import { FindAIError, findAIOpponent } from '../../../services/AIManager';
 
 @JsonController()
 @Service()
@@ -49,14 +49,26 @@ export default class GameController
 
     @Post('/api/games')
     async create(
-        @AuthenticatedPlayer() host: PlayerData,
+        @AuthenticatedPlayer() host: Player,
         @Body() gameOptions: GameOptionsData,
     ) {
         gameOptions = sanitizeGameOptions(gameOptions);
-        let opponent: null | PlayerData = null;
+        let opponent: null | Player = null;
 
-        if ('ai' === gameOptions.opponent.type) {
-            opponent = createAIPlayer(gameOptions);
+        try {
+            if ('ai' === gameOptions.opponent.type) {
+                opponent = await findAIOpponent(gameOptions);
+
+                if (null === opponent) {
+                    throw new HttpError(400, 'No matching AI found');
+                }
+            }
+        } catch (e) {
+            if (e instanceof FindAIError) {
+                throw new HttpError(400, e.message);
+            }
+
+            throw e;
         }
 
         const hostedGame = await this.hostedGameRepository.createGame(host, gameOptions, opponent);
@@ -67,9 +79,9 @@ export default class GameController
     @Post('/api/games/:publicId/join')
     async join(
         @Param('publicId') publicId: string,
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
     ) {
-        const result = await this.hostedGameRepository.playerJoinGame(playerData, publicId);
+        const result = await this.hostedGameRepository.playerJoinGame(player, publicId);
 
         if (true !== result) {
             throw new HttpError(400, result);
@@ -78,11 +90,11 @@ export default class GameController
 
     @Post('/api/games/:publicId/move')
     async move(
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
         @Body() move: Move,
     ) {
-        const result = await this.hostedGameRepository.playerMove(playerData, publicId, move);
+        const result = await this.hostedGameRepository.playerMove(player, publicId, move);
 
         if (true !== result) {
             throw new HttpError(400, result);
@@ -92,9 +104,9 @@ export default class GameController
     @Post('/api/games/:publicId/resign')
     async resign(
         @Param('publicId') publicId: string,
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
     ) {
-        const result = await this.hostedGameRepository.playerResign(playerData, publicId);
+        const result = await this.hostedGameRepository.playerResign(player, publicId);
 
         if (true !== result) {
             throw new HttpError(400, result);
@@ -104,9 +116,9 @@ export default class GameController
     @Post('/api/games/:publicId/cancel')
     async cancel(
         @Param('publicId') publicId: string,
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
     ) {
-        const result = await this.hostedGameRepository.playerCancel(playerData, publicId);
+        const result = await this.hostedGameRepository.playerCancel(player, publicId);
 
         if (true !== result) {
             throw new HttpError(400, result);

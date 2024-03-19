@@ -3,18 +3,6 @@ import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../game-engine';
 
 const { min, max, floor } = Math;
 
-export type GameOptionsOpponentPlayerData = {
-    type: 'player';
-};
-
-export type GameOptionsOpponentAIData = {
-    type: 'ai';
-};
-
-export type GameOptionsOpponentLocalAIData = {
-    type: 'local_ai';
-};
-
 export type GameOptionsData = {
     /**
      * Defaults to Board.
@@ -36,15 +24,18 @@ export type GameOptionsData = {
     swapRule: boolean;
 
     /**
-     * Which opponent I want. Can be:
-     *  - type: player, with elo restriction, or a friend...
-     *  - type: ai, with a engine, level...
-     *  - type: local_ai, play offline vs AI
+     * Which opponent I want.
+     * Let empty to create a game open to everyone can join.
      */
-    opponent: GameOptionsOpponentPlayerData
-        | GameOptionsOpponentAIData
-        | GameOptionsOpponentLocalAIData
-    ;
+    opponent: {
+        type: 'player' | 'ai';
+
+        /**
+         * If set, only this player can join.
+         * If it is a bot player, it will automatically join.
+         */
+        publicId?: string;
+    };
 
     timeControl: TimeControlType;
 };

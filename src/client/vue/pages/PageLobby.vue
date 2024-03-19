@@ -3,9 +3,11 @@
 import useLobbyStore from '@client/stores/lobbyStore';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
-import GameOptionsOverlay, { GameOptionsOverlayInput } from '@client/vue/components/overlay/GameOptionsOverlay.vue';
+import Create1v1Overlay, { Create1v1OverlayInput } from '@client/vue/components/overlay/Create1v1Overlay.vue';
+import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
+import Create1vOfflineAIOverlay, { Create1vOfflineAIOverlayInput } from '@client/vue/components/overlay/Create1vOfflineAIOverlay.vue';
 import { GameOptionsData } from '@shared/app/GameOptions';
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../shared/app/models/Player';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
 import HostedGameClient from '../../HostedGameClient';
@@ -31,13 +33,16 @@ const goToGame = (gameId: string) => {
     });
 };
 
-const gameOptionsOverlay = createOverlay<GameOptionsOverlayInput, GameOptionsData>(GameOptionsOverlay);
+/*
+ * 1 vs 1
+ */
+const create1v1Overlay = createOverlay<Create1v1OverlayInput, GameOptionsData>(Create1v1Overlay);
 
-const createAndJoinGame = async (opponentType: 'ai' | 'player') => {
+const create1v1AndJoinGame = async () => {
     try {
-        const gameOptions = await gameOptionsOverlay({
+        const gameOptions = await create1v1Overlay({
             gameOptions: {
-                opponent: { type: opponentType },
+                opponent: { type: 'player' },
             },
         });
 
@@ -48,13 +53,34 @@ const createAndJoinGame = async (opponentType: 'ai' | 'player') => {
     }
 };
 
-const createAndJoinGameVsLocalAI = async () => {
+/*
+ * 1 vs AI
+ */
+const create1vAIOverlay = createOverlay<Create1vAIOverlayInput, GameOptionsData>(Create1vAIOverlay);
+
+const create1vAIAndJoinGame = async () => {
     try {
-        const gameOptions = await gameOptionsOverlay({
+        const gameOptions = await create1vAIOverlay({
             gameOptions: {
-                opponent: { type: 'local_ai' },
+                opponent: { type: 'ai' },
             },
         });
+
+        const hostedGameClient = await lobbyStore.createGame(gameOptions);
+        goToGame(hostedGameClient.getId());
+    } catch (e) {
+        // noop, player just closed popin
+    }
+};
+
+/*
+ * Local play
+ */
+const create1vOfflineAIOverlay = createOverlay<Create1vOfflineAIOverlayInput, GameOptionsData>(Create1vOfflineAIOverlay);
+
+const createAndJoinGameVsLocalAI = async () => {
+    try {
+        const gameOptions = await create1vOfflineAIOverlay();
 
         router.push({
             name: 'play-vs-ai',
@@ -67,6 +93,9 @@ const createAndJoinGameVsLocalAI = async () => {
     }
 };
 
+/*
+ * Utils functions
+ */
 const isWaiting = (hostedGameClient: HostedGameClient) =>
     'created' === hostedGameClient.getHostedGameData().state
 ;
@@ -118,10 +147,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
                 <div class="play-buttons row">
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('player')"><b-icon-people class="fs-3" /><br>1v1</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1AndJoinGame()"><b-icon-people class="fs-3" /><br>1v1</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => createAndJoinGame('ai')"><b-icon-robot class="fs-3" /><br>Play vs AI</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><b-icon-robot class="fs-3" /><br>Play vs AI</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
                         <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><b-icon-robot class="fs-3" /><br>Play vs offline AI</button>
@@ -158,7 +187,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >Watch</router-link>
                                 </td>
-                                <td><app-pseudo-with-online-status :playerData="hostedGameClient.getHostedGameData().host" /></td>
+                                <td><app-pseudo-with-online-status :player="hostedGameClient.getHostedGameData().host" /></td>
                                 <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
                                 <td><app-time-control-label-vue :game-options="hostedGameClient.getGameOptions()" /></td>
                                 <td><app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></td>
@@ -190,9 +219,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 >Watch</router-link>
                             </td>
                             <td>
-                                <app-pseudo-with-online-status :player-data="(hostedGameClient.getPlayer(0) as PlayerData)" />
+                                <app-pseudo-with-online-status :player="(hostedGameClient.getPlayer(0) as Player)" />
                                 <span class="mx-3"> vs </span>
-                                <app-pseudo-with-online-status :player-data="(hostedGameClient.getPlayer(1) as PlayerData)" />
+                                <app-pseudo-with-online-status :player="(hostedGameClient.getPlayer(1) as Player)" />
                             </td>
                             <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
@@ -217,9 +246,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 </td>
                                 <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                     <template v-if="null !== gameData && null !== gameData.winner">
-                                        <app-pseudo-with-online-status :player-data="(hostedGameClient.getWinnerPlayer() as PlayerData)" is="strong" />
+                                        <app-pseudo-with-online-status :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" />
                                         <span class="mx-3"> won against </span>
-                                        <app-pseudo-with-online-status :player-data="(hostedGameClient.getLoserPlayer() as PlayerData)" classes="text-body-secondary" />
+                                        <app-pseudo-with-online-status :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" />
                                     </template>
                                 </td>
                             </tr>

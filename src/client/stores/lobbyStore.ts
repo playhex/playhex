@@ -2,7 +2,8 @@ import { Move, PlayerIndex } from '@shared/game-engine';
 import { MoveData, Outcome } from '@shared/game-engine/Types';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
-import { HostedGameData, PlayerData } from '@shared/app/Types';
+import { HostedGameData } from '@shared/app/Types';
+import Player from '../../shared/app/models/Player';
 import { apiPostGame, getEndedGames, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { GameTimeData } from '@shared/time-control/TimeControl';
@@ -108,9 +109,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         });
 
-        socket.on('gameJoined', (gameId: string, playerData: PlayerData) => {
+        socket.on('gameJoined', (gameId: string, player: Player) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].onServerPlayerJoined(playerData);
+                hostedGameClients.value[gameId].onServerPlayerJoined(player);
             }
         });
 

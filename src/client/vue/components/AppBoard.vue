@@ -7,7 +7,7 @@ import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
 import AppChrono from './AppChrono.vue';
 import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
-import { PlayerData } from '../../../shared/app/Types';
+import Player from '../../../shared/app/models/Player';
 import TimeControlType from '../../../shared/time-control/TimeControlType';
 import { GameTimeData } from '../../../shared/time-control/TimeControl';
 
@@ -15,7 +15,7 @@ const pixiApp = ref<HTMLElement>();
 
 const props = defineProps({
     players: {
-        type: Array as PropType<(null | PlayerData)[]>,
+        type: Array as PropType<(null | Player)[]>,
         required: true,
     },
     timeControlOptions: {
@@ -103,7 +103,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                 <p class="h5" v-if="players">
                     <app-pseudo-with-online-status
                         v-if="players[0]"
-                        :playerData="players[0]"
+                        :player="players[0]"
                         classes="text-danger"
                     />
                     <span v-else class="fst-italic">waiting…</span>
@@ -118,7 +118,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                 <p class="h5" v-if="players">
                     <app-pseudo-with-online-status
                         v-if="players[1]"
-                        :playerData="players[1]"
+                        :player="players[1]"
                         classes="text-primary"
                     />
                     <span v-else class="fst-italic">waiting…</span>

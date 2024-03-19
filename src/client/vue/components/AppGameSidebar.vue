@@ -5,7 +5,7 @@ import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconBoxArrowUpRight 
 import useAuthStore from '../../stores/authStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
-import { PlayerData } from '@shared/app/Types';
+import Player from '../../../shared/app/models/Player';
 import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
@@ -34,8 +34,8 @@ if (null === loggedInPlayer) {
 }
 
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-const playerColor = (playerData: PlayerData): string => {
-    const index = hostedGameClient.value.getPlayerIndex(playerData);
+const playerColor = (player: Player): string => {
+    const index = hostedGameClient.value.getPlayerIndex(player);
 
     if (0 === index) {
         return 'text-danger';
@@ -99,7 +99,7 @@ const shouldDisplayHexworldLink = (): boolean => {
                     </p>
                     <p>
                         Game created by
-                        <app-pseudo-with-online-status :player-data="hostedGameClient.getHostedGameData().host" />,
+                        <app-pseudo-with-online-status :player="hostedGameClient.getHostedGameData().host" />,
                         {{ formatDistanceToNow(hostedGameClient.getHostedGameData().createdAt) }} ago.
                     </p>
                 </template>
@@ -112,7 +112,7 @@ const shouldDisplayHexworldLink = (): boolean => {
                     </p>
                     <p>
                         Game was created by
-                        <app-pseudo-with-online-status :player-data="hostedGameClient.getHostedGameData().host" />,
+                        <app-pseudo-with-online-status :player="hostedGameClient.getHostedGameData().host" />,
                         {{ formatDistanceToNow(hostedGameClient.getHostedGameData().createdAt) }} ago.
                     </p>
                 </template>
@@ -134,7 +134,7 @@ const shouldDisplayHexworldLink = (): boolean => {
                         <small>Ended on {{ format(hostedGameClient.getGame().getEndedAt() as Date, 'd MMMM yyyy') }}</small>
                     </p>
                     <p class="lead text-center">
-                        <app-pseudo :player-data="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
+                        <app-pseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
                         won the game
                         <template v-if="hostedGameClient.getHostedGameData().gameData?.outcome">
                             by {{ hostedGameClient.getHostedGameData().gameData?.outcome ?? 'path' }}
@@ -167,7 +167,7 @@ const shouldDisplayHexworldLink = (): boolean => {
                     >
                         <span class="time text-muted">{{ formatHour(message.createdAt) }}</span>
                         <span>&nbsp;</span>
-                        <span class="player" v-if="message.author"><app-pseudo :player-data="message.author" :classes="playerColor(message.author)" /></span>
+                        <span class="player" v-if="message.author"><app-pseudo :player="message.author" :classes="playerColor(message.author)" /></span>
                         <span class="player fst-italic" v-else>System</span>
                         <span>&nbsp;</span>
                         <span class="content">{{ message.content }}</span>

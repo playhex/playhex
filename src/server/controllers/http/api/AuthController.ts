@@ -4,8 +4,7 @@ import { SessionData } from 'express-session';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import { authenticate } from '../../../services/security/authentication';
 import { normalize } from '../../../../shared/app/serializer';
-import { PlayerData } from '@shared/app/Types';
-import { transformPlayer } from '../../../serialization/Player';
+import Player, { transformPlayer } from '../../../../shared/app/models/Player';
 import { AuthenticatedPlayer } from '../middlewares';
 import { Request } from 'express';
 import { IsString } from 'class-validator';
@@ -29,16 +28,16 @@ export default class AuthController
 
     @Post('/api/auth/me-or-guest')
     async meOrGuest(
-        @CurrentUser() playerData: PlayerData,
+        @CurrentUser() player: Player,
         @Session() session: SessionData,
     ) {
-        if (null === playerData) {
-            playerData = await this.playerRepository.createGuest();
+        if (null === player) {
+            player = await this.playerRepository.createGuest();
         }
 
-        session.playerId = playerData.publicId;
+        session.playerId = player.publicId;
 
-        return normalize(transformPlayer(playerData));
+        return normalize(transformPlayer(player));
     }
 
     @Post('/api/auth/guest')
@@ -66,12 +65,12 @@ export default class AuthController
 
     @Post('/api/auth/signup-from-guest')
     async signupFromGuest(
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
         @Body() body: PseudoPasswordInput,
     ) {
-        const player = await this.playerRepository.upgradeGuest(playerData.publicId, body.pseudo, body.password);
+        const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo, body.password);
 
-        return normalize(transformPlayer(player));
+        return normalize(transformPlayer(upgradedPlayer));
     }
 
     @Post('/api/auth/login')
@@ -88,9 +87,9 @@ export default class AuthController
 
     @Get('/api/auth/me')
     async me(
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
     ) {
-        return normalize(transformPlayer(playerData));
+        return normalize(transformPlayer(player));
     }
 
     @Delete('/api/auth/logout')

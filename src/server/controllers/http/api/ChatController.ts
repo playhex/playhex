@@ -1,7 +1,7 @@
 import { Body, JsonController, Param, Post } from 'routing-controllers';
 import { Service } from 'typedi';
 import { AuthenticatedPlayer } from '../middlewares';
-import { PlayerData } from '../../../../shared/app/Types';
+import Player from '../../../../shared/app/models/Player';
 import ChatMessage from '../../../../shared/app/models/ChatMessage';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
 import HttpError from '../HttpError';
@@ -16,11 +16,11 @@ export default class ChatController
 
     @Post('/api/games/:gameId/chat-messages')
     async post(
-        @AuthenticatedPlayer() playerData: PlayerData,
+        @AuthenticatedPlayer() player: Player,
         @Param('gameId') gameId: string,
         @Body({ validate: { groups: ['playerInput'] } }) chatMessage: ChatMessage,
     ) {
-        chatMessage.author = playerData;
+        chatMessage.author = player;
         chatMessage.gameId = gameId;
         chatMessage.createdAt = new Date();
 
