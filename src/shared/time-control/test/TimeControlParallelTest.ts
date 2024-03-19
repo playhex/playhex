@@ -354,6 +354,26 @@ parallel('AbsoluteTimeControl', () => {
     });
 
 
+    it('[FischerTimeControl] elapse current player when setting values with both negative chrono', async function (done) {
+        this.timeout(1000);
+
+        const timeControl = new FischerTimeControl({ initialSeconds: 0.3, incrementSeconds: 0.1 });
+
+        timeControl.setValues({
+            state: 'running',
+            currentPlayer: 1,
+            players: [
+                { totalRemainingTime: new Date('2000-01-01') },
+                { totalRemainingTime: -0.5 },
+            ],
+        });
+
+        assert.strictEqual(timeControl.getStrictElapsedPlayer(), 1);
+
+        done();
+    });
+
+
     /**
      * SimpleTimeControl
      */

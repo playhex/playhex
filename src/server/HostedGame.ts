@@ -459,7 +459,17 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
         hostedGame.createdAt = data.createdAt;
 
-        hostedGame.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
+        try {
+            hostedGame.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
+        } catch (e) {
+            logger.error('Could not recreate time control instance from persisted data', {
+                reason: e.message,
+                hostedGameDataId: data.id,
+                data,
+            });
+
+            throw e;
+        }
 
         if (null !== hostedGame.game) {
             hostedGame.bindTimeControl();
