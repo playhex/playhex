@@ -12,6 +12,7 @@ import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
 import { format, formatDistanceToNow } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 
 const props = defineProps({
     hostedGameClient: {
@@ -78,11 +79,19 @@ onMounted(() => scrollChatToBottom());
  * Also prevent display to guest, to prevent grabbing link in a new incognito window.
  */
 const shouldDisplayHexworldLink = (): boolean => {
+    if ('ended' === hostedGameClient.value.getState()) {
+        return true;
+    }
+
+    if ('correspondance' === timeControlToCadencyName(hostedGameClient.value.getGameOptions())) {
+        return true;
+    }
+
     if (hostedGameClient.value.getState() === 'playing') {
         return !hostedGameClient.value.hasPlayer(loggedInPlayer) && !loggedInPlayer.isGuest;
     }
 
-    return hostedGameClient.value.getState() === 'ended';
+    return false;
 };
 </script>
 
