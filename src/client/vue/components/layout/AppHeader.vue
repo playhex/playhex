@@ -101,6 +101,6 @@ nav
 
     a
         font-size 0.8em
-        margin-top 0.13em
+        margin 0.18em -0.02em
         text-decoration none
 </style>
