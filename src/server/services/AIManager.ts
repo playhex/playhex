@@ -41,12 +41,19 @@ export const findAIOpponent = async (gameOptions: GameOptionsData): Promise<null
         throw new FindAIError(`AI player with slug "${player.slug}" (publicId: ${player.publicId}) is missing its config in table AIConfig.`);
     }
 
+    // AI is not on remote AI API, like random bot, moves are computed on this server
+    if (!player.aiConfig.isRemote) {
+        return player;
+    }
+
     const aiConfigStatus = await Container.get(HexAiApiClient).getPeersStatus();
 
-    if (player.aiConfig.isRemote && 0 === aiConfigStatus.totalPeers) {
+    // No peer at all
+    if (0 === aiConfigStatus.totalPeers) {
         throw new FindAIError('Cannot use this remote AI player, AI api currently has no worker');
     }
 
+    // AI requires more computation power, check there is powerful-enough peers, which should be the case of any primary peer.
     if (player.aiConfig.requireMorePower && 0 === aiConfigStatus.totalPeersPrimary) {
         throw new FindAIError('Cannot use this remote AI player, AI api currently has no powerful enough worker');
     }

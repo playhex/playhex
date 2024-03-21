@@ -302,11 +302,18 @@ export default class HostedGamePersister
         return prismaChatMessages;
     }
 
+    private markChatMessagesAsPersisted(chatMessages: ChatMessage[]): void
+    {
+        for (let i = 0; i < chatMessages.length; ++i) {
+            chatMessages[i].persisted = true;
+        }
+    }
+
     private async doCreate(data: HostedGameData)
     {
         const { gameData, gameOptions } = data;
 
-        return prisma.hostedGame.create({
+        const result = await prisma.hostedGame.create({
             select: {
                 id: true,
             },
@@ -357,13 +364,17 @@ export default class HostedGamePersister
                 },
             },
         });
+
+        this.markChatMessagesAsPersisted(data.chatMessages);
+
+        return result;
     }
 
     private async doUpdate(data: HostedGameData, hostedGameId: number)
     {
         const { gameData, gameOptions } = data;
 
-        return prisma.hostedGame.update({
+        const result = prisma.hostedGame.update({
             select: {
                 id: true,
             },
@@ -447,5 +458,9 @@ export default class HostedGamePersister
                 },
             },
         });
+
+        this.markChatMessagesAsPersisted(data.chatMessages);
+
+        return result;
     }
 }

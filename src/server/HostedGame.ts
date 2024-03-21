@@ -19,6 +19,7 @@ type HostedGameEvents = {
     played: () => void;
     ended: () => void;
     canceled: () => void;
+    chat: () => void;
 };
 
 /**
@@ -408,6 +409,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     {
         this.chatMessages.push(chatMessage);
         this.io.to(this.gameRooms()).emit('chat', { ...chatMessage });
+        this.emit('chat');
     }
 
     toData(): HostedGameData

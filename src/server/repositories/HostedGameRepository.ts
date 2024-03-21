@@ -103,27 +103,16 @@ export default class HostedGameRepository
     {
         // Persist on ended
         const onEnded = () => {
+            resetTimeout();
             this.hostedGamePersister.persist(hostedGame.toData());
             delete this.activeGames[hostedGame.getId()];
         };
 
-        if ('ended' === hostedGame.getState()) {
+        if ('ended' === hostedGame.getState() || 'canceled' === hostedGame.getState()) {
             onEnded();
         } else {
             hostedGame.on('ended', onEnded);
-        }
-
-        // Delete on canceled
-        const onCanceled = () => {
-            this.hostedGamePersister.deleteIfExists(hostedGame.toData());
-            // Not delete now to let player see the canceled game for few time again.
-            // Game will disappear totally on next server restart anyway.
-        };
-
-        if ('canceled' === hostedGame.getState()) {
-            onCanceled();
-        } else {
-            hostedGame.on('canceled', onCanceled);
+            hostedGame.on('canceled', onEnded);
         }
 
         // Persist on no activity
@@ -134,16 +123,17 @@ export default class HostedGameRepository
             }
         };
 
-        hostedGame.on('played', (): void => {
+        // Keep alive again when activity done on this game
+        const onActivity = (): void => {
             resetTimeout();
             this.persistWhenNoActivity[hostedGame.getId()] = setTimeout(
                 () => this.hostedGamePersister.persist(hostedGame.toData()),
                 300 * 1000, // Persist after 5min inactivity
             );
-        });
+        };
 
-        hostedGame.on('ended', () => resetTimeout());
-        hostedGame.on('canceled', () => resetTimeout());
+        hostedGame.on('played', onActivity);
+        hostedGame.on('chat', onActivity);
     }
 
     getActiveGames(): { [key: string]: HostedGame }
