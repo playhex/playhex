@@ -109,7 +109,7 @@ model AIConfig {
   engine           String
   order            Int     @default(0)
   label            String  @db.VarChar(32)
-  description      String? @db.VarChar(32)
+  description      String? @db.VarChar(64)
   boardsizeMin     Int?    @db.TinyInt()
   boardsizeMax     Int?    @db.TinyInt()
   requireMorePower Boolean @default(false) // Available only when there is powerful peers
