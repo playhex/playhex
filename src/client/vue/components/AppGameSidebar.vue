@@ -234,6 +234,10 @@ const shouldDisplayHexworldLink = (): boolean => {
             .player
                 margin-right 0.5em
 
+            .content
+                overflow-wrap break-word
+                hyphens auto
+
         .chat-input
             flex 0 1 auto
             margin-top auto
@@ -249,6 +253,7 @@ const shouldDisplayHexworldLink = (): boolean => {
 .block-close
     position relative
     height 3em
+    min-height 3em
 
     button
         position absolute
