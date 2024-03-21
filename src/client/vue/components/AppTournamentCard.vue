@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { onUnmounted, ref } from 'vue';
 import { secondsToTime } from '@shared/app/timeControlUtils';
-import { BIconTrophy } from 'bootstrap-icons-vue';
+import { BIconTrophy, BIconCircleFill } from 'bootstrap-icons-vue';
 
 const props = defineProps({
     name: {
@@ -51,6 +51,16 @@ if (shouldDisplay() && !started()) {
 
     onUnmounted(() => clearInterval(thread));
 }
+
+/**
+ * If tournament starts in 15min
+ */
+const isReallySoon = (): boolean => {
+    const now = new Date().getTime();
+    const start = startDate.getTime();
+
+    return now > (start - 15 * 60 * 1000);
+};
 </script>
 
 <template>
@@ -59,9 +69,12 @@ if (shouldDisplay() && !started()) {
         <div class="card-body">
             <h6 class="card-subtitle mb-2 text-body-secondary">Tournament</h6>
             <h4 class="card-title">{{ name }}</h4>
-            <p v-if="!started()" class="text-body-secondary">Starts in {{ tournamentStartsStr }}</p>
-            <p v-else class="m-0">Now!</p>
+
+            <p v-if="!started()" :class="isReallySoon() ? 'text-warning lead' : 'text-body-secondary'">Starts in {{ tournamentStartsStr }}</p>
+            <p v-else class="m-0"><b-icon-circle-fill class="text-danger" /> <span class="lead">Now!</span></p>
+
             <a v-if="!started()" :href="registerLink" target="_blank" class="btn btn-warning">Register on Challonge</a>
+            <a v-else :href="registerLink" target="_blank" class="btn btn-link">See progression on Challonge</a>
         </div>
     </div>
 </template>
