@@ -15,9 +15,19 @@ const {
 <template>
     <div>
         <app-tournament-card
-            name="Hex Monthly 15"
-            :start-date="new Date('2024-03-16T17:00:00Z')"
-            register-link="https://challonge.com/hex_monthly_15"
+            name="Hex Monthly 16"
+            :start-date="new Date('2024-04-20T17:00:00Z')"
+            register-link="https://challonge.com/hex_monthly_16"
+        />
+        <app-tournament-card
+            name="Hex Monthly 17"
+            :start-date="new Date('2024-05-18T17:00:00Z')"
+            register-link="https://challonge.com/hex_monthly_17"
+        />
+        <app-tournament-card
+            name="Hex Monthly 18"
+            :start-date="new Date('2024-06-15T17:00:00Z')"
+            register-link="https://challonge.com/hex_monthly_18"
         />
 
         <h3>Online ({{ null === totalPlayers ? '…' : totalPlayers}})</h3>
