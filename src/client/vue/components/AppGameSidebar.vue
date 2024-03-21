@@ -140,7 +140,7 @@ const shouldDisplayHexworldLink = (): boolean => {
                         <br>
                         <small>Time control: <app-time-control-label :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Ended on {{ format(hostedGameClient.getGame().getEndedAt() as Date, 'd MMMM yyyy') }}</small>
+                        <small>Ended on {{ format(hostedGameClient.getHostedGameData().gameData?.endedAt as Date, 'd MMMM yyyy') }}</small>
                     </p>
                     <p class="lead text-center">
                         <app-pseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />

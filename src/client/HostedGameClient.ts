@@ -98,6 +98,10 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             this.game.declareWinner(gameData.winner, gameData.outcome);
         }
 
+        if (this.game.isEnded() && null !== gameData.endedAt) {
+            this.game.setEndedAt(gameData.endedAt);
+        }
+
         return this.game;
     }
 

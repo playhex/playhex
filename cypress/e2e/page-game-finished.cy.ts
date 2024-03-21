@@ -17,6 +17,16 @@ describe('Page Game finished', () => {
         // Assert review links. Download SGF and HexWorld link.
         cy.contains('button', 'SGF');
         cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#11r9c1,g3h6i3i8b8g6d5i5e7k5c9f6e8e6e3d7a6c6h2a7i10b7b6d6c2j4d4e10b11k4');
+
+        cy.contains('Ok, close').click();
+
+        // Game sidebar
+        cy.get('[aria-label="Open game sidebar and chat"]').click();
+
+        cy.contains('.sidebar', 'Game ended');
+        cy.contains('.sidebar', 'Rules: host plays second');
+        cy.contains('.sidebar', 'Test player won the game');
+        cy.contains('.sidebar', 'Ended on 24 January 2024');
     });
 
     it('displays win popin when a player resigned', () => {
