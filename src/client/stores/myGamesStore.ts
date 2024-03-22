@@ -11,6 +11,7 @@ import useLobbyStore from './lobbyStore';
 import { timeValueToSeconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
 import { useRouter } from 'vue-router';
+import { sendNotification } from '../notifications';
 
 export type CurrentGame = {
     id: string;
@@ -149,19 +150,15 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         if (!document.hasFocus()) {
             const opponent = hostedGameData.players[1 - myColor]
 
-            new Notification(
-                `PlayHex`,
-                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started`
-                , icon: '/images/logo-transparent.svg'
+            sendNotification(
+                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started` },
+                () => {
+                    router.push({
+                        name: 'online-game',
+                        params: { gameId: id }
+                    });
                 }
-            ).onclick = function() {
-                router.push({
-                    name: 'online-game',
-                    params: { gameId: id }
-                });
-                focus(window);
-                this.close()
-            };
+            );
         }
 
         mostUrgentGame.value = getMostUrgentGame();
@@ -182,19 +179,15 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 .hostedGameData
                 .players[byPlayerIndex]
 
-            new Notification(
-                `PlayHex`,
-                { body: `${pseudoString(opponent, "pseudo")} made a move`
-                , icon: '/images/logo-transparent.svg'
+            sendNotification(
+                { body: `${pseudoString(opponent, "pseudo")} made a move` },
+                () => {
+                    router.push({
+                        name: 'online-game',
+                        params: { gameId }
+                    });
                 }
-            ).onclick = function() {
-                router.push({
-                    name: 'online-game',
-                    params: { gameId }
-                });
-                focus(window);
-                this.close()
-            };
+            );
         }
 
         mostUrgentGame.value = getMostUrgentGame();

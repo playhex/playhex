@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router';
 
 const { currentRoute } = useRouter();
 const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
-Notification.requestPermission();
 </script>
 
 <template>
