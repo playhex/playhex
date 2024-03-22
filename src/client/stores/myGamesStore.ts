@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import useAuthStore from './authStore';
 import useSocketStore from './socketStore';
 import { HostedGameData } from '@shared/app/Types';
+import Player from '@shared/models/Player';
 import { MoveData } from '@shared/game-engine/Types';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
@@ -28,6 +29,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
     const mostUrgentGame = ref<null | CurrentGame>(null);
+    const opponentName = (opponent: Player) => (opponent.isGuest ? "Guest " : "") + opponent.pseudo;
 
     /**
      * Number of games where I'm in, created or playing.
@@ -138,9 +140,21 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             };
         }
 
-        myGames.value[id].myColor = hostedGameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
+        const myColor = hostedGameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
+        myGames.value[id].myColor = myColor
         myGames.value[id].isMyTurn = hostedGameData.players[gameData.currentPlayerIndex].publicId === loggedInPlayer.value?.publicId;
         myGames.value[id].hostedGameData = hostedGameData;
+
+        if (!document.hasFocus()) {
+            const opponent = hostedGameData.players[1 - myColor]
+
+            new Notification(`PlayHex`, { body: `Game with ${opponentName(opponent)} has started` })
+                .onclick = function() {
+                    window.location.pathname = `/games/${id}`;
+                    focus(window);
+                    this.close()
+                };
+        }
 
         mostUrgentGame.value = getMostUrgentGame();
     });
@@ -160,9 +174,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 .hostedGameData
                 .players[byPlayerIndex]
 
-            const opponentName = (opponent.isGuest ? "Guest " : "") + opponent.pseudo;
-
-            new Notification(`PlayHex`, { body: `${opponentName} made a move` })
+            new Notification(`PlayHex`, { body: `${opponentName(opponent)} made a move` })
                 .onclick = function() {
                     window.location.pathname = `/games/${gameId}`;
                     focus(window);
