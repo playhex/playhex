@@ -12,6 +12,7 @@ import { timeValueToSeconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
 import { useRouter } from 'vue-router';
 import { sendNotification } from '../notifications';
+import * as Notif from '../notifications';
 
 export type CurrentGame = {
     id: string;
@@ -153,7 +154,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             const opponent = hostedGameData.players[1 - myColor];
 
             sendNotification(
-                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started` },
+                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started`
+                , tag: Notif.tags.game
+                },
                 () => {
                     router.push({
                         name: 'online-game',
@@ -182,7 +185,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 .players[byPlayerIndex];
 
             sendNotification(
-                { body: `${pseudoString(opponent, 'pseudo')} made a move` },
+                { body: `${pseudoString(opponent, 'pseudo')} made a move`
+                , tag: Notif.tags.game
+                },
                 () => {
                     router.push({
                         name: 'online-game',

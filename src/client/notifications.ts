@@ -12,4 +12,6 @@ const sendNotification = (options, route) => {
     }
 };
 
-export { sendNotification };
+const tags = { game: 'game notifications' };
+
+export { sendNotification, tags };
