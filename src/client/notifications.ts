@@ -10,6 +10,6 @@ const sendNotification = (options, route) => {
             this.close();
         };
     }
-}
+};
 
-export { sendNotification }
+export { sendNotification };

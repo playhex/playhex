@@ -145,12 +145,12 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         }
 
         const myColor = hostedGameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
-        myGames.value[id].myColor = myColor
+        myGames.value[id].myColor = myColor;
         myGames.value[id].isMyTurn = hostedGameData.players[gameData.currentPlayerIndex].publicId === loggedInPlayer.value?.publicId;
         myGames.value[id].hostedGameData = hostedGameData;
 
         if (!document.hasFocus()) {
-            const opponent = hostedGameData.players[1 - myColor]
+            const opponent = hostedGameData.players[1 - myColor];
 
             sendNotification(
                 { body: `Game with ${pseudoString(opponent, 'pseudo')} has started` },
@@ -179,10 +179,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 myGames
                 .value[gameId]
                 .hostedGameData
-                .players[byPlayerIndex]
+                .players[byPlayerIndex];
 
             sendNotification(
-                { body: `${pseudoString(opponent, "pseudo")} made a move` },
+                { body: `${pseudoString(opponent, 'pseudo')} made a move` },
                 () => {
                     router.push({
                         name: 'online-game',
