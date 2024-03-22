@@ -119,6 +119,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         };
 
         mostUrgentGame.value = getMostUrgentGame();
+
+        if (Notification.permission === 'default') Notification.requestPermission();
     });
 
     socket.on('gameStarted', (hostedGameData: HostedGameData) => {
