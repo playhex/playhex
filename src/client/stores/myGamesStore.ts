@@ -151,7 +151,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
             new Notification(
                 `PlayHex`,
-                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started` }
+                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started`
+                , icon: '/images/logo-transparent.svg'
+                }
             ).onclick = function() {
                 router.push({
                     name: 'online-game',
@@ -182,7 +184,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
             new Notification(
                 `PlayHex`,
-                { body: `${pseudoString(opponent, "pseudo")} made a move` }
+                { body: `${pseudoString(opponent, "pseudo")} made a move`
+                , icon: '/images/logo-transparent.svg'
+                }
             ).onclick = function() {
                 router.push({
                     name: 'online-game',
