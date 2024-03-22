@@ -3,10 +3,10 @@ import { computed, ref, watch } from 'vue';
 import useAuthStore from './authStore';
 import useSocketStore from './socketStore';
 import { HostedGameData } from '@shared/app/Types';
-import Player from '@shared/models/Player';
 import { MoveData } from '@shared/game-engine/Types';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
+import { pseudoString } from '@shared/app/pseudoUtils';
 import useLobbyStore from './lobbyStore';
 import { timeValueToSeconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
@@ -29,7 +29,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
     const mostUrgentGame = ref<null | CurrentGame>(null);
-    const opponentName = (opponent: Player) => (opponent.isGuest ? "Guest " : "") + opponent.pseudo;
 
     /**
      * Number of games where I'm in, created or playing.
@@ -148,12 +147,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         if (!document.hasFocus()) {
             const opponent = hostedGameData.players[1 - myColor]
 
-            new Notification(`PlayHex`, { body: `Game with ${opponentName(opponent)} has started` })
-                .onclick = function() {
-                    window.location.pathname = `/games/${id}`;
-                    focus(window);
-                    this.close()
-                };
+            new Notification(
+                `PlayHex`,
+                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started` }
+            ).onclick = function() {
+                window.location.pathname = `/games/${id}`;
+                focus(window);
+                this.close()
+            };
         }
 
         mostUrgentGame.value = getMostUrgentGame();
@@ -174,12 +175,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 .hostedGameData
                 .players[byPlayerIndex]
 
-            new Notification(`PlayHex`, { body: `${opponentName(opponent)} made a move` })
-                .onclick = function() {
-                    window.location.pathname = `/games/${gameId}`;
-                    focus(window);
-                    this.close()
-                };
+            new Notification(
+                `PlayHex`,
+                { body: `${pseudoString(opponent, "pseudo")} made a move` }
+            ).onclick = function() {
+                window.location.pathname = `/games/${gameId}`;
+                focus(window);
+                this.close()
+            };
         }
 
         mostUrgentGame.value = getMostUrgentGame();
