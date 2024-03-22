@@ -10,6 +10,7 @@ import { pseudoString } from '@shared/app/pseudoUtils';
 import useLobbyStore from './lobbyStore';
 import { timeValueToSeconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
+import { useRouter } from 'vue-router';
 
 export type CurrentGame = {
     id: string;
@@ -29,6 +30,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
     const mostUrgentGame = ref<null | CurrentGame>(null);
+    const router = useRouter();
 
     /**
      * Number of games where I'm in, created or playing.
@@ -151,7 +153,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 `PlayHex`,
                 { body: `Game with ${pseudoString(opponent, 'pseudo')} has started` }
             ).onclick = function() {
-                window.location.pathname = `/games/${id}`;
+                router.push({
+                    name: 'online-game',
+                    params: { gameId: id }
+                });
                 focus(window);
                 this.close()
             };
@@ -179,7 +184,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 `PlayHex`,
                 { body: `${pseudoString(opponent, "pseudo")} made a move` }
             ).onclick = function() {
-                window.location.pathname = `/games/${gameId}`;
+                router.push({
+                    name: 'online-game',
+                    params: { gameId }
+                });
                 focus(window);
                 this.close()
             };
