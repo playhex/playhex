@@ -150,7 +150,25 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        myGames.value[gameId].isMyTurn = myGames.value[gameId].myColor !== byPlayerIndex;
+        const isMyTurn = myGames.value[gameId].myColor !== byPlayerIndex;
+        myGames.value[gameId].isMyTurn = isMyTurn;
+
+        if (isMyTurn && !document.hasFocus()) {
+            const opponent =
+                myGames
+                .value[gameId]
+                .hostedGameData
+                .players[byPlayerIndex]
+
+            const opponentName = (opponent.isGuest ? "Guest " : "") + opponent.pseudo;
+
+            new Notification(`PlayHex`, { body: `${opponentName} made a move` })
+                .onclick = function() {
+                    window.location.pathname = `/games/${gameId}`;
+                    focus(window);
+                    this.close()
+                };
+        }
 
         mostUrgentGame.value = getMostUrgentGame();
     });
