@@ -32,4 +32,29 @@ describe('hexworld', () => {
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6i9c4');
     });
+
+    it('generates review link from a resigned game', () => {
+        const game = new Game(9);
+
+        game.move(Move.fromString('b3'), 0);
+        game.move(Move.fromString('b3'), 1);
+        game.move(Move.fromString('c6'), 0);
+        game.resign(1);
+
+        const link = gameToHexworldLink(game);
+
+        assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6:rw');
+    });
+
+    it('generates review link from a timed out game', () => {
+        const game = new Game(11);
+
+        game.move(Move.fromString('b3'), 0);
+        game.move(Move.fromString('c11'), 1);
+        game.loseByTime();
+
+        const link = gameToHexworldLink(game);
+
+        assert.strictEqual(link, 'https://hexworld.org/board/#11r9c1,b3c11:fb');
+    });
 });
