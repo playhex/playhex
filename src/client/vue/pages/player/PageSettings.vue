@@ -53,13 +53,13 @@ const portraitOrientations = [
 
         <div class="btn-group" role="group" aria-label="Dark or light theme switcher">
             <input type="radio" class="btn-check" v-model="selectedTheme" value="light" id="btn-theme-light" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-light"><b-icon-brightness-high-fill /> Light</label>
+            <label class="btn btn-outline-primary" for="btn-theme-light"><BIconBrightnessHighFill /> Light</label>
 
             <input type="radio" class="btn-check" v-model="selectedTheme" value="dark" id="btn-theme-dark" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-dark"><b-icon-moon-stars-fill /> Dark</label>
+            <label class="btn btn-outline-primary" for="btn-theme-dark"><BIconMoonStarsFill /> Dark</label>
 
             <input type="radio" class="btn-check" v-model="selectedTheme" value="auto" id="btn-theme-auto" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-auto"><b-icon-circle-half /> Auto</label>
+            <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> Auto</label>
         </div>
 
         <h3>Confirm move before submit</h3>
@@ -71,7 +71,7 @@ const portraitOrientations = [
 
         <template v-if="playerSettings">
             <div class="mb-3 row">
-                <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><b-icon-lightning-charge-fill /> Blitz</label>
+                <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><BIconLightningChargeFill /> Blitz</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
                         <option :value="false">Send immediately</option>
@@ -80,7 +80,7 @@ const portraitOrientations = [
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><b-icon-alarm-fill /> Normal</label>
+                <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><BIconAlarmFill /> Normal</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
                         <option :value="false">Send immediately</option>
@@ -89,7 +89,7 @@ const portraitOrientations = [
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><b-icon-calendar /> Correspondance</label>
+                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> Correspondance</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveCorrespondance" class="form-select" id="confirm-move-correspondace">
                         <option :value="false">Send immediately</option>
@@ -103,7 +103,7 @@ const portraitOrientations = [
 
         <template v-if="playerSettings">
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label"><b-icon-pc-display-horizontal /> Landscape</label>
+                <label class="col-sm-4 col-md-3 col-form-label"><BIconPcDisplayHorizontal /> Landscape</label>
                 <div class="col-sm-8 col-md-9">
                     <div class="btn-group" role="group">
                         <template v-for="orientation in landscapeOrientations" :key="i">
@@ -119,7 +119,7 @@ const portraitOrientations = [
             </div>
 
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label"><b-icon-phone /> Portrait</label>
+                <label class="col-sm-4 col-md-3 col-form-label"><BIconPhone /> Portrait</label>
                 <div class="col-sm-8 col-md-9">
                     <div class="btn-group" role="group">
                         <template v-for="orientation in portraitOrientations" :key="i">
@@ -140,7 +140,7 @@ const portraitOrientations = [
         <template v-if="playerSettings">
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
-                <label class="form-check-label" for="show-coords-checkbox"><b-icon-alphabet /> Show coords by default</label>
+                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> Show coords by default</label>
             </div>
         </template>
     </div>

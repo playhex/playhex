@@ -20,9 +20,9 @@ const candency = timeControlToCadencyName(gameOptions.value);
 
 <template>
     <span>
-        <b-icon-lightning-charge-fill v-if="candency === 'blitz'" class="d-none d-sm-inline" />
-        <b-icon-alarm-fill v-else-if="candency === 'normal'" class="d-none d-sm-inline" />
-        <b-icon-calendar v-else-if="candency === 'correspondance'" class="d-none d-sm-inline" />
+        <BIconLightningChargeFill v-if="candency === 'blitz'" class="d-none d-sm-inline" />
+        <BIconAlarmFill v-else-if="candency === 'normal'" class="d-none d-sm-inline" />
+        <BIconCalendar v-else-if="candency === 'correspondance'" class="d-none d-sm-inline" />
 
         {{ timeControlToString(gameOptions.timeControl) }}
 

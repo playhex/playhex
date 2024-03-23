@@ -96,8 +96,8 @@ const capSelectedBoardsize = () => {
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
-                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger"><b-icon-exclamation-triangle /> <small>No worker can compute moves right now. Only random bots are available.</small></p>
-                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning"><b-icon-exclamation-triangle /> <small>No fast worker is online right now. Only limited AI are available.</small></p>
+                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger"><BIconExclamationTriangle /> <small>No worker can compute moves right now. Only random bots are available.</small></p>
+                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning"><BIconExclamationTriangle /> <small>No fast worker is online right now. Only limited AI are available.</small></p>
                         </template>
 
                         <ul class="nav nav-pills nav-justified ai-engine-choice">
@@ -126,7 +126,7 @@ const capSelectedBoardsize = () => {
                         </div>
 
                         <div class="mb-3">
-                            <app-boardsize
+                            <AppBoardsize
                                 :game-options="gameOptions"
                                 :boardsize-min="selectedAiConfig?.boardsizeMin ?? undefined"
                                 :boardsize-max="selectedAiConfig?.boardsizeMax ?? undefined"
@@ -134,7 +134,7 @@ const capSelectedBoardsize = () => {
                         </div>
 
                         <div class="mb-3">
-                            <app-time-control :game-options="gameOptions" ref="timeControlComponent" />
+                            <AppTimeControl :game-options="gameOptions" ref="timeControlComponent" />
                         </div>
 
                         <button
@@ -142,21 +142,21 @@ const capSelectedBoardsize = () => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><b-icon-caret-down-fill /> Less options</button>
+                        ><BIconCaretDownFill /> Less options</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><b-icon-caret-right /> More options</button>
+                        ><BIconCaretRight /> More options</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <app-play-first-or-second :game-options="gameOptions" />
+                            <AppPlayFirstOrSecond :game-options="gameOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <app-swap-rule :game-options="gameOptions" />
+                            <AppSwapRule :game-options="gameOptions" />
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -9,7 +9,7 @@ module.exports = {
         parser: '@typescript-eslint/parser',
         extraFileExtensions: ['.vue'],
     },
-    plugins: ['@typescript-eslint'],
+    plugins: ['@typescript-eslint', 'eslint-plugin-vue'],
     root: true,
     rules: {
         'no-empty': 'off',
@@ -37,5 +37,6 @@ module.exports = {
             'multilineDetection': 'last-member',
         }],
         'no-console': 'warn',
+        'vue/component-name-in-template-casing': ['warn', 'PascalCase']
     },
 };

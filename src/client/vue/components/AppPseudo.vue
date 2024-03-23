@@ -22,7 +22,7 @@ const { player, is, classes } = toRefs(props);
 </script>
 
 <template>
-    <router-link
+    <RouterLink
         v-if="player.slug"
         :to="{ name: 'player', params: { slug: player.slug } }"
         class="text-body text-decoration-none"
@@ -31,7 +31,7 @@ const { player, is, classes } = toRefs(props);
             <span v-if="player.isGuest" class="fst-italic">Guest&nbsp;</span>
             <span>{{ player.pseudo }}</span>
         </component>
-    </router-link>
+    </RouterLink>
 
     <component v-else :is="is" :class="classes">
         <span v-if="player.isGuest" class="fst-italic">Guest&nbsp;</span>

@@ -74,7 +74,7 @@ const outcomeToString = (): string => {
                     </div>
                     <div class="modal-body text-center lead">
                         <p v-if="null !== winner">
-                            <app-pseudo
+                            <AppPseudo
                                 :player="winner"
                                 is="strong"
                                 :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
@@ -89,7 +89,7 @@ const outcomeToString = (): string => {
                             type="button"
                             class="btn btn-primary"
                             @click="confirm(); rematch();"
-                        ><b-icon-repeat /> Rematch</button>
+                        ><BIconRepeat /> Rematch</button>
 
                         <button
                             type="button"
@@ -104,14 +104,14 @@ const outcomeToString = (): string => {
                             type="button"
                             class="btn btn-sm btn-outline-primary"
                             @click="downloadSGF();"
-                        ><b-icon-download /> SGF</button>
+                        ><BIconDownload /> SGF</button>
 
                         <a
                             type="button"
                             class="btn btn-sm btn-outline-primary"
                             target="_blank"
                             :href="gameToHexworldLink(game)"
-                        ><b-icon-box-arrow-up-right/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
+                        ><BIconBoxArrowUpRight/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
                     </div>
                 </form>
             </div>

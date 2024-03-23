@@ -101,14 +101,14 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
                 <p class="h5" v-if="players">
-                    <app-pseudo-with-online-status
+                    <AppPseudoWithOnlineStatus
                         v-if="players[0]"
                         :player="players[0]"
                         classes="text-danger"
                     />
                     <span v-else class="fst-italic">waiting…</span>
                 </p>
-                <app-chrono
+                <AppChrono
                     v-if="timeControlOptions && timeControlValues"
                     :timeControlOptions="timeControlOptions"
                     :playerTimeData="timeControlValues.players[0]"
@@ -116,14 +116,14 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
             </div>
             <div class="player player-b">
                 <p class="h5" v-if="players">
-                    <app-pseudo-with-online-status
+                    <AppPseudoWithOnlineStatus
                         v-if="players[1]"
                         :player="players[1]"
                         classes="text-primary"
                     />
                     <span v-else class="fst-italic">waiting…</span>
                 </p>
-                <app-chrono
+                <AppChrono
                     v-if="timeControlOptions && timeControlValues"
                     :timeControlOptions="timeControlOptions"
                     :playerTimeData="timeControlValues.players[1]"

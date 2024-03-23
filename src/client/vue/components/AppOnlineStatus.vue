@@ -15,13 +15,13 @@ const { player } = toRefs(props);
 </script>
 
 <template>
-    <b-icon-circle-fill
+    <BIconCircleFill
         v-if="!player.isBot"
         class="online-status-icon"
         aria-hidden="true"
         :class="useOnlinePlayersStore().isPlayerOnline(player.publicId) ? 'text-success' : 'text-secondary'"
     />
-    <b-icon-robot
+    <BIconRobot
         v-else
         class="me-1 text-success"
         aria-hidden="true"

@@ -39,7 +39,7 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <app-boardsize :game-options="gameOptions" />
+                            <AppBoardsize :game-options="gameOptions" />
                         </div>
 
                         <button
@@ -47,21 +47,21 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><b-icon-caret-down-fill /> Less options</button>
+                        ><BIconCaretDownFill /> Less options</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><b-icon-caret-right /> More options</button>
+                        ><BIconCaretRight /> More options</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <app-play-first-or-second :game-options="gameOptions" />
+                            <AppPlayFirstOrSecond :game-options="gameOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <app-swap-rule :game-options="gameOptions" />
+                            <AppSwapRule :game-options="gameOptions" />
                         </div>
                     </div>
                     <div class="modal-footer">

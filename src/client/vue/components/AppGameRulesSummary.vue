@@ -17,12 +17,12 @@ let isDefaultRules = swapRule && null === firstPlayer;
 
 <template>
     <span class="game-rules" v-if="isDefaultRules">
-        <b-icon-check class="text-success" />
+        <BIconCheck class="text-success" />
         <span>normal</span>
     </span>
 
     <span class="game-rules" v-else>
-        <b-icon-exclamation-triangle-fill class="text-warning" />
+        <BIconExclamationTriangleFill class="text-warning" />
         <span v-if="!swapRule"> no swap</span>
         <span v-if="0 === firstPlayer"> host plays first</span>
         <span v-if="1 === firstPlayer"> host plays second</span>

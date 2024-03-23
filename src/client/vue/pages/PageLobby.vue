@@ -147,13 +147,13 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
                 <div class="play-buttons row">
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1AndJoinGame()"><b-icon-people class="fs-3" /><br>1v1</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1AndJoinGame()"><BIconPeople class="fs-3" /><br>1v1</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><b-icon-robot class="fs-3" /><br>Play vs AI</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><BIconRobot class="fs-3" /><br>Play vs AI</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><b-icon-robot class="fs-3" /><br>Play vs offline AI</button>
+                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><BIconRobot class="fs-3" /><br>Play vs offline AI</button>
                     </div>
                 </div>
 
@@ -187,17 +187,17 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >Watch</router-link>
                                 </td>
-                                <td><app-pseudo-with-online-status :player="hostedGameClient.getHostedGameData().host" /></td>
+                                <td><AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" /></td>
                                 <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
-                                <td><app-time-control-label-vue :game-options="hostedGameClient.getGameOptions()" /></td>
-                                <td><app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></td>
+                                <td><AppTimeControlLabelVue :game-options="hostedGameClient.getGameOptions()" /></td>
+                                <td><AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <p v-else>No game for now. Create a new one !</p>
 
-                <h4><b-icon-eye /> Watch current game</h4>
+                <h4><BIconEye /> Watch current game</h4>
 
                 <table v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table">
                     <thead>
@@ -219,9 +219,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 >Watch</router-link>
                             </td>
                             <td>
-                                <app-pseudo-with-online-status :player="(hostedGameClient.getPlayer(0) as Player)" />
+                                <AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" />
                                 <span class="mx-3"> vs </span>
-                                <app-pseudo-with-online-status :player="(hostedGameClient.getPlayer(1) as Player)" />
+                                <AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" />
                             </td>
                             <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
                         </tr>
@@ -230,7 +230,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                 <p v-else>No game currently playing.</p>
 
                 <template v-if="Object.values(lobbyStore.hostedGameClients).some(isLastPlayed)">
-                    <h4><b-icon-trophy /> Ended games</h4>
+                    <h4><BIconTrophy /> Ended games</h4>
 
                     <table class="table table-sm table-borderless">
                         <tbody>
@@ -246,9 +246,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 </td>
                                 <td v-for="gameData in [hostedGameClient.getHostedGameData().gameData]" :key="hostedGameClient.getHostedGameData().id">
                                     <template v-if="null !== gameData && null !== gameData.winner">
-                                        <app-pseudo-with-online-status :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" />
+                                        <AppPseudoWithOnlineStatus :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" />
                                         <span class="mx-3"> won against </span>
-                                        <app-pseudo-with-online-status :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" />
+                                        <AppPseudoWithOnlineStatus :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" />
                                     </template>
                                 </td>
                             </tr>
@@ -265,7 +265,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                 </template>
             </div>
             <div class="col-sm-3">
-                <app-sidebar></app-sidebar>
+                <AppSidebar></AppSidebar>
             </div>
         </div>
     </div>

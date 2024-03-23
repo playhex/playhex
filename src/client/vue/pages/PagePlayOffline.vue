@@ -113,13 +113,13 @@ const rematch = () => {
 
 <template>
     <div class="offline-board-container" ref="offlineBoardContainer">
-        <app-board
+        <AppBoard
             :key="reload"
             v-if="gameView"
             :game-view="gameView"
             :players="players"
             :rematch="rematch"
-        ></app-board>
+        ></AppBoard>
     </div>
 </template>
 

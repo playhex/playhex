@@ -327,14 +327,14 @@ const unreadMessages = (): number => {
     <div v-show="null !== hostedGameClient" class="game-and-sidebar-container" :class="sidebarOpen ? 'sidebar-open' : ''">
         <div class="game">
             <div class="board-container" ref="boardContainer">
-                <app-board
+                <AppBoard
                     v-if="null !== hostedGameClient && null !== gameView"
                     :players="hostedGameClient.getPlayers()"
                     :time-control-options="hostedGameClient.getTimeControlOptions()"
                     :time-control-values="hostedGameClient.getTimeControlValues()"
                     :game-view="gameView"
                     :rematch="rematch"
-                ></app-board>
+                ></AppBoard>
 
                 <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="join-button-container">
                     <div class="d-flex justify-content-center">
@@ -345,12 +345,12 @@ const unreadMessages = (): number => {
 
             <nav class="menu-game navbar" v-if="null !== hostedGameClient">
                 <div class="buttons container-fluid">
-                    <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><b-icon-flag /><span class="btn-label"> Resign</span></button>
-                    <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><b-icon-x-lg /><span class="btn-label"> Cancel</span></button>
-                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><b-icon-check /> Confirm<span class="btn-label"> move</span></button>
+                    <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><BIconFlag /><span class="btn-label"> Resign</span></button>
+                    <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><BIconXLg /><span class="btn-label"> Cancel</span></button>
+                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><BIconCheck /> Confirm<span class="btn-label"> move</span></button>
                     <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
-                        <b-icon-chat-right-text v-if="hostedGameClient.getChatMessages().length > 0" />
-                        <b-icon-chat-right v-else />
+                        <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
+                        <BIconChatRight v-else />
                         <span class="btn-label"> Chat</span>
                         <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             {{ unreadMessages() }}
@@ -358,13 +358,13 @@ const unreadMessages = (): number => {
                         </span>
                     </button>
 
-                    <button v-if="!sidebarOpen" type="button" class="btn btn-outline-primary toggle-sidebar-btn" @click="sidebarOpen = true" aria-label="Open game sidebar and chat"><b-icon-arrow-bar-left /></button>
+                    <button v-if="!sidebarOpen" type="button" class="btn btn-outline-primary toggle-sidebar-btn" @click="sidebarOpen = true" aria-label="Open game sidebar and chat"><BIconArrowBarLeft /></button>
                 </div>
             </nav>
         </div>
 
         <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
-            <app-game-sidebar
+            <AppGameSidebar
                 :hosted-game-client="hostedGameClient"
                 @close="sidebarOpen = false"
                 @toggle-coords="toggleCoords()"
