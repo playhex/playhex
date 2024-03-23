@@ -36,7 +36,7 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
 </script>
 
 <template>
-    <h6><b-icon-aspect-ratio /> Board size</h6>
+    <h6><BIconAspectRatio /> Board size</h6>
 
     <div class="btn-group" role="group">
         <template v-for="size in [9, 11, 13, 14, 19]" :key="size">

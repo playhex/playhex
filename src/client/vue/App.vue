@@ -10,7 +10,7 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
 <template>
     <div class="app-layout">
         <header>
-            <app-header></app-header>
+            <AppHeader></AppHeader>
         </header>
 
         <main>
@@ -18,7 +18,7 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
         </main>
 
         <footer v-if="displayFooter()">
-            <app-footer></app-footer>
+            <AppFooter></AppFooter>
         </footer>
     </div>
 </template>

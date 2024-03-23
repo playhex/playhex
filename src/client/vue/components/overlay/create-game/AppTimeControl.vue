@@ -157,7 +157,7 @@ defineExpose({ compileOptions });
 </script>
 
 <template>
-    <h6><b-icon-hourglass /> Time control</h6>
+    <h6><BIconHourglass /> Time control</h6>
 
     <div class="btn-group" role="group">
         <template v-for="(timeControl, label) in defaultTimeControls" :key="label">

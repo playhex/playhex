@@ -14,17 +14,17 @@ const {
 
 <template>
     <div>
-        <app-tournament-card
+        <AppTournamentCard
             name="Hex Monthly 16"
             :start-date="new Date('2024-04-20T17:00:00Z')"
             register-link="https://challonge.com/hex_monthly_16"
         />
-        <app-tournament-card
+        <AppTournamentCard
             name="Hex Monthly 17"
             :start-date="new Date('2024-05-18T17:00:00Z')"
             register-link="https://challonge.com/hex_monthly_17"
         />
-        <app-tournament-card
+        <AppTournamentCard
             name="Hex Monthly 18"
             :start-date="new Date('2024-06-15T17:00:00Z')"
             register-link="https://challonge.com/hex_monthly_18"
@@ -37,11 +37,11 @@ const {
             :key="player.publicId"
             class="mb-1"
         >
-            <b-icon-circle-fill
+            <BIconCircleFill
                 class="online-status-icon text-success"
                 aria-hidden="true"
             />
-            <app-pseudo :player="player" />
+            <AppPseudo :player="player" />
         </p>
     </div>
 </template>

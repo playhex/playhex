@@ -102,48 +102,48 @@ const shouldDisplayHexworldLink = (): boolean => {
                 <template v-if="'created' === hostedGameClient.getState()">
                     <h3>Waiting for an opponent…</h3>
                     <p>
-                        <small>Rules: <app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <app-time-control-label :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
                     </p>
                     <p>
                         Game created by
-                        <app-pseudo-with-online-status :player="hostedGameClient.getHostedGameData().host" />,
+                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" />,
                         {{ formatDistanceToNow(hostedGameClient.getHostedGameData().createdAt) }} ago.
                     </p>
                 </template>
                 <template v-if="'canceled' === hostedGameClient.getState()">
                     <h3>Game has been canceled</h3>
                     <p>
-                        <small>Rules: <app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <app-time-control-label :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
                     </p>
                     <p>
                         Game was created by
-                        <app-pseudo-with-online-status :player="hostedGameClient.getHostedGameData().host" />,
+                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" />,
                         {{ formatDistanceToNow(hostedGameClient.getHostedGameData().createdAt) }} ago.
                     </p>
                 </template>
                 <template v-if="'playing' === hostedGameClient.getState()">
                     <h3>Playing</h3>
                     <p>
-                        <small>Rules: <app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <app-time-control-label :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
                     </p>
                 </template>
                 <template v-if="'ended' === hostedGameClient.getState()">
                     <h3>Game ended</h3>
                     <p>
-                        <small>Rules: <app-game-rules-summary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <app-time-control-label :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>Ended on {{ format(hostedGameClient.getHostedGameData().gameData?.endedAt as Date, 'd MMMM yyyy') }}</small>
                     </p>
                     <p class="lead text-center">
-                        <app-pseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
+                        <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
                         won the game
                         <template v-if="hostedGameClient.getHostedGameData().gameData?.outcome">
                             by {{ hostedGameClient.getHostedGameData().gameData?.outcome ?? 'path' }}
@@ -155,14 +155,14 @@ const shouldDisplayHexworldLink = (): boolean => {
 
         <div class="block-controls">
             <div class="container-fluid">
-                <button type="button" class="btn btn-sm btn-outline-primary" @click="e => { e.preventDefault(); emits('toggleCoords') }"><b-icon-alphabet /> Toggle coords</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" @click="e => { e.preventDefault(); emits('toggleCoords') }"><BIconAlphabet /> Toggle coords</button>
                 <a
                     v-if="shouldDisplayHexworldLink()"
                     type="button"
                     class="btn btn-sm btn-outline-primary ms-2"
                     target="_blank"
                     :href="gameToHexworldLink(hostedGameClient.getGame())"
-                ><b-icon-box-arrow-up-right/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
+                ><BIconBoxArrowUpRight/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
             </div>
         </div>
 
@@ -176,7 +176,7 @@ const shouldDisplayHexworldLink = (): boolean => {
                     >
                         <span class="time text-muted">{{ formatHour(message.createdAt) }}</span>
                         <span>&nbsp;</span>
-                        <span class="player" v-if="message.author"><app-pseudo :player="message.author" :classes="playerColor(message.author)" /></span>
+                        <span class="player" v-if="message.author"><AppPseudo :player="message.author" :classes="playerColor(message.author)" /></span>
                         <span class="player fst-italic" v-else>System</span>
                         <span>&nbsp;</span>
                         <span class="content">{{ message.content }}</span>
@@ -188,14 +188,14 @@ const shouldDisplayHexworldLink = (): boolean => {
                 <div class="container-fluid">
                     <div class="input-group mb-3">
                         <input v-model="chatInput" class="form-control" aria-describedby="message-submit" placeholder="Message…" />
-                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><b-icon-send-fill /> Send</button>
+                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><BIconSendFill /> Send</button>
                     </div>
                 </div>
             </form>
         </div>
 
         <div class="block-close bg-dark-subtle">
-            <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">Close <b-icon-arrow-bar-right /></button>
+            <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">Close <BIconArrowBarRight /></button>
         </div>
     </div>
 </template>

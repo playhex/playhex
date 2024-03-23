@@ -14,22 +14,22 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
             <a href="https://feedback.alcalyn.app" target="_blank">
-                <b-icon-chat-dots class="text-body" />
+                <BIconChatDots class="text-body" />
                 <br>
                 Feedback
             </a>
             <a href="https://discord.gg/59SJ9KwvVq" target="_blank">
-                <b-icon-discord class="text-body" />
+                <BIconDiscord class="text-body" />
                 <br>
                 Discord
             </a>
             <a href="https://github.com/alcalyn/hex" target="_blank">
-                <b-icon-github class="text-body" />
+                <BIconGithub class="text-body" />
                 <br>
                 Github
             </a>
             <router-link :to="{ name: 'links' }">
-                <b-icon-bookmarks class="text-body" />
+                <BIconBookmarks class="text-body" />
                 <br>
                 Hex links
             </router-link>

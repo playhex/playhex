@@ -66,7 +66,7 @@ const color = (): string => null === mostUrgentGame.value
 
             <p class="nav-player-item">
                 <template v-if="loggedInPlayer">
-                    <b-icon-person-fill /> <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }"><app-pseudo :player="loggedInPlayer" /></router-link>
+                    <BIconPersonFill /> <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }"><AppPseudo :player="loggedInPlayer" /></router-link>
                 </template>
                 <template v-else>logging in…</template>
             </p>

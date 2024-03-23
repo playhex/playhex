@@ -65,13 +65,13 @@ const isReallySoon = (): boolean => {
 
 <template>
     <div v-if="shouldDisplay()" class="card card-bg-icon border-warning mb-4">
-        <b-icon-trophy style="top: 1rem; right: 0.5rem; font-size: 8rem" class="text-warning" />
+        <BIconTrophy style="top: 1rem; right: 0.5rem; font-size: 8rem" class="text-warning" />
         <div class="card-body">
             <h6 class="card-subtitle mb-2 text-body-secondary">Tournament</h6>
             <h4 class="card-title">{{ name }}</h4>
 
             <p v-if="!started()" :class="isReallySoon() ? 'text-warning lead' : 'text-body-secondary'">Starts in {{ tournamentStartsStr }}</p>
-            <p v-else class="m-0"><b-icon-circle-fill class="text-danger" /> <span class="lead">Now!</span></p>
+            <p v-else class="m-0"><BIconCircleFill class="text-danger" /> <span class="lead">Now!</span></p>
 
             <a v-if="!started()" :href="registerLink" target="_blank" class="btn btn-warning">Register on Challonge</a>
             <a v-else :href="registerLink" target="_blank" class="btn btn-link">See progression on Challonge</a>

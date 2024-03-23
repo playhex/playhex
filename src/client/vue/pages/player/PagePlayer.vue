@@ -185,11 +185,11 @@ const clickLogout = async () => {
     <div v-if="!playerNotFound" class="container my-3">
         <div class="d-flex">
             <div class="avatar-wrapper">
-                <b-icon-person class="icon img-thumbnail" />
-                <app-online-status v-if="player" :player="player" class="player-status" />
+                <BIconPerson class="icon img-thumbnail" />
+                <AppOnlineStatus v-if="player" :player="player" class="player-status" />
             </div>
             <div>
-                <h2><app-pseudo v-if="player" :player="player" /><template v-else>…</template></h2>
+                <h2><AppPseudo v-if="player" :player="player" /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest">Account created on {{ player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
@@ -201,7 +201,7 @@ const clickLogout = async () => {
                         <router-link
                             :to="{ name: 'signup' }"
                             class="btn btn-success"
-                        ><b-icon-person-up /> Create account</router-link>
+                        ><BIconPersonUp /> Create account</router-link>
 
                         <router-link
                             :to="{ name: 'login' }"
@@ -214,13 +214,13 @@ const clickLogout = async () => {
                             type="button"
                             class="btn btn-sm btn-outline-warning"
                             @click="clickLogout()"
-                        >Logout <b-icon-box-arrow-right /></button>
+                        >Logout <BIconBoxArrowRight /></button>
                     </template>
 
                     <router-link
                         :to="{ name: 'settings' }"
                         class="btn btn-sm btn-outline-primary"
-                    ><b-icon-gear /> Settings</router-link>
+                    ><BIconGear /> Settings</router-link>
                 </div>
             </div>
         </div>
@@ -241,7 +241,7 @@ const clickLogout = async () => {
                     </td>
                     <td>
                         <span class="me-2">Game vs </span>
-                        <app-pseudo-with-online-status-vue
+                        <AppPseudoWithOnlineStatusVue
                             :player="(game.getOtherPlayer(player) as Player)"
                         />
                     </td>
@@ -267,7 +267,7 @@ const clickLogout = async () => {
                     <td>
                         <span class="me-2 text-success" v-if="hasWon(game)">won against </span>
                         <span class="me-2 text-danger" v-else>lost against </span>
-                        <app-pseudo-with-online-status-vue
+                        <AppPseudoWithOnlineStatusVue
                             :player="getOpponent(game)"
                         />
                     </td>
