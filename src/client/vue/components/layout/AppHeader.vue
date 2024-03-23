@@ -88,19 +88,17 @@ nav
 .my-turn-notif
     position relative
     font-size 1.7em
-    margin-top -1.5em
     width 2em
+    display flex
+    justify-content center
+    align-items center
 
     svg, a
         position absolute
         text-align center
         width 100%
 
-    svg
-        margin-top 0.22em
-
     a
         font-size 0.8em
-        margin 0.18em -0.02em
         text-decoration none
 </style>
