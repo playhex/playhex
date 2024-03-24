@@ -3,8 +3,11 @@ import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDi
 import useDarkLightThemeStore from '../../../stores/darkLightThemeStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
-import { watch } from 'vue';
+import useAuthStore from '../../../stores/authStore';
+import { ApiClientError } from '../../../apiClient';
+import { watch, Ref, ref } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
+import { InputValidation, toInputClass } from '../../../vue/formUtils';
 
 useSeoMeta({
     robots: 'noindex',
@@ -12,6 +15,9 @@ useSeoMeta({
 });
 
 const playerSettingsStore = usePlayerSettingsStore();
+const authStore = useAuthStore();
+
+const hasAccount = !(authStore.loggedInPlayer?.isGuest ?? true);
 
 const { selectedTheme } = storeToRefs(useDarkLightThemeStore());
 const { playerSettings } = storeToRefs(playerSettingsStore);
@@ -43,6 +49,50 @@ const portraitOrientations = [
     { value: 9, label: 'Flat 2' },
     { value: 2, label: 'Diamond' },
 ];
+
+const oldPassword = ref('');
+const newPassword = ref('');
+const newPasswordConfirmed = ref('');
+const oldPasswordValidation: Ref<InputValidation> = ref(null);
+const confirmPasswordValidation: Ref<InputValidation> = ref(null);
+const changePasswordError: Ref<null | string> = ref(null);
+const changePasswordSuccess: Ref<null | string> = ref(null);
+
+const submitPasswordChange = async () => {
+    oldPasswordValidation.value = null;
+    confirmPasswordValidation.value = null;
+    changePasswordError.value = null;
+    changePasswordSuccess.value = null;
+
+    if (newPasswordConfirmed.value !== newPassword.value) {
+        confirmPasswordValidation.value = {
+            ok: false,
+            reason: 'Passwords do not match',
+        };
+        return;
+    }
+
+    try {
+        await authStore.changePassword(oldPassword.value, newPassword.value);
+        changePasswordSuccess.value = 'The password has been changed.';
+        oldPassword.value = '';
+        newPassword.value = '';
+        newPasswordConfirmed.value = '';
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
+        }
+
+        switch (e.type) {
+            case 'invalid_password':
+                oldPasswordValidation.value = { ok: false, reason: e.reason };
+                break;
+
+            default:
+                changePasswordError.value = e.reason;
+        }
+    }
+};
 </script>
 
 <template>
@@ -143,6 +193,37 @@ const portraitOrientations = [
                 <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> Show coords by default</label>
             </div>
         </template>
+
+        <form v-if="hasAccount" @submit.prevent="submitPasswordChange">
+            <h3>Change password</h3>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-old">Old password</label>
+                <div class="col-sm-8 col-md-4">
+                    <input v-model="oldPassword" required type="password" class="form-control" :class="toInputClass(oldPasswordValidation)" id="change-password-old">
+                    <div class="invalid-feedback">
+                        {{ oldPasswordValidation?.reason }}
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new">New password</label>
+                <div class="col-sm-8 col-md-4">
+                    <input v-model="newPassword" required type="password" class="form-control" id="change-password-new">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new-confirm">Confirm new password</label>
+                <div class="col-sm-8 col-md-4">
+                    <input v-model="newPasswordConfirmed" required type="password" class="form-control" :class="toInputClass(confirmPasswordValidation)" id="change-password-new-confirm">
+                    <div class="invalid-feedback">
+                        {{ confirmPasswordValidation?.reason }}
+                    </div>
+                </div>
+            </div>
+            <p v-if="changePasswordError" class="text-danger">{{ changePasswordError }}</p>
+            <p v-if="changePasswordSuccess" class="text-success">{{ changePasswordSuccess }}</p>
+            <button type="submit" class="btn btn-outline-primary">Update password</button>
+        </form>
     </div>
 </template>
 

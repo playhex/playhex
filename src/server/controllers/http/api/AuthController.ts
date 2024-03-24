@@ -18,6 +18,15 @@ class PseudoPasswordInput
     password: string;
 }
 
+class ChangePasswordInput
+{
+    @IsString()
+    oldPassword: string;
+
+    @IsString()
+    newPassword: string;
+}
+
 @JsonController()
 @Service()
 export default class AuthController
@@ -110,5 +119,14 @@ export default class AuthController
                 resolve(normalize(transformPlayer(player)));
             });
         });
+    }
+
+    @Post('/api/auth/change-password')
+    async changePassword(
+        @AuthenticatedPlayer() player: Player,
+        @Body() body: ChangePasswordInput,
+    ) {
+        const newPlayer = await this.playerRepository.changePassword(player.publicId, body.oldPassword, body.newPassword);
+        return normalize(transformPlayer(newPlayer));
     }
 }
