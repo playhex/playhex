@@ -1,5 +1,5 @@
 import Player from '../../shared/app/models/Player';
-import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest, authChangePassword } from '@client/apiClient';
+import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '@client/apiClient';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
@@ -24,16 +24,11 @@ const useAuthStore = defineStore('authStore', () => {
         return loggedInPlayer.value = await authLogout();
     };
 
-    const changePassword = async (oldPassword: string, newPassword: string): Promise<Player> => {
-        return loggedInPlayer.value = await authChangePassword(oldPassword, newPassword);
-    };
-
     return {
         loggedInPlayer,
         login,
         signup,
         logout,
-        changePassword,
     };
 });
 

@@ -262,7 +262,8 @@ describe('Authentication', () => {
         signupForm().contains('Password').click().type(password);
         signupForm().contains('button', 'Create account').click();
 
-        cy.visit('/settings');
+        cy.get('.menu-top').contains(pseudo).click();
+        cy.contains('Settings').click();
 
         cy.contains('h3', 'Change password').closest('form').as('form')
 

@@ -8,6 +8,7 @@ import { ApiClientError } from '../../../apiClient';
 import { watch, Ref, ref } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
+import { authChangePassword } from '@client/apiClient';
 
 useSeoMeta({
     robots: 'noindex',
@@ -15,10 +16,8 @@ useSeoMeta({
 });
 
 const playerSettingsStore = usePlayerSettingsStore();
-const authStore = useAuthStore();
 
-const hasAccount = !(authStore.loggedInPlayer?.isGuest ?? true);
-
+const { loggedInPlayer } = storeToRefs(useAuthStore());
 const { selectedTheme } = storeToRefs(useDarkLightThemeStore());
 const { playerSettings } = storeToRefs(playerSettingsStore);
 
@@ -73,7 +72,7 @@ const submitPasswordChange = async () => {
     }
 
     try {
-        await authStore.changePassword(oldPassword.value, newPassword.value);
+        await authChangePassword(oldPassword.value, newPassword.value);
         changePasswordSuccess.value = 'The password has been changed.';
         oldPassword.value = '';
         newPassword.value = '';
@@ -194,7 +193,7 @@ const submitPasswordChange = async () => {
             </div>
         </template>
 
-        <form v-if="hasAccount" @submit.prevent="submitPasswordChange">
+        <form v-if="loggedInPlayer && !loggedInPlayer.isGuest" @submit.prevent="submitPasswordChange">
             <h3>Change password</h3>
             <div class="mb-3 row">
                 <label class="col-sm-4 col-md-3 col-form-label" for="change-password-old">Old password</label>
