@@ -126,6 +126,24 @@ export const authLogout = async (): Promise<Player> => {
     return denormalize(await response.json());
 };
 
+export const authChangePassword = async (oldPassword: string, newPassword: string): Promise<Player> => {
+    const response = await fetch('/api/auth/change-password', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            oldPassword,
+            newPassword,
+        })
+    });
+
+    await checkResponse(response);
+
+    return denormalize(await response.json());
+};
+
 // TODO see if no need to pass type=lobby
 export const getGames = async (): Promise<HostedGameData[]> => {
     const response = await fetch(`/api/games`, {

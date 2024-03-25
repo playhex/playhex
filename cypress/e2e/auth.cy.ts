@@ -251,6 +251,68 @@ describe('Authentication', () => {
         cy.contains('This pseudo is already used by another player');
     });
 
+    it('sign up and change password', () => {
+        const pseudo = 'test-' + randomString();
+        const password = 'test';
+
+        cy.visit('/signup');
+
+        const signupForm = () => cy.contains('h2', 'Create an account').closest('form');
+        signupForm().contains('Pseudo').click().type(pseudo);
+        signupForm().contains('Password').click().type(password);
+        signupForm().contains('button', 'Create account').click();
+
+        cy.get('.menu-top').contains(pseudo).click();
+        cy.contains('Settings').click();
+
+        cy.contains('h3', 'Change password').closest('form').as('form')
+
+        // Invalid old password should fail
+        cy.get('@form').contains('Old password').click().type('invalidpwd');
+        cy.get('@form').contains('New password').click().type('foo');
+        cy.get('@form').contains('Confirm new password').click().type('foo');
+        cy.get('@form').contains('button', 'Update password').click();
+
+        cy.get('@form').contains('Invalid password for this player');
+
+        // "New password" and "Confirm new password" must match
+        cy.get('@form').contains('Old password').click().type('{selectall}{backspace}' + password);
+        cy.get('@form').contains('New password').click().type('{selectall}{backspace}foo-a');
+        cy.get('@form').contains('Confirm new password').click().type('{selectall}{backspace}foo-b');
+        cy.get('@form').contains('button', 'Update password').click();
+
+        cy.get('@form').contains('Passwords do not match');
+
+        // Finally change the password
+        cy.get('@form').contains('New password').click().type('{selectall}{backspace}foo');
+        cy.get('@form').contains('Confirm new password').click().type('{selectall}{backspace}foo');
+        cy.get('@form').contains('button', 'Update password').click();
+
+        cy.get('@form').contains('The password has been changed.');
+
+        // Log out
+        cy.get('.menu-top').contains(pseudo).click();
+        cy.contains('Logout').click();
+
+        cy.get('.menu-top').contains(/Guest \d+/).click();
+        cy.contains('Login').click();
+
+        const loginForm = () => cy.contains('h2', 'Login').closest('form');
+
+        // Cannot log in with the previous password
+        loginForm().contains('Pseudo').click().type(pseudo);
+        loginForm().contains('Password').click().type(password);
+        loginForm().contains('button', 'Login').click();
+
+        cy.contains('Invalid password for this player');
+
+        // Log in with the new password
+        loginForm().contains('Password').click().type('{selectall}{backspace}foo');
+        loginForm().contains('button', 'Login').click();
+
+        cy.get('.menu-top').contains(pseudo);
+    });
+
     it('should not return password not player id in api results', () => {
         cy.visit('/');
 

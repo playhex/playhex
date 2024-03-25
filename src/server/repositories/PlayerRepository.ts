@@ -2,7 +2,7 @@ import Player from '../../shared/app/models/Player';
 import prisma from '../services/prisma';
 import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
-import { hashPassword } from '../services/security/authentication';
+import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication';
 import logger from '../services/logger';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
@@ -113,6 +113,33 @@ export default class PlayerRepository
 
             throw e;
         }
+    }
+
+    /** @throws {InvalidPasswordError} */
+    async changePassword(publicId: string, oldPassword: string, newPassword: string): Promise<Player> {
+        const playerObject = await prisma.player.findUnique({
+            where: {
+                publicId,
+            },
+        });
+        const player = plainToInstance(Player, playerObject);
+        if (playerObject == null || player == null) {
+            logger.error(`Player with id ${publicId} doesn't exist`);
+            throw new Error('Cannot find player id');
+        }
+        if (!checkPassword(player, oldPassword)) {
+            throw new InvalidPasswordError();
+        }
+        const hashedPassword = await hashPassword(newPassword);
+        return this.playersCache[publicId] = plainToInstance(Player, await prisma.player.update({
+            select,
+            where: {
+                publicId,
+            },
+            data: {
+                password: hashedPassword
+            }
+        }));
     }
 
     /**
