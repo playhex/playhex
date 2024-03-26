@@ -111,11 +111,11 @@ const submitPasswordChange = async () => {
             <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> Auto</label>
         </div>
 
-        <h3>Confirm move before submit</h3>
+        <h3>Confirm move</h3>
 
         <p>
-            To prevent misclick, you can confirm your move
-            before actually submitting your move.
+            To prevent misclicks, you can require confirmation
+            before submitting a move.
         </p>
 
         <template v-if="playerSettings">
@@ -138,7 +138,7 @@ const submitPasswordChange = async () => {
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> Correspondance</label>
+                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> Correspondence</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveCorrespondance" class="form-select" id="confirm-move-correspondace">
                         <option :value="false">Send immediately</option>
@@ -189,7 +189,7 @@ const submitPasswordChange = async () => {
         <template v-if="playerSettings">
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
-                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> Show coords by default</label>
+                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> Show coordinates by default</label>
             </div>
         </template>
 

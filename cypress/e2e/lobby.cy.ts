@@ -72,7 +72,7 @@ describe('Lobby', () => {
 
         cy
             // Current games
-            .contains('Watch current game')
+            .contains('Watch current games')
             .next('table')
             .contains('Player A vs Player B')
             .closest('tr')
@@ -80,8 +80,8 @@ describe('Lobby', () => {
         ;
 
         cy
-            // Ended games
-            .contains('Ended games')
+            // Finished games
+            .contains('Finished games')
             .next('table')
             .contains('Player C won against Player D')
             .closest('tr')

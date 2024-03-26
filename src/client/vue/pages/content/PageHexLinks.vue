@@ -1,5 +1,5 @@
 <template>
-    <h1>Other Hex resources</h1>
+    <h1>Hex resources</h1>
 
     <p>
         Here is a list of external resources about Hex you may be interested in.
@@ -30,12 +30,12 @@
 </template>
 
 <script lang="ts" setup>
-import { BIconFileEarmarkText, BIconDiscord, BIconWikipedia } from 'bootstrap-icons-vue';
+import { BIconFileEarmarkText, BIconDiscord, BIconHexagon } from 'bootstrap-icons-vue';
 import { Component as ComponentType } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    title: 'Useful Hex links',
+    titleTemplate: title => `Useful Hex links - ${title}`,
 });
 
 type Icon = { icon: ComponentType };
@@ -60,9 +60,9 @@ const resources: Resource[] = [
         illustration: { src: '/images/links/500-puzzles.png', alt: '500 Hex puzzles by Matthew Seymour' },
         paragraph: [
             `
-                A collection of 500 puzzles made by hand by Matthew Seymour.
-                Puzzles are designed to let you learn all tactics you must know,
-                beginning with the most famous ones.
+                A collection of 500 interactive puzzles made by hand by Matthew Seymour.
+                Puzzles are designed to let you learn all essential tactics,
+                beginning with the most well-known.
             `,
         ],
     },
@@ -70,15 +70,18 @@ const resources: Resource[] = [
         link: 'http://www.mseymour.ca/hex_book/hexstrat.html',
         link_show: 'mseymour.ca/hex_book',
         title: 'Hex: A Strategy Guide',
-        subTitle: 'Guide to learn Hex basics and advanced tactics',
+        subTitle: 'Interactive book to learn Hex',
         illustration: { icon: BIconFileEarmarkText },
         paragraph: [
-            'By the same author of "500 Hex puzzles" above, a very exhaustive guide to learn Hex rules.',
             `
-                All knowns strategies and tactics are segmented in 9 chapters,
-                like "Basic concepts", "Advanced tactics", "The opening", "Commented games", …
+                By the same author of "500 Hex puzzles", a very exhaustive guide
+                to learn Hex, starting from the basics.
             `,
-            'The guide is illustrated with lot of interactive examples.',
+            `
+                All knowns strategies and tactics are segmented into 9 chapters,
+                including "Basic concepts", "Advanced tactics", "The opening", "Commented games"…
+            `,
+            'The guide is illustrated with a lot of interactive examples.',
         ],
     },
     {
@@ -95,10 +98,10 @@ const resources: Resource[] = [
         link: 'https://www.hexwiki.net',
         link_show: 'hexwiki.net',
         title: 'HexWiki',
-        subTitle: 'Still maintained wiki dedicated to Hex',
-        illustration: { icon: BIconWikipedia },
+        subTitle: 'Still-maintained wiki dedicated to Hex',
+        illustration: { icon: BIconHexagon },
         paragraph: [
-            'Detailled wiki on Hex. See main page to have a list of good pages to explore.',
+            'Detailed wiki on Hex. See the main page to have a list of good pages to explore.',
         ],
     },
 ];

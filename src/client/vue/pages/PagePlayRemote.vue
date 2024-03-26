@@ -183,15 +183,18 @@ const loadGame = async () => {
 
     const playerPseudos = hostedGameClient.value.getHostedGameData().players.map(p => p.pseudo);
     const { state, host } = hostedGameClient.value.getHostedGameData();
-    const title = `Hex game - ${playerPseudos.join(' VS ')} - ${state}`;
+    const stateForTitle = playerPseudos.length < 2 && 'created' === state
+        ? 'Waiting for an opponent'
+        : state[0].toUpperCase() + state.slice(1);
+    const title = `${stateForTitle}: ${playerPseudos.join(' VS ')}`;
     const description = 'created' === state
         ? `Hex game, hosted by ${host.pseudo}, waiting for an opponent.`
-        : `Hex ${state} game, ${playerPseudos.join(' versus ')}.`
+        : `${state} Hex game, ${playerPseudos.join(' versus ')}.`
     ;
 
     useSeoMeta({
         robots: 'noindex',
-        title,
+        titleTemplate: site => `${title} - ${site}`,
         ogTitle: title,
         description,
         ogDescription: description,
@@ -225,7 +228,7 @@ const resign = async (): Promise<void> => {
     try {
         await confirmationOverlay({
             title: 'Resign game',
-            message: 'Are you sure you want to resign game?',
+            message: 'Are you sure you want to resign the game?',
             confirmLabel: 'Yes, resign',
             confirmClass: 'btn-danger',
             cancelLabel: 'No, continue playing',
@@ -253,10 +256,10 @@ const cancel = async (): Promise<void> => {
     try {
         await confirmationOverlay({
             title: 'Cancel game',
-            message: 'Are you sure you want to cancel game?',
+            message: 'Are you sure you want to cancel the game?',
             confirmLabel: 'Yes, cancel',
             confirmClass: 'btn-warning',
-            cancelLabel: 'No, keep game',
+            cancelLabel: 'No, keep the game',
             cancelClass: 'btn-outline-primary',
         });
     } catch (e) {

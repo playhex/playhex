@@ -13,6 +13,7 @@ import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
 import { format, formatDistanceToNow } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
+import { outcomeToString } from '../../../shared/game-engine';
 
 const props = defineProps({
     hostedGameClient: {
@@ -134,20 +135,19 @@ const shouldDisplayHexworldLink = (): boolean => {
                     </p>
                 </template>
                 <template v-if="'ended' === hostedGameClient.getState()">
-                    <h3>Game ended</h3>
+                    <h3>
+                        <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
+                        wins
+                        <template v-if="hostedGameClient.getHostedGameData().gameData?.outcome">
+                            {{ outcomeToString(hostedGameClient.getHostedGameData().gameData?.outcome ?? null) }}
+                        </template>
+                    </h3>
                     <p>
                         <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>Ended on {{ format(hostedGameClient.getHostedGameData().gameData?.endedAt as Date, 'd MMMM yyyy') }}</small>
-                    </p>
-                    <p class="lead text-center">
-                        <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
-                        won the game
-                        <template v-if="hostedGameClient.getHostedGameData().gameData?.outcome">
-                            by {{ hostedGameClient.getHostedGameData().gameData?.outcome ?? 'path' }}
-                        </template>
                     </p>
                 </template>
             </div>

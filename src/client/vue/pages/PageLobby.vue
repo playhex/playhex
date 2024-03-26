@@ -195,9 +195,9 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         </tbody>
                     </table>
                 </div>
-                <p v-else>No game for now. Create a new one !</p>
+                <p v-else>No games available right now. Create a new one!</p>
 
-                <h4><BIconEye /> Watch current game</h4>
+                <h4><BIconEye /> Watch current games</h4>
 
                 <table v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table">
                     <thead>
@@ -227,10 +227,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         </tr>
                     </tbody>
                 </table>
-                <p v-else>No game currently playing.</p>
+                <p v-else>There are no games in progress right now.</p>
 
                 <template v-if="Object.values(lobbyStore.hostedGameClients).some(isLastPlayed)">
-                    <h4><BIconTrophy /> Ended games</h4>
+                    <h4><BIconTrophy /> Finished games</h4>
 
                     <table class="table table-sm table-borderless">
                         <tbody>
@@ -257,7 +257,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <button
                                         class="btn btn-sm btn-link"
                                         @click="() => lobbyStore.loadMoreEndedGames()"
-                                    >Load more ended games</button>
+                                    >Load more finished games</button>
                                 </td>
                             </tr>
                         </tbody>

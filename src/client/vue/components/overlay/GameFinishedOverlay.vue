@@ -8,7 +8,7 @@ import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icon
 import AppPseudo from '../AppPseudo.vue';
 import { PropType } from 'vue';
 import Player from '../../../../shared/app/models/Player';
-import { Game } from '../../../../shared/game-engine';
+import { Game, outcomeToString } from '../../../../shared/game-engine';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 
 const { visible, confirm } = useOverlayMeta();
@@ -53,14 +53,6 @@ const downloadSGF = (): void => {
     }), filename);
 };
 
-const outcomeToString = (): string => {
-    switch (game.getOutcome()) {
-        case null: return 'the game';
-        case 'resign': return 'by resignation';
-        case 'time': return 'by time';
-        case 'forfeit': return 'by forfeit';
-    }
-};
 </script>
 
 <template>
@@ -79,7 +71,7 @@ const outcomeToString = (): string => {
                                 is="strong"
                                 :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
                             />
-                            won {{ outcomeToString() }} !
+                            won {{ outcomeToString(game.getOutcome()) }}!
                         </p>
                         <p v-else>Game has been canceled.</p>
                     </div>
@@ -95,7 +87,7 @@ const outcomeToString = (): string => {
                             type="button"
                             class="btn btn-outline-primary"
                             @click="confirm()"
-                        >Ok, close</button>
+                        >Close</button>
                     </div>
                     <div class="modal-footer">
                         <p>Review game:</p>

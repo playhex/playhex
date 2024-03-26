@@ -25,7 +25,7 @@ describe('Authentication', () => {
         cy
             .contains('h2', 'Create an account')
             .closest('form')
-            .contains('Pseudo')
+            .contains('Username')
             .click()
             .type(pseudo)
         ;
@@ -39,7 +39,7 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('Create account')
+            .contains('Sign up')
             .click()
         ;
 
@@ -54,7 +54,7 @@ describe('Authentication', () => {
 
         // Logout
         cy
-            .contains('Logout')
+            .contains('Log out')
             .click()
         ;
 
@@ -68,20 +68,20 @@ describe('Authentication', () => {
 
         // Login
         cy
-            .contains('Login')
+            .contains('Log in')
             .click()
         ;
 
         cy
-            .contains('h2', 'Login')
+            .contains('h2', 'Log in')
             .closest('form')
-            .contains('Pseudo')
+            .contains('Username')
             .click()
             .type(pseudo)
         ;
 
         cy
-            .contains('h2', 'Login')
+            .contains('h2', 'Log in')
             .closest('form')
             .contains('Password')
             .click()
@@ -89,7 +89,7 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('button', 'Login')
+            .contains('button', 'Log in')
             .click()
         ;
 
@@ -99,7 +99,7 @@ describe('Authentication', () => {
         ;
     });
 
-    it('displays invalid pseudo error', () => {
+    it('displays invalid username error', () => {
         cy.visit('/');
 
         cy
@@ -109,20 +109,20 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('Login')
+            .contains('Log in')
             .click()
         ;
 
         cy
-            .contains('h2', 'Login')
+            .contains('h2', 'Log in')
             .closest('form')
-            .contains('Pseudo')
+            .contains('Username')
             .click()
             .type(randomString())
         ;
 
         cy
-            .contains('h2', 'Login')
+            .contains('h2', 'Log in')
             .closest('form')
             .contains('Password')
             .click()
@@ -130,11 +130,11 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('button', 'Login')
+            .contains('button', 'Log in')
             .click()
         ;
 
-        cy.contains('No player with this pseudo');
+        cy.contains('No player with this username');
     });
 
     it('displays invalid password error', () => {
@@ -152,20 +152,20 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('Login')
+            .contains('Log in')
             .click()
         ;
 
         cy
-            .contains('h2', 'Login')
+            .contains('h2', 'Log in')
             .closest('form')
-            .contains('Pseudo')
+            .contains('Username')
             .click()
             .type('mocked-anyway')
         ;
 
         cy
-            .contains('h2', 'Login')
+            .contains('h2', 'Log in')
             .closest('form')
             .contains('Password')
             .click()
@@ -173,11 +173,11 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('button', 'Login')
+            .contains('button', 'Log in')
             .click()
         ;
 
-        cy.contains('Invalid password for this player');
+        cy.contains('Invalid password for this account');
     });
 
     it('requires a valid password on signup', () => {
@@ -185,14 +185,14 @@ describe('Authentication', () => {
 
         // Create account
         cy
-            .contains('Create account')
+            .contains('Sign up')
             .click()
         ;
 
         cy
             .contains('h2', 'Create an account')
             .closest('form')
-            .contains('Pseudo')
+            .contains('Username')
             .click()
             .type('-')
         ;
@@ -206,14 +206,14 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('Create account')
+            .contains('button', 'Sign up')
             .click()
         ;
 
-        cy.contains('Pseudo is invalid');
+        cy.contains('Username is invalid');
     });
 
-    it('says that pseudo is already taken', () => {
+    it('says that username is already taken', () => {
         cy.intercept('/api/auth/signup-from-guest', {
             fixture: 'auth/pseudo-already-taken.json',
             statusCode: 409,
@@ -223,14 +223,14 @@ describe('Authentication', () => {
 
         // Create account
         cy
-            .contains('Create account')
+            .contains('Sign up')
             .click()
         ;
 
         cy
             .contains('h2', 'Create an account')
             .closest('form')
-            .contains('Pseudo')
+            .contains('Username')
             .click()
             .type('already-taken-mocked')
         ;
@@ -244,11 +244,11 @@ describe('Authentication', () => {
         ;
 
         cy
-            .contains('Create account')
+            .contains('button', 'Sign up')
             .click()
         ;
 
-        cy.contains('This pseudo is already used by another player');
+        cy.contains('This username is already used by another player');
     });
 
     it('sign up and change password', () => {
@@ -258,14 +258,14 @@ describe('Authentication', () => {
         cy.visit('/signup');
 
         const signupForm = () => cy.contains('h2', 'Create an account').closest('form');
-        signupForm().contains('Pseudo').click().type(pseudo);
+        signupForm().contains('Username').click().type(pseudo);
         signupForm().contains('Password').click().type(password);
-        signupForm().contains('button', 'Create account').click();
+        signupForm().contains('button', 'Sign up').click();
 
         cy.get('.menu-top').contains(pseudo).click();
         cy.contains('Settings').click();
 
-        cy.contains('h3', 'Change password').closest('form').as('form')
+        cy.contains('h3', 'Change password').closest('form').as('form');
 
         // Invalid old password should fail
         cy.get('@form').contains('Old password').click().type('invalidpwd');
@@ -273,7 +273,7 @@ describe('Authentication', () => {
         cy.get('@form').contains('Confirm new password').click().type('foo');
         cy.get('@form').contains('button', 'Update password').click();
 
-        cy.get('@form').contains('Invalid password for this player');
+        cy.get('@form').contains('Invalid password for this account');
 
         // "New password" and "Confirm new password" must match
         cy.get('@form').contains('Old password').click().type('{selectall}{backspace}' + password);
@@ -292,23 +292,23 @@ describe('Authentication', () => {
 
         // Log out
         cy.get('.menu-top').contains(pseudo).click();
-        cy.contains('Logout').click();
+        cy.contains('Log out').click();
 
         cy.get('.menu-top').contains(/Guest \d+/).click();
-        cy.contains('Login').click();
+        cy.contains('Log in').click();
 
-        const loginForm = () => cy.contains('h2', 'Login').closest('form');
+        const loginForm = () => cy.contains('h2', 'Log in').closest('form');
 
         // Cannot log in with the previous password
-        loginForm().contains('Pseudo').click().type(pseudo);
+        loginForm().contains('Username').click().type(pseudo);
         loginForm().contains('Password').click().type(password);
-        loginForm().contains('button', 'Login').click();
+        loginForm().contains('button', 'Log in').click();
 
-        cy.contains('Invalid password for this player');
+        cy.contains('Invalid password for this account');
 
         // Log in with the new password
         loginForm().contains('Password').click().type('{selectall}{backspace}foo');
-        loginForm().contains('button', 'Login').click();
+        loginForm().contains('button', 'Log in').click();
 
         cy.get('.menu-top').contains(pseudo);
     });

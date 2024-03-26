@@ -30,7 +30,7 @@ describe('Confirm move', () => {
         cy.contains(/Guest \d+/).click();
         cy.contains('Settings').click();
 
-        cy.contains('Confirm move before submit');
+        cy.contains('Confirm move');
 
         cy.get('[id="confirm-move-normal"]').select('true');
 
@@ -80,7 +80,7 @@ describe('Confirm move', () => {
         cy.visit('/games/705e2163-9fbd-4fd7-a408-098c5919625c');
 
         cy.contains('Loading game 705e2163-9fbd-4fd7-a408-098c5919625c…').should('not.exist');
-        cy.contains('Ok, close').click();
+        cy.get('.modal-footer').contains('button', 'Close').click();
         cy.contains('Confirm move').should('not.exist');
     });
 
