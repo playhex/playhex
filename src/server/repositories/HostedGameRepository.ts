@@ -101,6 +101,14 @@ export default class HostedGameRepository
      */
     private enableAutoPersist(hostedGame: HostedGame): void
     {
+        // Persist on no activity
+        const resetTimeout = (): void => {
+            if (this.persistWhenNoActivity[hostedGame.getId()]) {
+                clearTimeout(this.persistWhenNoActivity[hostedGame.getId()]);
+                delete this.persistWhenNoActivity[hostedGame.getId()];
+            }
+        };
+
         // Persist on ended
         const onEnded = () => {
             resetTimeout();
@@ -114,14 +122,6 @@ export default class HostedGameRepository
             hostedGame.on('ended', onEnded);
             hostedGame.on('canceled', onEnded);
         }
-
-        // Persist on no activity
-        const resetTimeout = (): void => {
-            if (this.persistWhenNoActivity[hostedGame.getId()]) {
-                clearTimeout(this.persistWhenNoActivity[hostedGame.getId()]);
-                delete this.persistWhenNoActivity[hostedGame.getId()];
-            }
-        };
 
         // Keep alive again when activity done on this game
         const onActivity = (): void => {
