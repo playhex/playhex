@@ -74,16 +74,18 @@ describe('Lobby', () => {
             // Current games
             .contains('Watch current games')
             .next('table')
-            .contains('Player A vs Player B')
+            .contains('Player A')
             .closest('tr')
             .contains('Watch')
         ;
+
+        cy.contains('Watch current games').next('table').contains('Player B');
 
         cy
             // Finished games
             .contains('Finished games')
             .next('table')
-            .contains('Player C won against Player D')
+            .contains('Player C')
             .closest('tr')
             .contains('Review')
 
@@ -91,6 +93,8 @@ describe('Lobby', () => {
             .closest('table')
             .contains(/Cancel A|Cancel B/).should('not.exist')
         ;
+
+        cy.contains('Finished games').next('table').contains('Player D');
     });
 
     it('warns when there is custom rules', () => {

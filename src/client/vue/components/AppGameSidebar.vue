@@ -201,6 +201,8 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
                         <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <br>
+                        <small>Started: {{ format(hostedGameClient.getHostedGameData().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
                 <template v-if="'ended' === hostedGameClient.getState()">
@@ -216,7 +218,9 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
                         <br>
                         <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Ended on {{ format(hostedGameClient.getHostedGameData().gameData?.endedAt as Date, 'd MMMM yyyy') }}</small>
+                        <small>Started: {{ format(hostedGameClient.getHostedGameData().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <br>
+                        <small>Ended: {{ format(hostedGameClient.getHostedGameData().gameData?.endedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
             </div>

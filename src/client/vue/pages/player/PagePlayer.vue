@@ -14,10 +14,15 @@ import HostedGameClient from '../../../HostedGameClient';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppPseudoWithOnlineStatusVue from '../../components/AppPseudoWithOnlineStatus.vue';
+import AppTimeControlLabelVue from '../../components/AppTimeControlLabel.vue';
+import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useJsonLd } from '../../../services/head';
 import { useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
+import { formatDistanceToNowStrict } from 'date-fns';
+import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
+import type { Outcome } from '@shared/game-engine/Types';
 
 const { slug } = useRoute().params;
 
@@ -91,6 +96,26 @@ const playerNotFound = ref(false);
  */
 const { hostedGameClients } = storeToRefs(useLobbyStore());
 
+const currentGameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
+    // Correspondence games go after real-time games, then sorted by "started at"
+    const timeA = timeControlToCadencyName(a.getGameOptions());
+    const timeB = timeControlToCadencyName(b.getGameOptions());
+
+    if (timeA !== 'correspondance' && timeB === 'correspondance')
+        return -1;
+
+    if (timeA === 'correspondance' && timeB !== 'correspondance')
+        return 1;
+
+    const startedAtA = a.getHostedGameData().gameData?.startedAt;
+    const startedAtB = b.getHostedGameData().gameData?.startedAt;
+
+    if (startedAtA != null && startedAtB != null)
+        return startedAtB.getTime() - startedAtA.getTime();
+
+    return 0;
+};
+
 const getCurrentGames = (): HostedGameClient[] => {
     if (null === player.value) {
         return [];
@@ -106,7 +131,7 @@ const getCurrentGames = (): HostedGameClient[] => {
         currentGames.push(hostedGameClient);
     }
 
-    return currentGames;
+    return currentGames.sort(currentGameComparator);
 };
 
 /*
@@ -179,6 +204,16 @@ const clickLogout = async () => {
         },
     });
 };
+
+const lossOutcomeToString = (outcome: Outcome): string => {
+    switch (outcome) {
+        case 'resign': return 'resign';
+        case 'forfeit': return 'forfeit';
+        case 'time': return 'timeout';
+        case null:
+        default: return 'loss';
+    }
+};
 </script>
 
 <template>
@@ -227,60 +262,87 @@ const clickLogout = async () => {
 
         <h3 class="mt-4">Current games</h3>
 
-        <table v-if="player" class="table">
-            <tbody>
-                <tr
-                    v-for="game in getCurrentGames()"
-                    :key="game.getId()"
-                >
-                    <td class="ps-0">
-                        <router-link
-                            :to="{ name: 'online-game', params: { gameId: game.getId() } }"
-                            class="btn btn-sm btn-link"
-                        >Watch</router-link>
-                    </td>
-                    <td>
-                        <span class="me-2">vs </span>
-                        <AppPseudoWithOnlineStatusVue
-                            :player="(game.getOtherPlayer(player) as Player)"
-                        />
-                    </td>
-                    <td class="text-end">{{ game.getHostedGameData().gameOptions.boardsize }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-if="player" class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Opponent</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Time control</th>
+                        <th scope="col">Rules</th>
+                        <th scope="col">Started</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="game in getCurrentGames()"
+                        :key="game.getId()"
+                    >
+                        <td class="ps-0">
+                            <router-link
+                                :to="{ name: 'online-game', params: { gameId: game.getId() } }"
+                                class="btn btn-sm btn-link"
+                            >Watch</router-link>
+                        </td>
+                        <td><AppPseudoWithOnlineStatusVue :player="(game.getOtherPlayer(player) as Player)" /></td>
+                        <td>{{ game.getHostedGameData().gameOptions.boardsize }}</td>
+                        <td><AppTimeControlLabelVue :game-options="game.getGameOptions()" /></td>
+                        <td><AppGameRulesSummary :game-options="game.getGameOptions()" /></td>
+                        <td>{{
+                            formatDistanceToNowStrict(game.getHostedGameData().gameData?.startedAt ?? 0, { addSuffix: true })
+                        }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <h3>Game history</h3>
 
-        <table class="table table-sm table-borderless">
-            <tbody>
-                <tr
-                    v-for="game in gamesHistory"
-                    :key="game.id"
-                >
-                    <td class="ps-0">
-                        <router-link
-                            :to="{ name: 'online-game', params: { gameId: game.id } }"
+        <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Outcome</th>
+                        <th scope="col">Opponent</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Time control</th>
+                        <th scope="col">Rules</th>
+                        <th scope="col">Finished</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="game in gamesHistory"
+                        :key="game.id"
+                    >
+                        <td class="ps-0">
+                            <router-link
+                                :to="{ name: 'online-game', params: { gameId: game.id } }"
+                                class="btn btn-sm btn-link"
+                            >Review</router-link>
+                        </td>
+                        <td v-if="hasWon(game)" style="width: 7em" class="text-success">win</td>
+                        <td v-else style="width: 7em" class="text-danger">{{ lossOutcomeToString(game?.gameData?.outcome ?? null) }}</td>
+                        <td><AppPseudoWithOnlineStatusVue :player="getOpponent(game)" /></td>
+                        <td>{{ game.gameOptions.boardsize }}</td>
+                        <td><AppTimeControlLabelVue :game-options="game.gameOptions" /></td>
+                        <td><AppGameRulesSummary :game-options="game.gameOptions" /></td>
+                        <td>{{
+                            formatDistanceToNowStrict(game.gameData?.endedAt ?? 0, { addSuffix: true })
+                        }}</td>
+                    </tr>
+                    <tr colspan="2">
+                        <button
+                            role="button"
                             class="btn btn-sm btn-link"
-                        >Review</router-link>
-                    </td>
-                    <td>
-                        <span class="me-2 text-success" v-if="hasWon(game)">won against </span>
-                        <span class="me-2 text-danger" v-else>lost against </span>
-                        <AppPseudoWithOnlineStatusVue
-                            :player="getOpponent(game)"
-                        />
-                    </td>
-                </tr>
-                <tr colspan="2">
-                    <button
-                        role="button"
-                        class="btn btn-sm btn-link"
-                        @click="() => loadMoreEndedGames()"
-                    >Load more</button>
-                </tr>
-            </tbody>
-        </table>
+                            @click="() => loadMoreEndedGames()"
+                        >Load more</button>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div v-else class="container">
@@ -308,4 +370,7 @@ const clickLogout = async () => {
         top 79%
         left 79%
         font-size 1em
+
+td:first-child, th:first-child
+    width 6em
 </style>

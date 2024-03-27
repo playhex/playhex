@@ -23,6 +23,8 @@ const { player, is, classes } = toRefs(props);
 </script>
 
 <template>
-    <AppOnlineStatus :player="player" />
-    <AppPseudo :player="player" :is="is" :classes="classes" />
+    <span class="text-nowrap">
+        <AppOnlineStatus :player="player" />
+        <AppPseudo :player="player" :is="is" :classes="classes" />
+    </span>
 </template>

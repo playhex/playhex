@@ -25,7 +25,8 @@ describe('Page Game finished', () => {
 
         cy.contains('.sidebar', 'Test player wins');
         cy.contains('.sidebar', 'Rules: host plays second');
-        cy.contains('.sidebar', 'Ended on 24 January 2024');
+        cy.contains('.sidebar', 'Started: 24 January 2024');
+        cy.contains('.sidebar', 'Ended: 24 January 2024');
     });
 
     it('displays win popin when a player resigned', () => {
