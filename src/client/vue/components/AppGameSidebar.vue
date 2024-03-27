@@ -170,7 +170,7 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
 const relCoordsTranslate = (str: string): string => {
     const size = hostedGameClient.value.getGame().board.size;
 
-    return str.replaceAll(/\[(\d+'?)(,?)(\d+'?)]/g, (_, row, comma, col) => {
+    return str.replaceAll(/\[(\d+'?)((?:-|,)?)(\d+'?)]/g, (_, row, sep, col) => {
         const abRow = row.match(/\d+'/)
             ? parseInt(row)
             : size - parseInt(row) + 1;
@@ -179,7 +179,7 @@ const relCoordsTranslate = (str: string): string => {
             ? Move.colToLetter(size - parseInt(col))
             : Move.colToLetter(parseInt(col) - 1);
 
-        return `${row}${comma || ''}${col}(${abCol}${abRow})`;
+        return `${row}${sep || ''}${col}(${abCol}${abRow})`;
    });
 };
 
