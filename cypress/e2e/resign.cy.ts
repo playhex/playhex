@@ -21,13 +21,13 @@ describe('Resign a game', () => {
         ;
 
         cy
-            .contains('Are you sure you want to resign game?')
+            .contains('Are you sure you want to resign the game?')
             .closest('.modal-content')
             .contains('Yes, resign')
             .click()
         ;
 
         cy.contains('Game finished');
-        cy.contains(' won by resignation !');
+        cy.contains(' won by resignation!');
     });
 });

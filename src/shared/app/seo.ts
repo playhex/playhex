@@ -2,7 +2,7 @@ import { WebSite, WithContext } from 'schema-dts';
 
 const seo = {
     title: 'PlayHex',
-    description: 'Play Hex board game with other players or with AI.',
+    description: 'Play the Hex board game with other players or with AI.',
 };
 
 const jsonLd: WithContext<WebSite> = {

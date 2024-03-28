@@ -30,14 +30,14 @@ if (Array.isArray(slug)) {
  */
 const updateMeta = (player: Player): void => {
     useSeoMeta({
-        title: `${pseudoString(player, 'pseudo')} - Hex player`,
+        titleTemplate: title => `${pseudoString(player, 'pseudo')} - ${title}`,
 
         // index only bots (Mohex) profile page.
         // Guest should never be indexed,
         // players only if they explicitely agree (settings)
         robots: player.isBot ? 'index' : 'noindex',
 
-        ogTitle: `${pseudoString(player, 'pseudo')} - Hex player`,
+        ogTitle: `${pseudoString(player, 'pseudo')}`,
         ogType: 'profile',
         ogUrl: window.location.href,
         twitterCard: 'summary',
@@ -206,7 +206,7 @@ const clickLogout = async () => {
                         <router-link
                             :to="{ name: 'login' }"
                             class="btn btn-primary"
-                        >Login</router-link>
+                        >Log in</router-link>
                     </template>
 
                     <template v-else>
@@ -214,7 +214,7 @@ const clickLogout = async () => {
                             type="button"
                             class="btn btn-sm btn-outline-warning"
                             @click="clickLogout()"
-                        >Logout <BIconBoxArrowRight /></button>
+                        >Log out <BIconBoxArrowRight /></button>
                     </template>
 
                     <router-link
@@ -240,7 +240,7 @@ const clickLogout = async () => {
                         >Watch</router-link>
                     </td>
                     <td>
-                        <span class="me-2">Game vs </span>
+                        <span class="me-2">vs </span>
                         <AppPseudoWithOnlineStatusVue
                             :player="(game.getOtherPlayer(player) as Player)"
                         />
@@ -250,7 +250,7 @@ const clickLogout = async () => {
             </tbody>
         </table>
 
-        <h3>Games history</h3>
+        <h3>Game history</h3>
 
         <table class="table table-sm table-borderless">
             <tbody>
@@ -277,14 +277,14 @@ const clickLogout = async () => {
                         role="button"
                         class="btn btn-sm btn-link"
                         @click="() => loadMoreEndedGames()"
-                    >Load more ended games</button>
+                    >Load more</button>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <div v-else class="container">
-        <p class="text-center lead mt-2">Looks like this player does not exists…</p>
+        <p class="text-center lead mt-2">Looks like there is no such player.</p>
     </div>
 </template>
 

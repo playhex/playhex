@@ -15,10 +15,10 @@ describe('Profile page', () => {
         cy.contains('h2', 'Player Test');
         cy.contains('Account created on 19 January 2024');
 
-        cy.contains('Logout');
+        cy.contains('Log out');
         cy.contains('Settings');
 
-        cy.contains('Game vs Determinist random bot');
+        cy.contains('vs Determinist random bot');
         cy.contains('won against Determinist random bot');
         cy.contains('lost against Determinist random bot');
     });
@@ -39,10 +39,10 @@ describe('Profile page', () => {
         cy.contains('h2', 'Player Test');
         cy.contains('Account created on 19 January 2024');
 
-        cy.contains('Logout').should('not.exist');
+        cy.contains('Log out').should('not.exist');
         cy.contains('Settings').should('not.exist');
 
-        cy.contains('Game vs Determinist random bot');
+        cy.contains('vs Determinist random bot');
         cy.contains('won against Determinist random bot');
         cy.contains('lost against Determinist random bot');
     });

@@ -130,7 +130,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                 />
             </div>
         </div>
-        <p v-else>Initialize game…</p>
+        <p v-else>Initializing game…</p>
     </div>
 </template>
 

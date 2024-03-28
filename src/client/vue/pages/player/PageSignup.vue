@@ -7,8 +7,8 @@ import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate: title => `Signup - ${title}`,
-    description: 'Create an account to keep an history of Hex games you played.',
+    titleTemplate: title => `Sign up - ${title}`,
+    description: 'Create an account to keep the history of Hex games you played.',
 });
 
 const pseudo = ref('');
@@ -55,7 +55,7 @@ const onSubmit = async () => {
                     <h2 class="mt-4 text-center">Create an account</h2>
 
                     <div class="mb-3">
-                        <label for="form-pseudo" class="form-label">Pseudo</label>
+                        <label for="form-pseudo" class="form-label">Username</label>
                         <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="emailHelp">
                         <div class="invalid-feedback">
                             {{ pseudoValidation?.reason }}
@@ -70,12 +70,12 @@ const onSubmit = async () => {
                     <p v-if="globalError" class="text-danger">{{ globalError }}</p>
 
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-lg btn-success">Create account</button>
+                        <button type="submit" class="btn btn-lg btn-success">Sign up</button>
                     </div>
                 </form>
 
                 <div class="mt-4 text-center">
-                    <p>Already have an account ? <router-link :to="{ name: 'login' }">Login instead</router-link></p>
+                    <p>Already have an account? <router-link :to="{ name: 'login' }">Log in</router-link> instead</p>
                 </div>
             </div>
         </div>

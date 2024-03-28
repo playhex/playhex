@@ -26,7 +26,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
             <a href="https://github.com/alcalyn/hex" target="_blank">
                 <BIconGithub class="text-body" />
                 <br>
-                Github
+                GitHub
             </a>
             <router-link :to="{ name: 'links' }">
                 <BIconBookmarks class="text-body" />

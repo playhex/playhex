@@ -184,10 +184,10 @@ defineExpose({ compileOptions });
     <div v-if="showCustomTimeControl" class="mt-2">
         <div v-if="'fischer' === gameOptions.timeControl.type">
             <strong class="min-w">Fischer</strong>
-            <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">Use Byo-Yomi</button>
+            <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">Use Byo-yomi</button>
         </div>
         <div v-else>
-            <strong class="min-w">Byo Yomi</strong>
+            <strong class="min-w">Byo-yomi</strong>
             <button type="button" @click="() => gameOptions.timeControl.type = 'fischer'" class="btn btn-sm btn-link">Use Fischer</button>
         </div>
 
@@ -202,11 +202,11 @@ defineExpose({ compileOptions });
             <label for="custom-byoyomi-initial-time" class="form-label">Initial time: {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
             <input type="range" class="form-range" id="custom-byoyomi-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
+            <label for="custom-byoyomi-period-count" class="form-label">Periods: {{ byoyomiPeriodsCount }}</label>
+            <input type="range" class="form-range" id="custom-byoyomi-period-count" v-model="byoyomiPeriodsCount" min="0" max="15" step="1">
+
             <label for="custom-byoyomi-perdiod-time" class="form-label">Period time: {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
             <input type="range" class="form-range" id="custom-byoyomi-perdiod-time" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
-
-            <label for="custom-byoyomi-period-count" class="form-label">Periods count: {{ byoyomiPeriodsCount }}</label>
-            <input type="range" class="form-range" id="custom-byoyomi-period-count" v-model="byoyomiPeriodsCount" min="0" max="15" step="1">
         </div>
     </div>
 </template>

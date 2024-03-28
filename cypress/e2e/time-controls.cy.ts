@@ -77,11 +77,11 @@ describe('Time controls', () => {
         cy
             .contains('Game options')
             .closest('.modal-content')
-            .contains('Use Byo-Yomi')
+            .contains('Use Byo-yomi')
             .click()
         ;
 
-        cy.contains('Periods count');
+        cy.contains('Periods:');
 
         cy
             .contains('Game options')
