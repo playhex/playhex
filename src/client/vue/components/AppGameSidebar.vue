@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconBoxArrowUpRight, BIconShareFill, BIconCheck } from 'bootstrap-icons-vue';
+import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
@@ -94,6 +95,74 @@ const shouldDisplayHexworldLink = (): boolean => {
 
     return false;
 };
+
+/*
+ * Share game link to send to a friend.
+ * Useful on PWA when url bar is not displayed.
+ * On desktop, just copy link.
+ * On mobile, use share api to allow share to other apps, or just copy.
+ */
+const { href } = window.location;
+const copiedResult = ref<null | true | false>(null);
+let copiedResultTimeout: null | number = null;
+type CopyResult = 'copied' | 'canceled' | 'unsupported';
+
+const shareWithShareApi = async (): Promise<CopyResult> => {
+    const shareData = {
+        title: document.title,
+        url: href,
+    };
+
+    if (!navigator.canShare || !navigator.canShare(shareData)) {
+        return 'unsupported';
+    }
+
+    try {
+        await navigator.share(shareData);
+
+        return 'copied';
+    } catch (e) {
+        return 'canceled';
+    }
+};
+
+const shareGameLink = async (): Promise<CopyResult> => {
+    const result = await shareWithShareApi();
+
+    if ('unsupported' !== result) {
+        return result;
+    }
+
+    return copy(href) ? 'copied' : 'unsupported';
+};
+
+const shareGameLinkAndShowResult = async (): Promise<void> => {
+    // In case "copied!" is already displayed, make it blink before copy again to show it worked again
+    if (null !== copiedResultTimeout) {
+        clearTimeout(copiedResultTimeout);
+        copiedResult.value = null;
+        await new Promise(resolve => setTimeout(resolve, 80));
+    }
+
+    const result = await shareGameLink();
+
+    if ('copied' === result) {
+        copiedResult.value = true;
+    }
+
+    if ('unsupported' === result) {
+        copiedResult.value = false;
+    }
+
+    copiedResultTimeout = setTimeout(() => {
+        copiedResult.value = null;
+
+        if (null !== copiedResultTimeout) {
+            clearTimeout(copiedResultTimeout);
+            copiedResultTimeout = null;
+        }
+    }, 30000);
+};
 </script>
 
 <template>
@@ -155,14 +224,20 @@ const shouldDisplayHexworldLink = (): boolean => {
 
         <div class="block-controls">
             <div class="container-fluid">
-                <button type="button" class="btn btn-sm btn-outline-primary" @click="e => { e.preventDefault(); emits('toggleCoords') }"><BIconAlphabet /> Toggle coords</button>
+                <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click="e => { e.preventDefault(); emits('toggleCoords') }"><BIconAlphabet /> Toggle coords</button>
+
                 <a
                     v-if="shouldDisplayHexworldLink()"
                     type="button"
-                    class="btn btn-sm btn-outline-primary ms-2"
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
                     target="_blank"
                     :href="gameToHexworldLink(hostedGameClient.getGame())"
                 ><BIconBoxArrowUpRight/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
+
+                <br>
+                <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click="e => { e.preventDefault(); shareGameLinkAndShowResult() }"><BIconShareFill /> Share game</a>
+                <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> Copied!</small>
+                <small v-else-if="false === copiedResult" class="text-warning me-2">not copied, use right click or long press</small>
             </div>
         </div>
 
