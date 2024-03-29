@@ -10,6 +10,7 @@ import Player from '../../../shared/app/models/Player';
 import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
+import Move from '@shared/game-engine/Move';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
 import { format, formatDistanceToNow } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
@@ -163,6 +164,25 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
         }
     }, 30000);
 };
+
+// Add absolute coordiates along side relative coordinates when the relative coordinates
+// are sourrounded in brackets []
+const relCoordsTranslate = (str: string): string => {
+    const size = hostedGameClient.value.getGame().board.size;
+
+    return str.replaceAll(/\[(\d+'?)((?:-|,)?)(\d+'?)]/g, (_, row, sep, col) => {
+        const abRow = row.match(/\d+'/)
+            ? parseInt(row)
+            : size - parseInt(row) + 1;
+
+        const abCol = col.match(/\d+'/)
+            ? Move.colToLetter(size - parseInt(col))
+            : Move.colToLetter(parseInt(col) - 1);
+
+        return `${row}${sep || ''}${col}(${abCol}${abRow})`;
+   });
+};
+
 </script>
 
 <template>
@@ -258,7 +278,7 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
                         <span class="player" v-if="message.author"><AppPseudo :player="message.author" :classes="playerColor(message.author)" /></span>
                         <span class="player fst-italic" v-else>System</span>
                         <span>&nbsp;</span>
-                        <span class="content">{{ message.content }}</span>
+                        <span class="content">{{ relCoordsTranslate(message.content) }}</span>
                     </div>
                 </div>
             </div>
