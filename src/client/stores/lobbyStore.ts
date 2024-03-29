@@ -72,6 +72,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         return hostedGameClients.value[gameId] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
     };
 
+    /**
+     * Load more finished games, excluding bot games.
+     */
     const loadMoreEndedGames = async (): Promise<void> => {
         let oldestHostedGameClient: HostedGameClient | undefined = undefined;
 

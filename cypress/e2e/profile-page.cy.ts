@@ -18,9 +18,8 @@ describe('Profile page', () => {
         cy.contains('Log out');
         cy.contains('Settings');
 
-        cy.contains('vs Determinist random bot');
-        cy.contains('won against Determinist random bot');
-        cy.contains('lost against Determinist random bot');
+        cy.contains('Determinist random bot');
+        cy.contains('win');
     });
 
     it('see someone else profile page', () => {
@@ -42,8 +41,7 @@ describe('Profile page', () => {
         cy.contains('Log out').should('not.exist');
         cy.contains('Settings').should('not.exist');
 
-        cy.contains('vs Determinist random bot');
-        cy.contains('won against Determinist random bot');
-        cy.contains('lost against Determinist random bot');
+        cy.contains('Determinist random bot');
+        cy.contains('win');
     });
 });
