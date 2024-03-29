@@ -154,12 +154,22 @@ export default class HostedGameRepository
     }
 
     /**
+     * Get finished games; bot games are ignored.
      * @param fromGamePublicId Take N ended games from fromGamePublicId, or from start if not set.
      */
     async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGameData[]>
     {
         const args: Prisma.HostedGameFindManyArgs = {
-            where: { state: 'ended' },
+            where: {
+                state: 'ended',
+                players: {
+                    every: {
+                        player: {
+                            isBot: false,
+                        }
+                    }
+                }
+            },
             orderBy: [
                 { game: { endedAt: 'desc' } },
                 { publicId: 'desc' }, // In case 2 games has same endedAt datetime, must keep a consistent order

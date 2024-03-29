@@ -106,6 +106,10 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
     'playing' === hostedGameClient.getHostedGameData().state
 ;
 
+const isFinished = (hostedGameClient: HostedGameClient) =>
+    'ended' === hostedGameClient.getHostedGameData().state
+;
+
 const joinGame = async (gameId: string) => {
     const hostedGameClient = await lobbyStore.retrieveHostedGameClient(gameId);
 
@@ -159,14 +163,8 @@ const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
 };
 
 /**
- * Ended games
+ * Finished games
  */
-const isFinishedGame = (hostedGameClient: HostedGameClient) =>
-    hostedGameClient.getHostedGameData().state === 'ended'
-    // Bot games are hidden
-    && !hostedGameClient.getPlayers().some(p => p.isBot)
-;
-
 const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
     const gameDataA = a.getHostedGameData().gameData;
     const gameDataB = b.getHostedGameData().gameData;
@@ -287,7 +285,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
                 <h4><BIconTrophy /> Finished games</h4>
 
-                <div v-if="Object.values(lobbyStore.hostedGameClients).some(isFinishedGame)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.hostedGameClients).some(isFinished)" class="table-responsive">
                     <table class="table table-responsive" style="margin-bottom: 0">
                         <thead>
                             <tr>
@@ -301,7 +299,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isFinishedGame).sort(byEndedAt)"
+                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isFinished).sort(byEndedAt)"
                                 :key="hostedGameClient.getId()"
                             >
                                 <td class="ps-0">
