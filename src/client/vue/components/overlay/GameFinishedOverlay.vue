@@ -81,7 +81,7 @@ const downloadSGF = (): void => {
                             type="button"
                             class="btn btn-primary"
                             @click="confirm(); rematch();"
-                        ><BIconRepeat /> Rematch</button>
+                        ><BIconRepeat /> New Game</button>
 
                         <button
                             type="button"
