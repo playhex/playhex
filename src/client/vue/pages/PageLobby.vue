@@ -106,6 +106,13 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
     'playing' === hostedGameClient.getHostedGameData().state
 ;
 
+const lobbyFilter = (hostedGameClient: HostedGameClient) => {
+    const startTime = hostedGameClient.getHostedGameData().gameData?.startedAt ?? 0;
+    const days = (Date.now() - startTime) / 86400000;
+    const lastMove = hostedGameClient.getHostedGameData().gameData?.lastMoveAt;
+    return days < 1 || lastMove
+};
+
 const isFinished = (hostedGameClient: HostedGameClient) =>
     'ended' === hostedGameClient.getHostedGameData().state
 ;
@@ -256,7 +263,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isPlaying).sort(gameComparator)"
+                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(lobbyFilter).sort(gameComparator)"
                                 :key="hostedGameClient.getId()"
                             >
                                 <td class="ps-0">
