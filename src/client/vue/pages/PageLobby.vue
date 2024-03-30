@@ -110,7 +110,8 @@ const lobbyFilter = (hostedGameClient: HostedGameClient) => {
     const startTime = hostedGameClient.getHostedGameData().gameData?.startedAt ?? 0;
     const days = (Date.now() - startTime) / 86400000;
     const lastMove = hostedGameClient.getHostedGameData().gameData?.lastMoveAt;
-    return days < 1 || lastMove
+    // Hide games with no moves and >= 1 days since the game start
+    return days < 1 || lastMove != null;
 };
 
 const isFinished = (hostedGameClient: HostedGameClient) =>
