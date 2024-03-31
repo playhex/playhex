@@ -165,21 +165,29 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
     }, 30000);
 };
 
-// Add absolute coordiates along side relative coordinates when the relative coordinates
+// Add absolute coordinates along side relative coordinates when the relative coordinates
 // are sourrounded in brackets []
 const relCoordsTranslate = (str: string): string => {
-    const size = hostedGameClient.value.getGame().board.size;
+    const size = hostedGameClient.value.getGame().getBoard().getSize();
 
-    return str.replaceAll(/\[(\d+'?)((?:-|,)?)(\d+'?)]/g, (_, row, sep, col) => {
-        const abRow = row.match(/\d+'/)
+    return str.replace(/\[(\d+'?)([-,]?)(\d+'?)]/g, (input, row: string, sep: string, col: string) => {
+        const rowNumber = row.endsWith("'")
             ? parseInt(row)
             : size - parseInt(row) + 1;
 
-        const abCol = col.match(/\d+'/)
-            ? Move.colToLetter(size - parseInt(col))
-            : Move.colToLetter(parseInt(col) - 1);
+        if (!Number.isInteger(rowNumber) || rowNumber < 1 || rowNumber > size)
+            return input;
 
-        return `${row}${sep || ''}${col}(${abCol}${abRow})`;
+        const colNumber = col.endsWith("'")
+            ? size - parseInt(col) + 1
+            : parseInt(col);
+
+        if (!Number.isInteger(colNumber) || colNumber < 1 || colNumber > size)
+            return input;
+
+        const colLetter = Move.colToLetter(colNumber - 1);
+
+        return `${row}${sep || ''}${col}(${colLetter}${rowNumber})`;
    });
 };
 
