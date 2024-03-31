@@ -191,6 +191,24 @@ const relCoordsTranslate = (str: string): string => {
    });
 };
 
+const renderMessage = (str: string): string => {
+    str = str.replace(/[<>&]/g, matched => {
+        switch (matched) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            default: return '';
+        }
+    });
+    str = str.replace(/https?:\/\/[\S]+[^\s?.,]/g, link => {
+        const escapedLink = link.replace(/"/g, '&quot;');
+        return `<a target="_blank" href="${escapedLink}">${link}</a>`;
+    });
+    if (str.includes('['))
+        str = relCoordsTranslate(str);
+    return str;
+};
+
 </script>
 
 <template>
@@ -286,7 +304,7 @@ const relCoordsTranslate = (str: string): string => {
                         <span class="player" v-if="message.author"><AppPseudo :player="message.author" :classes="playerColor(message.author)" /></span>
                         <span class="player fst-italic" v-else>System</span>
                         <span>&nbsp;</span>
-                        <span class="content">{{ relCoordsTranslate(message.content) }}</span>
+                        <span class="content" v-html="renderMessage(message.content)"></span>
                     </div>
                 </div>
             </div>
