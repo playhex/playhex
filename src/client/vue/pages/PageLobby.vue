@@ -107,6 +107,7 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
 ;
 
 const lobbyFilter = (hostedGameClient: HostedGameClient) => {
+    if (!isPlaying(hostedGameClient)) return false;
     const startTime = hostedGameClient.getHostedGameData().gameData?.startedAt ?? 0;
     const days = (Date.now() - startTime) / 86400000;
     const lastMove = hostedGameClient.getHostedGameData().gameData?.lastMoveAt;
