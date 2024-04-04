@@ -3,6 +3,9 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitReturns": true,
+        "resolveJsonModule": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "strictNullChecks": true
     }
 }

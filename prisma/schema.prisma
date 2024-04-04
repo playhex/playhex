@@ -49,6 +49,7 @@ model HostedGame {
   timeControl  Json
   createdAt    DateTime
   chatMessages ChatMessage[]
+  gameAnalyze  GameAnalyze?
 
   @@index([state, createdAt])
 }
@@ -117,4 +118,12 @@ model AIConfig {
   config           Json
 
   @@index([order])
+}
+
+model GameAnalyze {
+  hostedGame   HostedGame @relation(fields: [hostedGameId], references: [id])
+  hostedGameId Int        @unique
+  analyze      Json?
+  startedAt    DateTime   @default(now())
+  endedAt      DateTime?
 }

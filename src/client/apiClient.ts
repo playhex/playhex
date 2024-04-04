@@ -5,6 +5,7 @@ import { denormalize } from '@shared/app/serializer';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import ChatMessage from '../shared/app/models/ChatMessage';
 import AIConfig from '../shared/app/models/AIConfig';
+import GameAnalyze from '@shared/app/models/GameAnalyze';
 
 export class ApiClientError extends Error
 {
@@ -364,4 +365,38 @@ export const apiGetAiConfigsStatus = async (): Promise<AIConfigStatusData> => {
     await checkResponse(response);
 
     return await response.json();
+};
+
+export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | GameAnalyze> => {
+    const response = await fetch(`/api/games/${gamePublicId}/analyze`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    try {
+        await checkResponse(response);
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
+        }
+
+        return null;
+    }
+
+    return denormalize(await response.json());
+};
+
+export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameAnalyze> => {
+    const response = await fetch(`/api/games/${gamePublicId}/analyze`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return denormalize(await response.json());
 };

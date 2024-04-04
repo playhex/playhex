@@ -12,12 +12,17 @@ import PlayerRepository from '../../../repositories/PlayerRepository';
 import Player from '../../../../shared/app/models/Player';
 import ChatController from './ChatController';
 import AIConfigController from './AIConfigController';
+import GameAnalyzeController from './GameAnalyzeController';
 
 export const registerApi = (app: Express) => {
 
     useContainer(Container);
     useExpressServer(app, {
         defaultErrorHandler: false,
+        classToPlainTransformOptions: {
+            excludeExtraneousValues: true,
+            enableImplicitConversion: true,
+        },
         validation: {
             whitelist: true,
             forbidNonWhitelisted: true,
@@ -63,6 +68,7 @@ export const registerApi = (app: Express) => {
         controllers: [
             OnlinePlayersController,
             GameController,
+            GameAnalyzeController,
             ChatController,
             PlayerController,
             AuthController,

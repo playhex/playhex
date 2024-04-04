@@ -123,6 +123,14 @@ export default class Game extends TypedEmitter<GameEvents>
     }
 
     /**
+     * Returns move history as "a1 swap-pieces b4 c5 ..."
+     */
+    getMovesHistoryAsString(): string
+    {
+        return Move.movesAsString(this.movesHistory);
+    }
+
+    /**
      * @throws IllegalMove on invalid move.
      */
     checkMove(move: Move, byPlayerIndex: PlayerIndex): void
@@ -192,14 +200,6 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         return this.allowSwap
             && 1 === this.movesHistory.length
-        ;
-    }
-
-    hasSwapMove(): boolean
-    {
-        return this.allowSwap
-            && this.movesHistory.length >= 2
-            && (this.getFirstMove() as Move).hasSameCoordsAs(this.getSecondMove() as Move)
         ;
     }
 

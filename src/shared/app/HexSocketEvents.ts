@@ -4,6 +4,7 @@ import { HostedGameData } from './Types';
 import Player from './models/Player';
 import { GameTimeData } from 'time-control/TimeControl';
 import ChatMessage from './models/ChatMessage';
+import GameAnalyze from './models/GameAnalyze';
 
 export type HexClientToServerEvents = {
     /**
@@ -84,4 +85,11 @@ export type HexServerToClientEvents = {
      * A chat message has been posted in a game.
      */
     chat: (chatMessage: ChatMessage) => void;
+
+    /**
+     * Analyze has been requested for a given game, or has finished.
+     * See gameAnalyze.analyze and gameAnalyze.endedAt
+     * to know if game analyze has finished, or is just requested.
+     */
+    analyze: (gameId: string, gameAnalyze: GameAnalyze) => void;
 };

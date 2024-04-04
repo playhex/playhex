@@ -8,6 +8,7 @@ import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
 import Player from '../../../shared/app/models/Player';
 import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
+import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import Move from '@shared/game-engine/Move';
@@ -16,6 +17,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { outcomeToString } from '../../../shared/game-engine';
+import useAnalyzeStore from '../../stores/analyzeStore';
 
 const props = defineProps({
     hostedGameClient: {
@@ -209,6 +211,22 @@ const renderMessage = (str: string): string => {
     return str;
 };
 
+/*
+ * Game analyze
+ */
+const analyzeStore = useAnalyzeStore();
+const gameId = hostedGameClient.value.getId();
+const gameAnalyze = analyzeStore.getAnalyze(gameId);
+
+(async () => {
+    if (hostedGameClient.value.getGame().isEnded()) {
+        analyzeStore.loadAnalyze(gameId);
+    }
+})();
+
+const doAnalyzeGame = async () => {
+    analyzeStore.loadAnalyze(gameId, true);
+};
 </script>
 
 <template>
@@ -291,6 +309,23 @@ const renderMessage = (str: string): string => {
             </div>
         </div>
 
+        <div class="block-review" v-if="hostedGameClient.getGame().isEnded()">
+            <div class="container-fluid">
+                <div v-if="null === gameAnalyze" class="text-center">
+                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">Analyze game</button>
+                </div>
+                <p v-else-if="null === gameAnalyze.endedAt" class="text-center">
+                    Analyze requested…
+                    <small>({{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }})</small>
+                </p>
+                <p v-else-if="null === gameAnalyze.analyze" class="text-center text-warning">
+                    Analyze errored!
+                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">Try again</button>
+                </p>
+                <AppGameAnalyze v-else :analyze="gameAnalyze.analyze" />
+            </div>
+        </div>
+
         <div class="block-fill-rest">
             <div class="chat-messages" ref="chatMessagesElement">
                 <div class="container-fluid">
@@ -370,6 +405,9 @@ const renderMessage = (str: string): string => {
 .block-game-info
     h3
         margin-top 0.75rem
+
+.block-review
+    min-height 6em
 
 .block-controls
     > div

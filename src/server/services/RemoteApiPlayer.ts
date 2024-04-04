@@ -14,19 +14,10 @@ export default class RemoteApiPlayer
 
     private async fetchMove(engine: string, game: Game, config: { [key: string]: unknown }): Promise<Move>
     {
-        const moveHistory = game
-            .getMovesHistory()
-            .map(move => move.toString())
-        ;
-
-        if (game.hasSwapMove()) {
-            moveHistory[1] = 'swap-pieces';
-        }
-
         const payload: CalculateMoveRequest = {
             game: {
                 size: game.getSize(),
-                movesHistory: moveHistory.join(' '),
+                movesHistory: game.getMovesHistoryAsString(),
                 currentPlayer: 0 === game.getCurrentPlayerIndex() ? 'black' : 'white',
                 swapRule: game.getAllowSwap(),
             },
@@ -36,9 +27,11 @@ export default class RemoteApiPlayer
             },
         };
 
-        const moveString = await this.hexRemotePlayerApi.calculateMove(payload);
+        let moveString: null | string = null;
 
         try {
+            moveString = await this.hexRemotePlayerApi.calculateMove(payload);
+
             if ('swap-pieces' === moveString) {
                 const swapedMove = game.getFirstMove();
 
@@ -55,7 +48,7 @@ export default class RemoteApiPlayer
 
             return Move.fromString(moveString);
         } catch (e) {
-            logger.error(`Unexpected remote player move: "${moveString}"`);
+            logger.error(`Unexpected remote player move: "${moveString ?? '(api error)'}"`);
             throw new Error(e);
         }
     }

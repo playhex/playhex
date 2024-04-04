@@ -89,4 +89,18 @@ export default class Move implements Coords
             moveData.playedAt,
         );
     }
+
+    /**
+     * Returns moves like "a1 swap-pieces b4 c5 ..."
+     */
+    static movesAsString(moves: Move[]): string
+    {
+        const moveStrings = moves.map(move => move.toString());
+
+        if (moveStrings.length >= 2 && moveStrings[0] === moveStrings[1]) {
+            moveStrings[1] = 'swap-pieces';
+        }
+
+        return moveStrings.join(' ');
+    }
 }

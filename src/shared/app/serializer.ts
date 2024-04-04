@@ -47,13 +47,21 @@ export const normalize = (data: any, root = true): any => {
         return data;
     }
 
-    if (!data || 'Object' !== data.constructor.name) {
+    if (!data) {
         return data;
+    }
+
+    if ('object' !== typeof data || 'Date' === data.constructor.name) {
+        return data;
+    }
+
+    if ('Object' !== data.constructor.name) {
+        data = { ...data };
     }
 
     const { json, meta } = SuperJSON.serialize(data);
 
-    if (!json || 'Object' !== json.constructor.name) {
+    if (!json) {
         throw new Error(`Expected an object here, got ${json}`);
     }
 
