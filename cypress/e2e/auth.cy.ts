@@ -350,6 +350,7 @@ describe('Authentication', () => {
         cy.request('POST', '/api/games', {
             opponent: {
                 type: 'ai',
+                publicId: '77656f2d-0d80-48ba-b2d3-8f2816ced08c',
             },
             timeControl: {
                 type: 'fischer',

@@ -130,6 +130,7 @@
             "lastMoveAt": "2023-12-20T21:02:46.999Z",
             "endedAt": null
         },
+        "createdAt": "2023-12-20T21:02:44.748Z",
         "chatMessages": [],
         "state": "playing",
         "__meta": {
@@ -137,10 +138,55 @@
                 "timeControl.players.0.totalRemainingTime": [
                     "Date"
                 ],
+                "createdAt": [
+                    "Date"
+                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
                 "gameData.lastMoveAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.0.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.1.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.2.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.3.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.4.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.5.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.6.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.7.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.8.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.9.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.10.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.11.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.12.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.13.playedAt": [
                     "Date"
                 ]
             }
@@ -191,7 +237,15 @@
         },
         "gameData": null,
         "chatMessages": [],
-        "state": "created"
+        "createdAt": "2023-12-20T21:05:58.591Z",
+        "state": "created",
+        "__meta": {
+            "values": {
+                "createdAt": [
+                    "Date"
+                ]
+            }
+        }
     },
     {
         "id": "e212910d-9422-482d-97e1-b4d1c60516ed",
@@ -359,10 +413,14 @@
             "lastMoveAt": "2023-12-20T21:02:58.926Z",
             "endedAt": "2023-12-20T21:02:58.926Z"
         },
+        "createdAt": "2023-12-20T21:02:55.420Z",
         "chatMessages": [],
         "state": "ended",
         "__meta": {
             "values": {
+                "createdAt": [
+                    "Date"
+                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
@@ -370,6 +428,69 @@
                     "Date"
                 ],
                 "gameData.endedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.0.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.1.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.2.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.3.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.4.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.5.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.6.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.7.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.8.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.9.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.10.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.11.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.12.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.13.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.14.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.15.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.16.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.17.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.18.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.19.playedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.20.playedAt": [
                     "Date"
                 ]
             }
@@ -443,10 +564,14 @@
             "lastMoveAt": "2023-12-20T21:05:58.593Z",
             "endedAt": "2023-12-20T21:06:01.908Z"
         },
+        "createdAt": "2023-12-20T21:05:58.591Z",
         "chatMessages": [],
         "state": "canceled",
         "__meta": {
             "values": {
+                "createdAt": [
+                    "Date"
+                ],
                 "gameData.startedAt": [
                     "Date"
                 ],
@@ -454,6 +579,9 @@
                     "Date"
                 ],
                 "gameData.endedAt": [
+                    "Date"
+                ],
+                "gameData.movesHistory.0.playedAt": [
                     "Date"
                 ]
             }

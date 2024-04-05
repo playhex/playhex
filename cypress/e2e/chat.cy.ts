@@ -3,13 +3,7 @@ describe('Chat', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Play vs AI').click();
-
-        cy.contains('Game options')
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
-        ;
+        cy.createAIGameWithRandom();
 
         cy.get('[aria-label="Open game sidebar and chat"]').click();
 

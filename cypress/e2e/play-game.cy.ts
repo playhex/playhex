@@ -3,7 +3,7 @@ describe('Play a game to the end', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Play vs AI').click();
+        cy.createAIGameWithRandom(false);
 
         cy
             .contains('Game options')
@@ -46,11 +46,9 @@ describe('Play a game to the end', () => {
             .closest('.modal-content')
             .contains(/^First$/)
             .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         cy.get('canvas');
         cy.get('body')
@@ -71,11 +69,9 @@ describe('Play a game to the end', () => {
             .closest('.modal-content')
             .contains(/^First$/)
             .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         cy.get('canvas');
         cy.get('body')
@@ -99,11 +95,9 @@ describe('Play a game to the end', () => {
             .closest('.modal-content')
             .contains(/^Second$/)
             .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         cy.get('canvas');
         cy.get('body')

@@ -169,6 +169,7 @@ defineExpose({ compileOptions });
             <!-- eslint-disable vue/no-v-html label is safe, see defaultTimeControls -->
             <label
                 class="btn btn-outline-primary"
+                :for="'choice-' + label"
                 v-html="label"
             ></label>
         </template>

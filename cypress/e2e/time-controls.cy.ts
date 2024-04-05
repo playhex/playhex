@@ -3,7 +3,7 @@ describe('Time controls', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Play vs AI').click();
+        cy.createAIGameWithRandom(false);
 
         cy
             .contains('Game options')
@@ -34,11 +34,9 @@ describe('Time controls', () => {
             .closest('div')
             .contains('Normal 10 + 5')
             .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         cy.contains('Determinist random bot');
         cy.contains('10:00');
@@ -53,11 +51,9 @@ describe('Time controls', () => {
             .closest('div')
             .contains('Fast 5 + 2')
             .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         cy.contains('Determinist random bot');
         cy.contains('5:00');
@@ -83,12 +79,7 @@ describe('Time controls', () => {
 
         cy.contains('Periods:');
 
-        cy
-            .contains('Game options')
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
-        ;
+        cy.submitAIGame();
 
         cy.contains('Determinist random bot');
         cy.contains('10:00 + 5 × 5s');
@@ -105,12 +96,7 @@ describe('Time controls', () => {
             .click()
         ;
 
-        cy
-            .contains('Game options')
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
-        ;
+        cy.submitAIGame();
 
         cy.contains('Determinist random bot');
         cy.contains('10:00');

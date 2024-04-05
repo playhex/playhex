@@ -35,3 +35,52 @@
 //     }
 //   }
 // }
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare namespace Cypress {
+    interface Chainable {
+        /**
+         * Open AI game creation popin, select determinist bot.
+         * Pass submit=false to keep game options popin open.
+         */
+        createAIGameWithRandom(submit?: boolean): Chainable<unknown>;
+
+        /**
+         * To use after createAIGameWithRandom(false),
+         * submit game options and create game.
+         */
+        submitAIGame(): Chainable<unknown>;
+    }
+}
+
+Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
+    cy.contains('Play vs AI').click();
+
+    cy
+        .contains('Game options')
+        .closest('.modal-content')
+        .contains('random')
+        .click()
+    ;
+
+    cy
+        .contains('Game options')
+        .closest('.modal-content')
+        .contains('Determinist')
+        .click()
+    ;
+
+    if (!submit) {
+        return;
+    }
+
+    cy.submitAIGame();
+});
+
+Cypress.Commands.add('submitAIGame', () => {
+    cy.contains('Game options')
+        .closest('.modal-content')
+        .contains('Play vs AI')
+        .click()
+    ;
+});

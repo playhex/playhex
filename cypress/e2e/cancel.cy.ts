@@ -3,13 +3,7 @@ describe('Cancel a game', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Play vs AI').click();
-
-        cy.contains('Game options')
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
-        ;
+        cy.createAIGameWithRandom();
 
         cy
             .contains('Cancel')
@@ -17,7 +11,7 @@ describe('Cancel a game', () => {
         ;
 
         cy
-            .contains('Are you sure you want to cancel game?')
+            .contains('Are you sure you want to cancel the game?')
             .closest('.modal-content')
             .contains('Yes, cancel')
             .click()

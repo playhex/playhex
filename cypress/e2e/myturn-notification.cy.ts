@@ -105,7 +105,7 @@ describe('My turn notification', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Play vs AI').click();
+        cy.createAIGameWithRandom(false);
 
         cy
             .contains('Game options')
@@ -123,11 +123,9 @@ describe('My turn notification', () => {
             .closest('.modal-content')
             .contains(/^First$/)
             .click()
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         cy.contains('random bot');
 

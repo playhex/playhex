@@ -3,15 +3,9 @@ describe('Resign a game', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
-        cy.contains('Play vs AI').click();
+        cy.createAIGameWithRandom();
 
-        cy.contains('Game options')
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
-        ;
-
-        // Play at least one move to have Resign button
+        // Play at least one move to have Resign button (random bot will play the other move)
         cy.get('canvas');
         cy.get('body').click(409, 326);
 

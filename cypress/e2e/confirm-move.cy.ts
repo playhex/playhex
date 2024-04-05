@@ -4,7 +4,7 @@ describe('Confirm move', () => {
         cy.get('.menu-top').contains(/Guest \d+/);
 
         // Create normal game
-        cy.contains('Play vs AI').click();
+        cy.createAIGameWithRandom(false);
 
         cy
             .contains('Game options')
@@ -16,11 +16,9 @@ describe('Confirm move', () => {
             .get('input[type=number]')
             .clear()
             .type('11')
-
-            .closest('.modal-content')
-            .contains('Play vs AI')
-            .click()
         ;
+
+        cy.submitAIGame();
 
         // Confirm move button not there by default on normal games
         cy.contains('button', 'Cancel');
