@@ -421,7 +421,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             timeControl: this.timeControl.getValues(),
             gameOptions: this.gameOptions,
             gameData: this.game?.toData() ?? null,
-            chatMessages: this.chatMessages.map(chat => ({ ...chat })),
+            chatMessages: this.chatMessages,
             state: this.state,
             createdAt: this.createdAt,
         };
