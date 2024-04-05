@@ -155,7 +155,7 @@ const submitPasswordChange = async () => {
                 <label class="col-sm-4 col-md-3 col-form-label"><BIconPcDisplayHorizontal /> Landscape</label>
                 <div class="col-sm-8 col-md-9">
                     <div class="btn-group" role="group">
-                        <template v-for="orientation in landscapeOrientations" :key="i">
+                        <template v-for="orientation in landscapeOrientations" :key="orientation.value">
                             <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation.value" :id="'landscape-radio-' + orientation.value" autocomplete="off">
                             <label class="btn" :for="'landscape-radio-' + orientation.value">
                                 <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
@@ -171,7 +171,7 @@ const submitPasswordChange = async () => {
                 <label class="col-sm-4 col-md-3 col-form-label"><BIconPhone /> Portrait</label>
                 <div class="col-sm-8 col-md-9">
                     <div class="btn-group" role="group">
-                        <template v-for="orientation in portraitOrientations" :key="i">
+                        <template v-for="orientation in portraitOrientations" :key="orientation.value">
                             <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation.value" :id="'portrait-radio-' + orientation.value" autocomplete="off">
                             <label class="btn" :for="'portrait-radio-' + orientation.value">
                                 <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>

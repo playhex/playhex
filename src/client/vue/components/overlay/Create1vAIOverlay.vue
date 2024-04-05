@@ -101,7 +101,7 @@ const capSelectedBoardsize = () => {
                         </template>
 
                         <ul class="nav nav-pills nav-justified ai-engine-choice">
-                            <li v-for="(_, engine) in aiConfigs" class="nav-item">
+                            <li v-for="(_, engine) in aiConfigs" :key="engine" class="nav-item">
                                 <button type="button" class="nav-link" :class="{ active: engine === selectedEngine }" @click="selectedEngine = (engine as string)">{{ engine }}</button>
                             </li>
                         </ul>
@@ -127,14 +127,14 @@ const capSelectedBoardsize = () => {
 
                         <div class="mb-3">
                             <AppBoardsize
-                                :game-options="gameOptions"
-                                :boardsize-min="selectedAiConfig?.boardsizeMin ?? undefined"
-                                :boardsize-max="selectedAiConfig?.boardsizeMax ?? undefined"
+                                :gameOptions="gameOptions"
+                                :boardsizeMin="selectedAiConfig?.boardsizeMin ?? undefined"
+                                :boardsizeMax="selectedAiConfig?.boardsizeMax ?? undefined"
                             />
                         </div>
 
                         <div class="mb-3">
-                            <AppTimeControl :game-options="gameOptions" ref="timeControlComponent" />
+                            <AppTimeControl :gameOptions="gameOptions" ref="timeControlComponent" />
                         </div>
 
                         <button
@@ -152,11 +152,11 @@ const capSelectedBoardsize = () => {
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <AppPlayFirstOrSecond :game-options="gameOptions" />
+                            <AppPlayFirstOrSecond :gameOptions="gameOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <AppSwapRule :game-options="gameOptions" />
+                            <AppSwapRule :gameOptions="gameOptions" />
                         </div>
                     </div>
                     <div class="modal-footer">

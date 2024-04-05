@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '../../pixi-board/GameView';
-import { onMounted, onUnmounted, ref } from '@vue/runtime-core';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { PropType, toRefs } from 'vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
@@ -20,9 +20,13 @@ const props = defineProps({
     },
     timeControlOptions: {
         type: Object as PropType<TimeControlType>,
+        required: false,
+        default: null,
     },
     timeControlValues: {
         type: Object as PropType<GameTimeData>,
+        required: false,
+        default: null,
     },
     gameView: {
         type: GameView,
@@ -31,6 +35,7 @@ const props = defineProps({
     rematch: {
         type: Function,
         required: false,
+        default: null,
     },
 });
 

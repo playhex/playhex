@@ -116,10 +116,10 @@ const rematch = () => {
         <AppBoard
             :key="reload"
             v-if="gameView"
-            :game-view="gameView"
+            :gameView="gameView"
             :players="players"
             :rematch="rematch"
-        ></AppBoard>
+        />
     </div>
 </template>
 

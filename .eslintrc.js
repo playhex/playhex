@@ -3,6 +3,7 @@ module.exports = {
     extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
+        'plugin:vue/vue3-recommended',
     ],
     parser: 'vue-eslint-parser',
     parserOptions: {
@@ -37,6 +38,14 @@ module.exports = {
             'multilineDetection': 'last-member',
         }],
         'no-console': 'warn',
+        'vue/script-indent': ['warn', 4, { 'baseIndent': 0, 'switchCase': 1 }],
+        'vue/html-indent': ['warn', 4, { 'baseIndent': 1 }],
+        'vue/max-attributes-per-line': 'off',
+        'vue/singleline-html-element-content-newline': 'off',
+        'vue/attributes-order': 'off',
+        'vue/html-self-closing': ['warn', { 'html': { 'component': 'always', 'void': 'any', 'normal': 'any' } }],
+        'vue/multiline-html-element-content-newline': 'off',
+        'vue/attribute-hyphenation': ['warn', 'never'],
         'vue/component-name-in-template-casing': ['warn', 'PascalCase']
     },
 };

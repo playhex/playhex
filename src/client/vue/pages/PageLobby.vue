@@ -237,8 +237,8 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                 </td>
                                 <td><AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" /></td>
                                 <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
-                                <td><AppTimeControlLabelVue :game-options="hostedGameClient.getGameOptions()" /></td>
-                                <td><AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></td>
+                                <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
+                                <td><AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGameClient.getHostedGameData().createdAt, { addSuffix: true })
                                 }}</td>
@@ -282,7 +282,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" />
                                 </td>
                                 <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabelVue :game-options="hostedGameClient.getGameOptions()" /></td>
+                                <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGameClient.getHostedGameData().gameData?.startedAt ?? 0, { addSuffix: true })
                                 }}</td>
@@ -326,7 +326,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <td>-</td>
                                 </template>
                                 <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabelVue :game-options="hostedGameClient.getGameOptions()" /></td>
+                                <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGameClient.getHostedGameData().gameData?.endedAt ?? 0, { addSuffix: true })
                                 }}</td>
@@ -340,7 +340,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                 </div>
             </div>
             <div class="col-sm-3">
-                <AppSidebar></AppSidebar>
+                <AppSidebar />
             </div>
         </div>
     </div>

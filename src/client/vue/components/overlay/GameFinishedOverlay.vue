@@ -25,6 +25,7 @@ const props = defineProps({
     rematch: {
         type: Function,
         required: false,
+        default: null,
     },
 });
 
@@ -103,7 +104,7 @@ const downloadSGF = (): void => {
                             class="btn btn-sm btn-outline-primary"
                             target="_blank"
                             :href="gameToHexworldLink(game)"
-                        ><BIconBoxArrowUpRight/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
+                        ><BIconBoxArrowUpRight /> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
                     </div>
                 </form>
             </div>

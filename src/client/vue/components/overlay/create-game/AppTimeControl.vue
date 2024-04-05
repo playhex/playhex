@@ -10,10 +10,6 @@ const props = defineProps({
         type: Object as PropType<GameOptionsData>,
         required: true,
     },
-    beforeSubmit: {
-        type: Function,
-        required: false,
-    },
 });
 
 const { gameOptions } = toRefs(props);
@@ -170,9 +166,9 @@ defineExpose({ compileOptions });
                 @click="showCustomTimeControl = false"
                 :id="'choice-' + label"
             >
+            <!-- eslint-disable vue/no-v-html label is safe, see defaultTimeControls -->
             <label
                 class="btn btn-outline-primary"
-                :for="'choice-' + label"
                 v-html="label"
             ></label>
         </template>

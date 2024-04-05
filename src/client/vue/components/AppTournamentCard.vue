@@ -21,7 +21,7 @@ const props = defineProps({
 
 const { name, registerLink, startDate } = props;
 
- const startsInStr = (): string => {
+const startsInStr = (): string => {
     const seconds = Math.floor((startDate.getTime() - new Date().getTime()) / 1000);
 
     return secondsToTime(seconds);

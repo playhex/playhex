@@ -47,11 +47,11 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <AppBoardsize :game-options="gameOptions" />
+                            <AppBoardsize :gameOptions="gameOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <AppTimeControl :game-options="gameOptions" ref="timeControlComponent" />
+                            <AppTimeControl :gameOptions="gameOptions" ref="timeControlComponent" />
                         </div>
 
                         <button
@@ -69,11 +69,11 @@ const submitForm = (gameOptions: GameOptionsData): void => {
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <AppPlayFirstOrSecond :game-options="gameOptions" />
+                            <AppPlayFirstOrSecond :gameOptions="gameOptions" />
                         </div>
 
                         <div class="mb-3">
-                            <AppSwapRule :game-options="gameOptions" />
+                            <AppSwapRule :gameOptions="gameOptions" />
                         </div>
                     </div>
                     <div class="modal-footer">

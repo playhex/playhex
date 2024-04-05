@@ -8,7 +8,7 @@
         </div>
         <div class="col-12 col-sm-8 col-md-9">
             <div class="container my-3">
-                <router-view></router-view>
+                <router-view />
             </div>
         </div>
     </div>

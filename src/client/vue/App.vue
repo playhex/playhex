@@ -10,15 +10,15 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
 <template>
     <div class="app-layout">
         <header>
-            <AppHeader></AppHeader>
+            <AppHeader />
         </header>
 
         <main>
-            <router-view></router-view>
+            <router-view />
         </main>
 
         <footer v-if="displayFooter()">
-            <AppFooter></AppFooter>
+            <AppFooter />
         </footer>
     </div>
 </template>

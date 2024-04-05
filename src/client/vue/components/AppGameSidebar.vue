@@ -190,7 +190,7 @@ const relCoordsTranslate = (str: string): string => {
         const colLetter = Move.colToLetter(colNumber - 1);
 
         return `${row}${sep || ''}${col}(${colLetter}${rowNumber})`;
-   });
+    });
 };
 
 const renderMessage = (str: string): string => {
@@ -236,9 +236,9 @@ const doAnalyzeGame = async () => {
                 <template v-if="'created' === hostedGameClient.getState()">
                     <h3>Waiting for an opponent…</h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                     </p>
                     <p>
                         Game created by
@@ -249,9 +249,9 @@ const doAnalyzeGame = async () => {
                 <template v-if="'canceled' === hostedGameClient.getState()">
                     <h3>Game has been canceled</h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                     </p>
                     <p>
                         Game was created by
@@ -262,9 +262,9 @@ const doAnalyzeGame = async () => {
                 <template v-if="'playing' === hostedGameClient.getState()">
                     <h3>Playing</h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>Started: {{ format(hostedGameClient.getHostedGameData().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
@@ -278,9 +278,9 @@ const doAnalyzeGame = async () => {
                         </template>
                     </h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :game-options="hostedGameClient.getGameOptions()" /></small>
+                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>Started: {{ format(hostedGameClient.getHostedGameData().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                         <br>
@@ -300,7 +300,7 @@ const doAnalyzeGame = async () => {
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     target="_blank"
                     :href="gameToHexworldLink(hostedGameClient.getGame())"
-                ><BIconBoxArrowUpRight/> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
+                ><BIconBoxArrowUpRight /> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
 
                 <br>
                 <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click="e => { e.preventDefault(); shareGameLinkAndShowResult() }"><BIconShareFill /> Share game</a>
@@ -332,6 +332,7 @@ const doAnalyzeGame = async () => {
                     <small>Chat</small>
                     <div
                         v-for="message in hostedGameClient.getChatMessages()"
+                        :key="message.createdAt.getTime()"
                         class="chat-message"
                     >
                         <span class="time text-muted">{{ formatHour(message.createdAt) }}</span>
@@ -339,6 +340,7 @@ const doAnalyzeGame = async () => {
                         <span class="player" v-if="message.author"><AppPseudo :player="message.author" :classes="playerColor(message.author)" /></span>
                         <span class="player fst-italic" v-else>System</span>
                         <span>&nbsp;</span>
+                        <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
                         <span class="content" v-html="renderMessage(message.content)"></span>
                     </div>
                 </div>

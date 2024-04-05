@@ -11,10 +11,12 @@ const props = defineProps({
     boardsizeMin: {
         type: Number,
         required: false,
+        default: undefined,
     },
     boardsizeMax: {
         type: Number,
         required: false,
+        default: undefined,
     },
 });
 

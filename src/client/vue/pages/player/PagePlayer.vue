@@ -287,8 +287,8 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                         </td>
                         <td><AppPseudoWithOnlineStatusVue :player="(game.getOtherPlayer(player) as Player)" /></td>
                         <td>{{ game.getHostedGameData().gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabelVue :game-options="game.getGameOptions()" /></td>
-                        <td><AppGameRulesSummary :game-options="game.getGameOptions()" /></td>
+                        <td><AppTimeControlLabelVue :gameOptions="game.getGameOptions()" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game.getGameOptions()" /></td>
                         <td>{{
                             formatDistanceToNowStrict(game.getHostedGameData().gameData?.startedAt ?? 0, { addSuffix: true })
                         }}</td>
@@ -327,8 +327,8 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                         <td v-else style="width: 7em" class="text-danger">{{ lossOutcomeToString(game?.gameData?.outcome ?? null) }}</td>
                         <td><AppPseudoWithOnlineStatusVue :player="getOpponent(game)" /></td>
                         <td>{{ game.gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabelVue :game-options="game.gameOptions" /></td>
-                        <td><AppGameRulesSummary :game-options="game.gameOptions" /></td>
+                        <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
                         <td>{{
                             formatDistanceToNowStrict(game.gameData?.endedAt ?? 0, { addSuffix: true })
                         }}</td>

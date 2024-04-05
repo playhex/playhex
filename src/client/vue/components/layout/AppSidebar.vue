@@ -16,21 +16,21 @@ const {
     <div>
         <AppTournamentCard
             name="Hex Monthly 16"
-            :start-date="new Date('2024-04-20T17:00:00Z')"
-            register-link="https://challonge.com/hex_monthly_16"
+            :startDate="new Date('2024-04-20T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_16"
         />
         <AppTournamentCard
             name="Hex Monthly 17"
-            :start-date="new Date('2024-05-18T17:00:00Z')"
-            register-link="https://challonge.com/hex_monthly_17"
+            :startDate="new Date('2024-05-18T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_17"
         />
         <AppTournamentCard
             name="Hex Monthly 18"
-            :start-date="new Date('2024-06-15T17:00:00Z')"
-            register-link="https://challonge.com/hex_monthly_18"
+            :startDate="new Date('2024-06-15T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_18"
         />
 
-        <h3>Online ({{ null === totalPlayers ? '…' : totalPlayers}})</h3>
+        <h3>Online ({{ null === totalPlayers ? '…' : totalPlayers }})</h3>
 
         <p
             v-for="player in players"

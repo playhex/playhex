@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import GameView from '@client/pixi-board/GameView';
 import useLobbyStore from '@client/stores/lobbyStore';
-import { ref } from '@vue/runtime-core';
+import { ref } from 'vue';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
@@ -333,11 +333,11 @@ const unreadMessages = (): number => {
                 <AppBoard
                     v-if="null !== hostedGameClient && null !== gameView"
                     :players="hostedGameClient.getPlayers()"
-                    :time-control-options="hostedGameClient.getTimeControlOptions()"
-                    :time-control-values="hostedGameClient.getTimeControlValues()"
-                    :game-view="gameView"
+                    :timeControlOptions="hostedGameClient.getTimeControlOptions()"
+                    :timeControlValues="hostedGameClient.getTimeControlValues()"
+                    :gameView="gameView"
                     :rematch="rematch"
-                ></AppBoard>
+                />
 
                 <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="join-button-container">
                     <div class="d-flex justify-content-center">
@@ -368,7 +368,7 @@ const unreadMessages = (): number => {
 
         <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
             <AppGameSidebar
-                :hosted-game-client="hostedGameClient"
+                :hostedGameClient="hostedGameClient"
                 @close="sidebarOpen = false"
                 @toggle-coords="toggleCoords()"
             />
