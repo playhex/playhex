@@ -55,6 +55,7 @@ const color = (): string => null === mostUrgentGame.value
             <span class="my-turn-notif">
                 <component
                     :is="isFilled() ? BIconHexagonFill : BIconHexagon"
+                    class="hexagon"
                     :class="color()"
                 />
                 <a
@@ -87,7 +88,7 @@ nav
 
 .my-turn-notif
     position relative
-    font-size 1.7em
+    font-size 2em
     width 2em
     display flex
     justify-content center
@@ -99,6 +100,10 @@ nav
         width 100%
 
     a
+        margin-top -0.05em
         font-size 0.8em
         text-decoration none
+
+    .hexagon
+        transform: rotate(30deg)
 </style>

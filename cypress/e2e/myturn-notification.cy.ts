@@ -6,7 +6,9 @@ const hasOnlyClass = (
     'text-primary',
     'text-secondary',
 ].every(
-    c => $element.hasClass(c) === (c === classname),
+    c => !['text-danger', 'text-primary', 'text-secondary'].includes(classname)
+        || $element.hasClass(c) === (c === classname)
+    ,
 );
 
 const isEmptyHexagon = ($element: JQuery<HTMLElement>): boolean => {
