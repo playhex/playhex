@@ -31,7 +31,7 @@ onMounted(() => {
 <template>
     <div class="review-pixi" ref="gameAnalyzeContainer"></div>
     <div class="analyze-move-info">
-        <p v-if="moveAnalyze">
+        <span v-if="moveAnalyze">
             <template v-if="moveAnalyze.move.move === moveAnalyze.bestMoves[0].move">
                 <span :class="moveAnalyze.color">{{ moveAnalyze.move.move }}</span> (best move)
             </template>
@@ -43,7 +43,7 @@ onMounted(() => {
                 - best: <span :class="moveAnalyze.color">{{ moveAnalyze.bestMoves[0].move }}</span>
                 ({{ moveAnalyze.bestMoves[0].whiteWin?.toFixed(2) ?? '-' }})
             </template>
-        </p>
+        </span>
     </div>
 </template>
 

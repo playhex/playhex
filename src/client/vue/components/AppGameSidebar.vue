@@ -309,27 +309,33 @@ const doAnalyzeGame = async () => {
             </div>
         </div>
 
-        <div class="block-review" v-if="hostedGameClient.getGame().isEnded()">
+        <div class="block-analyze" v-if="hostedGameClient.getGame().isEnded()">
             <div class="container-fluid">
                 <div v-if="null === gameAnalyze" class="text-center">
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">Analyze game</button>
                 </div>
-                <p v-else-if="null === gameAnalyze.endedAt" class="text-center">
+                <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height">
                     Analyze requested…
-                    <small>({{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }})</small>
+                    <br>
+                    <small class="text-body-secondary">{{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }}</small>
                 </p>
-                <p v-else-if="null === gameAnalyze.analyze" class="text-center text-warning">
+                <p v-else-if="null === gameAnalyze.analyze" class="text-center text-warning analyze-min-height">
                     Analyze errored!
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">Try again</button>
                 </p>
-                <AppGameAnalyze v-else :analyze="gameAnalyze.analyze" />
+                <div v-else class="analyze-min-height">
+                    <small>Game analyze by AI</small>
+                    <AppGameAnalyze :analyze="gameAnalyze.analyze" />
+                </div>
             </div>
         </div>
 
         <div class="block-fill-rest">
+            <div class="container-fluid">
+                <small>Chat</small>
+            </div>
             <div class="chat-messages" ref="chatMessagesElement">
                 <div class="container-fluid">
-                    <small>Chat</small>
                     <div
                         v-for="message in hostedGameClient.getChatMessages()"
                         :key="message.createdAt.getTime()"
@@ -408,8 +414,9 @@ const doAnalyzeGame = async () => {
     h3
         margin-top 0.75rem
 
-.block-review
-    min-height 6em
+.block-analyze .analyze-min-height
+    min-height 9em
+    margin 0
 
 .block-controls
     > div
