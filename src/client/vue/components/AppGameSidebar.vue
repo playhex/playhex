@@ -157,7 +157,7 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
         copiedResult.value = false;
     }
 
-    copiedResultTimeout = setTimeout(() => {
+    copiedResultTimeout = window.setTimeout(() => {
         copiedResult.value = null;
 
         if (null !== copiedResultTimeout) {

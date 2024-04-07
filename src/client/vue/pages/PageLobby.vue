@@ -108,8 +108,8 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
 
 const lobbyFilter = (hostedGameClient: HostedGameClient) => {
     if (!isPlaying(hostedGameClient)) return false;
-    const startTime = hostedGameClient.getHostedGameData().gameData?.startedAt ?? 0;
-    const days = (Date.now() - startTime) / 86400000;
+    const startTime = hostedGameClient.getHostedGameData().gameData?.startedAt ?? hostedGameClient.getHostedGameData().createdAt;
+    const days = (Date.now() - startTime.getTime()) / 86400000;
     const lastMove = hostedGameClient.getHostedGameData().gameData?.lastMoveAt;
     // Hide games with no moves and >= 1 days since the game start
     return days < 1 || lastMove != null;
