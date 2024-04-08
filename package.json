@@ -1,6 +1,7 @@
 {
   "main": "index.js",
   "scripts": {
+    "hex": "ts-node --project src/server/tsconfig.json src/server/commands",
     "analyse-size": "DATE=$(date '+%Y%m%d-%H%M%S'); NODE_ENV=production webpack --profile --json | grep -E '^{' | sed -E 's/Done in .+//' > size-stats-$DATE.json && webpack-bundle-analyzer size-stats-$DATE.json dist/statics/",
     "lint": "eslint src --ext .ts,.vue && vue-tsc -p src/client --noEmit",
     "start": "node index.js",
@@ -30,6 +31,7 @@
     "bootstrap-icons-vue": "^1.11.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "commander": "^12.0.0",
     "connect-redis": "^7.1.0",
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^2.30.0",
@@ -69,6 +71,7 @@
     "@babel/plugin-transform-runtime": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
+    "@commander-js/extra-typings": "^12.0.1",
     "@types/debounce": "^1.2.1",
     "@types/events": "^3.0.0",
     "@types/express": "^4.17.13",

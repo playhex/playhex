@@ -61,7 +61,7 @@ export const findAIOpponent = async (gameOptions: GameOptionsData): Promise<null
     return player;
 };
 
-const validateConfigRandom = (config: unknown): config is { determinist: boolean } => {
+export const validateConfigRandom = (config: unknown): config is { determinist: boolean } => {
     return 'object' === typeof config
         && null !== config
         && 'determinist' in config

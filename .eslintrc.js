@@ -48,4 +48,12 @@ module.exports = {
         'vue/attribute-hyphenation': ['warn', 'never'],
         'vue/component-name-in-template-casing': ['warn', 'PascalCase']
     },
+    overrides: [
+        {
+            files: ['src/server/commands/*'],
+            rules: {
+                'no-console': 'off',
+            },
+        },
+    ],
 };

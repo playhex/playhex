@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useOverlayMeta } from 'unoverlay-vue';
-import { PropType, Ref, ref } from 'vue';
+import { PropType, Ref, ref, watch } from 'vue';
 import { GameOptionsData, sanitizeGameOptions } from '@shared/app/GameOptions';
 import { defaultGameOptions } from '@shared/app/GameOptions';
 import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from 'bootstrap-icons-vue';
@@ -40,13 +40,31 @@ const submitForm = (gameOptions: GameOptionsData): void => {
  * AI configs
  */
 const { aiConfigs } = storeToRefs(useAiConfigsStore());
-const selectedEngine = ref('katahex');
+const selectedEngine = ref<null | string>(null);
 const selectedAiConfig = ref<AIConfig<'withPlayerId'> | null>(null);
 const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
 
 (async () => {
     aiConfigsStatus.value = await apiGetAiConfigsStatus();
 })();
+
+const selectEngine = (engine: string): void => {
+    selectedEngine.value = engine;
+    selectAiConfig(aiConfigs.value[selectedEngine.value][0]);
+};
+
+const selectAiConfig = (aiConfig: AIConfig<'withPlayerId'>): void => {
+    selectedAiConfig.value = aiConfig;
+    capSelectedBoardsize();
+};
+
+if (Object.values(aiConfigs.value).length > 0) {
+    selectEngine(Object.keys(aiConfigs.value)[0]);
+} else {
+    watch(aiConfigs.value, newAiConfig => {
+        selectEngine(Object.keys(newAiConfig)[0]);
+    });
+}
 
 const isAIConfigAvailable = (aiConfig: AIConfig<'withPlayerId'>): boolean => {
     if (!aiConfig.isRemote) {
@@ -102,15 +120,15 @@ const capSelectedBoardsize = () => {
 
                         <ul class="nav nav-pills nav-justified ai-engine-choice">
                             <li v-for="(_, engine) in aiConfigs" :key="engine" class="nav-item">
-                                <button type="button" class="nav-link" :class="{ active: engine === selectedEngine }" @click="selectedEngine = (engine as string)">{{ engine }}</button>
+                                <button type="button" class="nav-link" :class="{ active: engine === selectedEngine }" @click="selectEngine(engine as string)">{{ engine }}</button>
                             </li>
                         </ul>
 
-                        <div class="engine-configs">
+                        <div v-if="selectedEngine" class="engine-configs">
                             <div v-for="aiConfig in aiConfigs[selectedEngine]" :key="aiConfig.player.publicId" class="form-check">
                                 <input
                                     v-model="gameOptions.opponent.publicId"
-                                    @click="selectedAiConfig = aiConfig; capSelectedBoardsize()"
+                                    @click="selectAiConfig(aiConfig)"
                                     required
                                     :disabled="!isAIConfigAvailable(aiConfig)"
                                     class="form-check-input"
