@@ -4,8 +4,8 @@ import { HexServer, HexSocket } from '../../server';
 import OnlinePlayersService from '../../services/OnlinePlayersService';
 import Rooms from '../../../shared/app/Rooms';
 
-@Service({ id: 'websocket_controller', multiple: true })
-export default class OnlinePlayersController implements WebsocketControllerInterface
+@Service()
+export default class OnlinePlayersWebsocketController implements WebsocketControllerInterface
 {
     constructor(
         private hexServer: HexServer,

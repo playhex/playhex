@@ -4,7 +4,7 @@ import { WebsocketControllerInterface } from '.';
 import { HexSocket } from '../../server';
 import ChatMessage from '../../../shared/app/models/ChatMessage';
 
-@Service({ id: 'websocket_controller', multiple: true })
+@Service()
 export default class ChatWebsocketController implements WebsocketControllerInterface
 {
     constructor(

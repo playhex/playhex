@@ -1,8 +1,9 @@
 import { HexServer, HexSocket } from '../../server';
 import Container from 'typedi';
+import RoomWebsocketController from './RoomWebsocketController';
 import LobbyWebsocketController from './LobbyWebsocketController';
 import GameWebsocketController from './GameWebsocketController';
-import OnlinePlayersController from './OnlinePlayersController';
+import OnlinePlayersWebsocketController from './OnlinePlayersWebsocketController';
 import ChatWebsocketController from './ChatWebsocketController';
 
 export interface WebsocketControllerInterface
@@ -11,24 +12,17 @@ export interface WebsocketControllerInterface
 }
 
 export function registerWebsocketControllers() {
-    // Explicitely load all WebsocketControllerInterface here to make them available in container.
-    ChatWebsocketController;
-    LobbyWebsocketController;
-    GameWebsocketController;
-    OnlinePlayersController;
-
-    const websocketControllers = Container.getMany<WebsocketControllerInterface>('websocket_controller');
+    const websocketControllers: WebsocketControllerInterface[] = [
+        Container.get(RoomWebsocketController),
+        Container.get(ChatWebsocketController),
+        Container.get(LobbyWebsocketController),
+        Container.get(GameWebsocketController),
+        Container.get(OnlinePlayersWebsocketController),
+    ];
 
     Container
         .get(HexServer)
         .on('connection', socket => {
-            socket.on('room', (join, room) => {
-                socket[join](room);
-            });
-
-            socket.join('lobby');
-            socket.join('online-players');
-
             websocketControllers.forEach(websocketController => {
                 websocketController.onConnection(socket);
             });
