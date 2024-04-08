@@ -156,6 +156,11 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         try {
             const move = await makeAIPlayerMove(player, this);
 
+            // Player canceled or resigned while ai was processing, do nothing.
+            if (this.game.isEnded()) {
+                return;
+            }
+
             if (null === move) {
                 this.game.resign(playerIndex);
                 return;

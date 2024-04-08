@@ -53,7 +53,7 @@ export default class RemoteApiPlayer
         }
     }
 
-    async makeMove(engine: string, hostedGame: HostedGame, config: { [key: string]: unknown }): Promise<null | Move>
+    async makeMove(engine: string, hostedGame: HostedGame, config: { maxGames?: number, treeSearch?: boolean }): Promise<null | Move>
     {
         const game = hostedGame.getGame();
 
@@ -63,7 +63,7 @@ export default class RemoteApiPlayer
 
         const measure = new TimeMeasureMetric('ai_time_to_respond', {
             engine,
-            level: 20,
+            level: config.maxGames ?? (config.treeSearch ? 500000 : 0) ?? -1,
             boardsize: game.getSize(),
             gameId: hostedGame.getId(),
         });
