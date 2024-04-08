@@ -59,7 +59,7 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
     cy
         .contains('Game options')
         .closest('.modal-content')
-        .contains('random')
+        .contains('button', 'random')
         .click()
     ;
 

@@ -349,8 +349,7 @@ describe('Authentication', () => {
          */
         cy.request('POST', '/api/games', {
             opponent: {
-                type: 'ai',
-                publicId: '77656f2d-0d80-48ba-b2d3-8f2816ced08c',
+                type: 'player',
             },
             timeControl: {
                 type: 'fischer',
@@ -370,7 +369,6 @@ describe('Authentication', () => {
 
             assert.doesNotHaveAnyKeys(game.host, ['id', 'password']);
             assert.doesNotHaveAnyKeys(game.players[0], ['id', 'password']);
-            assert.doesNotHaveAnyKeys(game.players[1], ['id', 'password']);
         });
 
         /*
