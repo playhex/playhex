@@ -1,6 +1,18 @@
 const icon = '/images/logo-transparent.svg';
 
+export const requestNotificationPermission = (): void => {
+    if ('undefined' === typeof Notification) {
+        return;
+    }
+
+    if (Notification.permission === 'default') Notification.requestPermission();
+};
+
 const sendNotification = (options: NotificationOptions, route: () => void) => {
+    if ('undefined' === typeof Notification) {
+        return;
+    }
+
     if (Notification.permission === 'default') {
         Notification.requestPermission();
     } else if (Notification.permission === 'granted') {

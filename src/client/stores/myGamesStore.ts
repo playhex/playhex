@@ -11,8 +11,8 @@ import useLobbyStore from './lobbyStore';
 import { timeValueToSeconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
 import { useRouter } from 'vue-router';
-import { sendNotification } from '../notifications';
-import * as Notif from '../notifications';
+import { sendNotification } from '../services/notifications';
+import * as Notif from '../services/notifications';
 
 export type CurrentGame = {
     id: string;
@@ -121,7 +121,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         mostUrgentGame.value = getMostUrgentGame();
 
-        if (Notification.permission === 'default') Notification.requestPermission();
+        Notif.requestNotificationPermission();
     });
 
     socket.on('gameStarted', (hostedGameData: HostedGameData) => {
