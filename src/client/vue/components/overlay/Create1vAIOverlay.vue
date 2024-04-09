@@ -48,9 +48,20 @@ const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
     aiConfigsStatus.value = await apiGetAiConfigsStatus();
 })();
 
-const selectEngine = (engine: string): void => {
-    selectedEngine.value = engine;
-    selectAiConfig(aiConfigs.value[selectedEngine.value][0]);
+const capSelectedBoardsize = () => {
+    if (null === selectedAiConfig.value) {
+        return;
+    }
+
+    const { boardsizeMin, boardsizeMax } = selectedAiConfig.value;
+
+    if (null !== boardsizeMin && gameOptions.value.boardsize < boardsizeMin) {
+        gameOptions.value.boardsize = boardsizeMin;
+    }
+
+    if (null !== boardsizeMax && gameOptions.value.boardsize > boardsizeMax) {
+        gameOptions.value.boardsize = boardsizeMax;
+    }
 };
 
 const selectAiConfig = (aiConfig: AIConfig<'withPlayerId'>): void => {
@@ -58,7 +69,11 @@ const selectAiConfig = (aiConfig: AIConfig<'withPlayerId'>): void => {
     capSelectedBoardsize();
 };
 
-if (Object.values(aiConfigs.value).length > 0) {
+const selectEngine = (engine: string): void => {
+    selectedEngine.value = engine;
+};
+
+if (Object.keys(aiConfigs.value).length > 0) {
     selectEngine(Object.keys(aiConfigs.value)[0]);
 } else {
     watch(aiConfigs.value, newAiConfig => {
@@ -84,22 +99,6 @@ const isAIConfigAvailable = (aiConfig: AIConfig<'withPlayerId'>): boolean => {
     }
 
     return true;
-};
-
-const capSelectedBoardsize = () => {
-    if (null === selectedAiConfig.value) {
-        return;
-    }
-
-    const { boardsizeMin, boardsizeMax } = selectedAiConfig.value;
-
-    if (null !== boardsizeMin && gameOptions.value.boardsize < boardsizeMin) {
-        gameOptions.value.boardsize = boardsizeMin;
-    }
-
-    if (null !== boardsizeMax && gameOptions.value.boardsize > boardsizeMax) {
-        gameOptions.value.boardsize = boardsizeMax;
-    }
 };
 </script>
 
