@@ -9,8 +9,8 @@
   <g>
     <rect width="102%" height="102%" x="-1%" y="-1%" fill="#212529" />
     <path
-       style="fill:#dc3545;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.264583"
-       d="m 50.33913,16.668587 -13.175549,22.820721 -26.351099,0 -13.1755496,-22.820721 13.1755496,-22.8207214 26.351099,0 z"
-       transform="matrix(0.7672767,0,0,0.7672767,15.46121,21.077249)" />
+       style="fill:#dc3545;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.16973"
+       d="M 50.770943,33.866667 42.318805,48.5062 H 25.41453 L 16.962392,33.866667 25.41453,19.227135 h 16.904275 z"
+    />
   </g>
 </svg>
