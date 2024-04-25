@@ -1,0 +1,12 @@
+[{
+  "relation": [
+    "delegate_permission/common.handle_all_urls"
+  ],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "org.playhex.twa",
+    "sha256_cert_fingerprints": [
+      "4D:76:55:BA:59:13:47:68:AE:88:21:A8:4C:91:EC:0D:9D:D3:41:B2:7F:76:04:34:E0:6A:D4:58:00:43:E2:23"
+    ]
+  }
+}]
