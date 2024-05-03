@@ -50,6 +50,7 @@ model HostedGame {
   createdAt    DateTime
   chatMessages ChatMessage[]
   gameAnalyze  GameAnalyze?
+  rematchId    String?              @db.Char(36)
 
   @@index([state, createdAt])
 }

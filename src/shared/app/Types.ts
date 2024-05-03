@@ -35,6 +35,7 @@ export type HostedGameData = {
     gameData: null | GameData;
 
     createdAt: Date;
+    rematchId: null | string;
 };
 
 export type OnlinePlayersData = {

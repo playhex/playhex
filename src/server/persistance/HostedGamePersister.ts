@@ -79,6 +79,7 @@ const select: Prisma.HostedGameSelect = {
             winner: true,
         },
     },
+    rematchId: true
 };
 
 /**
@@ -201,6 +202,7 @@ export default class HostedGamePersister
                 createdAt: dbData.createdAt,
                 players: dbData.players.map(p => p.player),
                 state: dbData.state as HostedGameState,
+                rematchId: dbData.rematchId ?? null,
                 gameData: null === game ? null : {
                     ...game,
                     movesHistory: game.movesHistory as unknown as MoveData[],
@@ -356,6 +358,7 @@ export default class HostedGamePersister
                         timeControlOptions: gameOptions.timeControl.options as object,
                     },
                 },
+                rematchId: data.rematchId ?? undefined,
                 timeControl: data.timeControl as object,
                 chatMessages: {
                     createMany: {
@@ -450,6 +453,7 @@ export default class HostedGamePersister
                         },
                     },
                 },
+                rematchId: data.rematchId ?? undefined,
                 timeControl: data.timeControl as object,
                 chatMessages: {
                     createMany: {

@@ -292,6 +292,17 @@ export const apiPostCancel = async (gameId: string): Promise<true | string> => {
     return response.text();
 };
 
+export const apiPostRematch = async (gameId: string): Promise<HostedGameData> => {
+    const response = await fetch(`/api/games/${gameId}/rematch`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return denormalize(await response.json());
+};
+
 export const apiGetOnlinePlayers = async (): Promise<OnlinePlayersData> => {
     const response = await fetch(`/api/online-players`, {
         method: 'get',

@@ -4,7 +4,7 @@ import { gameToSGF } from '../../../../shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { downloadString } from '../../../services/fileDownload';
 import { gameToHexworldLink } from '../../../../shared/app/hexworld';
-import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
+import { BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
 import { PropType } from 'vue';
 import Player from '../../../../shared/app/models/Player';
@@ -21,15 +21,10 @@ const props = defineProps({
     players: {
         type: Array as PropType<Player[]>,
         required: true,
-    },
-    rematch: {
-        type: Function,
-        required: false,
-        default: null,
-    },
+    }
 });
 
-const { players, game, rematch } = props;
+const { players, game } = props;
 
 const winner: null | Player = game.isCanceled()
     ? null
@@ -77,13 +72,6 @@ const downloadSGF = (): void => {
                         <p v-else>Game has been canceled.</p>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button
-                            v-if="rematch"
-                            type="button"
-                            class="btn btn-primary"
-                            @click="confirm(); rematch();"
-                        ><BIconRepeat /> New Game</button>
-
                         <button
                             type="button"
                             class="btn btn-outline-primary"

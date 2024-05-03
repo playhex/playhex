@@ -15,6 +15,9 @@ import { validateOrReject } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import Rooms from '../../shared/app/Rooms';
 import { HexServer } from '../server';
+import { FindAIError, findAIOpponent } from '../services/AIManager';
+
+export class GameError extends Error {}
 
 const byRecentFirst = (game0: HostedGameData, game1: HostedGameData): number => {
     const date0 = game0.gameData?.endedAt ?? game0.createdAt;
@@ -210,12 +213,21 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    async createGame(host: Player, gameOptions: GameOptionsData, opponent: null | Player = null): Promise<HostedGame>
+    async createGame(host: Player, gameOptions: GameOptionsData): Promise<HostedGame>
     {
         const hostedGame = HostedGame.hostNewGame(gameOptions, host);
 
-        if (null !== opponent) {
-            hostedGame.playerJoin(opponent);
+        if ('ai' === gameOptions.opponent.type) {
+            try {
+                const opponent = await findAIOpponent(gameOptions);
+                if (opponent == null) throw new GameError('No matching AI found');
+                hostedGame.playerJoin(opponent);
+            } catch (e) {
+                if (e instanceof FindAIError) {
+                    throw new GameError(e.message);
+                }
+                throw e;
+            }
         }
 
         this.activeGames[hostedGame.getId()] = hostedGame;
@@ -223,6 +235,35 @@ export default class HostedGameRepository
         this.enableAutoPersist(hostedGame);
 
         return hostedGame;
+    }
+
+    async rematchGame(host: Player, gameId: string): Promise<HostedGame>
+    {
+        const game = await this.getGame(gameId);
+
+        if (null === game) {
+            throw new GameError(`no game ${gameId}`);
+        }
+        if (!game.players.some(p => p.publicId === host.publicId)) {
+            throw new GameError('Player not in the game');
+        }
+        if (game.rematchId != null && this.activeGames[game.rematchId]) {
+            return this.activeGames[game.rematchId];
+        }
+        if (game.rematchId != null) {
+            throw new GameError('An inactive rematch game already exists');
+        }
+        if (this.activeGames[gameId]) {
+            throw new GameError('Cannot rematch an active game');
+        }
+
+        const rematch = await this.createGame(host, game.gameOptions);
+        game.rematchId = rematch.getId();
+        this.io.to(Rooms.game(game.id))
+            .emit('rematchAvailable', game.id, game.rematchId);
+        this.hostedGamePersister.persist(game)
+            .catch(e => logger.error(`Failed to persist: ${e?.message}`, e));
+        return rematch;
     }
 
     /**
@@ -341,7 +382,7 @@ export default class HostedGameRepository
                 groups: ['post'],
             });
         } catch (e) {
-            logger.error({ validationError: e });
+            logger.error('Validation failed', { validationError: e });
             return e.message;
         }
 
