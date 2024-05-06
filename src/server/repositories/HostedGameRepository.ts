@@ -1,25 +1,26 @@
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import HostedGame from '../HostedGame';
 import { Move } from '../../shared/game-engine';
-import { HostedGameData, HostedGameState } from '../../shared/app/Types';
+import { HostedGameState } from '../../shared/app/Types';
 import Player from '../../shared/app/models/Player';
-import { GameOptionsData } from '../../shared/app/GameOptions';
 import { MoveData } from '../../shared/game-engine/Types';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
 import HostedGamePersister from '../persistance/HostedGamePersister';
 import logger from '../services/logger';
-import { Prisma } from '@prisma/client';
 import ChatMessage from '../../shared/app/models/ChatMessage';
-import prisma from '../services/prisma';
 import { validateOrReject } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
 import Rooms from '../../shared/app/Rooms';
 import { HexServer } from '../server';
 import { FindAIError, findAIOpponent } from '../services/AIManager';
+import { Repository } from 'typeorm';
+import HostedGameEntity from '../../shared/app/models/HostedGame';
+import HostedGameOptions, { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
+import { AppDataSource } from '../data-source';
+import { plainToInstance } from '../../shared/app/class-transformer-custom';
 
 export class GameError extends Error {}
 
-const byRecentFirst = (game0: HostedGameData, game1: HostedGameData): number => {
+const byRecentFirst = (game0: HostedGameEntity, game1: HostedGameEntity): number => {
     const date0 = game0.gameData?.endedAt ?? game0.createdAt;
     const date1 = game1.gameData?.endedAt ?? game1.createdAt;
 
@@ -48,29 +49,32 @@ export default class HostedGameRepository
     constructor(
         private hostedGamePersister: HostedGamePersister,
         private io: HexServer,
+
+        @Inject('Repository<ChatMessage>')
+        private chatMessageRepository: Repository<ChatMessage>,
     ) {
         this.loadActiveGamesFromMemory();
     }
 
     private async loadActiveGamesFromMemory(): Promise<void>
     {
+        await AppDataSource.initialize();
+
         const games = await this.hostedGamePersister.findMany({
-            where: {
-                OR: [
-                    { state: 'created' },
-                    { state: 'playing' },
-                ],
-            },
+            where: [
+                { state: 'created' },
+                { state: 'playing' },
+            ],
         });
 
-        games.forEach(hostedGameData => {
-            if (this.activeGames[hostedGameData.id]) {
+        games.forEach(hostedGame => {
+            if (this.activeGames[hostedGame.id]) {
                 return;
             }
 
-            this.activeGames[hostedGameData.id] = HostedGame.fromData(hostedGameData);
+            this.activeGames[hostedGame.id] = HostedGame.fromData(hostedGame);
 
-            this.enableAutoPersist(this.activeGames[hostedGameData.id]);
+            this.enableAutoPersist(this.activeGames[hostedGame.id]);
         });
     }
 
@@ -149,7 +153,7 @@ export default class HostedGameRepository
         return this.activeGames[gameId] ?? null;
     }
 
-    getActiveGamesData(): HostedGameData[]
+    getActiveGamesData(): HostedGameEntity[]
     {
         return Object.values(this.activeGames)
             .map(game => game.toData())
@@ -160,41 +164,16 @@ export default class HostedGameRepository
      * Get finished games; bot games are ignored.
      * @param fromGamePublicId Take N ended games from fromGamePublicId, or from start if not set.
      */
-    async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGameData[]>
+    async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGameEntity[]>
     {
-        const args: Prisma.HostedGameFindManyArgs = {
-            where: {
-                state: 'ended',
-                players: {
-                    every: {
-                        player: {
-                            isBot: false,
-                        }
-                    }
-                }
-            },
-            orderBy: [
-                { game: { endedAt: 'desc' } },
-                { publicId: 'desc' }, // In case 2 games has same endedAt datetime, must keep a consistent order
-            ],
-            take,
-        };
-
-        if (undefined !== fromGamePublicId) {
-            args.skip = 1;
-            args.cursor = {
-                publicId: fromGamePublicId,
-            };
-        }
-
-        return await this.hostedGamePersister.findMany(args);
+        return await this.hostedGamePersister.findLastEnded1v1(take, fromGamePublicId);
     }
 
     /**
      * Returns games to display initially on lobby.
      * Active games, plus some ended games.
      */
-    async getLobbyGames(): Promise<HostedGameData[]>
+    async getLobbyGames(): Promise<HostedGameEntity[]>
     {
         const lobbyGames = this.getActiveGamesData();
         const endedGames = await this.getEndedGames(5);
@@ -204,7 +183,7 @@ export default class HostedGameRepository
         return lobbyGames;
     }
 
-    async getGame(publicId: string): Promise<HostedGameData | null>
+    async getGame(publicId: string): Promise<HostedGameEntity | null>
     {
         if (this.activeGames[publicId]) {
             return this.activeGames[publicId].toData();
@@ -213,11 +192,11 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    async createGame(host: Player, gameOptions: GameOptionsData): Promise<HostedGame>
+    async createGame(host: Player, gameOptions: HostedGameOptions): Promise<HostedGame>
     {
         const hostedGame = HostedGame.hostNewGame(gameOptions, host);
 
-        if ('ai' === gameOptions.opponent.type) {
+        if ('ai' === gameOptions.opponentType) {
             try {
                 const opponent = await findAIOpponent(gameOptions);
                 if (opponent == null) throw new GameError('No matching AI found');
@@ -244,25 +223,31 @@ export default class HostedGameRepository
         if (null === game) {
             throw new GameError(`no game ${gameId}`);
         }
-        if (!game.players.some(p => p.publicId === host.publicId)) {
+        if (!game.hostedGameToPlayers.some(p => p.player.publicId === host.publicId)) {
             throw new GameError('Player not in the game');
         }
-        if (game.rematchId != null && this.activeGames[game.rematchId]) {
-            return this.activeGames[game.rematchId];
+        if (game.rematch != null && this.activeGames[game.rematch.id]) {
+            return this.activeGames[game.rematch.id];
         }
-        if (game.rematchId != null) {
+        if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
         }
         if (this.activeGames[gameId]) {
             throw new GameError('Cannot rematch an active game');
         }
 
-        const rematch = await this.createGame(host, game.gameOptions);
-        game.rematchId = rematch.getId();
+        const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions));
+        game.rematch = rematch.toData();
         this.io.to(Rooms.game(game.id))
-            .emit('rematchAvailable', game.id, game.rematchId);
-        this.hostedGamePersister.persist(game)
-            .catch(e => logger.error(`Failed to persist: ${e?.message}`, e));
+            .emit('rematchAvailable', game.id, rematch.getId());
+
+        try {
+            await this.hostedGamePersister.persist(game.rematch);
+            await this.hostedGamePersister.persist(game);
+        } catch (e) {
+            logger.error(`Failed to persist: ${e?.message}`, e);
+        }
+
         return rematch;
     }
 
@@ -273,8 +258,8 @@ export default class HostedGameRepository
         player: Player,
         state: null | HostedGameState = null,
         fromGamePublicId: null | string = null,
-    ): Promise<HostedGameData[]> {
-        const hostedGameDataList: HostedGameData[] = [];
+    ): Promise<HostedGameEntity[]> {
+        const hostedGameList: HostedGameEntity[] = [];
 
         for (const key in this.activeGames) {
             if (!this.activeGames[key].isPlayerInGame(player)) {
@@ -285,38 +270,15 @@ export default class HostedGameRepository
                 continue;
             }
 
-            hostedGameDataList.push(this.activeGames[key].toData());
+            hostedGameList.push(this.activeGames[key].toData());
         }
 
-        hostedGameDataList.sort(byRecentFirst);
+        const gamesFromDb = await this.hostedGamePersister.findLastEndedByPlayer(player, fromGamePublicId ?? undefined);
 
-        const criteria: Prisma.HostedGameFindManyArgs = {
-            where: {
-                state: state ?? undefined,
-                players: {
-                    some: {
-                        player: {
-                            publicId: player.publicId,
-                        },
-                    },
-                },
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-            take: 20,
-        };
+        hostedGameList.push(...gamesFromDb);
+        hostedGameList.sort(byRecentFirst);
 
-        if (null !== fromGamePublicId) {
-            criteria.cursor = { publicId: fromGamePublicId };
-            criteria.skip = 1;
-        }
-
-        const gamesFromDb = await this.hostedGamePersister.findMany(criteria);
-
-        hostedGameDataList.push(...gamesFromDb);
-
-        return hostedGameDataList;
+        return hostedGameList;
     }
 
     async playerJoinGame(player: Player, gameId: string): Promise<string | true>
@@ -375,7 +337,11 @@ export default class HostedGameRepository
         return result;
     }
 
-    async postChatMessage(chatMessage: ChatMessage): Promise<string | true>
+    /**
+     * @param publicId HostedGame public id to post message on.
+     * @param chatMessage ChatMessage to post, with player, content and date.
+     */
+    async postChatMessage(publicId: string, chatMessage: ChatMessage): Promise<string | true>
     {
         try {
             await validateOrReject(plainToInstance(ChatMessage, chatMessage), {
@@ -386,8 +352,7 @@ export default class HostedGameRepository
             return e.message;
         }
 
-        const { gameId } = chatMessage;
-        const hostedGame = this.activeGames[gameId];
+        const hostedGame = this.activeGames[publicId];
 
         // Game is in memory, push chat message
         if (hostedGame) {
@@ -401,37 +366,24 @@ export default class HostedGameRepository
         }
 
         // Game is not in memory, store chat message directly in database, on persisted game
-        const hostedGameData = await this.hostedGamePersister.findUnique(chatMessage.gameId);
+        const hostedGameEntity = await this.hostedGamePersister.findUnique(publicId);
 
-        if (null === hostedGameData) {
+        if (null === hostedGameEntity) {
             logger.notice('Tried to chat on a non-existant game', { chatMessage });
-            return `Game ${chatMessage.gameId} not found`;
+            return `Game ${publicId} not found`;
         }
 
         let error: true | string;
-        if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameData))) {
+        if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameEntity))) {
             return error;
         }
 
-        // Game is in database, insert chat message into database
-        await prisma.chatMessage.create({
-            data: {
-                content: chatMessage.content,
-                createdAt: chatMessage.createdAt,
-                hostedGame: {
-                    connect: {
-                        publicId: hostedGameData.id,
-                    },
-                },
-                player: {
-                    connect: {
-                        publicId: chatMessage.author?.publicId,
-                    },
-                },
-            },
-        });
+        chatMessage.hostedGame = hostedGameEntity;
 
-        this.io.to(Rooms.game(chatMessage.gameId)).emit('chat', { ...chatMessage });
+        // Game is in database, insert chat message into database
+        await this.chatMessageRepository.save(chatMessage);
+
+        this.io.to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
 
         return true;
     }

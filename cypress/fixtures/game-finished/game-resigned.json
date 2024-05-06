@@ -8,22 +8,26 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "players": [
+    "hostedGameToPlayers": [
         {
-            "publicId": "determinist-random-bot|d6902ed2-5e33-46f3-998f-3739cb24d50b",
-            "pseudo": "The winner",
-            "slug": "the-winner",
-            "isBot": false,
-            "isGuest": false,
-            "createdAt": "2024-01-24T20:25:06.632Z"
+            "player": {
+                "publicId": "determinist-random-bot|d6902ed2-5e33-46f3-998f-3739cb24d50b",
+                "pseudo": "The winner",
+                "slug": "the-winner",
+                "isBot": false,
+                "isGuest": false,
+                "createdAt": "2024-01-24T20:25:06.632Z"
+            }
         },
         {
-            "pseudo": "aa",
-            "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
-            "isGuest": false,
-            "isBot": false,
-            "slug": "aa",
-            "createdAt": "2024-01-24T16:33:29.586Z"
+            "player": {
+                "pseudo": "aa",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aa",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
         }
     ],
     "timeControl": {
@@ -133,27 +137,5 @@
     },
     "chatMessages": [],
     "state": "ended",
-    "createdAt": "2024-01-24T20:25:06.632Z",
-    "__meta": {
-        "values": {
-            "host.createdAt": [
-                "Date"
-            ],
-            "opponent.createdAt": [
-                "Date"
-            ],
-            "gameData.startedAt": [
-                "Date"
-            ],
-            "gameData.lastMoveAt": [
-                "Date"
-            ],
-            "gameData.endedAt": [
-                "Date"
-            ],
-            "createdAt": [
-                "Date"
-            ]
-        }
-    }
+    "createdAt": "2024-01-24T20:25:06.632Z"
 }

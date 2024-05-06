@@ -2,13 +2,13 @@
 import { timeControlToCadencyName, timeControlToString } from '@shared/app/timeControlUtils';
 import { PropType, toRefs } from 'vue';
 import { BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from 'bootstrap-icons-vue';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
 import { calcAverageSecondsPerMove } from '@shared/app/timeControlUtils';
 import { secondsToDuration } from '@shared/app/timeControlUtils';
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<GameOptionsData>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
 });

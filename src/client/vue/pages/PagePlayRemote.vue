@@ -64,7 +64,7 @@ const shouldDisplayConfirmMove = (): boolean => {
         blitz: playerSettings.value.confirmMoveBlitz,
         normal: playerSettings.value.confirmMoveNormal,
         correspondance: playerSettings.value.confirmMoveCorrespondance,
-    }[timeControlToCadencyName(hostedGameClient.value.getHostedGameData().gameOptions)];
+    }[timeControlToCadencyName(hostedGameClient.value.getHostedGame().gameOptions)];
 };
 
 /*
@@ -181,8 +181,8 @@ const loadGame = async () => {
 
     initGameView();
 
-    const playerPseudos = hostedGameClient.value.getHostedGameData().players.map(p => p.pseudo);
-    const { state, host } = hostedGameClient.value.getHostedGameData();
+    const playerPseudos = hostedGameClient.value.getPlayers().map(p => p.pseudo);
+    const { state, host } = hostedGameClient.value.getHostedGame();
     const stateForTitle = playerPseudos.length < 2 && 'created' === state
         ? 'Waiting for an opponent'
         : state[0].toUpperCase() + state.slice(1);

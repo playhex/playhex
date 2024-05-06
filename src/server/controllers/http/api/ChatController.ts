@@ -20,11 +20,10 @@ export default class ChatController
         @Param('gameId') gameId: string,
         @Body({ validate: { groups: ['playerInput'] } }) chatMessage: ChatMessage,
     ) {
-        chatMessage.author = player;
-        chatMessage.gameId = gameId;
+        chatMessage.player = player;
         chatMessage.createdAt = new Date();
 
-        const result = await this.hostedGameRepository.postChatMessage(chatMessage);
+        const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
 
         if (true !== result) {
             throw new HttpError(400, result);

@@ -8,20 +8,24 @@
             "isGuest": false,
             "isBot": false
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
-                "pseudo": "Player A",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": false
+                "player": {
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "pseudo": "Player A",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": false
+                }
             },
             {
-                "publicId": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
-                "pseudo": "Player B",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": true
+                "player": {
+                    "publicId": "60294b85-dc8c-4b8d-8b13-f42de737b13c",
+                    "pseudo": "Player B",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": true
+                }
             }
         ],
         "timeControl": {
@@ -132,65 +136,7 @@
         },
         "createdAt": "2023-12-20T21:02:44.748Z",
         "chatMessages": [],
-        "state": "playing",
-        "__meta": {
-            "values": {
-                "timeControl.players.0.totalRemainingTime": [
-                    "Date"
-                ],
-                "createdAt": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.0.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.1.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.2.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.3.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.4.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.5.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.6.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.7.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.8.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.9.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.10.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.11.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.12.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.13.playedAt": [
-                    "Date"
-                ]
-            }
-        }
+        "state": "playing"
     },
     {
         "id": "969653f0-b874-404f-9b1b-6d3e66b52880",
@@ -201,13 +147,15 @@
             "isGuest": false,
             "isBot": false
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
-                "pseudo": "Player waiting",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": false
+                "player": {
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "pseudo": "Player waiting",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": false
+                }
             }
         ],
         "timeControl": {
@@ -238,14 +186,7 @@
         "gameData": null,
         "chatMessages": [],
         "createdAt": "2023-12-20T21:05:58.591Z",
-        "state": "created",
-        "__meta": {
-            "values": {
-                "createdAt": [
-                    "Date"
-                ]
-            }
-        }
+        "state": "created"
     },
     {
         "id": "e212910d-9422-482d-97e1-b4d1c60516ed",
@@ -256,20 +197,24 @@
             "isGuest": false,
             "isBot": false
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
-                "pseudo": "Player C",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": false
+                "player": {
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "pseudo": "Player C",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": false
+                }
             },
             {
-                "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
-                "pseudo": "Player D",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": true
+                "player": {
+                    "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
+                    "pseudo": "Player D",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": true
+                }
             }
         ],
         "timeControl": {
@@ -415,86 +360,7 @@
         },
         "createdAt": "2023-12-20T21:02:55.420Z",
         "chatMessages": [],
-        "state": "ended",
-        "__meta": {
-            "values": {
-                "createdAt": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "gameData.endedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.0.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.1.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.2.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.3.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.4.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.5.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.6.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.7.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.8.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.9.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.10.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.11.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.12.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.13.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.14.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.15.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.16.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.17.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.18.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.19.playedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.20.playedAt": [
-                    "Date"
-                ]
-            }
-        }
+        "state": "ended"
     },
     {
         "id": "c35d5279-ae07-4615-bacf-7b90ead71d71",
@@ -505,20 +371,24 @@
             "isGuest": false,
             "isBot": false
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
-                "pseudo": "Cancel B",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": true
+                "player": {
+                    "publicId": "determinist-random-bot|80616c44-a661-4f87-8b0c-3997bdd0551d",
+                    "pseudo": "Cancel B",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": true
+                }
             },
             {
-                "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
-                "pseudo": "Cancel A",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": false
+                "player": {
+                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "pseudo": "Cancel A",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": false
+                }
             }
         ],
         "timeControl": {
@@ -566,25 +436,6 @@
         },
         "createdAt": "2023-12-20T21:05:58.591Z",
         "chatMessages": [],
-        "state": "canceled",
-        "__meta": {
-            "values": {
-                "createdAt": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "gameData.endedAt": [
-                    "Date"
-                ],
-                "gameData.movesHistory.0.playedAt": [
-                    "Date"
-                ]
-            }
-        }
+        "state": "canceled"
     }
 ]

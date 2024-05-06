@@ -14,6 +14,8 @@
     "serve": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev-server\" \"yarn dev-client\"",
     "serve:prod": "yarn build && yarn start:prod",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
+    "db:diff": "yarn build-server && typeorm schema:log -d dist/server/data-source.js",
+    "db:sync": "yarn build-server && typeorm schema:sync -d dist/server/data-source.js",
     "test:unit": "mocha src/**/test/**/*.ts -n import=ts-node/esm --extension ts",
     "test:e2e": "cypress run",
     "test:all": "yarn test:unit && yarn test:e2e",
@@ -42,6 +44,7 @@
     "express-async-errors": "^3.1.1",
     "express-session": "^1.17.3",
     "find-up": "^5.0.0",
+    "pg": "^8.11.5",
     "pinia": "^2.0.28",
     "pixi.js": "^7.0.4",
     "redis": "^4.6.12",
@@ -55,6 +58,7 @@
     "superjson": "^1.13",
     "tiny-typed-emitter": "^2.1.0",
     "typedi": "^0.10.0",
+    "typeorm": "^0.3.20",
     "unoverlay-vue": "^0.2.3",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
@@ -94,7 +98,7 @@
     "http-proxy-middleware": "^2.0.1",
     "mocha": "^10.1.0",
     "mocha.parallel": "^0.15.6",
-    "prisma": "^5.8.1",
+    "mysql": "^2.18.1",
     "sass": "^1.69.7",
     "sass-loader": "^13.3.3",
     "schema-dts": "^1.1.2",
@@ -119,5 +123,8 @@
     "webpack-cli": "^5.0.0",
     "webpack-dev-server": "^4.11.1",
     "webpack-manifest-plugin": "^5.0.0"
+  },
+  "browser": {
+    "typeorm": false
   }
 }

@@ -3,11 +3,11 @@ import { PropType, Ref, ref, toRefs } from 'vue';
 import { BIconHourglass } from 'bootstrap-icons-vue';
 import { secondsToDuration } from '@shared/app/timeControlUtils';
 import TimeControlType from '@shared/time-control/TimeControlType';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../../../../shared/app/models/HostedGameOptions';
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<GameOptionsData>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
 });

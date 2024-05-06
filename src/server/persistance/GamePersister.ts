@@ -1,19 +1,25 @@
-import prisma from '../services/prisma';
+import { IsNull, Not, Repository } from 'typeorm';
+import { Game } from '@shared/app/models';
 import { AnalyzeGameRequest } from '../services/HexAiApiClient';
 import { Move } from '../../shared/game-engine';
 import { MoveData } from '../../shared/game-engine/Types';
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 
 @Service()
 export default class GamePersister
 {
+    constructor(
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
+    ) {}
+
     /**
      * Get only data required for a game analyze.
      * Game must have ended.
      */
     async getAnalyzeGameRequest(publicId: string): Promise<null | AnalyzeGameRequest>
     {
-        const data = await prisma.game.findFirst({
+        const data = await this.gameRepository.findOne({
             select: {
                 size: true,
                 movesHistory: true,
@@ -21,12 +27,10 @@ export default class GamePersister
             },
             where: {
                 hostedGame: {
-                    publicId: publicId,
+                    id: publicId,
                 },
-                NOT: {
-                    endedAt: null,
-                },
-            },
+                endedAt: Not(IsNull()),
+            }
         });
 
         if (null === data) {

@@ -1,6 +1,7 @@
 import './bootstrap.scss';
 import './base.styl';
 
+import 'reflect-metadata';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './vue/App.vue';

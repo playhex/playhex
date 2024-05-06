@@ -3,8 +3,7 @@ import { Body, CurrentUser, Delete, Get, JsonController, Post, Req, Session } fr
 import { SessionData } from 'express-session';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import { authenticate } from '../../../services/security/authentication';
-import { normalize } from '../../../../shared/app/serializer';
-import Player, { transformPlayer } from '../../../../shared/app/models/Player';
+import Player from '../../../../shared/app/models/Player';
 import { AuthenticatedPlayer } from '../middlewares';
 import { Request } from 'express';
 import { IsString } from 'class-validator';
@@ -46,7 +45,7 @@ export default class AuthController
 
         session.playerId = player.publicId;
 
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Post('/api/auth/guest')
@@ -57,7 +56,7 @@ export default class AuthController
 
         session.playerId = player.publicId;
 
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Post('/api/auth/signup')
@@ -69,7 +68,7 @@ export default class AuthController
 
         session.playerId = player.publicId;
 
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Post('/api/auth/signup-from-guest')
@@ -79,7 +78,7 @@ export default class AuthController
     ) {
         const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo, body.password);
 
-        return normalize(transformPlayer(upgradedPlayer));
+        return upgradedPlayer;
     }
 
     @Post('/api/auth/login')
@@ -91,14 +90,14 @@ export default class AuthController
 
         session.playerId = player.publicId;
 
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Get('/api/auth/me')
     async me(
         @AuthenticatedPlayer() player: Player,
     ) {
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Delete('/api/auth/logout')
@@ -116,7 +115,7 @@ export default class AuthController
 
                 req.session.playerId = player.publicId;
 
-                resolve(normalize(transformPlayer(player)));
+                resolve(player);
             });
         });
     }
@@ -127,6 +126,6 @@ export default class AuthController
         @Body() body: ChangePasswordInput,
     ) {
         const newPlayer = await this.playerRepository.changePassword(player.publicId, body.oldPassword, body.newPassword);
-        return normalize(transformPlayer(newPlayer));
+        return newPlayer;
     }
 }

@@ -1,5 +1,5 @@
 import TimeControlType from '../time-control/TimeControlType';
-import { GameOptionsData } from './GameOptions';
+import HostedGameOptions from './models/HostedGameOptions';
 
 /**
  * Returns average seconds per move
@@ -45,7 +45,7 @@ type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondance';
  * Naive function that guess if a game is a blitz or correspondance
  * given its time control and board size.
  */
-export const timeControlToCadencyName = (gameOptions: GameOptionsData): TimeControlCadencyName => {
+export const timeControlToCadencyName = (gameOptions: HostedGameOptions): TimeControlCadencyName => {
     const averageSecondsPerMove = calcAverageSecondsPerMove(
         gameOptions.timeControl,
         gameOptions.boardsize,

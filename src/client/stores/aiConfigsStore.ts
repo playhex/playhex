@@ -1,3 +1,4 @@
+import { WithRequired } from '@shared/app/Types';
 import AIConfig from '../../shared/app/models/AIConfig';
 import { apiGetAiConfigs } from '../apiClient';
 import { defineStore } from 'pinia';
@@ -8,7 +9,7 @@ const useAiConfigsStore = defineStore('aiConfigsStore', () => {
     /**
      * List of available bots.
      */
-    const aiConfigs: Ref<{ [engine: string]: AIConfig<'withPlayerId'>[] }> = ref({});
+    const aiConfigs: Ref<{ [engine: string]: WithRequired<AIConfig, 'player'>[] }> = ref({});
 
     const loadAiConfigs = async (): Promise<void> => {
         const configs = await apiGetAiConfigs();

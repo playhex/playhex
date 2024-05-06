@@ -1,12 +1,12 @@
-import { HostedGameData } from './Types';
+import HostedGame from './models/HostedGame';
 import Player from './models/Player';
 import ChatMessage from './models/ChatMessage';
 
-export const canPlayerChatInGame = (player: Player, hostedGameData: HostedGameData): true | string => {
+export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
     if (
-        'created' !== hostedGameData.state
+        'created' !== hostedGame.state
         && player.isGuest
-        && hostedGameData.players.every(p => p.publicId !== player.publicId)
+        && hostedGame.hostedGameToPlayers.every(p => p.player.publicId !== player.publicId)
     ) {
         return 'Guests cannot chat on started games if they are not in the game';
     }
@@ -14,11 +14,11 @@ export const canPlayerChatInGame = (player: Player, hostedGameData: HostedGameDa
     return true;
 };
 
-export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, hostedGameData: HostedGameData): true | string => {
+export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, hostedGame: HostedGame): true | string => {
     // Allow all "system" messages
-    if (null === chatMessage.author) {
+    if (null === chatMessage.player) {
         return true;
     }
 
-    return canPlayerChatInGame(chatMessage.author, hostedGameData);
+    return canPlayerChatInGame(chatMessage.player, hostedGame);
 };

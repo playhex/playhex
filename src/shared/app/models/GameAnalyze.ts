@@ -1,4 +1,6 @@
-import { Expose } from 'class-transformer';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Expose } from '../../../shared/app/class-transformer-custom';
+import HostedGame from './HostedGame';
 
 export type GameAnalyzeData = ({
     moveIndex: number;
@@ -20,19 +22,29 @@ export const hasGameAnalyzeErrored = (gameAnalyze: GameAnalyze): boolean =>
     null !== gameAnalyze.endedAt && null === gameAnalyze.analyze
 ;
 
+@Entity()
 export default class GameAnalyze
 {
+    @PrimaryColumn()
+    hostedGameId: number;
+
+    @OneToOne(() => HostedGame)
+    @JoinColumn({ name: 'hostedGameId' }) // TODO remove after id renaming
+    hostedGame: HostedGame;
+
     /**
      * If null but endedAt is not,
      * then the analyze errored.
      */
     @Expose()
+    @Column({ type: 'json', nullable: true })
     analyze: null | GameAnalyzeData = null;
 
     /**
      * Analyze started at.
      */
     @Expose()
+    @Column({ type: Date, precision: 3, default: () => 'current_timestamp(3)' })
     startedAt: Date = new Date();
 
     /**
@@ -42,5 +54,6 @@ export default class GameAnalyze
      * unless started too long ago and job seems to have errored.
      */
     @Expose()
+    @Column({ type: Date, precision: 3, nullable: true })
     endedAt: null | Date = null;
 }

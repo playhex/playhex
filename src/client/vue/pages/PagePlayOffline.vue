@@ -3,7 +3,7 @@
 import GameView from '@client/pixi-board/GameView';
 import AppBoard from '../components/AppBoard.vue';
 import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '@shared/game-engine';
-import { GameOptionsData, defaultGameOptions } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
 import { Ref, onMounted, ref } from 'vue';
 import Player from '../../../shared/app/models/Player';
 import useAuthStore from '../../stores/authStore';
@@ -16,8 +16,8 @@ useSeoMeta({
 
 const offlineBoardContainer = ref<HTMLElement>();
 const gameView = ref<GameView>();
-const selectedGameOptions: Partial<GameOptionsData> = JSON.parse(history.state.gameOptionsJson ?? '{}');
-const gameOptions: GameOptionsData = { ...defaultGameOptions, ...selectedGameOptions };
+const selectedGameOptions: Partial<HostedGameOptions> = JSON.parse(history.state.gameOptionsJson ?? '{}');
+const gameOptions: HostedGameOptions = { ...new HostedGameOptions(), ...selectedGameOptions };
 const players: Ref<Player[]> = ref([]);
 
 const makeAIMoveIfApplicable = async (game: Game, players: Player[]): Promise<void> => {

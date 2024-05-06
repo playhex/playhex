@@ -1,8 +1,9 @@
+import Container from 'typedi';
 import Player from '../../../shared/app/models/Player';
-import prisma from '../prisma';
 import bcrypt from 'bcryptjs';
 import HandledError from '../../../shared/app/Errors';
-import { plainToInstance } from 'class-transformer';
+import { AppDataSource } from '../../data-source';
+import PlayerRepository from '../../repositories/PlayerRepository';
 
 export class PseudoNotExistingError extends HandledError {}
 export class InvalidPasswordError extends HandledError {}
@@ -26,13 +27,14 @@ export const checkPassword = (player: Player, password: string): boolean => {
  * @throws {InvalidPasswordError}
  */
 export const authenticate = async (pseudo: string, password: string): Promise<Player> => {
-    const playerObject = await prisma.player.findUnique({
+    const playerRepository = AppDataSource.getRepository(Player);
+
+    const player = await playerRepository.findOne({
         where: {
             pseudo,
         },
+        select: Container.get(PlayerRepository).allColumnWithPassword(),
     });
-
-    const player = plainToInstance(Player, playerObject);
 
     if (null === player) {
         throw new PseudoNotExistingError();

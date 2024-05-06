@@ -1,58 +1,68 @@
-import { Expose, instanceToPlain } from 'class-transformer';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ColumnUUID } from '../custom-typeorm';
+import { Expose, GROUP_DEFAULT as GROUP_DEFAULT } from '../../../shared/app/class-transformer-custom';
 import AIConfig from './AIConfig';
+import { IsDate } from 'class-validator';
 
+@Entity()
 export default class Player
 {
+    @PrimaryGeneratedColumn()
+    id?: number;
+
     /**
      * Used for displays
      */
+    @Column({ length: 34, unique: true })
     @Expose()
     pseudo: string;
 
     /**
      * Used to identify a player
      */
-    @Expose()
+    @ColumnUUID({ unique: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     publicId: string;
 
     /**
      * Show an italized "Guest" before pseudo
      */
+    @Column({ default: false })
     @Expose()
     isGuest: boolean;
 
     /**
      * Used to know that we use an AI to generate moves. Show a robot icon before pseudo
      */
+    @Column({ default: false })
     @Expose()
     isBot: boolean;
 
     /**
      * Used for link to profile page, SGF file name
      */
+    @Column({ length: 34, unique: true })
     @Expose()
     slug: string;
 
     /**
      * Displayed on profile page
      */
+    @Column({ default: () => 'current_timestamp(3)', precision: 3 })
     @Expose()
+    @IsDate()
     createdAt: Date;
 
     /**
      * BCrypt hashed password
      */
+    @Column({ type: 'char', length: 60, nullable: true, select: false })
     password?: undefined | string;
 
     /**
      * For AI players, their config.
      * Should not be null for AI players: they must all have a AIConfig entry.
      */
+    @OneToOne(() => AIConfig, aiConfig => aiConfig.player)
     aiConfig?: AIConfig;
 }
-
-export const transformPlayer = (player: Player): object => {
-    return instanceToPlain(player, {
-        excludeExtraneousValues: true,
-    });
-};

@@ -1,5 +1,6 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
-import { HostedGameData, HostedGameState } from '@shared/app/Types';
+import HostedGame from '../shared/app/models/HostedGame';
+import { HostedGameState } from '@shared/app/Types';
 import Player from '../shared/app/models/Player';
 import { Outcome } from '@shared/game-engine/Types';
 import { GameTimeData } from '@shared/time-control/TimeControl';
@@ -8,8 +9,9 @@ import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import { apiPostCancel, apiPostResign } from './apiClient';
 import TimeControlType from '@shared/time-control/TimeControlType';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../shared/app/models/HostedGameOptions';
 import ChatMessage from '../shared/app/models/ChatMessage';
+import HostedGameToPlayer from '../shared/app/models/HostedGameToPlayer';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -17,14 +19,14 @@ type HostedGameClientEvents = {
 };
 
 /**
- * Contains info to display in the games list on lobby (HostedGameData).
+ * Contains info to display in the games list on lobby (HostedGame).
  * If needed, can also download full game data and start listening to game events (Game).
  */
 export default class HostedGameClient extends TypedEmitter<HostedGameClientEvents>
 {
     /**
      * Null if game data not fully loaded yet, i.e for lobby list display.
-     * Game data can still be retrieved in hostedGameData.
+     * Game data can still be retrieved in hostedGame.
      */
     private game: null | Game = null;
 
@@ -35,41 +37,41 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     private readMessages: number;
 
     constructor(
-        private hostedGameData: HostedGameData,
+        private hostedGame: HostedGame,
         private socket: Socket<HexServerToClientEvents, HexClientToServerEvents>,
     ) {
         super();
 
-        this.readMessages = hostedGameData.chatMessages.length;
+        this.readMessages = hostedGame.chatMessages.length;
     }
 
     getState(): HostedGameState
     {
-        return this.hostedGameData.state;
+        return this.hostedGame.state;
     }
 
     getPlayerIndex(player: Player): number
     {
-        return this.hostedGameData.players.findIndex(p => p.publicId === player.publicId);
+        return this.hostedGame.hostedGameToPlayers.findIndex(p => p.player.publicId === player.publicId);
     }
 
     loadGame(): Game
     {
-        return this.game ?? this.loadGameFromData(this.hostedGameData);
+        return this.game ?? this.loadGameFromData(this.hostedGame);
     }
 
-    private loadGameFromData(hostedGameData: HostedGameData): Game
+    private loadGameFromData(hostedGame: HostedGame): Game
     {
-        const { gameData } = hostedGameData;
+        const { gameData } = hostedGame;
 
         /**
          * No game server side, create an empty one to show client side
          */
         if (null === gameData) {
-            this.game = new Game(hostedGameData.gameOptions.boardsize);
+            this.game = new Game(hostedGame.gameOptions.boardsize);
 
             // Cancel here in case game has been canceled before started
-            if ('canceled' === hostedGameData.state) {
+            if ('canceled' === hostedGame.state) {
                 this.game.cancel();
             }
 
@@ -81,7 +83,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.game.setAllowSwap(gameData.allowSwap);
         this.game.setStartedAt(gameData.startedAt);
 
-        this.onServerGameStarted(hostedGameData);
+        this.onServerGameStarted(hostedGame);
 
         // Replay game and fill history
         for (const move of gameData.movesHistory) {
@@ -89,7 +91,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Cancel game if canceled
-        if ('canceled' === hostedGameData.state && !this.game.isEnded()) {
+        if ('canceled' === hostedGame.state && !this.game.isEnded()) {
             this.game.cancel();
         }
 
@@ -107,49 +109,49 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getId(): string
     {
-        return this.hostedGameData.id;
+        return this.hostedGame.id;
     }
 
     getPlayers(): Player[]
     {
-        return this.hostedGameData.players;
+        return this.hostedGame.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.player);
     }
 
     getPlayer(position: number): null | Player
     {
-        return this.hostedGameData.players[position] ?? null;
+        return this.hostedGame.hostedGameToPlayers[position].player ?? null;
     }
 
     getWinnerPlayer(): null | Player
     {
-        if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
+        if (this.hostedGame.gameData?.winner !== 0 && this.hostedGame.gameData?.winner !== 1) {
             return null;
         }
 
-        return this.hostedGameData.players[this.hostedGameData.gameData.winner];
+        return this.hostedGame.hostedGameToPlayers[this.hostedGame.gameData.winner].player;
     }
 
     getStrictWinnerPlayer(): Player
     {
-        if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
+        if (this.hostedGame.gameData?.winner !== 0 && this.hostedGame.gameData?.winner !== 1) {
             throw new Error('getStrictWinnerPlayer(): No winner');
         }
 
-        return this.hostedGameData.players[this.hostedGameData.gameData.winner];
+        return this.hostedGame.hostedGameToPlayers[this.hostedGame.gameData.winner].player;
     }
 
     getLoserPlayer(): null | Player
     {
-        if (this.hostedGameData.gameData?.winner !== 0 && this.hostedGameData.gameData?.winner !== 1) {
+        if (this.hostedGame.gameData?.winner !== 0 && this.hostedGame.gameData?.winner !== 1) {
             return null;
         }
 
-        return this.hostedGameData.players[1 - this.hostedGameData.gameData.winner];
+        return this.hostedGame.hostedGameToPlayers[1 - this.hostedGame.gameData.winner].player;
     }
 
     hasPlayer(player: Player): boolean
     {
-        return this.hostedGameData.players.some(p => p.publicId === player.publicId);
+        return this.hostedGame.hostedGameToPlayers.some(p => p.player.publicId === player.publicId);
     }
 
     /**
@@ -158,38 +160,38 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
      */
     getOtherPlayer(player: Player): null | Player
     {
-        if (2 !== this.hostedGameData.players.length) {
+        if (2 !== this.hostedGame.hostedGameToPlayers.length) {
             return null;
         }
 
-        if (this.hostedGameData.players[0].publicId === player.publicId) {
-            return this.hostedGameData.players[1];
+        if (this.hostedGame.hostedGameToPlayers[0].player.publicId === player.publicId) {
+            return this.hostedGame.hostedGameToPlayers[1].player;
         }
 
-        return this.hostedGameData.players[0];
+        return this.hostedGame.hostedGameToPlayers[0].player;
     }
 
-    getHostedGameData(): HostedGameData
+    getHostedGame(): HostedGame
     {
-        return this.hostedGameData;
+        return this.hostedGame;
     }
 
-    getGameOptions(): GameOptionsData
+    getGameOptions(): HostedGameOptions
     {
-        return this.hostedGameData.gameOptions;
+        return this.hostedGame.gameOptions;
     }
 
     getChatMessages(): ChatMessage[]
     {
-        return this.hostedGameData.chatMessages;
+        return this.hostedGame.chatMessages;
     }
 
     /**
-     * Update data and game from HostedGameData
+     * Update data and game from HostedGame
      */
-    updateFromHostedGameData(hostedGameData: HostedGameData): void
+    updateFromHostedGame(hostedGame: HostedGame): void
     {
-        this.hostedGameData = hostedGameData;
+        this.hostedGame = hostedGame;
     }
 
     getGame(): Game
@@ -203,7 +205,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     canResign(): boolean
     {
-        return this.hostedGameData.state === 'playing';
+        return this.hostedGame.state === 'playing';
     }
 
     canCancel(): boolean
@@ -213,21 +215,21 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         return !this.game.isCanceled()
-            && this.hostedGameData.state !== 'ended'
+            && this.hostedGame.state !== 'ended'
             && this.getGame().getMovesHistory().length < 2
         ;
     }
 
     canRematch(): boolean
     {
-        return (this.hostedGameData.state === 'ended'
-            || this.hostedGameData.state === 'canceled')
-            && this.hostedGameData.rematchId == null;
+        return (this.hostedGame.state === 'ended'
+            || this.hostedGame.state === 'canceled')
+            && this.hostedGame.rematch == null;
     }
 
     getRematchGameId(): string | null
     {
-        return this.hostedGameData.rematchId;
+        return this.hostedGame.rematch?.id ?? null;
     }
 
     canJoin(player: null | Player): boolean
@@ -237,7 +239,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Cannot join if game has been canceled
-        if ('canceled' === this.hostedGameData.state) {
+        if ('canceled' === this.hostedGame.state) {
             return false;
         }
 
@@ -247,7 +249,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Cannot join if game is full
-        if (this.hostedGameData.players.length >= 2) {
+        if (this.hostedGame.hostedGameToPlayers.length >= 2) {
             return false;
         }
 
@@ -295,14 +297,19 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onServerPlayerJoined(player: Player): void
     {
-        this.hostedGameData.players.push(player);
+        const hostedGameToPlayer = new HostedGameToPlayer();
+
+        hostedGameToPlayer.hostedGame = this.hostedGame;
+        hostedGameToPlayer.player = player;
+
+        this.hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
     }
 
-    onServerGameStarted(hostedGameData: HostedGameData): void
+    onServerGameStarted(hostedGame: HostedGame): void
     {
-        this.updateFromHostedGameData(hostedGameData);
+        this.updateFromHostedGame(hostedGame);
 
-        const { gameData } = hostedGameData;
+        const { gameData } = hostedGame;
 
         if (null === gameData) {
             throw new Error('game started but no game data');
@@ -313,17 +320,17 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return;
         }
 
-        this.hostedGameData.players = hostedGameData.players;
+        this.hostedGame.hostedGameToPlayers = hostedGame.hostedGameToPlayers;
 
         this.emit('started');
     }
 
     onServerGameCanceled(): void
     {
-        this.hostedGameData.state = 'canceled';
+        this.hostedGame.state = 'canceled';
 
-        if (this.hostedGameData.gameData) {
-            this.hostedGameData.gameData.endedAt = new Date();
+        if (this.hostedGame.gameData) {
+            this.hostedGame.gameData.endedAt = new Date();
         }
 
         if (null !== this.game) {
@@ -333,22 +340,26 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getTimeControlOptions(): TimeControlType
     {
-        return this.hostedGameData.gameOptions.timeControl;
+        return this.hostedGame.gameOptions.timeControl;
     }
 
     getTimeControlValues(): GameTimeData
     {
-        return this.hostedGameData.timeControl;
+        return this.hostedGame.timeControl;
     }
 
     onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
-        Object.assign(this.hostedGameData.timeControl, gameTimeData);
+        Object.assign(this.hostedGame.timeControl, gameTimeData);
     }
 
     onServerRematchAvailable(rematchId: string): void
     {
-        this.hostedGameData.rematchId = rematchId;
+        const hostedGame = new HostedGame();
+
+        hostedGame.id = rematchId;
+
+        this.hostedGame.rematch = hostedGame;
     }
 
     onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
@@ -368,12 +379,12 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onServerGameEnded(winner: PlayerIndex, outcome: Outcome): void
     {
-        this.hostedGameData.state = 'ended';
+        this.hostedGame.state = 'ended';
 
-        if (this.hostedGameData.gameData) {
-            this.hostedGameData.gameData.winner = winner;
-            this.hostedGameData.gameData.outcome = outcome;
-            this.hostedGameData.gameData.endedAt = new Date();
+        if (this.hostedGame.gameData) {
+            this.hostedGame.gameData.winner = winner;
+            this.hostedGame.gameData.outcome = outcome;
+            this.hostedGame.gameData.endedAt = new Date();
         }
 
         // Do nothing if game not loaded
@@ -392,7 +403,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     async sendChatMessage(content: string): Promise<string | true>
     {
         return new Promise((resolve, reject) => {
-            this.socket.emit('sendChat', this.hostedGameData.id, content, (answer: true | string) => {
+            this.socket.emit('sendChat', this.hostedGame.id, content, (answer: true | string) => {
                 if (true === answer) {
                     resolve(answer);
                 }
@@ -404,13 +415,13 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onChatMessage(chatMessage: ChatMessage): void
     {
-        this.hostedGameData.chatMessages.push(chatMessage);
+        this.hostedGame.chatMessages.push(chatMessage);
         this.emit('chatMessagePosted');
     }
 
     getUnreadMessages(): number
     {
-        return this.readMessages - this.hostedGameData.chatMessages.length;
+        return this.readMessages - this.hostedGame.chatMessages.length;
     }
 
     getReadMessages(): number
@@ -420,6 +431,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     markAllMessagesRead(): void
     {
-        this.readMessages = this.hostedGameData.chatMessages.length;
+        this.readMessages = this.hostedGame.chatMessages.length;
     }
 }

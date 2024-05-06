@@ -1,12 +1,11 @@
 import { Game, IllegalMove, Move, PlayerIndex } from '../shared/game-engine';
 import { Outcome } from '../shared/game-engine/Types';
-import { HostedGameData, HostedGameState } from '../shared/app/Types';
+import { HostedGameState } from '../shared/app/Types';
 import Player from '../shared/app/models/Player';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
 import logger from './services/logger';
-import { GameOptionsData } from '@shared/app/GameOptions';
 import Rooms from '../shared/app/Rooms';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl';
 import { createTimeControl } from '../shared/time-control/createTimeControl';
@@ -14,6 +13,9 @@ import Container from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import ChatMessage from '../shared/app/models/ChatMessage';
 import { makeAIPlayerMove } from './services/AIManager';
+import HostedGameEntity from '../shared/app/models/HostedGame'; // TODO rename HostedGame
+import HostedGameOptions from '../shared/app/models/HostedGameOptions';
+import { createHostedGameToPlayers } from '../shared/app/models/HostedGameToPlayer';
 
 type HostedGameEvents = {
     played: () => void;
@@ -39,13 +41,15 @@ type HostedGameEvents = {
  * Most of games should be played only in memory,
  * and persisted only on game finished.
  * Unless server restart, a player become temporarly inactive, or correspondace game.
+ *
+ * TODO rename HostedGameServer
  */
 export default class HostedGame extends TypedEmitter<HostedGameEvents>
 {
     private id: string = uuidv4();
 
     private host: Player;
-    private gameOptions: GameOptionsData;
+    private gameOptions: HostedGameOptions;
 
     /**
      * Null if not yet started, or ended and reloaded from database
@@ -64,12 +68,12 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     private createdAt: Date = new Date();
     private io: HexServer = Container.get(HexServer);
 
-    private rematchId: null | string = null;
+    private rematch: null | HostedGameEntity = null;
 
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
-    static hostNewGame(gameOptions: GameOptionsData, host: Player): HostedGame
+    static hostNewGame(gameOptions: HostedGameOptions, host: Player): HostedGame
     {
         const hostedGame = new HostedGame();
 
@@ -415,35 +419,35 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     postChatMessage(chatMessage: ChatMessage)
     {
         this.chatMessages.push(chatMessage);
-        this.io.to(this.gameRooms()).emit('chat', { ...chatMessage });
+        this.io.to(this.gameRooms()).emit('chat', this.id, chatMessage);
         this.emit('chat');
     }
 
-    toData(): HostedGameData
+    toData(): HostedGameEntity
     {
-        const hostedGameData: HostedGameData = {
-            id: this.id,
-            host: this.host,
-            players: this.players,
-            timeControl: this.timeControl.getValues(),
-            gameOptions: this.gameOptions,
-            gameData: this.game?.toData() ?? null,
-            chatMessages: this.chatMessages,
-            state: this.state,
-            createdAt: this.createdAt,
-            rematchId: this.rematchId
-        };
+        const hostedGameEntity = new HostedGameEntity();
 
-        return hostedGameData;
+        hostedGameEntity.id = this.id;
+        hostedGameEntity.host = this.host;
+        hostedGameEntity.hostedGameToPlayers = createHostedGameToPlayers(this.players, hostedGameEntity);
+        hostedGameEntity.timeControl = this.timeControl.getValues();
+        hostedGameEntity.gameOptions = this.gameOptions;
+        hostedGameEntity.gameData = this.game?.toData() ?? null;
+        hostedGameEntity.chatMessages = this.chatMessages;
+        hostedGameEntity.state = this.state;
+        hostedGameEntity.createdAt = this.createdAt;
+        hostedGameEntity.rematch = this.rematch;
+
+        return hostedGameEntity;
     }
 
-    static fromData(data: HostedGameData): HostedGame
+    static fromData(data: HostedGameEntity): HostedGame
     {
         // Check whether data.createdAt is an instance of Date and not a string,
         // to check whether denormalization with superjson worked.
         if (!(data.createdAt instanceof Date)) {
             logger.error(
-                'HostedGameData.fromData(): Error while trying to recreate a HostedGameData from data,'
+                'HostedGame.fromData(): Error while trying to recreate a HostedGame from data,'
                 + ' createdAt is not an instance of Date.'
             );
         }
@@ -464,7 +468,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             }
         }
 
-        hostedGame.players = data.players;
+        hostedGame.players = data.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.player);
         hostedGame.state = data.state;
 
         hostedGame.createdAt = data.createdAt;
@@ -474,7 +478,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         } catch (e) {
             logger.error('Could not recreate time control instance from persisted data', {
                 reason: e.message,
-                hostedGameDataId: data.id,
+                hostedGameId: data.id,
                 data,
             });
 
@@ -488,7 +492,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
         hostedGame.chatMessages = data.chatMessages;
 
-        hostedGame.rematchId = data.rematchId;
+        hostedGame.rematch = data.rematch;
 
         return hostedGame;
     }

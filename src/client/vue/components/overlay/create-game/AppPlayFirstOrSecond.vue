@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../../../../shared/app/models/HostedGameOptions';
 import { PropType, toRefs } from 'vue';
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<GameOptionsData>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
 });

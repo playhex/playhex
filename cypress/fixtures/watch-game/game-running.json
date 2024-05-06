@@ -8,22 +8,26 @@
         "slug": "player-a",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "players": [
+    "hostedGameToPlayers": [
         {
-            "pseudo": "Player A",
-            "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
-            "isGuest": false,
-            "isBot": false,
-            "slug": "player-a",
-            "createdAt": "2024-01-24T16:33:29.586Z"
+            "player": {
+                "pseudo": "Player A",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "player-a",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
         },
         {
-            "publicId": "cc9e20bb-e578-4cde-afe0-501855dd3409",
-            "pseudo": "Player B",
-            "slug": "player-b",
-            "isBot": false,
-            "isGuest": false,
-            "createdAt": "2024-01-24T21:03:42.979Z"
+            "player": {
+                "publicId": "cc9e20bb-e578-4cde-afe0-501855dd3409",
+                "pseudo": "Player B",
+                "slug": "player-b",
+                "isBot": false,
+                "isGuest": false,
+                "createdAt": "2024-01-24T21:03:42.979Z"
+            }
         }
     ],
     "timeControl": {
@@ -128,27 +132,5 @@
     },
     "chatMessages": [],
     "state": "playing",
-    "createdAt": "2024-01-24T21:03:42.979Z",
-    "__meta": {
-        "values": {
-            "host.createdAt": [
-                "Date"
-            ],
-            "opponent.createdAt": [
-                "Date"
-            ],
-            "timeControl.values.players.0.totalRemainingTime": [
-                "Date"
-            ],
-            "gameData.startedAt": [
-                "Date"
-            ],
-            "gameData.lastMoveAt": [
-                "Date"
-            ],
-            "createdAt": [
-                "Date"
-            ]
-        }
-    }
+    "createdAt": "2024-01-24T21:03:42.979Z"
 }

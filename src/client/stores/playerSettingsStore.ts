@@ -1,5 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia';
-import { PlayerSettingsData } from '@shared/app/Types';
+import { PlayerSettings } from '../../shared/app/models';
 import { Ref, ref, watch } from 'vue';
 import { apiGetPlayerSettings, apiPatchPlayerSettings } from '../apiClient';
 import useAuthStore from './authStore';
@@ -15,9 +15,9 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
 
     const { loggedInPlayer } = storeToRefs(useAuthStore());
 
-    const playerSettings: Ref<null | PlayerSettingsData> = ref(null);
+    const playerSettings: Ref<null | PlayerSettings> = ref(null);
 
-    const reloadPlayerSettings = async (): Promise<PlayerSettingsData> => {
+    const reloadPlayerSettings = async (): Promise<PlayerSettings> => {
         const promise = apiGetPlayerSettings();
 
         promise.then(settings => playerSettings.value = settings);

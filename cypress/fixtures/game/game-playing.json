@@ -8,36 +8,40 @@
         "slug": "ddd",
         "createdAt": "2024-03-25T20:03:25.194Z"
     },
-    "players": [
+    "hostedGameToPlayers": [
         {
-            "pseudo": "Random bot",
-            "publicId": "53ccc84c-c73b-40b2-9ee2-21ca2182ac85",
-            "isGuest": false,
-            "isBot": true,
-            "slug": "random-bot",
-            "createdAt": "2023-01-01T00:00:00.000Z",
-            "aiConfig": {
-                "playerId": 703,
-                "engine": "random",
-                "order": 30,
-                "label": "Random",
-                "description": "plays randomly",
-                "boardsizeMin": null,
-                "boardsizeMax": null,
-                "requireMorePower": false,
-                "isRemote": false,
-                "config": {
-                    "determinist": false
+            "player": {
+                "pseudo": "Random bot",
+                "publicId": "53ccc84c-c73b-40b2-9ee2-21ca2182ac85",
+                "isGuest": false,
+                "isBot": true,
+                "slug": "random-bot",
+                "createdAt": "2023-01-01T00:00:00.000Z",
+                "aiConfig": {
+                    "playerId": 703,
+                    "engine": "random",
+                    "order": 30,
+                    "label": "Random",
+                    "description": "plays randomly",
+                    "boardsizeMin": null,
+                    "boardsizeMax": null,
+                    "requireMorePower": false,
+                    "isRemote": false,
+                    "config": {
+                        "determinist": false
+                    }
                 }
             }
         },
         {
-            "pseudo": "ddd",
-            "publicId": "d811df6d-be5d-4916-8734-ac002ebe26b7",
-            "isGuest": false,
-            "isBot": false,
-            "slug": "ddd",
-            "createdAt": "2024-03-25T20:03:25.194Z"
+            "player": {
+                "pseudo": "ddd",
+                "publicId": "d811df6d-be5d-4916-8734-ac002ebe26b7",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "ddd",
+                "createdAt": "2024-03-25T20:03:25.194Z"
+            }
         }
     ],
     "timeControl": {
@@ -138,59 +142,5 @@
     },
     "chatMessages": [],
     "state": "playing",
-    "createdAt": "2024-03-28T11:06:58.317Z",
-    "__meta": {
-        "values": {
-            "timeControl.players.1.totalRemainingTime": [
-                "Date"
-            ],
-            "gameData.movesHistory.0.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.1.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.2.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.3.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.4.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.5.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.6.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.7.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.8.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.9.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.10.playedAt": [
-                "Date"
-            ],
-            "gameData.startedAt": [
-                "Date"
-            ],
-            "gameData.lastMoveAt": [
-                "Date"
-            ],
-            "createdAt": [
-                "Date"
-            ]
-        },
-        "referentialEqualities": {
-            "host": [
-                "players.1"
-            ]
-        }
-    }
+    "createdAt": "2024-03-28T11:06:58.317Z"
 }

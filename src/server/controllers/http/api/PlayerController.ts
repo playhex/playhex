@@ -1,8 +1,6 @@
 import { Service } from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
-import { normalize } from '../../../../shared/app/serializer';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import { transformPlayer } from '../../../../shared/app/models/Player';
 import HttpError from '../HttpError';
 import { HostedGameState } from '@shared/app/Types';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
@@ -30,7 +28,7 @@ export default class PlayerController
             throw new HttpError(404, 'Player not found');
         }
 
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Get('/api/players/:publicId')
@@ -43,7 +41,7 @@ export default class PlayerController
             throw new HttpError(404, 'Player not found');
         }
 
-        return normalize(transformPlayer(player));
+        return player;
     }
 
     @Get('/api/players/:publicId/games')
@@ -64,6 +62,6 @@ export default class PlayerController
             state = stateRaw;
         }
 
-        return normalize(await this.hostedGameRepository.getPlayerGames(player, state, fromGamePublicId));
+        return this.hostedGameRepository.getPlayerGames(player, state, fromGamePublicId);
     }
 }

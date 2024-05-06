@@ -1,10 +1,11 @@
-import { MoveData, Outcome } from '../game-engine/Types';
+import { Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
-import { HostedGameData } from './Types';
 import Player from './models/Player';
 import { GameTimeData } from 'time-control/TimeControl';
 import ChatMessage from './models/ChatMessage';
 import GameAnalyze from './models/GameAnalyze';
+import HostedGame from './models/HostedGame';
+import Move from './models/Move';
 
 export type HexClientToServerEvents = {
     /**
@@ -22,7 +23,7 @@ export type HexClientToServerEvents = {
      * A player wants to play a move.
      * Answer contains either true on success move, either a string containing an error message.
      */
-    move: (gameId: string, move: MoveData, answer: (result: true | string) => void) => void;
+    move: (gameId: string, move: Move, answer: (result: true | string) => void) => void;
 
     /**
      * A player send a chat message on a game
@@ -34,7 +35,7 @@ export type HexServerToClientEvents = {
     /**
      * A game has been created.
      */
-    gameCreated: (hostedGameData: HostedGameData) => void;
+    gameCreated: (hostedGame: HostedGame) => void;
 
     /**
      * A player joined gameId.
@@ -45,7 +46,7 @@ export type HexServerToClientEvents = {
      * Game has started.
      * All info are sent again, with GameData.
      */
-    gameStarted: (hostedGameData: HostedGameData) => void;
+    gameStarted: (hostedGame: HostedGame) => void;
 
     /**
      * Game has been canceled.
@@ -55,7 +56,7 @@ export type HexServerToClientEvents = {
     /**
      * A move has been played by a player.
      */
-    moved: (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => void;
+    moved: (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => void;
 
     /**
      * Players remaining time should be updated.
@@ -89,7 +90,7 @@ export type HexServerToClientEvents = {
     /**
      * A chat message has been posted in a game.
      */
-    chat: (chatMessage: ChatMessage) => void;
+    chat: (gameId: string, chatMessage: ChatMessage) => void;
 
     /**
      * Analyze has been requested for a given game, or has finished.

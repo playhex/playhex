@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useOverlayMeta } from 'unoverlay-vue';
 import { PropType, ref } from 'vue';
-import { GameOptionsData, sanitizeGameOptions } from '@shared/app/GameOptions';
-import { defaultGameOptions } from '@shared/app/GameOptions';
+import HostedGameOptions, { sanitizeGameOptions } from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
@@ -12,18 +11,18 @@ const { visible, confirm, cancel } = useOverlayMeta();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<Partial<GameOptionsData>>,
+        type: Object as PropType<Partial<HostedGameOptions>>,
         required: true,
     },
 });
 
 export type Create1vOfflineAIOverlayInput = typeof props;
 
-const gameOptions = ref<GameOptionsData>({ ...defaultGameOptions, ...props.gameOptions });
+const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions });
 
 const showSecondaryOptions = ref(false);
 
-const submitForm = (gameOptions: GameOptionsData): void => {
+const submitForm = (gameOptions: HostedGameOptions): void => {
     confirm(sanitizeGameOptions(gameOptions));
 };
 </script>

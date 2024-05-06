@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia';
 import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'bootstrap-icons-vue';
-import { HostedGameData } from '@shared/app/Types';
+import HostedGame from '../../../../shared/app/models/HostedGame';
 import Player from '../../../../shared/app/models/Player';
 import { getPlayerGames, getPlayerBySlug, ApiClientError } from '../../../apiClient';
 import { Ref, ref } from 'vue';
@@ -70,7 +70,7 @@ const player: Ref<null | Player> = isMe()
     : ref(null)
 ;
 
-const gamesHistory: Ref<null | HostedGameData[]> = ref(null);
+const gamesHistory: Ref<null | HostedGame[]> = ref(null);
 const playerNotFound = ref(false);
 
 (async () => {
@@ -107,8 +107,8 @@ const currentGameComparator = (a: HostedGameClient, b: HostedGameClient): number
     if (timeA === 'correspondance' && timeB !== 'correspondance')
         return 1;
 
-    const startedAtA = a.getHostedGameData().gameData?.startedAt;
-    const startedAtB = b.getHostedGameData().gameData?.startedAt;
+    const startedAtA = a.getHostedGame().gameData?.startedAt;
+    const startedAtB = b.getHostedGame().gameData?.startedAt;
 
     if (startedAtA != null && startedAtB != null)
         return startedAtB.getTime() - startedAtA.getTime();
@@ -137,7 +137,7 @@ const getCurrentGames = (): HostedGameClient[] => {
 /*
  * Games history
  */
-const hasWon = (game: HostedGameData): boolean => {
+const hasWon = (game: HostedGame): boolean => {
     if (null === player.value) {
         throw new Error('player must be set');
     }
@@ -150,12 +150,12 @@ const hasWon = (game: HostedGameData): boolean => {
         return false;
     }
 
-    const winner = game.players[game.gameData.winner];
+    const winner = game.hostedGameToPlayers[game.gameData.winner].player;
 
     return winner.publicId === player.value?.publicId;
 };
 
-const getOpponent = (game: HostedGameData): Player => {
+const getOpponent = (game: HostedGame): Player => {
     if (null === player.value) {
         throw new Error('player must be set');
     }
@@ -163,11 +163,11 @@ const getOpponent = (game: HostedGameData): Player => {
     let me: null | Player = null;
     let opponent: null | Player = null;
 
-    for (const p of game.players) {
-        if (p.publicId === player.value.publicId) {
-            me = p;
+    for (const p of game.hostedGameToPlayers) {
+        if (p.player.publicId === player.value.publicId) {
+            me = p.player;
         } else {
-            opponent = p;
+            opponent = p.player;
         }
     }
 
@@ -286,11 +286,11 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                             >Watch</router-link>
                         </td>
                         <td><AppPseudoWithOnlineStatusVue :player="(game.getOtherPlayer(player) as Player)" /></td>
-                        <td>{{ game.getHostedGameData().gameOptions.boardsize }}</td>
+                        <td>{{ game.getHostedGame().gameOptions.boardsize }}</td>
                         <td><AppTimeControlLabelVue :gameOptions="game.getGameOptions()" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.getGameOptions()" /></td>
                         <td>{{
-                            formatDistanceToNowStrict(game.getHostedGameData().gameData?.startedAt ?? 0, { addSuffix: true })
+                            formatDistanceToNowStrict(game.getHostedGame().gameData?.startedAt ?? 0, { addSuffix: true })
                         }}</td>
                     </tr>
                 </tbody>

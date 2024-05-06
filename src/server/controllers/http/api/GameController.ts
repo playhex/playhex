@@ -2,11 +2,8 @@ import HostedGameRepository, { GameError } from '../../../repositories/HostedGam
 import { AuthenticatedPlayer } from '../middlewares';
 import HttpError from '../HttpError';
 import { Body, Get, JsonController, Param, Post, QueryParam } from 'routing-controllers';
-import Player from '../../../../shared/app/models/Player';
-import Move from '../../../../shared/app/models/Move';
+import { Player, Move, HostedGameOptions } from '../../../../shared/app/models';
 import { Service } from 'typedi';
-import { normalize } from '../../../../shared/app/serializer';
-import { GameOptionsData, sanitizeGameOptions } from '../../../../shared/app/GameOptions';
 
 @JsonController()
 @Service()
@@ -23,11 +20,11 @@ export default class GameController
         @QueryParam('fromGamePublicId') fromGamePublicId: string,
     ) {
         if (undefined === type || 'lobby' === type) {
-            return normalize(await this.hostedGameRepository.getLobbyGames());
+            return await this.hostedGameRepository.getLobbyGames();
         }
 
         if ('ended' === type) {
-            return normalize(await this.hostedGameRepository.getEndedGames(take ?? 20, fromGamePublicId));
+            return await this.hostedGameRepository.getEndedGames(take ?? 20, fromGamePublicId);
         }
 
         throw new HttpError(400, 'Unexpected ?type= value');
@@ -43,18 +40,17 @@ export default class GameController
             throw new HttpError(404, 'Game not found');
         }
 
-        return normalize(game);
+        return game;
     }
 
     @Post('/api/games')
     async create(
         @AuthenticatedPlayer() host: Player,
-        @Body() gameOptions: GameOptionsData,
+        @Body() gameOptions: HostedGameOptions,
     ) {
-        gameOptions = sanitizeGameOptions(gameOptions);
         try {
             const hostedGame = await this.hostedGameRepository.createGame(host, gameOptions);
-            return normalize(hostedGame.toData());
+            return hostedGame.toData();
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);
@@ -70,7 +66,7 @@ export default class GameController
     ) {
         try {
             const hostedGame = await this.hostedGameRepository.rematchGame(host, publicId);
-            return normalize(hostedGame.toData());
+            return hostedGame.toData();
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);

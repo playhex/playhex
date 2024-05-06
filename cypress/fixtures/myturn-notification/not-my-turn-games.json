@@ -9,20 +9,24 @@
             "slug": "guest-3248",
             "createdAt": "2024-01-19T16:52:33.770Z"
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "pseudo": "3248",
-                "publicId": "1b883dae-1b53-4cc9-ac9d-0c36eac6e7a5",
-                "isGuest": true,
-                "isBot": false,
-                "slug": "guest-3248",
-                "createdAt": "2024-01-19T16:52:33.770Z"
+                "player": {
+                    "pseudo": "3248",
+                    "publicId": "1b883dae-1b53-4cc9-ac9d-0c36eac6e7a5",
+                    "isGuest": true,
+                    "isBot": false,
+                    "slug": "guest-3248",
+                    "createdAt": "2024-01-19T16:52:33.770Z"
+                }
             },
             {
-                "publicId": "determinist-random-bot|3e0a8160-914a-4d74-9886-397f2134a061",
-                "pseudo": "Determinist random bot",
-                "isBot": true,
-                "isGuest": false
+                "player": {
+                    "publicId": "determinist-random-bot|3e0a8160-914a-4d74-9886-397f2134a061",
+                    "pseudo": "Determinist random bot",
+                    "isBot": true,
+                    "isGuest": false
+                }
             }
         ],
         "timeControl": {
@@ -72,25 +76,6 @@
         },
         "chatMessages": [],
         "state": "playing",
-        "createdAt": "2024-01-19T21:38:06.310Z",
-        "__meta": {
-            "values": {
-                "host.createdAt": [
-                    "Date"
-                ],
-                "timeControl.values.players.1.totalRemainingTime": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "createdAt": [
-                    "Date"
-                ]
-            }
-        }
+        "createdAt": "2024-01-19T21:38:06.310Z"
     }
 ]
