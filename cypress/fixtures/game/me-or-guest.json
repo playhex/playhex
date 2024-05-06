@@ -1,0 +1,15 @@
+{
+    "pseudo": "aaa",
+    "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+    "isGuest": false,
+    "isBot": false,
+    "slug": "aaa",
+    "createdAt": "2024-03-05T10:16:32.291Z",
+    "__meta": {
+        "values": {
+            "createdAt": [
+                "Date"
+            ]
+        }
+    }
+}

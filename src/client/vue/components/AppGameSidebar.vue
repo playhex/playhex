@@ -357,11 +357,12 @@ const doAnalyzeGame = async () => {
             </div>
 
             <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGameData())">
-                <div class="container-fluid">
-                    <div class="input-group mb-3">
-                        <input v-model="chatInput" class="form-control" aria-describedby="message-submit" placeholder="Message…" />
+                <div class="container-fluid mb-3">
+                    <div class="input-group">
+                        <input v-model="chatInput" class="form-control" aria-describedby="message-submit" placeholder="Message…" maxlength="250" />
                         <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><BIconSendFill /> Send</button>
                     </div>
+                    <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / 250 characters</div>
                 </div>
             </form>
         </div>
