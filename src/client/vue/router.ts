@@ -63,6 +63,11 @@ const routes: RouteRecordRaw[] = [
                 path: 'resources/hex-links',
                 component: () => import('@client/vue/pages/content/PageHexLinks.vue'),
             },
+            {
+                name: 'privacy',
+                path: 'privacy',
+                component: () => import('@client/vue/pages/content/PagePrivacyPolicy.vue'),
+            },
         ],
     },
     {

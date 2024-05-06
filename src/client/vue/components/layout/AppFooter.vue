@@ -37,6 +37,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
         <p class="infos d-flex flex-column flex-md-row justify-content-center gap-md-4 text-center">
             <span>Project under development</span>
             <span v-if="lastCommitDate">Last&nbsp;change:&nbsp;{{ lastCommitDate }}</span>
+            <router-link :to="{ name: 'privacy' }">Privacy policy</router-link>
             <router-link :to="{ name: 'license' }">License AGPL-3.0</router-link>
         </p>
     </div>
