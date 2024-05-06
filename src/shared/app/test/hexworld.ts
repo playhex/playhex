@@ -57,4 +57,16 @@ describe('hexworld', () => {
 
         assert.strictEqual(link, 'https://hexworld.org/board/#11r9c1,b3c11:fb');
     });
+
+    it('generates a review link for the "Flat" board rotation', () => {
+        const game = new Game(11);
+        game.move(Move.fromString('c2'), 0);
+        game.move(Move.fromString('d4'), 1);
+        game.move(Move.fromString('c6'), 0);
+        game.resign(1);
+
+        const link = gameToHexworldLink(game, 0);
+
+        assert.strictEqual(link, 'https://hexworld.org/board/#11c1,c2d4c6:rw');
+    });
 });

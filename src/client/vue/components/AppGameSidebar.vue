@@ -2,8 +2,10 @@
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
 import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconBoxArrowUpRight, BIconShareFill, BIconCheck } from 'bootstrap-icons-vue';
+import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
+import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
 import Player from '../../../shared/app/models/Player';
@@ -38,6 +40,8 @@ const { loggedInPlayer } = useAuthStore();
 if (null === loggedInPlayer) {
     throw new Error('Unexpected null logged in player');
 }
+
+const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const playerColor = (player: Player): string => {
@@ -299,7 +303,7 @@ const doAnalyzeGame = async () => {
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     target="_blank"
-                    :href="gameToHexworldLink(hostedGameClient.getGame())"
+                    :href="gameToHexworldLink(hostedGameClient.getGame(), playerSettings?.orientationLandscape)"
                 ><BIconBoxArrowUpRight /> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
 
                 <br>

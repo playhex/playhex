@@ -1,12 +1,14 @@
 <script setup lang="ts">
 /* eslint-env browser */
+import { PropType } from 'vue';
+import { storeToRefs } from 'pinia';
+import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
 import { gameToSGF } from '../../../../shared/game-engine/SGF';
 import { useOverlayMeta } from 'unoverlay-vue';
 import { downloadString } from '../../../services/fileDownload';
 import { gameToHexworldLink } from '../../../../shared/app/hexworld';
 import { BIconRepeat, BIconDownload, BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
-import { PropType } from 'vue';
 import Player from '../../../../shared/app/models/Player';
 import { Game, outcomeToString } from '../../../../shared/game-engine';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
@@ -35,6 +37,8 @@ const winner: null | Player = game.isCanceled()
     ? null
     : players[game.getStrictWinner()]
 ;
+
+const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 
 /*
  * SGF download
@@ -103,7 +107,7 @@ const downloadSGF = (): void => {
                             type="button"
                             class="btn btn-sm btn-outline-primary"
                             target="_blank"
-                            :href="gameToHexworldLink(game)"
+                            :href="gameToHexworldLink(game, playerSettings?.orientationLandscape)"
                         ><BIconBoxArrowUpRight /> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
                     </div>
                 </form>
