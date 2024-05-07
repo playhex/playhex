@@ -7,13 +7,13 @@ import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
 import { createOverlay } from 'unoverlay-vue';
-import { Ref, onMounted, onUnmounted, watch } from 'vue';
+import { Ref, onMounted, onUnmounted, watch, watchEffect } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
@@ -36,6 +36,7 @@ if (Array.isArray(gameId)) {
 }
 
 const lobbyStore = useLobbyStore();
+const { loggedInPlayer } = storeToRefs(useAuthStore());
 const router = useRouter();
 
 /*
@@ -75,13 +76,12 @@ useSocketStore().joinRoom(Rooms.game(gameId));
 onUnmounted(() => useSocketStore().leaveRoom(Rooms.game(gameId)));
 
 const getLocalPlayerIndex = (): number => {
-    const { loggedInPlayer } = useAuthStore();
 
-    if (null === loggedInPlayer || !hostedGameClient.value) {
+    if (null === loggedInPlayer.value || !hostedGameClient.value) {
         return -1;
     }
 
-    return hostedGameClient.value.getPlayerIndex(loggedInPlayer);
+    return hostedGameClient.value.getPlayerIndex(loggedInPlayer.value);
 };
 
 const listenHexClick = () => {
@@ -279,20 +279,70 @@ const toggleCoords = () => {
 /*
  * Rematch
  */
-const rematch = async (): Promise<void> => {
+const canAcceptRematch: Ref<boolean> = ref(false);
+
+watchEffect(async () => {
+    if (hostedGameClient.value == null) return;
+    const rematchId = hostedGameClient.value.getRematchGameId();
+    if (rematchId == null) return;
+    if (loggedInPlayer.value == null) return;
+    if (getLocalPlayerIndex() === -1) return;
+    const rematchGameClient = await lobbyStore.retrieveHostedGameClient(rematchId);
+    if (rematchGameClient == null) return;
+    canAcceptRematch.value = rematchGameClient.canJoin(loggedInPlayer.value);
+});
+
+const canRematch = (): boolean => {
+    if (-1 === getLocalPlayerIndex() || null === hostedGameClient.value) {
+        return false;
+    }
+    return hostedGameClient.value.canRematch();
+};
+
+const createOrAcceptRematch = async (): Promise<void> => {
     if (!hostedGameClient.value) {
         throw new Error('Error while trying to rematch, no current game');
     }
 
-    const hostedGameClientRematch = await lobbyStore.createGame(
-        hostedGameClient.value.getHostedGameData().gameOptions,
-    );
+    const rematchId = hostedGameClient.value.getRematchGameId();
+    let hostedRematchClient;
+
+    if (rematchId != null) {
+        hostedRematchClient = await lobbyStore.retrieveHostedGameClient(rematchId);
+        if (hostedRematchClient == null) {
+            throw new Error('A rematch game does not exist');
+        }
+    } else {
+        hostedRematchClient = await lobbyStore.rematchGame(
+            hostedGameClient.value.getId()
+        );
+    }
+
+    if (loggedInPlayer && hostedRematchClient.canJoin(loggedInPlayer.value)) {
+        await hostedRematchClient.sendJoinGame();
+    }
 
     router.push({
         name: 'online-game',
         params: {
-            gameId: hostedGameClientRematch.getId(),
+            gameId: hostedRematchClient.getId(),
         },
+    });
+};
+
+const viewRematch = (): void => {
+    if (!hostedGameClient.value) {
+        throw new Error('Error while trying to view rematch, no current game');
+    }
+    const rematchId = hostedGameClient.value.getRematchGameId();
+    if (rematchId == null) {
+        throw new Error('Error while trying to view rematch, empty rematchId');
+    }
+    router.push({
+        name: 'online-game',
+        params: {
+            gameId: rematchId
+        }
     });
 };
 
@@ -336,10 +386,9 @@ const unreadMessages = (): number => {
                     :timeControlOptions="hostedGameClient.getTimeControlOptions()"
                     :timeControlValues="hostedGameClient.getTimeControlValues()"
                     :gameView="gameView"
-                    :rematch="rematch"
                 />
 
-                <div v-if="hostedGameClient && hostedGameClient.canJoin(useAuthStore().loggedInPlayer)" class="join-button-container">
+                <div v-if="hostedGameClient && hostedGameClient.canJoin(loggedInPlayer)" class="join-button-container">
                     <div class="d-flex justify-content-center">
                         <button class="btn btn-lg btn-success" @click="join()">Accept</button>
                     </div>
@@ -351,6 +400,18 @@ const unreadMessages = (): number => {
                     <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><BIconFlag /><span class="btn-label"> Resign</span></button>
                     <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><BIconXLg /><span class="btn-label"> Cancel</span></button>
                     <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><BIconCheck /> Confirm<span class="btn-label"> move</span></button>
+                    <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
+                        <BIconRepeat />
+                        <span class="btn-label"> Rematch</span>
+                    </button>
+                    <template v-else-if="hostedGameClient.getRematchGameId() != null">
+                        <button type="button" class="btn btn-success" v-if="canAcceptRematch" @click="createOrAcceptRematch()">
+                            Accept rematch
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" v-else @click="viewRematch()">
+                            View rematch
+                        </button>
+                    </template>
                     <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
                         <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
                         <BIconChatRight v-else />

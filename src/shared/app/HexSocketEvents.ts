@@ -63,6 +63,11 @@ export type HexServerToClientEvents = {
     timeControlUpdate: (gameId: string, gameTimeData: GameTimeData) => void;
 
     /**
+     * A rematch game is now available and can be accepted.
+     */
+    rematchAvailable: (gameId: string, rematchId: string) => void;
+
+    /**
      * A game has ended and there is a winner.
      */
     ended: (gameId: string, winner: PlayerIndex, outcome: Outcome) => void;

@@ -64,6 +64,8 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     private createdAt: Date = new Date();
     private io: HexServer = Container.get(HexServer);
 
+    private rematchId: null | string = null;
+
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
@@ -429,6 +431,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             chatMessages: this.chatMessages,
             state: this.state,
             createdAt: this.createdAt,
+            rematchId: this.rematchId
         };
 
         return hostedGameData;
@@ -484,6 +487,8 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         }
 
         hostedGame.chatMessages = data.chatMessages;
+
+        hostedGame.rematchId = data.rematchId;
 
         return hostedGame;
     }

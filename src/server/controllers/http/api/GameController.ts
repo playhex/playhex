@@ -1,4 +1,4 @@
-import HostedGameRepository from '../../../repositories/HostedGameRepository';
+import HostedGameRepository, { GameError } from '../../../repositories/HostedGameRepository';
 import { AuthenticatedPlayer } from '../middlewares';
 import HttpError from '../HttpError';
 import { Body, Get, JsonController, Param, Post, QueryParam } from 'routing-controllers';
@@ -7,7 +7,6 @@ import Move from '../../../../shared/app/models/Move';
 import { Service } from 'typedi';
 import { normalize } from '../../../../shared/app/serializer';
 import { GameOptionsData, sanitizeGameOptions } from '../../../../shared/app/GameOptions';
-import { FindAIError, findAIOpponent } from '../../../services/AIManager';
 
 @JsonController()
 @Service()
@@ -53,27 +52,31 @@ export default class GameController
         @Body() gameOptions: GameOptionsData,
     ) {
         gameOptions = sanitizeGameOptions(gameOptions);
-        let opponent: null | Player = null;
-
         try {
-            if ('ai' === gameOptions.opponent.type) {
-                opponent = await findAIOpponent(gameOptions);
-
-                if (null === opponent) {
-                    throw new HttpError(400, 'No matching AI found');
-                }
-            }
+            const hostedGame = await this.hostedGameRepository.createGame(host, gameOptions);
+            return normalize(hostedGame.toData());
         } catch (e) {
-            if (e instanceof FindAIError) {
+            if (e instanceof GameError) {
                 throw new HttpError(400, e.message);
             }
-
             throw e;
         }
+    }
 
-        const hostedGame = await this.hostedGameRepository.createGame(host, gameOptions, opponent);
-
-        return normalize(hostedGame.toData());
+    @Post('/api/games/:publicId/rematch')
+    async rematch(
+        @Param('publicId') publicId: string,
+        @AuthenticatedPlayer() host: Player,
+    ) {
+        try {
+            const hostedGame = await this.hostedGameRepository.rematchGame(host, publicId);
+            return normalize(hostedGame.toData());
+        } catch (e) {
+            if (e instanceof GameError) {
+                throw new HttpError(400, e.message);
+            }
+            throw e;
+        }
     }
 
     @Post('/api/games/:publicId/join')

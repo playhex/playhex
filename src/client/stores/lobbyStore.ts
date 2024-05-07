@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
 import { HostedGameData } from '@shared/app/Types';
 import Player from '../../shared/app/models/Player';
-import { apiPostGame, getEndedGames, getGame, getGames } from '@client/apiClient';
+import { apiPostGame, apiPostRematch, getEndedGames, getGame, getGames } from '@client/apiClient';
 import { GameOptionsData } from '@shared/app/GameOptions';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import useSocketStore from './socketStore';
@@ -31,6 +31,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
         hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
 
+        return hostedGameClients.value[hostedGameData.id];
+    };
+
+    const rematchGame = async (gameId: string): Promise<HostedGameClient> => {
+        const hostedGameData = await apiPostRematch(gameId);
+        hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         return hostedGameClients.value[hostedGameData.id];
     };
 
@@ -142,6 +148,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
+        socket.on('rematchAvailable', (gameId: string, rematchId: string) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].onServerRematchAvailable(rematchId);
+            }
+        });
+
         socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
             if (hostedGameClients.value[gameId]) {
                 hostedGameClients.value[gameId].onServerGameEnded(winner, outcome);
@@ -168,6 +180,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         hostedGameClients,
         initialGamesPromise,
         createGame,
+        rematchGame,
         updateGames,
         retrieveHostedGameClient,
         loadMoreEndedGames,

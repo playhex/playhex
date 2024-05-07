@@ -218,6 +218,18 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         ;
     }
 
+    canRematch(): boolean
+    {
+        return (this.hostedGameData.state === 'ended'
+            || this.hostedGameData.state === 'canceled')
+            && this.hostedGameData.rematchId == null;
+    }
+
+    getRematchGameId(): string | null
+    {
+        return this.hostedGameData.rematchId;
+    }
+
     canJoin(player: null | Player): boolean
     {
         if (!player) {
@@ -332,6 +344,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
         Object.assign(this.hostedGameData.timeControl, gameTimeData);
+    }
+
+    onServerRematchAvailable(rematchId: string): void
+    {
+        this.hostedGameData.rematchId = rematchId;
     }
 
     onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
