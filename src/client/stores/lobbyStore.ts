@@ -2,10 +2,10 @@ import { Move, PlayerIndex } from '@shared/game-engine';
 import { MoveData, Outcome } from '@shared/game-engine/Types';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
-import { HostedGameData } from '@shared/app/Types';
+import HostedGame from '../../shared/app/models/HostedGame';
 import Player from '../../shared/app/models/Player';
 import { apiPostGame, apiPostRematch, getEndedGames, getGame, getGames } from '@client/apiClient';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../shared/app/models/HostedGameOptions';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import useSocketStore from './socketStore';
 import { ref } from 'vue';
@@ -26,12 +26,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
      */
     const hostedGameClients = ref<{ [key: string]: HostedGameClient }>({});
 
-    const createGame = async (gameOptions?: GameOptionsData): Promise<HostedGameClient> => {
-        const hostedGameData = await apiPostGame(gameOptions);
+    const createGame = async (gameOptions?: HostedGameOptions): Promise<HostedGameClient> => {
+        const hostedGame = await apiPostGame(gameOptions);
 
-        hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+        hostedGameClients.value[hostedGame.id] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
 
-        return hostedGameClients.value[hostedGameData.id];
+        return hostedGameClients.value[hostedGame.id];
     };
 
     const rematchGame = async (gameId: string): Promise<HostedGameClient> => {
@@ -44,19 +44,19 @@ const useLobbyStore = defineStore('lobbyStore', () => {
      * Promise of list of games loaded on app start.
      * Can be reused.
      */
-    const initialGamesPromise: Promise<HostedGameData[]> = getGames();
+    const initialGamesPromise: Promise<HostedGame[]> = getGames();
 
     /**
      * Load and update all games from server.
      */
     const updateGames = async (): Promise<void> => {
-        const apiGames: HostedGameData[] = await initialGamesPromise;
+        const apiGames: HostedGame[] = await initialGamesPromise;
 
-        apiGames.forEach(hostedGameData => {
-            if (hostedGameClients.value[hostedGameData.id]) {
-                hostedGameClients.value[hostedGameData.id].updateFromHostedGameData(hostedGameData);
+        apiGames.forEach(hostedGame => {
+            if (hostedGameClients.value[hostedGame.id]) {
+                hostedGameClients.value[hostedGame.id].updateFromHostedGame(hostedGame);
             } else {
-                hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+                hostedGameClients.value[hostedGame.id] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
             }
         });
     };
@@ -69,13 +69,13 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             return hostedGameClients.value[gameId];
         }
 
-        const hostedGameData: null | HostedGameData = await getGame(gameId);
+        const hostedGame: null | HostedGame = await getGame(gameId);
 
-        if (null === hostedGameData) {
+        if (null === hostedGame) {
             return null;
         }
 
-        return hostedGameClients.value[gameId] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+        return hostedGameClients.value[gameId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
     };
 
     /**
@@ -94,8 +94,8 @@ const useLobbyStore = defineStore('lobbyStore', () => {
                 continue;
             }
 
-            const oldestDate = oldestHostedGameClient.getHostedGameData().gameData?.endedAt?.getTime();
-            const currentDate = hostedGameClients.value[publicId].getHostedGameData().gameData?.endedAt?.getTime();
+            const oldestDate = oldestHostedGameClient.getHostedGame().gameData?.endedAt?.getTime();
+            const currentDate = hostedGameClients.value[publicId].getHostedGame().gameData?.endedAt?.getTime();
 
             if (undefined === oldestDate || undefined === currentDate) {
                 continue;
@@ -114,8 +114,8 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     };
 
     const listenSocket = (): void => {
-        socket.on('gameCreated', (hostedGameData: HostedGameData) => {
-            hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+        socket.on('gameCreated', (hostedGame: HostedGame) => {
+            hostedGameClients.value[hostedGame.id] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         });
 
         socket.on('gameJoined', (gameId: string, player: Player) => {
@@ -124,9 +124,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
-        socket.on('gameStarted', (hostedGameData: HostedGameData) => {
-            if (hostedGameClients.value[hostedGameData.id]) {
-                hostedGameClients.value[hostedGameData.id].onServerGameStarted(hostedGameData);
+        socket.on('gameStarted', (hostedGame: HostedGame) => {
+            if (hostedGameClients.value[hostedGame.id]) {
+                hostedGameClients.value[hostedGame.id].onServerGameStarted(hostedGame);
             }
         });
 
@@ -160,9 +160,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
-        socket.on('chat', (chatMessage: ChatMessage) => {
-            if (hostedGameClients.value[chatMessage.gameId]) {
-                hostedGameClients.value[chatMessage.gameId].onChatMessage(chatMessage);
+        socket.on('chat', (gameId: string, chatMessage: ChatMessage) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].onChatMessage(chatMessage);
             }
         });
     };

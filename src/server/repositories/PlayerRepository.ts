@@ -1,14 +1,11 @@
 import Player from '../../shared/app/models/Player';
-import prisma from '../services/prisma';
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication';
 import logger from '../services/logger';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
-import { select } from '../persistance/PlayerPersister';
-import { plainToInstance } from 'class-transformer';
+import { FindOptionsSelect, QueryFailedError, Repository } from 'typeorm';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
@@ -21,20 +18,20 @@ export default class PlayerRepository
      */
     private playersCache: { [key: string]: Player } = {};
 
+    constructor(
+        @Inject('Repository<Player>')
+        private playerRepository: Repository<Player>,
+    ) {}
+
     async getPlayer(publicId: string): Promise<null | Player>
     {
         if (this.playersCache[publicId]) {
             return this.playersCache[publicId];
         }
 
-        const playerObject = await prisma.player.findUnique({
-            select,
-            where: {
-                publicId,
-            },
+        const player = await this.playerRepository.findOneBy({
+            publicId,
         });
-
-        const player = plainToInstance(Player, playerObject);
 
         if (null !== player) {
             this.playersCache[publicId] = player;
@@ -45,12 +42,9 @@ export default class PlayerRepository
 
     async getPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return plainToInstance(Player, await prisma.player.findUnique({
-            select,
-            where: {
-                slug,
-            },
-        }));
+        return this.playerRepository.findOneBy({
+            slug,
+        });
     }
 
     async createGuest(): Promise<Player>
@@ -59,20 +53,18 @@ export default class PlayerRepository
 
         while (exponent < 12) {
             try {
-                const pseudo = String(10 ** exponent + Math.floor(Math.random() * 9 * (10 ** exponent)));
-                const publicId = uuidv4();
+                const player = new Player();
 
-                return this.playersCache[publicId] = plainToInstance(Player, await prisma.player.create({
-                    select,
-                    data: {
-                        publicId,
-                        pseudo,
-                        slug: pseudoSlug(pseudo),
-                        isGuest: true,
-                    },
-                }));
+                player.pseudo = String(10 ** exponent + Math.floor(Math.random() * 9 * (10 ** exponent)));
+                player.publicId = uuidv4();
+                player.slug = pseudoSlug(player.pseudo);
+                player.isGuest = true;
+
+                await this.playerRepository.save(player);
+
+                return this.playersCache[player.publicId] = player;
             } catch (e) {
-                if (e instanceof PrismaClientKnownRequestError && e.message.includes('Unique constraint failed')) {
+                if (e instanceof QueryFailedError && e.message.includes('ER_DUP_ENTRY')) {
                     ++exponent;
                     continue;
                 }
@@ -95,19 +87,18 @@ export default class PlayerRepository
         checkPseudo(pseudo);
 
         try {
-            const publicId = uuidv4();
+            const player = new Player();
 
-            return this.playersCache[publicId] = plainToInstance(Player, await prisma.player.create({
-                select,
-                data: {
-                    publicId,
-                    pseudo,
-                    slug: pseudoSlug(pseudo),
-                    password: await hashPassword(password),
-                },
-            }));
+            player.publicId = uuidv4();
+            player.pseudo = pseudo;
+            player.slug = pseudoSlug(pseudo);
+            player.password = await hashPassword(password);
+
+            await this.playerRepository.save(player);
+
+            return this.playersCache[player.publicId] = player;
         } catch (e) {
-            if (e instanceof PrismaClientKnownRequestError && e.message.includes('Unique constraint failed')) {
+            if (e instanceof QueryFailedError && e.message.includes('ER_DUP_ENTRY')) {
                 throw new PseudoAlreadyTakenError();
             }
 
@@ -117,29 +108,22 @@ export default class PlayerRepository
 
     /** @throws {InvalidPasswordError} */
     async changePassword(publicId: string, oldPassword: string, newPassword: string): Promise<Player> {
-        const playerObject = await prisma.player.findUnique({
+        const player = await this.playerRepository.findOne({
+            select: this.allColumnWithPassword(),
             where: {
                 publicId,
             },
         });
-        const player = plainToInstance(Player, playerObject);
-        if (playerObject == null || player == null) {
+
+        if (player === null) {
             logger.error(`Player with id ${publicId} doesn't exist`);
             throw new Error('Cannot find player id');
         }
         if (!checkPassword(player, oldPassword)) {
             throw new InvalidPasswordError();
         }
-        const hashedPassword = await hashPassword(newPassword);
-        return this.playersCache[publicId] = plainToInstance(Player, await prisma.player.update({
-            select,
-            where: {
-                publicId,
-            },
-            data: {
-                password: hashedPassword
-            }
-        }));
+        player.password = await hashPassword(newPassword);
+        return this.playersCache[publicId] = await this.playerRepository.save(player);
     }
 
     /**
@@ -163,26 +147,39 @@ export default class PlayerRepository
             throw new MustBeGuestError();
         }
 
+        player.isGuest = false;
+        player.pseudo = pseudo;
+        player.slug = pseudoSlug(pseudo);
+        player.password = await hashPassword(password);
+        player.createdAt = new Date();
+
         try {
-            return this.playersCache[publicId] = plainToInstance(Player, await prisma.player.update({
-                select,
-                where: {
-                    publicId,
-                },
-                data: {
-                    isGuest: false,
-                    pseudo,
-                    slug: pseudoSlug(pseudo),
-                    password: await hashPassword(password),
-                    createdAt: new Date(),
-                },
-            }));
+            return this.playersCache[publicId] = await this.playerRepository.save(player);
         } catch (e) {
-            if (e instanceof PrismaClientKnownRequestError && e.message.includes('Unique constraint failed')) {
+            if (e instanceof QueryFailedError && e.message.includes('ER_DUP_ENTRY')) {
                 throw new PseudoAlreadyTakenError();
             }
 
             throw e;
         }
+    }
+
+    /**
+     * By default, player password column is not selected in database queries.
+     * To force select password, use:
+     *  {
+     *      select: allColumnWithPassword(),
+     *  },
+     *  where: { where: ... }
+     */
+    allColumnWithPassword(): FindOptionsSelect<Player>
+    {
+        const allColumnsWithPassword: FindOptionsSelect<Player> = {};
+
+        this.playerRepository.metadata.columns.forEach(column => {
+            allColumnsWithPassword[column.propertyName as keyof Player] = true;
+        });
+
+        return allColumnsWithPassword;
     }
 }

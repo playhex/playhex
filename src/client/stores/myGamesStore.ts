@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import useAuthStore from './authStore';
 import useSocketStore from './socketStore';
-import { HostedGameData } from '@shared/app/Types';
+import HostedGame from '@shared/app/models/HostedGame';
 import { MoveData } from '@shared/game-engine/Types';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
@@ -18,7 +18,7 @@ export type CurrentGame = {
     id: string;
     isMyTurn: boolean;
     myColor: null | PlayerIndex;
-    hostedGameData: HostedGameData;
+    hostedGame: HostedGame;
 };
 
 /**
@@ -56,14 +56,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return 0;
         }
 
-        const time0 = game0.hostedGameData.timeControl.players[game0.myColor].totalRemainingTime;
-        const time1 = game1.hostedGameData.timeControl.players[game1.myColor].totalRemainingTime;
+        const time0 = game0.hostedGame.timeControl.players[game0.myColor].totalRemainingTime;
+        const time1 = game1.hostedGame.timeControl.players[game1.myColor].totalRemainingTime;
 
         return timeValueToSeconds(time0) - timeValueToSeconds(time1);
     };
 
     const isPlaying = (game: CurrentGame): boolean => {
-        return game.hostedGameData.state === 'playing';
+        return game.hostedGame.state === 'playing';
     };
 
     const isEmpty = (): boolean => {
@@ -107,16 +107,16 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     };
 
 
-    socket.on('gameCreated', (hostedGameData: HostedGameData) => {
-        if (hostedGameData.host.publicId !== loggedInPlayer.value?.publicId) {
+    socket.on('gameCreated', (hostedGame: HostedGame) => {
+        if (hostedGame.host.publicId !== loggedInPlayer.value?.publicId) {
             return;
         }
 
-        myGames.value[hostedGameData.id] = {
-            id: hostedGameData.id,
+        myGames.value[hostedGame.id] = {
+            id: hostedGame.id,
             isMyTurn: false,
             myColor: null,
-            hostedGameData,
+            hostedGame: hostedGame,
         };
 
         mostUrgentGame.value = getMostUrgentGame();
@@ -124,15 +124,15 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         Notif.requestNotificationPermission();
     });
 
-    socket.on('gameStarted', (hostedGameData: HostedGameData) => {
-        const { gameData, id } = hostedGameData;
+    socket.on('gameStarted', (hostedGame: HostedGame) => {
+        const { gameData, id } = hostedGame;
         const me = loggedInPlayer.value;
 
         if (null === me || null === gameData) {
             return;
         }
 
-        if (!hostedGameData.players.some(p => p.publicId === me.publicId)) {
+        if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
             return;
         }
 
@@ -141,17 +141,17 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 id,
                 isMyTurn: false,
                 myColor: null,
-                hostedGameData,
+                hostedGame: hostedGame,
             };
         }
 
-        const myColor = hostedGameData.players[0].publicId === loggedInPlayer.value?.publicId ? 0 : 1;
+        const myColor = hostedGame.hostedGameToPlayers[0].player.publicId === loggedInPlayer.value?.publicId ? 0 : 1;
         myGames.value[id].myColor = myColor;
-        myGames.value[id].isMyTurn = hostedGameData.players[gameData.currentPlayerIndex].publicId === loggedInPlayer.value?.publicId;
-        myGames.value[id].hostedGameData = hostedGameData;
+        myGames.value[id].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.value?.publicId;
+        myGames.value[id].hostedGame = hostedGame;
 
         if (!document.hasFocus()) {
-            const opponent = hostedGameData.players[1 - myColor];
+            const opponent = hostedGame.hostedGameToPlayers[1 - myColor].player;
 
             sendNotification(
                 { body: `Game with ${pseudoString(opponent, 'pseudo')} has started`
@@ -181,8 +181,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             const opponent =
                 myGames
                 .value[gameId]
-                .hostedGameData
-                .players[byPlayerIndex];
+                .hostedGame
+                .hostedGameToPlayers[byPlayerIndex].player;
 
             sendNotification(
                 { body: `${pseudoString(opponent, 'pseudo')} made a move`
@@ -237,16 +237,16 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         initialized = true;
 
-        initialGames.forEach(hostedGameData => {
-            const { id, gameData } = hostedGameData;
+        initialGames.forEach(hostedGame => {
+            const { id, gameData } = hostedGame;
 
             // I'm not in the game
-            if (!hostedGameData.players.some(p => p.publicId === me.publicId)) {
+            if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
                 return;
             }
 
             // Game finished
-            if ('ended' === hostedGameData.state) {
+            if ('ended' === hostedGame.state) {
                 return;
             }
 
@@ -254,11 +254,11 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             let myColor: null | PlayerIndex = null;
 
             if (null !== gameData) {
-                myColor = hostedGameData.players[0].publicId === me.publicId ? 0 : 1;
-                isMyTurn = hostedGameData.players[gameData.currentPlayerIndex].publicId === me.publicId;
+                myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
+                isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === me.publicId;
             }
 
-            myGames.value[hostedGameData.id] = { id, isMyTurn, myColor, hostedGameData };
+            myGames.value[hostedGame.id] = { id, isMyTurn, myColor, hostedGame: hostedGame };
         });
 
         mostUrgentGame.value = getMostUrgentGame();

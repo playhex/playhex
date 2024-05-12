@@ -6,7 +6,7 @@ import { createOverlay } from 'unoverlay-vue';
 import Create1v1Overlay, { Create1v1OverlayInput } from '@client/vue/components/overlay/Create1v1Overlay.vue';
 import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
 import Create1vOfflineAIOverlay, { Create1vOfflineAIOverlayInput } from '@client/vue/components/overlay/Create1vOfflineAIOverlay.vue';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
 import Player from '../../../shared/app/models/Player';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
@@ -38,13 +38,13 @@ const goToGame = (gameId: string) => {
 /*
  * 1 vs 1
  */
-const create1v1Overlay = createOverlay<Create1v1OverlayInput, GameOptionsData>(Create1v1Overlay);
+const create1v1Overlay = createOverlay<Create1v1OverlayInput, HostedGameOptions>(Create1v1Overlay);
 
 const create1v1AndJoinGame = async () => {
     try {
         const gameOptions = await create1v1Overlay({
             gameOptions: {
-                opponent: { type: 'player' },
+                opponentType: 'player',
             },
         });
 
@@ -58,13 +58,13 @@ const create1v1AndJoinGame = async () => {
 /*
  * 1 vs AI
  */
-const create1vAIOverlay = createOverlay<Create1vAIOverlayInput, GameOptionsData>(Create1vAIOverlay);
+const create1vAIOverlay = createOverlay<Create1vAIOverlayInput, HostedGameOptions>(Create1vAIOverlay);
 
 const create1vAIAndJoinGame = async () => {
     try {
         const gameOptions = await create1vAIOverlay({
             gameOptions: {
-                opponent: { type: 'ai' },
+                opponentType: 'ai',
             },
         });
 
@@ -78,7 +78,7 @@ const create1vAIAndJoinGame = async () => {
 /*
  * Local play
  */
-const create1vOfflineAIOverlay = createOverlay<Create1vOfflineAIOverlayInput, GameOptionsData>(Create1vOfflineAIOverlay);
+const create1vOfflineAIOverlay = createOverlay<Create1vOfflineAIOverlayInput, HostedGameOptions>(Create1vOfflineAIOverlay);
 
 const createAndJoinGameVsLocalAI = async () => {
     try {
@@ -99,24 +99,24 @@ const createAndJoinGameVsLocalAI = async () => {
  * Utils functions
  */
 const isWaiting = (hostedGameClient: HostedGameClient) =>
-    'created' === hostedGameClient.getHostedGameData().state
+    'created' === hostedGameClient.getHostedGame().state
 ;
 
 const isPlaying = (hostedGameClient: HostedGameClient) =>
-    'playing' === hostedGameClient.getHostedGameData().state
+    'playing' === hostedGameClient.getHostedGame().state
 ;
 
 const lobbyFilter = (hostedGameClient: HostedGameClient) => {
     if (!isPlaying(hostedGameClient)) return false;
-    const startTime = hostedGameClient.getHostedGameData().gameData?.startedAt ?? hostedGameClient.getHostedGameData().createdAt;
+    const startTime = hostedGameClient.getHostedGame().gameData?.startedAt ?? hostedGameClient.getHostedGame().createdAt;
     const days = (Date.now() - startTime.getTime()) / 86400000;
-    const lastMove = hostedGameClient.getHostedGameData().gameData?.lastMoveAt;
+    const lastMove = hostedGameClient.getHostedGame().gameData?.lastMoveAt;
     // Hide games with no moves and >= 1 days since the game start
     return days < 1 || lastMove != null;
 };
 
 const isFinished = (hostedGameClient: HostedGameClient) =>
-    'ended' === hostedGameClient.getHostedGameData().state
+    'ended' === hostedGameClient.getHostedGame().state
 ;
 
 const joinGame = async (gameId: string) => {
@@ -159,8 +159,8 @@ const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
     if (timeA === 'correspondance' && timeB !== 'correspondance')
         return 1;
 
-    const hostedDataA = a.getHostedGameData();
-    const hostedDataB = b.getHostedGameData();
+    const hostedDataA = a.getHostedGame();
+    const hostedDataB = b.getHostedGame();
 
     const startedAtA = hostedDataA.gameData?.startedAt;
     const startedAtB = hostedDataB.gameData?.startedAt;
@@ -175,8 +175,8 @@ const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
  * Finished games
  */
 const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
-    const gameDataA = a.getHostedGameData().gameData;
-    const gameDataB = b.getHostedGameData().gameData;
+    const gameDataA = a.getHostedGame().gameData;
+    const gameDataB = b.getHostedGame().gameData;
 
     if (!gameDataA?.endedAt || !gameDataB?.endedAt) {
         return 0;
@@ -235,12 +235,12 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >Watch</router-link>
                                 </td>
-                                <td><AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" /></td>
+                                <td><AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" /></td>
                                 <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
                                 <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td><AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGameClient.getHostedGameData().createdAt, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGameClient.getHostedGame().createdAt, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>
@@ -281,10 +281,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <br>
                                     <AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" />
                                 </td>
-                                <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
+                                <td>{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</td>
                                 <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGameClient.getHostedGameData().gameData?.startedAt ?? 0, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGameClient.getHostedGame().gameData?.startedAt ?? 0, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>
@@ -317,7 +317,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >Review</router-link>
                                 </td>
-                                <template v-if="hostedGameClient.getHostedGameData()?.gameData?.winner != null">
+                                <template v-if="hostedGameClient.getHostedGame()?.gameData?.winner != null">
                                     <td><AppPseudoWithOnlineStatus :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" /></td>
                                     <td><AppPseudoWithOnlineStatus :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" /></td>
                                 </template>
@@ -325,10 +325,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <td>-</td>
                                     <td>-</td>
                                 </template>
-                                <td>{{ hostedGameClient.getHostedGameData().gameOptions.boardsize }}</td>
+                                <td>{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</td>
                                 <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGameClient.getHostedGameData().gameData?.endedAt ?? 0, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGameClient.getHostedGame().gameData?.endedAt ?? 0, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>

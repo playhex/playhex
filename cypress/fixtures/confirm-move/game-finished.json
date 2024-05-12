@@ -8,22 +8,26 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "players": [
+    "hostedGameToPlayers": [
         {
-            "publicId": "77656f2d-0d80-48ba-b2d3-8f2816ced08c",
-            "isBot": true,
-            "isGuest": false,
-            "pseudo": "Determinist random bot",
-            "slug": "determinist-random-bot",
-            "createdAt": "2024-01-25T10:22:38.422Z"
+            "player": {
+                "publicId": "77656f2d-0d80-48ba-b2d3-8f2816ced08c",
+                "isBot": true,
+                "isGuest": false,
+                "pseudo": "Determinist random bot",
+                "slug": "determinist-random-bot",
+                "createdAt": "2024-01-25T10:22:38.422Z"
+            }
         },
         {
-            "pseudo": "aa",
-            "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
-            "isGuest": false,
-            "isBot": false,
-            "slug": "aa",
-            "createdAt": "2024-01-24T16:33:29.586Z"
+            "player": {
+                "pseudo": "aa",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aa",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
         }
     ],
     "timeControl": {
@@ -78,35 +82,5 @@
     },
     "chatMessages": [],
     "state": "ended",
-    "createdAt": "2024-01-25T10:22:38.422Z",
-    "__meta": {
-        "values": {
-            "host.createdAt": [
-                "Date"
-            ],
-            "players.0.createdAt": [
-                "Date"
-            ],
-            "players.1.createdAt": [
-                "Date"
-            ],
-            "gameData.startedAt": [
-                "Date"
-            ],
-            "gameData.lastMoveAt": [
-                "Date"
-            ],
-            "gameData.endedAt": [
-                "Date"
-            ],
-            "createdAt": [
-                "Date"
-            ]
-        },
-        "referentialEqualities": {
-            "host": [
-                "players.1"
-            ]
-        }
-    }
+    "createdAt": "2024-01-25T10:22:38.422Z"
 }

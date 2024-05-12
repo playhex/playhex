@@ -7,7 +7,6 @@ import GamePersister from '../../../persistance/GamePersister';
 import GameAnalyze, { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze';
 import { HexServer } from '../../../server';
 import Rooms from '../../../../shared/app/Rooms';
-import { normalize } from '../../../../shared/app/serializer';
 import logger from '../../../services/logger';
 
 @JsonController()
@@ -31,7 +30,7 @@ export default class GameAnalyzeController
             throw new HttpError(404, 'Game analyze not yet processed');
         }
 
-        return normalize(gameAnalyze);
+        return gameAnalyze;
     }
 
     @Put('/api/games/:publicId/analyze')
@@ -41,7 +40,7 @@ export default class GameAnalyzeController
         let gameAnalyze = await this.gameAnalyzePersister.findByGamePublicId(publicId);
 
         if (null !== gameAnalyze && !hasGameAnalyzeErrored(gameAnalyze)) {
-            return normalize(gameAnalyze);
+            return gameAnalyze;
         }
 
         const analyzeGameRequest = await this.gamePersister.getAnalyzeGameRequest(publicId);
@@ -76,6 +75,6 @@ export default class GameAnalyzeController
             this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
         })();
 
-        return normalize(gameAnalyze);
+        return gameAnalyze;
     }
 }

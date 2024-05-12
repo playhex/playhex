@@ -8,20 +8,24 @@
             "isGuest": true,
             "isBot": false
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
-                "pseudo": "Determinist random bot",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": true
+                "player": {
+                    "publicId": "determinist-random-bot|d0c3bbf8-eb84-41b4-b141-337e3b36022d",
+                    "pseudo": "Determinist random bot",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": true
+                }
             },
             {
-                "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-                "pseudo": "1817",
-                "slug": "slug",
-                "isGuest": true,
-                "isBot": false
+                "player": {
+                    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                    "pseudo": "1817",
+                    "slug": "slug",
+                    "isGuest": true,
+                    "isBot": false
+                }
             }
         ],
         "timeControl": {
@@ -132,20 +136,7 @@
             "endedAt": "2023-12-22T15:14:40.711Z"
         },
         "chatMessages": [],
-        "state": "ended",
-        "__meta": {
-            "values": {
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "gameData.endedAt": [
-                    "Date"
-                ]
-            }
-        }
+        "state": "ended"
     },
     {
         "id": "0483ba90-2141-4d34-8272-94ecad8325a7",
@@ -156,20 +147,24 @@
             "isGuest": true,
             "isBot": false
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
-                "pseudo": "Determinist random bot",
-                "slug": "slug",
-                "isGuest": false,
-                "isBot": true
+                "player": {
+                    "publicId": "determinist-random-bot|8555be33-04b5-4e03-92f8-5f6f3f4dc80f",
+                    "pseudo": "Determinist random bot",
+                    "slug": "slug",
+                    "isGuest": false,
+                    "isBot": true
+                }
             },
             {
-                "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
-                "pseudo": "1817",
-                "slug": "slug",
-                "isGuest": true,
-                "isBot": false
+                "player": {
+                    "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
+                    "pseudo": "1817",
+                    "slug": "slug",
+                    "isGuest": true,
+                    "isBot": false
+                }
             }
         ],
         "timeControl": {
@@ -225,19 +220,6 @@
             "endedAt": null
         },
         "chatMessages": [],
-        "state": "playing",
-        "__meta": {
-            "values": {
-                "timeControl.players.1.totalRemainingTime": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ]
-            }
-        }
+        "state": "playing"
     }
 ]

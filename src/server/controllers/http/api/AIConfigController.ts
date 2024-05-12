@@ -1,10 +1,10 @@
-import { Get, JsonController } from 'routing-controllers';
-import prisma from '../../../services/prisma';
-import { Service } from 'typedi';
+import { Get, JsonController, ResponseClassTransformOptions } from 'routing-controllers';
+import { Inject, Service } from 'typedi';
 import { AIConfigStatusData } from '@shared/app/Types';
 import HexAiApiClient from '../../../services/HexAiApiClient';
 import logger from '../../../services/logger';
 import AIConfig from '../../../../shared/app/models/AIConfig';
+import { Repository } from 'typeorm';
 
 const { HEX_AI_API } = process.env;
 
@@ -14,32 +14,35 @@ export default class AIConfigController
 {
     constructor(
         private hexAiApiClient: HexAiApiClient,
+
+        @Inject('Repository<AIConfig>')
+        private aiConfigRepository: Repository<AIConfig>,
     ) {}
 
     @Get('/api/ai-configs')
-    async get(): Promise<AIConfig<'withPlayerId'>[]> {
-        const aIConfigs = await prisma.aIConfig.findMany({
+    @ResponseClassTransformOptions({ groups: ['ai_config'] })
+    async get(): Promise<AIConfig[]> {
+        return await this.aiConfigRepository.find({
+            relations: {
+                player: true,
+            },
             select: {
                 engine: true,
                 label: true,
                 description: true,
                 boardsizeMin: true,
                 boardsizeMax: true,
-                config: true,
                 requireMorePower: true,
                 isRemote: true,
+                config: true as unknown as undefined,
                 player: {
-                    select: {
-                        publicId: true,
-                    },
+                    publicId: true,
                 },
             },
-            orderBy: [
-                { order: 'asc' },
-            ],
+            order: {
+                order: 'asc',
+            },
         });
-
-        return aIConfigs as AIConfig<'withPlayerId'>[]; // Assume all aiConfig.config are json objects, and not json null/string/...
     }
 
     @Get('/api/ai-configs-status')

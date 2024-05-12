@@ -8,22 +8,26 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "players": [
+    "hostedGameToPlayers": [
         {
-            "publicId": "determinist-random-bot|ab1aad0c-b90c-41ca-9bbd-664ff000fda8",
-            "pseudo": "Determinist random bot",
-            "slug": "",
-            "isBot": true,
-            "isGuest": false,
-            "createdAt": "2024-01-24T20:22:40.783Z"
+            "player": {
+                "publicId": "determinist-random-bot|ab1aad0c-b90c-41ca-9bbd-664ff000fda8",
+                "pseudo": "Determinist random bot",
+                "slug": "",
+                "isBot": true,
+                "isGuest": false,
+                "createdAt": "2024-01-24T20:22:40.783Z"
+            }
         },
         {
-            "pseudo": "aa",
-            "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
-            "isGuest": false,
-            "isBot": false,
-            "slug": "aa",
-            "createdAt": "2024-01-24T16:33:29.586Z"
+            "player": {
+                "pseudo": "aa",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aa",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
         }
     ],
     "timeControl": {
@@ -73,35 +77,5 @@
     },
     "chatMessages": [],
     "state": "canceled",
-    "createdAt": "2024-01-24T20:22:40.783Z",
-    "__meta": {
-        "values": {
-            "host.createdAt": [
-                "Date"
-            ],
-            "opponent.createdAt": [
-                "Date"
-            ],
-            "gameData.startedAt": [
-                "Date"
-            ],
-            "gameData.lastMoveAt": [
-                "Date"
-            ],
-            "gameData.endedAt": [
-                "Date"
-            ],
-            "createdAt": [
-                "Date"
-            ]
-        },
-        "referentialEqualities": {
-            "host": [
-                "gameData.players.1"
-            ],
-            "opponent": [
-                "gameData.players.0"
-            ]
-        }
-    }
+    "createdAt": "2024-01-24T20:22:40.783Z"
 }

@@ -1,470 +1,167 @@
-import { Prisma } from '@prisma/client';
-import { HostedGameData, HostedGameState } from '../../shared/app/Types';
-import Player from '../../shared/app/models/Player';
-import { PlayerIndex } from '../../shared/game-engine';
-import { MoveData, Outcome } from '../../shared/game-engine/Types';
-import { defaultGameOptions } from '../../shared/app/GameOptions';
-import TimeControlType from '../../shared/time-control/TimeControlType';
-import prisma from '../services/prisma';
-import { Service } from 'typedi';
-import { GameTimeData, PlayerTimeData } from '../../shared/time-control/TimeControl';
+import { HostedGame, Player } from '../../shared/app/models';
+import { Inject, Service } from 'typedi';
 import logger from '../services/logger';
-import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYomiTimeControl';
-import PlayerPersister, { select as playerSelect } from './PlayerPersister';
-import ChatMessage from '@shared/app/models/ChatMessage';
+import { FindManyOptions, FindOptionsRelations, In, LessThanOrEqual, Not, Repository } from 'typeorm';
 
-export type HostedGameDBFull = Prisma.HostedGameGetPayload<{
-    include: {
-        game: true;
-        host: {
-            select: typeof playerSelect;
-        };
-        options: true;
-        chatMessages: {
-            include: {
-                player: {
-                    select: typeof playerSelect;
-                };
-            };
-        };
-        players: {
-            include: {
-                player: {
-                    select: typeof playerSelect;
-                };
-            };
-        };
-    };
-}>;
-
-const select: Prisma.HostedGameSelect = {
-    publicId: true,
-    createdAt: true,
-    state: true,
-    options: true,
-    host: {
-        select: playerSelect,
-    },
-    players: {
-        select: {
-            player: {
-                select: playerSelect,
-            },
-        },
-        orderBy: {
-            order: 'asc',
-        },
-    },
-    timeControl: true,
+/**
+ * Relations to load in order to recreate an HostedGame in memory.
+ */
+const relations: FindOptionsRelations<HostedGame> = {
     chatMessages: {
-        include: {
-            player: {
-                select: playerSelect,
-            },
-        },
-        orderBy: {
-            createdAt: 'asc',
-        },
+        player: true,
     },
-    game: {
-        select: {
-            currentPlayerIndex: true,
-            endedAt: true,
-            movesHistory: true,
-            allowSwap: true,
-            lastMoveAt: true,
-            outcome: true,
-            size: true,
-            startedAt: true,
-            winner: true,
-        },
+    rematch: true,
+    gameData: true,
+    gameOptions: true,
+    host: true,
+    hostedGameToPlayers: {
+        player: true,
     },
-    rematchId: true
 };
 
 /**
- * Layer between HostedGameData and database.
+ * Layer between HostedGame and database.
  */
 @Service()
 export default class HostedGamePersister
 {
-    private idFromPublicId: { [key: string]: number } = {};
-
     constructor(
-        private playerPersister: PlayerPersister,
+        @Inject('Repository<HostedGame>')
+        private hostedGameRepository: Repository<HostedGame>,
     ) {}
 
-    private async getIdFromPublicId(publicId: string): Promise<null | number>
+    async persist(hostedGame: HostedGame): Promise<void>
     {
-        if (this.idFromPublicId[publicId]) {
-            return this.idFromPublicId[publicId];
-        }
+        logger.info('Persisting a game...', { publicId: hostedGame.id });
 
-        const hostedGame = await prisma.hostedGame.findUnique({
-            select: {
-                id: true,
-            },
-            where: {
-                publicId,
-            },
-        });
+        await this.hostedGameRepository.save(hostedGame);
 
-        if (null === hostedGame) {
-            return null;
-        }
-
-        return this.idFromPublicId[publicId] = hostedGame.id;
+        logger.info('Persisting done', { publicId: hostedGame.id, id: hostedGame.internalId });
     }
 
-    async persist(hostedGameData: HostedGameData): Promise<void>
+    async deleteIfExists(hostedGame: HostedGame): Promise<void>
     {
-        logger.info('Persisting a game...', { publicId: hostedGameData.id });
+        logger.info('Delete a game if exists...', { publicId: hostedGame.id });
 
-        const hostedGameId = await this.getIdFromPublicId(hostedGameData.id);
+        await this.hostedGameRepository.remove(hostedGame);
 
-        const dbData = null === hostedGameId
-            ? await this.doCreate(hostedGameData)
-            : await this.doUpdate(hostedGameData, hostedGameId)
+        logger.info('Deleted.', { publicId: hostedGame.id, hostedGame });
+    }
+
+    async findUnique(publicId: string): Promise<null | HostedGame>
+    {
+        return await this.hostedGameRepository.findOne({
+            relations,
+            where: {
+                id: publicId,
+            },
+        });
+    }
+
+    async findMany(criteria?: FindManyOptions<HostedGame>): Promise<HostedGame[]>
+    {
+        return await this.hostedGameRepository.find({
+            ...criteria,
+            relations,
+        });
+    }
+
+    async findLastEnded1v1(take = 5, fromGamePublicId?: string): Promise<HostedGame[]>
+    {
+        // Get bot games ids to filter out
+        const botHostedGameIdsQuery = await this.hostedGameRepository
+            .createQueryBuilder('hostedGame')
+            .select('hostedGame.internalId', 'id')
+            .innerJoin('hostedGame.gameData', 'gameData')
+            .innerJoin('hostedGame.hostedGameToPlayers', 'hostedGameToPlayer')
+            .innerJoin('hostedGameToPlayer.player', 'player')
+            .where('player.isBot = true')
         ;
 
-        this.idFromPublicId[hostedGameData.id] = dbData.id;
+        const botHostedGameIds: { id: number }[] = await botHostedGameIdsQuery.getRawMany();
 
-        logger.info('Persisting done', { publicId: hostedGameData.id, id: dbData.id });
-    }
-
-    async deleteIfExists(hostedGameData: HostedGameData): Promise<void>
-    {
-        logger.info('Delete a game if exists...', { publicId: hostedGameData.id });
-
-        const hostedGameId = await this.getIdFromPublicId(hostedGameData.id);
-
-        if (null === hostedGameId) {
-            logger.info('Was not existing, nothing done.', { publicId: hostedGameData.id });
-            return;
-        }
-
-        prisma.$transaction([
-            prisma.hostedGameOptions.deleteMany({
-                where: { hostedGameId },
-            }),
-            prisma.hostedGameToPlayer.deleteMany({
-                where: { hostedGameId },
-            }),
-            prisma.hostedGameOptions.deleteMany({
-                where: { hostedGameId },
-            }),
-            prisma.game.deleteMany({
-                where: { hostedGameId },
-            }),
-            prisma.hostedGame.deleteMany({
-                where: { id: hostedGameId },
-            }),
-        ]);
-
-        logger.info('Deleted.', { publicId: hostedGameData.id, hostedGameId });
-    }
-
-    async findUnique(publicId: string): Promise<null | HostedGameData>
-    {
-        const dbData = await prisma.hostedGame.findUnique({
+        // Options to get all games not in bot games
+        const options: FindManyOptions<HostedGame> = {
+            relations,
             where: {
-                publicId,
+                internalId: Not(In(botHostedGameIds.map(row => row.id))),
             },
-            select,
-        });
-
-        if (null === dbData) {
-            return null;
-        }
-
-        return this.fromDbData(dbData as unknown as HostedGameDBFull);
-    }
-
-    async findMany(criteria?: Prisma.HostedGameFindManyArgs): Promise<HostedGameData[]>
-    {
-        const allDbData = await prisma.hostedGame.findMany({
-            ...criteria,
-            select,
-        });
-
-        return allDbData.map(dbData => this.fromDbData(dbData as unknown as HostedGameDBFull));
-    }
-
-    private fromDbData(dbData: HostedGameDBFull): HostedGameData
-    {
-        const { game, options } = dbData;
-        const timeControl = dbData.timeControl as unknown as GameTimeData;
-
-        try {
-            return {
-                id: dbData.publicId,
-                host: dbData.host,
-                createdAt: dbData.createdAt,
-                players: dbData.players.map(p => p.player),
-                state: dbData.state as HostedGameState,
-                rematchId: dbData.rematchId ?? null,
-                gameData: null === game ? null : {
-                    ...game,
-                    movesHistory: game.movesHistory as unknown as MoveData[],
-                    currentPlayerIndex: game.currentPlayerIndex as PlayerIndex,
-                    winner: game.winner as null | PlayerIndex,
-                    outcome: game.outcome as Outcome,
+            order: {
+                gameData: {
+                    endedAt: 'desc',
                 },
-                gameOptions: null === options ? defaultGameOptions : {
-                    ...options,
-                    opponent: {
-                        type: options.opponentType as 'player' | 'ai' ?? defaultGameOptions.opponent.type,
-                        publicId: options.opponentPublicId ?? undefined,
-                    },
-                    firstPlayer: options.firstPlayer as PlayerIndex,
-                    timeControl: {
-                        type: options.timeControlType,
-                        options: options.timeControlOptions,
-                    } as unknown as TimeControlType,
-                },
-                timeControl: {
-                    state: timeControl.state,
-                    currentPlayer: timeControl.currentPlayer,
-                    players: timeControl.players.map((p: PlayerTimeData | ByoYomiPlayerTimeData) => ({
-                        ...p,
-                        totalRemainingTime: 'number' === typeof p.totalRemainingTime
-                            ? p.totalRemainingTime
-                            : new Date(p.totalRemainingTime)
-                        ,
-                        remainingMainTime: undefined === (p as ByoYomiPlayerTimeData).remainingMainTime
-                            ? undefined
-                            : (
-                                'number' === typeof p.totalRemainingTime
-                                    ? p.totalRemainingTime
-                                    : new Date((p as ByoYomiPlayerTimeData).remainingMainTime)
-                            )
-                        ,
-                        remainingPeriods: undefined === (p as ByoYomiPlayerTimeData).remainingPeriods
-                            ? undefined
-                            : (p as ByoYomiPlayerTimeData).remainingPeriods
-                        ,
-                    })) as [PlayerTimeData | ByoYomiPlayerTimeData, PlayerTimeData | ByoYomiPlayerTimeData],
-                },
-                chatMessages: dbData.chatMessages.map(chatMessage => ({
-                    persisted: true,
-                    author: chatMessage.player,
-                    content: chatMessage.content,
-                    createdAt: chatMessage.createdAt,
-                    gameId: dbData.publicId,
-                })),
-            };
-        } catch (e) {
-            logger.error('Error while creating HostedGameData from db data', {
-                dbData,
-                e,
+            },
+            take,
+        };
+
+        // Alter options to get only older than cursor if defined
+        if (undefined !== fromGamePublicId) {
+            const cursor = await this.hostedGameRepository.findOne({
+                relations: { gameData: true },
+                where: { id: fromGamePublicId },
             });
 
-            throw e;
-        }
-    }
-
-    private playerConnectOrCreate(player: Player): Prisma.PlayerCreateOrConnectWithoutGamesAsHostInput
-    {
-        return {
-            where: {
-                publicId: player.publicId,
-            },
-            create: {
-                publicId: player.publicId,
-                pseudo: player.pseudo,
-                slug: player.slug,
-                isGuest: player.isGuest,
-                isBot: player.isBot,
-                createdAt: player.createdAt,
-            },
-        };
-    }
-
-    private async chatMessagesToData(chatMessages: ChatMessage[]): Promise<Prisma.ChatMessageCreateManyHostedGameInput[]>
-    {
-        const prismaChatMessages: Prisma.ChatMessageCreateManyHostedGameInput[] = [];
-
-        for (let i = 0; i < chatMessages.length; ++i) {
-            const chat = chatMessages[i];
-
-            if (chat.persisted) {
-                continue;
+            if (null === cursor) {
+                throw new Error('Invalid cursor, this id does not belong to a hostedGame');
             }
 
-            prismaChatMessages.push({
-                content: chat.content,
-                createdAt: chat.createdAt,
-                playerId: null === chat.author
-                    ? null
-                    : await this.playerPersister.getPlayerIdFromPublicId(chat.author.publicId)
-                ,
+            botHostedGameIds.push({ id: cursor.internalId! });
+
+            options.where = {
+                ...options.where,
+                internalId: Not(In(botHostedGameIds.map(row => row.id))),
+                gameData: {
+                    endedAt: LessThanOrEqual(cursor.gameData!.endedAt!),
+                },
+            };
+        }
+
+        const hostedGames = await this.hostedGameRepository.find(options);
+
+        return hostedGames;
+    }
+
+    async findLastEndedByPlayer(player: Player, fromGamePublicId?: string): Promise<HostedGame[]>
+    {
+        // Query to get id of games played by given player
+        const hostedGameIdsQuery = this.hostedGameRepository
+            .createQueryBuilder('hostedGame')
+            .select('hostedGame.internalId', 'id')
+            .innerJoin('hostedGame.gameData', 'gameData')
+            .innerJoin('hostedGame.hostedGameToPlayers', 'hostedGameToPlayer')
+            .innerJoin('hostedGameToPlayer.player', 'player')
+            .where('player.publicId = :publicId', { publicId: player.publicId })
+            .andWhere('hostedGame.state = :ended', { ended: 'ended' })
+            .orderBy('gameData.endedAt', 'DESC')
+            .limit(20)
+        ;
+
+        // Alter query to take only games older than cursor
+        if (undefined !== fromGamePublicId) {
+            const cursor = await this.hostedGameRepository.findOne({
+                relations: { gameData: true },
+                where: { id: fromGamePublicId },
             });
+
+            if (null === cursor) {
+                throw new Error('Invalid cursor, this id does not belong to a hostedGame');
+            }
+
+            hostedGameIdsQuery
+                .andWhere('gameData.endedAt <= :cursorEndedAt', { cursorEndedAt: cursor.gameData?.endedAt })
+                .andWhere('hostedGame.internalId != :cursorId', { cursorId: cursor.internalId })
+            ;
         }
 
-        return prismaChatMessages;
-    }
+        const hostedGameIds: { id: number }[] = await hostedGameIdsQuery.getRawMany();
 
-    private markChatMessagesAsPersisted(chatMessages: ChatMessage[]): void
-    {
-        for (let i = 0; i < chatMessages.length; ++i) {
-            chatMessages[i].persisted = true;
-        }
-    }
-
-    private async doCreate(data: HostedGameData)
-    {
-        const { gameData, gameOptions } = data;
-
-        const result = await prisma.hostedGame.create({
-            select: {
-                id: true,
-            },
-            data: {
-                publicId: data.id,
-                createdAt: data.createdAt,
-                state: data.state,
-                host: {
-                    connectOrCreate: this.playerConnectOrCreate(data.host),
-                },
-                game: null === gameData ? undefined : {
-                    create: {
-                        allowSwap: gameData.allowSwap,
-                        currentPlayerIndex: gameData.currentPlayerIndex,
-                        size: gameData.size,
-                        startedAt: gameData.startedAt,
-                        endedAt: gameData.endedAt,
-                        lastMoveAt: gameData.lastMoveAt,
-                        outcome: gameData.outcome,
-                        winner: gameData.winner,
-                        movesHistory: gameData.movesHistory,
-                    },
-                },
-                players: {
-                    create: data.players.map((player, order) => ({
-                        order,
-                        player: {
-                            connectOrCreate: this.playerConnectOrCreate(player),
-                        },
-                    })),
-                },
-                options: {
-                    create: {
-                        boardsize: gameOptions.boardsize,
-                        swapRule: gameOptions.swapRule,
-                        firstPlayer: gameOptions.firstPlayer,
-                        opponentType: gameOptions.opponent.type,
-                        opponentPublicId: gameOptions.opponent.publicId,
-                        timeControlType: gameOptions.timeControl.type,
-                        timeControlOptions: gameOptions.timeControl.options as object,
-                    },
-                },
-                rematchId: data.rematchId ?? undefined,
-                timeControl: data.timeControl as object,
-                chatMessages: {
-                    createMany: {
-                        data: await this.chatMessagesToData(data.chatMessages),
-                    },
-                },
-            },
-        });
-
-        this.markChatMessagesAsPersisted(data.chatMessages);
-
-        return result;
-    }
-
-    private async doUpdate(data: HostedGameData, hostedGameId: number)
-    {
-        const { gameData, gameOptions } = data;
-
-        const result = prisma.hostedGame.update({
-            select: {
-                id: true,
-            },
+        const hostedGames = await this.hostedGameRepository.find({
+            relations,
             where: {
-                id: hostedGameId,
-            },
-            data: {
-                state: data.state,
-                game: null === gameData ? undefined : {
-                    upsert: {
-                        where: {
-                            hostedGameId,
-                        },
-                        create: {
-                            allowSwap: gameData.allowSwap,
-                            currentPlayerIndex: gameData.currentPlayerIndex,
-                            size: gameData.size,
-                            startedAt: gameData.startedAt,
-                            endedAt: gameData.endedAt,
-                            lastMoveAt: gameData.lastMoveAt,
-                            outcome: gameData.outcome,
-                            winner: gameData.winner,
-                            movesHistory: gameData.movesHistory,
-                        },
-                        update: {
-                            allowSwap: gameData.allowSwap,
-                            currentPlayerIndex: gameData.currentPlayerIndex,
-                            size: gameData.size,
-                            startedAt: gameData.startedAt,
-                            endedAt: gameData.endedAt,
-                            lastMoveAt: gameData.lastMoveAt,
-                            outcome: gameData.outcome,
-                            winner: gameData.winner,
-                            movesHistory: gameData.movesHistory,
-                        },
-                    },
-                },
-                players: {
-                    upsert: data.players.map((player, order) => ({
-                        where: {
-                            hostedGameId_order: {
-                                hostedGameId,
-                                order,
-                            },
-                        },
-                        create: {
-                            order,
-                            player: {
-                                connectOrCreate: this.playerConnectOrCreate(player),
-                            },
-                        },
-                        update: {
-                            order,
-                            player: {
-                                connectOrCreate: this.playerConnectOrCreate(player),
-                            },
-                        },
-                    })),
-                },
-                options: {
-                    connectOrCreate: {
-                        where: {
-                            hostedGameId,
-                        },
-                        create: {
-                            boardsize: gameOptions.boardsize,
-                            swapRule: gameOptions.swapRule,
-                            firstPlayer: gameOptions.firstPlayer,
-                            opponentType: gameOptions.opponent.type,
-                            opponentPublicId: gameOptions.opponent.publicId,
-                            timeControlType: gameOptions.timeControl.type,
-                            timeControlOptions: gameOptions.timeControl.options as object,
-                        },
-                    },
-                },
-                rematchId: data.rematchId ?? undefined,
-                timeControl: data.timeControl as object,
-                chatMessages: {
-                    createMany: {
-                        data: await this.chatMessagesToData(data.chatMessages),
-                    },
-                },
+                internalId: In(hostedGameIds.map(row => row.id)),
             },
         });
 
-        this.markChatMessagesAsPersisted(data.chatMessages);
-
-        return result;
+        return hostedGames;
     }
 }

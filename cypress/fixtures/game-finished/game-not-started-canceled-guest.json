@@ -4,12 +4,5 @@
     "isGuest": false,
     "isBot": false,
     "slug": "aa",
-    "createdAt": "2024-01-24T16:33:29.586Z",
-    "__meta": {
-        "values": {
-            "createdAt": [
-                "Date"
-            ]
-        }
-    }
+    "createdAt": "2024-01-24T16:33:29.586Z"
 }

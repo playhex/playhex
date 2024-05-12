@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { BIconCheck, BIconExclamationTriangleFill } from 'bootstrap-icons-vue';
-import { GameOptionsData } from '@shared/app/GameOptions';
+import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
 import { PropType } from 'vue';
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<GameOptionsData>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
 });

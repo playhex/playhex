@@ -1,54 +1,39 @@
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import GameAnalyze from '../../shared/app/models/GameAnalyze';
-import prisma from '../services/prisma';
-import { plainToInstance } from 'class-transformer';
+import { Repository } from 'typeorm';
+import HostedGame from '../../shared/app/models/HostedGame';
 
 @Service()
 export default class GameAnalyzePersister
 {
+    constructor(
+        @Inject('Repository<GameAnalyze>')
+        private gameAnalyzeRepository: Repository<GameAnalyze>,
+
+        @Inject('Repository<HostedGame>')
+        private hostedGameRepository: Repository<HostedGame>,
+    ) {}
+
     async persist(gamePublicId: string, gameAnalyze: GameAnalyze): Promise<void>
     {
-        const hostedGame = await prisma.hostedGame.findUniqueOrThrow({
+        gameAnalyze.hostedGame = await this.hostedGameRepository.findOneOrFail({
             select: {
-                id: true,
+                internalId: true,
             },
             where: {
-                publicId: gamePublicId,
+                id: gamePublicId,
             },
         });
 
-        await prisma.gameAnalyze.upsert({
-            where: {
-                hostedGameId: hostedGame.id,
-            },
-            create: {
-                hostedGameId: hostedGame.id,
-                startedAt: gameAnalyze.startedAt,
-                endedAt: gameAnalyze.endedAt,
-                analyze: gameAnalyze.analyze ?? undefined,
-            },
-            update: {
-                startedAt: gameAnalyze.startedAt,
-                endedAt: gameAnalyze.endedAt,
-                analyze: gameAnalyze.analyze ?? undefined,
-            },
-        });
+        this.gameAnalyzeRepository.save(gameAnalyze);
     }
 
     async findByGamePublicId(publicId: string): Promise<null | GameAnalyze>
     {
-        const gameAnalyzeObject = await prisma.gameAnalyze.findFirst({
-            where: {
-                hostedGame: {
-                    publicId,
-                },
+        return await this.gameAnalyzeRepository.findOneBy({
+            hostedGame: {
+                id: publicId,
             },
         });
-
-        if (null === gameAnalyzeObject) {
-            return null;
-        }
-
-        return plainToInstance(GameAnalyze, gameAnalyzeObject);
     }
 }

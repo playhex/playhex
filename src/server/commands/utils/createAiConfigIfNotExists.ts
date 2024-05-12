@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import prisma from '../../services/prisma';
-import { Prisma } from '@prisma/client';
+import { AppDataSource } from '../../data-source';
+import Player from '../../../shared/app/models/Player';
+import AIConfig from '../../../shared/app/models/AIConfig';
 
 type CreateAiConfigParameters = {
-    config: Prisma.InputJsonObject;
+    config: { [key: string]: unknown };
     engine: string;
     label: string;
     description: string;
@@ -23,37 +24,43 @@ type CreateAiConfigParameters = {
  * @returns {Boolean} true if aiConfig just has been created, false if it was already existing.
  */
 export default async (parameters: CreateAiConfigParameters): Promise<boolean> => {
-    const alreadyExists = await prisma.player.findUnique({
-        where: {
-            slug: parameters.slug,
-        },
+    if (!AppDataSource.isInitialized) {
+        await AppDataSource.initialize();
+    }
+
+    const playerRepository = AppDataSource.getRepository(Player);
+
+    const alreadyExists = await playerRepository.findOneBy({
+        slug: parameters.slug,
     });
 
     if (null !== alreadyExists) {
         return false;
     }
 
-    await prisma.aIConfig.create({
-        data: {
-            config: parameters.config,
-            engine: parameters.engine,
-            label: parameters.label,
-            description: parameters.description,
-            order: parameters.order,
-            boardsizeMin: parameters.boardsizeMin,
-            boardsizeMax: parameters.boardsizeMax,
-            isRemote: parameters.isRemote,
-            requireMorePower: parameters.requireMorePower,
-            player: {
-                create: {
-                    pseudo: parameters.pseudo,
-                    slug: parameters.slug,
-                    isBot: true,
-                    publicId: uuidv4(),
-                },
-            },
-        }
-    });
+    const aiConfigRepository = AppDataSource.getRepository(AIConfig);
+
+    const player = new Player();
+
+    player.pseudo = parameters.pseudo;
+    player.slug = parameters.slug;
+    player.isBot = true;
+    player.publicId = uuidv4();
+
+    const aiConfig = new AIConfig();
+
+    aiConfig.config = parameters.config;
+    aiConfig.engine = parameters.engine;
+    aiConfig.label = parameters.label;
+    aiConfig.description = parameters.description;
+    aiConfig.order = parameters.order;
+    aiConfig.boardsizeMin = parameters.boardsizeMin;
+    aiConfig.boardsizeMax = parameters.boardsizeMax;
+    aiConfig.isRemote = parameters.isRemote ?? false;
+    aiConfig.requireMorePower = parameters.requireMorePower ?? false;
+    aiConfig.player = player;
+
+    await aiConfigRepository.save(aiConfig);
 
     return true;
 };

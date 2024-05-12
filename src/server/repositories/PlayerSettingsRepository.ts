@@ -1,68 +1,28 @@
-import { PlayerSettingsData } from '@shared/app/Types';
-import prisma from '../services/prisma';
-import { Service } from 'typedi';
-
-/**
- * Default player settings that should be used
- * if user has not yet changed its settings.
- */
-const defaultSettings: PlayerSettingsData = {
-    confirmMoveBlitz: false,
-    confirmMoveNormal: false,
-    confirmMoveCorrespondance: true,
-    orientationLandscape: 11,
-    orientationPortrait: 9,
-    showCoords: false,
-};
+import { Inject, Service } from 'typedi';
+import { Repository } from 'typeorm';
+import { PlayerSettings } from '../../shared/app/models';
 
 @Service()
 export default class PlayerSettingsRepository
 {
-    async getPlayerSettings(publicId: string): Promise<PlayerSettingsData>
+    constructor(
+        @Inject('Repository<PlayerSettings>')
+        private playerSettingsRepository: Repository<PlayerSettings>
+    ) {}
+
+    async getPlayerSettings(publicId: string): Promise<PlayerSettings>
     {
-        const playerSettings = await prisma.playerSettings.findFirst({
-            where: {
-                player: {
-                    publicId,
-                },
-            },
-            select: {
-                confirmMoveBlitz: true,
-                confirmMoveNormal: true,
-                confirmMoveCorrespondance: true,
-                orientationLandscape: true,
-                orientationPortrait: true,
-                showCoords: true,
+        const playerSettings = await this.playerSettingsRepository.findOneBy({
+            player: {
+                publicId,
             },
         });
 
-        return playerSettings ?? defaultSettings;
+        return playerSettings ?? new PlayerSettings();
     }
 
-    async updatePlayerSettings(publicId: string, playerSettings: Partial<PlayerSettingsData>): Promise<void>
+    async updatePlayerSettings(playerSettings: PlayerSettings): Promise<void>
     {
-        const result = await prisma.playerSettings.updateMany({
-            where: {
-                player: {
-                    publicId,
-                },
-            },
-            data: playerSettings,
-        });
-
-        if (result.count > 0) {
-            return;
-        }
-
-        await prisma.playerSettings.create({
-            data: {
-                ...playerSettings,
-                player: {
-                    connect: {
-                        publicId,
-                    },
-                },
-            },
-        });
+        await this.playerSettingsRepository.save(playerSettings);
     }
 }

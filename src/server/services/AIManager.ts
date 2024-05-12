@@ -1,31 +1,28 @@
-import { GameOptionsData } from '@shared/app/GameOptions';
-import prisma from './prisma';
+import HostedGameOptions from '../../shared/app/models/HostedGameOptions';
 import Player from '../../shared/app/models/Player';
 import { Move, calcRandomMove } from '../../shared/game-engine';
 import Container from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer';
 import logger from './logger';
-import { select as playerSelect } from '../persistance/PlayerPersister';
-import { plainToInstance } from 'class-transformer';
 import HostedGame from '../HostedGame';
 import HexAiApiClient from './HexAiApiClient';
+import { AppDataSource } from '../data-source';
 
 export class FindAIError extends Error {}
 
 const findPlayerWithAIConfig = async (publicId: string): Promise<null | Player> => {
-    return plainToInstance(Player, await prisma.player.findUnique({
+    return await AppDataSource.getRepository(Player).findOne({
         where: {
             publicId,
         },
-        select: {
-            ...playerSelect,
+        relations: {
             aiConfig: true,
         },
-    }));
+    });
 };
 
-export const findAIOpponent = async (gameOptions: GameOptionsData): Promise<null | Player> => {
-    const { publicId } = gameOptions.opponent;
+export const findAIOpponent = async (gameOptions: HostedGameOptions): Promise<null | Player> => {
+    const publicId = gameOptions.opponentPublicId;
 
     if (!publicId) {
         throw new FindAIError('ai player publicId must be specified');

@@ -313,7 +313,7 @@ describe('Authentication', () => {
         cy.get('.menu-top').contains(pseudo);
     });
 
-    it('should not return password not player id in api results', () => {
+    it('should not return password nor player id in api results', () => {
         cy.visit('/');
 
         /*
@@ -348,9 +348,7 @@ describe('Authentication', () => {
          * On game create (host, players)
          */
         cy.request('POST', '/api/games', {
-            opponent: {
-                type: 'player',
-            },
+            opponentType: 'player',
             timeControl: {
                 type: 'fischer',
                 options: {
@@ -368,7 +366,7 @@ describe('Authentication', () => {
             const game = gameResponse.body;
 
             assert.doesNotHaveAnyKeys(game.host, ['id', 'password']);
-            assert.doesNotHaveAnyKeys(game.players[0], ['id', 'password']);
+            assert.doesNotHaveAnyKeys(game.hostedGameToPlayers[0].player, ['id', 'password']);
         });
 
         /*
@@ -393,8 +391,8 @@ describe('Authentication', () => {
 
             for (let i = 0; i < persistedGames.length; ++i) {
                 assert.doesNotHaveAnyKeys(persistedGames[i].host, ['id', 'password']);
-                assert.doesNotHaveAnyKeys(persistedGames[i].players[0], ['id', 'password']);
-                assert.doesNotHaveAnyKeys(persistedGames[i].players[1], ['id', 'password']);
+                assert.doesNotHaveAnyKeys(persistedGames[i].hostedGameToPlayers[0].player, ['id', 'password']);
+                assert.doesNotHaveAnyKeys(persistedGames[i].hostedGameToPlayers[1].player, ['id', 'password']);
             }
         });
     });

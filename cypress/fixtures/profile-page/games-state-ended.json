@@ -9,20 +9,24 @@
             "slug": "player-test",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "publicId": "determinist-random-bot|fcb366fb-58c3-430c-aed0-8f72a79cbb50",
-                "pseudo": "Determinist random bot",
-                "isBot": true,
-                "isGuest": false
+                "player": {
+                    "publicId": "determinist-random-bot|fcb366fb-58c3-430c-aed0-8f72a79cbb50",
+                    "pseudo": "Determinist random bot",
+                    "isBot": true,
+                    "isGuest": false
+                }
             },
             {
-                "pseudo": "Player Test",
-                "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
-                "isGuest": false,
-                "isBot": false,
-                "slug": "player-test",
-                "createdAt": "2024-01-19T10:23:11.600Z"
+                "player": {
+                    "pseudo": "Player Test",
+                    "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
+                    "isGuest": false,
+                    "isBot": false,
+                    "slug": "player-test",
+                    "createdAt": "2024-01-19T10:23:11.600Z"
+                }
             }
         ],
         "timeControl": {
@@ -107,26 +111,7 @@
         },
         "chatMessages": [],
         "state": "ended",
-        "createdAt": "2024-01-19T12:42:40.005Z",
-        "__meta": {
-            "values": {
-                "host.createdAt": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "gameData.endedAt": [
-                    "Date"
-                ],
-                "createdAt": [
-                    "Date"
-                ]
-            }
-        }
+        "createdAt": "2024-01-19T12:42:40.005Z"
     },
     {
         "id": "e259618e-f477-4ade-8b86-d4287e0dce22",
@@ -138,20 +123,24 @@
             "slug": "guest-8385",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
-        "players": [
+        "hostedGameToPlayers": [
             {
-                "pseudo": "8385",
-                "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
-                "isGuest": true,
-                "isBot": false,
-                "slug": "guest-8385",
-                "createdAt": "2024-01-19T10:23:11.600Z"
+                "player": {
+                    "pseudo": "8385",
+                    "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
+                    "isGuest": true,
+                    "isBot": false,
+                    "slug": "guest-8385",
+                    "createdAt": "2024-01-19T10:23:11.600Z"
+                }
             },
             {
-                "publicId": "determinist-random-bot|8f1f660a-a88e-46e9-8488-00e8a8702ebc",
-                "pseudo": "Determinist random bot",
-                "isBot": true,
-                "isGuest": false
+                "player": {
+                    "publicId": "determinist-random-bot|8f1f660a-a88e-46e9-8488-00e8a8702ebc",
+                    "pseudo": "Determinist random bot",
+                    "isBot": true,
+                    "isGuest": false
+                }
             }
         ],
         "timeControl": {
@@ -216,25 +205,6 @@
         },
         "chatMessages": [],
         "state": "ended",
-        "createdAt": "2024-01-19T10:31:03.600Z",
-        "__meta": {
-            "values": {
-                "host.createdAt": [
-                    "Date"
-                ],
-                "gameData.startedAt": [
-                    "Date"
-                ],
-                "gameData.lastMoveAt": [
-                    "Date"
-                ],
-                "gameData.endedAt": [
-                    "Date"
-                ],
-                "createdAt": [
-                    "Date"
-                ]
-            }
-        }
+        "createdAt": "2024-01-19T10:31:03.600Z"
     }
 ]

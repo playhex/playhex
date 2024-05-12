@@ -1,12 +1,11 @@
 import { GameTimeData } from '../time-control/TimeControl';
-import { GameOptionsData } from './GameOptions';
 import TimeControlType from '../time-control/TimeControlType';
-import { PlayerSettings } from '@prisma/client';
-import { GameData } from '../game-engine/Types';
-import ChatMessage from './models/ChatMessage';
-import Player from './models/Player';
 
 export type Tuple<T> = [T, T];
+
+export type WithRequired<Type, Key extends keyof Type> = Type & {
+    [Property in Key]-?: Type[Property];
+};
 
 export type TimeControlOptionsValues = {
     options: TimeControlType;
@@ -19,31 +18,6 @@ export type HostedGameState =
     | 'playing'
     | 'ended'
 ;
-
-export type HostedGameData = {
-    id: string;
-    host: Player;
-    players: Player[];
-    gameOptions: GameOptionsData;
-    timeControl: GameTimeData;
-    state: HostedGameState;
-    chatMessages: ChatMessage[];
-
-    /**
-     * gameData is null on server when game is not yet started.
-     */
-    gameData: null | GameData;
-
-    createdAt: Date;
-    rematchId: null | string;
-};
-
-export type OnlinePlayersData = {
-    totalPlayers: number;
-    players: { [key: string]: Player };
-};
-
-export type PlayerSettingsData = Omit<PlayerSettings, 'playerId'>;
 
 export type AIConfigStatusData = {
     /**

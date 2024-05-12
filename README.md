@@ -13,7 +13,7 @@ Requires:
 
 - node >= 18.18.2
 - yarn
-- mysql
+- mysql or postgres
 
 Create an `.env` file with at least a database access. Example:
 
@@ -28,7 +28,7 @@ Then run these commands:
 yarn install
 
 # Create database schema
-yarn prisma db push
+yarn db:sync
 
 # Start application
 yarn serve
@@ -71,6 +71,25 @@ yarn hex create-katahex-bots
 yarn hex create-mohex-bots
 ```
 
+## Admin endpoints
+
+Some API endpoints exists for admin tasks (i.e persist all memory games into database manually).
+
+To use them, you must add in your `.env`:
+
+``` .env
+ADMIN_PASSWORD=your-password
+```
+
+Then you can now call admin endpoints by setting this same password as bearer token, curl example:
+
+``` bash
+curl --location --request POST 'http://localhost:3000/api/admin/persist-games' \
+    --header 'Authorization: Bearer your-password'
+```
+
+See available admin endpoints in postman collection, in "Admin" folder.
+
 ## Test
 
 ``` bash
@@ -82,6 +101,12 @@ yarn test:e2e
 
 # Open Cypress browser
 yarn cypress open
+```
+
+**Warning**: For e2e/cypress tests, random bots are required so don't forget to run this before:
+
+``` bash
+yarn hex create-random-bots
 ```
 
 ### Optimize js size

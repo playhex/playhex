@@ -13,16 +13,16 @@ import Player from '../../../../shared/app/models/Player';
 import ChatController from './ChatController';
 import AIConfigController from './AIConfigController';
 import GameAnalyzeController from './GameAnalyzeController';
+import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom';
 
 export const registerApi = (app: Express) => {
 
     useContainer(Container);
     useExpressServer(app, {
         defaultErrorHandler: false,
-        classToPlainTransformOptions: {
-            excludeExtraneousValues: true,
-            enableImplicitConversion: true,
-        },
+        classTransformer: true,
+        classToPlainTransformOptions: defaultInstanceToPlainOptions,
+        plainToClassTransformOptions: defaultPlainToInstanceOptions,
         validation: {
             whitelist: true,
             forbidNonWhitelisted: true,

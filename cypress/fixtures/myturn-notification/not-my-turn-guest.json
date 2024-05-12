@@ -4,12 +4,5 @@
     "isGuest": true,
     "isBot": false,
     "slug": "guest-3248",
-    "createdAt": "2024-01-19T16:52:33.770Z",
-    "__meta": {
-        "values": {
-            "createdAt": [
-                "Date"
-            ]
-        }
-    }
+    "createdAt": "2024-01-19T16:52:33.770Z"
 }

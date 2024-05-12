@@ -1,5 +1,4 @@
-import Player from '../../shared/app/models/Player';
-import { OnlinePlayersData } from '@shared/app/Types';
+import { Player, OnlinePlayers } from '../../shared/app/models';
 import { HexSocket } from '../server';
 import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -79,7 +78,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         this.emit('playerDisconnected', player);
     }
 
-    getOnlinePlayers(): OnlinePlayersData
+    getOnlinePlayers(): OnlinePlayers
     {
         const players: { [key: string]: Player } = {};
 

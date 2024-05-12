@@ -246,8 +246,8 @@ const doAnalyzeGame = async () => {
                     </p>
                     <p>
                         Game created by
-                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" />,
-                        {{ formatDistanceToNow(hostedGameClient.getHostedGameData().createdAt) }} ago.
+                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />,
+                        {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt) }} ago.
                     </p>
                 </template>
                 <template v-if="'canceled' === hostedGameClient.getState()">
@@ -259,8 +259,8 @@ const doAnalyzeGame = async () => {
                     </p>
                     <p>
                         Game was created by
-                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGameData().host" />,
-                        {{ formatDistanceToNow(hostedGameClient.getHostedGameData().createdAt) }} ago.
+                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />,
+                        {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt) }} ago.
                     </p>
                 </template>
                 <template v-if="'playing' === hostedGameClient.getState()">
@@ -270,15 +270,15 @@ const doAnalyzeGame = async () => {
                         <br>
                         <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Started: {{ format(hostedGameClient.getHostedGameData().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>Started: {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
                 <template v-if="'ended' === hostedGameClient.getState()">
                     <h3>
                         <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
                         wins
-                        <template v-if="hostedGameClient.getHostedGameData().gameData?.outcome">
-                            {{ outcomeToString(hostedGameClient.getHostedGameData().gameData?.outcome ?? null) }}
+                        <template v-if="hostedGameClient.getHostedGame().gameData?.outcome">
+                            {{ outcomeToString(hostedGameClient.getHostedGame().gameData?.outcome ?? null) }}
                         </template>
                     </h3>
                     <p>
@@ -286,9 +286,9 @@ const doAnalyzeGame = async () => {
                         <br>
                         <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Started: {{ format(hostedGameClient.getHostedGameData().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>Started: {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                         <br>
-                        <small>Ended: {{ format(hostedGameClient.getHostedGameData().gameData?.endedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>Ended: {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
             </div>
@@ -347,7 +347,7 @@ const doAnalyzeGame = async () => {
                     >
                         <span class="time text-muted">{{ formatHour(message.createdAt) }}</span>
                         <span>&nbsp;</span>
-                        <span class="player" v-if="message.author"><AppPseudo :player="message.author" :classes="playerColor(message.author)" /></span>
+                        <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
                         <span class="player fst-italic" v-else>System</span>
                         <span>&nbsp;</span>
                         <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
@@ -356,7 +356,7 @@ const doAnalyzeGame = async () => {
                 </div>
             </div>
 
-            <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGameData())">
+            <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGame())">
                 <div class="container-fluid mb-3">
                     <div class="input-group">
                         <input v-model="chatInput" class="form-control" aria-describedby="message-submit" placeholder="Message…" maxlength="250" />

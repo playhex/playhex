@@ -58,6 +58,7 @@ const config: Configuration = {
     resolve: {
         extensions: ['.js', '.ts'],
         alias: {
+            'typeorm': path.resolve(__dirname, 'node_modules/typeorm/typeorm-model-shim'), // To prevent typeorm decorators "not found" error on frontside
             '@client': path.resolve(__dirname, 'src/client/'),
             '@server': path.resolve(__dirname, 'src/server/'),
             '@shared': path.resolve(__dirname, 'src/shared/'),

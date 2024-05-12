@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useOverlayMeta } from 'unoverlay-vue';
 import { PropType, Ref, ref, watch } from 'vue';
-import { GameOptionsData, sanitizeGameOptions } from '@shared/app/GameOptions';
-import { defaultGameOptions } from '@shared/app/GameOptions';
+import HostedGameOptions, { sanitizeGameOptions } from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
@@ -18,19 +17,19 @@ const { visible, confirm, cancel } = useOverlayMeta();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<Partial<GameOptionsData>>,
+        type: Object as PropType<Partial<HostedGameOptions>>,
         required: true,
     },
 });
 
 export type Create1vAIOverlayInput = typeof props;
 
-const gameOptions = ref<GameOptionsData>({ ...defaultGameOptions, ...props.gameOptions });
+const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions });
 
 const showSecondaryOptions = ref(false);
 const timeControlComponent = ref();
 
-const submitForm = (gameOptions: GameOptionsData): void => {
+const submitForm = (gameOptions: HostedGameOptions): void => {
     timeControlComponent.value.compileOptions();
 
     confirm(sanitizeGameOptions(gameOptions));
@@ -41,7 +40,7 @@ const submitForm = (gameOptions: GameOptionsData): void => {
  */
 const { aiConfigs } = storeToRefs(useAiConfigsStore());
 const selectedEngine = ref<null | string>(null);
-const selectedAiConfig = ref<AIConfig<'withPlayerId'> | null>(null);
+const selectedAiConfig = ref<AIConfig | null>(null);
 const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
 
 (async () => {
@@ -55,16 +54,16 @@ const capSelectedBoardsize = () => {
 
     const { boardsizeMin, boardsizeMax } = selectedAiConfig.value;
 
-    if (null !== boardsizeMin && gameOptions.value.boardsize < boardsizeMin) {
+    if ('number' === typeof boardsizeMin && gameOptions.value.boardsize < boardsizeMin) {
         gameOptions.value.boardsize = boardsizeMin;
     }
 
-    if (null !== boardsizeMax && gameOptions.value.boardsize > boardsizeMax) {
+    if ('number' === typeof boardsizeMax && gameOptions.value.boardsize > boardsizeMax) {
         gameOptions.value.boardsize = boardsizeMax;
     }
 };
 
-const selectAiConfig = (aiConfig: AIConfig<'withPlayerId'>): void => {
+const selectAiConfig = (aiConfig: AIConfig): void => {
     selectedAiConfig.value = aiConfig;
     capSelectedBoardsize();
 };
@@ -81,7 +80,7 @@ if (Object.keys(aiConfigs.value).length > 0) {
     });
 }
 
-const isAIConfigAvailable = (aiConfig: AIConfig<'withPlayerId'>): boolean => {
+const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
     if (!aiConfig.isRemote) {
         return true;
     }
@@ -126,7 +125,7 @@ const isAIConfigAvailable = (aiConfig: AIConfig<'withPlayerId'>): boolean => {
                         <div v-if="selectedEngine" class="engine-configs">
                             <div v-for="aiConfig in aiConfigs[selectedEngine]" :key="aiConfig.player.publicId" class="form-check">
                                 <input
-                                    v-model="gameOptions.opponent.publicId"
+                                    v-model="gameOptions.opponentPublicId"
                                     @click="selectAiConfig(aiConfig)"
                                     required
                                     :disabled="!isAIConfigAvailable(aiConfig)"

@@ -1,33 +1,50 @@
-import { Expose } from 'class-transformer';
+import { Expose, GROUP_DEFAULT } from '../../../shared/app/class-transformer-custom';
 import Player from './Player';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
-type Groups = null | 'withPlayerId';
-
-export default class AIConfig<Group extends Groups = null>
+@Entity()
+export default class AIConfig
 {
-    @Expose()
+    @PrimaryColumn()
+    playerId?: number;
+
+    @OneToOne(() => Player, { cascade: ['insert', 'update'] })
+    @JoinColumn()
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
+    player?: Player;
+
+    @Column({ type: String, length: 191 })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     engine: string;
 
-    @Expose()
+    @Column({ length: 32 })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     label: string;
 
-    @Expose()
+    @Column({ type: String, length: 64, nullable: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     description: string | null;
 
-    @Expose()
-    boardsizeMin: null | number;
+    @Column({ type: 'smallint', nullable: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
+    boardsizeMin?: null | number;
 
-    @Expose()
-    boardsizeMax: null | number;
+    @Column({ type: 'smallint', nullable: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
+    boardsizeMax?: null | number;
 
-    @Expose()
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     requireMorePower: boolean;
 
-    @Expose()
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     isRemote: boolean;
 
-    @Expose()
+    @Column('json')
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     config: { [key: string]: unknown };
 
-    player: Group extends 'withPlayerId' ? Pick<Player, 'publicId'> : Pick<Player, 'publicId'> | undefined;
+    @Column({ default: 0 })
+    order: number;
 }

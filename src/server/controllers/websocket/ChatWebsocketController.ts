@@ -21,15 +21,13 @@ export default class ChatWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            const chatMessage: ChatMessage = {
-                persisted: false,
-                gameId,
-                content,
-                author: player,
-                createdAt: new Date(),
-            };
+            const chatMessage = new ChatMessage();
 
-            const result = await this.hostedGameRepository.postChatMessage(chatMessage);
+            chatMessage.player = player;
+            chatMessage.content = content;
+            chatMessage.createdAt = new Date();
+
+            const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
 
             if (true !== result) {
                 answer(result);

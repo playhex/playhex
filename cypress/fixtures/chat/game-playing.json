@@ -8,22 +8,26 @@
         "slug": "aaa",
         "createdAt": "2024-03-05T10:16:32.291Z"
     },
-    "players": [
+    "hostedGameToPlayers": [
         {
-            "pseudo": "aaa",
-            "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
-            "isGuest": false,
-            "isBot": false,
-            "slug": "aaa",
-            "createdAt": "2024-03-05T10:16:32.291Z"
+            "player": {
+                "pseudo": "aaa",
+                "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aaa",
+                "createdAt": "2024-03-05T10:16:32.291Z"
+            }
         },
         {
-            "pseudo": "6569",
-            "publicId": "77c251cb-16f6-4150-97ff-10f8814dcd8f",
-            "isGuest": true,
-            "isBot": false,
-            "slug": "6569",
-            "createdAt": "2024-03-05T12:48:22.885Z"
+            "player": {
+                "pseudo": "6569",
+                "publicId": "77c251cb-16f6-4150-97ff-10f8814dcd8f",
+                "isGuest": true,
+                "isBot": false,
+                "slug": "6569",
+                "createdAt": "2024-03-05T12:48:22.885Z"
+            }
         }
     ],
     "timeControl": {
@@ -83,10 +87,8 @@
     },
     "chatMessages": [
         {
-            "persisted": false,
-            "gameId": "de86a6a2-adb0-41e6-b8f1-a64da8b80867",
             "content": "Hello, I am a watcher",
-            "author": {
+            "player": {
                 "pseudo": "7614",
                 "publicId": "926972b7-a222-45d1-8a77-5c75c2a29b27",
                 "isGuest": true,
@@ -97,10 +99,8 @@
             "createdAt": "2024-03-05T12:48:06.651Z"
         },
         {
-            "persisted": false,
-            "gameId": "de86a6a2-adb0-41e6-b8f1-a64da8b80867",
             "content": "Hi, I am your opponent, ready ?",
-            "author": {
+            "player": {
                 "pseudo": "6569",
                 "publicId": "77c251cb-16f6-4150-97ff-10f8814dcd8f",
                 "isGuest": true,
@@ -111,10 +111,8 @@
             "createdAt": "2024-03-05T12:48:49.210Z"
         },
         {
-            "persisted": false,
-            "gameId": "de86a6a2-adb0-41e6-b8f1-a64da8b80867",
             "content": "Hello, ready. Let's play",
-            "author": {
+            "player": {
                 "pseudo": "aaa",
                 "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
                 "isGuest": false,
@@ -126,66 +124,5 @@
         }
     ],
     "state": "playing",
-    "createdAt": "2024-03-05T12:47:43.314Z",
-    "__meta": {
-        "values": {
-            "host.createdAt": [
-                "Date"
-            ],
-            "players.0.createdAt": [
-                "Date"
-            ],
-            "players.1.createdAt": [
-                "Date"
-            ],
-            "timeControl.players.1.totalRemainingTime": [
-                "Date"
-            ],
-            "gameData.movesHistory.0.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.1.playedAt": [
-                "Date"
-            ],
-            "gameData.movesHistory.2.playedAt": [
-                "Date"
-            ],
-            "gameData.startedAt": [
-                "Date"
-            ],
-            "gameData.lastMoveAt": [
-                "Date"
-            ],
-            "chatMessages.0.author.createdAt": [
-                "Date"
-            ],
-            "chatMessages.0.createdAt": [
-                "Date"
-            ],
-            "chatMessages.1.author.createdAt": [
-                "Date"
-            ],
-            "chatMessages.1.createdAt": [
-                "Date"
-            ],
-            "chatMessages.2.author.createdAt": [
-                "Date"
-            ],
-            "chatMessages.2.createdAt": [
-                "Date"
-            ],
-            "createdAt": [
-                "Date"
-            ]
-        },
-        "referentialEqualities": {
-            "host": [
-                "players.0",
-                "chatMessages.2.author"
-            ],
-            "players.1": [
-                "chatMessages.1.author"
-            ]
-        }
-    }
+    "createdAt": "2024-03-05T12:47:43.314Z"
 }

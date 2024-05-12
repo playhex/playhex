@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { PropType, ref, toRefs } from 'vue';
 import { BIconAspectRatio } from 'bootstrap-icons-vue';
-import { GameOptionsData, MAX_BOARDSIZE } from '../../../../../shared/app/GameOptions';
+import HostedGameOptions, { MAX_BOARDSIZE } from '../../../../../shared/app/models/HostedGameOptions';
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<GameOptionsData>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
     boardsizeMin: {

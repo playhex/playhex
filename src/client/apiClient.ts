@@ -1,11 +1,12 @@
-import { AIConfigStatusData, HostedGameData, HostedGameState, OnlinePlayersData, PlayerSettingsData } from '@shared/app/Types';
+import { AIConfigStatusData, HostedGameState, WithRequired } from '@shared/app/Types';
+import HostedGame from '../shared/app/models/HostedGame';
+import HostedGameOptions from '../shared/app/models/HostedGameOptions';
 import Player from '../shared/app/models/Player';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
-import { denormalize } from '@shared/app/serializer';
-import { GameOptionsData } from '@shared/app/GameOptions';
-import ChatMessage from '../shared/app/models/ChatMessage';
+import { ChatMessage, OnlinePlayers, PlayerSettings } from '../shared/app/models';
 import AIConfig from '../shared/app/models/AIConfig';
 import GameAnalyze from '@shared/app/models/GameAnalyze';
+import { plainToInstance } from '../shared/app/class-transformer-custom';
 
 export class ApiClientError extends Error
 {
@@ -43,7 +44,7 @@ export const authGetMe = async (): Promise<Player> => {
         },
     });
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const authLogin = async (pseudo: string, password: string): Promise<Player> => {
@@ -61,7 +62,7 @@ export const authLogin = async (pseudo: string, password: string): Promise<Playe
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const authSignup = async (pseudo: string, password: string): Promise<Player> => {
@@ -79,7 +80,7 @@ export const authSignup = async (pseudo: string, password: string): Promise<Play
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const authSignupFromGuest = async (pseudo: string, password: string): Promise<Player> => {
@@ -97,7 +98,7 @@ export const authSignupFromGuest = async (pseudo: string, password: string): Pro
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const authMeOrSignupGuest = async (): Promise<Player> => {
@@ -110,7 +111,7 @@ export const authMeOrSignupGuest = async (): Promise<Player> => {
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const authLogout = async (): Promise<Player> => {
@@ -124,7 +125,7 @@ export const authLogout = async (): Promise<Player> => {
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const authChangePassword = async (oldPassword: string, newPassword: string): Promise<Player> => {
@@ -142,11 +143,11 @@ export const authChangePassword = async (oldPassword: string, newPassword: strin
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 // TODO see if no need to pass type=lobby
-export const getGames = async (): Promise<HostedGameData[]> => {
+export const getGames = async (): Promise<HostedGame[]> => {
     const response = await fetch(`/api/games`, {
         method: 'get',
         headers: {
@@ -154,10 +155,12 @@ export const getGames = async (): Promise<HostedGameData[]> => {
         },
     });
 
-    return denormalize(await response.json());
+    return (await response.json() as HostedGame[])
+        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    ;
 };
 
-export const getEndedGames = async (take = 20, fromGamePublicId: null | string = null): Promise<HostedGameData[]> => {
+export const getEndedGames = async (take = 20, fromGamePublicId: null | string = null): Promise<HostedGame[]> => {
     const params = new URLSearchParams({
         type: 'ended',
         take: String(take),
@@ -174,7 +177,9 @@ export const getEndedGames = async (take = 20, fromGamePublicId: null | string =
         },
     });
 
-    return denormalize(await response.json());
+    return (await response.json() as HostedGame[])
+        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    ;
 };
 
 export const getPlayer = async (publicId: string): Promise<Player> => {
@@ -185,7 +190,7 @@ export const getPlayer = async (publicId: string): Promise<Player> => {
         },
     });
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 export const getPlayerBySlug = async (slug: string): Promise<Player> => {
@@ -198,7 +203,7 @@ export const getPlayerBySlug = async (slug: string): Promise<Player> => {
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(Player, await response.json());
 };
 
 /**
@@ -208,7 +213,7 @@ export const getPlayerGames = async (
     playerPublicId: string,
     state: null | HostedGameState = null,
     fromGamePublicId: null | string = null,
-): Promise<HostedGameData[]> => {
+): Promise<HostedGame[]> => {
     let url = `/api/players/${playerPublicId}/games`;
     const params = new URLSearchParams();
 
@@ -231,10 +236,12 @@ export const getPlayerGames = async (
         },
     });
 
-    return denormalize(await response.json());
+    return (await response.json() as HostedGame[])
+        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    ;
 };
 
-export const getGame = async (gameId: string): Promise<null | HostedGameData> => {
+export const getGame = async (gameId: string): Promise<null | HostedGame> => {
     const response = await fetch(`/api/games/${gameId}`, {
         method: 'get',
         headers: {
@@ -246,10 +253,10 @@ export const getGame = async (gameId: string): Promise<null | HostedGameData> =>
         return null;
     }
 
-    return denormalize(await response.json());
+    return plainToInstance(HostedGame, await response.json());
 };
 
-export const apiPostGame = async (gameOptions: Partial<GameOptionsData> = {}): Promise<HostedGameData> => {
+export const apiPostGame = async (gameOptions: Partial<HostedGameOptions> = {}): Promise<HostedGame> => {
     const response = await fetch('/api/games', {
         method: 'post',
         headers: {
@@ -259,7 +266,7 @@ export const apiPostGame = async (gameOptions: Partial<GameOptionsData> = {}): P
         body: JSON.stringify(gameOptions),
     });
 
-    return denormalize(await response.json());
+    return plainToInstance(HostedGame, await response.json());
 };
 
 export const apiPostResign = async (gameId: string): Promise<true | string> => {
@@ -292,7 +299,7 @@ export const apiPostCancel = async (gameId: string): Promise<true | string> => {
     return response.text();
 };
 
-export const apiPostRematch = async (gameId: string): Promise<HostedGameData> => {
+export const apiPostRematch = async (gameId: string): Promise<HostedGame> => {
     const response = await fetch(`/api/games/${gameId}/rematch`, {
         method: 'post',
         headers: {
@@ -300,10 +307,10 @@ export const apiPostRematch = async (gameId: string): Promise<HostedGameData> =>
         },
     });
 
-    return denormalize(await response.json());
+    return plainToInstance(HostedGame, await response.json());
 };
 
-export const apiGetOnlinePlayers = async (): Promise<OnlinePlayersData> => {
+export const apiGetOnlinePlayers = async (): Promise<OnlinePlayers> => {
     const response = await fetch(`/api/online-players`, {
         method: 'get',
         headers: {
@@ -311,10 +318,10 @@ export const apiGetOnlinePlayers = async (): Promise<OnlinePlayersData> => {
         },
     });
 
-    return response.json();
+    return plainToInstance(OnlinePlayers, await response.json());
 };
 
-export const apiGetPlayerSettings = async (): Promise<PlayerSettingsData> => {
+export const apiGetPlayerSettings = async (): Promise<PlayerSettings> => {
     const response = await fetch(`/api/player-settings`, {
         method: 'get',
         headers: {
@@ -325,21 +332,21 @@ export const apiGetPlayerSettings = async (): Promise<PlayerSettingsData> => {
     return response.json();
 };
 
-export const apiPatchPlayerSettings = async (playerSettingsData: PlayerSettingsData): Promise<void> => {
+export const apiPatchPlayerSettings = async (playerSettings: PlayerSettings): Promise<void> => {
     const response = await fetch(`/api/player-settings`, {
         method: 'PATCH',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(playerSettingsData),
+        body: JSON.stringify(playerSettings),
     });
 
     await checkResponse(response);
 };
 
-export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content' | 'gameId'>): Promise<void> => {
-    const response = await fetch(`/api/games/${chatMessage.gameId}/chat-messages`, {
+export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content' | 'hostedGameId'>): Promise<void> => {
+    const response = await fetch(`/api/games/${chatMessage.hostedGameId}/chat-messages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -352,7 +359,7 @@ export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content
     await checkResponse(response);
 };
 
-export const apiGetAiConfigs = async (): Promise<AIConfig<'withPlayerId'>[]> => {
+export const apiGetAiConfigs = async (): Promise<WithRequired<AIConfig, 'player'>[]> => {
     const response = await fetch(`/api/ai-configs`, {
         method: 'GET',
         headers: {
@@ -396,7 +403,7 @@ export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | Ga
         return null;
     }
 
-    return denormalize(await response.json());
+    return plainToInstance(GameAnalyze, await response.json());
 };
 
 export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameAnalyze> => {
@@ -409,5 +416,5 @@ export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameA
 
     await checkResponse(response);
 
-    return denormalize(await response.json());
+    return plainToInstance(GameAnalyze, await response.json());
 };
