@@ -111,7 +111,7 @@ const shouldDisplayHexworldLink = (): boolean => {
 const { href } = window.location;
 const copiedResult = ref<null | true | false>(null);
 let copiedResultTimeout: null | number = null;
-type CopyResult = 'copied' | 'canceled' | 'unsupported';
+type CopyResult = 'copied' | 'shared' | 'canceled' | 'unsupported';
 
 const shareWithShareApi = async (): Promise<CopyResult> => {
     const shareData = {
@@ -126,7 +126,7 @@ const shareWithShareApi = async (): Promise<CopyResult> => {
     try {
         await navigator.share(shareData);
 
-        return 'copied';
+        return 'shared';
     } catch (e) {
         return 'canceled';
     }
@@ -151,6 +151,11 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
     }
 
     const result = await shareGameLink();
+
+    if ('shared' === result || 'canceled' === result) {
+        copiedResult.value = null;
+        return;
+    }
 
     if ('copied' === result) {
         copiedResult.value = true;
