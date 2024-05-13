@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import HostedGame from './HostedGame';
 import type { Outcome, PlayerIndex } from '../../game-engine/Types';
 import { Expose } from '../class-transformer-custom';
@@ -51,6 +51,7 @@ export default class Game
     lastMoveAt: null | Date = null;
 
     @Column({ type: Date, precision: 3, nullable: true })
+    @Index()
     @Expose()
     @Type(() => Date)
     endedAt: null | Date = null;

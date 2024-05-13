@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm';
 import Player from './Player';
 import type { HostedGameState } from '../../app/Types';
@@ -33,6 +33,7 @@ export default class HostedGame
     hostedGameToPlayers: HostedGameToPlayer[];
 
     @Column({ length: 15 })
+    @Index()
     @Expose()
     state: HostedGameState;
 

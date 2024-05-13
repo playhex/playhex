@@ -1,7 +1,7 @@
 import { HostedGame, Player } from '../../shared/app/models';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger';
-import { FindManyOptions, FindOptionsRelations, In, LessThanOrEqual, Not, Repository } from 'typeorm';
+import { And, FindManyOptions, FindOptionsRelations, In, IsNull, LessThanOrEqual, Not, Repository } from 'typeorm';
 
 /**
  * Relations to load in order to recreate an HostedGame in memory.
@@ -68,23 +68,18 @@ export default class HostedGamePersister
 
     async findLastEnded1v1(take = 5, fromGamePublicId?: string): Promise<HostedGame[]>
     {
-        // Get bot games ids to filter out
-        const botHostedGameIdsQuery = await this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .select('hostedGame.internalId', 'id')
-            .innerJoin('hostedGame.gameData', 'gameData')
-            .innerJoin('hostedGame.hostedGameToPlayers', 'hostedGameToPlayer')
-            .innerJoin('hostedGameToPlayer.player', 'player')
-            .where('player.isBot = true')
-        ;
-
-        const botHostedGameIds: { id: number }[] = await botHostedGameIdsQuery.getRawMany();
-
         // Options to get all games not in bot games
         const options: FindManyOptions<HostedGame> = {
+            comment: 'find last ended 1v1',
             relations,
             where: {
-                internalId: Not(In(botHostedGameIds.map(row => row.id))),
+                state: 'ended',
+                gameOptions: {
+                    opponentType: 'player',
+                },
+                gameData: {
+                    endedAt: Not(IsNull()), // Works without, but query is slower
+                },
             },
             order: {
                 gameData: {
@@ -97,6 +92,7 @@ export default class HostedGamePersister
         // Alter options to get only older than cursor if defined
         if (undefined !== fromGamePublicId) {
             const cursor = await this.hostedGameRepository.findOne({
+                comment: 'find last ended 1v1 cursor',
                 relations: { gameData: true },
                 where: { id: fromGamePublicId },
             });
@@ -105,13 +101,14 @@ export default class HostedGamePersister
                 throw new Error('Invalid cursor, this id does not belong to a hostedGame');
             }
 
-            botHostedGameIds.push({ id: cursor.internalId! });
-
             options.where = {
                 ...options.where,
-                internalId: Not(In(botHostedGameIds.map(row => row.id))),
+                id: Not(cursor.id),
                 gameData: {
-                    endedAt: LessThanOrEqual(cursor.gameData!.endedAt!),
+                    endedAt: And(
+                        Not(IsNull()),
+                        LessThanOrEqual(cursor.gameData!.endedAt!),
+                    ),
                 },
             };
         }

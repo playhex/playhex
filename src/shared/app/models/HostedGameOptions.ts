@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm';
 import HostedGame from './HostedGame';
 import type TimeControlType from '../../time-control/TimeControlType';
@@ -55,6 +55,7 @@ export default class HostedGameOptions
      */
     @IsIn(['player', 'ai'])
     @Column({ length: 15 })
+    @Index()
     @Expose()
     opponentType: 'player' | 'ai' = 'player';
 
