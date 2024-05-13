@@ -19,7 +19,7 @@ export default class HostedGame
     @PrimaryGeneratedColumn({ name: 'id' }) // TODO remove name after id renaming
     internalId?: number;
 
-    @ColumnUUID({ name: 'publicId' }) // TODO remove name after id renaming
+    @ColumnUUID({ name: 'publicId', unique: true }) // TODO remove name after id renaming
     @Expose()
     id: string;
 

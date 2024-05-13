@@ -15,7 +15,7 @@ import ChatMessage from '../shared/app/models/ChatMessage';
 import { makeAIPlayerMove } from './services/AIManager';
 import HostedGameEntity from '../shared/app/models/HostedGame'; // TODO rename HostedGame
 import HostedGameOptions from '../shared/app/models/HostedGameOptions';
-import { createHostedGameToPlayers } from '../shared/app/models/HostedGameToPlayer';
+import HostedGameToPlayer from '../shared/app/models/HostedGameToPlayer';
 
 type HostedGameEvents = {
     played: () => void;
@@ -47,6 +47,8 @@ type HostedGameEvents = {
 export default class HostedGame extends TypedEmitter<HostedGameEvents>
 {
     private id: string = uuidv4();
+
+    private hostedGameEntity: null | HostedGameEntity = null;
 
     private host: Player;
     private gameOptions: HostedGameOptions;
@@ -425,20 +427,35 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
     toData(): HostedGameEntity
     {
-        const hostedGameEntity = new HostedGameEntity();
+        if (null === this.hostedGameEntity) {
+            this.hostedGameEntity = new HostedGameEntity();
+        }
 
-        hostedGameEntity.id = this.id;
-        hostedGameEntity.host = this.host;
-        hostedGameEntity.hostedGameToPlayers = createHostedGameToPlayers(this.players, hostedGameEntity);
-        hostedGameEntity.timeControl = this.timeControl.getValues();
-        hostedGameEntity.gameOptions = this.gameOptions;
-        hostedGameEntity.gameData = this.game?.toData() ?? null;
-        hostedGameEntity.chatMessages = this.chatMessages;
-        hostedGameEntity.state = this.state;
-        hostedGameEntity.createdAt = this.createdAt;
-        hostedGameEntity.rematch = this.rematch;
+        this.hostedGameEntity.id = this.id;
+        this.hostedGameEntity.host = this.host;
+        this.hostedGameEntity.timeControl = this.timeControl.getValues();
+        this.hostedGameEntity.gameOptions = this.gameOptions;
+        this.hostedGameEntity.gameData = this.game?.toData() ?? null;
+        this.hostedGameEntity.chatMessages = this.chatMessages;
+        this.hostedGameEntity.state = this.state;
+        this.hostedGameEntity.createdAt = this.createdAt;
+        this.hostedGameEntity.rematch = this.rematch;
 
-        return hostedGameEntity;
+        if (!Array.isArray(this.hostedGameEntity.hostedGameToPlayers)) {
+            this.hostedGameEntity.hostedGameToPlayers = [];
+        }
+
+        for (let i = 0; i < this.players.length; ++i) {
+            if (!this.hostedGameEntity.hostedGameToPlayers[i]) {
+                this.hostedGameEntity.hostedGameToPlayers[i] = new HostedGameToPlayer();
+                this.hostedGameEntity.hostedGameToPlayers[i].hostedGame = this.hostedGameEntity;
+            }
+
+            this.hostedGameEntity.hostedGameToPlayers[i].player = this.players[i];
+            this.hostedGameEntity.hostedGameToPlayers[i].order = i;
+        }
+
+        return this.hostedGameEntity;
     }
 
     static fromData(data: HostedGameEntity): HostedGame
@@ -453,6 +470,8 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         }
 
         const hostedGame = new HostedGame();
+
+        hostedGame.hostedGameEntity = data;
 
         hostedGame.id = data.id;
         hostedGame.host = data.host;

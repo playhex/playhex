@@ -23,15 +23,3 @@ export default class HostedGameToPlayer
     @PrimaryColumn('smallint')
     order: number;
 }
-
-export const createHostedGameToPlayers = (players: Player[], hostedGame: HostedGame): HostedGameToPlayer[] => {
-    return players.map((player, index) => {
-        const hostedGameToPlayer = new HostedGameToPlayer();
-
-        hostedGameToPlayer.player = player;
-        hostedGameToPlayer.hostedGame = hostedGame;
-        hostedGameToPlayer.order = index;
-
-        return hostedGameToPlayer;
-    });
-};
