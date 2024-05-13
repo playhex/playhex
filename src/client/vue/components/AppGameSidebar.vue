@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconBoxArrowUpRight, BIconShareFill, BIconCheck } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
@@ -19,6 +19,9 @@ import { format, formatDistanceToNow } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import useAnalyzeStore from '../../stores/analyzeStore';
+import { downloadString } from '../../services/fileDownload';
+import { pseudoString } from '../../../shared/app/pseudoUtils';
+import { gameToSGF } from '../../../shared/game-engine/SGF';
 
 const props = defineProps({
     hostedGameClient: {
@@ -100,6 +103,24 @@ const shouldDisplayHexworldLink = (): boolean => {
     }
 
     return false;
+};
+
+const downloadSGF = (): void => {
+    const game = hostedGameClient.value.getGame();
+    const players = hostedGameClient.value.getPlayers();
+
+    const filename = [
+        'hex',
+        game.getStartedAt().toISOString().substring(0, 10),
+        pseudoString(players[0], 'slug'),
+        'VS',
+        pseudoString(players[1], 'slug'),
+    ].join('-') + '.sgf';
+
+    downloadString(gameToSGF(game, {
+        PB: pseudoString(players[0], 'pseudo'),
+        PW: pseudoString(players[1], 'pseudo'),
+    }), filename);
 };
 
 /*
@@ -310,20 +331,38 @@ const doAnalyzeGame = async () => {
 
         <div class="block-controls">
             <div class="container-fluid">
-                <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click="e => { e.preventDefault(); emits('toggleCoords') }"><BIconAlphabet /> {{ $t('toggle_coords') }}</button>
-
+                <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click.prevent="emits('toggleCoords')"><BIconAlphabet /> {{ $t('toggle_coords') }}</button>
                 <a
                     v-if="shouldDisplayHexworldLink()"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     target="_blank"
                     :href="gameToHexworldLink(hostedGameClient.getGame(), playerSettings?.orientationLandscape)"
-                ><BIconBoxArrowUpRight /> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="1.4em"
+                        height="1.4em"
+                        viewBox="0 0 26 27"
+                        fill="#d8b47d"
+                        stroke="#000000"
+                        stroke-width="1"
+                        role="img"
+                        focusable="false"
+                    >
+                        <path d="M 3 8 L 13 2.25 L 23 8 L 23 19.5 L 13 25.25 L 3 19.5z" />
+                    </svg> HexWorld</a>
+                <button
+                    v-if="'ended' === hostedGameClient.getState()"
+                    type="button"
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                    @click="downloadSGF();"
+                ><BIconDownload /> SGF</button>
 
                 <br>
-                <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click="e => { e.preventDefault(); shareGameLinkAndShowResult() }"><BIconShareFill /> {{ $t('share_game') }}</a>
+                <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click.prevent="shareGameLinkAndShowResult()"><BIconShareFill /> {{ $t('share_game') }}</a>
                 <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> {{ $t('copied!') }}</small>
-                <small v-else-if="false === copiedResult" class="text-warning me-2">{{ $t('not_copied') }}</small>
+                <small v-else-if="false === copiedResult" class="text-warning me-2"> {{ $t('not_copied') }}</small>
             </div>
         </div>
 
@@ -439,7 +478,7 @@ const doAnalyzeGame = async () => {
 
 .block-controls
     > div
-        margin 1em 0
+        margin 0 0 1em
 
 .block-close
     position relative

@@ -165,7 +165,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
 
         if (this.game.isEnded()) {
-            this.endedCallback();
+            this.highlightSidesFromGame();
+            this.animateWinningPath();
         }
     }
 

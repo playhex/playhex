@@ -101,6 +101,8 @@ onMounted(() => {
  */
 const reload = ref(0);
 
+// TODO: Implement the rematch button for offline games
+// eslint-disable-next-line
 const rematch = () => {
     if (!offlineBoardContainer.value) {
         throw new Error('Missing element with ref="offlineBoardContainer"');
@@ -118,7 +120,6 @@ const rematch = () => {
             v-if="gameView"
             :gameView="gameView"
             :players="players"
-            :rematch="rematch"
         />
     </div>
 </template>

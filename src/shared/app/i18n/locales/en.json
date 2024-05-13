@@ -72,7 +72,7 @@
     "toggle_coords": "Toggle coords",
     "share_game": "Share game",
     "copied!": "Copied!",
-    "not_copied": "not copied, use right click or long press",
+    "not_copied": "Failed to copy, use right click or long tap",
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Game created by {player}, {timeAgo}.",
     "game_was_created_by_player_time_ago": "Game was created by {player}, {timeAgo}.",
@@ -99,8 +99,7 @@
     "waiting": "waiting…",
     "initializing_game": "Initializing game…",
     "game_finished_overlay": {
-        "title": "Game finished",
-        "review_game": "Review game:"
+        "title": "Game finished"
     },
     "game_has_been_canceled": "Game has been canceled.",
     "waiting_for_an_opponent": "Waiting for an opponent…",
