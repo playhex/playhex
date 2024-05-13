@@ -33,7 +33,7 @@ export const AppDataSource = new DataSource({
     url: DATABASE_URL,
     logging: 'true' === DATABASE_SHOW_SQL,
     timezone: 'Z',
-    entities,
+    entities: Object.values(entities),
     subscribers: [],
     migrations: [],
     maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
@@ -46,4 +46,8 @@ AppDataSource.initialize();
  * Waiting for this to be merged: https://github.com/typestack/typeorm-typedi-extensions/pull/69
  * Once merged, this could be removed, and use `@InjectRepository(Player)` instead of `@Inject('Repository<Player>')`
  */
-entities.forEach(entity => Container.set(`Repository<${entity.name}>`, AppDataSource.getRepository(entity)));
+for (const typeName in entities) {
+    const type = entities[typeName as keyof typeof entities];
+
+    Container.set(`Repository<${typeName}>`, AppDataSource.getRepository(type));
+}

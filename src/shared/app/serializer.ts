@@ -13,14 +13,18 @@ import { entities } from './models';
  * and follow Expose groups and all annotations.
  */
 
-entities.forEach(type => SuperJSON.registerCustom<typeof type, JSONObject>(
-    {
-        isApplicable: (v): v is typeof type => v instanceof type,
-        serialize: v => instanceToPlain(v),
-        deserialize: v => plainToInstance(type as any, v),
-    },
-    type.name,
-));
+for (const typeName in entities) {
+    const type = entities[typeName as keyof typeof entities];
+
+    SuperJSON.registerCustom<typeof type, JSONObject>(
+        {
+            isApplicable: (v): v is typeof type => v instanceof type,
+            serialize: v => instanceToPlain(v),
+            deserialize: v => plainToInstance(type as any, v),
+        },
+        typeName,
+    );
+}
 
 /**
  * Uses SuperJson to serialize data without losing dates.

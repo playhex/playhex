@@ -24,7 +24,7 @@ export {
     PlayerSettings,
 };
 
-export const entities = [
+export const entities = {
     AIConfig,
     ChatMessage,
     Game,
@@ -36,4 +36,4 @@ export const entities = [
     OnlinePlayers,
     Player,
     PlayerSettings,
-];
+};
