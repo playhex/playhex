@@ -16,7 +16,7 @@ class PrismaNamingStrategy extends DefaultNamingStrategy
     }
 }
 
-const { DATABASE_URL, DATABASE_SHOW_SQL } = process.env;
+const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
 
 if (!DATABASE_URL) {
     throw new Error('DATABASE_URL must be defined in .env');
@@ -36,6 +36,7 @@ export const AppDataSource = new DataSource({
     entities,
     subscribers: [],
     migrations: [],
+    maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
     namingStrategy: new PrismaNamingStrategy(),
 });
 
