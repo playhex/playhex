@@ -20,7 +20,12 @@
         "review": "Revoir",
         "won": "Gagnant",
         "lost": "Perdant",
-        "watch": "Observer"
+        "watch": "Observer",
+        "playing": "En cours",
+        "opponent": "Adversaire",
+        "board": "Plateau",
+        "board_size": "Taille du plateau",
+        "outcome": "Résultat"
     },
     "player_settings": {
         "title": "Préférences"
@@ -61,5 +66,23 @@
         "time": "{player} a gangé par temps !",
         "resign": "{player} a gagné par abandon !",
         "forfeit": "{player} a gagné par forfait !"
-    }
+    },
+    "game_create": {
+        "less_options": "Moins d'options",
+        "game_options": "Options de la partie",
+        "custom_size": "Personnalisée",
+        "more_options": "Plus d'options"
+    },
+    "copied!": "Copié !",
+    "game_was_created_by_player_time_ago": "La partie a été créée par {player}, {timeAgo}.",
+    "game_rules": {
+        "normal": "normales",
+        "host_plays_first": "Hôte joue 1er",
+        "host_plays_second": "Hôte joue 2ème"
+    },
+    "log_out": "Déconnexion",
+    "log_in": "Connexion",
+    "share_game": "Partager la partie",
+    "not_copied": "pas copié, utilisez le click droit ou appui long",
+    "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}."
 }
