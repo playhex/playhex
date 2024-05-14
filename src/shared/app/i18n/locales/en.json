@@ -1,0 +1,183 @@
+{
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "No games available right now. Create a new one!",
+        "watch_current_games": "Watch current games",
+        "join_a_game": "Join a game",
+        "no_playing_games": "There are no games in progress right now."
+    },
+    "game": {
+        "opponent": "Opponent",
+        "host": "Host",
+        "size": "Size",
+        "board": "Board",
+        "board_size": "Board size",
+        "time_control": "Time control",
+        "rules": "Rules",
+        "created": "Created",
+        "accept": "Accept",
+        "red": "Red",
+        "blue": "Blue",
+        "started": "Started",
+        "finished": "Finished",
+        "review": "Review",
+        "won": "Won",
+        "outcome": "Outcome",
+        "lost": "Lost",
+        "playing": "Playing",
+        "watch": "Watch"
+    },
+    "game_rules": {
+        "normal": "normal",
+        "host_plays_first": "host plays first",
+        "host_plays_second": "host plays second",
+        "no_swap": "no swap"
+    },
+    "game_create": {
+        "custom_size": "Custom",
+        "less_options": "Less options",
+        "more_options": "More options",
+        "game_options": "Game options"
+    },
+    "player_settings": {
+        "title": "Settings"
+    },
+    "background_theme": {
+        "title": "Theme",
+        "dark": "Dark",
+        "light": "Light",
+        "auto": "Auto"
+    },
+    "toggle_coords": "Toggle coords",
+    "share_game": "Share game",
+    "copied!": "Copied!",
+    "not_copied": "not copied, use right click or long press",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Game created by {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "Game was created by {player}, {timeAgo}.",
+    "log_out": "Log out",
+    "log_in": "Log in",
+    "sign_up": "Sign up",
+    "create_account": "Create an account",
+    "already_have_account_login_instead": "Already have an account? {login} instead",
+    "already_have_account_login_instead_link_label": "Log in",
+    "no_account_sign_up_instead": "No account? {signUp} instead",
+    "no_account_sign_up_instead_link_label": "Sign up",
+    "username": "Username",
+    "password": "Password",
+    "account_created_on": "Account created on {{date}}",
+    "player_current_games": "Current games",
+    "player_game_history": "Game history",
+    "waiting": "waiting…",
+    "initializing_game": "Initializing game…",
+    "game_finished_overlay": {
+        "title": "Game finished",
+        "review_game": "Review game:"
+    },
+    "game_has_been_canceled": "Game has been canceled.",
+    "waiting_for_an_opponent": "Waiting for an opponent…",
+    "confirm_overlay": {
+        "confirmation": "Confirmation",
+        "are_you_sure?": "Are you sure?"
+    },
+    "workers": {
+        "slow_worker": "No fast worker is online right now. Only limited AI are available.",
+        "no_worker": "No worker can compute moves right now. Only random bots are available."
+    },
+    "game_analyze": {
+        "analyze_by_ai": "Game analyze by AI",
+        "analyze_game": "Analyze game",
+        "requested": "Analyze requested…",
+        "errored": "Analyze errored!",
+        "best_move": "best move",
+        "best": "best:"
+    },
+    "try_again": "Try again",
+    "yes": "Yes",
+    "no": "No",
+    "language": "Language",
+    "cancel": "Cancel",
+    "close": "Close",
+    "create_1v1": "Create 1v1",
+    "new_game": "New game",
+    "players": "Players",
+    "player": "player",
+    "load_more": "Load more",
+    "no_such_player": "Looks like there is no such player.",
+    "n_online_players": "Online ({{n}})",
+    "guest": "Guest",
+    "finished_games": "Finished games",
+    "1v1": "1v1",
+    "play_vs_ai": "Play vs AI",
+    "play_vs_offline_ai": "Play vs offline AI",
+    "loading_game": "Loading game…",
+    "tournament": "Tournament",
+    "now!": "Now!",
+    "register_on_challonge": "Register on Challonge",
+    "see_progression_on_challonge": "See progression on Challonge",
+    "move": "move",
+    "chat": "Chat",
+    "system": "System",
+    "chat_message_placeholder": "Message…",
+    "unread_messages": "unread messages",
+    "send_chat_message": "Send",
+    "n_characters_one": "{{count}} character",
+    "n_characters_other": "{{count}} characters",
+    "landscape": "Landscape",
+    "portrait": "Portrait",
+    "resign": "Resign",
+    "board_orientation": {
+        "title": "Board orientation",
+        "flat": "Flat",
+        "flat_2": "Flat 2",
+        "diamond": "Diamond"
+    },
+    "change_password": "Change password",
+    "old_password": "Old password",
+    "new_password": "New password",
+    "confirm_new_password": "Confirm new password",
+    "update_password": "Update password",
+    "game_candency": {
+        "blitz": "Blitz",
+        "normal": "Normal",
+        "correspondence": "Correspondence"
+    },
+    "confirm_move": {
+        "title": "Confirm move",
+        "button_label": "Confirm move",
+        "button_label_short": "Confirm",
+        "send_immediately": "Send immediately",
+        "ask_confirmation": "Ask confirmation",
+        "description": "To prevent misclicks, you can require confirmation before submitting a move."
+    },
+    "rematch": {
+        "label": "Rematch",
+        "accept": "Accept rematch",
+        "view": "View rematch"
+    },
+    "short_time_unit": {
+        "day": "d",
+        "hour": "h",
+        "minute": "min",
+        "second": "s"
+    },
+    "outcome": {
+        "win": "win",
+        "loss": "loss",
+        "resign": "resign",
+        "forfeit": "forfeit",
+        "time": "timeout"
+    },
+    "player_won_by": {
+        "default": "{player} won the game!",
+        "time": "{player} won by time!",
+        "resign": "{player} won by resignation!",
+        "forfeit": "{player} won by forfeit!"
+    },
+    "player_wins_by": {
+        "default": "{player} wins the game!",
+        "time": "{player} wins by time!",
+        "resign": "{player} wins by resignation!",
+        "forfeit": "{player} wins by forfeit!"
+    }
+}

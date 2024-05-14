@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { t } from 'i18next';
 import { useOverlayMeta } from 'unoverlay-vue';
 
 const { visible, confirm, cancel } = useOverlayMeta();
@@ -6,15 +7,15 @@ const { visible, confirm, cancel } = useOverlayMeta();
 const props = defineProps({
     title: {
         type: String,
-        default: 'Confirmation',
+        default: t('confirm_overlay.confirmation'),
     },
     message: {
         type: String,
-        default: 'Are you sure?',
+        default: t('confirm_overlay.are_you_sure?'),
     },
     confirmLabel: {
         type: String,
-        default: 'Yes',
+        default: t('yes'),
     },
     confirmClass: {
         type: String,
@@ -22,7 +23,7 @@ const props = defineProps({
     },
     cancelLabel: {
         type: String,
-        default: 'No',
+        default: t('no'),
     },
     cancelClass: {
         type: String,

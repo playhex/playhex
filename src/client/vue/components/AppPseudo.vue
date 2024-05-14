@@ -28,13 +28,13 @@ const { player, is, classes } = toRefs(props);
         class="text-body text-decoration-none"
     >
         <component :is="is" :class="classes">
-            <span v-if="player.isGuest" class="fst-italic">Guest&nbsp;</span>
+            <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
             <span>{{ player.pseudo }}</span>
         </component>
     </RouterLink>
 
     <component v-else :is="is" :class="classes">
-        <span v-if="player.isGuest" class="fst-italic">Guest&nbsp;</span>
+        <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
         <span>{{ player.pseudo }}</span>
     </component>
 </template>

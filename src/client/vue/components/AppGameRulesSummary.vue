@@ -18,14 +18,14 @@ let isDefaultRules = swapRule && null === firstPlayer;
 <template>
     <span class="game-rules" v-if="isDefaultRules">
         <BIconCheck class="text-success" />
-        <span>normal</span>
+        <span>{{ $t('game_rules.normal') }}</span>
     </span>
 
     <span class="game-rules" v-else>
         <BIconExclamationTriangleFill class="text-warning" />
-        <span v-if="!swapRule"> no swap</span>
-        <span v-if="0 === firstPlayer"> host plays first</span>
-        <span v-if="1 === firstPlayer"> host plays second</span>
+        <span v-if="!swapRule"> {{ ' ' + $t('game_rules.no_swap') }}</span>
+        <span v-if="0 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_first') }}</span>
+        <span v-if="1 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_second') }}</span>
     </span>
 </template>
 

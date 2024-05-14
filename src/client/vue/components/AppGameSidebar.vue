@@ -18,7 +18,6 @@ import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
 import { format, formatDistanceToNow } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
-import { outcomeToString } from '../../../shared/game-engine';
 import useAnalyzeStore from '../../stores/analyzeStore';
 
 const props = defineProps({
@@ -238,57 +237,67 @@ const doAnalyzeGame = async () => {
         <div class="block-game-info">
             <div class="container-fluid">
                 <template v-if="'created' === hostedGameClient.getState()">
-                    <h3>Waiting for an opponent…</h3>
+                    <h3>{{ $t('waiting_for_an_opponent') }}</h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.time_control') }) }} <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                     </p>
                     <p>
-                        Game created by
-                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />,
-                        {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt) }} ago.
+                        <i18next :translation="$t('game_created_by_player_time_ago')">
+                            <template #player>
+                                <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />
+                            </template>
+                            <template #timeAgo>
+                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                            </template>
+                        </i18next>
                     </p>
                 </template>
                 <template v-if="'canceled' === hostedGameClient.getState()">
-                    <h3>Game has been canceled</h3>
+                    <h3>{{ $t('game_has_been_canceled') }}</h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.time_control') }) }} <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                     </p>
                     <p>
-                        Game was created by
-                        <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />,
-                        {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt) }} ago.
+                        <i18next :translation="$t('game_was_created_by_player_time_ago')">
+                            <template #player>
+                                <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />
+                            </template>
+                            <template #timeAgo>
+                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                            </template>
+                        </i18next>
                     </p>
                 </template>
                 <template v-if="'playing' === hostedGameClient.getState()">
-                    <h3>Playing</h3>
+                    <h3>{{ $t('game.playing') }}</h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.time_control') }) }} <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Started: {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
                 <template v-if="'ended' === hostedGameClient.getState()">
                     <h3>
-                        <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
-                        wins
-                        <template v-if="hostedGameClient.getHostedGame().gameData?.outcome">
-                            {{ outcomeToString(hostedGameClient.getHostedGame().gameData?.outcome ?? null) }}
-                        </template>
+                        <i18next :translation="$t('player_wins_by.' + hostedGameClient.getHostedGame().gameData?.outcome ?? 'default')">
+                            <template #player>
+                                <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
+                            </template>
+                        </i18next>
                     </h3>
                     <p>
-                        <small>Rules: <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Time control: <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                        <small>{{ $t('2dots', { s: $t('game.time_control') }) }} <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>Started: {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                         <br>
-                        <small>Ended: {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
             </div>
@@ -296,7 +305,7 @@ const doAnalyzeGame = async () => {
 
         <div class="block-controls">
             <div class="container-fluid">
-                <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click="e => { e.preventDefault(); emits('toggleCoords') }"><BIconAlphabet /> Toggle coords</button>
+                <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click="e => { e.preventDefault(); emits('toggleCoords') }"><BIconAlphabet /> {{ $t('toggle_coords') }}</button>
 
                 <a
                     v-if="shouldDisplayHexworldLink()"
@@ -307,28 +316,28 @@ const doAnalyzeGame = async () => {
                 ><BIconBoxArrowUpRight /> <img src="/images/hexworld-icon.png" alt="HexWorld icon" height="18" /> HexWorld</a>
 
                 <br>
-                <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click="e => { e.preventDefault(); shareGameLinkAndShowResult() }"><BIconShareFill /> Share game</a>
-                <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> Copied!</small>
-                <small v-else-if="false === copiedResult" class="text-warning me-2">not copied, use right click or long press</small>
+                <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click="e => { e.preventDefault(); shareGameLinkAndShowResult() }"><BIconShareFill /> {{ $t('share_game') }}</a>
+                <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> {{ $t('copied!') }}</small>
+                <small v-else-if="false === copiedResult" class="text-warning me-2">{{ $t('not_copied') }}</small>
             </div>
         </div>
 
         <div class="block-analyze" v-if="hostedGameClient.getGame().isEnded()">
             <div class="container-fluid">
                 <div v-if="null === gameAnalyze" class="text-center">
-                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">Analyze game</button>
+                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('game_analyze.analyze_by_ai') }}</button>
                 </div>
                 <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height">
-                    Analyze requested…
+                    {{ $t('game_analyze.requested') }}
                     <br>
                     <small class="text-body-secondary">{{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }}</small>
                 </p>
                 <p v-else-if="null === gameAnalyze.analyze" class="text-center text-warning analyze-min-height">
-                    Analyze errored!
-                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">Try again</button>
+                    {{ $t('game_analyze.errored') }}
+                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('try_again') }}</button>
                 </p>
                 <div v-else class="analyze-min-height">
-                    <small>Game analyze by AI</small>
+                    <small>{{ $t('game_analyze.analyze_by_ai') }}</small>
                     <AppGameAnalyze :analyze="gameAnalyze.analyze" />
                 </div>
             </div>
@@ -336,7 +345,7 @@ const doAnalyzeGame = async () => {
 
         <div class="block-fill-rest">
             <div class="container-fluid">
-                <small>Chat</small>
+                <small>{{ $t('chat') }}</small>
             </div>
             <div class="chat-messages" ref="chatMessagesElement">
                 <div class="container-fluid">
@@ -348,7 +357,7 @@ const doAnalyzeGame = async () => {
                         <span class="time text-muted">{{ formatHour(message.createdAt) }}</span>
                         <span>&nbsp;</span>
                         <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
-                        <span class="player fst-italic" v-else>System</span>
+                        <span class="player fst-italic" v-else>{{ $t('system') }}</span>
                         <span>&nbsp;</span>
                         <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
                         <span class="content" v-html="renderMessage(message.content)"></span>
@@ -359,16 +368,16 @@ const doAnalyzeGame = async () => {
             <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGame())">
                 <div class="container-fluid mb-3">
                     <div class="input-group">
-                        <input v-model="chatInput" class="form-control" aria-describedby="message-submit" placeholder="Message…" maxlength="250" />
-                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><BIconSendFill /> Send</button>
+                        <input v-model="chatInput" class="form-control" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />
+                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><BIconSendFill /> {{ $t('send_chat_message') }}</button>
                     </div>
-                    <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / 250 characters</div>
+                    <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / {{ $t('n_characters', { count: 250 }) }}</div>
                 </div>
             </form>
         </div>
 
         <div class="block-close bg-dark-subtle">
-            <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">Close <BIconArrowBarRight /></button>
+            <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">{{ $t('close') }} <BIconArrowBarRight /></button>
         </div>
     </div>
 </template>

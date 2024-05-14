@@ -71,6 +71,19 @@ yarn hex create-katahex-bots
 yarn hex create-mohex-bots
 ```
 
+## Translations
+
+PlayHex uses [i18next](https://www.i18next.com/)
+and [i18next-vue](https://github.com/i18next/i18next-vue)
+to translate user interface.
+
+You can contribute to translations without any coding,
+thanks to [Weblate](https://weblate.org).
+
+Here are all available translations, just click to help translating or add a new language:
+
+[![Translation status](https://hosted.weblate.org/widget/playhex/multi-auto.svg)](https://hosted.weblate.org/engage/playhex/)
+
 ## Admin endpoints
 
 Some API endpoints exists for admin tasks (i.e persist all memory games into database manually).

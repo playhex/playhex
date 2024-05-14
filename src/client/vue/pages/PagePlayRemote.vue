@@ -397,28 +397,38 @@ const unreadMessages = (): number => {
 
             <nav class="menu-game navbar" v-if="null !== hostedGameClient">
                 <div class="buttons container-fluid">
-                    <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()"><BIconFlag /><span class="btn-label"> Resign</span></button>
-                    <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()"><BIconXLg /><span class="btn-label"> Cancel</span></button>
-                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()"><BIconCheck /> Confirm<span class="btn-label"> move</span></button>
+                    <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()">
+                        <BIconFlag />
+                        <span class="d-none d-md-inline">{{ ' ' + $t('resign') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()">
+                        <BIconXLg />
+                        <span class="d-none d-md-inline">{{ ' ' + $t('cancel') }}</span>
+                    </button>
+                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()">
+                        <BIconCheck />
+                        <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
+                        <span class="d-none d-md-inline">{{ ' ' + $t('confirm_move.button_label') }}</span>
+                    </button>
                     <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
                         <BIconRepeat />
-                        <span class="btn-label"> Rematch</span>
+                        <span class="d-none d-md-inline">{{ ' ' + $t('rematch.label') }}</span>
                     </button>
                     <template v-else-if="hostedGameClient.getRematchGameId() != null">
                         <button type="button" class="btn btn-success" v-if="canAcceptRematch" @click="createOrAcceptRematch()">
-                            Accept rematch
+                            {{ ' ' + $t('rematch.accept') }}
                         </button>
                         <button type="button" class="btn btn-outline-primary" v-else @click="viewRematch()">
-                            View rematch
+                            {{ ' ' + $t('rematch.view') }}
                         </button>
                     </template>
                     <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
                         <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
                         <BIconChatRight v-else />
-                        <span class="btn-label"> Chat</span>
+                        <span class="d-none d-md-inline">{{ ' ' + $t('chat') }}</span>
                         <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             {{ unreadMessages() }}
-                            <span class="d-none"> unread messages</span>
+                            <span class="d-none">{{ ' ' + $t('unread_messages') }}</span>
                         </span>
                     </button>
 
@@ -437,7 +447,7 @@ const unreadMessages = (): number => {
     </div>
 
     <div v-if="null === hostedGameClient || null === gameView" class="container-fluid my-3">
-        <p class="lead text-center">Loading game…</p>
+        <p class="lead text-center">{{ $t('loading_game') }}</p>
     </div>
 </template>
 
@@ -464,12 +474,6 @@ const unreadMessages = (): number => {
     display flex
     justify-content center
     gap 0.5em
-
-.btn-label
-    display none
-
-    @media (min-width: 768px)
-        display inline
 
 .game-and-sidebar-container
     position relative

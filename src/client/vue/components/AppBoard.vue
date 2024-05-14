@@ -111,7 +111,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                         :player="players[0]"
                         classes="text-danger"
                     />
-                    <span v-else class="fst-italic">waiting…</span>
+                    <span v-else class="fst-italic">{{ $t('waiting') }}</span>
                 </p>
                 <AppChrono
                     v-if="timeControlOptions && timeControlValues"
@@ -126,7 +126,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                         :player="players[1]"
                         classes="text-primary"
                     />
-                    <span v-else class="fst-italic">waiting…</span>
+                    <span v-else class="fst-italic">{{ $t('waiting') }}</span>
                 </p>
                 <AppChrono
                     v-if="timeControlOptions && timeControlValues"
@@ -135,7 +135,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
                 />
             </div>
         </div>
-        <p v-else>Initializing game…</p>
+        <p v-else>{{ $t('initializing_game') }}</p>
     </div>
 </template>
 

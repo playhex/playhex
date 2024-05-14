@@ -41,7 +41,7 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
             <div class="modal-dialog">
                 <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
                     <div class="modal-header">
-                        <h5 class="modal-title">Game options</h5>
+                        <h5 class="modal-title">{{ $t('game_create.game_options') }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
@@ -58,13 +58,13 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> Less options</button>
+                        ><BIconCaretDownFill /> {{ $t('game_create.less_options') }}</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> More options</button>
+                        ><BIconCaretRight /> {{ $t('game_create.more_options') }}</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
@@ -76,8 +76,8 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">Cancel</button>
-                        <button type="submit" class="btn btn-success">Create 1v1</button>
+                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
+                        <button type="submit" class="btn btn-success">{{ $t('create_1v1') }}</button>
                     </div>
                 </form>
             </div>

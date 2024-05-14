@@ -59,10 +59,10 @@ const onSubmit = async () => {
         <div class="row">
             <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
                 <form @submit="e => { e.preventDefault(); onSubmit(); }">
-                    <h2 class="mt-4 text-center">Log in</h2>
+                    <h2 class="mt-4 text-center">{{ $t('log_in') }}</h2>
 
                     <div class="mb-3">
-                        <label for="form-pseudo" class="form-label">Username</label>
+                        <label for="form-pseudo" class="form-label">{{ $t('username') }}</label>
                         <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="emailHelp">
                         <div class="invalid-feedback">
                             {{ pseudoValidation?.reason }}
@@ -70,7 +70,7 @@ const onSubmit = async () => {
                     </div>
 
                     <div class="mb-3">
-                        <label for="form-password" class="form-label">Password</label>
+                        <label for="form-password" class="form-label">{{ $t('password') }}</label>
                         <input v-model="password" required type="password" class="form-control form-control-lg" :class="toInputClass(passwordValidation)" id="form-password">
                         <div class="invalid-feedback">
                             {{ passwordValidation?.reason }}
@@ -80,12 +80,16 @@ const onSubmit = async () => {
                     <p v-if="globalError" class="text-danger">{{ globalError }}</p>
 
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-lg btn-primary">Log in</button>
+                        <button type="submit" class="btn btn-lg btn-primary">{{ $t('log_in') }}</button>
                     </div>
                 </form>
 
                 <div class="mt-4 text-center">
-                    <p>No account? <router-link :to="{ name: 'signup' }">Sign up</router-link> instead</p>
+                    <i18next :translation="$t('no_account_sign_up_instead')">
+                        <template #signUp>
+                            <router-link :to="{ name: 'signup' }">{{ $t('no_account_sign_up_instead_link_label') }}</router-link>
+                        </template>
+                    </i18next>
                 </div>
             </div>
         </div>

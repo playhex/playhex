@@ -30,7 +30,7 @@ const {
             registerLink="https://challonge.com/hex_monthly_18"
         />
 
-        <h3>Online ({{ null === totalPlayers ? '…' : totalPlayers }})</h3>
+        <h3>{{ $t('n_online_players', { n: null === totalPlayers ? '…' : totalPlayers }) }}</h3>
 
         <p
             v-for="player in players"

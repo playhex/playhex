@@ -26,7 +26,7 @@ const candency = timeControlToCadencyName(gameOptions.value);
 
         {{ timeControlToString(gameOptions.timeControl) }}
 
-        <small class="text-body-secondary d-none d-sm-inline">(~{{ secondsToDuration(Math.round(calcAverageSecondsPerMove(gameOptions.timeControl, gameOptions.boardsize)), 1) }}&nbsp;/&nbsp;move)</small>
+        <small class="text-body-secondary d-none d-sm-inline">(~{{ secondsToDuration(Math.round(calcAverageSecondsPerMove(gameOptions.timeControl, gameOptions.boardsize)), 1) }}&nbsp;/&nbsp;{{ $t('move') }})</small>
     </span>
 </template>
 

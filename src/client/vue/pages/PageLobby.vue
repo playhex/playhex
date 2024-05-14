@@ -18,9 +18,12 @@ import { BIconEye, BIconTrophy, BIconPeople, BIconRobot } from 'bootstrap-icons-
 import AppTimeControlLabelVue from '../components/AppTimeControlLabel.vue';
 import { useSeoMeta } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
+import i18next from 'i18next';
+
+const { t } = i18next;
 
 useSeoMeta({
-    titleTemplate: title => `Lobby - ${title}`,
+    titleTemplate: title => `${t('lobby_title')} - ${title}`,
 });
 
 const router = useRouter();
@@ -190,32 +193,32 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
     <div class="container-fluid my-3">
         <div class="row">
             <div class="col-sm-9">
-                <h3>New game</h3>
+                <h3>{{ $t('new_game') }}</h3>
 
                 <div class="play-buttons row">
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1AndJoinGame()"><BIconPeople class="fs-3" /><br>1v1</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1AndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1') }}</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><BIconRobot class="fs-3" /><br>Play vs AI</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('play_vs_ai') }}</button>
                     </div>
                     <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><BIconRobot class="fs-3" /><br>Play vs offline AI</button>
+                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><BIconRobot class="fs-3" /><br>{{ $t('play_vs_offline_ai') }}</button>
                     </div>
                 </div>
 
-                <h3>Join a game</h3>
+                <h3>{{ $t('lobby.join_a_game') }}</h3>
 
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th scope="col"></th>
-                                <th scope="col">Host</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Time control</th>
-                                <th scope="col">Rules</th>
-                                <th scope="col">Created</th>
+                                <th scope="col">{{ $t('game.host') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.rules') }}</th>
+                                <th scope="col">{{ $t('game.created') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -228,12 +231,12 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)"
                                         class="btn me-3 btn-sm btn-success"
                                         @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
-                                    >Accept</button>
+                                    >{{ $t('game.accept') }}</button>
 
                                     <router-link
                                         class="btn me-3 btn-sm btn-link"
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
-                                    >Watch</router-link>
+                                    >{{ $t('game.watch') }}</router-link>
                                 </td>
                                 <td><AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" /></td>
                                 <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
@@ -246,21 +249,21 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         </tbody>
                     </table>
                 </div>
-                <p v-else>No games available right now. Create a new one!</p>
+                <p v-else>{{ $t('lobby.no_waiting_games') }}</p>
 
-                <h4><BIconEye /> Watch current games</h4>
+                <h4><BIconEye /> {{ $t('lobby.watch_current_games') }}</h4>
 
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th scope="col"></th>
-                                <th scope="col" class="d-none d-sm-table-cell">Red</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Blue</th>
-                                <th scope="col" class="d-table-cell d-sm-none">Players</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Time control</th>
-                                <th scope="col">Started</th>
+                                <th scope="col" class="d-none d-sm-table-cell">{{ $t('game.red') }}</th>
+                                <th scope="col" class="d-none d-sm-table-cell">{{ $t('game.blue') }}</th>
+                                <th scope="col" class="d-table-cell d-sm-none">{{ $t('players') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.started') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -272,7 +275,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <router-link
                                         class="btn btn-sm btn-link"
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
-                                    >Watch</router-link>
+                                    >{{ $t('game.watch') }}</router-link>
                                 </td>
                                 <td class="d-none d-sm-table-cell"><AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" /></td>
                                 <td class="d-none d-sm-table-cell"><AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" /></td>
@@ -290,20 +293,20 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         </tbody>
                     </table>
                 </div>
-                <p v-else>There are no games in progress right now.</p>
+                <p v-else>{{ $t('lobby.no_playing_games') }}</p>
 
-                <h4><BIconTrophy /> Finished games</h4>
+                <h4><BIconTrophy /> {{ $t('finished_games') }}</h4>
 
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isFinished)" class="table-responsive">
                     <table class="table table-responsive" style="margin-bottom: 0">
                         <thead>
                             <tr>
                                 <th scope="col"></th>
-                                <th scope="col">Won</th>
-                                <th scope="col">Lost</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Time control</th>
-                                <th scope="col">Finished</th>
+                                <th scope="col">{{ $t('game.won') }}</th>
+                                <th scope="col">{{ $t('game.lost') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.finished') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -315,7 +318,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                     <router-link
                                         class="btn btn-sm btn-link"
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
-                                    >Review</router-link>
+                                    >{{ $t('game.review') }}</router-link>
                                 </td>
                                 <template v-if="hostedGameClient.getHostedGame()?.gameData?.winner != null">
                                     <td><AppPseudoWithOnlineStatus :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" /></td>
@@ -336,7 +339,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                     <button
                         class="btn btn-sm btn-link"
                         @click="() => lobbyStore.loadMoreEndedGames()"
-                    >Load more finished games</button>
+                    >{{ $t('load_more') }}</button>
                 </div>
             </div>
             <div class="col-sm-3">

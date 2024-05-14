@@ -52,10 +52,10 @@ const onSubmit = async () => {
         <div class="row">
             <div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4">
                 <form @submit="e => { e.preventDefault(); onSubmit(); }">
-                    <h2 class="mt-4 text-center">Create an account</h2>
+                    <h2 class="mt-4 text-center">{{ $t('create_account') }}</h2>
 
                     <div class="mb-3">
-                        <label for="form-pseudo" class="form-label">Username</label>
+                        <label for="form-pseudo" class="form-label">{{ $t('username') }}</label>
                         <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="emailHelp">
                         <div class="invalid-feedback">
                             {{ pseudoValidation?.reason }}
@@ -63,19 +63,25 @@ const onSubmit = async () => {
                     </div>
 
                     <div class="mb-3">
-                        <label for="form-password" class="form-label">Password</label>
+                        <label for="form-password" class="form-label">{{ $t('password') }}</label>
                         <input v-model="password" required type="password" class="form-control form-control-lg" id="form-password">
                     </div>
 
                     <p v-if="globalError" class="text-danger">{{ globalError }}</p>
 
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-lg btn-success">Sign up</button>
+                        <button type="submit" class="btn btn-lg btn-success">{{ $t('sign_up') }}</button>
                     </div>
                 </form>
 
                 <div class="mt-4 text-center">
-                    <p>Already have an account? <router-link :to="{ name: 'login' }">Log in</router-link> instead</p>
+                    <p>
+                        <i18next :translation="$t('already_have_account_login_instead')">
+                            <template #login>
+                                <router-link :to="{ name: 'login' }">{{ $t('already_have_account_login_instead_link_label') }}</router-link>
+                            </template>
+                        </i18next>
+                    </p>
                 </div>
             </div>
         </div>

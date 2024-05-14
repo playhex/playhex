@@ -22,7 +22,6 @@ import { useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
-import type { Outcome } from '@shared/game-engine/Types';
 
 const { slug } = useRoute().params;
 
@@ -204,16 +203,6 @@ const clickLogout = async () => {
         },
     });
 };
-
-const lossOutcomeToString = (outcome: Outcome): string => {
-    switch (outcome) {
-        case 'resign': return 'resign';
-        case 'forfeit': return 'forfeit';
-        case 'time': return 'timeout';
-        case null:
-        default: return 'loss';
-    }
-};
 </script>
 
 <template>
@@ -226,9 +215,9 @@ const lossOutcomeToString = (outcome: Outcome): string => {
             <div>
                 <h2><AppPseudo v-if="player" :player="player" /><template v-else>…</template></h2>
 
-                <p v-if="player && !player.isGuest">Account created on {{ player?.createdAt
+                <p v-if="player && !player.isGuest">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
-                    : '…'
+                    : '…' })
                 }}</p>
 
                 <div v-if="isMe() && null !== player" class="player-btns">
@@ -236,12 +225,12 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                         <router-link
                             :to="{ name: 'signup' }"
                             class="btn btn-success"
-                        ><BIconPersonUp /> Create account</router-link>
+                        ><BIconPersonUp /> {{ $t('create_account') }}</router-link>
 
                         <router-link
                             :to="{ name: 'login' }"
                             class="btn btn-primary"
-                        >Log in</router-link>
+                        >{{ $t('log_in') }}</router-link>
                     </template>
 
                     <template v-else>
@@ -249,29 +238,29 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                             type="button"
                             class="btn btn-sm btn-outline-warning"
                             @click="clickLogout()"
-                        >Log out <BIconBoxArrowRight /></button>
+                        >{{ $t('log_out') }} <BIconBoxArrowRight /></button>
                     </template>
 
                     <router-link
                         :to="{ name: 'settings' }"
                         class="btn btn-sm btn-outline-primary"
-                    ><BIconGear /> Settings</router-link>
+                    ><BIconGear /> {{ $t('player_settings.title') }}</router-link>
                 </div>
             </div>
         </div>
 
-        <h3 class="mt-4">Current games</h3>
+        <h3 class="mt-4">{{ $t('player_current_games') }}</h3>
 
         <div v-if="player" class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col">Opponent</th>
-                        <th scope="col">Size</th>
-                        <th scope="col">Time control</th>
-                        <th scope="col">Rules</th>
-                        <th scope="col">Started</th>
+                        <th scope="col">{{ $t('game.opponent') }}</th>
+                        <th scope="col">{{ $t('game.size') }}</th>
+                        <th scope="col">{{ $t('game.time_control') }}</th>
+                        <th scope="col">{{ $t('game.rules') }}</th>
+                        <th scope="col">{{ $t('game.started') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -283,7 +272,7 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                             <router-link
                                 :to="{ name: 'online-game', params: { gameId: game.getId() } }"
                                 class="btn btn-sm btn-link"
-                            >Watch</router-link>
+                            >{{ $t('game.watch') }}</router-link>
                         </td>
                         <td><AppPseudoWithOnlineStatusVue :player="(game.getOtherPlayer(player) as Player)" /></td>
                         <td>{{ game.getHostedGame().gameOptions.boardsize }}</td>
@@ -297,19 +286,19 @@ const lossOutcomeToString = (outcome: Outcome): string => {
             </table>
         </div>
 
-        <h3>Game history</h3>
+        <h3>{{ $t('player_game_history') }}</h3>
 
         <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col">Outcome</th>
-                        <th scope="col">Opponent</th>
-                        <th scope="col">Size</th>
-                        <th scope="col">Time control</th>
-                        <th scope="col">Rules</th>
-                        <th scope="col">Finished</th>
+                        <th scope="col">{{ $t('game.outcome') }}</th>
+                        <th scope="col">{{ $t('game.opponent') }}</th>
+                        <th scope="col">{{ $t('game.size') }}</th>
+                        <th scope="col">{{ $t('game.time_control') }}</th>
+                        <th scope="col">{{ $t('game.rules') }}</th>
+                        <th scope="col">{{ $t('game.finished') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -321,10 +310,10 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                             <router-link
                                 :to="{ name: 'online-game', params: { gameId: game.id } }"
                                 class="btn btn-sm btn-link"
-                            >Review</router-link>
+                            >{{ $t('game.review') }}</router-link>
                         </td>
-                        <td v-if="hasWon(game)" style="width: 7em" class="text-success">win</td>
-                        <td v-else style="width: 7em" class="text-danger">{{ lossOutcomeToString(game?.gameData?.outcome ?? null) }}</td>
+                        <td v-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
+                        <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + game?.gameData?.outcome ?? 'loss') }}</td>
                         <td><AppPseudoWithOnlineStatusVue :player="getOpponent(game)" /></td>
                         <td>{{ game.gameOptions.boardsize }}</td>
                         <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
@@ -338,7 +327,7 @@ const lossOutcomeToString = (outcome: Outcome): string => {
                             role="button"
                             class="btn btn-sm btn-link"
                             @click="() => loadMoreEndedGames()"
-                        >Load more</button>
+                        >{{ $t('load_more') }}</button>
                     </tr>
                 </tbody>
             </table>
@@ -346,7 +335,7 @@ const lossOutcomeToString = (outcome: Outcome): string => {
     </div>
 
     <div v-else class="container">
-        <p class="text-center lead mt-2">Looks like there is no such player.</p>
+        <p class="text-center lead mt-2">{{ $t('no_such_player') }}</p>
     </div>
 </template>
 

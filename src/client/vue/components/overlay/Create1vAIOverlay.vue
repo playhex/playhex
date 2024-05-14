@@ -107,13 +107,13 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
             <div class="modal-dialog">
                 <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
                     <div class="modal-header">
-                        <h5 class="modal-title">Game options</h5>
+                        <h5 class="modal-title">{{ $t('create_game.game_options') }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
-                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger"><BIconExclamationTriangle /> <small>No worker can compute moves right now. Only random bots are available.</small></p>
-                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning"><BIconExclamationTriangle /> <small>No fast worker is online right now. Only limited AI are available.</small></p>
+                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger"><BIconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
+                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning"><BIconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
                         </template>
 
                         <ul class="nav nav-pills nav-justified ai-engine-choice">
@@ -158,13 +158,13 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> Less options</button>
+                        ><BIconCaretDownFill /> {{ $t('game_create.less_options') }}</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> More options</button>
+                        ><BIconCaretRight /> {{ $t('game_create.more_options') }}</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
@@ -176,8 +176,8 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">Cancel</button>
-                        <button type="submit" class="btn btn-success">Play vs AI</button>
+                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
+                        <button type="submit" class="btn btn-success">{{ $t('play_vs_ai') }}</button>
                     </div>
                 </form>
             </div>

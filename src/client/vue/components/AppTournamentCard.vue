@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { onUnmounted, ref } from 'vue';
-import { secondsToTime } from '@shared/app/timeControlUtils';
 import { BIconTrophy, BIconCircleFill } from 'bootstrap-icons-vue';
+import { formatDistanceToNowStrict } from 'date-fns';
 
 const props = defineProps({
     name: {
@@ -21,11 +21,9 @@ const props = defineProps({
 
 const { name, registerLink, startDate } = props;
 
-const startsInStr = (): string => {
-    const seconds = Math.floor((startDate.getTime() - new Date().getTime()) / 1000);
-
-    return secondsToTime(seconds);
-};
+const startsInStr = (): string => formatDistanceToNowStrict(startDate, {
+    addSuffix: true,
+});
 
 const tournamentStartsStr = ref(startsInStr());
 
@@ -67,14 +65,14 @@ const isReallySoon = (): boolean => {
     <div v-if="shouldDisplay()" class="card card-bg-icon border-warning mb-4">
         <BIconTrophy style="top: 1rem; right: 0.5rem; font-size: 8rem" class="text-warning" />
         <div class="card-body">
-            <h6 class="card-subtitle mb-2 text-body-secondary">Tournament</h6>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{ $t('tournament') }}</h6>
             <h4 class="card-title">{{ name }}</h4>
 
-            <p v-if="!started()" :class="isReallySoon() ? 'text-warning lead' : 'text-body-secondary'">Starts in {{ tournamentStartsStr }}</p>
-            <p v-else class="m-0"><BIconCircleFill class="text-danger" /> <span class="lead">Now!</span></p>
+            <p v-if="!started()" :class="isReallySoon() ? 'text-warning lead' : 'text-body-secondary'">{{ tournamentStartsStr }}</p>
+            <p v-else class="m-0"><BIconCircleFill class="text-danger" /> <span class="lead">{{ $t('now!') }}</span></p>
 
-            <a v-if="!started()" :href="registerLink" target="_blank" class="btn btn-warning">Register on Challonge</a>
-            <a v-else :href="registerLink" target="_blank" class="btn btn-link">See progression on Challonge</a>
+            <a v-if="!started()" :href="registerLink" target="_blank" class="btn btn-warning">{{ $t('register_on_challonge') }}</a>
+            <a v-else :href="registerLink" target="_blank" class="btn btn-link">{{ $t('see_progression_on_challonge') }}</a>
         </div>
     </div>
 </template>

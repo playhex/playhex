@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import TimeControlType from '../time-control/TimeControlType';
 import HostedGameOptions from './models/HostedGameOptions';
 
@@ -82,15 +83,15 @@ export const secondsToTime = (seconds: number): string => {
 
     if (parts[0] > 0) {
         return parts[1] > 0
-            ? `${parts[0]}d ${parts[1]}h`
-            : `${parts[0]}d`
+            ? `${parts[0]}${t('short_time_unit.day')} ${parts[1]}${t('short_time_unit.hour')}`
+            : `${parts[0]}${t('short_time_unit.day')}`
         ;
     }
 
     if (parts[1] > 0) {
         return parts[2] > 0
-            ? `${parts[1]}h${String(parts[2]).padStart(2, '0')}`
-            : `${parts[1]}h`
+            ? `${parts[1]}${t('short_time_unit.hour')}${String(parts[2]).padStart(2, '0')}`
+            : `${parts[1]}${t('short_time_unit.hour')}`
         ;
     }
 
@@ -121,19 +122,19 @@ export const secondsToDuration = (seconds: number, precision = 2): string => {
     const tokens = [];
 
     if (parts[0] > 0) {
-        tokens.push(parts[0] + 'd');
+        tokens.push(parts[0] + t('short_time_unit.day'));
     }
 
     if (parts[1] > 0) {
-        tokens.push(parts[1] + 'h');
+        tokens.push(parts[1] + t('short_time_unit.hour'));
     }
 
     if (parts[2] > 0) {
-        tokens.push(parts[2] + 'min');
+        tokens.push(parts[2] + t('short_time_unit.minute'));
     }
 
     if (parts[3] > 0) {
-        tokens.push(parts[3] + 's');
+        tokens.push(parts[3] + t('short_time_unit.second'));
     }
 
     return tokens.slice(0, precision).join('');
@@ -162,11 +163,11 @@ export const timeControlToString = (timeControl: TimeControlType): string => {
         }
 
         case 'absolute': {
-            return secondsToDuration(timeControl.options.secondsPerPlayer) + ' / player';
+            return secondsToDuration(timeControl.options.secondsPerPlayer) + ' / ' + t('_player');
         }
 
         case 'simple': {
-            return secondsToDuration(timeControl.options.secondsPerMove) + ' / move';
+            return secondsToDuration(timeControl.options.secondsPerMove) + ' / ' + t('move');
         }
     }
 };

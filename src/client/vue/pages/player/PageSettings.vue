@@ -9,6 +9,8 @@ import { watch, Ref, ref } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { authChangePassword } from '@client/apiClient';
+import { availableLocales, setLocale } from '../../../../shared/app/i18n';
+import i18next from 'i18next';
 
 useSeoMeta({
     robots: 'noindex',
@@ -39,14 +41,14 @@ watch(
  * Board orientation
  */
 const landscapeOrientations = [
-    { value: 0, label: 'Flat' },
-    { value: 10, label: 'Flat 2' },
-    { value: 11, label: 'Diamond' },
+    { value: 0, labelTransKey: 'board_orientation.flat' },
+    { value: 10, labelTransKey: 'board_orientation.flat_2' },
+    { value: 11, labelTransKey: 'board_orientation.diamond' },
 ];
 const portraitOrientations = [
-    { value: 1, label: 'Flat' },
-    { value: 9, label: 'Flat 2' },
-    { value: 2, label: 'Diamond' },
+    { value: 1, labelTransKey: 'board_orientation.flat' },
+    { value: 9, labelTransKey: 'board_orientation.flat_2' },
+    { value: 2, labelTransKey: 'board_orientation.diamond' },
 ];
 
 const oldPassword = ref('');
@@ -96,63 +98,75 @@ const submitPasswordChange = async () => {
 
 <template>
     <div class="container my-3">
-        <h2>Settings</h2>
+        <h2>{{ $t('player_settings.title') }}</h2>
 
-        <h3>Theme</h3>
+        <h3>{{ $t('language') }}</h3>
+
+        <div class="row">
+            <div class="col-sm-8 col-md-4">
+                <select class="form-select">
+                    <option
+                        v-for="(label, locale) in availableLocales"
+                        :key="locale"
+                        @click="() => setLocale(locale)"
+                        :selected="locale === i18next.language"
+                    >{{ label }}</option>
+                </select>
+            </div>
+        </div>
+
+        <h3>{{ $t('background_theme.title') }}</h3>
 
         <div class="btn-group" role="group" aria-label="Dark or light theme switcher">
             <input type="radio" class="btn-check" v-model="selectedTheme" value="light" id="btn-theme-light" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-light"><BIconBrightnessHighFill /> Light</label>
+            <label class="btn btn-outline-primary" for="btn-theme-light"><BIconBrightnessHighFill /> {{ $t('background_theme.light') }}</label>
 
             <input type="radio" class="btn-check" v-model="selectedTheme" value="dark" id="btn-theme-dark" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-dark"><BIconMoonStarsFill /> Dark</label>
+            <label class="btn btn-outline-primary" for="btn-theme-dark"><BIconMoonStarsFill /> {{ $t('background_theme.dark') }}</label>
 
             <input type="radio" class="btn-check" v-model="selectedTheme" value="auto" id="btn-theme-auto" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> Auto</label>
+            <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> {{ $t('background_theme.auto') }}</label>
         </div>
 
-        <h3>Confirm move</h3>
+        <h3>{{ $t('confirm_move.title') }}</h3>
 
-        <p>
-            To prevent misclicks, you can require confirmation
-            before submitting a move.
-        </p>
+        <p>{{ $t('confirm_move.description') }}</p>
 
         <template v-if="playerSettings">
             <div class="mb-3 row">
-                <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><BIconLightningChargeFill /> Blitz</label>
+                <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><BIconLightningChargeFill /> {{ $t('game_candency.blitz') }}</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
-                        <option :value="false">Send immediately</option>
-                        <option :value="true">Ask confirmation</option>
+                        <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
+                        <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
                     </select>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><BIconAlarmFill /> Normal</label>
+                <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><BIconAlarmFill /> {{ $t('game_candency.normal') }}</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
-                        <option :value="false">Send immediately</option>
-                        <option :value="true">Ask confirmation</option>
+                        <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
+                        <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
                     </select>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> Correspondence</label>
+                <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> {{ $t('game_candency.correspondence') }}</label>
                 <div class="col-sm-8 col-md-4">
                     <select v-model="playerSettings.confirmMoveCorrespondance" class="form-select" id="confirm-move-correspondace">
-                        <option :value="false">Send immediately</option>
-                        <option :value="true">Ask confirmation</option>
+                        <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
+                        <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
                     </select>
                 </div>
             </div>
         </template>
 
-        <h3>Board orientation</h3>
+        <h3>{{ $t('board_orientation.title') }}</h3>
 
         <template v-if="playerSettings">
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label"><BIconPcDisplayHorizontal /> Landscape</label>
+                <label class="col-sm-4 col-md-3 col-form-label"><BIconPcDisplayHorizontal /> {{ $t('landscape') }}</label>
                 <div class="col-sm-8 col-md-9">
                     <div class="btn-group" role="group">
                         <template v-for="orientation in landscapeOrientations" :key="orientation.value">
@@ -160,7 +174,7 @@ const submitPasswordChange = async () => {
                             <label class="btn" :for="'landscape-radio-' + orientation.value">
                                 <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
                                 <br>
-                                {{ orientation.label }}
+                                {{ $t(orientation.labelTransKey) }}
                             </label>
                         </template>
                     </div>
@@ -168,7 +182,7 @@ const submitPasswordChange = async () => {
             </div>
 
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label"><BIconPhone /> Portrait</label>
+                <label class="col-sm-4 col-md-3 col-form-label"><BIconPhone /> {{ $t('portrait') }}</label>
                 <div class="col-sm-8 col-md-9">
                     <div class="btn-group" role="group">
                         <template v-for="orientation in portraitOrientations" :key="orientation.value">
@@ -176,7 +190,7 @@ const submitPasswordChange = async () => {
                             <label class="btn" :for="'portrait-radio-' + orientation.value">
                                 <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
                                 <br>
-                                {{ orientation.label }}
+                                {{ $t(orientation.labelTransKey) }}
                             </label>
                         </template>
                     </div>
@@ -184,7 +198,7 @@ const submitPasswordChange = async () => {
             </div>
         </template>
 
-        <h3>Board</h3>
+        <h3>{{ $t('board') }}</h3>
 
         <template v-if="playerSettings">
             <div class="form-check form-switch">
@@ -194,9 +208,9 @@ const submitPasswordChange = async () => {
         </template>
 
         <form v-if="loggedInPlayer && !loggedInPlayer.isGuest" @submit.prevent="submitPasswordChange">
-            <h3>Change password</h3>
+            <h3>{{ $t('change_password') }}</h3>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-old">Old password</label>
+                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-old">{{ $t('old_password') }}</label>
                 <div class="col-sm-8 col-md-4">
                     <input v-model="oldPassword" required type="password" class="form-control" :class="toInputClass(oldPasswordValidation)" id="change-password-old">
                     <div class="invalid-feedback">
@@ -205,13 +219,13 @@ const submitPasswordChange = async () => {
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new">New password</label>
+                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new">{{ $t('new_password') }}</label>
                 <div class="col-sm-8 col-md-4">
                     <input v-model="newPassword" required type="password" class="form-control" id="change-password-new">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new-confirm">Confirm new password</label>
+                <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new-confirm">{{ $t('confirm_new_password') }}</label>
                 <div class="col-sm-8 col-md-4">
                     <input v-model="newPasswordConfirmed" required type="password" class="form-control" :class="toInputClass(confirmPasswordValidation)" id="change-password-new-confirm">
                     <div class="invalid-feedback">
@@ -221,7 +235,7 @@ const submitPasswordChange = async () => {
             </div>
             <p v-if="changePasswordError" class="text-danger">{{ changePasswordError }}</p>
             <p v-if="changePasswordSuccess" class="text-success">{{ changePasswordSuccess }}</p>
-            <button type="submit" class="btn btn-outline-primary">Update password</button>
+            <button type="submit" class="btn btn-outline-primary">{{ $t('update_password') }}</button>
         </form>
     </div>
 </template>

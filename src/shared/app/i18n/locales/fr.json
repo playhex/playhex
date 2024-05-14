@@ -1,0 +1,65 @@
+{
+    "lobby_title": "Accueil",
+    "lobby": {
+        "no_waiting_games": "Pas de partie en attente pour l'instant. Créez-en une !",
+        "watch_current_games": "Observer les parties",
+        "join_a_game": "Rejoindre une partie",
+        "no_playing_games": "Pas de partie en cours pour l'instant."
+    },
+    "game": {
+        "host": "Hôte",
+        "size": "Taille",
+        "time_control": "Horloge",
+        "rules": "Règles",
+        "created": "Créée",
+        "accept": "Accepter",
+        "red": "Rouge",
+        "blue": "Bleu",
+        "started": "Démarrée",
+        "finished": "Terminée",
+        "review": "Revoir",
+        "won": "Gagnant",
+        "lost": "Perdant",
+        "watch": "Observer"
+    },
+    "player_settings": {
+        "title": "Préférences"
+    },
+    "background_theme": {
+        "title": "Thème",
+        "dark": "Sombre",
+        "light": "Clair",
+        "auto": "Auto"
+    },
+    "2dots": "{{s}} :",
+    "new_game": "Nouvelle partie",
+    "players": "Joueurs",
+    "load_more": "Charger plus",
+    "n_online_players": "En ligne ({{n}})",
+    "guest": "Invité",
+    "finished_games": "Parties terminées",
+    "1v1": "1c1",
+    "tournament": "Tournoi",
+    "play_vs_ai": "Jouer contre IA",
+    "play_vs_offline_ai": "Jouer contre IA hors-ligne",
+    "_move": "coup",
+    "account_created_on": "Compte créé le {{date}}",
+    "board_orientation": {
+        "title": "Orientation du plateau",
+        "flat": "Plat",
+        "flat_2": "Plat 2",
+        "diamond": "Diamant"
+    },
+    "short_time_unit": {
+        "day": "j",
+        "hour": "h",
+        "minute": "min",
+        "second": "s"
+    },
+    "player_won_by": {
+        "default": "{player} a gagné la partie !",
+        "time": "{player} a gangé par temps !",
+        "resign": "{player} a gagné par abandon !",
+        "forfeit": "{player} a gagné par forfait !"
+    }
+}
