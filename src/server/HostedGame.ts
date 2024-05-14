@@ -449,10 +449,12 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             if (!this.hostedGameEntity.hostedGameToPlayers[i]) {
                 this.hostedGameEntity.hostedGameToPlayers[i] = new HostedGameToPlayer();
                 this.hostedGameEntity.hostedGameToPlayers[i].hostedGame = this.hostedGameEntity;
+                this.hostedGameEntity.hostedGameToPlayers[i].order = i;
             }
 
-            this.hostedGameEntity.hostedGameToPlayers[i].player = this.players[i];
-            this.hostedGameEntity.hostedGameToPlayers[i].order = i;
+            if (this.hostedGameEntity.hostedGameToPlayers[i].player !== this.players[i]) {
+                this.hostedGameEntity.hostedGameToPlayers[i].player = this.players[i];
+            }
         }
 
         return this.hostedGameEntity;

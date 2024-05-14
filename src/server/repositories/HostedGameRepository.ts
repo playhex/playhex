@@ -237,9 +237,10 @@ export default class HostedGameRepository
         }
 
         const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions));
-        game.rematch = rematch.toData();
         this.io.to(Rooms.game(game.id))
             .emit('rematchAvailable', game.id, rematch.getId());
+
+        game.rematch = rematch.toData();
 
         try {
             await this.hostedGamePersister.persist(game.rematch);

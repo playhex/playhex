@@ -27,7 +27,7 @@ export default class HostedGame
     @Expose()
     host: Player;
 
-    @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true })
+    @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
     @Expose()
     @Type(() => HostedGameToPlayer)
     hostedGameToPlayers: HostedGameToPlayer[];
