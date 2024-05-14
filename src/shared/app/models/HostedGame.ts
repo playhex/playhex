@@ -42,17 +42,9 @@ export default class HostedGame
     @Type(() => HostedGameOptions)
     gameOptions: HostedGameOptions;
 
-    @Column({ type: 'json' })
+    @Column({ type: 'json', transformer: { from: (value: null | GameTimeData) => deserializeTimeControlValue(value), to: value => value } })
     @Expose()
-    @Transform(({ value }: { value: GameTimeData }) => {
-        value.players.forEach(player => {
-            if ('string' === typeof player.totalRemainingTime) {
-                player.totalRemainingTime = new Date(player.totalRemainingTime);
-            }
-        });
-
-        return value;
-    }, { toClassOnly: true })
+    @Transform(({ value }: { value: GameTimeData }) => deserializeTimeControlValue(value), { toClassOnly: true })
     timeControl: GameTimeData; // TODO create model for transform
 
     @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
@@ -79,3 +71,17 @@ export default class HostedGame
     @Type(() => Date)
     createdAt: Date = new Date();
 }
+
+const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {
+    if (null === timeControlValue) {
+        return null;
+    }
+
+    timeControlValue.players.forEach(player => {
+        if ('string' === typeof player.totalRemainingTime) {
+            player.totalRemainingTime = new Date(player.totalRemainingTime);
+        }
+    });
+
+    return timeControlValue;
+};
