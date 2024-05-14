@@ -78,11 +78,108 @@
     "game_rules": {
         "normal": "normales",
         "host_plays_first": "Hôte joue 1er",
-        "host_plays_second": "Hôte joue 2ème"
+        "host_plays_second": "Hôte joue 2ème",
+        "no_swap": "pas d'échange"
     },
     "log_out": "Déconnexion",
     "log_in": "Connexion",
     "share_game": "Partager la partie",
     "not_copied": "pas copié, utilisez le click droit ou appui long",
-    "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}."
+    "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}.",
+    "toggle_coords": "Afficher/masquer les coordonnées",
+    "player_current_games": "Parties en cours",
+    "no": "Non",
+    "n_characters_one": "{{count}} caractère",
+    "n_characters_many": "{{count}} caractères",
+    "n_characters_other": "{{count}} caractères",
+    "outcome": {
+        "win": "victoire",
+        "loss": "défaite",
+        "resign": "abandon",
+        "time": "temps",
+        "forfeit": "forfait"
+    },
+    "player_wins_by": {
+        "time": "{player} gagne au temps !",
+        "resign": "{player} gagne par abandon !",
+        "default": "{player} remporte la partie !",
+        "forfeit": "{player} gagne par forfait !"
+    },
+    "cancel": "Annuler",
+    "create_1v1": "Créer une partie 1c1",
+    "player": "joueur",
+    "now!": "Maintenant !",
+    "see_progression_on_challonge": "Voir la progression sur Challonge",
+    "chat_message_placeholder": "Message…",
+    "unread_messages": "messages non lus",
+    "send_chat_message": "Envoyer",
+    "landscape": "Paysage",
+    "portrait": "Portrait",
+    "game_analyze": {
+        "best_move": "meilleur coup",
+        "best": "meilleur :",
+        "analyze_by_ai": "Analyse de la partie par l'IA",
+        "analyze_game": "Analyser la partie",
+        "requested": "Analyse demandée…",
+        "errored": "L'analyse a échouée !"
+    },
+    "try_again": "Réessayer",
+    "language": "Langage",
+    "yes": "Oui",
+    "close": "Fermer",
+    "no_such_player": "Apparament, ce joueur n'existe pas.",
+    "loading_game": "Chargement de la partie…",
+    "register_on_challonge": "S'enregistrer sur Challonge",
+    "move": "coup",
+    "chat": "Tchat",
+    "system": "Système",
+    "resign": "Abandonner",
+    "change_password": "Changer le mot de passe",
+    "update_password": "Mettre à jour le mot de passe",
+    "old_password": "Ancien mot de passe",
+    "new_password": "Nouveau mot de passe",
+    "confirm_new_password": "Confirmer le mot de passe",
+    "game_candency": {
+        "blitz": "Blitz",
+        "normal": "Normale",
+        "correspondence": "Correspondance"
+    },
+    "confirm_move": {
+        "title": "Valider les coups",
+        "button_label": "Valider le coup",
+        "send_immediately": "Envoyer tout de suite",
+        "button_label_short": "Valider",
+        "ask_confirmation": "Valider avant d'envoyer",
+        "description": "Pour éviter les erreurs de clics, vous pouvez valider vos coups avant de les envoyer."
+    },
+    "rematch": {
+        "accept": "Accepter la revanche",
+        "view": "Voir la revanche",
+        "label": "Revanche"
+    },
+    "sign_up": "Créer un compte",
+    "create_account": "Créer un compte",
+    "already_have_account_login_instead": "Vous avez déjà un compte ? {login} plutôt",
+    "no_account_sign_up_instead": "Pas encore de compte ? {signUp} plutôt",
+    "already_have_account_login_instead_link_label": "Connectez-vous",
+    "no_account_sign_up_instead_link_label": "Crééz-vous un compte",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "player_game_history": "Historique des parties",
+    "waiting": "en attente…",
+    "initializing_game": "Initialisation de la partie…",
+    "game_finished_overlay": {
+        "title": "Partie terminée",
+        "review_game": "Analyser la partie :"
+    },
+    "game_has_been_canceled": "La partie a été annulée.",
+    "waiting_for_an_opponent": "En attente d'un adversaire…",
+    "confirm_overlay": {
+        "confirmation": "Confirmation",
+        "are_you_sure?": "Êtes-vous sûr ?"
+    },
+    "workers": {
+        "slow_worker": "Pas de serveur puissant en ligne actuellement. Seules les IA limitées sont disponibles.",
+        "no_worker": "Aucun serveur ne peut calculer les coups de l'IA actuellement. Seules les IA de test sont disponibles."
+    }
 }
