@@ -284,7 +284,7 @@ const doAnalyzeGame = async () => {
                 </template>
                 <template v-if="'ended' === hostedGameClient.getState()">
                     <h3>
-                        <i18next :translation="$t('player_wins_by.' + hostedGameClient.getHostedGame().gameData?.outcome ?? 'default')">
+                        <i18next :translation="$t('player_wins_by.' + (hostedGameClient.getHostedGame().gameData?.outcome ?? 'default'))">
                             <template #player>
                                 <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
                             </template>

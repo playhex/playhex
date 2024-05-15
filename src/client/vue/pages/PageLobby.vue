@@ -20,10 +20,10 @@ import { useSeoMeta } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import i18next from 'i18next';
 
-const { t } = i18next;
-
-useSeoMeta({
-    titleTemplate: title => `${t('lobby_title')} - ${title}`,
+i18next.on('languageChanged', () => {
+    useSeoMeta({
+        titleTemplate: title => `${i18next.t('lobby_title')} - ${title}`,
+    });
 });
 
 const router = useRouter();

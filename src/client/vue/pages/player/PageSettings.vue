@@ -198,12 +198,12 @@ const submitPasswordChange = async () => {
             </div>
         </template>
 
-        <h3>{{ $t('board') }}</h3>
+        <h3>{{ $t('game.board') }}</h3>
 
         <template v-if="playerSettings">
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
-                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> Show coordinates by default</label>
+                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> {{ $t('show_coords_by_default') }}</label>
             </div>
         </template>
 

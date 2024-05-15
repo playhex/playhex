@@ -1,5 +1,4 @@
-import { setDefaultOptions } from 'date-fns';
-import { nextTick } from 'vue';
+import { setDefaultOptions as setDateFnsDefaultOptions } from 'date-fns';
 import i18next from 'i18next';
 import HttpBackend from 'i18next-http-backend';
 import { loadDateFnsLocale } from './dateFns';
@@ -22,7 +21,7 @@ const getSupportedBrowserLocale = (): null | string => {
         }
     }
 
-    return 'en';
+    return null;
 };
 
 /**
@@ -43,8 +42,6 @@ const loadLocaleMessages = async (locale: string) => {
 
     // set locale and locale message
     i18next.addResourceBundle(locale, 'translation', messages.default);
-
-    return nextTick();
 };
 
 /**
@@ -59,20 +56,26 @@ export const setLocale = async (locale: string, remember = true) => {
         localStorage?.setItem(localStorageKey, locale);
     }
 
+    setDateFnsDefaultOptions({ locale: await loadDateFnsLocale(locale) });
     await loadLocaleMessages(locale);
-    setI18nLanguage(locale);
-    setDefaultOptions({ locale: await loadDateFnsLocale(locale) });
+    setI18nLanguage(locale); // Should be last so when "languageChanged" is emitted, date fns also has the new locale
 };
 
-i18next
-    .use(HttpBackend)
-    .init({
-        debug: true,
-        fallbackLng: 'en',
-    })
-;
+(async () => {
+    // Load current locale translation as soon as possible to prevent text blinking
+    loadLocaleMessages(autoLocale());
 
-// Always load en locales for fallbacks (in case of missing translation)
-loadLocaleMessages('en');
+    // Always load en locales for fallbacks (in case of missing translation)
+    loadLocaleMessages('en');
 
-setLocale(autoLocale(), false);
+    await i18next
+        .use(HttpBackend)
+        .init({
+            lng: autoLocale(),
+            debug: true,
+            fallbackLng: 'en',
+        })
+    ;
+
+    setLocale(autoLocale(), false);
+})();

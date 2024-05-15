@@ -1,8 +1,8 @@
+import '../shared/app/i18n';
 import './bootstrap.scss';
 import './base.styl';
 
 import 'reflect-metadata';
-import '../shared/app/i18n';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './vue/App.vue';

@@ -47,7 +47,7 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
         </template>
 
         <input type="radio" name="boardsize-radio" class="btn-check" @click="showCustomBoardsize = true" id="size-custom">
-        <label class="btn btn-outline-primary" for="size-custom">{{ $t('game_create.custom_size') }}</label>
+        <label class="btn btn-outline-primary" for="size-custom">{{ $t('create_game.custom_size') }}</label>
     </div>
 
 

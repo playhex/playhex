@@ -64,7 +64,7 @@ export default class PlayerRepository
 
                 return this.playersCache[player.publicId] = player;
             } catch (e) {
-                if (e instanceof QueryFailedError && e.message.includes('ER_DUP_ENTRY')) {
+                if (e instanceof QueryFailedError && e.message.includes('Duplicate entry')) {
                     ++exponent;
                     continue;
                 }

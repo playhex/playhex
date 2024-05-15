@@ -33,7 +33,7 @@
         "host_plays_second": "host plays second",
         "no_swap": "no swap"
     },
-    "game_create": {
+    "create_game": {
         "custom_size": "Custom",
         "less_options": "Less options",
         "more_options": "More options",
@@ -48,6 +48,27 @@
         "light": "Light",
         "auto": "Auto"
     },
+    "time_control": {
+        "custom": "Custom",
+        "use": "Use {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "initial_time": "Initial time",
+        "time_increment": "Time increment",
+        "periods": "Periods",
+        "periods_time": "Periods time",
+        "fast": "Fast",
+        "normal": "Normal",
+        "long": "Long"
+    },
+    "i_play": {
+        "title": "I play",
+        "random": "Random",
+        "first": "First",
+        "second": "Second"
+    },
+    "swap_rule": "Swap rule",
+    "allow_swap_pieces": "Allow swap pieces",
     "toggle_coords": "Toggle coords",
     "share_game": "Share game",
     "copied!": "Copied!",
@@ -58,11 +79,18 @@
     "log_out": "Log out",
     "log_in": "Log in",
     "sign_up": "Sign up",
+    "feedback": "Feedback",
+    "hex_links": "Hex links",
+    "project_under_development": "Project under development",
+    "last_change": "Last change: {{date}}",
+    "privacy_policy": "Privacy policy",
+    "license_agpl": "License AGPL-3.0",
     "create_account": "Create an account",
     "already_have_account_login_instead": "Already have an account? {login} instead",
     "already_have_account_login_instead_link_label": "Log in",
     "no_account_sign_up_instead": "No account? {signUp} instead",
     "no_account_sign_up_instead_link_label": "Sign up",
+    "show_coords_by_default": "Show coordinates by default",
     "username": "Username",
     "password": "Password",
     "account_created_on": "Account created on {{date}}",

@@ -18,7 +18,7 @@ describe('Authentication', () => {
 
         // Create account
         cy
-            .contains('Create account')
+            .contains('Create an account')
             .click()
         ;
 

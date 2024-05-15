@@ -158,13 +158,13 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> {{ $t('game_create.less_options') }}</button>
+                        ><BIconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> {{ $t('game_create.more_options') }}</button>
+                        ><BIconCaretRight /> {{ $t('create_game.more_options') }}</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">

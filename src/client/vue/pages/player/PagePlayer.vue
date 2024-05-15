@@ -313,7 +313,7 @@ const clickLogout = async () => {
                             >{{ $t('game.review') }}</router-link>
                         </td>
                         <td v-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
-                        <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + game?.gameData?.outcome ?? 'loss') }}</td>
+                        <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + (game?.gameData?.outcome ?? 'loss')) }}</td>
                         <td><AppPseudoWithOnlineStatusVue :player="getOpponent(game)" /></td>
                         <td>{{ game.gameOptions.boardsize }}</td>
                         <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>

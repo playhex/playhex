@@ -4,6 +4,7 @@ import { BIconHourglass } from 'bootstrap-icons-vue';
 import { secondsToDuration } from '@shared/app/timeControlUtils';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import HostedGameOptions from '../../../../../shared/app/models/HostedGameOptions';
+import { t } from 'i18next';
 
 const props = defineProps({
     gameOptions: {
@@ -14,26 +15,35 @@ const props = defineProps({
 
 const { gameOptions } = toRefs(props);
 
-const defaultTimeControls: { [key: string]: TimeControlType } = {
-    'Fast 5&nbsp;+&nbsp;2': {
-        type: 'fischer',
-        options: {
-            initialSeconds: 300,
-            incrementSeconds: 2,
+const defaultTimeControls: { [key: string]: { label: string, timeControl: TimeControlType } } = {
+    fast: {
+        label: `${t('time_control.fast')} 5&nbsp;+&nbsp;2`,
+        timeControl: {
+            type: 'fischer',
+            options: {
+                initialSeconds: 300,
+                incrementSeconds: 2,
+            },
         },
     },
-    'Normal 10&nbsp;+&nbsp;5': {
-        type: 'fischer',
-        options: {
-            initialSeconds: 600,
-            incrementSeconds: 5,
+    normal: {
+        label: `${t('time_control.normal')} 10&nbsp;+&nbsp;5`,
+        timeControl: {
+            type: 'fischer',
+            options: {
+                initialSeconds: 600,
+                incrementSeconds: 5,
+            },
         },
     },
-    'Long 30&nbsp;+&nbsp;15': {
-        type: 'fischer',
-        options: {
-            initialSeconds: 1800,
-            incrementSeconds: 15,
+    long: {
+        label: `${t('time_control.long')} 30&nbsp;+&nbsp;15`,
+        timeControl: {
+            type: 'fischer',
+            options: {
+                initialSeconds: 1800,
+                incrementSeconds: 15,
+            },
         },
     },
 };
@@ -124,7 +134,7 @@ const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t
 const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t => t === 5));
 const byoyomiPeriodsCount = ref(5);
 
-gameOptions.value.timeControl = defaultTimeControls['Normal 10&nbsp;+&nbsp;5'];
+gameOptions.value.timeControl = defaultTimeControls.normal.timeControl;
 
 /**
  * Set timeControl options values from form input values.
@@ -153,10 +163,10 @@ defineExpose({ compileOptions });
 </script>
 
 <template>
-    <h6><BIconHourglass /> Time control</h6>
+    <h6><BIconHourglass /> {{ $t('game.time_control') }}</h6>
 
     <div class="btn-group" role="group">
-        <template v-for="(timeControl, label) in defaultTimeControls" :key="label">
+        <template v-for="{timeControl, label} in defaultTimeControls" :key="label">
             <input
                 type="radio"
                 name="time-control"
@@ -175,34 +185,34 @@ defineExpose({ compileOptions });
         </template>
 
         <input type="radio" name="time-control" class="btn-check" v-model="gameOptions.timeControl" :value="customTimeControl" @click="showCustomTimeControl = true" id="time-control-custom">
-        <label class="btn btn-outline-primary" for="time-control-custom">Custom</label>
+        <label class="btn btn-outline-primary" for="time-control-custom">{{ $t('time_control.custom') }}</label>
     </div>
 
     <div v-if="showCustomTimeControl" class="mt-2">
         <div v-if="'fischer' === gameOptions.timeControl.type">
-            <strong class="min-w">Fischer</strong>
-            <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">Use Byo-yomi</button>
+            <strong class="min-w">{{ $t('time_control.fischer') }}</strong>
+            <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">{{ $t('time_control.use', { type: $t('time_control.byo_yomi') }) }}</button>
         </div>
         <div v-else>
-            <strong class="min-w">Byo-yomi</strong>
-            <button type="button" @click="() => gameOptions.timeControl.type = 'fischer'" class="btn btn-sm btn-link">Use Fischer</button>
+            <strong class="min-w">{{ $t('time_control.byo_yomi') }}</strong>
+            <button type="button" @click="() => gameOptions.timeControl.type = 'fischer'" class="btn btn-sm btn-link">{{ $t('time_control.use', { type: $t('time_control.fischer') }) }}</button>
         </div>
 
         <div v-if="'fischer' === gameOptions.timeControl.type">
-            <label for="custom-fischer-initial-time" class="form-label">Initial time: {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
+            <label for="custom-fischer-initial-time" class="form-label">{{ $t('2dots', { s: $t('time_control.initial_time') }) }} {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
             <input type="range" class="form-range" id="custom-fischer-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
-            <label for="custom-fischer-time-increment" class="form-label">Time increment: {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
+            <label for="custom-fischer-time-increment" class="form-label">{{ $t('2dots', { s: $t('time_control.time_increment') }) }} {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
             <input type="range" class="form-range" id="custom-fischer-time-increment" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
         </div>
         <div v-if="'byoyomi' === gameOptions.timeControl.type">
-            <label for="custom-byoyomi-initial-time" class="form-label">Initial time: {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
+            <label for="custom-byoyomi-initial-time" class="form-label">{{ $t('2dots', { s: $t('time_control.initial_time') }) }} {{ secondsToDuration(initialTimeSteps[initialTimeSelected]) }}</label>
             <input type="range" class="form-range" id="custom-byoyomi-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
-            <label for="custom-byoyomi-period-count" class="form-label">Periods: {{ byoyomiPeriodsCount }}</label>
+            <label for="custom-byoyomi-period-count" class="form-label">{{ $t('2dots', { s: $t('time_control.periods') }) }} {{ byoyomiPeriodsCount }}</label>
             <input type="range" class="form-range" id="custom-byoyomi-period-count" v-model="byoyomiPeriodsCount" min="0" max="15" step="1">
 
-            <label for="custom-byoyomi-perdiod-time" class="form-label">Period time: {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
+            <label for="custom-byoyomi-perdiod-time" class="form-label">{{ $t('2dots', { s: $t('time_control.periods_time') }) }} {{ secondsToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
             <input type="range" class="form-range" id="custom-byoyomi-perdiod-time" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
         </div>
     </div>
