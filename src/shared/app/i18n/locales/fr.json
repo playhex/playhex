@@ -63,7 +63,7 @@
     },
     "player_won_by": {
         "default": "{player} a gagné la partie !",
-        "time": "{player} a gangé par temps !",
+        "time": "{player} a gagné au temps !",
         "resign": "{player} a gagné par abandon !",
         "forfeit": "{player} a gagné par forfait !"
     },
@@ -77,8 +77,8 @@
     "game_was_created_by_player_time_ago": "La partie a été créée par {player}, {timeAgo}.",
     "game_rules": {
         "normal": "normales",
-        "host_plays_first": "Hôte joue 1er",
-        "host_plays_second": "Hôte joue 2ème",
+        "host_plays_first": "hôte joue 1er",
+        "host_plays_second": "hôte joue 2ème",
         "no_swap": "pas d'échange"
     },
     "log_out": "Déconnexion",
