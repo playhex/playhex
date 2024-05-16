@@ -164,6 +164,10 @@
     "new_password": "New password",
     "confirm_new_password": "Confirm new password",
     "update_password": "Update password",
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Date shift: {{ms}}ms"
+    },
     "game_candency": {
         "blitz": "Blitz",
         "normal": "Normal",

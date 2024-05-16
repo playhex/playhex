@@ -28,6 +28,20 @@ type MetricsTags = {
     };
 };
 
+export const sendPoint = (point: Point): void => {
+    if (null === influxDBClient) {
+        return;
+    }
+
+    logger.debug('sending metric', {
+        lineProtocol: point.toLineProtocol(),
+    });
+
+    influxDBClient.write(point).catch(reason => {
+        logger.warning('Error while sending data to influxDB', { reason });
+    });
+};
+
 export const sendConnectedSocketsPoint = (count: number): void => {
     if (null === influxDBClient) {
         return;
@@ -37,13 +51,7 @@ export const sendConnectedSocketsPoint = (count: number): void => {
         .setIntegerField('value', count)
     ;
 
-    logger.debug('sending metric', {
-        lineProtocol: point.toLineProtocol(),
-    });
-
-    influxDBClient.write(point).catch(reason => {
-        logger.warning('Error while sending data to influxDB', { reason });
-    });
+    sendPoint(point);
 };
 
 export class TimeMeasureMetric<T extends keyof MetricsTags>
@@ -87,12 +95,6 @@ export class TimeMeasureMetric<T extends keyof MetricsTags>
             point.setTag(key, '' + value);
         }
 
-        logger.debug('sending metric', {
-            lineProtocol: point.toLineProtocol(),
-        });
-
-        influxDBClient.write(point).catch(reason => {
-            logger.warning('Error while sending data to influxDB', { reason });
-        });
+        sendPoint(point);
     }
 }
