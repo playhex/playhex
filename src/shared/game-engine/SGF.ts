@@ -9,7 +9,7 @@ import Game from './Game';
 const baseRootNode = {
     FF: 4,
     GM: 11,
-    AP: 'Alcalyn_SGF:0.0.0',
+    AP: 'PlayHex:0.0.0',
     PL: 'B',
 };
 
