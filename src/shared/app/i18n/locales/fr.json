@@ -84,7 +84,7 @@
     "log_out": "Déconnexion",
     "log_in": "Connexion",
     "share_game": "Partager la partie",
-    "not_copied": "pas copié, utilisez le click droit ou appui long",
+    "not_copied": "pas réussi à copier, utilisez le click droit ou appui long",
     "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}.",
     "toggle_coords": "Afficher/masquer les coordonnées",
     "player_current_games": "Parties en cours",
