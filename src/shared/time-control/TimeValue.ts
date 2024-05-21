@@ -9,13 +9,13 @@
  * - positive number/future date: countdown timer.
  * - negative number/past date: time is incrementing.
  */
-type TimeValue = Date | number;
+type TimeValue = Date | number; // TODO use milliseconds instead of seconds
 
 export default TimeValue;
 
-export const timeValueToSeconds = (timeValue: TimeValue): number => {
+export const timeValueToSeconds = (timeValue: TimeValue, date: Date): number => {
     return timeValue instanceof Date
-        ? (timeValue.getTime() - new Date().getTime()) / 1000
+        ? (timeValue.getTime() - date.getTime()) / 1000
         : timeValue
     ;
 };

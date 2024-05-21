@@ -5,7 +5,11 @@ import TimeControlType from './TimeControlType';
 export type PlayerIndex = 0 | 1;
 
 export type TimeControlEvents = {
-    elapsed: (playerLostByTime: PlayerIndex) => void;
+    /**
+     * @param playerLostByTime Player who get its chrono elapsed
+     * @param date When the chrono actually elapsed, can be i.e a slightly past date in case event loop has some lag
+     */
+    elapsed: (playerLostByTime: PlayerIndex, date: Date) => void;
 };
 
 export type TimeControlState =
@@ -52,6 +56,11 @@ export interface GameTimeData<T extends PlayerTimeData = PlayerTimeData> {
     players: [T, T];
 }
 
+type ElapsedPlayer = {
+    byPlayer: PlayerIndex;
+    date: Date;
+};
+
 export class TimeControlError extends Error {}
 
 /**
@@ -65,7 +74,7 @@ export abstract class AbstractTimeControl<
 {
     protected state: TimeControlState = 'ready';
     protected currentPlayer: PlayerIndex = 0;
-    protected elapsedPlayer: null | PlayerIndex = null;
+    protected elapsedPlayer: null | ElapsedPlayer = null;
 
     constructor(
         protected options: object,
@@ -86,15 +95,19 @@ export abstract class AbstractTimeControl<
     abstract getOptions(): TimeControlType;
 
     abstract getValues(): T;
-    abstract setValues(values: T): void;
 
-    protected abstract doStart(): void;
-    protected abstract doPause(): void;
-    protected abstract doResume(): void;
-    protected abstract doFinish(): void;
-    protected abstract doPush(byPlayer: PlayerIndex): void;
+    /**
+     * @param date When to set dates, used to check if a chrono is already elapsed. In doubt, use new Date()
+     */
+    abstract setValues(values: T, date: Date): void;
 
-    protected elapse(byPlayer: PlayerIndex): void
+    protected abstract doStart(date: Date): void;
+    protected abstract doPause(date: Date): void;
+    protected abstract doResume(date: Date): void;
+    protected abstract doFinish(date: Date): void;
+    protected abstract doPush(byPlayer: PlayerIndex, date: Date): void;
+
+    protected elapse(byPlayer: PlayerIndex, date: Date): void
     {
         if ('elapsed' === this.state) {
             throw new TimeControlError(
@@ -103,8 +116,8 @@ export abstract class AbstractTimeControl<
         }
 
         this.state = 'elapsed';
-        this.elapsedPlayer = byPlayer;
-        this.emit('elapsed', byPlayer);
+        this.elapsedPlayer = { byPlayer, date };
+        this.emit('elapsed', byPlayer, date);
     }
 
     getStrictElapsedPlayer(): PlayerIndex
@@ -113,7 +126,16 @@ export abstract class AbstractTimeControl<
             throw new Error('Trying to strictly get elapsed player, but there is not');
         }
 
-        return this.elapsedPlayer;
+        return this.elapsedPlayer.byPlayer;
+    }
+
+    getStrictElapsedAt(): Date
+    {
+        if (null === this.elapsedPlayer) {
+            throw new Error('Trying to strictly get elapsed date, but chrono has not elapsed');
+        }
+
+        return this.elapsedPlayer.date;
     }
 
     protected mustBeState(expectedState: TimeControlState): void
@@ -125,34 +147,34 @@ export abstract class AbstractTimeControl<
         }
     }
 
-    start(): void
+    start(date: Date): void
     {
         this.mustBeState('ready');
-        this.doStart();
+        this.doStart(date);
         this.state = 'running';
     }
 
-    pause(): void
+    pause(date: Date): void
     {
         this.mustBeState('running');
-        this.doPause();
+        this.doPause(date);
         this.state = 'paused';
     }
 
-    resume(): void
+    resume(date: Date): void
     {
         this.mustBeState('paused');
-        this.doResume();
+        this.doResume(date);
         this.state = 'running';
     }
 
-    finish(): void
+    finish(date: Date): void
     {
-        this.doFinish();
+        this.doFinish(date);
         this.state = 'over';
     }
 
-    push(byPlayer: PlayerIndex): void
+    push(byPlayer: PlayerIndex, date: Date): void
     {
         this.mustBeState('running');
 
@@ -160,6 +182,6 @@ export abstract class AbstractTimeControl<
             throw new TimeControlError(`Player ${byPlayer} pushed twice.`);
         }
 
-        this.doPush(byPlayer);
+        this.doPush(byPlayer, date);
     }
 }

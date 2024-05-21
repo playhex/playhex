@@ -1,12 +1,7 @@
 import { Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
-import Player from './models/Player';
 import { GameTimeData } from 'time-control/TimeControl';
-import ChatMessage from './models/ChatMessage';
-import GameAnalyze from './models/GameAnalyze';
-import HostedGame from './models/HostedGame';
-import Move from './models/Move';
-import { Ping } from './models';
+import { ChatMessage, GameAnalyze, HostedGame, Move, Ping, Player } from './models';
 
 export type HexClientToServerEvents = {
     /**
@@ -52,7 +47,7 @@ export type HexServerToClientEvents = {
     /**
      * Game has been canceled.
      */
-    gameCanceled: (gameId: string) => void;
+    gameCanceled: (gameId: string, canceledAt: { date: Date }) => void;
 
     /**
      * A move has been played by a player.
@@ -71,8 +66,9 @@ export type HexServerToClientEvents = {
 
     /**
      * A game has ended and there is a winner.
+     * endedAt is in object to allow date normalization (or will denormalize date as string instead of Date).
      */
-    ended: (gameId: string, winner: PlayerIndex, outcome: Outcome) => void;
+    ended: (gameId: string, winner: PlayerIndex, outcome: Outcome, endedAt: { date: Date }) => void;
 
     /**
      * A player just connected to server.

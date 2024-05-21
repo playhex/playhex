@@ -1,4 +1,5 @@
-import { Coords, MoveData } from './Types';
+import { Coords } from './Types';
+import { MoveData } from './normalization';
 
 export default class Move implements Coords
 {

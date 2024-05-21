@@ -2,7 +2,6 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { Game } from '@shared/app/models';
 import { AnalyzeGameRequest } from '../services/HexAiApiClient';
 import { Move } from '../../shared/game-engine';
-import { MoveData } from '../../shared/game-engine/Types';
 import { Inject, Service } from 'typedi';
 
 @Service()
@@ -45,7 +44,7 @@ export default class GamePersister
 
         return {
             size: data.size,
-            movesHistory: Move.movesAsString((movesHistory as unknown as MoveData[])
+            movesHistory: Move.movesAsString(movesHistory
                 .map(moveData => Move.fromData(moveData)),
             ),
         };

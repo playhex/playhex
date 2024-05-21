@@ -19,6 +19,7 @@ import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
+import { fromCoords } from '../../../shared/app/models/Move';
 
 useSeoMeta({
     robots: 'noindex',
@@ -108,14 +109,14 @@ const listenHexClick = () => {
 
             if (!shouldDisplayConfirmMove()) {
                 game.move(move, localPlayerIndex as PlayerIndex);
-                hostedGameClient.value.sendMove(move);
+                hostedGameClient.value.sendMove(fromCoords(move));
                 return;
             }
 
             confirmMove.value = () => {
                 gameView?.removePreviewMove();
                 game.move(move, localPlayerIndex as PlayerIndex);
-                hostedGameClient.value?.sendMove(move);
+                hostedGameClient.value?.sendMove(fromCoords(move));
                 confirmMove.value = null;
             };
 

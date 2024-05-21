@@ -1,5 +1,6 @@
-import { Move, PlayerIndex } from '@shared/game-engine';
-import { MoveData, Outcome } from '@shared/game-engine/Types';
+import { PlayerIndex } from '@shared/game-engine';
+import { Outcome } from '@shared/game-engine/Types';
+import { Move } from '../../shared/app/models';
 import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
 import HostedGame from '../../shared/app/models/HostedGame';
@@ -130,15 +131,15 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
-        socket.on('gameCanceled', (gameId: string) => {
+        socket.on('gameCanceled', (gameId, { date }) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].onServerGameCanceled();
+                hostedGameClients.value[gameId].onServerGameCanceled(date);
             }
         });
 
-        socket.on('moved', (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => {
+        socket.on('moved', (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].onServerGameMoved(new Move(move.row, move.col), moveIndex, byPlayerIndex);
+                hostedGameClients.value[gameId].onServerGameMoved(move, moveIndex, byPlayerIndex);
             }
         });
 
@@ -154,9 +155,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
-        socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome) => {
+        socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome, { date }) => {
             if (hostedGameClients.value[gameId]) {
-                hostedGameClients.value[gameId].onServerGameEnded(winner, outcome);
+                hostedGameClients.value[gameId].onServerGameEnded(winner, outcome, date);
             }
         });
 

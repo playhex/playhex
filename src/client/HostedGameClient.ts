@@ -1,7 +1,7 @@
-import { Game, Move, PlayerIndex } from '@shared/game-engine';
+import { Game, Move as GameMove, PlayerIndex } from '@shared/game-engine';
 import HostedGame from '../shared/app/models/HostedGame';
 import { HostedGameState } from '@shared/app/Types';
-import Player from '../shared/app/models/Player';
+import { Player, HostedGameOptions, ChatMessage, HostedGameToPlayer, Move } from '../shared/app/models';
 import { Outcome } from '@shared/game-engine/Types';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -9,9 +9,6 @@ import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import { apiPostCancel, apiPostResign } from './apiClient';
 import TimeControlType from '@shared/time-control/TimeControlType';
-import HostedGameOptions from '../shared/app/models/HostedGameOptions';
-import ChatMessage from '../shared/app/models/ChatMessage';
-import HostedGameToPlayer from '../shared/app/models/HostedGameToPlayer';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -72,7 +69,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
             // Cancel here in case game has been canceled before started
             if ('canceled' === hostedGame.state) {
-                this.game.cancel();
+                this.game.cancel(hostedGame.createdAt);
             }
 
             return this.game;
@@ -87,21 +84,17 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         // Replay game and fill history
         for (const move of gameData.movesHistory) {
-            this.game.move(new Move(move.row, move.col), this.game.getCurrentPlayerIndex());
+            this.game.move(new GameMove(move.row, move.col, move.playedAt), this.game.getCurrentPlayerIndex());
         }
 
         // Cancel game if canceled
         if ('canceled' === hostedGame.state && !this.game.isEnded()) {
-            this.game.cancel();
+            this.game.cancel(gameData.endedAt ?? gameData.lastMoveAt ?? new Date());
         }
 
         // Set a winner if not yet set because timeout or resignation
         if (null !== gameData.winner && !this.game.isEnded()) {
-            this.game.declareWinner(gameData.winner, gameData.outcome);
-        }
-
-        if (this.game.isEnded() && null !== gameData.endedAt) {
-            this.game.setEndedAt(gameData.endedAt);
+            this.game.declareWinner(gameData.winner, gameData.outcome, gameData.endedAt ?? new Date());
         }
 
         return this.game;
@@ -275,7 +268,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     async sendMove(move: Move): Promise<true | string>
     {
         return new Promise((resolve, reject) => {
-            this.socket.emit('move', this.getId(), move.toData(), answer => {
+            this.socket.emit('move', this.getId(), move, answer => {
                 if (true === answer) {
                     resolve(answer);
                 }
@@ -325,16 +318,16 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.emit('started');
     }
 
-    onServerGameCanceled(): void
+    onServerGameCanceled(date: Date): void
     {
         this.hostedGame.state = 'canceled';
 
         if (this.hostedGame.gameData) {
-            this.hostedGame.gameData.endedAt = new Date();
+            this.hostedGame.gameData.endedAt = date;
         }
 
         if (null !== this.game) {
-            this.game.cancel();
+            this.game.cancel(date);
         }
     }
 
@@ -374,17 +367,17 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return;
         }
 
-        this.game.move(move, byPlayerIndex);
+        this.game.move(new GameMove(move.row, move.col, move.playedAt), byPlayerIndex);
     }
 
-    onServerGameEnded(winner: PlayerIndex, outcome: Outcome): void
+    onServerGameEnded(winner: PlayerIndex, outcome: Outcome, date: Date): void
     {
         this.hostedGame.state = 'ended';
 
         if (this.hostedGame.gameData) {
             this.hostedGame.gameData.winner = winner;
             this.hostedGame.gameData.outcome = outcome;
-            this.hostedGame.gameData.endedAt = new Date();
+            this.hostedGame.gameData.endedAt = date;
         }
 
         // Do nothing if game not loaded
@@ -397,7 +390,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return;
         }
 
-        this.game.declareWinner(winner, outcome);
+        this.game.declareWinner(winner, outcome, date);
     }
 
     async sendChatMessage(content: string): Promise<string | true>

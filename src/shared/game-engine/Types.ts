@@ -9,12 +9,6 @@ export type Coords = {
     col: number;
 };
 
-export type MoveData = {
-    row: number;
-    col: number;
-    playedAt: Date;
-};
-
 export type PathItem = {
     parent: null | PathItem;
     cell: Coords;
@@ -47,15 +41,3 @@ export type Outcome =
      */
     | 'forfeit'
 ;
-
-export type GameData = {
-    size: number;
-    movesHistory: MoveData[];
-    allowSwap: boolean;
-    currentPlayerIndex: PlayerIndex;
-    winner: null | PlayerIndex;
-    outcome: null | Outcome;
-    startedAt: Date;
-    lastMoveAt: null | Date;
-    endedAt: null | Date;
-};

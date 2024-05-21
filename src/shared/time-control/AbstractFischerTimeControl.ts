@@ -10,6 +10,12 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
 {
     private playerChronos: [Chrono, Chrono];
 
+    /**
+     * Store the date when player chrono elapsed
+     * before losing it when setting player chrono to zero.
+     */
+    private lastElapsedDates: [null | Date, null | Date] = [null, null];
+
     constructor(
         protected options: object,
         private initialSeconds: number,
@@ -23,14 +29,16 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
             new Chrono(this.initialSeconds),
         ];
 
-        this.playerChronos[0].on('elapsed', () => {
+        this.playerChronos[0].on('elapsed', date => {
+            this.lastElapsedDates[0] = date;
             this.playerChronos[0].setValue(0);
-            this.elapse(0);
+            this.elapse(0, date);
         });
 
-        this.playerChronos[1].on('elapsed', () => {
+        this.playerChronos[1].on('elapsed', date => {
+            this.lastElapsedDates[1] = date;
             this.playerChronos[1].setValue(0);
-            this.elapse(1);
+            this.elapse(1, date);
         });
     }
 
@@ -53,55 +61,33 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
 
         this.playerChronos[0].setValue(values.players[0].totalRemainingTime);
         this.playerChronos[1].setValue(values.players[1].totalRemainingTime);
-
-        let player0Elapsed = false;
-        let player1Elapsed = false;
-
-        if (this.playerChronos[0].isElapsed()) {
-            this.playerChronos[0].setValue(0);
-            player0Elapsed = true;
-        }
-
-        if (this.playerChronos[1].isElapsed()) {
-            this.playerChronos[1].setValue(0);
-            player1Elapsed = true;
-        }
-
-        // In case setting values with negative values for both players
-        if (player0Elapsed && player1Elapsed) {
-            this.elapse(this.currentPlayer);
-        } else if (player0Elapsed) {
-            this.elapse(0);
-        } else if (player1Elapsed) {
-            this.elapse(1);
-        }
     }
 
-    protected doStart(): void
+    protected doStart(date: Date): void
     {
-        this.playerChronos[this.currentPlayer].run();
+        this.playerChronos[this.currentPlayer].run(date);
     }
 
-    protected doPause(): void
+    protected doPause(date: Date): void
     {
-        this.playerChronos[this.currentPlayer].pause();
+        this.playerChronos[this.currentPlayer].pause(date);
     }
 
-    protected doResume(): void
+    protected doResume(date: Date): void
     {
-        this.playerChronos[this.currentPlayer].run();
+        this.playerChronos[this.currentPlayer].run(date);
     }
 
-    protected doFinish(): void
+    protected doFinish(date: Date): void
     {
         if (this.state === 'running') {
-            this.playerChronos[this.currentPlayer].pause();
+            this.playerChronos[this.currentPlayer].pause(date);
         }
     }
 
-    protected doPush(byPlayer: PlayerIndex): void
+    protected doPush(byPlayer: PlayerIndex, date: Date): void
     {
-        this.playerChronos[this.currentPlayer].pause();
+        this.playerChronos[this.currentPlayer].pause(date);
         let seconds = this.playerChronos[this.currentPlayer].getValue();
 
         if (seconds instanceof Date) {
@@ -119,6 +105,6 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
         this.playerChronos[this.currentPlayer].setValue(seconds);
 
         this.currentPlayer = 1 - byPlayer as PlayerIndex;
-        this.playerChronos[this.currentPlayer].run();
+        this.playerChronos[this.currentPlayer].run(date);
     }
 }

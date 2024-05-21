@@ -39,14 +39,14 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
             new ByoYomiChrono(options.initialSeconds, options.periodSeconds, options.periodsCount),
         ];
 
-        this.playerChronos[0].on('elapsed', () => {
+        this.playerChronos[0].on('elapsed', date => {
             this.playerChronos[0].setMainValue(0);
-            this.elapse(0);
+            this.elapse(0, date);
         });
 
-        this.playerChronos[1].on('elapsed', () => {
+        this.playerChronos[1].on('elapsed', date => {
             this.playerChronos[1].setMainValue(0);
-            this.elapse(1);
+            this.elapse(1, date);
         });
     }
 
@@ -78,56 +78,46 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         };
     }
 
-    setValues(values: GameTimeData<ByoYomiPlayerTimeData>): void
+    setValues(values: GameTimeData<ByoYomiPlayerTimeData>, date: Date): void
     {
         this.state = values.state;
         this.currentPlayer = values.currentPlayer;
 
-        this.playerChronos[0].setValues(values.players[0].remainingMainTime, values.players[0].remainingPeriods);
-        this.playerChronos[1].setValues(values.players[1].remainingMainTime, values.players[1].remainingPeriods);
-
-        if (this.playerChronos[0].isElapsed()) {
-            this.playerChronos[0].setValues(0, 0);
-            this.elapse(0);
-        }
-
-        if (this.playerChronos[1].isElapsed()) {
-            this.playerChronos[1].setValues(0, 0);
-            this.elapse(1);
-        }
+        this.playerChronos[0].setValues(values.players[0].remainingMainTime, values.players[0].remainingPeriods, date);
+        this.playerChronos[1].setValues(values.players[1].remainingMainTime, values.players[1].remainingPeriods, date);
     }
 
-    protected doStart(): void
+    protected doStart(date: Date): void
     {
-        this.playerChronos[this.currentPlayer].run();
+        this.playerChronos[this.currentPlayer].run(date);
     }
 
-    protected doPause(): void
+    protected doPause(date: Date): void
     {
-        this.playerChronos[this.currentPlayer].pause();
+        this.playerChronos[this.currentPlayer].pause(date);
     }
 
-    protected doResume(): void
+    protected doResume(date: Date): void
     {
-        this.playerChronos[this.currentPlayer].run();
+        this.playerChronos[this.currentPlayer].run(date);
     }
 
-    protected doFinish(): void
+    protected doFinish(date: Date): void
     {
         if (this.state === 'running') {
-            this.playerChronos[this.currentPlayer].pause();
+            this.playerChronos[this.currentPlayer].pause(date);
         }
     }
 
-    protected doPush(byPlayer: PlayerIndex): void
+    protected doPush(byPlayer: PlayerIndex, date: Date): void
     {
-        this.playerChronos[this.currentPlayer].pauseByMovePlayed();
+        this.playerChronos[this.currentPlayer].pauseByMovePlayed(date);
         this.currentPlayer = 1 - byPlayer as PlayerIndex;
-        this.playerChronos[this.currentPlayer].run();
+        this.playerChronos[this.currentPlayer].run(date);
     }
 
-    toString(): string
+    toString(date: Date): string
     {
-        return this.playerChronos[0].toString() + ' | ' + this.playerChronos[1].toString();
+        return this.playerChronos[0].toString(date) + ' | ' + this.playerChronos[1].toString(date);
     }
 }

@@ -3,9 +3,8 @@
 import GameView from '@client/pixi-board/GameView';
 import AppBoard from '../components/AppBoard.vue';
 import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '@shared/game-engine';
-import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
+import { HostedGameOptions, Player } from '../../../shared/app/models';
 import { Ref, onMounted, ref } from 'vue';
-import Player from '../../../shared/app/models/Player';
 import useAuthStore from '../../stores/authStore';
 import { useSeoMeta } from '@unhead/vue';
 

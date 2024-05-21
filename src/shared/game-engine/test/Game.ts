@@ -52,7 +52,7 @@ describe('Game', () => {
         game.move(new Move(2, 1), 1);
 
         // Resign
-        game.resign(1);
+        game.resign(1, new Date());
 
         assert.strictEqual(game.isEnded(), true, 'Game is now finished after resign');
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner because p1 resigned');
@@ -132,7 +132,7 @@ describe('Game', () => {
         game.move(new Move(1, 2), 0);
         game.move(new Move(3, 1), 1);
 
-        game.resign(0);
+        game.resign(0, new Date());
 
         const gameData = game.toData();
         const restoredGame = Game.fromData(gameData);
@@ -150,7 +150,7 @@ describe('Game', () => {
         game.move(new Move(1, 2), 0);
         game.move(new Move(3, 1), 1);
 
-        game.cancel();
+        game.cancel(new Date());
 
         const gameData = game.toData();
         const restoredGame = Game.fromData(gameData);
@@ -178,5 +178,33 @@ describe('Game', () => {
         assert.strictEqual(game.isEnded(), restoredGame.isEnded());
         assert.strictEqual(game.getEndedAt(), restoredGame.getEndedAt());
         assert.strictEqual(game.isCanceled(), restoredGame.isCanceled());
+    });
+
+    it('provides consistent timestamping', () => {
+        const game = new Game(3);
+
+        let lastMoveAt: null | Date = null;
+        let lastEndedAt: null | Date = null;
+
+        game.on('played', move => lastMoveAt = move.getPlayedAt());
+        game.on('ended', (winner, outcome, date) => lastEndedAt = date);
+
+        const firstMoveDate = new Date();
+
+        // Players legal moves
+        game.move(new Move(1, 1, firstMoveDate), 0);
+
+        assert.strictEqual(lastMoveAt, firstMoveDate);
+
+        // Game end
+        game.move(new Move(1, 2), 1);
+        game.move(new Move(2, 1), 0);
+        game.move(new Move(2, 0), 1);
+        const lastMoveDate = new Date();
+        game.move(new Move(0, 1, lastMoveDate), 0);
+
+        assert.strictEqual(lastEndedAt, lastMoveDate);
+        assert.strictEqual(game.getLastMoveAt(), lastMoveDate);
+        assert.strictEqual(game.getEndedAt(), lastMoveDate);
     });
 });

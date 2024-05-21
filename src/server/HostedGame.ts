@@ -1,7 +1,6 @@
-import { Game, IllegalMove, Move, PlayerIndex } from '../shared/game-engine';
-import { Outcome } from '../shared/game-engine/Types';
+import { Game, IllegalMove, PlayerIndex, Move as GameMove } from '../shared/game-engine';
 import { HostedGameState } from '../shared/app/Types';
-import Player from '../shared/app/models/Player';
+import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move } from '../shared/app/models';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
@@ -11,11 +10,9 @@ import { AbstractTimeControl } from '../shared/time-control/TimeControl';
 import { createTimeControl } from '../shared/time-control/createTimeControl';
 import Container from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import ChatMessage from '../shared/app/models/ChatMessage';
 import { makeAIPlayerMove } from './services/AIManager';
 import HostedGameEntity from '../shared/app/models/HostedGame'; // TODO rename HostedGame
-import HostedGameOptions from '../shared/app/models/HostedGameOptions';
-import HostedGameToPlayer from '../shared/app/models/HostedGameToPlayer';
+import { fromEngineMove } from '../shared/app/models/Move';
 
 type HostedGameEvents = {
     played: () => void;
@@ -170,7 +167,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             }
 
             if (null === move) {
-                this.game.resign(playerIndex);
+                this.game.resign(playerIndex, new Date());
                 return;
             }
 
@@ -190,7 +187,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
          * Listen on played event, move can come from AI
          */
         game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.io.to(this.gameRooms()).emit('moved', this.id, move.toData(), moveIndex, byPlayerIndex);
+            this.io.to(this.gameRooms()).emit('moved', this.id, fromEngineMove(move), moveIndex, byPlayerIndex);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
             if (!game.isEnded()) {
@@ -204,10 +201,10 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
          * Listen on ended event, can come from game that turned into a winning position,
          * or time control that elapsed and made a winner.
          */
-        game.on('ended', (winner: PlayerIndex, outcome: Outcome) => {
+        game.on('ended', (winner, outcome, date) => {
             this.state = 'ended';
 
-            this.io.to(this.gameRooms(true)).emit('ended', this.id, winner, outcome);
+            this.io.to(this.gameRooms(true)).emit('ended', this.id, winner, outcome, { date });
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
             logger.info('Game ended.', { hostedGameId: this.id, winner, outcome });
@@ -329,7 +326,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         }
 
         try {
-            this.game.move(move, this.getPlayerIndex(player) as PlayerIndex);
+            this.game.move(new GameMove(move.row, move.col, new Date()), this.getPlayerIndex(player) as PlayerIndex);
 
             return true;
         } catch (e) {
@@ -359,8 +356,10 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
+        const now = new Date();
+
         try {
-            this.game.resign(this.getPlayerIndex(player) as PlayerIndex);
+            this.game.resign(this.getPlayerIndex(player) as PlayerIndex, now);
 
             return true;
         } catch (e) {
@@ -401,14 +400,16 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             return canCancel;
         }
 
+        const now = new Date();
+
         this.state = 'canceled';
-        this.timeControl.finish();
+        this.timeControl.finish(now);
 
         if (null !== this.game) {
-            this.game.cancel();
+            this.game.cancel(now);
         }
 
-        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id);
+        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id, { date: now });
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
 
         logger.info('Game canceled.', { hostedGameId: this.id });

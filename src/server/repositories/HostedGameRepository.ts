@@ -1,20 +1,16 @@
 import { Inject, Service } from 'typedi';
 import HostedGame from '../HostedGame';
-import { Move } from '../../shared/game-engine';
 import { HostedGameState } from '../../shared/app/Types';
-import Player from '../../shared/app/models/Player';
-import { MoveData } from '../../shared/game-engine/Types';
+import { Player, ChatMessage, HostedGame as HostedGameEntity, HostedGameOptions, Move } from '../../shared/app/models';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
 import HostedGamePersister from '../persistance/HostedGamePersister';
 import logger from '../services/logger';
-import ChatMessage from '../../shared/app/models/ChatMessage';
 import { validateOrReject } from 'class-validator';
 import Rooms from '../../shared/app/Rooms';
 import { HexServer } from '../server';
 import { FindAIError, findAIOpponent } from '../services/AIManager';
 import { Repository } from 'typeorm';
-import HostedGameEntity from '../../shared/app/models/HostedGame';
-import HostedGameOptions, { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
+import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
 import { AppDataSource } from '../data-source';
 import { plainToInstance } from '../../shared/app/class-transformer-custom';
 
@@ -299,7 +295,7 @@ export default class HostedGameRepository
         return true;
     }
 
-    async playerMove(player: Player, gameId: string, move: MoveData): Promise<string | true>
+    async playerMove(player: Player, gameId: string, move: Move): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -307,7 +303,7 @@ export default class HostedGameRepository
             return 'no game ' + gameId;
         }
 
-        const result = hostedGame.playerMove(player, new Move(move.row, move.col));
+        const result = hostedGame.playerMove(player, move);
 
         return result;
     }

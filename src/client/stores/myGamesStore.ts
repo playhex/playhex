@@ -2,8 +2,7 @@ import { defineStore, storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import useAuthStore from './authStore';
 import useSocketStore from './socketStore';
-import HostedGame from '@shared/app/models/HostedGame';
-import { MoveData } from '@shared/game-engine/Types';
+import { HostedGame, Move } from '@shared/app/models';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
 import { pseudoString } from '@shared/app/pseudoUtils';
@@ -51,7 +50,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         ;
     });
 
-    const byRemainingTime = (game0: CurrentGame, game1: CurrentGame): number => {
+    const byRemainingTime = (now: Date) => (game0: CurrentGame, game1: CurrentGame): number => {
         if (null === game0.myColor || null === game1.myColor) {
             return 0;
         }
@@ -59,7 +58,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         const time0 = game0.hostedGame.timeControl.players[game0.myColor].totalRemainingTime;
         const time1 = game1.hostedGame.timeControl.players[game1.myColor].totalRemainingTime;
 
-        return timeValueToSeconds(time0) - timeValueToSeconds(time1);
+        return timeValueToSeconds(time0, now) - timeValueToSeconds(time1, now);
     };
 
     const isPlaying = (game: CurrentGame): boolean => {
@@ -89,7 +88,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         const playingGames = Object.values(myGames.value)
             .filter(game => isPlaying(game))
-            .sort(byRemainingTime)
+            .sort(byRemainingTime(new Date()))
         ;
 
         if (0 === playingGames.length) {
@@ -169,7 +168,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         mostUrgentGame.value = getMostUrgentGame();
     });
 
-    socket.on('moved', (gameId: string, move: MoveData, moveIndex: number, byPlayerIndex: PlayerIndex) => {
+    socket.on('moved', (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => {
         if (!myGames.value[gameId] || null === myGames.value[gameId].myColor) {
             return;
         }

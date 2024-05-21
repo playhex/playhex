@@ -9,18 +9,19 @@ const nowDiff = (seconds: number) => new Date(new Date().getTime() + seconds * 1
 describe('ByoYomi', () => {
     it('can recreate ByoYomi Chrono from values, and consume periods if needed', () => {
         const chrono = new ByoYomiChrono(10, 10, 10);
+        const now = new Date();
 
         // Set 8 periods, but chrono elapsed for 45 seconds
-        chrono.setValues(nowDiff(-45.5), 8);
+        chrono.setValues(nowDiff(-45.5), 8, now);
 
         assert.strictEqual(chrono.getRemainingPeriods(), 3);
-        assert.match(chrono.toString(), /^4\.\d+s \+ 3 x 10s$/);
+        assert.match(chrono.toString(now), /^4\.\d+s \+ 3 x 10s$/);
 
         // Set 8 periods, but chrono elapsed for 100 seconds
-        chrono.setValues(nowDiff(-100), 8);
+        chrono.setValues(nowDiff(-100), 8, now);
 
         assert.strictEqual(chrono.getRemainingPeriods(), 0);
-        assert.match(chrono.toString(), /^-[\d.]+s \+ 0 x 10s$/);
+        assert.match(chrono.toString(now), /^-[\d.]+s \+ 0 x 10s$/);
     });
 
     it('can recreate ByoYomi TimeControl from values, and consume periods if needed', () => {
@@ -46,12 +47,12 @@ describe('ByoYomi', () => {
                     totalRemainingTime: 12345,
                 },
             ],
-        });
+        }, new Date());
 
         let values = timeControl.getValues();
 
         assert.strictEqual(values.players[0].remainingPeriods, 3);
-        assert.strictEqual(Math.floor(timeValueToSeconds(values.players[0].remainingMainTime)), 4);
+        assert.strictEqual(Math.floor(timeValueToSeconds(values.players[0].remainingMainTime, new Date())), 4);
         assert.ok(timeControl.getState() === 'running');
 
         // Set 8 periods, but chrono elapsed for 100 seconds
@@ -70,7 +71,7 @@ describe('ByoYomi', () => {
                     totalRemainingTime: 12345,
                 },
             ],
-        });
+        }, new Date());
 
         values = timeControl.getValues();
 

@@ -27,7 +27,7 @@ type ChronoData = {
 };
 
 const toChrono = (timeValue: TimeValue): ChronoData => {
-    let seconds = timeValueToSeconds(timeValue);
+    let seconds = timeValueToSeconds(timeValue, new Date());
     const { floor } = Math;
     let sign = '';
 

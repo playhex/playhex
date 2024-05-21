@@ -1,7 +1,8 @@
 import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from '.';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board';
-import { GameData, Outcome } from './Types';
+import { Outcome } from './Types';
+import { GameData } from './normalization';
 
 type GameEvents = {
     /**
@@ -14,12 +15,12 @@ type GameEvents = {
     /**
      * Game have been finished.
      */
-    ended: (winner: PlayerIndex, outcome: Outcome) => void;
+    ended: (winner: PlayerIndex, outcome: Outcome, date: Date) => void;
 
     /**
      * Game has been canceled, so game is over, but no winner.
      */
-    canceled: () => void;
+    canceled: (date: Date) => void;
 };
 
 export default class Game extends TypedEmitter<GameEvents>
@@ -169,11 +170,11 @@ export default class Game extends TypedEmitter<GameEvents>
         this.board.setCell(move.row, move.col, byPlayerIndex);
 
         this.movesHistory.push(move);
-        this.lastMoveAt = new Date();
+        this.lastMoveAt = move.getPlayedAt();
 
         // Naively check connection on every move played
         if (this.board.hasPlayerConnection(byPlayerIndex)) {
-            this.setWinner(byPlayerIndex, null);
+            this.setWinner(byPlayerIndex, null, move.getPlayedAt());
         } else {
             this.changeCurrentPlayer();
         }
@@ -182,7 +183,11 @@ export default class Game extends TypedEmitter<GameEvents>
 
         // Emit "ended" event after "played" event to keep order between events.
         if (this.hasWinner()) {
-            this.emit('ended', this.getStrictWinner(), null);
+            if (null === this.endedAt) {
+                throw new Error('Ended at expected to be set');
+            }
+
+            this.emit('ended', this.getStrictWinner(), null, this.endedAt);
         }
     }
 
@@ -245,7 +250,7 @@ export default class Game extends TypedEmitter<GameEvents>
         this.board.setCell(swappedMoveMirrored.row, swappedMoveMirrored.col, byPlayerIndex);
 
         this.movesHistory.push(move);
-        this.lastMoveAt = new Date();
+        this.lastMoveAt = move.getPlayedAt();
 
         this.changeCurrentPlayer();
 
@@ -280,17 +285,17 @@ export default class Game extends TypedEmitter<GameEvents>
      * Just update properties, do not emit "ended" event.
      * Should be emitted manually.
      */
-    private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
+    private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null, date: Date): void
     {
         this.winner = playerIndex;
         this.outcome = outcome;
-        this.endedAt = new Date();
+        this.endedAt = date;
     }
 
     /**
      * Change game state by setting a winner and emitting "ended" event.
      */
-    declareWinner(playerIndex: PlayerIndex, outcome: Outcome = null): void
+    declareWinner(playerIndex: PlayerIndex, outcome: Outcome, date: Date): void
     {
         if (null !== this.winner) {
             throw new Error('Cannot set a winner again, there is already a winner');
@@ -300,20 +305,20 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new Error('Cannot set a winner, game is already ended, probably canceled');
         }
 
-        this.setWinner(playerIndex, outcome);
+        this.setWinner(playerIndex, outcome, date);
 
-        this.emit('ended', playerIndex, outcome);
+        this.emit('ended', playerIndex, outcome, date);
     }
 
-    cancel(): void
+    cancel(date: Date): void
     {
         if (this.isEnded()) {
             throw new Error('Cannot cancel, game already ended');
         }
 
-        this.endedAt = new Date();
+        this.endedAt = date;
 
-        this.emit('canceled');
+        this.emit('canceled', date);
     }
 
     isCanceled(): boolean
@@ -329,17 +334,17 @@ export default class Game extends TypedEmitter<GameEvents>
     /**
      * Makes playerIndex resign
      */
-    resign(playerIndex: PlayerIndex): void
+    resign(playerIndex: PlayerIndex, date: Date): void
     {
-        this.declareWinner(0 === playerIndex ? 1 : 0, 'resign');
+        this.declareWinner(0 === playerIndex ? 1 : 0, 'resign', date);
     }
 
     /**
      * Makes current player lose by time
      */
-    loseByTime(): void
+    loseByTime(date: Date): void
     {
-        this.declareWinner(this.otherPlayerIndex(), 'time');
+        this.declareWinner(this.otherPlayerIndex(), 'time', date);
     }
 
     getStartedAt(): Date

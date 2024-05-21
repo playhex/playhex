@@ -39,7 +39,7 @@ describe('hexworld', () => {
         game.move(Move.fromString('b3'), 0);
         game.move(Move.fromString('b3'), 1);
         game.move(Move.fromString('c6'), 0);
-        game.resign(1);
+        game.resign(1, new Date());
 
         const link = gameToHexworldLink(game);
 
@@ -51,7 +51,7 @@ describe('hexworld', () => {
 
         game.move(Move.fromString('b3'), 0);
         game.move(Move.fromString('c11'), 1);
-        game.loseByTime();
+        game.loseByTime(new Date());
 
         const link = gameToHexworldLink(game);
 
@@ -63,7 +63,7 @@ describe('hexworld', () => {
         game.move(Move.fromString('c2'), 0);
         game.move(Move.fromString('d4'), 1);
         game.move(Move.fromString('c6'), 0);
-        game.resign(1);
+        game.resign(1, new Date());
 
         const link = gameToHexworldLink(game, 0);
 
