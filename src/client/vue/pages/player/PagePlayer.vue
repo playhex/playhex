@@ -226,7 +226,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                     : '…' })
                 }}</p>
 
-                <p class="text-muted">
+                <p v-if="isMe()" class="text-body-secondary">
                     <small>
                         {{ $t('ping.ping_ms', { ms: pingTime }) }}
                         –

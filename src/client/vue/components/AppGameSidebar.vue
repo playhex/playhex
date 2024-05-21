@@ -398,7 +398,7 @@ const doAnalyzeGame = async () => {
                         :key="message.createdAt.getTime()"
                         class="chat-message"
                     >
-                        <span class="time text-muted">{{ formatHour(message.createdAt) }}</span>
+                        <span class="time text-body-secondary">{{ formatHour(message.createdAt) }}</span>
                         <span>&nbsp;</span>
                         <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
                         <span class="player fst-italic" v-else>{{ $t('system') }}</span>
