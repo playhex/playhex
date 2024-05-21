@@ -25,6 +25,8 @@ const { timeControlOptions, playerTimeData } = toRefs(props);
 type ChronoData = {
     time: string;
     ms?: string;
+    isPaused?: boolean;
+    warning?: boolean;
 };
 
 const toChrono = (timeValue: TimeValue): ChronoData => {
@@ -39,10 +41,12 @@ const toChrono = (timeValue: TimeValue): ChronoData => {
 
     const chrono: ChronoData = {
         time: `${sign}${msToTime(ms)}`,
+        isPaused: 'number' === typeof timeValue,
     };
 
     if (ms < 10000) {
         chrono.ms = `.${floor((ms % 1000) / 100)}`;
+        chrono.warning = ms % 1000 < 500;
     }
 
     return chrono;
@@ -82,7 +86,7 @@ onUnmounted(() => clearInterval(chronoThread));
 </script>
 
 <template>
-    <p>
+    <p :class="{ 'text-secondary': chronoDisplay.isPaused, 'text-warning': chronoDisplay.warning }">
         <span class="chrono-time">{{ chronoDisplay.time }}</span>
         <span v-if="chronoDisplay.ms">{{ chronoDisplay.ms }}</span>
         <span v-if="timeControlOptions.type === 'byoyomi' && null !== byoYomiChrono">

@@ -66,6 +66,28 @@ export const validateConfigRandom = (config: unknown): config is { determinist: 
     ;
 };
 
+const waitTimeBeforeRandomMove = (() => {
+    const { RANDOM_BOT_WAIT_BEFORE_PLAY } = process.env;
+
+    if (!RANDOM_BOT_WAIT_BEFORE_PLAY) {
+        return () => 0;
+    }
+
+    const matches = RANDOM_BOT_WAIT_BEFORE_PLAY.match(/\d+/g);
+
+    if (!matches) {
+        return () => 0;
+    }
+
+    if (2 === matches.length) {
+        const [min, max] = matches.map(s => parseInt(s, 10));
+
+        return () => min + Math.random() * (max - min);
+    }
+
+    return () => parseInt(matches[0], 10);
+})();
+
 export const makeAIPlayerMove = async (player: Player, hostedGame: HostedGame): Promise<null | Move> => {
     const { isBot } = player;
     let { aiConfig } = player;
@@ -103,7 +125,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGame: HostedGame): 
                 throw new Error('Invalid config for aiConfig');
             }
 
-            return await calcRandomMove(game, 0, aiConfig.config.determinist);
+            return await calcRandomMove(game, waitTimeBeforeRandomMove(), aiConfig.config.determinist);
     }
 
     logger.error(`No local AI play for bot with slug = "${player.slug}"`);
