@@ -47,7 +47,6 @@
     "tournament": "Tournoi",
     "play_vs_ai": "Jouer contre IA",
     "play_vs_offline_ai": "Jouer contre IA hors-ligne",
-    "_move": "coup",
     "account_created_on": "Compte créé le {{date}}",
     "board_orientation": {
         "title": "Orientation du plateau",
