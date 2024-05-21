@@ -7,6 +7,7 @@ import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYom
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { ByoYomiChrono } from '@shared/time-control/ByoYomiChrono';
 import { msToDuration, msToTime } from '@shared/app/timeControlUtils';
+import useServerDateStore from '../../stores/serverDateStore';
 
 const props = defineProps({
     timeControlOptions: {
@@ -27,7 +28,7 @@ type ChronoData = {
 };
 
 const toChrono = (timeValue: TimeValue): ChronoData => {
-    let ms = timeValueToMilliseconds(timeValue, new Date());
+    let ms = timeValueToMilliseconds(timeValue, useServerDateStore().newDate());
     const { floor } = Math;
     let sign = '';
 
@@ -41,7 +42,7 @@ const toChrono = (timeValue: TimeValue): ChronoData => {
     };
 
     if (ms < 10000) {
-        chrono.ms = `.${floor(ms / 100)}`;
+        chrono.ms = `.${floor((ms % 1000) / 100)}`;
     }
 
     return chrono;

@@ -22,6 +22,7 @@ import { useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
+import useServerDateStore from '../../../stores/serverDateStore';
 
 const { slug } = useRoute().params;
 
@@ -203,6 +204,11 @@ const clickLogout = async () => {
         },
     });
 };
+
+/**
+ * ping and date shift
+ */
+const { pingTime, medianShift } = storeToRefs(useServerDateStore());
 </script>
 
 <template>
@@ -215,12 +221,20 @@ const clickLogout = async () => {
             <div>
                 <h2><AppPseudo v-if="player" :player="player" /><template v-else>…</template></h2>
 
-                <p v-if="player && !player.isGuest">{{ $t('account_created_on', { date: player?.createdAt
+                <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
                     : '…' })
                 }}</p>
 
-                <div v-if="isMe() && null !== player" class="player-btns">
+                <p class="text-muted">
+                    <small>
+                        {{ $t('ping.ping_ms', { ms: pingTime }) }}
+                        –
+                        {{ $t('ping.date_shift_ms', { ms: medianShift }) }}
+                    </small>
+                </p>
+
+                <div v-if="isMe() && null !== player" class="player-btns mt-3">
                     <template v-if="player.isGuest">
                         <router-link
                             :to="{ name: 'signup' }"

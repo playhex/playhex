@@ -5,6 +5,7 @@ import LobbyWebsocketController from './LobbyWebsocketController';
 import GameWebsocketController from './GameWebsocketController';
 import OnlinePlayersWebsocketController from './OnlinePlayersWebsocketController';
 import ChatWebsocketController from './ChatWebsocketController';
+import ServerStatusWebsocketController from './ServerStatusWebsocketController';
 
 export interface WebsocketControllerInterface
 {
@@ -18,6 +19,7 @@ export function registerWebsocketControllers() {
         Container.get(LobbyWebsocketController),
         Container.get(GameWebsocketController),
         Container.get(OnlinePlayersWebsocketController),
+        Container.get(ServerStatusWebsocketController),
     ];
 
     Container

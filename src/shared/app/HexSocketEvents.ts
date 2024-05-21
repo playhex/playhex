@@ -25,6 +25,13 @@ export type HexClientToServerEvents = {
      * A player send a chat message on a game
      */
     sendChat: (gameId: string, content: string, answer: (result: true | string) => void) => void;
+
+    /**
+     * Returns info about server:
+     *  - serverDate: Used to allow client to synchronize with server date,
+     *      and prevent displaying a shifted chrono in games.
+     */
+    getServerStatus: (answer: (serverStatus: { serverDate: Date }) => void) => void;
 };
 
 export type HexServerToClientEvents = {
