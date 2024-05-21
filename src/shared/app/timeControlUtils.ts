@@ -20,19 +20,19 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
 
     switch (type) {
         case 'simple':
-            return options.secondsPerMove;
+            return options.timePerMove / 1000;
 
         case 'absolute':
-            return options.secondsPerPlayer / averageMoves;
+            return (options.timePerPlayer / 1000) / averageMoves;
 
         case 'fischer':
-            return options.initialSeconds / averageMoves
-                + (options.incrementSeconds ?? 0);
+            return (options.initialTime / 1000) / averageMoves
+                + (options.timeIncrement ?? 0) / 1000;
 
         case 'byoyomi':
-            return options.initialSeconds / averageMoves
+            return (options.initialTime / 1000) / averageMoves
                 + (options.periodsCount > 0
-                    ? (options.periodsCount - 1) * options.periodSeconds / averageMoves + options.periodSeconds
+                    ? (options.periodsCount - 1) * (options.periodTime / 1000) / averageMoves + options.periodTime / 1000
                     : 0
                 )
             ;
@@ -68,18 +68,18 @@ export const timeControlToCadencyName = (gameOptions: HostedGameOptions): TimeCo
  * Show seconds like time. For in game elapsing time.
  * "5:02", "1h06", "1d 5h"
  */
-export const secondsToTime = (seconds: number): string => {
+export const msToTime = (ms: number): string => {
     const { floor } = Math;
 
     const parts = [];
 
-    parts.push(floor(seconds / 86400));
-    seconds -= parts[0] * 86400;
-    parts.push(floor(seconds / 3600));
-    seconds -= parts[1] * 3600;
-    parts.push(floor(seconds / 60));
-    seconds -= parts[2] * 60;
-    parts.push(floor(seconds));
+    parts.push(floor(ms / 86400000));
+    ms -= parts[0] * 86400000;
+    parts.push(floor(ms / 3600000));
+    ms -= parts[1] * 3600000;
+    parts.push(floor(ms / 60000));
+    ms -= parts[2] * 60000;
+    parts.push(floor(ms / 1000));
 
     if (parts[0] > 0) {
         return parts[1] > 0
@@ -102,8 +102,8 @@ export const secondsToTime = (seconds: number): string => {
  * Show seconds like duration. For lobby or time increments.
  * "5min", "1h", "1d12h"
  */
-export const secondsToDuration = (seconds: number, precision = 2): string => {
-    if (seconds <= 0) {
+export const msToDuration = (ms: number, precision = 2): string => {
+    if (ms <= 0) {
         return '0';
     }
 
@@ -111,13 +111,13 @@ export const secondsToDuration = (seconds: number, precision = 2): string => {
 
     const parts = [];
 
-    parts.push(floor(seconds / 86400));
-    seconds -= parts[0] * 86400;
-    parts.push(floor(seconds / 3600));
-    seconds -= parts[1] * 3600;
-    parts.push(floor(seconds / 60));
-    seconds -= parts[2] * 60;
-    parts.push(floor(seconds));
+    parts.push(floor(ms / 86400000));
+    ms -= parts[0] * 86400000;
+    parts.push(floor(ms / 3600000));
+    ms -= parts[1] * 3600000;
+    parts.push(floor(ms / 60000));
+    ms -= parts[2] * 60000;
+    parts.push(floor(ms / 1000));
 
     const tokens = [];
 
@@ -143,31 +143,31 @@ export const secondsToDuration = (seconds: number, precision = 2): string => {
 export const timeControlToString = (timeControl: TimeControlType): string => {
     switch (timeControl.type) {
         case 'fischer': {
-            let string = secondsToDuration(timeControl.options.initialSeconds);
+            let string = msToDuration(timeControl.options.initialTime);
 
-            if (timeControl.options.incrementSeconds) {
-                string += ' + ' + secondsToDuration(timeControl.options.incrementSeconds);
+            if (timeControl.options.timeIncrement) {
+                string += ' + ' + msToDuration(timeControl.options.timeIncrement);
             }
 
             return string;
         }
 
         case 'byoyomi': {
-            let string = secondsToDuration(timeControl.options.initialSeconds);
+            let string = msToDuration(timeControl.options.initialTime);
 
-            if (timeControl.options.periodSeconds && timeControl.options.periodsCount) {
-                string += ` + ${timeControl.options.periodsCount} × ${secondsToDuration(timeControl.options.periodSeconds)}`;
+            if (timeControl.options.periodTime && timeControl.options.periodsCount) {
+                string += ` + ${timeControl.options.periodsCount} × ${msToDuration(timeControl.options.periodTime)}`;
             }
 
             return string;
         }
 
         case 'absolute': {
-            return secondsToDuration(timeControl.options.secondsPerPlayer) + ' / ' + t('_player');
+            return msToDuration(timeControl.options.timePerPlayer) + ' / ' + t('_player');
         }
 
         case 'simple': {
-            return secondsToDuration(timeControl.options.secondsPerMove) + ' / ' + t('move');
+            return msToDuration(timeControl.options.timePerMove) + ' / ' + t('move');
         }
     }
 };

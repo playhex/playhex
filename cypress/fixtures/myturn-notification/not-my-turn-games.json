@@ -34,7 +34,7 @@
             "currentPlayer": 1,
             "players": [
                 {
-                    "totalRemainingTime": 587.769
+                    "totalRemainingTime": 587769
                 },
                 {
                     "totalRemainingTime": "2024-01-19T21:48:23.543Z"
@@ -51,9 +51,9 @@
             "timeControl": {
                 "type": "fischer",
                 "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
                 }
             }
         },

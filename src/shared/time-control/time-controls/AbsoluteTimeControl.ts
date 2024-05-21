@@ -3,7 +3,7 @@ import { AbstractFischerTimeControl } from '../AbstractFischerTimeControl';
 
 export interface AbsoluteTimeControlOptions
 {
-    secondsPerPlayer: number;
+    timePerPlayer: number;
 }
 
 /**
@@ -16,7 +16,7 @@ export class AbsoluteTimeControl extends AbstractFischerTimeControl
     ) {
         super(
             options,
-            options.secondsPerPlayer,
+            options.timePerPlayer,
         );
     }
 

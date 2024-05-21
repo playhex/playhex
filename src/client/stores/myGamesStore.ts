@@ -7,7 +7,7 @@ import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
 import { pseudoString } from '@shared/app/pseudoUtils';
 import useLobbyStore from './lobbyStore';
-import { timeValueToSeconds } from '@shared/time-control/TimeValue';
+import { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
 import { useRouter } from 'vue-router';
 import { sendNotification } from '../services/notifications';
@@ -58,7 +58,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         const time0 = game0.hostedGame.timeControl.players[game0.myColor].totalRemainingTime;
         const time1 = game1.hostedGame.timeControl.players[game1.myColor].totalRemainingTime;
 
-        return timeValueToSeconds(time0, now) - timeValueToSeconds(time1, now);
+        return timeValueToMilliseconds(time0, now) - timeValueToMilliseconds(time1, now);
     };
 
     const isPlaying = (game: CurrentGame): boolean => {

@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import TimeValue, { timeValueToSeconds } from './TimeValue';
+import TimeValue, { timeValueToMilliseconds } from './TimeValue';
 
 type ChronoEvents = {
     /**
@@ -79,14 +79,18 @@ export class Chrono extends TypedEmitter<ChronoEvents>
     }
 
     /**
+     * Increment or decrement time of this chrono,
+     * keeping running/paused state.
+     *
      * @param date Used to know if chrono is elapsed from this date after increment
      */
-    increment(seconds: number): void
+    increment(ms: number): void
     {
         if (this.value instanceof Date) {
-            this.setValue(new Date(this.value.getTime() + seconds * 1000));
+            this.value = new Date(this.value.getTime() + ms);
+            this.resetElapseTimeout();
         } else {
-            this.value += seconds;
+            this.value += ms;
         }
     }
 
@@ -99,7 +103,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
             return;
         }
 
-        this.value = new Date(date.getTime() + this.value * 1000);
+        this.value = new Date(date.getTime() + this.value);
 
         this.resetElapseTimeout();
     }
@@ -113,7 +117,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
             return;
         }
 
-        this.value = (this.value.getTime() - date.getTime()) / 1000;
+        this.value = this.value.getTime() - date.getTime();
 
         this.resetElapseTimeout();
     }
@@ -150,6 +154,6 @@ export class Chrono extends TypedEmitter<ChronoEvents>
      */
     toString(date: Date): string
     {
-        return `${timeValueToSeconds(this.value, date)}s`;
+        return `${timeValueToMilliseconds(this.value, date)}ms`;
     }
 }

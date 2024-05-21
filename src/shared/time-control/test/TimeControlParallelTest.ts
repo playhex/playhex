@@ -4,7 +4,7 @@ import { TimeControlError } from '../TimeControl';
 import { AbsoluteTimeControl } from '../time-controls/AbsoluteTimeControl';
 import { FischerTimeControl } from '../time-controls/FischerTimeControl';
 import { SimpleTimeControl } from '../time-controls/SimpleTimeControl';
-import TimeValue, { timeValueToSeconds } from '../TimeValue';
+import TimeValue, { timeValueToMilliseconds } from '../TimeValue';
 import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const parallel = require('mocha.parallel');
@@ -14,18 +14,18 @@ const wait = async (seconds: number) => new Promise(resolve => setTimeout(resolv
 /**
  * Asserts whether time is equals with some milliseconds tolerance.
  *
- * assertTimeEquals(0.205, 0.2) asserts true
- * assertTimeEquals(0.304, 0.2) asserts false
- * assertTimeEquals(new Date(...), 0.2) asserts if remaining time is almost same
+ * assertTimeEquals(205, 200) asserts true
+ * assertTimeEquals(304, 200) asserts false
+ * assertTimeEquals(new Date(...), 200) asserts if remaining time is almost same
  */
 const assertTimeEquals = (timeValue: TimeValue, time: number): void => {
     if (timeValue instanceof Date) {
-        timeValue = timeValueToSeconds(timeValue, new Date());
+        timeValue = timeValueToMilliseconds(timeValue, new Date());
     }
 
     const diff = Math.abs(timeValue - time);
 
-    assert.strictEqual(diff < 0.020, true);
+    assert.strictEqual(diff < 20, true);
 };
 
 /**
@@ -41,7 +41,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[AbsoluteTimeControl] should display exactly 0/paused after time elapsed', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new AbsoluteTimeControl({ secondsPerPlayer: 0.1 });
+        const timeControl = new AbsoluteTimeControl({ timePerPlayer: 100 });
 
         // 1s | 1s
         timeControl.start(new Date());
@@ -59,7 +59,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[AbsoluteTimeControl] elapses on first player', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new AbsoluteTimeControl({ secondsPerPlayer: 0.5 });
+        const timeControl = new AbsoluteTimeControl({ timePerPlayer: 500 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -85,7 +85,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[AbsoluteTimeControl] elapses on second player', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new AbsoluteTimeControl({ secondsPerPlayer: 0.3 });
+        const timeControl = new AbsoluteTimeControl({ timePerPlayer: 300 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -118,7 +118,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[AbsoluteTimeControl] does not elapses if paused', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new AbsoluteTimeControl({ secondsPerPlayer: 0.3 });
+        const timeControl = new AbsoluteTimeControl({ timePerPlayer: 300 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -155,7 +155,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[AbsoluteTimeControl] cannot push while paused', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new AbsoluteTimeControl({ secondsPerPlayer: 0.3 });
+        const timeControl = new AbsoluteTimeControl({ timePerPlayer: 300 });
 
         // 3s | 3s
         timeControl.start(new Date());
@@ -181,7 +181,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] should display exactly 0/paused after time elapsed', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.1, incrementSeconds: 0.1 });
+        const timeControl = new FischerTimeControl({ initialTime: 100, timeIncrement: 100 });
 
         // 1s | 1s
         timeControl.start(new Date());
@@ -199,7 +199,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] elapses on first player', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.5, incrementSeconds: 0.1 });
+        const timeControl = new FischerTimeControl({ initialTime: 500, timeIncrement: 100 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -225,7 +225,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] elapses on second player', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.3, incrementSeconds: 0.1 });
+        const timeControl = new FischerTimeControl({ initialTime: 300, timeIncrement: 100 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -258,7 +258,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] does not elapses if paused', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.3, incrementSeconds: 0.1 });
+        const timeControl = new FischerTimeControl({ initialTime: 300, timeIncrement: 100 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -295,7 +295,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] cannot push while paused', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.3, incrementSeconds: 0.1 });
+        const timeControl = new FischerTimeControl({ initialTime: 300, timeIncrement: 100 });
 
         // 3s | 3s
         timeControl.start(new Date());
@@ -318,7 +318,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] time increment', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.3, incrementSeconds: 0.4 });
+        const timeControl = new FischerTimeControl({ initialTime: 300, timeIncrement: 400 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -348,7 +348,7 @@ parallel('AbsoluteTimeControl', () => {
         assert.strictEqual(elapsedEvent, 0);
         assert.strictEqual(timeControl.getState(), 'elapsed');
         assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime, 0);
-        assertTimeEquals(timeControl.getValues().players[1].totalRemainingTime, 0.6);
+        assertTimeEquals(timeControl.getValues().players[1].totalRemainingTime, 600);
 
         done();
     });
@@ -357,7 +357,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[FischerTimeControl] elapses player when restoring old time control already elapsed', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new FischerTimeControl({ initialSeconds: 0.3, incrementSeconds: 0.1 });
+        const timeControl = new FischerTimeControl({ initialTime: 300, timeIncrement: 100 });
 
         let eventElapsedPlayer: null | number = null;
         let eventElapsedAt: null | Date = null;
@@ -393,7 +393,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[SimpleTimeControl] cannot push while paused', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new SimpleTimeControl({ secondsPerMove: 0.2 });
+        const timeControl = new SimpleTimeControl({ timePerMove: 200 });
 
         // 2s | 2s
         timeControl.start(new Date());
@@ -416,7 +416,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[SimpleTimeControl] displays well remaining time', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new SimpleTimeControl({ secondsPerMove: 0.2 });
+        const timeControl = new SimpleTimeControl({ timePerMove: 200 });
 
         // 2s | 2s
         timeControl.start(new Date());
@@ -426,7 +426,7 @@ parallel('AbsoluteTimeControl', () => {
         // 1s | 2s
         assert.strictEqual(timeControl.getValues().currentPlayer, 0);
         assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime instanceof Date, true);
-        assert.strictEqual(timeControl.getValues().players[1].totalRemainingTime, 0.2);
+        assert.strictEqual(timeControl.getValues().players[1].totalRemainingTime, 200);
         assert.strictEqual(timeControl.getState(), 'running');
 
         await wait(0.2);
@@ -441,7 +441,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[SimpleTimeControl] displays well remaining time after a push', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new SimpleTimeControl({ secondsPerMove: 0.5 });
+        const timeControl = new SimpleTimeControl({ timePerMove: 500 });
 
         // 5s | 5s
         timeControl.start(new Date());
@@ -455,7 +455,7 @@ parallel('AbsoluteTimeControl', () => {
 
         // 5s | 2s
         assert.strictEqual(timeControl.getValues().currentPlayer, 1);
-        assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime, 0.5);
+        assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime, 500);
         assert.strictEqual(timeControl.getValues().players[1].totalRemainingTime instanceof Date, true);
         assert.strictEqual(timeControl.getState(), 'running');
 
@@ -466,7 +466,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[SimpleTimeControl] displays well remaining time when paused', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new SimpleTimeControl({ secondsPerMove: 0.5 });
+        const timeControl = new SimpleTimeControl({ timePerMove: 500 });
 
         // 5s | 5s
         timeControl.start(new Date());
@@ -481,7 +481,7 @@ parallel('AbsoluteTimeControl', () => {
         // 5s | 2s
         assert.strictEqual(timeControl.getValues().currentPlayer, 0);
         assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime instanceof Date, false);
-        assert.strictEqual(timeControl.getValues().players[1].totalRemainingTime, 0.5);
+        assert.strictEqual(timeControl.getValues().players[1].totalRemainingTime, 500);
         assert.strictEqual(timeControl.getState(), 'paused');
 
         done();
@@ -491,7 +491,7 @@ parallel('AbsoluteTimeControl', () => {
     it('[SimpleTimeControl] elapses', async function (done) {
         this.timeout(1000);
 
-        const timeControl = new SimpleTimeControl({ secondsPerMove: 0.3 });
+        const timeControl = new SimpleTimeControl({ timePerMove: 300 });
         let elapsedEvent: null | 0 | 1 = null;
         timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
 
@@ -521,8 +521,8 @@ parallel('AbsoluteTimeControl', () => {
         this.timeout(1000);
 
         const timeControl = new ByoYomiTimeControl({
-            initialSeconds: 0.4,
-            periodSeconds: 0.2,
+            initialTime: 400,
+            periodTime: 200,
             periodsCount: 2,
         });
 
@@ -533,28 +533,28 @@ parallel('AbsoluteTimeControl', () => {
         timeControl.start(new Date());
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 2);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.8);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 800);
 
         await wait(0.2);
 
         // 2s + 2x2s | 4s + 2x2s
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 2);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.6);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 600);
 
         await wait(0.3);
 
         // 1s + 1x2s | 4s + 2x2s
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 1);
-        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 0.1);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.3);
+        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 100);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 300);
         timeControl.push(0, new Date());
         // 2s + 1x2s | 4s + 2x2s
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 1);
-        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 0.2);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.4);
+        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 200);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 400);
 
         await wait(0.1);
 
@@ -562,8 +562,8 @@ parallel('AbsoluteTimeControl', () => {
         timeControl.push(1, new Date());
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[1].remainingPeriods, 2);
-        assertTimeEquals(timeControl.getValues().players[1].remainingMainTime, 0.3);
-        assertTimeEquals(timeControl.getValues().players[1].totalRemainingTime, 0.7);
+        assertTimeEquals(timeControl.getValues().players[1].remainingMainTime, 300);
+        assertTimeEquals(timeControl.getValues().players[1].totalRemainingTime, 700);
 
         assert.strictEqual(elapsedEvent, null);
 
@@ -575,8 +575,8 @@ parallel('AbsoluteTimeControl', () => {
         this.timeout(1000);
 
         const timeControl = new ByoYomiTimeControl({
-            initialSeconds: 0.3,
-            periodSeconds: 0.2,
+            initialTime: 300,
+            periodTime: 200,
             periodsCount: 2,
         });
 
@@ -587,24 +587,24 @@ parallel('AbsoluteTimeControl', () => {
         timeControl.start(new Date());
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 2);
-        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 0.3);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.7);
+        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 300);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 700);
 
         await wait(0.6);
 
         // 1s + 0x2s | 4s + 2x2s
         assert.strictEqual(timeControl.getValues().state, 'running');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 0);
-        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 0.1);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.1);
+        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 100);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 100);
 
         await wait(0.2);
 
         // elapsed | 4s + 2x2s
         assert.strictEqual(timeControl.getValues().state, 'elapsed');
         assert.strictEqual(timeControl.getValues().players[0].remainingPeriods, 0);
-        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 0.0);
-        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0.0);
+        assertTimeEquals(timeControl.getValues().players[0].remainingMainTime, 0);
+        assertTimeEquals(timeControl.getValues().players[0].totalRemainingTime, 0);
 
         assert.strictEqual(elapsedEvent, 0);
 

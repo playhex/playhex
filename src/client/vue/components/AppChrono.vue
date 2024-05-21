@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import TimeValue, { timeValueToSeconds } from '@shared/time-control/TimeValue';
+import TimeValue, { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
 import { PropType, onUnmounted, ref, toRefs, watch } from 'vue';
 import { PlayerTimeData } from '@shared/time-control/TimeControl';
 import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYomiTimeControl';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { ByoYomiChrono } from '@shared/time-control/ByoYomiChrono';
-import { secondsToDuration, secondsToTime } from '@shared/app/timeControlUtils';
+import { msToDuration, msToTime } from '@shared/app/timeControlUtils';
 
 const props = defineProps({
     timeControlOptions: {
@@ -27,21 +27,21 @@ type ChronoData = {
 };
 
 const toChrono = (timeValue: TimeValue): ChronoData => {
-    let seconds = timeValueToSeconds(timeValue, new Date());
+    let ms = timeValueToMilliseconds(timeValue, new Date());
     const { floor } = Math;
     let sign = '';
 
-    if (seconds < 0) {
-        seconds = -seconds;
+    if (ms < 0) {
+        ms = -ms;
         sign = '-';
     }
 
     const chrono: ChronoData = {
-        time: `${sign}${secondsToTime(seconds)}`,
+        time: `${sign}${msToTime(ms)}`,
     };
 
-    if (seconds < 10) {
-        chrono.ms = `.${floor((seconds % 1) * 10)}`;
+    if (ms < 10000) {
+        chrono.ms = `.${floor(ms / 100)}`;
     }
 
     return chrono;
@@ -52,7 +52,7 @@ const chronoDisplay = ref<ChronoData>({ time: '…' });
 let byoYomiChrono: null | ByoYomiChrono = null;
 
 if ('byoyomi' === timeControlOptions.value.type) {
-    const { initialSeconds, periodSeconds, periodsCount } = timeControlOptions.value.options;
+    const { initialTime: initialSeconds, periodTime: periodSeconds, periodsCount } = timeControlOptions.value.options;
     const { remainingMainTime, remainingPeriods } = (playerTimeData.value as ByoYomiPlayerTimeData);
 
     byoYomiChrono = new ByoYomiChrono(initialSeconds, periodSeconds, periodsCount);
@@ -85,7 +85,7 @@ onUnmounted(() => clearInterval(chronoThread));
         <span class="chrono-time">{{ chronoDisplay.time }}</span>
         <span v-if="chronoDisplay.ms">{{ chronoDisplay.ms }}</span>
         <span v-if="timeControlOptions.type === 'byoyomi' && null !== byoYomiChrono">
-            + <strong>{{ byoYomiChrono.getRemainingPeriods() }}</strong> × {{ secondsToDuration(timeControlOptions.options.periodSeconds) }}</span>
+            + <strong>{{ byoYomiChrono.getRemainingPeriods() }}</strong> × {{ msToDuration(timeControlOptions.options.periodTime) }}</span>
     </p>
 </template>
 

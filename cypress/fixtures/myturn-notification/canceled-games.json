@@ -40,7 +40,7 @@
             "timeControl": {
                 "type": "absolute",
                 "options": {
-                    "secondsPerPlayer": 900
+                    "timePerPlayer": 900000
                 }
             }
         },
@@ -82,10 +82,10 @@
             "state": "over",
             "players": [
                 {
-                    "totalRemainingTime": 863.72
+                    "totalRemainingTime": 863720
                 },
                 {
-                    "totalRemainingTime": 895.439
+                    "totalRemainingTime": 895439
                 }
             ]
         },
@@ -98,7 +98,7 @@
             "timeControl": {
                 "type": "absolute",
                 "options": {
-                    "secondsPerPlayer": 900
+                    "timePerPlayer": 900000
                 }
             }
         },
@@ -250,10 +250,10 @@
             "state": "over",
             "players": [
                 {
-                    "totalRemainingTime": 741.051
+                    "totalRemainingTime": 741051
                 },
                 {
-                    "totalRemainingTime": 892.436
+                    "totalRemainingTime": 892436
                 }
             ]
         },
@@ -266,7 +266,7 @@
             "timeControl": {
                 "type": "absolute",
                 "options": {
-                    "secondsPerPlayer": 900
+                    "timePerPlayer": 900000
                 }
             }
         },
@@ -688,10 +688,10 @@
             "state": "over",
             "players": [
                 {
-                    "totalRemainingTime": 817.285
+                    "totalRemainingTime": 817285
                 },
                 {
-                    "totalRemainingTime": 880.992
+                    "totalRemainingTime": 880992
                 }
             ]
         },
@@ -704,7 +704,7 @@
             "timeControl": {
                 "type": "absolute",
                 "options": {
-                    "secondsPerPlayer": 900
+                    "timePerPlayer": 900000
                 }
             }
         },

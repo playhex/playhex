@@ -3,7 +3,7 @@ import { AbstractFischerTimeControl } from '../AbstractFischerTimeControl';
 
 export interface SimpleTimeControlOptions
 {
-    secondsPerMove: number;
+    timePerMove: number;
 }
 
 /**
@@ -15,9 +15,9 @@ export class SimpleTimeControl extends AbstractFischerTimeControl
     {
         super(
             options,
-            options.secondsPerMove,
-            options.secondsPerMove,
-            options.secondsPerMove,
+            options.timePerMove,
+            options.timePerMove,
+            options.timePerMove,
         );
     }
 

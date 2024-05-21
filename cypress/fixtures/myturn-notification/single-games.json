@@ -33,10 +33,10 @@
             "state": "over",
             "players": [
                 {
-                    "totalRemainingTime": 899.98
+                    "totalRemainingTime": 899980
                 },
                 {
-                    "totalRemainingTime": 896.275
+                    "totalRemainingTime": 896275
                 }
             ]
         },
@@ -49,7 +49,7 @@
             "timeControl": {
                 "type": "absolute",
                 "options": {
-                    "secondsPerPlayer": 900
+                    "timePerPlayer": 900000
                 }
             }
         },
@@ -172,7 +172,7 @@
             "state": "running",
             "players": [
                 {
-                    "totalRemainingTime": 899.993
+                    "totalRemainingTime": 899993
                 },
                 {
                     "totalRemainingTime": "2023-12-22T15:29:43.801Z"
@@ -188,7 +188,7 @@
             "timeControl": {
                 "type": "absolute",
                 "options": {
-                    "secondsPerPlayer": 900
+                    "timePerPlayer": 900000
                 }
             }
         },

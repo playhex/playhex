@@ -37,7 +37,7 @@
                     "totalRemainingTime": 0
                 },
                 {
-                    "totalRemainingTime": 600
+                    "totalRemainingTime": 600000
                 }
             ]
         },
@@ -51,9 +51,9 @@
             "timeControl": {
                 "type": "fischer",
                 "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
                 }
             }
         },
@@ -129,10 +129,10 @@
             "currentPlayer": 1,
             "players": [
                 {
-                    "totalRemainingTime": 600
+                    "totalRemainingTime": 600000
                 },
                 {
-                    "totalRemainingTime": 599.427
+                    "totalRemainingTime": 599427
                 }
             ]
         },
@@ -146,9 +146,9 @@
             "timeControl": {
                 "type": "fischer",
                 "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
                 }
             }
         },
@@ -208,10 +208,10 @@
             "currentPlayer": 0,
             "players": [
                 {
-                    "totalRemainingTime": 599.999
+                    "totalRemainingTime": 599999
                 },
                 {
-                    "totalRemainingTime": 600
+                    "totalRemainingTime": 600000
                 }
             ]
         },
@@ -225,9 +225,9 @@
             "timeControl": {
                 "type": "fischer",
                 "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
                 }
             }
         },
@@ -325,7 +325,7 @@
                     "totalRemainingTime": "2024-01-19T12:52:47.201Z"
                 },
                 {
-                    "totalRemainingTime": 600
+                    "totalRemainingTime": 600000
                 }
             ]
         },
@@ -339,9 +339,9 @@
             "timeControl": {
                 "type": "fischer",
                 "options": {
-                    "initialSeconds": 600,
-                    "incrementSeconds": 5,
-                    "maxSeconds": 600
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
                 }
             }
         },

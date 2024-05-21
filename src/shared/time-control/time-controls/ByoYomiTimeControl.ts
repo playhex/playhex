@@ -5,8 +5,8 @@ import TimeControlType from '../TimeControlType';
 
 export interface ByoYomiTimeControlOptions
 {
-    initialSeconds: number;
-    periodSeconds: number;
+    initialTime: number;
+    periodTime: number;
     periodsCount: number;
 }
 
@@ -35,8 +35,8 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         super(options);
 
         this.playerChronos = [
-            new ByoYomiChrono(options.initialSeconds, options.periodSeconds, options.periodsCount),
-            new ByoYomiChrono(options.initialSeconds, options.periodSeconds, options.periodsCount),
+            new ByoYomiChrono(options.initialTime, options.periodTime, options.periodsCount),
+            new ByoYomiChrono(options.initialTime, options.periodTime, options.periodsCount),
         ];
 
         this.playerChronos[0].on('elapsed', date => {

@@ -75,7 +75,7 @@ export default class HostedGameOptions
     timeControl: TimeControlType = {
         type: 'absolute',
         options: {
-            secondsPerPlayer: 900,
+            timePerPlayer: 900000,
         },
     };
 }

@@ -1,6 +1,6 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { Chrono } from './Chrono';
-import TimeValue, { timeValueToSeconds } from './TimeValue';
+import TimeValue, { timeValueToMilliseconds } from './TimeValue';
 
 type ChronoEvents = {
     /**
@@ -18,14 +18,19 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
     private chrono: Chrono;
     private remainingPeriods: number;
 
+    /**
+     * @param initialTime Time in ms of the initial time before periods.
+     * @param periodTime Time in ms of a single period.
+     * @param periodsCount Number of periods.
+     */
     constructor(
-        initialSeconds: number,
-        private periodSeconds: number,
+        initialTime: number,
+        private periodTime: number,
         private periodsCount: number,
     ) {
         super();
 
-        this.chrono = new Chrono(initialSeconds);
+        this.chrono = new Chrono(initialTime);
         this.remainingPeriods = periodsCount;
 
         this.chrono.on('elapsed', date => {
@@ -35,7 +40,7 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
             }
 
             --this.remainingPeriods;
-            this.chrono.increment(this.periodSeconds);
+            this.chrono.increment(this.periodTime);
         });
     }
 
@@ -59,10 +64,10 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
         const mainValue = this.chrono.getValue();
 
         if (mainValue instanceof Date) {
-            return new Date(mainValue.getTime() + this.remainingPeriods * this.periodSeconds * 1000);
+            return new Date(mainValue.getTime() + this.remainingPeriods * this.periodTime);
         }
 
-        return mainValue + this.remainingPeriods * this.periodSeconds;
+        return mainValue + this.remainingPeriods * this.periodTime;
     }
 
     getRemainingPeriods(): number
@@ -82,14 +87,14 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
 
         while (this.chrono.isElapsedAt(date) && this.remainingPeriods > 0) {
             --this.remainingPeriods;
-            this.chrono.increment(this.periodSeconds);
+            this.chrono.increment(this.periodTime);
         }
     }
 
     /**
      * Set time of the chrono, can be the initial time or period time.
      *
-     * @param value Value to set, either a date of an elapsing chrono, or a number of seconds for a paused chrono.
+     * @param value Value to set, either a date of an elapsing chrono, or a number of milliseconds for a paused chrono.
      * @param date Will chech whether chrono is elapsed from this time. Pass new Date() in case of doubt.
      */
     setMainValue(value: TimeValue): void
@@ -119,7 +124,7 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
     pauseByMovePlayed(date: Date): void
     {
         if (this.isInitialTimeElapsed()) {
-            this.chrono.setValue(this.periodSeconds);
+            this.chrono.setValue(this.periodTime);
             return;
         }
 
@@ -148,6 +153,6 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
 
     toString(date: Date): string
     {
-        return `${timeValueToSeconds(this.getMainValue(), date)}s + ${this.remainingPeriods} x ${this.periodSeconds}s`;
+        return `${timeValueToMilliseconds(this.getMainValue(), date) / 1000}s + ${this.remainingPeriods} x ${this.periodTime / 1000}s`;
     }
 }

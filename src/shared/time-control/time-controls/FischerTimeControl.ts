@@ -3,9 +3,9 @@ import TimeControlType from '../TimeControlType';
 
 export interface FischerTimeControlOptions
 {
-    initialSeconds: number;
-    incrementSeconds?: number;
-    maxSeconds?: number;
+    initialTime: number;
+    timeIncrement?: number;
+    maxTime?: number;
 }
 
 /**
@@ -18,9 +18,9 @@ export class FischerTimeControl extends AbstractFischerTimeControl
     ) {
         super(
             options,
-            options.initialSeconds,
-            options.incrementSeconds,
-            options.maxSeconds,
+            options.initialTime,
+            options.timeIncrement,
+            options.maxTime,
         );
     }
 

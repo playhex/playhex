@@ -7,7 +7,7 @@ describe('Chrono', () => {
         const runAt = new Date('2024-01-01 00:00:00');
         let elapsedAt: null | Date = null;
 
-        const chrono = new Chrono(30);
+        const chrono = new Chrono(30000);
 
         chrono.on('elapsed', date => elapsedAt = date);
         chrono.run(runAt);
@@ -18,22 +18,22 @@ describe('Chrono', () => {
 
     it('run at given timestamp', () => {
         const now = new Date();
-        const run10SecondsEarlier = new Date(now.getTime() - 10_000);
+        const run10SecondsEarlier = new Date(now.getTime() - 10000);
 
-        const chrono = new Chrono(30);
+        const chrono = new Chrono(30000);
 
         chrono.run(run10SecondsEarlier);
         chrono.pause(now);
 
-        assert.strictEqual(chrono.getValue(), 20);
+        assert.strictEqual(chrono.getValue(), 20000);
     });
 
     it('isElapsed uses strict timestamp', () => {
         const now = new Date();
-        const run10SecondsEarlier = new Date(now.getTime() - 10_000);
-        const aFewMomentLater = new Date(now.getTime() + 60_000);
+        const run10SecondsEarlier = new Date(now.getTime() - 10000);
+        const aFewMomentLater = new Date(now.getTime() + 60000);
 
-        const chrono = new Chrono(30);
+        const chrono = new Chrono(30000);
         chrono.run(run10SecondsEarlier);
 
         const isElapsedNow = chrono.isElapsedAt(now);
@@ -41,6 +41,6 @@ describe('Chrono', () => {
 
         assert.strictEqual(isElapsedNow, null, 'Not expected to have elapsed now');
         assert.notStrictEqual(isElapsedFewMomentLater, null, 'Expected to have elapsed when checking a few moment later');
-        assert.strictEqual(isElapsedFewMomentLater!.getTime() - run10SecondsEarlier.getTime(), 30_000, 'Expected to have elapsed 30 seconds after started');
+        assert.strictEqual(isElapsedFewMomentLater!.getTime() - run10SecondsEarlier.getTime(), 30000, 'Expected to have elapsed 30 seconds after started');
     });
 });

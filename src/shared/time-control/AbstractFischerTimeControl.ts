@@ -16,17 +16,23 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
      */
     private lastElapsedDates: [null | Date, null | Date] = [null, null];
 
+    /**
+     * @param options Object that contains options of this time control.
+     * @param initialTime Initial time in ms.
+     * @param timeIncrement Number of ms to add on move played. Defaults to 0.
+     * @param maxTime Maximum time in ms time increment can reach. Defaults to initialTime.
+     */
     constructor(
         protected options: object,
-        private initialSeconds: number,
-        private incrementSeconds?: number,
-        private maxSeconds?: number,
+        private initialTime: number,
+        private timeIncrement?: number,
+        private maxTime?: number,
     ) {
         super(options);
 
         this.playerChronos = [
-            new Chrono(this.initialSeconds),
-            new Chrono(this.initialSeconds),
+            new Chrono(this.initialTime),
+            new Chrono(this.initialTime),
         ];
 
         this.playerChronos[0].on('elapsed', date => {
@@ -88,21 +94,21 @@ export abstract class AbstractFischerTimeControl extends AbstractTimeControl
     protected doPush(byPlayer: PlayerIndex, date: Date): void
     {
         this.playerChronos[this.currentPlayer].pause(date);
-        let seconds = this.playerChronos[this.currentPlayer].getValue();
+        let ms = this.playerChronos[this.currentPlayer].getValue();
 
-        if (seconds instanceof Date) {
+        if (ms instanceof Date) {
             throw new TimeControlError('Unexpected Date here, expected a number');
         }
 
-        if (undefined !== this.incrementSeconds) {
-            seconds += this.incrementSeconds;
+        if (undefined !== this.timeIncrement) {
+            ms += this.timeIncrement;
         }
 
-        if (undefined !== this.maxSeconds && seconds > this.maxSeconds) {
-            seconds = this.maxSeconds;
+        if (undefined !== this.maxTime && ms > this.maxTime) {
+            ms = this.maxTime;
         }
 
-        this.playerChronos[this.currentPlayer].setValue(seconds);
+        this.playerChronos[this.currentPlayer].setValue(ms);
 
         this.currentPlayer = 1 - byPlayer as PlayerIndex;
         this.playerChronos[this.currentPlayer].run(date);

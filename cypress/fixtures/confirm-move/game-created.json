@@ -25,10 +25,10 @@
         "currentPlayer": 0,
         "players": [
             {
-                "totalRemainingTime": 600
+                "totalRemainingTime": 600000
             },
             {
-                "totalRemainingTime": 600
+                "totalRemainingTime": 600000
             }
         ]
     },
@@ -42,9 +42,9 @@
         "timeControl": {
             "type": "fischer",
             "options": {
-                "initialSeconds": 600,
-                "incrementSeconds": 5,
-                "maxSeconds": 600
+                "initialTime": 600000,
+                "timeIncrement": 5000,
+                "maxTime": 600000
             }
         }
     },

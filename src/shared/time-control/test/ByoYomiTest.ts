@@ -2,13 +2,13 @@ import assert from 'assert';
 import { describe, it } from 'mocha';
 import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl';
 import { ByoYomiChrono } from '../ByoYomiChrono';
-import { timeValueToSeconds } from '../TimeValue';
+import { timeValueToMilliseconds } from '../TimeValue';
 
 const nowDiff = (seconds: number) => new Date(new Date().getTime() + seconds * 1000);
 
 describe('ByoYomi', () => {
     it('can recreate ByoYomi Chrono from values, and consume periods if needed', () => {
-        const chrono = new ByoYomiChrono(10, 10, 10);
+        const chrono = new ByoYomiChrono(10000, 10000, 10);
         const now = new Date();
 
         // Set 8 periods, but chrono elapsed for 45 seconds
@@ -26,9 +26,9 @@ describe('ByoYomi', () => {
 
     it('can recreate ByoYomi TimeControl from values, and consume periods if needed', () => {
         const timeControl = new ByoYomiTimeControl({
-            initialSeconds: 10,
+            initialTime: 10000,
             periodsCount: 10,
-            periodSeconds: 10,
+            periodTime: 10000,
         });
 
         // Set 8 periods, but chrono elapsed for 45 seconds
@@ -42,7 +42,7 @@ describe('ByoYomi', () => {
                     totalRemainingTime: 12345,
                 },
                 {
-                    remainingMainTime: 5,
+                    remainingMainTime: 5000,
                     remainingPeriods: 5,
                     totalRemainingTime: 12345,
                 },
@@ -52,7 +52,7 @@ describe('ByoYomi', () => {
         let values = timeControl.getValues();
 
         assert.strictEqual(values.players[0].remainingPeriods, 3);
-        assert.strictEqual(Math.floor(timeValueToSeconds(values.players[0].remainingMainTime, new Date())), 4);
+        assert.strictEqual(Math.floor(timeValueToMilliseconds(values.players[0].remainingMainTime, new Date()) / 1000), 4);
         assert.ok(timeControl.getState() === 'running');
 
         // Set 8 periods, but chrono elapsed for 100 seconds
@@ -66,7 +66,7 @@ describe('ByoYomi', () => {
                     totalRemainingTime: 12345,
                 },
                 {
-                    remainingMainTime: 5,
+                    remainingMainTime: 5000,
                     remainingPeriods: 5,
                     totalRemainingTime: 12345,
                 },
