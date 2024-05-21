@@ -12,7 +12,6 @@ import useDarkLightThemeStore from './stores/darkLightThemeStore';
 import I18NextVue from 'i18next-vue';
 import i18next from 'i18next';
 import { head } from './services/head';
-import { answerPing } from './services/ping';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
@@ -31,8 +30,6 @@ vueApp.use(pinia);
 vueApp.use(I18NextVue, { i18next });
 vueApp.use(unoverlay);
 vueApp.use(head);
-
-answerPing();
 
 // Load store now to set theme early enough and prevent blinking
 useDarkLightThemeStore();

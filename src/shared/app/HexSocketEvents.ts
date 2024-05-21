@@ -1,7 +1,7 @@
 import { Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
 import { GameTimeData } from 'time-control/TimeControl';
-import { ChatMessage, GameAnalyze, HostedGame, Move, Ping, Player } from './models';
+import { ChatMessage, GameAnalyze, HostedGame, Move, Player } from './models';
 
 export type HexClientToServerEvents = {
     /**
@@ -95,16 +95,4 @@ export type HexServerToClientEvents = {
      * to know if game analyze has finished, or is just requested.
      */
     analyze: (gameId: string, gameAnalyze: GameAnalyze) => void;
-
-    /**
-     * Ping, client must anwser pong with same code,
-     * server will attribute a ping time to this player.
-     */
-    ping: (answer: (clientDateIsoString: string) => void) => void;
-
-    /**
-     * Ping and time shift values of a player has been recalculated,
-     * one for each devices currently connected.
-     */
-    pingUpdate: (playerId: string, pings: Ping[]) => void;
 };

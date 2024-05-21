@@ -7,7 +7,6 @@ import HostedGameOptions from './HostedGameOptions';
 import HostedGameToPlayer from './HostedGameToPlayer';
 import Move from './Move';
 import OnlinePlayers from './OnlinePlayers';
-import Ping from './Ping';
 import Player from './Player';
 import PlayerSettings from './PlayerSettings';
 
@@ -21,7 +20,6 @@ export {
     HostedGameToPlayer,
     Move,
     OnlinePlayers,
-    Ping,
     Player,
     PlayerSettings,
 };
@@ -36,7 +34,6 @@ export const entities = {
     HostedGameToPlayer,
     Move,
     OnlinePlayers,
-    Ping,
     Player,
     PlayerSettings,
 };

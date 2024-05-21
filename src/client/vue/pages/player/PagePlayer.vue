@@ -7,7 +7,7 @@ import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'boots
 import HostedGame from '../../../../shared/app/models/HostedGame';
 import Player from '../../../../shared/app/models/Player';
 import { getPlayerGames, getPlayerBySlug, ApiClientError } from '../../../apiClient';
-import { Ref, onUnmounted, ref, watch } from 'vue';
+import { Ref, ref } from 'vue';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore';
 import HostedGameClient from '../../../HostedGameClient';
@@ -22,8 +22,6 @@ import { useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
-import usePingStore from '../../../stores/pingStore';
-import { Ping } from '@shared/app/models';
 
 const { slug } = useRoute().params;
 
@@ -205,34 +203,6 @@ const clickLogout = async () => {
         },
     });
 };
-
-/*
- * Ping and date shift
- */
-const pingStore = usePingStore();
-let pings = ref<Ping[]>([]);
-
-watch(player, (newPlayer, previousPlayer) => {
-    if (null !== previousPlayer) {
-        pingStore.stopListening(previousPlayer.publicId);
-    }
-
-    if (null !== newPlayer) {
-        // eslint-disable-next-line vue/no-ref-as-operand
-        pings = pingStore.getPlayerPings(newPlayer.publicId);
-    }
-});
-
-if (null !== player.value) {
-    // eslint-disable-next-line vue/no-ref-as-operand
-    pings = pingStore.getPlayerPings(player.value.publicId);
-}
-
-onUnmounted(() => {
-    if (null !== player.value) {
-        pingStore.stopListening(player.value.publicId);
-    }
-});
 </script>
 
 <template>
@@ -245,23 +215,12 @@ onUnmounted(() => {
             <div>
                 <h2><AppPseudo v-if="player" :player="player" /><template v-else>…</template></h2>
 
-                <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
+                <p v-if="player && !player.isGuest">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
                     : '…' })
                 }}</p>
 
-                <p v-if="pings.length > 0" class="text-muted">
-                    <small>
-                        <span v-for="ping in pings" :key="ping.socketId" :class="{'this-device': ping.isThisDevice }">
-                            {{ $t('ping.ping_ms', { ms: ping.pingMs }) }}
-                            –
-                            {{ $t('ping.date_shift_ms', { ms: ping.dateShiftMs }) }}
-                            <br>
-                        </span>
-                    </small>
-                </p>
-
-                <div v-if="isMe() && null !== player" class="player-btns mt-3">
+                <div v-if="isMe() && null !== player" class="player-btns">
                     <template v-if="player.isGuest">
                         <router-link
                             :to="{ name: 'signup' }"
@@ -403,7 +362,4 @@ onUnmounted(() => {
 
 td:first-child, th:first-child
     width 6em
-
-.this-device
-    text-decoration underline
 </style>

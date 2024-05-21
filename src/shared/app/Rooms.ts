@@ -26,10 +26,4 @@ export default class Rooms
      * Used to know when a player needs to play on one of his games.
      */
     static readonly playerGames = (playerId: string) => `players/${playerId}/games`;
-
-    /**
-     * Ping and time shift update to get real time ping of a player,
-     * and its time shift from server.
-     */
-    static readonly playerPing = (playerId: string) => `players/${playerId}/ping`;
 }

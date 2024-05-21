@@ -139,10 +139,6 @@
     "old_password": "Ancien mot de passe",
     "new_password": "Nouveau mot de passe",
     "confirm_new_password": "Confirmer le mot de passe",
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Décalage de date: {{ms}}ms"
-    },
     "game_candency": {
         "blitz": "Blitz",
         "normal": "Normale",
