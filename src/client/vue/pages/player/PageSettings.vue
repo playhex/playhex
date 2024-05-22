@@ -104,11 +104,11 @@ const submitPasswordChange = async () => {
 
         <div class="row">
             <div class="col-sm-8 col-md-4">
-                <select class="form-select">
+                <select class="form-select" @change="e => e.target && setLocale((e.target as HTMLSelectElement).value)">
                     <option
                         v-for="(label, locale) in availableLocales"
                         :key="locale"
-                        @click="() => setLocale(locale)"
+                        :value="locale"
                         :selected="locale === i18next.language"
                     >{{ label }}</option>
                 </select>
