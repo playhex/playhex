@@ -1,6 +1,6 @@
 import { Game, IllegalMove, PlayerIndex, Move as GameMove } from '../shared/game-engine';
 import { HostedGameState } from '../shared/app/Types';
-import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move } from '../shared/app/models';
+import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
@@ -11,7 +11,6 @@ import { createTimeControl } from '../shared/time-control/createTimeControl';
 import Container from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager';
-import HostedGameEntity from '../shared/app/models/HostedGame'; // TODO rename HostedGame
 import { fromEngineMove } from '../shared/app/models/Move';
 
 type HostedGameEvents = {
@@ -38,14 +37,12 @@ type HostedGameEvents = {
  * Most of games should be played only in memory,
  * and persisted only on game finished.
  * Unless server restart, a player become temporarly inactive, or correspondace game.
- *
- * TODO rename HostedGameServer
  */
-export default class HostedGame extends TypedEmitter<HostedGameEvents>
+export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 {
     private publicId: string = uuidv4();
 
-    private hostedGameEntity: null | HostedGameEntity = null;
+    private hostedGame: null | HostedGame = null;
 
     private host: Player;
     private gameOptions: HostedGameOptions;
@@ -67,14 +64,14 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     private createdAt: Date = new Date();
     private io: HexServer = Container.get(HexServer);
 
-    private rematch: null | HostedGameEntity = null;
+    private rematch: null | HostedGame = null;
 
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
-    static hostNewGame(gameOptions: HostedGameOptions, host: Player): HostedGame
+    static hostNewGame(gameOptions: HostedGameOptions, host: Player): HostedGameServer
     {
-        const hostedGame = new HostedGame();
+        const hostedGame = new HostedGameServer();
 
         hostedGame.gameOptions = gameOptions;
         hostedGame.host = host;
@@ -426,42 +423,42 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         this.emit('chat');
     }
 
-    toData(): HostedGameEntity
+    toData(): HostedGame
     {
-        if (null === this.hostedGameEntity) {
-            this.hostedGameEntity = new HostedGameEntity();
+        if (null === this.hostedGame) {
+            this.hostedGame = new HostedGame();
         }
 
-        this.hostedGameEntity.publicId = this.publicId;
-        this.hostedGameEntity.host = this.host;
-        this.hostedGameEntity.timeControl = this.timeControl.getValues();
-        this.hostedGameEntity.gameOptions = this.gameOptions;
-        this.hostedGameEntity.gameData = this.game?.toData() ?? null;
-        this.hostedGameEntity.chatMessages = this.chatMessages;
-        this.hostedGameEntity.state = this.state;
-        this.hostedGameEntity.createdAt = this.createdAt;
-        this.hostedGameEntity.rematch = this.rematch;
+        this.hostedGame.publicId = this.publicId;
+        this.hostedGame.host = this.host;
+        this.hostedGame.timeControl = this.timeControl.getValues();
+        this.hostedGame.gameOptions = this.gameOptions;
+        this.hostedGame.gameData = this.game?.toData() ?? null;
+        this.hostedGame.chatMessages = this.chatMessages;
+        this.hostedGame.state = this.state;
+        this.hostedGame.createdAt = this.createdAt;
+        this.hostedGame.rematch = this.rematch;
 
-        if (!Array.isArray(this.hostedGameEntity.hostedGameToPlayers)) {
-            this.hostedGameEntity.hostedGameToPlayers = [];
+        if (!Array.isArray(this.hostedGame.hostedGameToPlayers)) {
+            this.hostedGame.hostedGameToPlayers = [];
         }
 
         for (let i = 0; i < this.players.length; ++i) {
-            if (!this.hostedGameEntity.hostedGameToPlayers[i]) {
-                this.hostedGameEntity.hostedGameToPlayers[i] = new HostedGameToPlayer();
-                this.hostedGameEntity.hostedGameToPlayers[i].hostedGame = this.hostedGameEntity;
-                this.hostedGameEntity.hostedGameToPlayers[i].order = i;
+            if (!this.hostedGame.hostedGameToPlayers[i]) {
+                this.hostedGame.hostedGameToPlayers[i] = new HostedGameToPlayer();
+                this.hostedGame.hostedGameToPlayers[i].hostedGame = this.hostedGame;
+                this.hostedGame.hostedGameToPlayers[i].order = i;
             }
 
-            if (this.hostedGameEntity.hostedGameToPlayers[i].player !== this.players[i]) {
-                this.hostedGameEntity.hostedGameToPlayers[i].player = this.players[i];
+            if (this.hostedGame.hostedGameToPlayers[i].player !== this.players[i]) {
+                this.hostedGame.hostedGameToPlayers[i].player = this.players[i];
             }
         }
 
-        return this.hostedGameEntity;
+        return this.hostedGame;
     }
 
-    static fromData(data: HostedGameEntity): HostedGame
+    static fromData(data: HostedGame): HostedGameServer
     {
         // Check whether data.createdAt is an instance of Date and not a string,
         // to check whether denormalization with superjson worked.
@@ -472,9 +469,9 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             );
         }
 
-        const hostedGame = new HostedGame();
+        const hostedGame = new HostedGameServer();
 
-        hostedGame.hostedGameEntity = data;
+        hostedGame.hostedGame = data;
 
         hostedGame.publicId = data.publicId;
         hostedGame.host = data.host;

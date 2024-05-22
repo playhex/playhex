@@ -4,7 +4,7 @@ import { Move, calcRandomMove } from '../../shared/game-engine';
 import Container from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer';
 import logger from './logger';
-import HostedGame from '../HostedGame';
+import HostedGameServer from '../HostedGameServer';
 import HexAiApiClient from './HexAiApiClient';
 import { AppDataSource } from '../data-source';
 
@@ -88,7 +88,7 @@ const waitTimeBeforeRandomMove = (() => {
     return () => parseInt(matches[0], 10);
 })();
 
-export const makeAIPlayerMove = async (player: Player, hostedGame: HostedGame): Promise<null | Move> => {
+export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedGameServer): Promise<null | Move> => {
     const { isBot } = player;
     let { aiConfig } = player;
 
@@ -110,10 +110,10 @@ export const makeAIPlayerMove = async (player: Player, hostedGame: HostedGame): 
     }
 
     if (aiConfig.isRemote) {
-        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, hostedGame, aiConfig.config);
+        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, hostedGameServer, aiConfig.config);
     }
 
-    const game = hostedGame.getGame();
+    const game = hostedGameServer.getGame();
 
     if (null === game) {
         throw new Error('makeAIPlayerMove() called with a HostedGame without game');

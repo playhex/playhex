@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
-import HostedGame from '../HostedGame';
+import HostedGameServer from '../HostedGameServer';
 import { HostedGameState } from '../../shared/app/Types';
-import { Player, ChatMessage, HostedGame as HostedGameEntity, HostedGameOptions, Move } from '../../shared/app/models';
+import { Player, ChatMessage, HostedGame, HostedGameOptions, Move } from '../../shared/app/models';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
 import HostedGamePersister from '../persistance/HostedGamePersister';
 import logger from '../services/logger';
@@ -16,7 +16,7 @@ import { plainToInstance } from '../../shared/app/class-transformer-custom';
 
 export class GameError extends Error {}
 
-const byRecentFirst = (game0: HostedGameEntity, game1: HostedGameEntity): number => {
+const byRecentFirst = (game0: HostedGame, game1: HostedGame): number => {
     const date0 = game0.gameData?.endedAt ?? game0.createdAt;
     const date1 = game1.gameData?.endedAt ?? game1.createdAt;
 
@@ -33,7 +33,7 @@ export default class HostedGameRepository
      * Each playing game can contains a persisted copy,
      * but the most updated game should be in memory.
      */
-    private activeGames: { [key: string]: HostedGame } = {};
+    private activeGames: { [key: string]: HostedGameServer } = {};
 
     /**
      * Keep timeout thread id of hosted games to persist in N minutes
@@ -68,7 +68,7 @@ export default class HostedGameRepository
                 return;
             }
 
-            this.activeGames[hostedGame.publicId] = HostedGame.fromData(hostedGame);
+            this.activeGames[hostedGame.publicId] = HostedGameServer.fromData(hostedGame);
 
             this.enableAutoPersist(this.activeGames[hostedGame.publicId]);
         });
@@ -102,54 +102,54 @@ export default class HostedGameRepository
      * Auto persist game when needed.
      * Also flush it from memory.
      */
-    private enableAutoPersist(hostedGame: HostedGame): void
+    private enableAutoPersist(hostedGameServer: HostedGameServer): void
     {
         // Persist on no activity
         const resetTimeout = (): void => {
-            if (this.persistWhenNoActivity[hostedGame.getId()]) {
-                clearTimeout(this.persistWhenNoActivity[hostedGame.getId()]);
-                delete this.persistWhenNoActivity[hostedGame.getId()];
+            if (this.persistWhenNoActivity[hostedGameServer.getId()]) {
+                clearTimeout(this.persistWhenNoActivity[hostedGameServer.getId()]);
+                delete this.persistWhenNoActivity[hostedGameServer.getId()];
             }
         };
 
         // Persist on ended
         const onEnded = () => {
             resetTimeout();
-            this.hostedGamePersister.persist(hostedGame.toData());
-            delete this.activeGames[hostedGame.getId()];
+            this.hostedGamePersister.persist(hostedGameServer.toData());
+            delete this.activeGames[hostedGameServer.getId()];
         };
 
-        if ('ended' === hostedGame.getState() || 'canceled' === hostedGame.getState()) {
+        if ('ended' === hostedGameServer.getState() || 'canceled' === hostedGameServer.getState()) {
             onEnded();
         } else {
-            hostedGame.on('ended', onEnded);
-            hostedGame.on('canceled', onEnded);
+            hostedGameServer.on('ended', onEnded);
+            hostedGameServer.on('canceled', onEnded);
         }
 
         // Keep alive again when activity done on this game
         const onActivity = (): void => {
             resetTimeout();
-            this.persistWhenNoActivity[hostedGame.getId()] = setTimeout(
-                () => this.hostedGamePersister.persist(hostedGame.toData()),
+            this.persistWhenNoActivity[hostedGameServer.getId()] = setTimeout(
+                () => this.hostedGamePersister.persist(hostedGameServer.toData()),
                 300 * 1000, // Persist after 5min inactivity
             );
         };
 
-        hostedGame.on('played', onActivity);
-        hostedGame.on('chat', onActivity);
+        hostedGameServer.on('played', onActivity);
+        hostedGameServer.on('chat', onActivity);
     }
 
-    getActiveGames(): { [key: string]: HostedGame }
+    getActiveGames(): { [key: string]: HostedGameServer }
     {
         return this.activeGames;
     }
 
-    getActiveGame(gameId: string): null | HostedGame
+    getActiveGame(gameId: string): null | HostedGameServer
     {
         return this.activeGames[gameId] ?? null;
     }
 
-    getActiveGamesData(): HostedGameEntity[]
+    getActiveGamesData(): HostedGame[]
     {
         return Object.values(this.activeGames)
             .map(game => game.toData())
@@ -160,7 +160,7 @@ export default class HostedGameRepository
      * Get finished games; bot games are ignored.
      * @param fromGamePublicId Take N ended games from fromGamePublicId, or from start if not set.
      */
-    async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGameEntity[]>
+    async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGame[]>
     {
         return await this.hostedGamePersister.findLastEnded1v1(take, fromGamePublicId);
     }
@@ -169,7 +169,7 @@ export default class HostedGameRepository
      * Returns games to display initially on lobby.
      * Active games, plus some ended games.
      */
-    async getLobbyGames(): Promise<HostedGameEntity[]>
+    async getLobbyGames(): Promise<HostedGame[]>
     {
         const lobbyGames = this.getActiveGamesData();
         const endedGames = await this.getEndedGames(5);
@@ -179,7 +179,7 @@ export default class HostedGameRepository
         return lobbyGames;
     }
 
-    async getGame(publicId: string): Promise<HostedGameEntity | null>
+    async getGame(publicId: string): Promise<HostedGame | null>
     {
         if (this.activeGames[publicId]) {
             return this.activeGames[publicId].toData();
@@ -188,9 +188,9 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    async createGame(host: Player, gameOptions: HostedGameOptions): Promise<HostedGame>
+    async createGame(host: Player, gameOptions: HostedGameOptions): Promise<HostedGameServer>
     {
-        const hostedGame = HostedGame.hostNewGame(gameOptions, host);
+        const hostedGame = HostedGameServer.hostNewGame(gameOptions, host);
 
         if ('ai' === gameOptions.opponentType) {
             try {
@@ -212,7 +212,7 @@ export default class HostedGameRepository
         return hostedGame;
     }
 
-    async rematchGame(host: Player, gameId: string): Promise<HostedGame>
+    async rematchGame(host: Player, gameId: string): Promise<HostedGameServer>
     {
         const game = await this.getGame(gameId);
 
@@ -255,8 +255,8 @@ export default class HostedGameRepository
         player: Player,
         state: null | HostedGameState = null,
         fromGamePublicId: null | string = null,
-    ): Promise<HostedGameEntity[]> {
-        const hostedGameList: HostedGameEntity[] = [];
+    ): Promise<HostedGame[]> {
+        const hostedGameList: HostedGame[] = [];
 
         for (const key in this.activeGames) {
             if (!this.activeGames[key].isPlayerInGame(player)) {
@@ -349,33 +349,33 @@ export default class HostedGameRepository
             return e.message;
         }
 
-        const hostedGame = this.activeGames[publicId];
+        const hostedGameServer = this.activeGames[publicId];
 
         // Game is in memory, push chat message
-        if (hostedGame) {
+        if (hostedGameServer) {
             let error: true | string;
-            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGame.toData()))) {
+            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.toData()))) {
                 return error;
             }
 
-            hostedGame.postChatMessage(chatMessage);
+            hostedGameServer.postChatMessage(chatMessage);
             return true;
         }
 
         // Game is not in memory, store chat message directly in database, on persisted game
-        const hostedGameEntity = await this.hostedGamePersister.findUnique(publicId);
+        const hostedGame = await this.hostedGamePersister.findUnique(publicId);
 
-        if (null === hostedGameEntity) {
+        if (null === hostedGame) {
             logger.notice('Tried to chat on a non-existant game', { chatMessage });
             return `Game ${publicId} not found`;
         }
 
         let error: true | string;
-        if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameEntity))) {
+        if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGame))) {
             return error;
         }
 
-        chatMessage.hostedGame = hostedGameEntity;
+        chatMessage.hostedGame = hostedGame;
 
         // Game is in database, insert chat message into database
         await this.chatMessageRepository.save(chatMessage);
