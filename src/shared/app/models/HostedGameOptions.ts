@@ -8,7 +8,7 @@ import { Expose } from '../class-transformer-custom';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
-export const MAX_BOARDSIZE = 80; // TODO tmp for fun purpose, put limit back to 42
+export const MAX_BOARDSIZE = 42;
 
 @Entity()
 export default class HostedGameOptions
