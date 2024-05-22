@@ -611,4 +611,25 @@ parallel('AbsoluteTimeControl', () => {
         done();
     });
 
+
+    it.only('[ByoYomiTimeControl] elapses when setting 2 periods and period time = 2', async function (done) {
+        this.timeout(300);
+
+        const timeControl = new ByoYomiTimeControl({
+            initialTime: 100,
+            periodTime: 0,
+            periodsCount: 2,
+        });
+
+        let elapsedEvent: null | 0 | 1 = null;
+        timeControl.on('elapsed', playerLostByTime => elapsedEvent = playerLostByTime);
+
+        timeControl.start(new Date());
+        await wait(0.2);
+
+        assert.strictEqual(elapsedEvent, 0);
+
+        done();
+    });
+
 });
