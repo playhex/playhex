@@ -2,10 +2,9 @@
 
 Play Hex online.
 
-Currently hosted here: <https://playhex.org/>
+Currently hosted here: <https://playhex.org>
 
-![Game screenshot](assets/images/screenshots/game.png)
-
+[![PlayHex](assets/images/screenshots/game.png)](https://playhex.org)
 
 ## Install
 
