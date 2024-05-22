@@ -149,14 +149,24 @@ gameOptions.value.timeControl = defaultTimeControls.normal.timeControl;
 const compileOptions = () => {
     if (showCustomTimeControl.value) {
         if ('fischer' === gameOptions.value.timeControl.type) {
-            gameOptions.value.timeControl.options.initialTime = initialTimeSteps[initialTimeSelected.value];
-            gameOptions.value.timeControl.options.timeIncrement = secondaryTimeSteps[secondaryTimeIncrementSelected.value];
+            gameOptions.value.timeControl.options = {
+                initialTime: initialTimeSteps[initialTimeSelected.value],
+                timeIncrement: secondaryTimeSteps[secondaryTimeIncrementSelected.value],
+            };
         }
 
         if ('byoyomi' === gameOptions.value.timeControl.type) {
-            gameOptions.value.timeControl.options.initialTime = initialTimeSteps[initialTimeSelected.value];
-            gameOptions.value.timeControl.options.periodTime = secondaryTimeSteps[secondaryTimeIncrementSelected.value];
-            gameOptions.value.timeControl.options.periodsCount = Number(byoyomiPeriodsCount.value);
+            gameOptions.value.timeControl.options = {
+                initialTime: initialTimeSteps[initialTimeSelected.value],
+                periodTime: secondaryTimeSteps[secondaryTimeIncrementSelected.value],
+                periodsCount: Number(byoyomiPeriodsCount.value),
+            };
+
+            // In case player select fischer, set 0 time increment, then select byo yomi,
+            // prevent sending periodTime=0, then getting a 400 error.
+            if (gameOptions.value.timeControl.options.periodTime < 1000) {
+                gameOptions.value.timeControl.options.periodTime = 1000;
+            }
         }
     }
 
@@ -216,10 +226,10 @@ defineExpose({ compileOptions });
             <input type="range" class="form-range" id="custom-byoyomi-initial-time" v-model="initialTimeSelected" min="0" :max="Object.keys(initialTimeSteps).length - 1" step="1">
 
             <label for="custom-byoyomi-period-count" class="form-label">{{ $t('2dots', { s: $t('time_control.periods') }) }} {{ byoyomiPeriodsCount }}</label>
-            <input type="range" class="form-range" id="custom-byoyomi-period-count" v-model="byoyomiPeriodsCount" min="0" max="15" step="1">
+            <input type="range" class="form-range" id="custom-byoyomi-period-count" v-model="byoyomiPeriodsCount" min="1" max="15" step="1">
 
             <label for="custom-byoyomi-perdiod-time" class="form-label">{{ $t('2dots', { s: $t('time_control.periods_time') }) }} {{ msToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
-            <input type="range" class="form-range" id="custom-byoyomi-perdiod-time" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
+            <input type="range" class="form-range" id="custom-byoyomi-perdiod-time" v-model="secondaryTimeIncrementSelected" min="1" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
         </div>
     </div>
 </template>

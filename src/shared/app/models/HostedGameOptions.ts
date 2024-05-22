@@ -1,10 +1,12 @@
 import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Type } from 'class-transformer';
 import { ColumnUUID } from '../custom-typeorm';
 import HostedGame from './HostedGame';
-import type TimeControlType from '../../time-control/TimeControlType';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../../game-engine';
-import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, validate } from 'class-validator';
+import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom';
+import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlAbsolute, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer, HostedGameOptionsTimeControlSimple } from './HostedGameOptionsTimeControl';
+import type { HostedGameOptionsTimeControlType } from './HostedGameOptionsTimeControl';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
@@ -71,13 +73,21 @@ export default class HostedGameOptions
 
     @Column({ type: 'json' })
     @Expose()
-    @IsObject() // TODO better validate type
-    timeControl: TimeControlType = {
-        type: 'absolute',
-        options: {
-            timePerPlayer: 900000,
+    @IsObject()
+    @ValidateNested()
+    @Type(() => HostedGameOptionsTimeControl, {
+        keepDiscriminatorProperty: true,
+        discriminator: {
+            property: 'type',
+            subTypes: [
+                { value: HostedGameOptionsTimeControlFischer, name: 'fischer' },
+                { value: HostedGameOptionsTimeControlAbsolute, name: 'absolute' },
+                { value: HostedGameOptionsTimeControlSimple, name: 'simple' },
+                { value: HostedGameOptionsTimeControlByoYomi, name: 'byoyomi' },
+            ],
         },
-    };
+    })
+    timeControl: HostedGameOptionsTimeControlType;
 }
 
 /**
@@ -95,10 +105,4 @@ export const cloneGameOptions = (gameOptions: HostedGameOptions): HostedGameOpti
     clone.timeControl = gameOptions.timeControl;
 
     return clone;
-};
-
-export const sanitizeGameOptions = (gameOptions: HostedGameOptions): HostedGameOptions => {
-    validate(gameOptions); // TODO check validation works
-
-    return gameOptions;
 };

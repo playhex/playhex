@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useOverlayMeta } from 'unoverlay-vue';
 import { PropType, Ref, ref, watch } from 'vue';
-import HostedGameOptions, { sanitizeGameOptions } from '../../../../shared/app/models/HostedGameOptions';
+import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
@@ -27,12 +27,16 @@ export type Create1vAIOverlayInput = typeof props;
 const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions });
 
 const showSecondaryOptions = ref(false);
-const timeControlComponent = ref();
+const timeControlComponent = ref<typeof AppTimeControl>();
 
 const submitForm = (gameOptions: HostedGameOptions): void => {
+    if (undefined === timeControlComponent.value) {
+        throw new Error('No element with ref="timeControlComponent" found in template');
+    }
+
     timeControlComponent.value.compileOptions();
 
-    confirm(sanitizeGameOptions(gameOptions));
+    confirm(gameOptions);
 };
 
 /*

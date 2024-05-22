@@ -352,9 +352,9 @@ describe('Authentication', () => {
             timeControl: {
                 type: 'fischer',
                 options: {
-                    initialSeconds: 600,
-                    incrementSeconds: 5,
-                    maxSeconds: 600,
+                    initialTime: 600000,
+                    timeIncrement: 5000,
+                    maxTime: 600000,
                 },
             },
         }).as('gameResponse');

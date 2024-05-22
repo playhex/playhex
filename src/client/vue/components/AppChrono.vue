@@ -57,10 +57,10 @@ const chronoDisplay = ref<ChronoData>({ time: '…' });
 let byoYomiChrono: null | ByoYomiChrono = null;
 
 if ('byoyomi' === timeControlOptions.value.type) {
-    const { initialTime: initialSeconds, periodTime: periodSeconds, periodsCount } = timeControlOptions.value.options;
+    const { initialTime, periodTime, periodsCount } = timeControlOptions.value.options;
     const { remainingMainTime, remainingPeriods } = (playerTimeData.value as ByoYomiPlayerTimeData);
 
-    byoYomiChrono = new ByoYomiChrono(initialSeconds, periodSeconds, periodsCount);
+    byoYomiChrono = new ByoYomiChrono(initialTime, periodTime, periodsCount);
 
     byoYomiChrono.setMainValue(remainingMainTime);
     byoYomiChrono.setRemainingPeriods(remainingPeriods);

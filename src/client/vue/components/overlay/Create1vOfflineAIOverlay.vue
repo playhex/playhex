@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useOverlayMeta } from 'unoverlay-vue';
 import { PropType, ref } from 'vue';
-import HostedGameOptions, { sanitizeGameOptions } from '../../../../shared/app/models/HostedGameOptions';
+import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
@@ -23,7 +23,7 @@ const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...prop
 const showSecondaryOptions = ref(false);
 
 const submitForm = (gameOptions: HostedGameOptions): void => {
-    confirm(sanitizeGameOptions(gameOptions));
+    confirm(gameOptions);
 };
 </script>
 
