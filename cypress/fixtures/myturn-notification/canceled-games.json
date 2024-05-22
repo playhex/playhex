@@ -1,6 +1,6 @@
 [
     {
-        "id": "40c551d0-e9a4-4e6d-9bf3-44a9e9523828",
+        "publicId": "40c551d0-e9a4-4e6d-9bf3-44a9e9523828",
         "host": {
             "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
             "pseudo": "8201",
@@ -49,7 +49,7 @@
         "state": "canceled"
     },
     {
-        "id": "c1db33be-6134-4185-a8ac-3a02f0ae2376",
+        "publicId": "c1db33be-6134-4185-a8ac-3a02f0ae2376",
         "host": {
             "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
             "pseudo": "8201",
@@ -217,7 +217,7 @@
         "state": "ended"
     },
     {
-        "id": "a8a516cc-86e2-4057-bffd-4aef17f69cb3",
+        "publicId": "a8a516cc-86e2-4057-bffd-4aef17f69cb3",
         "host": {
             "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
             "pseudo": "8201",
@@ -655,7 +655,7 @@
         "state": "ended"
     },
     {
-        "id": "a668e147-fce0-48ea-8f22-c0d3c8b1b4e9",
+        "publicId": "a668e147-fce0-48ea-8f22-c0d3c8b1b4e9",
         "host": {
             "publicId": "0808f397-9e12-45af-bd5b-42885fe36212",
             "pseudo": "2810",

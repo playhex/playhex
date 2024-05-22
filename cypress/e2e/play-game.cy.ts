@@ -30,11 +30,9 @@ describe('Play a game to the end', () => {
             clickHistory.push({ x: clientX, y: clientY });
 
             console.log(
-                "cy.get('canvas');\ncy.get('body')\n"
-                    + clickHistory
-                        .map(c => `    .click(${c.x}, ${c.y})`)
-                        .join('\n')
-                    + '\n;\n'
+                clickHistory
+                    .map(c => `cy.play(${c.x}, ${c.y});\n`)
+                    .join('')
                 ,
             );
         };
@@ -50,14 +48,11 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.get('canvas');
-        cy.get('body')
-            .click(409, 326)
-            .click(307, 270)
-            .click(603, 329)
-            .click(504, 279)
-            .click(605, 440)
-        ;
+        cy.play(409, 326);
+        cy.play(307, 270);
+        cy.play(603, 329);
+        cy.play(504, 279);
+        cy.play(605, 440);
 
         cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game!/);
@@ -73,17 +68,14 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.get('canvas');
-        cy.get('body')
-            .click(210, 326)
-            .click(410, 209)
-            .click(509, 145)
-            .click(797, 328)
-            .click(506, 497)
-            .click(601, 205)
-            .click(510, 269)
-            .click(413, 326)
-        ;
+        cy.play(210, 326);
+        cy.play(410, 209);
+        cy.play(509, 145);
+        cy.play(797, 328);
+        cy.play(506, 497);
+        cy.play(601, 205);
+        cy.play(510, 269);
+        cy.play(413, 326);
 
         cy.contains('Game finished');
         cy.contains('Determinist random bot won the game!');
@@ -99,13 +91,10 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.get('canvas');
-        cy.get('body')
-            .click(504, 152)
-            .click(605, 323)
-            .click(607, 208)
-            .click(607, 439)
-        ;
+        cy.play(504, 152);
+        cy.play(605, 323);
+        cy.play(607, 208);
+        cy.play(607, 439);
 
         cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game!/);

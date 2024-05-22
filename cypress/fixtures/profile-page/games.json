@@ -1,6 +1,6 @@
 [
     {
-        "id": "e259618e-f477-4ade-8b86-d4287e0dce22",
+        "publicId": "e259618e-f477-4ade-8b86-d4287e0dce22",
         "host": {
             "pseudo": "8385",
             "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
@@ -95,7 +95,7 @@
         "createdAt": "2024-01-19T10:31:03.600Z"
     },
     {
-        "id": "e43daf3e-f787-46e4-aa48-56217d126501",
+        "publicId": "e43daf3e-f787-46e4-aa48-56217d126501",
         "host": {
             "pseudo": "2450",
             "publicId": "aabfeee4-23c8-4d4a-8a88-8c485196b042",
@@ -174,7 +174,7 @@
         "createdAt": "2024-01-19T10:33:20.810Z"
     },
     {
-        "id": "4d0ace85-5b7c-436e-b127-fd4e9edd32bf",
+        "publicId": "4d0ace85-5b7c-436e-b127-fd4e9edd32bf",
         "host": {
             "pseudo": "Player Test",
             "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
@@ -288,7 +288,7 @@
         "createdAt": "2024-01-19T12:42:40.005Z"
     },
     {
-        "id": "118668ce-29b2-4ce8-8893-6ca3eeadc52d",
+        "publicId": "118668ce-29b2-4ce8-8893-6ca3eeadc52d",
         "host": {
             "pseudo": "Player Test",
             "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",

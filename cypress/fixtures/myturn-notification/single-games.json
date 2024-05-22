@@ -1,6 +1,6 @@
 [
     {
-        "id": "914ca90b-5e07-4dc4-9dbb-45e1b0ff84bf",
+        "publicId": "914ca90b-5e07-4dc4-9dbb-45e1b0ff84bf",
         "host": {
             "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
             "pseudo": "1817",
@@ -139,7 +139,7 @@
         "state": "ended"
     },
     {
-        "id": "0483ba90-2141-4d34-8272-94ecad8325a7",
+        "publicId": "0483ba90-2141-4d34-8272-94ecad8325a7",
         "host": {
             "publicId": "7ec0127b-9481-4a20-a0e0-924517cbc427",
             "pseudo": "1817",

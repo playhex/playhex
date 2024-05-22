@@ -1,6 +1,6 @@
 [
     {
-        "id": "f45d0703-827b-4da7-b804-48ea6f5e276b",
+        "publicId": "f45d0703-827b-4da7-b804-48ea6f5e276b",
         "host": {
             "pseudo": "Julien",
             "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
@@ -55,7 +55,7 @@
         "createdAt": "2024-02-20T20:06:21.075Z"
     },
     {
-        "id": "02a9d462-afe2-46d9-9ab4-723f86b5b8be",
+        "publicId": "02a9d462-afe2-46d9-9ab4-723f86b5b8be",
         "host": {
             "pseudo": "Julien",
             "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
@@ -110,7 +110,7 @@
         "createdAt": "2024-02-20T20:06:28.192Z"
     },
     {
-        "id": "6cbc0c65-d20d-40d8-bcb0-8d93f8b08f05",
+        "publicId": "6cbc0c65-d20d-40d8-bcb0-8d93f8b08f05",
         "host": {
             "pseudo": "Julien",
             "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",
@@ -165,7 +165,7 @@
         "createdAt": "2024-02-20T20:06:33.517Z"
     },
     {
-        "id": "56c8982b-3979-4368-b4f8-80f2e2771d34",
+        "publicId": "56c8982b-3979-4368-b4f8-80f2e2771d34",
         "host": {
             "pseudo": "Julien",
             "publicId": "48c68cfc-4401-469f-ba29-1fb184e9d415",

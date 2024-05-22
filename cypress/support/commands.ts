@@ -50,6 +50,12 @@ declare namespace Cypress {
          * submit game options and create game.
          */
         submitAIGame(): Chainable<unknown>;
+
+        /**
+         * Click on screen to play a move.
+         * x and y are coords of pixel on screen.
+         */
+        play(x: number, y: number): Chainable<unknown>;
     }
 }
 
@@ -83,4 +89,10 @@ Cypress.Commands.add('submitAIGame', () => {
         .contains('Play vs AI')
         .click()
     ;
+});
+
+Cypress.Commands.add('play', (x, y) => {
+    cy.get('canvas');
+    cy.wait(50);
+    cy.get('body').click(x, y);
 });

@@ -8,25 +8,22 @@ describe('Page Game finished', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Game finished');
-        cy.contains('Test player won the game!');
+        // Game sidebar
+        cy.get('[aria-label="Open game sidebar and chat"]').click();
+
+        cy.contains('Test player wins the game!');
 
         // Winner appears in his color, blue
-        cy.get('strong.text-primary').contains('Test player');
+        cy.get('h3 .text-primary').contains('Test player');
 
         // Assert review links. Download SGF and HexWorld link.
         cy.contains('button', 'SGF');
         cy.contains('HexWorld').should('have.attr', 'href', 'https://hexworld.org/board/#11r9c1,g3h6i3i8b8g6d5i5e7k5c9f6e8e6e3d7a6c6h2a7i10b7b6d6c2j4d4e10b11k4');
 
-        cy.get('.modal-footer').contains('button', 'Close').click();
-
-        // Game sidebar
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
-
         cy.contains('.sidebar', 'Test player wins');
         cy.contains('.sidebar', 'Rules: host plays second');
         cy.contains('.sidebar', 'Started: 24 January 2024');
-        cy.contains('.sidebar', 'Ended: 24 January 2024');
+        cy.contains('.sidebar', 'Finished: 24 January 2024 9:18 PM');
     });
 
     it('displays win popin when a player resigned', () => {
@@ -38,11 +35,13 @@ describe('Page Game finished', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Game finished');
-        cy.contains('The winner won by resignation!');
+        // Game sidebar
+        cy.get('[aria-label="Open game sidebar and chat"]').click();
+
+        cy.contains('The winner wins by resignation!');
 
         // Winner appears in his color, red
-        cy.get('strong.text-danger').contains('The winner');
+        cy.get('h3 .text-danger').contains('The winner');
     });
 
     it('displays win popin when game has been canceled', () => {
@@ -54,7 +53,9 @@ describe('Page Game finished', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Game finished');
+        // Game sidebar
+        cy.get('[aria-label="Open game sidebar and chat"]').click();
+
         cy.contains('Game has been canceled.');
     });
 
@@ -71,10 +72,11 @@ describe('Page Game finished', () => {
 
         cy.get('Accept').should('not.exist');
 
-        cy.contains('Game finished');
-        cy.contains('Game has been canceled.');
+        // Game sidebar
+        cy.get('[aria-label="Open game sidebar and chat"]').click();
 
-        cy.get('.modal-footer').contains('button', 'Close').click();
+        cy.contains('Game has been canceled');
+
         cy.contains('Accept').should('not.exist');
     });
 
@@ -94,7 +96,9 @@ describe('Page Game finished', () => {
 
         cy.get('Accept').should('not.exist');
 
-        cy.contains('Game finished');
-        cy.contains('Game has been canceled.');
+        // Game sidebar
+        cy.get('[aria-label="Open game sidebar and chat"]').click();
+
+        cy.contains('Game has been canceled');
     });
 });

@@ -39,8 +39,7 @@ describe('Confirm move', () => {
 
         cy.contains('Confirm move').should('have.attr', 'disabled');
 
-        cy.get('canvas');
-        cy.get('body').click(506, 397);
+        cy.play(506, 397);
 
         cy.contains('Confirm move').should('not.have.attr', 'disabled');
         cy.contains('Confirm move').click();
@@ -78,7 +77,6 @@ describe('Confirm move', () => {
         cy.visit('/games/705e2163-9fbd-4fd7-a408-098c5919625c');
 
         cy.contains('Loading game 705e2163-9fbd-4fd7-a408-098c5919625c…').should('not.exist');
-        cy.get('.modal-footer').contains('button', 'Close').click();
         cy.contains('Confirm move').should('not.exist');
     });
 

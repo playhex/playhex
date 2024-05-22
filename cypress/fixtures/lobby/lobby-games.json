@@ -1,6 +1,6 @@
 [
     {
-        "id": "549737f7-5a70-453a-b227-abb4f7906138",
+        "publicId": "549737f7-5a70-453a-b227-abb4f7906138",
         "host": {
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player A",
@@ -139,7 +139,7 @@
         "state": "playing"
     },
     {
-        "id": "969653f0-b874-404f-9b1b-6d3e66b52880",
+        "publicId": "969653f0-b874-404f-9b1b-6d3e66b52880",
         "host": {
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player waiting",
@@ -189,7 +189,7 @@
         "state": "created"
     },
     {
-        "id": "e212910d-9422-482d-97e1-b4d1c60516ed",
+        "publicId": "e212910d-9422-482d-97e1-b4d1c60516ed",
         "host": {
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player C",
@@ -363,7 +363,7 @@
         "state": "ended"
     },
     {
-        "id": "c35d5279-ae07-4615-bacf-7b90ead71d71",
+        "publicId": "c35d5279-ae07-4615-bacf-7b90ead71d71",
         "host": {
             "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Cancel A",

@@ -6,8 +6,7 @@ describe('Resign a game', () => {
         cy.createAIGameWithRandom();
 
         // Play at least one move to have Resign button (random bot will play the other move)
-        cy.get('canvas');
-        cy.get('body').click(409, 326);
+        cy.play(409, 326);
 
         cy
             .contains('Resign')
