@@ -43,7 +43,7 @@ type HostedGameEvents = {
  */
 export default class HostedGame extends TypedEmitter<HostedGameEvents>
 {
-    private id: string = uuidv4();
+    private publicId: string = uuidv4();
 
     private hostedGameEntity: null | HostedGameEntity = null;
 
@@ -79,7 +79,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         hostedGame.gameOptions = gameOptions;
         hostedGame.host = host;
 
-        logger.info('Hosted game created.', { hostedGameId: hostedGame.id, host: host.pseudo });
+        logger.info('Hosted game created.', { hostedGameId: hostedGame.publicId, host: host.pseudo });
 
         hostedGame.players = [host];
 
@@ -92,7 +92,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
     getId(): string
     {
-        return this.id;
+        return this.publicId;
     }
 
     getGame(): null | Game
@@ -127,7 +127,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     private gameRooms(withLobby = false): string[]
     {
         const rooms = [
-            Rooms.game(this.id),
+            Rooms.game(this.publicId),
         ];
 
         if (withLobby) {
@@ -187,8 +187,8 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
          * Listen on played event, move can come from AI
          */
         game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.io.to(this.gameRooms()).emit('moved', this.id, fromEngineMove(move), moveIndex, byPlayerIndex);
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+            this.io.to(this.gameRooms()).emit('moved', this.publicId, fromEngineMove(move), moveIndex, byPlayerIndex);
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, this.timeControl.getValues());
 
             if (!game.isEnded()) {
                 this.makeAIMoveIfApplicable();
@@ -204,10 +204,10 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         game.on('ended', (winner, outcome, date) => {
             this.state = 'ended';
 
-            this.io.to(this.gameRooms(true)).emit('ended', this.id, winner, outcome, { date });
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+            this.io.to(this.gameRooms(true)).emit('ended', this.publicId, winner, outcome, { date });
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, this.timeControl.getValues());
 
-            logger.info('Game ended.', { hostedGameId: this.id, winner, outcome });
+            logger.info('Game ended.', { hostedGameId: this.publicId, winner, outcome });
 
             this.emit('ended');
         });
@@ -231,17 +231,17 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     private createAndStartGame(): void
     {
         if ('canceled' === this.state) {
-            logger.warning('Cannot init game, canceled', { hostedGameId: this.id });
+            logger.warning('Cannot init game, canceled', { hostedGameId: this.publicId });
             return;
         }
 
         if (null !== this.game) {
-            logger.warning('Cannot init game, already started', { hostedGameId: this.id });
+            logger.warning('Cannot init game, already started', { hostedGameId: this.publicId });
             return;
         }
 
         if (this.players.length < 2) {
-            logger.warning('Cannot init game, no opponent', { hostedGameId: this.id });
+            logger.warning('Cannot init game, no opponent', { hostedGameId: this.publicId });
             return;
         }
 
@@ -263,9 +263,9 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         this.bindTimeControl();
 
         this.io.to(this.gameRooms(true)).emit('gameStarted', this.toData());
-        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, this.timeControl.getValues());
 
-        logger.info('Game Started.', { hostedGameId: this.id });
+        logger.info('Game Started.', { hostedGameId: this.publicId });
 
         this.makeAIMoveIfApplicable();
     }
@@ -276,27 +276,27 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     playerJoin(player: Player): true | string
     {
         if ('created' !== this.state) {
-            logger.notice('Player tried to join but hosted game has started or ended', { hostedGameId: this.id, joiner: player.pseudo });
+            logger.notice('Player tried to join but hosted game has started or ended', { hostedGameId: this.publicId, joiner: player.pseudo });
             return 'Game has started or ended';
         }
 
         // Check whether game is full
         if (this.players.length >= 2) {
-            logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.id, joiner: player.pseudo });
+            logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.publicId, joiner: player.pseudo });
             return 'Game is full';
         }
 
         // Prevent a player from joining twice
         if (this.isPlayerInGame(player)) {
-            logger.notice('Player tried to join twice', { hostedGameId: this.id, joiner: player.pseudo });
+            logger.notice('Player tried to join twice', { hostedGameId: this.publicId, joiner: player.pseudo });
             return 'You already joined this game.';
         }
 
         this.players.push(player);
 
-        this.io.to(this.gameRooms(true)).emit('gameJoined', this.id, player);
+        this.io.to(this.gameRooms(true)).emit('gameJoined', this.publicId, player);
 
-        logger.info('Player joined.', { hostedGameId: this.id, joiner: player.pseudo });
+        logger.info('Player joined.', { hostedGameId: this.publicId, joiner: player.pseudo });
 
         // Starts automatically when game is full
         if (2 === this.players.length) {
@@ -308,20 +308,20 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
     playerMove(player: Player, move: Move): true | string
     {
-        logger.info('Move played', { hostedGameId: this.id, move, player: player.pseudo });
+        logger.info('Move played', { hostedGameId: this.publicId, move, player: player.pseudo });
 
         if ('playing' !== this.state) {
-            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.id, joiner: player.pseudo });
+            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.publicId, joiner: player.pseudo });
             return 'Game is not playing';
         }
 
         if (!this.game) {
-            logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.id, player: player.pseudo });
+            logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.publicId, player: player.pseudo });
             return 'Game not yet started, cannot make a move';
         }
 
         if (!this.isPlayerInGame(player)) {
-            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: player.pseudo });
+            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.publicId, player: player.pseudo });
             return 'you are not a player of this game';
         }
 
@@ -334,7 +334,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
                 return e.message;
             }
 
-            logger.warning('Unexpected error from player.move', { hostedGameId: this.id, err: e.message });
+            logger.warning('Unexpected error from player.move', { hostedGameId: this.publicId, err: e.message });
             return 'Unexpected error: ' + e.message;
         }
     }
@@ -342,17 +342,17 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     playerResign(player: Player): true | string
     {
         if ('playing' !== this.state) {
-            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.id, joiner: player.pseudo });
+            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.publicId, joiner: player.pseudo });
             return 'Game is not playing';
         }
 
         if (!this.game) {
-            logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.id, player: player.pseudo });
+            logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.publicId, player: player.pseudo });
             return 'Game not yet started, cannot resign';
         }
 
         if (!this.isPlayerInGame(player)) {
-            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.id, player: player.pseudo });
+            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.publicId, player: player.pseudo });
             return 'you are not a player of this game';
         }
 
@@ -363,7 +363,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
             return true;
         } catch (e) {
-            logger.warning('Unexpected error from player.resign', { hostedGameId: this.id, err: e.message });
+            logger.warning('Unexpected error from player.resign', { hostedGameId: this.publicId, err: e.message });
             return e.message;
         }
     }
@@ -371,12 +371,12 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     private canCancel(player: Player): true | string
     {
         if (!this.isPlayerInGame(player)) {
-            logger.notice('A player not in the game tried to cancel game', { hostedGameId: this.id, player: player.pseudo });
+            logger.notice('A player not in the game tried to cancel game', { hostedGameId: this.publicId, player: player.pseudo });
             return 'you are not a player of this game';
         }
 
         if ('playing' !== this.state && 'created' !== this.state) {
-            logger.notice('Player tried to move but hosted game is not playing nor created', { hostedGameId: this.id, joiner: player.pseudo });
+            logger.notice('Player tried to move but hosted game is not playing nor created', { hostedGameId: this.publicId, joiner: player.pseudo });
             return 'Game is not playing nor created';
         }
 
@@ -385,7 +385,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         }
 
         if (this.game.getMovesHistory().length >= this.players.length) {
-            logger.notice('A player tried to cancel, but too late, every player played a move', { hostedGameId: this.id, player: player.pseudo });
+            logger.notice('A player tried to cancel, but too late, every player played a move', { hostedGameId: this.publicId, player: player.pseudo });
             return 'cannot cancel now, each player has played at least one move';
         }
 
@@ -409,10 +409,10 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             this.game.cancel(now);
         }
 
-        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.id, { date: now });
-        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.id, this.timeControl.getValues());
+        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.publicId, { date: now });
+        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, this.timeControl.getValues());
 
-        logger.info('Game canceled.', { hostedGameId: this.id });
+        logger.info('Game canceled.', { hostedGameId: this.publicId });
 
         this.emit('canceled');
 
@@ -422,7 +422,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
     postChatMessage(chatMessage: ChatMessage)
     {
         this.chatMessages.push(chatMessage);
-        this.io.to(this.gameRooms()).emit('chat', this.id, chatMessage);
+        this.io.to(this.gameRooms()).emit('chat', this.publicId, chatMessage);
         this.emit('chat');
     }
 
@@ -432,7 +432,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
             this.hostedGameEntity = new HostedGameEntity();
         }
 
-        this.hostedGameEntity.id = this.id;
+        this.hostedGameEntity.publicId = this.publicId;
         this.hostedGameEntity.host = this.host;
         this.hostedGameEntity.timeControl = this.timeControl.getValues();
         this.hostedGameEntity.gameOptions = this.gameOptions;
@@ -476,7 +476,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
 
         hostedGame.hostedGameEntity = data;
 
-        hostedGame.id = data.id;
+        hostedGame.publicId = data.publicId;
         hostedGame.host = data.host;
         hostedGame.gameOptions = data.gameOptions;
 
@@ -500,7 +500,7 @@ export default class HostedGame extends TypedEmitter<HostedGameEvents>
         } catch (e) {
             logger.error('Could not recreate time control instance from persisted data', {
                 reason: e.message,
-                hostedGameId: data.id,
+                hostedGameId: data.publicId,
                 data,
             });
 

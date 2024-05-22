@@ -18,10 +18,10 @@ export default class GameAnalyzePersister
     {
         gameAnalyze.hostedGame = await this.hostedGameRepository.findOneOrFail({
             select: {
-                internalId: true,
+                id: true,
             },
             where: {
-                id: gamePublicId,
+                publicId: gamePublicId,
             },
         });
 
@@ -32,7 +32,7 @@ export default class GameAnalyzePersister
     {
         return await this.gameAnalyzeRepository.findOneBy({
             hostedGame: {
-                id: publicId,
+                publicId: publicId,
             },
         });
     }

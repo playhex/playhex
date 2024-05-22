@@ -10,7 +10,7 @@ export default class HostedGameToPlayer
     hostedGameId: number;
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.hostedGameToPlayers)
-    @JoinColumn({ name: 'hostedGameId' }) // TODO remove after id renaming
+    @JoinColumn()
     hostedGame: HostedGame;
 
     @Column()

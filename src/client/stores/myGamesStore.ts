@@ -14,7 +14,7 @@ import { sendNotification } from '../services/notifications';
 import * as Notif from '../services/notifications';
 
 export type CurrentGame = {
-    id: string;
+    publicId: string;
     isMyTurn: boolean;
     myColor: null | PlayerIndex;
     hostedGame: HostedGame;
@@ -111,8 +111,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        myGames.value[hostedGame.id] = {
-            id: hostedGame.id,
+        myGames.value[hostedGame.publicId] = {
+            publicId: hostedGame.publicId,
             isMyTurn: false,
             myColor: null,
             hostedGame: hostedGame,
@@ -124,7 +124,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     socket.on('gameStarted', (hostedGame: HostedGame) => {
-        const { gameData, id } = hostedGame;
+        const { gameData, publicId } = hostedGame;
         const me = loggedInPlayer.value;
 
         if (null === me || null === gameData) {
@@ -135,9 +135,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        if (!myGames.value[id]) {
-            myGames.value[id] = {
-                id,
+        if (!myGames.value[publicId]) {
+            myGames.value[publicId] = {
+                publicId,
                 isMyTurn: false,
                 myColor: null,
                 hostedGame: hostedGame,
@@ -145,9 +145,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         }
 
         const myColor = hostedGame.hostedGameToPlayers[0].player.publicId === loggedInPlayer.value?.publicId ? 0 : 1;
-        myGames.value[id].myColor = myColor;
-        myGames.value[id].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.value?.publicId;
-        myGames.value[id].hostedGame = hostedGame;
+        myGames.value[publicId].myColor = myColor;
+        myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.value?.publicId;
+        myGames.value[publicId].hostedGame = hostedGame;
 
         if (!document.hasFocus()) {
             const opponent = hostedGame.hostedGameToPlayers[1 - myColor].player;
@@ -159,7 +159,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 () => {
                     router.push({
                         name: 'online-game',
-                        params: { gameId: id }
+                        params: { gameId: publicId }
                     });
                 }
             );
@@ -237,7 +237,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         initialized = true;
 
         initialGames.forEach(hostedGame => {
-            const { id, gameData } = hostedGame;
+            const { publicId: id, gameData } = hostedGame;
 
             // I'm not in the game
             if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
@@ -257,7 +257,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === me.publicId;
             }
 
-            myGames.value[hostedGame.id] = { id, isMyTurn, myColor, hostedGame: hostedGame };
+            myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: hostedGame };
         });
 
         mostUrgentGame.value = getMostUrgentGame();

@@ -30,15 +30,15 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const createGame = async (gameOptions?: HostedGameOptions): Promise<HostedGameClient> => {
         const hostedGame = await apiPostGame(gameOptions);
 
-        hostedGameClients.value[hostedGame.id] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+        hostedGameClients.value[hostedGame.publicId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
 
-        return hostedGameClients.value[hostedGame.id];
+        return hostedGameClients.value[hostedGame.publicId];
     };
 
     const rematchGame = async (gameId: string): Promise<HostedGameClient> => {
         const hostedGameData = await apiPostRematch(gameId);
-        hostedGameClients.value[hostedGameData.id] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
-        return hostedGameClients.value[hostedGameData.id];
+        hostedGameClients.value[hostedGameData.publicId] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+        return hostedGameClients.value[hostedGameData.publicId];
     };
 
     /**
@@ -54,10 +54,10 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         const apiGames: HostedGame[] = await initialGamesPromise;
 
         apiGames.forEach(hostedGame => {
-            if (hostedGameClients.value[hostedGame.id]) {
-                hostedGameClients.value[hostedGame.id].updateFromHostedGame(hostedGame);
+            if (hostedGameClients.value[hostedGame.publicId]) {
+                hostedGameClients.value[hostedGame.publicId].updateFromHostedGame(hostedGame);
             } else {
-                hostedGameClients.value[hostedGame.id] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+                hostedGameClients.value[hostedGame.publicId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
             }
         });
     };
@@ -110,13 +110,13 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         const moreEndedGames = await getEndedGames(20, oldestHostedGameClient?.getId() ?? null);
 
         moreEndedGames.forEach(endedGame => {
-            hostedGameClients.value[endedGame.id] = new HostedGameClient(endedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+            hostedGameClients.value[endedGame.publicId] = new HostedGameClient(endedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         });
     };
 
     const listenSocket = (): void => {
         socket.on('gameCreated', (hostedGame: HostedGame) => {
-            hostedGameClients.value[hostedGame.id] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+            hostedGameClients.value[hostedGame.publicId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         });
 
         socket.on('gameJoined', (gameId: string, player: Player) => {
@@ -126,8 +126,8 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
 
         socket.on('gameStarted', (hostedGame: HostedGame) => {
-            if (hostedGameClients.value[hostedGame.id]) {
-                hostedGameClients.value[hostedGame.id].onServerGameStarted(hostedGame);
+            if (hostedGameClients.value[hostedGame.publicId]) {
+                hostedGameClients.value[hostedGame.publicId].onServerGameStarted(hostedGame);
             }
         });
 

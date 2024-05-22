@@ -32,20 +32,20 @@ export default class HostedGamePersister
 
     async persist(hostedGame: HostedGame): Promise<void>
     {
-        logger.info('Persisting a game...', { publicId: hostedGame.id });
+        logger.info('Persisting a game...', { publicId: hostedGame.publicId });
 
         await this.hostedGameRepository.save(hostedGame);
 
-        logger.info('Persisting done', { publicId: hostedGame.id, id: hostedGame.internalId });
+        logger.info('Persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
     }
 
     async deleteIfExists(hostedGame: HostedGame): Promise<void>
     {
-        logger.info('Delete a game if exists...', { publicId: hostedGame.id });
+        logger.info('Delete a game if exists...', { publicId: hostedGame.publicId });
 
         await this.hostedGameRepository.remove(hostedGame);
 
-        logger.info('Deleted.', { publicId: hostedGame.id, hostedGame });
+        logger.info('Deleted.', { publicId: hostedGame.publicId, hostedGame });
     }
 
     async findUnique(publicId: string): Promise<null | HostedGame>
@@ -53,7 +53,7 @@ export default class HostedGamePersister
         return await this.hostedGameRepository.findOne({
             relations,
             where: {
-                id: publicId,
+                publicId: publicId,
             },
         });
     }
@@ -94,7 +94,7 @@ export default class HostedGamePersister
             const cursor = await this.hostedGameRepository.findOne({
                 comment: 'find last ended 1v1 cursor',
                 relations: { gameData: true },
-                where: { id: fromGamePublicId },
+                where: { publicId: fromGamePublicId },
             });
 
             if (null === cursor) {
@@ -103,7 +103,7 @@ export default class HostedGamePersister
 
             options.where = {
                 ...options.where,
-                id: Not(cursor.id),
+                publicId: Not(cursor.publicId),
                 gameData: {
                     endedAt: And(
                         Not(IsNull()),
@@ -123,7 +123,7 @@ export default class HostedGamePersister
         // Query to get id of games played by given player
         const hostedGameIdsQuery = this.hostedGameRepository
             .createQueryBuilder('hostedGame')
-            .select('hostedGame.internalId', 'id')
+            .select('hostedGame.id', 'id')
             .innerJoin('hostedGame.gameData', 'gameData')
             .innerJoin('hostedGame.hostedGameToPlayers', 'hostedGameToPlayer')
             .innerJoin('hostedGameToPlayer.player', 'player')
@@ -137,7 +137,7 @@ export default class HostedGamePersister
         if (undefined !== fromGamePublicId) {
             const cursor = await this.hostedGameRepository.findOne({
                 relations: { gameData: true },
-                where: { id: fromGamePublicId },
+                where: { publicId: fromGamePublicId },
             });
 
             if (null === cursor) {
@@ -146,7 +146,7 @@ export default class HostedGamePersister
 
             hostedGameIdsQuery
                 .andWhere('gameData.endedAt <= :cursorEndedAt', { cursorEndedAt: cursor.gameData?.endedAt })
-                .andWhere('hostedGame.internalId != :cursorId', { cursorId: cursor.internalId })
+                .andWhere('hostedGame.id != :cursorId', { cursorId: cursor.id })
             ;
         }
 
@@ -155,7 +155,7 @@ export default class HostedGamePersister
         const hostedGames = await this.hostedGameRepository.find({
             relations,
             where: {
-                internalId: In(hostedGameIds.map(row => row.id)),
+                id: In(hostedGameIds.map(row => row.id)),
             },
         });
 

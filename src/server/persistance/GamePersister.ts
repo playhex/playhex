@@ -26,7 +26,7 @@ export default class GamePersister
             },
             where: {
                 hostedGame: {
-                    id: publicId,
+                    publicId,
                 },
                 endedAt: Not(IsNull()),
             }

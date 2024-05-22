@@ -29,7 +29,7 @@ export default class GameAnalyze
     hostedGameId: number;
 
     @OneToOne(() => HostedGame)
-    @JoinColumn({ name: 'hostedGameId' }) // TODO remove after id renaming
+    @JoinColumn()
     hostedGame: HostedGame;
 
     /**

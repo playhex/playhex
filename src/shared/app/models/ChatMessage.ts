@@ -16,7 +16,7 @@ export default class ChatMessage
     hostedGameId: number;
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
-    @JoinColumn({ name: 'hostedGameId' }) // TODO remove after id renaming
+    @JoinColumn()
     hostedGame: HostedGame;
 
     @Column({ nullable: true })

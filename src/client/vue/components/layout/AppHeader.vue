@@ -22,7 +22,7 @@ const goToMostUrgentGame = (): void => {
     router.push({
         name: 'online-game',
         params: {
-            gameId: mostUrgentGame.value.id,
+            gameId: mostUrgentGame.value.publicId,
         },
     });
 };

@@ -10,18 +10,15 @@ import HostedGameToPlayer from './HostedGameToPlayer';
 import { Expose } from '../../../shared/app/class-transformer-custom';
 import { Transform, Type } from 'class-transformer';
 
-/**
- * TODO migrate internalId => id, id => publicId
- */
 @Entity()
 export default class HostedGame
 {
-    @PrimaryGeneratedColumn({ name: 'id' }) // TODO remove name after id renaming
-    internalId?: number;
+    @PrimaryGeneratedColumn()
+    id?: number;
 
-    @ColumnUUID({ name: 'publicId', unique: true }) // TODO remove name after id renaming
+    @ColumnUUID({ unique: true })
     @Expose()
-    id: string;
+    publicId: string;
 
     @ManyToOne(() => Player, { nullable: false })
     @Expose()
@@ -61,7 +58,7 @@ export default class HostedGame
     gameData: null | Game = null;
 
     @OneToOne(() => HostedGame)
-    @JoinColumn({ name: 'rematchId' }) // TODO remove custom name after id rename
+    @JoinColumn()
     @Expose()
     @Type(() => HostedGame)
     rematch: null | HostedGame = null;

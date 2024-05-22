@@ -102,7 +102,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getId(): string
     {
-        return this.hostedGame.id;
+        return this.hostedGame.publicId;
     }
 
     getPlayers(): Player[]
@@ -222,7 +222,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getRematchGameId(): string | null
     {
-        return this.hostedGame.rematch?.id ?? null;
+        return this.hostedGame.rematch?.publicId ?? null;
     }
 
     canJoin(player: null | Player): boolean
@@ -350,7 +350,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         const hostedGame = new HostedGame();
 
-        hostedGame.id = rematchId;
+        hostedGame.publicId = rematchId;
 
         this.hostedGame.rematch = hostedGame;
     }
@@ -396,7 +396,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     async sendChatMessage(content: string): Promise<string | true>
     {
         return new Promise((resolve, reject) => {
-            this.socket.emit('sendChat', this.hostedGame.id, content, (answer: true | string) => {
+            this.socket.emit('sendChat', this.hostedGame.publicId, content, (answer: true | string) => {
                 if (true === answer) {
                     resolve(answer);
                 }

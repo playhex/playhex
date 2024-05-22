@@ -184,7 +184,7 @@ const loadMoreEndedGames = async (): Promise<void> => {
     }
 
     const last = gamesHistory.value[gamesHistory.value.length - 1];
-    const games = await getPlayerGames(player.value.publicId, 'ended', last?.id ?? null);
+    const games = await getPlayerGames(player.value.publicId, 'ended', last?.publicId ?? null);
 
     for (let i = 0; i < games.length; ++i) {
         gamesHistory.value.push(games[i]);
@@ -318,11 +318,11 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                 <tbody>
                     <tr
                         v-for="game in gamesHistory"
-                        :key="game.id"
+                        :key="game.publicId"
                     >
                         <td class="ps-0">
                             <router-link
-                                :to="{ name: 'online-game', params: { gameId: game.id } }"
+                                :to="{ name: 'online-game', params: { gameId: game.publicId } }"
                                 class="btn btn-sm btn-link"
                             >{{ $t('game.review') }}</router-link>
                         </td>

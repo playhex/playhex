@@ -64,13 +64,13 @@ export default class HostedGameRepository
         });
 
         games.forEach(hostedGame => {
-            if (this.activeGames[hostedGame.id]) {
+            if (this.activeGames[hostedGame.publicId]) {
                 return;
             }
 
-            this.activeGames[hostedGame.id] = HostedGame.fromData(hostedGame);
+            this.activeGames[hostedGame.publicId] = HostedGame.fromData(hostedGame);
 
-            this.enableAutoPersist(this.activeGames[hostedGame.id]);
+            this.enableAutoPersist(this.activeGames[hostedGame.publicId]);
         });
     }
 
@@ -222,8 +222,8 @@ export default class HostedGameRepository
         if (!game.hostedGameToPlayers.some(p => p.player.publicId === host.publicId)) {
             throw new GameError('Player not in the game');
         }
-        if (game.rematch != null && this.activeGames[game.rematch.id]) {
-            return this.activeGames[game.rematch.id];
+        if (game.rematch != null && this.activeGames[game.rematch.publicId]) {
+            return this.activeGames[game.rematch.publicId];
         }
         if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
@@ -233,8 +233,8 @@ export default class HostedGameRepository
         }
 
         const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions));
-        this.io.to(Rooms.game(game.id))
-            .emit('rematchAvailable', game.id, rematch.getId());
+        this.io.to(Rooms.game(game.publicId))
+            .emit('rematchAvailable', game.publicId, rematch.getId());
 
         game.rematch = rematch.toData();
 
