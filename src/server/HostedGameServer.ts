@@ -469,31 +469,35 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             );
         }
 
-        const hostedGame = new HostedGameServer();
+        const hostedGameServer = new HostedGameServer();
 
-        hostedGame.hostedGame = data;
+        // Fix typeorm trying to re-insert same hostedGameToPlayer instance, and having duplication error
+        // the solution is to set manually the hostedGame instance, because not set when fetching from db... but player is
+        data.hostedGameToPlayers.forEach(hostedGameToPlayer => hostedGameToPlayer.hostedGame = data);
 
-        hostedGame.publicId = data.publicId;
-        hostedGame.host = data.host;
-        hostedGame.gameOptions = data.gameOptions;
+        hostedGameServer.hostedGame = data;
+
+        hostedGameServer.publicId = data.publicId;
+        hostedGameServer.host = data.host;
+        hostedGameServer.gameOptions = data.gameOptions;
 
         if (null !== data.gameData) {
             try {
-                hostedGame.game = Game.fromData(data.gameData);
-                hostedGame.listenGame(hostedGame.game);
+                hostedGameServer.game = Game.fromData(data.gameData);
+                hostedGameServer.listenGame(hostedGameServer.game);
             } catch (e) {
                 logger.error('Could not recreate game from data', { data });
                 throw e;
             }
         }
 
-        hostedGame.players = data.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.player);
-        hostedGame.state = data.state;
+        hostedGameServer.players = data.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.player);
+        hostedGameServer.state = data.state;
 
-        hostedGame.createdAt = data.createdAt;
+        hostedGameServer.createdAt = data.createdAt;
 
         try {
-            hostedGame.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
+            hostedGameServer.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
         } catch (e) {
             logger.error('Could not recreate time control instance from persisted data', {
                 reason: e.message,
@@ -504,15 +508,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             throw e;
         }
 
-        if (null !== hostedGame.game) {
-            hostedGame.bindTimeControl();
-            hostedGame.makeAIMoveIfApplicable();
+        if (null !== hostedGameServer.game) {
+            hostedGameServer.bindTimeControl();
+            hostedGameServer.makeAIMoveIfApplicable();
         }
 
-        hostedGame.chatMessages = data.chatMessages;
+        hostedGameServer.chatMessages = data.chatMessages;
 
-        hostedGame.rematch = data.rematch;
+        hostedGameServer.rematch = data.rematch;
 
-        return hostedGame;
+        return hostedGameServer;
     }
 }
