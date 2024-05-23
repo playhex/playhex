@@ -42,6 +42,7 @@ export class OptionsFischer implements FischerTimeControlOptions
 
 export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeControl
 {
+    @Expose()
     type: 'fischer';
 
     @ValidateNested()
@@ -59,6 +60,7 @@ export class OptionsAbsolute implements AbsoluteTimeControlOptions
 
 export class HostedGameOptionsTimeControlAbsolute extends HostedGameOptionsTimeControl
 {
+    @Expose()
     type: 'absolute';
 
     @ValidateNested()
@@ -76,6 +78,7 @@ export class OptionsSimple implements SimpleTimeControlOptions
 
 export class HostedGameOptionsTimeControlSimple extends HostedGameOptionsTimeControl
 {
+    @Expose()
     type: 'simple';
 
     @ValidateNested()
@@ -105,15 +108,9 @@ export class OptionsByoYomi implements ByoYomiTimeControlOptions
 
 export class HostedGameOptionsTimeControlByoYomi extends HostedGameOptionsTimeControl
 {
+    @Expose()
     type: 'byoyomi';
 
     @ValidateNested()
     options: OptionsByoYomi;
 }
-
-export type HostedGameOptionsTimeControlType =
-    HostedGameOptionsTimeControlFischer
-    | HostedGameOptionsTimeControlAbsolute
-    | HostedGameOptionsTimeControlSimple
-    | HostedGameOptionsTimeControlByoYomi
-;

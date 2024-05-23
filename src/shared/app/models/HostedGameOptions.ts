@@ -6,7 +6,7 @@ import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../../game-engine';
 import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlAbsolute, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer, HostedGameOptionsTimeControlSimple } from './HostedGameOptionsTimeControl';
-import type { HostedGameOptionsTimeControlType } from './HostedGameOptionsTimeControl';
+import type TimeControlType from '../../time-control/TimeControlType';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
@@ -75,19 +75,17 @@ export default class HostedGameOptions
     @Expose()
     @IsObject()
     @ValidateNested()
-    @Type(() => HostedGameOptionsTimeControl, {
-        keepDiscriminatorProperty: true,
-        discriminator: {
-            property: 'type',
-            subTypes: [
-                { value: HostedGameOptionsTimeControlFischer, name: 'fischer' },
-                { value: HostedGameOptionsTimeControlAbsolute, name: 'absolute' },
-                { value: HostedGameOptionsTimeControlSimple, name: 'simple' },
-                { value: HostedGameOptionsTimeControlByoYomi, name: 'byoyomi' },
-            ],
-        },
+    @Type((type) => {
+        // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
+        switch (type?.object.timeControl.type) {
+            case 'fischer': return HostedGameOptionsTimeControlFischer;
+            case 'absolute': return HostedGameOptionsTimeControlAbsolute;
+            case 'simple': return HostedGameOptionsTimeControlSimple;
+            case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
+            default: return HostedGameOptionsTimeControl;
+        }
     })
-    timeControl: HostedGameOptionsTimeControlType;
+    timeControl: TimeControlType;
 }
 
 /**
