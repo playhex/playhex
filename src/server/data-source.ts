@@ -1,20 +1,7 @@
 import './config';
-import { camelCase } from 'typeorm/util/StringUtils';
-import { DataSource, DefaultNamingStrategy } from 'typeorm';
+import { DataSource } from 'typeorm';
 import Container from 'typedi';
 import { entities } from '../shared/app/models';
-
-/**
- * Temporary, while migrating from prisma to typeorm.
- * Should be removed in a second step, while renaming tables to fit typeorm default naming.
- */
-class PrismaNamingStrategy extends DefaultNamingStrategy
-{
-    tableName(targetName: string, userSpecifiedName: string | undefined): string
-    {
-        return userSpecifiedName ? userSpecifiedName : camelCase(targetName, true);
-    }
-}
 
 const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
 
@@ -37,7 +24,6 @@ export const AppDataSource = new DataSource({
     subscribers: [],
     migrations: [],
     maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
-    namingStrategy: new PrismaNamingStrategy(),
 });
 
 AppDataSource.initialize();
