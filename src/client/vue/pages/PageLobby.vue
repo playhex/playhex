@@ -156,10 +156,10 @@ const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
     const timeA = timeControlToCadencyName(a.getGameOptions());
     const timeB = timeControlToCadencyName(b.getGameOptions());
 
-    if (timeA !== 'correspondance' && timeB === 'correspondance')
+    if (timeA !== 'correspondence' && timeB === 'correspondence')
         return -1;
 
-    if (timeA === 'correspondance' && timeB !== 'correspondance')
+    if (timeA === 'correspondence' && timeB !== 'correspondence')
         return 1;
 
     const hostedDataA = a.getHostedGame();

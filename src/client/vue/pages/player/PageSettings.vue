@@ -154,7 +154,7 @@ const submitPasswordChange = async () => {
             <div class="mb-3 row">
                 <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> {{ $t('game_candency.correspondence') }}</label>
                 <div class="col-sm-8 col-md-4">
-                    <select v-model="playerSettings.confirmMoveCorrespondance" class="form-select" id="confirm-move-correspondace">
+                    <select v-model="playerSettings.confirmMoveCorrespondence" class="form-select" id="confirm-move-correspondace">
                         <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
                         <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
                     </select>

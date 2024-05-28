@@ -64,7 +64,7 @@ const shouldDisplayConfirmMove = (): boolean => {
     return {
         blitz: playerSettings.value.confirmMoveBlitz,
         normal: playerSettings.value.confirmMoveNormal,
-        correspondance: playerSettings.value.confirmMoveCorrespondance,
+        correspondence: playerSettings.value.confirmMoveCorrespondence,
     }[timeControlToCadencyName(hostedGameClient.value.getHostedGame().gameOptions)];
 };
 

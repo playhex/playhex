@@ -40,10 +40,10 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
 };
 
 
-type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondance';
+type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
 
 /**
- * Naive function that guess if a game is a blitz or correspondance
+ * Naive function that guess if a game is a blitz or correspondence
  * given its time control and board size.
  */
 export const timeControlToCadencyName = (gameOptions: HostedGameOptions): TimeControlCadencyName => {
@@ -58,7 +58,7 @@ export const timeControlToCadencyName = (gameOptions: HostedGameOptions): TimeCo
 
     // wet finger technique
     if (averageSecondsPerMove > 3600 * 9) {
-        return 'correspondance';
+        return 'correspondence';
     }
 
     return 'normal';

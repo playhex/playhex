@@ -94,7 +94,7 @@ const shouldDisplayHexworldLink = (): boolean => {
         return true;
     }
 
-    if ('correspondance' === timeControlToCadencyName(hostedGameClient.value.getGameOptions())) {
+    if ('correspondence' === timeControlToCadencyName(hostedGameClient.value.getGameOptions())) {
         return true;
     }
 

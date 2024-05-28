@@ -29,7 +29,7 @@ export default class PlayerSettings
     @IsOptional()
     @IsBoolean()
     @Column({ default: true })
-    confirmMoveCorrespondance: boolean = true;
+    confirmMoveCorrespondence: boolean = true;
 
     @Expose()
     @IsOptional()

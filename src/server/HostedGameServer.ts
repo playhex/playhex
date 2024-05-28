@@ -29,7 +29,7 @@ type HostedGameEvents = {
  *  - archive games once finished (in database)
  *  - before server restart (probably not applicable for blitz. Redis should be suffisant, as optional)
  *  - at intervals to prevent game data loss on server crash (for long games, still playing but no players activity. Redis should be suffisant, as optional)
- *  - someone create a correspondance game then logout: game should not be lost (on game create)
+ *  - someone create a correspondence game then logout: game should not be lost (on game create)
  *  - tournament games: should be persisted more often (every move)
  *
  * Persisting is done on repository.
