@@ -24,7 +24,7 @@ hexProgram
 
         console.log('Replacing all account passwords to "test"...');
         AppDataSource.query(
-            'update Player set password = ? where password is not null',
+            'update player set password = ? where password is not null',
             [await hashPassword('test')],
         );
 
