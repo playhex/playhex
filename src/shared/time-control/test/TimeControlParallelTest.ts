@@ -612,7 +612,7 @@ parallel('AbsoluteTimeControl', () => {
     });
 
 
-    it.only('[ByoYomiTimeControl] elapses when setting 2 periods and period time = 2', async function (done) {
+    it('[ByoYomiTimeControl] elapses when setting 2 periods and period time = 2', async function (done) {
         this.timeout(300);
 
         const timeControl = new ByoYomiTimeControl({
