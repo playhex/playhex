@@ -1,4 +1,4 @@
-import slugify from 'slugify';
+import diacritics from 'diacritics';
 import HandledError from './Errors';
 import Player from './models/Player';
 
@@ -42,10 +42,12 @@ export const validatePseudo = (pseudo: string): boolean => {
 };
 
 export const pseudoSlug = (pseudo: string): string => {
-    return slugify(pseudo, {
-        lower: true,
-        remove: /"|\(|\)|'|\/|\\/,
-    });
+    return diacritics.remove(pseudo)
+        .replace(/[^a-zA-Z0-9]+/g, ' ')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+    ;
 };
 
 /**
