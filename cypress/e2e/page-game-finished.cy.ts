@@ -9,7 +9,7 @@ describe('Page Game finished', () => {
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
         // Game sidebar
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.contains('Test player wins the game!');
 
@@ -36,7 +36,7 @@ describe('Page Game finished', () => {
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
         // Game sidebar
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.contains('The winner wins by resignation!');
 
@@ -54,7 +54,7 @@ describe('Page Game finished', () => {
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
         // Game sidebar
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.contains('Game has been canceled.');
     });
@@ -73,7 +73,7 @@ describe('Page Game finished', () => {
         cy.get('Accept').should('not.exist');
 
         // Game sidebar
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.contains('Game has been canceled');
 
@@ -97,7 +97,7 @@ describe('Page Game finished', () => {
         cy.get('Accept').should('not.exist');
 
         // Game sidebar
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.contains('Game has been canceled');
     });

@@ -62,6 +62,6 @@ export default class PlayerController
             state = stateRaw;
         }
 
-        return this.hostedGameRepository.getPlayerGames(player, state, fromGamePublicId);
+        return await this.hostedGameRepository.getPlayerGames(player, state, fromGamePublicId);
     }
 }

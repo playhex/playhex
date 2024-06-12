@@ -13,6 +13,7 @@ const defaultClassTransformOptions: ClassTransformOptions = {
     excludeExtraneousValues: true,
     enableImplicitConversion: true,
     exposeDefaultValues: true,
+    enableCircularCheck: true,
     groups: [GROUP_DEFAULT],
 };
 

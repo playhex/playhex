@@ -47,6 +47,14 @@ export default class PlayerRepository
         });
     }
 
+    async getAIPlayerBySlug(slug: string): Promise<null | Player>
+    {
+        return this.playerRepository.findOneBy({
+            slug,
+            isBot: true,
+        });
+    }
+
     async createGuest(): Promise<Player>
     {
         let exponent = 3;

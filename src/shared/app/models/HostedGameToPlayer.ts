@@ -16,7 +16,7 @@ export default class HostedGameToPlayer
     @Column()
     playerId: number;
 
-    @ManyToOne(() => Player, { cascade: true })
+    @ManyToOne(() => Player)
     @Expose()
     player: Player;
 

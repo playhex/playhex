@@ -13,6 +13,7 @@ import Player from '../../../../shared/app/models/Player';
 import ChatController from './ChatController';
 import AIConfigController from './AIConfigController';
 import GameAnalyzeController from './GameAnalyzeController';
+import RatingController from './RatingController';
 import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom';
 
 export const registerApi = (app: Express) => {
@@ -75,6 +76,7 @@ export const registerApi = (app: Express) => {
             PlayerSettingsController,
             AdminController,
             AIConfigController,
+            RatingController,
         ],
     });
 

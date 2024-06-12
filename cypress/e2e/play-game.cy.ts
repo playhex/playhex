@@ -6,7 +6,7 @@ describe('Play a game to the end', () => {
         cy.createAIGameWithRandom(false);
 
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains('Custom')
             .click()
@@ -40,7 +40,7 @@ describe('Play a game to the end', () => {
 
     it('wins vs cpu on board size 4', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains(/^First$/)
             .click()
@@ -60,7 +60,7 @@ describe('Play a game to the end', () => {
 
     it('loses vs cpu on board size 4', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains(/^First$/)
             .click()
@@ -83,7 +83,7 @@ describe('Play a game to the end', () => {
 
     it('uses swap rule and wins on board size 4', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains(/^Second$/)
             .click()

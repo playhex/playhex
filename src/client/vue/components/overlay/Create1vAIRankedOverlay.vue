@@ -2,16 +2,17 @@
 import { useOverlayMeta } from 'unoverlay-vue';
 import { PropType, Ref, ref, watch } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
-import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from 'bootstrap-icons-vue';
+import { BIconExclamationTriangle, BIconTrophy } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
-import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
-import AppSwapRule from './create-game/AppSwapRule.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore';
 import { storeToRefs } from 'pinia';
-import { AIConfigStatusData } from '@shared/app/Types';
+import { AIConfigStatusData } from '../../../../shared/app/Types';
 import { apiGetAiConfigsStatus } from '../../../apiClient';
 import AIConfig from '../../../../shared/app/models/AIConfig';
+import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils';
+
+const { min, max } = Math;
 
 const { visible, confirm, cancel } = useOverlayMeta();
 
@@ -22,11 +23,10 @@ const props = defineProps({
     },
 });
 
-export type Create1vAIOverlayInput = typeof props;
+export type Create1vAIRankedOverlayInput = typeof props;
 
-const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions });
+const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions, ranked: true });
 
-const showSecondaryOptions = ref(false);
 const timeControlComponent = ref<typeof AppTimeControl>();
 
 const submitForm = (gameOptions: HostedGameOptions): void => {
@@ -111,7 +111,7 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
             <div class="modal-dialog">
                 <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
                     <div class="modal-header">
-                        <h5 class="modal-title">{{ $t('1vAI_friendly.title') }}</h5>
+                        <h5 class="modal-title">{{ $t('1vAI_ranked.title') }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
@@ -148,8 +148,9 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                         <div class="mb-3">
                             <AppBoardsize
                                 :gameOptions="gameOptions"
-                                :boardsizeMin="selectedAiConfig?.boardsizeMin ?? undefined"
-                                :boardsizeMax="selectedAiConfig?.boardsizeMax ?? undefined"
+                                :boardsizeMin="max(selectedAiConfig?.boardsizeMin ?? RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MIN)"
+                                :boardsizeMax="min(selectedAiConfig?.boardsizeMax ?? RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MAX)"
+                                :sizesSelection="[11, 13, 14, 17, 19]"
                             />
                         </div>
 
@@ -157,31 +158,10 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                             <AppTimeControl :gameOptions="gameOptions" ref="timeControlComponent" />
                         </div>
 
-                        <button
-                            v-if="showSecondaryOptions"
-                            @click="showSecondaryOptions = false"
-                            type="button"
-                            class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
-                        <button
-                            v-else
-                            @click="showSecondaryOptions = true"
-                            type="button"
-                            class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> {{ $t('create_game.more_options') }}</button>
-                    </div>
-                    <div v-if="showSecondaryOptions" class="modal-body border-top">
-                        <div class="mb-3">
-                            <AppPlayFirstOrSecond :gameOptions="gameOptions" />
-                        </div>
-
-                        <div class="mb-3">
-                            <AppSwapRule :gameOptions="gameOptions" />
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
-                        <button type="submit" class="btn btn-success">{{ $t('1vAI_friendly.create') }}</button>
+                        <button type="submit" class="btn btn-warning"><BIconTrophy /> {{ $t('1vAI_ranked.create') }}</button>
                     </div>
                 </form>
             </div>

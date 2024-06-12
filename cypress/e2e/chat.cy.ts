@@ -5,7 +5,7 @@ describe('Chat', () => {
 
         cy.createAIGameWithRandom();
 
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.get('.chat-input input').type('Hello, have a good game!');
         cy.contains('.chat-input button', 'Send').click();
@@ -15,7 +15,7 @@ describe('Chat', () => {
 
         // Chat messages stays after page refresh
         cy.reload();
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
         cy.contains('.chat-messages', /\d+:\d+ Guest \d+ Hello, have a good game!/);
     });
 
@@ -28,7 +28,7 @@ describe('Chat', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.get('[aria-label="Open game sidebar and chat"]').click();
+        cy.openGameSidebar();
 
         cy.contains(/\d+:48 Guest 7614 Hello, I am a watcher/);
         cy.contains(/\d+:48 Guest 6569 Hi, I am your opponent, ready \?/);

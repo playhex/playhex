@@ -1,12 +1,8 @@
 import { AIConfigStatusData, HostedGameState, WithRequired } from '@shared/app/Types';
-import HostedGame from '../shared/app/models/HostedGame';
-import HostedGameOptions from '../shared/app/models/HostedGameOptions';
-import Player from '../shared/app/models/Player';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
-import { ChatMessage, OnlinePlayers, PlayerSettings } from '../shared/app/models';
-import AIConfig from '../shared/app/models/AIConfig';
-import GameAnalyze from '@shared/app/models/GameAnalyze';
 import { plainToInstance } from '../shared/app/class-transformer-custom';
+import { RatingCategory } from '../shared/app/ratingUtils';
 
 export class ApiClientError extends Error
 {
@@ -417,4 +413,27 @@ export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameA
     await checkResponse(response);
 
     return plainToInstance(GameAnalyze, await response.json());
+};
+
+export const apiGetGameRatingUpdates = async (gamePublicId: string, category: RatingCategory = 'overall'): Promise<null | Rating[]> => {
+    const response = await fetch(`/api/games/${gamePublicId}/ratings/${category}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    try {
+        await checkResponse(response);
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
+        }
+
+        return null;
+    }
+
+    return (await response.json() as Rating[])
+        .map(rating => plainToInstance(Rating, rating))
+    ;
 };

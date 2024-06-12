@@ -1,7 +1,7 @@
 import { Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
 import { GameTimeData } from 'time-control/TimeControl';
-import { ChatMessage, GameAnalyze, HostedGame, Move, Player } from './models';
+import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models';
 
 export type HexClientToServerEvents = {
     /**
@@ -76,6 +76,17 @@ export type HexServerToClientEvents = {
      * endedAt is in object to allow date normalization (or will denormalize date as string instead of Date).
      */
     ended: (gameId: string, winner: PlayerIndex, outcome: Outcome, endedAt: { date: Date }) => void;
+
+    /**
+     * Some players ratings have been updated
+     * due to a ranked game ended.
+     *
+     * Only overall ratings are emitted in "ratings" parameter.
+     *
+     * Used to display rating changes on game page,
+     * and update rating displayed next to player username.
+     */
+    ratingsUpdated: (gameId: string, ratings: Rating[]) => void;
 
     /**
      * A player just connected to server.

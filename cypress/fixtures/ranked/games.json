@@ -1,0 +1,180 @@
+[
+    {
+        "publicId": "df79004e-66b2-48cb-be48-421fbead83d3",
+        "host": {
+            "pseudo": "2943",
+            "publicId": "e30dd5a3-501f-4ef8-9e69-e42b1de22d07",
+            "isGuest": true,
+            "isBot": false,
+            "slug": "2943",
+            "createdAt": "2024-06-11T19:57:49.749Z",
+            "currentRating": {
+                "category": "overall",
+                "createdAt": "2024-06-11T19:58:44.243Z",
+                "rating": 1662.3108939062977,
+                "deviation": 290.31896371798047,
+                "volatility": 0.05999967537233814,
+                "ratingChange": 162.31089390629768
+            }
+        },
+        "hostedGameToPlayers": [
+            {
+                "player": {
+                    "pseudo": "2943",
+                    "publicId": "e30dd5a3-501f-4ef8-9e69-e42b1de22d07",
+                    "isGuest": true,
+                    "isBot": false,
+                    "slug": "2943",
+                    "createdAt": "2024-06-11T19:57:49.749Z",
+                    "currentRating": {
+                        "category": "overall",
+                        "createdAt": "2024-06-11T19:58:44.243Z",
+                        "rating": 1662.3108939062977,
+                        "deviation": 290.31896371798047,
+                        "volatility": 0.05999967537233814,
+                        "ratingChange": 162.31089390629768
+                    }
+                }
+            }
+        ],
+        "state": "created",
+        "gameOptions": {
+            "ranked": true,
+            "boardsize": 13,
+            "firstPlayer": null,
+            "swapRule": true,
+            "opponentType": "player",
+            "opponentPublicId": null,
+            "timeControl": {
+                "type": "fischer",
+                "options": {
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
+                }
+            }
+        },
+        "timeControl": {
+            "state": "ready",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 600000
+                },
+                {
+                    "totalRemainingTime": 600000
+                }
+            ]
+        },
+        "chatMessages": [],
+        "gameData": null,
+        "rematch": null,
+        "createdAt": "2024-06-11T19:58:00.087Z"
+    },
+    {
+        "publicId": "d67d5947-f74c-47fb-ab1f-87ba318c9899",
+        "host": {
+            "pseudo": "2943",
+            "publicId": "e30dd5a3-501f-4ef8-9e69-e42b1de22d07",
+            "isGuest": true,
+            "isBot": false,
+            "slug": "2943",
+            "createdAt": "2024-06-11T19:57:49.749Z",
+            "currentRating": {
+                "category": "overall",
+                "createdAt": "2024-06-11T19:58:44.243Z",
+                "rating": 1662.3108939062977,
+                "deviation": 290.31896371798047,
+                "volatility": 0.05999967537233814,
+                "ratingChange": 162.31089390629768
+            }
+        },
+        "hostedGameToPlayers": [
+            {
+                "player": {
+                    "pseudo": "Determinist random bot",
+                    "publicId": "9c226258-d78b-4083-bd5e-4c4efdf66cec",
+                    "isGuest": false,
+                    "isBot": true,
+                    "slug": "determinist-random-bot",
+                    "createdAt": "2024-06-11T19:57:24.341Z",
+                    "currentRating": {
+                        "category": "overall",
+                        "createdAt": "2024-06-11T19:58:44.000Z",
+                        "rating": 1337.69,
+                        "deviation": 290.319,
+                        "volatility": 0.0599997,
+                        "ratingChange": -162.311
+                    }
+                }
+            },
+            {
+                "player": {
+                    "pseudo": "2943",
+                    "publicId": "e30dd5a3-501f-4ef8-9e69-e42b1de22d07",
+                    "isGuest": true,
+                    "isBot": false,
+                    "slug": "2943",
+                    "createdAt": "2024-06-11T19:57:49.749Z",
+                    "currentRating": {
+                        "category": "overall",
+                        "createdAt": "2024-06-11T19:58:44.243Z",
+                        "rating": 1662.3108939062977,
+                        "deviation": 290.31896371798047,
+                        "volatility": 0.05999967537233814,
+                        "ratingChange": 162.31089390629768
+                    }
+                }
+            }
+        ],
+        "state": "playing",
+        "gameOptions": {
+            "ranked": true,
+            "boardsize": 11,
+            "firstPlayer": null,
+            "swapRule": true,
+            "opponentType": "ai",
+            "opponentPublicId": "9c226258-d78b-4083-bd5e-4c4efdf66cec",
+            "timeControl": {
+                "type": "fischer",
+                "options": {
+                    "initialTime": 600000,
+                    "timeIncrement": 5000,
+                    "maxTime": 600000
+                }
+            }
+        },
+        "timeControl": {
+            "state": "running",
+            "currentPlayer": 1,
+            "players": [
+                {
+                    "totalRemainingTime": 600000
+                },
+                {
+                    "totalRemainingTime": "2024-06-11T20:08:57.145Z"
+                }
+            ]
+        },
+        "chatMessages": [],
+        "gameData": {
+            "size": 11,
+            "movesHistory": [
+                {
+                    "row": 2,
+                    "col": 6,
+                    "playedAt": "2024-06-11T19:58:57.145Z"
+                }
+            ],
+            "allowSwap": true,
+            "currentPlayerIndex": 1,
+            "winner": null,
+            "outcome": null,
+            "startedAt": "2024-06-11T19:58:57.104Z",
+            "lastMoveAt": "2024-06-11T19:58:57.145Z",
+            "endedAt": null
+        },
+        "rematch": null,
+        "createdAt": "2024-06-11T19:58:57.096Z"
+    }
+]

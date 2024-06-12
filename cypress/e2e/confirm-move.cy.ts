@@ -7,7 +7,7 @@ describe('Confirm move', () => {
         cy.createAIGameWithRandom(false);
 
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains('Custom')
             .click()

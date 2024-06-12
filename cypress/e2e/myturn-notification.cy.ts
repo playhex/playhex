@@ -110,7 +110,7 @@ describe('My turn notification', () => {
         cy.createAIGameWithRandom(false);
 
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains('Custom')
             .click()
@@ -121,7 +121,7 @@ describe('My turn notification', () => {
         ;
 
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains(/^First$/)
             .click()

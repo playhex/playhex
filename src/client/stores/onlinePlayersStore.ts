@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-import Player from '../../shared/app/models/Player';
 import { apiGetOnlinePlayers } from '@client/apiClient';
 import useSocketStore from './socketStore';
 import useAuthStore from './authStore';
+import { Player } from '../../shared/app/models';
 
 /**
  * Online players displayed on home sidebar.
@@ -35,6 +35,16 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
 
         if (null !== player) {
             delete players.value[player.publicId];
+        }
+    });
+
+    socket.on('ratingsUpdated', (gameId, ratings) => {
+        for (const rating of ratings) {
+            const player = players.value[rating.player.publicId];
+
+            if (player) {
+                player.currentRating = rating;
+            }
         }
     });
 

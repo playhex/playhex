@@ -4,6 +4,7 @@ import { PropType, ref } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
+import AppTimeControl from './create-game/AppTimeControl.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 
@@ -16,13 +17,24 @@ const props = defineProps({
     },
 });
 
-export type Create1vOfflineAIOverlayInput = typeof props;
+export type Create1v1FriendlyOverlayInput = typeof props;
 
 const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions });
 
 const showSecondaryOptions = ref(false);
 
+/*
+ * Set data before sumbit form
+ */
+const timeControlComponent = ref<typeof AppTimeControl>();
+
 const submitForm = (gameOptions: HostedGameOptions): void => {
+    if (undefined === timeControlComponent.value) {
+        throw new Error('No element with ref="timeControlComponent" found in template');
+    }
+
+    timeControlComponent.value.compileOptions();
+
     confirm(gameOptions);
 };
 </script>
@@ -33,16 +45,16 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
             <div class="modal-dialog">
                 <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
                     <div class="modal-header">
-                        <h5 class="modal-title">{{ $t('1vAI_offline.title') }}</h5>
+                        <h5 class="modal-title">{{ $t('1v1_friendly.title') }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
-                        <p>
-                            <small>{{ $t('offline_game_explain') }}</small>
-                        </p>
-
                         <div class="mb-3">
                             <AppBoardsize :gameOptions="gameOptions" />
+                        </div>
+
+                        <div class="mb-3">
+                            <AppTimeControl :gameOptions="gameOptions" ref="timeControlComponent" />
                         </div>
 
                         <button
@@ -69,7 +81,7 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
-                        <button type="submit" class="btn btn-success">{{ $t('1vAI_offline.create') }}</button>
+                        <button type="submit" class="btn btn-success">{{ $t('1v1_friendly.create') }}</button>
                     </div>
                 </form>
             </div>

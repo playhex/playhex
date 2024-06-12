@@ -43,10 +43,7 @@
     "n_online_players": "En ligne ({{n}})",
     "guest": "Invité",
     "finished_games": "Parties terminées",
-    "1v1": "1c1",
     "tournament": "Tournoi",
-    "play_vs_ai": "Jouer contre IA",
-    "play_vs_offline_ai": "Jouer contre IA hors-ligne",
     "account_created_on": "Compte créé le {{date}}",
     "board_orientation": {
         "title": "Orientation du plateau",
@@ -104,8 +101,30 @@
         "default": "{player} remporte la partie !",
         "forfeit": "{player} gagne par forfait !"
     },
+    "1v1_ranked": {
+        "title": "1c1",
+        "create": "Créer une partie 1c1"
+    },
+    "1v1_friendly": {
+        "title": "1c1 personnalisée",
+        "create": "Créer une partie personnalisée 1c1"
+    },
+    "1vAI_ranked": {
+        "title": "IA classée",
+        "create": "Jouer classé contre l'IA"
+    },
+    "1vAI_friendly": {
+        "title": "Jouer contre l'IA",
+        "create": "Jouer contre l'IA"
+    },
+    "1vAI_offline": {
+        "title": "IA hors-ligne",
+        "create": "Jouer hors-ligne contre l'IA"
+    },
+    "offline_game_explain": "Une partie hors-ligne se déroule uniquement sur votre appareil, Le serveur PlayHex n'est pas appelé. Vous pouvez donc jouer sans internet.",
     "cancel": "Annuler",
-    "create_1v1": "Créer une partie 1c1",
+    "ranked": "Classée",
+    "rating": "Évaluation : {{rating}}",
     "player": "joueur",
     "now!": "Maintenant !",
     "see_progression_on_challonge": "Voir la progression sur Challonge",

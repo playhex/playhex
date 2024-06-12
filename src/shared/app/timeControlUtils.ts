@@ -40,7 +40,7 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
 };
 
 
-type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
+export type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
 
 /**
  * Naive function that guess if a game is a blitz or correspondence

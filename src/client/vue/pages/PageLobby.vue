@@ -3,8 +3,10 @@
 import useLobbyStore from '@client/stores/lobbyStore';
 import { useRouter } from 'vue-router';
 import { createOverlay } from 'unoverlay-vue';
-import Create1v1Overlay, { Create1v1OverlayInput } from '@client/vue/components/overlay/Create1v1Overlay.vue';
+import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '@client/vue/components/overlay/Create1v1RankedOverlay.vue';
+import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '@client/vue/components/overlay/Create1v1FriendlyOverlay.vue';
 import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
+import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '@client/vue/components/overlay/Create1vAIRankedOverlay.vue';
 import Create1vOfflineAIOverlay, { Create1vOfflineAIOverlayInput } from '@client/vue/components/overlay/Create1vOfflineAIOverlay.vue';
 import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
@@ -13,8 +15,8 @@ import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
 import HostedGameClient from '../../HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
-import AppPseudoWithOnlineStatus from '../components/AppPseudoWithOnlineStatus.vue';
-import { BIconEye, BIconTrophy, BIconPeople, BIconRobot } from 'bootstrap-icons-vue';
+import AppPseudo from '../components/AppPseudo.vue';
+import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill } from 'bootstrap-icons-vue';
 import AppTimeControlLabelVue from '../components/AppTimeControlLabel.vue';
 import { useSeoMeta } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
@@ -39,15 +41,57 @@ const goToGame = (gameId: string) => {
 };
 
 /*
- * 1 vs 1
+ * 1 vs 1 - ranked
  */
-const create1v1Overlay = createOverlay<Create1v1OverlayInput, HostedGameOptions>(Create1v1Overlay);
+const create1v1RankedOverlay = createOverlay<Create1v1RankedOverlayInput, HostedGameOptions>(Create1v1RankedOverlay);
 
-const create1v1AndJoinGame = async () => {
+const create1v1RankedAndJoinGame = async () => {
     try {
-        const gameOptions = await create1v1Overlay({
+        const gameOptions = await create1v1RankedOverlay({
             gameOptions: {
                 opponentType: 'player',
+                ranked: true,
+            },
+        });
+
+        const hostedGameClient = await lobbyStore.createGame(gameOptions);
+        goToGame(hostedGameClient.getId());
+    } catch (e) {
+        // noop, player just closed popin
+    }
+};
+
+/*
+ * 1 vs 1 - friendly
+ */
+const create1v1FriendlyOverlay = createOverlay<Create1v1FriendlyOverlayInput, HostedGameOptions>(Create1v1FriendlyOverlay);
+
+const create1v1FriendlyAndJoinGame = async () => {
+    try {
+        const gameOptions = await create1v1FriendlyOverlay({
+            gameOptions: {
+                opponentType: 'player',
+            },
+        });
+
+        const hostedGameClient = await lobbyStore.createGame(gameOptions);
+        goToGame(hostedGameClient.getId());
+    } catch (e) {
+        // noop, player just closed popin
+    }
+};
+
+/*
+ * 1 vs AI ranked
+ */
+const create1vAIRankedOverlay = createOverlay<Create1vAIRankedOverlayInput, HostedGameOptions>(Create1vAIRankedOverlay);
+
+const create1vAIRankedAndJoinGame = async () => {
+    try {
+        const gameOptions = await create1vAIRankedOverlay({
+            gameOptions: {
+                opponentType: 'ai',
+                ranked: true,
             },
         });
 
@@ -196,14 +240,22 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                 <h3>{{ $t('new_game') }}</h3>
 
                 <div class="play-buttons row">
-                    <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1AndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1') }}</button>
+                    <div class="col-6 col-md-4 mb-4">
+                        <button type="button" class="btn w-100 btn-warning" @click="() => create1v1RankedAndJoinGame()"><BIconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('play_vs_ai') }}</button>
+                    <div class="col-6 col-md-4 mb-4">
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1FriendlyAndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
                     </div>
-                    <div class="col-6 col-md-4 col-lg-3 mb-4">
-                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><BIconRobot class="fs-3" /><br>{{ $t('play_vs_offline_ai') }}</button>
+                </div>
+                <div class="play-buttons row">
+                    <div class="col-6 col-md-4 mb-4">
+                        <button type="button" class="btn w-100 btn-warning" @click="() => create1vAIRankedAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
+                    </div>
+                    <div class="col-6 col-md-4 mb-4">
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
+                    </div>
+                    <div class="col-6 col-md-4 mb-4">
+                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_offline.title') }}</button>
                     </div>
                 </div>
 
@@ -213,6 +265,7 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                     <table class="table">
                         <thead>
                             <tr>
+                                <th scope="col"></th>
                                 <th scope="col"></th>
                                 <th scope="col">{{ $t('game.host') }}</th>
                                 <th scope="col">{{ $t('game.size') }}</th>
@@ -238,7 +291,8 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >{{ $t('game.watch') }}</router-link>
                                 </td>
-                                <td><AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" /></td>
+                                <td><span v-if="hostedGameClient.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
+                                <td><AppPseudo onlineStatus rating :player="hostedGameClient.getHostedGame().host" /></td>
                                 <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
                                 <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
                                 <td><AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></td>
@@ -276,13 +330,15 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         class="btn btn-sm btn-link"
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >{{ $t('game.watch') }}</router-link>
+
+                                    <span v-if="hostedGameClient.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
-                                <td class="d-none d-sm-table-cell"><AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" /></td>
-                                <td class="d-none d-sm-table-cell"><AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" /></td>
+                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" /></td>
+                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" /></td>
                                 <td class="d-table-cell d-sm-none">
-                                    <AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" />
+                                    <AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" />
                                     <br>
-                                    <AppPseudoWithOnlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" />
+                                    <AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" />
                                 </td>
                                 <td>{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</td>
                                 <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
@@ -319,10 +375,12 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                                         class="btn btn-sm btn-link"
                                         :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
                                     >{{ $t('game.review') }}</router-link>
+
+                                    <span v-if="hostedGameClient.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
                                 <template v-if="hostedGameClient.getHostedGame()?.gameData?.winner != null">
-                                    <td><AppPseudoWithOnlineStatus :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" /></td>
-                                    <td><AppPseudoWithOnlineStatus :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" /></td>
+                                    <td><AppPseudo rating onlineStatus :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" /></td>
+                                    <td><AppPseudo rating onlineStatus :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" /></td>
                                 </template>
                                 <template v-else>
                                     <td>-</td>
