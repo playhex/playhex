@@ -453,7 +453,7 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                 </div>
             </div>
 
-            <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGame())">
+            <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer as Player, hostedGameClient.getHostedGame())">
                 <div class="container-fluid mb-3">
                     <div class="input-group">
                         <input v-model="chatInput" class="form-control" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />

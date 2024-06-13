@@ -221,7 +221,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                 <h2><AppPseudo v-if="player" rating="full" :player="player" /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
-                    ? format(player?.createdAt, 'd MMMM Y')
+                    ? format(player?.createdAt, 'd MMMM y')
                     : '…' })
                 }}</p>
 
