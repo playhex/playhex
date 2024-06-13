@@ -1,15 +1,14 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconTrophy, BIconCaretUpFill, BIconCaretDownFill } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
-import Player from '../../../shared/app/models/Player';
-import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
+import { Player, Rating } from '../../../shared/app/models';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
@@ -31,6 +30,7 @@ const props = defineProps({
 });
 
 const { hostedGameClient } = toRefs(props);
+const { round, abs } = Math;
 
 const emits = defineEmits([
     'close',
@@ -256,6 +256,18 @@ const gameAnalyze = analyzeStore.getAnalyze(gameId);
 const doAnalyzeGame = async () => {
     analyzeStore.loadAnalyze(gameId, true);
 };
+
+/*
+ * Ratings
+ */
+
+/**
+ * Sort ratings to place red player first
+ */
+const byPlayerPosition = (a: Rating, b: Rating): number =>
+    hostedGameClient.value.getPlayerIndex(a.player) -
+    hostedGameClient.value.getPlayerIndex(b.player)
+;
 </script>
 
 <template>
@@ -264,6 +276,9 @@ const doAnalyzeGame = async () => {
             <div class="container-fluid">
                 <template v-if="'created' === hostedGameClient.getState()">
                     <h3>{{ $t('waiting_for_an_opponent') }}</h3>
+                    <p v-if="hostedGameClient.isRanked()" class="text-warning">
+                        <BIconTrophy /> {{ $t('ranked') }}
+                    </p>
                     <p>
                         <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
@@ -272,7 +287,7 @@ const doAnalyzeGame = async () => {
                     <p>
                         <i18next :translation="$t('game_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />
+                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host" />
                             </template>
                             <template #timeAgo>
                                 {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
@@ -282,6 +297,9 @@ const doAnalyzeGame = async () => {
                 </template>
                 <template v-if="'canceled' === hostedGameClient.getState()">
                     <h3>{{ $t('game_has_been_canceled') }}</h3>
+                    <p v-if="hostedGameClient.isRanked()" class="text-warning">
+                        <BIconTrophy /> {{ $t('ranked') }}
+                    </p>
                     <p>
                         <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
@@ -290,7 +308,7 @@ const doAnalyzeGame = async () => {
                     <p>
                         <i18next :translation="$t('game_was_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudoWithOnlineStatus :player="hostedGameClient.getHostedGame().host" />
+                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host" />
                             </template>
                             <template #timeAgo>
                                 {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
@@ -300,6 +318,9 @@ const doAnalyzeGame = async () => {
                 </template>
                 <template v-if="'playing' === hostedGameClient.getState()">
                     <h3>{{ $t('game.playing') }}</h3>
+                    <p v-if="hostedGameClient.isRanked()" class="text-warning">
+                        <BIconTrophy /> {{ $t('ranked') }}
+                    </p>
                     <p>
                         <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
@@ -316,6 +337,29 @@ const doAnalyzeGame = async () => {
                             </template>
                         </i18next>
                     </h3>
+                    <div v-if="hostedGameClient.isRanked()" class="text-warning">
+                        <BIconTrophy /> {{ $t('ranked') }}
+                    </div>
+                    <div v-if="hostedGameClient.isRanked()" class="d-flex justify-content-center gap-4 my-2">
+                        <div v-for="rating in hostedGameClient.getRatings().sort(byPlayerPosition)" :key="rating.id">
+                            <AppPseudo
+                                :player="rating.player"
+                                :classes="[playerColor(rating.player), 'me-1']"
+                                is="span"
+                            />
+                            <span v-if="undefined === rating.ratingChange">
+                                -
+                            </span>
+                            <span v-else-if="rating.ratingChange > 0" class="text-success">
+                                <small><BIconCaretUpFill /></small> {{ round(rating.ratingChange) }}
+                            </span>
+                            <span v-else class="text-danger">
+                                <small><BIconCaretDownFill /></small> {{ abs(round(rating.ratingChange)) }}
+                            </span>
+                            <br>
+                            <small>{{ $t('rating', { rating: round(rating.rating) }) }}</small>
+                        </div>
+                    </div>
                     <p>
                         <small>{{ $t('2dots', { s: $t('game.rules') }) }} <AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>

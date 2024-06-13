@@ -3,7 +3,7 @@
 import { storeToRefs } from 'pinia';
 import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore';
-import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear } from 'bootstrap-icons-vue';
+import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
 import HostedGame from '../../../../shared/app/models/HostedGame';
 import Player from '../../../../shared/app/models/Player';
 import { getPlayerGames, getPlayerBySlug, ApiClientError } from '../../../apiClient';
@@ -13,7 +13,6 @@ import useLobbyStore from '../../../stores/lobbyStore';
 import HostedGameClient from '../../../HostedGameClient';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
-import AppPseudoWithOnlineStatusVue from '../../components/AppPseudoWithOnlineStatus.vue';
 import AppTimeControlLabelVue from '../../components/AppTimeControlLabel.vue';
 import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -219,7 +218,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                 <AppOnlineStatus v-if="player" :player="player" class="player-status" />
             </div>
             <div>
-                <h2><AppPseudo v-if="player" :player="player" /><template v-else>…</template></h2>
+                <h2><AppPseudo v-if="player" rating="full" :player="player" /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM Y')
@@ -270,6 +269,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                 <thead>
                     <tr>
                         <th scope="col"></th>
+                        <th scope="col"></th>
                         <th scope="col">{{ $t('game.opponent') }}</th>
                         <th scope="col">{{ $t('game.size') }}</th>
                         <th scope="col">{{ $t('game.time_control') }}</th>
@@ -288,7 +288,10 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                                 class="btn btn-sm btn-link"
                             >{{ $t('game.watch') }}</router-link>
                         </td>
-                        <td><AppPseudoWithOnlineStatusVue :player="(game.getOtherPlayer(player) as Player)" /></td>
+                        <td>
+                            <span v-if="game.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                        </td>
+                        <td><AppPseudo rating onlineStatus :player="(game.getOtherPlayer(player) as Player)" /></td>
                         <td>{{ game.getHostedGame().gameOptions.boardsize }}</td>
                         <td><AppTimeControlLabelVue :gameOptions="game.getGameOptions()" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.getGameOptions()" /></td>
@@ -306,6 +309,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
             <table class="table">
                 <thead>
                     <tr>
+                        <th scope="col"></th>
                         <th scope="col"></th>
                         <th scope="col">{{ $t('game.outcome') }}</th>
                         <th scope="col">{{ $t('game.opponent') }}</th>
@@ -326,9 +330,12 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                                 class="btn btn-sm btn-link"
                             >{{ $t('game.review') }}</router-link>
                         </td>
+                        <td>
+                            <span v-if="game.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                        </td>
                         <td v-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
                         <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + (game?.gameData?.outcome ?? 'loss')) }}</td>
-                        <td><AppPseudoWithOnlineStatusVue :player="getOpponent(game)" /></td>
+                        <td><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
                         <td>{{ game.gameOptions.boardsize }}</td>
                         <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>

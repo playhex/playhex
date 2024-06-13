@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm';
 import Player from './Player';
 import type { HostedGameState } from '../../app/Types';
@@ -9,6 +9,7 @@ import ChatMessage from './ChatMessage';
 import HostedGameToPlayer from './HostedGameToPlayer';
 import { Expose } from '../../../shared/app/class-transformer-custom';
 import { Transform, Type } from 'class-transformer';
+import Rating from './Rating';
 
 @Entity()
 export default class HostedGame
@@ -67,6 +68,15 @@ export default class HostedGame
     @Expose()
     @Type(() => Date)
     createdAt: Date = new Date();
+
+    /**
+     * Which new ratings have been issued from this game.
+     * Can be used to take rating.ratingChange for each player.
+     * Other games can also have issued a same rating in case of tournament for example.
+     */
+    @ManyToMany(() => Rating, rating => rating.games)
+    @Expose()
+    ratings: Rating[];
 }
 
 const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {

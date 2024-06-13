@@ -161,6 +161,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
+        socket.on('ratingsUpdated', (gameId, ratings) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].onRatingsUpdated(ratings);
+            }
+        });
+
         socket.on('chat', (gameId: string, chatMessage: ChatMessage) => {
             if (hostedGameClients.value[gameId]) {
                 hostedGameClients.value[gameId].onChatMessage(chatMessage);

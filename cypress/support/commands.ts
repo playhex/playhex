@@ -56,6 +56,11 @@ declare namespace Cypress {
          * x and y are coords of pixel on screen.
          */
         play(x: number, y: number): Chainable<unknown>;
+
+        /**
+         * When on game page, open game sidebar.
+         */
+        openGameSidebar(): Chainable<unknown>;
     }
 }
 
@@ -63,14 +68,14 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
     cy.contains('Play vs AI').click();
 
     cy
-        .contains('Game options')
+        .contains('h5', 'Play vs AI')
         .closest('.modal-content')
         .contains('button', 'random')
         .click()
     ;
 
     cy
-        .contains('Game options')
+        .contains('h5', 'Play vs AI')
         .closest('.modal-content')
         .contains('Determinist')
         .click()
@@ -84,9 +89,10 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
 });
 
 Cypress.Commands.add('submitAIGame', () => {
-    cy.contains('Game options')
+    cy
+        .contains('h5', 'Play vs AI')
         .closest('.modal-content')
-        .contains('Play vs AI')
+        .contains('button', 'Play vs AI')
         .click()
     ;
 });
@@ -95,4 +101,11 @@ Cypress.Commands.add('play', (x, y) => {
     cy.get('canvas');
     cy.wait(50);
     cy.get('body').click(x, y);
+});
+
+Cypress.Commands.add('openGameSidebar', () => {
+    cy
+        .get('[aria-label="Open game sidebar and chat"]')
+        .click()
+    ;
 });

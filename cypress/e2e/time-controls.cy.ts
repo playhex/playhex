@@ -6,7 +6,7 @@ describe('Time controls', () => {
         cy.createAIGameWithRandom(false);
 
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains('Custom')
             .click()
@@ -18,7 +18,7 @@ describe('Time controls', () => {
 
         // I must play first to keep full time for my opponent and make assertions on his time
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains(/^First$/)
             .click()
@@ -27,7 +27,7 @@ describe('Time controls', () => {
 
     it('create a game with default 10 minutes for each player', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
             .contains('Time control')
@@ -44,7 +44,7 @@ describe('Time controls', () => {
 
     it('create a game with default 5 minutes for each player', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
             .contains('Time control')
@@ -61,7 +61,7 @@ describe('Time controls', () => {
 
     it('create a game with custom time control, Byo Yomi', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
             .contains('Time control')
@@ -71,7 +71,7 @@ describe('Time controls', () => {
         ;
 
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
             .contains('Use Byo-Yomi')
             .click()
@@ -87,7 +87,7 @@ describe('Time controls', () => {
 
     it('create a game with custom time control, Fischer', () => {
         cy
-            .contains('Game options')
+            .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
             .contains('Time control')

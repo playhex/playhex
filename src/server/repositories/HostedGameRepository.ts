@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer';
 import { HostedGameState } from '../../shared/app/Types';
-import { Player, ChatMessage, HostedGame, HostedGameOptions, Move } from '../../shared/app/models';
+import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
 import HostedGamePersister from '../persistance/HostedGamePersister';
 import logger from '../services/logger';
@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
 import { AppDataSource } from '../data-source';
 import { plainToInstance } from '../../shared/app/class-transformer-custom';
+import RatingRepository from './RatingRepository';
 
 export class GameError extends Error {}
 
@@ -45,9 +46,13 @@ export default class HostedGameRepository
     constructor(
         private hostedGamePersister: HostedGamePersister,
         private io: HexServer,
+        private ratingRepository: RatingRepository,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
+
+        @Inject('Repository<Player>')
+        private playerRepository: Repository<Player>,
     ) {
         this.loadActiveGamesFromMemory();
     }
@@ -70,7 +75,7 @@ export default class HostedGameRepository
 
             this.activeGames[hostedGame.publicId] = HostedGameServer.fromData(hostedGame);
 
-            this.enableAutoPersist(this.activeGames[hostedGame.publicId]);
+            this.listenHostedGameServer(this.activeGames[hostedGame.publicId]);
         });
     }
 
@@ -98,45 +103,110 @@ export default class HostedGameRepository
         return allSuccess;
     }
 
-    /**
-     * Auto persist game when needed.
-     * Also flush it from memory.
-     */
-    private enableAutoPersist(hostedGameServer: HostedGameServer): void
+    private listenHostedGameServer(hostedGameServer: HostedGameServer): void
     {
-        // Persist on no activity
-        const resetTimeout = (): void => {
-            if (this.persistWhenNoActivity[hostedGameServer.getId()]) {
-                clearTimeout(this.persistWhenNoActivity[hostedGameServer.getId()]);
-                delete this.persistWhenNoActivity[hostedGameServer.getId()];
-            }
-        };
-
-        // Persist on ended
-        const onEnded = () => {
-            resetTimeout();
-            this.hostedGamePersister.persist(hostedGameServer.toData());
-            delete this.activeGames[hostedGameServer.getId()];
-        };
-
-        if ('ended' === hostedGameServer.getState() || 'canceled' === hostedGameServer.getState()) {
-            onEnded();
-        } else {
-            hostedGameServer.on('ended', onEnded);
-            hostedGameServer.on('canceled', onEnded);
+        if ('ended' === hostedGameServer.getState()) {
+            this.onGameEnded(hostedGameServer);
+            return;
         }
 
-        // Keep alive again when activity done on this game
-        const onActivity = (): void => {
-            resetTimeout();
-            this.persistWhenNoActivity[hostedGameServer.getId()] = setTimeout(
-                () => this.hostedGamePersister.persist(hostedGameServer.toData()),
-                300 * 1000, // Persist after 5min inactivity
-            );
-        };
+        if ('canceled' === hostedGameServer.getState()) {
+            this.onGameCanceled(hostedGameServer);
+            return;
+        }
 
-        hostedGameServer.on('played', onActivity);
-        hostedGameServer.on('chat', onActivity);
+        this.persistAfterDelayOfInactivity(hostedGameServer);
+
+        hostedGameServer.on('ended', () => this.onGameEnded(hostedGameServer));
+        hostedGameServer.on('canceled', () => this.onGameCanceled(hostedGameServer));
+    }
+
+    /**
+     * Activity made on a game, makes persist in new 5 minutes
+     */
+    private resetActivityTimeout(hostedGameServer: HostedGameServer): void
+    {
+        this.clearActivityTimeout(hostedGameServer);
+        this.persistWhenNoActivity[hostedGameServer.getId()] = setTimeout(
+            () => this.hostedGamePersister.persist(hostedGameServer.toData()),
+            300 * 1000, // Persist after 5min inactivity
+        );
+    }
+
+    /**
+     * Cancel planned persist
+     */
+    private clearActivityTimeout(hostedGameServer: HostedGameServer): void
+    {
+        if (this.persistWhenNoActivity[hostedGameServer.getId()]) {
+            clearTimeout(this.persistWhenNoActivity[hostedGameServer.getId()]);
+            delete this.persistWhenNoActivity[hostedGameServer.getId()];
+        }
+    }
+
+    /**
+     * Persist game when no activity in case server restart
+     */
+    private persistAfterDelayOfInactivity(hostedGameServer: HostedGameServer): void
+    {
+        hostedGameServer.on('played', () => this.resetActivityTimeout(hostedGameServer));
+        hostedGameServer.on('chat', () => this.resetActivityTimeout(hostedGameServer));
+    }
+
+    /**
+     * Flush game from memory, persist into database
+     */
+    private async flushHostedGame(hostedGameServer: HostedGameServer): Promise<void>
+    {
+        this.clearActivityTimeout(hostedGameServer);
+        const hostedGame = hostedGameServer.toData();
+        await this.hostedGamePersister.persist(hostedGame);
+        delete this.activeGames[hostedGameServer.getId()];
+    }
+
+    /**
+     * Things to do when game has ended
+     */
+    private async onGameEnded(hostedGameServer: HostedGameServer): Promise<void>
+    {
+        await this.flushHostedGame(hostedGameServer);
+
+        if (hostedGameServer.toData().gameOptions.ranked) {
+            const newRatings = await this.updateRatings(hostedGameServer);
+
+            this.io
+                .to([
+                    Rooms.game(hostedGameServer.getId()),
+                    Rooms.lobby,
+                ])
+                .emit(
+                    'ratingsUpdated',
+                    hostedGameServer.getId(),
+                    newRatings.filter(rating => 'overall' === rating.category),
+                )
+            ;
+        }
+    }
+
+    /**
+     * Things to do when game has canceled
+     */
+    private async onGameCanceled(hostedGameServer: HostedGameServer): Promise<void>
+    {
+        await this.flushHostedGame(hostedGameServer);
+    }
+
+    /**
+     * Update players ratings
+     */
+    private async updateRatings(hostedGameServer: HostedGameServer): Promise<Rating[]>
+    {
+        const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.toData());
+
+        await this.ratingRepository.persistRatings(newRatings);
+        await this.playerRepository.save(hostedGameServer.getPlayers());
+
+        return newRatings;
     }
 
     getActiveGames(): { [key: string]: HostedGameServer }
@@ -207,7 +277,7 @@ export default class HostedGameRepository
 
         this.activeGames[hostedGame.getId()] = hostedGame;
 
-        this.enableAutoPersist(hostedGame);
+        this.listenHostedGameServer(hostedGame);
 
         return hostedGame;
     }
@@ -240,7 +310,7 @@ export default class HostedGameRepository
 
         try {
             await this.hostedGamePersister.persist(game.rematch);
-            await this.hostedGamePersister.persist(game);
+            await this.hostedGamePersister.persistLinkToRematch(game);
         } catch (e) {
             logger.error(`Failed to persist: ${e?.message}`, e);
         }

@@ -41,7 +41,7 @@ const {
                 class="online-status-icon text-success"
                 aria-hidden="true"
             />
-            <AppPseudo :player="player" />
+            <AppPseudo rating :player="player" />
         </p>
     </div>
 </template>

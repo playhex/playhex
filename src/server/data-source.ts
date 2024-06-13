@@ -2,6 +2,7 @@ import './config';
 import { DataSource } from 'typeorm';
 import Container from 'typedi';
 import { entities } from '../shared/app/models';
+import FixPasswordRemoving from './persistance/subscriber/FixPasswordRemoving';
 
 const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
 
@@ -21,7 +22,9 @@ export const AppDataSource = new DataSource({
     logging: 'true' === DATABASE_SHOW_SQL,
     timezone: 'Z',
     entities: Object.values(entities),
-    subscribers: [],
+    subscribers: [
+        FixPasswordRemoving,
+    ],
     migrations: [],
     maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
 });

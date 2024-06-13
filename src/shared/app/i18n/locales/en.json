@@ -36,8 +36,7 @@
     "create_game": {
         "custom_size": "Custom",
         "less_options": "Less options",
-        "more_options": "More options",
-        "game_options": "Game options"
+        "more_options": "More options"
     },
     "player_settings": {
         "title": "Settings"
@@ -126,6 +125,9 @@
     "cancel": "Cancel",
     "close": "Close",
     "create_1v1": "Create 1v1",
+    "create_1v1_ranked": "Create ranked 1v1",
+    "ranked": "Ranked",
+    "rating": "Rating: {{rating}}",
     "new_game": "New game",
     "players": "Players",
     "player": "player",
@@ -134,9 +136,27 @@
     "n_online_players": "Online ({{n}})",
     "guest": "Guest",
     "finished_games": "Finished games",
-    "1v1": "1v1",
-    "play_vs_ai": "Play vs AI",
-    "play_vs_offline_ai": "Play vs offline AI",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Create 1v1"
+    },
+    "1v1_friendly": {
+        "title": "Custom 1v1",
+        "create": "Create custom 1v1"
+    },
+    "1vAI_ranked": {
+        "title": "Ranked vs AI",
+        "create": "Play ranked vs AI"
+    },
+    "1vAI_friendly": {
+        "title": "Play vs AI",
+        "create": "Play vs AI"
+    },
+    "1vAI_offline": {
+        "title": "Offline AI",
+        "create": "Play vs offline AI"
+    },
+    "offline_game_explain": "Offline game only runs on your device, PlayHex server is not called. So you can play when no internet.",
     "loading_game": "Loading game…",
     "tournament": "Tournament",
     "now!": "Now!",

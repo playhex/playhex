@@ -1,7 +1,7 @@
 import { Game, Move as GameMove, PlayerIndex } from '@shared/game-engine';
 import HostedGame from '../shared/app/models/HostedGame';
 import { HostedGameState } from '@shared/app/Types';
-import { Player, HostedGameOptions, ChatMessage, HostedGameToPlayer, Move } from '../shared/app/models';
+import { Player, HostedGameOptions, ChatMessage, HostedGameToPlayer, Move, Rating } from '../shared/app/models';
 import { Outcome } from '@shared/game-engine/Types';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -177,6 +177,16 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getChatMessages(): ChatMessage[]
     {
         return this.hostedGame.chatMessages;
+    }
+
+    isRanked(): boolean
+    {
+        return this.hostedGame.gameOptions.ranked;
+    }
+
+    getRatings(): Rating[]
+    {
+        return this.hostedGame.ratings ?? [];
     }
 
     /**
@@ -391,6 +401,27 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.game.declareWinner(winner, outcome, date);
+    }
+
+    onRatingsUpdated(ratings: Rating[]): void
+    {
+        // Add rating change of this game
+        this.hostedGame.ratings = ratings;
+
+        // Update player current rating to update view
+        ratings.forEach(rating => {
+            const player = this.hostedGame
+                .hostedGameToPlayers
+                .find(hostedGameToPlayer => hostedGameToPlayer.player.publicId === rating.player.publicId)
+                ?.player
+            ;
+
+            if (!player) {
+                return;
+            }
+
+            player.currentRating = rating;
+        });
     }
 
     async sendChatMessage(content: string): Promise<string | true>

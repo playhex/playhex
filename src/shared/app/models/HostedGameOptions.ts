@@ -3,10 +3,11 @@ import { Type } from 'class-transformer';
 import { ColumnUUID } from '../custom-typeorm';
 import HostedGame from './HostedGame';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../../game-engine';
-import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, ValidateNested } from 'class-validator';
+import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlAbsolute, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer, HostedGameOptionsTimeControlSimple } from './HostedGameOptionsTimeControl';
 import type TimeControlType from '../../time-control/TimeControlType';
+import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
@@ -21,6 +22,14 @@ export default class HostedGameOptions
     @OneToOne(() => HostedGame, hostedGame => hostedGame.gameOptions)
     @JoinColumn({ name: 'hostedGameId' })
     hostedGame: HostedGame;
+
+    @Column()
+    @Expose()
+    @IsBoolean()
+    @Validate(BoardsizeEligibleForRanked)
+    @Validate(FirstPlayerEligibleForRanked)
+    @Validate(SwapRuleEligibleForRanked)
+    ranked: boolean = false;
 
     /**
      * Defaults to BOARD_DEFAULT_SIZE.
@@ -95,6 +104,7 @@ export default class HostedGameOptions
 export const cloneGameOptions = (gameOptions: HostedGameOptions): HostedGameOptions => {
     const clone = new HostedGameOptions();
 
+    clone.ranked = gameOptions.ranked;
     clone.boardsize = gameOptions.boardsize;
     clone.firstPlayer = gameOptions.firstPlayer;
     clone.swapRule = gameOptions.swapRule;

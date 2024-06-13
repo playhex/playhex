@@ -1,0 +1,21 @@
+{
+    "totalPlayers": 1,
+    "players": {
+        "e30dd5a3-501f-4ef8-9e69-e42b1de22d07": {
+            "pseudo": "2943",
+            "publicId": "e30dd5a3-501f-4ef8-9e69-e42b1de22d07",
+            "isGuest": true,
+            "isBot": false,
+            "slug": "2943",
+            "createdAt": "2024-06-11T19:57:49.749Z",
+            "currentRating": {
+                "category": "overall",
+                "createdAt": "2024-06-11T19:58:44.243Z",
+                "rating": 1662.3108939062977,
+                "deviation": 290.31896371798047,
+                "volatility": 0.05999967537233814,
+                "ratingChange": 162.31089390629768
+            }
+        }
+    }
+}

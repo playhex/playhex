@@ -13,9 +13,16 @@ const relations: FindOptionsRelations<HostedGame> = {
     rematch: true,
     gameData: true,
     gameOptions: true,
-    host: true,
-    hostedGameToPlayers: {
+    ratings: {
         player: true,
+    },
+    host: {
+        currentRating: true,
+    },
+    hostedGameToPlayers: {
+        player: {
+            currentRating: true,
+        },
     },
 };
 
@@ -39,6 +46,14 @@ export default class HostedGamePersister
         logger.info('Persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
     }
 
+    async persistLinkToRematch(hostedGame: HostedGame): Promise<void>
+    {
+        await this.hostedGameRepository.save({
+            id: hostedGame.id,
+            rematch: hostedGame.rematch,
+        });
+    }
+
     async deleteIfExists(hostedGame: HostedGame): Promise<void>
     {
         logger.info('Delete a game if exists...', { publicId: hostedGame.publicId });
@@ -54,6 +69,9 @@ export default class HostedGamePersister
             relations,
             where: {
                 publicId: publicId,
+                ratings: {
+                    category: 'overall',
+                },
             },
         });
     }

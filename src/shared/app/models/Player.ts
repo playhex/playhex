@@ -1,8 +1,9 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm';
 import { Expose, GROUP_DEFAULT as GROUP_DEFAULT } from '../../../shared/app/class-transformer-custom';
 import AIConfig from './AIConfig';
 import { IsDate } from 'class-validator';
+import Rating from './Rating';
 
 @Entity()
 export default class Player
@@ -57,7 +58,7 @@ export default class Player
      * BCrypt hashed password
      */
     @Column({ type: 'char', length: 60, nullable: true, select: false })
-    password?: undefined | string;
+    password?: null | string;
 
     /**
      * For AI players, their config.
@@ -65,4 +66,14 @@ export default class Player
      */
     @OneToOne(() => AIConfig, aiConfig => aiConfig.player)
     aiConfig?: AIConfig;
+
+    /**
+     * Link to current player overall rating.
+     * If not set, consider player has not played ranked game yet,
+     * and have default rating, see createInitialRating().
+     */
+    @OneToOne(() => Rating, { eager: true, cascade: true })
+    @JoinColumn()
+    @Expose()
+    currentRating?: Rating;
 }

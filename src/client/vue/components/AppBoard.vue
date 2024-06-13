@@ -7,7 +7,7 @@ import { BIconTrophyFill } from 'bootstrap-icons-vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { createOverlay } from 'unoverlay-vue';
 import AppChrono from './AppChrono.vue';
-import AppPseudoWithOnlineStatus from './AppPseudoWithOnlineStatus.vue';
+import AppPseudo from './AppPseudo.vue';
 import Player from '../../../shared/app/models/Player';
 import TimeControlType from '../../../shared/time-control/TimeControlType';
 import { GameTimeData } from '../../../shared/time-control/TimeControl';
@@ -100,8 +100,10 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
                 <p class="h5" v-if="players">
-                    <AppPseudoWithOnlineStatus
+                    <AppPseudo
                         v-if="players[0]"
+                        rating
+                        onlineStatus
                         :player="players[0]"
                         classes="text-danger"
                     />
@@ -117,8 +119,10 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
             <div class="player player-b">
                 <p class="h5" v-if="players">
                     <span v-if="game.getWinner() === 1"><BIconTrophyFill class="text-warning" />&nbsp;</span>
-                    <AppPseudoWithOnlineStatus
+                    <AppPseudo
                         v-if="players[1]"
+                        rating
+                        onlineStatus
                         :player="players[1]"
                         classes="text-primary"
                     />
