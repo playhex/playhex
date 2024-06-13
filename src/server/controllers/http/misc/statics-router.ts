@@ -1,6 +1,7 @@
 import path from 'path';
 import express from 'express';
 import { Router } from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { IS_DEV, WEBPACK_PORT } from '../../../config';
 
 /* eslint-disable */
@@ -9,12 +10,11 @@ export function staticsRouter() {
     const router = Router();
 
     if (IS_DEV) {
-        const { createProxyMiddleware } = require('http-proxy-middleware');
         // All the assets are hosted by Webpack on localhost:${config.WEBPACK_PORT} (Webpack-dev-server)
         router.use(
             '/statics',
             createProxyMiddleware({
-                target: `http://localhost:${WEBPACK_PORT}/`,
+                target: `http://localhost:${WEBPACK_PORT}/statics`,
             }),
         );
     } else {
