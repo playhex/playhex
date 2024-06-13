@@ -7,7 +7,7 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './vue/App.vue';
 import router from './vue/router';
-import unoverlay from 'unoverlay-vue';
+import unoverlay from '@overlastic/vue';
 import useDarkLightThemeStore from './stores/darkLightThemeStore';
 import I18NextVue from 'i18next-vue';
 import i18next from 'i18next';

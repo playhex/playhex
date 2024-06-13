@@ -5,7 +5,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { PropType, toRefs } from 'vue';
 import { BIconTrophyFill } from 'bootstrap-icons-vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
-import { createOverlay } from 'unoverlay-vue';
+import { defineOverlay } from '@overlastic/vue';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
 import Player from '../../../shared/app/models/Player';
@@ -79,7 +79,7 @@ onUnmounted(() => {
 /*
  * Game end: win popin
  */
-const gameFinishedOverlay = createOverlay(GameFinishedOverlay);
+const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 
 gameView.on('endedAndWinAnimationOver', () => {
     gameFinishedOverlay({

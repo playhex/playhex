@@ -6,7 +6,7 @@ import { ref } from 'vue';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
-import { createOverlay } from 'unoverlay-vue';
+import { defineOverlay } from '@overlastic/vue';
 import { Ref, onMounted, onUnmounted, watch, watchEffect } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
@@ -206,7 +206,7 @@ onMounted(() => loadGame());
 
 const join = () => hostedGameClient.value?.sendJoinGame();
 
-const confirmationOverlay = createOverlay(ConfirmationOverlay);
+const confirmationOverlay = defineOverlay(ConfirmationOverlay);
 
 /*
  * Resign

@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import useLobbyStore from '@client/stores/lobbyStore';
 import { useRouter } from 'vue-router';
-import { createOverlay } from 'unoverlay-vue';
+import { defineOverlay } from '@overlastic/vue';
 import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '@client/vue/components/overlay/Create1v1RankedOverlay.vue';
 import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '@client/vue/components/overlay/Create1v1FriendlyOverlay.vue';
 import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
@@ -43,7 +43,7 @@ const goToGame = (gameId: string) => {
 /*
  * 1 vs 1 - ranked
  */
-const create1v1RankedOverlay = createOverlay<Create1v1RankedOverlayInput, HostedGameOptions>(Create1v1RankedOverlay);
+const create1v1RankedOverlay = defineOverlay<Create1v1RankedOverlayInput, HostedGameOptions>(Create1v1RankedOverlay);
 
 const create1v1RankedAndJoinGame = async () => {
     try {
@@ -64,7 +64,7 @@ const create1v1RankedAndJoinGame = async () => {
 /*
  * 1 vs 1 - friendly
  */
-const create1v1FriendlyOverlay = createOverlay<Create1v1FriendlyOverlayInput, HostedGameOptions>(Create1v1FriendlyOverlay);
+const create1v1FriendlyOverlay = defineOverlay<Create1v1FriendlyOverlayInput, HostedGameOptions>(Create1v1FriendlyOverlay);
 
 const create1v1FriendlyAndJoinGame = async () => {
     try {
@@ -84,7 +84,7 @@ const create1v1FriendlyAndJoinGame = async () => {
 /*
  * 1 vs AI ranked
  */
-const create1vAIRankedOverlay = createOverlay<Create1vAIRankedOverlayInput, HostedGameOptions>(Create1vAIRankedOverlay);
+const create1vAIRankedOverlay = defineOverlay<Create1vAIRankedOverlayInput, HostedGameOptions>(Create1vAIRankedOverlay);
 
 const create1vAIRankedAndJoinGame = async () => {
     try {
@@ -105,7 +105,7 @@ const create1vAIRankedAndJoinGame = async () => {
 /*
  * 1 vs AI
  */
-const create1vAIOverlay = createOverlay<Create1vAIOverlayInput, HostedGameOptions>(Create1vAIOverlay);
+const create1vAIOverlay = defineOverlay<Create1vAIOverlayInput, HostedGameOptions>(Create1vAIOverlay);
 
 const create1vAIAndJoinGame = async () => {
     try {
@@ -125,7 +125,7 @@ const create1vAIAndJoinGame = async () => {
 /*
  * Local play
  */
-const create1vOfflineAIOverlay = createOverlay<Create1vOfflineAIOverlayInput, HostedGameOptions>(Create1vOfflineAIOverlay);
+const create1vOfflineAIOverlay = defineOverlay<Create1vOfflineAIOverlayInput, HostedGameOptions>(Create1vOfflineAIOverlay);
 
 const createAndJoinGameVsLocalAI = async () => {
     try {

@@ -24,6 +24,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@influxdata/influxdb3-client": "^0.8.0",
+    "@overlastic/vue": "^0.4.7",
     "@sentry/webpack-plugin": "^2.10.2",
     "@socket.io/admin-ui": "^0.5.1",
     "@unhead/vue": "^1.8.10",
@@ -62,7 +63,6 @@
     "tiny-typed-emitter": "^2.1.0",
     "typedi": "^0.10.0",
     "typeorm": "^0.3.20",
-    "unoverlay-vue": "^0.2.3",
     "uuid": "^10.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",

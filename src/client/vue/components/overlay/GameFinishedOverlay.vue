@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType } from 'vue';
-import { useOverlayMeta } from 'unoverlay-vue';
+import { usePrograms } from '@overlastic/vue';
 import AppPseudo from '../AppPseudo.vue';
 import Player from '../../../../shared/app/models/Player';
 import { Game } from '../../../../shared/game-engine';
 
-const { visible, confirm } = useOverlayMeta();
+const { visible, resolve } = usePrograms();
 
 const props = defineProps({
     game: {
@@ -30,12 +30,12 @@ const winner: null | Player = game.isCanceled()
 
 <template>
     <div v-if="visible">
-        <div class="modal d-block" @click="confirm()">
+        <div class="modal d-block" @click="resolve()">
             <div class="modal-dialog" @click="e => e.stopPropagation()">
                 <form class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $t('game_finished_overlay.title') }}</h5>
-                        <button type="button" class="btn-close" @click="confirm()"></button>
+                        <button type="button" class="btn-close" @click="resolve()"></button>
                     </div>
                     <div class="modal-body text-center lead">
                         <p v-if="null !== winner">
@@ -55,7 +55,7 @@ const winner: null | Player = game.isCanceled()
                         <button
                             type="button"
                             class="btn btn-outline-primary"
-                            @click="confirm()"
+                            @click="resolve()"
                         >{{ $t('close') }}</button>
                     </div>
                 </form>

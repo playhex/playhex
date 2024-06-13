@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { t } from 'i18next';
-import { useOverlayMeta } from 'unoverlay-vue';
+import { usePrograms } from '@overlastic/vue';
 
-const { visible, confirm, cancel } = useOverlayMeta();
+const { visible, resolve, reject } = usePrograms();
 
 const props = defineProps({
     title: {
@@ -34,19 +34,19 @@ const props = defineProps({
 
 <template>
     <div v-if="visible">
-        <div class="modal d-block" @click="cancel()">
+        <div class="modal d-block" @click="reject()">
             <div class="modal-dialog" @click="e => e.stopPropagation()">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ props.title }}</h5>
-                        <button type="button" class="btn-close" @click="cancel()"></button>
+                        <button type="button" class="btn-close" @click="reject()"></button>
                     </div>
                     <div class="modal-body">
                         <p>{{ props.message }}</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn" :class="cancelClass" @click="cancel()">{{ props.cancelLabel }}</button>
-                        <button type="button" class="btn" :class="confirmClass" @click="confirm()">{{ props.confirmLabel }}</button>
+                        <button type="button" class="btn" :class="cancelClass" @click="reject()">{{ props.cancelLabel }}</button>
+                        <button type="button" class="btn" :class="confirmClass" @click="resolve()">{{ props.confirmLabel }}</button>
                     </div>
                 </div>
             </div>

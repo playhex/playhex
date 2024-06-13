@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useOverlayMeta } from 'unoverlay-vue';
+import { usePrograms } from '@overlastic/vue';
 import { PropType, ref } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
@@ -7,7 +7,7 @@ import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 
-const { visible, confirm, cancel } = useOverlayMeta();
+const { visible, resolve, reject } = usePrograms();
 
 const props = defineProps({
     gameOptions: {
@@ -23,7 +23,7 @@ const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...prop
 const showSecondaryOptions = ref(false);
 
 const submitForm = (gameOptions: HostedGameOptions): void => {
-    confirm(gameOptions);
+    resolve(gameOptions);
 };
 </script>
 
@@ -34,7 +34,7 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                 <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $t('1vAI_offline.title') }}</h5>
-                        <button type="button" class="btn-close" @click="cancel()"></button>
+                        <button type="button" class="btn-close" @click="reject()"></button>
                     </div>
                     <div class="modal-body">
                         <p>
@@ -68,7 +68,7 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
+                        <button type="button" class="btn btn-outline-secondary" @click="reject()">{{ $t('cancel') }}</button>
                         <button type="submit" class="btn btn-success">{{ $t('1vAI_offline.create') }}</button>
                     </div>
                 </form>
