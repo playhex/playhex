@@ -2,7 +2,7 @@
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate : title => `License - ${title}`,
+    titleTemplate: title => `License - ${title}`,
 });
 </script>
 

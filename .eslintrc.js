@@ -20,6 +20,9 @@ module.exports = {
         '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],
         '@typescript-eslint/no-empty-function': 'off',
         'no-unused-vars': 'off',
+        'key-spacing': ['warn', {
+            singleLine: { beforeColon: false, afterColon: true },
+        }],
         '@typescript-eslint/no-unused-vars': 'warn',
         '@typescript-eslint/ban-ts-comment': 'off',
         'space-infix-ops': 'off',
