@@ -7,23 +7,19 @@ import { GameAnalyzeData } from '@shared/app/models/GameAnalyze';
 /**
  * Rectangle, but allow using negative height for better readability.
  */
-class RectangleWithNegative extends Rectangle
-{
-    constructor(x: number, y: number, width: number, height: number)
-    {
-        if (width < 0) {
-            x += width;
-            width = -width;
-        }
-
-        if (height < 0) {
-            y += height;
-            height = -height;
-        }
-
-        super(x, y, width, height);
+const rectWithNegative = (g: Graphics, x: number, y: number, width: number, height: number): void => {
+    if (width < 0) {
+        x += width;
+        width = -width;
     }
-}
+
+    if (height < 0) {
+        y += height;
+        height = -height;
+    }
+
+    g.rect(x, y, width, height);
+};
 
 export type MoveAndValue = {
     move: string;
@@ -50,6 +46,8 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     private container: Container = new Container();
     private highlight: null | Graphics = null;
 
+    private initPromise: Promise<void>;
+
     constructor(
         /**
          * Element in which this gameView should fit.
@@ -62,7 +60,9 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     ) {
         super();
 
-        this.pixi = new Application({
+        this.pixi = new Application();
+
+        this.initPromise = this.pixi.init({
             antialias: true,
             backgroundAlpha: 0,
             resolution: Math.ceil(window.devicePixelRatio),
@@ -71,26 +71,35 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             ...this.getWrapperSize(),
         });
 
-        this.pixi.stage.eventMode = 'static';
+        (async () => {
+            await this.ready();
 
-        this.pixi.stage.addChild(this.container);
+            this.pixi.stage.eventMode = 'static';
 
-        this.listenContainerElementResize();
-        this.redraw();
+            this.pixi.stage.addChild(this.container);
 
-        const selectMove = (event: FederatedPointerEvent) => {
-            const moveClicked = this.getMoveIndexAt(event.global);
+            this.listenContainerElementResize();
+            this.redraw();
 
-            if (null !== this.highlight) {
-                const width = this.pixi.renderer.width / this.pixi.renderer.resolution;
-                this.highlight.x = (moveClicked / this.analyze.length) * width;
-            }
+            const selectMove = (event: FederatedPointerEvent) => {
+                const moveClicked = this.getMoveIndexAt(event.global);
 
-            this.emit('selectedMove', this.analyze[moveClicked] as AnalyzeMoveOutput);
-        };
+                if (null !== this.highlight) {
+                    const width = this.pixi.renderer.width / this.pixi.renderer.resolution;
+                    this.highlight.x = (moveClicked / this.analyze.length) * width;
+                }
 
-        this.pixi.stage.on('pointertap', selectMove);
-        this.pixi.stage.on('mousemove', selectMove);
+                this.emit('selectedMove', this.analyze[moveClicked] as AnalyzeMoveOutput);
+            };
+
+            this.pixi.stage.on('pointertap', selectMove);
+            this.pixi.stage.on('mousemove', selectMove);
+        })();
+    }
+
+    ready(): Promise<void>
+    {
+        return this.initPromise;
     }
 
     private redraw()
@@ -121,21 +130,24 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             const bestMovePower = moveAnalyze.bestMoves[0].whiteWin as number;
 
             if (movePower !== undefined) {
-                graphics.beginFill(movePower < 0.5 ? themes.dark.colorA : themes.dark.colorB);
-                graphics.drawShape(new RectangleWithNegative(
+                rectWithNegative(
+                    graphics,
                     i * barWidth,
                     height / 2,
                     barWidth,
                     (movePower - 0.5) * height,
-                ));
+                );
+
+                graphics.fill({ color: movePower < 0.5 ? themes.dark.colorA : themes.dark.colorB });
             }
 
-            graphics.beginFill('green');
-            graphics.drawCircle(
+            graphics.circle(
                 (i + 0.5) * barWidth,
                 bestMovePower * height,
                 2,
             );
+
+            graphics.fill({ color: 'green' });
         }
 
         this.container.addChild(graphics);
@@ -143,19 +155,18 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         // Highlight
         this.highlight = new Graphics();
 
-        this.highlight.lineStyle({
+        this.highlight.rect(0, 0, barWidth, height);
+        this.highlight.stroke({
             color: 'white',
             width: 1,
         });
-
-        this.highlight.drawRect(0, 0, barWidth, height);
 
         this.container.addChild(this.highlight);
     }
 
     getView(): ICanvas
     {
-        return this.pixi.view;
+        return this.pixi.canvas;
     }
 
     getWrapperSize()

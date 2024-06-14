@@ -1,4 +1,4 @@
-import { Graphics, IPointData, Sprite, Ticker } from 'pixi.js';
+import { Container, Graphics, PointData, Ticker } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
 import GameView from './GameView';
 
@@ -12,7 +12,7 @@ const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
     return 1 - (2 * (x - 1) ** 2 - 1) ** 2;
 });
 
-export default class Hex extends Sprite
+export default class Hex extends Container
 {
     /**
      * Base radius of an hex cell
@@ -66,16 +66,14 @@ export default class Hex extends Sprite
     private createBackground(): Graphics
     {
         const g = new Graphics();
-        const path: IPointData[] = [];
+        const path: PointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
             path.push(Hex.cornerCoords(i, Hex.OUTER_RADIUS));
         }
 
-        g.lineStyle(0);
-        g.beginFill(GameView.currentTheme.strokeColor, 1);
-        g.drawPolygon(path);
-        g.endFill();
+        g.poly(path);
+        g.fill({ color: GameView.currentTheme.strokeColor, alpha: 1 });
 
         return g;
     }
@@ -86,16 +84,14 @@ export default class Hex extends Sprite
     private createEmptyColor(): Graphics
     {
         const g = new Graphics();
-        const path: IPointData[] = [];
+        const path: PointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
             path.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
         }
 
-        g.lineStyle(0);
-        g.beginFill(GameView.currentTheme.colorEmpty);
-        g.drawPolygon(path);
-        g.endFill();
+        g.poly(path);
+        g.fill({ color: GameView.currentTheme.colorEmpty });
 
         return g;
     }
@@ -108,16 +104,14 @@ export default class Hex extends Sprite
     private createHexColor(): Graphics
     {
         const g = new Graphics();
-        const path: IPointData[] = [];
+        const path: PointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
             path.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
         }
 
-        g.lineStyle(0);
-        g.beginFill(0xffffff);
-        g.drawPolygon(path);
-        g.endFill();
+        g.poly(path);
+        g.fill({ color: 0xffffff });
         g.visible = false;
 
         return g;
@@ -129,23 +123,21 @@ export default class Hex extends Sprite
     private createHighlight(): Graphics
     {
         const g = new Graphics();
-        const path: IPointData[] = [];
+        const path: PointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
             path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.3));
         }
 
-        g.lineStyle(0);
-        g.beginFill(0xffffff, 0.4);
-        g.drawPolygon(path);
-        g.endFill();
+        g.poly(path);
+        g.fill({ color: 0xffffff, alpha: 0.4 });
 
         g.visible = false;
 
         return g;
     }
 
-    static coords(row: number, col: number): IPointData
+    static coords(row: number, col: number): PointData
     {
         return {
             x: col * Hex.RADIUS * SQRT3 + row * Hex.RADIUS * SQRT3 / 2,
@@ -153,7 +145,7 @@ export default class Hex extends Sprite
         };
     }
 
-    static cornerCoords(i: number, dist: number = Hex.RADIUS): IPointData
+    static cornerCoords(i: number, dist: number = Hex.RADIUS): PointData
     {
         return {
             x: dist * sin(2 * PI * i / 6),

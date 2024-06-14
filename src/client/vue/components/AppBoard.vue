@@ -47,7 +47,7 @@ if (!gameView || !game) {
     throw new Error('gameView is required');
 }
 
-onMounted(() => {
+onMounted(async () => {
     if (!pixiApp.value) {
         throw new Error('No element with ref="pixiApp"');
     }
@@ -55,6 +55,8 @@ onMounted(() => {
     if (!gameView) {
         throw new Error('gameView has no value');
     }
+
+    await gameView.ready();
 
     pixiApp.value.appendChild(gameView.getView() as unknown as Node);
 });

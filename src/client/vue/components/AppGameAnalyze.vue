@@ -15,12 +15,14 @@ const { analyze } = props;
 const gameAnalyzeContainer = ref<HTMLElement>();
 const moveAnalyze = ref<null | AnalyzeMoveOutput>(null);
 
-onMounted(() => {
+onMounted(async () => {
     if (!gameAnalyzeContainer.value) {
         throw new Error('element with ref="gameReview" not found');
     }
 
     const gameAnalyzeView = new GameAnalyzeView(gameAnalyzeContainer.value, analyze);
+
+    await gameAnalyzeView.ready();
 
     gameAnalyzeContainer.value.appendChild(gameAnalyzeView.getView() as unknown as Node);
 

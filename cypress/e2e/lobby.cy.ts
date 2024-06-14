@@ -11,6 +11,8 @@ describe('Lobby', () => {
 
         cy.createAIGameWithRandom();
 
+        cy.contains('10:00');
+
         cy.contains('PlayHex')
             .click()
         ;

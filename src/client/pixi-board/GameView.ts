@@ -1,5 +1,5 @@
 import { Game, Move, PlayerIndex } from '@shared/game-engine';
-import { Application, Container, Graphics, ICanvas, IPointData, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Graphics, ICanvas, PointData, Text, TextStyle } from 'pixi.js';
 import Hex from '@client/pixi-board/Hex';
 import { Theme, themes } from '@client/pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -132,6 +132,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private unwatchThemeSwitchedListener: WatchStopHandle;
 
+    private initPromise: Promise<void>;
+
     constructor(
         private game: Game,
 
@@ -146,28 +148,39 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
 
-        this.pixi = new Application({
+        this.pixi = new Application();
+
+        this.initPromise = this.pixi.init({
             antialias: true,
             backgroundAlpha: 0,
             resolution: ceil(window.devicePixelRatio),
             autoDensity: true,
-            resizeTo: containerElement,
+            resizeTo: this.containerElement,
             ...this.getWrapperSize(),
         });
 
-        this.listenContainerElementResize();
+        (async () => {
+            await this.ready();
 
-        this.pixi.stage.addChild(this.gameContainer);
+            this.listenContainerElementResize();
 
-        this.redraw();
-        this.listenModel();
+            this.pixi.stage.addChild(this.gameContainer);
 
-        this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
+            this.redraw();
+            this.listenModel();
 
-        if (this.game.isEnded()) {
-            this.highlightSidesFromGame();
-            this.animateWinningPath();
-        }
+            this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
+
+            if (this.game.isEnded()) {
+                this.highlightSidesFromGame();
+                this.animateWinningPath();
+            }
+        })();
+    }
+
+    async ready(): Promise<void>
+    {
+        return this.initPromise;
     }
 
     private redraw(): void
@@ -277,7 +290,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     getView(): ICanvas
     {
-        return this.pixi.view;
+        return this.pixi.canvas;
     }
 
     getOrientation(): OrientationValue
@@ -507,12 +520,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.sidesGraphics = [new Graphics(), new Graphics()];
 
         let g: Graphics;
-        const to = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x, a.y + b.y);
-        const m = (a: IPointData, b: IPointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
+        const to = (a: PointData, b: PointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x, a.y + b.y);
+        const m = (a: PointData, b: PointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
 
         // Set sides colors
-        this.sidesGraphics[0].lineStyle(Hex.RADIUS * 0.6, GameView.currentTheme.colorA);
-        this.sidesGraphics[1].lineStyle(Hex.RADIUS * 0.6, GameView.currentTheme.colorB);
+        this.sidesGraphics[0].setStrokeStyle({ width: Hex.RADIUS * 0.6, color: GameView.currentTheme.colorA });
+        this.sidesGraphics[1].setStrokeStyle({ width: Hex.RADIUS * 0.6, color: GameView.currentTheme.colorB });
 
         // From a1 to i1 (red)
         g = this.sidesGraphics[0];
@@ -523,6 +536,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             to(Hex.coords(0, i), Hex.cornerCoords(0));
         }
 
+        g.stroke();
+
         // From i1 to i9 (blue)
         g = this.sidesGraphics[1];
         m(Hex.coords(0, this.game.getSize() - 1), Hex.cornerCoords(0));
@@ -531,6 +546,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(1));
             to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(2));
         }
+
+        g.stroke();
 
         // From i9 to a9 (red)
         g = this.sidesGraphics[0];
@@ -541,6 +558,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(4));
         }
 
+        g.stroke();
+
         // From a9 to a1 (blue)
         g = this.sidesGraphics[1];
         m(Hex.coords(this.game.getSize() - 1, 0), Hex.cornerCoords(4));
@@ -549,6 +568,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             if (i) to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(4));
             to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
         }
+
+        g.stroke();
 
         // Add both sides into a single container
         const sidesContainer = new Container();
@@ -586,7 +607,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         });
 
         const createText = (string: string, x: number, y: number): Text => {
-            const text = new Text(string, coordsTextStyle);
+            const text = new Text({ text: string, style: coordsTextStyle });
 
             text.resolution = window.devicePixelRatio * 2;
             text.rotation = -this.gameContainer.rotation;

@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { Container, Text, TextStyle } from 'pixi.js';
 import Hex from './Hex';
 
 export default class SwapedSprite extends Container
@@ -12,8 +12,6 @@ export default class SwapedSprite extends Container
 
     private draw(): void
     {
-        const g = new Graphics();
-
         const coordsTextStyle = new TextStyle({
             fontFamily: 'Arial',
             fontSize: Hex.RADIUS * 1.4,
@@ -21,13 +19,11 @@ export default class SwapedSprite extends Container
             fill: 0xffffff,
         });
 
-        const S = new Text('S', coordsTextStyle);
+        const S = new Text({ text: 'S', style: coordsTextStyle });
 
         S.anchor.set(0.5, 0.5);
+        S.alpha = 0.4;
 
-        g.alpha = 0.4;
-
-        g.addChild(S);
-        this.addChild(g);
+        this.addChild(S);
     }
 }

@@ -9,8 +9,9 @@ module.exports = {
     parserOptions: {
         parser: '@typescript-eslint/parser',
         extraFileExtensions: ['.vue'],
+        project: true,
     },
-    plugins: ['@typescript-eslint', 'eslint-plugin-vue'],
+    plugins: ['@typescript-eslint', 'eslint-plugin-vue', 'deprecation'],
     root: true,
     rules: {
         'no-empty': 'off',
@@ -41,6 +42,7 @@ module.exports = {
             'multilineDetection': 'last-member',
         }],
         'no-console': 'warn',
+        'deprecation/deprecation': 'warn',
         'vue/script-indent': ['warn', 4, { 'baseIndent': 0, 'switchCase': 1 }],
         'vue/html-indent': ['warn', 4, { 'baseIndent': 1 }],
         'vue/max-attributes-per-line': 'off',

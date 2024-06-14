@@ -127,7 +127,7 @@ const listenHexClick = () => {
     });
 };
 
-const initGameView = () => {
+const initGameView = async () => {
     if (!hostedGameClient.value) {
         throw new Error('Cannot init game view now, no hostedGameClient');
     }
@@ -139,6 +139,8 @@ const initGameView = () => {
     }
 
     gameView = new GameView(game, boardContainer.value);
+
+    await gameView.ready();
 
     if (null !== playerSettings.value) {
         gameView.setDisplayCoords(playerSettings.value.showCoords);
@@ -180,7 +182,7 @@ const loadGame = async () => {
         return;
     }
 
-    initGameView();
+    await initGameView();
 
     const playerPseudos = hostedGameClient.value.getPlayers().map(p => p.pseudo);
     const { state, host } = hostedGameClient.value.getHostedGame();
