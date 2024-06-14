@@ -69,9 +69,10 @@ export default class HostedGamePersister
             relations,
             where: {
                 publicId: publicId,
-                ratings: {
-                    category: 'overall',
-                },
+                ratings: [
+                    { category: 'overall' },
+                    { category: IsNull() },
+                ],
             },
         });
     }
