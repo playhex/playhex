@@ -305,10 +305,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     playerMove(player: Player, move: Move): true | string
     {
-        logger.info('Move played', { hostedGameId: this.publicId, move, player: player.pseudo });
+        const playedAt = new Date();
+        logger.info('Move played', { hostedGameId: this.publicId, move, playedAt, player: player.pseudo });
 
         if ('playing' !== this.state) {
-            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.publicId, joiner: player.pseudo });
+            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.publicId, player: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -323,7 +324,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         try {
-            this.game.move(new GameMove(move.row, move.col, new Date()), this.getPlayerIndex(player) as PlayerIndex);
+            this.game.move(new GameMove(move.row, move.col, playedAt), this.getPlayerIndex(player) as PlayerIndex);
 
             return true;
         } catch (e) {
@@ -418,6 +419,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     postChatMessage(chatMessage: ChatMessage)
     {
+        logger.info('Chat message posted', { gamePublicId: chatMessage.hostedGame.publicId, author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
         this.chatMessages.push(chatMessage);
         this.io.to(this.gameRooms()).emit('chat', this.publicId, chatMessage);
         this.emit('chat');
