@@ -124,8 +124,6 @@
     "language": "Language",
     "cancel": "Cancel",
     "close": "Close",
-    "create_1v1": "Create 1v1",
-    "create_1v1_ranked": "Create ranked 1v1",
     "ranked": "Ranked",
     "rating": "Rating: {{rating}}",
     "new_game": "New game",
