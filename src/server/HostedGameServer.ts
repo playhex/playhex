@@ -419,7 +419,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     postChatMessage(chatMessage: ChatMessage)
     {
-        logger.info('Chat message posted', { gamePublicId: chatMessage.hostedGame.publicId, author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
+        logger.info('Chat message posted', { gamePublicId: this.getId(), author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
         this.chatMessages.push(chatMessage);
         this.io.to(this.gameRooms()).emit('chat', this.publicId, chatMessage);
         this.emit('chat');
