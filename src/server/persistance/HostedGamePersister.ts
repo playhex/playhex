@@ -99,6 +99,10 @@ export default class HostedGamePersister
                 gameData: {
                     endedAt: Not(IsNull()), // Works without, but query is slower
                 },
+                ratings: [
+                    { category: 'overall' },
+                    { category: IsNull() },
+                ],
             },
             order: {
                 gameData: {
@@ -175,6 +179,10 @@ export default class HostedGamePersister
             relations,
             where: {
                 id: In(hostedGameIds.map(row => row.id)),
+                ratings: [
+                    { category: 'overall' },
+                    { category: IsNull() },
+                ],
             },
         });
 
