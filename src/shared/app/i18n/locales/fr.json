@@ -81,7 +81,6 @@
     },
     "create_game": {
         "less_options": "Moins d'options",
-        "game_options": "Options de la partie",
         "custom_size": "Personnalisée",
         "more_options": "Plus d'options"
     },
