@@ -85,8 +85,8 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
                 const moveClicked = this.getMoveIndexAt(event.global);
 
                 if (null !== this.highlight) {
-                    const width = this.pixi.renderer.width / this.pixi.renderer.resolution;
-                    this.highlight.x = (moveClicked / this.analyze.length) * width;
+                    const { width } = this.pixi.renderer;
+                    this.highlight.x = width * (moveClicked / this.analyze.length);
                 }
 
                 this.emit('selectedMove', this.analyze[moveClicked] as AnalyzeMoveOutput);
@@ -197,7 +197,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     private getMoveIndexAt(point: { x: number }): number
     {
-        const width = this.pixi.renderer.width / this.pixi.renderer.resolution;
+        const { width } = this.pixi.renderer;
         const { x } = this.pixi.stage.toLocal({ x: point.x, y: 0 });
 
         return Math.floor(this.analyze.length * x / width);
