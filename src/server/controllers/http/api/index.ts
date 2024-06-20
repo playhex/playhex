@@ -15,6 +15,7 @@ import AIConfigController from './AIConfigController';
 import GameAnalyzeController from './GameAnalyzeController';
 import RatingController from './RatingController';
 import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom';
+import ServerInfoController from './ServerInfoController';
 
 export const registerApi = (app: Express) => {
 
@@ -77,6 +78,7 @@ export const registerApi = (app: Express) => {
             AdminController,
             AIConfigController,
             RatingController,
+            ServerInfoController,
         ],
     });
 

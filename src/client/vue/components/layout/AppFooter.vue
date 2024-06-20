@@ -46,6 +46,7 @@ i18next.on('languageChanged', () => {
         <p class="infos d-flex flex-column flex-md-row justify-content-center gap-md-4 text-center">
             <span>{{ $t('project_under_development') }}</span>
             <span v-if="date">{{ $t('last_change', { date }) }}</span>
+            <router-link :to="{ name: 'rescue' }">Rescue page</router-link>
             <router-link :to="{ name: 'privacy' }">{{ $t('privacy_policy') }}</router-link>
             <router-link :to="{ name: 'license' }">{{ $t('license_agpl') }}</router-link>
         </p>

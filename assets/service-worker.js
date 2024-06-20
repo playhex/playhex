@@ -12,6 +12,7 @@ self.addEventListener('fetch', event => {
             const cache = await caches.open('cache');
 
             cache.put(event.request.url, res.clone());
+            cache.delete()
 
             return res;
         } catch (error) {
@@ -19,3 +20,13 @@ self.addEventListener('fetch', event => {
         }
     })());
 });
+
+(async () => {
+    try {
+        const cache = await caches.open('cache');
+
+        console.log('here', await cache.keys());
+    } catch (error) {
+        console.log({error})
+    }
+})()

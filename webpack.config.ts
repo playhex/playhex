@@ -14,6 +14,7 @@ const plugins = [
     new DefinePlugin({
         BASE_URL: JSON.stringify(process.env.BASE_URL),
         LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
+        VERSION: JSON.stringify(commitRef.version),
         __VUE_OPTIONS_API__: false,
         __VUE_PROD_DEVTOOLS__: false,
     }),

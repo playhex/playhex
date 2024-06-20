@@ -437,3 +437,14 @@ export const apiGetGameRatingUpdates = async (gamePublicId: string, category: Ra
         .map(rating => plainToInstance(Rating, rating))
     ;
 };
+
+export const apiGetServerInfo = async (): Promise<{ version: string }> => {
+    const response = await fetch('/api/server-info', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return await response.json();
+};
