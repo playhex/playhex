@@ -8,7 +8,9 @@ import SwapableSprite from './SwapableSprite';
 import SwapedSprite from './SwapedSprite';
 import { Coords } from '@shared/game-engine/Types';
 import useDarkLightThemeStore from '../stores/darkLightThemeStore';
+import usePlayerSettingsStore from '../stores/playerSettingsStore';
 import { WatchStopHandle, watch } from 'vue';
+import { createShadingPattern } from '../../shared/app/shading-patterns';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -129,8 +131,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private resizeObserver: null | ResizeObserver = null;
     private themeSwitchedListener = () => this.redraw();
+    private settingsChangedListener = () => this.redraw();
 
     private unwatchThemeSwitchedListener: WatchStopHandle;
+    private unwatchSettingsChangedListener: WatchStopHandle;
 
     private initPromise: Promise<void>;
 
@@ -170,6 +174,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.listenModel();
 
             this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
+            this.unwatchSettingsChangedListener = watch(() => usePlayerSettingsStore().playerSettings, this.settingsChangedListener, { deep: true });
 
             if (this.game.isEnded()) {
                 this.highlightSidesFromGame();
@@ -468,11 +473,20 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private createAndAddHexes(): void
     {
-        this.hexes = Array(this.game.getSize()).fill(null).map(() => Array(this.game.getSize()));
+        const { playerSettings } = usePlayerSettingsStore();
+        const size = this.game.getSize();
 
-        for (let row = 0; row < this.game.getSize(); ++row) {
-            for (let col = 0; col < this.game.getSize(); ++col) {
-                const hex = new Hex(this.game.getBoard().getCell(row, col));
+        const boardShadingPattern = playerSettings?.boardShadingPattern ?? null;
+        const boardShadingPatternIntensity = playerSettings?.boardShadingPatternIntensity ?? 0.5;
+        const boardShadingPatternOption = playerSettings?.boardShadingPatternOption ?? null;
+        const show44dots = playerSettings?.show44dots ?? false;
+        const shadingPattern = createShadingPattern(boardShadingPattern, size, boardShadingPatternOption);
+
+        this.hexes = Array(size).fill(null).map(() => Array(size));
+
+        for (let row = 0; row < size; ++row) {
+            for (let col = 0; col < size; ++col) {
+                const hex = new Hex(this.game.getBoard().getCell(row, col), shadingPattern.calc(row, col) * boardShadingPatternIntensity);
 
                 hex.position = Hex.coords(row, col);
 
@@ -484,6 +498,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                     this.emit('hexClicked', new Move(row, col));
                 });
             }
+        }
+
+        if (show44dots && size > 9) {
+            this.hexes[3][3].showDot();
+            this.hexes[3][size - 4].showDot();
+            this.hexes[size - 4][3].showDot();
+            this.hexes[size - 4][size - 4].showDot();
         }
 
         this.highlightLastMove();
@@ -748,5 +769,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.destroyResizeObserver();
         this.unwatchThemeSwitchedListener();
+        this.unwatchSettingsChangedListener();
     }
 }

@@ -1,16 +1,21 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet } from 'bootstrap-icons-vue';
+import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot } from 'bootstrap-icons-vue';
 import useDarkLightThemeStore from '../../../stores/darkLightThemeStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
 import useAuthStore from '../../../stores/authStore';
 import { ApiClientError } from '../../../apiClient';
-import { watch, Ref, ref } from 'vue';
+import { watch, Ref, ref, onMounted } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { authChangePassword } from '@client/apiClient';
 import { availableLocales, setLocale } from '../../../../shared/app/i18n';
+import { allShadingPatterns } from '../../../../shared/app/shading-patterns';
 import i18next from 'i18next';
+import GameView from '../../../pixi-board/GameView';
+import { Game } from '../../../../shared/game-engine';
+import { Player } from '../../../../shared/app/models';
+import AppBoard from '../../components/AppBoard.vue';
 
 useSeoMeta({
     robots: 'noindex',
@@ -94,6 +99,33 @@ const submitPasswordChange = async () => {
         }
     }
 };
+
+/*
+ * Board preview
+ */
+const boardContainer = ref<HTMLElement>();
+const gameView = ref<null | GameView>(null);
+const game = new Game(14);
+
+const players = ['A', 'B'].map(pseudo => {
+    const player = new Player();
+
+    player.pseudo = pseudo;
+    player.createdAt = new Date();
+    player.isBot = false;
+    player.isGuest = false;
+    player.publicId = 'nope';
+
+    return player;
+});
+
+onMounted(() => {
+    if (!boardContainer.value) {
+        throw new Error('Missing element with ref="boardContainer"');
+    }
+
+    gameView.value = new GameView(game, boardContainer.value);
+});
 </script>
 
 <template>
@@ -162,7 +194,21 @@ const submitPasswordChange = async () => {
             </div>
         </template>
 
-        <h3>{{ $t('board_orientation.title') }}</h3>
+        <h3>{{ $t('game.board') }}</h3>
+
+        <template v-if="playerSettings">
+            <div class="form-check form-switch my-3">
+                <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
+                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> {{ $t('show_coords_by_default') }}</label>
+            </div>
+
+            <div class="form-check form-switch my-3">
+                <input class="form-check-input" type="checkbox" v-model="playerSettings.show44dots" role="switch" id="show-board-dots">
+                <label class="form-check-label" for="show-board-dots"><BIconDot /> {{ $t('show_44_dots') }}</label>
+            </div>
+        </template>
+
+        <h4>{{ $t('board_orientation.title') }}</h4>
 
         <template v-if="playerSettings">
             <div class="mb-3 row">
@@ -198,14 +244,61 @@ const submitPasswordChange = async () => {
             </div>
         </template>
 
-        <h3>{{ $t('game.board') }}</h3>
+        <h4>{{ $t('shading_patterns.title') }}</h4>
 
         <template v-if="playerSettings">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
-                <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> {{ $t('show_coords_by_default') }}</label>
+            <div class="row">
+                <div class="col-md-6">
+                    <select class="form-select" v-model="playerSettings.boardShadingPattern">
+                        <option
+                            v-for="shadingPattern in allShadingPatterns"
+                            :key="shadingPattern ?? 'null'"
+                            :value="shadingPattern"
+                        >{{ $t(`shading_patterns.types.${shadingPattern ?? 'null'}`) }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" v-if="'custom' === (playerSettings.boardShadingPattern ?? 'null')">
+                <div class="col-md-6">
+                    <!-- eslint-disable-next-line vue/no-v-html translated content comes from translation files, that should be reviewed -->
+                    <div class="form-text mb-3" v-html="i18next.t('shading_patterns.help_custom')"></div>
+                    <label for="shading-pattern-option" class="form-label">{{ $t(`shading_patterns.custom_expression`) }}</label>
+                    <textarea
+                        class="form-control font-monospace"
+                        v-model="playerSettings.boardShadingPatternOption"
+                        maxlength="255"
+                        id="shading-pattern-option"
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-6 col-md-3">
+                    <label for="shading-pattern-visibility" class="form-label">{{ $t(`shading_patterns.visibility`) }}</label>
+                    <input
+                        type="range"
+                        v-model.number="playerSettings.boardShadingPatternIntensity"
+                        min="0"
+                        max="1"
+                        step="0.1"
+                        class="form-range"
+                        id="shading-pattern-visibility"
+                    >
+                </div>
             </div>
         </template>
+
+        <h5>{{ $t('preview') }}</h5>
+
+        <div class="board-container" ref="boardContainer">
+            <AppBoard
+                v-if="gameView"
+                :gameView="(gameView as GameView)"
+                :players="players"
+            />
+        </div>
 
         <form v-if="loggedInPlayer && !loggedInPlayer.isGuest" @submit.prevent="submitPasswordChange">
             <h3>{{ $t('change_password') }}</h3>
@@ -241,7 +334,7 @@ const submitPasswordChange = async () => {
 </template>
 
 <style lang="stylus" scoped>
-h3
+h3, h4
     margin 1em 0 0.5em 0
 
 .rhombus::before
@@ -258,4 +351,8 @@ h3
     display inline-block
     margin 1em
     transform rotate(150deg)
+
+.board-container
+    width 300px
+    height 300px
 </style>
