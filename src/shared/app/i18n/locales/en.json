@@ -10,7 +10,7 @@
         "opponent": "Opponent",
         "host": "Host",
         "size": "Size",
-        "board": "Board",
+        "board": "Game board",
         "board_size": "Board size",
         "time_control": "Time control",
         "rules": "Rules",
@@ -172,11 +172,27 @@
     "portrait": "Portrait",
     "resign": "Resign",
     "board_orientation": {
-        "title": "Board orientation",
+        "title": "Orientation",
         "flat": "Flat",
         "flat_2": "Flat 2",
         "diamond": "Diamond"
     },
+    "shading_patterns": {
+        "title": "Shading pattern",
+        "visibility": "Shading pattern visibility",
+        "types": {
+            "null": "None",
+            "tricolor_checkerboard": "Tri-color checkerboard",
+            "concentrical_rings": "Concentrical rings (Hexworld)",
+            "height_5_lines": "Height 5th lines",
+            "single_ring": "Single ring",
+            "custom": "Custom"
+        },
+        "custom_expression": "Custom expression",
+        "help_custom": "Math expression for custom shading pattern.<br>Expression must return a number between 0 (no shading) to 1 (fully shaded) for a given cell (row, col). You can use i.e 0.5 for tri color shading patterns. Returning <code>true</code> or <code>false</code> also works same as returning <code>1</code> or <code>0</code>.<br>Variables are availables:<br>- <code>row</code> and <code>col</code> (shortcuts: <code>r</code> and <code>c</code>) for row and col number, starts from 0.<br>- <code>size</code> (or <code>s</code>) for board size.<br>- <code>distToSide</code> distance of current cell to its nearest side.<br>See list of available operators at https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Examples:<br>- Concentrical rings: <code>distToSide % 2</code><br>- Tri color checkerboard: <code>((size + row - col) % 3) / 2</code><br>- Disk with radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Open javascript console (F12) to see errors while executing your expression."
+    },
+    "show_44_dots": "Show dots on 4-4 cells",
+    "preview": "Preview",
     "change_password": "Change password",
     "old_password": "Old password",
     "new_password": "New password",

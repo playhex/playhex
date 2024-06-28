@@ -1,6 +1,7 @@
 import { Container, Graphics, PointData, Ticker } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
 import GameView from './GameView';
+import { colorAverage } from '../../shared/app/colorUtils';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -36,11 +37,29 @@ export default class Hex extends Container
 
     private hexColor: Graphics;
     private highlight: Graphics;
+    private dotContainer: Container = new Container();
 
     constructor(
+        /**
+         * null: empty cell
+         * 0 or 1: red or blue
+         */
         private playerIndex: null | PlayerIndex = null,
+
+        /**
+         * Shading to apply, between 0 and 1.
+         * 0 = not shaded, 1 = shaded,
+         * 0.5 = half-shaded (i.e for tri color shading patterns)...
+         */
+        private shading: number = 0,
     ) {
         super();
+
+        if (shading < 0) {
+            shading = 0;
+        } else if (shading > 1) {
+            shading = 1;
+        }
 
         this.redrawHex();
         this.setPlayer(playerIndex);
@@ -55,6 +74,7 @@ export default class Hex extends Container
         this.addChild(
             this.createBackground(),
             this.createEmptyColor(),
+            this.dotContainer,
             this.hexColor = this.createHexColor(),
             this.highlight = this.createHighlight(),
         );
@@ -91,7 +111,11 @@ export default class Hex extends Container
         }
 
         g.poly(path);
-        g.fill({ color: GameView.currentTheme.colorEmpty });
+        g.fill({ color: colorAverage(
+            GameView.currentTheme.colorEmpty,
+            GameView.currentTheme.colorEmptyShade,
+            this.shading,
+        ) });
 
         return g;
     }
@@ -135,6 +159,21 @@ export default class Hex extends Container
         g.visible = false;
 
         return g;
+    }
+
+    /**
+     * Show dot for starting anchors
+     */
+    showDot(): void
+    {
+        this.dotContainer.removeChildren();
+
+        const g = new Graphics();
+
+        g.circle(0, 0, Hex.RADIUS * 0.2);
+        g.fill({ color: GameView.currentTheme.textColor, alpha: 0.2 });
+
+        this.dotContainer.addChild(g);
     }
 
     static coords(row: number, col: number): PointData
