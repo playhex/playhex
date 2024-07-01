@@ -158,7 +158,9 @@
         "how_it_works": "Fonctionnement"
     },
     "try_again": "Réessayer",
-    "language": "Langage",
+    "language": "Langue",
+    "add_your_language": "Votre langue n'est pas là ? {link} !",
+    "add_your_language_link": "Ajoutez là avec Weblate",
     "yes": "Oui",
     "close": "Fermer",
     "no_such_player": "Apparament, ce joueur n'existe pas.",

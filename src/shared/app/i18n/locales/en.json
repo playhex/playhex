@@ -89,6 +89,8 @@
     "already_have_account_login_instead_link_label": "Log in",
     "no_account_sign_up_instead": "No account? {signUp} instead",
     "no_account_sign_up_instead_link_label": "Sign up",
+    "add_your_language": "Your language is missing? {link}!",
+    "add_your_language_link": "Add it with Weblate",
     "show_coords_by_default": "Show coordinates by default",
     "username": "Username",
     "password": "Password",

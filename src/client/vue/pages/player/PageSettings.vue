@@ -11,7 +11,7 @@ import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { authChangePassword } from '@client/apiClient';
 import { availableLocales, setLocale } from '../../../../shared/app/i18n';
 import { allShadingPatterns } from '../../../../shared/app/shading-patterns';
-import i18next from 'i18next';
+import i18n from 'i18next';
 import GameView from '../../../pixi-board/GameView';
 import { Game } from '../../../../shared/game-engine';
 import { Player } from '../../../../shared/app/models';
@@ -141,11 +141,19 @@ onMounted(() => {
                         v-for="(label, locale) in availableLocales"
                         :key="locale"
                         :value="locale"
-                        :selected="locale === i18next.language"
+                        :selected="locale === i18n.language"
                     >{{ label }}</option>
                 </select>
             </div>
         </div>
+
+        <p class="mt-1"><small>
+            <i18next :translation="$t('add_your_language')">
+                <template #link>
+                    <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">{{ $t('add_your_language_link') }}</a>
+                </template>
+            </i18next>
+        </small></p>
 
         <h3>{{ $t('background_theme.title') }}</h3>
 
@@ -262,7 +270,7 @@ onMounted(() => {
             <div class="row" v-if="'custom' === (playerSettings.boardShadingPattern ?? 'null')">
                 <div class="col-md-6">
                     <!-- eslint-disable-next-line vue/no-v-html translated content comes from translation files, that should be reviewed -->
-                    <div class="form-text mb-3" v-html="i18next.t('shading_patterns.help_custom')"></div>
+                    <div class="form-text mb-3" v-html="i18n.t('shading_patterns.help_custom')"></div>
                     <label for="shading-pattern-option" class="form-label">{{ $t(`shading_patterns.custom_expression`) }}</label>
                     <textarea
                         class="form-control font-monospace"
