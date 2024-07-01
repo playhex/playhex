@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconTrophy, BIconCaretUpFill, BIconCaretDownFill } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconTrophy, BIconCaretUpFill, BIconCaretDownFill, BIconInfoCircle } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
@@ -425,7 +425,7 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('try_again') }}</button>
                 </p>
                 <div v-else class="analyze-min-height">
-                    <small>{{ $t('game_analyze.analyze_by_ai') }}</small>
+                    <small>{{ $t('game_analyze.analyze_by_ai') }} <router-link :to="{ name: 'analysis-details' }" class="float-end text-decoration-none"><BIconInfoCircle /> {{ $t('game_analyze.how_it_works') }}</router-link></small>
                     <AppGameAnalyze :analyze="gameAnalyze.analyze" />
                 </div>
             </div>

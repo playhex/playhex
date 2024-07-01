@@ -154,7 +154,8 @@
         "analyze_by_ai": "Analyse de la partie par l'IA",
         "analyze_game": "Analyser la partie",
         "requested": "Analyse demandée…",
-        "errored": "L'analyse a échouée !"
+        "errored": "L'analyse a échouée !",
+        "how_it_works": "Fonctionnement"
     },
     "try_again": "Réessayer",
     "language": "Langage",

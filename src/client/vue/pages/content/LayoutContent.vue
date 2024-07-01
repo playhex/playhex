@@ -4,6 +4,7 @@
             <nav class="nav flex-sm-column my-sm-3">
                 <router-link :to="{ name: 'links' }" class="nav-link">Hex resources</router-link>
                 <router-link :to="{ name: 'contribute' }" class="nav-link">{{ $t('contribute') }}</router-link>
+                <router-link :to="{ name: 'analysis-details' }" class="nav-link">How analysis are done</router-link>
                 <router-link :to="{ name: 'privacy' }" class="nav-link">Privacy policy</router-link>
                 <router-link :to="{ name: 'license' }" class="nav-link">License AGPL-3.0</router-link>
             </nav>

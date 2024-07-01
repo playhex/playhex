@@ -74,6 +74,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@client/vue/pages/content/PageSpawnWorker.vue'),
             },
             {
+                name: 'analysis-details',
+                path: 'hex-game-analysis',
+                component: () => import('@client/vue/pages/content/PageAnalysisDetails.vue'),
+            },
+            {
                 name: 'privacy',
                 path: 'privacy',
                 component: () => import('@client/vue/pages/content/PagePrivacyPolicy.vue'),

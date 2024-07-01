@@ -117,7 +117,8 @@
         "requested": "Analyze requested…",
         "errored": "Analyze errored!",
         "best_move": "best move",
-        "best": "best:"
+        "best": "best:",
+        "how_it_works": "How it works"
     },
     "try_again": "Try again",
     "yes": "Yes",
