@@ -244,6 +244,7 @@
     },
     "workers": {
         "slow_worker": "Pas de serveur puissant en ligne actuellement. Seules les IA limitées sont disponibles.",
-        "no_worker": "Aucun serveur ne peut calculer les coups de l'IA actuellement. Seules les IA de test sont disponibles."
+        "no_worker": "Aucun serveur ne peut calculer les coups de l'IA actuellement. Seules les IA de test sont disponibles.",
+        "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
     }
 }

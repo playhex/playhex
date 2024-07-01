@@ -116,8 +116,16 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
-                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger"><BIconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
-                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning"><BIconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
+                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger mb-0"><BIconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
+                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning mb-0"><BIconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
+
+                            <p><small>
+                                <router-link
+                                    v-if="!aiConfigsStatus.aiApiAvailable || !aiConfigsStatus.powerfulPeerAvailable"
+                                    :to="{ name: 'spawn-worker' }"
+                                    @click="reject()"
+                                >{{ $t('workers.see_how_to_spawn_a_worker') }}</router-link>
+                            </small></p>
                         </template>
 
                         <ul class="nav nav-pills nav-justified ai-engine-choice">

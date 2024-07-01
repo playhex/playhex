@@ -108,7 +108,8 @@
     },
     "workers": {
         "slow_worker": "No fast worker is online right now. Only limited AI are available.",
-        "no_worker": "No worker can compute moves right now. Only random bots are available."
+        "no_worker": "No worker can compute moves right now. Only random bots are available.",
+        "see_how_to_spawn_a_worker": "See how to compute AI moves for PlayHex from my computer"
     },
     "game_analyze": {
         "analyze_by_ai": "Game analyze by AI",
@@ -198,6 +199,7 @@
     "new_password": "New password",
     "confirm_new_password": "Confirm new password",
     "update_password": "Update password",
+    "contribute": "Contribute",
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
         "date_shift_ms": "Date shift compensation: {{ms}}ms"

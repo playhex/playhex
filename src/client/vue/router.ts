@@ -64,6 +64,16 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@client/vue/pages/content/PageHexLinks.vue'),
             },
             {
+                name: 'contribute',
+                path: 'contribute',
+                component: () => import('@client/vue/pages/content/PageContribute.vue'),
+            },
+            {
+                name: 'spawn-worker',
+                path: 'spawn-worker',
+                component: () => import('@client/vue/pages/content/PageSpawnWorker.vue'),
+            },
+            {
                 name: 'privacy',
                 path: 'privacy',
                 component: () => import('@client/vue/pages/content/PagePrivacyPolicy.vue'),
