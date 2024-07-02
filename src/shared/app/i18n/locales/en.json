@@ -203,6 +203,7 @@
     "confirm_new_password": "Confirm new password",
     "update_password": "Update password",
     "contribute": "Contribute",
+    "contributors": "Contributors",
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
         "date_shift_ms": "Date shift compensation: {{ms}}ms"

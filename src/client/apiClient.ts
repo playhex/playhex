@@ -1,4 +1,4 @@
-import { AIConfigStatusData, HostedGameState, WithRequired } from '@shared/app/Types';
+import { AIConfigStatusData, HostedGameState, PlayHexContributors, WithRequired } from '@shared/app/Types';
 import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { plainToInstance } from '../shared/app/class-transformer-custom';
@@ -440,6 +440,17 @@ export const apiGetGameRatingUpdates = async (gamePublicId: string, category: Ra
 
 export const apiGetServerInfo = async (): Promise<{ version: string }> => {
     const response = await fetch('/api/server-info', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return await response.json();
+};
+
+export const apiGetContributors = async (): Promise<PlayHexContributors> => {
+    const response = await fetch('/api/contributors', {
         method: 'GET',
         headers: {
             'Accept': 'application/json',

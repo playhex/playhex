@@ -47,6 +47,7 @@ i18next.on('languageChanged', () => {
             <span>{{ $t('project_under_development') }}</span>
             <span v-if="date">{{ $t('last_change', { date }) }}</span>
             <router-link :to="{ name: 'contribute' }">{{ $t('contribute') }}</router-link>
+            <router-link :to="{ name: 'contributors' }">{{ $t('contributors') }}</router-link>
             <router-link :to="{ name: 'rescue' }">Rescue page</router-link>
             <router-link :to="{ name: 'privacy' }">{{ $t('privacy_policy') }}</router-link>
             <router-link :to="{ name: 'license' }">{{ $t('license_agpl') }}</router-link>

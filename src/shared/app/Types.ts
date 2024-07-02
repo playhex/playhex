@@ -19,6 +19,25 @@ export type HostedGameState =
     | 'ended'
 ;
 
+export type GithubContributor = {
+    username: string;
+    link: string;
+    avatarUrl: string;
+};
+
+export type WeblateContributor = {
+    fullName: string;
+};
+
+export type WeblateContributors = {
+    [lang: string]: WeblateContributor[];
+};
+
+export type PlayHexContributors = {
+    github: GithubContributor[];
+    weblate: WeblateContributors;
+};
+
 export type AIConfigStatusData = {
     /**
      * Whether remote AIs can be run (AIConfig: "isRemote")

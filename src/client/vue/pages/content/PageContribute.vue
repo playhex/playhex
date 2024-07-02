@@ -40,7 +40,7 @@ const playerIsFair = ref(0);
 
     <p>
         To do so, go to
-        <a href="https://hosted.weblate.org/projects/playhex/" target="_blank">PlayHex project on Weblate</a>,
+        <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">PlayHex project on Weblate</a>,
         then you can search for the string to fix, translate…
     </p>
 
@@ -51,7 +51,7 @@ const playerIsFair = ref(0);
     </p>
 
     <p>
-        <a class="btn btn-success" href="https://hosted.weblate.org/projects/playhex/" target="_blank">Translate PlayHex</a>
+        <a class="btn btn-success" href="https://hosted.weblate.org/engage/playhex/" target="_blank">Translate PlayHex</a>
     </p>
 
     <p>Here is the current translation status:</p>

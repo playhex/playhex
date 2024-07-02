@@ -69,6 +69,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@client/vue/pages/content/PageContribute.vue'),
             },
             {
+                name: 'contributors',
+                path: 'contributors',
+                component: () => import('@client/vue/pages/content/PageContributors.vue'),
+            },
+            {
                 name: 'spawn-worker',
                 path: 'spawn-worker',
                 component: () => import('@client/vue/pages/content/PageSpawnWorker.vue'),
