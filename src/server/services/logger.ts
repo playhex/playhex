@@ -1,4 +1,5 @@
 import winston, { Logger } from 'winston';
+import LokiTransport from 'winston-loki';
 
 type SyslogLevels =
     'debug'
@@ -32,10 +33,11 @@ type SyslogLevels =
  *
  * See https://en.wikipedia.org/wiki/Syslog for base interpretation.
  */
-const logger: Pick<Logger, SyslogLevels> = winston.createLogger({
+const logger = winston.createLogger({
     levels: winston.config.syslog.levels,
     transports: [
         new winston.transports.Console({
+            handleExceptions: true,
             format: winston.format.combine(
                 winston.format.colorize(),
                 winston.format.simple(),
@@ -44,4 +46,26 @@ const logger: Pick<Logger, SyslogLevels> = winston.createLogger({
     ],
 });
 
-export default logger;
+const { LOKI_HOST, LOKI_USER, LOKI_TOKEN, LOKI_SERVICE_NAME, LOKI_LOG_LEVEL } = process.env;
+
+if (LOKI_HOST) {
+    const basicAuth = LOKI_USER && LOKI_TOKEN
+        ? `${LOKI_USER}:${LOKI_TOKEN}`
+        : undefined
+    ;
+
+    logger.add(new LokiTransport({
+        host: LOKI_HOST,
+        basicAuth,
+        labels: { service_name: LOKI_SERVICE_NAME },
+        level: LOKI_LOG_LEVEL,
+        handleExceptions: true,
+        batching: false,
+        onConnectionError(error) {
+            // eslint-disable-next-line no-console
+            console.error('loki transport connect error', error);
+        },
+    }));
+}
+
+export default logger as Pick<Logger, SyslogLevels>;
