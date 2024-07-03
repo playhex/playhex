@@ -80,7 +80,8 @@ const playerIsFair = ref(0);
         Fix bugs, adding features you want…
     </p>
 
-    <p>PlayHex is developed with these technologies:
+    <p>
+        PlayHex is developed with these technologies:
         Nodejs, socket.io, vuejs 3, typescript, pixi.js, express, typestack.
         Repositories are on Github:
     </p>
@@ -91,13 +92,12 @@ const playerIsFair = ref(0);
     </ul>
 
     <p>
-        I like developing PlayHex, but I also like helping others learning development and contribute.
         If you don't know where to start,
         follow the <a href="https://github.com/alcalyn/hex/blob/master/README.md" target="_blank">README</a>,
         try to have a running instance of PlayHex locally,
         try changing things or reproducing a bug locally,
         ask for a "easy" thing to develop,
-        ask for help on how to install (I'm on the Hex Discord).
+        ask for help on how to install on Hex Discord.
     </p>
 
     <a href="https://github.com/alcalyn/hex" class="btn btn-success" target="_blank">PlayHex on Github</a>

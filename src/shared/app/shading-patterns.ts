@@ -56,7 +56,7 @@ export class Height5Lines extends AbstractShadingPattern
 {
     calc(row: number, col: number): number
     {
-        if (this.size < 14) {
+        if (this.size < 9) {
             return 0;
         }
 

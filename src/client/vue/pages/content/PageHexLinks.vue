@@ -98,7 +98,7 @@ const resources: Resource[] = [
         link: 'https://www.hexwiki.net',
         link_show: 'hexwiki.net',
         title: 'HexWiki',
-        subTitle: 'Still-maintained wiki dedicated to Hex',
+        subTitle: 'Wiki dedicated to Hex',
         illustration: { icon: BIconHexagon },
         paragraph: [
             'Detailed wiki on Hex. See the main page to have a list of good pages to explore.',
