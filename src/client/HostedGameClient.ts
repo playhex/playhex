@@ -336,7 +336,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             this.hostedGame.gameData.endedAt = date;
         }
 
-        if (null !== this.game) {
+        if (null !== this.game && !this.game.isCanceled()) {
             this.game.cancel(date);
         }
     }

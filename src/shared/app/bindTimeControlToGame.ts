@@ -20,13 +20,21 @@ export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeContr
         timeControl.finish(date);
     });
 
+    game.prependListener('canceled', (date) => {
+        timeControl.finish(date);
+    });
+
     // When instanciating a game from data, but chrono elapsed before instanciating (i.e while offline)
     const onElapsed = (playerLostByTime: PlayerIndex, date: Date) => {
         if (playerLostByTime !== game.getCurrentPlayerIndex()) {
             throw new Error('player lose by time is not the one playing…');
         }
 
-        game.loseByTime(date);
+        if (game.getMovesHistory().length < 2) {
+            game.cancel(date);
+        } else {
+            game.loseByTime(date);
+        }
     };
 
     if ('elapsed' === timeControl.getState()) {

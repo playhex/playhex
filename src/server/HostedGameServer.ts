@@ -208,6 +208,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             this.emit('ended');
         });
+
+        /**
+         * Listen on canceled event, can come from game timed out with less than 2 moves,
+         * or player canceled because nobody joined.
+         */
+        game.on('canceled', (date) => {
+            this.doHostedGameCancel(date);
+        });
     }
 
     bindTimeControl(): void
@@ -400,21 +408,25 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         const now = new Date();
 
-        this.state = 'canceled';
-        this.timeControl.finish(now);
-
         if (null !== this.game) {
             this.game.cancel(now);
+        } else {
+            this.doHostedGameCancel(now);
         }
 
-        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.publicId, { date: now });
+        return true;
+    }
+
+    private doHostedGameCancel(date: Date): void
+    {
+        this.state = 'canceled';
+
+        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.publicId, { date });
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, this.timeControl.getValues());
 
         logger.info('Game canceled.', { hostedGameId: this.publicId });
 
         this.emit('canceled');
-
-        return true;
     }
 
     postChatMessage(chatMessage: ChatMessage)

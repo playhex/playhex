@@ -101,4 +101,41 @@ describe('Time controls', () => {
         cy.contains('Determinist random bot');
         cy.contains('10:00');
     });
+
+    it('cancels a game when timeout with only one move', () => {
+        // Plays a second to make a one-move game
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+            .contains(/^Second$/)
+            .click()
+        ;
+
+        // Put minimal time
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+
+            .contains('Time control')
+            .closest('div')
+            .contains('Custom')
+            .click()
+        ;
+
+        cy
+            .get('input#custom-fischer-initial-time')
+            .invoke('val', 0)
+            .trigger('input')
+        ;
+
+        cy.submitAIGame();
+
+        cy.contains('Game has been canceled', { timeout: 8000 });
+        cy.contains('.modal-content .modal-footer', 'Close').click();
+        cy.contains('.player-b', '0:00.0');
+
+        cy.openGameSidebar();
+
+        cy.contains('.sidebar', 'Game has been canceled');
+    });
 });
