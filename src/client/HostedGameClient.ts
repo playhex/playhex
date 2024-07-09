@@ -9,6 +9,9 @@ import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import { apiPostCancel, apiPostResign } from './apiClient';
 import TimeControlType from '@shared/time-control/TimeControlType';
+import { notifier } from './services/notifications';
+import useServerDateStore from './stores/serverDateStore';
+import { timeValueToMilliseconds } from '../shared/time-control/TimeValue';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -32,6 +35,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
      * on last time player open the chat.
      */
     private readMessages: number;
+
+    private lowTimeNotificationThread: null | NodeJS.Timeout = null;
 
     constructor(
         private hostedGame: HostedGame,
@@ -80,7 +85,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.game.setAllowSwap(gameData.allowSwap);
         this.game.setStartedAt(gameData.startedAt);
 
-        this.onServerGameStarted(hostedGame);
+        this.doStartGame(hostedGame);
 
         // Replay game and fill history
         for (const move of gameData.movesHistory) {
@@ -285,6 +290,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
                 reject(answer);
             });
+
+            notifier.emit('move', this.hostedGame);
         });
     }
 
@@ -308,7 +315,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
     }
 
-    onServerGameStarted(hostedGame: HostedGame): void
+    private doStartGame(hostedGame: HostedGame): void
     {
         this.updateFromHostedGame(hostedGame);
 
@@ -324,8 +331,15 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.hostedGame.hostedGameToPlayers = hostedGame.hostedGameToPlayers;
+    }
+
+    onServerGameStarted(hostedGame: HostedGame): void
+    {
+        this.doStartGame(hostedGame);
 
         this.emit('started');
+
+        notifier.emit('gameStart', hostedGame);
     }
 
     onServerGameCanceled(date: Date): void
@@ -354,6 +368,34 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
         Object.assign(this.hostedGame.timeControl, gameTimeData);
+
+        this.notifyWhenLowTime(gameTimeData);
+    }
+
+    private resetLowTimeNotificationThread(): void
+    {
+        if (null !== this.lowTimeNotificationThread) {
+            clearTimeout(this.lowTimeNotificationThread);
+            this.lowTimeNotificationThread = null;
+        }
+    }
+
+    private notifyWhenLowTime(gameTimeData: GameTimeData): void
+    {
+        this.resetLowTimeNotificationThread();
+
+        const { players, currentPlayer } = gameTimeData;
+        const { totalRemainingTime } = players[currentPlayer];
+
+        if (!(totalRemainingTime instanceof Date)) {
+            return;
+        }
+
+        const serverDate = useServerDateStore().newDate();
+
+        this.lowTimeNotificationThread = setTimeout(() => {
+            notifier.emit('gameTimeControlWarning', this.hostedGame);
+        }, timeValueToMilliseconds(totalRemainingTime, serverDate) - 10000);
     }
 
     onServerRematchAvailable(rematchId: string): void
@@ -367,6 +409,14 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
     {
+        const { gameData } = this.hostedGame;
+
+        if (null !== gameData) {
+            gameData.movesHistory.push(move);
+            gameData.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
+            gameData.lastMoveAt = move.playedAt;
+        }
+
         // Do nothing if game not loaded
         if (null === this.game) {
             return;
@@ -378,6 +428,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.game.move(new GameMove(move.row, move.col, move.playedAt), byPlayerIndex);
+
+        notifier.emit('move', this.hostedGame);
     }
 
     onServerGameEnded(winner: PlayerIndex, outcome: Outcome, date: Date): void
@@ -394,6 +446,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         if (null === this.game) {
             return;
         }
+
+        notifier.emit('gameEnd', this.hostedGame);
 
         // If game is not already ended locally by server response anticipation
         if (this.game.isEnded()) {
@@ -441,6 +495,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         this.hostedGame.chatMessages.push(chatMessage);
         this.emit('chatMessagePosted');
+        notifier.emit('chatMessage', this.hostedGame, chatMessage);
     }
 
     getUnreadMessages(): number

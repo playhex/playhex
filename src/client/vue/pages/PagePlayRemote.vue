@@ -116,8 +116,13 @@ const listenHexClick = () => {
             confirmMove.value = () => {
                 gameView?.removePreviewMove();
                 game.move(move, localPlayerIndex as PlayerIndex);
-                hostedGameClient.value?.sendMove(fromCoords(move));
                 confirmMove.value = null;
+
+                if (!hostedGameClient.value) {
+                    return;
+                }
+
+                hostedGameClient.value.sendMove(fromCoords(move));
             };
 
             gameView?.previewMove(move, localPlayerIndex as PlayerIndex);

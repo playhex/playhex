@@ -46,6 +46,7 @@ export interface PlayerTimeData
 {
     /**
      * Time remaing before player lose by time.
+     * in milliseconds.
      */
     totalRemainingTime: TimeValue;
 }

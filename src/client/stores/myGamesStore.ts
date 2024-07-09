@@ -5,13 +5,10 @@ import useSocketStore from './socketStore';
 import { HostedGame, Move } from '@shared/app/models';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
-import { pseudoString } from '@shared/app/pseudoUtils';
 import useLobbyStore from './lobbyStore';
 import { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
 import { getGames } from '../apiClient';
-import { useRouter } from 'vue-router';
-import { sendNotification } from '../services/notifications';
-import * as Notif from '../services/notifications';
+import { requestBrowserNotificationPermission } from '../services/notifications';
 
 export type CurrentGame = {
     publicId: string;
@@ -31,7 +28,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
     const mostUrgentGame = ref<null | CurrentGame>(null);
-    const router = useRouter();
 
     /**
      * Number of games where I'm in, created or playing.
@@ -120,7 +116,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         mostUrgentGame.value = getMostUrgentGame();
 
-        Notif.requestNotificationPermission();
+        requestBrowserNotificationPermission();
     });
 
     socket.on('gameStarted', (hostedGame: HostedGame) => {
@@ -149,22 +145,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.value?.publicId;
         myGames.value[publicId].hostedGame = hostedGame;
 
-        if (!document.hasFocus()) {
-            const opponent = hostedGame.hostedGameToPlayers[1 - myColor].player;
-
-            sendNotification(
-                { body: `Game with ${pseudoString(opponent, 'pseudo')} has started`
-                , tag: Notif.tags.game
-                },
-                () => {
-                    router.push({
-                        name: 'online-game',
-                        params: { gameId: publicId }
-                    });
-                }
-            );
-        }
-
         mostUrgentGame.value = getMostUrgentGame();
     });
 
@@ -175,26 +155,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         const isMyTurn = myGames.value[gameId].myColor !== byPlayerIndex;
         myGames.value[gameId].isMyTurn = isMyTurn;
-
-        if (isMyTurn && !document.hasFocus()) {
-            const opponent =
-                myGames
-                .value[gameId]
-                .hostedGame
-                .hostedGameToPlayers[byPlayerIndex].player;
-
-            sendNotification(
-                { body: `${pseudoString(opponent, 'pseudo')} made a move`
-                , tag: Notif.tags.game
-                },
-                () => {
-                    router.push({
-                        name: 'online-game',
-                        params: { gameId }
-                    });
-                }
-            );
-        }
 
         mostUrgentGame.value = getMostUrgentGame();
     });

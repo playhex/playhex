@@ -132,4 +132,12 @@ Compare two json files with: <https://happy-water-0887b0b1e.azurestaticapps.net>
 
 ## License
 
-This library is under [AGPL-3.0 license](LICENSE).
+This project is under [AGPL-3.0 license](LICENSE).
+
+### Exceptions
+
+Files under these folders are under another license:
+
+| Folder | License | Author |
+| ------ | ------- | ------ |
+| `assets/sounds/lisp/` | `CC BY-NC-SA 4.0` | [EdinburghCollective](http://lichess.org/@/EdinburghCollective) |

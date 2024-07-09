@@ -204,6 +204,8 @@
     "update_password": "Update password",
     "contribute": "Contribute",
     "contributors": "Contributors",
+    "player_made_a_move": "{{player}} made a move",
+    "game_with_player_has_started": "Game with {{player}} has started",
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
         "date_shift_ms": "Date shift compensation: {{ms}}ms"

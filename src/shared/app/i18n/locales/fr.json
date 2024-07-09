@@ -250,6 +250,8 @@
         "no_worker": "Aucun serveur ne peut calculer les coups de l'IA actuellement. Seules les IA de test sont disponibles.",
         "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
     },
+    "player_made_a_move": "{{player}} a joué",
+    "game_with_player_has_started": "La partie avec {{player}} a commencé",
     "contributors": "Contributeurs",
     "contribute": "Contribuer"
 }

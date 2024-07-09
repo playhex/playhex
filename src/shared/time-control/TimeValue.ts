@@ -13,6 +13,10 @@ type TimeValue = Date | number;
 
 export default TimeValue;
 
+/**
+ * Convert a elasping or not time value to milliseconds, from a given date.
+ * date can be new Date(), or server date.
+ */
 export const timeValueToMilliseconds = (timeValue: TimeValue, date: Date): number => {
     if (timeValue instanceof Date) {
         return timeValue.getTime() - date.getTime();
