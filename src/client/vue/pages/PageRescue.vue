@@ -52,7 +52,6 @@ const serverVersion = ref<null | string>(null);
 
 (async () => {
     serverVersion.value = (await apiGetServerInfo()).version;
-    console.log({ clientVersion, serverVersion });
 })();
 
 /*
@@ -160,7 +159,7 @@ onMounted(() => {
     </div>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .board-container
     width 200px
     height 200px

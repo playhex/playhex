@@ -1,10 +1,10 @@
 import { getLoser, iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils';
 import { notifier } from '../notifier';
 
-const play = (filename: string): void => {
+const play = async (filename: string): Promise<void> => {
     try {
         const audio = new Audio(filename);
-        audio.play();
+        await audio.play();
     } catch (e) {
         // noop, browser says user has not allowed audio permission
     }
