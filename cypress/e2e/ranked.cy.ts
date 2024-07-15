@@ -65,8 +65,8 @@ describe('Ranked games', () => {
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
-        cy.contains(/Determinist random bot \d+/).closest('div').contains(/Rating: \d+/);
-        cy.contains(/Guest \d+ \d+/).closest('div').contains(/Rating: \d+/);
+        cy.contains('.sidebar', /Determinist random bot \d+/).closest('div').contains(/Rating: \d+/);
+        cy.contains('.sidebar', /Guest \d+ \d+/).closest('div').contains(/Rating: \d+/);
     });
 
     it('displays my game as a ranked one on the lobby', () => {
@@ -99,6 +99,6 @@ describe('Ranked games', () => {
 
         cy.visit('/');
 
-        cy.contains('Guest 2943 (1662?)');
+        cy.contains('Guest 2943 ~1662');
     });
 });

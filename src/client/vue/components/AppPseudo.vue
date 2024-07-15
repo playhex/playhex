@@ -31,8 +31,8 @@ const props = defineProps({
     /**
      * How to display rating:
      * - `<AppPseudo />` If not set, rating is not shown.
-     * - `<AppPseudo rating />` rating is shown in minimalist form, like "(1500)" or "(1500?)" or "(?)" depending on confidence
-     * - `<AppPseudo rating="full" />` rating is fully shown, like "(1500 ± 140)"
+     * - `<AppPseudo rating />` rating is shown in minimalist form, like "1500" or "~1500" depending on confidence
+     * - `<AppPseudo rating="full" />` rating is fully shown, like "1500 ±140"
      */
     rating: {
         type: [Boolean, String] as PropType<boolean | 'full'>,
@@ -61,20 +61,12 @@ const currentRating = (): Rating => player.value.currentRating ?? createInitialR
         <template v-if="rating">
             <span>&nbsp;</span>
 
-            <small class="text-body-secondary">
+            <small class="text-body-secondary ms-1">
                 <template v-if="'full' === rating">
-                    ({{ round(currentRating().rating) }} ± {{ round(currentRating().deviation * 2) }})
+                    {{ round(currentRating().rating) }} ±{{ round(currentRating().deviation * 2) }}
                 </template>
                 <template v-else>
-                    <template v-if="currentRating().deviation > 300">
-                        (?)
-                    </template>
-                    <template v-else-if="currentRating().deviation > 100">
-                        ({{ round(currentRating().rating) }}?)
-                    </template>
-                    <template v-else>
-                        ({{ round(currentRating().rating) }})
-                    </template>
+                    <template v-if="currentRating().deviation > 100">~</template>{{ round(currentRating().rating) }}
                 </template>
             </small>
         </template>
