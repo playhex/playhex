@@ -59,13 +59,12 @@ const currentRating = (): Rating => player.value.currentRating ?? createInitialR
         </component>
 
         <template v-if="rating">
-            <span>&nbsp;</span>
-
             <small class="text-body-secondary ms-1">
                 <template v-if="'full' === rating">
                     {{ round(currentRating().rating) }} ±{{ round(currentRating().deviation * 2) }}
                 </template>
                 <template v-else>
+                    &nbsp;
                     <template v-if="currentRating().deviation > 100">~</template>{{ round(currentRating().rating) }}
                 </template>
             </small>
