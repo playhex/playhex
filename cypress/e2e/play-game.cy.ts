@@ -48,11 +48,10 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.play(409, 326);
-        cy.play(307, 270);
-        cy.play(603, 329);
-        cy.play(504, 279);
-        cy.play(605, 440);
+        cy.play(339, 284);
+        cy.play(336, 382);
+        cy.play(254, 236);
+        cy.play(420, 427);
 
         cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game!/);
@@ -68,14 +67,12 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.play(210, 326);
-        cy.play(410, 209);
-        cy.play(509, 145);
-        cy.play(797, 328);
-        cy.play(506, 497);
-        cy.play(601, 205);
-        cy.play(510, 269);
-        cy.play(413, 326);
+        cy.play(170, 385);
+        cy.play(504, 283);
+        cy.play(505, 383);
+        cy.play(341, 381);
+        cy.play(251, 430);
+        cy.play(425, 436);
 
         cy.contains('Game finished');
         cy.contains('Determinist random bot won the game!');
@@ -91,10 +88,11 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.play(504, 152);
-        cy.play(605, 323);
-        cy.play(607, 208);
-        cy.play(607, 439);
+        cy.play(336, 182);
+        cy.play(339, 282);
+        cy.play(342, 182);
+        cy.play(422, 329);
+        cy.play(422, 432);
 
         cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game!/);

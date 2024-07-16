@@ -8,8 +8,6 @@ describe('Page Game', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.openGameSidebar();
-
         cy.contains('Share game');
         // Cannot click with cypress, seems to be handled in a way it cannot make assertions.
     });
@@ -25,8 +23,6 @@ describe('Page Game', () => {
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
-
-        cy.openGameSidebar();
 
         cy.contains(/\d+ \/ 250 characters/).should('not.exist');
         cy.get('.chat-input input').click().type('I am writing a message too long, Quod natus vitae soluta officia. Laboriosam assumenda velit quasi et laboriosam magnam occaecati. Et similique aspernatur rerum est ipsa. Aut at ut itaque. Odio sed non qui aut minima sed vel. Deleniti illo dolorum', { timeout: 10000 });

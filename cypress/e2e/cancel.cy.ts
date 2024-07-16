@@ -53,8 +53,6 @@ describe('Cancel a game', () => {
         cy.contains('Game has been canceled');
         cy.contains('.modal-content .modal-footer', 'Close').click();
 
-        cy.openGameSidebar();
-
         cy.contains('.sidebar', 'Game has been canceled');
     });
 });

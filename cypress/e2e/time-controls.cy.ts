@@ -134,8 +134,6 @@ describe('Time controls', () => {
         cy.contains('.modal-content .modal-footer', 'Close').click();
         cy.contains('.player-b', '0:00.0');
 
-        cy.openGameSidebar();
-
         cy.contains('.sidebar', 'Game has been canceled');
     });
 });

@@ -61,6 +61,11 @@ declare namespace Cypress {
          * When on game page, open game sidebar.
          */
         openGameSidebar(): Chainable<unknown>;
+
+        /**
+         * When on game page, close game sidebar.
+         */
+        closeGameSidebar(): Chainable<unknown>;
     }
 }
 
@@ -106,6 +111,13 @@ Cypress.Commands.add('play', (x, y) => {
 Cypress.Commands.add('openGameSidebar', () => {
     cy
         .get('[aria-label="Open game sidebar and chat"]')
+        .click()
+    ;
+});
+
+Cypress.Commands.add('closeGameSidebar', () => {
+    cy
+        .contains('.block-close', 'Close')
         .click()
     ;
 });

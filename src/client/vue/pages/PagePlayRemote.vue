@@ -15,6 +15,7 @@ import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
 import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
+import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
@@ -44,6 +45,7 @@ const router = useRouter();
  * Confirm move
  */
 const { playerSettings } = storeToRefs(usePlayerSettingsStore());
+const { localSettings } = usePlayerLocalSettingsStore();
 const confirmMove: Ref<null | (() => void)> = ref(null);
 
 const shouldDisplayConfirmMove = (): boolean => {
@@ -357,20 +359,37 @@ const viewRematch = (): void => {
 /*
  * Sidebar
  */
-const sidebarOpen = ref(false);
+const showSidebar = (open = true): void => {
+    localSettings.openSidebar = open;
+};
 
+const isSidebarCurrentlyOpen = (): boolean => {
+    if (undefined !== localSettings.openSidebar) {
+        return localSettings.openSidebar;
+    }
+
+    return window.screen.width >= 576;
+};
+
+/*
+ * Chat
+ */
 watch(hostedGameClient, game => {
     if (null === game) {
         return;
     }
 
     game.on('chatMessagePosted', () => {
-        if (sidebarOpen.value) {
+        if (isSidebarCurrentlyOpen()) {
             game.markAllMessagesRead();
         }
     });
 
-    watch(sidebarOpen, () => game.markAllMessagesRead());
+    watch(localSettings, () => {
+        if (isSidebarCurrentlyOpen()) {
+            game.markAllMessagesRead();
+        }
+    });
 });
 
 const unreadMessages = (): number => {
@@ -385,7 +404,7 @@ const unreadMessages = (): number => {
 </script>
 
 <template>
-    <div v-show="null !== hostedGameClient" class="game-and-sidebar-container" :class="sidebarOpen ? 'sidebar-open' : ''">
+    <div v-show="null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : '')">
         <div class="game">
             <div class="board-container" ref="boardContainer">
                 <AppBoard
@@ -430,7 +449,7 @@ const unreadMessages = (): number => {
                             {{ ' ' + $t('rematch.view') }}
                         </button>
                     </template>
-                    <button type="button" class="btn btn-outline-primary position-relative" @click="sidebarOpen = true">
+                    <button type="button" class="btn btn-outline-primary position-relative" @click="showSidebar()">
                         <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
                         <BIconChatRight v-else />
                         <span class="d-none d-md-inline">{{ ' ' + $t('chat') }}</span>
@@ -440,7 +459,7 @@ const unreadMessages = (): number => {
                         </span>
                     </button>
 
-                    <button v-if="!sidebarOpen" type="button" class="btn btn-outline-primary toggle-sidebar-btn" @click="sidebarOpen = true" aria-label="Open game sidebar and chat"><BIconArrowBarLeft /></button>
+                    <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat"><BIconArrowBarLeft /></button>
                 </div>
             </nav>
         </div>
@@ -449,7 +468,7 @@ const unreadMessages = (): number => {
             <AppGameSidebar
                 :hostedGameClient="hostedGameClient"
                 :gameView="gameView"
-                @close="sidebarOpen = false"
+                @close="showSidebar(false)"
                 @toggle-coords="toggleCoords()"
             />
         </div>
@@ -492,20 +511,14 @@ const unreadMessages = (): number => {
         width 100%
 
     .sidebar
-        position relative
         display none
-        width 75%
 
-        @media (max-width: 575px)
-            width 100%
-            position absolute
-            right 0
-            top 0
-            bottom 0
-            --bs-bg-opacity 0.85
-            // backdrop-filter blur(2px) // laggy on mobile
+    .open-sidebar-btn
+        position absolute
+        right 0
+        margin-right 0.75em
 
-.sidebar-open
+sidebarOpen()
     .game
         width 100%
 
@@ -517,7 +530,16 @@ const unreadMessages = (): number => {
 
     .sidebar
         display flex
+        position relative
         width 100%
+
+        @media (max-width: 575px)
+            position absolute
+            right 0
+            top 0
+            bottom 0
+            --bs-bg-opacity 0.85
+            // backdrop-filter blur(2px) // laggy on mobile
 
         @media (min-width: 576px)
             width 50%
@@ -525,9 +547,13 @@ const unreadMessages = (): number => {
         @media (min-width: 992px)
             width 33%
 
-.buttons
-    .toggle-sidebar-btn
-        position absolute
-        right 0
-        margin-right 0.75em
+    .open-sidebar-btn
+        display none
+
+.sidebar-open
+    sidebarOpen()
+
+.sidebar-auto
+    @media (min-width: 576px)
+        sidebarOpen()
 </style>

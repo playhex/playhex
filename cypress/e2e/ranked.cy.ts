@@ -43,8 +43,6 @@ describe('Ranked games', () => {
             .click()
         ;
 
-        cy.openGameSidebar();
-
         cy.contains('.sidebar', 'Ranked');
 
         // Must play diagonal line to win both as red or blue because we can't choose our color on ranked games

@@ -17,6 +17,15 @@ class LocalSettings
      */
     @Expose()
     selectedBoardOrientation: 'auto' | 'landscape' | 'portrait' = 'auto';
+
+    /**
+     * Whether to open sidebar on game page open.
+     *
+     * undefined means it will automatically open on large screens only.
+     * true or false to let it open or closed.
+     */
+    @Expose()
+    openSidebar?: boolean;
 }
 
 const loadLocalSettings = (): LocalSettings => {
@@ -46,6 +55,12 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
     const localSettings = ref(loadLocalSettings());
 
     watch(localSettings.value, () => saveLocalSettings(localSettings.value));
+
+    // When open game page on small screen, make openSidebar auto to hide it.
+    // Or on larger screen, also make auto so it stays open, but will close when reducing screen.
+    if (window.screen.width < 576 || localSettings.value.openSidebar) {
+        localSettings.value.openSidebar = undefined;
+    }
 
     return {
         localSettings,
