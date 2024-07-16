@@ -5,7 +5,7 @@ import { apiGetPlayerSettings, apiPatchPlayerSettings } from '../apiClient';
 import useAuthStore from './authStore';
 
 /**
- * Current player settings.
+ * Player settings stored in database, so shared accross his devices
  *
  * Contains player settings when needed
  * for every games (ask move confirm or not...)

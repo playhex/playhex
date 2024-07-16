@@ -44,8 +44,7 @@
     "background_theme": {
         "title": "Theme",
         "dark": "Dark",
-        "light": "Light",
-        "auto": "Auto"
+        "light": "Light"
     },
     "time_control": {
         "custom": "Custom",
@@ -175,8 +174,10 @@
     "landscape": "Landscape",
     "portrait": "Portrait",
     "resign": "Resign",
+    "auto": "Auto",
     "board_orientation": {
         "title": "Orientation",
+        "description": "Your preferred board orientation for portrait and landscape screen orientation.",
         "flat": "Flat",
         "flat_2": "Flat 2",
         "diamond": "Diamond"

@@ -5,7 +5,7 @@ import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIcon
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
-import usePlayerSettingsStore from '../../stores/playerSettingsStore';
+import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
 import { Player, Rating } from '../../../shared/app/models';
@@ -21,15 +21,21 @@ import useAnalyzeStore from '../../stores/analyzeStore';
 import { downloadString } from '../../services/fileDownload';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { gameToSGF } from '../../../shared/game-engine/SGF';
+import GameView from '../../pixi-board/GameView';
 
 const props = defineProps({
     hostedGameClient: {
         type: Object as PropType<HostedGameClient>,
         required: true,
     },
+    gameView: {
+        type: Object as PropType<null | GameView>,
+        required: false,
+        default: null,
+    },
 });
 
-const { hostedGameClient } = toRefs(props);
+const { hostedGameClient, gameView } = toRefs(props);
 const { round, abs } = Math;
 
 const emits = defineEmits([
@@ -38,12 +44,11 @@ const emits = defineEmits([
 ]);
 
 const { loggedInPlayer } = useAuthStore();
+const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 
 if (null === loggedInPlayer) {
     throw new Error('Unexpected null logged in player');
 }
-
-const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const playerColor = (player: Player): string => {
@@ -268,12 +273,22 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
     hostedGameClient.value.getPlayerIndex(a.player) -
     hostedGameClient.value.getPlayerIndex(b.player)
 ;
+
+/*
+ * Board orientation
+ */
 </script>
 
 <template>
     <div class="sidebar-blocks">
+
+        <!--
+            Game info
+        -->
         <div class="block-game-info">
             <div class="container-fluid">
+
+                <!-- created -->
                 <template v-if="'created' === hostedGameClient.getState()">
                     <h3>{{ $t('waiting_for_an_opponent') }}</h3>
                     <p v-if="hostedGameClient.isRanked()" class="text-warning">
@@ -295,6 +310,8 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         </i18next>
                     </p>
                 </template>
+
+                <!-- canceled -->
                 <template v-if="'canceled' === hostedGameClient.getState()">
                     <h3>{{ $t('game_has_been_canceled') }}</h3>
                     <p v-if="hostedGameClient.isRanked()" class="text-warning">
@@ -316,6 +333,8 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         </i18next>
                     </p>
                 </template>
+
+                <!-- playing -->
                 <template v-if="'playing' === hostedGameClient.getState()">
                     <h3>{{ $t('game.playing') }}</h3>
                     <p v-if="hostedGameClient.isRanked()" class="text-warning">
@@ -329,6 +348,8 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
                     </p>
                 </template>
+
+                <!-- ended -->
                 <template v-if="'ended' === hostedGameClient.getState()">
                     <h3>
                         <i18next :translation="$t('player_wins_by.' + (hostedGameClient.getHostedGame().gameData?.outcome ?? 'default'))">
@@ -373,15 +394,34 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
             </div>
         </div>
 
+        <!--
+            Game buttons
+        -->
         <div class="block-controls">
             <div class="container-fluid">
+
+                <!-- Toggle coords -->
                 <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click.prevent="emits('toggleCoords')"><BIconAlphabet /> {{ $t('toggle_coords') }}</button>
+
+                <!-- change board orientation -->
+                <div class="btn-group btn-group-sm me-2 mb-2" role="group" aria-label="Change board orientation">
+                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="auto" id="btn-orientation-auto" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-orientation-auto">{{ $t('auto') }}</label>
+
+                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-orientation-landscape">{{ $t('landscape') }}</label>
+
+                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
+                </div>
+
+                <!-- HexWorld link -->
                 <a
                     v-if="shouldDisplayHexworldLink()"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     target="_blank"
-                    :href="gameToHexworldLink(hostedGameClient.getGame(), playerSettings?.orientationLandscape)"
+                    :href="gameToHexworldLink(hostedGameClient.getGame(), gameView?.getComputedBoardOrientation())"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -395,7 +435,10 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         focusable="false"
                     >
                         <path d="M 3 8 L 13 2.25 L 23 8 L 23 19.5 L 13 25.25 L 3 19.5z" />
-                    </svg> HexWorld</a>
+                    </svg> HexWorld
+                </a>
+
+                <!-- Download SGF -->
                 <button
                     v-if="'ended' === hostedGameClient.getState()"
                     type="button"
@@ -403,13 +446,17 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                     @click="downloadSGF();"
                 ><BIconDownload /> SGF</button>
 
+                <!-- Share -->
                 <br>
-                <a :href="href" class="btn btn-sm btn-outline-primary mb-2" @click.prevent="shareGameLinkAndShowResult()"><BIconShareFill /> {{ $t('share_game') }}</a>
+                <a :href="href" class="btn btn-sm btn-outline-primary me-2 mb-2" @click.prevent="shareGameLinkAndShowResult()"><BIconShareFill /> {{ $t('share_game') }}</a>
                 <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> {{ $t('copied!') }}</small>
                 <small v-else-if="false === copiedResult" class="text-warning me-2"> {{ $t('not_copied') }}</small>
             </div>
         </div>
 
+        <!--
+            Game analyze
+        -->
         <div class="block-analyze" v-if="hostedGameClient.getGame().isEnded()">
             <div class="container-fluid">
                 <div v-if="null === gameAnalyze" class="text-center">
@@ -431,6 +478,9 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
             </div>
         </div>
 
+        <!--
+            Game chat
+        -->
         <div class="block-fill-rest">
             <div class="container-fluid">
                 <small>{{ $t('chat') }}</small>
@@ -464,6 +514,9 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
             </form>
         </div>
 
+        <!--
+            Close game sidebar
+        -->
         <div class="block-close bg-dark-subtle">
             <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">{{ $t('close') }} <BIconArrowBarRight /></button>
         </div>

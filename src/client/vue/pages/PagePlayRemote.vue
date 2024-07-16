@@ -149,7 +149,7 @@ const initGameView = async () => {
 
     if (null !== playerSettings.value) {
         gameView.setDisplayCoords(playerSettings.value.showCoords);
-        gameView.setOrientation({
+        gameView.setPreferredOrientations({
             landscape: playerSettings.value.orientationLandscape,
             portrait: playerSettings.value.orientationPortrait,
         });
@@ -161,7 +161,7 @@ const initGameView = async () => {
         }
 
         gameView.setDisplayCoords(settings.showCoords);
-        gameView.setOrientation({
+        gameView.setPreferredOrientations({
             landscape: settings.orientationLandscape,
             portrait: settings.orientationPortrait,
         });
@@ -448,6 +448,7 @@ const unreadMessages = (): number => {
         <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
             <AppGameSidebar
                 :hostedGameClient="hostedGameClient"
+                :gameView="gameView"
                 @close="sidebarOpen = false"
                 @toggle-coords="toggleCoords()"
             />

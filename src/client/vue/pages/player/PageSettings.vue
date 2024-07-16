@@ -48,6 +48,7 @@ watch(
 
 /*
  * Board orientation
+ * https://www.hexwiki.net/index.php/Conventions
  */
 const landscapeOrientations = [
     { value: 0, labelTransKey: 'board_orientation.flat' },
@@ -169,7 +170,7 @@ onMounted(() => {
             <label class="btn btn-outline-primary" for="btn-theme-dark"><BIconMoonStarsFill /> {{ $t('background_theme.dark') }}</label>
 
             <input type="radio" class="btn-check" v-model="selectedTheme" value="auto" id="btn-theme-auto" autocomplete="off">
-            <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> {{ $t('background_theme.auto') }}</label>
+            <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> {{ $t('auto') }}</label>
         </div>
 
         <h3>{{ $t('confirm_move.title') }}</h3>
@@ -221,6 +222,8 @@ onMounted(() => {
         </template>
 
         <h4>{{ $t('board_orientation.title') }}</h4>
+
+        <p>{{ $t('board_orientation.description') }}</p>
 
         <template v-if="playerSettings">
             <div class="mb-3 row">

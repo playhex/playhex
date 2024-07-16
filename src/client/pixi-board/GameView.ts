@@ -9,6 +9,7 @@ import SwapedSprite from './SwapedSprite';
 import { Coords } from '@shared/game-engine/Types';
 import useDarkLightThemeStore from '../stores/darkLightThemeStore';
 import usePlayerSettingsStore from '../stores/playerSettingsStore';
+import usePlayerLocalSettingsStore from '../stores/playerLocalSettingsStore';
 import { WatchStopHandle, watch } from 'vue';
 import { createShadingPattern } from '../../shared/app/shading-patterns';
 
@@ -18,75 +19,10 @@ const PI_3 = PI / 3;
 const PI_6 = PI / 6;
 
 /**
- * Orientation names from
- * https://www.hexwiki.net/index.php/Conventions
- */
-export type OrientationName =
-    /**
-     * Displayed as horizontal diamond.
-     * Recommended for large screen.
-     */
-    'diamond'
-
-    /**
-     * Displayed as vertical diamond.
-     */
-    | 'vertical_diamond'
-
-    /**
-     *  __
-     *  \_\
-     */
-    | 'flat'
-
-    /**
-     *   __
-     *  /_/
-     */
-    | 'flat_2'
-
-    /**
-     * Displayed as vertical,
-     * but not symmetric         /|
-     * to optimize screen space. |/
-     * Recommended for mobile screens.
-     */
-    | 'vertical_flat'
-
-    /**
-     * Same as right_hand, but board goes |\
-     * from top left to bottom right.     \|
-     */
-    | 'vertical_flat_2'
-;
-
-const orientationNameToRotation = (orientationName: OrientationName): number => {
-    switch (orientationName) {
-        case 'diamond':
-            return 11;
-
-        case 'vertical_diamond':
-            return 2;
-
-        case 'flat':
-            return 0;
-
-        case 'flat_2':
-            return 10;
-
-        case 'vertical_flat':
-            return 9;
-
-        case 'vertical_flat_2':
-            return 1;
-    }
-};
-
-/**
  * Integer, every PI/6.
  * Or an orientation depending on screen orientation.
  */
-type OrientationValue = number | { landscape: number, portrait: number };
+type PreferredOrientations = { landscape: number, portrait: number };
 
 export type GameViewSize = {
     width: number;
@@ -116,9 +52,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private pixi: Application;
     private gameContainer: Container = new Container();
 
-    private orientation: OrientationValue = {
-        landscape: orientationNameToRotation('diamond'),
-        portrait: orientationNameToRotation('vertical_flat'),
+    private preferredOrientations: PreferredOrientations = {
+        landscape: 11, // Diamond
+        portrait: 9, // Vertical flat
     };
 
     private currentOrientation: number;
@@ -135,6 +71,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private unwatchThemeSwitchedListener: WatchStopHandle;
     private unwatchSettingsChangedListener: WatchStopHandle;
+    private unwatchLocalSettingsChangedListener: WatchStopHandle;
 
     private initPromise: Promise<void>;
 
@@ -175,6 +112,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
             this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
             this.unwatchSettingsChangedListener = watch(() => usePlayerSettingsStore().playerSettings, this.settingsChangedListener, { deep: true });
+            this.unwatchLocalSettingsChangedListener = watch(() => usePlayerLocalSettingsStore().localSettings.selectedBoardOrientation, this.settingsChangedListener);
 
             if (this.game.isEnded()) {
                 this.highlightSidesFromGame();
@@ -188,6 +126,39 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this.initPromise;
     }
 
+    /**
+     * Returns which board orientation should be used
+     * from game view wrapper ratio, and user preferred orientations for landscape and portrait.
+     */
+    getComputedBoardOrientation(): number
+    {
+        const wrapperSize = this.getWrapperSize();
+        const { selectedBoardOrientation } = usePlayerLocalSettingsStore().localSettings;
+
+        if ('auto' === selectedBoardOrientation) {
+            return wrapperSize.width > wrapperSize.height
+                ? this.preferredOrientations.landscape
+                : this.preferredOrientations.portrait
+            ;
+        }
+
+        return this.preferredOrientations[selectedBoardOrientation];
+    }
+
+    /**
+     * Re-check screen ratio to change board orientation if needed
+     */
+    private updateOrientation(): void
+    {
+        const previousCurrentOrientation = this.currentOrientation;
+
+        this.currentOrientation = this.getComputedBoardOrientation();
+
+        if (previousCurrentOrientation !== this.currentOrientation) {
+            this.emit('orientationChanged');
+        }
+    }
+
     private redraw(): void
     {
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
@@ -195,20 +166,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.gameContainer.removeChildren();
 
-        const previousCurrentOrientation = this.currentOrientation;
-
-        if (typeof this.orientation === 'number') {
-            this.currentOrientation = this.orientation;
-        } else {
-            this.currentOrientation = wrapperSize.width > wrapperSize.height
-                ? this.orientation.landscape
-                : this.orientation.portrait
-            ;
-        }
-
-        if (previousCurrentOrientation !== this.currentOrientation) {
-            this.emit('orientationChanged');
-        }
+        this.updateOrientation();
 
         this.gameContainer.rotation = this.currentOrientation * PI_6;
 
@@ -298,9 +256,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this.pixi.canvas;
     }
 
-    getOrientation(): OrientationValue
+    getPreferredOrientations(): PreferredOrientations
     {
-        return this.orientation;
+        return this.preferredOrientations;
+    }
+
+    setPreferredOrientations(preferredOrientations: PreferredOrientations): void
+    {
+        this.preferredOrientations = preferredOrientations;
+        this.redraw();
     }
 
     /**
@@ -310,12 +274,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     getCurrentOrientation(): number
     {
         return (this.currentOrientation + 12) % 12;
-    }
-
-    setOrientation(orientation: OrientationValue): void
-    {
-        this.orientation = orientation;
-        this.redraw();
     }
 
     /**
@@ -688,8 +646,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private fixedRotation(): number
     {
-        const { ceil } = Math;
-
         return -ceil(((this.gameContainer.rotation / PI_6) + 1) / 2) * PI_3 + PI_6;
     }
 
@@ -770,5 +726,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.destroyResizeObserver();
         this.unwatchThemeSwitchedListener();
         this.unwatchSettingsChangedListener();
+        this.unwatchLocalSettingsChangedListener();
     }
 }
