@@ -33,8 +33,7 @@
     "background_theme": {
         "title": "Thème",
         "dark": "Sombre",
-        "light": "Clair",
-        "auto": "Auto"
+        "light": "Clair"
     },
     "2dots": "{{s}} :",
     "new_game": "Nouvelle partie",
