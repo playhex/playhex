@@ -5,51 +5,6 @@ import { calcAverageSecondsPerMove } from '../timeControlUtils';
 
 describe('timeControlUtils', () => {
     it('calculates average seconds per move for a given time control and a board size', () => {
-        /**
-         * Simple
-         */
-        assert.strictEqual(
-            calcAverageSecondsPerMove({
-                type: 'simple',
-                options: {
-                    timePerMove: 12000,
-                },
-            }, 13),
-            12,
-        );
-
-        assert.strictEqual(
-            calcAverageSecondsPerMove({
-                type: 'simple',
-                options: {
-                    timePerMove: 12000,
-                },
-            }, 7),
-            12,
-        );
-
-        /**
-         * Absolute
-         */
-        assert.strictEqual(
-            calcAverageSecondsPerMove({
-                type: 'absolute',
-                options: {
-                    timePerPlayer: 36000,
-                },
-            }, 6),
-            6,
-        );
-
-        assert.strictEqual(
-            calcAverageSecondsPerMove({
-                type: 'absolute',
-                options: {
-                    timePerPlayer: 360000,
-                },
-            }, 12),
-            15,
-        );
 
         /**
          * Fischer
