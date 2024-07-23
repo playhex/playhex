@@ -88,6 +88,13 @@ export abstract class AbstractTimeControl<
         return this.state;
     }
 
+    /**
+     * Returns current player who is it turn to play,
+     * and having its clock elapsing in case time control is running.
+     * If time control has not yet started, returns first player.
+     * If time control has finished/elapsed, returns last player who have not pushed,
+     * or player who have elapsed.
+     */
     getCurrentPlayer(): PlayerIndex
     {
         return this.currentPlayer;
@@ -102,11 +109,67 @@ export abstract class AbstractTimeControl<
      */
     abstract setValues(values: T, date: Date): void;
 
-    protected abstract doStart(date: Date): void;
+    /**
+     * To call from setValues() to update elapsedPlayer
+     * and prevent having an elapsed time control
+     * but having getStrictElapsedPlayer() failing.
+     */
+    protected setElapsedPlayerFromValues(values: T, now: Date): void
+    {
+        if ('elapsed' === values.state) {
+            let elapsedAt = values.players[values.currentPlayer].totalRemainingTime;
+
+            if ('number' === typeof elapsedAt) {
+                // eslint-disable-next-line no-console
+                console.warn('setValues with an elapsed time control values, but unable to get exact elapsed date because chrono was paused. Using "now" date.');
+
+                elapsedAt = now;
+            }
+
+            this.elapsedPlayer = {
+                byPlayer: values.currentPlayer,
+                date: elapsedAt,
+            };
+        }
+    }
+
+    /**
+     * @param date When exactly time control has been started. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     */
+    protected abstract doStart(date: Date, now: null | Date): void;
+
+    /**
+     * @param date When exactly time control has been paused. In doubt, use new Date()
+     */
     protected abstract doPause(date: Date): void;
-    protected abstract doResume(date: Date): void;
+
+    /**
+     * @param date When exactly time control has been resumed. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     */
+    protected abstract doResume(date: Date, now: null | Date): void;
+
+    /**
+     * @param date When exactly time control has been finished. In doubt, use new Date()
+     */
     protected abstract doFinish(date: Date): void;
-    protected abstract doPush(byPlayer: PlayerIndex, date: Date): void;
+
+    /**
+     * @param byPlayer Which player has pushed. Used to check a same player don't push twice.
+     * @param date When exactly time control has been pushed. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     */
+    protected abstract doPush(byPlayer: PlayerIndex, date: Date, now: null | Date): void;
 
     protected elapse(byPlayer: PlayerIndex, date: Date): void
     {
@@ -148,13 +211,33 @@ export abstract class AbstractTimeControl<
         }
     }
 
-    start(date: Date): void
+    /**
+     * Game starts, first player clock starts elapsing.
+     * Useful to bind listeners before starting time control.
+     *
+     * @param date When exactly time control has been started. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     *
+     * @throws {TimeControlError} When time control has already been started.
+     */
+    start(date: Date, now: null | Date = new Date()): void
     {
         this.mustBeState('ready');
-        this.doStart(date);
+        this.doStart(date, now);
         this.state = 'running';
     }
 
+    /**
+     * Pause both clocks because players having a break.
+     * Call resume() to resume.
+     *
+     * @param date When exactly time control has been paused. In doubt, use new Date()
+     *
+     * @throws {TimeControlError} When time control was not running.
+     */
     pause(date: Date): void
     {
         this.mustBeState('running');
@@ -162,20 +245,51 @@ export abstract class AbstractTimeControl<
         this.state = 'paused';
     }
 
-    resume(date: Date): void
+    /**
+     * Resume a pause, players have finished break.
+     * Current player's clock will elapsing again.
+     *
+     * @param date When exactly time control has been resumed. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     *
+     * @throws {TimeControlError} When time control was not paused.
+     */
+    resume(date: Date, now: null | Date = new Date()): void
     {
         this.mustBeState('paused');
-        this.doResume(date);
+        this.doResume(date, now);
         this.state = 'running';
     }
 
+    /**
+     * Finish time control, because game has finished, or canceled...
+     * Clocks will be paused forever, "elapsed" event won't be emitted.
+     *
+     * @param date When exactly time control has finished. In doubt, use new Date()
+     */
     finish(date: Date): void
     {
         this.doFinish(date);
         this.state = 'over';
     }
 
-    push(byPlayer: PlayerIndex, date: Date): void
+    /**
+     * A player moved and push to pause its clock and resume its opponent clock.
+     *
+     * @param byPlayer Which player has pushed. Used to check a same player don't push twice.
+     * @param date When exactly time control has been pushed. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     *
+     * @throws {TimeControlError} When a same player push twice.
+     * @throws {TimeControlError} When pushing but time control is not running.
+     */
+    push(byPlayer: PlayerIndex, date: Date, now: null | Date = new Date()): void
     {
         this.mustBeState('running');
 
@@ -183,6 +297,16 @@ export abstract class AbstractTimeControl<
             throw new TimeControlError(`Player ${byPlayer} pushed twice.`);
         }
 
-        this.doPush(byPlayer, date);
+        this.doPush(byPlayer, date, now);
+    }
+
+    /**
+     * For debug purpose.
+     *
+     * @param date When exactly you look at time control clocks. In doubt, use new Date()
+     */
+    toString(date: Date): string
+    {
+        return `TimeControl, state: ${this.state}, currentPlayer: ${this.currentPlayer} (at date ${date})`;
     }
 }

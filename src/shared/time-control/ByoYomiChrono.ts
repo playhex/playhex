@@ -12,10 +12,19 @@ type ChronoEvents = {
 /**
  * ByoYomi chrono for a single player.
  * Can be started or paused.
+ *
+ * Unlike Chrono, this ByoYomiChrono won't continue elapsing in negative values.
  */
 export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
 {
+    /**
+     * Main chrono, from initial time or reloaded by period.
+     */
     private chrono: Chrono;
+
+    /**
+     * Remaining byoyomi periods, initialized by periodsCount.
+     */
     private remainingPeriods: number;
 
     /**
@@ -36,6 +45,7 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
         this.chrono.on('elapsed', date => {
             if (this.remainingPeriods <= 0) {
                 this.emit('elapsed', date);
+                this.setMainValue(0);
                 return;
             }
 
@@ -75,17 +85,12 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
         return this.remainingPeriods;
     }
 
-    isInitialTimeElapsed(): boolean
-    {
-        return this.remainingPeriods < this.periodsCount;
-    }
-
-    setValues(timeValue: TimeValue, periods: number, date: Date): void
+    setValues(timeValue: TimeValue, periods: number, now: Date = new Date()): void
     {
         this.remainingPeriods = periods;
         this.chrono.setValue(timeValue);
 
-        while (this.chrono.isElapsedAt(date) && this.remainingPeriods > 0) {
+        while (this.chrono.isElapsedAt(now) && this.remainingPeriods > 0) {
             --this.remainingPeriods;
             this.chrono.increment(this.periodTime);
         }
@@ -107,52 +112,68 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
         this.remainingPeriods = remainingPeriods;
     }
 
-    run(date: Date): void
+    /**
+     * Start/restart chrono, make it elapsing.
+     * Can emit elapsed event if chrono restarted from a date that make it already elapsed now.
+     *
+     * @param date When exactly chrono has been started. In doubt, use new Date()
+     * @param now Set null or same date as "date" to prevent elapsing when working with past dates.
+     *            Or set a reference date to use to know whether chrono has elapsed,
+     *            or when it will elapse.
+     *            Defaults to current system date.
+     */
+    run(date: Date, now: null | Date = new Date()): void
     {
-        this.chrono.run(date);
+        this.chrono.run(date, now);
     }
 
+    /**
+     * Pause chrono.
+     * Consumes periods if paused at a date after main chrono elapses.
+     * Can emit elapsed event if no remaining periods and main chrono elapses.
+     *
+     * @param date When exactly chrono has been paused. In doubt, use new Date()
+     */
     pause(date: Date): void
     {
+        let remaining = timeValueToMilliseconds(this.chrono.getValue(), date);
+
+        while (remaining <= 0 && this.remainingPeriods > 0) {
+            remaining += this.periodTime;
+            --this.remainingPeriods;
+            this.chrono.increment(this.periodTime, null);
+        }
+
         this.chrono.pause(date);
     }
 
     /**
      * Must be called instead of pause()
      * to reload time from periods if player elapsed initial time.
+     * Can emit elapsed event if paused at a date when chrono already have elapsed.
      */
     pauseByMovePlayed(date: Date): void
     {
-        if (this.isInitialTimeElapsed()) {
-            this.chrono.setValue(this.periodTime);
+        this.pause(date);
+
+        // Do not increment if paused after having elapsed
+        if (this.remainingPeriods <= 0 && this.chrono.isElapsedAt(date)) {
             return;
         }
 
-        this.chrono.pause(date);
+        // No increment while still on main time
+        if (this.remainingPeriods === this.periodsCount) {
+            return;
+        }
+
+        this.chrono.setValue(this.periodTime);
     }
 
     /**
-     * Whether chrono has reached 0, and there is 0 periods, and time is now incrementing.
-     * Elapsed event should have been emited,
-     * except if an elapsed time has been set manually.
+     * @param date For when to show chrono value. In doubt, use new Date()
      */
-    isElapsedAt(date: Date): null | Date
-    {
-        const elapsesAt = this.getTotalValue();
-
-        if (elapsesAt instanceof Date) {
-            if (elapsesAt.getTime() < date.getTime()) {
-                return elapsesAt;
-            }
-
-            return null;
-        }
-
-        return null;
-    }
-
     toString(date: Date): string
     {
-        return `${timeValueToMilliseconds(this.getMainValue(), date) / 1000}s + ${this.remainingPeriods} x ${this.periodTime / 1000}s`;
+        return `${timeValueToMilliseconds(this.getMainValue(), date)}ms + ${this.remainingPeriods} x ${this.periodTime}ms (${this.getMainValue() instanceof Date ? 'elapsing' : 'paused'})`;
     }
 }

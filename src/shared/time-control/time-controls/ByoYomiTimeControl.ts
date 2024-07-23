@@ -78,18 +78,20 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         };
     }
 
-    setValues(values: GameTimeData<ByoYomiPlayerTimeData>, date: Date): void
+    setValues(values: GameTimeData<ByoYomiPlayerTimeData>, now: Date = new Date()): void
     {
         this.state = values.state;
         this.currentPlayer = values.currentPlayer;
 
-        this.playerChronos[0].setValues(values.players[0].remainingMainTime, values.players[0].remainingPeriods, date);
-        this.playerChronos[1].setValues(values.players[1].remainingMainTime, values.players[1].remainingPeriods, date);
+        this.playerChronos[0].setValues(values.players[0].remainingMainTime, values.players[0].remainingPeriods, now);
+        this.playerChronos[1].setValues(values.players[1].remainingMainTime, values.players[1].remainingPeriods, now);
+
+        this.setElapsedPlayerFromValues(values, now);
     }
 
-    protected doStart(date: Date): void
+    protected doStart(date: Date, now: null | Date = new Date()): void
     {
-        this.playerChronos[this.currentPlayer].run(date);
+        this.playerChronos[this.currentPlayer].run(date, now);
     }
 
     protected doPause(date: Date): void
@@ -97,9 +99,9 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         this.playerChronos[this.currentPlayer].pause(date);
     }
 
-    protected doResume(date: Date): void
+    protected doResume(date: Date, now: null | Date = new Date()): void
     {
-        this.playerChronos[this.currentPlayer].run(date);
+        this.playerChronos[this.currentPlayer].run(date, now);
     }
 
     protected doFinish(date: Date): void
@@ -109,15 +111,21 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         }
     }
 
-    protected doPush(byPlayer: PlayerIndex, date: Date): void
+    protected doPush(byPlayer: PlayerIndex, date: Date, now: null | Date = new Date()): void
     {
         this.playerChronos[this.currentPlayer].pauseByMovePlayed(date);
+
+        // If pushing made player elapsing, do not run other player chrono
+        if (null !== this.elapsedPlayer) {
+            return;
+        }
+
         this.currentPlayer = 1 - byPlayer as PlayerIndex;
-        this.playerChronos[this.currentPlayer].run(date);
+        this.playerChronos[this.currentPlayer].run(date, now);
     }
 
     toString(date: Date): string
     {
-        return this.playerChronos[0].toString(date) + ' | ' + this.playerChronos[1].toString(date);
+        return `ByoYomi (${this.state}): ${this.playerChronos[0].toString(date)} | ${this.playerChronos[1].toString(date)}`;
     }
 }

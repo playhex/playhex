@@ -27,12 +27,6 @@ export class FischerTimeControl extends AbstractTimeControl
 {
     private playerChronos: [Chrono, Chrono];
 
-    /**
-     * Store the date when player chrono elapsed
-     * before losing it when setting player chrono to zero.
-     */
-    private lastElapsedDates: [null | Date, null | Date] = [null, null];
-
     constructor(
         protected options: FischerTimeControlOptions,
     ) {
@@ -44,13 +38,11 @@ export class FischerTimeControl extends AbstractTimeControl
         ];
 
         this.playerChronos[0].on('elapsed', date => {
-            this.lastElapsedDates[0] = date;
             this.playerChronos[0].setValue(0);
             this.elapse(0, date);
         });
 
         this.playerChronos[1].on('elapsed', date => {
-            this.lastElapsedDates[1] = date;
             this.playerChronos[1].setValue(0);
             this.elapse(1, date);
         });
@@ -68,18 +60,20 @@ export class FischerTimeControl extends AbstractTimeControl
         };
     }
 
-    setValues(values: GameTimeData): void
+    setValues(values: GameTimeData, now: Date = new Date()): void
     {
         this.state = values.state;
         this.currentPlayer = values.currentPlayer;
 
-        this.playerChronos[0].setValue(values.players[0].totalRemainingTime);
-        this.playerChronos[1].setValue(values.players[1].totalRemainingTime);
+        this.playerChronos[0].setValue(values.players[0].totalRemainingTime, now);
+        this.playerChronos[1].setValue(values.players[1].totalRemainingTime, now);
+
+        this.setElapsedPlayerFromValues(values, now);
     }
 
-    protected doStart(date: Date): void
+    protected doStart(date: Date, now: null | Date): void
     {
-        this.playerChronos[this.currentPlayer].run(date);
+        this.playerChronos[this.currentPlayer].run(date, now);
     }
 
     protected doPause(date: Date): void
@@ -87,9 +81,9 @@ export class FischerTimeControl extends AbstractTimeControl
         this.playerChronos[this.currentPlayer].pause(date);
     }
 
-    protected doResume(date: Date): void
+    protected doResume(date: Date, now: null | Date): void
     {
-        this.playerChronos[this.currentPlayer].run(date);
+        this.playerChronos[this.currentPlayer].run(date, now);
     }
 
     protected doFinish(date: Date): void
@@ -99,9 +93,14 @@ export class FischerTimeControl extends AbstractTimeControl
         }
     }
 
-    protected doPush(byPlayer: PlayerIndex, date: Date): void
+    protected doPush(byPlayer: PlayerIndex, date: Date, now: null | Date = new Date()): void
     {
         this.playerChronos[this.currentPlayer].pause(date);
+
+        // Check if pause() call has not elapsed, which occurs when pausing at a date when chrono already have elapsed
+        if ('elapsed' === this.state) {
+            return;
+        }
 
         const { timeIncrement, maxTime } = this.options;
         let ms = this.playerChronos[this.currentPlayer].getValue();
@@ -118,10 +117,10 @@ export class FischerTimeControl extends AbstractTimeControl
             ms = maxTime;
         }
 
-        this.playerChronos[this.currentPlayer].setValue(ms);
+        this.playerChronos[this.currentPlayer].setValue(ms, now);
 
         this.currentPlayer = 1 - byPlayer as PlayerIndex;
-        this.playerChronos[this.currentPlayer].run(date);
+        this.playerChronos[this.currentPlayer].run(date, now);
     }
 
     getOptions(): TimeControlType
@@ -130,5 +129,10 @@ export class FischerTimeControl extends AbstractTimeControl
             type: 'fischer',
             options: this.options,
         };
+    }
+
+    toString(date: Date): string
+    {
+        return `Fischer (${this.state}): ${this.playerChronos[0].toString(date)} | ${this.playerChronos[1].toString(date)}`;
     }
 }
