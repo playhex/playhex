@@ -168,12 +168,23 @@ const listenHexClick = () => {
 
             hostedGameClient.value.getGame().checkMove(move, localPlayerIndex as PlayerIndex);
 
+            // Send move if move preview is not enabled
             if (!shouldDisplayConfirmMove()) {
                 game.move(move, localPlayerIndex as PlayerIndex);
                 hostedGameClient.value.sendMove(fromEngineMove(move));
                 return;
             }
 
+            // Cancel move preview if I click on it
+            const previewedMove = gameView?.getPreviewedMove();
+
+            if (previewedMove && previewedMove.move.sameAs(move)) {
+                gameView?.removePreviewMove();
+                confirmMove.value = null;
+                return;
+            }
+
+            // What happens when I validate move
             confirmMove.value = () => {
                 game.move(move, localPlayerIndex as PlayerIndex);
                 confirmMove.value = null;

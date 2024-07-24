@@ -749,6 +749,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this;
     }
 
+    getPreviewedMove(): null | { move: Move, playerIndex: PlayerIndex }
+    {
+        return this.previewedMove;
+    }
+
     previewMove(move: Move, playerIndex: PlayerIndex): this
     {
         if (null !== this.previewedMove && !this.previewedMove.move.sameAs(move)) {
@@ -779,6 +784,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this;
     }
 
+    /**
+     * @param undoneMoves In case of a move undo, pass them here so we can which was coords of undone moves to remove preview
+     */
     removePreviewMove(undoneMoves: null | Move[] = null): this
     {
         if (null === this.previewedMove) {
