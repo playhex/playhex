@@ -183,6 +183,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             } else {
                 logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { err: e.message, slug: player.slug });
             }
+
+            this.game.resign(playerIndex, new Date());
         }
     }
 

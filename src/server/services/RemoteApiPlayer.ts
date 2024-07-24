@@ -33,13 +33,7 @@ export default class RemoteApiPlayer
             moveString = await this.hexRemotePlayerApi.calculateMove(payload);
 
             if ('swap-pieces' === moveString) {
-                const swapedMove = game.getFirstMove();
-
-                if (null === swapedMove) {
-                    throw new Error('"swap-pieces" only available on first move');
-                }
-
-                return swapedMove.clone();
+                return Move.swapPieces();
             }
 
             if ('resign' === moveString) {
@@ -48,7 +42,7 @@ export default class RemoteApiPlayer
 
             return Move.fromString(moveString);
         } catch (e) {
-            logger.error(`Unexpected remote player move: "${moveString ?? '(api error)'}"`);
+            logger.error(`Unexpected remote player move: "${moveString ?? '(api error)'}"`, { error: e.message });
             throw new Error(e);
         }
     }
