@@ -5,7 +5,7 @@ import HostedGame from './HostedGame';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../../game-engine';
 import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom';
-import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlAbsolute, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer, HostedGameOptionsTimeControlSimple } from './HostedGameOptionsTimeControl';
+import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl';
 import type TimeControlType from '../../time-control/TimeControlType';
 import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked';
 
@@ -88,8 +88,6 @@ export default class HostedGameOptions
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
         switch (type?.object.timeControl.type) {
             case 'fischer': return HostedGameOptionsTimeControlFischer;
-            case 'absolute': return HostedGameOptionsTimeControlAbsolute;
-            case 'simple': return HostedGameOptionsTimeControlSimple;
             case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
             default: return HostedGameOptionsTimeControl;
         }

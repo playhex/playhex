@@ -1,8 +1,6 @@
 import { IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom';
 import { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl';
-import { SimpleTimeControlOptions } from '../../time-control/time-controls/SimpleTimeControl';
-import { AbsoluteTimeControlOptions } from '../../time-control/time-controls/AbsoluteTimeControl';
 import { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl';
 
 export class HostedGameOptionsTimeControl
@@ -47,42 +45,6 @@ export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeCo
 
     @ValidateNested()
     options: OptionsFischer;
-}
-
-export class OptionsAbsolute implements AbsoluteTimeControlOptions
-{
-    @IsNumber()
-    @Min(oneSecond)
-    @Max(twoWeeks)
-    @Expose()
-    timePerPlayer: number;
-}
-
-export class HostedGameOptionsTimeControlAbsolute extends HostedGameOptionsTimeControl
-{
-    @Expose()
-    type: 'absolute';
-
-    @ValidateNested()
-    options: OptionsAbsolute;
-}
-
-export class OptionsSimple implements SimpleTimeControlOptions
-{
-    @IsNumber()
-    @Min(oneSecond)
-    @Max(twoWeeks)
-    @Expose()
-    timePerMove: number;
-}
-
-export class HostedGameOptionsTimeControlSimple extends HostedGameOptionsTimeControl
-{
-    @Expose()
-    type: 'simple';
-
-    @ValidateNested()
-    options: OptionsSimple;
 }
 
 export class OptionsByoYomi implements ByoYomiTimeControlOptions

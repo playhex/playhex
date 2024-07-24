@@ -1,4 +1,4 @@
-import { Game, IllegalMove, PlayerIndex, Move as GameMove } from '../shared/game-engine';
+import { Game, IllegalMove, PlayerIndex } from '../shared/game-engine';
 import { HostedGameState } from '../shared/app/Types';
 import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +11,8 @@ import { createTimeControl } from '../shared/time-control/createTimeControl';
 import Container from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager';
-import { fromEngineMove } from '../shared/app/models/Move';
+import { fromEngineMove, toEngineMove } from '../shared/app/models/Move';
+import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
 
 type HostedGameEvents = {
     played: () => void;
@@ -71,20 +72,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     static hostNewGame(gameOptions: HostedGameOptions, host: Player): HostedGameServer
     {
-        const hostedGame = new HostedGameServer();
+        const hostedGameServer = new HostedGameServer();
 
-        hostedGame.gameOptions = gameOptions;
-        hostedGame.host = host;
+        hostedGameServer.gameOptions = gameOptions;
+        hostedGameServer.host = host;
 
-        logger.info('Hosted game created.', { hostedGameId: hostedGame.publicId, host: host.pseudo });
+        logger.info('Hosted game created.', { hostedGameId: hostedGameServer.publicId, host: host.pseudo });
 
-        hostedGame.players = [host];
+        hostedGameServer.players = [host];
 
-        hostedGame.timeControl = createTimeControl(gameOptions.timeControl);
+        hostedGameServer.timeControl = createTimeControl(gameOptions.timeControl);
 
-        hostedGame.io.to(Rooms.lobby).emit('gameCreated', hostedGame.toData());
+        hostedGameServer.io.to(Rooms.lobby).emit('gameCreated', hostedGameServer.toData());
 
-        return hostedGame;
+        return hostedGameServer;
     }
 
     getId(): string
@@ -156,10 +157,17 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         try {
+            const boardPosition = this.game.getMovesHistoryAsString();
             const move = await makeAIPlayerMove(player, this);
 
             // Player canceled or resigned while ai was processing, do nothing.
             if (this.game.isEnded()) {
+                return;
+            }
+
+            // Ignore, board position has changed while AI was computing. Occurs when move has been undone.
+            if (this.game.getMovesHistoryAsString() !== boardPosition) {
+                logger.info('Board position changed while AI was computing, ignoring AI move', { gameId: this.getId() });
                 return;
             }
 
@@ -178,6 +186,73 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
     }
 
+    /**
+     * In player vs bot game, returns last player move.
+     * Returns null if player has not yet played, or if this is bot vs bot.
+     */
+    private getLastPlayerMove(): null | Move
+    {
+        if (null === this.game) {
+            return null;
+        }
+
+        const movesHistory = this.game.getMovesHistory();
+        let i = movesHistory.length - 1;
+
+        if (this.players[i % 2].isBot) {
+            --i;
+
+            if (this.players[i % 2].isBot) {
+                return null;
+            }
+        }
+
+        return fromEngineMove(this.game.getMovesHistory()[i]);
+    }
+
+    /**
+     * Should be called after ask undo.
+     * Check if opponent is a bot, and let bot make a decision to accept or reject player's undo request.
+     * On ranked games, bot should only accept undo on misclicks.
+     * On friendly games, bot should accept any undo to let player try another line.
+     */
+    private async makeAIAnswerUndoIfApplicable(): Promise<void>
+    {
+        if (null === this.hostedGame || null === this.game || 'playing' !== this.state || 'number' !== typeof this.hostedGame.undoRequest) {
+            return;
+        }
+
+        const player = this.players[1 - this.hostedGame.undoRequest];
+
+        if (!player.isBot) {
+            return;
+        }
+
+        const { ranked } = this.hostedGame.gameOptions;
+
+        if (!ranked) {
+            this.playerAnswerUndo(player, true);
+            return;
+        }
+
+        const lastPlayerMove = this.getLastPlayerMove();
+
+        if (null === lastPlayerMove) {
+            logger.warning('Could not get last player move to make decision on undo request', { gameId: this.getId() });
+            return;
+        }
+
+        // On ranked, bot accepts undo only if player ask undo quickly after misclick.
+        if (new Date().getTime() < (lastPlayerMove.playedAt.getTime() + 2000)) {
+            this.playerAnswerUndo(player, true);
+        } else {
+            // else, bot reject undo request to show that bot is reactive to undo requests.
+            // Wait to prevent being instant and show the undo button does something.
+            await new Promise(r => setTimeout(r, 500));
+            this.playerAnswerUndo(player, false);
+        }
+    }
+
     private listenGame(game: Game): void
     {
         /**
@@ -191,6 +266,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 this.makeAIMoveIfApplicable();
             }
 
+            this.cancelUndoRequestIfAny(byPlayerIndex);
             this.emit('played');
         });
 
@@ -332,7 +408,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         try {
-            this.game.move(new GameMove(move.row, move.col, playedAt), this.getPlayerIndex(player) as PlayerIndex);
+            this.game.move(toEngineMove(move), this.getPlayerIndex(player) as PlayerIndex);
 
             return true;
         } catch (e) {
@@ -342,6 +418,121 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             logger.warning('Unexpected error from player.move', { hostedGameId: this.publicId, err: e.message });
             return 'Unexpected error: ' + e.message;
+        }
+    }
+
+    playerAskUndo(player: Player): true | string
+    {
+        logger.info('Player ask undo', { hostedGameId: this.publicId, player: player.pseudo });
+
+        if ('playing' !== this.state) {
+            logger.notice('Player tried to ask undo but hosted game is not playing', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'Game is not playing';
+        }
+
+        if (!this.game) {
+            logger.warning('Tried to ask undo but game is not yet created.', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'Game not yet started, cannot ask undo';
+        }
+
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (null === playerIndex) {
+            logger.notice('A player not in the game tried to ask undo', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'you are not a player of this game';
+        }
+
+        const hostedGame = this.toData();
+
+        if (null !== hostedGame.undoRequest) {
+            logger.notice('A player tried to ask undo but there is already an undo request', { hostedGameId: this.publicId, player: player.pseudo, undoRequest: hostedGame.undoRequest });
+            return 'there is already an undo request';
+        }
+
+        const reason = this.game.canPlayerUndo(playerIndex as PlayerIndex);
+
+        if (true !== reason) {
+            return reason;
+        }
+
+        hostedGame.undoRequest = playerIndex;
+        this.io.to(this.gameRooms()).emit('askUndo', this.publicId, playerIndex);
+
+        this.makeAIAnswerUndoIfApplicable();
+
+        return true;
+    }
+
+    playerAnswerUndo(player: Player, accept: boolean): true | string
+    {
+        logger.info('Player answer undo request', { hostedGameId: this.publicId, player: player.pseudo, accept });
+
+        if ('playing' !== this.state) {
+            logger.notice('Player tried to answer undo but hosted game is not playing', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'Game is not playing';
+        }
+
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (null === playerIndex) {
+            logger.notice('A player not in the game tried to answer undo', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'you are not a player of this game';
+        }
+
+        if (!this.game) {
+            logger.warning('Tried to answer undo but game is not yet created.', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'Game not yet started, cannot answer undo';
+        }
+
+        const hostedGame = this.toData();
+        const now = new Date();
+
+        if (null === hostedGame.undoRequest) {
+            logger.notice('A player tried to answer undo but there is no undo request', { hostedGameId: this.publicId, player: player.pseudo, undoRequest: hostedGame.undoRequest });
+            return 'there is no undo request';
+        }
+
+        if (hostedGame.undoRequest === playerIndex) {
+            logger.notice('A player tried to answer his own undo request', { hostedGameId: this.publicId, player: player.pseudo, undoRequest: hostedGame.undoRequest });
+            return 'cannot answer own undo request';
+        }
+
+        const timeControlAfterUndo = recreateTimeControlAfterUndo(hostedGame, this.game.playerUndoDryRun(hostedGame.undoRequest as PlayerIndex).length, now);
+
+        if (accept && null === timeControlAfterUndo) {
+            logger.notice('An undo request has been accepted, but will make time control elapsing. Ignoring', { gameId: this.getId() });
+            return 'too late to accept undo request, it will elapse time control';
+        }
+
+        if (accept) {
+            this.game.playerUndo(hostedGame.undoRequest as PlayerIndex);
+        }
+
+        hostedGame.gameData = this.game.toData() ?? null;
+        hostedGame.undoRequest = null;
+        this.io.to(this.gameRooms()).emit('answerUndo', this.publicId, accept);
+
+        if (accept) {
+            this.timeControl.setValues(timeControlAfterUndo!.getValues(), now);
+            hostedGame.timeControl = this.timeControl.getValues();
+            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, hostedGame.timeControl);
+        }
+
+        return true;
+    }
+
+    /**
+     * A player undo request is automatically canceled when this same player make a move.
+     */
+    private cancelUndoRequestIfAny(playerIndex: number): void
+    {
+        if (!this.hostedGame || 'number' !== typeof this.hostedGame.undoRequest) {
+            return;
+        }
+
+        if (playerIndex === this.hostedGame.undoRequest) {
+            this.hostedGame.undoRequest = null;
+            this.io.to(this.gameRooms()).emit('cancelUndo', this.getId());
         }
     }
 

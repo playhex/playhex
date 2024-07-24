@@ -67,8 +67,9 @@
                 "playedAt": "2024-03-05T12:50:16.014Z"
             },
             {
-                "row": 5,
-                "col": 6,
+                "row": -1,
+                "col": -1,
+                "specialMoveType": "swap-pieces",
                 "playedAt": "2024-03-05T12:50:20.018Z"
             },
             {

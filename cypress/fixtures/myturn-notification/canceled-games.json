@@ -20,7 +20,7 @@
             }
         ],
         "timeControl": {
-            "type": "absolute",
+            "type": "fischer",
             "state": "over",
             "players": [
                 {
@@ -38,9 +38,9 @@
                 "type": "player"
             },
             "timeControl": {
-                "type": "absolute",
+                "type": "fischer",
                 "options": {
-                    "timePerPlayer": 900000
+                    "initialTime": 900000
                 }
             }
         },
@@ -78,7 +78,7 @@
             }
         ],
         "timeControl": {
-            "type": "absolute",
+            "type": "fischer",
             "state": "over",
             "players": [
                 {
@@ -96,9 +96,9 @@
                 "type": "ai"
             },
             "timeControl": {
-                "type": "absolute",
+                "type": "fischer",
                 "options": {
-                    "timePerPlayer": 900000
+                    "initialTime": 900000
                 }
             }
         },
@@ -246,7 +246,7 @@
             }
         ],
         "timeControl": {
-            "type": "absolute",
+            "type": "fischer",
             "state": "over",
             "players": [
                 {
@@ -264,9 +264,9 @@
                 "type": "ai"
             },
             "timeControl": {
-                "type": "absolute",
+                "type": "fischer",
                 "options": {
-                    "timePerPlayer": 900000
+                    "initialTime": 900000
                 }
             }
         },
@@ -684,7 +684,7 @@
             }
         ],
         "timeControl": {
-            "type": "absolute",
+            "type": "fischer",
             "state": "over",
             "players": [
                 {
@@ -702,9 +702,9 @@
                 "type": "ai"
             },
             "timeControl": {
-                "type": "absolute",
+                "type": "fischer",
                 "options": {
-                    "timePerPlayer": 900000
+                    "initialTime": 900000
                 }
             }
         },

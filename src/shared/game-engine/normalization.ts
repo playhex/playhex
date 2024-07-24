@@ -1,3 +1,4 @@
+import { SpecialMoveType } from './Move';
 import { Outcome, PlayerIndex } from './Types';
 
 /*
@@ -10,6 +11,7 @@ import { Outcome, PlayerIndex } from './Types';
 export type MoveData = {
     row: number;
     col: number;
+    specialMoveType?: SpecialMoveType;
     playedAt: Date;
 };
 

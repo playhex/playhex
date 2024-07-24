@@ -73,7 +73,9 @@ const initGame = (gameContainer: HTMLElement) => {
 
     gameView.value = new GameView(game, gameContainer);
 
-    gameView.value.on('hexClicked', move => {
+    gameView.value.on('hexClicked', coords => {
+        const move = game.createMoveOrSwapMove(coords);
+
         try {
             game.move(move, playerIndex as PlayerIndex);
         } catch (e) {

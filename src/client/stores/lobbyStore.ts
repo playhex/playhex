@@ -143,6 +143,24 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             }
         });
 
+        socket.on('askUndo', (gameId: string, byPlayerIndex: PlayerIndex) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].onServerAskUndo(byPlayerIndex);
+            }
+        });
+
+        socket.on('answerUndo', (gameId: string, accept) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].onServerAnswerUndo(accept);
+            }
+        });
+
+        socket.on('cancelUndo', (gameId: string) => {
+            if (hostedGameClients.value[gameId]) {
+                hostedGameClients.value[gameId].onServerCancelUndo();
+            }
+        });
+
         socket.on('timeControlUpdate', (gameId: string, gameTimeData: GameTimeData) => {
             if (hostedGameClients.value[gameId]) {
                 hostedGameClients.value[gameId].onServerUpdateTimeControl(gameTimeData);

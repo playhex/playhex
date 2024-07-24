@@ -58,28 +58,11 @@ describe('Game', () => {
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner because p1 resigned');
     });
 
-    it('returns whether a move is actually a swap', () => {
-        const game = new Game(5);
-
-        assert.strictEqual(game.isSwapPiecesMove(new Move(0, 0), 0), false);
-
-        game.move(new Move(1, 2), 0);
-
-        assert.strictEqual(game.isSwapPiecesMove(new Move(0, 0), 1), false);
-        assert.strictEqual(game.isSwapPiecesMove(new Move(1, 2), 1), true);
-
-        game.move(new Move(3, 4), 1);
-
-        assert.strictEqual(game.isSwapPiecesMove(new Move(0, 0), 0), false);
-        assert.strictEqual(game.isSwapPiecesMove(new Move(1, 2), 0), false);
-        assert.strictEqual(game.isSwapPiecesMove(new Move(3, 4), 0), false);
-    });
-
     it('swap pieces', () => {
         const game = new Game(5);
 
         game.move(new Move(1, 2), 0);
-        game.move(new Move(1, 2), 1);
+        game.move(Move.swapPieces(), 1);
 
         assert.strictEqual(game.getBoard().getCell(1, 2), null);
         assert.strictEqual(game.getBoard().getCell(2, 1), 1);
@@ -92,11 +75,28 @@ describe('Game', () => {
         game.setAllowSwap(false);
 
         game.move(new Move(1, 2), 0);
-        assert.throws(() => game.move(new Move(1, 2), 1), { message: 'Move c2: This cell is already occupied' });
+        assert.throws(() => game.move(Move.swapPieces(), 1), { message: 'Move swap-pieces: Cannot swap, swap rule is disabled' });
 
         assert.strictEqual(game.getBoard().getCell(1, 2), 0);
         assert.strictEqual(game.getBoard().getCell(2, 1), null);
         assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+    });
+
+    it('cannot swap pieces in the middle of the game', () => {
+        const game = new Game(5);
+
+        game.move(new Move(0, 0), 0);
+        game.move(new Move(1, 1), 1);
+
+        assert.throws(() => game.move(Move.swapPieces(), 0), { message: 'Move swap-pieces: Cannot swap now' });
+    });
+
+    it('cannot swap twice', () => {
+        const game = new Game(5);
+
+        game.move(new Move(0, 0), 0);
+        game.move(Move.swapPieces(), 1);
+        assert.throws(() => game.move(Move.swapPieces(), 0), { message: 'Move swap-pieces: Cannot swap now' });
     });
 
     it('recreate a playing Game from raw data object', () => {
@@ -206,5 +206,110 @@ describe('Game', () => {
         assert.strictEqual(lastEndedAt, lastMoveDate);
         assert.strictEqual(game.getLastMoveAt(), lastMoveDate);
         assert.strictEqual(game.getEndedAt(), lastMoveDate);
+    });
+
+    describe('Undo move', () => {
+        it('undo simple move', () => {
+            const game = new Game(3);
+
+            game.move(new Move(0, 0), 0);
+            game.move(new Move(1, 1), 1);
+            game.move(new Move(2, 2), 0);
+
+            game.undoMove();
+
+            assert.strictEqual(game.getMovesHistory().length, 2);
+            assert.strictEqual(game.getLastMove()?.row, 1);
+            assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+
+            assert.strictEqual(game.getBoard().getCell(0, 0), 0);
+            assert.strictEqual(game.getBoard().getCell(1, 1), 1);
+            assert.strictEqual(game.getBoard().getCell(2, 2), null);
+        });
+
+        it('undo swap move', () => {
+            const game = new Game(3);
+
+            game.move(new Move(1, 0), 0);
+            game.move(Move.swapPieces(), 1);
+
+            game.undoMove();
+
+            assert.strictEqual(game.getMovesHistory().length, 1);
+            assert.strictEqual(game.getLastMove()?.row, 1);
+            assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+
+            assert.strictEqual(game.getBoard().getCell(1, 0), 0);
+            assert.strictEqual(game.getBoard().getCell(0, 1), null);
+        });
+
+        it('player undo move', () => {
+            const game = new Game(5);
+
+            game.move(new Move(0, 0), 0);
+            game.move(new Move(1, 1), 1);
+            game.move(new Move(2, 2), 0);
+
+            game.playerUndo(0);
+
+            assert.strictEqual(game.getMovesHistory().length, 2);
+            assert.strictEqual(game.getLastMove()?.row, 1);
+            assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+
+            assert.strictEqual(game.getBoard().getCell(0, 0), 0);
+            assert.strictEqual(game.getBoard().getCell(1, 1), 1);
+            assert.strictEqual(game.getBoard().getCell(2, 2), null);
+        });
+
+        it('player undo move after opponent played', () => {
+            const game = new Game(5);
+
+            game.move(new Move(0, 0), 0);
+            game.move(new Move(1, 1), 1);
+            game.move(new Move(2, 2), 0);
+            game.move(new Move(3, 3), 1);
+
+            game.playerUndo(0);
+
+            assert.strictEqual(game.getMovesHistory().length, 2);
+            assert.strictEqual(game.getLastMove()?.row, 1);
+            assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+
+            assert.strictEqual(game.getBoard().getCell(0, 0), 0);
+            assert.strictEqual(game.getBoard().getCell(1, 1), 1);
+            assert.strictEqual(game.getBoard().getCell(2, 2), null);
+        });
+
+        it('player undo his swap move after opponent played', () => {
+            const game = new Game(3);
+
+            game.move(new Move(1, 0), 0);
+            game.move(Move.swapPieces(), 1);
+            game.move(new Move(2, 2), 0);
+
+            game.playerUndo(1);
+
+            assert.strictEqual(game.getMovesHistory().length, 1);
+            assert.strictEqual(game.getLastMove()?.row, 1);
+            assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+
+            assert.strictEqual(game.getBoard().getCell(1, 0), 0);
+            assert.strictEqual(game.getBoard().getCell(0, 1), null);
+            assert.strictEqual(game.getBoard().getCell(2, 2), null);
+        });
+
+        it('player undo dry run', () => {
+            const game = new Game(3);
+
+            game.move(new Move(1, 0), 0);
+            game.move(Move.swapPieces(), 1);
+            game.move(new Move(2, 2), 0);
+
+            const moves = game.playerUndoDryRun(1);
+
+            assert.strictEqual(moves.length, 2);
+            assert.ok(moves[0].sameAs(game.getLastMove()!));
+            assert.ok(moves[1].sameAs(game.getMovesHistory()[game.getMovesHistory().length - 2]));
+        });
     });
 });

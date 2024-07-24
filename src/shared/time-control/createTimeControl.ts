@@ -1,9 +1,7 @@
 import { AbstractTimeControl, GameTimeData } from './TimeControl';
 import TimeControlType from './TimeControlType';
-import { AbsoluteTimeControl } from './time-controls/AbsoluteTimeControl';
 import { ByoYomiTimeControl } from './time-controls/ByoYomiTimeControl';
 import { FischerTimeControl } from './time-controls/FischerTimeControl';
-import { SimpleTimeControl } from './time-controls/SimpleTimeControl';
 
 /**
  * Recreate a time control instance from options and values data.
@@ -22,14 +20,6 @@ export const createTimeControl = (
     let timeControl: AbstractTimeControl;
 
     switch (type) {
-        case 'absolute':
-            timeControl = new AbsoluteTimeControl(options);
-            break;
-
-        case 'simple':
-            timeControl = new SimpleTimeControl(options);
-            break;
-
         case 'fischer':
             timeControl = new FischerTimeControl(options);
             break;

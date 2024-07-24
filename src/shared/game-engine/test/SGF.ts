@@ -62,7 +62,7 @@ describe('SGF', () => {
         const game = new Game(4);
 
         game.move(new Move(1, 2), 0);
-        game.move(new Move(1, 2), 1);
+        game.move(Move.swapPieces(), 1);
         game.move(new Move(0, 3), 0);
 
         game.setStartedAt(new Date('2023-12-08 12:00:00'));

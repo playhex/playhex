@@ -265,6 +265,40 @@ export const apiPostGame = async (gameOptions: Partial<HostedGameOptions> = {}):
     return plainToInstance(HostedGame, await response.json());
 };
 
+export const apiPostAskUndo = async (gameId: string): Promise<true | string> => {
+    const response = await fetch(`/api/games/${gameId}/ask-undo`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (204 === response.status) {
+        return true;
+    }
+
+    return response.text();
+};
+
+export const apiPostAnswerUndo = async (gameId: string, accept: boolean): Promise<true | string> => {
+    const response = await fetch(`/api/games/${gameId}/answer-undo`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            accept,
+        }),
+    });
+
+    if (204 === response.status) {
+        return true;
+    }
+
+    return response.text();
+};
+
 export const apiPostResign = async (gameId: string): Promise<true | string> => {
     const response = await fetch(`/api/games/${gameId}/resign`, {
         method: 'post',

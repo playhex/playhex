@@ -7,11 +7,12 @@ import { GameTimeData } from '@shared/time-control/TimeControl';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
-import { apiPostCancel, apiPostResign } from './apiClient';
+import { apiPostAnswerUndo, apiPostAskUndo, apiPostCancel, apiPostResign } from './apiClient';
 import TimeControlType from '@shared/time-control/TimeControlType';
 import { notifier } from './services/notifications';
 import useServerDateStore from './stores/serverDateStore';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue';
+import { toEngineMove } from '../shared/app/models/Move';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -89,7 +90,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         // Replay game and fill history
         for (const move of gameData.movesHistory) {
-            this.game.move(new GameMove(move.row, move.col, move.playedAt), this.game.getCurrentPlayerIndex());
+            this.game.move(GameMove.fromData(move), this.game.getCurrentPlayerIndex());
         }
 
         // Cancel game if canceled
@@ -295,6 +296,21 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         });
     }
 
+    async sendAskUndo(): Promise<string | true>
+    {
+        return apiPostAskUndo(this.getId());
+    }
+
+    async sendAnswerUndo(accept: boolean): Promise<string | true>
+    {
+        return apiPostAnswerUndo(this.getId(), accept);
+    }
+
+    getUndoRequest(): number | null
+    {
+        return this.hostedGame.undoRequest;
+    }
+
     async sendResign(): Promise<string | true>
     {
         return apiPostResign(this.getId());
@@ -427,9 +443,32 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return;
         }
 
-        this.game.move(new GameMove(move.row, move.col, move.playedAt), byPlayerIndex);
+        this.game.move(toEngineMove(move), byPlayerIndex);
 
         notifier.emit('move', this.hostedGame);
+    }
+
+    onServerAskUndo(byPlayerIndex: PlayerIndex): void
+    {
+        this.hostedGame.undoRequest = byPlayerIndex;
+    }
+
+    onServerAnswerUndo(accept: boolean): void
+    {
+        if (accept && this.game) {
+            if (null === this.hostedGame.undoRequest) {
+                throw new Error('undo answered but no undo request');
+            }
+
+            this.game.playerUndo(this.hostedGame.undoRequest as PlayerIndex);
+        }
+
+        this.hostedGame.undoRequest = null;
+    }
+
+    onServerCancelUndo(): void
+    {
+        this.hostedGame.undoRequest = null;
     }
 
     onServerGameEnded(winner: PlayerIndex, outcome: Outcome, date: Date): void

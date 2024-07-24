@@ -19,12 +19,6 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
     const { type, options } = timeControlType;
 
     switch (type) {
-        case 'simple':
-            return options.timePerMove / 1000;
-
-        case 'absolute':
-            return (options.timePerPlayer / 1000) / averageMoves;
-
         case 'fischer':
             return (options.initialTime / 1000) / averageMoves
                 + (options.timeIncrement ?? 0) / 1000;
@@ -160,14 +154,6 @@ export const timeControlToString = (timeControl: TimeControlType): string => {
             }
 
             return string;
-        }
-
-        case 'absolute': {
-            return msToDuration(timeControl.options.timePerPlayer) + ' / ' + t('_player');
-        }
-
-        case 'simple': {
-            return msToDuration(timeControl.options.timePerMove) + ' / ' + t('move');
         }
     }
 };

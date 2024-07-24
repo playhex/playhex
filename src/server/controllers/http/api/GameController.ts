@@ -4,6 +4,15 @@ import HttpError from '../HttpError';
 import { Body, Get, JsonController, Param, Post, QueryParam } from 'routing-controllers';
 import { Player, Move, HostedGameOptions } from '../../../../shared/app/models';
 import { Service } from 'typedi';
+import { Expose } from '../../../../shared/app/class-transformer-custom';
+import { IsBoolean } from 'class-validator';
+
+class AnswerUndoBody
+{
+    @Expose()
+    @IsBoolean()
+    accept: boolean;
+}
 
 @JsonController()
 @Service()
@@ -94,6 +103,31 @@ export default class GameController
         @Body() move: Move,
     ) {
         const result = await this.hostedGameRepository.playerMove(player, publicId, move);
+
+        if (true !== result) {
+            throw new HttpError(400, result);
+        }
+    }
+
+    @Post('/api/games/:publicId/ask-undo')
+    async askUndo(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+    ) {
+        const result = await this.hostedGameRepository.playerAskUndo(player, publicId);
+
+        if (true !== result) {
+            throw new HttpError(400, result);
+        }
+    }
+
+    @Post('/api/games/:publicId/answer-undo')
+    async answerUndo(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+        @Body() answerUndoBody: AnswerUndoBody,
+    ) {
+        const result = await this.hostedGameRepository.playerAnswerUndo(player, publicId, answerUndoBody.accept);
 
         if (true !== result) {
             throw new HttpError(400, result);

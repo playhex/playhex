@@ -58,6 +58,14 @@ export default class HostedGame
     @Type(() => Game)
     gameData: null | Game = null;
 
+    /**
+     * Whether there is a current player undo request.
+     * Equals to the index of the player who asked for undo.
+     */
+    @Column({ type: 'smallint', nullable: true })
+    @Expose()
+    undoRequest: null | number = null;
+
     @OneToOne(() => HostedGame)
     @JoinColumn()
     @Expose()
