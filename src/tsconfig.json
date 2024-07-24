@@ -3,6 +3,7 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitReturns": true,
+        "noImplicitOverride": true,
         "resolveJsonModule": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,

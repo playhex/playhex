@@ -172,7 +172,7 @@ export class ByoYomiChrono extends TypedEmitter<ChronoEvents>
     /**
      * @param date For when to show chrono value. In doubt, use new Date()
      */
-    toString(date: Date): string
+    override toString(date: Date): string
     {
         return `${timeValueToMilliseconds(this.getMainValue(), date)}ms + ${this.remainingPeriods} x ${this.periodTime}ms (${this.getMainValue() instanceof Date ? 'elapsing' : 'paused'})`;
     }

@@ -30,7 +30,7 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
     private playerChronos: [ByoYomiChrono, ByoYomiChrono];
 
     constructor(
-        protected options: ByoYomiTimeControlOptions,
+        protected override options: ByoYomiTimeControlOptions,
     ) {
         super(options);
 
@@ -124,7 +124,7 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         this.playerChronos[this.currentPlayer].run(date, now);
     }
 
-    toString(date: Date): string
+    override toString(date: Date): string
     {
         return `ByoYomi (${this.state}): ${this.playerChronos[0].toString(date)} | ${this.playerChronos[1].toString(date)}`;
     }

@@ -305,7 +305,7 @@ export abstract class AbstractTimeControl<
      *
      * @param date When exactly you look at time control clocks. In doubt, use new Date()
      */
-    toString(date: Date): string
+    override toString(date: Date): string
     {
         return `TimeControl, state: ${this.state}, currentPlayer: ${this.currentPlayer} (at date ${date})`;
     }

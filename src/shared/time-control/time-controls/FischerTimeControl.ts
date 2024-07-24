@@ -28,7 +28,7 @@ export class FischerTimeControl extends AbstractTimeControl
     private playerChronos: [Chrono, Chrono];
 
     constructor(
-        protected options: FischerTimeControlOptions,
+        protected override options: FischerTimeControlOptions,
     ) {
         super(options);
 
@@ -131,7 +131,7 @@ export class FischerTimeControl extends AbstractTimeControl
         };
     }
 
-    toString(date: Date): string
+    override toString(date: Date): string
     {
         return `Fischer (${this.state}): ${this.playerChronos[0].toString(date)} | ${this.playerChronos[1].toString(date)}`;
     }
