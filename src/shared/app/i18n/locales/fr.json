@@ -254,5 +254,10 @@
     "game_with_player_has_started": "La partie avec {{player}} a commencé",
     "contributors": "Contributeurs",
     "contribute": "Contribuer",
-    "auto": "Auto"
+    "auto": "Auto",
+    "undo": {
+        "undo_move": "Oups",
+        "accept": "Accepter reprise",
+        "reject": "Refuser"
+    }
 }
