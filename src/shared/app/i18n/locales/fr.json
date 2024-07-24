@@ -33,8 +33,7 @@
     "background_theme": {
         "title": "Thème",
         "dark": "Sombre",
-        "light": "Clair",
-        "auto": "Auto"
+        "light": "Clair"
     },
     "2dots": "{{s}} :",
     "new_game": "Nouvelle partie",
@@ -49,7 +48,8 @@
         "title": "Orientation",
         "flat": "Plat",
         "flat_2": "Plat 2",
-        "diamond": "Diamant"
+        "diamond": "Diamant",
+        "description": "Votre orientation du plateau préférée pour les orientations portrait ou paysage de votre écran."
     },
     "shading_patterns": {
         "title": "Motif d'arrière plan",
@@ -253,5 +253,11 @@
     "player_made_a_move": "{{player}} a joué",
     "game_with_player_has_started": "La partie avec {{player}} a commencé",
     "contributors": "Contributeurs",
-    "contribute": "Contribuer"
+    "contribute": "Contribuer",
+    "auto": "Auto",
+    "undo": {
+        "undo_move": "Oups",
+        "accept": "Accepter reprise",
+        "reject": "Refuser"
+    }
 }
