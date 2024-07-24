@@ -108,6 +108,23 @@ export type HexServerToClientEvents = {
     chat: (gameId: string, chatMessage: ChatMessage) => void;
 
     /**
+     * A player wants to undo his last move.
+     */
+    askUndo: (gameId: string, byPlayerIndex: number) => void;
+
+    /**
+     * Opponent accepted or rejected undo request,
+     * game has been updated server side, or not.
+     * Undo request is over.
+     */
+    answerUndo: (gameId: string, accept: boolean) => void;
+
+    /**
+     * Undo request has been automatically canceled
+     */
+    cancelUndo: (gameId: string) => void;
+
+    /**
      * Analyze has been requested for a given game, or has finished.
      * See gameAnalyze.analyze and gameAnalyze.endedAt
      * to know if game analyze has finished, or is just requested.

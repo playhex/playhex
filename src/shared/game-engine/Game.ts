@@ -1,8 +1,9 @@
 import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from '.';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board';
-import { Outcome } from './Types';
+import { Coords, Outcome } from './Types';
 import { GameData } from './normalization';
+import IllegalUndo from './IllegalUndo';
 
 type GameEvents = {
     /**
@@ -21,6 +22,15 @@ type GameEvents = {
      * Game has been canceled, so game is over, but no winner.
      */
     canceled: (date: Date) => void;
+
+    /**
+     * Moves have been undone.
+     *
+     * @param undoneMoves List of moves that have been undone.
+     *                    First one is the first undone, so the latest played one.
+     *                    So A, B, C, undone 2 moves will make: [C, B]
+     */
+    undo: (undoneMoves: Move[]) => void;
 };
 
 export default class Game extends TypedEmitter<GameEvents>
@@ -140,16 +150,38 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new IllegalMove(move, 'Game is finished');
         }
 
-        if (!this.board.containsCoords(move.row, move.col)) {
-            throw new IllegalMove(move, 'Cell outside board');
-        }
-
         if (this.currentPlayerIndex !== byPlayerIndex) {
             throw new IllegalMove(move, 'Not your turn');
         }
 
-        if (!this.board.isEmpty(move.row, move.col) && !this.isSwapPiecesMove(move, byPlayerIndex)) {
-            throw new IllegalMove(move, 'This cell is already occupied');
+        switch (move.getSpecialMoveType()) {
+            case undefined:
+                if (!this.board.containsCoords(move.row, move.col)) {
+                    throw new IllegalMove(move, 'Cell outside board');
+                }
+
+                if (!this.board.isEmpty(move.row, move.col)) {
+                    throw new IllegalMove(move, 'This cell is already occupied');
+                }
+
+                break;
+
+            case 'swap-pieces':
+                if (!this.allowSwap) {
+                    throw new IllegalMove(move, 'Cannot swap, swap rule is disabled');
+                }
+
+                if (!this.canSwapNow()) {
+                    throw new IllegalMove(move, 'Cannot swap now');
+                }
+
+                break;
+
+            case 'pass':
+                break;
+
+            default:
+                throw new IllegalMove(move, `Unknown move special type: "${move.getSpecialMoveType()}"`);
         }
     }
 
@@ -162,12 +194,26 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         this.checkMove(move, byPlayerIndex);
 
-        if (this.isSwapPiecesMove(move, byPlayerIndex)) {
-            this.doSwapPieces(move, byPlayerIndex);
-            return;
-        }
+        switch (move.getSpecialMoveType()) {
+            case 'swap-pieces': {
+                const swapCoords = this.getSwapCoords(false)!;
+                const { swapped, mirror } = swapCoords;
 
-        this.board.setCell(move.row, move.col, byPlayerIndex);
+                this.board.setCell(swapped.row, swapped.col, null);
+                this.board.setCell(mirror.row, mirror.col, byPlayerIndex);
+                break;
+            }
+
+            case undefined:
+                this.board.setCell(move.row, move.col, byPlayerIndex);
+                break;
+
+            case 'pass':
+                break;
+
+            default:
+                throw new IllegalMove(move, `Unknown move special type: "${move.getSpecialMoveType()}"`);
+        }
 
         this.movesHistory.push(move);
         this.lastMoveAt = move.getPlayedAt();
@@ -209,52 +255,163 @@ export default class Game extends TypedEmitter<GameEvents>
     }
 
     /**
-     * Whether a move is actually a swap-pieces move.
+     * Returns whether there is a swap move in this game history
      */
-    isSwapPiecesMove(move: Move, byPlayerIndex: PlayerIndex): boolean
+    hasSwapped(): boolean
     {
-        return this.allowSwap
-            && 1 === byPlayerIndex
-            && this.movesHistory.length === 1
-            && this.getBoard().getCell(move.row, move.col) === 0
-        ;
+        if (this.movesHistory.length < 2) {
+            return false;
+        }
+
+        return 'swap-pieces' === this.movesHistory[1].getSpecialMoveType();
+    }
+
+    createMoveOrSwapMove(coords: Coords): Move
+    {
+        if (this.canSwapNow() && this.board.getCell(coords.row, coords.col) === 0) {
+            return Move.swapPieces();
+        }
+
+        return new Move(coords.row, coords.col);
     }
 
     /**
-     * Whether last played move was actually a swap move.
      * Returns previous move and new move coords.
      */
-    isLastMoveSwapPieces(): null | { swapped: Move, mirror: Move }
+    getSwapCoords(checkIsSwap = true): null | { swapped: Coords, mirror: Coords }
     {
-        if (this.allowSwap
-            && this.movesHistory.length === 2
-            && this.movesHistory[0].hasSameCoordsAs(this.movesHistory[1])
-        ) {
-            const firstMove = this.getFirstMove() as Move;
-
-            return {
-                swapped: firstMove,
-                mirror: firstMove.cloneMirror(),
-            };
+        if (checkIsSwap && ('swap-pieces' !== this.getLastMove()?.getSpecialMoveType())) {
+            return null;
         }
 
-        return null;
+        const firstMove = this.getFirstMove();
+
+        if (!firstMove) {
+            return null;
+        }
+
+        return {
+            swapped: firstMove,
+            mirror: firstMove.cloneMirror(),
+        };
     }
 
-    private doSwapPieces(move: Move, byPlayerIndex: PlayerIndex): void
+    /**
+     * @param playerIndex Player who ask for undo
+     *
+     * @throws {IllegalUndo} If not possible to undo with the reason
+     */
+    checkPlayerUndo(playerIndex: PlayerIndex): void
     {
-        const swappedMove = this.getFirstMove() as Move;
-        const swappedMoveMirrored = swappedMove.cloneMirror();
+        if (this.isEnded()) {
+            throw new IllegalUndo('Game is finished');
+        }
 
-        this.board.setCell(swappedMove.row, swappedMove.col, null);
-        this.board.setCell(swappedMoveMirrored.row, swappedMoveMirrored.col, byPlayerIndex);
+        if (this.movesHistory.length < 1) {
+            throw new IllegalUndo('Cannot undo, no move to undo yet');
+        }
 
-        this.movesHistory.push(move);
-        this.lastMoveAt = move.getPlayedAt();
+        if (this.movesHistory.length < 2 && 1 === playerIndex) {
+            throw new IllegalUndo('Second player cannot undo his move because he has not played any move yet');
+        }
+    }
+
+    canPlayerUndo(playerIndex: PlayerIndex): true | string
+    {
+        try {
+            this.checkPlayerUndo(playerIndex);
+
+            return true;
+        } catch (e) {
+            if (e instanceof IllegalUndo) {
+                return e.message;
+            }
+
+            throw e;
+        }
+    }
+
+    private doUndoMove(): Move
+    {
+        const lastMove = this.getLastMove();
+
+        if (null === lastMove) {
+            throw new Error('Cannot undo, board is empty');
+        }
+
+        switch (lastMove.getSpecialMoveType()) {
+            case undefined:
+                this.board.setCell(lastMove.row, lastMove.col, null);
+                break;
+
+            case 'swap-pieces': {
+                const firstMove = this.getFirstMove();
+
+                if (null === firstMove) {
+                    throw new Error('Unexpected null first move');
+                }
+
+                this.board.setCell(firstMove.col, firstMove.row, null);
+                this.board.setCell(firstMove.row, firstMove.col, 0);
+                break;
+            }
+        }
 
         this.changeCurrentPlayer();
 
-        this.emit('played', move, this.movesHistory.length - 1, byPlayerIndex, this.getWinner());
+        return this.movesHistory.pop()!;
+    }
+
+    undoMove(): Move
+    {
+        const undoneMove = this.doUndoMove();
+
+        this.emit('undo', [undoneMove]);
+
+        return undoneMove;
+    }
+
+    /**
+     * player undo, moves are undone until it is player's turn again.
+     * So 1 move is undone, or 2 if opponent played, his last move is also undone.
+     */
+    playerUndo(playerIndex: PlayerIndex): Move[]
+    {
+        const undoneMoves = [];
+
+        if (this.movesHistory.length < 2 && 1 === playerIndex) {
+            throw new Error('player 1 cannot undo, player 1 has not played yet');
+        }
+
+        undoneMoves.push(this.doUndoMove());
+
+        if (this.currentPlayerIndex !== playerIndex) {
+            undoneMoves.push(this.doUndoMove());
+        }
+
+        this.emit('undo', undoneMoves);
+
+        return undoneMoves;
+    }
+
+    /**
+     * Returns moves that will be undone if we call playerUndo()
+     */
+    playerUndoDryRun(playerIndex: PlayerIndex): Move[]
+    {
+        const undoneMoves: Move[] = [];
+
+        if (this.movesHistory.length < 2 && 1 === playerIndex) {
+            return undoneMoves;
+        }
+
+        undoneMoves.push(this.movesHistory[this.movesHistory.length - 1]);
+
+        if (((this.movesHistory.length - 1) % 2) !== playerIndex) {
+            undoneMoves.push(this.movesHistory[this.movesHistory.length - 2]);
+        }
+
+        return undoneMoves;
     }
 
     hasWinner(): boolean

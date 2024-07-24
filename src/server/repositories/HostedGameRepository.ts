@@ -59,6 +59,8 @@ export default class HostedGameRepository
 
     private async loadActiveGamesFromMemory(): Promise<void>
     {
+        logger.info('Loading active games from memory...');
+
         await AppDataSource.initialize();
 
         const games = await this.hostedGamePersister.findMany({
@@ -69,6 +71,8 @@ export default class HostedGameRepository
         });
 
         games.forEach(hostedGame => {
+            logger.info(`Loading game ${hostedGame.publicId}...`);
+
             if (this.activeGames[hostedGame.publicId]) {
                 return;
             }
@@ -77,6 +81,8 @@ export default class HostedGameRepository
 
             this.listenHostedGameServer(this.activeGames[hostedGame.publicId]);
         });
+
+        logger.info(`${games.length} games loaded.`);
     }
 
     /**
@@ -374,6 +380,32 @@ export default class HostedGameRepository
         }
 
         const result = hostedGame.playerMove(player, move);
+
+        return result;
+    }
+
+    async playerAskUndo(player: Player, gameId: string): Promise<string | true>
+    {
+        const hostedGame = this.activeGames[gameId];
+
+        if (!hostedGame) {
+            return 'no game ' + gameId;
+        }
+
+        const result = hostedGame.playerAskUndo(player);
+
+        return result;
+    }
+
+    async playerAnswerUndo(player: Player, gameId: string, accept: boolean): Promise<string | true>
+    {
+        const hostedGame = this.activeGames[gameId];
+
+        if (!hostedGame) {
+            return 'no game ' + gameId;
+        }
+
+        const result = hostedGame.playerAnswerUndo(player, accept);
 
         return result;
     }

@@ -1,6 +1,7 @@
 import type { Coords } from '../../game-engine/Types';
 import { Expose } from '../class-transformer-custom';
 import { Move as EngineMove } from '../../game-engine';
+import type { SpecialMoveType } from '../../game-engine';
 
 export default class Move implements Coords
 {
@@ -11,22 +12,27 @@ export default class Move implements Coords
     col: number;
 
     @Expose()
+    specialMoveType?: SpecialMoveType;
+
+    @Expose()
     playedAt: Date;
 }
 
-export const fromCoords = (coords: Coords): Move => {
+export const fromEngineMove = (engineMove: EngineMove): Move => {
     const move = new Move();
 
-    move.row = coords.row;
-    move.col = coords.col;
+    move.row = engineMove.row;
+    move.col = engineMove.col;
+    move.specialMoveType = engineMove.getSpecialMoveType();
+    move.playedAt = engineMove.getPlayedAt();
 
     return move;
 };
 
-export const fromEngineMove = (engineMove: EngineMove): Move => {
-    const move = fromCoords(engineMove);
+export const toEngineMove = (move: Move): EngineMove => {
+    if (move.specialMoveType) {
+        return EngineMove.special(move.specialMoveType, move.playedAt);
+    }
 
-    move.playedAt = engineMove.getPlayedAt();
-
-    return move;
+    return new EngineMove(move.row, move.col, move.playedAt);
 };

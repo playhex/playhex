@@ -115,11 +115,21 @@ yarn test:e2e
 yarn cypress open
 ```
 
-**Warning**: For e2e/cypress tests, random bots are required so don't forget to run this before:
+**Warning**: For e2e/cypress tests, there is some configuration requirements:
+
+- Random bots must exists in database, if not, run:
 
 ``` bash
 yarn hex create-random-bots
 ```
+
+- Random bots must play instantaneously, which is the default. If you changed this, make sure this env var is zero again:
+
+```
+RANDOM_BOT_WAIT_BEFORE_PLAY=0
+```
+
+- A functional test in auth.cy.ts needs at least one game in database to run fully.
 
 ### Optimize js size
 

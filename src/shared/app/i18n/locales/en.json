@@ -207,6 +207,11 @@
     "contributors": "Contributors",
     "player_made_a_move": "{{player}} made a move",
     "game_with_player_has_started": "Game with {{player}} has started",
+    "undo": {
+        "undo_move": "Undo",
+        "accept": "Accept undo",
+        "reject": "Reject"
+    },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
         "date_shift_ms": "Date shift compensation: {{ms}}ms"

@@ -2,6 +2,23 @@ import seedrandom from 'seedrandom';
 import { Game, Move } from '../game-engine';
 
 /**
+ * Returns a random number in [0;1[
+ * if determinist, return always same number for a given game position.
+ */
+const rand = (game: Game, determinist: boolean): number => {
+    const rng = determinist
+        ? seedrandom(game
+            .getMovesHistory()
+            .map(m => m.toString())
+            .join(' ')
+        )
+        : seedrandom()
+    ;
+
+    return rng();
+};
+
+/**
  * Returns a random move to play on a given game.
  *
  * @param waitBeforePlay Time to wait in millisecond before return move. 0 to test concurrence, higher value to see coming.
@@ -13,6 +30,11 @@ export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist
         await new Promise(resolve => {
             setTimeout(resolve, waitBeforePlay);
         });
+    }
+
+    // Swaps 30% times
+    if (game.canSwapNow() && rand(game, determinist) < 0.3) {
+        return Move.swapPieces();
     }
 
     const possibleMoves: Move[] = [];
@@ -29,14 +51,5 @@ export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist
         throw new Error('Cannot play a random move, no possible move');
     }
 
-    const rng = determinist
-        ? seedrandom(game
-            .getMovesHistory()
-            .map(m => m.toString())
-            .join(' ')
-        )
-        : seedrandom()
-    ;
-
-    return possibleMoves[Math.floor(rng() * possibleMoves.length)];
+    return possibleMoves[Math.floor(rand(game, determinist) * possibleMoves.length)];
 };

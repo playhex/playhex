@@ -33,7 +33,7 @@ type GameViewEvents = {
     /**
      * A hex has been clicked on the view.
      */
-    hexClicked: (move: Move) => void;
+    hexClicked: (coords: Coords) => void;
 
     /**
      * Game has ended, and win animation is over.
@@ -61,9 +61,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private sidesGraphics: [Graphics, Graphics];
     private displayCoords = false;
+
+    private lastSimpleMoveHighlighted: null | Coords = null;
     private swapable: SwapableSprite;
     private swaped: SwapedSprite;
-    private previewedMove: null | { coords: Coords, playerIndex: PlayerIndex } = null;
+
+    private previewedMove: null | { move: Move, playerIndex: PlayerIndex } = null;
 
     private resizeObserver: null | ResizeObserver = null;
     private themeSwitchedListener = () => this.redraw();
@@ -197,8 +200,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightSidesFromGame();
 
         if (null !== this.previewedMove) {
-            const { coords, playerIndex } = this.previewedMove;
-            this.hexes[coords.row][coords.col].previewMove(playerIndex);
+            const { move, playerIndex } = this.previewedMove;
+            this.previewMove(move, playerIndex);
         }
 
         this.gameContainer.addChild(
@@ -352,63 +355,100 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.emit('endedAndWinAnimationOver');
     }
 
+    /**
+     * Returns swap coords from a game, and optionnal undone moves, assuming player swapped.
+     *
+     * While undoing swap move, we cannot get swap coords
+     * because at this time, game has already undone moves, and has no first move.
+     * So we assume next move of undoneMoves was first move.
+     */
+    private getSwapCoordsFromGameOrUndoneMoves(undoneMoves: null | Move[] = null): { swapped: Coords, mirror: Coords }
+    {
+        const swapCoords = this.game.getSwapCoords(false);
+
+        if (swapCoords) {
+            return swapCoords;
+        }
+
+        if (null === undoneMoves) {
+            throw new Error('Cannot get swap coords from game: no swap move, or has been undone but no undoneMoves provided.');
+        }
+
+        let firstMove: null | Move = null;
+
+        for (let i = 0; i < undoneMoves.length; ++i) {
+            if ('swap-pieces' === undoneMoves[i].getSpecialMoveType()) {
+                firstMove = undoneMoves[i + 1] ?? null;
+            }
+        }
+
+        if (!firstMove) {
+            throw new Error('Expected to have at least swap coords from game, or first move before swap move in undoneMoves');
+        }
+
+        return {
+            mirror: firstMove.cloneMirror(),
+            swapped: firstMove,
+        };
+    }
+
     private listenModel(): void
     {
         this.highlightSidesFromGame();
 
         this.game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.resetHighlightedHexes();
 
-            this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
-
-            switch (this.game.getMovesHistory().length) {
-                case 1:
-                    if (this.game.canSwapNow()) {
-                        this.showSwapable(move);
-                    } else {
-                        this.hexes[move.row][move.col].setHighlighted();
-                    }
-
+            // Update board cells
+            switch (move.getSpecialMoveType()) {
+                case undefined:
+                    this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
                     break;
 
-                case 2: {
-                    const swapMove = this.game.isLastMoveSwapPieces();
-
-                    if (null === swapMove) {
-                        this.hexes[move.row][move.col].setHighlighted();
-                        break;
-                    }
-
-                    const { swapped, mirror } = swapMove;
+                case 'swap-pieces': {
+                    const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
 
                     this.hexes[swapped.row][swapped.col].setPlayer(null);
                     this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
-                    this.showSwaped(mirror);
-
                     break;
                 }
-
-                default:
-                    this.hexes[move.row][move.col].setHighlighted();
             }
 
+            this.removePreviewMove();
+            this.highlightLastMove();
             this.highlightSidesFromGame();
+        });
+
+        this.game.on('undo', async undoneMoves => {
+            this.removePreviewMove(undoneMoves);
+
+            for (let i = 0; i < undoneMoves.length; ++i) {
+                const move = undoneMoves[i];
+
+                if (i > 0) {
+                    // If two moves are undone, slightly wait between these two moves removal
+                    await new Promise(r => setTimeout(r, 150));
+                }
+
+                switch (move.getSpecialMoveType()) {
+                    case undefined:
+                        this.hexes[move.row][move.col].setPlayer(null);
+                        break;
+
+                    case 'swap-pieces': {
+                        const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
+
+                        this.hexes[mirror.row][mirror.col].setPlayer(null);
+                        this.hexes[swapped.row][swapped.col].setPlayer(0);
+                        break;
+                    }
+                }
+
+                this.highlightLastMove(undoneMoves[i + 1] ?? null);
+            }
         });
 
         this.game.on('ended', () => this.endedCallback());
         this.game.on('canceled', () => this.endedCallback());
-    }
-
-    resetHighlightedHexes(): void
-    {
-        this.game.getMovesHistory().forEach((move) => {
-            this.hexes[move.row][move.col].setHighlighted(false);
-        });
-
-        if (this.game.getAllowSwap()) {
-            this.showSwapable(false);
-            this.showSwaped(false);
-        }
     }
 
     private async animateWinningPath(): Promise<void>
@@ -453,7 +493,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                 this.gameContainer.addChild(hex);
 
                 hex.on('pointertap', () => {
-                    this.emit('hexClicked', new Move(row, col));
+                    this.emit('hexClicked', { row, col });
                 });
             }
         }
@@ -468,28 +508,42 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightLastMove();
     }
 
-    private highlightLastMove(): void
+    /**
+     * Shows a dot on game current last played move.
+     * For swap move, shows arrows if possible to swap opponent move,
+     * or show a "S" to show that last move was swapped.
+     *
+     * @param {Move} move Override last move to highlight this move instead.
+     */
+    private highlightLastMove(move: null | Move = null): void
     {
-        const lastMove = this.game.getLastMove();
+        if (null !== this.lastSimpleMoveHighlighted) {
+            const { row, col } = this.lastSimpleMoveHighlighted;
+            this.hexes[row][col].setHighlighted(false);
+            this.lastSimpleMoveHighlighted = null;
+        }
+
+        this.showSwapable(false);
+        this.showSwaped(false);
+
+        const lastMove = move ?? this.game.getLastMove();
 
         if (null === lastMove) {
             return;
         }
 
-        if (this.game.getAllowSwap()) {
-            if (1 === this.game.getMovesHistory().length) {
-                this.showSwapable(lastMove);
-                return;
-            }
-
-            const swapPieces = this.game.isLastMoveSwapPieces();
-
-            if (null !== swapPieces) {
-                this.showSwaped(swapPieces.mirror);
-                return;
-            }
+        if (this.game.canSwapNow()) {
+            this.showSwapable(lastMove);
+            return;
         }
 
+        if ('swap-pieces' === lastMove.getSpecialMoveType()) {
+            const { mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
+            this.showSwaped(mirror);
+            return;
+        }
+
+        this.lastSimpleMoveHighlighted = lastMove;
         this.hexes[lastMove.row][lastMove.col].setHighlighted();
     }
 
@@ -695,26 +749,57 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this;
     }
 
-    previewMove(coords: Coords, playerIndex: PlayerIndex): this
+    previewMove(move: Move, playerIndex: PlayerIndex): this
     {
-        this.removePreviewMove();
+        if (null !== this.previewedMove && !this.previewedMove.move.sameAs(move)) {
+            this.removePreviewMove();
+        }
 
-        this.hexes[coords.row][coords.col].previewMove(playerIndex);
-        this.previewedMove = { coords, playerIndex };
+        this.previewedMove = { move, playerIndex };
+
+        switch (move.getSpecialMoveType()) {
+            case undefined:
+                this.hexes[move.row][move.col].previewMove(playerIndex);
+                break;
+
+            case 'swap-pieces': {
+                const swapCoords = this.game.getSwapCoords(false);
+
+                if (null === swapCoords) {
+                    throw new Error('Unexpected null swapCoords');
+                }
+
+                const { mirror, swapped } = swapCoords;
+
+                this.hexes[swapped.row][swapped.col].previewMove(1 - playerIndex as PlayerIndex);
+                this.hexes[mirror.row][mirror.col].previewMove(playerIndex);
+            }
+        }
 
         return this;
     }
 
-    removePreviewMove(): this
+    removePreviewMove(undoneMoves: null | Move[] = null): this
     {
         if (null === this.previewedMove) {
             return this;
         }
 
-        const { row, col } = this.previewedMove.coords;
-
-        this.hexes[row][col].removePreviewMove();
+        const { move } = this.previewedMove;
         this.previewedMove = null;
+
+        switch (move.getSpecialMoveType()) {
+            case undefined:
+                this.hexes[move.row][move.col].removePreviewMove();
+                break;
+
+            case 'swap-pieces': {
+                const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
+
+                this.hexes[swapped.row][swapped.col].removePreviewMove();
+                this.hexes[mirror.row][mirror.col].removePreviewMove();
+            }
+        }
 
         return this;
     }

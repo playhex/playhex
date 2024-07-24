@@ -13,14 +13,14 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import { PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
-import { fromCoords } from '../../../shared/app/models/Move';
+import { fromEngineMove } from '../../../shared/app/models/Move';
 
 useSeoMeta({
     robots: 'noindex',
@@ -71,6 +71,64 @@ const shouldDisplayConfirmMove = (): boolean => {
 };
 
 /*
+ * Undo move
+ */
+const shouldDisplayUndoMove = (): boolean => {
+    if (null === hostedGameClient.value || null === playerSettings.value) {
+        return false;
+    }
+
+    // I am watcher
+    if (-1 === getLocalPlayerIndex()) {
+        return false;
+    }
+
+    if ('playing' !== hostedGameClient.value.getState()) {
+        return false;
+    }
+
+    // Show a disabled button if I sent an undo request,
+    // but hide it if opponent sent an undo request.
+    if (hostedGameClient.value?.getUndoRequest() === 1 - getLocalPlayerIndex()) {
+        return false;
+    }
+
+    return true;
+};
+
+const shouldDisableUndoMove = (): boolean => {
+    if (!hostedGameClient.value) {
+        return true;
+    }
+
+    const game = hostedGameClient.value.getGame();
+
+    return hostedGameClient.value.getUndoRequest() === getLocalPlayerIndex()
+        || true !== game.canPlayerUndo(getLocalPlayerIndex() as PlayerIndex)
+    ;
+};
+
+const shouldDisplayAnswerUndoMove = (): boolean => {
+    if (!hostedGameClient.value) {
+        return false;
+    }
+
+    if ('playing' !== hostedGameClient.value.getState()) {
+        return false;
+    }
+
+    return hostedGameClient.value?.getUndoRequest() === 1 - getLocalPlayerIndex();
+};
+
+const askUndo = (): void => {
+    hostedGameClient.value?.sendAskUndo();
+};
+
+const answerUndo = (accept: boolean): void => {
+    hostedGameClient.value?.sendAnswerUndo(accept);
+};
+
+/*
  * Join/leave game room.
  * Not required if player is already in game,
  * but necessary for watchers to received game updates.
@@ -92,12 +150,13 @@ const listenHexClick = () => {
         throw new Error('no game view');
     }
 
-    gameView.on('hexClicked', move => {
+    gameView.on('hexClicked', coords => {
         if (null === hostedGameClient.value) {
             throw new Error('hex clicked but hosted game is null');
         }
 
         const game = hostedGameClient.value.getGame();
+        const move = game.createMoveOrSwapMove(coords);
 
         try {
             // Must get local player again in case player joined after (click "Watch", then "Join")
@@ -111,12 +170,11 @@ const listenHexClick = () => {
 
             if (!shouldDisplayConfirmMove()) {
                 game.move(move, localPlayerIndex as PlayerIndex);
-                hostedGameClient.value.sendMove(fromCoords(move));
+                hostedGameClient.value.sendMove(fromEngineMove(move));
                 return;
             }
 
             confirmMove.value = () => {
-                gameView?.removePreviewMove();
                 game.move(move, localPlayerIndex as PlayerIndex);
                 confirmMove.value = null;
 
@@ -124,7 +182,7 @@ const listenHexClick = () => {
                     return;
                 }
 
-                hostedGameClient.value.sendMove(fromCoords(move));
+                hostedGameClient.value.sendMove(fromEngineMove(move));
             };
 
             gameView?.previewMove(move, localPlayerIndex as PlayerIndex);
@@ -424,9 +482,9 @@ const unreadMessages = (): number => {
 
             <nav class="menu-game navbar" v-if="null !== hostedGameClient">
                 <div class="buttons container-fluid">
-                    <button type="button" class="btn btn-outline-primary" v-if="canResign() && !canCancel()" @click="resign()">
+                    <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">
                         <BIconFlag />
-                        <span class="d-none d-md-inline">{{ ' ' + $t('resign') }}</span>
+                        <span class="d-none d-lg-inline">{{ ' ' + $t('resign') }}</span>
                     </button>
                     <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()">
                         <BIconXLg />
@@ -436,6 +494,18 @@ const unreadMessages = (): number => {
                         <BIconCheck />
                         <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
                         <span class="d-none d-md-inline">{{ ' ' + $t('confirm_move.button_label') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-primary" v-if="shouldDisplayUndoMove()" @click="askUndo()" :disabled="shouldDisableUndoMove()" :class="{ 'btn-outline-secondary btn-disabled': shouldDisableUndoMove() }">
+                        <BIconArrowCounterclockwise />
+                        <span class="d-none d-md-inline">{{ $t('undo.undo_move') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(true)">
+                        <BIconCheck />
+                        <span class="d-none d-md-inline">{{ $t('undo.accept') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(false)">
+                        <BIconX />
+                        <span class="d-none d-lg-inline">{{ $t('undo.reject') }}</span>
                     </button>
                     <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
                         <BIconRepeat />
@@ -452,7 +522,7 @@ const unreadMessages = (): number => {
                     <button type="button" class="btn btn-outline-primary position-relative" @click="showSidebar()">
                         <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
                         <BIconChatRight v-else />
-                        <span class="d-none d-md-inline">{{ ' ' + $t('chat') }}</span>
+                        <span class="d-none d-lg-inline">{{ ' ' + $t('chat') }}</span>
                         <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             {{ unreadMessages() }}
                             <span class="d-none">{{ ' ' + $t('unread_messages') }}</span>
