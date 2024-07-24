@@ -475,6 +475,8 @@ const unreadMessages = (): number => {
 <template>
     <div v-show="null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : '')">
         <div class="game">
+
+            <!-- Game board, "Accept" button -->
             <div class="board-container" ref="boardContainer">
                 <AppBoard
                     v-if="null !== hostedGameClient && null !== gameView"
@@ -491,37 +493,54 @@ const unreadMessages = (): number => {
                 </div>
             </div>
 
+            <!-- Control buttons at bottom of game board (resign, undo, confirm move, ...) -->
             <nav class="menu-game navbar" v-if="null !== hostedGameClient">
                 <div class="buttons container-fluid">
+
+                    <!-- Resign -->
                     <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">
                         <BIconFlag />
                         <span class="d-none d-lg-inline">{{ ' ' + $t('resign') }}</span>
                     </button>
+
+                    <!-- Cancel -->
                     <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()">
                         <BIconXLg />
                         <span class="d-none d-md-inline">{{ ' ' + $t('cancel') }}</span>
                     </button>
+
+                    <!-- Confirm move -->
                     <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()">
                         <BIconCheck />
                         <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
                         <span class="d-none d-md-inline">{{ ' ' + $t('confirm_move.button_label') }}</span>
                     </button>
+
+                    <!-- Undo -->
                     <button type="button" class="btn btn-primary" v-if="shouldDisplayUndoMove()" @click="askUndo()" :disabled="shouldDisableUndoMove()" :class="{ 'btn-outline-secondary btn-disabled': shouldDisableUndoMove() }">
                         <BIconArrowCounterclockwise />
                         <span class="d-none d-md-inline">{{ $t('undo.undo_move') }}</span>
                     </button>
+
+                    <!-- Undo accept -->
                     <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(true)">
                         <BIconCheck />
                         <span class="d-none d-md-inline">{{ $t('undo.accept') }}</span>
                     </button>
+
+                    <!-- Undo reject -->
                     <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(false)">
                         <BIconX />
                         <span class="d-none d-lg-inline">{{ $t('undo.reject') }}</span>
                     </button>
+
+                    <!-- Rematch -->
                     <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
                         <BIconRepeat />
                         <span class="d-none d-md-inline">{{ ' ' + $t('rematch.label') }}</span>
                     </button>
+
+                    <!-- Accept / View rematch -->
                     <template v-else-if="hostedGameClient.getRematchGameId() != null">
                         <button type="button" class="btn btn-success" v-if="canAcceptRematch" @click="createOrAcceptRematch()">
                             {{ ' ' + $t('rematch.accept') }}
@@ -530,6 +549,8 @@ const unreadMessages = (): number => {
                             {{ ' ' + $t('rematch.view') }}
                         </button>
                     </template>
+
+                    <!-- Chat -->
                     <button type="button" class="btn btn-outline-primary position-relative" @click="showSidebar()">
                         <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
                         <BIconChatRight v-else />
@@ -540,11 +561,14 @@ const unreadMessages = (): number => {
                         </span>
                     </button>
 
+                    <!-- Right button, open sidebar -->
                     <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat"><BIconArrowBarLeft /></button>
+
                 </div>
             </nav>
         </div>
 
+        <!-- Game sidebar -->
         <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
             <AppGameSidebar
                 :hostedGameClient="hostedGameClient"
@@ -607,7 +631,7 @@ sidebarOpen()
             width 50%
 
         @media (min-width: 992px)
-            width 67%
+            width 64%
 
     .sidebar
         display flex
@@ -626,7 +650,7 @@ sidebarOpen()
             width 50%
 
         @media (min-width: 992px)
-            width 33%
+            width 36%
 
     .open-sidebar-btn
         display none

@@ -19,6 +19,7 @@
         "red": "Red",
         "blue": "Blue",
         "started": "Started",
+        "played": "Played",
         "finished": "Finished",
         "review": "Review",
         "won": "Won",
@@ -68,6 +69,7 @@
     "swap_rule": "Swap rule",
     "allow_swap_pieces": "Allow swap pieces",
     "toggle_coords": "Toggle coords",
+    "toggle_coords_short": "Coords",
     "share_game": "Share game",
     "copied!": "Copied!",
     "not_copied": "Failed to copy, use right click or long tap",
@@ -207,6 +209,7 @@
     "contributors": "Contributors",
     "player_made_a_move": "{{player}} made a move",
     "game_with_player_has_started": "Game with {{player}} has started",
+    "last_move": "Last move",
     "undo": {
         "undo_move": "Undo",
         "accept": "Accept undo",

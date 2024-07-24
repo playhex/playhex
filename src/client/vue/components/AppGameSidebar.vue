@@ -14,10 +14,11 @@ import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import Move from '@shared/game-engine/Move';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow, formatRelative, isSameDay } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import useAnalyzeStore from '../../stores/analyzeStore';
+import useServerDateStore from '../../stores/serverDateStore';
 import { downloadString } from '../../services/fileDownload';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { gameToSGF } from '../../../shared/game-engine/SGF';
@@ -346,6 +347,12 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         <small>{{ $t('2dots', { s: $t('game.time_control') }) }} <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
                         <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <br>
+                        <small>
+                            {{ $t('2dots', { s: $t('last_move') }) }}
+                            <template v-if="hostedGameClient.getHostedGame().gameData?.lastMoveAt">{{ formatRelative(hostedGameClient.getHostedGame().gameData?.lastMoveAt as Date, useServerDateStore().newDate()) }}</template>
+                            <template v-else>-</template>
+                        </small>
                     </p>
                 </template>
 
@@ -377,8 +384,6 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                             <span v-else class="text-danger">
                                 <small><BIconCaretDownFill /></small> {{ abs(round(rating.ratingChange)) }}
                             </span>
-                            <br>
-                            <small>{{ $t('rating', { rating: round(rating.rating) }) }}</small>
                         </div>
                     </div>
                     <p>
@@ -386,9 +391,31 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         <br>
                         <small>{{ $t('2dots', { s: $t('game.time_control') }) }} <AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></small>
                         <br>
-                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
-                        <br>
-                        <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small v-if="hostedGameClient.getHostedGame().gameData?.startedAt && hostedGameClient.getHostedGame().gameData?.endedAt">
+
+                            <!-- Game played is same day, show short form: "Played date/hour -> hour" -->
+                            <template v-if="isSameDay(hostedGameClient.getHostedGame().gameData?.startedAt!, hostedGameClient.getHostedGame().gameData?.endedAt!)">
+                                {{ $t('2dots', { s: $t('game.played') }) }}
+                                {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}
+                                →
+                                {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'p') }}
+                            </template>
+
+                            <!-- Game played on multiple days, show dates, no times, and no need to repeat year -->
+                            <template v-else>
+                                {{ $t('2dots', { s: $t('game.played') }) }}
+                                {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM') }}
+                                →
+                                {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM yyyy') }}
+                            </template>
+                        </small>
+
+                        <!-- Fallback to naive form if missing a date, should not be used -->
+                        <template v-else>
+                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                            <br>
+                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM p') }}</small>
+                        </template>
                     </p>
                 </template>
             </div>
@@ -401,19 +428,13 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
             <div class="container-fluid">
 
                 <!-- Toggle coords -->
-                <button type="button" class="btn btn-sm btn-outline-primary me-2 mb-2" @click.prevent="emits('toggleCoords')"><BIconAlphabet /> {{ $t('toggle_coords') }}</button>
-
-                <!-- change board orientation -->
-                <div class="btn-group btn-group-sm me-2 mb-2" role="group" aria-label="Change board orientation">
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="auto" id="btn-orientation-auto" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="btn-orientation-auto">{{ $t('auto') }}</label>
-
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="btn-orientation-landscape">{{ $t('landscape') }}</label>
-
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
-                </div>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                    @click.prevent="emits('toggleCoords')"
+                    :aria-label="$t('toggle_coords')"
+                    :title="$t('toggle_coords')"
+                ><BIconAlphabet /> {{ $t('toggle_coords_short') }}</button>
 
                 <!-- HexWorld link -->
                 <a
@@ -435,7 +456,7 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                         focusable="false"
                     >
                         <path d="M 3 8 L 13 2.25 L 23 8 L 23 19.5 L 13 25.25 L 3 19.5z" />
-                    </svg> HexWorld
+                    </svg> <span class="d-none d-lg-inline">HexWorld</span>
                 </a>
 
                 <!-- Download SGF -->
@@ -447,10 +468,30 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                 ><BIconDownload /> SGF</button>
 
                 <!-- Share -->
-                <br>
-                <a :href="href" class="btn btn-sm btn-outline-primary me-2 mb-2" @click.prevent="shareGameLinkAndShowResult()"><BIconShareFill /> {{ $t('share_game') }}</a>
+                <a
+                    :href="href"
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                    @click.prevent="shareGameLinkAndShowResult()"
+                    :aria-label="$t('share_game')"
+                    :title="$t('share_game')"
+                ><BIconShareFill /></a>
+
                 <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> {{ $t('copied!') }}</small>
                 <small v-else-if="false === copiedResult" class="text-warning me-2"> {{ $t('not_copied') }}</small>
+
+                <br>
+
+                <!-- change board orientation -->
+                <div class="btn-group btn-group-sm me-2 mb-2" role="group" aria-label="Change board orientation">
+                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="auto" id="btn-orientation-auto" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-orientation-auto">{{ $t('auto') }}</label>
+
+                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-orientation-landscape">{{ $t('landscape') }}</label>
+
+                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
+                </div>
             </div>
         </div>
 
@@ -459,22 +500,41 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
         -->
         <div class="block-analyze" v-if="hostedGameClient.getGame().isEnded()">
             <div class="container-fluid">
+
+                <!-- Request analyze -->
                 <div v-if="null === gameAnalyze" class="text-center">
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('game_analyze.analyze_by_ai') }}</button>
                 </div>
+
+                <!-- Waiting results -->
                 <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height">
                     {{ $t('game_analyze.requested') }}
                     <br>
                     <small class="text-body-secondary">{{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }}</small>
                 </p>
+
+                <!-- Errored, try again -->
                 <p v-else-if="null === gameAnalyze.analyze" class="text-center text-warning analyze-min-height">
                     {{ $t('game_analyze.errored') }}
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('try_again') }}</button>
                 </p>
+
+                <!-- Done, analyze graph -->
                 <div v-else class="analyze-min-height">
-                    <small>{{ $t('game_analyze.analyze_by_ai') }} <router-link :to="{ name: 'analysis-details' }" class="float-end text-decoration-none"><BIconInfoCircle /> {{ $t('game_analyze.how_it_works') }}</router-link></small>
+                    <!-- How it works link -->
+                    <small>
+                        {{ $t('game_analyze.analyze_by_ai') }}
+                        <router-link
+                            :to="{ name: 'analysis-details' }"
+                            class="text-decoration-none align-text-bottom"
+                            :title="$t('game_analyze.how_it_works')"
+                            :aria-label="$t('game_analyze.how_it_works')"
+                        ><BIconInfoCircle /></router-link>
+                    </small>
+                    <!-- Anayze graph -->
                     <AppGameAnalyze :analyze="gameAnalyze.analyze" />
                 </div>
+
             </div>
         </div>
 

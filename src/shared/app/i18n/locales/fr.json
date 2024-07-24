@@ -16,6 +16,7 @@
         "red": "Rouge",
         "blue": "Bleu",
         "started": "Démarrée",
+        "played": "Jouée",
         "finished": "Terminée",
         "review": "Revoir",
         "won": "Gagnant",
@@ -27,6 +28,7 @@
         "board_size": "Taille du plateau",
         "outcome": "Résultat"
     },
+    "last_move": "Dernier coup",
     "player_settings": {
         "title": "Préférences"
     },
@@ -98,6 +100,7 @@
     "not_copied": "pas réussi à copier, utilisez le click droit ou appui long",
     "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}.",
     "toggle_coords": "Afficher/masquer les coordonnées",
+    "toggle_coords_short": "Coords",
     "player_current_games": "Parties en cours",
     "no": "Non",
     "n_characters_one": "{{count}} caractère",
