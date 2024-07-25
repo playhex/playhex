@@ -283,8 +283,15 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     async sendMove(move: Move): Promise<true | string>
     {
+        // No need to send client playedAt date, server won't trust it
+        const moveWithoutDate = new Move();
+
+        moveWithoutDate.row = move.row;
+        moveWithoutDate.col = move.col;
+        moveWithoutDate.specialMoveType = move.specialMoveType;
+
         return new Promise((resolve, reject) => {
-            this.socket.emit('move', this.getId(), move, answer => {
+            this.socket.emit('move', this.getId(), moveWithoutDate, answer => {
                 if (true === answer) {
                     resolve(answer);
                 }

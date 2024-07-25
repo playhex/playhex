@@ -391,8 +391,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     playerMove(player: Player, move: Move): true | string
     {
-        const playedAt = new Date();
-        logger.info('Move played', { hostedGameId: this.publicId, move, playedAt, player: player.pseudo });
+        move.playedAt = new Date();
+        logger.info('Move played', { hostedGameId: this.publicId, move, player: player.pseudo });
 
         if ('playing' !== this.state) {
             logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.publicId, player: player.pseudo });
