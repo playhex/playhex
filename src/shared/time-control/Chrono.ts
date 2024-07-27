@@ -131,6 +131,11 @@ export class Chrono extends TypedEmitter<ChronoEvents>
      */
     run(date: Date, now: null | Date = new Date()): void
     {
+        // TODO remove this tmp fix, will fix deserialization later
+        if ('string' === typeof date) {
+            date = new Date(date);
+        }
+
         if (this.value instanceof Date) {
             return;
         }
@@ -148,6 +153,11 @@ export class Chrono extends TypedEmitter<ChronoEvents>
      */
     pause(date: Date): void
     {
+        // TODO remove this tmp fix, will fix deserialization later
+        if ('string' === typeof date) {
+            date = new Date(date);
+        }
+
         if (!(this.value instanceof Date)) {
             return;
         }
@@ -166,6 +176,11 @@ export class Chrono extends TypedEmitter<ChronoEvents>
 
     private getElapsedAtDate(now: Date): null | { date: Date, safeDate: boolean }
     {
+        // TODO remove this tmp fix, will fix deserialization later
+        if ('string' === typeof now) {
+            now = new Date(now);
+        }
+
         if (this.value instanceof Date) {
             if (this.value.getTime() <= now.getTime()) {
                 return {
