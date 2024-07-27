@@ -1,1 +1,139 @@
-{}
+{
+    "game": {
+        "size": "Größe",
+        "board": "Spielbrett",
+        "board_size": "Brettgröße",
+        "rules": "Regeln",
+        "created": "Erstellt",
+        "accept": "Annehmen",
+        "red": "Rot",
+        "blue": "Blau",
+        "played": "Gespielt",
+        "finished": "Abgeschlossen",
+        "won": "Gewonnen",
+        "started": "Gestartet",
+        "lost": "Verloren"
+    },
+    "create_game": {
+        "more_options": "Mehr Optionen",
+        "less_options": "Weniger Optionen"
+    },
+    "player_settings": {
+        "title": "Einstellungen"
+    },
+    "background_theme": {
+        "light": "Hell",
+        "title": "Thema",
+        "dark": "Dunkel"
+    },
+    "time_control": {
+        "fast": "Schnell",
+        "normal": "Normal",
+        "long": "Lang",
+        "use": "{{type}} verwenden",
+        "time_increment": "Zeitinkrement"
+    },
+    "game_was_created_by_player_time_ago": "Spiel wurde erstellt von {player}, {timeAgo}.",
+    "log_out": "Abmelden",
+    "log_in": "Anmelden",
+    "sign_up": "Registrieren",
+    "feedback": "Rückmeldung",
+    "license_agpl": "Lizenz AGPL-3.0",
+    "create_account": "Konto erstellen",
+    "player_game_history": "Spielverlauf",
+    "game_finished_overlay": {
+        "title": "Spiel abgeschlossen"
+    },
+    "initializing_game": "Spiel wird initialisiert …",
+    "confirm_overlay": {
+        "confirmation": "Bestätigung"
+    },
+    "no": "Nein",
+    "loading_game": "Spiel wird geladen …",
+    "chat": "Chat",
+    "system": "System",
+    "landscape": "Querformat",
+    "portrait": "Hochformat",
+    "shading_patterns": {
+        "types": {
+            "null": "Keine"
+        }
+    },
+    "update_password": "Passwort aktualisieren",
+    "contribute": "Beitragen",
+    "contributors": "Beitragende",
+    "confirm_move": {
+        "title": "Zug bestätigen",
+        "button_label": "Zug bestätigen",
+        "send_immediately": "Sofort senden",
+        "button_label_short": "Bestätigen"
+    },
+    "undo": {
+        "accept": "Rückgängig machen akzeptieren",
+        "reject": "Ablehnen",
+        "undo_move": "Rückgängig machen"
+    },
+    "game_candency": {
+        "normal": "Normal"
+    },
+    "short_time_unit": {
+        "minute": "Min."
+    },
+    "player_won_by": {
+        "default": "{player} hat das Spiel gewonnen!"
+    },
+    "player_wins_by": {
+        "default": "{player} gewinnt das Spiel!"
+    },
+    "i_play": {
+        "random": "Zufällig"
+    },
+    "copied!": "Kopiert!",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Spiel erstellt von {player}, {timeAgo}.",
+    "project_under_development": "Projekt in Entwicklung",
+    "already_have_account_login_instead_link_label": "Anmelden",
+    "account_created_on": "Konto erstellt am {{date}}",
+    "game_has_been_canceled": "Spiel wurde abgebrochen.",
+    "game_analyze": {
+        "how_it_works": "Wie es funktioniert",
+        "best_move": "bester Zug",
+        "analyze_game": "Spiel analysieren"
+    },
+    "language": "Sprache",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "rating": "Bewertung: {{rating}}",
+    "new_game": "Neues Spiel",
+    "players": "Spieler",
+    "player": "Spieler",
+    "guest": "Gast",
+    "chat_message_placeholder": "Nachricht …",
+    "unread_messages": "ungelesene Nachrichten",
+    "n_characters_one": "{{count}} Zeichen",
+    "n_characters_other": "{{count}} Zeichen",
+    "board_orientation": {
+        "title": "Ausrichtung",
+        "flat_2": "Flach 2",
+        "diamond": "Diamant",
+        "flat": "Flach"
+    },
+    "old_password": "Altes Passwort",
+    "last_move": "Letzter Zug",
+    "no_account_sign_up_instead_link_label": "Registrieren",
+    "username": "Benutzername",
+    "now!": "Jetzt!",
+    "player_current_games": "Aktuelle Spiele",
+    "yes": "Ja",
+    "send_chat_message": "Senden",
+    "auto": "Automatisch",
+    "password": "Passwort",
+    "confirm_new_password": "Neues Passwort bestätigen",
+    "resign": "Aufgeben",
+    "change_password": "Passwort ändern",
+    "preview": "Vorschau",
+    "new_password": "Neues Passwort",
+    "ping": {
+        "ping_ms": "Ping: {{ms}} ms"
+    }
+}
