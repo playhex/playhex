@@ -1,7 +1,7 @@
 import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import HostedGame from './HostedGame';
 import type { Outcome, PlayerIndex } from '../../game-engine/Types';
-import { Expose } from '../class-transformer-custom';
+import { Expose, plainToInstance } from '../class-transformer-custom';
 import { Type } from 'class-transformer';
 import Move from './Move';
 
@@ -19,7 +19,7 @@ export default class Game
     @Expose()
     size: number;
 
-    @Column({ type: 'json' })
+    @Column({ type: 'json', transformer: { from: (value: null | unknown) => deserializeMovesHistory(value), to: value => value } })
     @Expose()
     @Type(() => Move)
     movesHistory: Move[];
@@ -56,3 +56,15 @@ export default class Game
     @Type(() => Date)
     endedAt: null | Date = null;
 }
+
+const deserializeMovesHistory = (value: null | unknown): Move[] => {
+    if (!value) {
+        return [];
+    }
+
+    if (!(value instanceof Array)) {
+        throw new Error('Expected an array here');
+    }
+
+    return value.map(v => plainToInstance(Move, v));
+};
