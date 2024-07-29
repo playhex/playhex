@@ -70,7 +70,7 @@ export default class HostedGameRepository
             ],
         });
 
-        games.forEach(hostedGame => {
+        for (const hostedGame of games) {
             logger.info(`Loading game ${hostedGame.publicId}...`);
 
             if (this.activeGames[hostedGame.publicId]) {
@@ -80,7 +80,7 @@ export default class HostedGameRepository
             this.activeGames[hostedGame.publicId] = HostedGameServer.fromData(hostedGame);
 
             this.listenHostedGameServer(this.activeGames[hostedGame.publicId]);
-        });
+        }
 
         logger.info(`${games.length} games loaded.`);
     }
