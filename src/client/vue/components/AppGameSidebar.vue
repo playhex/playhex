@@ -16,6 +16,7 @@ import Move from '@shared/game-engine/Move';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
 import { format, formatDistanceToNow, formatRelative, isSameDay } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
+import { canPassAgain } from '../../../shared/app/passUtils';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import useAnalyzeStore from '../../stores/analyzeStore';
 import useServerDateStore from '../../stores/serverDateStore';
@@ -23,6 +24,9 @@ import { downloadString } from '../../services/fileDownload';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { gameToSGF } from '../../../shared/game-engine/SGF';
 import GameView from '../../pixi-board/GameView';
+import { isMyTurn } from '../../services/notifications/context-utils';
+import { PlayerIndex } from '@shared/game-engine';
+import { fromEngineMove } from '@shared/app/models/Move';
 
 const props = defineProps({
     hostedGameClient: {
@@ -276,8 +280,37 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
 ;
 
 /*
- * Board orientation
+ * Pass
  */
+const getLocalPlayerIndex = (): number => {
+    if (null === loggedInPlayer || !hostedGameClient.value) {
+        return -1;
+    }
+
+    return hostedGameClient.value.getPlayerIndex(loggedInPlayer);
+};
+
+const pass = async () => {
+    const passMove = Move.pass();
+    hostedGameClient.value.getGame().move(passMove, getLocalPlayerIndex() as PlayerIndex);
+    hostedGameClient.value.sendMove(fromEngineMove(passMove));
+};
+
+const shouldShowPass = (): boolean => {
+    // TODO temporary disabled because pass move not yet handled by remote ai
+    if (hostedGameClient.value.getPlayers().some(player => player.isBot && !player.slug.match(/random-bot$/))) {
+        return false;
+    }
+
+    return -1 !== getLocalPlayerIndex();
+};
+
+const shouldEnablePass = (): boolean => {
+    return 'playing' === hostedGameClient.value.getState()
+        && isMyTurn(hostedGameClient.value.getHostedGame())
+        && canPassAgain(hostedGameClient.value.getGame())
+    ;
+};
 </script>
 
 <template>
@@ -492,6 +525,16 @@ const byPlayerPosition = (a: Rating, b: Rating): number =>
                     <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
                 </div>
+
+                <!-- Pass -->
+                <button
+                    v-if="shouldShowPass()"
+                    type="button"
+                    class="btn btn-sm me-2 mb-2"
+                    :class="shouldEnablePass() ? 'btn-warning' : 'btn-ouline-secondary disabled'"
+                    :disabled="!shouldEnablePass()"
+                    @click.prevent="pass()"
+                >{{ $t('pass') }}</button>
             </div>
         </div>
 

@@ -537,6 +537,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return;
         }
 
+        if ('pass' === lastMove.getSpecialMoveType()) {
+            return;
+        }
+
         if ('swap-pieces' === lastMove.getSpecialMoveType()) {
             const { mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
             this.showSwaped(mirror);

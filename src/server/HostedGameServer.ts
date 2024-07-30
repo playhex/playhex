@@ -8,6 +8,7 @@ import logger from './services/logger';
 import Rooms from '../shared/app/Rooms';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl';
 import { createTimeControl } from '../shared/time-control/createTimeControl';
+import { canPassAgain } from '../shared/app/passUtils';
 import Container from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager';
@@ -145,12 +146,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private async makeAIMoveIfApplicable(): Promise<void>
     {
-        if (null === this.game || 'playing' !== this.state) {
+        if (null === this.game) {
             return;
         }
 
         const player = this.players[this.game.getCurrentPlayerIndex()];
-        const playerIndex = this.getPlayerIndex(player) as PlayerIndex;
 
         if (!player.isBot) {
             return;
@@ -172,11 +172,16 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             }
 
             if (null === move) {
-                this.game.resign(playerIndex, new Date());
+                this.playerResign(player);
                 return;
             }
 
-            this.game.move(move, playerIndex);
+            const result = this.playerMove(player, fromEngineMove(move));
+
+            if (true !== result) {
+                logger.error('Bot tried to move but get an error', { gameId: this.getId(), result });
+                this.playerResign(player);
+            }
         } catch (e) {
             if (e instanceof IllegalMove) {
                 logger.error('From makeAIMoveIfApplicable(): an AI played an illegal move', { err: e.message, slug: player.slug });
@@ -184,7 +189,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { err: e.message, slug: player.slug });
             }
 
-            this.game.resign(playerIndex, new Date());
+            this.playerResign(player);
         }
     }
 
@@ -407,6 +412,18 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         if (!this.isPlayerInGame(player)) {
             logger.notice('A player not in the game tried to make a move', { hostedGameId: this.publicId, player: player.pseudo });
             return 'you are not a player of this game';
+        }
+
+        if ('pass' === move.specialMoveType && !canPassAgain(this.game)) {
+            logger.notice('Tried to pass again', { hostedGameId: this.publicId, player: player.pseudo });
+            return 'cannot pass infinitely. Now, play';
+        }
+
+        // TODO temporary disabled because pass move not yet handled by remote ai
+        if ('pass' === move.specialMoveType) {
+            if (this.hostedGame?.hostedGameToPlayers.some(hostedGameToPlayer => hostedGameToPlayer.player.isBot && !hostedGameToPlayer.player.slug.match(/random-bot$/))) {
+                return 'passing against remote ai not yet implemented';
+            }
         }
 
         try {

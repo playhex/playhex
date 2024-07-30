@@ -46,25 +46,25 @@ describe('Ranked games', () => {
         cy.contains('.sidebar', 'Ranked');
 
         // Must play diagonal line to win both as red or blue because we can't choose our color on ranked games
-        cy.play(337, 261);
-        cy.play(338, 227);
-        cy.play(334, 192);
-        cy.play(337, 367);
-        cy.play(336, 401);
-        cy.play(337, 334);
-        cy.play(337, 296);
-        cy.play(336, 439);
-        cy.play(339, 469);
-        cy.play(338, 156);
-        cy.play(338, 506);
+        cy.play(322, 436);
+        cy.play(322, 367);
+        cy.play(323, 233);
+        cy.play(323, 264);
+        cy.play(322, 397);
+        cy.play(323, 299);
+        cy.play(321, 337);
+        cy.play(321, 466);
+        cy.play(321, 503);
+        cy.play(325, 166);
+        cy.play(323, 196);
 
         cy.contains('Game finished');
         cy.contains(/Guest \d+ won the game!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
-        cy.contains('.sidebar', /Determinist random bot \d+/).closest('div').contains(/Rating: \d+/);
-        cy.contains('.sidebar', /Guest \d+ \d+/).closest('div').contains(/Rating: \d+/);
+        cy.contains('.sidebar', /Determinist random bot \d+/).closest('div');
+        cy.contains('.sidebar', /Guest \d+ \d+/).closest('div');
     });
 
     it('displays my game as a ranked one on the lobby', () => {

@@ -18,11 +18,13 @@ describe('Game', () => {
         // Players legal moves
         game.move(new Move(1, 1), 0);
         assert.strictEqual(game.getBoard().getCell(1, 1), 0);
+        assert.strictEqual(game.getLastMoveIndex(), 0);
 
         assert.strictEqual(emitted['played'], true);
 
         game.move(new Move(1, 2), 1);
         assert.strictEqual(game.getBoard().getCell(1, 2), 1);
+        assert.strictEqual(game.getLastMoveIndex(), 1);
 
         // Illegal moves
         assert.throws(() => game.move(new Move(0, 0), 1), { message: 'Move a1: Not your turn' });
@@ -310,6 +312,64 @@ describe('Game', () => {
             assert.strictEqual(moves.length, 2);
             assert.ok(moves[0].sameAs(game.getLastMove()!));
             assert.ok(moves[1].sameAs(game.getMovesHistory()[game.getMovesHistory().length - 2]));
+        });
+    });
+
+    describe('Pass', () => {
+        it('passes', () => {
+            const game = new Game(3);
+
+            game.move(new Move(0, 0), 0);
+            game.move(new Move(1, 0), 1);
+            game.move(new Move(2, 0), 0);
+            game.move(Move.pass(), 1);
+
+            assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+            assert.strictEqual(game.getLastMoveIndex(), 3);
+        });
+
+        it('passes on first move, then we cannot pass a swap move', () => {
+            const game = new Game(3);
+
+            game.move(Move.pass(), 0);
+
+            assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+            assert.strictEqual(game.canSwapNow(), false);
+
+            assert.throws(() => game.checkMove(Move.swapPieces(), 1), { message: 'Move swap-pieces: Cannot swap now' });
+        });
+
+        it('passes on second move', () => {
+            const game = new Game(3);
+
+            game.move(new Move(1, 2), 0);
+            game.move(Move.pass(), 1);
+
+            assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+            assert.strictEqual(game.canSwapNow(), false);
+
+            assert.throws(() => game.checkMove(Move.swapPieces(), 0), { message: 'Move swap-pieces: Cannot swap now' });
+        });
+
+        it('passes twice', () => {
+            const game = new Game(3);
+
+            game.move(Move.pass(), 0);
+            game.move(Move.pass(), 1);
+
+            assert.strictEqual(game.getCurrentPlayerIndex(), 0);
+            assert.strictEqual(game.canSwapNow(), false);
+        });
+
+        it('passes after swap move', () => {
+            const game = new Game(3);
+
+            game.move(new Move(1, 2), 0);
+            game.move(Move.swapPieces(), 1);
+            game.move(Move.pass(), 0);
+
+            assert.strictEqual(game.getCurrentPlayerIndex(), 1);
+            assert.strictEqual(game.canSwapNow(), false);
         });
     });
 });

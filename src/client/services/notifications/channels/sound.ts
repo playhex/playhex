@@ -20,14 +20,17 @@ notifier.on('gameStart', (hostedGame) => {
     play('/sounds/lisp/GenericNotify.ogg');
 });
 
-notifier.on('move', (hostedGame) => {
+notifier.on('move', (hostedGame, move) => {
     if (!(
         viewingGame(hostedGame)
     )) {
         return;
     }
 
-    play('/sounds/lisp/Move.ogg');
+    play('pass' === move.specialMoveType
+        ? '/sounds/lisp/Check.ogg'
+        : '/sounds/lisp/Move.ogg'
+    );
 });
 
 notifier.on('gameEnd', (hostedGame) => {

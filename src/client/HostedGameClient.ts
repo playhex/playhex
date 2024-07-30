@@ -299,7 +299,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
                 reject(answer);
             });
 
-            notifier.emit('move', this.hostedGame);
+            notifier.emit('move', this.hostedGame, moveWithoutDate);
         });
     }
 
@@ -452,7 +452,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         this.game.move(toEngineMove(move), byPlayerIndex);
 
-        notifier.emit('move', this.hostedGame);
+        notifier.emit('move', this.hostedGame, move);
     }
 
     onServerAskUndo(byPlayerIndex: PlayerIndex): void
