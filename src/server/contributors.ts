@@ -38,19 +38,21 @@ const fetchWeblateContributors = async (): Promise<WeblateContributors> => {
         return cachedWeblateContributors;
     }
 
-    if ('true' !== FETCH_CONTRIBUTORS) {
-        return {};
-    }
-
     // Not yet exposed in API, see https://github.com/WeblateOrg/weblate/issues/5459
     // So copy report from https://hosted.weblate.org/projects/playhex/#reports (left menu, JSON).
     // For now, return hard coded until there is a new translator.
 
+    // Check disabled because for now, not actually fetching external data
+    // if ('true' !== FETCH_CONTRIBUTORS) {
+    //     return {};
+    // }
+
     return cachedWeblateContributors = {
         French: [
-            {
-                fullName: 'Julien Maulny',
-            },
+            { fullName: 'Julien Maulny' },
+        ],
+        German: [
+            { fullName: 'Ettore Atalan' },
         ],
     };
 };

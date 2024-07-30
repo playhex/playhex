@@ -143,7 +143,7 @@ onMounted(() => {
             <div class="col-sm-8 col-md-4">
                 <select class="form-select" @change="e => e.target && setLocale((e.target as HTMLSelectElement).value)">
                     <option
-                        v-for="(label, locale) in availableLocales"
+                        v-for="({ label }, locale) in availableLocales"
                         :key="locale"
                         :value="locale"
                         :selected="locale === i18n.language"

@@ -2,10 +2,10 @@ import { setDefaultOptions as setDateFnsDefaultOptions } from 'date-fns';
 import i18next from 'i18next';
 import HttpBackend from 'i18next-http-backend';
 import { loadDateFnsLocale } from './dateFns';
+import { availableLocales } from './availableLocales';
 
-export const availableLocales = {
-    en: 'English',
-    fr: 'Français',
+export {
+    availableLocales,
 };
 
 const localStorageKey = 'selectedLocale';

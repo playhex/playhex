@@ -1,25 +1,19 @@
 import { Locale } from 'date-fns';
-
-type DefaultExportLocale = Promise<{ default: Locale }>;
-
-const localeLoaders: { [locale: string]: () => DefaultExportLocale } = {
-    en: () => import(/* webpackChunkName: "locale-en" */ 'date-fns/locale/en-US') as unknown as DefaultExportLocale,
-    fr: () => import(/* webpackChunkName: "locale-fr" */ 'date-fns/locale/fr') as unknown as DefaultExportLocale,
-};
+import { availableLocales } from './availableLocales';
 
 export const loadDateFnsLocale = async (locale: string): Promise<undefined | Locale> => {
-    if (localeLoaders[locale]) {
-        return (await localeLoaders[locale]()).default;
+    if (availableLocales[locale]) {
+        return (await availableLocales[locale].loader()).default;
     }
 
-    const primaryLang = locale.split('-')[0];
+    locale = locale.split('-')[0]; // If not "en-US", try loading "en" file
 
-    if (localeLoaders[primaryLang]) {
-        return (await localeLoaders[primaryLang]()).default;
+    if (availableLocales[locale]) {
+        return (await availableLocales[locale].loader()).default;
     }
 
     // eslint-disable-next-line no-console
     console.warn(`No locale "${locale}" for date-fns`);
 
-    return;
+    return (await availableLocales['en'].loader()).default;
 };
