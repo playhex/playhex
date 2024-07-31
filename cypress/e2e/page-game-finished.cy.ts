@@ -20,8 +20,7 @@ describe('Page Game finished', () => {
 
         cy.contains('.sidebar', 'Test player wins');
         cy.contains('.sidebar', 'Rules: host plays second');
-        cy.contains('.sidebar', 'Started: 24 January 2024');
-        cy.contains('.sidebar', 'Finished: 24 January 2024 9:18 PM');
+        cy.contains('.sidebar', 'Played: 24 January 2024 9:18 PM → 9:18 PM');
     });
 
     it('displays win popin when a player resigned', () => {

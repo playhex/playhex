@@ -8,7 +8,7 @@ describe('Page Game', () => {
 
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
-        cy.contains('Share game');
+        cy.get('[aria-label="Share game"]').should('be.visible');
         // Cannot click with cypress, seems to be handled in a way it cannot make assertions.
     });
 

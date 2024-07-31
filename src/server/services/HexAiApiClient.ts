@@ -18,7 +18,7 @@ export type CalculateMoveRequest = {
 
         /**
          * Like "f6 g7 d4"
-         * Or "g5 swap-pieces g4".
+         * Or "g5 swap-pieces g4 pass".
          * In swap-pieces case, g5 black has become e7 white, then black played g4.
          */
         movesHistory: string;

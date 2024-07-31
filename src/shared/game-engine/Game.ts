@@ -251,6 +251,7 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         return this.allowSwap
             && 1 === this.movesHistory.length
+            && 'pass' !== this.movesHistory[0].getSpecialMoveType()
         ;
     }
 
@@ -412,6 +413,15 @@ export default class Game extends TypedEmitter<GameEvents>
         }
 
         return undoneMoves;
+    }
+
+    pass(byPlayerIndex: PlayerIndex): Move
+    {
+        const passMove = Move.pass();
+
+        this.move(passMove, byPlayerIndex);
+
+        return passMove;
     }
 
     hasWinner(): boolean
