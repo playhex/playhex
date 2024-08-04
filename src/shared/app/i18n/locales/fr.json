@@ -262,5 +262,6 @@
         "undo_move": "Oups",
         "accept": "Accepter reprise",
         "reject": "Refuser"
-    }
+    },
+    "pass": "Passer"
 }
