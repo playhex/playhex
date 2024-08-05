@@ -297,11 +297,6 @@ const pass = async () => {
 };
 
 const shouldShowPass = (): boolean => {
-    // TODO temporary disabled because pass move not yet handled by remote ai
-    if (hostedGameClient.value.getPlayers().some(player => player.isBot && !player.slug.match(/random-bot$/))) {
-        return false;
-    }
-
     return -1 !== getLocalPlayerIndex();
 };
 

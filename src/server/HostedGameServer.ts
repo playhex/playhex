@@ -419,13 +419,6 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'cannot pass infinitely. Now, play';
         }
 
-        // TODO temporary disabled because pass move not yet handled by remote ai
-        if ('pass' === move.specialMoveType) {
-            if (this.hostedGame?.hostedGameToPlayers.some(hostedGameToPlayer => hostedGameToPlayer.player.isBot && !hostedGameToPlayer.player.slug.match(/random-bot$/))) {
-                return 'passing against remote ai not yet implemented';
-            }
-        }
-
         try {
             this.game.move(toEngineMove(move), this.getPlayerIndex(player) as PlayerIndex);
 
