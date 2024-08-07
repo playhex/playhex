@@ -14,16 +14,16 @@ apiGetContributors().then(result => contributors.value = result);
 </script>
 
 <template>
-    <h1>PlayHex contributors</h1>
+    <h1>PlayHex Contributors</h1>
 
-    <p>Who is behind PlayHex, or help to make it grow?</p>
+    <p>Who is behind PlayHex, or has helped make it grow?</p>
 
     <p>
         <strong><a href="https://github.com/ursi" target="_blank" class="text-decoration-none">Mason</a></strong>
         for hosting his Hex Monthly tournament at PlayHex since the very beginning.
-        It helped to have good feedbacks to know what was the missing features.
+        It has provided valuable feedback, helping illuminate which features are missing.
         <br>
-        And for giving his <code>playhex.org</code> domain name to this project. And, with
+        And for giving the <code>playhex.org</code> domain name to this project. And, with
         <br>
         <strong><a href="https://github.com/Bannerets" target="_blank" class="text-decoration-none">comonoid</a></strong>,
         for their early contributions.
@@ -31,15 +31,15 @@ apiGetContributors().then(result => contributors.value = result);
 
     <p>
         <strong><a href="https://github.com/hzyhhzy" target="_blank" class="text-decoration-none">hzyhhzy</a></strong>
-        for Katahex neural network. It allows to run game analysis very efficiently, which is one of the key features.
+        for the Katahex neural network. It allows running game analysis very efficiently, which is one of PlayHex's key features.
         <br>
         <strong><a href="https://github.com/selinger" target="_blank" class="text-decoration-none">Quasar</a></strong>
-        for Katahex adaptation from KataGo (coordinates system, documentation).
+        for the Katahex adaptation from KataGo (coordinates system, documentation).
     </p>
 
     <p>
-        The Hex community at <a href="https://discord.gg/59SJ9KwvVq" target="_blank">Hex Discord</a>,
-        which is still testing PlayHex and giving feedbacks.
+        The Hex community at the <a href="https://discord.gg/59SJ9KwvVq" target="_blank">Hex Discord</a>,
+        which is still testing PlayHex and giving feedback.
     </p>
 
     <h2>Code contributors</h2>
