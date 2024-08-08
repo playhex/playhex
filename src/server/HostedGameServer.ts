@@ -67,16 +67,18 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private io: HexServer = Container.get(HexServer);
 
     private rematch: null | HostedGame = null;
+    private rematchedFrom: null | HostedGame = null;
 
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
-    static hostNewGame(gameOptions: HostedGameOptions, host: Player): HostedGameServer
+    static hostNewGame(gameOptions: HostedGameOptions, host: Player, rematchedFrom: null | HostedGame = null): HostedGameServer
     {
         const hostedGameServer = new HostedGameServer();
 
         hostedGameServer.gameOptions = gameOptions;
         hostedGameServer.host = host;
+        hostedGameServer.rematchedFrom = rematchedFrom;
 
         logger.info('Hosted game created.', { hostedGameId: hostedGameServer.publicId, host: host.pseudo });
 
@@ -333,13 +335,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
-        if (null === this.gameOptions.firstPlayer) {
-            if (Math.random() < 0.5) {
-                this.players.reverse();
-            }
-        } else if (1 === this.gameOptions.firstPlayer) {
-            this.players.reverse();
-        }
+        this.affectPlayersColors();
 
         this.game = new Game(this.gameOptions.boardsize);
 
@@ -356,6 +352,66 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         logger.info('Game Started.', { hostedGameId: this.publicId });
 
         this.makeAIMoveIfApplicable();
+    }
+
+    private affectPlayersColors(): void
+    {
+        // Random colors
+        if (null === this.gameOptions.firstPlayer) {
+
+            // In case of rematch, alternate colors from previous game instead of random
+            if (null !== this.rematchedFrom && this.shouldAlternateColorsFromRematchedGame()) {
+                logger.info('Rematch: alternate colors', { gameId: this.getId() });
+
+                const previousFirstPlayer = this.rematchedFrom.hostedGameToPlayers[0].playerId;
+                const currentFirstPlayer = this.toData().hostedGameToPlayers[0].playerId;
+
+                if ('number' !== typeof previousFirstPlayer || 'number' !== typeof currentFirstPlayer) {
+                    logger.warning('Rematch: missing previous or current first player id. Randomize.', { previousFirstPlayer, currentFirstPlayer });
+
+                    if (Math.random() < 0.5) {
+                        this.players.reverse();
+                    }
+
+                    return;
+                }
+
+                if (this.rematchedFrom.hostedGameToPlayers[0].playerId === this.toData().hostedGameToPlayers[0].playerId) {
+                    this.players.reverse();
+                }
+
+                return;
+            }
+
+            if (Math.random() < 0.5) {
+                this.players.reverse();
+            }
+
+            return;
+        }
+
+        // Fixed colors
+        if (1 === this.gameOptions.firstPlayer) {
+            this.players.reverse();
+        }
+    }
+
+    private shouldAlternateColorsFromRematchedGame(): boolean
+    {
+        if (null === this.rematchedFrom) {
+            return false;
+        }
+
+        // Do not alternate if previous game is not played, i.e canceled
+        if ('ended' !== this.rematchedFrom.state) {
+            return false;
+        }
+
+        // Alternate only if players are same. If another player joined rematch, just use random colors
+        const previousPlayersIds = this.rematchedFrom.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
+        const currentPlayersIds = this.toData().hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
+
+        return currentPlayersIds.every(id => previousPlayersIds.includes(id));
     }
 
     /**
@@ -655,6 +711,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.hostedGame.state = this.state;
         this.hostedGame.createdAt = this.createdAt;
         this.hostedGame.rematch = this.rematch;
+        this.hostedGame.rematchedFrom = this.rematchedFrom;
 
         if (!Array.isArray(this.hostedGame.hostedGameToPlayers)) {
             this.hostedGame.hostedGameToPlayers = [];
@@ -669,6 +726,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             if (this.hostedGame.hostedGameToPlayers[i].player !== this.players[i]) {
                 this.hostedGame.hostedGameToPlayers[i].player = this.players[i];
+
+                const { id } = this.players[i];
+
+                if (id) {
+                    this.hostedGame.hostedGameToPlayers[i].playerId = id;
+                }
             }
         }
 

@@ -66,11 +66,23 @@ export default class HostedGame
     @Expose()
     undoRequest: null | number = null;
 
+    /**
+     * Link to next game if this game has been rematched.
+     */
     @OneToOne(() => HostedGame)
     @JoinColumn()
     @Expose()
     @Type(() => HostedGame)
     rematch: null | HostedGame = null;
+
+    /**
+     * Link to previous game if this game is a rematch.
+     */
+    @OneToOne(() => HostedGame)
+    @JoinColumn()
+    @Expose()
+    @Type(() => HostedGame)
+    rematchedFrom: null | HostedGame = null;
 
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
     @Expose()

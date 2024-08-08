@@ -264,9 +264,9 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    async createGame(host: Player, gameOptions: HostedGameOptions): Promise<HostedGameServer>
+    async createGame(host: Player, gameOptions: HostedGameOptions, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
     {
-        const hostedGame = HostedGameServer.hostNewGame(gameOptions, host);
+        const hostedGame = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
 
         if ('ai' === gameOptions.opponentType) {
             try {
@@ -308,7 +308,7 @@ export default class HostedGameRepository
             throw new GameError('Cannot rematch an active game');
         }
 
-        const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions));
+        const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions), game);
         this.io.to(Rooms.game(game.publicId))
             .emit('rematchAvailable', game.publicId, rematch.getId());
 
