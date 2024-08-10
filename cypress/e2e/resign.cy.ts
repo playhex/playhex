@@ -21,6 +21,6 @@ describe('Resign a game', () => {
         ;
 
         cy.contains('Game finished');
-        cy.contains(' won by resignation!');
+        cy.contains(' won!');
     });
 });

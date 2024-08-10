@@ -252,15 +252,15 @@
         "time": "timeout"
     },
     "player_won_by": {
-        "default": "{player} won the game!",
-        "time": "{player} won by time!",
-        "resign": "{player} won by resignation!",
+        "default": "{player} won!",
+        "time": "{player} won on time!",
+        "resign": "{player} won!",
         "forfeit": "{player} won by forfeit!"
     },
     "player_wins_by": {
-        "default": "{player} wins the game!",
-        "time": "{player} wins by time!",
-        "resign": "{player} wins by resignation!",
+        "default": "{player} wins!",
+        "time": "{player} wins on time!",
+        "resign": "{player} wins!",
         "forfeit": "{player} wins by forfeit!"
     }
 }
