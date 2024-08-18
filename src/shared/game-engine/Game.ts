@@ -507,7 +507,7 @@ export default class Game extends TypedEmitter<GameEvents>
     }
 
     /**
-     * Makes current player lose by time
+     * Makes current player lose on time
      */
     loseByTime(date: Date): void
     {

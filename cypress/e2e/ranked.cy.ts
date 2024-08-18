@@ -59,7 +59,7 @@ describe('Ranked games', () => {
         cy.play(323, 196);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ won the game!/);
+        cy.contains(/Guest \d+ won!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 

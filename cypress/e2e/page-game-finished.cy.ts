@@ -9,7 +9,7 @@ describe('Page Game finished', () => {
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
         // Game sidebar
-        cy.contains('Test player wins the game!');
+        cy.contains('Test player wins!');
 
         // Winner appears in his color, blue
         cy.get('h3 .text-primary').contains('Test player');
@@ -33,7 +33,7 @@ describe('Page Game finished', () => {
         cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
 
         // Game sidebar
-        cy.contains('The winner wins by resignation!');
+        cy.contains('The winner wins!');
 
         // Winner appears in his color, red
         cy.get('h3 .text-danger').contains('The winner');

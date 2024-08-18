@@ -54,7 +54,7 @@ describe('Play a game to the end', () => {
         cy.play(420, 427);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ won the game!/);
+        cy.contains(/Guest \d+ won!/);
     });
 
     it('loses vs cpu on board size 4', () => {
@@ -77,7 +77,7 @@ describe('Play a game to the end', () => {
         cy.play(503, 282);
 
         cy.contains('Game finished');
-        cy.contains('Determinist random bot won the game!');
+        cy.contains('Determinist random bot!');
     });
 
     it('uses swap rule and wins on board size 4', () => {
@@ -96,6 +96,6 @@ describe('Play a game to the end', () => {
         cy.play(423, 231);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ won the game!/);
+        cy.contains(/Guest \d+ won!/);
     });
 });

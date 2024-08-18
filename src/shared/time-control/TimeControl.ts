@@ -45,7 +45,7 @@ export type TimeControlState =
 export interface PlayerTimeData
 {
     /**
-     * Time remaing before player lose by time.
+     * Time remaing before player lose on time.
      * in milliseconds.
      */
     totalRemainingTime: TimeValue;

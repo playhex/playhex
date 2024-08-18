@@ -163,7 +163,7 @@ export default class Board
     /**
      * Get list of cells of the winning path.
      * Can be null, even with a winner,
-     * when winner has won by time or resignation by example.
+     * when winner has won on time or resignation by example.
      */
     getShortestWinningPath(): null | Coords[]
     {
