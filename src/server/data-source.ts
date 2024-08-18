@@ -10,10 +10,11 @@ if (!DATABASE_URL) {
     throw new Error('DATABASE_URL must be defined in .env');
 }
 
-const type = DATABASE_URL.split('://').shift();
+const scheme = DATABASE_URL.split('://').shift();
+const type = scheme === 'postgresql' ? 'postgres' : scheme
 
 if ('mysql' !== type && 'postgres' !== type) {
-    throw new Error('DATABASE_URL expected to be like "mysql://... or postgres://...');
+    throw new Error('DATABASE_URL expected to be like "mysql://... or postgresql://...');
 }
 
 export const AppDataSource = new DataSource({
