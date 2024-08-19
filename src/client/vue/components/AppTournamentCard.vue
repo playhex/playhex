@@ -2,7 +2,8 @@
 /* eslint-env browser */
 import { onUnmounted, ref } from 'vue';
 import { BIconTrophy, BIconCircleFill } from 'bootstrap-icons-vue';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
+import { autoLocale } from '../../../shared/app/i18n';
 
 const props = defineProps({
     name: {
@@ -21,9 +22,15 @@ const props = defineProps({
 
 const { name, registerLink, startDate } = props;
 
-const startsInStr = (): string => formatDistanceToNowStrict(startDate, {
-    addSuffix: true,
-});
+const startsInStr = (): string => intlFormat(
+    startDate,
+    { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' },
+    { locale: autoLocale() }
+)
+    + ' ('
+    + formatDistanceToNowStrict(startDate, { addSuffix: true })
+    + ')'
+;
 
 const tournamentStartsStr = ref(startsInStr());
 
@@ -31,14 +38,14 @@ const started = (): boolean => new Date().getTime() > startDate.getTime();
 
 /**
  * Display card only 10 days before tournament start,
- * and hide it 2h after tournament started.
+ * and hide it 4h after tournament started.
  */
 const shouldDisplay = (): boolean => {
     const now = new Date().getTime();
     const start = startDate.getTime();
 
     return now > (start - 10 * 86400 * 1000)
-        && now < (start + 2 * 3600 * 1000)
+        && now < (start + 4 * 3600 * 1000)
     ;
 };
 
@@ -72,7 +79,15 @@ const isReallySoon = (): boolean => {
             <p v-else class="m-0"><BIconCircleFill class="text-danger" /> <span class="lead">{{ $t('now!') }}</span></p>
 
             <a v-if="!started()" :href="registerLink" target="_blank" class="btn btn-warning">{{ $t('register_on_challonge') }}</a>
-            <a v-else :href="registerLink" target="_blank" class="btn btn-link">{{ $t('see_progression_on_challonge') }}</a>
+            <a v-else :href="registerLink" target="_blank" class="btn btn-link px-0">{{ $t('see_progression_on_challonge') }}</a>
+
+            <p v-if="!started()" class="mb-0 mt-2">
+                <a href="#create-hex-monthly-1vAI-friendly" class="btn btn-sm btn-outline-primary mt-2 me-2">Train with AI</a>
+                <a href="#create-hex-monthly-1v1-friendly" class="btn btn-sm btn-outline-primary mt-2">Create 1v1</a>
+            </p>
+            <p v-else class="mb-0">
+                <a href="#create-hex-monthly" class="btn btn-sm btn-warning mt-2">Create Hex Monthly game</a>
+            </p>
         </div>
     </div>
 </template>

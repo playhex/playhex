@@ -15,16 +15,6 @@ const {
 <template>
     <div>
         <AppTournamentCard
-            name="Hex Monthly 19"
-            :startDate="new Date('2024-07-20T17:00:00Z')"
-            registerLink="https://challonge.com/hex_monthly_19"
-        />
-        <AppTournamentCard
-            name="Hex Monthly 20"
-            :startDate="new Date('2024-08-17T17:00:00Z')"
-            registerLink="https://challonge.com/hex_monthly_20"
-        />
-        <AppTournamentCard
             name="Hex Monthly 21"
             :startDate="new Date('2024-09-21T17:00:00Z')"
             registerLink="https://challonge.com/hex_monthly_21"

@@ -28,7 +28,7 @@ const getSupportedBrowserLocale = (): null | string => {
  * Get locale that should be used.
  * Either player selected it, or prefered by browser.
  */
-const autoLocale = (): string => getPlayerSelectedLocale() ?? getSupportedBrowserLocale() ?? 'en';
+export const autoLocale = (): string => getPlayerSelectedLocale() ?? getSupportedBrowserLocale() ?? 'en';
 
 const setI18nLanguage = (locale: string) => {
     i18next.changeLanguage(locale);
