@@ -445,6 +445,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
                 this.highlightLastMove(undoneMoves[i + 1] ?? null);
             }
+
+            this.highlightSidesFromGame();
         });
 
         this.game.on('ended', () => this.endedCallback());
