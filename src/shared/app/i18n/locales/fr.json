@@ -223,6 +223,7 @@
         "use": "Utiliser {{type}}",
         "byo_yomi": "Byo-Yomi",
         "fischer": "Fischer",
+        "fischer_capped": "Fischer plafonné",
         "initial_time": "Temps initial",
         "time_increment": "Increment de temps",
         "periods": "Periodes",

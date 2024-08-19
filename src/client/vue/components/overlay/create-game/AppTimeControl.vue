@@ -206,7 +206,7 @@ defineExpose({ compileOptions });
 
     <div v-if="showCustomTimeControl" class="mt-2">
         <div v-if="'fischer' === gameOptions.timeControl.type">
-            <strong class="min-w">{{ $t('time_control.fischer') }}</strong>
+            <strong class="min-w">{{ $t('time_control.fischer_capped') }}</strong>
             <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">{{ $t('time_control.use', { type: $t('time_control.byo_yomi') }) }}</button>
         </div>
         <div v-else>

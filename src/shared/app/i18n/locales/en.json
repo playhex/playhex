@@ -52,6 +52,7 @@
         "use": "Use {{type}}",
         "byo_yomi": "Byo-Yomi",
         "fischer": "Fischer",
+        "fischer_capped": "Capped Fischer",
         "initial_time": "Initial time",
         "time_increment": "Time increment",
         "periods": "Periods",
