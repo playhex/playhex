@@ -77,7 +77,7 @@ describe('Play a game to the end', () => {
         cy.play(503, 282);
 
         cy.contains('Game finished');
-        cy.contains('Determinist random bot!');
+        cy.contains('Determinist random bot won!');
     });
 
     it('uses swap rule and wins on board size 4', () => {
