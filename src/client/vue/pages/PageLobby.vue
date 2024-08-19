@@ -21,6 +21,7 @@ import AppTimeControlLabelVue from '../components/AppTimeControlLabel.vue';
 import { useSeoMeta } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import i18next from 'i18next';
+import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash';
 
 const updateSeoMeta = () => useSeoMeta({
     titleTemplate: title => `${i18next.t('lobby_title')} - ${title}`,
@@ -46,14 +47,12 @@ const goToGame = (gameId: string) => {
  */
 const create1v1RankedOverlay = defineOverlay<Create1v1RankedOverlayInput, HostedGameOptions>(Create1v1RankedOverlay);
 
-const create1v1RankedAndJoinGame = async () => {
+const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    gameOptions.opponentType = 'player';
+    gameOptions.ranked = true;
+
     try {
-        const gameOptions = await create1v1RankedOverlay({
-            gameOptions: {
-                opponentType: 'player',
-                ranked: true,
-            },
-        });
+        gameOptions = await create1v1RankedOverlay({ gameOptions });
 
         const hostedGameClient = await lobbyStore.createGame(gameOptions);
         goToGame(hostedGameClient.getId());
@@ -67,13 +66,12 @@ const create1v1RankedAndJoinGame = async () => {
  */
 const create1v1FriendlyOverlay = defineOverlay<Create1v1FriendlyOverlayInput, HostedGameOptions>(Create1v1FriendlyOverlay);
 
-const create1v1FriendlyAndJoinGame = async () => {
+const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    gameOptions.opponentType = 'player';
+    gameOptions.ranked = false;
+
     try {
-        const gameOptions = await create1v1FriendlyOverlay({
-            gameOptions: {
-                opponentType: 'player',
-            },
-        });
+        gameOptions = await create1v1FriendlyOverlay({ gameOptions });
 
         const hostedGameClient = await lobbyStore.createGame(gameOptions);
         goToGame(hostedGameClient.getId());
@@ -87,14 +85,12 @@ const create1v1FriendlyAndJoinGame = async () => {
  */
 const create1vAIRankedOverlay = defineOverlay<Create1vAIRankedOverlayInput, HostedGameOptions>(Create1vAIRankedOverlay);
 
-const create1vAIRankedAndJoinGame = async () => {
+const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    gameOptions.opponentType = 'ai';
+    gameOptions.ranked = true;
+
     try {
-        const gameOptions = await create1vAIRankedOverlay({
-            gameOptions: {
-                opponentType: 'ai',
-                ranked: true,
-            },
-        });
+        gameOptions = await create1vAIRankedOverlay({ gameOptions });
 
         const hostedGameClient = await lobbyStore.createGame(gameOptions);
         goToGame(hostedGameClient.getId());
@@ -108,13 +104,12 @@ const create1vAIRankedAndJoinGame = async () => {
  */
 const create1vAIOverlay = defineOverlay<Create1vAIOverlayInput, HostedGameOptions>(Create1vAIOverlay);
 
-const create1vAIAndJoinGame = async () => {
+const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    gameOptions.opponentType = 'ai';
+    gameOptions.ranked = false;
+
     try {
-        const gameOptions = await create1vAIOverlay({
-            gameOptions: {
-                opponentType: 'ai',
-            },
-        });
+        gameOptions = await create1vAIOverlay({ gameOptions });
 
         const hostedGameClient = await lobbyStore.createGame(gameOptions);
         goToGame(hostedGameClient.getId());
@@ -128,9 +123,9 @@ const create1vAIAndJoinGame = async () => {
  */
 const create1vOfflineAIOverlay = defineOverlay<Create1vOfflineAIOverlayInput, HostedGameOptions>(Create1vOfflineAIOverlay);
 
-const createAndJoinGameVsLocalAI = async () => {
+const createAndJoinGameVsLocalAI = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
     try {
-        const gameOptions = await create1vOfflineAIOverlay();
+        gameOptions = await create1vOfflineAIOverlay({ gameOptions });
 
         router.push({
             name: 'play-vs-ai',
@@ -232,6 +227,38 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
 
     return gameDataB.endedAt.getTime() - gameDataA.endedAt.getTime();
 };
+
+/*
+ * Auto create game with options from url hash
+ * I.e "/#create-1v1" -> open create 1v1 popin with predefined parameters
+ */
+const createGameFromHash = () => {
+    const gameOptions = createGameOptionsFromUrlHash();
+
+    if (null === gameOptions) {
+        return;
+    }
+
+    // Remove hash to allow re-open create game overlay in case of clicking on a link again
+    document.location.hash = '';
+
+    if ('player' === gameOptions.opponentType) {
+        if (gameOptions.ranked) {
+            create1v1RankedAndJoinGame(gameOptions);
+        } else {
+            create1v1FriendlyAndJoinGame(gameOptions);
+        }
+    } else {
+        if (gameOptions.ranked) {
+            create1vAIRankedAndJoinGame(gameOptions);
+        } else {
+            create1vAIFriendlyAndJoinGame(gameOptions);
+        }
+    }
+};
+
+createGameFromHash();
+window.addEventListener('hashchange', () => createGameFromHash());
 </script>
 
 <template>
@@ -253,10 +280,10 @@ const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
                         <button type="button" class="btn w-100 btn-warning" @click="() => create1vAIRankedAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
                     </div>
                     <div class="col-6 col-md-4 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIFriendlyAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
                     </div>
                     <div class="col-6 col-md-4 mb-4">
-                        <button type="button" class="btn w-100 btn-outline-primary" @click="createAndJoinGameVsLocalAI"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_offline.title') }}</button>
+                        <button type="button" class="btn w-100 btn-outline-primary" @click="() => createAndJoinGameVsLocalAI()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_offline.title') }}</button>
                     </div>
                 </div>
 

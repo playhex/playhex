@@ -50,7 +50,7 @@ const defaultTimeControls: { [key: string]: { label: string, timeControl: TimeCo
 
 // Must be different that predefined ones,
 // or "Custom" will be select first on Game option popin open
-const customTimeControl: Ref<TimeControlType> = ref({
+const customTimeControl: Ref<TimeControlType> = ref(gameOptions.value.timeControl ?? {
     type: 'fischer',
     options: {
         initialTime: 480 * 1000,
@@ -59,6 +59,12 @@ const customTimeControl: Ref<TimeControlType> = ref({
 });
 
 const showCustomTimeControl = ref(false);
+
+if (gameOptions.value.timeControl) {
+    showCustomTimeControl.value = true;
+} else {
+    gameOptions.value.timeControl = defaultTimeControls.normal.timeControl;
+}
 
 /**
  * initial time for Fischer and ByoYomi
@@ -136,11 +142,13 @@ const secondaryTimeSteps: number[] = [
     86400 * 14 * 1000,
 ];
 
-const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t === 600 * 1000));
-const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t => t === 5 * 1000));
+const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t === gameOptions.value.timeControl.options.initialTime));
+const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t =>
+    'fischer' === gameOptions.value.timeControl.type
+        ? t === gameOptions.value.timeControl.options.timeIncrement
+        : t === gameOptions.value.timeControl.options.periodTime
+));
 const byoyomiPeriodsCount = ref(5);
-
-gameOptions.value.timeControl = defaultTimeControls.normal.timeControl;
 
 /**
  * Set timeControl options values from form input values.

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, ref, toRefs } from 'vue';
+import { PropType, Ref, ref, toRefs } from 'vue';
 import { BIconAspectRatio } from 'bootstrap-icons-vue';
 import HostedGameOptions, { MAX_BOARDSIZE } from '../../../../../shared/app/models/HostedGameOptions';
 
@@ -25,9 +25,9 @@ const props = defineProps({
     },
 });
 
-const { gameOptions, boardsizeMin, boardsizeMax } = toRefs(props);
+const { gameOptions, boardsizeMin, boardsizeMax, sizesSelection } = toRefs(props);
 
-const showCustomBoardsize = ref(false);
+const showCustomBoardsize: Ref<boolean> = ref(!sizesSelection.value.includes(gameOptions.value.boardsize));
 
 const isBoardsizeAllowed = (boardsize: number): boolean => {
     if ('number' === typeof boardsizeMin?.value && boardsize < boardsizeMin.value) {
