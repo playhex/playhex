@@ -1,1 +1,267 @@
-{}
+{
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "Brak dostępnych gier. Stwórz nową!",
+        "watch_current_games": "Oglądaj aktualne gry",
+        "join_a_game": "Dołącz do gry",
+        "no_playing_games": "Obecnie nie ma żadnych gier w toku."
+    },
+    "game": {
+        "opponent": "Przeciwnik",
+        "host": "Gospodarz",
+        "size": "Rozmiar",
+        "board": "Plansza",
+        "board_size": "Rozmiar planszy",
+        "time_control": "Kontrola czasu",
+        "rules": "Zasady",
+        "created": "Utworzona",
+        "accept": "Akceptuj",
+        "red": "Czerwony",
+        "blue": "Niebieski",
+        "started": "Rozpoczęta",
+        "played": "Rozegrana",
+        "finished": "Zakończona",
+        "review": "Przegląd",
+        "won": "Wygrana",
+        "outcome": "Wynik",
+        "lost": "Przegrana",
+        "playing": "Gra w toku",
+        "watch": "Oglądaj"
+    },
+    "game_rules": {
+        "normal": "normalne",
+        "host_plays_first": "gospodarz gra pierwszy",
+        "host_plays_second": "gospodarz gra drugi",
+        "no_swap": "bez zamiany"
+    },
+    "create_game": {
+        "custom_size": "Niestandardowy",
+        "less_options": "Mniej opcji",
+        "more_options": "Więcej opcji"
+    },
+    "player_settings": {
+        "title": "Ustawienia"
+    },
+    "background_theme": {
+        "title": "Motyw",
+        "dark": "Ciemny",
+        "light": "Jasny"
+    },
+    "time_control": {
+        "custom": "Niestandardowy",
+        "use": "Użyj {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Fischer z limitem",
+        "initial_time": "Czas początkowy",
+        "time_increment": "Inkrementacja czasu",
+        "periods": "Okresy",
+        "periods_time": "Czas okresów",
+        "fast": "Szybka",
+        "normal": "Normalna",
+        "long": "Długa"
+    },
+    "i_play": {
+        "title": "Gram jako",
+        "random": "Losowo",
+        "first": "Pierwszy",
+        "second": "Drugi"
+    },
+    "swap_rule": "Zasada zamiany",
+    "allow_swap_pieces": "Zezwól na zamianę elementów",
+    "toggle_coords": "Pokaż/Ukryj współrzędne",
+    "toggle_coords_short": "Współrzędne",
+    "share_game": "Udostępnij grę",
+    "copied!": "Skopiowano!",
+    "not_copied": "Nie udało się skopiować, użyj prawego przycisku myszy lub długiego dotknięcia",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Gra utworzona przez {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "Gra została utworzona przez {player}, {timeAgo}.",
+    "log_out": "Wyloguj się",
+    "log_in": "Zaloguj się",
+    "sign_up": "Zarejestruj się",
+    "feedback": "Opinie",
+    "hex_links": "Linki do Hex",
+    "project_under_development": "Projekt w trakcie rozwoju",
+    "last_change": "Ostatnia zmiana: {{date}}",
+    "privacy_policy": "Polityka prywatności",
+    "license_agpl": "Licencja AGPL-3.0",
+    "create_account": "Utwórz konto",
+    "already_have_account_login_instead": "Masz już konto? {login} zamiast tego",
+    "already_have_account_login_instead_link_label": "Zaloguj się",
+    "no_account_sign_up_instead": "Nie masz konta? {signUp} zamiast tego",
+    "no_account_sign_up_instead_link_label": "Zarejestruj się",
+    "add_your_language": "Twojego języka brakuje? {link}!",
+    "add_your_language_link": "Dodaj go przez Weblate",
+    "show_coords_by_default": "Pokaż współrzędne domyślnie",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "account_created_on": "Konto utworzone {{date}}",
+    "player_current_games": "Aktualne gry",
+    "player_game_history": "Historia gier",
+    "waiting": "oczekiwanie…",
+    "initializing_game": "Inicjalizacja gry…",
+    "game_finished_overlay": {
+        "title": "Gra zakończona"
+    },
+    "game_has_been_canceled": "Gra została anulowana.",
+    "waiting_for_an_opponent": "Oczekiwanie na przeciwnika…",
+    "confirm_overlay": {
+        "confirmation": "Potwierdzenie",
+        "are_you_sure?": "Czy na pewno?"
+    },
+    "workers": {
+        "slow_worker": "Obecnie nie ma szybkich pracowników online. Dostępne są tylko ograniczone AI.",
+        "no_worker": "Nie ma dostępnych pracowników do obliczania ruchów. Dostępne są tylko losowe boty.",
+        "see_how_to_spawn_a_worker": "Zobacz, jak obliczać ruchy AI dla PlayHex z mojego komputera"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "Analiza gry przez AI",
+        "analyze_game": "Analizuj grę",
+        "requested": "Analiza zażądana…",
+        "errored": "Błąd analizy!",
+        "best_move": "najlepszy ruch",
+        "best": "najlepszy:",
+        "how_it_works": "Jak to działa"
+    },
+    "try_again": "Spróbuj ponownie",
+    "yes": "Tak",
+    "no": "Nie",
+    "language": "Język",
+    "cancel": "Anuluj",
+    "pass": "Pasuj",
+    "close": "Zamknij",
+    "ranked": "Rankingowa",
+    "rating": "Ocena: {{rating}}",
+    "new_game": "Nowa gra",
+    "players": "Gracze",
+    "player": "gracz",
+    "load_more": "Załaduj więcej",
+    "no_such_player": "Wygląda na to, że nie ma takiego gracza.",
+    "n_online_players": "Online ({{n}})",
+    "guest": "Gość",
+    "finished_games": "Zakończone gry",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Stwórz 1v1"
+    },
+    "1v1_friendly": {
+        "title": "Niestandardowy 1v1",
+        "create": "Stwórz niestandardowy 1v1"
+    },
+    "1vAI_ranked": {
+        "title": "Ranking vs AI",
+        "create": "Graj rankingowo vs AI"
+    },
+    "1vAI_friendly": {
+        "title": "Graj vs AI",
+        "create": "Graj vs AI"
+    },
+    "1vAI_offline": {
+        "title": "Offline AI",
+        "create": "Graj vs offline AI"
+    },
+    "offline_game_explain": "Gra offline działa tylko na twoim urządzeniu, serwer PlayHex nie jest używany. Możesz grać, gdy nie masz internetu.",
+    "loading_game": "Ładowanie gry…",
+    "tournament": "Turniej",
+    "now!": "Teraz!",
+    "register_on_challonge": "Zarejestruj się na Challonge",
+    "see_progression_on_challonge": "Zobacz postępy na Challonge",
+    "move": "ruch",
+    "chat": "Czat",
+    "system": "System",
+    "chat_message_placeholder": "Wiadomość…",
+    "unread_messages": "nieprzeczytane wiadomości",
+    "send_chat_message": "Wyślij",
+    "n_characters_one": "{{count}} znak",
+    "n_characters_other": "{{count}} znaków",
+    "landscape": "Pejzaż",
+    "portrait": "Portret",
+    "resign": "Poddaj się",
+    "auto": "Auto",
+    "board_orientation": {
+        "title": "Orientacja",
+        "description": "Preferowana orientacja planszy dla ekranów w orientacji pionowej i poziomej.",
+        "flat": "Płaska",
+        "flat_2": "Płaska 2",
+        "diamond": "Diamentowa"
+    },
+    "shading_patterns": {
+        "title": "Wzór cieniowania",
+        "visibility": "Widoczność wzoru cieniowania",
+        "types": {
+            "null": "Brak",
+            "tricolor_checkerboard": "Trójkolorowa szachownica",
+            "concentrical_rings": "Koncentryczne pierścienie (Hexworld)",
+            "height_5_lines": "Linie wysokości 5",
+            "single_ring": "Pojedynczy pierścień",
+            "custom": "Niestandardowy"
+        },
+        "custom_expression": "Niestandardowa ekspresja",
+        "help_custom": "Wyrażenie matematyczne dla niestandardowego wzoru cieniowania.<br>Wyrażenie musi zwracać liczbę od 0 (bez cieniowania) do 1 (pełne cieniowanie) dla danej komórki (rząd, kolumna). Możesz użyć np. 0.5 dla trójkolorowych wzorów cieniowania. Zwrócenie <code>true</code> lub <code>false</code> działa tak samo, jak zwrócenie <code>1</code> lub <code>0</code>.<br>Dostępne zmienne:<br>- <code>row</code> i <code>col</code> (skróty: <code>r</code> i <code>c</code>) dla numeru rzędu i kolumny, zaczyna się od 0.<br>- <code>size</code> (lub <code>s</code>) dla rozmiaru planszy.<br>- <code>distToSide</code> odległość bieżącej komórki do najbliższego boku.<br>Zobacz listę dostępnych operatorów na https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Przykłady:<br>- Koncentryczne pierścienie: <code>distToSide % 2</code><br>- Trójkolorowa szachownica: <code>((size + row - col) % 3) / 2</code><br>- Dysk o promieniu sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Otwórz konsolę javascript (F12), aby zobaczyć błędy podczas wykonywania wyrażenia."
+    },
+    "show_44_dots": "Pokaż kropki na komórkach 4-4",
+    "preview": "Podgląd",
+    "change_password": "Zmień hasło",
+    "old_password": "Stare hasło",
+    "new_password": "Nowe hasło",
+    "confirm_new_password": "Potwierdź nowe hasło",
+    "update_password": "Zaktualizuj hasło",
+    "contribute": "Wnieś wkład",
+    "contributors": "Współtwórcy",
+    "player_made_a_move": "{{player}} wykonał ruch",
+    "game_with_player_has_started": "Gra z {{player}} została rozpoczęta",
+    "last_move": "Ostatni ruch",
+    "undo": {
+        "undo_move": "Cofnij",
+        "accept": "Zaakceptuj cofnięcie",
+        "reject": "Odrzuć"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Kompensacja przesunięcia daty: {{ms}}ms"
+    },
+    "game_candency": {
+        "blitz": "Blitz",
+        "normal": "Normalne",
+        "correspondence": "Korespondencja"
+    },
+    "confirm_move": {
+        "title": "Potwierdź ruch",
+        "button_label": "Potwierdź ruch",
+        "button_label_short": "Potwierdź",
+        "send_immediately": "Wyślij natychmiast",
+        "ask_confirmation": "Zapytaj o potwierdzenie",
+        "description": "Aby zapobiec błędnym kliknięciom, możesz wymagać potwierdzenia przed przesłaniem ruchu."
+    },
+    "rematch": {
+        "label": "Rewanż",
+        "accept": "Zaakceptuj rewanż",
+        "view": "Zobacz rewanż"
+    },
+    "short_time_unit": {
+        "day": "d",
+        "hour": "h",
+        "minute": "min",
+        "second": "s"
+    },
+    "outcome": {
+        "win": "wygrana",
+        "loss": "przegrana",
+        "resign": "poddanie",
+        "forfeit": "walkower",
+        "time": "czas wyczerpany"
+    },
+    "player_won_by": {
+        "default": "{player} wygrał!",
+        "time": "{player} wygrał na czas!",
+        "resign": "{player} wygrał!",
+        "forfeit": "{player} wygrał przez walkower!"
+    },
+    "player_wins_by": {
+        "default": "{player} wygrywa!",
+        "time": "{player} wygrywa na czas!",
+        "resign": "{player} wygrywa!",
+        "forfeit": "{player} wygrywa przez walkower!"
+    }
+}

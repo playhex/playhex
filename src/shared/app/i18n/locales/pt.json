@@ -1,0 +1,267 @@
+{
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "Nenhum jogo disponível agora. Crie um novo!",
+        "watch_current_games": "Assista aos jogos atuais",
+        "join_a_game": "Entrar em um jogo",
+        "no_playing_games": "Não há jogos em andamento agora."
+    },
+    "game": {
+        "opponent": "Oponente",
+        "host": "Anfitrião",
+        "size": "Tamanho",
+        "board": "Tabuleiro de jogo",
+        "board_size": "Tamanho do tabuleiro",
+        "time_control": "Controle de tempo",
+        "rules": "Regras",
+        "created": "Criado",
+        "accept": "Aceitar",
+        "red": "Vermelho",
+        "blue": "Azul",
+        "started": "Iniciado",
+        "played": "Jogou",
+        "finished": "Finalizado",
+        "review": "Revisão",
+        "won": "Venceu",
+        "outcome": "Resultado",
+        "lost": "Perdeu",
+        "playing": "Jogando",
+        "watch": "Assistir"
+    },
+    "game_rules": {
+        "normal": "normal",
+        "host_plays_first": "anfitrião joga primeiro",
+        "host_plays_second": "anfitrião joga segundo",
+        "no_swap": "sem troca"
+    },
+    "create_game": {
+        "custom_size": "Personalizado",
+        "less_options": "Menos opções",
+        "more_options": "Mais opções"
+    },
+    "player_settings": {
+        "title": "Configurações"
+    },
+    "background_theme": {
+        "title": "Tema",
+        "dark": "Escuro",
+        "light": "Claro"
+    },
+    "time_control": {
+        "custom": "Personalizado",
+        "use": "Usar {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Fischer Limitado",
+        "initial_time": "Tempo inicial",
+        "time_increment": "Incremento de tempo",
+        "periods": "Períodos",
+        "periods_time": "Tempo dos períodos",
+        "fast": "Rápido",
+        "normal": "Normal",
+        "long": "Longo"
+    },
+    "i_play": {
+        "title": "Eu jogo",
+        "random": "Aleatório",
+        "first": "Primeiro",
+        "second": "Segundo"
+    },
+    "swap_rule": "Regra de troca",
+    "allow_swap_pieces": "Permitir troca de peças",
+    "toggle_coords": "Alternar coordenadas",
+    "toggle_coords_short": "Coordenadas",
+    "share_game": "Compartilhar jogo",
+    "copied!": "Copiado!",
+    "not_copied": "Falha ao copiar, use clique direito ou toque longo",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Jogo criado por {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "O jogo foi criado por {player}, {timeAgo}.",
+    "log_out": "Sair",
+    "log_in": "Entrar",
+    "sign_up": "Cadastrar-se",
+    "feedback": "Feedback",
+    "hex_links": "Links de Hex",
+    "project_under_development": "Projeto em desenvolvimento",
+    "last_change": "Última mudança: {{date}}",
+    "privacy_policy": "Política de Privacidade",
+    "license_agpl": "Licença AGPL-3.0",
+    "create_account": "Criar uma conta",
+    "already_have_account_login_instead": "Já tem uma conta? {login} em vez disso",
+    "already_have_account_login_instead_link_label": "Entrar",
+    "no_account_sign_up_instead": "Não tem uma conta? {signUp} em vez disso",
+    "no_account_sign_up_instead_link_label": "Cadastrar-se",
+    "add_your_language": "Seu idioma está faltando? {link}!",
+    "add_your_language_link": "Adicione com Weblate",
+    "show_coords_by_default": "Mostrar coordenadas por padrão",
+    "username": "Nome de usuário",
+    "password": "Senha",
+    "account_created_on": "Conta criada em {{date}}",
+    "player_current_games": "Jogos atuais",
+    "player_game_history": "Histórico de jogos",
+    "waiting": "aguardando…",
+    "initializing_game": "Inicializando jogo…",
+    "game_finished_overlay": {
+        "title": "Jogo finalizado"
+    },
+    "game_has_been_canceled": "O jogo foi cancelado.",
+    "waiting_for_an_opponent": "Aguardando um oponente…",
+    "confirm_overlay": {
+        "confirmation": "Confirmação",
+        "are_you_sure?": "Você tem certeza?"
+    },
+    "workers": {
+        "slow_worker": "Nenhum trabalhador rápido está online agora. Apenas IA limitadas estão disponíveis.",
+        "no_worker": "Nenhum trabalhador pode calcular movimentos agora. Apenas bots aleatórios estão disponíveis.",
+        "see_how_to_spawn_a_worker": "Veja como calcular movimentos de IA para o PlayHex no meu computador"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "Análise do jogo por IA",
+        "analyze_game": "Analisar jogo",
+        "requested": "Análise solicitada…",
+        "errored": "Erro na análise!",
+        "best_move": "melhor movimento",
+        "best": "melhor:",
+        "how_it_works": "Como funciona"
+    },
+    "try_again": "Tentar novamente",
+    "yes": "Sim",
+    "no": "Não",
+    "language": "Idioma",
+    "cancel": "Cancelar",
+    "pass": "Passar",
+    "close": "Fechar",
+    "ranked": "Ranqueado",
+    "rating": "Classificação: {{rating}}",
+    "new_game": "Novo jogo",
+    "players": "Jogadores",
+    "player": "jogador",
+    "load_more": "Carregar mais",
+    "no_such_player": "Parece que não existe tal jogador.",
+    "n_online_players": "Online ({{n}})",
+    "guest": "Convidado",
+    "finished_games": "Jogos finalizados",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Criar 1v1"
+    },
+    "1v1_friendly": {
+        "title": "1v1 Personalizado",
+        "create": "Criar 1v1 personalizado"
+    },
+    "1vAI_ranked": {
+        "title": "Ranqueado contra IA",
+        "create": "Jogar ranqueado contra IA"
+    },
+    "1vAI_friendly": {
+        "title": "Jogar contra IA",
+        "create": "Jogar contra IA"
+    },
+    "1vAI_offline": {
+        "title": "IA offline",
+        "create": "Jogar contra IA offline"
+    },
+    "offline_game_explain": "Jogo offline funciona apenas no seu dispositivo, o servidor do PlayHex não é chamado. Assim, você pode jogar sem internet.",
+    "loading_game": "Carregando jogo…",
+    "tournament": "Torneio",
+    "now!": "Agora!",
+    "register_on_challonge": "Registrar-se no Challonge",
+    "see_progression_on_challonge": "Ver progresso no Challonge",
+    "move": "movimento",
+    "chat": "Chat",
+    "system": "Sistema",
+    "chat_message_placeholder": "Mensagem…",
+    "unread_messages": "mensagens não lidas",
+    "send_chat_message": "Enviar",
+    "n_characters_one": "{{count}} caractere",
+    "n_characters_other": "{{count}} caracteres",
+    "landscape": "Paisagem",
+    "portrait": "Retrato",
+    "resign": "Desistir",
+    "auto": "Auto",
+    "board_orientation": {
+        "title": "Orientação",
+        "description": "Sua orientação preferida para o tabuleiro em tela retrato e paisagem.",
+        "flat": "Plano",
+        "flat_2": "Plano 2",
+        "diamond": "Diamante"
+    },
+    "shading_patterns": {
+        "title": "Padrão de sombreamento",
+        "visibility": "Visibilidade do padrão de sombreamento",
+        "types": {
+            "null": "Nenhum",
+            "tricolor_checkerboard": "Tabuleiro de três cores",
+            "concentrical_rings": "Anéis concêntricos (Hexworld)",
+            "height_5_lines": "Linhas de altura 5",
+            "single_ring": "Anel único",
+            "custom": "Personalizado"
+        },
+        "custom_expression": "Expressão personalizada",
+        "help_custom": "Expressão matemática para padrão de sombreamento personalizado.<br>A expressão deve retornar um número entre 0 (sem sombreamento) e 1 (totalmente sombreado) para uma célula dada (linha, coluna). Você pode usar 0.5 para padrões de sombreamento de três cores. Retornar <code>true</code> ou <code>false</code> também funciona como retornar <code>1</code> ou <code>0</code>.<br>Variáveis disponíveis:<br>- <code>row</code> e <code>col</code> (atalhos: <code>r</code> e <code>c</code>) para o número da linha e coluna, começando de 0.<br>- <code>size</code> (ou <code>s</code>) para o tamanho do tabuleiro.<br>- <code>distToSide</code> distância da célula atual ao seu lado mais próximo.<br>Veja a lista de operadores disponíveis em https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Exemplos:<br>- Anéis concêntricos: <code>distToSide % 2</code><br>- Tabuleiro de três cores: <code>((size + row - col) % 3) / 2</code><br>- Disco com raio sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Abra o console de javascript (F12) para ver erros ao executar sua expressão."
+    },
+    "show_44_dots": "Mostrar pontos nas células 4-4",
+    "preview": "Visualizar",
+    "change_password": "Alterar senha",
+    "old_password": "Senha antiga",
+    "new_password": "Nova senha",
+    "confirm_new_password": "Confirmar nova senha",
+    "update_password": "Atualizar senha",
+    "contribute": "Contribuir",
+    "contributors": "Contribuidores",
+    "player_made_a_move": "{{player}} fez um movimento",
+    "game_with_player_has_started": "O jogo com {{player}} começou",
+    "last_move": "Último movimento",
+    "undo": {
+        "undo_move": "Desfazer",
+        "accept": "Aceitar desfazer",
+        "reject": "Rejeitar"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Compensação de deslocamento de data: {{ms}}ms"
+    },
+    "game_candency": {
+        "blitz": "Blitz",
+        "normal": "Normal",
+        "correspondence": "Correspondência"
+    },
+    "confirm_move": {
+        "title": "Confirmar movimento",
+        "button_label": "Confirmar movimento",
+        "button_label_short": "Confirmar",
+        "send_immediately": "Enviar imediatamente",
+        "ask_confirmation": "Solicitar confirmação",
+        "description": "Para evitar cliques errados, você pode exigir confirmação antes de enviar um movimento."
+    },
+    "rematch": {
+        "label": "Revanche",
+        "accept": "Aceitar revanche",
+        "view": "Ver revanche"
+    },
+    "short_time_unit": {
+        "day": "d",
+        "hour": "h",
+        "minute": "min",
+        "second": "s"
+    },
+    "outcome": {
+        "win": "vitória",
+        "loss": "derrota",
+        "resign": "desistência",
+        "forfeit": "desclassificação",
+        "time": "tempo esgotado"
+    },
+    "player_won_by": {
+        "default": "{player} venceu!",
+        "time": "{player} venceu por tempo!",
+        "resign": "{player} venceu!",
+        "forfeit": "{player} venceu por desclassificação!"
+    },
+    "player_wins_by": {
+        "default": "{player} vence!",
+        "time": "{player} vence por tempo!",
+        "resign": "{player} vence!",
+        "forfeit": "{player} vence por desclassificação!"
+    }
+}

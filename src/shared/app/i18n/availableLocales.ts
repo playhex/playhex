@@ -22,4 +22,16 @@ export const availableLocales: AvailableLocales = {
         label: 'Français',
         loader: () => import(/* webpackChunkName: "locale-fr" */ 'date-fns/locale/fr') as unknown as DefaultExportLocale,
     },
+    'zh-Hans': {
+        label: 'Chinese (beta)',
+        loader: () => import(/* webpackChunkName: "locale-zh" */ 'date-fns/locale/zh-CN') as unknown as DefaultExportLocale,
+    },
+    pl: {
+        label: 'Polish (beta)',
+        loader: () => import(/* webpackChunkName: "locale-pl" */ 'date-fns/locale/pl') as unknown as DefaultExportLocale,
+    },
+    pt: {
+        label: 'Portuguese (beta)',
+        loader: () => import(/* webpackChunkName: "locale-pt" */ 'date-fns/locale/pt') as unknown as DefaultExportLocale,
+    },
 };

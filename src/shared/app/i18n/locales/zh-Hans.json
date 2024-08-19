@@ -1,1 +1,267 @@
-{}
+{
+    "lobby_title": "大厅",
+    "lobby": {
+        "no_waiting_games": "目前没有可用的游戏。创建一个新游戏吧！",
+        "watch_current_games": "观看当前游戏",
+        "join_a_game": "加入游戏",
+        "no_playing_games": "目前没有正在进行的游戏。"
+    },
+    "game": {
+        "opponent": "对手",
+        "host": "主持人",
+        "size": "大小",
+        "board": "游戏棋盘",
+        "board_size": "棋盘大小",
+        "time_control": "时间控制",
+        "rules": "规则",
+        "created": "已创建",
+        "accept": "接受",
+        "red": "红色",
+        "blue": "蓝色",
+        "started": "已开始",
+        "played": "已玩",
+        "finished": "已完成",
+        "review": "回顾",
+        "won": "获胜",
+        "outcome": "结果",
+        "lost": "失败",
+        "playing": "正在玩",
+        "watch": "观看"
+    },
+    "game_rules": {
+        "normal": "普通",
+        "host_plays_first": "主持人先手",
+        "host_plays_second": "主持人后手",
+        "no_swap": "不交换"
+    },
+    "create_game": {
+        "custom_size": "自定义",
+        "less_options": "更少选项",
+        "more_options": "更多选项"
+    },
+    "player_settings": {
+        "title": "设置"
+    },
+    "background_theme": {
+        "title": "主题",
+        "dark": "深色",
+        "light": "浅色"
+    },
+    "time_control": {
+        "custom": "自定义",
+        "use": "使用{{type}}",
+        "byo_yomi": "读秒",
+        "fischer": "费舍尔",
+        "fischer_capped": "封顶费舍尔",
+        "initial_time": "初始时间",
+        "time_increment": "时间增量",
+        "periods": "时间段",
+        "periods_time": "每段时间",
+        "fast": "快",
+        "normal": "普通",
+        "long": "长"
+    },
+    "i_play": {
+        "title": "我玩",
+        "random": "随机",
+        "first": "先手",
+        "second": "后手"
+    },
+    "swap_rule": "交换规则",
+    "allow_swap_pieces": "允许交换棋子",
+    "toggle_coords": "切换坐标",
+    "toggle_coords_short": "坐标",
+    "share_game": "分享游戏",
+    "copied!": "已复制!",
+    "not_copied": "复制失败，请使用右键点击或长按复制",
+    "2dots": "{{s}}：",
+    "game_created_by_player_time_ago": "游戏由{player}创建，{timeAgo}。",
+    "game_was_created_by_player_time_ago": "游戏由{player}创建，{timeAgo}。",
+    "log_out": "登出",
+    "log_in": "登录",
+    "sign_up": "注册",
+    "feedback": "反馈",
+    "hex_links": "Hex链接",
+    "project_under_development": "项目开发中",
+    "last_change": "最后更改：{{date}}",
+    "privacy_policy": "隐私政策",
+    "license_agpl": "AGPL-3.0许可",
+    "create_account": "创建账户",
+    "already_have_account_login_instead": "已有账户？请{login}",
+    "already_have_account_login_instead_link_label": "登录",
+    "no_account_sign_up_instead": "没有账户？请{signUp}",
+    "no_account_sign_up_instead_link_label": "注册",
+    "add_your_language": "没有你的语言？{link}！",
+    "add_your_language_link": "通过Weblate添加",
+    "show_coords_by_default": "默认显示坐标",
+    "username": "用户名",
+    "password": "密码",
+    "account_created_on": "账户创建于{{date}}",
+    "player_current_games": "当前游戏",
+    "player_game_history": "游戏历史",
+    "waiting": "等待中…",
+    "initializing_game": "正在初始化游戏…",
+    "game_finished_overlay": {
+        "title": "游戏已结束"
+    },
+    "game_has_been_canceled": "游戏已取消。",
+    "waiting_for_an_opponent": "等待对手…",
+    "confirm_overlay": {
+        "confirmation": "确认",
+        "are_you_sure?": "你确定吗？"
+    },
+    "workers": {
+        "slow_worker": "当前没有快速的工作者在线。仅有有限的AI可用。",
+        "no_worker": "目前没有工作者可以计算动作。仅有随机机器人可用。",
+        "see_how_to_spawn_a_worker": "查看如何从我的电脑为PlayHex计算AI动作"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "由AI分析游戏",
+        "analyze_game": "分析游戏",
+        "requested": "已请求分析…",
+        "errored": "分析出错！",
+        "best_move": "最佳走法",
+        "best": "最佳：",
+        "how_it_works": "工作原理"
+    },
+    "try_again": "重试",
+    "yes": "是",
+    "no": "否",
+    "language": "语言",
+    "cancel": "取消",
+    "pass": "跳过",
+    "close": "关闭",
+    "ranked": "排名赛",
+    "rating": "评分：{{rating}}",
+    "new_game": "新游戏",
+    "players": "玩家",
+    "player": "玩家",
+    "load_more": "加载更多",
+    "no_such_player": "看起来没有这个玩家。",
+    "n_online_players": "在线（{{n}}）",
+    "guest": "游客",
+    "finished_games": "已完成的游戏",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "创建1v1"
+    },
+    "1v1_friendly": {
+        "title": "自定义1v1",
+        "create": "创建自定义1v1"
+    },
+    "1vAI_ranked": {
+        "title": "对AI排名赛",
+        "create": "对AI排名赛"
+    },
+    "1vAI_friendly": {
+        "title": "对AI",
+        "create": "对AI"
+    },
+    "1vAI_offline": {
+        "title": "离线AI",
+        "create": "对离线AI"
+    },
+    "offline_game_explain": "离线游戏仅在您的设备上运行，不会连接PlayHex服务器。因此，即使没有网络也可以玩。",
+    "loading_game": "正在加载游戏…",
+    "tournament": "锦标赛",
+    "now!": "现在！",
+    "register_on_challonge": "在Challonge上注册",
+    "see_progression_on_challonge": "在Challonge上查看进度",
+    "move": "步",
+    "chat": "聊天",
+    "system": "系统",
+    "chat_message_placeholder": "消息…",
+    "unread_messages": "未读消息",
+    "send_chat_message": "发送",
+    "n_characters_one": "{{count}}个字符",
+    "n_characters_other": "{{count}}个字符",
+    "landscape": "横屏",
+    "portrait": "竖屏",
+    "resign": "认输",
+    "auto": "自动",
+    "board_orientation": {
+        "title": "棋盘方向",
+        "description": "你喜欢的棋盘方向，用于竖屏和横屏模式。",
+        "flat": "平面",
+        "flat_2": "平面2",
+        "diamond": "菱形"
+    },
+    "shading_patterns": {
+        "title": "阴影模式",
+        "visibility": "阴影模式可见性",
+        "types": {
+            "null": "无",
+            "tricolor_checkerboard": "三色棋盘",
+            "concentrical_rings": "同心圆（Hexworld）",
+            "height_5_lines": "高度5线",
+            "single_ring": "单圈",
+            "custom": "自定义"
+        },
+        "custom_expression": "自定义表达式",
+        "help_custom": "自定义阴影模式的数学表达式。<br>表达式必须返回一个在0（无阴影）到1（完全阴影）之间的数字，针对某个单元格（行，列）。你可以使用例如0.5来表示三色阴影模式。返回<code>true</code>或<code>false</code>的效果等同于返回<code>1</code>或<code>0</code>。<br>可用变量：<br>- <code>row</code>和<code>col</code>（快捷方式：<code>r</code>和<code>c</code>），表示行和列编号，从0开始。<br>- <code>size</code>（或<code>s</code>），表示棋盘大小。<br>- <code>distToSide</code>表示当前单元格到最近边界的距离。<br>可用操作符的列表参见https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>示例：<br>- 同心圆：<code>distToSide % 2</code><br>- 三色棋盘：<code>((size + row - col) % 3) / 2</code><br>- 半径为sqrt(20)的圆：<code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>打开JavaScript控制台（F12）查看执行表达式时的错误。"
+    },
+    "show_44_dots": "在4-4点显示标记",
+    "preview": "预览",
+    "change_password": "更改密码",
+    "old_password": "旧密码",
+    "new_password": "新密码",
+    "confirm_new_password": "确认新密码",
+    "update_password": "更新密码",
+    "contribute": "贡献",
+    "contributors": "贡献者",
+    "player_made_a_move": "{{player}}下了一步棋",
+    "game_with_player_has_started": "与{{player}}的游戏已开始",
+    "last_move": "最后一步",
+    "undo": {
+        "undo_move": "撤销",
+        "accept": "接受撤销",
+        "reject": "拒绝"
+    },
+    "ping": {
+        "ping_ms": "延迟：{{ms}}毫秒",
+        "date_shift_ms": "日期偏移补偿：{{ms}}毫秒"
+    },
+    "game_candency": {
+        "blitz": "闪电战",
+        "normal": "普通",
+        "correspondence": "通信赛"
+    },
+    "confirm_move": {
+        "title": "确认走棋",
+        "button_label": "确认走棋",
+        "button_label_short": "确认",
+        "send_immediately": "立即发送",
+        "ask_confirmation": "要求确认",
+        "description": "为了防止误点，你可以要求在提交走棋前确认。"
+    },
+    "rematch": {
+        "label": "重赛",
+        "accept": "接受重赛",
+        "view": "查看重赛"
+    },
+    "short_time_unit": {
+        "day": "天",
+        "hour": "小时",
+        "minute": "分",
+        "second": "秒"
+    },
+    "outcome": {
+        "win": "胜",
+        "loss": "负",
+        "resign": "认输",
+        "forfeit": "弃权",
+        "time": "超时"
+    },
+    "player_won_by": {
+        "default": "{player}赢了！",
+        "time": "{player}因时间赢了！",
+        "resign": "{player}赢了！",
+        "forfeit": "{player}因弃权赢了！"
+    },
+    "player_wins_by": {
+        "default": "{player}获胜！",
+        "time": "{player}因时间获胜！",
+        "resign": "{player}获胜！",
+        "forfeit": "{player}因弃权获胜！"
+    }
+}
