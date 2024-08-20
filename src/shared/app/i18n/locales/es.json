@@ -86,9 +86,9 @@
     "username": "Nombre de usuario",
     "password": "Contraseña",
     "account_created_on": "Cuenta creada el {{date}}",
-    "player_current_games": "Juegos actuales",
-    "initializing_game": "Inicializando el juego…",
-    "waiting_for_an_opponent": "Esperando a un(a) adversari@…",
+    "player_current_games": "Partidas en curso",
+    "initializing_game": "Iniciando partida…",
+    "waiting_for_an_opponent": "Esperando contrincante…",
     "workers": {
         "slow_worker": "Ningún trabajador@ rápid@ está en línea en este momento. Solo hay una IA limitada disponible.",
         "see_how_to_spawn_a_worker": "Ver cómo calcular los movimientos de la IA para PlayHex desde mi ordenador",
@@ -228,26 +228,26 @@
         "forfeit": "¡{player} gana por abandono!"
     },
     "lobby_title": "Sala de espera",
-    "last_change": "Última modificación: {{date}}",
+    "last_change": "Última modificación: {{date}}",
     "create_account": "Crear una cuenta",
     "license_agpl": "Licencia AGPL-3.0",
-    "already_have_account_login_instead": "¿Ya tienes una cuenta? {login} en su lugar",
-    "no_account_sign_up_instead": "¿No tienes cuenta? {signUp} en su lugar",
-    "player_game_history": "Historial del juego",
+    "already_have_account_login_instead": "¿Ya tienes una cuenta? {login}",
+    "no_account_sign_up_instead": "¿No tienes cuenta? {signUp}",
+    "player_game_history": "Historial de la partida",
     "allow_swap_pieces": "Permitir intercambio de piezas",
     "2dots": "{{s}}:",
     "waiting": "esperando…",
     "game_finished_overlay": {
-        "title": "Juego terminado"
+        "title": "Partida terminada"
     },
     "confirm_overlay": {
         "confirmation": "Confirmación",
-        "are_you_sure?": "¿Segur@?"
+        "are_you_sure?": "¿Seguro?"
     },
     "toggle_coords_short": "Coordenadas",
     "game_created_by_player_time_ago": "Partida creada por {player}, {timeAgo}.",
-    "game_was_created_by_player_time_ago": "Juego creado por {player}, {timeAgo}.",
-    "game_has_been_canceled": "Se ha cancelado el juego.",
+    "game_was_created_by_player_time_ago": "Partida creada por {player}, {timeAgo}.",
+    "game_has_been_canceled": "Partida cancelada.",
     "try_again": "Inténtalo de nuevo",
     "yes": "Sí",
     "no": "No",
