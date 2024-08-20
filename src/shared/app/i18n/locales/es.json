@@ -3,7 +3,7 @@
         "join_a_game": "Únete a una partida",
         "no_playing_games": "En este momento no hay partidas en curso.",
         "no_waiting_games": "En este momento no hay partidas disponibles ¡Crea una!",
-        "watch_current_games": "Ver partidas en marcha"
+        "watch_current_games": "Ver partidas en curso"
     },
     "game": {
         "opponent": "Contrincante",
@@ -90,24 +90,24 @@
     "initializing_game": "Iniciando partida…",
     "waiting_for_an_opponent": "Esperando contrincante…",
     "workers": {
-        "slow_worker": "Ningún trabajador@ rápid@ está en línea en este momento. Solo hay una IA limitada disponible.",
+        "slow_worker": "En este momento no hay ningún trabajador rápido en línea. Solo hay disponibles IAs limitadas.",
         "see_how_to_spawn_a_worker": "Ver cómo calcular los movimientos de la IA para PlayHex desde mi ordenador",
         "no_worker": "Ningún trabajador puede calcular movimientos en este momento. Solo hay bots aleatorios disponibles."
     },
     "game_analyze": {
-        "analyze_by_ai": "Juego analizado por la IA",
-        "analyze_game": "Analizar el juego",
-        "requested": "Analizando las solicitudes…",
-        "errored": "¡Análisis erróneo!",
-        "best_move": "mejor movimiento",
+        "analyze_by_ai": "Partida analizada por IA",
+        "analyze_game": "Analizar partida",
+        "requested": "Análisis solicitado…",
+        "errored": "¡El análisis falló!",
+        "best_move": "mejor jugada",
         "best": "mejor:",
-        "how_it_works": "¿Cómo funciona?"
+        "how_it_works": "Cómo funciona"
     },
     "close": "Cerrar",
     "ranked": "Clasificad@",
     "rating": "Clasificación: {{rating}}",
-    "new_game": "Nuevo juego",
-    "no_such_player": "Parece que no existe tal jugador@.",
+    "new_game": "Nueva partida",
+    "no_such_player": "Parece que no existe tal jugador.",
     "n_online_players": "En línea ({{n}})",
     "guest": "Invitad@",
     "1v1_ranked": {
@@ -119,31 +119,31 @@
         "create": "Crear 1 contra 1 personalizado"
     },
     "1vAI_ranked": {
-        "create": "Juega en grupo contra la IA",
-        "title": "Clasificados contra la IA"
+        "create": "Jugar partida clasificada contra IA",
+        "title": "Clasificación contra IA"
     },
     "1vAI_friendly": {
-        "create": "Jugar contra la IA",
-        "title": "Jugar contra la IA"
+        "create": "Jugar contra IA",
+        "title": "Jugar contra IA"
     },
     "1vAI_offline": {
         "title": "IA sin conexión",
         "create": "Jugar contra la IA sin conexión"
     },
-    "offline_game_explain": "El juego sin conexión solo se ejecuta en tu dispositivo, no se llama al servidor PlayHex. Así que puedes jugar cuando no hay internet.",
-    "loading_game": "Cargando el juego…",
+    "offline_game_explain": "El juego sin conexión solo se ejecuta en tu dispositivo, no se llama al servidor PlayHex. Así puedes jugar cuando no hay internet.",
+    "loading_game": "Cargando partida…",
     "tournament": "Torneo",
     "now!": "¡Ahora!",
     "register_on_challonge": "Inscribirte en Challonge",
     "system": "Sistema",
     "unread_messages": "mensajes sin leer",
     "send_chat_message": "Enviar",
-    "landscape": "Paisaje",
+    "landscape": "Apaisado",
     "portrait": "Retrato",
-    "resign": "Renunciar",
+    "resign": "Abandonar",
     "auto": "Auto",
     "board_orientation": {
-        "description": "Tu orientación preferida de la pizarra para la orientación vertical y horizontal de la pantalla.",
+        "description": "Tu orientación preferida de tablero para la orientación vertical y horizontal de la pantalla.",
         "title": "Orientación",
         "flat": "Plana",
         "flat_2": "Plana 2",
@@ -172,12 +172,12 @@
     "update_password": "Actualizar la contraseña",
     "contribute": "Colaborar",
     "contributors": "Colaboradores",
-    "player_made_a_move": "{{player}} hizo un movimiento",
+    "player_made_a_move": "{{player}} hizo una jugada",
     "game_with_player_has_started": "La partida con {{player}} ha comenzado",
-    "last_move": "Último movimiento",
+    "last_move": "Última jugada",
     "undo": {
         "undo_move": "Deshacer",
-        "accept": "Aceptar lo desecho",
+        "accept": "Aceptar deshacer",
         "reject": "Rechazar"
     },
     "ping": {
@@ -190,40 +190,40 @@
         "correspondence": "Correspondencia"
     },
     "confirm_move": {
-        "title": "Confirmar movimiento",
-        "button_label": "Confirmar movimiento",
+        "title": "Confirmar jugada",
+        "button_label": "Confirmar jugada",
         "ask_confirmation": "Pedir confirmación",
-        "description": "Para evitar errores, puedes pedir confirmación antes de enviar un movimiento.",
+        "description": "Para evitar errores, puedes pedir confirmación antes de enviar una jugada.",
         "button_label_short": "Confirmar",
         "send_immediately": "Enviar inmediatamente"
     },
     "rematch": {
         "label": "Revancha",
-        "accept": "Acepta la revancha",
-        "view": "Ver la revancha"
+        "accept": "Aceptar revancha",
+        "view": "Ver revancha"
     },
     "short_time_unit": {
         "day": "d",
         "hour": "h",
-        "minute": "min",
+        "minute": "mín",
         "second": "s"
     },
     "outcome": {
         "resign": "abandonar",
-        "time": "tiempo de espera",
-        "win": "ganar",
-        "loss": "perder",
+        "time": "tiempo agotado",
+        "win": "victoria",
+        "loss": "derrota",
         "forfeit": "renunciar"
     },
     "player_won_by": {
         "default": "¡{player} ganó!",
-        "time": "¡{player} ganó a tiempo!",
+        "time": "¡{player} ganó por tiempo!",
         "forfeit": "¡{player} ganó por abandono!",
         "resign": "{player} ganó!"
     },
     "player_wins_by": {
         "default": "¡{player} gana!",
-        "time": "¡{jugador} gana a tiempo!",
+        "time": "¡{jugador} gana por tiempo!",
         "resign": "¡{player} gana!",
         "forfeit": "¡{player} gana por abandono!"
     },
@@ -253,11 +253,11 @@
     "no": "No",
     "cancel": "Cancelar",
     "language": "Idioma",
-    "pass": "Aprobar",
+    "pass": "Pasar",
     "load_more": "Cargar más",
-    "players": "Jugador@s",
-    "player": "jugad@r",
-    "finished_games": "Juegos terminados",
+    "players": "Jugadores",
+    "player": "jugador",
+    "finished_games": "Partidas terminadas",
     "see_progression_on_challonge": "Ver progresión en Challonge",
     "chat": "Chat",
     "move": "mover",
