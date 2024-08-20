@@ -232,7 +232,7 @@
     "create_account": "Crear una cuenta",
     "license_agpl": "Licencia AGPL-3.0",
     "already_have_account_login_instead": "¿Ya tienes una cuenta? {login}",
-    "no_account_sign_up_instead": "¿No tienes cuenta? {signUp}",
+    "no_account_sign_up_instead": "¿No tienes una cuenta? Por favor {signUp}",
     "player_game_history": "Historial de la partida",
     "allow_swap_pieces": "Permitir intercambio de piezas",
     "2dots": "{{s}}:",
