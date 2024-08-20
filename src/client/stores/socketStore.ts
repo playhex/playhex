@@ -26,6 +26,17 @@ const useSocketStore = defineStore('socketStore', () => {
         () => reconnectSocket(),
     );
 
+    let reconnecting = false;
+
+    socket.on('connect', () => {
+        if (reconnecting) {
+            location.reload();
+            reconnecting = false;
+        }
+    });
+
+    socket.on('disconnect', () => reconnecting = true);
+
     return {
         socket,
         joinRoom,
