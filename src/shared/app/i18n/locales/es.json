@@ -1,12 +1,12 @@
 {
     "lobby": {
-        "join_a_game": "Únete a un juego",
-        "no_playing_games": "No hay ningún juego en curso en este momento.",
-        "no_waiting_games": "No hay juegos disponibles en este momento. ¡Crear uno nuevo!",
-        "watch_current_games": "Ver juegos actuales"
+        "join_a_game": "Únete a una partida",
+        "no_playing_games": "En este momento no hay partidas en curso.",
+        "no_waiting_games": "En este momento no hay partidas disponibles ¡Crea una!",
+        "watch_current_games": "Ver partidas en marcha"
     },
     "game": {
-        "opponent": "Adversari@",
+        "opponent": "Contrincante",
         "host": "Anfitrión",
         "board_size": "Tamaño del tablero",
         "time_control": "Control de tiempo",
@@ -24,7 +24,7 @@
         "played": "Jugado",
         "red": "Rojo",
         "started": "Comenzó",
-        "created": "Creado",
+        "created": "Creada",
         "playing": "Jugando"
     },
     "game_rules": {
@@ -56,7 +56,7 @@
         "normal": "Normal",
         "long": "Largo",
         "custom": "Personalizado",
-        "periods_time": "Períodos de tiempo",
+        "periods_time": "Tiempo de los periodos",
         "initial_time": "Tiempo inicial",
         "time_increment": "Incremento de tiempo"
     },
@@ -70,7 +70,7 @@
     "toggle_coords": "Cambiar coordenadas",
     "share_game": "Compartir juego",
     "copied!": "¡Copiado!",
-    "not_copied": "Error al copiar, haz clic con el botón derecho o manten presionado para copiar",
+    "not_copied": "Error al copiar, haz clic con el botón derecho o mantén presionado",
     "log_out": "Cerrar sesión",
     "log_in": "Iniciar sesión",
     "sign_up": "Regístrate",
@@ -227,7 +227,7 @@
         "resign": "¡{player} gana!",
         "forfeit": "¡{player} gana por abandono!"
     },
-    "lobby_title": "Vestíbulo",
+    "lobby_title": "Sala de espera",
     "last_change": "Última modificación: {{date}}",
     "create_account": "Crear una cuenta",
     "license_agpl": "Licencia AGPL-3.0",
@@ -245,7 +245,7 @@
         "are_you_sure?": "¿Segur@?"
     },
     "toggle_coords_short": "Coordenadas",
-    "game_created_by_player_time_ago": "Juego creado por {player}, {timeAgo}.",
+    "game_created_by_player_time_ago": "Partida creada por {player}, {timeAgo}.",
     "game_was_created_by_player_time_ago": "Juego creado por {player}, {timeAgo}.",
     "game_has_been_canceled": "Se ha cancelado el juego.",
     "try_again": "Inténtalo de nuevo",
