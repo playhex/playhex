@@ -27,6 +27,7 @@ export type GithubContributor = {
 
 export type WeblateContributor = {
     fullName: string;
+    link?: `http${string}`;
 };
 
 export type WeblateContributors = {

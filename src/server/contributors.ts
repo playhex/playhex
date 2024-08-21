@@ -49,10 +49,17 @@ const fetchWeblateContributors = async (): Promise<WeblateContributors> => {
 
     return cachedWeblateContributors = {
         French: [
-            { fullName: 'Julien Maulny' },
+            { fullName: 'Julien Maulny', link: 'https://playhex.org/@alcalyn' },
         ],
         German: [
-            { fullName: 'Ettore Atalan' },
+            { fullName: 'Ettore Atalan', link: 'https://hosted.weblate.org/user/Atalanttore/' },
+        ],
+        Polish: [
+            { fullName: 'FlyPside', link: 'https://playhex.org/@flypside' },
+        ],
+        Spanish: [
+            { fullName: 'gallegonovato', link: 'https://hosted.weblate.org/user/gallegonovato/' },
+            { fullName: 'Guille', link: 'https://hosted.weblate.org/user/guillevg/' },
         ],
     };
 };

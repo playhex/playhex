@@ -1,8 +1,18 @@
 {
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "Derzeit sind keine Spiele verfügbar. Erstelle ein neues!",
+        "watch_current_games": "Aktuelle Spiele ansehen",
+        "join_a_game": "Einem Spiel beitreten",
+        "no_playing_games": "Derzeit sind keine Spiele im Gange."
+    },
     "game": {
+        "opponent": "Gegner",
+        "host": "Host",
         "size": "Größe",
         "board": "Spielbrett",
         "board_size": "Brettgröße",
+        "time_control": "Zeitkontrolle",
         "rules": "Regeln",
         "created": "Erstellt",
         "accept": "Annehmen",
@@ -10,12 +20,23 @@
         "blue": "Blau",
         "played": "Gespielt",
         "finished": "Abgeschlossen",
+        "review": "Überprüfung",
         "won": "Gewonnen",
+        "outcome": "Ergebnis",
         "started": "Gestartet",
+        "playing": "Spielend",
+        "watch": "Beobachten",
         "lost": "Verloren"
+    },
+    "game_rules": {
+        "normal": "normal",
+        "host_plays_first": "Host spielt zuerst",
+        "host_plays_second": "Host spielt als Zweiter",
+        "no_swap": "Kein Tausch"
     },
     "create_game": {
         "more_options": "Mehr Optionen",
+        "custom_size": "Benutzerdefiniert",
         "less_options": "Weniger Optionen"
     },
     "player_settings": {
@@ -27,6 +48,13 @@
         "dark": "Dunkel"
     },
     "time_control": {
+        "custom": "Benutzerdefiniert",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Gedeckelter Fischer",
+        "initial_time": "Anfangszeit",
+        "periods": "Perioden",
+        "periods_time": "Periodenzeit",
         "fast": "Schnell",
         "normal": "Normal",
         "long": "Lang",
@@ -38,34 +66,96 @@
     "log_in": "Anmelden",
     "sign_up": "Registrieren",
     "feedback": "Rückmeldung",
+    "hex_links": "Hex-Links",
+    "last_change": "Letzte Änderung: {{date}}",
+    "privacy_policy": "Datenschutzrichtlinie",
     "license_agpl": "Lizenz AGPL-3.0",
     "create_account": "Konto erstellen",
+    "already_have_account_login_instead": "Bereits ein Konto? {login} stattdessen",
+    "no_account_sign_up_instead": "Kein Konto? {signUp} stattdessen",
+    "add_your_language": "Fehlt deine Sprache? {link}!",
+    "add_your_language_link": "Füge sie mit Weblate hinzu",
+    "show_coords_by_default": "Koordinaten standardmäßig anzeigen",
     "player_game_history": "Spielverlauf",
+    "waiting": "warten…",
     "game_finished_overlay": {
         "title": "Spiel abgeschlossen"
     },
     "initializing_game": "Spiel wird initialisiert …",
+    "waiting_for_an_opponent": "Warten auf einen Gegner…",
     "confirm_overlay": {
+        "are_you_sure?": "Bist du sicher?",
         "confirmation": "Bestätigung"
     },
+    "workers": {
+        "slow_worker": "Kein schneller Worker ist momentan online. Nur begrenzte KI ist verfügbar.",
+        "no_worker": "Kein Worker kann derzeit Züge berechnen. Nur zufällige Bots sind verfügbar.",
+        "see_how_to_spawn_a_worker": "Sieh dir an, wie du KI-Züge für PlayHex auf meinem Computer berechnen kannst"
+    },
+    "try_again": "Erneut versuchen",
     "no": "Nein",
+    "pass": "Passen",
+    "ranked": "Rangliste",
+    "load_more": "Mehr laden",
+    "no_such_player": "Sieht so aus, als gäbe es diesen Spieler nicht.",
+    "n_online_players": "Online ({{n}})",
+    "finished_games": "Beendete Spiele",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Erstelle 1v1"
+    },
+    "1v1_friendly": {
+        "title": "Benutzerdefiniertes 1v1",
+        "create": "Erstelle benutzerdefiniertes 1v1"
+    },
+    "1vAI_ranked": {
+        "title": "Rangliste vs KI",
+        "create": "Gegen KI im Ranglistenspiel spielen"
+    },
+    "1vAI_friendly": {
+        "title": "Gegen KI spielen",
+        "create": "Gegen KI spielen"
+    },
+    "1vAI_offline": {
+        "title": "Offline-KI",
+        "create": "Gegen Offline-KI spielen"
+    },
+    "offline_game_explain": "Offline-Spiel läuft nur auf deinem Gerät, PlayHex-Server wird nicht aufgerufen. Du kannst also spielen, wenn keine Internetverbindung besteht.",
     "loading_game": "Spiel wird geladen …",
+    "tournament": "Turnier",
+    "register_on_challonge": "Auf Challonge registrieren",
+    "see_progression_on_challonge": "Fortschritt auf Challonge sehen",
+    "move": "Zug",
     "chat": "Chat",
     "system": "System",
     "landscape": "Querformat",
     "portrait": "Hochformat",
     "shading_patterns": {
+        "title": "Schattierungsmuster",
+        "visibility": "Sichtbarkeit des Schattierungsmusters",
+        "custom_expression": "Benutzerdefinierter Ausdruck",
+        "help_custom": "Mathematischer Ausdruck für benutzerdefiniertes Schattierungsmuster.<br>Der Ausdruck muss eine Zahl zwischen 0 (keine Schattierung) und 1 (vollständig schattiert) für ein gegebenes Feld (Zeile, Spalte) zurückgeben. Du kannst z.B. 0,5 für dreifarbige Schattierungsmuster verwenden. Die Rückgabe von <code>true</code> oder <code>false</code> funktioniert genauso wie die Rückgabe von <code>1</code> oder <code>0</code>.<br>Verfügbare Variablen:<br>- <code>row</code> und <code>col</code> (Abkürzungen: <code>r</code> und <code>c</code>) für Zeilen- und Spaltennummer, beginnend bei 0.<br>- <code>size</code> (oder <code>s</code>) für Brettgröße.<br>- <code>distToSide</code> Entfernung der aktuellen Zelle zu ihrer nächsten Seite.<br>Sieh dir die Liste der verfügbaren Operatoren an unter https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Beispiele:<br>- Konzentrische Ringe: <code>distToSide % 2</code><br>- Dreifarbiges Schachbrettmuster: <code>((size + row - col) % 3) / 2</code><br>- Disk mit Radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Öffne die Javascript-Konsole (F12), um Fehler bei der Ausführung deines Ausdrucks zu sehen.",
         "types": {
+            "tricolor_checkerboard": "Dreifarbiges Schachbrettmuster",
+            "concentrical_rings": "Konzentrische Ringe (Hexworld)",
+            "height_5_lines": "Höhe 5 Linien",
+            "single_ring": "Einzelner Ring",
+            "custom": "Benutzerdefiniert",
             "null": "Keine"
         }
     },
+    "show_44_dots": "Punkte auf 4-4 Feldern anzeigen",
     "update_password": "Passwort aktualisieren",
     "contribute": "Beitragen",
     "contributors": "Beitragende",
+    "player_made_a_move": "{{player}} hat einen Zug gemacht",
+    "game_with_player_has_started": "Das Spiel mit {{player}} hat begonnen",
     "confirm_move": {
         "title": "Zug bestätigen",
         "button_label": "Zug bestätigen",
         "send_immediately": "Sofort senden",
+        "ask_confirmation": "Bestätigung anfordern",
+        "description": "Um Fehleingaben zu vermeiden, kannst du eine Bestätigung vor dem Absenden eines Zugs verlangen.",
         "button_label_short": "Bestätigen"
     },
     "undo": {
@@ -74,21 +164,53 @@
         "undo_move": "Rückgängig machen"
     },
     "game_candency": {
+        "blitz": "Blitz",
+        "correspondence": "Fernschach",
         "normal": "Normal"
     },
+    "rematch": {
+        "label": "Revanche",
+        "accept": "Revanche annehmen",
+        "view": "Revanche ansehen"
+    },
     "short_time_unit": {
+        "day": "T",
+        "hour": "Std",
+        "second": "Sek",
         "minute": "Min."
     },
+    "outcome": {
+        "win": "Sieg",
+        "loss": "Niederlage",
+        "resign": "aufgegeben",
+        "forfeit": "verloren",
+        "time": "Zeitüberschreitung"
+    },
     "player_won_by": {
+        "time": "{player} hat auf Zeit gewonnen!",
+        "resign": "{player} hat gewonnen!",
+        "forfeit": "{player} hat durch Aufgabe gewonnen!",
         "default": "{player} hat das Spiel gewonnen!"
     },
     "player_wins_by": {
+        "time": "{player} gewinnt auf Zeit!",
+        "resign": "{player} gewinnt!",
+        "forfeit": "{player} gewinnt durch Aufgabe!",
         "default": "{player} gewinnt das Spiel!"
     },
     "i_play": {
+        "title": "Ich spiele",
+        "first": "Erster",
+        "second": "Zweiter",
         "random": "Zufällig"
     },
+    "swap_rule": "Tauschregel",
+    "allow_swap_pieces": "Tausch von Spielsteinen erlauben",
+    "toggle_coords": "Koordinaten umschalten",
+    "toggle_coords_short": "Koordinaten",
+    "share_game": "Spiel teilen",
     "copied!": "Kopiert!",
+    "not_copied": "Kopieren fehlgeschlagen, benutze Rechtsklick oder langen Tastendruck",
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Spiel erstellt von {player}, {timeAgo}.",
     "project_under_development": "Projekt in Entwicklung",
@@ -98,6 +220,10 @@
     "game_analyze": {
         "how_it_works": "Wie es funktioniert",
         "best_move": "bester Zug",
+        "analyze_by_ai": "Spielanalyse durch KI",
+        "requested": "Analyse angefordert…",
+        "errored": "Analyse fehlgeschlagen!",
+        "best": "beste:",
         "analyze_game": "Spiel analysieren"
     },
     "language": "Sprache",
@@ -114,6 +240,7 @@
     "n_characters_other": "{{count}} Zeichen",
     "board_orientation": {
         "title": "Ausrichtung",
+        "description": "Bevorzugte Brettausrichtung für Hoch- und Querformatbildschirme.",
         "flat_2": "Flach 2",
         "diamond": "Diamant",
         "flat": "Flach"
@@ -134,6 +261,7 @@
     "preview": "Vorschau",
     "new_password": "Neues Passwort",
     "ping": {
+        "date_shift_ms": "Datumsausgleich: {{ms}}ms",
         "ping_ms": "Ping: {{ms}} ms"
     }
 }

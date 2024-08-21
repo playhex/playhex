@@ -62,11 +62,14 @@ apiGetContributors().then(result => contributors.value = result);
             <strong>{{ lang }}</strong>
             <ul class="list-inline">
                 <li v-for="contributor in weblateContributors" :key="contributor.fullName" class="list-inline-item me-3">
-                    {{ contributor.fullName }}
+                    <a v-if="contributor.link" :href="contributor.link" target="_blank">{{ contributor.fullName }}</a>
+                    <template v-else>{{ contributor.fullName }}</template>
                 </li>
             </ul>
         </li>
     </ul>
+
+    <p><small>Let me know if you want to change your name or your link.</small></p>
 
     <p>Want to help translating? <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">Translate PlayHex here</a>.</p>
 </template>
