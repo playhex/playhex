@@ -76,9 +76,9 @@
         "second": "s"
     },
     "player_won_by": {
-        "default": "{player} a gagné la partie !",
+        "default": "{player} a gagné !",
         "time": "{player} a gagné au temps !",
-        "resign": "{player} a gagné par abandon !",
+        "resign": "{player} a gagné !",
         "forfeit": "{player} a gagné par forfait !"
     },
     "create_game": {
@@ -115,8 +115,8 @@
     },
     "player_wins_by": {
         "time": "{player} gagne au temps !",
-        "resign": "{player} gagne par abandon !",
-        "default": "{player} remporte la partie !",
+        "resign": "{player} a gagné !",
+        "default": "{player} a gagné !",
         "forfeit": "{player} gagne par forfait !"
     },
     "1v1_ranked": {
