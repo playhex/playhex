@@ -14,10 +14,15 @@ const useSocketStore = defineStore('socketStore', () => {
     const joinRoom = (room: string) => socket.emit('room', 'join', room);
     const leaveRoom = (room: string) => socket.emit('room', 'leave', room);
 
+    // used to determine if the client should refresh when reconnecting
+    // in order to make sure the state is up to date
+    let disconnect: 'planned' | 'unplanned' | null = null;
+
     /*
      * Reconnect socket when logged in player changed
      */
     const reconnectSocket = (): void => {
+        disconnect = 'planned';
         socket.disconnect().connect();
     };
 
@@ -26,16 +31,24 @@ const useSocketStore = defineStore('socketStore', () => {
         () => reconnectSocket(),
     );
 
-    let reconnecting = false;
-
     socket.on('connect', () => {
-        if (reconnecting) {
+        if (disconnect === 'unplanned') {
             location.reload();
-            reconnecting = false;
         }
+
+        disconnect = null;
     });
 
-    socket.on('disconnect', () => reconnecting = true);
+    socket.on('disconnect', () => {
+        switch (disconnect) {
+            case 'planned':
+                disconnect = null;
+                break;
+            case null:
+                disconnect = 'unplanned';
+                break;
+        }
+    });
 
     return {
         socket,
