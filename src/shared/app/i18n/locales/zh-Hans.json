@@ -173,7 +173,6 @@
     "chat_message_placeholder": "消息…",
     "unread_messages": "未读消息",
     "send_chat_message": "发送",
-    "n_characters_one": "{{count}}个字符",
     "n_characters_other": "{{count}}个字符",
     "landscape": "横屏",
     "portrait": "竖屏",
