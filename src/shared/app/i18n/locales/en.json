@@ -219,7 +219,7 @@
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Date shift compensation: {{ms}}ms"
+        "date_shift_ms": "Time shift: {{ms}}ms"
     },
     "game_candency": {
         "blitz": "Blitz",
