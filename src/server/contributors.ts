@@ -53,6 +53,7 @@ const fetchWeblateContributors = async (): Promise<WeblateContributors> => {
         ],
         German: [
             { fullName: 'Ettore Atalan', link: 'https://hosted.weblate.org/user/Atalanttore/' },
+            { fullName: 'Peter Selinger', link: 'https://playhex.org/@quasar' },
         ],
         Polish: [
             { fullName: 'FlyPside', link: 'https://playhex.org/@flypside' },
