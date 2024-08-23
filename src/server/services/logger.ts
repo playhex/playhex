@@ -35,6 +35,7 @@ type SyslogLevels =
  */
 const logger = winston.createLogger({
     levels: winston.config.syslog.levels,
+    level: 'development' === process.env.NODE_ENV ? 'debug' : 'info',
     transports: [
         new winston.transports.Console({
             handleExceptions: true,
