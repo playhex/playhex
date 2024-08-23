@@ -149,15 +149,6 @@ const isPlaying = (hostedGameClient: HostedGameClient) =>
     'playing' === hostedGameClient.getHostedGame().state
 ;
 
-const lobbyFilter = (hostedGameClient: HostedGameClient) => {
-    if (!isPlaying(hostedGameClient)) return false;
-    const startTime = hostedGameClient.getHostedGame().gameData?.startedAt ?? hostedGameClient.getHostedGame().createdAt;
-    const days = (Date.now() - startTime.getTime()) / 86400000;
-    const lastMove = hostedGameClient.getHostedGame().gameData?.lastMoveAt;
-    // Hide games with no moves and >= 1 days since the game start
-    return days < 1 || lastMove != null;
-};
-
 const isFinished = (hostedGameClient: HostedGameClient) =>
     'ended' === hostedGameClient.getHostedGame().state
 ;
@@ -289,6 +280,9 @@ window.addEventListener('hashchange', () => createGameFromHash());
 
                 <h3>{{ $t('lobby.join_a_game') }}</h3>
 
+                <!--
+                    Created games
+                -->
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table-responsive">
                     <table class="table">
                         <thead>
@@ -335,6 +329,9 @@ window.addEventListener('hashchange', () => createGameFromHash());
 
                 <h4><BIconEye /> {{ $t('lobby.watch_current_games') }}</h4>
 
+                <!--
+                    Currently playing games
+                -->
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table-responsive">
                     <table class="table">
                         <thead>
@@ -350,7 +347,7 @@ window.addEventListener('hashchange', () => createGameFromHash());
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(lobbyFilter).sort(gameComparator)"
+                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isPlaying).sort(gameComparator)"
                                 :key="hostedGameClient.getId()"
                             >
                                 <td class="ps-0">
@@ -381,6 +378,9 @@ window.addEventListener('hashchange', () => createGameFromHash());
 
                 <h4><BIconTrophy /> {{ $t('finished_games') }}</h4>
 
+                <!--
+                    Finished games
+                -->
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isFinished)" class="table-responsive">
                     <table class="table table-responsive" style="margin-bottom: 0">
                         <thead>

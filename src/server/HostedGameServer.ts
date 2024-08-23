@@ -101,6 +101,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return this.game;
     }
 
+    getHostedGameOptions(): HostedGameOptions
+    {
+        return this.gameOptions;
+    }
+
     getPlayers(): Player[]
     {
         return this.players;
@@ -299,7 +304,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * or player canceled because nobody joined.
          */
         game.on('canceled', (date) => {
-            this.doHostedGameCancel(date);
+            logger.info('Game canceled.', { hostedGameId: this.publicId });
+            this.doCancel(date);
         });
     }
 
@@ -659,9 +665,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     playerCancel(player: Player): true | string
     {
+        logger.info('Player cancel game', { hostedGameId: this.publicId, player: player.pseudo });
+
         const canCancel = this.canCancel(player);
 
         if (true !== canCancel) {
+            logger.notice('Player tried to cancel game, but cannot', { hostedGameId: this.publicId, player: player.pseudo, canCancel });
             return canCancel;
         }
 
@@ -670,20 +679,33 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         if (null !== this.game) {
             this.game.cancel(now);
         } else {
-            this.doHostedGameCancel(now);
+            this.doCancel(now);
         }
 
         return true;
     }
 
-    private doHostedGameCancel(date: Date): void
+    systemCancel(): void
+    {
+        logger.info('System cancel game', { hostedGameId: this.publicId });
+
+        const now = new Date();
+
+        if (null !== this.game) {
+            this.game.cancel(now);
+        } else {
+            this.doCancel(now);
+        }
+    }
+
+    private doCancel(date: Date): void
     {
         this.state = 'canceled';
 
         this.io.to(this.gameRooms(true)).emit('gameCanceled', this.publicId, { date });
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.publicId, this.timeControl.getValues());
 
-        logger.info('Game canceled.', { hostedGameId: this.publicId });
+        logger.info('hosted game server canceled', { hostedGameId: this.publicId, date });
 
         this.emit('canceled');
     }

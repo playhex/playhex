@@ -14,6 +14,7 @@ import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
 import { AppDataSource } from '../data-source';
 import { plainToInstance } from '../../shared/app/class-transformer-custom';
 import RatingRepository from './RatingRepository';
+import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames';
 
 export class GameError extends Error {}
 
@@ -47,6 +48,7 @@ export default class HostedGameRepository
         private hostedGamePersister: HostedGamePersister,
         private io: HexServer,
         private ratingRepository: RatingRepository,
+        private autoCancelStaleGames: AutoCancelStaleGames,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
@@ -83,6 +85,13 @@ export default class HostedGameRepository
         }
 
         logger.info(`${games.length} games loaded.`);
+
+        if ('true' === process.env.AUTO_CANCEL_STALE_GAMES) {
+            this.autoCancelStaleGames.start(
+                player => this.getPlayerActiveGames(player),
+                Object.values(this.activeGames),
+            );
+        }
     }
 
     /**
@@ -322,6 +331,21 @@ export default class HostedGameRepository
         }
 
         return rematch;
+    }
+
+    getPlayerActiveGames(player: Player): HostedGameServer[]
+    {
+        const hostedGameServers: HostedGameServer[] = [];
+
+        for (const key in this.activeGames) {
+            if (!this.activeGames[key].isPlayerInGame(player)) {
+                continue;
+            }
+
+            hostedGameServers.push(this.activeGames[key]);
+        }
+
+        return hostedGameServers;
     }
 
     /**

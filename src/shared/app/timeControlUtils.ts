@@ -51,7 +51,7 @@ export const timeControlToCadencyName = (gameOptions: HostedGameOptions): TimeCo
     }
 
     // wet finger technique
-    if (averageSecondsPerMove > 3600 * 9) {
+    if (averageSecondsPerMove > 3600) {
         return 'correspondence';
     }
 

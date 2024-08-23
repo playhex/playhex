@@ -22,12 +22,12 @@ interface OnlinePlayersServiceEvents
 @Service()
 export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServiceEvents>
 {
-    private onlinePlayers: { [key: string]: {
+    private onlinePlayers: { [publicId: string]: {
         player: Player;
         sockets: HexSocket[];
     } } = {};
 
-    async socketHasConnected(socket: HexSocket): Promise<void>
+    socketHasConnected(socket: HexSocket): void
     {
         const { player } = socket.data;
 
@@ -50,7 +50,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         this.emit('playerConnected', player);
     }
 
-    async socketHasDisconnected(socket: HexSocket): Promise<void>
+    socketHasDisconnected(socket: HexSocket): void
     {
         const { player } = socket.data;
 
@@ -95,5 +95,10 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     getOnlinePlayersCount(): number
     {
         return Object.keys(this.onlinePlayers).length;
+    }
+
+    isOnline(player: Player): boolean
+    {
+        return player.publicId in this.onlinePlayers;
     }
 }
