@@ -181,7 +181,7 @@
         "reject": "Rechazar"
     },
     "ping": {
-        "date_shift_ms": "Compensación de cambio de fecha: {{ms}}ms",
+        "date_shift_ms": "Ajustes temporales: {{ms}}ms",
         "ping_ms": "Ping: {{ms}}ms"
     },
     "game_candency": {
