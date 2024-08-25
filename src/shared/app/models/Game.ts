@@ -22,7 +22,7 @@ export default class Game
     @Column({ type: 'json', transformer: { from: (value: null | unknown) => deserializeMovesHistory(value), to: value => value } })
     @Expose()
     @Type(() => Move)
-    movesHistory: Move[];
+    movesHistory: Move[] = [];
 
     @Column()
     @Expose()

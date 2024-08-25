@@ -13,6 +13,7 @@ import { notifier } from './services/notifications';
 import useServerDateStore from './stores/serverDateStore';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue';
 import { toEngineMove } from '../shared/app/models/Move';
+import { RichChat, RichChatMessage } from '../shared/app/rich-chat';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -37,6 +38,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
      */
     private readMessages: number;
 
+    private richChat: RichChat;
+
     private lowTimeNotificationThread: null | NodeJS.Timeout = null;
 
     constructor(
@@ -46,6 +49,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         super();
 
         this.readMessages = hostedGame.chatMessages.length;
+        this.richChat = new RichChat(hostedGame);
     }
 
     getState(): HostedGameState
@@ -183,6 +187,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getChatMessages(): ChatMessage[]
     {
         return this.hostedGame.chatMessages;
+    }
+
+    getRichChatMessages(): RichChatMessage[]
+    {
+        return this.richChat.getRichChatMessages();
     }
 
     isRanked(): boolean
@@ -540,6 +549,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onChatMessage(chatMessage: ChatMessage): void
     {
         this.hostedGame.chatMessages.push(chatMessage);
+        this.richChat.postChatMessage(chatMessage);
         this.emit('chatMessagePosted');
         notifier.emit('chatMessage', this.hostedGame, chatMessage);
     }

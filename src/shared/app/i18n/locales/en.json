@@ -168,6 +168,7 @@
     "register_on_challonge": "Register on Challonge",
     "see_progression_on_challonge": "See progression on Challonge",
     "move": "move",
+    "move_number": "move {{n}}",
     "chat": "Chat",
     "system": "System",
     "chat_message_placeholder": "Message…",

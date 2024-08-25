@@ -8,13 +8,13 @@ import useAuthStore from '../../stores/authStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
-import { Player, Rating } from '../../../shared/app/models';
+import { ChatMessage, Player, Rating } from '../../../shared/app/models';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import Move from '@shared/game-engine/Move';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
-import { format, formatDistanceToNow, formatRelative, isSameDay } from 'date-fns';
+import { format, formatDistanceToNow, formatRelative, intlFormat, isSameDay } from 'date-fns';
 import { gameToHexworldLink } from '../../../shared/app/hexworld';
 import { canPassAgain } from '../../../shared/app/passUtils';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
@@ -27,6 +27,7 @@ import GameView from '../../pixi-board/GameView';
 import { isMyTurn } from '../../services/notifications/context-utils';
 import { PlayerIndex } from '@shared/game-engine';
 import { fromEngineMove } from '@shared/app/models/Move';
+import { autoLocale } from '../../../shared/app/i18n';
 
 const props = defineProps({
     hostedGameClient: {
@@ -55,6 +56,7 @@ if (null === loggedInPlayer) {
     throw new Error('Unexpected null logged in player');
 }
 
+const formatChatDateHeader = (date: Date): string => intlFormat(date, { day: 'numeric', month: 'long' }, { locale: autoLocale() });
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const playerColor = (player: Player): string => {
     const index = hostedGameClient.value.getPlayerIndex(player);
@@ -586,17 +588,27 @@ const shouldEnablePass = (): boolean => {
             <div class="chat-messages" ref="chatMessagesElement">
                 <div class="container-fluid">
                     <div
-                        v-for="message in hostedGameClient.getChatMessages()"
-                        :key="message.createdAt.getTime()"
+                        v-for="message, key in hostedGameClient.getRichChatMessages()"
+                        :key
                         class="chat-message"
+                        :class="(message instanceof ChatMessage) ? '' : `chat-header chat-header-${message.type}`"
                     >
-                        <span class="time text-body-secondary">{{ formatHour(message.createdAt) }}</span>
-                        <span>&nbsp;</span>
-                        <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
-                        <span class="player fst-italic" v-else>{{ $t('system') }}</span>
-                        <span>&nbsp;</span>
-                        <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
-                        <span class="content" v-html="renderMessage(message.content)"></span>
+                        <template v-if="(message instanceof ChatMessage)">
+                            <span class="time text-body-secondary">{{ formatHour(message.createdAt) }}</span>
+                            <span>&nbsp;</span>
+                            <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
+                            <span class="player fst-italic" v-else>{{ $t('system') }}</span>
+                            <span>&nbsp;</span>
+                            <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
+                            <span class="content" v-html="renderMessage(message.content)"></span>
+                        </template>
+
+                        <template v-else-if="message.type === 'move'">
+                            <small class="header-move text-secondary text-center">{{ $t('move_number', { n: message.moveNumber }) }}</small>
+                        </template>
+                        <template v-else-if="message.type === 'date'">
+                            <small class="header-date text-secondary text-center mt-1">{{ formatChatDateHeader(message.date) }}</small>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -691,4 +703,8 @@ const shouldEnablePass = (): boolean => {
 
         > *
             margin-left 1em
+
+.chat-messages
+    .chat-header-move
+        text-align center
 </style>

@@ -170,6 +170,7 @@
     "loading_game": "Chargement de la partie…",
     "register_on_challonge": "S'enregistrer sur Challonge",
     "move": "coup",
+    "move_number": "coup {{n}}",
     "chat": "Tchat",
     "system": "Système",
     "resign": "Abandonner",
