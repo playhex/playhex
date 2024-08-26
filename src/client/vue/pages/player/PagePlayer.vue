@@ -340,7 +340,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                         <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
                         <td>{{
-                            formatDistanceToNowStrict(game.gameData?.endedAt ?? 0, { addSuffix: true })
+                            game.gameData?.endedAt ? format(game.gameData.endedAt, 'd MMMM yyyy p') : '-'
                         }}</td>
                     </tr>
                     <tr colspan="2">
