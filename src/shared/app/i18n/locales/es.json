@@ -264,5 +264,6 @@
     "chat_message_placeholder": "Mensaje…",
     "n_characters_one": "{{count}} carácter",
     "n_characters_many": "{{count}} caracteres",
-    "n_characters_other": "{{count}} caracteres"
+    "n_characters_other": "{{count}} caracteres",
+    "move_number": "mover {{n}}"
 }
