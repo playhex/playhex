@@ -1,0 +1,268 @@
+{
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "Er zijn momenteel geen spellen beschikbaar. Maak een nieuw spel aan!",
+        "watch_current_games": "Bekijk huidige spellen",
+        "join_a_game": "Doe mee aan een spel",
+        "no_playing_games": "Er zijn momenteel geen spellen bezig."
+    },
+    "game": {
+        "opponent": "Tegenstander",
+        "host": "Gastheer",
+        "size": "Grootte",
+        "board": "Spelbord",
+        "board_size": "Bordgrootte",
+        "time_control": "Tijdcontrole",
+        "rules": "Regels",
+        "created": "Aangemaakt",
+        "accept": "Accepteren",
+        "red": "Rood",
+        "blue": "Blauw",
+        "started": "Gestart",
+        "played": "Gespeeld",
+        "finished": "Voltooid",
+        "review": "Beoordelen",
+        "won": "Gewonnen",
+        "outcome": "Uitkomst",
+        "lost": "Verloren",
+        "playing": "Aan het spelen",
+        "watch": "Kijken"
+    },
+    "game_rules": {
+        "normal": "normaal",
+        "host_plays_first": "gastheer speelt eerst",
+        "host_plays_second": "gastheer speelt als tweede",
+        "no_swap": "geen ruil"
+    },
+    "create_game": {
+        "custom_size": "Aangepast",
+        "less_options": "Minder opties",
+        "more_options": "Meer opties"
+    },
+    "player_settings": {
+        "title": "Instellingen"
+    },
+    "background_theme": {
+        "title": "Thema",
+        "dark": "Donker",
+        "light": "Licht"
+    },
+    "time_control": {
+        "custom": "Aangepast",
+        "use": "Gebruik {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Capped Fischer",
+        "initial_time": "Initiële tijd",
+        "time_increment": "Tijdstoename",
+        "periods": "Periodes",
+        "periods_time": "Periodes tijd",
+        "fast": "Snel",
+        "normal": "Normaal",
+        "long": "Lang"
+    },
+    "i_play": {
+        "title": "Ik speel",
+        "random": "Willekeurig",
+        "first": "Eerst",
+        "second": "Tweede"
+    },
+    "swap_rule": "Ruilregel",
+    "allow_swap_pieces": "Sta stukjes ruilen toe",
+    "toggle_coords": "Coördinaten aan/uit",
+    "toggle_coords_short": "Coördinaten",
+    "share_game": "Deel spel",
+    "copied!": "Gekopieerd!",
+    "not_copied": "Kopiëren mislukt, gebruik rechtermuisknop of lang tikken",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Spel aangemaakt door {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "Spel werd aangemaakt door {player}, {timeAgo}.",
+    "log_out": "Uitloggen",
+    "log_in": "Inloggen",
+    "sign_up": "Registreren",
+    "feedback": "Feedback",
+    "hex_links": "Hex links",
+    "project_under_development": "Project in ontwikkeling",
+    "last_change": "Laatste wijziging: {{date}}",
+    "privacy_policy": "Privacybeleid",
+    "license_agpl": "Licentie AGPL-3.0",
+    "create_account": "Account aanmaken",
+    "already_have_account_login_instead": "Heb je al een account? {login} in plaats daarvan",
+    "already_have_account_login_instead_link_label": "Inloggen",
+    "no_account_sign_up_instead": "Geen account? {signUp} in plaats daarvan",
+    "no_account_sign_up_instead_link_label": "Registreren",
+    "add_your_language": "Jouw taal ontbreekt? {link}!",
+    "add_your_language_link": "Voeg het toe met Weblate",
+    "show_coords_by_default": "Toon coördinaten standaard",
+    "username": "Gebruikersnaam",
+    "password": "Wachtwoord",
+    "account_created_on": "Account aangemaakt op {{date}}",
+    "player_current_games": "Huidige spellen",
+    "player_game_history": "Spelgeschiedenis",
+    "waiting": "wachten…",
+    "initializing_game": "Spel initialiseren…",
+    "game_finished_overlay": {
+        "title": "Spel voltooid"
+    },
+    "game_has_been_canceled": "Spel is geannuleerd.",
+    "waiting_for_an_opponent": "Wachten op een tegenstander…",
+    "confirm_overlay": {
+        "confirmation": "Bevestiging",
+        "are_you_sure?": "Weet je het zeker?"
+    },
+    "workers": {
+        "slow_worker": "Er is momenteel geen snelle worker online. Alleen beperkte AI zijn beschikbaar.",
+        "no_worker": "Er is momenteel geen worker beschikbaar om zetten te berekenen. Alleen willekeurige bots zijn beschikbaar.",
+        "see_how_to_spawn_a_worker": "Zie hoe je AI zetten kunt berekenen voor PlayHex vanaf mijn computer"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "Spelanalyse door AI",
+        "analyze_game": "Analyseer spel",
+        "requested": "Analyse aangevraagd…",
+        "errored": "Analyse mislukt!",
+        "best_move": "beste zet",
+        "best": "beste:",
+        "how_it_works": "Hoe het werkt"
+    },
+    "try_again": "Probeer opnieuw",
+    "yes": "Ja",
+    "no": "Nee",
+    "language": "Taal",
+    "cancel": "Annuleren",
+    "pass": "Passeren",
+    "close": "Sluiten",
+    "ranked": "Gerangschikt",
+    "rating": "Rating: {{rating}}",
+    "new_game": "Nieuw spel",
+    "players": "Spelers",
+    "player": "speler",
+    "load_more": "Meer laden",
+    "no_such_player": "Het lijkt erop dat er geen dergelijke speler is.",
+    "n_online_players": "Online ({{n}})",
+    "guest": "Gast",
+    "finished_games": "Voltooide spellen",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Maak 1v1"
+    },
+    "1v1_friendly": {
+        "title": "Aangepaste 1v1",
+        "create": "Maak aangepaste 1v1"
+    },
+    "1vAI_ranked": {
+        "title": "Gerangschikt vs AI",
+        "create": "Speel gerangschikt vs AI"
+    },
+    "1vAI_friendly": {
+        "title": "Speel vs AI",
+        "create": "Speel vs AI"
+    },
+    "1vAI_offline": {
+        "title": "Offline AI",
+        "create": "Speel vs offline AI"
+    },
+    "offline_game_explain": "Offline spel draait alleen op je apparaat, de PlayHex-server wordt niet aangeroepen. Je kunt dus spelen wanneer er geen internet is.",
+    "loading_game": "Spel laden…",
+    "tournament": "Toernooi",
+    "now!": "Nu!",
+    "register_on_challonge": "Registreer op Challonge",
+    "see_progression_on_challonge": "Bekijk voortgang op Challonge",
+    "move": "zet",
+    "move_number": "zet {{n}}",
+    "chat": "Chat",
+    "system": "Systeem",
+    "chat_message_placeholder": "Bericht…",
+    "unread_messages": "ongelezen berichten",
+    "send_chat_message": "Versturen",
+    "n_characters_one": "{{count}} teken",
+    "n_characters_other": "{{count}} tekens",
+    "landscape": "Landschap",
+    "portrait": "Portret",
+    "resign": "Opgeven",
+    "auto": "Auto",
+    "board_orientation": {
+        "title": "Oriëntatie",
+        "description": "Je voorkeursbordoriëntatie voor portret- en landschermoriëntatie.",
+        "flat": "Plat",
+        "flat_2": "Plat 2",
+        "diamond": "Diamant"
+    },
+    "shading_patterns": {
+        "title": "Schaduwpatroon",
+        "visibility": "Zichtbaarheid schaduwpatroon",
+        "types": {
+            "null": "Geen",
+            "tricolor_checkerboard": "Driekleurig dambord",
+            "concentrical_rings": "Concentrische ringen (Hexworld)",
+            "height_5_lines": "Hoogte 5 lijnen",
+            "single_ring": "Enkele ring",
+            "custom": "Aangepast"
+        },
+        "custom_expression": "Aangepaste expressie",
+        "help_custom": "Wiskundige expressie voor aangepast schaduwpatroon.<br>De expressie moet een getal tussen 0 (geen schaduw) en 1 (volledig geschaduwd) teruggeven voor een bepaalde cel (rij, kolom). Je kunt bijvoorbeeld 0,5 gebruiken voor driekleurige schaduwpatronen. Het teruggeven van <code>true</code> of <code>false</code> werkt hetzelfde als het teruggeven van <code>1</code> of <code>0</code>.<br>Beschikbare variabelen:<br>- <code>row</code> en <code>col</code> (afkortingen: <code>r</code> en <code>c</code>) voor rij- en kolomnummer, beginnend vanaf 0.<br>- <code>size</code> (of <code>s</code>) voor de grootte van het bord.<br>- <code>distToSide</code> de afstand van de huidige cel tot de dichtstbijzijnde zijde.<br>Bekijk de lijst met beschikbare operators op https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Voorbeelden:<br>- Concentrische ringen: <code>distToSide % 2</code><br>- Driekleurig dambord: <code>((size + row - col) % 3) / 2</code><br>- Schijf met straal sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Open de javascriptconsole (F12) om fouten te zien bij het uitvoeren van je expressie."
+    },
+    "show_44_dots": "Toon stippen op 4-4 cellen",
+    "preview": "Voorbeeld",
+    "change_password": "Wachtwoord wijzigen",
+    "old_password": "Oud wachtwoord",
+    "new_password": "Nieuw wachtwoord",
+    "confirm_new_password": "Bevestig nieuw wachtwoord",
+    "update_password": "Wachtwoord bijwerken",
+    "contribute": "Bijdragen",
+    "contributors": "Bijdragers",
+    "player_made_a_move": "{{player}} heeft een zet gedaan",
+    "game_with_player_has_started": "Spel met {{player}} is gestart",
+    "last_move": "Laatste zet",
+    "undo": {
+        "undo_move": "Ongedaan maken",
+        "accept": "Ongedaan maken accepteren",
+        "reject": "Afwijzen"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Tijdsverschuiving: {{ms}}ms"
+    },
+    "game_candency": {
+        "blitz": "Blitz",
+        "normal": "Normaal",
+        "correspondence": "Correspondentie"
+    },
+    "confirm_move": {
+        "title": "Bevestig zet",
+        "button_label": "Bevestig zet",
+        "button_label_short": "Bevestigen",
+        "send_immediately": "Onmiddellijk verzenden",
+        "ask_confirmation": "Vraag bevestiging",
+        "description": "Om verkeerde klikken te voorkomen, kun je bevestiging vereisen voordat je een zet verzendt."
+    },
+    "rematch": {
+        "label": "Rematch",
+        "accept": "Rematch accepteren",
+        "view": "Bekijk rematch"
+    },
+    "short_time_unit": {
+        "day": "d",
+        "hour": "u",
+        "minute": "min",
+        "second": "s"
+    },
+    "outcome": {
+        "win": "winst",
+        "loss": "verlies",
+        "resign": "opgeven",
+        "forfeit": "verbeuren",
+        "time": "tijd overschrijding"
+    },
+    "player_won_by": {
+        "default": "{player} heeft gewonnen!",
+        "time": "{player} heeft op tijd gewonnen!",
+        "resign": "{player} heeft gewonnen!",
+        "forfeit": "{player} heeft gewonnen door verbeuren!"
+    },
+    "player_wins_by": {
+        "default": "{player} wint!",
+        "time": "{player} wint op tijd!",
+        "resign": "{player} wint!",
+        "forfeit": "{player} wint door verbeuren!"
+    }
+}

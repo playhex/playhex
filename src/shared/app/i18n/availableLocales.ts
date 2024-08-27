@@ -59,6 +59,14 @@ export const availableLocales: AvailableLocales = {
             { fullName: 'Julien Maulny', link: 'https://playhex.org/@alcalyn' },
         ],
     },
+    it: {
+        label: 'Italiano (Italian) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-it" */ 'date-fns/locale/it') as unknown as DefaultExportLocale,
+    },
+    nl: {
+        label: 'Nederlands (Dutch) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-nl" */ 'date-fns/locale/nl') as unknown as DefaultExportLocale,
+    },
     pl: {
         label: 'Polski (Polish)',
         loader: () => import(/* webpackChunkName: "locale-pl" */ 'date-fns/locale/pl') as unknown as DefaultExportLocale,
@@ -69,6 +77,14 @@ export const availableLocales: AvailableLocales = {
     pt: {
         label: 'Português (Portuguese) (beta)',
         loader: () => import(/* webpackChunkName: "locale-pt" */ 'date-fns/locale/pt') as unknown as DefaultExportLocale,
+    },
+    ru: {
+        label: 'Русский (Russian) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-ru" */ 'date-fns/locale/ru') as unknown as DefaultExportLocale,
+    },
+    ja: {
+        label: '日本語 (Japanese) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-ja" */ 'date-fns/locale/ja') as unknown as DefaultExportLocale,
     },
     'zh-Hans': {
         label: '简体中文 (Chinese) (beta)',

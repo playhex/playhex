@@ -1,0 +1,268 @@
+{
+    "lobby_title": "Лобби",
+    "lobby": {
+        "no_waiting_games": "Сейчас нет доступных игр. Создайте новую!",
+        "watch_current_games": "Смотреть текущие игры",
+        "join_a_game": "Присоединиться к игре",
+        "no_playing_games": "В данный момент нет активных игр."
+    },
+    "game": {
+        "opponent": "Противник",
+        "host": "Хост",
+        "size": "Размер",
+        "board": "Игровое поле",
+        "board_size": "Размер поля",
+        "time_control": "Контроль времени",
+        "rules": "Правила",
+        "created": "Создано",
+        "accept": "Принять",
+        "red": "Красный",
+        "blue": "Синий",
+        "started": "Начато",
+        "played": "Сыграно",
+        "finished": "Завершено",
+        "review": "Обзор",
+        "won": "Победа",
+        "outcome": "Результат",
+        "lost": "Проигрыш",
+        "playing": "Играем",
+        "watch": "Смотреть"
+    },
+    "game_rules": {
+        "normal": "обычные",
+        "host_plays_first": "хост ходит первым",
+        "host_plays_second": "хост ходит вторым",
+        "no_swap": "без обмена"
+    },
+    "create_game": {
+        "custom_size": "Пользовательский",
+        "less_options": "Меньше опций",
+        "more_options": "Больше опций"
+    },
+    "player_settings": {
+        "title": "Настройки"
+    },
+    "background_theme": {
+        "title": "Тема",
+        "dark": "Темная",
+        "light": "Светлая"
+    },
+    "time_control": {
+        "custom": "Пользовательский",
+        "use": "Использовать {{type}}",
+        "byo_yomi": "Бё-ёми",
+        "fischer": "Фишер",
+        "fischer_capped": "Ограниченный Фишер",
+        "initial_time": "Начальное время",
+        "time_increment": "Инкремент времени",
+        "periods": "Периоды",
+        "periods_time": "Время периодов",
+        "fast": "Быстро",
+        "normal": "Нормально",
+        "long": "Долго"
+    },
+    "i_play": {
+        "title": "Я играю",
+        "random": "Случайно",
+        "first": "Первый",
+        "second": "Второй"
+    },
+    "swap_rule": "Правило обмена",
+    "allow_swap_pieces": "Разрешить обмен фигур",
+    "toggle_coords": "Переключить координаты",
+    "toggle_coords_short": "Координаты",
+    "share_game": "Поделиться игрой",
+    "copied!": "Скопировано!",
+    "not_copied": "Не удалось скопировать, используйте правую кнопку мыши или длительное нажатие",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Игра создана {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "Игра была создана {player}, {timeAgo}.",
+    "log_out": "Выйти",
+    "log_in": "Войти",
+    "sign_up": "Зарегистрироваться",
+    "feedback": "Обратная связь",
+    "hex_links": "Ссылки на Hex",
+    "project_under_development": "Проект в разработке",
+    "last_change": "Последнее изменение: {{date}}",
+    "privacy_policy": "Политика конфиденциальности",
+    "license_agpl": "Лицензия AGPL-3.0",
+    "create_account": "Создать аккаунт",
+    "already_have_account_login_instead": "Уже есть аккаунт? {login} вместо этого",
+    "already_have_account_login_instead_link_label": "Войти",
+    "no_account_sign_up_instead": "Нет аккаунта? {signUp} вместо этого",
+    "no_account_sign_up_instead_link_label": "Зарегистрироваться",
+    "add_your_language": "Ваш язык отсутствует? {link}!",
+    "add_your_language_link": "Добавьте его с помощью Weblate",
+    "show_coords_by_default": "Показывать координаты по умолчанию",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "account_created_on": "Аккаунт создан {{date}}",
+    "player_current_games": "Текущие игры",
+    "player_game_history": "История игр",
+    "waiting": "ожидание…",
+    "initializing_game": "Инициализация игры…",
+    "game_finished_overlay": {
+        "title": "Игра завершена"
+    },
+    "game_has_been_canceled": "Игра была отменена.",
+    "waiting_for_an_opponent": "Ожидание противника…",
+    "confirm_overlay": {
+        "confirmation": "Подтверждение",
+        "are_you_sure?": "Вы уверены?"
+    },
+    "workers": {
+        "slow_worker": "Сейчас нет быстрого исполнителя. Доступны только ограниченные AI.",
+        "no_worker": "Ни один исполнитель не может сейчас вычислить ходы. Доступны только случайные боты.",
+        "see_how_to_spawn_a_worker": "Узнайте, как вычислять ходы AI для PlayHex с моего компьютера"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "Анализ игры AI",
+        "analyze_game": "Анализировать игру",
+        "requested": "Запрос анализа…",
+        "errored": "Ошибка анализа!",
+        "best_move": "лучший ход",
+        "best": "лучший:",
+        "how_it_works": "Как это работает"
+    },
+    "try_again": "Попробовать снова",
+    "yes": "Да",
+    "no": "Нет",
+    "language": "Язык",
+    "cancel": "Отмена",
+    "pass": "Пас",
+    "close": "Закрыть",
+    "ranked": "Рейтинговая",
+    "rating": "Рейтинг: {{rating}}",
+    "new_game": "Новая игра",
+    "players": "Игроки",
+    "player": "игрок",
+    "load_more": "Загрузить больше",
+    "no_such_player": "Похоже, такого игрока нет.",
+    "n_online_players": "В сети ({{n}})",
+    "guest": "Гость",
+    "finished_games": "Завершенные игры",
+    "1v1_ranked": {
+        "title": "1 на 1",
+        "create": "Создать 1 на 1"
+    },
+    "1v1_friendly": {
+        "title": "Пользовательский 1 на 1",
+        "create": "Создать пользовательский 1 на 1"
+    },
+    "1vAI_ranked": {
+        "title": "Рейтинговая против AI",
+        "create": "Играть рейтинговую против AI"
+    },
+    "1vAI_friendly": {
+        "title": "Играть против AI",
+        "create": "Играть против AI"
+    },
+    "1vAI_offline": {
+        "title": "Офлайн AI",
+        "create": "Играть против офлайн AI"
+    },
+    "offline_game_explain": "Офлайн игра работает только на вашем устройстве, сервер PlayHex не используется. Вы можете играть без интернета.",
+    "loading_game": "Загрузка игры…",
+    "tournament": "Турнир",
+    "now!": "Сейчас!",
+    "register_on_challonge": "Зарегистрироваться на Challonge",
+    "see_progression_on_challonge": "Посмотреть прогресс на Challonge",
+    "move": "ход",
+    "move_number": "ход {{n}}",
+    "chat": "Чат",
+    "system": "Система",
+    "chat_message_placeholder": "Сообщение…",
+    "unread_messages": "непрочитанные сообщения",
+    "send_chat_message": "Отправить",
+    "n_characters_one": "{{count}} символ",
+    "n_characters_other": "{{count}} символов",
+    "landscape": "Альбомный",
+    "portrait": "Портретный",
+    "resign": "Сдаться",
+    "auto": "Авто",
+    "board_orientation": {
+        "title": "Ориентация",
+        "description": "Предпочтительная ориентация доски для альбомного и портретного экранов.",
+        "flat": "Плоская",
+        "flat_2": "Плоская 2",
+        "diamond": "Ромб"
+    },
+    "shading_patterns": {
+        "title": "Узор затенения",
+        "visibility": "Видимость узора затенения",
+        "types": {
+            "null": "Нет",
+            "tricolor_checkerboard": "Трехцветная шашечная доска",
+            "concentrical_rings": "Концентрические кольца (Hexworld)",
+            "height_5_lines": "Линии высоты 5",
+            "single_ring": "Одиночное кольцо",
+            "custom": "Пользовательский"
+        },
+        "custom_expression": "Пользовательское выражение",
+        "help_custom": "Математическое выражение для пользовательского узора затенения.<br>Выражение должно возвращать число от 0 (нет затенения) до 1 (полностью затенено) для данной ячейки (ряд, колонка). Можно использовать, например, 0.5 для трёхцветных узоров затенения. Возвращение <code>true</code> или <code>false</code> работает так же, как возвращение <code>1</code> или <code>0</code>.<br>Доступны переменные:<br>- <code>row</code> и <code>col</code> (сокращения: <code>r</code> и <code>c</code>) для номера ряда и колонки, начиная с 0.<br>- <code>size</code> (или <code>s</code>) для размера доски.<br>- <code>distToSide</code> для расстояния от текущей ячейки до ближайшей стороны.<br>Смотрите список доступных операторов на https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Примеры:<br>- Концентрические кольца: <code>distToSide % 2</code><br>- Трехцветная шашечная доска: <code>((size + row - col) % 3) / 2</code><br>- Диск с радиусом sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Откройте консоль JavaScript (F12), чтобы увидеть ошибки при выполнении вашего выражения."
+    },
+    "show_44_dots": "Показывать точки на клетках 4-4",
+    "preview": "Предпросмотр",
+    "change_password": "Изменить пароль",
+    "old_password": "Старый пароль",
+    "new_password": "Новый пароль",
+    "confirm_new_password": "Подтвердить новый пароль",
+    "update_password": "Обновить пароль",
+    "contribute": "Внести вклад",
+    "contributors": "Участники",
+    "player_made_a_move": "{{player}} сделал ход",
+    "game_with_player_has_started": "Игра с {{player}} началась",
+    "last_move": "Последний ход",
+    "undo": {
+        "undo_move": "Отменить",
+        "accept": "Принять отмену",
+        "reject": "Отклонить"
+    },
+    "ping": {
+        "ping_ms": "Пинг: {{ms}}мс",
+        "date_shift_ms": "Сдвиг времени: {{ms}}мс"
+    },
+    "game_candency": {
+        "blitz": "Блиц",
+        "normal": "Нормальная",
+        "correspondence": "Корреспонденция"
+    },
+    "confirm_move": {
+        "title": "Подтвердить ход",
+        "button_label": "Подтвердить ход",
+        "button_label_short": "Подтвердить",
+        "send_immediately": "Отправить немедленно",
+        "ask_confirmation": "Запросить подтверждение",
+        "description": "Чтобы избежать ошибочных нажатий, вы можете потребовать подтверждения перед отправкой хода."
+    },
+    "rematch": {
+        "label": "Реванш",
+        "accept": "Принять реванш",
+        "view": "Просмотр реванша"
+    },
+    "short_time_unit": {
+        "day": "д",
+        "hour": "ч",
+        "minute": "мин",
+        "second": "с"
+    },
+    "outcome": {
+        "win": "победа",
+        "loss": "поражение",
+        "resign": "сдаться",
+        "forfeit": "техническое поражение",
+        "time": "по времени"
+    },
+    "player_won_by": {
+        "default": "{player} победил!",
+        "time": "{player} победил по времени!",
+        "resign": "{player} победил!",
+        "forfeit": "{player} победил по техническому поражению!"
+    },
+    "player_wins_by": {
+        "default": "{player} побеждает!",
+        "time": "{player} побеждает по времени!",
+        "resign": "{player} побеждает!",
+        "forfeit": "{player} побеждает по техническому поражению!"
+    }
+}

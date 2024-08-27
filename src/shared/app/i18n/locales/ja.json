@@ -1,0 +1,268 @@
+{
+    "lobby_title": "ロビー",
+    "lobby": {
+        "no_waiting_games": "現在利用可能なゲームはありません。新しいゲームを作成しましょう！",
+        "watch_current_games": "現在のゲームを観戦する",
+        "join_a_game": "ゲームに参加する",
+        "no_playing_games": "現在進行中のゲームはありません。"
+    },
+    "game": {
+        "opponent": "対戦相手",
+        "host": "ホスト",
+        "size": "サイズ",
+        "board": "ゲームボード",
+        "board_size": "ボードサイズ",
+        "time_control": "持ち時間",
+        "rules": "ルール",
+        "created": "作成日",
+        "accept": "承認",
+        "red": "赤",
+        "blue": "青",
+        "started": "開始",
+        "played": "プレイ済み",
+        "finished": "終了",
+        "review": "レビュー",
+        "won": "勝利",
+        "outcome": "結果",
+        "lost": "敗北",
+        "playing": "プレイ中",
+        "watch": "観戦"
+    },
+    "game_rules": {
+        "normal": "通常",
+        "host_plays_first": "ホストが先手",
+        "host_plays_second": "ホストが後手",
+        "no_swap": "スワップなし"
+    },
+    "create_game": {
+        "custom_size": "カスタム",
+        "less_options": "オプションを減らす",
+        "more_options": "オプションを増やす"
+    },
+    "player_settings": {
+        "title": "設定"
+    },
+    "background_theme": {
+        "title": "テーマ",
+        "dark": "ダーク",
+        "light": "ライト"
+    },
+    "time_control": {
+        "custom": "カスタム",
+        "use": "{{type}}を使用",
+        "byo_yomi": "秒読み",
+        "fischer": "フィッシャー",
+        "fischer_capped": "上限付きフィッシャー",
+        "initial_time": "初期時間",
+        "time_increment": "時間加算",
+        "periods": "期間",
+        "periods_time": "期間時間",
+        "fast": "速い",
+        "normal": "普通",
+        "long": "長い"
+    },
+    "i_play": {
+        "title": "プレイする",
+        "random": "ランダム",
+        "first": "先手",
+        "second": "後手"
+    },
+    "swap_rule": "スワップルール",
+    "allow_swap_pieces": "スワップを許可する",
+    "toggle_coords": "座標を切り替える",
+    "toggle_coords_short": "座標",
+    "share_game": "ゲームを共有",
+    "copied!": "コピーしました！",
+    "not_copied": "コピーに失敗しました。右クリックまたは長押しを使用してください",
+    "2dots": "{{s}}：",
+    "game_created_by_player_time_ago": "{player} により {timeAgo} に作成されたゲーム。",
+    "game_was_created_by_player_time_ago": "ゲームは {player} により {timeAgo} に作成されました。",
+    "log_out": "ログアウト",
+    "log_in": "ログイン",
+    "sign_up": "サインアップ",
+    "feedback": "フィードバック",
+    "hex_links": "Hex リンク",
+    "project_under_development": "開発中のプロジェクト",
+    "last_change": "最終変更：{{date}}",
+    "privacy_policy": "プライバシーポリシー",
+    "license_agpl": "ライセンス AGPL-3.0",
+    "create_account": "アカウントを作成",
+    "already_have_account_login_instead": "すでにアカウントをお持ちですか？代わりに{login}してください",
+    "already_have_account_login_instead_link_label": "ログイン",
+    "no_account_sign_up_instead": "アカウントがありませんか？代わりに{signUp}してください",
+    "no_account_sign_up_instead_link_label": "サインアップ",
+    "add_your_language": "言語がありませんか？{link}で追加！",
+    "add_your_language_link": "Weblateで追加",
+    "show_coords_by_default": "デフォルトで座標を表示",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "account_created_on": "{{date}}にアカウントが作成されました",
+    "player_current_games": "現在のゲーム",
+    "player_game_history": "ゲーム履歴",
+    "waiting": "待機中…",
+    "initializing_game": "ゲームを初期化中…",
+    "game_finished_overlay": {
+        "title": "ゲーム終了"
+    },
+    "game_has_been_canceled": "ゲームがキャンセルされました。",
+    "waiting_for_an_opponent": "対戦相手を待っています…",
+    "confirm_overlay": {
+        "confirmation": "確認",
+        "are_you_sure?": "よろしいですか？"
+    },
+    "workers": {
+        "slow_worker": "現在オンラインの高速ワーカーはいません。利用可能なAIは限られています。",
+        "no_worker": "現在、移動を計算できるワーカーはいません。利用可能なランダムボットのみです。",
+        "see_how_to_spawn_a_worker": "自分のコンピュータでPlayHexのAI移動を計算する方法を見る"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "AIによるゲーム分析",
+        "analyze_game": "ゲームを分析",
+        "requested": "分析をリクエストしました…",
+        "errored": "分析エラー！",
+        "best_move": "最善手",
+        "best": "最善:",
+        "how_it_works": "動作の仕組み"
+    },
+    "try_again": "再試行",
+    "yes": "はい",
+    "no": "いいえ",
+    "language": "言語",
+    "cancel": "キャンセル",
+    "pass": "パス",
+    "close": "閉じる",
+    "ranked": "ランク戦",
+    "rating": "レーティング: {{rating}}",
+    "new_game": "新しいゲーム",
+    "players": "プレイヤー",
+    "player": "プレイヤー",
+    "load_more": "さらに読み込む",
+    "no_such_player": "そのようなプレイヤーはいないようです。",
+    "n_online_players": "オンライン ({{n}})",
+    "guest": "ゲスト",
+    "finished_games": "終了したゲーム",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "1v1を作成"
+    },
+    "1v1_friendly": {
+        "title": "カスタム 1v1",
+        "create": "カスタム 1v1を作成"
+    },
+    "1vAI_ranked": {
+        "title": "AIとランク戦",
+        "create": "AIとランク戦をプレイ"
+    },
+    "1vAI_friendly": {
+        "title": "AIとプレイ",
+        "create": "AIとプレイ"
+    },
+    "1vAI_offline": {
+        "title": "オフラインAI",
+        "create": "オフラインAIとプレイ"
+    },
+    "offline_game_explain": "オフラインゲームはデバイス上のみで実行され、PlayHexサーバーは呼び出されません。インターネットがないときでもプレイできます。",
+    "loading_game": "ゲームを読み込み中…",
+    "tournament": "トーナメント",
+    "now!": "今すぐ！",
+    "register_on_challonge": "Challongeで登録",
+    "see_progression_on_challonge": "Challongeで進捗を見る",
+    "move": "手",
+    "move_number": "手数 {{n}}",
+    "chat": "チャット",
+    "system": "システム",
+    "chat_message_placeholder": "メッセージ…",
+    "unread_messages": "未読メッセージ",
+    "send_chat_message": "送信",
+    "n_characters_one": "{{count}} 文字",
+    "n_characters_other": "{{count}} 文字",
+    "landscape": "横向き",
+    "portrait": "縦向き",
+    "resign": "投了",
+    "auto": "自動",
+    "board_orientation": {
+        "title": "ボードの向き",
+        "description": "縦画面と横画面の向きに対するボードの向きの設定。",
+        "flat": "フラット",
+        "flat_2": "フラット 2",
+        "diamond": "ダイヤモンド"
+    },
+    "shading_patterns": {
+        "title": "陰影パターン",
+        "visibility": "陰影パターンの可視性",
+        "types": {
+            "null": "なし",
+            "tricolor_checkerboard": "三色チェッカーボード",
+            "concentrical_rings": "同心円 (Hexworld)",
+            "height_5_lines": "高さ5のライン",
+            "single_ring": "単一リング",
+            "custom": "カスタム"
+        },
+        "custom_expression": "カスタム式",
+        "help_custom": "カスタム陰影パターンのための数式。<br>式は、指定されたセル（行、列）に対して0（陰影なし）から1（完全に陰影あり）までの数値を返す必要があります。三色陰影パターンの場合は0.5を使用できます。<code>true</code>または<code>false</code>を返すことも、<code>1</code>または<code>0</code>を返すのと同様に動作します。<br>使用可能な変数:<br>- 行と列番号には<code>row</code>および<code>col</code>（省略形: <code>r</code>および<code>c</code>）を使用できます。0から始まります。<br>- ボードサイズには<code>size</code>（または<code>s</code>）を使用します。<br>- 現在のセルから最も近い辺までの距離には<code>distToSide</code>を使用します。<br>利用可能な演算子のリストは https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax を参照してください。<br>例:<br>- 同心円: <code>distToSide % 2</code><br>- 三色チェッカーボード: <code>((size + row - col) % 3) / 2</code><br>- 半径 sqrt(20) の円: <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>JavaScriptコンソール（F12）を開いて式実行時のエラーを確認してください。"
+    },
+    "show_44_dots": "4-4セルにドットを表示",
+    "preview": "プレビュー",
+    "change_password": "パスワードを変更",
+    "old_password": "古いパスワード",
+    "new_password": "新しいパスワード",
+    "confirm_new_password": "新しいパスワードを確認",
+    "update_password": "パスワードを更新",
+    "contribute": "貢献する",
+    "contributors": "貢献者",
+    "player_made_a_move": "{{player}} が手を打ちました",
+    "game_with_player_has_started": "{{player}} とのゲームが始まりました",
+    "last_move": "最後の手",
+    "undo": {
+        "undo_move": "手を戻す",
+        "accept": "戻しを承認",
+        "reject": "却下"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "時間シフト: {{ms}}ms"
+    },
+    "game_candency": {
+        "blitz": "ブリッツ",
+        "normal": "通常",
+        "correspondence": "通信"
+    },
+    "confirm_move": {
+        "title": "手を確認",
+        "button_label": "手を確認",
+        "button_label_short": "確認",
+        "send_immediately": "すぐに送信",
+        "ask_confirmation": "確認を求める",
+        "description": "誤クリックを防ぐため、手を送信する前に確認を求めることができます。"
+    },
+    "rematch": {
+        "label": "再戦",
+        "accept": "再戦を受け入れる",
+        "view": "再戦を見る"
+    },
+    "short_time_unit": {
+        "day": "日",
+        "hour": "時間",
+        "minute": "分",
+        "second": "秒"
+    },
+    "outcome": {
+        "win": "勝ち",
+        "loss": "負け",
+        "resign": "投了",
+        "forfeit": "没収",
+        "time": "タイムアウト"
+    },
+    "player_won_by": {
+        "default": "{player} が勝ちました！",
+        "time": "{player} が時間切れで勝ちました！",
+        "resign": "{player} が勝ちました！",
+        "forfeit": "{player} が没収勝ちしました！"
+    },
+    "player_wins_by": {
+        "default": "{player} の勝利！",
+        "time": "{player} が時間切れで勝利！",
+        "resign": "{player} の勝利！",
+        "forfeit": "{player} が没収勝ち！"
+    }
+}
