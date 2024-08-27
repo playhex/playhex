@@ -1,5 +1,6 @@
 import { GameTimeData } from '../time-control/TimeControl';
 import TimeControlType from '../time-control/TimeControlType';
+import { Translator } from './i18n/availableLocales';
 
 export type Tuple<T> = [T, T];
 
@@ -25,13 +26,8 @@ export type GithubContributor = {
     avatarUrl: string;
 };
 
-export type WeblateContributor = {
-    fullName: string;
-    link?: `http${string}`;
-};
-
 export type WeblateContributors = {
-    [lang: string]: WeblateContributor[];
+    [lang: string]: Translator[];
 };
 
 export type PlayHexContributors = {

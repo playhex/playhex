@@ -1,4 +1,5 @@
 import type { GithubContributor, WeblateContributors } from '../shared/app/Types';
+import { availableLocales } from '../shared/app/i18n/availableLocales';
 
 const { FETCH_CONTRIBUTORS } = process.env;
 
@@ -31,38 +32,18 @@ const fetchGithubContributors = async (): Promise<GithubContributor[]> => {
 
 export { fetchGithubContributors };
 
-let cachedWeblateContributors: null | WeblateContributors = null;
+const cachedWeblateContributors: WeblateContributors = {};
+
+for (const locale in availableLocales) {
+    const { translators, label } = availableLocales[locale];
+
+    if (translators && translators.length > 0) {
+        cachedWeblateContributors[label] = translators;
+    }
+}
 
 const fetchWeblateContributors = async (): Promise<WeblateContributors> => {
-    if (null !== cachedWeblateContributors) {
-        return cachedWeblateContributors;
-    }
-
-    // Not yet exposed in API, see https://github.com/WeblateOrg/weblate/issues/5459
-    // So copy report from https://hosted.weblate.org/projects/playhex/#reports (left menu, JSON).
-    // For now, return hard coded until there is a new translator.
-
-    // Check disabled because for now, not actually fetching external data
-    // if ('true' !== FETCH_CONTRIBUTORS) {
-    //     return {};
-    // }
-
-    return cachedWeblateContributors = {
-        French: [
-            { fullName: 'Julien Maulny', link: 'https://playhex.org/@alcalyn' },
-        ],
-        German: [
-            { fullName: 'Ettore Atalan', link: 'https://hosted.weblate.org/user/Atalanttore/' },
-            { fullName: 'Peter Selinger', link: 'https://playhex.org/@quasar' },
-        ],
-        Polish: [
-            { fullName: 'FlyPside', link: 'https://playhex.org/@flypside' },
-        ],
-        Spanish: [
-            { fullName: 'gallegonovato', link: 'https://hosted.weblate.org/user/gallegonovato/' },
-            { fullName: 'Guille', link: 'https://hosted.weblate.org/user/guillevg/' },
-        ],
-    };
+    return cachedWeblateContributors;
 };
 
 export { fetchWeblateContributors };

@@ -16,15 +16,14 @@ import GameView from '../../../pixi-board/GameView';
 import { Game } from '../../../../shared/game-engine';
 import { Player } from '../../../../shared/app/models';
 import AppBoard from '../../components/AppBoard.vue';
-import i18next from 'i18next';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
-    titleTemplate: title => `${i18next.t('player_settings.title')} - ${title}`,
+    titleTemplate: title => `${i18n.t('player_settings.title')} - ${title}`,
 });
 
 updateSeoMeta();
-i18next.on('languageChanged', () => updateSeoMeta());
+i18n.on('languageChanged', () => updateSeoMeta());
 
 const playerSettingsStore = usePlayerSettingsStore();
 
