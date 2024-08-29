@@ -22,7 +22,7 @@ import useAnalyzeStore from '../../stores/analyzeStore';
 import useServerDateStore from '../../stores/serverDateStore';
 import { downloadString } from '../../services/fileDownload';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
-import { gameToSGF } from '../../../shared/game-engine/SGF';
+import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF';
 import GameView from '../../pixi-board/GameView';
 import { isMyTurn } from '../../services/notifications/context-utils';
 import { PlayerIndex } from '@shared/game-engine';
@@ -122,17 +122,14 @@ const downloadSGF = (): void => {
     const players = hostedGameClient.value.getPlayers();
 
     const filename = [
-        'hex',
+        'playhex',
         game.getStartedAt().toISOString().substring(0, 10),
         pseudoString(players[0], 'slug'),
         'VS',
         pseudoString(players[1], 'slug'),
     ].join('-') + '.sgf';
 
-    downloadString(gameToSGF(game, {
-        PB: pseudoString(players[0], 'pseudo'),
-        PW: pseudoString(players[1], 'pseudo'),
-    }), filename);
+    downloadString(hostedGameToSGF(hostedGameClient.value.getHostedGame()), filename);
 };
 
 /*
