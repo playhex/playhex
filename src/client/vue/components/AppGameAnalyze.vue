@@ -11,6 +11,10 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits<{
+    (e: 'selectedMove', move: AnalyzeMoveOutput): void;
+}>();
+
 const { analyze } = props;
 const gameAnalyzeContainer = ref<HTMLElement>();
 const moveAnalyze = ref<null | AnalyzeMoveOutput>(null);
@@ -26,7 +30,15 @@ onMounted(async () => {
 
     gameAnalyzeContainer.value.appendChild(gameAnalyzeView.getView() as unknown as Node);
 
-    gameAnalyzeView.on('selectedMove', move => moveAnalyze.value = move);
+    gameAnalyzeView.on('selectedMove', move => {
+        moveAnalyze.value = move;
+
+        if (null === move) {
+            return;
+        }
+
+        emit('selectedMove', move);
+    });
 });
 </script>
 

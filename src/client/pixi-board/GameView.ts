@@ -87,6 +87,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private initPromise: Promise<void>;
 
+    /**
+     * Show board at position N.
+     * If null, show current board.
+     * If number, show position like it was when move N was played.
+     *
+     * null => current board
+     * 0 => first move is played.
+     * negative value => empty board
+     */
+    private showPositionAtMoveIndex: null | number = null;
+
     constructor(
         private game: Game,
 
@@ -210,6 +221,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.swaped = this.createSwaped();
 
         this.createAndAddHexes();
+        this.addAllMoves();
         this.highlightSidesFromGame();
 
         if (null !== this.previewedMove) {
@@ -361,6 +373,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private async endedCallback(): Promise<void>
     {
+        this.resetRewind();
         this.highlightSidesFromGame();
 
         await this.animateWinningPath();
@@ -405,33 +418,51 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         };
     }
 
+    addMove(move: Move, byPlayerIndex: PlayerIndex): void
+    {
+        switch (move.getSpecialMoveType()) {
+            case undefined:
+                this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
+                break;
+
+            case 'swap-pieces': {
+                const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
+
+                this.hexes[swapped.row][swapped.col].setPlayer(null);
+                this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
+                break;
+            }
+        }
+
+        this.removePreviewMove();
+        this.highlightLastMove(move);
+        this.highlightSidesFromGame();
+    }
+
+    private addAllMoves(): void
+    {
+        const movesHistory = this.game.getMovesHistory();
+
+        for (let i = 0; i < movesHistory.length; ++i) {
+            if (null !== this.showPositionAtMoveIndex && i > this.showPositionAtMoveIndex) {
+                break;
+            }
+
+            this.addMove(movesHistory[i], i % 2 as PlayerIndex);
+        }
+    }
+
     private listenModel(): void
     {
         this.highlightSidesFromGame();
 
         this.game.on('played', (move, moveIndex, byPlayerIndex) => {
-
-            // Update board cells
-            switch (move.getSpecialMoveType()) {
-                case undefined:
-                    this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
-                    break;
-
-                case 'swap-pieces': {
-                    const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
-
-                    this.hexes[swapped.row][swapped.col].setPlayer(null);
-                    this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
-                    break;
-                }
-            }
-
-            this.removePreviewMove();
-            this.highlightLastMove();
-            this.highlightSidesFromGame();
+            this.resetRewind();
+            this.addMove(move, byPlayerIndex);
         });
 
         this.game.on('undo', async undoneMoves => {
+            this.resetRewind();
             this.removePreviewMove(undoneMoves);
 
             for (let i = 0; i < undoneMoves.length; ++i) {
@@ -509,7 +540,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         for (let row = 0; row < size; ++row) {
             for (let col = 0; col < size; ++col) {
-                const hex = new Hex(this.game.getBoard().getCell(row, col), shadingPattern.calc(row, col) * boardShadingPatternIntensity);
+                const hex = new Hex(null, shadingPattern.calc(row, col) * boardShadingPatternIntensity);
 
                 hex.position = Hex.coords(row, col);
 
@@ -530,17 +561,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.hexes[size - 4][size - 4].showDot();
         }
 
-        this.highlightLastMove();
+        this.highlightLastMove(this.game.getLastMove());
     }
 
     /**
-     * Shows a dot on game current last played move.
+     * Shows a dot provided move.
      * For swap move, shows arrows if possible to swap opponent move,
      * or show a "S" to show that last move was swapped.
-     *
-     * @param {Move} move Override last move to highlight this move instead.
      */
-    private highlightLastMove(move: null | Move = null): void
+    private highlightLastMove(lastMove: null | Move): void
     {
         if (null !== this.lastSimpleMoveHighlighted) {
             const { row, col } = this.lastSimpleMoveHighlighted;
@@ -550,8 +579,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.showSwapable(false);
         this.showSwaped(false);
-
-        const lastMove = move ?? this.game.getLastMove();
 
         if (null === lastMove) {
             return;
@@ -839,6 +866,51 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         return this;
+    }
+
+    showPositionAtMove(showPositionAtMoveIndex: number): void
+    {
+        this.showPositionAtMoveIndex = showPositionAtMoveIndex;
+
+        this.redraw();
+    }
+
+    resetRewind(): void
+    {
+        if (null === this.showPositionAtMoveIndex) {
+            return;
+        }
+
+        this.showPositionAtMoveIndex = null;
+
+        this.redraw();
+    }
+
+    private customHighlights: Graphics[] = [];
+
+    private drawGreen(value: number): Graphics
+    {
+        const g = new Graphics();
+
+        g.circle(0, 0, Hex.RADIUS / 3);
+        g.fill({ color: [1 - value, value, 0] });
+
+        return g;
+    }
+
+    setGreen(coords: Coords, value: number): void
+    {
+        const green = this.drawGreen(value);
+
+        green.position = Hex.coords(coords.row, coords.col);
+        this.gameContainer.addChild(green);
+        this.customHighlights.push(green);
+    }
+
+    resetGreens(): void
+    {
+        this.gameContainer.removeChild(...this.customHighlights);
+        this.customHighlights = [];
     }
 
     destroy(): void

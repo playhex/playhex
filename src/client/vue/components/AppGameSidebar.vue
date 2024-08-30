@@ -28,6 +28,7 @@ import { isMyTurn } from '../../services/notifications/context-utils';
 import { PlayerIndex } from '@shared/game-engine';
 import { fromEngineMove } from '@shared/app/models/Move';
 import { autoLocale } from '../../../shared/app/i18n';
+import { AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeView';
 
 const props = defineProps({
     hostedGameClient: {
@@ -94,6 +95,21 @@ const sendChat = () => {
 };
 
 onMounted(() => scrollChatToBottom());
+
+const showMove = (moveIndex: number): void => gameView.value?.showPositionAtMove(moveIndex);
+const showAnalyzeMove = (move: AnalyzeMoveOutput): void => {
+    showMove(move.moveIndex);
+
+    gameView.value?.resetGreens();
+
+    let maxValue = move.bestMoves.reduce((max, current) => Math.max(max, current.value), 0);
+
+    for (const bestMove of move.bestMoves) {
+        gameView.value?.setGreen(Move.fromString(bestMove.move), bestMove.value / maxValue);
+    }
+
+    gameView.value?.setGreen(Move.fromString(move.move.move), move.move.value / maxValue);
+};
 
 /*
  * Show Hexworld link for other players.
@@ -569,7 +585,10 @@ const shouldEnablePass = (): boolean => {
                         ><BIconInfoCircle /></router-link>
                     </small>
                     <!-- Anayze graph -->
-                    <AppGameAnalyze :analyze="gameAnalyze.analyze" />
+                    <AppGameAnalyze
+                        :analyze="gameAnalyze.analyze"
+                        @selectedMove="move => showAnalyzeMove(move)"
+                    />
                 </div>
 
             </div>
@@ -601,7 +620,14 @@ const shouldEnablePass = (): boolean => {
                         </template>
 
                         <template v-else-if="message.type === 'move'">
-                            <small class="header-move text-secondary text-center">{{ $t('move_number', { n: message.moveNumber }) }}</small>
+                            <span class="header-move text-center">
+                                <button
+                                    @click="showMove(message.moveNumber - 1)"
+                                    class="btn btn-sm btn-link text-secondary text-decoration-none"
+                                >
+                                    {{ $t('move_number', { n: message.moveNumber }) }}
+                                </button>
+                            </span>
                         </template>
                         <template v-else-if="message.type === 'date'">
                             <small class="header-date text-secondary text-center mt-1">{{ formatChatDateHeader(message.date) }}</small>
