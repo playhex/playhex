@@ -44,11 +44,20 @@ type GameViewEvents = {
     orientationChanged: () => void;
 };
 
+/**
+ * Generates a pixi application to show a Hex board and position from a game.
+ *
+ * Memory leaks: to check for memory leak,
+ * put `redraw()` in a loop (i.e `setInterval(() => this.redraw(), 20)`),
+ * open a game to create a GameView,
+ * check memory used, then create a snapshot after few seconds (no need to exceed 400Mb).
+ * In chrome, Summary, check for known pixi classes that take more space.
+ */
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
     static currentTheme: Theme;
 
-    private hexes: Hex[][];
+    private hexes: Hex[][] = [];
     private pixi: Application;
     private gameContainer: Container = new Container();
 
@@ -166,6 +175,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         GameView.currentTheme = themes[useDarkLightThemeStore().displayedTheme()];
         const wrapperSize = this.getWrapperSize();
+
+        for (const child of this.gameContainer.children) {
+            child.destroy(true);
+        }
 
         this.gameContainer.removeChildren();
 
@@ -473,6 +486,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private createAndAddHexes(): void
     {
+        if (this.hexes.length > 0) {
+            for (const hexRow of this.hexes) {
+                for (const hex of hexRow) {
+                    hex.destroy(true);
+                }
+            }
+
+            this.hexes = [];
+        }
+
         const { playerSettings } = usePlayerSettingsStore();
         const size = this.game.getSize();
 
