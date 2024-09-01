@@ -1,0 +1,268 @@
+{
+    "lobby_title": "로비",
+    "lobby": {
+        "no_waiting_games": "현재 이용 가능한 게임이 없습니다. 새 게임을 만들어보세요!",
+        "watch_current_games": "현재 진행 중인 게임 보기",
+        "join_a_game": "게임 참여하기",
+        "no_playing_games": "현재 진행 중인 게임이 없습니다."
+    },
+    "game": {
+        "opponent": "상대",
+        "host": "호스트",
+        "size": "크기",
+        "board": "게임 보드",
+        "board_size": "보드 크기",
+        "time_control": "시간 제어",
+        "rules": "규칙",
+        "created": "생성됨",
+        "accept": "수락",
+        "red": "빨강",
+        "blue": "파랑",
+        "started": "시작됨",
+        "played": "플레이됨",
+        "finished": "종료됨",
+        "review": "리뷰",
+        "won": "승리",
+        "outcome": "결과",
+        "lost": "패배",
+        "playing": "플레이 중",
+        "watch": "관전"
+    },
+    "game_rules": {
+        "normal": "일반",
+        "host_plays_first": "호스트가 먼저 플레이",
+        "host_plays_second": "호스트가 두 번째로 플레이",
+        "no_swap": "교환 없음"
+    },
+    "create_game": {
+        "custom_size": "사용자 정의",
+        "less_options": "옵션 줄이기",
+        "more_options": "옵션 더 보기"
+    },
+    "player_settings": {
+        "title": "설정"
+    },
+    "background_theme": {
+        "title": "테마",
+        "dark": "다크",
+        "light": "라이트"
+    },
+    "time_control": {
+        "custom": "사용자 정의",
+        "use": "{{type}} 사용",
+        "byo_yomi": "바이오-요미",
+        "fischer": "피셔",
+        "fischer_capped": "제한된 피셔",
+        "initial_time": "초기 시간",
+        "time_increment": "시간 증가",
+        "periods": "기간",
+        "periods_time": "기간 시간",
+        "fast": "빠름",
+        "normal": "보통",
+        "long": "긴"
+    },
+    "i_play": {
+        "title": "내가 플레이",
+        "random": "랜덤",
+        "first": "첫 번째",
+        "second": "두 번째"
+    },
+    "swap_rule": "교환 규칙",
+    "allow_swap_pieces": "조각 교환 허용",
+    "toggle_coords": "좌표 전환",
+    "toggle_coords_short": "좌표",
+    "share_game": "게임 공유",
+    "copied!": "복사됨!",
+    "not_copied": "복사 실패, 우클릭 또는 길게 누르세요",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "{player}이(가) {timeAgo} 전에 게임을 생성했습니다.",
+    "game_was_created_by_player_time_ago": "게임이 {player}에 의해 {timeAgo} 전에 생성되었습니다.",
+    "log_out": "로그아웃",
+    "log_in": "로그인",
+    "sign_up": "회원가입",
+    "feedback": "피드백",
+    "hex_links": "Hex 링크",
+    "project_under_development": "프로젝트 개발 중",
+    "last_change": "마지막 변경: {{date}}",
+    "privacy_policy": "개인정보 보호정책",
+    "license_agpl": "라이선스 AGPL-3.0",
+    "create_account": "계정 생성",
+    "already_have_account_login_instead": "이미 계정이 있나요? 대신 {login}하세요",
+    "already_have_account_login_instead_link_label": "로그인",
+    "no_account_sign_up_instead": "계정이 없나요? 대신 {signUp}하세요",
+    "no_account_sign_up_instead_link_label": "회원가입",
+    "add_your_language": "사용하는 언어가 없나요? {link}!",
+    "add_your_language_link": "Weblate로 추가하세요",
+    "show_coords_by_default": "기본적으로 좌표 표시",
+    "username": "사용자 이름",
+    "password": "비밀번호",
+    "account_created_on": "계정 생성일: {{date}}",
+    "player_current_games": "현재 게임",
+    "player_game_history": "게임 기록",
+    "waiting": "대기 중…",
+    "initializing_game": "게임 초기화 중…",
+    "game_finished_overlay": {
+        "title": "게임 종료"
+    },
+    "game_has_been_canceled": "게임이 취소되었습니다.",
+    "waiting_for_an_opponent": "상대방을 기다리는 중…",
+    "confirm_overlay": {
+        "confirmation": "확인",
+        "are_you_sure?": "확실합니까?"
+    },
+    "workers": {
+        "slow_worker": "현재 빠른 작업자가 없습니다. 제한된 AI만 사용할 수 있습니다.",
+        "no_worker": "현재 작업자가 이동을 계산할 수 없습니다. 랜덤 봇만 사용할 수 있습니다.",
+        "see_how_to_spawn_a_worker": "내 컴퓨터에서 PlayHex의 AI 이동을 계산하는 방법을 확인하세요"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "AI로 게임 분석",
+        "analyze_game": "게임 분석",
+        "requested": "분석 요청됨…",
+        "errored": "분석 오류 발생!",
+        "best_move": "최고의 이동",
+        "best": "최고:",
+        "how_it_works": "작동 방식"
+    },
+    "try_again": "다시 시도",
+    "yes": "예",
+    "no": "아니요",
+    "language": "언어",
+    "cancel": "취소",
+    "pass": "패스",
+    "close": "닫기",
+    "ranked": "랭크",
+    "rating": "평점: {{rating}}",
+    "new_game": "새 게임",
+    "players": "플레이어",
+    "player": "플레이어",
+    "load_more": "더 불러오기",
+    "no_such_player": "해당 플레이어가 없는 것 같습니다.",
+    "n_online_players": "온라인 ({{n}})",
+    "guest": "게스트",
+    "finished_games": "종료된 게임",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "1v1 생성"
+    },
+    "1v1_friendly": {
+        "title": "커스텀 1v1",
+        "create": "커스텀 1v1 생성"
+    },
+    "1vAI_ranked": {
+        "title": "AI와 랭크전",
+        "create": "AI와 랭크전 플레이"
+    },
+    "1vAI_friendly": {
+        "title": "AI와 플레이",
+        "create": "AI와 플레이"
+    },
+    "1vAI_offline": {
+        "title": "오프라인 AI",
+        "create": "오프라인 AI와 플레이"
+    },
+    "offline_game_explain": "오프라인 게임은 귀하의 장치에서만 실행되며, PlayHex 서버는 호출되지 않습니다. 인터넷이 없을 때도 플레이할 수 있습니다.",
+    "loading_game": "게임 로딩 중…",
+    "tournament": "토너먼트",
+    "now!": "지금!",
+    "register_on_challonge": "Challonge에서 등록",
+    "see_progression_on_challonge": "Challonge에서 진행 상황 보기",
+    "move": "이동",
+    "move_number": "{{n}} 번째 이동",
+    "chat": "채팅",
+    "system": "시스템",
+    "chat_message_placeholder": "메시지…",
+    "unread_messages": "읽지 않은 메시지",
+    "send_chat_message": "보내기",
+    "n_characters_one": "{{count}} 문자",
+    "n_characters_other": "{{count}} 문자",
+    "landscape": "가로",
+    "portrait": "세로",
+    "resign": "기권",
+    "auto": "자동",
+    "board_orientation": {
+        "title": "보드 방향",
+        "description": "가로 및 세로 화면 방향에 대한 선호하는 보드 방향입니다.",
+        "flat": "평면",
+        "flat_2": "평면 2",
+        "diamond": "다이아몬드"
+    },
+    "shading_patterns": {
+        "title": "음영 패턴",
+        "visibility": "음영 패턴 가시성",
+        "types": {
+            "null": "없음",
+            "tricolor_checkerboard": "3색 체커보드",
+            "concentrical_rings": "동심원 링 (Hexworld)",
+            "height_5_lines": "높이 5선",
+            "single_ring": "단일 링",
+            "custom": "사용자 정의"
+        },
+        "custom_expression": "사용자 정의 수식",
+        "help_custom": "사용자 정의 음영 패턴을 위한 수학 표현입니다.<br>표현식은 해당 셀(row, col)에 대해 0(음영 없음)에서 1(완전히 음영됨) 사이의 숫자를 반환해야 합니다. 예를 들어, 3색 음영 패턴의 경우 0.5를 사용할 수 있습니다. <code>true</code> 또는 <code>false</code>를 반환하는 것도 <code>1</code> 또는 <code>0</code>을 반환하는 것과 같습니다.<br>사용 가능한 변수는 다음과 같습니다:<br>- <code>row</code> 및 <code>col</code> (줄임말: <code>r</code> 및 <code>c</code>)은 행 및 열 번호이며, 0에서 시작합니다.<br>- <code>size</code> (또는 <code>s</code>)는 보드 크기입니다.<br>- <code>distToSide</code>는 현재 셀이 가장 가까운 측면까지의 거리입니다.<br>사용 가능한 연산자 목록은 https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax에서 확인할 수 있습니다.<br>예제:<br>- 동심원 링: <code>distToSide % 2</code><br>- 3색 체커보드: <code>((size + row - col) % 3) / 2</code><br>- 반지름이 sqrt(20)인 원: <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>자바스크립트 콘솔(F12)을 열어 표현식을 실행하는 동안 발생한 오류를 확인하세요."
+    },
+    "show_44_dots": "4-4 셀에 점 표시",
+    "preview": "미리보기",
+    "change_password": "비밀번호 변경",
+    "old_password": "이전 비밀번호",
+    "new_password": "새 비밀번호",
+    "confirm_new_password": "새 비밀번호 확인",
+    "update_password": "비밀번호 업데이트",
+    "contribute": "기여하기",
+    "contributors": "기여자",
+    "player_made_a_move": "{player}이(가) 이동했습니다",
+    "game_with_player_has_started": "{player}와(과) 게임이 시작되었습니다",
+    "last_move": "마지막 이동",
+    "undo": {
+        "undo_move": "되돌리기",
+        "accept": "되돌리기 수락",
+        "reject": "거부"
+    },
+    "ping": {
+        "ping_ms": "핑: {{ms}}ms",
+        "date_shift_ms": "시간 변동: {{ms}}ms"
+    },
+    "game_candency": {
+        "blitz": "블리츠",
+        "normal": "보통",
+        "correspondence": "서신"
+    },
+    "confirm_move": {
+        "title": "이동 확인",
+        "button_label": "이동 확인",
+        "button_label_short": "확인",
+        "send_immediately": "즉시 보내기",
+        "ask_confirmation": "확인 요청",
+        "description": "잘못 클릭하는 것을 방지하기 위해 이동 제출 전에 확인을 요청할 수 있습니다."
+    },
+    "rematch": {
+        "label": "재대결",
+        "accept": "재대결 수락",
+        "view": "재대결 보기"
+    },
+    "short_time_unit": {
+        "day": "일",
+        "hour": "시간",
+        "minute": "분",
+        "second": "초"
+    },
+    "outcome": {
+        "win": "승리",
+        "loss": "패배",
+        "resign": "기권",
+        "forfeit": "몰수",
+        "time": "시간 초과"
+    },
+    "player_won_by": {
+        "default": "{player}가 승리했습니다!",
+        "time": "{player}가 시간 초과로 승리했습니다!",
+        "resign": "{player}가 승리했습니다!",
+        "forfeit": "{player}가 몰수승을 거두었습니다!"
+    },
+    "player_wins_by": {
+        "default": "{player}가 승리합니다!",
+        "time": "{player}가 시간 초과로 승리합니다!",
+        "resign": "{player}가 승리합니다!",
+        "forfeit": "{player}가 몰수승을 거둡니다!"
+    }
+}

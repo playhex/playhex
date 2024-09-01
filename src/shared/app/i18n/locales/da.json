@@ -1,0 +1,268 @@
+{
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "Ingen spil tilgængelige lige nu. Opret et nyt!",
+        "watch_current_games": "Se nuværende spil",
+        "join_a_game": "Deltag i et spil",
+        "no_playing_games": "Der er ingen spil i gang lige nu."
+    },
+    "game": {
+        "opponent": "Modstander",
+        "host": "Vært",
+        "size": "Størrelse",
+        "board": "Spilleplade",
+        "board_size": "Brætstørrelse",
+        "time_control": "Tidskontrol",
+        "rules": "Regler",
+        "created": "Oprettet",
+        "accept": "Accepter",
+        "red": "Rød",
+        "blue": "Blå",
+        "started": "Startet",
+        "played": "Spillet",
+        "finished": "Afsluttet",
+        "review": "Gennemse",
+        "won": "Vundet",
+        "outcome": "Resultat",
+        "lost": "Tabt",
+        "playing": "Spiller",
+        "watch": "Se"
+    },
+    "game_rules": {
+        "normal": "normal",
+        "host_plays_first": "vært spiller først",
+        "host_plays_second": "vært spiller anden",
+        "no_swap": "ingen bytte"
+    },
+    "create_game": {
+        "custom_size": "Brugerdefineret",
+        "less_options": "Færre muligheder",
+        "more_options": "Flere muligheder"
+    },
+    "player_settings": {
+        "title": "Indstillinger"
+    },
+    "background_theme": {
+        "title": "Tema",
+        "dark": "Mørk",
+        "light": "Lys"
+    },
+    "time_control": {
+        "custom": "Brugerdefineret",
+        "use": "Brug {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Capped Fischer",
+        "initial_time": "Starttid",
+        "time_increment": "Tidsforøgelse",
+        "periods": "Perioder",
+        "periods_time": "Periodetid",
+        "fast": "Hurtig",
+        "normal": "Normal",
+        "long": "Lang"
+    },
+    "i_play": {
+        "title": "Jeg spiller",
+        "random": "Tilfældig",
+        "first": "Første",
+        "second": "Anden"
+    },
+    "swap_rule": "Bytteregel",
+    "allow_swap_pieces": "Tillad brikker bytte",
+    "toggle_coords": "Skift koordinater",
+    "toggle_coords_short": "Koordinater",
+    "share_game": "Del spil",
+    "copied!": "Kopieret!",
+    "not_copied": "Kunne ikke kopieres, brug højreklik eller langt tryk",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Spillet blev oprettet af {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "Spillet blev oprettet af {player}, {timeAgo}.",
+    "log_out": "Log ud",
+    "log_in": "Log ind",
+    "sign_up": "Tilmeld",
+    "feedback": "Feedback",
+    "hex_links": "Hex links",
+    "project_under_development": "Projekt under udvikling",
+    "last_change": "Sidste ændring: {{date}}",
+    "privacy_policy": "Fortrolighedspolitik",
+    "license_agpl": "Licens AGPL-3.0",
+    "create_account": "Opret en konto",
+    "already_have_account_login_instead": "Har du allerede en konto? {login} i stedet",
+    "already_have_account_login_instead_link_label": "Log ind",
+    "no_account_sign_up_instead": "Ingen konto? {signUp} i stedet",
+    "no_account_sign_up_instead_link_label": "Tilmeld",
+    "add_your_language": "Mangler dit sprog? {link}!",
+    "add_your_language_link": "Tilføj det med Weblate",
+    "show_coords_by_default": "Vis koordinater som standard",
+    "username": "Brugernavn",
+    "password": "Adgangskode",
+    "account_created_on": "Konto oprettet den {{date}}",
+    "player_current_games": "Nuværende spil",
+    "player_game_history": "Spilhistorik",
+    "waiting": "venter…",
+    "initializing_game": "Initialiserer spil…",
+    "game_finished_overlay": {
+        "title": "Spil afsluttet"
+    },
+    "game_has_been_canceled": "Spil er blevet aflyst.",
+    "waiting_for_an_opponent": "Venter på en modstander…",
+    "confirm_overlay": {
+        "confirmation": "Bekræftelse",
+        "are_you_sure?": "Er du sikker?"
+    },
+    "workers": {
+        "slow_worker": "Ingen hurtig arbejdskraft er online lige nu. Kun begrænset AI er tilgængelige.",
+        "no_worker": "Ingen arbejdskraft kan beregne træk lige nu. Kun tilfældige bots er tilgængelige.",
+        "see_how_to_spawn_a_worker": "Se, hvordan man beregner AI-træk for PlayHex fra min computer"
+    },
+    "game_analyze": {
+        "analyze_by_ai": "Spilanalyse af AI",
+        "analyze_game": "Analyser spil",
+        "requested": "Analyse anmodet…",
+        "errored": "Analyse fejlede!",
+        "best_move": "bedste træk",
+        "best": "bedste:",
+        "how_it_works": "Sådan fungerer det"
+    },
+    "try_again": "Prøv igen",
+    "yes": "Ja",
+    "no": "Nej",
+    "language": "Sprog",
+    "cancel": "Annuller",
+    "pass": "Pas",
+    "close": "Luk",
+    "ranked": "Ranglistet",
+    "rating": "Bedømmelse: {{rating}}",
+    "new_game": "Nyt spil",
+    "players": "Spillere",
+    "player": "spiller",
+    "load_more": "Indlæs mere",
+    "no_such_player": "Det ser ud til, at der ikke er en sådan spiller.",
+    "n_online_players": "Online ({{n}})",
+    "guest": "Gæst",
+    "finished_games": "Afsluttede spil",
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Opret 1v1"
+    },
+    "1v1_friendly": {
+        "title": "Brugerdefineret 1v1",
+        "create": "Opret brugerdefineret 1v1"
+    },
+    "1vAI_ranked": {
+        "title": "Ranglistet vs AI",
+        "create": "Spil ranglistet vs AI"
+    },
+    "1vAI_friendly": {
+        "title": "Spil vs AI",
+        "create": "Spil vs AI"
+    },
+    "1vAI_offline": {
+        "title": "Offline AI",
+        "create": "Spil vs offline AI"
+    },
+    "offline_game_explain": "Offline spil kører kun på din enhed, PlayHex-serveren kaldes ikke. Så du kan spille, når der ikke er internet.",
+    "loading_game": "Indlæser spil…",
+    "tournament": "Turnering",
+    "now!": "Nu!",
+    "register_on_challonge": "Registrer dig på Challonge",
+    "see_progression_on_challonge": "Se progression på Challonge",
+    "move": "træk",
+    "move_number": "træk {{n}}",
+    "chat": "Chat",
+    "system": "System",
+    "chat_message_placeholder": "Besked…",
+    "unread_messages": "ulæste beskeder",
+    "send_chat_message": "Send",
+    "n_characters_one": "{{count}} tegn",
+    "n_characters_other": "{{count}} tegn",
+    "landscape": "Landskab",
+    "portrait": "Portræt",
+    "resign": "Giv op",
+    "auto": "Auto",
+    "board_orientation": {
+        "title": "Orientering",
+        "description": "Din foretrukne brætorientering for portræt- og landskabsskærmorientering.",
+        "flat": "Flad",
+        "flat_2": "Flad 2",
+        "diamond": "Diamant"
+    },
+    "shading_patterns": {
+        "title": "Skyggemønster",
+        "visibility": "Skyggemønster synlighed",
+        "types": {
+            "null": "Ingen",
+            "tricolor_checkerboard": "Tre-farvet skakbræt",
+            "concentrical_rings": "Koncentriske ringe (Hexworld)",
+            "height_5_lines": "Højde 5 linjer",
+            "single_ring": "Enkel ring",
+            "custom": "Brugerdefineret"
+        },
+        "custom_expression": "Brugerdefineret udtryk",
+        "help_custom": "Matematisk udtryk for brugerdefineret skyggemønster.<br>Udtrykket skal returnere et tal mellem 0 (ingen skygge) og 1 (fuldt skygge) for en given celle (række, kolonne). Du kan bruge f.eks. 0,5 for tre farveskyggemønstre. Returnering af <code>true</code> eller <code>false</code> fungerer også ligesom at returnere <code>1</code> eller <code>0</code>.<br>Variabler er tilgængelige:<br>- <code>row</code> og <code>col</code> (genveje: <code>r</code> og <code>c</code>) for række- og kolonnenummer, starter fra 0.<br>- <code>size</code> (eller <code>s</code>) for brættets størrelse.<br>- <code>distToSide</code> afstand af den aktuelle celle til dens nærmeste side.<br>Se listen over tilgængelige operatører på https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Eksempler:<br>- Koncentriske ringe: <code>distToSide % 2</code><br>- Tre farves skakbræt: <code>((size + row - col) % 3) / 2</code><br>- Disk med radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Åbn javascript-konsollen (F12) for at se fejl, mens du udfører dit udtryk."
+    },
+    "show_44_dots": "Vis prikker på 4-4 celler",
+    "preview": "Forhåndsvisning",
+    "change_password": "Skift adgangskode",
+    "old_password": "Gammel adgangskode",
+    "new_password": "Ny adgangskode",
+    "confirm_new_password": "Bekræft ny adgangskode",
+    "update_password": "Opdater adgangskode",
+    "contribute": "Bidrag",
+    "contributors": "Bidragsydere",
+    "player_made_a_move": "{{player}} lavede et træk",
+    "game_with_player_has_started": "Spillet med {{player}} er startet",
+    "last_move": "Sidste træk",
+    "undo": {
+        "undo_move": "Fortryd",
+        "accept": "Accepter fortrydelse",
+        "reject": "Afvis"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Tidsforskel: {{ms}}ms"
+    },
+    "game_candency": {
+        "blitz": "Blitz",
+        "normal": "Normal",
+        "correspondence": "Korrespondance"
+    },
+    "confirm_move": {
+        "title": "Bekræft træk",
+        "button_label": "Bekræft træk",
+        "button_label_short": "Bekræft",
+        "send_immediately": "Send straks",
+        "ask_confirmation": "Anmod om bekræftelse",
+        "description": "For at undgå fejlklik kan du kræve bekræftelse, før du sender et træk."
+    },
+    "rematch": {
+        "label": "Rematch",
+        "accept": "Accepter rematch",
+        "view": "Vis rematch"
+    },
+    "short_time_unit": {
+        "day": "d",
+        "hour": "t",
+        "minute": "min",
+        "second": "s"
+    },
+    "outcome": {
+        "win": "sejr",
+        "loss": "tab",
+        "resign": "giv op",
+        "forfeit": "tabt",
+        "time": "timeout"
+    },
+    "player_won_by": {
+        "default": "{player} vandt!",
+        "time": "{player} vandt på tid!",
+        "resign": "{player} vandt!",
+        "forfeit": "{player} vandt ved forfald!"
+    },
+    "player_wins_by": {
+        "default": "{player} vinder!",
+        "time": "{player} vinder på tid!",
+        "resign": "{player} vinder!",
+        "forfeit": "{player} vinder ved forfald!"
+    }
+}

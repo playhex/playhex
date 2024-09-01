@@ -16,7 +16,7 @@ type AvailableLocales = {
 };
 
 /**
- * Should be sorted by label, except "English" should be first, just because source language and most used.
+ * Should be sorted by label.
  *
  * - Locale key must have same name a translation file
  *
@@ -32,9 +32,9 @@ type AvailableLocales = {
  *      https://hosted.weblate.org/projects/playhex/#reports (left menu, JSON, since beginning).
  */
 export const availableLocales: AvailableLocales = {
-    en: {
-        label: 'English',
-        loader: () => import(/* webpackChunkName: "locale-en" */ 'date-fns/locale/en-US') as unknown as DefaultExportLocale,
+    da: {
+        label: 'Dansk (Danish) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-da" */ 'date-fns/locale/da') as unknown as DefaultExportLocale,
     },
     de: {
         label: 'Deutsch (German)',
@@ -43,6 +43,10 @@ export const availableLocales: AvailableLocales = {
             { fullName: 'Ettore Atalan', link: 'https://hosted.weblate.org/user/Atalanttore/' },
             { fullName: 'Peter Selinger', link: 'https://playhex.org/@quasar' },
         ],
+    },
+    en: {
+        label: 'English',
+        loader: () => import(/* webpackChunkName: "locale-en" */ 'date-fns/locale/en-US') as unknown as DefaultExportLocale,
     },
     es: {
         label: 'Español (Spanish)',
@@ -62,6 +66,10 @@ export const availableLocales: AvailableLocales = {
     it: {
         label: 'Italiano (Italian) (beta)',
         loader: () => import(/* webpackChunkName: "locale-it" */ 'date-fns/locale/it') as unknown as DefaultExportLocale,
+    },
+    ko: {
+        label: '한국어 (Korean) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-ko" */ 'date-fns/locale/ko') as unknown as DefaultExportLocale,
     },
     nl: {
         label: 'Nederlands (Dutch) (beta)',
