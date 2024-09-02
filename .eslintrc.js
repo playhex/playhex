@@ -51,6 +51,7 @@ module.exports = {
         'vue/html-self-closing': ['warn', { 'html': { 'component': 'always', 'void': 'any', 'normal': 'any' } }],
         'vue/multiline-html-element-content-newline': 'off',
         'vue/attribute-hyphenation': ['warn', 'never'],
+        'vue/v-on-event-hyphenation': ['warn', 'never'],
         'vue/component-name-in-template-casing': ['warn', 'PascalCase']
     },
     overrides: [

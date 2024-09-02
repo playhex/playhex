@@ -574,7 +574,7 @@ const unreadMessages = (): number => {
                 :hostedGameClient="hostedGameClient"
                 :gameView="gameView"
                 @close="showSidebar(false)"
-                @toggle-coords="toggleCoords()"
+                @toggleCoords="toggleCoords()"
             />
         </div>
     </div>

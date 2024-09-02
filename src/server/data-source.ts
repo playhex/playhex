@@ -11,7 +11,7 @@ if (!DATABASE_URL) {
 }
 
 const scheme = DATABASE_URL.split('://').shift();
-const type = scheme === 'postgresql' ? 'postgres' : scheme
+const type = scheme === 'postgresql' ? 'postgres' : scheme;
 
 if ('mysql' !== type && 'postgres' !== type) {
     throw new Error('DATABASE_URL expected to be like "mysql://... or postgresql://...');
