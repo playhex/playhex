@@ -3,7 +3,7 @@ import Player from '../../../shared/app/models/Player';
 import { PropType, toRefs } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
-import { createInitialRating } from '../../../shared/app/ratingUtils';
+import { createInitialRating, isRatingConfident } from '../../../shared/app/ratingUtils';
 import { Rating } from '../../../shared/app/models';
 
 const props = defineProps({
@@ -64,7 +64,7 @@ const currentRating = (): Rating => player.value.currentRating ?? createInitialR
                     {{ round(currentRating().rating) }} ±{{ round(currentRating().deviation * 2) }}
                 </template>
                 <template v-else>
-                    <template v-if="currentRating().deviation > 100">~</template>{{ round(currentRating().rating) }}
+                    <template v-if="!isRatingConfident(currentRating())">~</template>{{ round(currentRating().rating) }}
                 </template>
             </small>
         </template>

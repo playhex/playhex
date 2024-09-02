@@ -111,6 +111,7 @@ export type SGF = SGFNode & {
 
     /**
      * White rating.
+     * See `BR` for more documentation and examples.
      *
      * https://www.red-bean.com/sgf/properties.html#WR
      */

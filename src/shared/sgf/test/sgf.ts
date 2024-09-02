@@ -11,7 +11,9 @@ describe('SGF', () => {
             SZ: 14,
             AP: 'PlayHex:0.0.0',
             PW: 'Alcalyn',
+            WR: '1500?',
             PB: 'Test',
+            BR: '2345',
 
             moves: [
                 { B: 'a1' },
@@ -20,7 +22,7 @@ describe('SGF', () => {
             ],
         };
 
-        assert.strictEqual(sgfToString(sgf), '(;FF[4]CA[UTF-8]AP[PlayHex:0.0.0]GM[11]SZ[14]PB[Test]PW[Alcalyn];B[a1];W[b4];B[d5])');
+        assert.strictEqual(sgfToString(sgf), '(;FF[4]CA[UTF-8]AP[PlayHex:0.0.0]GM[11]SZ[14]PB[Test]BR[2345]PW[Alcalyn]WR[1500?];B[a1];W[b4];B[d5])');
     });
 
     it('generate valid SGF string with empty array in moves', () => {
@@ -53,6 +55,7 @@ describe('SGF', () => {
             PC: 'https://test.org?x[]=y',
             GM: 11,
             SZ: 14,
+            PB: 'Troll]HA[42',
 
             moves: [
                 { B: 'a1', C: 'Alcalyn: Hello' },
@@ -61,7 +64,7 @@ describe('SGF', () => {
             ],
         };
 
-        assert.strictEqual(sgfToString(sgf), '(;FF[4]PC[https://test.org?x[\\]=y]GM[11]SZ[14];B[a1]C[Alcalyn: Hello];W[a2]C[https://hexworld.org];B[a3]C[Test "\\\\" "\\]"])');
+        assert.strictEqual(sgfToString(sgf), '(;FF[4]PC[https://test.org?x[\\]=y]GM[11]SZ[14]PB[Troll\\]HA[42];B[a1]C[Alcalyn: Hello];W[a2]C[https://hexworld.org];B[a3]C[Test "\\\\" "\\]"])');
     });
 
     describe('Variations', () => {

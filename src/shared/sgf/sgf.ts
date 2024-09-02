@@ -47,7 +47,7 @@ const write = <T extends (SGF & SGFMove)>(sgf: T, properties: (keyof T)[]): stri
  * Render root node properties, i.e `FF[4]GM[11]...`
  */
 const writeRoot = (sgf: SGF): string => {
-    return write(sgf, ['FF', 'CA', 'AP', 'SO', 'PC', 'GM', 'SZ', 'RU', 'PB', 'PW', 'DT', 'HA', 'RE', 'PL', 'N', 'GC', 'C']);
+    return write(sgf, ['FF', 'CA', 'AP', 'SO', 'PC', 'GM', 'SZ', 'RU', 'PB', 'BR', 'PW', 'WR', 'DT', 'HA', 'RE', 'PL', 'N', 'GC', 'C']);
 };
 
 /**

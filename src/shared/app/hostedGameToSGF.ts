@@ -4,6 +4,7 @@ import { HostedGame, ChatMessage } from './models';
 import { pseudoString } from './pseudoUtils';
 import { Move } from '../game-engine';
 import { guessDemerHandicapFromHostedGame } from './demerHandicap';
+import { isRatingConfident } from './ratingUtils';
 
 const baseSGF: SGF = {
     FF: 4,
@@ -112,6 +113,23 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     if (hostedGame.gameData?.startedAt) {
         sgf.PB = pseudoString(hostedGame.hostedGameToPlayers[0].player, 'pseudo');
         sgf.PW = pseudoString(hostedGame.hostedGameToPlayers[1].player, 'pseudo');
+    }
+
+    // BR, WR, players ratings if available (rated games only)
+    if (hostedGame.ratings.length > 0) {
+        const { ratings, hostedGameToPlayers } = hostedGame;
+        const { round } = Math;
+
+        const blackRating = ratings.find(rating => rating.player.publicId === hostedGameToPlayers[0].player.publicId);
+        const whiteRating = ratings.find(rating => rating.player.publicId === hostedGameToPlayers[1].player.publicId);
+
+        if (blackRating) {
+            sgf.BR = round(blackRating.rating) + (isRatingConfident(blackRating) ? '' : '?');
+        }
+
+        if (whiteRating) {
+            sgf.WR = round(whiteRating.rating) + (isRatingConfident(whiteRating) ? '' : '?');
+        }
     }
 
     // HA, guess Demer handicap from game settings and pass moves

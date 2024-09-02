@@ -99,3 +99,11 @@ export const getRatingCategoriesFromGame = (hostedGame: HostedGame): RatingCateg
         `${boardsize}.${cadency}`,
     ];
 };
+
+/**
+ * Whether a rating can be considered as "confident",
+ * i.e glicko2 rating deviation is small enough.
+ *
+ * If not confident, rating should be displayed like "~1500".
+ */
+export const isRatingConfident = (rating: Rating): boolean => rating.deviation < 100;
