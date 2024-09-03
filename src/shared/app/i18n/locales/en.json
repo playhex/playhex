@@ -26,13 +26,21 @@
         "outcome": "Outcome",
         "lost": "Lost",
         "playing": "Playing",
-        "watch": "Watch"
+        "watch": "Watch",
+        "title_your_turn": "Your turn!",
+        "title_waiting": "Waiting for an opponent: hosted by"
     },
     "game_rules": {
         "normal": "normal",
         "host_plays_first": "host plays first",
         "host_plays_second": "host plays second",
         "no_swap": "no swap"
+    },
+    "game_state": {
+        "created": "Created",
+        "canceled": "Canceled",
+        "playing": "Playing",
+        "ended": "Ended"
     },
     "create_game": {
         "custom_size": "Custom",
