@@ -5,7 +5,7 @@ import type { PlayHexContributors } from '../../../../shared/app/Types';
 import { ref } from 'vue';
 
 useSeoMeta({
-    titleTemplate: title => `Contributors - ${title}`,
+    title: 'Contributors',
 });
 
 const contributors = ref<null | PlayHexContributors>(null);

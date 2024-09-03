@@ -19,7 +19,7 @@ import AppBoard from '../../components/AppBoard.vue';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
-    titleTemplate: title => `${i18n.t('player_settings.title')} - ${title}`,
+    title: i18n.t('player_settings.title')
 });
 
 updateSeoMeta();

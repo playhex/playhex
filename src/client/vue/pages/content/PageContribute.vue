@@ -3,7 +3,7 @@ import { useSeoMeta } from '@unhead/vue';
 import { ref } from 'vue';
 
 useSeoMeta({
-    titleTemplate: title => `How to contribute - ${title}`,
+    title: 'How to contribute',
 });
 
 const playerIsFair = ref(0);

@@ -34,7 +34,7 @@ if (Array.isArray(slug)) {
  */
 const updateMeta = (player: Player): void => {
     useSeoMeta({
-        titleTemplate: title => `${pseudoString(player, 'pseudo')} - ${title}`,
+        title: pseudoString(player, 'pseudo'),
 
         // index only bots (Mohex) profile page.
         // Guest should never be indexed,

@@ -273,7 +273,7 @@ const loadGame = async () => {
 
     useSeoMeta({
         robots: 'noindex',
-        titleTemplate: site => `${title} - ${site}`,
+        title,
         ogTitle: title,
         description,
         ogDescription: description,

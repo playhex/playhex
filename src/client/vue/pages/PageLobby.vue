@@ -24,7 +24,7 @@ import i18next from 'i18next';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash';
 
 const updateSeoMeta = () => useSeoMeta({
-    titleTemplate: title => `${i18next.t('lobby_title')} - ${title}`,
+    title: i18next.t('lobby_title'),
 });
 
 updateSeoMeta();
