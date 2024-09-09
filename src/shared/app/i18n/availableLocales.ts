@@ -81,6 +81,7 @@ export const availableLocales: AvailableLocales = {
         loader: () => import(/* webpackChunkName: "locale-pl" */ 'date-fns/locale/pl') as unknown as DefaultExportLocale,
         translators: [
             { fullName: 'FlyPside', link: 'https://playhex.org/@flypside' },
+            { fullName: 'Eryk Michalak', link: 'https://hosted.weblate.org/user/gnu-ewm/' },
         ],
     },
     pt: {
