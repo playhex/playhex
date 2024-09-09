@@ -220,7 +220,7 @@
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Kompensacja przesunięcia daty: {{ms}}ms"
+        "date_shift_ms": "Różnica czasu: {{ms}}ms"
     },
     "game_candency": {
         "blitz": "Blitz",
@@ -264,5 +264,6 @@
         "time": "{player} wygrywa na czas!",
         "resign": "{player} wygrywa!",
         "forfeit": "{player} wygrywa przez walkower!"
-    }
+    },
+    "move_number": "{{n}} ruch"
 }
