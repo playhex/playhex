@@ -1,5 +1,5 @@
 import { Application, Container, FederatedPointerEvent, Graphics, ICanvas, Rectangle } from 'pixi.js';
-import debounceFunction from 'debounce-fn';
+import { debounceRedraw } from '../services/debounceRedraw';
 import { themes } from '../pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '@shared/app/models/GameAnalyze';
@@ -186,11 +186,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     {
         this.destroyResizeObserver();
 
-        this.resizeObserver = new ResizeObserver(debounceFunction(() => this.redraw(), {
-            wait: 60,
-            before: true,
-            after: true,
-        }));
+        this.resizeObserver = new ResizeObserver(debounceRedraw(() => this.redraw()));
 
         this.resizeObserver.observe(this.containerElement);
     }

@@ -16,7 +16,7 @@
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
     "db:diff": "yarn build-server && typeorm schema:log -d dist/server/data-source.js",
     "db:sync": "yarn build-server && typeorm schema:sync -d dist/server/data-source.js",
-    "test:unit": "TS_NODE_PROJECT='src/shared/tsconfig.json' mocha src/**/test/**/*.ts -n import=ts-node/esm --extension ts",
+    "test:unit": "TS_NODE_PROJECT='src/shared/tsconfig.json' mocha src/**/**/test/**/*.ts -n import=ts-node/esm --extension ts",
     "test:e2e": "cypress run",
     "test:all": "yarn test:unit && yarn test:e2e",
     "test": "yarn test:unit"
@@ -37,7 +37,6 @@
     "connect-redis": "^7.1.0",
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^3.6.0",
-    "debounce-fn": "^6.0.0",
     "diacritics": "^1.3.0",
     "ejs": "^3.1.10",
     "eslint-plugin-vue": "^9.23.0",

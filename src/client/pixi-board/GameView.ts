@@ -3,7 +3,7 @@ import { Application, Container, Graphics, ICanvas, PointData, Text, TextStyle }
 import Hex from '@client/pixi-board/Hex';
 import { Theme, themes } from '@client/pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import debounceFunction from 'debounce-fn';
+import { debounceRedraw } from '../services/debounceRedraw';
 import SwapableSprite from './SwapableSprite';
 import SwapedSprite from './SwapedSprite';
 import { Coords } from '@shared/game-engine/Types';
@@ -125,11 +125,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
             this.unwatchSettingsChangedListener = watch(() => usePlayerSettingsStore().playerSettings, this.settingsChangedListener, { deep: true });
             this.unwatchLocalSettingsChangedListener = watch(() => usePlayerLocalSettingsStore().localSettings.selectedBoardOrientation, this.settingsChangedListener);
-
-            if (this.game.isEnded()) {
-                this.highlightSidesFromGame();
-                this.animateWinningPath();
-            }
         })();
     }
 
@@ -245,14 +240,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private listenContainerElementResize(): void
     {
+        // Resize renderer first when starting listening to element resize
         this.resizeRendererAndRedraw();
+
         this.destroyResizeObserver();
 
-        this.resizeObserver = new ResizeObserver(debounceFunction(() => this.resizeRendererAndRedraw(), {
-            wait: 60,
-            before: true,
-            after: true,
-        }));
+        this.resizeObserver = new ResizeObserver(debounceRedraw(() => this.resizeRendererAndRedraw()));
 
         this.resizeObserver.observe(this.containerElement);
     }
@@ -466,7 +459,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.game.on('canceled', () => this.endedCallback());
     }
 
-    private async animateWinningPath(): Promise<void>
+    /**
+     * Animate winning path if there is one.
+     * To be called once all is loaded and board won't redraw anymore
+     * (redrawing while animation is running will make the animation incomplete).
+     */
+    async animateWinningPath(): Promise<void>
     {
         const winningPath = this.game.getBoard().getShortestWinningPath();
 

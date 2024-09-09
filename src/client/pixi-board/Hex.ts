@@ -1,4 +1,4 @@
-import { Container, Graphics, PointData, Ticker } from 'pixi.js';
+import { Container, DestroyOptions, Graphics, PointData, Ticker } from 'pixi.js';
 import { PlayerIndex } from '@shared/game-engine';
 import GameView from './GameView';
 import { colorAverage } from '../../shared/app/colorUtils';
@@ -38,6 +38,7 @@ export default class Hex extends Container
     private hexColor: Graphics;
     private highlight: Graphics;
     private dotContainer: Container = new Container();
+    private animationLoop: null | (() => void) = null;
 
     constructor(
         /**
@@ -240,15 +241,36 @@ export default class Hex extends Container
         return this;
     }
 
+    private clearAnimationLoop(): void
+    {
+        if (null !== this.animationLoop) {
+            if (this.destroyed) {
+                // Call animationLoop to resolve promise if destroyed and prevent let it unresolved
+                this.animationLoop();
+            } else {
+                this.hexColor.scale = { x: 1, y: 1 };
+            }
+
+            Ticker.shared.remove(this.animationLoop);
+            this.animationLoop = null;
+        }
+    }
+
     async animate(): Promise<void>
     {
+        this.clearAnimationLoop();
+
         return new Promise(resolve => {
             let i = 0;
 
-            const animationLoop = (): void => {
+            this.animationLoop = (): void => {
+                if (this.destroyed) {
+                    resolve();
+                    return;
+                }
+
                 if (i >= animationDuration) {
-                    this.hexColor.scale = { x: 1, y: 1 };
-                    Ticker.shared.remove(animationLoop);
+                    this.clearAnimationLoop();
                     resolve();
                     return;
                 }
@@ -258,7 +280,15 @@ export default class Hex extends Container
                 ++i;
             };
 
-            Ticker.shared.add(animationLoop);
+            Ticker.shared.add(this.animationLoop);
         });
+    }
+
+    override destroy(options?: DestroyOptions): void
+    {
+        super.destroy(options);
+
+        // Must be after destroy, so animation knows it's destroyed and can resolve
+        this.clearAnimationLoop();
     }
 }

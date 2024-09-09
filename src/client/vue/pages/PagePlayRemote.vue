@@ -226,6 +226,9 @@ const initGameView = async () => {
         });
     }
 
+    // Should be after setDisplayCoords and setPreferredOrientations to start after redraws
+    gameView.animateWinningPath();
+
     watch(playerSettings, settings => {
         if (null === gameView || null === settings) {
             return;
