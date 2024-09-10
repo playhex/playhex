@@ -59,6 +59,9 @@ const currentRating = (): Rating => player.value.currentRating ?? createInitialR
         </component>
 
         <template v-if="rating">
+            <!-- adds an invisible space between username and rating to make copy/paste and functionnal tests more readable -->
+            <span class="small">&nbsp;</span>
+
             <small class="text-body-secondary ms-2 d-inline-block">
                 <template v-if="'full' === rating">
                     {{ round(currentRating().rating) }} ±{{ round(currentRating().deviation * 2) }}
@@ -70,3 +73,8 @@ const currentRating = (): Rating => player.value.currentRating ?? createInitialR
         </template>
     </RouterLink>
 </template>
+
+<style lang="stylus" scoped>
+.small
+    font-size 0px
+</style>
