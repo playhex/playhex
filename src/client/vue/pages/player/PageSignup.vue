@@ -7,7 +7,7 @@ import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate: title => `Sign up - ${title}`,
+    title: 'Sign up',
     description: 'Create an account to keep the history of Hex games you played.',
 });
 

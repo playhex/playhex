@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import GameView from '@client/pixi-board/GameView';
 import useLobbyStore from '@client/stores/lobbyStore';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
@@ -17,10 +17,12 @@ import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BI
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
+import i18next from 'i18next';
 import { PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import { fromEngineMove } from '../../../shared/app/models/Move';
+import { pseudoString } from '../../../shared/app/pseudoUtils';
 
 useSeoMeta({
     robots: 'noindex',
@@ -28,7 +30,7 @@ useSeoMeta({
 
 const { gameId } = useRoute().params;
 
-const hostedGameClient = ref<null | HostedGameClient>(null);
+const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
 
 const boardContainer = ref<HTMLElement>();
 let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board
@@ -248,6 +250,24 @@ const initGameView = async () => {
     }
 };
 
+const makeTitle = (gameClient: HostedGameClient) => {
+    const players = gameClient.getPlayers();
+    const { state } = gameClient.getHostedGame();
+    const playerPseudos = players.map(p => pseudoString(p, 'pseudo'));
+    if (players.length < 2 && 'created' === state)
+        return `${i18next.t('game.title_waiting')} ${playerPseudos[0]}`;
+    let yourTurn = '';
+    if ('playing' === state && loggedInPlayer.value != null) {
+        const player = loggedInPlayer.value;
+        const index = players.findIndex(p => p.publicId === player.publicId);
+        if (index != null && gameClient.getGame().getCurrentPlayerIndex() === index) {
+            yourTurn = `• ${i18next.t('game.title_your_turn')} • `;
+        }
+    }
+    const pairing = playerPseudos.join(' VS ');
+    return `${yourTurn}${i18next.t('game_state.' + state)}: ${pairing}`;
+};
+
 /*
  * Load game
  */
@@ -265,19 +285,17 @@ const loadGame = async () => {
 
     const playerPseudos = hostedGameClient.value.getPlayers().map(p => p.pseudo);
     const { state, host } = hostedGameClient.value.getHostedGame();
-    const stateForTitle = playerPseudos.length < 2 && 'created' === state
-        ? 'Waiting for an opponent'
-        : state[0].toUpperCase() + state.slice(1);
-    const title = `${stateForTitle}: ${playerPseudos.join(' VS ')}`;
     const description = 'created' === state
         ? `Hex game, hosted by ${host.pseudo}, waiting for an opponent.`
-        : `${state} Hex game, ${playerPseudos.join(' versus ')}.`
+        : `Hex game, ${playerPseudos.join(' versus ')}.`
     ;
 
     useSeoMeta({
         robots: 'noindex',
-        titleTemplate: site => `${title} - ${site}`,
-        ogTitle: title,
+        title: computed(() => {
+            if (hostedGameClient.value == null) return '';
+            return makeTitle(hostedGameClient.value);
+        }),
         description,
         ogDescription: description,
     });

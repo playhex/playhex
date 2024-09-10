@@ -2,7 +2,7 @@
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate: title => `Spawn a Hex AI worker - ${title}`,
+    title: 'Spawn a Hex AI worker',
 });
 </script>
 

@@ -35,7 +35,7 @@ import { Component as ComponentType } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate: title => `Useful Hex links - ${title}`,
+    title: 'Useful Hex links',
 });
 
 type Icon = { icon: ComponentType };

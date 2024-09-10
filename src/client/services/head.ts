@@ -20,7 +20,8 @@ export const useHeadDefault = (): void => {
     useSeoMeta({
         robots: 'index',
 
-        title: seo.title,
+        titleTemplate: (title?: string) =>
+            title ? `${title} - ${seo.title}` : seo.title,
         description: seo.description,
 
         ogType: 'website',

@@ -2,7 +2,7 @@
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate: title => `Privacy policy - ${title}`,
+    title: 'Privacy policy',
 });
 </script>
 

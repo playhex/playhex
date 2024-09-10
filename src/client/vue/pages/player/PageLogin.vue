@@ -7,7 +7,7 @@ import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
-    titleTemplate: title => `Log in - ${title}`,
+    title: 'Log in',
     description: 'Log in to your PlayHex account.',
 });
 

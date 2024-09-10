@@ -3,7 +3,7 @@ import { useSeoMeta } from '@unhead/vue';
 import { BIconInfoCircleFill } from 'bootstrap-icons-vue';
 
 useSeoMeta({
-    titleTemplate: title => `Hex game analysis - ${title}`,
+    title: 'Hex game analysis',
 });
 </script>
 
