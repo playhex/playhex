@@ -382,7 +382,7 @@ window.addEventListener('hashchange', () => createGameFromHash());
                     Finished games
                 -->
                 <div v-if="Object.values(lobbyStore.hostedGameClients).some(isFinished)" class="table-responsive">
-                    <table class="table table-responsive" style="margin-bottom: 0">
+                    <table class="table" style="margin-bottom: 0">
                         <thead>
                             <tr>
                                 <th scope="col"></th>

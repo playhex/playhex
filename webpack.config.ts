@@ -138,7 +138,15 @@ const config: Configuration = {
                     // Translates CSS into CommonJS
                     'css-loader',
                     // Compiles Sass to CSS
-                    'sass-loader',
+                    //'sass-loader', // TODO uncomment this and remove following sass loader with silenced depreciations when bootstrap 5.3.4 is released. See https://github.com/twbs/bootstrap/issues/40621#issuecomment-2289654044
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sassOptions: {
+                                silenceDeprecations: ['mixed-decls'],
+                            },
+                        },
+                    },
                 ],
             },
             {
