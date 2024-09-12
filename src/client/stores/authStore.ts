@@ -13,7 +13,14 @@ const useAuthStore = defineStore('authStore', () => {
      */
     const loggedInPlayer = ref<null | Player>(null);
 
-    authMeOrSignupGuest().then(player => loggedInPlayer.value = player);
+    (async () => {
+        try {
+            const player = await authMeOrSignupGuest();
+            loggedInPlayer.value = player;
+        } catch (e) {
+            // seems offline
+        }
+    })();
 
     const login = async (pseudo: string, password: string): Promise<Player> => {
         return loggedInPlayer.value = await authLogin(pseudo, password);
