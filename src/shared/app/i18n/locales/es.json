@@ -25,7 +25,9 @@
         "red": "Rojo",
         "started": "Empezada",
         "created": "Creada",
-        "playing": "Jugando"
+        "playing": "Jugando",
+        "title_waiting": "A la espera de un adversario: organizado por",
+        "title_your_turn": "¡Tu turno!"
     },
     "game_rules": {
         "host_plays_first": "El anfitrión juega primero",
@@ -265,5 +267,11 @@
     "n_characters_one": "{{count}} carácter",
     "n_characters_many": "{{count}} caracteres",
     "n_characters_other": "{{count}} caracteres",
-    "move_number": "mover {{n}}"
+    "move_number": "mover {{n}}",
+    "game_state": {
+        "created": "Creado",
+        "playing": "Jugando",
+        "canceled": "Cancelado",
+        "ended": "Terminado"
+    }
 }
