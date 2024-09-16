@@ -26,7 +26,9 @@
         "opponent": "Adversaire",
         "board": "Plateau de jeu",
         "board_size": "Taille du plateau",
-        "outcome": "Résultat"
+        "outcome": "Résultat",
+        "title_waiting": "En attente d'un adversaire : créée par",
+        "title_your_turn": "Votre tour !"
     },
     "last_move": "Dernier coup",
     "player_settings": {
@@ -265,5 +267,11 @@
         "accept": "Accepter reprise",
         "reject": "Refuser"
     },
-    "pass": "Passer"
+    "pass": "Passer",
+    "game_state": {
+        "canceled": "Annulée",
+        "ended": "Terminée",
+        "created": "Créée",
+        "playing": "En cours"
+    }
 }
