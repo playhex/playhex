@@ -6,6 +6,7 @@ import logger from '../services/logger';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
 import { FindOptionsSelect, QueryFailedError, Repository } from 'typeorm';
+import { isDuplicateError } from './typeormUtils';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
@@ -106,7 +107,7 @@ export default class PlayerRepository
 
             return this.playersCache[player.publicId] = player;
         } catch (e) {
-            if (e instanceof QueryFailedError && e.message.includes('ER_DUP_ENTRY')) {
+            if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
             }
 
@@ -164,7 +165,7 @@ export default class PlayerRepository
         try {
             return this.playersCache[publicId] = await this.playerRepository.save(player);
         } catch (e) {
-            if (e instanceof QueryFailedError && e.message.includes('ER_DUP_ENTRY')) {
+            if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
             }
 

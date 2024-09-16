@@ -31,7 +31,7 @@ describe('Cancel a game', () => {
         ;
 
         cy
-            .contains('Create 1v1')
+            .contains('.modal button', 'Create 1v1')
             .click()
         ;
 

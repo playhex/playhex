@@ -15,6 +15,7 @@ import { AppDataSource } from '../data-source';
 import { plainToInstance } from '../../shared/app/class-transformer-custom';
 import RatingRepository from './RatingRepository';
 import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames';
+import { isDuplicateError } from './typeormUtils';
 
 export class GameError extends Error {}
 
@@ -297,7 +298,7 @@ export default class HostedGameRepository
         return hostedGame;
     }
 
-    async rematchGame(host: Player, gameId: string): Promise<HostedGameServer>
+    async rematchGame(host: Player, gameId: string): Promise<HostedGame>
     {
         const game = await this.getGame(gameId);
 
@@ -308,7 +309,7 @@ export default class HostedGameRepository
             throw new GameError('Player not in the game');
         }
         if (game.rematch != null && this.activeGames[game.rematch.publicId]) {
-            return this.activeGames[game.rematch.publicId];
+            return this.activeGames[game.rematch.publicId].toData();
         }
         if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
@@ -318,19 +319,38 @@ export default class HostedGameRepository
         }
 
         const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions), game);
-        this.io.to(Rooms.game(game.publicId))
-            .emit('rematchAvailable', game.publicId, rematch.getId());
-
         game.rematch = rematch.toData();
 
         try {
             await this.hostedGamePersister.persist(game.rematch);
             await this.hostedGamePersister.persistLinkToRematch(game);
         } catch (e) {
-            logger.error(`Failed to persist: ${e?.message}`, e);
+            if (isDuplicateError(e)) {
+                // In case both players rematch at same time, 2 games are created in memory but with same rematchedFromId, so one game won't persist thanks to unicity constraint.
+                // So here we try to fetch the actual rematch, returns it, and remove the duplicated rematch from memory.
+                delete this.activeGames[game.rematch.publicId];
+
+                if (!game.id) {
+                    throw new Error('Unexpected empty game.id');
+                }
+
+                game.rematch = await this.hostedGamePersister.findRematch(game.id);
+
+                if (null === game.rematch) {
+                    throw new Error('Game has already rematched, but could not find rematch game');
+                }
+            } else {
+                logger.error(`Failed to persist: ${e?.message}`, e);
+
+                // Throw to prevent returning a rematch game that failed to persist
+                throw new Error('Error while persisting rematch game');
+            }
         }
 
-        return rematch;
+        this.io.to(Rooms.game(game.publicId))
+            .emit('rematchAvailable', game.publicId, game.rematch.publicId);
+
+        return game.rematch;
     }
 
     getPlayerActiveGames(player: Player): HostedGameServer[]

@@ -74,8 +74,7 @@ export default class GameController
         @AuthenticatedPlayer() host: Player,
     ) {
         try {
-            const hostedGame = await this.hostedGameRepository.rematchGame(host, publicId);
-            return hostedGame.toData();
+            return await this.hostedGameRepository.rematchGame(host, publicId);
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);

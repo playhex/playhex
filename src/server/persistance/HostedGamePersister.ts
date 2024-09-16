@@ -11,6 +11,7 @@ const relations: FindOptionsRelations<HostedGame> = {
         player: true,
     },
     rematch: true,
+    rematchedFrom: true,
     gameData: true,
     gameOptions: true,
     ratings: {
@@ -73,6 +74,18 @@ export default class HostedGamePersister
                     { category: 'overall' },
                     { category: IsNull() },
                 ],
+            },
+        });
+    }
+
+    async findRematch(rematchedFromId: number): Promise<null | HostedGame>
+    {
+        return await this.hostedGameRepository.findOne({
+            relations,
+            where: {
+                rematchedFrom: {
+                    id: rematchedFromId,
+                },
             },
         });
     }
