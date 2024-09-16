@@ -74,8 +74,8 @@ const getCachePolicy = (request) => {
         }
     }
 
-    // console.warn('CACHE: Undefined policy for this url, using NETWORK_FIRST cache policy', { pathname });
-    return CachePolicy.NETWORK_FIRST;
+    // console.warn('CACHE: Undefined policy for this url, using NETWORK_ONLY cache policy', { pathname });
+    return CachePolicy.NETWORK_ONLY;
 };
 
 /**
