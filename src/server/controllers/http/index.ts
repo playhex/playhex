@@ -20,7 +20,7 @@ export const registerHttpControllers = (app: Express): void => {
     app.use(pagesRouter());
 
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-        logger.notice('API error', { classname: err.constructor.name, errorMessage: err.message, err, stack: err.stack });
+        logger.notice('API error: ' + err.message, { classname: err.constructor.name, errorMessage: err.message, err, stack: err.stack });
 
         if (err instanceof HandledError) {
             const httpError = HttpError.fromHandledError(err);

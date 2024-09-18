@@ -31,7 +31,7 @@ export default class HttpError extends Error
          */
         public details?: unknown,
     ) {
-        super(`HttpError ${status}: "${reason}" (type="${type ?? 'none'}")`);
+        super(`HttpError ${status}: "${reason}"` + (type ? ` (type="${type}")` : ''));
     }
 
     normalize(): ErrorResponse
