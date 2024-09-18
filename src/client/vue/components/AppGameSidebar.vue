@@ -23,7 +23,7 @@ import useServerDateStore from '../../stores/serverDateStore';
 import { downloadString } from '../../services/fileDownload';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF';
-import GameView from '../../pixi-board/GameView';
+import GameView from '../../../shared/pixi-board/GameView';
 import { isMyTurn } from '../../services/notifications/context-utils';
 import { PlayerIndex } from '@shared/game-engine';
 import { fromEngineMove } from '@shared/app/models/Move';
@@ -117,6 +117,22 @@ const shouldDisplayHexworldLink = (): boolean => {
     return false;
 };
 
+const generateHexworldLink = () => gameToHexworldLink(
+    hostedGameClient.value.getGame(),
+    gameView.value?.getComputedBoardOrientation(),
+);
+
+const hexworldLink = ref(generateHexworldLink());
+
+if (gameView.value) {
+    gameView.value.on('orientationChanged', () => {
+        hexworldLink.value = generateHexworldLink();
+    });
+}
+
+/*
+ * SGF download
+ */
 const downloadSGF = (): void => {
     const game = hostedGameClient.value.getGame();
     const players = hostedGameClient.value.getPlayers();
@@ -469,7 +485,7 @@ const shouldEnablePass = (): boolean => {
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     target="_blank"
-                    :href="gameToHexworldLink(hostedGameClient.getGame(), gameView?.getComputedBoardOrientation())"
+                    :href="hexworldLink"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

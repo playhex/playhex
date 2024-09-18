@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import Player from './Player';
 import { Expose } from '../class-transformer-custom';
 import { IsBoolean, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
-import { allShadingPatterns, type ShadingPatternType } from '../shading-patterns';
+import { allShadingPatterns, type ShadingPatternType } from '../../../shared/pixi-board/shading-patterns';
 
 @Entity()
 export default class PlayerSettings

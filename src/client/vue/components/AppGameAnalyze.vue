@@ -24,7 +24,7 @@ onMounted(async () => {
 
     await gameAnalyzeView.ready();
 
-    gameAnalyzeContainer.value.appendChild(gameAnalyzeView.getView() as unknown as Node);
+    gameAnalyzeContainer.value.appendChild(gameAnalyzeView.getView());
 
     gameAnalyzeView.on('selectedMove', move => moveAnalyze.value = move);
 });

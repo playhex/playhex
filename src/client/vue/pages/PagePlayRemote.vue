@@ -1,6 +1,5 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '@client/pixi-board/GameView';
 import useLobbyStore from '@client/stores/lobbyStore';
 import { ref, computed } from 'vue';
 import AppBoard from '@client/vue/components/AppBoard.vue';
@@ -23,6 +22,7 @@ import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import { fromEngineMove } from '../../../shared/app/models/Move';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
+import { CustomizedGameView } from '../../services/CustomizedGameView';
 
 useSeoMeta({
     robots: 'noindex',
@@ -32,8 +32,7 @@ const { gameId } = useRoute().params;
 
 const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
 
-const boardContainer = ref<HTMLElement>();
-let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board
+let gameView: null | CustomizedGameView = null; // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
 
 if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
@@ -212,21 +211,13 @@ const initGameView = async () => {
 
     const game = hostedGameClient.value.loadGame();
 
-    if (!boardContainer.value) {
-        throw new Error('Missing element with ref="boardContainer"');
-    }
-
-    gameView = new GameView(game, boardContainer.value);
-
-    await gameView.ready();
+    gameView = new CustomizedGameView(game);
 
     if (null !== playerSettings.value) {
-        gameView.setDisplayCoords(playerSettings.value.showCoords);
-        gameView.setPreferredOrientations({
-            landscape: playerSettings.value.orientationLandscape,
-            portrait: playerSettings.value.orientationPortrait,
-        });
+        gameView.updateOptionsFromPlayerSettings(playerSettings.value);
     }
+
+    await gameView.ready();
 
     // Should be after setDisplayCoords and setPreferredOrientations to start after redraws
     gameView.animateWinningPath();
@@ -498,7 +489,7 @@ const unreadMessages = (): number => {
         <div class="game">
 
             <!-- Game board, "Accept" button -->
-            <div class="board-container" ref="boardContainer">
+            <div class="board-container">
                 <AppBoard
                     v-if="null !== hostedGameClient && null !== gameView"
                     :players="hostedGameClient.getPlayers()"

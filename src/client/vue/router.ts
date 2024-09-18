@@ -96,6 +96,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@client/vue/pages/PageRescue.vue'),
     },
     {
+        name: 'test',
+        path: '/test',
+        component: () => import('@client/vue/pages/PageTest.vue'),
+    },
+    {
         name: 'not-found',
         path: '/:pathMatch(.*)',
         component: () => import('@client/vue/pages/PageNotFound.vue'),

@@ -4,7 +4,7 @@ import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class
 
 const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 
-class LocalSettings
+export class LocalSettings
 {
     /**
      * Selected board orientation.

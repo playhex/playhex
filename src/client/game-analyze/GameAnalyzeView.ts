@@ -1,6 +1,6 @@
-import { Application, Container, FederatedPointerEvent, Graphics, ICanvas, Rectangle } from 'pixi.js';
-import { debounceRedraw } from '../services/debounceRedraw';
-import { themes } from '../pixi-board/BoardTheme';
+import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
+import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced';
+import { themes } from '../../shared/pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '@shared/app/models/GameAnalyze';
 
@@ -164,7 +164,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         this.container.addChild(this.highlight);
     }
 
-    getView(): ICanvas
+    getView(): HTMLCanvasElement
     {
         return this.pixi.canvas;
     }
@@ -186,7 +186,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     {
         this.destroyResizeObserver();
 
-        this.resizeObserver = new ResizeObserver(debounceRedraw(() => this.redraw()));
+        this.resizeObserver = new ResizeObserverDebounced(() => this.redraw());
 
         this.resizeObserver.observe(this.containerElement);
     }

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, onUnmounted, ref, Ref } from 'vue';
+import { onBeforeMount, onUnmounted, ref, Ref } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
-import GameView from '../../pixi-board/GameView';
+import GameView from '../../../shared/pixi-board/GameView';
 import { Game, Move } from '../../../shared/game-engine';
 import { Player } from '../../../shared/app/models';
 import { apiGetServerInfo } from '../../apiClient';
+import { CustomizedGameView } from '../../services/CustomizedGameView';
 
 type LoggedError = {
     type: string;
@@ -89,9 +90,8 @@ const clearCache = async () => {
 /*
  * Test board rendering
  */
-const boardContainer = ref<HTMLElement>();
-const gameView = ref<null | GameView>(null);
 const game = new Game(3);
+const gameView = ref<null | GameView>(new CustomizedGameView(game));
 game.move(new Move(1, 1), 0);
 
 const players = ['A', 'B'].map(pseudo => {
@@ -104,14 +104,6 @@ const players = ['A', 'B'].map(pseudo => {
     player.publicId = 'nope';
 
     return player;
-});
-
-onMounted(() => {
-    if (!boardContainer.value) {
-        throw new Error('Missing element with ref="boardContainer"');
-    }
-
-    gameView.value = new GameView(game, boardContainer.value);
 });
 </script>
 
@@ -141,7 +133,7 @@ onMounted(() => {
 
         <p>Displaying Hex board:</p>
 
-        <div class="board-container" ref="boardContainer">
+        <div class="board-container">
             <AppBoard
                 v-if="gameView"
                 :gameView="(gameView as GameView)"

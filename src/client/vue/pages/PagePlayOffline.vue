@@ -1,20 +1,19 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '@client/pixi-board/GameView';
 import AppBoard from '../components/AppBoard.vue';
 import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '@shared/game-engine';
 import { HostedGameOptions, Player } from '../../../shared/app/models';
-import { Ref, onMounted, ref } from 'vue';
+import { Ref, ref } from 'vue';
 import useAuthStore from '../../stores/authStore';
 import { useSeoMeta } from '@unhead/vue';
+import { CustomizedGameView } from '../../services/CustomizedGameView';
 
 useSeoMeta({
     title: 'Play offline',
     robots: 'noindex',
 });
 
-const offlineBoardContainer = ref<HTMLElement>();
-const gameView = ref<GameView>();
+let gameView: null | CustomizedGameView = null;
 const selectedGameOptions: Partial<HostedGameOptions> = JSON.parse(history.state.gameOptionsJson ?? '{}');
 const gameOptions: HostedGameOptions = { ...new HostedGameOptions(), ...selectedGameOptions };
 const players: Ref<Player[]> = ref([]);
@@ -31,7 +30,7 @@ const makeAIMoveIfApplicable = async (game: Game, players: Player[]): Promise<vo
     game.move(move, game.getCurrentPlayerIndex());
 };
 
-const initGame = (gameContainer: HTMLElement) => {
+const initGame = () => {
     const player: Player = useAuthStore().loggedInPlayer ?? {
         publicId: '',
         isBot: false,
@@ -71,9 +70,9 @@ const initGame = (gameContainer: HTMLElement) => {
 
     game.setAllowSwap(gameOptions.swapRule);
 
-    gameView.value = new GameView(game, gameContainer);
+    gameView = new CustomizedGameView(game);
 
-    gameView.value.on('hexClicked', coords => {
+    gameView.on('hexClicked', coords => {
         const move = game.createMoveOrSwapMove(coords);
 
         try {
@@ -89,13 +88,7 @@ const initGame = (gameContainer: HTMLElement) => {
     game.on('played', () => makeAIMoveIfApplicable(game, players.value));
 };
 
-onMounted(() => {
-    if (!offlineBoardContainer.value) {
-        throw new Error('Missing element with ref="offlineBoardContainer"');
-    }
-
-    initGame(offlineBoardContainer.value);
-});
+initGame();
 
 /*
  * Rematch
@@ -105,20 +98,16 @@ const reload = ref(0);
 // TODO: Implement the rematch button for offline games
 // eslint-disable-next-line
 const rematch = () => {
-    if (!offlineBoardContainer.value) {
-        throw new Error('Missing element with ref="offlineBoardContainer"');
-    }
-
-    initGame(offlineBoardContainer.value);
+    initGame();
     ++reload.value;
 };
 </script>
 
 <template>
-    <div class="offline-board-container" ref="offlineBoardContainer">
+    <div class="offline-board-container">
         <AppBoard
             :key="reload"
-            v-if="gameView"
+            v-if="null !== gameView"
             :gameView="gameView"
             :players="players"
         />

@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
 import { Ref, ref, watch } from 'vue';
 
-type DarkOrLight = 'dark' | 'light';
-type SelectedTheme = DarkOrLight | 'auto';
+export type DarkOrLight = 'dark' | 'light';
+export type SelectedTheme = DarkOrLight | 'auto';
 
+/**
+ * TODO move this in local settings
+ */
 const useDarkLightThemeStore = defineStore('darkLightThemeStore', () => {
 
     /**

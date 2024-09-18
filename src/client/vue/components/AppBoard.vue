@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '../../pixi-board/GameView';
+import GameView from '../../../shared/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { PropType, toRefs } from 'vue';
 import { BIconTrophyFill } from 'bootstrap-icons-vue';
@@ -43,22 +43,12 @@ const { players, timeControlOptions, timeControlValues } = toRefs(props);
  */
 const game = gameView.getGame();
 
-if (!gameView || !game) {
-    throw new Error('gameView is required');
-}
-
-onMounted(async () => {
+onMounted(() => {
     if (!pixiApp.value) {
         throw new Error('No element with ref="pixiApp"');
     }
 
-    if (!gameView) {
-        throw new Error('gameView has no value');
-    }
-
-    await gameView.ready();
-
-    pixiApp.value.appendChild(gameView.getView() as unknown as Node);
+    gameView.mount(pixiApp.value);
 });
 
 onUnmounted(() => {
@@ -95,9 +85,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
 
 <template>
     <div class="app-board">
-        <div class="board-container">
-            <div ref="pixiApp"></div>
-        </div>
+        <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
@@ -144,10 +132,14 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
 <style scoped lang="stylus">
 .app-board
     position relative
+    width 100%
+    height 100%
 
 .board-container
     display flex
     justify-content center
+    width 100%
+    height 100%
 
 .player
     display flex

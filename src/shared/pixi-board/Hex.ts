@@ -1,7 +1,7 @@
 import { Container, DestroyOptions, Graphics, PointData, Ticker } from 'pixi.js';
-import { PlayerIndex } from '@shared/game-engine';
-import GameView from './GameView';
-import { colorAverage } from '../../shared/app/colorUtils';
+import { PlayerIndex } from '../game-engine';
+import { colorAverage } from './colorUtils';
+import { Theme } from './BoardTheme';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -41,6 +41,8 @@ export default class Hex extends Container
     private animationLoop: null | (() => void) = null;
 
     constructor(
+        private theme: Theme,
+
         /**
          * null: empty cell
          * 0 or 1: red or blue
@@ -94,7 +96,7 @@ export default class Hex extends Container
         }
 
         g.poly(path);
-        g.fill({ color: GameView.currentTheme.strokeColor, alpha: 1 });
+        g.fill({ color: this.theme.strokeColor, alpha: 1 });
 
         return g;
     }
@@ -113,8 +115,8 @@ export default class Hex extends Container
 
         g.poly(path);
         g.fill({ color: colorAverage(
-            GameView.currentTheme.colorEmpty,
-            GameView.currentTheme.colorEmptyShade,
+            this.theme.colorEmpty,
+            this.theme.colorEmptyShade,
             this.shading,
         ) });
 
@@ -172,7 +174,7 @@ export default class Hex extends Container
         const g = new Graphics();
 
         g.circle(0, 0, Hex.RADIUS * 0.2);
-        g.fill({ color: GameView.currentTheme.textColor, alpha: 0.2 });
+        g.fill({ color: this.theme.textColor, alpha: 0.2 });
 
         this.dotContainer.addChild(g);
     }
@@ -200,8 +202,8 @@ export default class Hex extends Container
 
         if (null !== this.playerIndex) {
             this.hexColor.tint = [
-                GameView.currentTheme.colorA,
-                GameView.currentTheme.colorB,
+                this.theme.colorA,
+                this.theme.colorB,
             ][this.playerIndex];
         }
     }
@@ -220,8 +222,8 @@ export default class Hex extends Container
         this.hexColor.alpha = 0.5;
 
         this.hexColor.tint = [
-            GameView.currentTheme.colorA,
-            GameView.currentTheme.colorB,
+            this.theme.colorA,
+            this.theme.colorB,
         ][playerIndex];
 
         return this;

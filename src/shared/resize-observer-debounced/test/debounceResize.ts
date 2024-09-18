@@ -1,14 +1,14 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { debounceRedraw } from '../../services/debounceRedraw';
+import { debounceResize } from '../ResizeObserverDebounced';
 import { setTimeout as wait } from 'timers/promises';
 
-describe('debounceRedraw', () => {
+describe('debounceResize', () => {
     it('call redraw callback instantly', async () => {
         let called = 0;
         const cb = () => ++called;
 
-        const f = debounceRedraw(cb, 20);
+        const f = debounceResize(cb, 20);
 
         assert.strictEqual(called, 0);
         f();
@@ -21,7 +21,7 @@ describe('debounceRedraw', () => {
         let called = 0;
         const cb = () => ++called;
 
-        const f = debounceRedraw(cb, 20);
+        const f = debounceResize(cb, 20);
 
         assert.strictEqual(called, 0);
         f();
@@ -35,7 +35,7 @@ describe('debounceRedraw', () => {
         let called = 0;
         const cb = () => ++called;
 
-        const f = debounceRedraw(cb, 20);
+        const f = debounceResize(cb, 20);
 
         assert.strictEqual(called, 0);
         f();

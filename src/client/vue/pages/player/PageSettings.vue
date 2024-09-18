@@ -5,17 +5,17 @@ import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
 import useAuthStore from '../../../stores/authStore';
 import { ApiClientError } from '../../../apiClient';
-import { watch, Ref, ref, onMounted } from 'vue';
+import { watch, Ref, ref } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { authChangePassword } from '@client/apiClient';
 import { availableLocales, setLocale } from '../../../../shared/app/i18n';
-import { allShadingPatterns } from '../../../../shared/app/shading-patterns';
+import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns';
 import i18n from 'i18next';
-import GameView from '../../../pixi-board/GameView';
 import { Game } from '../../../../shared/game-engine';
 import { Player } from '../../../../shared/app/models';
 import AppBoard from '../../components/AppBoard.vue';
+import { CustomizedGameView } from '../../../services/CustomizedGameView';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
@@ -107,9 +107,8 @@ const submitPasswordChange = async () => {
 /*
  * Board preview
  */
-const boardContainer = ref<HTMLElement>();
-const gameView = ref<null | GameView>(null);
 const game = new Game(14);
+const gameView = new CustomizedGameView(game);
 
 const players = ['A', 'B'].map(pseudo => {
     const player = new Player();
@@ -121,14 +120,6 @@ const players = ['A', 'B'].map(pseudo => {
     player.publicId = 'nope';
 
     return player;
-});
-
-onMounted(() => {
-    if (!boardContainer.value) {
-        throw new Error('Missing element with ref="boardContainer"');
-    }
-
-    gameView.value = new GameView(game, boardContainer.value);
 });
 </script>
 
@@ -306,10 +297,10 @@ onMounted(() => {
 
         <h5>{{ $t('preview') }}</h5>
 
-        <div class="board-container" ref="boardContainer">
+        <div class="board-container">
             <AppBoard
                 v-if="gameView"
-                :gameView="(gameView as GameView)"
+                :gameView="gameView"
                 :players="players"
             />
         </div>

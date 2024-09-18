@@ -4,7 +4,7 @@ export abstract class AbstractShadingPattern
 {
     constructor(
         protected size: number,
-        protected options?: null | string,
+        protected options?: unknown,
     ) {}
 
     /**
@@ -93,7 +93,7 @@ export class CustomShadingPattern extends AbstractShadingPattern
 
     constructor(
         protected override size: number,
-        protected override options?: null | string,
+        protected override options?: unknown,
     ) {
         super(size, options);
 
@@ -176,7 +176,7 @@ export const allShadingPatterns = [
 
 export type ShadingPatternType = typeof allShadingPatterns[number];
 
-export const createShadingPattern = (name: ShadingPatternType, size: number, option?: null | string): AbstractShadingPattern => {
+export const createShadingPattern = (name: ShadingPatternType, size: number, option?: unknown): AbstractShadingPattern => {
     if (!allShadingPatterns.includes(name)) {
         return new NoShadingPattern(size, option);
     }

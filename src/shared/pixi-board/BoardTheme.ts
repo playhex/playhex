@@ -1,4 +1,4 @@
-import { darken } from '@shared/app/colorUtils';
+import { darken } from './colorUtils';
 
 export type Theme = {
     /**
