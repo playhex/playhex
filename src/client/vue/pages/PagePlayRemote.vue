@@ -12,7 +12,7 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconChevronLeft } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
@@ -508,6 +508,11 @@ const unreadMessages = (): number => {
             <!-- Control buttons at bottom of game board (resign, undo, confirm move, ...) -->
             <nav class="menu-game navbar" v-if="null !== hostedGameClient">
                 <div class="buttons container-fluid">
+
+                    <!-- rewind mode -->
+                    <button type="button" v-if="null !== gameView" @click="() => gameView?.changeMovesHistoryCursor(-1)" class="btn btn-outline-primary">
+                        <BIconChevronLeft />
+                    </button>
 
                     <!-- Resign -->
                     <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">

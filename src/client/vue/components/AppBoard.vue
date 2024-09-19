@@ -3,7 +3,7 @@
 import GameView from '../../../shared/pixi-board/GameView';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { PropType, toRefs } from 'vue';
-import { BIconTrophyFill } from 'bootstrap-icons-vue';
+import { BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconTrophyFill, BIconX } from 'bootstrap-icons-vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import AppChrono from './AppChrono.vue';
@@ -11,6 +11,7 @@ import AppPseudo from './AppPseudo.vue';
 import Player from '../../../shared/app/models/Player';
 import TimeControlType from '../../../shared/time-control/TimeControlType';
 import { GameTimeData } from '../../../shared/time-control/TimeControl';
+import type { Ref } from 'vue';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -81,10 +82,51 @@ gameView.on('endedAndWinAnimationOver', () => {
 });
 
 onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
+
+/*
+ * Rewind
+ */
+gameView.listenArrowKeys();
+
+const hasRewindControls = ref(false);
+
+const btnRewindBack = ref<HTMLElement>();
+const btnRewindForward = ref<HTMLElement>();
+
+const blinkButton = (button: Ref<HTMLElement | undefined>) => {
+    button.value?.classList.add('active');
+    setTimeout(() => button.value?.classList.remove('active'), 80);
+};
+
+gameView.on('movesHistoryCursorChanged', cursor => hasRewindControls.value = null !== cursor);
+
+const rewindZero = () => gameView.setMovesHistoryCursor(-1);
+const backward = () => gameView.changeMovesHistoryCursor(-1);
+const forward = () => gameView.changeMovesHistoryCursor(+1);
+const rewindCurrent = () => gameView.setMovesHistoryCursor(Infinity);
+const rewindClose = () => gameView.clearMovesHistoryCursor();
+
+const keyboardEventListener = (event: KeyboardEvent) => {
+    switch (event.key) {
+        case 'ArrowLeft':
+            blinkButton(btnRewindBack);
+            break;
+
+        case 'ArrowRight':
+            blinkButton(btnRewindForward);
+            break;
+    }
+};
+
+window.addEventListener('keydown', keyboardEventListener);
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', keyboardEventListener);
+});
 </script>
 
 <template>
-    <div class="app-board">
+    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
@@ -126,6 +168,33 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
             </div>
         </div>
         <p v-else>{{ $t('initializing_game') }}</p>
+
+        <div class="rewind-controls" v-if="hasRewindControls">
+            <!-- backward initial -->
+            <button type="button" @click="rewindZero()" class="btn btn-outline-primary">
+                <BIconChevronBarLeft />
+            </button>
+
+            <!-- backward -->
+            <button type="button" @click="backward()" class="btn btn-outline-primary" ref="btnRewindBack">
+                <BIconChevronLeft />
+            </button>
+
+            <!-- forward -->
+            <button type="button" @click="forward()" class="btn btn-outline-primary" ref="btnRewindForward">
+                <BIconChevronRight />
+            </button>
+
+            <!-- forward max -->
+            <button type="button" @click="rewindCurrent()" class="btn btn-outline-primary">
+                <BIconChevronBarRight />
+            </button>
+
+            <!-- Close rewind -->
+            <button type="button" @click="rewindClose()" class="btn btn-outline-danger">
+                <BIconX />
+            </button>
+        </div>
     </div>
 </template>
 
@@ -134,6 +203,7 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
     position relative
     width 100%
     height 100%
+    transition height 0.15s ease-out
 
 .board-container
     display flex
@@ -181,4 +251,12 @@ onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
         flex-direction column-reverse
         top auto
         bottom 0
+
+.app-board.has-rewind-controls
+    height calc(100% - 3rem)
+
+    .rewind-controls
+        display flex
+        justify-content center
+        gap 0.25em
 </style>

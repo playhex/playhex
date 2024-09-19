@@ -37,6 +37,8 @@ type GameViewEvents = {
     endedAndWinAnimationOver: () => void;
 
     orientationChanged: () => void;
+
+    movesHistoryCursorChanged: (cursor: null | number) => void;
 };
 
 const defer = () => {
@@ -130,6 +132,19 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private swaped: SwapedSprite;
 
     private previewedMove: null | { move: Move, playerIndex: PlayerIndex } = null;
+
+    /**
+     * Show an earlier position on the board.
+     * - `null`: show current position
+     * - `0`: show first move
+     * - `-1`: show empty board
+     */
+    private movesHistoryCursor: null | number = null;
+
+    /**
+     * Listener for keyboard event to control moves history cursor
+     */
+    private keyboardEventListener: null | ((event: KeyboardEvent) => void) = null;
 
     private resizeObserver: null | ResizeObserver = null;
 
@@ -302,6 +317,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.swaped = this.createSwaped();
 
         this.createAndAddHexes();
+        this.addAllMoves();
         this.highlightSidesFromGame();
 
         if (null !== this.previewedMove) {
@@ -641,7 +657,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             for (let col = 0; col < size; ++col) {
                 const hex = new Hex(
                     this.options.theme,
-                    this.game.getBoard().getCell(row, col),
+                    null,
                     shadingPattern.calc(row, col) * shadingPatternIntensity,
                 );
 
@@ -652,6 +668,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                 hexesContainer.addChild(hex);
 
                 hex.on('pointertap', () => {
+
+                    // Disable play in rewind mode. May change when simulation mode is implemented.
+                    if (null !== this.movesHistoryCursor) {
+                        if (this.movesHistoryCursor !== this.game.getMovesHistory().length - 1) {
+                            return;
+                        }
+
+                        // In case rewind was already on last move, just disable rewind mode.
+                        this.clearMovesHistoryCursor();
+                    }
+
                     this.emit('hexClicked', { row, col });
                 });
             }
@@ -664,9 +691,19 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.hexes[size - 4][size - 4].showDot();
         }
 
-        this.highlightLastMove();
-
         this.gameContainer.addChild(hexesContainer);
+    }
+
+    private unhighlightLastMove(): void
+    {
+        if (null !== this.lastSimpleMoveHighlighted) {
+            const { row, col } = this.lastSimpleMoveHighlighted;
+            this.hexes[row][col].setHighlighted(false);
+            this.lastSimpleMoveHighlighted = null;
+        }
+
+        this.showSwapable(false);
+        this.showSwaped(false);
     }
 
     /**
@@ -678,14 +715,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private highlightLastMove(move: null | Move = null): void
     {
-        if (null !== this.lastSimpleMoveHighlighted) {
-            const { row, col } = this.lastSimpleMoveHighlighted;
-            this.hexes[row][col].setHighlighted(false);
-            this.lastSimpleMoveHighlighted = null;
-        }
-
-        this.showSwapable(false);
-        this.showSwaped(false);
+        this.unhighlightLastMove();
 
         const lastMove = move ?? this.game.getLastMove();
 
@@ -855,12 +885,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return;
         }
 
-        if (!this.game.isEnded()) {
-            this.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
+        if (this.game.isEnded()) {
+            this.highlightSideForPlayer(this.game.getStrictWinner());
             return;
         }
 
-        this.highlightSideForPlayer(this.game.getStrictWinner());
+        this.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
     }
 
     /**
@@ -981,10 +1011,126 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this;
     }
 
+    getMovesHistoryCursor(): null | number
+    {
+        return this.movesHistoryCursor;
+    }
+
+    setMovesHistoryCursor(cursor: null | number): void
+    {
+        if (cursor === this.movesHistoryCursor) {
+            return;
+        }
+
+        this.movesHistoryCursor = cursor;
+        this.boundMovesHistoryCursor();
+        this.redrawIfInitialized();
+        this.emit('movesHistoryCursorChanged', cursor);
+    }
+
+    private boundMovesHistoryCursor(): void
+    {
+        if (null === this.movesHistoryCursor) {
+            return;
+        }
+
+        if (this.movesHistoryCursor < -1) {
+            this.movesHistoryCursor = -1;
+            return;
+        }
+
+        const { length } = this.getGame().getMovesHistory();
+
+        if (this.movesHistoryCursor >= length) {
+            this.movesHistoryCursor = length - 1;
+        }
+    }
+
+    changeMovesHistoryCursor(delta: number): void
+    {
+        this.setMovesHistoryCursor((this.movesHistoryCursor ?? this.getGame().getMovesHistory().length - 1) + delta);
+    }
+
+    clearMovesHistoryCursor(): void
+    {
+        if (null === this.movesHistoryCursor) {
+            return;
+        }
+
+        this.setMovesHistoryCursor(null);
+    }
+
+    addMove(move: Move, byPlayerIndex: PlayerIndex): void
+    {
+        switch (move.getSpecialMoveType()) {
+            case undefined:
+                this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
+                break;
+
+            case 'swap-pieces': {
+                const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
+
+                this.hexes[swapped.row][swapped.col].setPlayer(null);
+                this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
+                break;
+            }
+        }
+
+        this.removePreviewMove();
+        this.highlightLastMove(move);
+    }
+
+    private addAllMoves(): void
+    {
+        this.unhighlightLastMove();
+
+        const movesHistory = this.game.getMovesHistory();
+
+        for (let i = 0; i < movesHistory.length; ++i) {
+            if (null !== this.movesHistoryCursor && i > this.movesHistoryCursor) {
+                break;
+            }
+
+            this.addMove(movesHistory[i], i % 2 as PlayerIndex);
+        }
+    }
+
+    listenArrowKeys(): void
+    {
+        if (null !== this.keyboardEventListener) {
+            return;
+        }
+
+        this.keyboardEventListener = event => {
+            switch (event.key) {
+                case 'ArrowLeft':
+                    this.changeMovesHistoryCursor(-1);
+                    break;
+
+                case 'ArrowRight':
+                    this.changeMovesHistoryCursor(+1);
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', this.keyboardEventListener);
+    }
+
+    unlistenArrowKeys(): void
+    {
+        if (null === this.keyboardEventListener) {
+            return;
+        }
+
+        window.removeEventListener('keydown', this.keyboardEventListener);
+        this.keyboardEventListener = null;
+    }
+
     destroy(): void
     {
         this.pixi.destroy(true);
 
         this.destroyResizeObserver();
+        this.unlistenArrowKeys();
     }
 }
