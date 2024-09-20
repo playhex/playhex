@@ -617,10 +617,10 @@ const shouldEnablePass = (): boolean => {
                         </template>
 
                         <template v-else-if="message.type === 'move'">
-                            <small class="header-move text-secondary text-center">{{ $t('move_number', { n: message.moveNumber }) }}</small>
+                            <button class="btn btn-link btn-sm header-move text-secondary" @click="gameView?.setMovesHistoryCursor(message.moveNumber - 1)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
                         </template>
                         <template v-else-if="message.type === 'date'">
-                            <small class="header-date text-secondary text-center mt-1">{{ formatChatDateHeader(message.date) }}</small>
+                            <small class="header-date text-secondary mt-1">{{ formatChatDateHeader(message.date) }}</small>
                         </template>
                     </div>
                 </div>
