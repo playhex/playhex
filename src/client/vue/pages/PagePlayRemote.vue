@@ -663,7 +663,7 @@ sidebarOpen()
         position relative
         width 100%
 
-        @media (max-width: 575px)
+        @media (max-width: 575.5px) // .5 is a fix because sometimes 575px only is not inclusive
             position absolute
             right 0
             top 0
