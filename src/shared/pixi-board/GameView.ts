@@ -676,7 +676,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         }
 
                         // In case rewind was already on last move, just disable rewind mode.
-                        this.clearMovesHistoryCursor();
+                        this.disableRewindMode();
                     }
 
                     this.emit('hexClicked', { row, col });
@@ -1025,7 +1025,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.movesHistoryCursor = cursor;
         this.boundMovesHistoryCursor();
         this.redrawIfInitialized();
-        this.emit('movesHistoryCursorChanged', cursor);
+        this.emit('movesHistoryCursorChanged', this.movesHistoryCursor);
     }
 
     private boundMovesHistoryCursor(): void
@@ -1046,18 +1046,23 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
+    enableRewindMode(): void
+    {
+        if (null === this.movesHistoryCursor) {
+            this.setMovesHistoryCursor(Infinity);
+        }
+    }
+
+    disableRewindMode(): void
+    {
+        if (null !== this.movesHistoryCursor) {
+            this.setMovesHistoryCursor(null);
+        }
+    }
+
     changeMovesHistoryCursor(delta: number): void
     {
         this.setMovesHistoryCursor((this.movesHistoryCursor ?? this.getGame().getMovesHistory().length - 1) + delta);
-    }
-
-    clearMovesHistoryCursor(): void
-    {
-        if (null === this.movesHistoryCursor) {
-            return;
-        }
-
-        this.setMovesHistoryCursor(null);
     }
 
     addMove(move: Move, byPlayerIndex: PlayerIndex): void

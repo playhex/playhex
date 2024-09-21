@@ -3,37 +3,49 @@
 import { GameAnalyzeData } from '@shared/app/models/GameAnalyze';
 import GameAnalyzeView, { AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeView';
 import { PropType, onMounted, ref } from 'vue';
+import GameView from '@shared/pixi-board/GameView';
 
 const props = defineProps({
     analyze: {
         type: Object as PropType<GameAnalyzeData>,
         required: true,
     },
+    gameView: {
+        type: Object as PropType<null | GameView>,
+        required: false,
+        default: null,
+    }
 });
 
-const { analyze } = props;
+const { analyze, gameView } = props;
 const gameAnalyzeContainer = ref<HTMLElement>();
 const moveAnalyze = ref<null | AnalyzeMoveOutput>(null);
 
 onMounted(async () => {
     if (!gameAnalyzeContainer.value) {
-        throw new Error('element with ref="gameReview" not found');
+        throw new Error('element with ref="gameAnalyzeContainer" not found');
     }
 
-    const gameAnalyzeView = new GameAnalyzeView(gameAnalyzeContainer.value, analyze);
+    const gameAnalyzeView = new GameAnalyzeView(analyze);
 
-    await gameAnalyzeView.ready();
+    if (null !== gameView) {
+        gameAnalyzeView.linkGameViewCursor(gameView);
+    }
 
-    gameAnalyzeContainer.value.appendChild(gameAnalyzeView.getView());
+    gameAnalyzeView.mount(gameAnalyzeContainer.value);
 
-    gameAnalyzeView.on('selectedMove', move => moveAnalyze.value = move);
+    gameAnalyzeView.on('highlightedMoveChanged', move => moveAnalyze.value = move);
 });
 </script>
 
 <template>
     <div class="review-pixi" ref="gameAnalyzeContainer"></div>
+
     <div class="analyze-move-info">
-        <span v-if="moveAnalyze">
+        <small v-if="moveAnalyze">
+            {{ $t('move_number', { n: moveAnalyze.moveIndex + 1 }) }}
+            -
+
             <template v-if="moveAnalyze.move.move === moveAnalyze.bestMoves[0].move">
                 <span :class="moveAnalyze.color">{{ moveAnalyze.move.move }}</span> ({{ $t('game_analysis.best_move') }})
             </template>
@@ -45,7 +57,7 @@ onMounted(async () => {
                 - {{ $t('game_analysis.best') }} <span :class="moveAnalyze.color">{{ moveAnalyze.bestMoves[0].move }}</span>
                 ({{ moveAnalyze.bestMoves[0].whiteWin?.toFixed(2) ?? '-' }})
             </template>
-        </span>
+        </small>
     </div>
 </template>
 

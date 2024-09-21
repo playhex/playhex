@@ -12,7 +12,7 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconChevronLeft } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
@@ -33,6 +33,11 @@ const { gameId } = useRoute().params;
 const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
 
 let gameView: null | CustomizedGameView = null; // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
+
+/**
+ * When game is loaded, gameView instanciated
+ */
+const gameViewInitialized = ref(false);
 
 if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
@@ -212,6 +217,8 @@ const initGameView = async () => {
     const game = hostedGameClient.value.loadGame();
 
     gameView = new CustomizedGameView(game);
+
+    gameViewInitialized.value = true;
 
     if (null !== playerSettings.value) {
         gameView.updateOptionsFromPlayerSettings(playerSettings.value);
@@ -485,7 +492,7 @@ const unreadMessages = (): number => {
 </script>
 
 <template>
-    <div v-show="null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : '')">
+    <div v-show="gameViewInitialized && null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : '')">
         <div class="game">
 
             <!-- Game board, "Accept" button -->
@@ -510,8 +517,8 @@ const unreadMessages = (): number => {
                 <div class="buttons container-fluid">
 
                     <!-- rewind mode -->
-                    <button type="button" v-if="null !== gameView" @click="() => gameView?.changeMovesHistoryCursor(-1)" class="btn btn-outline-primary">
-                        <BIconChevronLeft />
+                    <button type="button" v-if="null !== gameView" @click="() => gameView?.enableRewindMode()" class="btn btn-outline-primary">
+                        <BIconRewind />
                     </button>
 
                     <!-- Resign -->
@@ -589,6 +596,7 @@ const unreadMessages = (): number => {
         <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
             <AppGameSidebar
                 :hostedGameClient="hostedGameClient"
+                v-if="gameView"
                 :gameView="gameView"
                 @close="showSidebar(false)"
                 @toggleCoords="toggleCoords()"

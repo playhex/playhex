@@ -104,7 +104,7 @@ const rewindZero = () => gameView.setMovesHistoryCursor(-1);
 const backward = () => gameView.changeMovesHistoryCursor(-1);
 const forward = () => gameView.changeMovesHistoryCursor(+1);
 const rewindCurrent = () => gameView.setMovesHistoryCursor(Infinity);
-const rewindClose = () => gameView.clearMovesHistoryCursor();
+const rewindClose = () => gameView.disableRewindMode();
 
 const keyboardEventListener = (event: KeyboardEvent) => {
     switch (event.key) {

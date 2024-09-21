@@ -35,13 +35,13 @@ const props = defineProps({
         required: true,
     },
     gameView: {
-        type: Object as PropType<null | GameView>,
-        required: false,
-        default: null,
+        type: Object as PropType<GameView>,
+        required: true,
     },
 });
 
-const { hostedGameClient, gameView } = toRefs(props);
+const { gameView } = props;
+const { hostedGameClient } = toRefs(props);
 const { round, abs } = Math;
 
 const emits = defineEmits([
@@ -119,16 +119,12 @@ const shouldDisplayHexworldLink = (): boolean => {
 
 const generateHexworldLink = () => gameToHexworldLink(
     hostedGameClient.value.getGame(),
-    gameView.value?.getComputedBoardOrientation(),
+    gameView.getComputedBoardOrientation(),
 );
 
 const hexworldLink = ref(generateHexworldLink());
 
-if (gameView.value) {
-    gameView.value.on('orientationChanged', () => {
-        hexworldLink.value = generateHexworldLink();
-    });
-}
+gameView.on('orientationChanged', () => hexworldLink.value = generateHexworldLink());
 
 /*
  * SGF download
@@ -281,6 +277,12 @@ const gameAnalyze = analyzeStore.getAnalyze(gameId);
 const doAnalyzeGame = async () => {
     analyzeStore.loadAnalyze(gameId, true);
 };
+
+const timeControlComponent = ref<typeof AppGameAnalyze>();
+
+gameView.on('movesHistoryCursorChanged', cursor => {
+    timeControlComponent.value?.selectMove(cursor);
+});
 
 /*
  * Ratings
@@ -584,8 +586,9 @@ const shouldEnablePass = (): boolean => {
                             :aria-label="$t('game_analysis.how_it_works')"
                         ><BIconInfoCircle /></router-link>
                     </small>
+
                     <!-- Anayze graph -->
-                    <AppGameAnalyze :analyze="gameAnalyze.analyze" />
+                    <AppGameAnalyze :analyze="gameAnalyze.analyze" :gameView />
                 </div>
 
             </div>
