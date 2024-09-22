@@ -489,6 +489,14 @@ const unreadMessages = (): number => {
         - hostedGameClient.value.getReadMessages()
     ;
 };
+
+/*
+ * Rewind mode
+ */
+const enableRewindMode = () => {
+    gameView?.lockOrientationMode();
+    gameView?.enableRewindMode();
+};
 </script>
 
 <template>
@@ -517,7 +525,7 @@ const unreadMessages = (): number => {
                 <div class="buttons container-fluid">
 
                     <!-- rewind mode -->
-                    <button type="button" v-if="null !== gameView" @click="() => gameView?.enableRewindMode()" class="btn btn-outline-primary">
+                    <button type="button" v-if="null !== gameView" @click="() => enableRewindMode()" class="btn btn-outline-primary">
                         <BIconRewind />
                     </button>
 

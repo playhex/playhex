@@ -13,6 +13,8 @@ const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 const PI_6 = PI / 6;
 
+type OrientationMode = 'landscape' | 'portrait';
+
 /**
  * Integer, every PI/6.
  * Or an orientation depending on screen orientation.
@@ -73,7 +75,7 @@ type GameViewOptions = {
      * Let "auto" to adapt board orientation depending on container ratio.
      * Or set "landscape" or "portrait" to force displaying in this mode.
      */
-    selectedBoardOrientation: 'auto' | 'landscape' | 'portrait';
+    selectedBoardOrientationMode: 'auto' | OrientationMode;
 
     /**
      * Whether to show "anchors" on 4-4 cells.
@@ -93,7 +95,7 @@ const defaultOptions: GameViewOptions = {
         landscape: 11, // Diamond
         portrait: 9, // Vertical flat
     },
-    selectedBoardOrientation: 'auto',
+    selectedBoardOrientationMode: 'auto',
     show44dots: false,
     shadingPatternType: null,
     shadingPatternIntensity: 0.5,
@@ -124,6 +126,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private gameContainer: Container = new Container();
 
     private currentOrientation: number;
+
+    /**
+     * If set, and selected orientation is "auto",
+     * the current orientation will be used while resizing
+     * instead of recalculated from view ratio.
+     *
+     * Used when we want to slightly resize view without switch orientation,
+     * i.e when we want to add a menu and slightly reduce view height
+     * (i.e arrows to rewind position).
+     */
+    private lockedOrientationMode: null | OrientationMode = null;
 
     private sidesGraphics: [Graphics, Graphics];
 
@@ -235,23 +248,33 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Returns which board orientation should be used
      * from game view wrapper ratio, and user preferred orientations for landscape and portrait.
      */
+    getComputedBoardOrientationMode(): OrientationMode
+    {
+        const { selectedBoardOrientationMode: selectedBoardOrientation } = this.options;
+
+        // If currently locked to an orientation, returns it
+        if (null !== this.lockedOrientationMode) {
+            return this.lockedOrientationMode;
+        }
+
+        // If "portrait" or "landscape" explicitely selected, returns it
+        if ('auto' !== selectedBoardOrientation) {
+            return selectedBoardOrientation;
+        }
+
+        // If set to auto, returns depending on wrapper ratio
+        return this.getWrapperOrientationMode();
+    }
+
+    /**
+     * Returns which board orientation should be used
+     * from game view wrapper ratio, and user preferred orientations for landscape and portrait.
+     */
     getComputedBoardOrientation(): number
     {
-        const wrapperSize = this.getWrapperSize();
-        const { preferredOrientations, selectedBoardOrientation } = this.options;
+        const { preferredOrientations } = this.options;
 
-        if (null === wrapperSize) {
-            return preferredOrientations.landscape;
-        }
-
-        if ('auto' === selectedBoardOrientation) {
-            return wrapperSize.width > wrapperSize.height
-                ? preferredOrientations.landscape
-                : preferredOrientations.portrait
-            ;
-        }
-
-        return preferredOrientations[selectedBoardOrientation];
+        return preferredOrientations[this.getComputedBoardOrientationMode()];
     }
 
     /**
@@ -382,6 +405,20 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return { width, height };
     }
 
+    private getWrapperOrientationMode(): OrientationMode
+    {
+        const wrapperSize = this.getWrapperSize();
+
+        if (null === wrapperSize) {
+            return 'landscape';
+        }
+
+        return wrapperSize.width > wrapperSize.height
+            ? 'landscape'
+            : 'portrait'
+        ;
+    }
+
     getGame()
     {
         return this.game;
@@ -410,6 +447,19 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     getCurrentOrientation(): number
     {
         return (this.currentOrientation + 12) % 12;
+    }
+
+    /**
+     * To call before resizing, to prevent orientation mode changes while resize.
+     */
+    lockOrientationMode(): void
+    {
+        this.lockedOrientationMode = this.getComputedBoardOrientationMode();
+    }
+
+    unlockOrientationMode(): void
+    {
+        this.lockedOrientationMode = null;
     }
 
     getTheme(): Theme

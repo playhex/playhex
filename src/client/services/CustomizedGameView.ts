@@ -84,7 +84,7 @@ export class CustomizedGameView extends GameView
     updateOptionsFromPlayerLocalSettings(localSettings: LocalSettings): void
     {
         this.updateOptions({
-            selectedBoardOrientation: localSettings.selectedBoardOrientation,
+            selectedBoardOrientationMode: localSettings.selectedBoardOrientation,
         });
     }
 
