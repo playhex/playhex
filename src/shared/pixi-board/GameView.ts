@@ -127,17 +127,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private currentOrientation: number;
 
-    /**
-     * If set, and selected orientation is "auto",
-     * the current orientation will be used while resizing
-     * instead of recalculated from view ratio.
-     *
-     * Used when we want to slightly resize view without switch orientation,
-     * i.e when we want to add a menu and slightly reduce view height
-     * (i.e arrows to rewind position).
-     */
-    private lockedOrientationMode: null | OrientationMode = null;
-
     private sidesGraphics: [Graphics, Graphics];
 
     private lastSimpleMoveHighlighted: null | Coords = null;
@@ -251,11 +240,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     getComputedBoardOrientationMode(): OrientationMode
     {
         const { selectedBoardOrientationMode: selectedBoardOrientation } = this.options;
-
-        // If currently locked to an orientation, returns it
-        if (null !== this.lockedOrientationMode) {
-            return this.lockedOrientationMode;
-        }
 
         // If "portrait" or "landscape" explicitely selected, returns it
         if ('auto' !== selectedBoardOrientation) {
@@ -447,19 +431,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     getCurrentOrientation(): number
     {
         return (this.currentOrientation + 12) % 12;
-    }
-
-    /**
-     * To call before resizing, to prevent orientation mode changes while resize.
-     */
-    lockOrientationMode(): void
-    {
-        this.lockedOrientationMode = this.getComputedBoardOrientationMode();
-    }
-
-    unlockOrientationMode(): void
-    {
-        this.lockedOrientationMode = null;
     }
 
     getTheme(): Theme

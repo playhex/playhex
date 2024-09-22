@@ -106,7 +106,6 @@ const forward = () => gameView.changeMovesHistoryCursor(+1);
 const rewindCurrent = () => gameView.setMovesHistoryCursor(Infinity);
 const rewindClose = () => {
     gameView.disableRewindMode();
-    setTimeout(() => gameView.unlockOrientationMode(), 150); // unlock after css transition is done, see <style> below
 };
 
 const keyboardEventListener = (event: KeyboardEvent) => {

@@ -494,7 +494,6 @@ const unreadMessages = (): number => {
  * Rewind mode
  */
 const enableRewindMode = () => {
-    gameView?.lockOrientationMode();
     gameView?.enableRewindMode();
 };
 </script>
