@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import { PropType, nextTick, onMounted, ref, toRefs, watch } from 'vue';
+import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconTrophy, BIconCaretUpFill, BIconCaretDownFill, BIconInfoCircle } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
@@ -123,6 +123,10 @@ const generateHexworldLink = () => gameToHexworldLink(
 );
 
 const hexworldLink = ref(generateHexworldLink());
+
+watchEffect(() => {
+    hexworldLink.value = generateHexworldLink();
+});
 
 gameView.on('orientationChanged', () => hexworldLink.value = generateHexworldLink());
 
