@@ -15,9 +15,14 @@ const {
 <template>
     <div>
         <AppTournamentCard
-            name="Hex Monthly 21"
-            :startDate="new Date('2024-09-21T17:00:00Z')"
-            registerLink="https://challonge.com/hex_monthly_21"
+            name="Hex Monthly 22"
+            :startDate="new Date('2024-10-19T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_22"
+        />
+        <AppTournamentCard
+            name="Hex Monthly 23"
+            :startDate="new Date('2024-11-16T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_23"
         />
 
         <h3>{{ $t('n_online_players', { n: null === totalPlayers ? '…' : totalPlayers }) }}</h3>

@@ -83,7 +83,7 @@ const isReallySoon = (): boolean => {
 
             <p v-if="!started()" class="mb-0 mt-2">
                 <a href="#create-hex-monthly-1vAI-friendly" class="btn btn-sm btn-outline-primary mt-2 me-2">Train with AI</a>
-                <a href="#create-hex-monthly-1v1-friendly" class="btn btn-sm btn-outline-primary mt-2">Create 1v1</a>
+                <a href="#create-hex-monthly" class="btn btn-sm btn-outline-primary mt-2">Create 1v1</a>
             </p>
             <p v-else class="mb-0">
                 <a href="#create-hex-monthly" class="btn btn-sm btn-warning mt-2">Create Hex Monthly game</a>
