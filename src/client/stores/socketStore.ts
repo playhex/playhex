@@ -3,7 +3,7 @@ import { HexClientToServerEvents, HexServerToClientEvents } from '../../shared/a
 import * as CustomParser from '@shared/app/socketCustomParser';
 import { defineStore } from 'pinia';
 import useAuthStore from './authStore';
-import { watch } from 'vue';
+import { watch, ref } from 'vue';
 
 const useSocketStore = defineStore('socketStore', () => {
     const socket: Socket<HexServerToClientEvents, HexClientToServerEvents> = io({
@@ -14,15 +14,15 @@ const useSocketStore = defineStore('socketStore', () => {
     const joinRoom = (room: string) => socket.emit('room', 'join', room);
     const leaveRoom = (room: string) => socket.emit('room', 'leave', room);
 
-    // used to determine if the client should refresh when reconnecting
-    // in order to make sure the state is up to date
-    let disconnect: 'planned' | 'unplanned' | null = null;
+    const connected = ref(false);
+
+    // reload in order to make sure the state is up to date
+    let shouldReloadPage = false;
 
     /*
      * Reconnect socket when logged in player changed
      */
     const reconnectSocket = (): void => {
-        disconnect = 'planned';
         socket.disconnect().connect();
     };
 
@@ -32,26 +32,20 @@ const useSocketStore = defineStore('socketStore', () => {
     );
 
     socket.on('connect', () => {
-        if (disconnect === 'unplanned') {
+        connected.value = true;
+        if (shouldReloadPage)
             location.reload();
-        }
-
-        disconnect = null;
     });
 
-    socket.on('disconnect', () => {
-        switch (disconnect) {
-            case 'planned':
-                disconnect = null;
-                break;
-            case null:
-                disconnect = 'unplanned';
-                break;
-        }
+    socket.on('disconnect', reason => {
+        connected.value = false;
+        if (reason !== 'io client disconnect') // if not manual disconnect
+            shouldReloadPage = true;
     });
 
     return {
         socket,
+        connected,
         joinRoom,
         leaveRoom,
         reconnectSocket,
