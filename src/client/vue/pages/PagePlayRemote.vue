@@ -428,22 +428,6 @@ const createOrAcceptRematch = async (): Promise<void> => {
     });
 };
 
-const viewRematch = (): void => {
-    if (!hostedGameClient.value) {
-        throw new Error('Error while trying to view rematch, no current game');
-    }
-    const rematchId = hostedGameClient.value.getRematchGameId();
-    if (rematchId == null) {
-        throw new Error('Error while trying to view rematch, empty rematchId');
-    }
-    router.push({
-        name: 'online-game',
-        params: {
-            gameId: rematchId
-        }
-    });
-};
-
 /*
  * Sidebar
  */
@@ -573,12 +557,12 @@ const enableRewindMode = () => {
 
                     <!-- Accept / View rematch -->
                     <template v-else-if="hostedGameClient.getRematchGameId() != null">
-                        <button type="button" class="btn btn-success" v-if="canAcceptRematch" @click="createOrAcceptRematch()">
+                        <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()">
                             {{ ' ' + $t('rematch.accept') }}
                         </button>
-                        <button type="button" class="btn btn-outline-primary" v-else @click="viewRematch()">
+                        <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGameClient.getRematchGameId() } }" class="btn btn-outline-primary">
                             {{ ' ' + $t('rematch.view') }}
-                        </button>
+                        </router-link>
                     </template>
 
                     <!-- Chat -->
