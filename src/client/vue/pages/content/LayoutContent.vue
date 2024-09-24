@@ -5,7 +5,7 @@
                 <router-link class="nav-link" :to="{ name: 'links' }">Hex resources</router-link>
                 <router-link class="nav-link" :to="{ name: 'contribute' }">{{ $t('contribute') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'contributors' }">{{ $t('contributors') }}</router-link>
-                <router-link class="nav-link" :to="{ name: 'analysis-details' }">How analysis are done</router-link>
+                <router-link class="nav-link" :to="{ name: 'analysis-details' }">How AI analysis is done</router-link>
                 <router-link class="nav-link" :to="{ name: 'spawn-worker' }">Spawn an AI worker</router-link>
                 <router-link class="nav-link" :to="{ name: 'privacy' }">{{ $t('privacy_policy') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'license' }">{{ $t('license_agpl') }}</router-link>

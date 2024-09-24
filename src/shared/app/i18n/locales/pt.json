@@ -68,7 +68,7 @@
         "second": "Segundo"
     },
     "swap_rule": "Regra de troca",
-    "allow_swap_pieces": "Permitir troca de peças",
+    "enable_swap_rule": "Permitir troca de peças",
     "toggle_coords": "Alternar coordenadas",
     "toggle_coords_short": "Coordenadas",
     "share_game": "Compartilhar jogo",
@@ -115,9 +115,8 @@
         "no_worker": "Nenhum trabalhador pode calcular movimentos agora. Apenas bots aleatórios estão disponíveis.",
         "see_how_to_spawn_a_worker": "Veja como calcular movimentos de IA para o PlayHex no meu computador"
     },
-    "game_analyze": {
-        "analyze_by_ai": "Análise do jogo por IA",
-        "analyze_game": "Analisar jogo",
+    "game_analysis": {
+        "game_analysis": "Análise do jogo por IA",
         "requested": "Análise solicitada…",
         "errored": "Erro na análise!",
         "best_move": "melhor movimento",

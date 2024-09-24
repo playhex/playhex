@@ -153,11 +153,10 @@
     "send_chat_message": "Envoyer",
     "landscape": "Paysage",
     "portrait": "Portrait",
-    "game_analyze": {
+    "game_analysis": {
         "best_move": "meilleur coup",
         "best": "meilleur :",
-        "analyze_by_ai": "Analyse de la partie par l'IA",
-        "analyze_game": "Analyser la partie",
+        "game_analysis": "Analyse de la partie par l'IA",
         "requested": "Analyse demandée…",
         "errored": "L'analyse a échouée !",
         "how_it_works": "Fonctionnement"
@@ -242,7 +241,7 @@
         "second": "Deuxième"
     },
     "swap_rule": "Règle d'échange",
-    "allow_swap_pieces": "Permettre l'échange du premier coup",
+    "enable_swap_rule": "Permettre l'échange du premier coup",
     "game_finished_overlay": {
         "title": "Partie terminée"
     },

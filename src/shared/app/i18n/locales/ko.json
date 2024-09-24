@@ -68,7 +68,7 @@
         "second": "두 번째"
     },
     "swap_rule": "교환 규칙",
-    "allow_swap_pieces": "조각 교환 허용",
+    "enable_swap_rule": "조각 교환 허용",
     "toggle_coords": "좌표 전환",
     "toggle_coords_short": "좌표",
     "share_game": "게임 공유",
@@ -115,9 +115,8 @@
         "no_worker": "현재 작업자가 이동을 계산할 수 없습니다. 랜덤 봇만 사용할 수 있습니다.",
         "see_how_to_spawn_a_worker": "내 컴퓨터에서 PlayHex의 AI 이동을 계산하는 방법을 확인하세요"
     },
-    "game_analyze": {
-        "analyze_by_ai": "AI로 게임 분석",
-        "analyze_game": "게임 분석",
+    "game_analysis": {
+        "game_analysis": "AI로 게임 분석",
         "requested": "분석 요청됨…",
         "errored": "분석 오류 발생!",
         "best_move": "최고의 이동",

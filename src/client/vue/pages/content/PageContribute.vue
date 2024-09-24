@@ -18,10 +18,10 @@ const playerIsFair = ref(0);
         as a developer or not.
     </p>
 
-    <h2>Translating and typo fixes</h2>
+    <h2>Translate and fix typos</h2>
 
     <p>
-        Most of visible texts on UI are translatable.
+        Most of the visible text in the UI is translatable.
         These "translation strings" can be changed through an interface.
     </p>
 
@@ -32,22 +32,22 @@ const playerIsFair = ref(0);
     </p>
 
     <ul>
-        <li>fix typo in texts,</li>
-        <li>reword a text,</li>
-        <li>translate some untranslated texts that are still in english,</li>
-        <li>or even translate PlayHex in your language if not yet done.</li>
+        <li>fix typos,</li>
+        <li>reword text,</li>
+        <li>translate some untranslated strings that are still in English,</li>
+        <li>or even translate PlayHex to your language if that has not been done yet.</li>
     </ul>
 
     <p>
-        To do so, go to
-        <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">PlayHex project on Weblate</a>,
-        then you can search for the string to fix, translate…
+        To do so, go to the
+        <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">PlayHex project on Weblate</a>
+        and search for the string to fix or translate.
     </p>
 
     <p>
         You need a Weblate account to submit your translations.
-        If you have a Github account, link it, so your contributions
-        will be authored as your Github name.
+        If you have a GitHub account, link it, so your contributions
+        will be authored as your GitHub name.
     </p>
 
     <p>
@@ -64,8 +64,8 @@ const playerIsFair = ref(0);
 
     <p>
         If you have a not too old computer,
-        you can pull a Hex AI worker, and run it.
-        This way, when someone plays against Katahex or Mohex,
+        you can pull a Hex AI worker and run it.
+        This way, when someone plays against KataHex or MoHex,
         your computer can compute moves if no faster worker is available.
     </p>
 
@@ -77,13 +77,13 @@ const playerIsFair = ref(0);
     <h2>Develop</h2>
 
     <p>
-        Fix bugs, adding features you want…
+        Fix bugs, add features you want…
     </p>
 
     <p>
         PlayHex is developed with these technologies:
-        Nodejs, socket.io, vuejs 3, typescript, pixi.js, express, typestack.
-        Repositories are on Github:
+        Node.js, socket.io, vue.js 3, typescript, pixi.js, express, typestack.
+        Repositories are on GitHub:
     </p>
 
     <ul>

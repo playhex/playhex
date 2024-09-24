@@ -96,9 +96,8 @@
         "see_how_to_spawn_a_worker": "Ver cómo calcular los movimientos de la IA para PlayHex desde mi ordenador",
         "no_worker": "Ningún trabajador puede calcular movimientos en este momento. Solo hay bots aleatorios disponibles."
     },
-    "game_analyze": {
-        "analyze_by_ai": "Partida analizada por IA",
-        "analyze_game": "Analizar partida",
+    "game_analysis": {
+        "game_analysis": "Partida analizada por IA",
         "requested": "Análisis solicitado…",
         "errored": "¡El análisis falló!",
         "best_move": "mejor jugada",
@@ -236,7 +235,7 @@
     "already_have_account_login_instead": "¿Ya tienes una cuenta? {login}",
     "no_account_sign_up_instead": "¿No tienes una cuenta? Por favor {signUp}",
     "player_game_history": "Historial de la partida",
-    "allow_swap_pieces": "Permitir intercambio de piezas",
+    "enable_swap_rule": "Permitir intercambio de piezas",
     "2dots": "{{s}}:",
     "waiting": "esperando…",
     "game_finished_overlay": {

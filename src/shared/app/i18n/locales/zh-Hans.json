@@ -68,7 +68,7 @@
         "second": "后手"
     },
     "swap_rule": "交换规则",
-    "allow_swap_pieces": "允许交换棋子",
+    "enable_swap_rule": "允许交换棋子",
     "toggle_coords": "切换坐标",
     "toggle_coords_short": "坐标",
     "share_game": "分享游戏",
@@ -115,9 +115,8 @@
         "no_worker": "目前没有工作者可以计算动作。仅有随机机器人可用。",
         "see_how_to_spawn_a_worker": "查看如何从我的电脑为PlayHex计算AI动作"
     },
-    "game_analyze": {
-        "analyze_by_ai": "由AI分析游戏",
-        "analyze_game": "分析游戏",
+    "game_analysis": {
+        "game_analysis": "由AI分析游戏",
         "requested": "已请求分析…",
         "errored": "分析出错！",
         "best_move": "最佳走法",

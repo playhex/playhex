@@ -12,28 +12,27 @@ useSeoMeta({
     <p><strong>Last update: 5 May 2024</strong></p>
 
     <p>
-        PlayHex.org is an online website to play Hex.
-        You will find below the PlayHex Privacy Policy
-        - the explanation of our practices and our commitments
-        with regard to the processing of your personal data.
+        PlayHex.org is an online website to play Hex. You will find below the
+        PlayHex Privacy Policy—the explanation of our practices and our
+        commitments with regard to the processing of your personal data.
     </p>
 
     <h2>Which personal data is collected, how and why</h2>
 
     <p>
         Data is kept until you ask for account deletion
-        to provided contact information in this privacy policy.
+        using the contact information provided in this privacy policy.
     </p>
 
     <p>
-        Here is the list of collected personal data:
+        Here is the list of the personal data that is collected:
     </p>
 
     <ul>
-        <li><strong>Username</strong>: to login and identify you in your games and lobby.</li>
+        <li><strong>Username</strong>: to log in and identify you in your games and lobby.</li>
         <li><strong>Account creation date</strong>: displayed on your player page.</li>
-        <li><strong>Chat messages</strong>: displayed games and to other players.</li>
-        <li><strong>Your games</strong>: actions you make on games: creation, moves.</li>
+        <li><strong>Chat messages</strong>: displayed in games to you and other players.</li>
+        <li><strong>Your games</strong>: actions you make in games: match creation, moves.</li>
     </ul>
 
     <h2>Who is responsible for processing your personal data?</h2>

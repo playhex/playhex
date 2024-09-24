@@ -205,7 +205,7 @@
         "random": "Zufällig"
     },
     "swap_rule": "Tauschregel",
-    "allow_swap_pieces": "Tausch von Spielsteinen erlauben",
+    "enable_swap_rule": "Tausch von Spielsteinen erlauben",
     "toggle_coords": "Koordinaten umschalten",
     "toggle_coords_short": "Koordinaten",
     "share_game": "Spiel teilen",
@@ -217,14 +217,13 @@
     "already_have_account_login_instead_link_label": "Anmelden",
     "account_created_on": "Konto erstellt am {{date}}",
     "game_has_been_canceled": "Spiel wurde abgebrochen.",
-    "game_analyze": {
+    "game_analysis": {
         "how_it_works": "Wie es funktioniert",
         "best_move": "bester Zug",
-        "analyze_by_ai": "Spielanalyse durch KI",
+        "game_analysis": "Spielanalyse durch KI",
         "requested": "Analyse angefordert…",
         "errored": "Analyse fehlgeschlagen!",
-        "best": "beste:",
-        "analyze_game": "Spiel analysieren"
+        "best": "beste:"
     },
     "language": "Sprache",
     "cancel": "Abbrechen",

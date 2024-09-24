@@ -68,7 +68,7 @@
         "second": "Anden"
     },
     "swap_rule": "Bytteregel",
-    "allow_swap_pieces": "Tillad brikker bytte",
+    "enable_swap_rule": "Tillad brikker bytte",
     "toggle_coords": "Skift koordinater",
     "toggle_coords_short": "Koordinater",
     "share_game": "Del spil",
@@ -115,9 +115,8 @@
         "no_worker": "Ingen arbejdskraft kan beregne træk lige nu. Kun tilfældige bots er tilgængelige.",
         "see_how_to_spawn_a_worker": "Se, hvordan man beregner AI-træk for PlayHex fra min computer"
     },
-    "game_analyze": {
-        "analyze_by_ai": "Spilanalyse af AI",
-        "analyze_game": "Analyser spil",
+    "game_analysis": {
+        "game_analysis": "Spilanalyse af AI",
         "requested": "Analyse anmodet…",
         "errored": "Analyse fejlede!",
         "best_move": "bedste træk",
