@@ -173,7 +173,6 @@
     "chat_message_placeholder": "메시지…",
     "unread_messages": "읽지 않은 메시지",
     "send_chat_message": "보내기",
-    "n_characters_one": "{{count}} 문자",
     "n_characters_other": "{{count}} 문자",
     "landscape": "가로",
     "portrait": "세로",
