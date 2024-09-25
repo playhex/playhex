@@ -173,7 +173,6 @@
     "chat_message_placeholder": "メッセージ…",
     "unread_messages": "未読メッセージ",
     "send_chat_message": "送信",
-    "n_characters_one": "{{count}} 文字",
     "n_characters_other": "{{count}} 文字",
     "landscape": "横向き",
     "portrait": "縦向き",
