@@ -69,7 +69,7 @@
         "second": "Segundo"
     },
     "swap_rule": "Regla de intercambio",
-    "toggle_coords": "Cambiar coordenadas",
+    "toggle_coords": "Alternar la visualización de coordenadas",
     "share_game": "Compartir juego",
     "copied!": "¡Copiado!",
     "not_copied": "Error al copiar, haz clic con el botón derecho o mantén presionado",
@@ -92,7 +92,7 @@
     "initializing_game": "Iniciando partida…",
     "waiting_for_an_opponent": "Esperando contrincante…",
     "workers": {
-        "slow_worker": "En este momento no hay ningún trabajador rápido en línea. Solo hay disponibles IAs limitadas.",
+        "slow_worker": "En este momento, no hay ningún trabajador rápido en línea. Solo hay disponible una IA limitada.",
         "see_how_to_spawn_a_worker": "Ver cómo calcular los movimientos de la IA para PlayHex desde mi ordenador",
         "no_worker": "Ningún trabajador puede calcular movimientos en este momento. Solo hay bots aleatorios disponibles."
     },
@@ -102,7 +102,8 @@
         "errored": "¡El análisis falló!",
         "best_move": "mejor jugada",
         "best": "mejor:",
-        "how_it_works": "Cómo funciona"
+        "how_it_works": "Cómo funciona",
+        "request_analysis": "Solicitar análisis de IA"
     },
     "close": "Cerrar",
     "ranked": "Clasificatoria",
@@ -131,7 +132,7 @@
         "title": "IA sin conexión",
         "create": "Jugar contra la IA sin conexión"
     },
-    "offline_game_explain": "El juego sin conexión solo se ejecuta en tu dispositivo, no se llama al servidor PlayHex. Así puedes jugar cuando no hay internet.",
+    "offline_game_explain": "Los juegos sin conexión sólo se ejecutan en su dispositivo, de modo que puede jugar sin conexión a Internet. El servidor PlayHex no está involucrado.",
     "loading_game": "Cargando partida…",
     "tournament": "Torneo",
     "now!": "¡Ahora!",
@@ -144,7 +145,7 @@
     "resign": "Abandonar",
     "auto": "Auto",
     "board_orientation": {
-        "description": "Tu orientación preferida de tablero para la orientación vertical y horizontal de la pantalla.",
+        "description": "Rotación del tablero preferida para las orientaciones de pantalla vertical y horizontal.",
         "title": "Orientación",
         "flat": "Plana",
         "flat_2": "Plana 2",
@@ -162,7 +163,7 @@
         "custom_expression": "Expresión personalizada",
         "title": "Patrón de sombreado",
         "visibility": "Visibilidad del patrón de sombreado",
-        "help_custom": "Expresión matemática para patrones de sombreado personalizados.<br>La expresión debe devolver un número entre 0 (sin sombreado) y 1 (sombreado completo) para una determinada celda (row, col). Podría utilizar, por ejemplo, 0,5 para representar un patrón de sombreado de tres colores. Devolver <code>true</code> o <code>false</code> tiene el mismo efecto que devolver <code>1</code> o <code>0</code>. <br>Variables disponibles:<br>- <code>row</code> y <code>col</code> (atajos: <code>r</code> y <code>c</code>), representa números de fila y columna, comenzando desde 0.<br>- <code>size</code> (o <code>s</code>), que indica el tamaño del tablero de ajedrez.<br>- <code>distToSide</code> representa la distancia desde la celda actual hasta el límite más cercano.<br>Para obtener una lista de operadores disponibles, consulte https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Ejemplo:<br>- Círculos concéntricos: <code>distToSide % 2</code><br>- Tablero de ajedrez de tres colores: <code>((size + row - col) % 3) / 2</code><br>- Círculo con radio sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Abra la consola de JavaScript (F12) para ver los errores al ejecutar la expresión."
+        "help_custom": "Expresión matemática para el patrón de sombreado personalizado.<br>La expresión debe evaluarse como un número entre 0 (sin sombreado) y 1 (totalmente sombreado) para una celda determinada (fila, columna). Puede utilizar, por ejemplo, 0,5 para patrones de sombreado tricolor. <code>true</code> y <code>false</code> son lo mismo que <code>1</code> y <code>0</code>.<br>Las siguientes variables están disponibles:<br>- <code>row</code> y <code>col</code> (o <code>r</code> y <code>c</code>) para los números de fila y columna, comenzando en 0.<br>- <code>size</code> (o <code>s</code>) para el tamaño del tablero.<br>- <code>distToSide</code> para la distancia de la celda actual a su lado más cercano.<br>Consulte la lista de operadores disponibles en https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Ejemplos:<br>- Anillos concéntricos: <code>distToSide % 2</code><br>- Tablero de ajedrez tricolor: <code>((size + row - col) % 3) / 2</code><br>- Disco con radio sqrt(20): <code>o = tamaño / 2; (fila - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Abra la consola de JavaScript (F12 o ⌥⌘I) para ver los errores de la ejecución de su expresión."
     },
     "show_44_dots": "Mostrar puntos en celdas 4-4",
     "preview": "Vista previa",
