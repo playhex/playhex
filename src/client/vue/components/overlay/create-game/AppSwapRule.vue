@@ -18,7 +18,7 @@ const { gameOptions } = toRefs(props);
     <div class="form-check">
         <input class="form-check-input" v-model="gameOptions.swapRule" type="checkbox" id="swap-rule">
         <label class="form-check-label" for="swap-rule">
-            {{ $t('allow_swap_pieces') }}
+            {{ $t('enable_swap_rule') }}
         </label>
     </div>
 </template>

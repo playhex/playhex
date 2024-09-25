@@ -68,7 +68,7 @@
         "second": "Tweede"
     },
     "swap_rule": "Ruilregel",
-    "allow_swap_pieces": "Sta stukjes ruilen toe",
+    "enable_swap_rule": "Sta stukjes ruilen toe",
     "toggle_coords": "Coördinaten aan/uit",
     "toggle_coords_short": "Coördinaten",
     "share_game": "Deel spel",
@@ -115,9 +115,8 @@
         "no_worker": "Er is momenteel geen worker beschikbaar om zetten te berekenen. Alleen willekeurige bots zijn beschikbaar.",
         "see_how_to_spawn_a_worker": "Zie hoe je AI zetten kunt berekenen voor PlayHex vanaf mijn computer"
     },
-    "game_analyze": {
-        "analyze_by_ai": "Spelanalyse door AI",
-        "analyze_game": "Analyseer spel",
+    "game_analysis": {
+        "game_analysis": "Spelanalyse door AI",
         "requested": "Analyse aangevraagd…",
         "errored": "Analyse mislukt!",
         "best_move": "beste zet",

@@ -76,8 +76,8 @@
         "second": "Second"
     },
     "swap_rule": "Swap rule",
-    "allow_swap_pieces": "Allow swap pieces",
-    "toggle_coords": "Toggle coords",
+    "enable_swap_rule": "Enable swap rule",
+    "toggle_coords": "Toggle the display of coordinates",
     "toggle_coords_short": "Coords",
     "share_game": "Share game",
     "copied!": "Copied!",
@@ -119,15 +119,15 @@
         "are_you_sure?": "Are you sure?"
     },
     "workers": {
-        "slow_worker": "No fast worker is online right now. Only limited AI are available.",
+        "slow_worker": "No fast worker is online right now. Only limited AI is available.",
         "no_worker": "No worker can compute moves right now. Only random bots are available.",
         "see_how_to_spawn_a_worker": "See how to compute AI moves for PlayHex from my computer"
     },
-    "game_analyze": {
-        "analyze_by_ai": "Game analyze by AI",
-        "analyze_game": "Analyze game",
-        "requested": "Analyze requested…",
-        "errored": "Analyze errored!",
+    "game_analysis": {
+        "game_analysis": "AI game analysis",
+        "request_analysis": "Request AI analysis",
+        "requested": "Waiting for AI analysis…",
+        "errored": "AI analysis failed!",
         "best_move": "best move",
         "best": "best:",
         "how_it_works": "How it works"
@@ -169,7 +169,7 @@
         "title": "Offline AI",
         "create": "Play vs offline AI"
     },
-    "offline_game_explain": "Offline game only runs on your device, PlayHex server is not called. So you can play when no internet.",
+    "offline_game_explain": "Offline games run on your device only, so that you can play without internet connection. The PlayHex server is not involved.",
     "loading_game": "Loading game…",
     "tournament": "Tournament",
     "now!": "Now!",
@@ -190,7 +190,7 @@
     "auto": "Auto",
     "board_orientation": {
         "title": "Orientation",
-        "description": "Your preferred board orientation for portrait and landscape screen orientation.",
+        "description": "Your preferred board rotation for the portrait and landscape screen orientations.",
         "flat": "Flat",
         "flat_2": "Flat 2",
         "diamond": "Diamond"
@@ -201,13 +201,13 @@
         "types": {
             "null": "None",
             "tricolor_checkerboard": "Tri-color checkerboard",
-            "concentrical_rings": "Concentrical rings (Hexworld)",
+            "concentrical_rings": "Concentrical rings (HexWorld)",
             "height_5_lines": "Height 5 lines",
             "single_ring": "Single ring",
             "custom": "Custom"
         },
         "custom_expression": "Custom expression",
-        "help_custom": "Math expression for custom shading pattern.<br>Expression must return a number between 0 (no shading) to 1 (fully shaded) for a given cell (row, col). You can use i.e 0.5 for tri color shading patterns. Returning <code>true</code> or <code>false</code> also works same as returning <code>1</code> or <code>0</code>.<br>Variables are availables:<br>- <code>row</code> and <code>col</code> (shortcuts: <code>r</code> and <code>c</code>) for row and col number, starts from 0.<br>- <code>size</code> (or <code>s</code>) for board size.<br>- <code>distToSide</code> distance of current cell to its nearest side.<br>See list of available operators at https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Examples:<br>- Concentrical rings: <code>distToSide % 2</code><br>- Tri color checkerboard: <code>((size + row - col) % 3) / 2</code><br>- Disk with radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Open javascript console (F12) to see errors while executing your expression."
+        "help_custom": "Math expression for the custom shading pattern.<br>The expression must evaluate to a number between 0 (no shading) and 1 (fully shaded) for a given cell (row, col). You can use e.g. 0.5 for tricolor shading patterns. <code>true</code> and <code>false</code> are the same as <code>1</code> and <code>0</code>.<br>The following variables are available:<br>- <code>row</code> and <code>col</code> (or <code>r</code> and <code>c</code>) for the row and column numbers, starting at 0.<br>- <code>size</code> (or <code>s</code>) for the board size.<br>- <code>distToSide</code> for the distance of the current cell to its nearest side.<br>See the list of available operators at https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Examples:<br>- Concentrical rings: <code>distToSide % 2</code><br>- Tri-color checkerboard: <code>((size + row - col) % 3) / 2</code><br>- Disk with radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Open the JavaScript console (F12 or ⌥⌘I) to see errors from the execution of your expression."
     },
     "show_44_dots": "Show dots on 4-4 cells",
     "preview": "Preview",

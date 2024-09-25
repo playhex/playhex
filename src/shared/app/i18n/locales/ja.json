@@ -68,7 +68,7 @@
         "second": "後手"
     },
     "swap_rule": "スワップルール",
-    "allow_swap_pieces": "スワップを許可する",
+    "enable_swap_rule": "スワップを許可する",
     "toggle_coords": "座標を切り替える",
     "toggle_coords_short": "座標",
     "share_game": "ゲームを共有",
@@ -115,9 +115,8 @@
         "no_worker": "現在、移動を計算できるワーカーはいません。利用可能なランダムボットのみです。",
         "see_how_to_spawn_a_worker": "自分のコンピュータでPlayHexのAI移動を計算する方法を見る"
     },
-    "game_analyze": {
-        "analyze_by_ai": "AIによるゲーム分析",
-        "analyze_game": "ゲームを分析",
+    "game_analysis": {
+        "game_analysis": "AIによるゲーム分析",
         "requested": "分析をリクエストしました…",
         "errored": "分析エラー！",
         "best_move": "最善手",

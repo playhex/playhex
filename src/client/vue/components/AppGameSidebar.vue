@@ -540,19 +540,19 @@ const shouldEnablePass = (): boolean => {
 
                 <!-- Request analyze -->
                 <div v-if="null === gameAnalyze" class="text-center">
-                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('game_analyze.analyze_by_ai') }}</button>
+                    <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('game_analysis.request_analysis') }}</button>
                 </div>
 
                 <!-- Waiting results -->
                 <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height">
-                    {{ $t('game_analyze.requested') }}
+                    {{ $t('game_analysis.requested') }}
                     <br>
                     <small class="text-body-secondary">{{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }}</small>
                 </p>
 
                 <!-- Errored, try again -->
                 <p v-else-if="null === gameAnalyze.analyze" class="text-center text-warning analyze-min-height">
-                    {{ $t('game_analyze.errored') }}
+                    {{ $t('game_analysis.errored') }}
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('try_again') }}</button>
                 </p>
 
@@ -560,12 +560,12 @@ const shouldEnablePass = (): boolean => {
                 <div v-else class="analyze-min-height">
                     <!-- How it works link -->
                     <small>
-                        {{ $t('game_analyze.analyze_by_ai') }}
+                        {{ $t('game_analysis.game_analysis') }}
                         <router-link
                             :to="{ name: 'analysis-details' }"
                             class="text-decoration-none align-text-bottom"
-                            :title="$t('game_analyze.how_it_works')"
-                            :aria-label="$t('game_analyze.how_it_works')"
+                            :title="$t('game_analysis.how_it_works')"
+                            :aria-label="$t('game_analysis.how_it_works')"
                         ><BIconInfoCircle /></router-link>
                     </small>
                     <!-- Anayze graph -->

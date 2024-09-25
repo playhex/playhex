@@ -68,7 +68,7 @@
         "second": "Второй"
     },
     "swap_rule": "Правило обмена",
-    "allow_swap_pieces": "Разрешить обмен фигур",
+    "enable_swap_rule": "Разрешить обмен фигур",
     "toggle_coords": "Переключить координаты",
     "toggle_coords_short": "Координаты",
     "share_game": "Поделиться игрой",
@@ -115,9 +115,8 @@
         "no_worker": "Ни один исполнитель не может сейчас вычислить ходы. Доступны только случайные боты.",
         "see_how_to_spawn_a_worker": "Узнайте, как вычислять ходы AI для PlayHex с моего компьютера"
     },
-    "game_analyze": {
-        "analyze_by_ai": "Анализ игры AI",
-        "analyze_game": "Анализировать игру",
+    "game_analysis": {
+        "game_analysis": "Анализ игры AI",
         "requested": "Запрос анализа…",
         "errored": "Ошибка анализа!",
         "best_move": "лучший ход",
