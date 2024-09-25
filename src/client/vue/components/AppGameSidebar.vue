@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconTrophy, BIconCaretUpFill, BIconCaretDownFill, BIconInfoCircle } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconTrophy, BIconCaretUpFill, BIconCaretDownFill, BIconInfoCircle, BIconGear } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
@@ -540,6 +540,8 @@ const shouldEnablePass = (): boolean => {
 
                     <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
+
+                    <router-link class="btn btn-outline-primary" :to="{ name: 'settings', hash: '#board-orientation' }"><BIconGear /></router-link>
                 </div>
 
                 <!-- Pass -->

@@ -110,6 +110,15 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+    scrollBehavior: async to => {
+        if (to.hash) {
+            await new Promise(r => setTimeout(r, 100));
+            return { el: to.hash };
+        }
+
+        // Yes, eslint, I return nothing here.
+        return;
+    },
 });
 
 router.beforeEach(() => {
