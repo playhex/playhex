@@ -7,6 +7,7 @@ import SwapableSprite from './SwapableSprite';
 import SwapedSprite from './SwapedSprite';
 import { createShadingPattern, ShadingPatternType } from './shading-patterns';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced';
+import { Mark } from './Mark';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -152,6 +153,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private initPromise = defer();
 
+    private marksContainer = new Container();
+    private marks: Mark[] = [];
+
     constructor(
         private game: Game,
         options: Partial<GameViewOptions> = {},
@@ -290,6 +294,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             throw new Error('Cannot redraw, no wrapper size, seems not yet mounted');
         }
 
+        // Prevent destroying marks recursively
+        this.gameContainer.removeChild(this.marksContainer);
+
         for (const child of this.gameContainer.children) {
             child.destroy(true);
         }
@@ -335,6 +342,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.gameContainer.addChild(
             this.swapable,
             this.swaped,
+            this.marksContainer,
         );
     }
 
@@ -1150,6 +1158,24 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         window.removeEventListener('keydown', this.keyboardEventListener);
         this.keyboardEventListener = null;
+    }
+
+    addMark(mark: Mark): void
+    {
+        this.marks.push(mark);
+        this.marksContainer.addChild(mark);
+    }
+
+    removeMark(mark: Mark): void
+    {
+        this.marksContainer.removeChild(mark);
+        this.marks = this.marks.filter(m => m !== mark);
+    }
+
+    removeAllMarks(): void
+    {
+        this.marksContainer.removeChildren();
+        this.marks = [];
     }
 
     destroy(): void

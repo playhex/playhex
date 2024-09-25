@@ -1,9 +1,12 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
 import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced';
+import { Move } from '../../shared/game-engine';
 import { themes } from '../../shared/pixi-board/BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze';
 import GameView from '../../shared/pixi-board/GameView';
+import { BestMoveMark } from './BestMoveMark';
+import { PlayedMoveMark } from './PlayedMoveMark';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -70,6 +73,8 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     private highlight: null | Graphics = null;
     private highlightedMove: null | number = null;
     private selectedMove: null | number = null;
+    private bestMoveMark = new BestMoveMark();
+    private playedMoveMark = new PlayedMoveMark();
 
     private initPromise = defer();
 
@@ -169,6 +174,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             const bestMovePower = moveAnalyze.bestMoves[0].whiteWin as number;
 
             if (movePower !== undefined) {
+                // Draw bar
                 rectWithNegative(
                     graphics,
                     i * barWidth,
@@ -180,13 +186,14 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
                 graphics.fill({ color: movePower < 0.5 ? themes.dark.colorA : themes.dark.colorB });
             }
 
+            // Draw best move
             graphics.circle(
                 (i + 0.5) * barWidth,
                 bestMovePower * height,
                 2,
             );
 
-            graphics.fill({ color: 'green' });
+            graphics.fill({ color: '0x00ff00' });
         }
 
         this.container.addChild(graphics);
@@ -228,6 +235,11 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
      */
     linkGameViewCursor(gameView: GameView): void
     {
+        this.playedMoveMark.hide();
+        this.bestMoveMark.hide();
+        gameView.addMark(this.playedMoveMark);
+        gameView.addMark(this.bestMoveMark);
+
         gameView.on('movesHistoryCursorChanged', cursor => {
             if (null === cursor) {
                 return;
@@ -237,11 +249,50 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         });
 
         this.on('selectedMoveChanged', move => {
+            this.bestMoveMark.hide();
+            this.playedMoveMark.hide();
+
             if (null === move) {
                 return;
             }
 
             gameView.setMovesHistoryCursor(move.moveIndex);
+
+            // Place best move
+            this.bestMoveMark.setCoords(Move.fromString(move.bestMoves[0].move));
+            this.bestMoveMark.show();
+
+            // Place played move and eval color
+            this.playedMoveMark.setCoords(Move.fromString(move.move.move));
+
+            const playedWhiteWin = move.move.whiteWin;
+            const bestWhiteWin = move.bestMoves[0].whiteWin;
+
+            if (undefined !== playedWhiteWin && undefined !== bestWhiteWin) {
+                let diff = playedWhiteWin - bestWhiteWin;
+                diff *= 2; // drop 50% means full red
+
+                // Oppose value every two move, as it is whiteWin
+                if (move.moveIndex % 2) {
+                    diff = -diff;
+                }
+
+                // Can be negative when player found a better move than cpu best move
+                if (diff < 0) {
+                    diff = 0;
+                }
+
+                // Can be >1 when big mistake, because we multiply the diff
+                if (diff > 1) {
+                    diff = 1;
+                }
+
+                this.playedMoveMark.setWhiteWinDiff(diff);
+            } else {
+                this.playedMoveMark.setWhiteWinDiff(0);
+            }
+
+            this.playedMoveMark.show();
         });
     }
 
