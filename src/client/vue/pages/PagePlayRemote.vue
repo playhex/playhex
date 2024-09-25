@@ -20,6 +20,7 @@ import i18next from 'i18next';
 import { PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
+import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { fromEngineMove } from '../../../shared/app/models/Move';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { CustomizedGameView } from '../../services/CustomizedGameView';
@@ -598,6 +599,8 @@ const enableRewindMode = () => {
     <div v-if="null === hostedGameClient || null === gameView" class="container-fluid my-3">
         <p class="lead text-center">{{ $t('loading_game') }}</p>
     </div>
+
+    <AppConnectionAlert />
 </template>
 
 <style scoped lang="stylus">
