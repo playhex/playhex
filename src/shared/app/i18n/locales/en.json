@@ -222,7 +222,7 @@
     "game_with_player_has_started": "Game with {{player}} has started",
     "last_move": "Last move",
     "undo": {
-        "undo_move": "Undo",
+        "undo_move": "Takeback",
         "accept": "Accept undo",
         "reject": "Reject"
     },
