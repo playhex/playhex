@@ -61,13 +61,13 @@
         "types": {
             "null": "Aucun",
             "tricolor_checkerboard": "Damier 3 couleurs",
-            "concentrical_rings": "Cercles concentriques (Hexworld)",
+            "concentrical_rings": "Cercles concentriques (HexWorld)",
             "height_5_lines": "Lignes en 5ème",
             "single_ring": "Cercle simple",
             "custom": "Personnalisé"
         },
         "custom_expression": "Expression personnalisée",
-        "help_custom": "Expression mathématique pour un motif personnalisé.<br>L'expression doit retourner un nombre entre 0 (pas colorée) et 1 (colorée) pour une case donnée (ligne, colonne). Vous pouvez utiliser par exemple 0.5 Pour un motif à trois couleurs. Retourner <code>true</code> ou <code>false</code> équivaut à retourner <code>1</code> ou <code>0</code>.<br>Des variables sont disponibles :<br>- <code>row</code> et <code>col</code> (raccourcis : <code>r</code> et <code>c</code>) pour le numéro de la ligne ou colonne, commence à 0.<br>- <code>size</code> (ou <code>s</code>) pour la taille du plateau.<br>- <code>distToSide</code> distance de la case actuelle au côté le plus proche.<br>Voir la liste des opérateurs possible sur https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Exemples :<br>- Cercles concentriques : <code>distToSide % 2</code><br>- Damier 3 couleurs : <code>((size + row - col) % 3) / 2</code><br>- Disque de rayon racine(20) : <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Ouvrez la console javascript (F12) pour voir les erreurs lors de l'execution de votre expression."
+        "help_custom": "Expression mathématique pour un motif personnalisé.<br>L'expression doit retourner un nombre entre 0 (pas colorée) et 1 (colorée) pour une case donnée (ligne, colonne). Vous pouvez utiliser par exemple 0.5 Pour un motif à trois couleurs. Retourner <code>true</code> ou <code>false</code> équivaut à retourner <code>1</code> ou <code>0</code>.<br>Des variables sont disponibles :<br>- <code>row</code> et <code>col</code> (raccourcis : <code>r</code> et <code>c</code>) pour le numéro de la ligne ou colonne, commence à 0.<br>- <code>size</code> (ou <code>s</code>) pour la taille du plateau.<br>- <code>distToSide</code> distance de la case actuelle au côté le plus proche.<br>Voir la liste des opérateurs possible sur https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Exemples :<br>- Cercles concentriques : <code>distToSide % 2</code><br>- Damier 3 couleurs : <code>((size + row - col) % 3) / 2</code><br>- Disque de rayon racine(20) : <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Ouvrez la console javascript (F12) pour voir les erreurs lors de l'execution de votre expression."
     },
     "preview": "Aperçu",
     "show_44_dots": "Afficher des points sur les cases en 4-4",
@@ -141,7 +141,7 @@
         "title": "IA hors-ligne",
         "create": "Jouer hors-ligne contre l'IA"
     },
-    "offline_game_explain": "Une partie hors-ligne se déroule uniquement sur votre appareil, Le serveur PlayHex n'est pas appelé. Vous pouvez donc jouer sans internet.",
+    "offline_game_explain": "Une partie hors-ligne se déroule uniquement sur votre appareil, vous pouvez donc jouer sans internet. Le serveur PlayHex n'est pas appelé.",
     "cancel": "Annuler",
     "ranked": "Classée",
     "rating": "Évaluation : {{rating}}",
@@ -159,7 +159,8 @@
         "game_analysis": "Analyse de la partie par l'IA",
         "requested": "Analyse demandée…",
         "errored": "L'analyse a échouée !",
-        "how_it_works": "Fonctionnement"
+        "how_it_works": "Fonctionnement",
+        "request_analysis": "Demander une analyse par l'IA"
     },
     "try_again": "Réessayer",
     "language": "Langue",
@@ -262,7 +263,7 @@
     "contribute": "Contribuer",
     "auto": "Auto",
     "undo": {
-        "undo_move": "Oups",
+        "undo_move": "Reprendre",
         "accept": "Accepter reprise",
         "reject": "Refuser"
     },
