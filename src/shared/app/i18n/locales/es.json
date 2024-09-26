@@ -177,7 +177,7 @@
     "game_with_player_has_started": "La partida con {{player}} ha comenzado",
     "last_move": "Última jugada",
     "undo": {
-        "undo_move": "Deshacer",
+        "undo_move": "Recuperación",
         "accept": "Aceptar deshacer",
         "reject": "Rechazar"
     },
