@@ -4,6 +4,7 @@ import useOnlinePlayersStore from '@client/stores/onlinePlayersStore';
 import { BIconCircleFill } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
 import AppTournamentCard from '../AppTournamentCard.vue';
+import AppTournamentPlayOk from '../AppTournamentPlayOk.vue';
 
 const {
     players,
@@ -14,6 +15,10 @@ const {
 
 <template>
     <div>
+        <AppTournamentPlayOk
+            name="PlayOk"
+            :startDate="new Date('2024-09-27T18:00:00Z')"
+        />
         <AppTournamentCard
             name="Hex Monthly 22"
             :startDate="new Date('2024-10-19T17:00:00Z')"
