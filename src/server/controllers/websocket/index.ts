@@ -5,11 +5,13 @@ import LobbyWebsocketController from './LobbyWebsocketController';
 import GameWebsocketController from './GameWebsocketController';
 import OnlinePlayersWebsocketController from './OnlinePlayersWebsocketController';
 import ChatWebsocketController from './ChatWebsocketController';
+import PlayerGamesWebsocketController from './PlayerGamesWebsocketController';
 import ServerStatusWebsocketController from './ServerStatusWebsocketController';
 
 export interface WebsocketControllerInterface
 {
     onConnection(socket: HexSocket): void;
+    onJoinRoom?(socket: HexSocket, room: string): void;
 }
 
 export function registerWebsocketControllers() {
@@ -19,15 +21,23 @@ export function registerWebsocketControllers() {
         Container.get(LobbyWebsocketController),
         Container.get(GameWebsocketController),
         Container.get(OnlinePlayersWebsocketController),
+        Container.get(PlayerGamesWebsocketController),
         Container.get(ServerStatusWebsocketController),
     ];
 
-    Container
-        .get(HexServer)
-        .on('connection', socket => {
-            websocketControllers.forEach(websocketController => {
-                websocketController.onConnection(socket);
-            });
-        })
-    ;
+    const io = Container.get(HexServer);
+
+    io.on('connection', socket => {
+        websocketControllers.forEach(websocketController => {
+            websocketController.onConnection(socket);
+        });
+    });
+
+    io.of('/').adapter.on('join-room', (room: string, id) => {
+        const socket = io.sockets.sockets.get(id);
+        if (socket == null) return;
+        websocketControllers.forEach(websocketController => {
+            websocketController.onJoinRoom?.(socket, room);
+        });
+    });
 }

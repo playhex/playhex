@@ -23,4 +23,12 @@ export default class GameWebsocketController implements WebsocketControllerInter
             answer(await this.hostedGameRepository.playerMove(player, gameId, move));
         });
     }
+
+    async onJoinRoom(socket: HexSocket, room: string)
+    {
+        const gameId = room.match(/games\/(.+)/)?.[1];
+        if (gameId == null) return;
+        const game = await this.hostedGameRepository.getGame(gameId);
+        socket.emit('gameUpdate', gameId, game);
+    }
 }

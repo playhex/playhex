@@ -42,4 +42,11 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
         this.onlinePlayersService.socketHasConnected(socket);
         socket.on('disconnect', () => this.onlinePlayersService.socketHasDisconnected(socket));
     }
+
+    onJoinRoom(socket: HexSocket, room: string): void
+    {
+        if (room !== Rooms.onlinePlayers) return;
+        const onlinePlayers = this.onlinePlayersService.getOnlinePlayers();
+        socket.emit('onlinePlayersUpdate', onlinePlayers);
+    }
 }

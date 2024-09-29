@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Player from '../../../shared/app/models/Player';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore';
-import { PropType, toRefs } from 'vue';
+import { PropType } from 'vue';
 import { BIconCircleFill, BIconRobot } from 'bootstrap-icons-vue';
 
 const props = defineProps({
@@ -11,15 +11,15 @@ const props = defineProps({
     },
 });
 
-const { player } = toRefs(props);
+const onlinePlayersStore = useOnlinePlayersStore();
 </script>
 
 <template>
     <BIconCircleFill
-        v-if="!player.isBot"
+        v-if="!props.player.isBot"
         class="online-status-icon"
         aria-hidden="true"
-        :class="useOnlinePlayersStore().isPlayerOnline(player.publicId) ? 'text-success' : 'text-secondary'"
+        :class="onlinePlayersStore.isPlayerOnline(props.player.publicId) ? 'text-success' : 'text-secondary'"
     />
     <BIconRobot
         v-else
