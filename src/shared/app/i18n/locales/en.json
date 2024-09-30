@@ -201,13 +201,13 @@
         "types": {
             "null": "None",
             "tricolor_checkerboard": "Tri-color checkerboard",
-            "concentrical_rings": "Concentrical rings (HexWorld)",
+            "concentrical_rings": "Concentric rings (HexWorld)",
             "height_5_lines": "Height 5 lines",
             "single_ring": "Single ring",
             "custom": "Custom"
         },
         "custom_expression": "Custom expression",
-        "help_custom": "Math expression for the custom shading pattern.<br>The expression must evaluate to a number between 0 (no shading) and 1 (fully shaded) for a given cell (row, col). You can use e.g. 0.5 for tricolor shading patterns. <code>true</code> and <code>false</code> are the same as <code>1</code> and <code>0</code>.<br>The following variables are available:<br>- <code>row</code> and <code>col</code> (or <code>r</code> and <code>c</code>) for the row and column numbers, starting at 0.<br>- <code>size</code> (or <code>s</code>) for the board size.<br>- <code>distToSide</code> for the distance of the current cell to its nearest side.<br>See the list of available operators at https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Examples:<br>- Concentrical rings: <code>distToSide % 2</code><br>- Tri-color checkerboard: <code>((size + row - col) % 3) / 2</code><br>- Disk with radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Open the JavaScript console (F12 or ⌥⌘I) to see errors from the execution of your expression."
+        "help_custom": "Math expression for the custom shading pattern.<br>The expression must evaluate to a number between 0 (no shading) and 1 (fully shaded) for a given cell (row, col). You can use e.g. 0.5 for tricolor shading patterns. <code>true</code> and <code>false</code> are the same as <code>1</code> and <code>0</code>.<br>The following variables are available:<br>- <code>row</code> and <code>col</code> (or <code>r</code> and <code>c</code>) for the row and column numbers, starting at 0.<br>- <code>size</code> (or <code>s</code>) for the board size.<br>- <code>distToSide</code> for the distance of the current cell to its nearest side.<br>See the list of available operators at https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Examples:<br>- Concentric rings: <code>distToSide % 2</code><br>- Tri-color checkerboard: <code>((size + row - col) % 3) / 2</code><br>- Disk with radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Open the JavaScript console (F12 or ⌥⌘I) to see errors from the execution of your expression."
     },
     "show_44_dots": "Show dots on 4-4 cells",
     "preview": "Preview",
