@@ -2,6 +2,7 @@ import { Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
 import { GameTimeData } from 'time-control/TimeControl';
 import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models';
+import type { OnlinePlayers } from './models';
 
 export type HexClientToServerEvents = {
     /**
@@ -11,9 +12,14 @@ export type HexClientToServerEvents = {
     joinGame: (gameId: string, answer: (joined: true | string) => void) => void;
 
     /**
-     * A player wants to join or leave a room.
+     * A player wants to join a room.
      */
-    room: (join: 'join' | 'leave', room: string) => void;
+    joinRoom: (room: string) => void;
+
+    /**
+     * A player wants to leave a room.
+     */
+    leaveRoom: (room: string) => void;
 
     /**
      * A player wants to play a move.
@@ -130,4 +136,18 @@ export type HexServerToClientEvents = {
      * to know if game analyze has finished, or is just requested.
      */
     analyze: (gameId: string, gameAnalyze: GameAnalyze) => void;
+
+    // Room updates
+
+    /** State for the `Rooms.lobby` room. */
+    lobbyUpdate: (games: HostedGame[]) => void;
+
+    /** State for the `Rooms.onlinePlayers` room. */
+    onlinePlayersUpdate: (onlinePlayers: OnlinePlayers) => void;
+
+    /** State for the `Rooms.game` room. */
+    gameUpdate: (gameId: string, game: HostedGame | null) => void;
+
+    /** State for the `Rooms.playerGames` room. */
+    playerGamesUpdate: (myGames: HostedGame[]) => void;
 };

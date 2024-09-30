@@ -1,13 +1,11 @@
-import { defineStore, storeToRefs } from 'pinia';
+import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import useAuthStore from './authStore';
 import useSocketStore from './socketStore';
 import { HostedGame, Move } from '@shared/app/models';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
-import useLobbyStore from './lobbyStore';
 import { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
-import { getGames } from '../apiClient';
 import { requestBrowserNotificationPermission } from '../services/notifications';
 
 export type CurrentGame = {
@@ -22,9 +20,9 @@ export type CurrentGame = {
  */
 const useMyGamesStore = defineStore('myGamesStore', () => {
 
-    const { socket, joinRoom, leaveRoom } = useSocketStore();
-    const { loggedInPlayer } = storeToRefs(useAuthStore());
-    const { initialGamesPromise } = useLobbyStore();
+    const socketStore = useSocketStore();
+    const { socket, joinRoom, leaveRoom } = socketStore;
+    const authStore = useAuthStore();
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
     const mostUrgentGame = ref<null | CurrentGame>(null);
@@ -103,7 +101,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
 
     socket.on('gameCreated', (hostedGame: HostedGame) => {
-        if (hostedGame.host.publicId !== loggedInPlayer.value?.publicId) {
+        if (hostedGame.host.publicId !== authStore.loggedInPlayer?.publicId) {
             return;
         }
 
@@ -121,7 +119,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
     socket.on('gameStarted', (hostedGame: HostedGame) => {
         const { gameData, publicId } = hostedGame;
-        const me = loggedInPlayer.value;
+        const me = authStore.loggedInPlayer;
 
         if (null === me || null === gameData) {
             return;
@@ -140,9 +138,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             };
         }
 
-        const myColor = hostedGame.hostedGameToPlayers[0].player.publicId === loggedInPlayer.value?.publicId ? 0 : 1;
+        const myColor = hostedGame.hostedGameToPlayers[0].player.publicId === authStore.loggedInPlayer?.publicId ? 0 : 1;
         myGames.value[publicId].myColor = myColor;
-        myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.value?.publicId;
+        myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === authStore.loggedInPlayer?.publicId;
         myGames.value[publicId].hostedGame = hostedGame;
 
         mostUrgentGame.value = getMostUrgentGame();
@@ -171,32 +169,15 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         mostUrgentGame.value = getMostUrgentGame();
     });
 
-    /**
-     * Initialize notification
-     */
-    let initialized = false;
+    socket.on('playerGamesUpdate', (initialGames: HostedGame[]) => {
+        const me = authStore.loggedInPlayer;
 
-    watch(storeToRefs(useAuthStore()).loggedInPlayer, async (me, oldMe) => {
+        if (null === me) return;
+
         myGames.value = {};
         mostUrgentGame.value = null;
 
-        if (null !== oldMe) {
-            leaveRoom(Rooms.playerGames(oldMe.publicId));
-        }
-
-        if (null === me) {
-            return;
-        }
-
-        joinRoom(Rooms.playerGames(me.publicId));
-
-        // On page load, reuse same initial games list load.
-        // For next player changements, reload games list.
-        const initialGames = await (initialized ? getGames() : initialGamesPromise);
-
-        initialized = true;
-
-        initialGames.forEach(hostedGame => {
+        for (const hostedGame of initialGames) {
             const { publicId: id, gameData } = hostedGame;
 
             // I'm not in the game
@@ -218,11 +199,24 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             }
 
             myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: hostedGame };
-        });
+        }
 
         mostUrgentGame.value = getMostUrgentGame();
     });
 
+    watch(
+        [() => socketStore.connected, () => authStore.loggedInPlayer],
+        ([connected, me], [, oldMe]) => {
+            if (!connected) return;
+            if (null != oldMe) {
+                leaveRoom(Rooms.playerGames(oldMe.publicId));
+            }
+            if (null != me) {
+                joinRoom(Rooms.playerGames(me.publicId));
+            }
+        },
+        { immediate: true }
+    );
 
     return {
         myGames,

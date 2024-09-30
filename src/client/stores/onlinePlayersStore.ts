@@ -1,16 +1,17 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
-import { apiGetOnlinePlayers } from '@client/apiClient';
+import { ref, watch, watchEffect } from 'vue';
 import useSocketStore from './socketStore';
 import useAuthStore from './authStore';
 import { Player } from '../../shared/app/models';
+import Rooms from '../../shared/app/Rooms';
 
 /**
  * Online players displayed on home sidebar.
  */
 const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
 
-    const { socket } = useSocketStore();
+    const socketStore = useSocketStore();
+    const { socket, joinRoom } = socketStore;
 
     /**
      * List of connected players
@@ -48,12 +49,12 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         }
     });
 
-    const isPlayerOnline = (playerId: string): boolean => playerId in players.value;
-
-    apiGetOnlinePlayers().then(onlinePlayers => {
+    socket.on('onlinePlayersUpdate', onlinePlayers => {
         totalPlayers.value = onlinePlayers.totalPlayers;
         players.value = onlinePlayers.players;
     });
+
+    const isPlayerOnline = (playerId: string): boolean => playerId in players.value;
 
     /*
      * Explicitely display my player disconnection
@@ -71,6 +72,10 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
             }
         },
     );
+
+    watchEffect(() => {
+        if (socketStore.connected) joinRoom(Rooms.onlinePlayers);
+    });
 
     return {
         players,

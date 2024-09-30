@@ -2,6 +2,7 @@ import HostedGameRepository from '../../repositories/HostedGameRepository';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from '.';
 import { HexSocket } from '../../server';
+import Rooms from '../../../shared/app/Rooms';
 
 @Service()
 export default class LobbyWebsocketController implements WebsocketControllerInterface
@@ -22,5 +23,12 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
 
             answer(await this.hostedGameRepository.playerJoinGame(player, gameId));
         });
+    }
+
+    async onJoinRoom(socket: HexSocket, room: string)
+    {
+        if (room !== Rooms.lobby) return;
+        const games = await this.hostedGameRepository.getLobbyGames();
+        socket.emit('lobbyUpdate', games);
     }
 }

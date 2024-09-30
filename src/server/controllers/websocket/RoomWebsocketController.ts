@@ -7,11 +7,12 @@ export default class RoomWebsocketController implements WebsocketControllerInter
 {
     onConnection(socket: HexSocket): void
     {
-        socket.on('room', (join, room) => {
-            socket[join](room);
+        socket.on('joinRoom', room => {
+            socket.join(room);
         });
 
-        socket.join('lobby');
-        socket.join('online-players');
+        socket.on('leaveRoom', room => {
+            socket.leave(room);
+        });
     }
 }

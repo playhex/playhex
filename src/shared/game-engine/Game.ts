@@ -565,6 +565,35 @@ export default class Game extends TypedEmitter<GameEvents>
         };
     }
 
+    updateFromData(gameData: GameData) {
+        const lastMove = this.getLastMove();
+        let found = lastMove == null;
+        // Update move history only from the last move that we have (or from
+        // the beginning if lastMove is null)
+        let i = this.movesHistory.length;
+        for (const moveData of gameData.movesHistory) {
+            if (!found) {
+                if (moveData.col === lastMove!.col && moveData.row === lastMove!.row)
+                    found = true;
+                continue;
+            }
+            this.move(Move.fromData(moveData), i % 2 as PlayerIndex);
+            i++;
+        }
+
+        this.currentPlayerIndex = gameData.currentPlayerIndex;
+        this.startedAt = gameData.startedAt;
+        this.lastMoveAt = gameData.lastMoveAt;
+
+        if (this.endedAt == null && this.winner == null && gameData.endedAt != null && gameData.winner != null) {
+            this.declareWinner(gameData.winner, gameData.outcome, gameData.endedAt);
+        } else {
+            this.winner = gameData.winner;
+            this.outcome = gameData.outcome;
+            this.endedAt = gameData.endedAt;
+        }
+    }
+
     static fromData(gameData: GameData): Game
     {
         const game = new Game(gameData.size);

@@ -11,13 +11,10 @@ const useSocketStore = defineStore('socketStore', () => {
         autoConnect: false, // connect once player is logged in at least as guest
     });
 
-    const joinRoom = (room: string) => socket.emit('room', 'join', room);
-    const leaveRoom = (room: string) => socket.emit('room', 'leave', room);
+    const joinRoom = (room: string) => socket.emit('joinRoom', room);
+    const leaveRoom = (room: string) => socket.emit('leaveRoom', room);
 
     const connected = ref(false);
-
-    // reload in order to make sure the state is up to date
-    let shouldReloadPage = false;
 
     /*
      * Reconnect socket when logged in player changed
@@ -26,21 +23,16 @@ const useSocketStore = defineStore('socketStore', () => {
         socket.disconnect().connect();
     };
 
-    watch(
-        () => useAuthStore().loggedInPlayer,
-        () => reconnectSocket(),
-    );
+    const authStore = useAuthStore();
+
+    watch(() => authStore.loggedInPlayer, reconnectSocket);
 
     socket.on('connect', () => {
         connected.value = true;
-        if (shouldReloadPage)
-            location.reload();
     });
 
-    socket.on('disconnect', reason => {
+    socket.on('disconnect', () => {
         connected.value = false;
-        if (reason !== 'io client disconnect') // if not manual disconnect
-            shouldReloadPage = true;
     });
 
     return {

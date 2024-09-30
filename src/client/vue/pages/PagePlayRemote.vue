@@ -6,7 +6,7 @@ import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient from '../../HostedGameClient';
 import { defineOverlay } from '@overlastic/vue';
-import { Ref, onMounted, onUnmounted, watch, watchEffect } from 'vue';
+import { Ref, onUnmounted, watch, watchEffect } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
 import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
@@ -44,6 +44,7 @@ if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
 }
 
+const socketStore = useSocketStore();
 const lobbyStore = useLobbyStore();
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 const router = useRouter();
@@ -137,11 +138,12 @@ const answerUndo = (accept: boolean): void => {
 
 /*
  * Join/leave game room.
- * Not required if player is already in game,
- * but necessary for watchers to received game updates.
  */
-useSocketStore().joinRoom(Rooms.game(gameId));
-onUnmounted(() => useSocketStore().leaveRoom(Rooms.game(gameId)));
+watchEffect(() => {
+    if (socketStore.connected)
+        socketStore.joinRoom(Rooms.game(gameId));
+});
+onUnmounted(() => socketStore.leaveRoom(Rooms.game(gameId)));
 
 const getLocalPlayerIndex = (): number => {
 
@@ -270,15 +272,13 @@ const makeTitle = (gameClient: HostedGameClient) => {
 /*
  * Load game
  */
-const loadGame = async () => {
-    // Must reload from server when I watch a game, I am not up to date
-    // Or when I come back on a game where I did not received events, again not up to date
-    hostedGameClient.value = await lobbyStore.retrieveHostedGameClient(gameId, true);
-
-    if (!hostedGameClient.value) {
+lobbyStore.onLoaded(gameId, async gameClient => {
+    if (!gameClient) {
         router.push({ name: 'home' });
         return;
     }
+
+    hostedGameClient.value = gameClient;
 
     await initGameView();
 
@@ -298,9 +298,7 @@ const loadGame = async () => {
         description,
         ogDescription: description,
     });
-};
-
-onMounted(() => loadGame());
+});
 
 const join = () => hostedGameClient.value?.sendJoinGame();
 

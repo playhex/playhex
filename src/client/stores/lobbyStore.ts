@@ -5,11 +5,11 @@ import { defineStore } from 'pinia';
 import HostedGameClient from '@client/HostedGameClient';
 import HostedGame from '../../shared/app/models/HostedGame';
 import Player from '../../shared/app/models/Player';
-import { apiPostGame, apiPostRematch, getEndedGames, getGame, getGames } from '@client/apiClient';
+import { apiPostGame, apiPostRematch, getEndedGames, getGame } from '@client/apiClient';
 import HostedGameOptions from '../../shared/app/models/HostedGameOptions';
 import { GameTimeData } from '@shared/time-control/TimeControl';
 import useSocketStore from './socketStore';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import Rooms from '@shared/app/Rooms';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../../shared/app/HexSocketEvents';
@@ -20,7 +20,8 @@ import ChatMessage from '../../shared/app/models/ChatMessage';
  */
 const useLobbyStore = defineStore('lobbyStore', () => {
 
-    const { socket, joinRoom } = useSocketStore();
+    const socketStore = useSocketStore();
+    const { socket, joinRoom } = socketStore;
 
     /**
      * List of games.
@@ -39,27 +40,6 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         const hostedGameData = await apiPostRematch(gameId);
         hostedGameClients.value[hostedGameData.publicId] = new HostedGameClient(hostedGameData, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         return hostedGameClients.value[hostedGameData.publicId];
-    };
-
-    /**
-     * Promise of list of games loaded on app start.
-     * Can be reused.
-     */
-    const initialGamesPromise: Promise<HostedGame[]> = getGames();
-
-    /**
-     * Load and update all games from server.
-     */
-    const updateGames = async (): Promise<void> => {
-        const apiGames: HostedGame[] = await initialGamesPromise;
-
-        apiGames.forEach(hostedGame => {
-            if (hostedGameClients.value[hostedGame.publicId]) {
-                hostedGameClients.value[hostedGame.publicId].updateFromHostedGame(hostedGame);
-            } else {
-                hostedGameClients.value[hostedGame.publicId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
-            }
-        });
     };
 
     /**
@@ -114,7 +94,54 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
     };
 
+    const loadingListeners = new Map<string, Array<(client: null | HostedGameClient) => void>>();
+
+    const onLoaded = (gameId: string, callback: (client: null | HostedGameClient) => void) => {
+        let listeners = loadingListeners.get(gameId);
+        if (listeners == null) {
+            listeners = [];
+            loadingListeners.set(gameId, listeners);
+        }
+        listeners.push(callback);
+    };
+
+    const emitLoaded = (gameId: string, hostedGameClient: null | HostedGameClient) => {
+        const listeners = loadingListeners.get(gameId);
+        if (listeners == null) return;
+        loadingListeners.delete(gameId);
+        for (const callback of listeners)
+            callback(hostedGameClient);
+    };
+
     const listenSocket = (): void => {
+        socket.on('lobbyUpdate', games => {
+            for (const hostedGame of games) {
+                if (hostedGameClients.value[hostedGame.publicId]) {
+                    hostedGameClients.value[hostedGame.publicId].updateFromHostedGame(hostedGame);
+                } else {
+                    hostedGameClients.value[hostedGame.publicId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+                }
+            }
+        });
+
+        socket.on('gameUpdate', (gameId, hostedGame) => {
+            if (hostedGame == null) {
+                emitLoaded(gameId, null);
+                return;
+            }
+            let client = hostedGameClients.value[hostedGame.publicId];
+            if (client) {
+                client.updateFromHostedGame(hostedGame);
+                const game = client.getGameIfExists();
+                if (hostedGame.gameData && game)
+                    game.updateFromData(hostedGame.gameData);
+            } else {
+                client = hostedGameClients.value[hostedGame.publicId] =
+                    new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+            }
+            emitLoaded(gameId, client);
+        });
+
         socket.on('gameCreated', (hostedGame: HostedGame) => {
             hostedGameClients.value[hostedGame.publicId] = new HostedGameClient(hostedGame, socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
         });
@@ -196,17 +223,15 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     listenSocket();
 
     // Get lobby updates
-    joinRoom(Rooms.lobby);
-
-    // Load games on vue app open
-    updateGames();
+    watchEffect(() => {
+        if (socketStore.connected) joinRoom(Rooms.lobby);
+    });
 
     return {
         hostedGameClients,
-        initialGamesPromise,
         createGame,
         rematchGame,
-        updateGames,
+        onLoaded,
         retrieveHostedGameClient,
         loadMoreEndedGames,
     };
