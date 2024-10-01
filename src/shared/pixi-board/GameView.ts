@@ -1136,6 +1136,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         this.keyboardEventListener = event => {
+            if ((event.target as HTMLElement | null)?.nodeName === 'INPUT')
+                return;
             switch (event.key) {
                 case 'ArrowLeft':
                     this.changeMovesHistoryCursor(-1);
