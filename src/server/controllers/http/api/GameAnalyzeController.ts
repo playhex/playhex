@@ -1,5 +1,5 @@
 import HttpError from '../HttpError';
-import { Get, JsonController, Param, Put } from 'routing-controllers';
+import { Get, JsonController, OnUndefined, Param, Put } from 'routing-controllers';
 import { Service } from 'typedi';
 import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister';
 import HexAiApiClient from '../../../services/HexAiApiClient';
@@ -21,13 +21,14 @@ export default class GameAnalyzeController
     ) {}
 
     @Get('/api/games/:publicId/analyze')
+    @OnUndefined(404)
     async getOne(
         @Param('publicId') publicId: string,
     ) {
         const gameAnalyze = await this.gameAnalyzePersister.findByGamePublicId(publicId);
 
         if (null === gameAnalyze) {
-            throw new HttpError(404, 'Game analyze not yet processed');
+            return;
         }
 
         return gameAnalyze;

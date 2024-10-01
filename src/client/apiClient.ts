@@ -423,6 +423,10 @@ export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | Ga
         },
     });
 
+    if (404 === response.status) {
+        return null;
+    }
+
     try {
         await checkResponse(response);
     } catch (e) {
