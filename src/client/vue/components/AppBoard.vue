@@ -109,6 +109,8 @@ const rewindClose = () => {
 };
 
 const keyboardEventListener = (event: KeyboardEvent) => {
+    if ((event.target as HTMLElement | null)?.nodeName === 'INPUT')
+        return;
     switch (event.key) {
         case 'ArrowLeft':
             blinkButton(btnRewindBack);
