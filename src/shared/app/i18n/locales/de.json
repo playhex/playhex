@@ -137,7 +137,7 @@
         "help_custom": "Mathematischer Ausdruck für benutzerdefiniertes Schattierungsmuster.<br>Der Ausdruck muss eine Zahl zwischen 0 (keine Schattierung) und 1 (vollständig schattiert) für ein gegebenes Feld (Zeile, Spalte) zurückgeben. Du kannst z.B. 0,5 für dreifarbige Schattierungsmuster verwenden. Die Rückgabe von <code>true</code> oder <code>false</code> funktioniert genauso wie die Rückgabe von <code>1</code> oder <code>0</code>.<br>Verfügbare Variablen:<br>- <code>row</code> und <code>col</code> (Abkürzungen: <code>r</code> und <code>c</code>) für Zeilen- und Spaltennummer, beginnend bei 0.<br>- <code>size</code> (oder <code>s</code>) für Brettgröße.<br>- <code>distToSide</code> Entfernung der aktuellen Zelle zu ihrer nächsten Seite.<br>Sieh dir die Liste der verfügbaren Operatoren an unter https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Beispiele:<br>- Konzentrische Ringe: <code>distToSide % 2</code><br>- Dreifarbiges Schachbrettmuster: <code>((size + row - col) % 3) / 2</code><br>- Disk mit Radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Öffne die Javascript-Konsole (F12), um Fehler bei der Ausführung deines Ausdrucks zu sehen.",
         "types": {
             "tricolor_checkerboard": "Dreifarbiges Schachbrettmuster",
-            "concentrical_rings": "Konzentrische Ringe (Hexworld)",
+            "concentrical_rings": "Konzentrische Ringe (HexWorld)",
             "height_5_lines": "Höhe 5 Linien",
             "single_ring": "Einzelner Ring",
             "custom": "Benutzerdefiniert",
@@ -206,7 +206,7 @@
     },
     "swap_rule": "Tauschregel",
     "enable_swap_rule": "Tausch von Spielsteinen erlauben",
-    "toggle_coords": "Koordinaten umschalten",
+    "toggle_coords": "Anzeige der Koordinaten umschalten",
     "toggle_coords_short": "Koordinaten",
     "share_game": "Spiel teilen",
     "copied!": "Kopiert!",
@@ -223,7 +223,8 @@
         "game_analysis": "Spielanalyse durch KI",
         "requested": "Analyse angefordert…",
         "errored": "Analyse fehlgeschlagen!",
-        "best": "beste:"
+        "best": "beste:",
+        "request_analysis": "KI-Analyse anfordern"
     },
     "language": "Sprache",
     "cancel": "Abbrechen",
@@ -262,5 +263,9 @@
     "ping": {
         "date_shift_ms": "Datumsausgleich: {{ms}}ms",
         "ping_ms": "Ping: {{ms}} ms"
+    },
+    "game_state": {
+        "canceled": "Abgebrochen",
+        "created": "Erstellt"
     }
 }
