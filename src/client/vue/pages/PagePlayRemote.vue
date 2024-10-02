@@ -411,7 +411,7 @@ const createOrAcceptRematch = async (): Promise<void> => {
         }
     } else {
         hostedRematchClient = await lobbyStore.rematchGame(
-            hostedGameClient.value.getId()
+            hostedGameClient.value.getId(),
         );
     }
 

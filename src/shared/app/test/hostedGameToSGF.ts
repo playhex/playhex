@@ -11,29 +11,29 @@ describe('hostedGameToSGF', () => {
                     {
                         row: 1,
                         col: 0,
-                        playedAt: '2024-08-27T20:11:56.396Z'
+                        playedAt: '2024-08-27T20:11:56.396Z',
                     },
                     {
                         row: -1,
                         col: -1,
                         specialMoveType: 'swap-pieces',
-                        playedAt: '2024-08-27T20:11:57.428Z'
+                        playedAt: '2024-08-27T20:11:57.428Z',
                     },
                     {
                         row: 4,
                         col: 10,
-                        playedAt: '2024-08-27T20:11:58.432Z'
+                        playedAt: '2024-08-27T20:11:58.432Z',
                     },
                     {
                         row: 5,
                         col: 5,
-                        playedAt: '2024-08-27T20:11:58.951Z'
+                        playedAt: '2024-08-27T20:11:58.951Z',
                     },
                     {
                         row: 2,
                         col: 4,
-                        playedAt: '2024-08-27T20:11:59.954Z'
-                    }
+                        playedAt: '2024-08-27T20:11:59.954Z',
+                    },
                 ],
                 winner: 0,
                 outcome: 'resign',
@@ -42,7 +42,7 @@ describe('hostedGameToSGF', () => {
                 endedAt: '2024-08-27T20:12:01.162Z',
                 size: 11,
                 allowSwap: true,
-                currentPlayerIndex: 1
+                currentPlayerIndex: 1,
             },
             undoRequest: null,
             rematch: null,
@@ -56,7 +56,7 @@ describe('hostedGameToSGF', () => {
                 isBot: false,
                 slug: 'aaa',
                 createdAt: '2024-08-25T14:09:33.524Z',
-                currentRating: null
+                currentRating: null,
             },
             hostedGameToPlayers: [
                 {
@@ -73,9 +73,9 @@ describe('hostedGameToSGF', () => {
                             rating: 1266.36,
                             deviation: 68.9991,
                             volatility: 0.0601171,
-                            ratingChange: -2.1114
-                        }
-                    }
+                            ratingChange: -2.1114,
+                        },
+                    },
                 },
                 {
                     player: {
@@ -85,9 +85,9 @@ describe('hostedGameToSGF', () => {
                         isBot: false,
                         slug: 'aaa',
                         createdAt: '2024-08-25T14:09:33.524Z',
-                        currentRating: null
-                    }
-                }
+                        currentRating: null,
+                    },
+                },
             ],
             state: 'ended',
             gameOptions: {
@@ -102,24 +102,24 @@ describe('hostedGameToSGF', () => {
                     options: {
                         initialTime: 600000,
                         timeIncrement: 5000,
-                        maxTime: 600000
-                    }
-                }
+                        maxTime: 600000,
+                    },
+                },
             },
             timeControl: {
                 state: 'over',
                 currentPlayer: 1,
                 players: [
                     {
-                        totalRemainingTime: 600000
+                        totalRemainingTime: 600000,
                     },
                     {
-                        totalRemainingTime: 598792
-                    }
-                ]
+                        totalRemainingTime: 598792,
+                    },
+                ],
             },
             chatMessages: [],
-            ratings: []
+            ratings: [],
         });
 
         assert.strictEqual(
@@ -135,29 +135,29 @@ describe('hostedGameToSGF', () => {
                     {
                         row: 1,
                         col: 0,
-                        playedAt: '2024-08-27T20:11:56.396Z'
+                        playedAt: '2024-08-27T20:11:56.396Z',
                     },
                     {
                         row: -1,
                         col: -1,
                         specialMoveType: 'swap-pieces',
-                        playedAt: '2024-08-27T20:11:57.428Z'
+                        playedAt: '2024-08-27T20:11:57.428Z',
                     },
                     {
                         row: 4,
                         col: 10,
-                        playedAt: '2024-08-27T20:11:58.432Z'
+                        playedAt: '2024-08-27T20:11:58.432Z',
                     },
                     {
                         row: 5,
                         col: 5,
-                        playedAt: '2024-08-27T20:11:58.951Z'
+                        playedAt: '2024-08-27T20:11:58.951Z',
                     },
                     {
                         row: 2,
                         col: 4,
-                        playedAt: '2024-08-28T20:11:59.954Z'
-                    }
+                        playedAt: '2024-08-28T20:11:59.954Z',
+                    },
                 ],
                 winner: 0,
                 outcome: 'resign',
@@ -166,7 +166,7 @@ describe('hostedGameToSGF', () => {
                 endedAt: '2024-08-27T20:12:01.162Z',
                 size: 11,
                 allowSwap: true,
-                currentPlayerIndex: 1
+                currentPlayerIndex: 1,
             },
             undoRequest: null,
             rematch: null,
@@ -180,7 +180,7 @@ describe('hostedGameToSGF', () => {
                 isBot: false,
                 slug: 'aaa',
                 createdAt: '2024-08-25T14:09:33.524Z',
-                currentRating: null
+                currentRating: null,
             },
             hostedGameToPlayers: [
                 {
@@ -197,9 +197,9 @@ describe('hostedGameToSGF', () => {
                             rating: 1266.36,
                             deviation: 68.9991,
                             volatility: 0.0601171,
-                            ratingChange: -2.1114
-                        }
-                    }
+                            ratingChange: -2.1114,
+                        },
+                    },
                 },
                 {
                     player: {
@@ -209,9 +209,9 @@ describe('hostedGameToSGF', () => {
                         isBot: false,
                         slug: 'aaa',
                         createdAt: '2024-08-25T14:09:33.524Z',
-                        currentRating: null
-                    }
-                }
+                        currentRating: null,
+                    },
+                },
             ],
             state: 'ended',
             gameOptions: {
@@ -226,24 +226,24 @@ describe('hostedGameToSGF', () => {
                     options: {
                         initialTime: 600000,
                         timeIncrement: 5000,
-                        maxTime: 600000
-                    }
-                }
+                        maxTime: 600000,
+                    },
+                },
             },
             timeControl: {
                 state: 'over',
                 currentPlayer: 1,
                 players: [
                     {
-                        totalRemainingTime: 600000
+                        totalRemainingTime: 600000,
                     },
                     {
-                        totalRemainingTime: 598792
-                    }
-                ]
+                        totalRemainingTime: 598792,
+                    },
+                ],
             },
             chatMessages: [],
-            ratings: []
+            ratings: [],
         });
 
         assert.strictEqual(

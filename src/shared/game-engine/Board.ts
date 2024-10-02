@@ -94,6 +94,7 @@ export default class Board
                 : sideIndex
                     ? { row: i, col: z } // right
                     : { row: i, col: 0 } // left
+                ,
             )
         ;
     }
@@ -248,7 +249,7 @@ export default class Board
                 && (
                     playerIndex === undefined
                     || playerIndex === this.hexes[cell.row][cell.col]
-                )
+                ),
             )
         ;
     }

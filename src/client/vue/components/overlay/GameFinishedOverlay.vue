@@ -16,7 +16,7 @@ const props = defineProps({
     players: {
         type: Array as PropType<Player[]>,
         required: true,
-    }
+    },
 });
 
 const { players, game } = props;

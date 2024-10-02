@@ -215,7 +215,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 joinRoom(Rooms.playerGames(me.publicId));
             }
         },
-        { immediate: true }
+        { immediate: true },
     );
 
     return {

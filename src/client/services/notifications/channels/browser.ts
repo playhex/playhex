@@ -66,7 +66,7 @@ notifier.on('gameStart', (hostedGame) => {
         () => {
             router.push({
                 name: 'online-game',
-                params: { gameId: hostedGame.publicId }
+                params: { gameId: hostedGame.publicId },
             });
         },
     );
@@ -95,7 +95,7 @@ notifier.on('move', (hostedGame) => {
         () => {
             router.push({
                 name: 'online-game',
-                params: { gameId: hostedGame.publicId }
+                params: { gameId: hostedGame.publicId },
             });
         },
     );
@@ -122,7 +122,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         () => {
             router.push({
                 name: 'online-game',
-                params: { gameId: hostedGame.publicId }
+                params: { gameId: hostedGame.publicId },
             });
         },
         chatMessage.player ? pseudoString(chatMessage.player) : 'PlayHex',

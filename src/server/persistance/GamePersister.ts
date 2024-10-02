@@ -29,7 +29,7 @@ export default class GamePersister
                     publicId,
                 },
                 endedAt: Not(IsNull()),
-            }
+            },
         });
 
         if (null === data) {

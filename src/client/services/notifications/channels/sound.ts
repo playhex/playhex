@@ -29,7 +29,7 @@ notifier.on('move', (hostedGame, move) => {
 
     play('pass' === move.specialMoveType
         ? '/sounds/lisp/Check.ogg'
-        : '/sounds/lisp/Move.ogg'
+        : '/sounds/lisp/Move.ogg',
     );
 });
 

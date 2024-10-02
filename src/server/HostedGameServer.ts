@@ -141,7 +141,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         this.players.forEach(player =>
-            rooms.push(Rooms.playerGames(player.publicId))
+            rooms.push(Rooms.playerGames(player.publicId)),
         );
 
         return rooms;
@@ -767,7 +767,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         if (!(data.createdAt instanceof Date)) {
             logger.error(
                 'HostedGame.fromData(): Error while trying to recreate a HostedGame from data,'
-                + ' createdAt is not an instance of Date.'
+                + ' createdAt is not an instance of Date.',
             );
         }
 

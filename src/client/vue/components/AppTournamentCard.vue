@@ -25,7 +25,7 @@ const { name, registerLink, startDate } = props;
 const startsInStr = (): string => intlFormat(
     startDate,
     { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' },
-    { locale: autoLocale() }
+    { locale: autoLocale() },
 )
     + ' ('
     + formatDistanceToNowStrict(startDate, { addSuffix: true })

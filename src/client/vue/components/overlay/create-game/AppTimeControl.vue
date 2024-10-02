@@ -146,7 +146,7 @@ const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t
 const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t =>
     'fischer' === gameOptions.value.timeControl.type
         ? t === gameOptions.value.timeControl.options.timeIncrement
-        : t === gameOptions.value.timeControl.options.periodTime
+        : t === gameOptions.value.timeControl.options.periodTime,
 ));
 const byoyomiPeriodsCount = ref(5);
 

@@ -20,7 +20,7 @@ import { simulateTargetPseudoClassHandler } from '../../../services/simulateTarg
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
-    title: i18n.t('player_settings.title')
+    title: i18n.t('player_settings.title'),
 });
 
 updateSeoMeta();

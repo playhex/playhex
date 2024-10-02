@@ -29,5 +29,5 @@ const addSessionMiddlewares = (app: Express, io: HexServer): void => {
 };
 
 export {
-    addSessionMiddlewares
+    addSessionMiddlewares,
 };

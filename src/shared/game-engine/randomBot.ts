@@ -10,7 +10,7 @@ const rand = (game: Game, determinist: boolean): number => {
         ? seedrandom(game
             .getMovesHistory()
             .map(m => m.toString())
-            .join(' ')
+            .join(' '),
         )
         : seedrandom()
     ;

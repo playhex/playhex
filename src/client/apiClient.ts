@@ -134,7 +134,7 @@ export const authChangePassword = async (oldPassword: string, newPassword: strin
         body: JSON.stringify({
             oldPassword,
             newPassword,
-        })
+        }),
     });
 
     await checkResponse(response);

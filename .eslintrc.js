@@ -16,6 +16,7 @@ module.exports = {
     rules: {
         'no-empty': 'off',
         'object-curly-spacing': 'off',
+        'comma-dangle': ['warn', 'always-multiline'],
         '@typescript-eslint/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
         '@typescript-eslint/object-curly-spacing': ['warn', 'always'],
         '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],

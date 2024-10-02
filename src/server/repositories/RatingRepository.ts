@@ -85,7 +85,7 @@ export default class RatingRepository
             // Load players previous ratings for this category
             const ratings = await Promise.all(hostedGame
                 .hostedGameToPlayers
-                .map(async hostedGameToPlayer => this.findPlayerRating(hostedGameToPlayer.player, category))
+                .map(async hostedGameToPlayer => this.findPlayerRating(hostedGameToPlayer.player, category)),
             );
 
             // Keep previous rating to set ratingChange

@@ -78,7 +78,7 @@ if ('byoyomi' === timeControlOptions.value.type) {
 const chronoThread = setInterval(() => {
     chronoDisplay.value = toChrono(null !== byoYomiChrono
         ? byoYomiChrono.getMainValue()
-        : playerTimeData.value.totalRemainingTime
+        : playerTimeData.value.totalRemainingTime,
     );
 }, 50);
 

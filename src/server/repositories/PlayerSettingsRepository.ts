@@ -7,7 +7,7 @@ export default class PlayerSettingsRepository
 {
     constructor(
         @Inject('Repository<PlayerSettings>')
-        private playerSettingsRepository: Repository<PlayerSettings>
+        private playerSettingsRepository: Repository<PlayerSettings>,
     ) {}
 
     async getPlayerSettings(publicId: string): Promise<PlayerSettings>

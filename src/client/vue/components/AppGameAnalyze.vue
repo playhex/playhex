@@ -14,7 +14,7 @@ const props = defineProps({
         type: Object as PropType<null | GameView>,
         required: false,
         default: null,
-    }
+    },
 });
 
 const { analyze, gameView } = props;
