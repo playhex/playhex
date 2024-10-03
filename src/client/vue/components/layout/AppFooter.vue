@@ -32,7 +32,7 @@ i18next.on('languageChanged', () => {
                 <br>
                 Discord
             </a>
-            <a href="https://github.com/alcalyn/hex" target="_blank">
+            <a href="https://github.com/playhex/playhex" target="_blank">
                 <BIconGithub class="text-body" />
                 <br>
                 GitHub

@@ -53,7 +53,7 @@ This is useful to reproduce things.
 
 If you need to work with real AI (Katahex, Mohex), see:
 
-<https://github.com/alcalyn/hex-ai-distributed>
+<https://github.com/playhex/hex-ai-distributed>
 
 You can install it locally, and with Docker you don't need to compile any ai engine.
 
