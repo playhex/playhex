@@ -87,20 +87,20 @@ const playerIsFair = ref(0);
     </p>
 
     <ul>
-        <li><a href="https://github.com/alcalyn/hex" target="_blank">alcalyn/hex</a> – main repository, website, api, server, client</li>
-        <li><a href="https://github.com/alcalyn/hex-ai-distributed" target="_blank">alcalyn/hex-ai-distributed</a> – distributed AI source code, calculate AI moves with peers</li>
+        <li><a href="https://github.com/playhex/playhex" target="_blank">playhex/playhex</a> – main repository, website, api, server, client</li>
+        <li><a href="https://github.com/playhex/hex-ai-distributed" target="_blank">playhex/hex-ai-distributed</a> – distributed AI source code, calculate AI moves with peers</li>
     </ul>
 
     <p>
         If you don't know where to start,
-        follow the <a href="https://github.com/alcalyn/hex/blob/master/README.md" target="_blank">README</a>,
+        follow the <a href="https://github.com/playhex/playhex/blob/master/README.md" target="_blank">README</a>,
         try to have a running instance of PlayHex locally,
         try changing things or reproducing a bug locally,
         ask for a "easy" thing to develop,
         ask for help on how to install on Hex Discord.
     </p>
 
-    <a href="https://github.com/alcalyn/hex" class="btn btn-success" target="_blank">PlayHex on Github</a>
+    <a href="https://github.com/playhex/playhex" class="btn btn-success" target="_blank">PlayHex on Github</a>
 
     <h2>Be a fair player</h2>
 

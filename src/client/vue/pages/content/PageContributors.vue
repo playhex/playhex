@@ -53,7 +53,7 @@ apiGetContributors().then(result => contributors.value = result);
         </li>
     </ul>
 
-    <p>See <a href="https://github.com/alcalyn/hex" target="_blank">PlayHex on Github</a>.</p>
+    <p>See <a href="https://github.com/playhex/playhex" target="_blank">PlayHex on Github</a>.</p>
 
     <h2>Translators</h2>
 

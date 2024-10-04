@@ -14,7 +14,7 @@ const fetchGithubContributors = async (): Promise<GithubContributor[]> => {
         return [];
     }
 
-    const response = await fetch('https://api.github.com/repos/alcalyn/hex/contributors?per_page=100');
+    const response = await fetch('https://api.github.com/repos/playhex/playhex/contributors?per_page=100');
     const results = await response.json();
 
     type GithubResult = {

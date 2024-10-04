@@ -19,6 +19,6 @@ useSeoMeta({
 
     <p>
         See
-        <a href="https://github.com/alcalyn/hex/blob/master/LICENSE" target="_blank">the full license here</a>.
+        <a href="https://github.com/playhex/playhex/blob/master/LICENSE" target="_blank">the full license here</a>.
     </p>
 </template>

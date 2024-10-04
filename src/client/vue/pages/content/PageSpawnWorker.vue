@@ -49,7 +49,7 @@ useSeoMeta({
     </ul>
 
     <p>
-        See <a href="https://github.com/alcalyn/hex-ai-distributed" target="_blank">alcalyn/hex-ai-distributed project on Github</a>.
+        See <a href="https://github.com/playhex/hex-ai-distributed" target="_blank">playhex/hex-ai-distributed project on Github</a>.
     </p>
 
     <p>
