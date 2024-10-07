@@ -19,7 +19,7 @@ const sessionOptions: session.SessionOptions = {
     },
 };
 
-const { REDIS_URL } = process.env;
+const { REDIS_URL, REDIS_PREFIX } = process.env;
 
 if (REDIS_URL) {
     const redisClient = createClient({
@@ -30,7 +30,7 @@ if (REDIS_URL) {
 
     sessionOptions.store = new RedisStore({
         client: redisClient,
-        prefix: 'hex-session:',
+        prefix: (REDIS_PREFIX ?? 'hex') + '-session:',
     });
 }
 
