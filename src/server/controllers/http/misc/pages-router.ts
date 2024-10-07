@@ -23,6 +23,7 @@ export function pagesRouter() {
             jsonLd,
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,
+            blockRobotsIndex: 'true' === process.env.BLOCK_ROBOTS_INDEX,
         });
     });
 
