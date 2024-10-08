@@ -209,7 +209,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
      */
     updateFromHostedGame(hostedGame: HostedGame): void
     {
-        this.hostedGame = hostedGame;
+        Object.assign(this.hostedGame, hostedGame);
     }
 
     getGame(): Game
