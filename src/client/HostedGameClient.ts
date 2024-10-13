@@ -216,7 +216,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getRating(player: Player): null | Rating
     {
         return this.hostedGame.ratings
-            .find(r => r.player.publicId === player.publicId)
+            ?.find(r => r.player.publicId === player.publicId)
             ?? null
         ;
     }
