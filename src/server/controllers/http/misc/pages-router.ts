@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getManifest } from './manifest-manager';
 import { seo, jsonLd } from '../../../../shared/app/seo';
 
-export function pagesRouter() {
+export function pagesRouter(): Router {
     const router = Router();
 
     // Render main page for any routes for html5 navigation

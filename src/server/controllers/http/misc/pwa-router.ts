@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { seo } from '../../../../shared/app/seo';
 
-export function pwaRouter() {
+export function pwaRouter(): Router {
     const router = Router();
 
     router.get('/pwa-manifest.json', async (_, res) => {

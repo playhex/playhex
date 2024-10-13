@@ -40,7 +40,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private richChat: RichChat;
 
-    private lowTimeNotificationThread: null | number = null;
+    private lowTimeNotificationThread: null | NodeJS.Timeout = null;
 
     constructor(
         private hostedGame: HostedGame,

@@ -6,7 +6,7 @@ import { IS_DEV, WEBPACK_PORT } from '../../../config';
 
 /* eslint-disable */
 
-export function staticsRouter() {
+export function staticsRouter(): Router {
     const router = Router();
 
     if (IS_DEV) {

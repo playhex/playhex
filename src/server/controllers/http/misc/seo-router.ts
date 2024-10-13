@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-export function seoRouter() {
+export function seoRouter(): Router {
     const router = Router();
     const baseUrl = process.env.BASE_URL;
 

@@ -1,6 +1,7 @@
 import session from 'express-session';
 import RedisStore from 'connect-redis';
 import { createClient } from 'redis';
+import type { RequestHandler } from 'express';
 
 const { SESSION_SECRET, SESSION_HTTPS_ONLY } = process.env;
 
@@ -34,4 +35,4 @@ if (REDIS_URL) {
     });
 }
 
-export const sessionMiddleware = session(sessionOptions);
+export const sessionMiddleware: RequestHandler = session(sessionOptions);
