@@ -35,7 +35,7 @@ const shouldDisplayHexworldLink = (): boolean => {
         return true;
     }
 
-    if ('ended' === hostedGameClient.value.getState()) {
+    if (['ended', 'canceled'].includes(hostedGameClient.value.getState())) {
         return true;
     }
 
