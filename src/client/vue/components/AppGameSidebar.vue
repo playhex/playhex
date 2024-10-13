@@ -256,6 +256,13 @@ const gameId = hostedGameClient.value.getId();
 const gameAnalyze = analyzeStore.getAnalyze(gameId);
 const analyzeSummarized = ref(false);
 
+const shouldShowAnalyzeBlock = (): boolean => {
+    return hostedGameClient.value.getGame().isEnded()
+        && !hostedGameClient.value.getGame().isCanceled()
+        && hostedGameClient.value.getGame().getMovesHistory().length >= 2
+    ;
+};
+
 (async () => {
     if (hostedGameClient.value.getGame().isEnded()) {
         analyzeStore.loadAnalyze(gameId);
@@ -611,7 +618,7 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
         <!--
             Game analyze
         -->
-        <div class="sidebar-block block-analyze" v-if="isTab('main') && hostedGameClient.getGame().isEnded()">
+        <div class="sidebar-block block-analyze" v-if="isTab('main') && shouldShowAnalyzeBlock()">
             <div class="container-fluid">
 
                 <!-- Request analyze -->
