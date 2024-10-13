@@ -252,12 +252,6 @@
         "forfeit": "desclassificação",
         "time": "tempo esgotado"
     },
-    "player_won_by": {
-        "default": "{player} venceu!",
-        "time": "{player} venceu por tempo!",
-        "resign": "{player} venceu!",
-        "forfeit": "{player} venceu por desclassificação!"
-    },
     "player_wins_by": {
         "default": "{player} vence!",
         "time": "{player} vence por tempo!",

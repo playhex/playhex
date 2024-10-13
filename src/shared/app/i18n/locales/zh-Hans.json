@@ -250,12 +250,6 @@
         "forfeit": "弃权",
         "time": "超时"
     },
-    "player_won_by": {
-        "default": "{player}赢了！",
-        "time": "{player}因时间赢了！",
-        "resign": "{player}赢了！",
-        "forfeit": "{player}因弃权赢了！"
-    },
     "player_wins_by": {
         "default": "{player}获胜！",
         "time": "{player}因时间获胜！",

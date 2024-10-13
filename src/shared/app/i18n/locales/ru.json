@@ -253,12 +253,6 @@
         "forfeit": "техническое поражение",
         "time": "по времени"
     },
-    "player_won_by": {
-        "default": "{player} победил!",
-        "time": "{player} победил по времени!",
-        "resign": "{player} победил!",
-        "forfeit": "{player} победил по техническому поражению!"
-    },
     "player_wins_by": {
         "default": "{player} побеждает!",
         "time": "{player} побеждает по времени!",

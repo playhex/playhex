@@ -17,6 +17,7 @@ import { Player } from '../../../../shared/app/models';
 import AppBoard from '../../components/AppBoard.vue';
 import { CustomizedGameView } from '../../../services/CustomizedGameView';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler';
+import AppRhombus from '../../components/AppRhombus.vue';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
@@ -256,7 +257,7 @@ onUnmounted(() => {
                             <template v-for="orientation in landscapeOrientations" :key="orientation.value">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation.value" :id="'landscape-radio-' + orientation.value" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation.value">
-                                    <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
+                                    <AppRhombus :orientation="orientation.value" />
                                     <br>
                                     {{ $t(orientation.labelTransKey) }}
                                 </label>
@@ -272,7 +273,7 @@ onUnmounted(() => {
                             <template v-for="orientation in portraitOrientations" :key="orientation.value">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation.value" :id="'portrait-radio-' + orientation.value" autocomplete="off">
                                 <label class="btn" :for="'portrait-radio-' + orientation.value">
-                                    <div class="rhombus" :style="`transform: rotate(${orientation.value * 30}deg)`"></div>
+                                    <AppRhombus :orientation="orientation.value" />
                                     <br>
                                     {{ $t(orientation.labelTransKey) }}
                                 </label>
@@ -383,21 +384,6 @@ onUnmounted(() => {
 <style lang="stylus" scoped>
 h3, h4
     margin 0 0 0.5em 0
-
-.rhombus::before
-    content ''
-    display block
-    border 0.5em solid
-    border-color #dc3545 #0d6efd
-    border-radius 0.2em
-    width 2.5em
-    height 2.5em
-    transform skew(30deg)
-
-.rhombus
-    display inline-block
-    margin 1em
-    transform rotate(150deg)
 
 .board-container
     width 300px

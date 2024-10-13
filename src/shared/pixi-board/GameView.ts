@@ -14,7 +14,7 @@ const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 const PI_6 = PI / 6;
 
-type OrientationMode = 'landscape' | 'portrait';
+export type OrientationMode = 'landscape' | 'portrait';
 
 /**
  * Integer, every PI/6.
@@ -232,6 +232,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this.ready();
     }
 
+    /**
+     * When pixi app created, board drawn, and mounted with `mount()`.
+     */
     async ready(): Promise<void>
     {
         return this.initPromise.promise;

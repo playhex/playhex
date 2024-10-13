@@ -1,5 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
+import 'bootstrap/js/dist/dropdown';
 import useLobbyStore from '@client/stores/lobbyStore';
 import { ref, computed } from 'vue';
 import AppBoard from '@client/vue/components/AppBoard.vue';
@@ -12,18 +13,21 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconChatRightText, BIconChatRight, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import i18next from 'i18next';
-import { PlayerIndex } from '@shared/game-engine';
+import { Move, PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { fromEngineMove } from '../../../shared/app/models/Move';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { CustomizedGameView } from '../../services/CustomizedGameView';
+import { isMyTurn } from '../../services/notifications/context-utils';
+import { canPassAgain } from '../../../shared/app/passUtils';
+import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 
 useSeoMeta({
     robots: 'noindex',
@@ -146,7 +150,6 @@ watchEffect(() => {
 onUnmounted(() => socketStore.leaveRoom(Rooms.game(gameId)));
 
 const getLocalPlayerIndex = (): number => {
-
     if (null === loggedInPlayer.value || !hostedGameClient.value) {
         return -1;
     }
@@ -479,10 +482,44 @@ const unreadMessages = (): number => {
 const enableRewindMode = () => {
     gameView?.enableRewindMode();
 };
+
+/*
+ * Pass
+ */
+const pass = async () => {
+    if (null === hostedGameClient.value) {
+        return;
+    }
+
+    const passMove = Move.pass();
+    hostedGameClient.value.getGame().move(passMove, getLocalPlayerIndex() as PlayerIndex);
+    hostedGameClient.value.sendMove(fromEngineMove(passMove));
+};
+
+const shouldShowPass = (): boolean => {
+    if (null === hostedGameClient.value) {
+        return false;
+    }
+
+    return 'playing' === hostedGameClient.value.getState()
+        && -1 !== getLocalPlayerIndex()
+    ;
+};
+
+const shouldEnablePass = (): boolean => {
+    if (null === hostedGameClient.value) {
+        return false;
+    }
+
+    return 'playing' === hostedGameClient.value.getState()
+        && isMyTurn(hostedGameClient.value.getHostedGame())
+        && canPassAgain(hostedGameClient.value.getGame())
+    ;
+};
 </script>
 
 <template>
-    <div v-show="gameViewInitialized && null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : '')">
+    <div v-show="gameViewInitialized && null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : 'sidebar-closed')">
         <div class="game">
 
             <!-- Game board, "Accept" button -->
@@ -514,44 +551,38 @@ const enableRewindMode = () => {
                     <!-- Resign -->
                     <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">
                         <BIconFlag />
-                        <span class="d-none d-lg-inline">{{ ' ' + $t('resign') }}</span>
+                        <span class="hide-sm">{{ ' ' + $t('resign') }}</span>
                     </button>
 
                     <!-- Cancel -->
-                    <button type="button" class="btn btn-outline-primary" v-if="canCancel()" @click="cancel()">
+                    <button type="button" class="btn btn-outline-warning" v-if="canCancel()" @click="cancel()">
                         <BIconXLg />
-                        <span class="d-none d-md-inline">{{ ' ' + $t('cancel') }}</span>
+                        <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
                     </button>
 
                     <!-- Confirm move -->
                     <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()">
                         <BIconCheck />
                         <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
-                        <span class="d-none d-md-inline">{{ ' ' + $t('confirm_move.button_label') }}</span>
-                    </button>
-
-                    <!-- Undo -->
-                    <button type="button" class="btn btn-primary" v-if="shouldDisplayUndoMove()" @click="askUndo()" :disabled="shouldDisableUndoMove()" :class="{ 'btn-outline-secondary btn-disabled': shouldDisableUndoMove() }">
-                        <BIconArrowCounterclockwise />
-                        <span class="d-none d-md-inline">{{ $t('undo.undo_move') }}</span>
+                        <span class="hide-sm">{{ ' ' + $t('confirm_move.button_label') }}</span>
                     </button>
 
                     <!-- Undo accept -->
                     <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(true)">
                         <BIconCheck />
-                        <span class="d-none d-md-inline">{{ $t('undo.accept') }}</span>
+                        <span class="hide-sm">{{ $t('undo.accept') }}</span>
                     </button>
 
                     <!-- Undo reject -->
                     <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(false)">
                         <BIconX />
-                        <span class="d-none d-lg-inline">{{ $t('undo.reject') }}</span>
+                        <span class="hide-sm">{{ $t('undo.reject') }}</span>
                     </button>
 
                     <!-- Rematch -->
                     <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
                         <BIconRepeat />
-                        <span class="d-none d-md-inline">{{ ' ' + $t('rematch.label') }}</span>
+                        <span class="hide-sm">{{ ' ' + $t('rematch.label') }}</span>
                     </button>
 
                     <!-- Accept / View rematch -->
@@ -564,19 +595,56 @@ const enableRewindMode = () => {
                         </router-link>
                     </template>
 
-                    <!-- Chat -->
-                    <button type="button" class="btn btn-outline-primary position-relative" @click="showSidebar()">
-                        <BIconChatRightText v-if="hostedGameClient.getChatMessages().length > 0" />
-                        <BIconChatRight v-else />
-                        <span class="d-none d-lg-inline">{{ ' ' + $t('chat') }}</span>
-                        <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <!-- Right button, open sidebar -->
+                    <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat">
+                        <BIconArrowBarLeft />
+                        <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
                             {{ unreadMessages() }}
                             <span class="d-none">{{ ' ' + $t('unread_messages') }}</span>
                         </span>
                     </button>
 
-                    <!-- Right button, open sidebar -->
-                    <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat"><BIconArrowBarLeft /></button>
+                    <!-- Secondary actions dropup -->
+                    <div class="dropup-center dropup">
+
+                        <!-- Dropup button -->
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="true">
+                            <BIconList />
+                        </button>
+
+                        <!-- Secondary actions -->
+                        <div class="dropdown-menu">
+
+                            <!-- Undo -->
+                            <button
+                                v-if="shouldDisplayUndoMove()"
+                                type="button"
+                                class="dropdown-item"
+                                :class="!shouldDisableUndoMove() ? 'text-primary' : 'disabled'"
+                                :disabled="shouldDisableUndoMove()"
+                                @click="askUndo()"
+                            >
+                                <BIconArrowCounterclockwise />
+                                {{ $t('undo.undo_move') }}
+                            </button>
+
+                            <!-- Pass -->
+                            <button
+                                v-if="shouldShowPass()"
+                                type="button"
+                                class="dropdown-item"
+                                :class="shouldEnablePass() ? 'text-warning' : 'text-secondary disabled'"
+                                :disabled="!shouldEnablePass()"
+                                @click="pass()"
+                            >
+                                <BIconArrowDownUp />
+                                {{ $t('pass') }}
+                            </button>
+
+                            <!-- Explore -->
+                            <AppHexWorldExplore v-if="gameViewInitialized && gameView" :hostedGameClient :gameView :label="$t('explore')" class="dropdown-item" />
+                        </div>
+                    </div>
 
                 </div>
             </nav>
@@ -634,6 +702,8 @@ const enableRewindMode = () => {
 
     .sidebar
         display none
+        height calc(100vh - 3rem) // (fallback if dvh is not supported)
+        height calc(100dvh - 3rem) // 3rem = header height
 
     .open-sidebar-btn
         position absolute
@@ -648,7 +718,13 @@ sidebarOpen()
             width 50%
 
         @media (min-width: 992px)
+            width 55%
+
+        @media (min-width: 1200px)
             width 64%
+
+        @media (min-width: 1400px)
+            width 68%
 
     .sidebar
         display flex
@@ -667,7 +743,13 @@ sidebarOpen()
             width 50%
 
         @media (min-width: 992px)
+            width 45%
+
+        @media (min-width: 1200px)
             width 36%
+
+        @media (min-width: 1400px)
+            width 32%
 
     .open-sidebar-btn
         display none
@@ -678,4 +760,21 @@ sidebarOpen()
 .sidebar-auto
     @media (min-width: 576px)
         sidebarOpen()
+
+// Custom hidden when limited space:
+// hide on small screen, and medium screen when sidebar is open.
+.game-and-sidebar-container
+    &.sidebar-closed
+        .hide-sm
+            display none
+
+            @media (min-width: 576px)
+                display unset
+
+    &.sidebar-open, &.sidebar-auto
+        .hide-sm
+            display none
+
+            @media (min-width: 992px)
+                display unset
 </style>

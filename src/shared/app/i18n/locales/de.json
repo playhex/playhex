@@ -186,12 +186,6 @@
         "forfeit": "verloren",
         "time": "Zeitüberschreitung"
     },
-    "player_won_by": {
-        "time": "{player} hat auf Zeit gewonnen!",
-        "resign": "{player} hat gewonnen!",
-        "forfeit": "{player} hat durch Aufgabe gewonnen!",
-        "default": "{player} hat gewonnen!"
-    },
     "player_wins_by": {
         "time": "{player} gewinnt auf Zeit!",
         "resign": "{player} gewinnt!",

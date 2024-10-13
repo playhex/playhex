@@ -217,12 +217,6 @@
         "loss": "derrota",
         "forfeit": "renunciar"
     },
-    "player_won_by": {
-        "default": "¡{player} ganó!",
-        "time": "¡{player} ganó por tiempo!",
-        "forfeit": "¡{player} ganó por abandono!",
-        "resign": "{player} ganó!"
-    },
     "player_wins_by": {
         "default": "¡{player} gana!",
         "time": "¡{jugador} gana por tiempo!",

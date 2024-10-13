@@ -252,12 +252,6 @@
         "forfeit": "walkower",
         "time": "czas wyczerpany"
     },
-    "player_won_by": {
-        "default": "{player} wygrał!",
-        "time": "{player} wygrał na czas!",
-        "resign": "{player} wygrał!",
-        "forfeit": "{player} wygrał przez walkower!"
-    },
     "player_wins_by": {
         "default": "{player} wygrywa!",
         "time": "{player} wygrywa na czas!",

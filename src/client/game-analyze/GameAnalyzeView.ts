@@ -7,6 +7,7 @@ import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze';
 import GameView from '../../shared/pixi-board/GameView';
 import { BestMoveMark } from './BestMoveMark';
 import { PlayedMoveMark } from './PlayedMoveMark';
+import { defer } from '../../shared/app/defer';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -23,18 +24,6 @@ const rectWithNegative = (g: Graphics, x: number, y: number, width: number, heig
     }
 
     g.rect(x, y, width, height);
-};
-
-const defer = () => {
-    let resolve!: () => void;
-    let reject!: (reason: Error) => void;
-
-    const promise = new Promise<void>((res, rej) => {
-        resolve = res;
-        reject = rej;
-    });
-
-    return { promise, resolve, reject };
 };
 
 export type MoveAndValue = {
@@ -76,7 +65,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     private bestMoveMark = new BestMoveMark();
     private playedMoveMark = new PlayedMoveMark();
 
-    private initPromise = defer();
+    private initPromise = defer<void>();
 
     /**
      * Element in which this gameView should fit.

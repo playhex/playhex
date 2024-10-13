@@ -252,12 +252,6 @@
         "forfeit": "verbeuren",
         "time": "tijd overschrijding"
     },
-    "player_won_by": {
-        "default": "{player} heeft gewonnen!",
-        "time": "{player} heeft op tijd gewonnen!",
-        "resign": "{player} heeft gewonnen!",
-        "forfeit": "{player} heeft gewonnen door verbeuren!"
-    },
     "player_wins_by": {
         "default": "{player} wint!",
         "time": "{player} wint op tijd!",

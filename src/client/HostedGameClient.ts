@@ -152,6 +152,15 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGame.hostedGameToPlayers[1 - this.hostedGame.gameData.winner].player;
     }
 
+    getStrictLoserPlayer(): Player
+    {
+        if (this.hostedGame.gameData?.winner !== 0 && this.hostedGame.gameData?.winner !== 1) {
+            throw new Error('getStrictWinnerPlayer(): No winner');
+        }
+
+        return this.hostedGame.hostedGameToPlayers[1 - this.hostedGame.gameData.winner].player;
+    }
+
     hasPlayer(player: Player): boolean
     {
         return this.hostedGame.hostedGameToPlayers.some(p => p.player.publicId === player.publicId);
@@ -202,6 +211,14 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getRatings(): Rating[]
     {
         return this.hostedGame.ratings ?? [];
+    }
+
+    getRating(player: Player): null | Rating
+    {
+        return this.hostedGame.ratings
+            .find(r => r.player.publicId === player.publicId)
+            ?? null
+        ;
     }
 
     /**

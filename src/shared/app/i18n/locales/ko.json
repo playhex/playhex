@@ -251,12 +251,6 @@
         "forfeit": "몰수",
         "time": "시간 초과"
     },
-    "player_won_by": {
-        "default": "{player}가 승리했습니다!",
-        "time": "{player}가 시간 초과로 승리했습니다!",
-        "resign": "{player}가 승리했습니다!",
-        "forfeit": "{player}가 몰수승을 거두었습니다!"
-    },
     "player_wins_by": {
         "default": "{player}가 승리합니다!",
         "time": "{player}가 시간 초과로 승리합니다!",

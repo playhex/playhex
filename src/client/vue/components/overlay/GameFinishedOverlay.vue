@@ -39,7 +39,7 @@ const winner: null | Player = game.isCanceled()
                     </div>
                     <div class="modal-body text-center lead">
                         <p v-if="null !== winner">
-                            <i18next :translation="$t('player_won_by.' + (game.getOutcome() ?? 'default'))">
+                            <i18next :translation="$t('player_wins_by.' + (game.getOutcome() ?? 'default'))">
                                 <template #player>
                                     <AppPseudo
                                         :player="winner"

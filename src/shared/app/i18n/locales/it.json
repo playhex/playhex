@@ -253,12 +253,6 @@
         "forfeit": "abbandono",
         "time": "timeout"
     },
-    "player_won_by": {
-        "default": "{player} ha vinto!",
-        "time": "{player} ha vinto per tempo!",
-        "resign": "{player} ha vinto!",
-        "forfeit": "{player} ha vinto per abbandono!"
-    },
     "player_wins_by": {
         "default": "{player} vince!",
         "time": "{player} vince per tempo!",

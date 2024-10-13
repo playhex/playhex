@@ -251,12 +251,6 @@
         "forfeit": "没収",
         "time": "タイムアウト"
     },
-    "player_won_by": {
-        "default": "{player} が勝ちました！",
-        "time": "{player} が時間切れで勝ちました！",
-        "resign": "{player} が勝ちました！",
-        "forfeit": "{player} が没収勝ちしました！"
-    },
     "player_wins_by": {
         "default": "{player} の勝利！",
         "time": "{player} が時間切れで勝利！",

@@ -7,6 +7,8 @@
         "no_playing_games": "There are no games in progress right now."
     },
     "game": {
+        "title": "Game",
+        "info": "Info",
         "opponent": "Opponent",
         "host": "Host",
         "size": "Size",
@@ -21,6 +23,7 @@
         "started": "Started",
         "played": "Played",
         "finished": "Finished",
+        "duration": "Duration",
         "review": "Review",
         "won": "Won",
         "outcome": "Outcome",
@@ -31,7 +34,7 @@
         "title_waiting": "Waiting for an opponent: hosted by"
     },
     "game_rules": {
-        "normal": "normal",
+        "normal": "standard",
         "host_plays_first": "host plays first",
         "host_plays_second": "host plays second",
         "no_swap": "no swap"
@@ -78,10 +81,15 @@
     "swap_rule": "Swap rule",
     "enable_swap_rule": "Enable swap rule",
     "toggle_coords": "Toggle the display of coordinates",
-    "toggle_coords_short": "Coords",
+    "toggle_coords_short": "Toggle coordinates",
     "share_game": "Share game",
     "copied!": "Copied!",
     "not_copied": "Failed to copy, use right click or long tap",
+    "handicap": {
+        "title": "Handicap",
+        "none": "none",
+        "handicap_for_player": "{{n}} for {{player}}"
+    },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Game created by {player}, {timeAgo}.",
     "game_was_created_by_player_time_ago": "Game was created by {player}, {timeAgo}.",
@@ -138,8 +146,10 @@
     "language": "Language",
     "cancel": "Cancel",
     "pass": "Pass",
+    "explore": "Explore",
     "close": "Close",
     "ranked": "Ranked",
+    "friendly": "Friendly",
     "rating": "Rating: {{rating}}",
     "new_game": "New game",
     "players": "Players",
@@ -176,6 +186,7 @@
     "register_on_challonge": "Register on Challonge",
     "see_progression_on_challonge": "See progression on Challonge",
     "move": "move",
+    "moves": "Moves",
     "move_number": "move {{n}}",
     "chat": "Chat",
     "system": "System",
@@ -186,6 +197,7 @@
     "n_characters_other": "{{count}} characters",
     "landscape": "Landscape",
     "portrait": "Portrait",
+    "force_board_orientation_mode": "Force displaying board in landscape or portrait for this screen",
     "resign": "Resign",
     "auto": "Auto",
     "board_orientation": {
@@ -261,16 +273,16 @@
         "forfeit": "forfeit",
         "time": "timeout"
     },
-    "player_won_by": {
-        "default": "{player} won!",
-        "time": "{player} won on time!",
-        "resign": "{player} won!",
-        "forfeit": "{player} won by forfeit!"
-    },
     "player_wins_by": {
         "default": "{player} wins!",
         "time": "{player} wins on time!",
         "resign": "{player} wins!",
         "forfeit": "{player} wins by forfeit!"
+    },
+    "player_loses_reason": {
+        "default": "{player} loses.",
+        "time": "{player} times out.",
+        "resign": "{player} resigns.",
+        "forfeit": "{player} forfeits."
     }
 }

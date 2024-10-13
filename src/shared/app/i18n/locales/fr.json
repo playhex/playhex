@@ -7,6 +7,8 @@
         "no_playing_games": "Pas de partie en cours pour l'instant."
     },
     "game": {
+        "title": "Partie",
+        "info": "Infos",
         "host": "Hôte",
         "size": "Taille",
         "time_control": "Horloge",
@@ -19,6 +21,7 @@
         "played": "Jouée",
         "finished": "Terminée",
         "review": "Revoir",
+        "duration": "Durée",
         "won": "Gagnant",
         "lost": "Perdant",
         "watch": "Observer",
@@ -77,12 +80,6 @@
         "minute": "min",
         "second": "s"
     },
-    "player_won_by": {
-        "default": "{player} a gagné !",
-        "time": "{player} a gagné au temps !",
-        "resign": "{player} a gagné !",
-        "forfeit": "{player} a gagné par forfait !"
-    },
     "create_game": {
         "less_options": "Moins d'options",
         "custom_size": "Personnalisée",
@@ -91,7 +88,7 @@
     "copied!": "Copié !",
     "game_was_created_by_player_time_ago": "La partie a été créée par {player}, {timeAgo}.",
     "game_rules": {
-        "normal": "normales",
+        "normal": "standard",
         "host_plays_first": "hôte joue 1er",
         "host_plays_second": "hôte joue 2ème",
         "no_swap": "pas d'échange"
@@ -102,7 +99,7 @@
     "not_copied": "pas réussi à copier, utilisez le click droit ou appui long",
     "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}.",
     "toggle_coords": "Afficher/masquer les coordonnées",
-    "toggle_coords_short": "Coords",
+    "toggle_coords_short": "Coordonnées",
     "player_current_games": "Parties en cours",
     "no": "Non",
     "n_characters_one": "{{count}} caractère",
@@ -117,9 +114,15 @@
     },
     "player_wins_by": {
         "time": "{player} gagne au temps !",
-        "resign": "{player} a gagné !",
-        "default": "{player} a gagné !",
+        "resign": "{player} gagne !",
+        "default": "{player} gagne !",
         "forfeit": "{player} gagne par forfait !"
+    },
+    "player_loses_reason": {
+        "default": "{player} perd.",
+        "time": "{player} n'a plus de temps.",
+        "resign": "{player} abandonne.",
+        "forfeit": "{player} déclare forfait."
     },
     "1v1_ranked": {
         "title": "1c1",
@@ -143,6 +146,7 @@
     },
     "offline_game_explain": "Une partie hors-ligne se déroule uniquement sur votre appareil, vous pouvez donc jouer sans internet. Le serveur PlayHex n'est pas appelé.",
     "cancel": "Annuler",
+    "friendly": "Amicale",
     "ranked": "Classée",
     "rating": "Évaluation : {{rating}}",
     "player": "joueur",
@@ -153,6 +157,7 @@
     "send_chat_message": "Envoyer",
     "landscape": "Paysage",
     "portrait": "Portrait",
+    "force_board_orientation_mode": "Forcer l'affichage en paysage ou portrait pour cet écran",
     "game_analysis": {
         "best_move": "meilleur coup",
         "best": "meilleur :",
@@ -172,7 +177,13 @@
     "loading_game": "Chargement de la partie…",
     "register_on_challonge": "S'enregistrer sur Challonge",
     "move": "coup",
+    "moves": "Coups",
     "move_number": "coup {{n}}",
+    "handicap": {
+        "title": "Handicap",
+        "none": "aucun",
+        "handicap_for_player": "{{n}} pour {{player}}"
+    },
     "chat": "Tchat",
     "system": "Système",
     "resign": "Abandonner",
@@ -268,6 +279,7 @@
         "reject": "Refuser"
     },
     "pass": "Passer",
+    "explore": "Explorer",
     "game_state": {
         "canceled": "Annulée",
         "ended": "Terminée",
