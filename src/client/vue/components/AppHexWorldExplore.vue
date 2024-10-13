@@ -31,6 +31,10 @@ const shouldDisplayHexworldLink = (): boolean => {
         return true;
     }
 
+    if (!hostedGameClient.value.isRanked()) {
+        return true;
+    }
+
     if ('ended' === hostedGameClient.value.getState()) {
         return true;
     }
