@@ -95,35 +95,32 @@ abstract class AbstractChatHeaderGenerator
  */
 class DateHeader extends AbstractChatHeaderGenerator
 {
-    private lastDate: string;
+    private currentDate: Date;
 
     override init(): void
     {
-        this.lastDate = this.toLocalDate(this.hostedGame.gameData?.startedAt ?? this.hostedGame.createdAt);
+        this.currentDate = this.hostedGame.gameData?.startedAt ?? this.hostedGame.createdAt;
     }
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        const currentDate = this.toLocalDate(chatMessage.createdAt);
-
-        if (currentDate === this.lastDate) {
+        if (this.isSameDay(chatMessage.createdAt)) {
             return [];
         }
 
-        this.lastDate = currentDate;
+        this.currentDate = chatMessage.createdAt;
 
         return [
-            { type: 'date', date: new Date(currentDate) },
+            { type: 'date', date: this.currentDate },
         ];
     }
 
-    /**
-     * Returns date of a js date, i.e "2024-08-24",
-     * in current timezone.
-     */
-    private toLocalDate(date: Date): string
+    private isSameDay(date: Date): boolean
     {
-        return date.toLocaleDateString('sv');
+        return date.getFullYear() === this.currentDate.getFullYear()
+            && date.getMonth() === this.currentDate.getMonth()
+            && date.getDate() === this.currentDate.getDate()
+        ;
     }
 }
 
