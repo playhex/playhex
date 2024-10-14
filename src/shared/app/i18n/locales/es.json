@@ -27,7 +27,10 @@
         "created": "Creada",
         "playing": "Jugando",
         "title_waiting": "A la espera de un adversario: organizado por",
-        "title_your_turn": "¡Tu turno!"
+        "title_your_turn": "¡Tu turno!",
+        "title": "Juego",
+        "info": "Información",
+        "duration": "Duración"
     },
     "game_rules": {
         "host_plays_first": "El anfitrión juega primero",
