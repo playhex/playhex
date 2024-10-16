@@ -1,11 +1,21 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class-transformer-custom';
 
 const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 
+export type DarkOrLight = 'dark' | 'light';
+export type SelectedTheme = DarkOrLight | 'auto';
+
 export class LocalSettings
 {
+    /**
+     * Dark or light theme.
+     * "auto" for system theme.
+     */
+    @Expose()
+    selectedTheme: SelectedTheme = 'auto';
+
     /**
      * Selected board orientation.
      *
@@ -62,8 +72,45 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
         localSettings.value.openSidebar = undefined;
     }
 
+    /*
+     * Dark/light theme
+     */
+    const displayedTheme = (): DarkOrLight => {
+        if ('auto' !== localSettings.value.selectedTheme) {
+            return localSettings.value.selectedTheme;
+        }
+
+        return getSystemPreferredTheme();
+    };
+
+    const getSystemPreferredTheme = (): DarkOrLight => window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+    ;
+
+    const switchTheme = (): void => {
+        localSettings.value.selectedTheme = displayedTheme() === 'light'
+            ? 'dark'
+            : 'light'
+        ;
+    };
+
+    // TODO remove this later, when most players have migrated their theme setting in local storage to prevent losing their selected theme
+    const storedTheme = localStorage?.getItem('selectedTheme');
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+        localSettings.value.selectedTheme = storedTheme;
+    }
+
+    watchEffect(() => {
+        localStorage?.setItem('selectedTheme', localSettings.value.selectedTheme);
+        document.documentElement.setAttribute('data-bs-theme', displayedTheme());
+    });
+
     return {
         localSettings,
+
+        switchTheme,
+        displayedTheme,
     };
 
 });

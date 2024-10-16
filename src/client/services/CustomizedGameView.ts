@@ -1,6 +1,5 @@
 import { Game } from '../../shared/game-engine';
 import GameView from '../../shared/pixi-board/GameView';
-import useDarkLightThemeStore, { DarkOrLight } from '../../client/stores/darkLightThemeStore';
 import usePlayerSettingsStore from '../../client/stores/playerSettingsStore';
 import usePlayerLocalSettingsStore, { LocalSettings } from '../../client/stores/playerLocalSettingsStore';
 import { watch, WatchStopHandle } from 'vue';
@@ -13,13 +12,6 @@ import { PlayerSettings } from '../../shared/app/models';
  */
 export class CustomizedGameView extends GameView
 {
-    /**
-     * TODO after moving dark/light store in local settings, remove this
-     */
-    private themeSwitchedListener = (theme: DarkOrLight) => {
-        this.setTheme(themes[theme]);
-    };
-
     private playerSettingsChangedListener = (playerSettings: PlayerSettings) => {
         this.updateOptionsFromPlayerSettings(playerSettings);
     };
@@ -28,7 +20,6 @@ export class CustomizedGameView extends GameView
         this.updateOptionsFromPlayerLocalSettings(localSettings);
     };
 
-    private unwatchThemeSwitchedListener: WatchStopHandle;
     private unwatchSettingsChangedListener: WatchStopHandle;
     private unwatchLocalSettingsChangedListener: WatchStopHandle;
 
@@ -52,12 +43,6 @@ export class CustomizedGameView extends GameView
         }
 
         this.unwatchSettingsChangedListener = watch(() => usePlayerSettingsStore().playerSettings, this.playerSettingsChangedListener, { deep: true });
-
-        /*
-         * Set dark/light theme, and when it changes.
-         */
-        this.setTheme(themes[useDarkLightThemeStore().displayedTheme()]);
-        this.unwatchThemeSwitchedListener = watch(useDarkLightThemeStore().displayedTheme, this.themeSwitchedListener);
 
         /*
          * Set local settings and update when it changes.
@@ -85,6 +70,7 @@ export class CustomizedGameView extends GameView
     {
         this.updateOptions({
             selectedBoardOrientationMode: localSettings.selectedBoardOrientation,
+            theme: themes[usePlayerLocalSettingsStore().displayedTheme()],
         });
     }
 
@@ -92,7 +78,6 @@ export class CustomizedGameView extends GameView
     {
         super.destroy();
 
-        this.unwatchThemeSwitchedListener();
         this.unwatchSettingsChangedListener();
         this.unwatchLocalSettingsChangedListener();
     }

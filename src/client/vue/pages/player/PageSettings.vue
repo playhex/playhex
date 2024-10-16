@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot } from 'bootstrap-icons-vue';
-import useDarkLightThemeStore from '../../../stores/darkLightThemeStore';
+import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
 import useAuthStore from '../../../stores/authStore';
@@ -30,7 +30,7 @@ i18n.on('languageChanged', () => updateSeoMeta());
 const playerSettingsStore = usePlayerSettingsStore();
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
-const { selectedTheme } = storeToRefs(useDarkLightThemeStore());
+const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 const { playerSettings } = storeToRefs(playerSettingsStore);
 
 // Auto save when any setting changed
@@ -175,13 +175,13 @@ onUnmounted(() => {
             <h3>{{ $t('background_theme.title') }}</h3>
 
             <div class="btn-group" role="group" aria-label="Dark or light theme switcher">
-                <input type="radio" class="btn-check" v-model="selectedTheme" value="light" id="btn-theme-light" autocomplete="off">
+                <input type="radio" class="btn-check" v-model="localSettings.selectedTheme" value="light" id="btn-theme-light" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btn-theme-light"><BIconBrightnessHighFill /> {{ $t('background_theme.light') }}</label>
 
-                <input type="radio" class="btn-check" v-model="selectedTheme" value="dark" id="btn-theme-dark" autocomplete="off">
+                <input type="radio" class="btn-check" v-model="localSettings.selectedTheme" value="dark" id="btn-theme-dark" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btn-theme-dark"><BIconMoonStarsFill /> {{ $t('background_theme.dark') }}</label>
 
-                <input type="radio" class="btn-check" v-model="selectedTheme" value="auto" id="btn-theme-auto" autocomplete="off">
+                <input type="radio" class="btn-check" v-model="localSettings.selectedTheme" value="auto" id="btn-theme-auto" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> {{ $t('auto') }}</label>
             </div>
         </div>
