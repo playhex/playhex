@@ -11,7 +11,6 @@ export function pwaRouter(): Router {
             name: seo.title,
             description: seo.description,
             lang: 'en',
-            orientation: 'any',
             start_url: '/',
             theme_color: '#DC3545',
             background_color: '#212529',
