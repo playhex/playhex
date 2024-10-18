@@ -1,1 +1,6 @@
-{}
+{
+    "lobby_title": "Lobi",
+    "lobby": {
+        "no_waiting_games": "Tidak ada permainan yang tersedia. Buat yang baru!"
+    }
+}
