@@ -274,7 +274,7 @@
     "player_loses_reason": {
         "resign": "{player} renuncia.",
         "default": "{player} pierde(n).",
-        "time": "{player} se ha acabado.",
+        "time": "{player} perdió por tiempo agotado.",
         "forfeit": "{player} pierde."
     },
     "handicap": {
