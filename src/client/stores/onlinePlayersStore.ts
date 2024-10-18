@@ -39,16 +39,6 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         }
     });
 
-    socket.on('ratingsUpdated', (gameId, ratings) => {
-        for (const rating of ratings) {
-            const player = players.value[rating.player.publicId];
-
-            if (player) {
-                player.currentRating = rating;
-            }
-        }
-    });
-
     socket.on('onlinePlayersUpdate', onlinePlayers => {
         totalPlayers.value = onlinePlayers.totalPlayers;
         players.value = onlinePlayers.players;

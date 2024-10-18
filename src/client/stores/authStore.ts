@@ -3,10 +3,12 @@ import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from 
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import useSocketStore from './socketStore';
+import usePlayersStore from './playersStore';
 
 const useAuthStore = defineStore('authStore', () => {
 
     const { socket } = useSocketStore();
+    const { playerRef } = usePlayersStore();
 
     /**
      * Current logged in player
@@ -16,7 +18,7 @@ const useAuthStore = defineStore('authStore', () => {
     (async () => {
         try {
             const player = await authMeOrSignupGuest();
-            loggedInPlayer.value = player;
+            loggedInPlayer.value = playerRef(player);
         } catch (e) {
             // seems offline
         }

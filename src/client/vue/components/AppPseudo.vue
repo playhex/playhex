@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import Player from '../../../shared/app/models/Player';
-import { PropType, toRefs } from 'vue';
+import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
-import { createInitialRating, isRatingConfident } from '../../../shared/app/ratingUtils';
-import { Rating } from '../../../shared/app/models';
+import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils';
+import usePlayersStore from '../../stores/playersStore';
 
 const props = defineProps({
     player: {
@@ -40,22 +40,20 @@ const props = defineProps({
     },
 });
 
-const { player, is, classes, onlineStatus, rating } = toRefs(props);
 const { round } = Math;
-
-const currentRating = (): Rating => player.value.currentRating ?? createInitialRating(player.value);
+const p = usePlayersStore().playerRef(props.player);
 </script>
 
 <template>
-    <AppOnlineStatus v-if="onlineStatus" :player="player" />
+    <AppOnlineStatus v-if="onlineStatus" :player="p" />
 
     <RouterLink
-        :to="player.slug ? { name: 'player', params: { slug: player.slug } } : ''"
+        :to="p.slug ? { name: 'player', params: { slug: p.slug } } : ''"
         class="text-body text-decoration-none"
     >
         <component :is="is" :class="classes">
-            <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
-            <span>{{ player.pseudo }}</span>
+            <span v-if="p.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
+            <span>{{ p.pseudo }}</span>
         </component>
 
         <template v-if="rating">
@@ -64,10 +62,10 @@ const currentRating = (): Rating => player.value.currentRating ?? createInitialR
 
             <small class="text-body-secondary ms-2 d-inline-block">
                 <template v-if="'full' === rating">
-                    {{ round(currentRating().rating) }} ±{{ round(currentRating().deviation * 2) }}
+                    {{ round(p.currentRating?.rating ?? glicko2Settings.rating) }} ±{{ round((p.currentRating?.deviation ?? glicko2Settings.rd) * 2) }}
                 </template>
                 <template v-else>
-                    <template v-if="!isRatingConfident(currentRating())">~</template>{{ round(currentRating().rating) }}
+                    <template v-if="p.currentRating ? !isRatingConfident(p.currentRating) : true">~</template>{{ round(p.currentRating?.rating ?? glicko2Settings.rating) }}
                 </template>
             </small>
         </template>
