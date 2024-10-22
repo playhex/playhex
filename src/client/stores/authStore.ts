@@ -18,22 +18,22 @@ const useAuthStore = defineStore('authStore', () => {
     (async () => {
         try {
             const player = await authMeOrSignupGuest();
-            loggedInPlayer.value = playerRef(player);
+            loggedInPlayer.value = playerRef(player, true);
         } catch (e) {
             // seems offline
         }
     })();
 
     const login = async (pseudo: string, password: string): Promise<Player> => {
-        return loggedInPlayer.value = await authLogin(pseudo, password);
+        return loggedInPlayer.value = playerRef(await authLogin(pseudo, password), true);
     };
 
     const signup = async (pseudo: string, password: string): Promise<Player> => {
-        return loggedInPlayer.value = await authSignupFromGuest(pseudo, password);
+        return loggedInPlayer.value = playerRef(await authSignupFromGuest(pseudo, password), true);
     };
 
     const logout = async (): Promise<Player> => {
-        return loggedInPlayer.value = await authLogout();
+        return loggedInPlayer.value = playerRef(await authLogout(), true);
     };
 
     socket.on('ratingsUpdated', (gameId, ratings) => {
@@ -42,6 +42,10 @@ const useAuthStore = defineStore('authStore', () => {
         }
 
         for (const rating of ratings) {
+            if ('overall' !== rating.category) {
+                continue;
+            }
+
             if (rating.player.publicId === loggedInPlayer.value.publicId) {
                 loggedInPlayer.value.currentRating = rating;
             }

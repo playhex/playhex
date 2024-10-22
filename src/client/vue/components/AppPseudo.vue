@@ -5,6 +5,8 @@ import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
 import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils';
 import usePlayersStore from '../../stores/playersStore';
+import { ref } from 'vue';
+import { watchEffect } from 'vue';
 
 const props = defineProps({
     player: {
@@ -41,7 +43,10 @@ const props = defineProps({
 });
 
 const { round } = Math;
-const p = usePlayersStore().playerRef(props.player);
+const p = ref();
+watchEffect(() => {
+    p.value = usePlayersStore().playerRef(props.player);
+});
 </script>
 
 <template>

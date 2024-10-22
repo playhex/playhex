@@ -15,7 +15,7 @@ const usePlayersStore = defineStore('playerstore', () => {
 
     const players: { [publicId: string]: Reactive<Player> } = {};
 
-    const playerRef = (player: Player): Reactive<Player> => {
+    const playerRef = (player: Player, update = false): Reactive<Player> => {
         const { publicId } = player;
 
         if (!players[publicId]) {
@@ -24,6 +24,8 @@ const usePlayersStore = defineStore('playerstore', () => {
             if (!players[publicId].currentRating) {
                 players[publicId].currentRating = createInitialRating(players[publicId]);
             }
+        } else if (update) {
+            Object.assign(players[publicId], player);
         }
 
         return players[publicId];
