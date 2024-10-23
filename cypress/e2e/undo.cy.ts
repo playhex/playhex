@@ -1,10 +1,12 @@
 describe('Undo', () => {
 
     it('allows to accept or reject opponent undo request', () => {
+        cy.mockSocketIO();
         cy.intercept('/api/auth/me-or-guest', { fixture: 'undo/me.json' });
-        cy.intercept('/api/games/09d21b8a-814c-4a57-877c-46e0044641c0', { fixture: 'undo/game-with-undo-request.json' });
 
         cy.visit('/games/09d21b8a-814c-4a57-877c-46e0044641c0');
+
+        cy.receiveGameUpdate('undo/game-with-undo-request.json');
 
         cy.contains('.sidebar', 'Playing');
 
@@ -34,7 +36,8 @@ describe('Undo', () => {
 
         cy.wait(50); // Wait AI plays
 
-        cy.contains('Undo').click();
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Takeback').click();
 
         cy.wait(500); // Wait to make sure cypress capture js error and fail if any
     });
@@ -61,7 +64,8 @@ describe('Undo', () => {
 
         cy.wait(50); // Wait AI plays
 
-        cy.contains('Undo').click();
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Takeback').click();
 
         cy.wait(500); // Wait to make sure cypress capture js error and fail if any
     });

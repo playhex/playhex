@@ -2,7 +2,7 @@
     {
         "publicId": "549737f7-5a70-453a-b227-abb4f7906138",
         "host": {
-            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "afb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player A",
             "slug": "slug",
             "isGuest": false,
@@ -11,7 +11,7 @@
         "hostedGameToPlayers": [
             {
                 "player": {
-                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "afb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player A",
                     "slug": "slug",
                     "isGuest": false,
@@ -143,7 +143,7 @@
     {
         "publicId": "969653f0-b874-404f-9b1b-6d3e66b52880",
         "host": {
-            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "ffb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player waiting",
             "slug": "slug",
             "isGuest": false,
@@ -152,7 +152,7 @@
         "hostedGameToPlayers": [
             {
                 "player": {
-                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "ffb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player waiting",
                     "slug": "slug",
                     "isGuest": false,
@@ -195,7 +195,7 @@
     {
         "publicId": "e212910d-9422-482d-97e1-b4d1c60516ed",
         "host": {
-            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "cfb0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Player C",
             "slug": "slug",
             "isGuest": false,
@@ -204,7 +204,7 @@
         "hostedGameToPlayers": [
             {
                 "player": {
-                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "cfb0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Player C",
                     "slug": "slug",
                     "isGuest": false,
@@ -371,7 +371,7 @@
     {
         "publicId": "c35d5279-ae07-4615-bacf-7b90ead71d71",
         "host": {
-            "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "publicId": "cab0bb91-60af-468b-b470-4fa10dfadfc4",
             "pseudo": "Cancel A",
             "slug": "slug",
             "isGuest": false,
@@ -389,7 +389,7 @@
             },
             {
                 "player": {
-                    "publicId": "2fb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "publicId": "cab0bb91-60af-468b-b470-4fa10dfadfc4",
                     "pseudo": "Cancel A",
                     "slug": "slug",
                     "isGuest": false,

@@ -608,7 +608,7 @@ const shouldEnablePass = (): boolean => {
                     <div class="dropup-center dropup">
 
                         <!-- Dropup button -->
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="true">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Secondary actions" aria-expanded="false" data-bs-auto-close="true">
                             <BIconList />
                         </button>
 

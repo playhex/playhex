@@ -5,8 +5,17 @@ import { defineStore } from 'pinia';
 import useAuthStore from './authStore';
 import { watch, ref } from 'vue';
 
+/**
+ * Use global io if overriden, else use normal io.
+ * Used for functionnal tests, to allow using a mocked io.
+ */
+const getIo = (): typeof io => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ((window as any).io ?? io);
+};
+
 const useSocketStore = defineStore('socketStore', () => {
-    const socket: Socket<HexServerToClientEvents, HexClientToServerEvents> = io({
+    const socket: Socket<HexServerToClientEvents, HexClientToServerEvents> = getIo()({
         parser: CustomParser,
         autoConnect: false, // connect once player is logged in at least as guest
     });

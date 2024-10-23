@@ -182,12 +182,12 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
             // I'm not in the game
             if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
-                return;
+                continue;
             }
 
             // Game finished
             if ('ended' === hostedGame.state) {
-                return;
+                continue;
             }
 
             let isMyTurn = false;

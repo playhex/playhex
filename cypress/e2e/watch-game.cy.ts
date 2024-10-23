@@ -1,12 +1,12 @@
 describe('Watch game', () => {
     it('displays game, I have no current game', () => {
-        cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'watch-game/game-running.json',
-        });
+        cy.mockSocketIO();
 
-        cy.visit('/games/00000000-0000-0000-0000-000000000000');
+        cy.visit('/games/280fa373-affd-46bd-b2cd-b2cb4578bc94');
 
-        cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
+        cy.contains('Loading game…');
+        cy.receiveGameUpdate('watch-game/game-running.json');
+        cy.contains('Loading game…').should('not.exist');
 
         cy.contains('Player A');
         cy.contains('Player B');

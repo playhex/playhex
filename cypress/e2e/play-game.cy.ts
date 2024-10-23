@@ -48,13 +48,13 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.play(339, 284);
-        cy.play(336, 382);
-        cy.play(254, 236);
-        cy.play(420, 427);
+        cy.play(236, 308);
+        cy.play(321, 355);
+        cy.play(399, 305);
+        cy.play(153, 259);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ won!/);
+        cy.contains(/Guest \d+ wins!/);
     });
 
     it('loses vs cpu on board size 4', () => {
@@ -67,17 +67,15 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.play(184, 375);
-        cy.play(165, 381);
-        cy.play(77, 328);
-        cy.play(336, 185);
-        cy.play(585, 333);
-        cy.play(254, 236);
-        cy.play(251, 329);
-        cy.play(503, 282);
+        cy.play(156, 355);
+        cy.play(236, 303);
+        cy.play(233, 404);
+        cy.play(321, 450);
+        cy.play(233, 214);
+        cy.play(316, 164);
 
         cy.contains('Game finished');
-        cy.contains('Determinist random bot won!');
+        cy.contains('Determinist random bot wins!');
     });
 
     it('uses swap rule and wins on board size 4', () => {
@@ -90,12 +88,12 @@ describe('Play a game to the end', () => {
 
         cy.submitAIGame();
 
-        cy.play(334, 189);
-        cy.play(339, 382);
-        cy.play(423, 336);
-        cy.play(423, 231);
+        cy.play(154, 256);
+        cy.play(316, 261);
+        cy.play(319, 352);
+        cy.play(236, 217);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ won!/);
+        cy.contains(/Guest \d+ wins!/);
     });
 });

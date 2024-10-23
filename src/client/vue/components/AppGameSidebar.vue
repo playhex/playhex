@@ -113,6 +113,14 @@ const sendChat = () => {
 
 onMounted(() => scrollChatToBottom());
 
+const isChatMessage = (object: unknown): object is ChatMessage => {
+    if ('object' !== typeof object || !object) {
+        return false;
+    }
+
+    return 'ChatMessage' === object.constructor.name;
+};
+
 /*
  * SGF download
  */
@@ -678,9 +686,9 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
                             v-for="message, key in hostedGameClient.getRichChatMessages()"
                             :key
                             class="chat-message"
-                            :class="(message instanceof ChatMessage) ? '' : `chat-header chat-header-${message.type}`"
+                            :class="isChatMessage(message) ? '' : `chat-header chat-header-${message.type}`"
                         >
-                            <template v-if="(message instanceof ChatMessage)">
+                            <template v-if="isChatMessage(message)">
                                 <small class="time text-secondary">{{ formatHour(message.createdAt) }}</small>
                                 <span>&nbsp;</span>
                                 <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>

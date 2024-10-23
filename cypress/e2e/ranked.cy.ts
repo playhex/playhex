@@ -46,32 +46,33 @@ describe('Ranked games', () => {
         cy.contains('.sidebar', 'Ranked');
 
         // Must play diagonal line to win both as red or blue because we can't choose our color on ranked games
-        cy.play(322, 436);
-        cy.play(322, 367);
-        cy.play(323, 233);
-        cy.play(323, 264);
-        cy.play(322, 397);
-        cy.play(323, 299);
-        cy.play(321, 337);
-        cy.play(321, 466);
-        cy.play(321, 503);
-        cy.play(325, 166);
-        cy.play(323, 196);
+        cy.play(217, 297);
+        cy.play(247, 314);
+        cy.play(189, 278);
+        cy.play(159, 266);
+        cy.play(127, 245);
+        cy.play(275, 332);
+        cy.play(307, 347);
+        cy.play(335, 363);
+        cy.play(365, 382);
+        cy.play(393, 398);
+        cy.play(425, 417);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ won!/);
+        cy.contains(/Guest \d+ wins!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
-        cy.contains('.sidebar', /Determinist random bot \d+/).closest('div');
-        cy.contains('.sidebar', /Guest \d+ \d+/).closest('div');
+        cy.contains('.sidebar', /Determinist random bot loses. \d+/).closest('div');
+        cy.contains('.sidebar', /Guest \d+ wins! \d+/).closest('div');
     });
 
     it('displays my game as a ranked one on the lobby', () => {
-        cy.intercept('/api/games', { fixture: 'ranked/games.json' });
-        cy.intercept('/api/online-players', { fixture: 'ranked/online-players.json' });
+        cy.mockSocketIO();
 
         cy.visit('/');
+
+        cy.receiveLobbyUpdate('ranked/games.json');
 
         cy
             // Waiting games
@@ -93,9 +94,11 @@ describe('Ranked games', () => {
     });
 
     it('displays rankings of online players', () => {
-        cy.intercept('/api/online-players', { fixture: 'ranked/online-players.json' });
+        cy.mockSocketIO();
 
         cy.visit('/');
+
+        cy.receiveOnlinePlayersUpdate('ranked/online-players.json');
 
         cy.contains('Guest 2943 ~1662');
     });

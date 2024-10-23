@@ -17,13 +17,12 @@ describe('Chat', () => {
     });
 
     it('shows previous chat message on game page load', () => {
-        cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'chat/game-playing.json',
-        });
-
+        cy.mockSocketIO();
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
 
-        cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
+        cy.contains('Loading game…');
+        cy.receiveGameUpdate('chat/game-playing.json');
+        cy.contains('Loading game…').should('not.exist');
 
         cy.contains(/\d+:48 Guest 7614 Hello, I am a watcher/);
         cy.contains(/\d+:48 Guest 6569 Hi, I am your opponent, ready \?/);
@@ -39,16 +38,16 @@ describe('Chat', () => {
     });
 
     it('shows chat message length limit when I am about to reach it, instead of crashing when sending a too long message', () => {
-        cy.intercept('/api/games/00000000-0000-0000-0000-000000000000', {
-            fixture: 'game/game-playing.json',
-        });
+        cy.mockSocketIO();
         cy.intercept('/api/auth/me-or-guest', {
             fixture: 'game/me-or-guest.json',
         });
 
         cy.visit('/games/00000000-0000-0000-0000-000000000000');
 
-        cy.contains('Loading game 00000000-0000-0000-0000-000000000000…').should('not.exist');
+        cy.contains('Loading game…');
+        cy.receiveGameUpdate('chat/game-playing.json');
+        cy.contains('Loading game…').should('not.exist');
 
         cy.contains(/\d+ \/ 250 characters/).should('not.exist');
         cy.get('.chat-input input').click().type('I am writing a message too long, Quod natus vitae soluta officia. Laboriosam assumenda velit quasi et laboriosam magnam occaecati. Et similique aspernatur rerum est ipsa. Aut at ut itaque. Odio sed non qui aut minima sed vel. Deleniti illo dolorum', { timeout: 10000 });
