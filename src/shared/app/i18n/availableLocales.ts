@@ -55,6 +55,7 @@ export const availableLocales: AvailableLocales = {
         translators: [
             { fullName: 'gallegonovato', link: 'https://hosted.weblate.org/user/gallegonovato/' },
             { fullName: 'Guille', link: 'https://hosted.weblate.org/user/guillevg/' },
+            { fullName: '2swap', link: 'http://localhost:3000/@2swap' },
         ],
     },
     fr: {
@@ -62,6 +63,13 @@ export const availableLocales: AvailableLocales = {
         loader: () => import(/* webpackChunkName: "locale-fr" */ 'date-fns/locale/fr') as unknown as DefaultExportLocale,
         translators: [
             { fullName: 'Julien Maulny', link: 'https://playhex.org/@alcalyn' },
+        ],
+    },
+    id: {
+        label: '🇮🇩 Indonesia (Indonesian)',
+        loader: () => import(/* webpackChunkName: "locale-id" */ 'date-fns/locale/id') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: '2swap', link: 'http://localhost:3000/@2swap' },
         ],
     },
     it: {
