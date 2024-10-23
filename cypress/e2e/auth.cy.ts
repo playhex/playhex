@@ -396,4 +396,110 @@ describe('Authentication', () => {
             }
         });
     });
+
+    it('should not create account if nickname already taken', () => {
+        cy.visit('/');
+
+        const pseudo = 'test-' + randomString();
+        const password = 'test-password';
+
+        // Show guest profile page
+        cy
+            .get('.menu-top')
+            .contains(/Guest \d+/)
+            .click()
+        ;
+
+        cy.contains('h2', /Guest \d+/);
+
+        // Create account
+        cy
+            .contains('Create an account')
+            .click()
+        ;
+
+        cy
+            .contains('h2', 'Create an account')
+            .closest('form')
+            .contains('Username')
+            .click()
+            .type(pseudo)
+        ;
+
+        cy
+            .contains('h2', 'Create an account')
+            .closest('form')
+            .contains('Password')
+            .click()
+            .type(password)
+        ;
+
+        cy
+            .contains('Sign up')
+            .click()
+        ;
+
+        // Account created, logged in. Show profile page
+        cy
+            .get('.menu-top')
+            .contains(pseudo)
+            .click()
+        ;
+
+        cy.contains('h2', pseudo);
+
+        // Logout
+        cy
+            .contains('Log out')
+            .click()
+        ;
+
+        cy
+            .get('.menu-top')
+            .contains(/Guest \d+/)
+            .click()
+        ;
+
+        cy.contains('h2', /Guest \d+/);
+
+        // Create account with same nickname
+        cy
+            .contains('Create an account')
+            .click()
+        ;
+
+        cy
+            .contains('h2', 'Create an account')
+            .closest('form')
+            .contains('Username')
+            .click()
+            .type(pseudo)
+        ;
+
+        cy
+            .contains('h2', 'Create an account')
+            .closest('form')
+            .contains('Password')
+            .click()
+            .type(randomString())
+        ;
+
+        cy
+            .contains('Sign up')
+            .click()
+        ;
+
+        cy.contains('This username is already used by another player');
+
+        cy.reload();
+
+        // Should not be logged as test user, but still as guest
+        cy
+            .get('.menu-top')
+            .contains(/Guest \d+/)
+            .click()
+        ;
+
+        cy.contains('h2', /Guest \d+/);
+    });
 });

@@ -156,14 +156,18 @@ export default class PlayerRepository
             throw new MustBeGuestError();
         }
 
-        player.isGuest = false;
-        player.pseudo = pseudo;
-        player.slug = pseudoSlug(pseudo);
-        player.password = await hashPassword(password);
-        player.createdAt = new Date();
+        // Do not mutate current in-memory player until upgraded successfully
+        const upgradedPlayer = new Player();
+        Object.assign(upgradedPlayer, player);
+
+        upgradedPlayer.isGuest = false;
+        upgradedPlayer.pseudo = pseudo;
+        upgradedPlayer.slug = pseudoSlug(pseudo);
+        upgradedPlayer.password = await hashPassword(password);
+        upgradedPlayer.createdAt = new Date();
 
         try {
-            return this.playersCache[publicId] = await this.playerRepository.save(player);
+            return this.playersCache[publicId] = await this.playerRepository.save(upgradedPlayer);
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
