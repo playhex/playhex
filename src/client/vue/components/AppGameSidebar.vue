@@ -114,11 +114,7 @@ const sendChat = () => {
 onMounted(() => scrollChatToBottom());
 
 const isChatMessage = (object: unknown): object is ChatMessage => {
-    if ('object' !== typeof object || !object) {
-        return false;
-    }
-
-    return 'ChatMessage' === object.constructor.name;
+    return object instanceof ChatMessage;
 };
 
 /*
