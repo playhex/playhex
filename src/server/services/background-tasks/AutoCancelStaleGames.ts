@@ -29,9 +29,9 @@ export default class AutoCancelStaleGames
 
     constructor(
         private onlinePlayersService: OnlinePlayersService,
-        private waitAfterDisconnect: number = AUTO_CANCEL_STALE_GAMES_AFTER
+        private waitAfterDisconnect: number = AUTO_CANCEL_STALE_GAMES_AFTER?.match(/^\d+$/)
             ? parseInt(AUTO_CANCEL_STALE_GAMES_AFTER, 10)
-            : 30000
+            : -1
         ,
     ) {}
 
@@ -46,6 +46,11 @@ export default class AutoCancelStaleGames
      */
     start(getPlayerActiveGames: GetPlayerActiveGamesCallback, loadedGames: HostedGameServer[]): void
     {
+        if (this.waitAfterDisconnect <= 0) {
+            logger.info('Not starting auto cancel games because disabled.');
+            return;
+        }
+
         logger.info('Auto cancel stale games enabled', { waitAfterDisconnect: this.waitAfterDisconnect });
 
         this.getPlayerActiveGames = getPlayerActiveGames;

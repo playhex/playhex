@@ -15,6 +15,7 @@ import { AppDataSource } from '../data-source';
 import { plainToInstance } from '../../shared/app/class-transformer-custom';
 import RatingRepository from './RatingRepository';
 import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames';
+import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames';
 import { isDuplicateError } from './typeormUtils';
 
 export class GameError extends Error {}
@@ -50,6 +51,7 @@ export default class HostedGameRepository
         private io: HexServer,
         private ratingRepository: RatingRepository,
         private autoCancelStaleGames: AutoCancelStaleGames,
+        private autoCancelStaleCorrespondenceGames: AutoCancelStaleCorrespondenceGames,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
@@ -87,12 +89,8 @@ export default class HostedGameRepository
 
         logger.info(`${games.length} games loaded.`);
 
-        if ('true' === process.env.AUTO_CANCEL_STALE_GAMES) {
-            this.autoCancelStaleGames.start(
-                player => this.getPlayerActiveGames(player),
-                Object.values(this.activeGames),
-            );
-        }
+        this.autoCancelStaleGames.start(player => this.getPlayerActiveGames(player), Object.values(this.activeGames));
+        this.autoCancelStaleCorrespondenceGames.start(() => Object.values(this.activeGames));
     }
 
     /**
