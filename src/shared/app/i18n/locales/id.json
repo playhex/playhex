@@ -1,0 +1,159 @@
+{
+    "lobby_title": "Lobi",
+    "lobby": {
+        "no_waiting_games": "Tidak ada permainan yang tersedia. Buat yang baru!",
+        "watch_current_games": "Nonton permainan lain",
+        "join_a_game": "Ikut permainan",
+        "no_playing_games": "Tidak ada permainan berlangsung saat ini."
+    },
+    "ranked": "Peringkat",
+    "yes": "Iya",
+    "no": "Tidak",
+    "explore": "Menjelajah",
+    "try_again": "Coba lagi",
+    "language": "Bahasa",
+    "friendly": "Persahabatan",
+    "new_game": "Permainan baru",
+    "players": "Pemain",
+    "player": "Pemain",
+    "load_more": "Muat lebih banyak",
+    "game": {
+        "title": "Permainan",
+        "info": "Informasi",
+        "opponent": "Lawan",
+        "host": "Tuan rumah",
+        "size": "Ukuran",
+        "rules": "Aturan",
+        "created": "Dibuat",
+        "accept": "Terima",
+        "red": "Merah",
+        "played": "Dimain",
+        "finished": "Selesai",
+        "duration": "Kepanjangan",
+        "review": "Ulasan",
+        "outcome": "Hasil",
+        "title_your_turn": "Sekarang giliran kamu!",
+        "title_waiting": "Menunggu lawan: nama tuan rumah",
+        "board_size": "Ukuran papan",
+        "started": "Dimulai",
+        "board": "Papan",
+        "time_control": "Pengaturan waktu",
+        "blue": "Biru",
+        "playing": "Bermain",
+        "lost": "Kalah",
+        "watch": "Nonton"
+    },
+    "game_rules": {
+        "normal": "baku",
+        "host_plays_first": "tuan rumah memulai",
+        "no_swap": "Tanpa aturan swap",
+        "host_plays_second": "Tamu memulai"
+    },
+    "create_game": {
+        "custom_size": "Khusus",
+        "less_options": "Lihat lebih sedikit pilihan",
+        "more_options": "Lihat lebih banyak pilihan"
+    },
+    "background_theme": {
+        "title": "Tema",
+        "dark": "Gelap",
+        "light": "Terang"
+    },
+    "time_control": {
+        "use": "Gunakan {{type}}",
+        "fischer_capped": "Fischer dengan batas",
+        "time_increment": "Waktu yang ditambah",
+        "long": "Panjang",
+        "custom": "Khusus",
+        "initial_time": "Waktu di awal",
+        "fischer": "Fischer",
+        "byo_yomi": "Byo-Yomi",
+        "fast": "Cepat",
+        "periods": "Periode",
+        "normal": "Biasa"
+    },
+    "i_play": {
+        "title": "Saya bermain",
+        "random": "Acak",
+        "second": "Kedua",
+        "first": "Dulu"
+    },
+    "swap_rule": "Aturan swap",
+    "enable_swap_rule": "Gunakan aturan swap",
+    "copied!": "Disalin!",
+    "not_copied": "Salinan tautan gagal, menyalin secara manual",
+    "game_was_created_by_player_time_ago": "Permainan dibuat oleh {player}, {timeAgo}.",
+    "log_out": "Keluar",
+    "project_under_development": "Proyek ini sedang dikembangkan",
+    "license_agpl": "Lisensi AGPL-3.0",
+    "create_account": "Membuat akun",
+    "already_have_account_login_instead_link_label": "Masuk",
+    "add_your_language": "Bahasamu tidak ada? {link}!",
+    "username": "Nama akun",
+    "password": "Kata sandi",
+    "account_created_on": "Akun dibuat {{date}}",
+    "player_current_games": "Permainan yang sedang berlangsung",
+    "player_game_history": "Permainan yang sudah selesai",
+    "waiting": "menunggu…",
+    "initializing_game": "Membuat permainan…",
+    "game_finished_overlay": {
+        "title": "Permainan sudah selesai"
+    },
+    "workers": {
+        "slow_worker": "Tidak ada kecerdasan buatan yang tersedia. Hanya ada evaluasi terbatas.",
+        "no_worker": "Tidak ada lawan kecerdasan buatan yang tersedia. Hanya ada robot acak.",
+        "see_how_to_spawn_a_worker": "Lihat lebih banyak tentang menjalankan kecerdasan buatan dari komputer Anda sendiri"
+    },
+    "game_analysis": {
+        "best_move": "Langkah terbaik",
+        "best": "terbaik:",
+        "how_it_works": "Gimana cara kerjanya",
+        "game_analysis": "Ulasan permainan AI",
+        "request_analysis": "Meminta Ulasan AI",
+        "requested": "Menunggu ulasan AI…",
+        "errored": "Ulasan AI gagal!"
+    },
+    "cancel": "Membatalkan",
+    "pass": "Melewati giliran",
+    "close": "Tutup",
+    "rating": "Peringkat: {{rating}}",
+    "no_such_player": "Pemain ini tidak ada.",
+    "n_online_players": "Daring ({{n}})",
+    "guest": "Tamu",
+    "finished_games": "Permainan yang sudah selesai",
+    "1v1_ranked": {
+        "title": "1v1"
+    },
+    "game_state": {
+        "canceled": "Dibatalkan",
+        "created": "Dibuat",
+        "playing": "Bermain",
+        "ended": "Diakhir"
+    },
+    "player_settings": {
+        "title": "Pengaturan"
+    },
+    "toggle_coords": "Alihkan koordinat papan",
+    "toggle_coords_short": "Alihkan koordinat",
+    "handicap": {
+        "handicap_for_player": "{{n}} untuk {{player}}",
+        "title": "Cacat",
+        "none": "Tanpa cacat"
+    },
+    "share_game": "Bagikan permainan",
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Permainan dibuat oleh {player}, {timeAgo}.",
+    "log_in": "Masuk",
+    "sign_up": "Daftar",
+    "feedback": "Umpan balik",
+    "hex_links": "Tautan Hex",
+    "already_have_account_login_instead": "Sudah punya akun? {login}",
+    "no_account_sign_up_instead": "Tidak punya akun? {signUp}",
+    "no_account_sign_up_instead_link_label": "Daftar",
+    "game_has_been_canceled": "Permainan telah dibatalkan.",
+    "confirm_overlay": {
+        "confirmation": "Konfirmasi",
+        "are_you_sure?": "Apakah Anda yakin?"
+    },
+    "waiting_for_an_opponent": "Menunggu lawan…"
+}

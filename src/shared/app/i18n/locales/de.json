@@ -26,10 +26,15 @@
         "started": "Gestartet",
         "playing": "Spielend",
         "watch": "Beobachten",
-        "lost": "Verloren"
+        "lost": "Verloren",
+        "title_your_turn": "Du bist dran!",
+        "title_waiting": "Suche Gegner: gehosted von",
+        "title": "Spiel",
+        "info": "Info",
+        "duration": "Spieldauer"
     },
     "game_rules": {
-        "normal": "normal",
+        "normal": "standard",
         "host_plays_first": "Host spielt zuerst",
         "host_plays_second": "Host spielt als Zweiter",
         "no_swap": "Kein Tausch"
@@ -90,7 +95,7 @@
     "workers": {
         "slow_worker": "Kein schneller Worker ist momentan online. Nur begrenzte KI ist verfügbar.",
         "no_worker": "Kein Worker kann derzeit Züge berechnen. Nur zufällige Bots sind verfügbar.",
-        "see_how_to_spawn_a_worker": "Sieh dir an, wie du KI-Züge für PlayHex auf meinem Computer berechnen kannst"
+        "see_how_to_spawn_a_worker": "Zeige mir, wie ich KI-Züge für PlayHex auf meinem Computer berechnen kann"
     },
     "try_again": "Erneut versuchen",
     "no": "Nein",
@@ -120,7 +125,7 @@
         "title": "Offline-KI",
         "create": "Gegen Offline-KI spielen"
     },
-    "offline_game_explain": "Offline-Spiel läuft nur auf deinem Gerät, PlayHex-Server wird nicht aufgerufen. Du kannst also spielen, wenn keine Internetverbindung besteht.",
+    "offline_game_explain": "Offline-Spiele laufen nur auf deinem Gerät, so daß du ohne Internetverbindung spielen kannst. Der PlayHex-Server wird nicht benutzt.",
     "loading_game": "Spiel wird geladen …",
     "tournament": "Turnier",
     "register_on_challonge": "Auf Challonge registrieren",
@@ -134,7 +139,7 @@
         "title": "Schattierungsmuster",
         "visibility": "Sichtbarkeit des Schattierungsmusters",
         "custom_expression": "Benutzerdefinierter Ausdruck",
-        "help_custom": "Mathematischer Ausdruck für benutzerdefiniertes Schattierungsmuster.<br>Der Ausdruck muss eine Zahl zwischen 0 (keine Schattierung) und 1 (vollständig schattiert) für ein gegebenes Feld (Zeile, Spalte) zurückgeben. Du kannst z.B. 0,5 für dreifarbige Schattierungsmuster verwenden. Die Rückgabe von <code>true</code> oder <code>false</code> funktioniert genauso wie die Rückgabe von <code>1</code> oder <code>0</code>.<br>Verfügbare Variablen:<br>- <code>row</code> und <code>col</code> (Abkürzungen: <code>r</code> und <code>c</code>) für Zeilen- und Spaltennummer, beginnend bei 0.<br>- <code>size</code> (oder <code>s</code>) für Brettgröße.<br>- <code>distToSide</code> Entfernung der aktuellen Zelle zu ihrer nächsten Seite.<br>Sieh dir die Liste der verfügbaren Operatoren an unter https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Beispiele:<br>- Konzentrische Ringe: <code>distToSide % 2</code><br>- Dreifarbiges Schachbrettmuster: <code>((size + row - col) % 3) / 2</code><br>- Disk mit Radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Öffne die Javascript-Konsole (F12), um Fehler bei der Ausführung deines Ausdrucks zu sehen.",
+        "help_custom": "Mathematischer Ausdruck für benutzerdefiniertes Schattierungsmuster.<br>Der Ausdruck muss eine Zahl zwischen 0 (keine Schattierung) und 1 (vollständig schattiert) für ein gegebenes Feld (Zeile, Spalte) zurückgeben. Du kannst z.B. 0.5 für dreifarbige Schattierungsmuster verwenden. Die Rückgabe von <code>true</code> oder <code>false</code> funktioniert genauso wie die Rückgabe von <code>1</code> oder <code>0</code>.<br>Verfügbare Variablen:<br>- <code>row</code> und <code>col</code> (Abkürzungen: <code>r</code> und <code>c</code>) für Zeilen- und Spaltennummer, beginnend bei 0.<br>- <code>size</code> (oder <code>s</code>) für Brettgröße.<br>- <code>distToSide</code> Entfernung der aktuellen Zelle zu ihrer nächsten Seite.<br>Sieh dir die Liste der verfügbaren Operatoren an unter https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Beispiele:<br>- Konzentrische Ringe: <code>distToSide % 2</code><br>- Dreifarbiges Schachbrettmuster: <code>((size + row - col) % 3) / 2</code><br>- Disk mit Radius sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Öffne die Javascript-Konsole (F12), um Fehler bei der Ausführung deines Ausdrucks zu sehen.",
         "types": {
             "tricolor_checkerboard": "Dreifarbiges Schachbrettmuster",
             "concentrical_rings": "Konzentrische Ringe (HexWorld)",
@@ -161,7 +166,7 @@
     "undo": {
         "accept": "Rückgängig machen akzeptieren",
         "reject": "Ablehnen",
-        "undo_move": "Rückgängig machen"
+        "undo_move": "Zurücknahme"
     },
     "game_candency": {
         "blitz": "Blitz",
@@ -201,7 +206,7 @@
     "swap_rule": "Tauschregel",
     "enable_swap_rule": "Tausch von Spielsteinen erlauben",
     "toggle_coords": "Anzeige der Koordinaten umschalten",
-    "toggle_coords_short": "Koordinaten",
+    "toggle_coords_short": "Koordinaten ein/ausschalten",
     "share_game": "Spiel teilen",
     "copied!": "Kopiert!",
     "not_copied": "Kopieren fehlgeschlagen, benutze Rechtsklick oder langen Tastendruck",
@@ -255,11 +260,29 @@
     "preview": "Vorschau",
     "new_password": "Neues Passwort",
     "ping": {
-        "date_shift_ms": "Datumsausgleich: {{ms}}ms",
+        "date_shift_ms": "Zeitversatz: {{ms}}ms",
         "ping_ms": "Ping: {{ms}} ms"
     },
     "game_state": {
         "canceled": "Abgebrochen",
-        "created": "Erstellt"
+        "created": "Erstellt",
+        "ended": "Beendet",
+        "playing": "Spiel im Gang"
+    },
+    "force_board_orientation_mode": "Anzeigen des Spielbretts im Querformat oder Hochformat für diesen Bildschirm erzwingen",
+    "move_number": "Zug {{n}}",
+    "handicap": {
+        "title": "Handicap",
+        "none": "ohne Handicap",
+        "handicap_for_player": "{{n}} für {{player}}"
+    },
+    "explore": "Erkunden",
+    "friendly": "Freundlich",
+    "moves": "Züge",
+    "player_loses_reason": {
+        "default": "{player} verliert.",
+        "time": "{player} überschreitet die Zeit.",
+        "resign": "{player} gibt auf.",
+        "forfeit": "{player} verliert kampflos."
     }
 }
