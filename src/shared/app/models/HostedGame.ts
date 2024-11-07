@@ -4,6 +4,7 @@ import Player from './Player';
 import type { HostedGameState } from '../../app/Types';
 import HostedGameOptions from './HostedGameOptions';
 import type { GameTimeData } from '../../time-control/TimeControl';
+import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl';
 import Game from './Game';
 import ChatMessage from './ChatMessage';
 import HostedGameToPlayer from './HostedGameToPlayer';
@@ -107,6 +108,10 @@ const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): nul
     timeControlValue.players.forEach(player => {
         if ('string' === typeof player.totalRemainingTime) {
             player.totalRemainingTime = new Date(player.totalRemainingTime);
+        }
+
+        if ('string' === typeof (player as ByoYomiPlayerTimeData).remainingMainTime) {
+            (player as ByoYomiPlayerTimeData).remainingMainTime = new Date((player as ByoYomiPlayerTimeData).remainingMainTime);
         }
     });
 

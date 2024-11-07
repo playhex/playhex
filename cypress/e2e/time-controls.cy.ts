@@ -83,6 +83,14 @@ describe('Time controls', () => {
 
         cy.contains('Determinist random bot');
         cy.contains('10:00 + 5 × 5s');
+
+        // byo yomi dates are well deserialized
+        cy.play(406, 397);
+
+        cy.reload();
+
+        cy.contains(/\d+:\d+ \+ 5 × 5s/);
+        cy.contains('.chrono-time', 'NaN').should('not.exist');
     });
 
     it('create a game with custom time control, Fischer', () => {
