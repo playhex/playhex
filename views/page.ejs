@@ -25,6 +25,8 @@
     <% for(var jsLocation of Object.values(manifest)) {%>
         <script type="text/javascript" src="<%- jsLocation %>"></script>
     <% } %>
+
+    <% if (matomo.websiteId) { %><%- include('partials/matomo.ejs') %><% } %>
 </body>
 
 </html>
