@@ -6,6 +6,7 @@ import { Game, Move } from '../../../shared/game-engine';
 import { Player } from '../../../shared/app/models';
 import { apiGetServerInfo } from '../../apiClient';
 import { CustomizedGameView } from '../../services/CustomizedGameView';
+import { shallowRef } from 'vue';
 
 type LoggedError = {
     type: string;
@@ -91,7 +92,7 @@ const clearCache = async () => {
  * Test board rendering
  */
 const game = new Game(3);
-const gameView = ref<null | GameView>(new CustomizedGameView(game));
+const gameView = shallowRef<null | GameView>(new CustomizedGameView(game));
 game.move(new Move(1, 1), 0);
 
 const players = ['A', 'B'].map(pseudo => {

@@ -1,5 +1,5 @@
 import { Game, Move, PlayerIndex, Coords } from '../game-engine';
-import { Application, Container, FillGradient, Graphics, PointData, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pixi.js';
 import Hex from './Hex';
 import { Theme, themes } from './BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -858,16 +858,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         const container = new Container();
 
-        // TODO tmp, pixi bug workaround. Remove this and just set fill = this.options.theme.textColor
-        // with this is fixed: https://github.com/pixijs/pixijs/discussions/10444
-        const fill = new FillGradient(0, 0, 1, 1);
-        fill.addColorStop(0, this.options.theme.textColor);
-        fill.addColorStop(1, this.options.theme.textColor);
-
         const coordsTextStyle = new TextStyle({
             fontFamily: 'Arial',
             fontSize: Hex.RADIUS * 0.6,
-            fill,
+            fill: this.options.theme.textColor,
         });
 
         const createText = (string: string, x: number, y: number): Text => {
