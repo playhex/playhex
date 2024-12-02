@@ -3,7 +3,12 @@ import HostedGame from './HostedGame';
 import Player from './Player';
 import { Expose } from '../class-transformer-custom';
 
-@Entity()
+@Entity({
+    orderBy: {
+        hostedGameId: 'ASC',
+        order: 'ASC',
+    },
+})
 export default class HostedGameToPlayer
 {
     @PrimaryColumn()
