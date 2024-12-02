@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm';
 import Player from './Player';
 import type { HostedGameState } from '../../app/Types';
@@ -98,6 +98,14 @@ export default class HostedGame
     @ManyToMany(() => Rating, rating => rating.games)
     @Expose()
     ratings: Rating[];
+
+    @AfterLoad()
+    sortPlayersPosition()
+    {
+        if (this?.hostedGameToPlayers?.length > 1) {
+            this.hostedGameToPlayers.sort((a, b) => a.order - b.order);
+        }
+    }
 }
 
 const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {
