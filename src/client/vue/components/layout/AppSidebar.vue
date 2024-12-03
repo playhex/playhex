@@ -5,7 +5,6 @@ import useOnlinePlayersStore from '@client/stores/onlinePlayersStore';
 import { BIconCircleFill } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
 import AppTournamentCard from '../AppTournamentCard.vue';
-import AppTournamentPlayOk from '../AppTournamentPlayOk.vue';
 import type { Player } from '@shared/app/models';
 
 const {
@@ -27,19 +26,20 @@ const orderedPlayers = computed<Player[]>(() => {
 
 <template>
     <div>
-        <AppTournamentPlayOk
-            name="PlayOk"
-            :startDate="new Date('2024-09-27T18:00:00Z')"
+        <AppTournamentCard
+            name="Hex Monthly 24"
+            :startDate="new Date('2024-12-21T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_24"
         />
         <AppTournamentCard
-            name="Hex Monthly 22"
-            :startDate="new Date('2024-10-19T17:00:00Z')"
-            registerLink="https://challonge.com/hex_monthly_22"
+            name="Hex Monthly 25"
+            :startDate="new Date('2025-01-18T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_25"
         />
         <AppTournamentCard
-            name="Hex Monthly 23"
-            :startDate="new Date('2024-11-16T17:00:00Z')"
-            registerLink="https://challonge.com/hex_monthly_23"
+            name="Hex Monthly 26"
+            :startDate="new Date('2025-02-15T17:00:00Z')"
+            registerLink="https://challonge.com/hex_monthly_26"
         />
 
         <h3>{{ $t('n_online_players', { n: null === totalPlayers ? '…' : totalPlayers }) }}</h3>
