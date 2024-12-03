@@ -12,6 +12,7 @@ import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore';
 import I18NextVue from 'i18next-vue';
 import i18next from 'i18next';
 import { head } from './services/head';
+import useMatomo from './vue/useMatomo';
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
@@ -30,6 +31,8 @@ vueApp.use(pinia);
 vueApp.use(I18NextVue, { i18next });
 vueApp.use(unoverlay);
 vueApp.use(head);
+
+useMatomo(vueApp);
 
 // Load store now to set dark/light theme early enough and prevent blinking
 usePlayerLocalSettingsStore();

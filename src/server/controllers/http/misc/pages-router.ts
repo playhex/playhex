@@ -16,15 +16,9 @@ export function pagesRouter(): Router {
             hostUrl: process.env.UMAMI_HOST_URL,
         };
 
-        const matomo = {
-            websiteId: process.env.MATOMO_WEBSITE_ID,
-            src: process.env.MATOMO_SRC,
-        };
-
         res.render('page.ejs', {
             manifest,
             umami,
-            matomo,
             seo,
             jsonLd,
             baseUrl: process.env.BASE_URL,
