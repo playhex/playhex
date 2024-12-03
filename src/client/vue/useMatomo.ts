@@ -17,8 +17,6 @@ const useMatomo = (app: App): void => {
         host,
         siteId,
         router,
-
-        debug: true,
     });
 };
 
