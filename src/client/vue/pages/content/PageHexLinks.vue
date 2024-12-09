@@ -21,8 +21,6 @@
                     :href="resource.link"
                     class="stretched-link"
                     target="_blank"
-                    data-umami-event="Click Hex Link"
-                    :data-umami-event-link="resource.title"
                 >{{ resource.link_show }}</a>
             </div>
         </div>

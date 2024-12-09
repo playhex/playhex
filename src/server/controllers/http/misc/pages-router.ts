@@ -9,16 +9,8 @@ export function pagesRouter(): Router {
     router.get('/**', async (_, res) => {
         const manifest = await getManifest();
 
-        const umami = {
-            websiteId: process.env.UMAMI_WEBSITE_ID,
-            src: process.env.UMAMI_SRC,
-            domains: process.env.UMAMI_DOMAINS,
-            hostUrl: process.env.UMAMI_HOST_URL,
-        };
-
         res.render('page.ejs', {
             manifest,
-            umami,
             seo,
             jsonLd,
             baseUrl: process.env.BASE_URL,
