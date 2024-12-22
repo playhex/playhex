@@ -73,6 +73,6 @@ export default class AdminController
 
         const hostedGameServer = await this.hostedGameRepository.createGame(ai0, options);
 
-        return hostedGameServer.toData();
+        return hostedGameServer.getHostedGame();
     }
 }

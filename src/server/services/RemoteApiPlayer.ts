@@ -59,7 +59,7 @@ export default class RemoteApiPlayer
             engine,
             level: config.maxGames ?? (config.treeSearch ? 500000 : 0) ?? -1,
             boardsize: game.getSize(),
-            gameId: hostedGameServer.getId(),
+            gameId: hostedGameServer.getPublicId(),
         });
 
         try {

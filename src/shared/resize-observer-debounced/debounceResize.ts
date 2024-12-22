@@ -1,7 +1,7 @@
 export const DEFAULT_WAIT = 60 as const;
 
 export const debounceResize = (onResize: () => void, wait: number = DEFAULT_WAIT): () => void => {
-    let timeout: null | NodeJS.Timeout = null;
+    let timeout: null | ReturnType<typeof setTimeout> = null;
     let shouldCallAfter = false;
 
     const resetTimeout = () => {

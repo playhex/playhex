@@ -44,7 +44,7 @@ export default class HostedGameRepository
      * if no activity.
      * Prevent too much data loss in case server crashes.
      */
-    private persistWhenNoActivity: { [key: string]: NodeJS.Timeout } = {};
+    private persistWhenNoActivity: { [key: string]: ReturnType<typeof setTimeout> } = {};
 
     constructor(
         private hostedGamePersister: HostedGamePersister,
@@ -105,7 +105,7 @@ export default class HostedGameRepository
 
         for (const key in this.activeGames) {
             try {
-                await this.hostedGamePersister.persist(this.activeGames[key].toData());
+                await this.hostedGamePersister.persist(this.activeGames[key].getHostedGame());
             } catch (e) {
                 allSuccess = false;
                 logger.error('Could not persist a game. Continue with others.', { gameId: key, e, errorMessage: e.message });
@@ -141,8 +141,8 @@ export default class HostedGameRepository
     private resetActivityTimeout(hostedGameServer: HostedGameServer): void
     {
         this.clearActivityTimeout(hostedGameServer);
-        this.persistWhenNoActivity[hostedGameServer.getId()] = setTimeout(
-            () => this.hostedGamePersister.persist(hostedGameServer.toData()),
+        this.persistWhenNoActivity[hostedGameServer.getPublicId()] = setTimeout(
+            () => this.hostedGamePersister.persist(hostedGameServer.getHostedGame()),
             300 * 1000, // Persist after 5min inactivity
         );
     }
@@ -152,9 +152,9 @@ export default class HostedGameRepository
      */
     private clearActivityTimeout(hostedGameServer: HostedGameServer): void
     {
-        if (this.persistWhenNoActivity[hostedGameServer.getId()]) {
-            clearTimeout(this.persistWhenNoActivity[hostedGameServer.getId()]);
-            delete this.persistWhenNoActivity[hostedGameServer.getId()];
+        if (this.persistWhenNoActivity[hostedGameServer.getPublicId()]) {
+            clearTimeout(this.persistWhenNoActivity[hostedGameServer.getPublicId()]);
+            delete this.persistWhenNoActivity[hostedGameServer.getPublicId()];
         }
     }
 
@@ -173,9 +173,9 @@ export default class HostedGameRepository
     private async flushHostedGame(hostedGameServer: HostedGameServer): Promise<void>
     {
         this.clearActivityTimeout(hostedGameServer);
-        const hostedGame = hostedGameServer.toData();
+        const hostedGame = hostedGameServer.getHostedGame();
         await this.hostedGamePersister.persist(hostedGame);
-        delete this.activeGames[hostedGameServer.getId()];
+        delete this.activeGames[hostedGameServer.getPublicId()];
     }
 
     /**
@@ -185,17 +185,17 @@ export default class HostedGameRepository
     {
         await this.flushHostedGame(hostedGameServer);
 
-        if (hostedGameServer.toData().gameOptions.ranked) {
+        if (hostedGameServer.getHostedGame().gameOptions.ranked) {
             const newRatings = await this.updateRatings(hostedGameServer);
 
             this.io
                 .to([
-                    Rooms.game(hostedGameServer.getId()),
+                    Rooms.game(hostedGameServer.getPublicId()),
                     Rooms.lobby,
                 ])
                 .emit(
                     'ratingsUpdated',
-                    hostedGameServer.getId(),
+                    hostedGameServer.getPublicId(),
                     newRatings.filter(rating => 'overall' === rating.category),
                 )
             ;
@@ -215,7 +215,7 @@ export default class HostedGameRepository
      */
     private async updateRatings(hostedGameServer: HostedGameServer): Promise<Rating[]>
     {
-        const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.toData());
+        const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.getHostedGame());
 
         await this.ratingRepository.persistRatings(newRatings);
         await this.playerRepository.save(hostedGameServer.getPlayers());
@@ -236,7 +236,7 @@ export default class HostedGameRepository
     getActiveGamesData(): HostedGame[]
     {
         return Object.values(this.activeGames)
-            .map(game => game.toData())
+            .map(game => game.getHostedGame())
         ;
     }
 
@@ -266,7 +266,7 @@ export default class HostedGameRepository
     async getGame(publicId: string): Promise<HostedGame | null>
     {
         if (this.activeGames[publicId]) {
-            return this.activeGames[publicId].toData();
+            return this.activeGames[publicId].getHostedGame();
         }
 
         return await this.hostedGamePersister.findUnique(publicId);
@@ -289,7 +289,7 @@ export default class HostedGameRepository
             }
         }
 
-        this.activeGames[hostedGame.getId()] = hostedGame;
+        this.activeGames[hostedGame.getPublicId()] = hostedGame;
 
         this.listenHostedGameServer(hostedGame);
 
@@ -307,7 +307,7 @@ export default class HostedGameRepository
             throw new GameError('Player not in the game');
         }
         if (game.rematch != null && this.activeGames[game.rematch.publicId]) {
-            return this.activeGames[game.rematch.publicId].toData();
+            return this.activeGames[game.rematch.publicId].getHostedGame();
         }
         if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
@@ -317,7 +317,7 @@ export default class HostedGameRepository
         }
 
         const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions), game);
-        game.rematch = rematch.toData();
+        game.rematch = rematch.getHostedGame();
 
         try {
             await this.hostedGamePersister.persist(game.rematch);
@@ -385,7 +385,7 @@ export default class HostedGameRepository
                 continue;
             }
 
-            hostedGameList.push(this.activeGames[key].toData());
+            hostedGameList.push(this.activeGames[key].getHostedGame());
         }
 
         const gamesFromDb = await this.hostedGamePersister.findLastEndedByPlayer(player, fromGamePublicId ?? undefined);
@@ -498,7 +498,7 @@ export default class HostedGameRepository
         // Game is in memory, push chat message
         if (hostedGameServer) {
             let error: true | string;
-            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.toData()))) {
+            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.getHostedGame()))) {
                 return error;
             }
 

@@ -59,7 +59,7 @@ export default class GameController
     ) {
         try {
             const hostedGame = await this.hostedGameRepository.createGame(host, gameOptions);
-            return hostedGame.toData();
+            return hostedGame.getHostedGame();
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);

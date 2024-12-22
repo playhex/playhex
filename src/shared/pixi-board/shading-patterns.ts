@@ -89,7 +89,7 @@ export class CustomShadingPattern extends AbstractShadingPattern
 {
     private expr: null | Expression = null;
 
-    private warnCooldown: null | NodeJS.Timeout = null;
+    private warnCooldown: null | ReturnType<typeof setTimeout> = null;
 
     constructor(
         protected override size: number,

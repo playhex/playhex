@@ -40,7 +40,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private richChat: RichChat;
 
-    private lowTimeNotificationThread: null | NodeJS.Timeout = null;
+    private lowTimeNotificationThread: null | ReturnType<typeof setTimeout> = null;
 
     constructor(
         private hostedGame: HostedGame,
@@ -48,7 +48,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     ) {
         super();
 
-        this.readMessages = hostedGame.chatMessages.length;
+        this.readMessages = hostedGame.chatMessages?.length ?? 0;
         this.richChat = new RichChat(hostedGame);
     }
 

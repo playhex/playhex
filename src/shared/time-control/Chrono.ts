@@ -18,7 +18,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
 {
     private value: TimeValue;
 
-    private timeout: null | NodeJS.Timeout = null;
+    private timeout: null | ReturnType<typeof setTimeout> = null;
 
     constructor(initialTimeValue: TimeValue = 0)
     {

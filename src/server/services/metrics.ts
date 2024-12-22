@@ -49,7 +49,7 @@ export const sendConnectedSocketsPoint = (count: number): void => {
 export class TimeMeasureMetric<T extends keyof MetricsTags>
 {
     private tStart: Date;
-    private timeout: NodeJS.Timeout;
+    private timeout: ReturnType<typeof setTimeout>;
     private isFinished = false;
 
     constructor(
