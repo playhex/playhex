@@ -191,7 +191,7 @@ const listenHexClick = () => {
             const previewedMove = gameView?.getPreviewedMove();
 
             if (previewedMove && previewedMove.move.sameAs(move)) {
-                gameView?.removePreviewMove();
+                gameView?.removePreviewedMove();
                 confirmMove.value = null;
                 return;
             }
@@ -208,7 +208,7 @@ const listenHexClick = () => {
                 hostedGameClient.value.sendMove(fromEngineMove(move));
             };
 
-            gameView?.previewMove(move, localPlayerIndex as PlayerIndex);
+            gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
         } catch (e) {
             // noop
         }
