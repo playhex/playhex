@@ -62,11 +62,11 @@ const color = (): string => null === mostUrgentGame.value
                     class="hexagon"
                     :class="color()"
                 />
-                <a
-                    href="#"
+                <button
+                    class="btn-my-turn btn btn-link"
                     @click="goToMostUrgentGame()"
                     :class="isFilled() ? 'text-white' : 'text-body'"
-                >{{ myTurnCount }}</a>
+                >{{ myTurnCount }}</button>
             </span>
 
             <p class="nav-player-item">
@@ -102,12 +102,12 @@ nav
     justify-content center
     align-items center
 
-    svg, a
+    svg, .btn-my-turn
         position absolute
         text-align center
         width 100%
 
-    a
+    .btn-my-turn
         margin-top -0.05em
         font-size 0.8em
         text-decoration none
