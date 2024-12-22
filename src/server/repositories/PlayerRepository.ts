@@ -5,8 +5,9 @@ import { hashPassword, checkPassword, InvalidPasswordError } from '../services/s
 import logger from '../services/logger';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
-import { FindOptionsSelect, QueryFailedError, Repository } from 'typeorm';
+import { CreateRequestContext, EntityRepository } from '@mikro-orm/core';
 import { isDuplicateError } from './typeormUtils';
+import { orm } from '../data-source';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
@@ -20,17 +21,18 @@ export default class PlayerRepository
     private playersCache: { [key: string]: Player } = {};
 
     constructor(
-        @Inject('Repository<Player>')
-        private playerRepository: Repository<Player>,
+        @Inject('EntityRepository<Player>')
+        private playerRepository: EntityRepository<Player>,
     ) {}
 
+    // @CreateRequestContext(() => orm)
     async getPlayer(publicId: string): Promise<null | Player>
     {
         if (this.playersCache[publicId]) {
             return this.playersCache[publicId];
         }
 
-        const player = await this.playerRepository.findOneBy({
+        const player = await this.playerRepository.findOne({
             publicId,
         });
 
@@ -43,14 +45,14 @@ export default class PlayerRepository
 
     async getPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return this.playerRepository.findOneBy({
+        return this.playerRepository.findOne({
             slug,
         });
     }
 
     async getAIPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return this.playerRepository.findOneBy({
+        return this.playerRepository.findOne({
             slug,
             isBot: true,
         });
@@ -59,8 +61,11 @@ export default class PlayerRepository
     async createGuest(): Promise<Player>
     {
         let exponent = 3;
+        let lastError;
 
         while (exponent < 12) {
+            // TODO remove next line
+            // eslint-disable-next-line no-useless-catch
             try {
                 const player = new Player();
 
@@ -69,20 +74,23 @@ export default class PlayerRepository
                 player.slug = pseudoSlug(player.pseudo);
                 player.isGuest = true;
 
-                await this.playerRepository.save(player);
+                await orm.em.persistAndFlush(player);
 
                 return this.playersCache[player.publicId] = player;
             } catch (e) {
-                if (e instanceof QueryFailedError && e.message.includes('Duplicate entry')) {
+                lastError = e;
+                // TODO
+
+                // if (e instanceof QueryFailedError && e.message.includes('Duplicate entry')) {
                     ++exponent;
                     continue;
-                }
+                // }
 
-                throw e;
+                // throw e; // TODO uncomment
             }
         }
 
-        logger.error('Unable to create a guest');
+        logger.error('Unable to create a guest', { lastError });
         throw new Error('Unable to create a guest');
     }
 
@@ -103,7 +111,7 @@ export default class PlayerRepository
             player.slug = pseudoSlug(pseudo);
             player.password = await hashPassword(password);
 
-            await this.playerRepository.save(player);
+            await this.playerRepository.upsert(player);
 
             return this.playersCache[player.publicId] = player;
         } catch (e) {
@@ -118,10 +126,7 @@ export default class PlayerRepository
     /** @throws {InvalidPasswordError} */
     async changePassword(publicId: string, oldPassword: string, newPassword: string): Promise<Player> {
         const player = await this.playerRepository.findOne({
-            select: this.allColumnWithPassword(),
-            where: {
-                publicId,
-            },
+            publicId,
         });
 
         if (player === null) {
@@ -132,7 +137,7 @@ export default class PlayerRepository
             throw new InvalidPasswordError();
         }
         player.password = await hashPassword(newPassword);
-        return this.playersCache[publicId] = await this.playerRepository.save(player);
+        return this.playersCache[publicId] = await this.playerRepository.upsert(player);
     }
 
     /**
@@ -167,7 +172,7 @@ export default class PlayerRepository
         upgradedPlayer.createdAt = new Date();
 
         try {
-            return this.playersCache[publicId] = await this.playerRepository.save(upgradedPlayer);
+            return this.playersCache[publicId] = await this.playerRepository.upsert(upgradedPlayer);
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
@@ -175,24 +180,5 @@ export default class PlayerRepository
 
             throw e;
         }
-    }
-
-    /**
-     * By default, player password column is not selected in database queries.
-     * To force select password, use:
-     *  {
-     *      select: allColumnWithPassword(),
-     *  },
-     *  where: { where: ... }
-     */
-    allColumnWithPassword(): FindOptionsSelect<Player>
-    {
-        const allColumnsWithPassword: FindOptionsSelect<Player> = {};
-
-        this.playerRepository.metadata.columns.forEach(column => {
-            allColumnsWithPassword[column.propertyName as keyof Player] = true;
-        });
-
-        return allColumnsWithPassword;
     }
 }

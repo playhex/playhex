@@ -21,7 +21,7 @@ export default class PlayerGamesWebsocketController implements WebsocketControll
         const player = await this.playerRepository.getPlayer(playerId);
         if (player == null) return;
         const games = this.hostedGameRepository.getPlayerActiveGames(player)
-            .map(g => g.toData());
+            .map(g => g.getHostedGame());
         socket.emit('playerGamesUpdate', games);
     }
 }

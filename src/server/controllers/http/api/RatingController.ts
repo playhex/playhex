@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/core';
 import { Get, JsonController, Param } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository';
@@ -15,8 +15,8 @@ export default class RatingController
         private playerRepository: PlayerRepository,
         private ratingRepository: RatingRepository,
 
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('EntityRepository<HostedGame>')
+        private hostedGameRepository: EntityRepository<HostedGame>,
     ) {}
 
     @Get('/api/players/:publicId/ratings')
@@ -59,7 +59,7 @@ export default class RatingController
             throw new HttpError(400, 'Invalid category');
         }
 
-        const game = await this.hostedGameRepository.findOneBy({ publicId });
+        const game = await this.hostedGameRepository.findOne({ publicId });
 
         if (null === game) {
             throw new HttpError(404, 'Game not found');

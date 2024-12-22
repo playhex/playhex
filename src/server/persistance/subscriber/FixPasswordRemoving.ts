@@ -1,6 +1,4 @@
-import { EntitySubscriberInterface, EventSubscriber, UpdateEvent } from 'typeorm';
-import { Player } from '../../../shared/app/models';
-import logger from '../../services/logger';
+// TODO check
 
 /**
  * After updating Player (i.e after setting him a new currentRating),
@@ -11,23 +9,3 @@ import logger from '../../services/logger';
  *
  * This subscriber fixes this behaviour.
  */
-@EventSubscriber()
-export default class FixPasswordRemoving implements EntitySubscriberInterface<Player>
-{
-    listenTo(): typeof Player
-    {
-        return Player;
-    }
-
-    afterUpdate(event: UpdateEvent<Player>): void
-    {
-        const { entity } = event;
-
-        if (!(entity instanceof Player)) {
-            logger.warning('afterUpdate received an entity which is not a Player');
-            return;
-        }
-
-        entity.password = undefined;
-    }
-}

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryKey, ManyToOne } from '@mikro-orm/core';
 import HostedGame from './HostedGame';
 import Player from './Player';
 import { Expose } from '../class-transformer-custom';
@@ -6,20 +6,13 @@ import { Expose } from '../class-transformer-custom';
 @Entity()
 export default class HostedGameToPlayer
 {
-    @PrimaryColumn()
-    hostedGameId: number;
-
-    @ManyToOne(() => HostedGame, hostedGame => hostedGame.hostedGameToPlayers)
-    @JoinColumn()
+    @ManyToOne(() => HostedGame, { primary: true })
     hostedGame: HostedGame;
-
-    @Column()
-    playerId: number;
 
     @ManyToOne(() => Player)
     @Expose()
     player: Player;
 
-    @PrimaryColumn('smallint')
+    @PrimaryKey({ type: 'smallint' })
     order: number;
 }

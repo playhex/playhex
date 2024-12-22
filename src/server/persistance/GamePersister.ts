@@ -1,4 +1,4 @@
-import { IsNull, Not, Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/core';
 import { Game } from '@shared/app/models';
 import { AnalyzeGameRequest } from '../services/HexAiApiClient';
 import { Move } from '../../shared/game-engine';
@@ -8,8 +8,8 @@ import { Inject, Service } from 'typedi';
 export default class GamePersister
 {
     constructor(
-        @Inject('Repository<Game>')
-        private gameRepository: Repository<Game>,
+        @Inject('EntityRepository<Game>')
+        private gameRepository: EntityRepository<Game>,
     ) {}
 
     /**
@@ -19,17 +19,16 @@ export default class GamePersister
     async getAnalyzeGameRequest(publicId: string): Promise<null | AnalyzeGameRequest>
     {
         const data = await this.gameRepository.findOne({
-            select: {
-                size: true,
-                movesHistory: true,
-                hostedGameId: true,
+            hostedGame: {
+                publicId,
             },
-            where: {
-                hostedGame: {
-                    publicId,
-                },
-                endedAt: Not(IsNull()),
-            },
+            // endedAt: Not(IsNull()), // TODO
+        }, {
+            fields: [
+                'size',
+                'movesHistory',
+                //'hostedGameId', // TODO
+            ],
         });
 
         if (null === data) {

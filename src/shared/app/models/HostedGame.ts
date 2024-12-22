@@ -1,5 +1,4 @@
-import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad } from 'typeorm';
-import { ColumnUUID } from '../custom-typeorm';
+import { Entity, PrimaryKey, Property, ManyToOne, OneToOne, OneToMany, ManyToMany, Index, Cascade, Collection } from '@mikro-orm/core';
 import Player from './Player';
 import type { HostedGameState } from '../../app/Types';
 import HostedGameOptions from './HostedGameOptions';
@@ -15,10 +14,10 @@ import Rating from './Rating';
 @Entity()
 export default class HostedGame
 {
-    @PrimaryGeneratedColumn()
+    @PrimaryKey()
     id?: number;
 
-    @ColumnUUID({ unique: true })
+    @Property({ unique: true })
     @Expose()
     publicId: string;
 
@@ -26,35 +25,35 @@ export default class HostedGame
     @Expose()
     host: Player;
 
-    @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
+    @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: [Cascade.ALL] })
     @Expose()
     @Type(() => HostedGameToPlayer)
-    hostedGameToPlayers: HostedGameToPlayer[];
+    hostedGameToPlayers = new Collection<HostedGameToPlayer>(this);
 
-    @Column({ length: 15 })
+    @Property({ length: 15 })
     @Index()
     @Expose()
     state: HostedGameState;
 
-    @OneToOne(() => HostedGameOptions, hostedGameOptions => hostedGameOptions.hostedGame, { cascade: true })
+    @OneToOne(() => HostedGameOptions, hostedGameOptions => hostedGameOptions.hostedGame, { cascade: [Cascade.ALL] })
     @Expose()
     @Type(() => HostedGameOptions)
     gameOptions: HostedGameOptions;
 
-    @Column({ type: 'json', transformer: { from: (value: null | GameTimeData) => deserializeTimeControlValue(value), to: value => value } })
+    @Property({ type: 'json' })
     @Expose()
     @Transform(({ value }: { value: GameTimeData }) => deserializeTimeControlValue(value), { toClassOnly: true })
     timeControl: GameTimeData; // TODO create model for transform
 
-    @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
+    @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: [Cascade.ALL] })
     @Expose()
     @Type(() => ChatMessage)
-    chatMessages: ChatMessage[];
+    chatMessages = new Collection<ChatMessage>(this);
 
     /**
      * gameData is null on server when game is not yet started.
      */
-    @OneToOne(() => Game, game => game.hostedGame, { cascade: true })
+    @OneToOne(() => Game, game => game.hostedGame, { cascade: [Cascade.ALL] })
     @Expose()
     @Type(() => Game)
     gameData: null | Game = null;
@@ -63,15 +62,14 @@ export default class HostedGame
      * Whether there is a current player undo request.
      * Equals to the index of the player who asked for undo.
      */
-    @Column({ type: 'smallint', nullable: true })
+    @Property({ type: 'smallint', nullable: true })
     @Expose()
     undoRequest: null | number = null;
 
     /**
      * Link to next game if this game has been rematched.
      */
-    @OneToOne(() => HostedGame)
-    @JoinColumn()
+    @OneToOne(() => HostedGame, rematch => rematch.rematchedFrom, { owner: true, cascade: [Cascade.PERSIST] })
     @Expose()
     @Type(() => HostedGame)
     rematch: null | HostedGame = null;
@@ -79,13 +77,12 @@ export default class HostedGame
     /**
      * Link to previous game if this game is a rematch.
      */
-    @OneToOne(() => HostedGame)
-    @JoinColumn()
+    @OneToOne(() => HostedGame, { mappedBy: 'rematch', cascade: [Cascade.PERSIST] })
     @Expose()
     @Type(() => HostedGame)
     rematchedFrom: null | HostedGame = null;
 
-    @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
+    @Property({ type: Date })
     @Expose()
     @Type(() => Date)
     createdAt: Date = new Date();
@@ -95,17 +92,9 @@ export default class HostedGame
      * Can be used to take rating.ratingChange for each player.
      * Other games can also have issued a same rating in case of tournament for example.
      */
-    @ManyToMany(() => Rating, rating => rating.games)
+    @ManyToMany(() => Rating, rating => rating.games, { owner: true }) // TODO pivotTable
     @Expose()
-    ratings: Rating[];
-
-    @AfterLoad()
-    sortPlayersPosition()
-    {
-        if (this?.hostedGameToPlayers?.length > 1) {
-            this.hostedGameToPlayers.sort((a, b) => a.order - b.order);
-        }
-    }
+    ratings = new Collection<Rating>(this);
 }
 
 const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {

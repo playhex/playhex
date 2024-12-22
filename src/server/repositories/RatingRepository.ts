@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/core';
 import { HostedGame, Player, Rating } from '../../shared/app/models';
 import { RatingCategory, createInitialRating, createRanking, getRatingCategoriesFromGame } from '../../shared/app/ratingUtils';
 
@@ -7,8 +7,8 @@ import { RatingCategory, createInitialRating, createRanking, getRatingCategories
 export default class RatingRepository
 {
     constructor(
-        @Inject('Repository<Rating>')
-        private ratingRepository: Repository<Rating>,
+        @Inject('EntityRepository<Rating>')
+        private ratingRepository: EntityRepository<Rating>,
     ) {}
 
     /**
@@ -24,12 +24,10 @@ export default class RatingRepository
         }
 
         let rating = await this.ratingRepository.findOne({
-            comment: 'find player rating',
-            where: {
-                player: { id },
-                category,
-            },
-            order: {
+            player: { id },
+            category,
+        }, {
+            orderBy: {
                 createdAt: 'desc',
             },
         });
@@ -52,15 +50,14 @@ export default class RatingRepository
     async findGameRatingUpdates(hostedGame: HostedGame, category: RatingCategory): Promise<Rating[]>
     {
         return this.ratingRepository.find({
-            relations: {
-                player: true,
+            // TODO
+            // relations: {
+            //     player: true,
+            // },
+            games: {
+                id: hostedGame.id,
             },
-            where: {
-                games: {
-                    id: hostedGame.id,
-                },
-                category,
-            },
+            category,
         });
     }
 
@@ -113,7 +110,7 @@ export default class RatingRepository
                 rating.ratingChange = glicko2Player.getRating() - previousPlayersRating[index];
                 rating.deviation = glicko2Player.getRd();
                 rating.volatility = glicko2Player.getVol();
-                rating.games = [hostedGame];
+                rating.games.set([hostedGame]);
 
                 if ('overall' === category) {
                     rating.player.currentRating = rating;
@@ -128,6 +125,6 @@ export default class RatingRepository
 
     async persistRatings(ratings: Rating[]): Promise<Rating[]>
     {
-        return this.ratingRepository.save(ratings);
+        return this.ratingRepository.upsertMany(ratings);
     }
 }

@@ -5,6 +5,7 @@ import './base.styl';
 import 'reflect-metadata';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
+import './superjson-serialization';
 import App from './vue/App.vue';
 import router from './vue/router';
 import unoverlay from '@overlastic/vue';

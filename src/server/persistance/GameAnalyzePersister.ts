@@ -1,38 +1,33 @@
 import { Inject, Service } from 'typedi';
 import GameAnalyze from '../../shared/app/models/GameAnalyze';
-import { Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/core';
 import HostedGame from '../../shared/app/models/HostedGame';
 
 @Service()
 export default class GameAnalyzePersister
 {
     constructor(
-        @Inject('Repository<GameAnalyze>')
-        private gameAnalyzeRepository: Repository<GameAnalyze>,
+        @Inject('EntityRepository<GameAnalyze>')
+        private gameAnalyzeRepository: EntityRepository<GameAnalyze>,
 
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('EntityRepository<HostedGame>')
+        private hostedGameRepository: EntityRepository<HostedGame>,
     ) {}
 
     async persist(gamePublicId: string, gameAnalyze: GameAnalyze): Promise<void>
     {
         gameAnalyze.hostedGame = await this.hostedGameRepository.findOneOrFail({
-            select: {
-                id: true,
-            },
-            where: {
-                publicId: gamePublicId,
-            },
+            publicId: gamePublicId,
         });
 
-        this.gameAnalyzeRepository.save(gameAnalyze);
+        this.gameAnalyzeRepository.upsert(gameAnalyze);
     }
 
     async findByGamePublicId(publicId: string): Promise<null | GameAnalyze>
     {
-        return await this.gameAnalyzeRepository.findOneBy({
+        return await this.gameAnalyzeRepository.findOne({
             hostedGame: {
-                publicId: publicId,
+                publicId,
             },
         });
     }

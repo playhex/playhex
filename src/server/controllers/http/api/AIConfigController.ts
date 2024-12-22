@@ -1,10 +1,11 @@
-import { Get, JsonController, ResponseClassTransformOptions } from 'routing-controllers';
+import { Get, JsonController } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
 import { AIConfigStatusData } from '@shared/app/Types';
 import HexAiApiClient from '../../../services/HexAiApiClient';
 import logger from '../../../services/logger';
 import AIConfig from '../../../../shared/app/models/AIConfig';
-import { Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/core';
+import { instanceToPlain } from '../../../../shared/app/class-transformer-custom';
 
 const { HEX_AI_API } = process.env;
 
@@ -15,34 +16,20 @@ export default class AIConfigController
     constructor(
         private hexAiApiClient: HexAiApiClient,
 
-        @Inject('Repository<AIConfig>')
-        private aiConfigRepository: Repository<AIConfig>,
+        @Inject('EntityRepository<AIConfig>')
+        private aiConfigRepository: EntityRepository<AIConfig>,
     ) {}
 
     @Get('/api/ai-configs')
-    @ResponseClassTransformOptions({ groups: ['ai_config'] })
-    async get(): Promise<AIConfig[]> {
-        return await this.aiConfigRepository.find({
-            relations: {
-                player: true,
-            },
-            select: {
-                engine: true,
-                label: true,
-                description: true,
-                boardsizeMin: true,
-                boardsizeMax: true,
-                requireMorePower: true,
-                isRemote: true,
-                config: true as unknown as undefined,
-                player: {
-                    publicId: true,
-                },
-            },
-            order: {
+    async get() {
+        const aiConfigs = await this.aiConfigRepository.findAll({
+            populate: ['player'],
+            orderBy: {
                 order: 'asc',
             },
         });
+
+        return instanceToPlain(aiConfigs, { groups: ['ai_config'] });
     }
 
     @Get('/api/ai-configs-status')

@@ -1,4 +1,4 @@
-import Player from '../../shared/app/models/Player';
+import { Player } from '../../shared/app/models';
 import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '@client/apiClient';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';

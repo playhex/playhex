@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 import './config';
+import './data-source';
 import express from 'express';
 import http from 'http';
+import './superjson-serialization';
 import { registerHttpControllers } from './controllers/http';
 import Container from 'typedi';
 import { registerWebsocketControllers } from './controllers/websocket';
@@ -11,6 +13,7 @@ import socketIoAdminUi from './services/socketIoAdminUi';
 import logger from './services/logger';
 import { addSessionMiddlewares } from './services/security/middlewares';
 import monitorConnectedSockets from './services/monitorConnectedSockets';
+import mikroOrmRequestContext from './services/mikro-orm-request-context';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -28,6 +31,7 @@ const io = new HexServer(server, {
     },
 });
 
+mikroOrmRequestContext(app);
 addSessionMiddlewares(app, io);
 socketIoAdminUi(io);
 monitorConnectedSockets();

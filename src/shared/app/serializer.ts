@@ -1,30 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SuperJSON } from 'superjson';
-import { JSONObject, SuperJSONResult } from 'superjson/dist/types';
-import { instanceToPlain, plainToInstance } from './class-transformer-custom';
-import { entities } from './models';
-
-/*
- * Used to serialize/deserialize messages through socket,
- * when they contains special objects like date,
- * or model instance like Game, Player.
- *
- * Model instances will be tranformed using class-transformer
- * and follow Expose groups and all annotations.
- */
-
-for (const typeName in entities) {
-    const type = entities[typeName as keyof typeof entities];
-
-    SuperJSON.registerCustom<typeof type, JSONObject>(
-        {
-            isApplicable: (v): v is typeof type => v instanceof type,
-            serialize: v => instanceToPlain(v),
-            deserialize: v => plainToInstance(type as any, v),
-        },
-        typeName,
-    );
-}
+import { SuperJSONResult } from 'superjson/dist/types';
 
 /**
  * Uses SuperJson to serialize data without losing dates.

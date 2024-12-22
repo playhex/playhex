@@ -6,18 +6,16 @@ import RemoteApiPlayer from './RemoteApiPlayer';
 import logger from './logger';
 import HostedGameServer from '../HostedGameServer';
 import HexAiApiClient from './HexAiApiClient';
-import { AppDataSource } from '../data-source';
+import { orm } from '../data-source';
+import { wrap } from '@mikro-orm/core';
 
 export class FindAIError extends Error {}
 
 const findPlayerWithAIConfig = async (publicId: string): Promise<null | Player> => {
-    return await AppDataSource.getRepository(Player).findOne({
-        where: {
-            publicId,
-        },
-        relations: {
-            aiConfig: true,
-        },
+    return await orm.em.getRepository(Player).findOne({
+        publicId,
+    }, {
+        populate: ['aiConfig'],
     });
 };
 
@@ -89,24 +87,16 @@ const waitTimeBeforeRandomMove = (() => {
 })();
 
 export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedGameServer): Promise<null | Move> => {
-    const { isBot } = player;
-    let { aiConfig } = player;
+    await wrap(player).populate(['aiConfig']);
+
+    const { isBot, aiConfig } = player;
 
     if (!isBot) {
         throw new Error('makeAIPlayerMove() called with a non bot player');
     }
 
     if (!aiConfig) {
-        // Used when impersonating AI player to create AI vs AI games,
-        // player.aiConfig won't be loaded when fetching authenticated player.
-        const playerFull = await findPlayerWithAIConfig(player.publicId);
-
-        if (null === playerFull || !playerFull.aiConfig) {
-            throw new Error('makeAIPlayerMove() called with a ai player without ai config');
-        }
-
-        player = playerFull;
-        aiConfig = playerFull.aiConfig;
+        throw new Error('makeAIPlayerMove() called with an ai player without ai config');
     }
 
     if (aiConfig.isRemote) {

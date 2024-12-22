@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Property, OneToOne, Index } from '@mikro-orm/core';
 import HostedGame from './HostedGame';
 import type { Outcome, PlayerIndex } from '../../game-engine/Types';
 import { Expose, plainToInstance } from '../class-transformer-custom';
@@ -8,49 +8,45 @@ import Move from './Move';
 @Entity()
 export default class Game
 {
-    @PrimaryColumn()
-    hostedGameId?: number;
-
-    @OneToOne(() => HostedGame)
-    @JoinColumn()
+    @OneToOne(() => HostedGame, hostedGame => hostedGame.gameData, { primary: true, owner: true })
     hostedGame?: HostedGame;
 
-    @Column('smallint')
+    @Property({ type: 'smallint' })
     @Expose()
     size: number;
 
-    @Column({ type: 'json', transformer: { from: (value: null | unknown) => deserializeMovesHistory(value), to: value => value } })
+    @Property({ type: 'json' })
     @Expose()
     @Type(() => Move)
     movesHistory: Move[] = [];
 
-    @Column()
+    @Property()
     @Expose()
     allowSwap: boolean;
 
-    @Column({ type: 'smallint' })
+    @Property({ type: 'smallint' })
     @Expose()
     currentPlayerIndex: PlayerIndex;
 
-    @Column({ type: 'smallint', nullable: true })
+    @Property({ type: 'smallint', nullable: true })
     @Expose()
     winner: null | PlayerIndex = null;
 
-    @Column({ type: String, length: 15, nullable: true })
+    @Property({ type: String, length: 15, nullable: true })
     @Expose()
     outcome: Outcome = null;
 
-    @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
+    @Property({ type: Date })
     @Expose()
     @Type(() => Date)
     startedAt: Date = new Date();
 
-    @Column({ type: Date, precision: 3, nullable: true })
+    @Property({ type: Date, nullable: true })
     @Expose()
     @Type(() => Date)
     lastMoveAt: null | Date = null;
 
-    @Column({ type: Date, precision: 3, nullable: true })
+    @Property({ type: Date, nullable: true })
     @Index()
     @Expose()
     @Type(() => Date)

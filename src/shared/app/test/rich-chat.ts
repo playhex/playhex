@@ -30,11 +30,11 @@ describe('Rich Chat', () => {
         message2.player = blue;
 
         hostedGame.gameData = game;
-        hostedGame.chatMessages = [
+        hostedGame.chatMessages.set([
             message0,
             message1,
             message2,
-        ];
+        ]);
 
         const richChat = createRichChat(hostedGame)
             .filter(item => item instanceof ChatMessage || 'date' === item.type)
@@ -66,8 +66,6 @@ describe('Rich Chat', () => {
             { row: 0, col: 5, playedAt: new Date('2024-08-24T12:07:00Z') },
         ];
 
-        hostedGame.chatMessages = [];
-
         const message0 = new ChatMessage();
         message0.content = 'Hi';
         message0.createdAt = new Date('2024-08-24T12:00:01Z');
@@ -84,11 +82,11 @@ describe('Rich Chat', () => {
         message2.player = blue;
 
         hostedGame.gameData = game;
-        hostedGame.chatMessages = [
+        hostedGame.chatMessages.set([
             message0,
             message1,
             message2,
-        ];
+        ]);
 
         const richChat = createRichChat(hostedGame)
             .filter(item => item instanceof ChatMessage || 'move' === item.type)

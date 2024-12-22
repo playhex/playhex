@@ -1,0 +1,23 @@
+- remove this file
+- Mikro orm shim: make it better and move it outside
+- fix all warnings
+- use same config for mikro-orm.config and data-source.ts
+- make it works with pgsql also
+- fix all TODO in code
+- remove all "typeorm" in code
+
+mikro orm:
+    - primary key prop typings in string[]
+    - primary key prop jsdoc
+    - serialization.includePrimaryKeys jsdoc
+    - pivot table example in doc, with fixedOrder
+
+- frontend:
+    - Question: How to transform and validate MikroORM collections using class-transformer and class-validator?
+        https://github.com/mikro-orm/mikro-orm/issues/720
+    - Browser shim?
+        https://github.com/mikro-orm/mikro-orm/issues/1972
+    - Validation of entities with class-validator decorators?
+        https://github.com/mikro-orm/mikro-orm/issues/833
+    - Sharing Entity type definitions with frontend applications
+        https://github.com/mikro-orm/mikro-orm/issues/300

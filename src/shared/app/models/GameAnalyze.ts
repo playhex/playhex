@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Property, OneToOne } from '@mikro-orm/core';
 import { Expose } from '../../../shared/app/class-transformer-custom';
 import HostedGame from './HostedGame';
 
@@ -25,11 +25,7 @@ export const hasGameAnalyzeErrored = (gameAnalyze: GameAnalyze): boolean =>
 @Entity()
 export default class GameAnalyze
 {
-    @PrimaryColumn()
-    hostedGameId: number;
-
-    @OneToOne(() => HostedGame)
-    @JoinColumn()
+    @OneToOne(() => HostedGame, { primary: true })
     hostedGame: HostedGame;
 
     /**
@@ -37,14 +33,14 @@ export default class GameAnalyze
      * then the analyze errored.
      */
     @Expose()
-    @Column({ type: 'json', nullable: true })
+    @Property({ type: 'json', nullable: true })
     analyze: null | GameAnalyzeData = null;
 
     /**
      * Analyze started at.
      */
     @Expose()
-    @Column({ type: Date, precision: 3, default: () => 'current_timestamp(3)' })
+    @Property({ type: Date })
     startedAt: Date = new Date();
 
     /**
@@ -54,6 +50,6 @@ export default class GameAnalyze
      * unless started too long ago and job seems to have errored.
      */
     @Expose()
-    @Column({ type: Date, precision: 3, nullable: true })
+    @Property({ type: Date, precision: 3, nullable: true })
     endedAt: null | Date = null;
 }

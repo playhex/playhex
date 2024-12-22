@@ -1,6 +1,5 @@
-import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Property, OneToOne, Index } from '@mikro-orm/core';
 import { Type } from 'class-transformer';
-import { ColumnUUID } from '../custom-typeorm';
 import HostedGame from './HostedGame';
 import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../../game-engine';
 import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
@@ -16,14 +15,10 @@ export const MAX_BOARDSIZE = 42;
 @Entity()
 export default class HostedGameOptions
 {
-    @PrimaryColumn()
-    hostedGameId?: number;
-
-    @OneToOne(() => HostedGame, hostedGame => hostedGame.gameOptions)
-    @JoinColumn({ name: 'hostedGameId' })
+    @OneToOne(() => HostedGame, hostedGame => hostedGame.gameOptions, { primary: true, owner: true })
     hostedGame: HostedGame;
 
-    @Column()
+    @Property()
     @Expose()
     @IsBoolean()
     @Validate(BoardsizeEligibleForRanked)
@@ -36,7 +31,7 @@ export default class HostedGameOptions
      */
     @Min(MIN_BOARDSIZE)
     @Max(MAX_BOARDSIZE)
-    @Column({ type: 'smallint' })
+    @Property({ type: 'smallint' })
     @Expose()
     boardsize: number = DEFAULT_BOARDSIZE;
 
@@ -48,7 +43,7 @@ export default class HostedGameOptions
      */
     @IsNumber()
     @IsOptional()
-    @Column({ type: 'smallint', nullable: true })
+    @Property({ type: 'smallint', nullable: true })
     @Expose()
     firstPlayer: null | PlayerIndex = null;
 
@@ -57,7 +52,7 @@ export default class HostedGameOptions
      * Should be true by default for 1v1 games.
      */
     @IsBoolean()
-    @Column()
+    @Property()
     @Expose()
     swapRule: boolean = true;
 
@@ -65,7 +60,7 @@ export default class HostedGameOptions
      * Which opponent type I want.
      */
     @IsIn(['player', 'ai'])
-    @Column({ length: 15 })
+    @Property({ length: 15 })
     @Index()
     @Expose()
     opponentType: 'player' | 'ai' = 'player';
@@ -76,11 +71,11 @@ export default class HostedGameOptions
      */
     @IsUUID()
     @IsOptional()
-    @ColumnUUID({ nullable: true })
+    @Property({ nullable: true })
     @Expose()
     opponentPublicId?: null | string = null;
 
-    @Column({ type: 'json' })
+    @Property({ type: 'json' })
     @Expose()
     @IsObject()
     @ValidateNested()

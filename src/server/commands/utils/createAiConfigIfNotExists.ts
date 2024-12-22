@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { AppDataSource } from '../../data-source';
-import Player from '../../../shared/app/models/Player';
-import AIConfig from '../../../shared/app/models/AIConfig';
+import { AIConfig, Player } from '../../../shared/app/models';
+import { orm } from '../../data-source';
 
 type CreateAiConfigParameters = {
     config: { [key: string]: unknown };
@@ -24,21 +23,15 @@ type CreateAiConfigParameters = {
  * @returns {Boolean} true if aiConfig just has been created, false if it was already existing.
  */
 export default async (parameters: CreateAiConfigParameters): Promise<boolean> => {
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
+    const em = orm.em.fork();
 
-    const playerRepository = AppDataSource.getRepository(Player);
-
-    const alreadyExists = await playerRepository.findOneBy({
+    const alreadyExists = await em.getRepository(Player).findOne({
         slug: parameters.slug,
     });
 
     if (null !== alreadyExists) {
         return false;
     }
-
-    const aiConfigRepository = AppDataSource.getRepository(AIConfig);
 
     const player = new Player();
 
@@ -60,7 +53,7 @@ export default async (parameters: CreateAiConfigParameters): Promise<boolean> =>
     aiConfig.requireMorePower = parameters.requireMorePower ?? false;
     aiConfig.player = player;
 
-    await aiConfigRepository.save(aiConfig);
+    await em.persistAndFlush([player, aiConfig]);
 
     return true;
 };

@@ -1,12 +1,13 @@
 import { HostedGame, Player } from '../../shared/app/models';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger';
-import { And, FindManyOptions, FindOptionsRelations, In, IsNull, LessThanOrEqual, Not, Repository } from 'typeorm';
+import { EntityRepository, FilterQuery, wrap } from '@mikro-orm/core';
+import { orm } from '../data-source';
 
 /**
  * Relations to load in order to recreate an HostedGame in memory.
  */
-const relations: FindOptionsRelations<HostedGame> = {
+const relations = {
     chatMessages: {
         player: true,
     },
@@ -34,32 +35,44 @@ const relations: FindOptionsRelations<HostedGame> = {
 export default class HostedGamePersister
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('EntityRepository<HostedGame>')
+        private hostedGameRepository: EntityRepository<HostedGame>,
     ) {}
 
     async persist(hostedGame: HostedGame): Promise<void>
     {
         logger.info('Persisting a game...', { publicId: hostedGame.publicId });
 
-        await this.hostedGameRepository.save(hostedGame);
+
+
+        // console.log('HERE');
+        // const testEm = orm.em.fork();
+        // const hg = await testEm.findOne(HostedGame, 1, {
+        //     populate: ['gameData'],
+        // });
+        // if (null === hg) throw new Error('arg');
+        // hg.gameData!.size = 42;
+        // await testEm.flush();
+        // console.log('HERE DONE');
+
+        orm.em.persist(hostedGame);
+        await orm.em.flush();
 
         logger.info('Persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
     }
 
     async persistLinkToRematch(hostedGame: HostedGame): Promise<void>
     {
-        await this.hostedGameRepository.save({
-            id: hostedGame.id,
-            rematch: hostedGame.rematch,
-        });
+        await orm.em.persistAndFlush(hostedGame);
     }
 
     async deleteIfExists(hostedGame: HostedGame): Promise<void>
     {
         logger.info('Delete a game if exists...', { publicId: hostedGame.publicId });
 
-        await this.hostedGameRepository.remove(hostedGame);
+        await this.hostedGameRepository.nativeDelete({
+            id: hostedGame.id,
+        });
 
         logger.info('Deleted.', { publicId: hostedGame.publicId, hostedGame });
     }
@@ -67,138 +80,121 @@ export default class HostedGamePersister
     async findUnique(publicId: string): Promise<null | HostedGame>
     {
         return await this.hostedGameRepository.findOne({
-            relations,
-            where: {
-                publicId: publicId,
-                ratings: [
-                    { category: 'overall' },
-                    { category: IsNull() },
-                ],
-            },
+            publicId,
+            ratings: { $or: [
+                { category: 'overall' },
+                { category: null },
+            ] },
+        }, {
+            populate: [
+                'chatMessages.player',
+                'rematch',
+                'rematchedFrom',
+                'gameData',
+                'gameOptions',
+                'host.currentRating',
+                'hostedGameToPlayers.player.currentRating',
+            ],
         });
     }
 
     async findRematch(rematchedFromId: number): Promise<null | HostedGame>
     {
         return await this.hostedGameRepository.findOne({
-            relations,
-            where: {
-                rematchedFrom: {
-                    id: rematchedFromId,
-                },
+            rematchedFrom: {
+                id: rematchedFromId,
             },
+        }, {
+            populate: [
+                'chatMessages.player',
+                'rematch',
+                'rematchedFrom',
+                'gameData',
+                'gameOptions',
+                'host.currentRating',
+                'hostedGameToPlayers.player.currentRating',
+            ],
         });
     }
 
-    async findMany(criteria?: FindManyOptions<HostedGame>): Promise<HostedGame[]>
+    async findMany(criteria?: FilterQuery<HostedGame>): Promise<HostedGame[]>
     {
-        return await this.hostedGameRepository.find({
-            ...criteria,
-            relations,
+        return await this.hostedGameRepository.find(criteria || {}, {
+            populate: [
+                'chatMessages.player',
+                'rematch',
+                'rematchedFrom',
+                'gameData',
+                'gameOptions',
+                'host.currentRating',
+                'hostedGameToPlayers.player.currentRating',
+            ],
         });
     }
 
     async findLastEnded1v1(take = 5, fromGamePublicId?: string): Promise<HostedGame[]>
     {
-        // Options to get all games not in bot games
-        const options: FindManyOptions<HostedGame> = {
-            comment: 'find last ended 1v1',
-            relations,
-            where: {
-                state: 'ended',
-                gameOptions: {
-                    opponentType: 'player',
-                },
-                gameData: {
-                    endedAt: Not(IsNull()), // Works without, but query is slower
-                },
-                ratings: [
-                    { category: 'overall' },
-                    { category: IsNull() },
-                ],
+        const cursor = await this.hostedGameRepository.findByCursor({
+            state: 'ended',
+            gameOptions: {
+                opponentType: 'player',
             },
-            order: {
+            ratings: { $or: [
+                { category: 'overall' },
+                { category: null },
+            ] },
+        }, {
+            first: take,
+            after: fromGamePublicId && {
+                publicId: fromGamePublicId,
+            },
+            populate: [
+                'gameData',
+                'gameOptions',
+                'host',
+                'hostedGameToPlayers.player.currentRating',
+            ],
+            orderBy: {
                 gameData: {
                     endedAt: 'desc',
                 },
             },
-            take,
-        };
+        });
 
-        // Alter options to get only older than cursor if defined
-        if (undefined !== fromGamePublicId) {
-            const cursor = await this.hostedGameRepository.findOne({
-                comment: 'find last ended 1v1 cursor',
-                relations: { gameData: true },
-                where: { publicId: fromGamePublicId },
-            });
-
-            if (null === cursor) {
-                throw new Error('Invalid cursor, this id does not belong to a hostedGame');
-            }
-
-            options.where = {
-                ...options.where,
-                publicId: Not(cursor.publicId),
-                gameData: {
-                    endedAt: And(
-                        Not(IsNull()),
-                        LessThanOrEqual(cursor.gameData!.endedAt!),
-                    ),
-                },
-            };
-        }
-
-        const hostedGames = await this.hostedGameRepository.find(options);
-
-        return hostedGames;
+        return cursor.items;
     }
 
     async findLastEndedByPlayer(player: Player, fromGamePublicId?: string): Promise<HostedGame[]>
     {
-        // Query to get id of games played by given player
-        const hostedGameIdsQuery = this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .select('hostedGame.id', 'id')
-            .innerJoin('hostedGame.gameData', 'gameData')
-            .innerJoin('hostedGame.hostedGameToPlayers', 'hostedGameToPlayer')
-            .innerJoin('hostedGameToPlayer.player', 'player')
-            .where('player.publicId = :publicId', { publicId: player.publicId })
-            .andWhere('hostedGame.state = :ended', { ended: 'ended' })
-            .orderBy('gameData.endedAt', 'DESC')
-            .limit(20)
-        ;
-
-        // Alter query to take only games older than cursor
-        if (undefined !== fromGamePublicId) {
-            const cursor = await this.hostedGameRepository.findOne({
-                relations: { gameData: true },
-                where: { publicId: fromGamePublicId },
-            });
-
-            if (null === cursor) {
-                throw new Error('Invalid cursor, this id does not belong to a hostedGame');
-            }
-
-            hostedGameIdsQuery
-                .andWhere('gameData.endedAt <= :cursorEndedAt', { cursorEndedAt: cursor.gameData?.endedAt })
-                .andWhere('hostedGame.id != :cursorId', { cursorId: cursor.id })
-            ;
-        }
-
-        const hostedGameIds: { id: number }[] = await hostedGameIdsQuery.getRawMany();
-
-        const hostedGames = await this.hostedGameRepository.find({
-            relations,
-            where: {
-                id: In(hostedGameIds.map(row => row.id)),
-                ratings: [
-                    { category: 'overall' },
-                    { category: IsNull() },
-                ],
+        const cursor = await this.hostedGameRepository.findByCursor({
+            state: 'ended',
+            hostedGameToPlayers: {
+                player: {
+                    publicId: player.publicId,
+                },
+            },
+            ratings: { $or: [
+                { category: 'overall' },
+                { category: null },
+            ] },
+        }, {
+            first: 20,
+            after: fromGamePublicId && {
+                publicId: fromGamePublicId,
+            },
+            populate: [
+                'gameData',
+                'gameOptions',
+                'host',
+                'hostedGameToPlayers.player.currentRating',
+            ],
+            orderBy: {
+                gameData: {
+                    endedAt: 'desc',
+                },
             },
         });
 
-        return hostedGames;
+        return cursor.items;
     }
 }

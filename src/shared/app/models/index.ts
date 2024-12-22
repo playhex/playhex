@@ -45,17 +45,20 @@ export const entities = {
     GameAnalyze,
     HostedGame,
     HostedGameOptions,
+    HostedGameToPlayer,
+    Player,
+    PlayerSettings,
+    Rating,
+};
+
+export const models = {
     HostedGameOptionsTimeControl,
     OptionsFischer,
     HostedGameOptionsTimeControlFischer,
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
-    HostedGameToPlayer,
     Move,
     OnlinePlayers,
-    Player,
-    PlayerSettings,
-    Rating,
 };
 
 const errored = Object.keys(entities).filter(name => !entities[name as keyof typeof entities]);
@@ -65,6 +68,10 @@ if (errored.length > 0) {
      * Occurs not sure why, but i.e when adding both lines, in this order:
      * import HostedGame from '../shared/app/models/HostedGame';
      * import { HostedGameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models';
+     *
+     * To fix it, never import entity from file directly like '../shared/app/models/HostedGame',
+     * but always import entities in a single line like:
+     * import { HostedGame } from '../shared/app/models';
      */
     throw new Error(`Error while generating entities list: ${errored.join(', ')}`);
 }

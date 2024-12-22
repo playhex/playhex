@@ -1,11 +1,10 @@
-import { QueryFailedError } from 'typeorm';
+import { UniqueConstraintViolationException } from '@mikro-orm/core';
 
 /**
  * Whether the error thrown by typeorm comes from a duplicate error,
  * i.e unicity constraint failed.
+ * TODO rename file
  */
 export const isDuplicateError = (e: Error): boolean => {
-    // e.message example for a duplicate:
-    // "Duplicate entry 'xxx' for key 'IDX_xxx'"
-    return e instanceof QueryFailedError && e.message.includes('uplicate');
+    return e instanceof UniqueConstraintViolationException;
 };

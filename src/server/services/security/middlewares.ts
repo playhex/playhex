@@ -3,6 +3,7 @@ import { HexServer } from '../../server';
 import { sessionMiddleware } from '../sessionMiddleware';
 import Container from 'typedi';
 import PlayerRepository from '../../repositories/PlayerRepository';
+import { orm } from '../../data-source';
 
 const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     // Makes express and socketio aware of session in cookie

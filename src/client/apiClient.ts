@@ -1,5 +1,5 @@
 import { AIConfigStatusData, HostedGameState, PlayHexContributors, WithRequired } from '@shared/app/Types';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating } from '../shared/app/models';
+import { HostedGameOptions, HostedGame, Player, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { plainToInstance } from '../shared/app/class-transformer-custom';
 import { RatingCategory } from '../shared/app/ratingUtils';
@@ -375,14 +375,14 @@ export const apiPatchPlayerSettings = async (playerSettings: PlayerSettings): Pr
     await checkResponse(response);
 };
 
-export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content' | 'hostedGameId'>): Promise<void> => {
-    const response = await fetch(`/api/games/${chatMessage.hostedGameId}/chat-messages`, {
+export const apiPostChatMessage = async (hostedGamePublicId: string, content: string): Promise<void> => {
+    const response = await fetch(`/api/games/${hostedGamePublicId}/chat-messages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            content: chatMessage.content,
+            content,
         }),
     });
 

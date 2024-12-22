@@ -1,9 +1,7 @@
-import Container from 'typedi';
 import Player from '../../../shared/app/models/Player';
 import bcrypt from 'bcryptjs';
 import HandledError from '../../../shared/app/Errors';
-import { AppDataSource } from '../../data-source';
-import PlayerRepository from '../../repositories/PlayerRepository';
+import { orm } from '../../data-source';
 
 export class PseudoNotExistingError extends HandledError {}
 export class InvalidPasswordError extends HandledError {}
@@ -27,13 +25,8 @@ export const checkPassword = (player: Player, password: string): boolean => {
  * @throws {InvalidPasswordError}
  */
 export const authenticate = async (pseudo: string, password: string): Promise<Player> => {
-    const playerRepository = AppDataSource.getRepository(Player);
-
-    const player = await playerRepository.findOne({
-        where: {
-            pseudo,
-        },
-        select: Container.get(PlayerRepository).allColumnWithPassword(),
+    const player = await orm.em.getRepository(Player).findOne({
+        pseudo,
     });
 
     if (null === player) {

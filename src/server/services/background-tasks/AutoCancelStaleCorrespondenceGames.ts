@@ -51,7 +51,7 @@ export default class AutoCancelStaleCorrespondenceGames
 
         for (const hostedGameServer of hostedGameServers) {
             if (this.shouldAutoCancel(hostedGameServer)) {
-                logger.info('Cancel correspondence game because no activity', { gameId: hostedGameServer.getId() });
+                logger.info('Cancel correspondence game because no activity', { gameId: hostedGameServer.getPublicId() });
                 hostedGameServer.systemCancel();
             }
         }
@@ -70,7 +70,7 @@ export default class AutoCancelStaleCorrespondenceGames
         }
 
         const game = hostedGameServer.getGame();
-        const lastActivityAt = game?.getLastMoveAt() ?? game?.getStartedAt() ?? hostedGameServer.toData().createdAt;
+        const lastActivityAt = game?.getLastMoveAt() ?? game?.getStartedAt() ?? hostedGameServer.getHostedGame().createdAt;
 
         return new Date().valueOf() - lastActivityAt.valueOf() > this.autoCancelAfter;
     }

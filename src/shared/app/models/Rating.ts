@@ -1,14 +1,14 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryKey, Property, ManyToOne, ManyToMany, Index, Collection } from '@mikro-orm/core';
 import type { RatingCategory } from '../ratingUtils';
 import Player from './Player';
 import HostedGame from './HostedGame';
 import { Expose } from '../class-transformer-custom';
 
 @Entity()
-@Index(['player', 'category', 'createdAt'])
+@Index({ properties: ['player', 'category', 'createdAt'] })
 export default class Rating
 {
-    @PrimaryGeneratedColumn()
+    @PrimaryKey()
     id: number;
 
     @ManyToOne(() => Player)
@@ -19,30 +19,29 @@ export default class Rating
      * Which game(s) have issued this new player rating
      */
     @ManyToMany(() => HostedGame, hostedGame => hostedGame.ratings)
-    @JoinTable()
-    games: HostedGame[];
+    games = new Collection<HostedGame>(this);
 
     /**
      * Category of rating, "overall" for overall rating,
      * or a category name like "blitz", "small", "normal.medium", ...
      */
-    @Column()
+    @Property()
     @Expose()
     category: RatingCategory;
 
-    @Column()
+    @Property()
     @Expose()
     createdAt: Date;
 
-    @Column({ type: 'float' })
+    @Property({ type: 'float' })
     @Expose()
     rating: number;
 
-    @Column({ type: 'float' })
+    @Property({ type: 'float' })
     @Expose()
     deviation: number;
 
-    @Column({ type: 'float' })
+    @Property({ type: 'float' })
     @Expose()
     volatility: number;
 
@@ -50,7 +49,7 @@ export default class Rating
      * Rating change from last rating.
      * Used to show "+17" next to player username on finished games.
      */
-    @Column({ type: 'float', nullable: true })
+    @Property({ type: 'float', nullable: true })
     @Expose()
     ratingChange?: number;
 }

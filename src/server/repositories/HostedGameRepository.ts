@@ -9,14 +9,13 @@ import { validateOrReject } from 'class-validator';
 import Rooms from '../../shared/app/Rooms';
 import { HexServer } from '../server';
 import { FindAIError, findAIOpponent } from '../services/AIManager';
-import { Repository } from 'typeorm';
+import { EntityRepository } from '@mikro-orm/core';
 import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
-import { AppDataSource } from '../data-source';
-import { plainToInstance } from '../../shared/app/class-transformer-custom';
 import RatingRepository from './RatingRepository';
 import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames';
 import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames';
 import { isDuplicateError } from './typeormUtils';
+import { orm } from '../data-source';
 
 export class GameError extends Error {}
 
@@ -53,11 +52,11 @@ export default class HostedGameRepository
         private autoCancelStaleGames: AutoCancelStaleGames,
         private autoCancelStaleCorrespondenceGames: AutoCancelStaleCorrespondenceGames,
 
-        @Inject('Repository<ChatMessage>')
-        private chatMessageRepository: Repository<ChatMessage>,
+        @Inject('EntityRepository<ChatMessage>')
+        private chatMessageRepository: EntityRepository<ChatMessage>,
 
-        @Inject('Repository<Player>')
-        private playerRepository: Repository<Player>,
+        @Inject('EntityRepository<Player>')
+        private playerRepository: EntityRepository<Player>,
     ) {
         this.loadActiveGamesFromMemory();
     }
@@ -66,13 +65,8 @@ export default class HostedGameRepository
     {
         logger.info('Loading active games from memory...');
 
-        await AppDataSource.initialize();
-
         const games = await this.hostedGamePersister.findMany({
-            where: [
-                { state: 'created' },
-                { state: 'playing' },
-            ],
+            state: ['created', 'playing'],
         });
 
         for (const hostedGame of games) {
@@ -105,7 +99,7 @@ export default class HostedGameRepository
 
         for (const key in this.activeGames) {
             try {
-                await this.hostedGamePersister.persist(this.activeGames[key].toData());
+                await this.hostedGamePersister.persist(this.activeGames[key].getHostedGame());
             } catch (e) {
                 allSuccess = false;
                 logger.error('Could not persist a game. Continue with others.', { gameId: key, e, errorMessage: e.message });
@@ -141,8 +135,8 @@ export default class HostedGameRepository
     private resetActivityTimeout(hostedGameServer: HostedGameServer): void
     {
         this.clearActivityTimeout(hostedGameServer);
-        this.persistWhenNoActivity[hostedGameServer.getId()] = setTimeout(
-            () => this.hostedGamePersister.persist(hostedGameServer.toData()),
+        this.persistWhenNoActivity[hostedGameServer.getPublicId()] = setTimeout(
+            () => this.hostedGamePersister.persist(hostedGameServer.getHostedGame()),
             300 * 1000, // Persist after 5min inactivity
         );
     }
@@ -152,9 +146,9 @@ export default class HostedGameRepository
      */
     private clearActivityTimeout(hostedGameServer: HostedGameServer): void
     {
-        if (this.persistWhenNoActivity[hostedGameServer.getId()]) {
-            clearTimeout(this.persistWhenNoActivity[hostedGameServer.getId()]);
-            delete this.persistWhenNoActivity[hostedGameServer.getId()];
+        if (this.persistWhenNoActivity[hostedGameServer.getPublicId()]) {
+            clearTimeout(this.persistWhenNoActivity[hostedGameServer.getPublicId()]);
+            delete this.persistWhenNoActivity[hostedGameServer.getPublicId()];
         }
     }
 
@@ -173,9 +167,9 @@ export default class HostedGameRepository
     private async flushHostedGame(hostedGameServer: HostedGameServer): Promise<void>
     {
         this.clearActivityTimeout(hostedGameServer);
-        const hostedGame = hostedGameServer.toData();
+        const hostedGame = hostedGameServer.getHostedGame();
         await this.hostedGamePersister.persist(hostedGame);
-        delete this.activeGames[hostedGameServer.getId()];
+        delete this.activeGames[hostedGameServer.getPublicId()];
     }
 
     /**
@@ -185,17 +179,17 @@ export default class HostedGameRepository
     {
         await this.flushHostedGame(hostedGameServer);
 
-        if (hostedGameServer.toData().gameOptions.ranked) {
+        if (hostedGameServer.getHostedGame().gameOptions.ranked) {
             const newRatings = await this.updateRatings(hostedGameServer);
 
             this.io
                 .to([
-                    Rooms.game(hostedGameServer.getId()),
+                    Rooms.game(hostedGameServer.getPublicId()),
                     Rooms.lobby,
                 ])
                 .emit(
                     'ratingsUpdated',
-                    hostedGameServer.getId(),
+                    hostedGameServer.getPublicId(),
                     newRatings.filter(rating => 'overall' === rating.category),
                 )
             ;
@@ -215,10 +209,10 @@ export default class HostedGameRepository
      */
     private async updateRatings(hostedGameServer: HostedGameServer): Promise<Rating[]>
     {
-        const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.toData());
+        const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.getHostedGame());
 
-        await this.ratingRepository.persistRatings(newRatings);
-        await this.playerRepository.save(hostedGameServer.getPlayers());
+        orm.em.persist(newRatings);
+        await orm.em.flush();
 
         return newRatings;
     }
@@ -236,7 +230,7 @@ export default class HostedGameRepository
     getActiveGamesData(): HostedGame[]
     {
         return Object.values(this.activeGames)
-            .map(game => game.toData())
+            .map(game => game.getHostedGame())
         ;
     }
 
@@ -266,7 +260,7 @@ export default class HostedGameRepository
     async getGame(publicId: string): Promise<HostedGame | null>
     {
         if (this.activeGames[publicId]) {
-            return this.activeGames[publicId].toData();
+            return this.activeGames[publicId].getHostedGame();
         }
 
         return await this.hostedGamePersister.findUnique(publicId);
@@ -289,7 +283,7 @@ export default class HostedGameRepository
             }
         }
 
-        this.activeGames[hostedGame.getId()] = hostedGame;
+        this.activeGames[hostedGame.getPublicId()] = hostedGame;
 
         this.listenHostedGameServer(hostedGame);
 
@@ -303,11 +297,11 @@ export default class HostedGameRepository
         if (null === game) {
             throw new GameError(`no game ${gameId}`);
         }
-        if (!game.hostedGameToPlayers.some(p => p.player.publicId === host.publicId)) {
+        if (!game.hostedGameToPlayers.exists(p => p.player.publicId === host.publicId)) {
             throw new GameError('Player not in the game');
         }
         if (game.rematch != null && this.activeGames[game.rematch.publicId]) {
-            return this.activeGames[game.rematch.publicId].toData();
+            return this.activeGames[game.rematch.publicId].getHostedGame();
         }
         if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
@@ -317,11 +311,11 @@ export default class HostedGameRepository
         }
 
         const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions), game);
-        game.rematch = rematch.toData();
+        game.rematch = rematch.getHostedGame();
 
         try {
-            await this.hostedGamePersister.persist(game.rematch);
-            await this.hostedGamePersister.persistLinkToRematch(game);
+            orm.em.persist(game);
+            await orm.em.flush();
         } catch (e) {
             if (isDuplicateError(e)) {
                 // In case both players rematch at same time, 2 games are created in memory but with same rematchedFromId, so one game won't persist thanks to unicity constraint.
@@ -385,7 +379,7 @@ export default class HostedGameRepository
                 continue;
             }
 
-            hostedGameList.push(this.activeGames[key].toData());
+            hostedGameList.push(this.activeGames[key].getHostedGame());
         }
 
         const gamesFromDb = await this.hostedGamePersister.findLastEndedByPlayer(player, fromGamePublicId ?? undefined);
@@ -485,7 +479,7 @@ export default class HostedGameRepository
     async postChatMessage(publicId: string, chatMessage: ChatMessage): Promise<string | true>
     {
         try {
-            await validateOrReject(plainToInstance(ChatMessage, chatMessage), {
+            await validateOrReject(chatMessage, {
                 groups: ['post'],
             });
         } catch (e) {
@@ -498,7 +492,7 @@ export default class HostedGameRepository
         // Game is in memory, push chat message
         if (hostedGameServer) {
             let error: true | string;
-            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.toData()))) {
+            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.getHostedGame()))) {
                 return error;
             }
 
@@ -522,7 +516,7 @@ export default class HostedGameRepository
         chatMessage.hostedGame = hostedGame;
 
         // Game is in database, insert chat message into database
-        await this.chatMessageRepository.save(chatMessage);
+        await this.chatMessageRepository.upsert(chatMessage);
 
         this.io.to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
 

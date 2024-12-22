@@ -14,16 +14,19 @@ export default class ChatController
         private hostedGameRepository: HostedGameRepository,
     ) {}
 
-    @Post('/api/games/:gameId/chat-messages')
+    @Post('/api/games/:publicId/chat-messages')
     async post(
         @AuthenticatedPlayer() player: Player,
-        @Param('gameId') gameId: string,
-        @Body({ validate: { groups: ['playerInput'] } }) chatMessage: ChatMessage,
+        @Param('publicId') publicId: string,
+        @Body({ validate: { groups: ['playerInput'] } }) input: ChatMessage,
     ) {
+        const chatMessage = new ChatMessage();
+
+        chatMessage.content = input.content;
         chatMessage.player = player;
         chatMessage.createdAt = new Date();
 
-        const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
+        const result = await this.hostedGameRepository.postChatMessage(publicId, chatMessage);
 
         if (true !== result) {
             throw new HttpError(400, result);
