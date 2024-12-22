@@ -4,7 +4,7 @@ import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, Hoste
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
-import logger from './services/logger';
+import baseLogger from './services/logger';
 import Rooms from '../shared/app/Rooms';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl';
 import { createTimeControl } from '../shared/time-control/createTimeControl';
@@ -59,6 +59,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private io: HexServer = Container.get(HexServer);
 
+    private logger = baseLogger;
+
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
@@ -77,12 +79,16 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         hostedGame.chatMessages = [];
         hostedGame.hostedGameToPlayers = [];
 
+        hostedGameServer.logger = baseLogger.child({
+            hostedGamePublicId: hostedGame.publicId,
+        });
+
         hostedGameServer.players.push(host);
         hostedGameServer.timeControl = createTimeControl(gameOptions.timeControl);
 
         hostedGameServer.saveState();
 
-        logger.info('Hosted game created.', { hostedGameId: hostedGame.publicId, host: host.pseudo });
+        hostedGameServer.logger.info('Hosted game created.', { host: host.pseudo });
 
         hostedGameServer.io.to(Rooms.lobby).emit('gameCreated', hostedGame);
 
@@ -172,7 +178,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             // Ignore, board position has changed while AI was computing. Occurs when move has been undone.
             if (this.game.getMovesHistoryAsString() !== boardPosition) {
-                logger.info('Board position changed while AI was computing, ignoring AI move', { gameId: this.getPublicId() });
+                this.logger.info('Board position changed while AI was computing, ignoring AI move');
                 return;
             }
 
@@ -184,14 +190,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             const result = this.playerMove(player, fromEngineMove(move));
 
             if (true !== result) {
-                logger.error('Bot tried to move but get an error', { gameId: this.getPublicId(), result });
+                this.logger.error('Bot tried to move but get an error', { result });
                 this.playerResign(player);
             }
         } catch (e) {
             if (e instanceof IllegalMove) {
-                logger.error('From makeAIMoveIfApplicable(): an AI played an illegal move', { err: e.message, slug: player.slug });
+                this.logger.error('From makeAIMoveIfApplicable(): an AI played an illegal move', { err: e.message, slug: player.slug });
             } else {
-                logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { err: e.message, slug: player.slug });
+                this.logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { err: e.message, slug: player.slug });
             }
 
             this.playerResign(player);
@@ -250,7 +256,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         const lastPlayerMove = this.getLastPlayerMove();
 
         if (null === lastPlayerMove) {
-            logger.warning('Could not get last player move to make decision on undo request', { gameId: this.getPublicId() });
+            this.logger.warning('Could not get last player move to make decision on undo request');
             return;
         }
 
@@ -292,7 +298,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.io.to(this.gameRooms(true)).emit('ended', this.getPublicId(), winner, outcome, { date });
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
-            logger.info('Game ended.', { hostedGameId: this.getPublicId(), winner, outcome });
+            this.logger.info('Game ended.', { winner, outcome });
 
             this.emit('ended');
         });
@@ -302,7 +308,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * or player canceled because nobody joined.
          */
         game.on('canceled', (date) => {
-            logger.info('Game canceled.', { hostedGameId: this.getPublicId() });
+            this.logger.info('Game canceled.');
             this.doCancel(date);
         });
     }
@@ -310,7 +316,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     bindTimeControl(): void
     {
         if (!this.game) {
-            logger.error('Cannot call bindTimeControl() now, game is not yet created.');
+            this.logger.error('Cannot call bindTimeControl() now, game is not yet created.');
             return;
         }
 
@@ -325,17 +331,17 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private createAndStartGame(): void
     {
         if ('canceled' === this.hostedGame.state) {
-            logger.warning('Cannot init game, canceled', { hostedGameId: this.getPublicId() });
+            this.logger.warning('Cannot init game, canceled');
             return;
         }
 
         if (null !== this.game) {
-            logger.warning('Cannot init game, already started', { hostedGameId: this.getPublicId() });
+            this.logger.warning('Cannot init game, already started');
             return;
         }
 
         if (this.players.length < 2) {
-            logger.warning('Cannot init game, no opponent', { hostedGameId: this.getPublicId() });
+            this.logger.warning('Cannot init game, no opponent');
             return;
         }
 
@@ -355,7 +361,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.io.to(this.gameRooms(true)).emit('gameStarted', this.getHostedGame());
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
-        logger.info('Game Started.', { hostedGameId: this.getPublicId() });
+        this.logger.info('Game Started.');
 
         this.makeAIMoveIfApplicable();
     }
@@ -367,13 +373,13 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             // In case of rematch, alternate colors from previous game instead of random
             if (null !== this.hostedGame.rematchedFrom && this.shouldAlternateColorsFromRematchedGame()) {
-                logger.info('Rematch: alternate colors', { gameId: this.getPublicId() });
+                this.logger.info('Rematch: alternate colors');
 
                 const previousFirstPlayer = this.hostedGame.rematchedFrom.hostedGameToPlayers[0].playerId;
                 const currentFirstPlayer = this.getHostedGame().hostedGameToPlayers[0].playerId;
 
                 if ('number' !== typeof previousFirstPlayer || 'number' !== typeof currentFirstPlayer) {
-                    logger.warning('Rematch: missing previous or current first player id. Randomize.', { previousFirstPlayer, currentFirstPlayer });
+                    this.logger.warning('Rematch: missing previous or current first player id. Randomize.', { previousFirstPlayer, currentFirstPlayer });
 
                     if (Math.random() < 0.5) {
                         this.players.reverse();
@@ -426,19 +432,19 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     playerJoin(player: Player): true | string
     {
         if ('created' !== this.hostedGame.state) {
-            logger.notice('Player tried to join but hosted game has started or ended', { hostedGameId: this.getPublicId(), joiner: player.pseudo });
+            this.logger.notice('Player tried to join but hosted game has started or ended', { joiner: player.pseudo });
             return 'Game has started or ended';
         }
 
         // Check whether game is full
         if (this.players.length >= 2) {
-            logger.notice('Player tried to join but hosted game is full', { hostedGameId: this.getPublicId(), joiner: player.pseudo });
+            this.logger.notice('Player tried to join but hosted game is full', { joiner: player.pseudo });
             return 'Game is full';
         }
 
         // Prevent a player from joining twice
         if (this.isPlayerInGame(player)) {
-            logger.notice('Player tried to join twice', { hostedGameId: this.getPublicId(), joiner: player.pseudo });
+            this.logger.notice('Player tried to join twice', { joiner: player.pseudo });
             return 'You already joined this game.';
         }
 
@@ -446,7 +452,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.io.to(this.gameRooms(true)).emit('gameJoined', this.getPublicId(), player);
 
-        logger.info('Player joined.', { hostedGameId: this.getPublicId(), joiner: player.pseudo });
+        this.logger.info('Player joined.', { joiner: player.pseudo });
 
         // Starts automatically when game is full
         if (2 === this.players.length) {
@@ -459,25 +465,25 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     playerMove(player: Player, move: Move): true | string
     {
         move.playedAt = new Date();
-        logger.info('Move played', { hostedGameId: this.getPublicId(), move, player: player.pseudo });
+        this.logger.info('Move played', { move, player: player.pseudo });
 
         if ('playing' !== this.hostedGame.state) {
-            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('Player tried to move but hosted game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
         if (!this.game) {
-            logger.warning('Tried to make a move but game is not yet created.', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.warning('Tried to make a move but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot make a move';
         }
 
         if (!this.isPlayerInGame(player)) {
-            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('A player not in the game tried to make a move', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
         if ('pass' === move.specialMoveType && !canPassAgain(this.game)) {
-            logger.notice('Tried to pass again', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('Tried to pass again', { player: player.pseudo });
             return 'cannot pass infinitely. Now, play';
         }
 
@@ -490,36 +496,36 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 return e.message;
             }
 
-            logger.warning('Unexpected error from player.move', { hostedGameId: this.getPublicId(), err: e.message });
+            this.logger.warning('Unexpected error from player.move', { err: e.message });
             return 'Unexpected error: ' + e.message;
         }
     }
 
     playerAskUndo(player: Player): true | string
     {
-        logger.info('Player ask undo', { hostedGameId: this.getPublicId(), player: player.pseudo });
+        this.logger.info('Player ask undo', { player: player.pseudo });
 
         if ('playing' !== this.hostedGame.state) {
-            logger.notice('Player tried to ask undo but hosted game is not playing', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('Player tried to ask undo but hosted game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
         if (!this.game) {
-            logger.warning('Tried to ask undo but game is not yet created.', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.warning('Tried to ask undo but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot ask undo';
         }
 
         const playerIndex = this.getPlayerIndex(player);
 
         if (null === playerIndex) {
-            logger.notice('A player not in the game tried to ask undo', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('A player not in the game tried to ask undo', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
         const hostedGame = this.getHostedGame();
 
         if (null !== hostedGame.undoRequest) {
-            logger.notice('A player tried to ask undo but there is already an undo request', { hostedGameId: this.getPublicId(), player: player.pseudo, undoRequest: hostedGame.undoRequest });
+            this.logger.notice('A player tried to ask undo but there is already an undo request', { player: player.pseudo, undoRequest: hostedGame.undoRequest });
             return 'there is already an undo request';
         }
 
@@ -539,22 +545,22 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     playerAnswerUndo(player: Player, accept: boolean): true | string
     {
-        logger.info('Player answer undo request', { hostedGameId: this.getPublicId(), player: player.pseudo, accept });
+        this.logger.info('Player answer undo request', { player: player.pseudo, accept });
 
         if ('playing' !== this.hostedGame.state) {
-            logger.notice('Player tried to answer undo but hosted game is not playing', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('Player tried to answer undo but hosted game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
         const playerIndex = this.getPlayerIndex(player);
 
         if (null === playerIndex) {
-            logger.notice('A player not in the game tried to answer undo', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('A player not in the game tried to answer undo', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
         if (!this.game) {
-            logger.warning('Tried to answer undo but game is not yet created.', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.warning('Tried to answer undo but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot answer undo';
         }
 
@@ -562,19 +568,19 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         const now = new Date();
 
         if (null === hostedGame.undoRequest) {
-            logger.notice('A player tried to answer undo but there is no undo request', { hostedGameId: this.getPublicId(), player: player.pseudo, undoRequest: hostedGame.undoRequest });
+            this.logger.notice('A player tried to answer undo but there is no undo request', { player: player.pseudo, undoRequest: hostedGame.undoRequest });
             return 'there is no undo request';
         }
 
         if (hostedGame.undoRequest === playerIndex) {
-            logger.notice('A player tried to answer his own undo request', { hostedGameId: this.getPublicId(), player: player.pseudo, undoRequest: hostedGame.undoRequest });
+            this.logger.notice('A player tried to answer his own undo request', { player: player.pseudo, undoRequest: hostedGame.undoRequest });
             return 'cannot answer own undo request';
         }
 
         const timeControlAfterUndo = recreateTimeControlAfterUndo(hostedGame, this.game.playerUndoDryRun(hostedGame.undoRequest as PlayerIndex).length, now);
 
         if (accept && null === timeControlAfterUndo) {
-            logger.notice('An undo request has been accepted, but will make time control elapsing. Ignoring', { gameId: this.getPublicId() });
+            this.logger.notice('An undo request has been accepted, but will make time control elapsing. Ignoring');
             return 'too late to accept undo request, it will elapse time control';
         }
 
@@ -613,17 +619,17 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     playerResign(player: Player): true | string
     {
         if ('playing' !== this.hostedGame.state) {
-            logger.notice('Player tried to move but hosted game is not playing', { hostedGameId: this.getPublicId(), joiner: player.pseudo });
+            this.logger.notice('Player tried to move but hosted game is not playing', { joiner: player.pseudo });
             return 'Game is not playing';
         }
 
         if (!this.game) {
-            logger.warning('Tried to resign but game is not yet created.', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.warning('Tried to resign but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot resign';
         }
 
         if (!this.isPlayerInGame(player)) {
-            logger.notice('A player not in the game tried to make a move', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('A player not in the game tried to make a move', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
@@ -634,7 +640,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             return true;
         } catch (e) {
-            logger.warning('Unexpected error from player.resign', { hostedGameId: this.getPublicId(), err: e.message });
+            this.logger.warning('Unexpected error from player.resign', { err: e.message });
             return e.message;
         }
     }
@@ -642,12 +648,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private canCancel(player: Player): true | string
     {
         if (!this.isPlayerInGame(player)) {
-            logger.notice('A player not in the game tried to cancel game', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('A player not in the game tried to cancel game', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
         if ('playing' !== this.hostedGame.state && 'created' !== this.hostedGame.state) {
-            logger.notice('Player tried to move but hosted game is not playing nor created', { hostedGameId: this.getPublicId(), joiner: player.pseudo });
+            this.logger.notice('Player tried to move but hosted game is not playing nor created', { joiner: player.pseudo });
             return 'Game is not playing nor created';
         }
 
@@ -656,7 +662,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         if (this.game.getMovesHistory().length >= this.players.length) {
-            logger.notice('A player tried to cancel, but too late, every player played a move', { hostedGameId: this.getPublicId(), player: player.pseudo });
+            this.logger.notice('A player tried to cancel, but too late, every player played a move', { player: player.pseudo });
             return 'cannot cancel now, each player has played at least one move';
         }
 
@@ -665,12 +671,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     playerCancel(player: Player): true | string
     {
-        logger.info('Player cancel game', { hostedGameId: this.getPublicId(), player: player.pseudo });
+        this.logger.info('Player cancel game', { player: player.pseudo });
 
         const canCancel = this.canCancel(player);
 
         if (true !== canCancel) {
-            logger.notice('Player tried to cancel game, but cannot', { hostedGameId: this.getPublicId(), player: player.pseudo, canCancel });
+            this.logger.notice('Player tried to cancel game, but cannot', { player: player.pseudo, canCancel });
             return canCancel;
         }
 
@@ -687,7 +693,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     systemCancel(): void
     {
-        logger.info('System cancel game', { hostedGameId: this.getPublicId() });
+        this.logger.info('System cancel game');
 
         const now = new Date();
 
@@ -705,14 +711,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.io.to(this.gameRooms(true)).emit('gameCanceled', this.getPublicId(), { date });
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
-        logger.info('hosted game server canceled', { hostedGameId: this.getPublicId(), date });
+        this.logger.info('hosted game server canceled', { date });
 
         this.emit('canceled');
     }
 
     postChatMessage(chatMessage: ChatMessage)
     {
-        logger.info('Chat message posted', { gamePublicId: this.getPublicId(), author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
+        this.logger.info('Chat message posted', { gamePublicId: this.getPublicId(), author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
         this.hostedGame.chatMessages.push(chatMessage);
         this.io.to(this.gameRooms()).emit('chat', this.getPublicId(), chatMessage);
         this.emit('chat');
@@ -780,7 +786,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         // Check whether data.createdAt is an instance of Date and not a string,
         // to check whether denormalization with superjson worked.
         if (!(data.createdAt instanceof Date)) {
-            logger.error(
+            baseLogger.error(
                 'HostedGame.fromData(): Error while trying to recreate a HostedGame from data,'
                 + ' createdAt is not an instance of Date.',
             );
@@ -800,7 +806,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 hostedGameServer.game = EngineGame.fromData(data.gameData);
                 hostedGameServer.listenGame(hostedGameServer.game);
             } catch (e) {
-                logger.error('Could not recreate game from data', { data });
+                baseLogger.error('Could not recreate game from data', { data });
                 throw e;
             }
         }
@@ -808,9 +814,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         try {
             hostedGameServer.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
         } catch (e) {
-            logger.error('Could not recreate time control instance from persisted data', {
+            baseLogger.error('Could not recreate time control instance from persisted data', {
                 reason: e.message,
-                hostedGameId: data.publicId,
+                hostedGamePublicId: data.publicId,
                 data,
             });
 

@@ -50,4 +50,4 @@ const logger = winston.createLogger({
 
 addSentryLoggerIfConfigured(logger);
 
-export default logger as Pick<Logger, SyslogLevels>;
+export default logger as Pick<Logger, SyslogLevels | 'child'>;
