@@ -1,4 +1,4 @@
-import { IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom';
 import { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl';
 import { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl';
@@ -31,6 +31,7 @@ export class OptionsFischer implements FischerTimeControlOptions
     @Expose()
     timeIncrement?: number;
 
+    @IsOptional()
     @IsNumber()
     @Min(oneSecond)
     @Max(twoWeeks)

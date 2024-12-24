@@ -142,6 +142,16 @@ const secondaryTimeSteps: number[] = [
     86400 * 14 * 1000,
 ];
 
+const capped = ref(false);
+
+if (gameOptions.value.timeControl.type === 'fischer') {
+    const { maxTime, initialTime } = gameOptions.value.timeControl.options;
+
+    if (maxTime === initialTime) {
+        capped.value = true;
+    }
+}
+
 const initialTimeSelected = ref(Object.values(initialTimeSteps).findIndex(t => t === gameOptions.value.timeControl.options.initialTime));
 const secondaryTimeIncrementSelected = ref(Object.values(secondaryTimeSteps).findIndex(t =>
     'fischer' === gameOptions.value.timeControl.type
@@ -160,6 +170,7 @@ const compileOptions = () => {
             gameOptions.value.timeControl.options = {
                 initialTime: initialTimeSteps[initialTimeSelected.value],
                 timeIncrement: secondaryTimeSteps[secondaryTimeIncrementSelected.value],
+                maxTime: gameOptions.value.timeControl.options.maxTime,
             };
         }
 
@@ -178,7 +189,10 @@ const compileOptions = () => {
         }
     }
 
-    if ('fischer' === gameOptions.value.timeControl.type) {
+    if ('fischer' === gameOptions.value.timeControl.type
+        && undefined === gameOptions.value.timeControl.options.maxTime
+        && capped.value
+    ) {
         gameOptions.value.timeControl.options.maxTime = gameOptions.value.timeControl.options.initialTime;
     }
 };
@@ -214,7 +228,7 @@ defineExpose({ compileOptions });
 
     <div v-if="showCustomTimeControl" class="mt-2">
         <div v-if="'fischer' === gameOptions.timeControl.type">
-            <strong class="min-w">{{ $t('time_control.fischer_capped') }}</strong>
+            <strong class="min-w">{{ $t('time_control.fischer') }}</strong>
             <button type="button" @click="() => gameOptions.timeControl.type = 'byoyomi'" class="btn btn-sm btn-link">{{ $t('time_control.use', { type: $t('time_control.byo_yomi') }) }}</button>
         </div>
         <div v-else>
@@ -228,6 +242,13 @@ defineExpose({ compileOptions });
 
             <label for="custom-fischer-time-increment" class="form-label">{{ $t('2dots', { s: $t('time_control.time_increment') }) }} {{ msToDuration(secondaryTimeSteps[secondaryTimeIncrementSelected]) }}</label>
             <input type="range" class="form-range" id="custom-fischer-time-increment" v-model="secondaryTimeIncrementSelected" min="0" :max="Object.keys(secondaryTimeSteps).length - 1" step="1">
+
+            <div class="form-check">
+                <input class="form-check-input" v-model="capped" type="checkbox" id="capped">
+                <label class="form-check-label" for="capped">
+                    {{ $t('time_control.fischer_capped') }}
+                </label>
+            </div>
         </div>
         <div v-if="'byoyomi' === gameOptions.timeControl.type">
             <label for="custom-byoyomi-initial-time" class="form-label">{{ $t('2dots', { s: $t('time_control.initial_time') }) }} {{ msToDuration(initialTimeSteps[initialTimeSelected]) }}</label>

@@ -30,10 +30,14 @@ export const createGameOptionsFromUrlHash = (hash: string = document.location.ha
                 type: 'fischer',
                 options: {
                     initialTime: parseInt(match[1], 10) * 60000,
-                    maxTime: parseInt(match[1], 10) * 60000,
                     timeIncrement: parseInt(match[2], 10) * 1000,
                 },
             };
+
+            if (hash.includes('capped')) {
+                gameOptions.timeControl.options.maxTime = gameOptions.timeControl.options.initialTime;
+            }
+
             continue;
         }
 

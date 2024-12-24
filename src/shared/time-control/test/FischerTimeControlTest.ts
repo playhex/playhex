@@ -89,4 +89,33 @@ describe('FischerTimeControl', () => {
         assert.strictEqual(timeControl.getStrictElapsedAt().toISOString(), dateDiff(startedAt, 20000).toISOString());
         assert.strictEqual(timeControl.toString(now), 'Fischer (elapsed): 0ms (paused) | 10000ms (paused)');
     });
+
+    it('can increment more than initial time in case of uncapped Fischer', () => {
+        const now = new Date();
+        let elapsedAt: null | { playerLostByTime: number, date: Date } = null;
+
+        // 10s + 2s, uncapped
+        const timeControl = new FischerTimeControl({
+            initialTime: 10000,
+            timeIncrement: 2000,
+        });
+
+        timeControl.on('elapsed', (playerLostByTime, date) => elapsedAt = { playerLostByTime, date });
+
+        // Game started 30 seconds earlier
+        timeControl.start(now, null);
+        assert.strictEqual(elapsedAt, null);
+
+        // First player plays instantly, he now have 10-0+2 = 12s
+        timeControl.push(0, now, null);
+        assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime, 12000);
+
+        // Second player takes 1s to play, he now have 10-1+2 = 11s
+        timeControl.push(1, dateDiff(now, 1000), null);
+        assert.strictEqual(timeControl.getValues().players[1].totalRemainingTime, 11000);
+
+        // First player takes 3s, he now have 12-3+2 = 11s
+        timeControl.push(0, dateDiff(now, 4000), null);
+        assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime, 11000);
+    });
 });

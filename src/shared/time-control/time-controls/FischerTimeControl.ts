@@ -15,7 +15,7 @@ export interface FischerTimeControlOptions
     timeIncrement?: number;
 
     /**
-     * Maximum time in ms time increment can reach. Defaults to initialTime.
+     * Maximum time in ms time increment can reach. Defaults to undefined, so no max time.
      */
     maxTime?: number;
 }
