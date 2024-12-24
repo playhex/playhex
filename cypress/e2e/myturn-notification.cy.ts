@@ -29,7 +29,7 @@ describe('My turn notification', () => {
 
         cy.contains('Guest 1817');
 
-        cy.get('.my-turn-notif a').then($a => {
+        cy.get('.my-turn-notif .btn-my-turn').then($a => {
             if ('1' !== $a.text()) {
                 throw new Error('I should have 1 game where it is my turn to play');
             }
@@ -59,7 +59,7 @@ describe('My turn notification', () => {
 
         cy.contains('Guest 8201');
 
-        cy.get('.my-turn-notif a').then($a => {
+        cy.get('.my-turn-notif .btn-my-turn').then($a => {
             if ('0' !== $a.text()) {
                 throw new Error('I should have no game where it is my turn to play');
             }
@@ -89,7 +89,7 @@ describe('My turn notification', () => {
 
         cy.contains('Guest 3248');
 
-        cy.get('.my-turn-notif a').then($a => {
+        cy.get('.my-turn-notif .btn-my-turn').then($a => {
             if ('0' !== $a.text()) {
                 throw new Error('I should have no game where it is my turn to play');
             }
@@ -134,7 +134,7 @@ describe('My turn notification', () => {
 
         cy.contains('random bot');
 
-        cy.get('.my-turn-notif a').then($a => {
+        cy.get('.my-turn-notif .btn-my-turn').then($a => {
             if ('1' !== $a.text()) {
                 throw new Error('I should have one game where I have to play');
             }
