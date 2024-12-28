@@ -1,5 +1,5 @@
 import { AIConfigStatusData, HostedGameState, PlayHexContributors, WithRequired } from '@shared/app/Types';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating } from '../shared/app/models';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { plainToInstance } from '../shared/app/class-transformer-custom';
 import { RatingCategory } from '../shared/app/ratingUtils';
@@ -476,6 +476,52 @@ export const apiGetGameRatingUpdates = async (gamePublicId: string, category: Ra
     ;
 };
 
+export const apiGetPlayerRatingHistory = async (playerPublicId: string, category: RatingCategory = 'overall'): Promise<null | Rating[]> => {
+    const response = await fetch(`/api/players/${playerPublicId}/ratings/${category}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    try {
+        await checkResponse(response);
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
+        }
+
+        return null;
+    }
+
+    return (await response.json() as Rating[])
+        .map(rating => plainToInstance(Rating, rating))
+    ;
+};
+
+export const apiGetPlayerCurrentRatings = async (playerPublicId: string): Promise<null | Rating[]> => {
+    const response = await fetch(`/api/players/${playerPublicId}/current-ratings`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    try {
+        await checkResponse(response);
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
+        }
+
+        return null;
+    }
+
+    return (await response.json() as Rating[])
+        .map(rating => plainToInstance(Rating, rating))
+    ;
+};
+
 export const apiGetServerInfo = async (): Promise<{ version: string }> => {
     const response = await fetch('/api/server-info', {
         method: 'GET',
@@ -496,4 +542,25 @@ export const apiGetContributors = async (): Promise<PlayHexContributors> => {
     });
 
     return await response.json();
+};
+
+export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | PlayerStats> => {
+    const response = await fetch(`/api/players/${playerPublicId}/stats`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    try {
+        await checkResponse(response);
+    } catch (e) {
+        if (!(e instanceof ApiClientError)) {
+            throw e;
+        }
+
+        return null;
+    }
+
+    return plainToInstance(PlayerStats, await response.json());
 };
