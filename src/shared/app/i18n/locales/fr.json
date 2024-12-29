@@ -238,6 +238,7 @@
         "byo_yomi": "Byo-Yomi",
         "fischer": "Fischer",
         "fischer_capped": "Fischer plafonné",
+        "capped_abbreviation": "plaf.",
         "initial_time": "Temps initial",
         "time_increment": "Increment de temps",
         "periods": "Periodes",

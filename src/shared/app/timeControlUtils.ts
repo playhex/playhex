@@ -137,20 +137,31 @@ export const msToDuration = (ms: number, precision = 2): string => {
 export const timeControlToString = (timeControl: TimeControlType): string => {
     switch (timeControl.type) {
         case 'fischer': {
-            let string = msToDuration(timeControl.options.initialTime);
+            const { initialTime, timeIncrement, maxTime } = timeControl.options;
 
-            if (timeControl.options.timeIncrement) {
-                string += ' + ' + msToDuration(timeControl.options.timeIncrement);
+            let string = msToDuration(initialTime);
+
+            if (timeIncrement) {
+                string += ' + ' + msToDuration(timeIncrement);
+            }
+
+            if (undefined !== maxTime) {
+                string += ' ' + t('time_control.capped_abbreviation');
+
+                if (maxTime !== initialTime) {
+                    string += ' ' + msToDuration(maxTime);
+                }
             }
 
             return string;
         }
 
         case 'byoyomi': {
-            let string = msToDuration(timeControl.options.initialTime);
+            const { initialTime, periodsCount, periodTime } = timeControl.options;
+            let string = msToDuration(initialTime);
 
-            if (timeControl.options.periodTime && timeControl.options.periodsCount) {
-                string += ` + ${timeControl.options.periodsCount} × ${msToDuration(timeControl.options.periodTime)}`;
+            if (periodTime && periodsCount) {
+                string += ` + ${periodsCount} × ${msToDuration(periodTime)}`;
             }
 
             return string;
