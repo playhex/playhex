@@ -4,6 +4,7 @@ import HostedGameRepository from '../../../repositories/HostedGameRepository';
 import HttpError from '../HttpError';
 import { HostedGameState } from '@shared/app/Types';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
+import StatsRepository from '../../../repositories/StatsRepository';
 
 @JsonController()
 @Service()
@@ -12,6 +13,7 @@ export default class PlayerController
     constructor(
         private playerRepository: PlayerRepository,
         private hostedGameRepository: HostedGameRepository,
+        private statsRepository: StatsRepository,
     ) {}
 
     /**
@@ -63,5 +65,22 @@ export default class PlayerController
         }
 
         return await this.hostedGameRepository.getPlayerGames(player, state, fromGamePublicId);
+    }
+
+    @Get('/api/players/:publicId/stats')
+    async getPlayerStats(
+        @Param('publicId') publicId: string,
+    ) {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (null === player) {
+            throw new HttpError(404, 'Player not found');
+        }
+
+        if (!player.id) {
+            throw new Error('Player has not id');
+        }
+
+        return this.statsRepository.getPlayerStats(player.id);
     }
 }

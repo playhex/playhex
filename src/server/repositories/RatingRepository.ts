@@ -42,6 +42,37 @@ export default class RatingRepository
         return rating;
     }
 
+    /**
+     * Get current player rating on a given category.
+     * If not yet rating, create and persist one on the fly and returns it.
+     */
+    async findPlayerRatingHistory(player: Player, category: RatingCategory = 'overall'): Promise<Rating[]>
+    {
+        const { id } = player;
+
+        if ('number' !== typeof id) {
+            throw new Error('Player have no id');
+        }
+
+        let ratings = await this.ratingRepository.find({
+            comment: 'find player rating history',
+            where: {
+                player: { id },
+                category,
+            },
+            order: {
+                createdAt: 'asc',
+            },
+        });
+
+        if (0 === ratings.length) {
+            ratings = [createInitialRating(player, category)];
+            await this.persistRatings(ratings);
+        }
+
+        return ratings;
+    }
+
     async findPlayerRatings(player: Player, categories: RatingCategory[]): Promise<Rating[]>
     {
         return Promise.all(

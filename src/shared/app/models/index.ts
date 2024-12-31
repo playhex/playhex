@@ -16,6 +16,7 @@ import Move from './Move';
 import OnlinePlayers from './OnlinePlayers';
 import Player from './Player';
 import PlayerSettings from './PlayerSettings';
+import PlayerStats from './PlayerStats';
 import Rating from './Rating';
 
 export {
@@ -35,6 +36,7 @@ export {
     OnlinePlayers,
     Player,
     PlayerSettings,
+    PlayerStats,
     Rating,
 };
 
@@ -55,6 +57,7 @@ export const entities = {
     OnlinePlayers,
     Player,
     PlayerSettings,
+    PlayerStats,
     Rating,
 };
 
