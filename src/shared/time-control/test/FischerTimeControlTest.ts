@@ -2,6 +2,7 @@ import { describe, it } from 'mocha';
 import assert from 'assert';
 import { FischerTimeControl } from '../time-controls/FischerTimeControl';
 import { dateDiff } from './utils';
+import { createTimeControl } from '../createTimeControl';
 
 describe('FischerTimeControl', () => {
     it('elapses instantly at expected date, when started at past date', () => {
@@ -117,5 +118,42 @@ describe('FischerTimeControl', () => {
         // First player takes 3s, he now have 12-3+2 = 11s
         timeControl.push(0, dateDiff(now, 4000), null);
         assert.strictEqual(timeControl.getValues().players[0].totalRemainingTime, 11000);
+    });
+
+    it('does not increment clock more than systemMaxTime', () => {
+        const now = new Date();
+        const timeControl = createTimeControl({
+            type: 'fischer',
+            options: {
+                initialTime: 10000,
+                timeIncrement: 10000,
+            },
+        }, null, { systemMaxTime: 15000 });
+
+        timeControl.start(now);
+
+        timeControl.push(0, now);
+
+        const values = timeControl.getValues();
+        assert.strictEqual(values.players[0].totalRemainingTime, 15000);
+    });
+
+    it('does not increment clock more than maxTime, with systemMaxTime also defined', () => {
+        const now = new Date();
+        const timeControl = createTimeControl({
+            type: 'fischer',
+            options: {
+                initialTime: 10000,
+                timeIncrement: 10000,
+                maxTime: 15000,
+            },
+        }, null, { systemMaxTime: 20000 });
+
+        timeControl.start(now);
+
+        timeControl.push(0, now);
+
+        const values = timeControl.getValues();
+        assert.strictEqual(values.players[0].totalRemainingTime, 15000);
     });
 });

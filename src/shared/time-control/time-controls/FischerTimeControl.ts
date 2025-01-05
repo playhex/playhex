@@ -15,7 +15,10 @@ export interface FischerTimeControlOptions
     timeIncrement?: number;
 
     /**
-     * Maximum time in ms time increment can reach. Defaults to undefined, so no max time.
+     * Maximum time in ms clock can reach after time increment. Defaults to undefined, so no max time.
+     *
+     * Note that no max time can make clocks with more than 2^31 milliseconds,
+     * and this value cannot be stored in a 32-bit signed integer.
      */
     maxTime?: number;
 }

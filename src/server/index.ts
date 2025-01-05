@@ -11,6 +11,7 @@ import socketIoAdminUi from './services/socketIoAdminUi';
 import logger from './services/logger';
 import { addSessionMiddlewares } from './services/security/middlewares';
 import monitorConnectedSockets from './services/monitorConnectedSockets';
+import { initTimeControl } from './services/initTimeControl';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -18,6 +19,8 @@ logger.info(`*******************************************`);
 
 const app = express();
 app.disable('x-powered-by');
+
+initTimeControl();
 
 const server = http.createServer(app);
 const io = new HexServer(server, {

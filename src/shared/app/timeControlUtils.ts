@@ -134,6 +134,8 @@ export const msToDuration = (ms: number, precision = 2): string => {
     return tokens.slice(0, precision).join('');
 };
 
+const twoWeeks = 86400 * 14 * 1000;
+
 export const timeControlToString = (timeControl: TimeControlType): string => {
     switch (timeControl.type) {
         case 'fischer': {
@@ -145,7 +147,8 @@ export const timeControlToString = (timeControl: TimeControlType): string => {
                 string += ' + ' + msToDuration(timeIncrement);
             }
 
-            if (undefined !== maxTime) {
+            // Show "capped" when maxTime <= 14d, i.e explicitely defined by user and not by system max time.
+            if (undefined !== maxTime && maxTime <= twoWeeks) {
                 string += ' ' + t('time_control.capped_abbreviation');
 
                 if (maxTime !== initialTime) {
