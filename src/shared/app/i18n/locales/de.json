@@ -168,7 +168,7 @@
         "reject": "Ablehnen",
         "undo_move": "Zurücknahme"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "Blitz",
         "correspondence": "Fernschach",
         "normal": "Normal"

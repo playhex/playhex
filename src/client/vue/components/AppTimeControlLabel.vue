@@ -15,14 +15,14 @@ const props = defineProps({
 
 const { gameOptions } = toRefs(props);
 
-const candency = timeControlToCadencyName(gameOptions.value);
+const cadency = timeControlToCadencyName(gameOptions.value);
 </script>
 
 <template>
     <span>
-        <BIconLightningChargeFill v-if="candency === 'blitz'" class="d-none d-sm-inline" />
-        <BIconAlarmFill v-else-if="candency === 'normal'" class="d-none d-sm-inline" />
-        <BIconCalendar v-else-if="candency === 'correspondence'" class="d-none d-sm-inline" />
+        <BIconLightningChargeFill v-if="cadency === 'blitz'" class="d-none d-sm-inline" />
+        <BIconAlarmFill v-else-if="cadency === 'normal'" class="d-none d-sm-inline" />
+        <BIconCalendar v-else-if="cadency === 'correspondence'" class="d-none d-sm-inline" />
 
         {{ timeControlToString(gameOptions.timeControl) }}
 

@@ -243,10 +243,16 @@
         "ping_ms": "Ping: {{ms}}ms",
         "date_shift_ms": "Time shift: {{ms}}ms"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "Blitz",
-        "normal": "Normal",
+        "normal": "Live",
         "correspondence": "Correspondence"
+    },
+    "overall": "Overall",
+    "boardsize": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
     },
     "confirm_move": {
         "title": "Confirm move",

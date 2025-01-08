@@ -197,10 +197,16 @@
         "ping_ms": "Ping : {{ms}}ms",
         "date_shift_ms": "Décalage de date : {{ms}}ms"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "Blitz",
-        "normal": "Normale",
+        "normal": "Temps réel",
         "correspondence": "Correspondance"
+    },
+    "overall": "Global",
+    "boardsize": {
+        "small": "Petit",
+        "medium": "Moyen",
+        "large": "Grand"
     },
     "confirm_move": {
         "title": "Valider les coups",
@@ -244,7 +250,7 @@
         "periods": "Periodes",
         "periods_time": "Temps d'une période",
         "fast": "Rapide",
-        "normal": "Normale",
+        "normal": "Temps réel",
         "long": "Lente"
     },
     "i_play": {

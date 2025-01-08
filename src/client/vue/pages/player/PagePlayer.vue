@@ -4,9 +4,8 @@ import { storeToRefs } from 'pinia';
 import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
-import HostedGame from '../../../../shared/app/models/HostedGame';
-import Player from '../../../../shared/app/models/Player';
-import { getPlayerGames, getPlayerBySlug, ApiClientError } from '../../../apiClient';
+import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models';
+import { getPlayerGames, getPlayerBySlug, ApiClientError, apiGetPlayerStats, apiGetPlayerCurrentRatings } from '../../../apiClient';
 import { Ref, ref } from 'vue';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore';
@@ -15,6 +14,9 @@ import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppTimeControlLabelVue from '../../components/AppTimeControlLabel.vue';
 import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
+import AppPlayerStats from '@client/vue/components/AppPlayerStats.vue';
+import AppPlayerRatingChart from '@client/vue/components/AppPlayerRatingChart.vue';
+import AppTablePlayerRating from '@client/vue/components/AppTablePlayerRating.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useJsonLd } from '../../../services/head';
 import { useSeoMeta } from '@unhead/vue';
@@ -22,6 +24,9 @@ import { pseudoString } from '../../../../shared/app/pseudoUtils';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
 import useServerDateStore from '../../../stores/serverDateStore';
+import { watchEffect } from 'vue';
+import { RatingCategory } from '@shared/app/ratingUtils';
+import { Directive } from 'vue';
 
 const { slug } = useRoute().params;
 
@@ -208,17 +213,72 @@ const clickLogout = async () => {
  * ping and date shift
  */
 const { pingTime, medianShift } = storeToRefs(useServerDateStore());
+
+/*
+ * Player stats
+ */
+const playerStats = ref<null | PlayerStats>(null);
+
+watchEffect(async () => {
+    if (null === player.value) {
+        playerStats.value = null;
+        return;
+    }
+
+    playerStats.value = await apiGetPlayerStats(player.value.publicId);
+});
+
+const playerCurrentRatings = ref<null | Partial<Record<RatingCategory, Rating>>>(null);
+
+watchEffect(async () => {
+    if (null === player.value) {
+        playerStats.value = null;
+        return;
+    }
+
+    playerCurrentRatings.value = null;
+    const ratings = await apiGetPlayerCurrentRatings(player.value.publicId);
+
+    if (null === ratings) {
+        return;
+    }
+
+    playerCurrentRatings.value = {};
+
+    for (const rating of ratings) {
+        playerCurrentRatings.value[rating.category] = rating;
+    }
+});
+
+const ratingChart = ref<typeof AppPlayerRatingChart>();
+
+const showRatingCategory = (category: RatingCategory): void => {
+    if (!ratingChart.value) {
+        return;
+    }
+
+    ratingChart.value.showRatingCategory(category);
+};
+
+const vRating: Directive<HTMLElement, RatingCategory> = {
+    mounted: (el, binding) => {
+        el.classList.add('clickable-rating');
+        el.addEventListener('click', () => {
+            showRatingCategory(binding.value);
+        });
+    },
+};
 </script>
 
 <template>
-    <div v-if="!playerNotFound" class="container my-3">
-        <div class="d-flex">
+    <div v-if="!playerNotFound" class="container-fluid my-3">
+        <div class="d-flex mb-4">
             <div class="avatar-wrapper">
                 <BIconPerson class="icon img-thumbnail" />
-                <AppOnlineStatus v-if="player" :player="player" class="player-status" />
+                <AppOnlineStatus v-if="player" :player class="player-status" />
             </div>
             <div>
-                <h2><AppPseudo v-if="player" rating="full" :player="player" /><template v-else>…</template></h2>
+                <h2><AppPseudo v-if="player" :player /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM y')
@@ -259,6 +319,60 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
                         class="btn btn-sm btn-outline-primary"
                     ><BIconGear /> {{ $t('player_settings.title') }}</router-link>
                 </div>
+            </div>
+        </div>
+
+        <AppPlayerStats v-if="playerStats" :playerStats />
+
+        <h3 class="mt-4">Rating</h3>
+
+        <div class="row">
+            <div class="col-lg-6 col-xl-5">
+                <div class="table-responsive">
+                    <table v-if="playerCurrentRatings" class="table table-bordered ratings-table">
+                        <tbody class="text-nowrap">
+                            <tr>
+                                <td rowspan="2" colspan="2" class="text-center mb-0" v-rating="'overall'">
+                                    <strong>{{ $t('overall') }}</strong>
+                                    <br>
+                                    <AppTablePlayerRating :rating="playerCurrentRatings.overall" class="lead" />
+                                </td>
+                                <th v-rating="'blitz'">{{ $t('time_cadency.blitz') }}</th>
+                                <th v-rating="'normal'">{{ $t('time_cadency.normal') }}</th>
+                                <th v-rating="'correspondence'">{{ $t('time_cadency.correspondence') }}</th>
+                            </tr>
+                            <tr>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings.blitz" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings.normal" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings.correspondence" /></td>
+                            </tr>
+                            <tr>
+                                <th v-rating="'small'">{{ $t('boardsize.small') }}</th>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings.small" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['small.blitz']" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['small.normal']" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['small.correspondence']" /></td>
+                            </tr>
+                            <tr>
+                                <th v-rating="'medium'">{{ $t('boardsize.medium') }}</th>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings.medium" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['medium.blitz']" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['medium.normal']" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['medium.correspondence']" /></td>
+                            </tr>
+                            <tr>
+                                <th v-rating="'large'">{{ $t('boardsize.large') }}</th>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings.large" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['large.blitz']" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['large.normal']" /></td>
+                                <td><AppTablePlayerRating :rating="playerCurrentRatings['large.correspondence']" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-6 col-xl-7">
+                <AppPlayerRatingChart ref="ratingChart" v-if="player" :player />
             </div>
         </div>
 
@@ -381,4 +495,16 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
 
 td:first-child, th:first-child
     width 6em
+
+.ratings-table
+    th
+        text-overflow ellipsis
+        overflow hidden
+        max-width 7em
+
+.clickable-rating
+    cursor pointer
+
+    &:hover
+        text-decoration underline
 </style>

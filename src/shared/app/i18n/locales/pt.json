@@ -221,7 +221,7 @@
         "ping_ms": "Ping: {{ms}}ms",
         "date_shift_ms": "Compensação de deslocamento de data: {{ms}}ms"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "Blitz",
         "normal": "Normal",
         "correspondence": "Correspondência"

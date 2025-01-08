@@ -189,7 +189,7 @@
         "date_shift_ms": "Ajustes temporales: {{ms}}ms",
         "ping_ms": "Ping: {{ms}}ms"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "Blitz",
         "normal": "Normal",
         "correspondence": "Correspondencia"

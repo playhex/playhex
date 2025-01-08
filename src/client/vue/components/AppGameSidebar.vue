@@ -538,7 +538,7 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
 
                 <div class="mb-2" v-if="playerSettings">
                     <div class="row" v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="confirm-move-blitz" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconLightningChargeFill /> {{ $t('game_candency.blitz') }})</small></label>
+                        <label for="confirm-move-blitz" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
                         <div class="col-12">
                             <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
                                 <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
@@ -547,7 +547,7 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
                         </div>
                     </div>
                     <div class="row" v-if="'normal' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="confirm-move-normal" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconAlarmFill /> {{ $t('game_candency.normal') }})</small></label>
+                        <label for="confirm-move-normal" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
                         <div class="col-12">
                             <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
                                 <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
@@ -556,7 +556,7 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
                         </div>
                     </div>
                     <div class="row" v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="confirm-move-correspondace" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconCalendar /> {{ $t('game_candency.correspondence') }})</small></label>
+                        <label for="confirm-move-correspondace" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
                         <div class="col-12">
                             <select v-model="playerSettings.confirmMoveCorrespondence" class="form-select" id="confirm-move-correspondace">
                                 <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>

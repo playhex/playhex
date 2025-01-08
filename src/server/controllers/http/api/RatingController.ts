@@ -19,8 +19,8 @@ export default class RatingController
         private hostedGameRepository: Repository<HostedGame>,
     ) {}
 
-    @Get('/api/players/:publicId/ratings')
-    async getRatings(
+    @Get('/api/players/:publicId/current-ratings')
+    async getPlayerCurrentRatings(
         @Param('publicId') publicId: string,
     ) {
         const player = await this.playerRepository.getPlayer(publicId);
@@ -32,8 +32,8 @@ export default class RatingController
         return await this.ratingRepository.findPlayerRatings(player, ratingCategories);
     }
 
-    @Get('/api/players/:publicId/ratings/:category')
-    async getRating(
+    @Get('/api/players/:publicId/current-ratings/:category')
+    async getPlayerCurrentRating(
         @Param('publicId') publicId: string,
         @Param('category') category: string,
     ) {
@@ -48,6 +48,24 @@ export default class RatingController
         }
 
         return await this.ratingRepository.findPlayerRating(player, category);
+    }
+
+    @Get('/api/players/:publicId/ratings/:category')
+    async getPlayerRatingHistory(
+        @Param('publicId') publicId: string,
+        @Param('category') category: string,
+    ) {
+        if (!validateRatingCategory(category)) {
+            throw new HttpError(400, 'Invalid category');
+        }
+
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (null === player) {
+            throw new HttpError(404, 'Player not found');
+        }
+
+        return await this.ratingRepository.findPlayerRatingHistory(player, category);
     }
 
     @Get('/api/games/:publicId/ratings/:category')

@@ -219,7 +219,7 @@
         "ping_ms": "延迟：{{ms}}毫秒",
         "date_shift_ms": "日期偏移补偿：{{ms}}毫秒"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "闪电战",
         "normal": "普通",
         "correspondence": "通信赛"

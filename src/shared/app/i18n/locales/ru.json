@@ -222,7 +222,7 @@
         "ping_ms": "Пинг: {{ms}}мс",
         "date_shift_ms": "Сдвиг времени: {{ms}}мс"
     },
-    "game_candency": {
+    "time_cadency": {
         "blitz": "Блиц",
         "normal": "Нормальная",
         "correspondence": "Корреспонденция"

@@ -195,7 +195,7 @@ onUnmounted(() => {
 
             <template v-if="playerSettings">
                 <div class="mb-3 row">
-                    <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><BIconLightningChargeFill /> {{ $t('game_candency.blitz') }}</label>
+                    <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }}</label>
                     <div class="col-sm-8 col-md-4">
                         <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
                             <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
@@ -204,7 +204,7 @@ onUnmounted(() => {
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><BIconAlarmFill /> {{ $t('game_candency.normal') }}</label>
+                    <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><BIconAlarmFill /> {{ $t('time_cadency.normal') }}</label>
                     <div class="col-sm-8 col-md-4">
                         <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
                             <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
@@ -213,7 +213,7 @@ onUnmounted(() => {
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> {{ $t('game_candency.correspondence') }}</label>
+                    <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> {{ $t('time_cadency.correspondence') }}</label>
                     <div class="col-sm-8 col-md-4">
                         <select v-model="playerSettings.confirmMoveCorrespondence" class="form-select" id="confirm-move-correspondace">
                             <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
