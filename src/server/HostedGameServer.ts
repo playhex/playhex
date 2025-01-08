@@ -368,18 +368,16 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private affectPlayersColors(): void
     {
-        // Random colors
-        if (null === this.hostedGame.gameOptions.firstPlayer) {
+        // In case of rematch, alternate colors from previous game instead of random
+        if (null !== this.hostedGame.rematchedFrom) {
+            this.logger.info('Rematch alternate colors: should alternate?');
 
-            // In case of rematch, alternate colors from previous game instead of random
-            if (null !== this.hostedGame.rematchedFrom && this.shouldAlternateColorsFromRematchedGame()) {
-                this.logger.info('Rematch: alternate colors');
-
+            if (this.shouldAlternateColorsFromRematchedGame()) {
                 const previousFirstPlayer = this.hostedGame.rematchedFrom.hostedGameToPlayers[0].playerId;
-                const currentFirstPlayer = this.getHostedGame().hostedGameToPlayers[0].playerId;
+                const currentFirstPlayer = this.players[0].id;
 
                 if ('number' !== typeof previousFirstPlayer || 'number' !== typeof currentFirstPlayer) {
-                    this.logger.warning('Rematch: missing previous or current first player id. Randomize.', { previousFirstPlayer, currentFirstPlayer });
+                    this.logger.warning('Rematch alternate colors: missing previous or current first player id. Randomize.', { previousFirstPlayer, currentFirstPlayer });
 
                     if (Math.random() < 0.5) {
                         this.players.reverse();
@@ -388,12 +386,19 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                     return;
                 }
 
-                if (this.hostedGame.rematchedFrom.hostedGameToPlayers[0].playerId === this.getHostedGame().hostedGameToPlayers[0].playerId) {
+                this.logger.info('Rematch alternate colors: yes', { previousFirstPlayer, currentFirstPlayer });
+
+                if (previousFirstPlayer === currentFirstPlayer) {
                     this.players.reverse();
                 }
 
                 return;
             }
+        }
+
+        // Random colors
+        if (null === this.hostedGame.gameOptions.firstPlayer) {
+            this.logger.info('Affect random colors');
 
             if (Math.random() < 0.5) {
                 this.players.reverse();
@@ -402,7 +407,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
+
         // Fixed colors
+        this.logger.info('Set fixed colors');
+
         if (1 === this.hostedGame.gameOptions.firstPlayer) {
             this.players.reverse();
         }
@@ -416,14 +424,21 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         // Do not alternate if previous game is not played, i.e canceled
         if ('ended' !== this.hostedGame.rematchedFrom.state) {
+            this.logger.info('Rematch alternate colors: no, previous game is not ended', { state: this.hostedGame.rematchedFrom.state });
             return false;
         }
 
         // Alternate only if players are same. If another player joined rematch, just use random colors
         const previousPlayersIds = this.hostedGame.rematchedFrom.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
-        const currentPlayersIds = this.getHostedGame().hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
+        const currentPlayersIds = this.players.map(player => player.id ?? 0);
 
-        return currentPlayersIds.every(id => previousPlayersIds.includes(id));
+        const samePlayers = currentPlayersIds.every(id => previousPlayersIds.includes(id));
+
+        if (!samePlayers) {
+            this.logger.info('Rematch alternate colors: no, not same players', { previousPlayersIds, currentPlayersIds });
+        }
+
+        return samePlayers;
     }
 
     /**
