@@ -11,7 +11,12 @@ module.exports = {
         extraFileExtensions: ['.vue'],
         project: true,
     },
-    plugins: ['@typescript-eslint', 'eslint-plugin-vue', 'deprecation'],
+    plugins: [
+        '@typescript-eslint',
+        'eslint-plugin-vue',
+        'deprecation',
+        'mocha',
+    ],
     root: true,
     rules: {
         'no-empty': 'off',
@@ -44,6 +49,7 @@ module.exports = {
         }],
         'no-console': 'warn',
         'deprecation/deprecation': 'warn',
+        'mocha/no-exclusive-tests': 'warn',
         'vue/script-indent': ['warn', 4, { 'baseIndent': 0, 'switchCase': 1 }],
         'vue/html-indent': ['warn', 4, { 'baseIndent': 1 }],
         'vue/max-attributes-per-line': 'off',

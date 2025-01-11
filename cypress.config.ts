@@ -7,7 +7,7 @@ export default defineConfig({
         baseUrl: 'http://localhost:3000',
         experimentalRunAllSpecs: true,
         watchForFileChanges: false,
-        setupNodeEvents(on, config) {
+        setupNodeEvents(on) {
             on('file:preprocessor', webpackPreprocessor({
                 webpackOptions,
                 watchOptions: {},

@@ -108,6 +108,7 @@
     "dotenv": "^16.0.3",
     "eslint": "^8.30.0",
     "eslint-plugin-deprecation": "^3.0.0",
+    "eslint-plugin-mocha": "^10.5.0",
     "http-proxy-middleware": "^3.0.2",
     "mocha": "^10.7.3",
     "mocha.parallel": "^0.15.6",

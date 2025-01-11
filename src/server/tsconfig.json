@@ -1,10 +1,9 @@
 {
-    "extends": "../tsconfig.json",
+    "extends": "../../tsconfig.json",
     "compilerOptions": {
         "target": "ES2019",
         "sourceMap": true,
         "module": "commonjs",
-        "esModuleInterop": true,
         "declaration": true,
         "resolveJsonModule": true,
         "removeComments": true,
