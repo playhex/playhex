@@ -391,9 +391,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 if (previousFirstPlayer === currentFirstPlayer) {
                     this.players.reverse();
                 }
-
-                return;
             }
+
+            return;
         }
 
         // Random colors
@@ -419,6 +419,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private shouldAlternateColorsFromRematchedGame(): boolean
     {
         if (null === this.hostedGame.rematchedFrom) {
+            return false;
+        }
+
+        if (null !== this.hostedGame.gameOptions.firstPlayer) {
+            this.logger.info('Rematch alternate colors: no, colors are fixed', { state: this.hostedGame.rematchedFrom.state });
             return false;
         }
 

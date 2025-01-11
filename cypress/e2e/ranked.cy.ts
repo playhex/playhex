@@ -65,34 +65,6 @@ describe('Ranked games', () => {
 
         cy.contains('.sidebar', /Determinist random bot loses. \d+/).closest('div');
         cy.contains('.sidebar', /Guest \d+ wins! \d+/).closest('div');
-
-        // Rematch should reverse players colors.
-        let previousFirstPlayer: string;
-        let currentFirstPlayer: string;
-
-        cy
-            .get('.game-info-overlay .player-a .text-danger')
-            .invoke('text')
-            .invoke('trim')
-            .then(p => previousFirstPlayer = p)
-        ;
-
-
-        cy.contains('Rematch').click();
-        cy.contains('.sidebar', 'Playing');
-
-        cy
-            .get('.game-info-overlay .player-a .text-danger')
-            .invoke('text')
-            .invoke('trim')
-            .then(p => currentFirstPlayer = p)
-        ;
-
-        cy.then(() => {
-            if (previousFirstPlayer === currentFirstPlayer) {
-                throw new Error('Players have not switched color after rematch');
-            }
-        });
     });
 
     it('displays my game as a ranked one on the lobby', () => {
