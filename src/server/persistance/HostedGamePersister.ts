@@ -92,6 +92,11 @@ export default class HostedGamePersister
                     id: rematchedFromId,
                 },
             },
+            order: {
+                chatMessages: {
+                    createdAt: 'asc',
+                },
+            },
         });
     }
 
@@ -130,6 +135,9 @@ export default class HostedGamePersister
             order: {
                 gameData: {
                     endedAt: 'desc',
+                },
+                chatMessages: {
+                    createdAt: 'asc',
                 },
             },
             take,
@@ -206,6 +214,14 @@ export default class HostedGamePersister
                     { category: 'overall' },
                     { category: IsNull() },
                 ],
+            },
+            order: {
+                gameData: {
+                    endedAt: 'desc',
+                },
+                chatMessages: {
+                    createdAt: 'asc',
+                },
             },
         });
 
