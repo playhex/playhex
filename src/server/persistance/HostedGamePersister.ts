@@ -75,6 +75,11 @@ export default class HostedGamePersister
                     { category: IsNull() },
                 ],
             },
+            order: {
+                chatMessages: {
+                    createdAt: 'asc',
+                },
+            },
         });
     }
 
@@ -95,6 +100,11 @@ export default class HostedGamePersister
         return await this.hostedGameRepository.find({
             ...criteria,
             relations,
+            order: {
+                chatMessages: {
+                    createdAt: 'asc',
+                },
+            },
         });
     }
 
