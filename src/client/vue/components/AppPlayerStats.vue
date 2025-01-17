@@ -26,7 +26,7 @@ topBoardsizes.sort((a, b) => b.playedGames - a.playedGames);
 
 let show = ref(0);
 
-while (show.value < 3 && topBoardsizes[show.value].playedGames / totalGames >= 0.095) {
+while (show.value < 3 && topBoardsizes.length > show.value && topBoardsizes[show.value].playedGames / totalGames >= 0.095) {
     ++show.value;
 }
 </script>
@@ -39,13 +39,14 @@ while (show.value < 3 && topBoardsizes[show.value].playedGames / totalGames >= 0
         </div>
         <div class="col-6 col-sm-6">
             <p class="mb-0">Preferred board sizes</p>
-            <ul class="list-inline">
+            <ul class="list-inline" v-if="topBoardsizes.length > 0">
                 <li v-for="{ boardsize, playedGames } in topBoardsizes.slice(0, show)" :key="boardsize" class="list-inline-item">
                     <span class="lead">{{ boardsize }}</span>
                     {{ ' ' }}
                     <small>({{ Math.round(100 * playedGames / totalGames) }}%)</small>
                 </li>
             </ul>
+            <p><small>{{ $t('no_yet_data') }}</small></p>
         </div>
         <div class="col-6 col-sm-4">
             <p class="mb-0">1v1 ranked</p>
