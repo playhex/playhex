@@ -1,11 +1,15 @@
+import { Response } from 'express';
+import { format } from 'content-range';
 import HostedGameRepository, { GameError } from '../../../repositories/HostedGameRepository';
 import { AuthenticatedPlayer } from '../middlewares';
 import HttpError from '../HttpError';
-import { Body, Get, JsonController, Param, Post, QueryParam } from 'routing-controllers';
+import { Body, Get, JsonController, Param, Post, QueryParams, Res } from 'routing-controllers';
 import { Player, Move, HostedGameOptions } from '../../../../shared/app/models';
 import { Service } from 'typedi';
 import { Expose } from '../../../../shared/app/class-transformer-custom';
+import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters';
 import { IsBoolean } from 'class-validator';
+import HostedGamePersister from '../../../persistance/HostedGamePersister';
 
 class AnswerUndoBody
 {
@@ -20,30 +24,57 @@ export default class GameController
 {
     constructor(
         private hostedGameRepository: HostedGameRepository,
+        private hostedGamePersister: HostedGamePersister,
     ) {}
 
+    /**
+     * Returns games from database.
+     * Won't return active games not yet persisted.
+     */
     @Get('/api/games')
     async getAll(
-        @QueryParam('type') type: string,
-        @QueryParam('take') take: number,
-        @QueryParam('fromGamePublicId') fromGamePublicId: string,
+        @QueryParams() searchParams: SearchGamesParameters,
+        @Res() res: Response,
     ) {
-        if (undefined === type || 'lobby' === type) {
-            return await this.hostedGameRepository.getLobbyGames();
+        const { results, count } = await this.hostedGamePersister.search(searchParams);
+
+        const contentRange = format({
+            unit: 'games',
+            size: count,
+            start: 0,
+            end: results.length,
+        });
+
+        if (null !== contentRange) {
+            res.set('Content-Range', contentRange);
         }
 
-        if ('ended' === type) {
-            return await this.hostedGameRepository.getEndedGames(take ?? 20, fromGamePublicId);
-        }
+        return results;
+    }
 
-        throw new HttpError(400, 'Unexpected ?type= value');
+    @Get('/api/games-stats')
+    async getStatsAll(
+        @QueryParams() searchParams: SearchGamesParameters,
+    ) {
+        const results = await this.hostedGamePersister.searchStatsByDay(searchParams);
+
+        return results;
+    }
+
+    /**
+     * Returns all active games from memory.
+     */
+    @Get('/api/games/active')
+    getActiveGames(
+    ) {
+        return this.hostedGameRepository.getActiveGamesData();
     }
 
     @Get('/api/games/:publicId')
     async getOne(
         @Param('publicId') publicId: string,
     ) {
-        const game = await this.hostedGameRepository.getGame(publicId);
+        const game = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
 
         if (null === game) {
             throw new HttpError(404, 'Game not found');

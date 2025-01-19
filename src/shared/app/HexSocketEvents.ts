@@ -145,7 +145,13 @@ export type HexServerToClientEvents = {
     /** State for the `Rooms.onlinePlayers` room. */
     onlinePlayersUpdate: (onlinePlayers: OnlinePlayers) => void;
 
-    /** State for the `Rooms.game` room. */
+    /**
+     * State for the `Rooms.game` room.
+     *
+     * game can be null e.g when a player enters a room of a game that doesn't exists,
+     * so we should show a message like "game not found" or redirect player.
+     * Happens in dev, when I restart server, game no longer in memory
+     */
     gameUpdate: (gameId: string, game: HostedGame | null) => void;
 
     /** State for the `Rooms.playerGames` room. */

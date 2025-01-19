@@ -34,11 +34,11 @@ while (show.value < 3 && topBoardsizes.length > show.value && topBoardsizes[show
 <template>
     <div class="row">
         <div class="col-6 col-sm-4">
-            <p class="mb-0">Total played games</p>
+            <p class="mb-0">{{ $t('total_played_games') }}</p>
             <p class="lead">{{ playerStats.totalPlayedGames }}</p>
         </div>
         <div class="col-6 col-sm-6">
-            <p class="mb-0">Preferred board sizes</p>
+            <p class="mb-0">{{ $t('preferred_board_sizes') }}</p>
             <ul class="list-inline" v-if="topBoardsizes.length > 0">
                 <li v-for="{ boardsize, playedGames } in topBoardsizes.slice(0, show)" :key="boardsize" class="list-inline-item">
                     <span class="lead">{{ boardsize }}</span>
@@ -46,18 +46,18 @@ while (show.value < 3 && topBoardsizes.length > show.value && topBoardsizes[show
                     <small>({{ Math.round(100 * playedGames / totalGames) }}%)</small>
                 </li>
             </ul>
-            <p><small>{{ $t('no_yet_data') }}</small></p>
+            <p v-else><small>{{ $t('no_yet_data') }}</small></p>
         </div>
         <div class="col-6 col-sm-4">
-            <p class="mb-0">1v1 ranked</p>
+            <p class="mb-0">{{ $t('ranked_games') }}</p>
             <p class="lead">{{ playerStats.totalRanked }}</p>
         </div>
         <div class="col-6 col-sm-4">
-            <p class="mb-0">1v1 friendly</p>
+            <p class="mb-0">{{ $t('friendly_games') }}</p>
             <p class="lead">{{ playerStats.totalFriendly }}</p>
         </div>
         <div class="col-6 col-sm-4">
-            <p class="mb-0">Bot games</p>
+            <p class="mb-0">{{ $t('bot_games') }}</p>
             <p class="lead">{{ playerStats.totalBotGames }}</p>
         </div>
     </div>

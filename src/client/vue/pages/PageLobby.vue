@@ -8,20 +8,20 @@ import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '@client
 import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
 import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '@client/vue/components/overlay/Create1vAIRankedOverlay.vue';
 import Create1vOfflineAIOverlay, { Create1vOfflineAIOverlayInput } from '@client/vue/components/overlay/Create1vOfflineAIOverlay.vue';
-import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
-import Player from '../../../shared/app/models/Player';
+import { HostedGame, HostedGameOptions } from '../../../shared/app/models';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
-import HostedGameClient from '../../HostedGameClient';
 import useAuthStore from '@client/stores/authStore';
 import AppPseudo from '../components/AppPseudo.vue';
-import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill } from 'bootstrap-icons-vue';
-import AppTimeControlLabelVue from '../components/AppTimeControlLabel.vue';
+import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from 'bootstrap-icons-vue';
+import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useSeoMeta } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import i18next from 'i18next';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash';
+import { apiPostGame } from '../../apiClient';
+import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils';
 
 const updateSeoMeta = () => useSeoMeta({
     title: i18next.t('lobby_title'),
@@ -54,8 +54,8 @@ const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new H
     try {
         gameOptions = await create1v1RankedOverlay({ gameOptions });
 
-        const hostedGameClient = await lobbyStore.createGame(gameOptions);
-        goToGame(hostedGameClient.getId());
+        const hostedGame = await apiPostGame(gameOptions);
+        goToGame(hostedGame.publicId);
     } catch (e) {
         // noop, player just closed popin
     }
@@ -73,8 +73,8 @@ const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new
     try {
         gameOptions = await create1v1FriendlyOverlay({ gameOptions });
 
-        const hostedGameClient = await lobbyStore.createGame(gameOptions);
-        goToGame(hostedGameClient.getId());
+        const hostedGame = await apiPostGame(gameOptions);
+        goToGame(hostedGame.publicId);
     } catch (e) {
         // noop, player just closed popin
     }
@@ -92,8 +92,8 @@ const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new 
     try {
         gameOptions = await create1vAIRankedOverlay({ gameOptions });
 
-        const hostedGameClient = await lobbyStore.createGame(gameOptions);
-        goToGame(hostedGameClient.getId());
+        const hostedGame = await apiPostGame(gameOptions);
+        goToGame(hostedGame.publicId);
     } catch (e) {
         // noop, player just closed popin
     }
@@ -111,8 +111,8 @@ const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = ne
     try {
         gameOptions = await create1vAIOverlay({ gameOptions });
 
-        const hostedGameClient = await lobbyStore.createGame(gameOptions);
-        goToGame(hostedGameClient.getId());
+        const hostedGame = await apiPostGame(gameOptions);
+        goToGame(hostedGame.publicId);
     } catch (e) {
         // noop, player just closed popin
     }
@@ -141,42 +141,42 @@ const createAndJoinGameVsLocalAI = async (gameOptions: HostedGameOptions = new H
 /*
  * Utils functions
  */
-const isWaiting = (hostedGameClient: HostedGameClient) =>
-    'created' === hostedGameClient.getHostedGame().state
+const isWaiting = (hostedGame: HostedGame) =>
+    'created' === hostedGame.state
 ;
 
-const isPlaying = (hostedGameClient: HostedGameClient) =>
-    'playing' === hostedGameClient.getHostedGame().state
+const isPlaying = (hostedGame: HostedGame) =>
+    'playing' === hostedGame.state
 ;
 
-const isFinished = (hostedGameClient: HostedGameClient) =>
-    'ended' === hostedGameClient.getHostedGame().state
+const isFinished = (hostedGame: HostedGame) =>
+    'ended' === hostedGame.state
 ;
 
 const joinGame = async (gameId: string) => {
-    const hostedGameClient = await lobbyStore.retrieveHostedGameClient(gameId);
+    const result = await lobbyStore.joinGame(gameId);
 
-    if (null === hostedGameClient) {
-        throw new Error(`Cannot join game "${gameId}", game does not exists`);
+    if (true !== result) {
+        throw new Error('Could not join game: ' + result);
     }
 
-    hostedGameClient.sendJoinGame();
+    goToGame(gameId);
 };
 
-const isUncommonBoardsize = (hostedGameClient: HostedGameClient): boolean => {
-    const { boardsize } = hostedGameClient.getGameOptions();
+const isUncommonBoardsize = (hostedGame: HostedGame): boolean => {
+    const { boardsize } = hostedGame.gameOptions;
 
     return boardsize < 9 || boardsize > 19;
 };
 
 // Sort games in the "current games" and "join a game" sections
-const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
+const gameComparator = (a: HostedGame, b: HostedGame): number => {
     // All bots games are placed at the end. Correspondence games are placed
     // after real-time games. The third factor is start time (if not existent,
     // then creation time).
 
-    const botA = a.getPlayers().some(p => p.isBot);
-    const botB = b.getPlayers().some(p => p.isBot);
+    const botA = a.hostedGameToPlayers.some(p => p.player.isBot);
+    const botB = b.hostedGameToPlayers.some(p => p.player.isBot);
 
     if (!botA && botB)
         return -1;
@@ -184,8 +184,8 @@ const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
     if (botA && !botB)
         return 1;
 
-    const timeA = timeControlToCadencyName(a.getGameOptions());
-    const timeB = timeControlToCadencyName(b.getGameOptions());
+    const timeA = timeControlToCadencyName(a.gameOptions);
+    const timeB = timeControlToCadencyName(b.gameOptions);
 
     if (timeA !== 'correspondence' && timeB === 'correspondence')
         return -1;
@@ -193,24 +193,21 @@ const gameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
     if (timeA === 'correspondence' && timeB !== 'correspondence')
         return 1;
 
-    const hostedDataA = a.getHostedGame();
-    const hostedDataB = b.getHostedGame();
-
-    const startedAtA = hostedDataA.gameData?.startedAt;
-    const startedAtB = hostedDataB.gameData?.startedAt;
+    const startedAtA = a.gameData?.startedAt;
+    const startedAtB = b.gameData?.startedAt;
 
     if (startedAtA != null && startedAtB != null)
         return startedAtB.getTime() - startedAtA.getTime();
 
-    return hostedDataB.createdAt.getTime() - hostedDataA.createdAt.getTime();
+    return b.createdAt.getTime() - a.createdAt.getTime();
 };
 
 /**
  * Finished games
  */
-const byEndedAt = (a: HostedGameClient, b: HostedGameClient): number => {
-    const gameDataA = a.getHostedGame().gameData;
-    const gameDataB = b.getHostedGame().gameData;
+const byEndedAt = (a: HostedGame, b: HostedGame): number => {
+    const gameDataA = a.gameData;
+    const gameDataB = b.gameData;
 
     if (!gameDataA?.endedAt || !gameDataB?.endedAt) {
         return 0;
@@ -283,7 +280,7 @@ window.addEventListener('hashchange', () => createGameFromHash());
                 <!--
                     Created games
                 -->
-                <div v-if="Object.values(lobbyStore.hostedGameClients).some(isWaiting)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.hostedGames).some(isWaiting)" class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
@@ -298,28 +295,28 @@ window.addEventListener('hashchange', () => createGameFromHash());
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isWaiting).sort(gameComparator)"
-                                :key="hostedGameClient.getId()"
+                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isWaiting).sort(gameComparator)"
+                                :key="hostedGame.publicId"
                             >
                                 <td>
                                     <button
-                                        v-if="hostedGameClient.canJoin(useAuthStore().loggedInPlayer)"
+                                        v-if="canJoin(hostedGame, useAuthStore().loggedInPlayer)"
                                         class="btn me-3 btn-sm btn-success"
-                                        @click="joinGame(hostedGameClient.getId()); goToGame(hostedGameClient.getId())"
+                                        @click="joinGame(hostedGame.publicId)"
                                     >{{ $t('game.accept') }}</button>
 
                                     <router-link
                                         class="btn me-3 btn-sm btn-link"
-                                        :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.watch') }}</router-link>
                                 </td>
-                                <td><span v-if="hostedGameClient.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
-                                <td><AppPseudo onlineStatus rating :player="hostedGameClient.getHostedGame().host" /></td>
-                                <td :class="isUncommonBoardsize(hostedGameClient) ? 'text-warning' : ''">{{ hostedGameClient.getGameOptions().boardsize }}</td>
-                                <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
-                                <td><AppGameRulesSummary :gameOptions="hostedGameClient.getGameOptions()" /></td>
+                                <td><span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
+                                <td><AppPseudo onlineStatus rating :player="hostedGame.host" /></td>
+                                <td :class="isUncommonBoardsize(hostedGame) ? 'text-warning' : ''">{{ hostedGame.gameOptions.boardsize }}</td>
+                                <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
+                                <td><AppGameRulesSummary :gameOptions="hostedGame.gameOptions" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGameClient.getHostedGame().createdAt, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGame.createdAt, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>
@@ -332,7 +329,7 @@ window.addEventListener('hashchange', () => createGameFromHash());
                 <!--
                     Currently playing games
                 -->
-                <div v-if="Object.values(lobbyStore.hostedGameClients).some(isPlaying)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.hostedGames).some(isPlaying)" class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
@@ -347,28 +344,28 @@ window.addEventListener('hashchange', () => createGameFromHash());
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isPlaying).sort(gameComparator)"
-                                :key="hostedGameClient.getId()"
+                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isPlaying).sort(gameComparator)"
+                                :key="hostedGame.publicId"
                             >
                                 <td class="ps-0">
                                     <router-link
                                         class="btn btn-sm btn-link"
-                                        :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.watch') }}</router-link>
 
-                                    <span v-if="hostedGameClient.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
-                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" /></td>
-                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" /></td>
+                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 0)!" /></td>
+                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" /></td>
                                 <td class="d-table-cell d-sm-none">
-                                    <AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(0) as Player)" />
+                                    <AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 0)!" />
                                     <br>
-                                    <AppPseudo rating onlineStatus :player="(hostedGameClient.getPlayer(1) as Player)" />
+                                    <AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" />
                                 </td>
-                                <td>{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
+                                <td>{{ hostedGame.gameOptions.boardsize }}</td>
+                                <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGameClient.getHostedGame().gameData?.startedAt ?? 0, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGame.gameData?.startedAt ?? 0, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>
@@ -381,7 +378,7 @@ window.addEventListener('hashchange', () => createGameFromHash());
                 <!--
                     Finished games
                 -->
-                <div v-if="Object.values(lobbyStore.hostedGameClients).some(isFinished)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.endedHostedGames).some(isFinished)" class="table-responsive">
                     <table class="table" style="margin-bottom: 0">
                         <thead>
                             <tr>
@@ -395,37 +392,36 @@ window.addEventListener('hashchange', () => createGameFromHash());
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGameClient in Object.values(lobbyStore.hostedGameClients).filter(isFinished).sort(byEndedAt)"
-                                :key="hostedGameClient.getId()"
+                                v-for="hostedGame in Object.values(lobbyStore.endedHostedGames).filter(isFinished).sort(byEndedAt)"
+                                :key="hostedGame.publicId"
                             >
                                 <td class="ps-0">
                                     <router-link
                                         class="btn btn-sm btn-link"
-                                        :to="{ name: 'online-game', params: { gameId: hostedGameClient.getId() } }"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.review') }}</router-link>
 
-                                    <span v-if="hostedGameClient.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
-                                <template v-if="hostedGameClient.getHostedGame()?.gameData?.winner != null">
-                                    <td><AppPseudo rating onlineStatus :player="(hostedGameClient.getWinnerPlayer() as Player)" is="strong" /></td>
-                                    <td><AppPseudo rating onlineStatus :player="(hostedGameClient.getLoserPlayer() as Player)" classes="text-body-secondary" /></td>
+                                <template v-if="hostedGame?.gameData?.winner != null">
+                                    <td><AppPseudo rating onlineStatus :player="getStrictWinnerPlayer(hostedGame)" is="strong" /></td>
+                                    <td><AppPseudo rating onlineStatus :player="getStrictLoserPlayer(hostedGame)" classes="text-body-secondary" /></td>
                                 </template>
                                 <template v-else>
                                     <td>-</td>
                                     <td>-</td>
                                 </template>
-                                <td>{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabelVue :gameOptions="hostedGameClient.getGameOptions()" /></td>
+                                <td>{{ hostedGame.gameOptions.boardsize }}</td>
+                                <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGameClient.getHostedGame().gameData?.endedAt ?? 0, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGame.gameData?.endedAt ?? 0, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>
                     </table>
-                    <button
-                        class="btn btn-sm btn-link"
-                        @click="() => lobbyStore.loadMoreEndedGames()"
-                    >{{ $t('load_more') }}</button>
+                    <router-link class="btn btn-link text-decoration-none" :to="{ name: 'games-archive' }">
+                        <BIconSearch /> {{ $t('browse_all_ended_games') }}
+                    </router-link>
                 </div>
             </div>
             <div class="col-sm-3">

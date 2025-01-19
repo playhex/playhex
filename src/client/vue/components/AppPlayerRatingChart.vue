@@ -16,6 +16,10 @@ const { player } = defineProps({
     },
 });
 
+const emit = defineEmits<{
+    (e: 'timeRangeUpdated', from: null | Date, to: null | Date): void;
+}>();
+
 Chart.register(
     LinearScale,
     TimeScale,
@@ -71,7 +75,13 @@ const ratingChartOptions: ChartOptions<'line'> = {
                     enabled: true,
                 },
                 onZoom: ({ chart }) => {
-                    isZoomed.value = 1 !== chart.getZoomLevel();
+                    if (1 === chart.getZoomLevel()) {
+                        isZoomed.value = false;
+                        emit('timeRangeUpdated', null, null);
+                    } else {
+                        isZoomed.value = true;
+                        emit('timeRangeUpdated', new Date(chart.scales.x.min), new Date(chart.scales.x.max));
+                    }
                 },
             },
         },
@@ -86,12 +96,14 @@ const ratingChartOptions: ChartOptions<'line'> = {
     animation: {
         duration: 200,
     },
+    maintainAspectRatio: false,
 };
 
 const resetZoom = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ratingChart.value as any)?.chart.resetZoom('zoom');
     isZoomed.value = false;
+    emit('timeRangeUpdated', null, null);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -124,7 +136,6 @@ defineExpose({
             :data="(ratingChartData as unknown as ChartData<'line'>)"
             :options="ratingChartOptions"
             aria-label="Chart of rating history."
-            height="120"
         />
     </div>
 </template>
@@ -132,6 +143,8 @@ defineExpose({
 <style lang="stylus" scoped>
 .chart-container
     position relative
+    height 250px
+    max-height 50vw
 
     .chart-controls
         position absolute

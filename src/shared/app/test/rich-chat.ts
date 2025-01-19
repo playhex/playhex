@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { ChatMessage, Game, HostedGame, Player } from '../models';
-import { createRichChat } from '../rich-chat';
+import { RichChat } from '../rich-chat';
 
 describe('Rich Chat', () => {
     it('yield date headers', () => {
@@ -36,7 +36,8 @@ describe('Rich Chat', () => {
             message2,
         ];
 
-        const richChat = createRichChat(hostedGame)
+        const richChat = new RichChat(hostedGame)
+            .getRichChatMessages()
             .filter(item => item instanceof ChatMessage || 'date' === item.type)
         ;
 
@@ -90,7 +91,8 @@ describe('Rich Chat', () => {
             message2,
         ];
 
-        const richChat = createRichChat(hostedGame)
+        const richChat = new RichChat(hostedGame)
+            .getRichChatMessages()
             .filter(item => item instanceof ChatMessage || 'move' === item.type)
         ;
 

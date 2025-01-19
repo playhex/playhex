@@ -13,12 +13,14 @@ export type TimeControlOptionsValues = {
     values: GameTimeData;
 };
 
-export type HostedGameState =
-    'created'
-    | 'canceled'
-    | 'playing'
-    | 'ended'
-;
+export const hostedGameStates = [
+    'created',
+    'canceled',
+    'playing',
+    'ended',
+] as const;
+
+export type HostedGameState = typeof hostedGameStates[number];
 
 export type GithubContributor = {
     username: string;

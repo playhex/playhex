@@ -151,7 +151,9 @@
     "close": "Close",
     "ranked": "Ranked",
     "friendly": "Friendly",
-    "rating": "Rating: {{rating}}",
+    "any": "Any",
+    "rating_n": "Rating: {{rating}}",
+    "rating": "Rating",
     "new_game": "New game",
     "players": "Players",
     "player": "player",
@@ -160,6 +162,11 @@
     "n_online_players": "Online ({{n}})",
     "guest": "Guest",
     "finished_games": "Finished games",
+    "1v1": "1v1",
+    "sort_date": {
+        "asc": "Chronological",
+        "desc": "Recent first"
+    },
     "1v1_ranked": {
         "title": "1v1",
         "create": "Create 1v1"
@@ -235,6 +242,18 @@
     "player_made_a_move": "{{player}} made a move",
     "game_with_player_has_started": "Game with {{player}} has started",
     "last_move": "Last move",
+    "total_played_games": "Total played games",
+    "preferred_board_sizes": "Preferred board sizes",
+    "ranked_games": "Ranked",
+    "friendly_games": "Friendlies",
+    "bot_games": "Bot games",
+    "browse_all_ended_games": "Browse all ended games",
+    "n_total_games_zero": "No matching game.",
+    "n_total_games_one": "1 total game.",
+    "n_total_games_other": "{{count}} total games.",
+    "previous": "Previous",
+    "next": "Next",
+    "page_page_of_max": "Page {{page}} / {{max}}",
     "undo": {
         "undo_move": "Takeback",
         "accept": "Accept undo",

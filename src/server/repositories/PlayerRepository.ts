@@ -7,6 +7,7 @@ import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
 import { FindOptionsSelect, QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils';
+import SearchPlayersParameters from '@shared/app/SearchPlayersParameters';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
@@ -54,6 +55,39 @@ export default class PlayerRepository
             slug,
             isBot: true,
         });
+    }
+
+    async searchPlayers(params: SearchPlayersParameters): Promise<Player[]>
+    {
+        const queryBuilder = this.playerRepository.createQueryBuilder('player')
+            .take(10)
+        ;
+
+        if (undefined !== params.nicknameLike) {
+            queryBuilder
+                .andWhere(`(
+                    player.pseudo like :nicknameLike
+                    or player.slug like :nicknameLike
+                )`)
+                .setParameter('nicknameLike', params.nicknameLike + '%')
+            ;
+        }
+
+        if (undefined !== params.isBot) {
+            queryBuilder
+                .andWhere('player.isBot = :isBot')
+                .setParameter('isBot', params.isBot)
+            ;
+        }
+
+        if (undefined !== params.isGuest) {
+            queryBuilder
+                .andWhere('player.isGuest = :isGuest')
+                .setParameter('isGuest', params.isGuest)
+            ;
+        }
+
+        return queryBuilder.getMany();
     }
 
     async createGuest(): Promise<Player>

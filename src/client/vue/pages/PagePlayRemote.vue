@@ -5,7 +5,7 @@ import useLobbyStore from '@client/stores/lobbyStore';
 import { ref, computed } from 'vue';
 import AppBoard from '@client/vue/components/AppBoard.vue';
 import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
-import HostedGameClient from '../../HostedGameClient';
+import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient';
 import { defineOverlay } from '@overlastic/vue';
 import { Ref, onUnmounted, watch, watchEffect } from 'vue';
 import useSocketStore from '@client/stores/socketStore';
@@ -22,12 +22,17 @@ import { Move, PlayerIndex } from '@shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
+import { HostedGame } from '../../../shared/app/models';
 import { fromEngineMove } from '../../../shared/app/models/Move';
 import { pseudoString } from '../../../shared/app/pseudoUtils';
 import { CustomizedGameView } from '../../services/CustomizedGameView';
 import { isMyTurn } from '../../services/notifications/context-utils';
 import { canPassAgain } from '../../../shared/app/passUtils';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
+import { apiPostRematch } from '../../apiClient';
+import { canJoin } from '../../../shared/app/hostedGameUtils';
+import { Socket } from 'socket.io-client';
+import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents';
 
 useSeoMeta({
     robots: 'noindex',
@@ -140,15 +145,6 @@ const answerUndo = (accept: boolean): void => {
     hostedGameClient.value?.sendAnswerUndo(accept);
 };
 
-/*
- * Join/leave game room.
- */
-watchEffect(() => {
-    if (socketStore.connected)
-        socketStore.joinRoom(Rooms.game(gameId));
-});
-onUnmounted(() => socketStore.leaveRoom(Rooms.game(gameId)));
-
 const getLocalPlayerIndex = (): number => {
     if (null === loggedInPlayer.value || !hostedGameClient.value) {
         return -1;
@@ -254,9 +250,9 @@ const initGameView = async () => {
     }
 };
 
-const makeTitle = (gameClient: HostedGameClient) => {
-    const players = gameClient.getPlayers();
-    const { state } = gameClient.getHostedGame();
+const makeTitle = (hostedGame: HostedGame) => {
+    const players = hostedGame.hostedGameToPlayers.map(h => h.player);
+    const { state } = hostedGame;
     const playerPseudos = players.map(p => pseudoString(p, 'pseudo'));
     if (players.length < 2 && 'created' === state)
         return `${i18next.t('game.title_waiting')} ${playerPseudos[0]}`;
@@ -264,7 +260,7 @@ const makeTitle = (gameClient: HostedGameClient) => {
     if ('playing' === state && loggedInPlayer.value != null) {
         const player = loggedInPlayer.value;
         const index = players.findIndex(p => p.publicId === player.publicId);
-        if (index != null && gameClient.getGame().getCurrentPlayerIndex() === index) {
+        if (index != null && hostedGame.gameData?.currentPlayerIndex === index) {
             yourTurn = `• ${i18next.t('game.title_your_turn')} • `;
         }
     }
@@ -275,13 +271,28 @@ const makeTitle = (gameClient: HostedGameClient) => {
 /*
  * Load game
  */
-lobbyStore.onLoaded(gameId, async gameClient => {
-    if (!gameClient) {
+let unlistenGameUpdates: null | (() => void) = null;
+
+socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
+    // ignore if not my game, or already initialized
+    if (publicId !== gameId || null !== hostedGameClient.value) {
+        return;
+    }
+
+    // I received update but game seems not to exists.
+    if (null === hostedGame) {
         router.push({ name: 'home' });
         return;
     }
 
-    hostedGameClient.value = gameClient;
+    hostedGameClient.value = new HostedGameClient(hostedGame, socketStore.socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+
+    // I think `listenGameUpdates()` must be called synchronously here (i.e do not put await before this call)
+    // to prevent losing updates between game initialization and next socket event.
+    unlistenGameUpdates = listenGameUpdates(
+        hostedGameClient as Ref<HostedGameClient>,
+        socketStore.socket as Socket<HexServerToClientEvents, HexClientToServerEvents>,
+    );
 
     await initGameView();
 
@@ -296,14 +307,43 @@ lobbyStore.onLoaded(gameId, async gameClient => {
         robots: 'noindex',
         title: computed(() => {
             if (hostedGameClient.value == null) return '';
-            return makeTitle(hostedGameClient.value);
+            return makeTitle(hostedGameClient.value.getHostedGame());
         }),
         description,
         ogDescription: description,
     });
 });
 
-const join = () => hostedGameClient.value?.sendJoinGame();
+/*
+ * Join/leave game room.
+ *
+ * Must join after we set up the gameUpdate listener,
+ * in order to initialize game properly.
+ */
+watchEffect(() => {
+    if (socketStore.connected)
+        socketStore.joinRoom(Rooms.game(gameId));
+});
+
+onUnmounted(() => {
+    socketStore.leaveRoom(Rooms.game(gameId));
+
+    if (null !== unlistenGameUpdates) {
+        unlistenGameUpdates();
+        unlistenGameUpdates = null;
+    }
+});
+
+/*
+ * Join game
+ */
+const join = () => {
+    if (null === hostedGameClient.value) {
+        return;
+    }
+
+    return lobbyStore.joinGame(hostedGameClient.value.getId());
+};
 
 const confirmationOverlay = defineOverlay(ConfirmationOverlay);
 
@@ -381,15 +421,13 @@ const toggleCoords = () => {
  */
 const canAcceptRematch: Ref<boolean> = ref(false);
 
-watchEffect(async () => {
+watchEffect(() => {
     if (hostedGameClient.value == null) return;
-    const rematchId = hostedGameClient.value.getRematchGameId();
-    if (rematchId == null) return;
+    const rematch = hostedGameClient.value.getRematch();
+    if (rematch == null) return;
     if (loggedInPlayer.value == null) return;
     if (getLocalPlayerIndex() === -1) return;
-    const rematchGameClient = await lobbyStore.retrieveHostedGameClient(rematchId);
-    if (rematchGameClient == null) return;
-    canAcceptRematch.value = rematchGameClient.canJoin(loggedInPlayer.value);
+    canAcceptRematch.value = canJoin(rematch, loggedInPlayer.value);
 });
 
 const canRematch = (): boolean => {
@@ -405,27 +443,25 @@ const createOrAcceptRematch = async (): Promise<void> => {
     }
 
     const rematchId = hostedGameClient.value.getRematchGameId();
-    let hostedRematchClient;
+    let hostedGameRematch: null | HostedGame = null;
 
     if (rematchId != null) {
-        hostedRematchClient = await lobbyStore.retrieveHostedGameClient(rematchId);
-        if (hostedRematchClient == null) {
+        hostedGameRematch = await lobbyStore.getOrFetchHostedGame(rematchId);
+        if (hostedGameRematch == null) {
             throw new Error('A rematch game does not exist');
         }
     } else {
-        hostedRematchClient = await lobbyStore.rematchGame(
-            hostedGameClient.value.getId(),
-        );
+        hostedGameRematch = await apiPostRematch(hostedGameClient.value.getId());
     }
 
-    if (loggedInPlayer && hostedRematchClient.canJoin(loggedInPlayer.value)) {
-        await hostedRematchClient.sendJoinGame();
+    if (loggedInPlayer && canJoin(hostedGameRematch, loggedInPlayer.value)) {
+        await lobbyStore.joinGame(hostedGameRematch.publicId);
     }
 
     router.push({
         name: 'online-game',
         params: {
-            gameId: hostedRematchClient.getId(),
+            gameId: hostedGameRematch.publicId,
         },
     });
 };
@@ -651,11 +687,10 @@ const shouldEnablePass = (): boolean => {
         </div>
 
         <!-- Game sidebar -->
-        <div class="sidebar bg-body" v-if="(hostedGameClient instanceof HostedGameClient)">
+        <div class="sidebar bg-body" v-if="hostedGameClient && gameView">
             <AppGameSidebar
-                :hostedGameClient="hostedGameClient"
-                v-if="gameView"
-                :gameView="gameView"
+                :hostedGameClient
+                :gameView
                 @close="showSidebar(false)"
                 @toggleCoords="toggleCoords()"
             />

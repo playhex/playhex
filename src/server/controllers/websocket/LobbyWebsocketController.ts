@@ -25,10 +25,10 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
         });
     }
 
-    async onJoinRoom(socket: HexSocket, room: string)
+    onJoinRoom(socket: HexSocket, room: string)
     {
         if (room !== Rooms.lobby) return;
-        const games = await this.hostedGameRepository.getLobbyGames();
+        const games = this.hostedGameRepository.getActiveGamesData();
         socket.emit('lobbyUpdate', games);
     }
 }
