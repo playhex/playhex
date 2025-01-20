@@ -1,8 +1,12 @@
-import { AIConfigStatusData, HostedGameState, PlayHexContributors, WithRequired } from '@shared/app/Types';
+import qs from 'qs';
+import { AIConfigStatusData, PlayHexContributors, WithRequired } from '@shared/app/Types';
 import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { plainToInstance } from '../shared/app/class-transformer-custom';
 import { RatingCategory } from '../shared/app/ratingUtils';
+import SearchGamesParameters from '../shared/app/SearchGamesParameters';
+import { parse } from 'content-range';
+import SearchPlayersParameters from '@shared/app/SearchPlayersParameters';
 
 export class ApiClientError extends Error
 {
@@ -142,40 +146,41 @@ export const authChangePassword = async (oldPassword: string, newPassword: strin
     return plainToInstance(Player, await response.json());
 };
 
-// TODO see if no need to pass type=lobby
-export const getGames = async (): Promise<HostedGame[]> => {
-    const response = await fetch(`/api/games`, {
+/**
+ * Won't return active games, but can return created and playing games if persisted.
+ */
+export const getGames = async (searchGamesParameters: SearchGamesParameters = {}): Promise<{ results: HostedGame[], count: null | number }> => {
+    const response = await fetch(`/api/games?${qs.stringify(searchGamesParameters)}`, {
         method: 'get',
         headers: {
             'Accept': 'application/json',
         },
     });
 
-    return (await response.json() as HostedGame[])
+    const hostedGames = (await response.json() as HostedGame[])
         .map(hostedGame => plainToInstance(HostedGame, hostedGame))
     ;
+
+    return {
+        results: hostedGames,
+        count: parse(response.headers.get('Content-Range') ?? '')?.size ?? null,
+    };
 };
 
-export const getEndedGames = async (take = 20, fromGamePublicId: null | string = null): Promise<HostedGame[]> => {
-    const params = new URLSearchParams({
-        type: 'ended',
-        take: String(take),
-    });
-
-    if (null !== fromGamePublicId) {
-        params.append('fromGamePublicId', fromGamePublicId);
-    }
-
-    const response = await fetch(`/api/games?${params.toString()}`, {
+export const getGamesStats = async (searchGamesParameters: SearchGamesParameters = {}): Promise<{ date: Date, totalGames: number }[]> => {
+    const response = await fetch(`/api/games-stats?${qs.stringify(searchGamesParameters)}`, {
         method: 'get',
         headers: {
             'Accept': 'application/json',
         },
     });
 
-    return (await response.json() as HostedGame[])
-        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
-    ;
+    const results: { date: string, totalGames: number }[] = await response.json();
+
+    return results.map(result => ({
+        date: new Date(result.date),
+        totalGames: result.totalGames,
+    }));
 };
 
 export const getPlayer = async (publicId: string): Promise<Player> => {
@@ -202,38 +207,16 @@ export const getPlayerBySlug = async (slug: string): Promise<Player> => {
     return plainToInstance(Player, await response.json());
 };
 
-/**
- * @param fromGamePublicId Cursor
- */
-export const getPlayerGames = async (
-    playerPublicId: string,
-    state: null | HostedGameState = null,
-    fromGamePublicId: null | string = null,
-): Promise<HostedGame[]> => {
-    let url = `/api/players/${playerPublicId}/games`;
-    const params = new URLSearchParams();
-
-    if (null !== state) {
-        params.append('state', state);
-    }
-
-    if (null !== fromGamePublicId) {
-        params.append('fromGamePublicId', fromGamePublicId);
-    }
-
-    if (params.size > 0) {
-        url += `?${params.toString()}`;
-    }
-
-    const response = await fetch(url, {
+export const getSearchPlayers = async (searchPlayersParameters: SearchPlayersParameters): Promise<Player[]> => {
+    const response = await fetch(`/api/search/players?${qs.stringify(searchPlayersParameters)}`, {
         method: 'get',
         headers: {
             'Accept': 'application/json',
         },
     });
 
-    return (await response.json() as HostedGame[])
-        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    return (await response.json() as Player[])
+        .map(player => plainToInstance(Player, player))
     ;
 };
 

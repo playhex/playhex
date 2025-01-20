@@ -1,6 +1,5 @@
 import { Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer';
-import { HostedGameState } from '../../shared/app/Types';
 import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
 import HostedGamePersister from '../persistance/HostedGamePersister';
@@ -19,13 +18,6 @@ import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/Aut
 import { isDuplicateError } from './typeormUtils';
 
 export class GameError extends Error {}
-
-const byRecentFirst = (game0: HostedGame, game1: HostedGame): number => {
-    const date0 = game0.gameData?.endedAt ?? game0.createdAt;
-    const date1 = game1.gameData?.endedAt ?? game1.createdAt;
-
-    return date1.getTime() - date0.getTime();
-};
 
 @Service()
 export default class HostedGameRepository
@@ -240,30 +232,7 @@ export default class HostedGameRepository
         ;
     }
 
-    /**
-     * Get finished games; bot games are ignored.
-     * @param fromGamePublicId Take N ended games from fromGamePublicId, or from start if not set.
-     */
-    async getEndedGames(take = 10, fromGamePublicId?: string): Promise<HostedGame[]>
-    {
-        return await this.hostedGamePersister.findLastEnded1v1(take, fromGamePublicId);
-    }
-
-    /**
-     * Returns games to display initially on lobby.
-     * Active games, plus some ended games.
-     */
-    async getLobbyGames(): Promise<HostedGame[]>
-    {
-        const lobbyGames = this.getActiveGamesData();
-        const endedGames = await this.getEndedGames(5);
-
-        lobbyGames.push(...endedGames);
-
-        return lobbyGames;
-    }
-
-    async getGame(publicId: string): Promise<HostedGame | null>
+    async getActiveOrArchivedGame(publicId: string): Promise<HostedGame | null>
     {
         if (this.activeGames[publicId]) {
             return this.activeGames[publicId].getHostedGame();
@@ -298,7 +267,7 @@ export default class HostedGameRepository
 
     async rematchGame(host: Player, gameId: string): Promise<HostedGame>
     {
-        const game = await this.getGame(gameId);
+        const game = await this.getActiveOrArchivedGame(gameId);
 
         if (null === game) {
             throw new GameError(`no game ${gameId}`);
@@ -366,42 +335,12 @@ export default class HostedGameRepository
         return hostedGameServers;
     }
 
-    /**
-     * @param fromGamePublicId Cursor, retrieve games after this one.
-     */
-    async getPlayerGames(
-        player: Player,
-        state: null | HostedGameState = null,
-        fromGamePublicId: null | string = null,
-    ): Promise<HostedGame[]> {
-        const hostedGameList: HostedGame[] = [];
-
-        for (const key in this.activeGames) {
-            if (!this.activeGames[key].isPlayerInGame(player)) {
-                continue;
-            }
-
-            if (null !== state && this.activeGames[key].getState() !== state) {
-                continue;
-            }
-
-            hostedGameList.push(this.activeGames[key].getHostedGame());
-        }
-
-        const gamesFromDb = await this.hostedGamePersister.findLastEndedByPlayer(player, fromGamePublicId ?? undefined);
-
-        hostedGameList.push(...gamesFromDb);
-        hostedGameList.sort(byRecentFirst);
-
-        return hostedGameList;
-    }
-
     async playerJoinGame(player: Player, gameId: string): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];
 
         if (!hostedGame) {
-            return 'no game ' + gameId;
+            return 'no active game ' + gameId;
         }
 
         const joinResult = hostedGame.playerJoin(player);
@@ -418,7 +357,7 @@ export default class HostedGameRepository
         const hostedGame = this.activeGames[gameId];
 
         if (!hostedGame) {
-            return 'no game ' + gameId;
+            return 'no active game ' + gameId;
         }
 
         const result = hostedGame.playerMove(player, move);
@@ -431,7 +370,7 @@ export default class HostedGameRepository
         const hostedGame = this.activeGames[gameId];
 
         if (!hostedGame) {
-            return 'no game ' + gameId;
+            return 'no active game ' + gameId;
         }
 
         const result = hostedGame.playerAskUndo(player);
@@ -444,7 +383,7 @@ export default class HostedGameRepository
         const hostedGame = this.activeGames[gameId];
 
         if (!hostedGame) {
-            return 'no game ' + gameId;
+            return 'no active game ' + gameId;
         }
 
         const result = hostedGame.playerAnswerUndo(player, accept);
@@ -457,7 +396,7 @@ export default class HostedGameRepository
         const hostedGame = this.activeGames[gameId];
 
         if (!hostedGame) {
-            return 'no game ' + gameId;
+            return 'no active game ' + gameId;
         }
 
         const result = hostedGame.playerResign(player);
@@ -470,7 +409,7 @@ export default class HostedGameRepository
         const hostedGame = this.activeGames[gameId];
 
         if (!hostedGame) {
-            return 'no game ' + gameId;
+            return 'no active game ' + gameId;
         }
 
         const result = hostedGame.playerCancel(player);

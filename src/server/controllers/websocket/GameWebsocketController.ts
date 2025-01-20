@@ -28,7 +28,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
     {
         const gameId = room.match(/games\/(.+)/)?.[1];
         if (gameId == null) return;
-        const game = await this.hostedGameRepository.getGame(gameId);
+        const game = await this.hostedGameRepository.getActiveOrArchivedGame(gameId);
         socket.emit('gameUpdate', gameId, game);
     }
 }

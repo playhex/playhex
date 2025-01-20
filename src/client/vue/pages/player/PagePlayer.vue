@@ -5,11 +5,10 @@ import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models';
-import { getPlayerGames, getPlayerBySlug, ApiClientError, apiGetPlayerStats, apiGetPlayerCurrentRatings } from '../../../apiClient';
-import { Ref, ref } from 'vue';
+import { getPlayerBySlug, ApiClientError, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient';
+import { Ref, ref, watch } from 'vue';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore';
-import HostedGameClient from '../../../HostedGameClient';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppTimeControlLabelVue from '../../components/AppTimeControlLabel.vue';
@@ -17,6 +16,7 @@ import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue'
 import AppPlayerStats from '@client/vue/components/AppPlayerStats.vue';
 import AppPlayerRatingChart from '@client/vue/components/AppPlayerRatingChart.vue';
 import AppTablePlayerRating from '@client/vue/components/AppTablePlayerRating.vue';
+import AppSearchGamesParameters from '@client/vue/components/AppSearchGamesParameters.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useJsonLd } from '../../../services/head';
 import { useSeoMeta } from '@unhead/vue';
@@ -27,6 +27,10 @@ import useServerDateStore from '../../../stores/serverDateStore';
 import { watchEffect } from 'vue';
 import { RatingCategory } from '@shared/app/ratingUtils';
 import { Directive } from 'vue';
+import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters';
+import { getOtherPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils';
+import { useSearchGamesPagination } from '../../composables/searchGamesPagination';
+import { useSearchGamesSyncHash } from '../../composables/searchGamesSyncHash';
 
 const { slug } = useRoute().params;
 
@@ -74,7 +78,6 @@ const player: Ref<null | Player> = isMe()
     : ref(null)
 ;
 
-const gamesHistory: Ref<null | HostedGame[]> = ref(null);
 const playerNotFound = ref(false);
 
 (async () => {
@@ -84,8 +87,6 @@ const playerNotFound = ref(false);
         }
 
         updateMeta(player.value);
-
-        gamesHistory.value = await getPlayerGames(player.value.publicId, 'ended');
     } catch (e) {
         if (!(e instanceof ApiClientError)) {
             throw e;
@@ -98,12 +99,12 @@ const playerNotFound = ref(false);
 /*
  * Current games
  */
-const { hostedGameClients } = storeToRefs(useLobbyStore());
+const { hostedGames } = storeToRefs(useLobbyStore());
 
-const currentGameComparator = (a: HostedGameClient, b: HostedGameClient): number => {
+const currentGameComparator = (a: HostedGame, b: HostedGame): number => {
     // Correspondence games go after real-time games, then sorted by "started at"
-    const timeA = timeControlToCadencyName(a.getGameOptions());
-    const timeB = timeControlToCadencyName(b.getGameOptions());
+    const timeA = timeControlToCadencyName(a.gameOptions);
+    const timeB = timeControlToCadencyName(b.gameOptions);
 
     if (timeA !== 'correspondence' && timeB === 'correspondence')
         return -1;
@@ -111,8 +112,8 @@ const currentGameComparator = (a: HostedGameClient, b: HostedGameClient): number
     if (timeA === 'correspondence' && timeB !== 'correspondence')
         return 1;
 
-    const startedAtA = a.getHostedGame().gameData?.startedAt;
-    const startedAtB = b.getHostedGame().gameData?.startedAt;
+    const startedAtA = a.gameData?.startedAt;
+    const startedAtB = b.gameData?.startedAt;
 
     if (startedAtA != null && startedAtB != null)
         return startedAtB.getTime() - startedAtA.getTime();
@@ -120,19 +121,19 @@ const currentGameComparator = (a: HostedGameClient, b: HostedGameClient): number
     return 0;
 };
 
-const getCurrentGames = (): HostedGameClient[] => {
+const getCurrentGames = (): HostedGame[] => {
     if (null === player.value) {
         return [];
     }
 
-    const currentGames: HostedGameClient[] = [];
+    const currentGames: HostedGame[] = [];
 
-    for (const hostedGameClient of Object.values(hostedGameClients.value)) {
-        if ('playing' !== hostedGameClient.getState() || !hostedGameClient.hasPlayer(player.value)) {
+    for (const hostedGame of Object.values(hostedGames.value)) {
+        if ('playing' !== hostedGame.state || !hasPlayer(hostedGame, player.value)) {
             continue;
         }
 
-        currentGames.push(hostedGameClient);
+        currentGames.push(hostedGame);
     }
 
     return currentGames.sort(currentGameComparator);
@@ -141,6 +142,58 @@ const getCurrentGames = (): HostedGameClient[] => {
 /*
  * Games history
  */
+const gamesHistory = ref<null | HostedGame[]>(null);
+const totalResults = ref<null | number>(null);
+const DEFAULT_PAGE_SIZE = 15;
+
+const searchGamesParameters = ref<SearchGamesParameters>({
+    players: null === player.value
+        ? undefined
+        : [{ publicId: player.value.publicId }]
+    ,
+    opponentType: 'player',
+    states: ['ended'],
+    endedAtSort: 'desc',
+    paginationPageSize: DEFAULT_PAGE_SIZE,
+});
+
+useSearchGamesSyncHash(searchGamesParameters);
+
+const { totalPages, goPagePrevious, goPageNext } = useSearchGamesPagination(
+    searchGamesParameters,
+    totalResults,
+    DEFAULT_PAGE_SIZE,
+);
+
+// Set filter to current player, but keep same filter if already set on this player
+watch(player, newPlayer => {
+    if (null === newPlayer) {
+        return;
+    }
+
+    if (undefined === searchGamesParameters.value.players
+        || searchGamesParameters.value.players.every(p => p.publicId !== newPlayer.publicId)
+    ) {
+        searchGamesParameters.value.players = [
+            { publicId: newPlayer.publicId },
+        ];
+    }
+});
+
+// Update games list when filters change
+watchEffect(async () => {
+    // Do not search yet to prevent having games without current player,
+    // which is impossible to display in this page table because we need to display the opponent to currentPlayer
+    if (undefined === searchGamesParameters.value.players || 0 === searchGamesParameters.value.players.length) {
+        return;
+    }
+
+    const { results, count } = await getGames(searchGamesParameters.value);
+
+    gamesHistory.value = results;
+    totalResults.value = count;
+});
+
 const hasWon = (game: HostedGame): boolean => {
     if (null === player.value) {
         throw new Error('player must be set');
@@ -180,19 +233,6 @@ const getOpponent = (game: HostedGame): Player => {
     }
 
     return opponent;
-};
-
-const loadMoreEndedGames = async (): Promise<void> => {
-    if (null === player.value || !Array.isArray(gamesHistory.value)) {
-        return;
-    }
-
-    const last = gamesHistory.value[gamesHistory.value.length - 1];
-    const games = await getPlayerGames(player.value.publicId, 'ended', last?.publicId ?? null);
-
-    for (let i = 0; i < games.length; ++i) {
-        gamesHistory.value.push(games[i]);
-    }
 };
 
 const router = useRouter();
@@ -268,6 +308,29 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
         });
     },
 };
+
+const timeRangeUpdated = (from: null | Date, to: null | Date) => {
+    let isZoomed = from || to;
+
+    if (from) {
+        searchGamesParameters.value.fromEndedAt = from;
+    }
+
+    if (to) {
+        searchGamesParameters.value.toEndedAt = to;
+    }
+
+    if (isZoomed) {
+        searchGamesParameters.value.ranked = true;
+        searchGamesParameters.value.opponentType = undefined;
+        searchGamesParameters.value.endedAtSort = 'asc';
+        searchGamesParameters.value.states = ['ended'];
+    } else {
+        searchGamesParameters.value.fromEndedAt = undefined;
+        searchGamesParameters.value.toEndedAt = undefined;
+        searchGamesParameters.value.endedAtSort = 'desc';
+    }
+};
 </script>
 
 <template>
@@ -324,7 +387,7 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
 
         <AppPlayerStats v-if="playerStats" :playerStats />
 
-        <h3 class="mt-4">Rating</h3>
+        <h3 class="mt-4">{{ $t('rating') }}</h3>
 
         <div class="row">
             <div class="col-lg-6 col-xl-5">
@@ -372,7 +435,7 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
                 </div>
             </div>
             <div class="col-lg-6 col-xl-7">
-                <AppPlayerRatingChart ref="ratingChart" v-if="player" :player />
+                <AppPlayerRatingChart ref="ratingChart" v-if="player" :player @timeRangeUpdated="timeRangeUpdated" />
             </div>
         </div>
 
@@ -394,23 +457,23 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
                 <tbody>
                     <tr
                         v-for="game in getCurrentGames()"
-                        :key="game.getId()"
+                        :key="game.publicId"
                     >
                         <td class="ps-0">
                             <router-link
-                                :to="{ name: 'online-game', params: { gameId: game.getId() } }"
+                                :to="{ name: 'online-game', params: { gameId: game.publicId } }"
                                 class="btn btn-sm btn-link"
                             >{{ $t('game.watch') }}</router-link>
                         </td>
                         <td>
-                            <span v-if="game.isRanked()" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                            <span v-if="game.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
-                        <td><AppPseudo rating onlineStatus :player="(game.getOtherPlayer(player) as Player)" /></td>
-                        <td>{{ game.getHostedGame().gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabelVue :gameOptions="game.getGameOptions()" /></td>
-                        <td><AppGameRulesSummary :gameOptions="game.getGameOptions()" /></td>
+                        <td><AppPseudo rating onlineStatus :player="getOtherPlayer(game, player)!" /></td>
+                        <td>{{ game.gameOptions.boardsize }}</td>
+                        <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
                         <td>{{
-                            formatDistanceToNowStrict(game.getHostedGame().gameData?.startedAt ?? 0, { addSuffix: true })
+                            formatDistanceToNowStrict(game.gameData?.startedAt ?? 0, { addSuffix: true })
                         }}</td>
                     </tr>
                 </tbody>
@@ -418,6 +481,17 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
         </div>
 
         <h3>{{ $t('player_game_history') }}</h3>
+
+        <AppSearchGamesParameters :searchGamesParameters />
+
+        <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
+        <p v-else>…</p>
+
+        <div class="mt-3">
+            <button @click="goPagePrevious" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+            <span class="mx-3">{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+            <button @click="goPageNext" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+        </div>
 
         <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
             <table class="table mb-0">
@@ -447,9 +521,14 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
                         <td>
                             <span v-if="game.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
-                        <td v-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
+
+                        <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
+                        <td v-else-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
                         <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + (game?.gameData?.outcome ?? 'loss')) }}</td>
-                        <td><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
+
+                        <td v-if="game.hostedGameToPlayers.length < 2">-</td>
+                        <td v-else><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
+
                         <td>{{ game.gameOptions.boardsize }}</td>
                         <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
@@ -459,11 +538,12 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
                     </tr>
                 </tbody>
             </table>
-            <button
-                role="button"
-                class="btn btn-sm btn-link"
-                @click="() => loadMoreEndedGames()"
-            >{{ $t('load_more') }}</button>
+        </div>
+
+        <div v-if="gamesHistory && gamesHistory.length > 0" class="mt-3">
+            <button @click="goPagePrevious" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+            <span class="mx-3">{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+            <button @click="goPageNext" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
         </div>
     </div>
 

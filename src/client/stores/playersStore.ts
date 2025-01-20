@@ -11,7 +11,7 @@ import { createInitialRating } from '../../shared/app/ratingUtils';
  *
  * I.e: usePlayersStore().playerRef(player) => returns a same ref used accross all views.
  */
-const usePlayersStore = defineStore('playerstore', () => {
+const usePlayersStore = defineStore('playersStore', () => {
 
     const players: { [publicId: string]: Reactive<Player> } = {};
 

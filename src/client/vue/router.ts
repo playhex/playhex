@@ -35,6 +35,11 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        name: 'games-archive',
+        path: '/games-archive',
+        component: () => import('@client/vue/pages/PageGamesArchive.vue'),
+    },
+    {
         name: 'login',
         path: '/login',
         component: () => import('@client/vue/pages/player/PageLogin.vue'),

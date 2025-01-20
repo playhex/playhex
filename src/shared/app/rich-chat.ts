@@ -64,12 +64,6 @@ export class RichChat
     }
 }
 
-export const createRichChat = (hostedGame: HostedGame): RichChatMessage[] => {
-    const richChat = new RichChat(hostedGame);
-
-    return richChat.getRichChatMessages();
-};
-
 abstract class AbstractChatHeaderGenerator
 {
     constructor(
