@@ -95,12 +95,6 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
         ;
     };
 
-    // TODO remove this later, when most players have migrated their theme setting in local storage to prevent losing their selected theme
-    const storedTheme = localStorage?.getItem('selectedTheme');
-    if (storedTheme === 'light' || storedTheme === 'dark') {
-        localSettings.value.selectedTheme = storedTheme;
-    }
-
     watchEffect(() => {
         localStorage?.setItem('selectedTheme', localSettings.value.selectedTheme);
         document.documentElement.setAttribute('data-bs-theme', displayedTheme());
