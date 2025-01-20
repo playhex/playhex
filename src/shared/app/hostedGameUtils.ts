@@ -2,7 +2,6 @@ import { PlayerIndex } from 'game-engine';
 import { HostedGame, HostedGameToPlayer, Player } from './models';
 import { Outcome } from 'game-engine/Types';
 import SearchGamesParameters from './SearchGamesParameters';
-import { timeControlToCadencyName } from './timeControlUtils';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     return hostedGame.hostedGameToPlayers.some(p => p.player.publicId === player.publicId);
@@ -25,11 +24,6 @@ export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean 
 
     // Cannot join if game is full
     if (hostedGame.hostedGameToPlayers.length >= 2) {
-        return false;
-    }
-
-    // Cannot join correspondence games with a guest accaount
-    if ('correspondence' === timeControlToCadencyName(hostedGame.gameOptions) && player.isGuest) {
         return false;
     }
 
