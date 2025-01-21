@@ -22,6 +22,7 @@ import i18next from 'i18next';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash';
 import { apiPostGame } from '../../apiClient';
 import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils';
+import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
 
 const updateSeoMeta = () => useSeoMeta({
     title: i18next.t('lobby_title'),
@@ -153,14 +154,22 @@ const isFinished = (hostedGame: HostedGame) =>
     'ended' === hostedGame.state
 ;
 
-const joinGame = async (gameId: string) => {
-    const result = await lobbyStore.joinGame(gameId);
+const joinGame = async (hostedGame: HostedGame) => {
+    if (isGuestJoiningCorrepondence(hostedGame)) {
+        try {
+            await createGuestJoiningCorrepondenceWarningOverlay();
+        } catch (e) {
+            return;
+        }
+    }
+
+    const result = await lobbyStore.joinGame(hostedGame.publicId);
 
     if (true !== result) {
         throw new Error('Could not join game: ' + result);
     }
 
-    goToGame(gameId);
+    goToGame(hostedGame.publicId);
 };
 
 const isUncommonBoardsize = (hostedGame: HostedGame): boolean => {
@@ -247,6 +256,14 @@ const createGameFromHash = () => {
 
 createGameFromHash();
 window.addEventListener('hashchange', () => createGameFromHash());
+
+/*
+ * Warning when guest joining correspondence game
+ */
+const {
+    createGuestJoiningCorrepondenceWarningOverlay,
+    isGuestJoiningCorrepondence,
+} = useGuestJoiningCorrespondenceWarning();
 </script>
 
 <template>
@@ -301,8 +318,9 @@ window.addEventListener('hashchange', () => createGameFromHash());
                                 <td>
                                     <button
                                         v-if="canJoin(hostedGame, useAuthStore().loggedInPlayer)"
-                                        class="btn me-3 btn-sm btn-success"
-                                        @click="joinGame(hostedGame.publicId)"
+                                        class="btn me-3 btn-sm"
+                                        :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
+                                        @click="joinGame(hostedGame)"
                                     >{{ $t('game.accept') }}</button>
 
                                     <router-link

@@ -33,6 +33,7 @@ import { apiPostRematch } from '../../apiClient';
 import { canJoin } from '../../../shared/app/hostedGameUtils';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents';
+import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
 
 useSeoMeta({
     robots: 'noindex',
@@ -337,9 +338,17 @@ onUnmounted(() => {
 /*
  * Join game
  */
-const join = () => {
+const join = async () => {
     if (null === hostedGameClient.value) {
         return;
+    }
+
+    if (isGuestJoiningCorrepondence(hostedGameClient.value.getHostedGame())) {
+        try {
+            await createGuestJoiningCorrepondenceWarningOverlay();
+        } catch (e) {
+            return;
+        }
     }
 
     return lobbyStore.joinGame(hostedGameClient.value.getId());
@@ -552,6 +561,14 @@ const shouldEnablePass = (): boolean => {
         && canPassAgain(hostedGameClient.value.getGame())
     ;
 };
+
+/*
+ * Warning when guest joining correspondence game
+ */
+const {
+    createGuestJoiningCorrepondenceWarningOverlay,
+    isGuestJoiningCorrepondence,
+} = useGuestJoiningCorrespondenceWarning();
 </script>
 
 <template>
@@ -570,7 +587,11 @@ const shouldEnablePass = (): boolean => {
 
                 <div v-if="hostedGameClient && hostedGameClient.canJoin(loggedInPlayer)" class="join-button-container">
                     <div class="d-flex justify-content-center">
-                        <button class="btn btn-lg btn-success" @click="join()">Accept</button>
+                        <button
+                            class="btn btn-lg"
+                            :class="isGuestJoiningCorrepondence(hostedGameClient.getHostedGame()) ? 'btn-outline-warning' : 'btn-success'"
+                            @click="join()"
+                        >Accept</button>
                     </div>
                 </div>
             </div>
