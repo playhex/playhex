@@ -583,24 +583,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightSidesFromGame();
 
         this.game.on('played', (move, moveIndex, byPlayerIndex) => {
-
-            // Update board cells
-            switch (move.getSpecialMoveType()) {
-                case undefined:
-                    this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
-                    break;
-
-                case 'swap-pieces': {
-                    const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
-
-                    this.hexes[swapped.row][swapped.col].setPlayer(null);
-                    this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
-                    break;
-                }
-            }
-
+            this.addMove(move, byPlayerIndex);
             this.removePreviewedMove();
-            this.highlightLastMove();
             this.highlightSidesFromGame();
         });
 
