@@ -226,8 +226,8 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     {
         this.playedMoveMark.hide();
         this.bestMoveMark.hide();
-        gameView.addMark(this.playedMoveMark);
-        gameView.addMark(this.bestMoveMark);
+        gameView.addMark(this.playedMoveMark, 'analyze');
+        gameView.addMark(this.bestMoveMark, 'analyze');
 
         gameView.on('movesHistoryCursorChanged', cursor => {
             if (null === cursor) {

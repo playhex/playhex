@@ -154,7 +154,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private initPromise = defer();
 
     private marksContainer = new Container();
-    private marks: Mark[] = [];
+    private marks: { [group: string]: Mark[] } = {};
 
     constructor(
         private game: Game,
@@ -1156,22 +1156,34 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.keyboardEventListener = null;
     }
 
-    addMark(mark: Mark): void
+    addMark(mark: Mark, group: string = 'default'): void
     {
-        this.marks.push(mark);
+        if (undefined === this.marks[group]) {
+            this.marks[group] = [];
+        }
+
+        this.marks[group].push(mark);
         this.marksContainer.addChild(mark);
     }
 
     removeMark(mark: Mark): void
     {
         this.marksContainer.removeChild(mark);
-        this.marks = this.marks.filter(m => m !== mark);
+
+        for (const group in this.marks) {
+            this.marks[group] = this.marks[group].filter(m => m !== mark);
+        }
     }
 
-    removeAllMarks(): void
+    removeAllMarks(group: null | string = null): void
     {
-        this.marksContainer.removeChildren();
-        this.marks = [];
+        if (null !== group) {
+            this.marksContainer.removeChild(...this.marks[group]);
+            this.marks[group] = [];
+        } else {
+            this.marksContainer.removeChildren();
+            this.marks = {};
+        }
     }
 
     destroy(): void
