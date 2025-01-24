@@ -30,7 +30,7 @@ import { isMyTurn } from '../../services/notifications/context-utils';
 import { canPassAgain } from '../../../shared/app/passUtils';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { apiPostRematch } from '../../apiClient';
-import { canJoin } from '../../../shared/app/hostedGameUtils';
+import { canJoin, getPlayerIndex } from '../../../shared/app/hostedGameUtils';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
@@ -151,7 +151,7 @@ const getLocalPlayerIndex = (): number => {
         return -1;
     }
 
-    return hostedGameClient.value.getPlayerIndex(loggedInPlayer.value);
+    return getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value);
 };
 
 const listenHexClick = () => {

@@ -17,6 +17,7 @@ import RatingController from './RatingController';
 import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom';
 import ServerInfoController from './ServerInfoController';
 import SearchController from './SearchController';
+import GameConditionalMovesController from './GameConditionalMovesController';
 
 export const registerApi = (app: Express) => {
 
@@ -71,6 +72,7 @@ export const registerApi = (app: Express) => {
         controllers: [
             OnlinePlayersController,
             GameController,
+            GameConditionalMovesController,
             GameAnalyzeController,
             ChatController,
             PlayerController,
