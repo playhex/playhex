@@ -26,10 +26,15 @@
         "outcome": "Wynik",
         "lost": "Przegrana",
         "playing": "Gra w toku",
-        "watch": "Oglądaj"
+        "watch": "Oglądaj",
+        "title_your_turn": "Twój ruch!",
+        "title_waiting": "Oczekiwanie na przeciwnika: gospodarz",
+        "title": "Gra",
+        "info": "Info",
+        "duration": "Czas trwania"
     },
     "game_rules": {
-        "normal": "normalne",
+        "normal": "Standardowe",
         "host_plays_first": "gospodarz gra pierwszy",
         "host_plays_second": "gospodarz gra drugi",
         "no_swap": "bez zamiany"
@@ -59,7 +64,8 @@
         "periods_time": "Czas okresów",
         "fast": "Szybka",
         "normal": "Normalna",
-        "long": "Długa"
+        "long": "Długa",
+        "capped_abbreviation": "cap."
     },
     "i_play": {
         "title": "Gram jako",
@@ -69,8 +75,8 @@
     },
     "swap_rule": "Zasada zamiany",
     "enable_swap_rule": "Zezwól na zamianę elementów",
-    "toggle_coords": "Pokaż/Ukryj współrzędne",
-    "toggle_coords_short": "Współrzędne",
+    "toggle_coords": "Przełącz wyświetlanie współrzędnych",
+    "toggle_coords_short": "Przełącz współrzędne",
     "share_game": "Udostępnij grę",
     "copied!": "Skopiowano!",
     "not_copied": "Nie udało się skopiować, użyj prawego przycisku myszy lub długiego dotknięcia",
@@ -111,17 +117,18 @@
         "are_you_sure?": "Jesteś pewny?"
     },
     "workers": {
-        "slow_worker": "Obecnie nie ma szybkich pracowników online. Dostępne są tylko ograniczone AI.",
+        "slow_worker": "Żaden szybki pracownik nie jest teraz online. Dostępna jest tylko ograniczona sztuczna inteligencja.",
         "no_worker": "Nie ma dostępnych pracowników do obliczania ruchów. Dostępne są tylko losowe boty.",
         "see_how_to_spawn_a_worker": "Zobacz, jak obliczać ruchy AI dla PlayHex z mojego komputera"
     },
     "game_analysis": {
         "game_analysis": "Analiza gry przez AI",
-        "requested": "Analiza zażądana…",
+        "requested": "Oczekiwanie na analizę AI…",
         "errored": "Błąd analizy!",
         "best_move": "najlepszy ruch",
         "best": "najlepszy:",
-        "how_it_works": "Jak to działa"
+        "how_it_works": "Jak to działa",
+        "request_analysis": "Zarządaj analizy AI"
     },
     "try_again": "Spróbuj ponownie",
     "yes": "Tak",
@@ -161,7 +168,7 @@
         "title": "Offline AI",
         "create": "Graj vs offline AI"
     },
-    "offline_game_explain": "Gra offline działa tylko na twoim urządzeniu, serwer PlayHex nie jest używany. Możesz grać, gdy nie masz internetu.",
+    "offline_game_explain": "Gry offline działają tylko na Twoim urządzeniu, więc możesz grać bez połączenia z Internetem. Serwer PlayHex nie jest zaangażowany.",
     "loading_game": "Ładowanie gry…",
     "tournament": "Turniej",
     "now!": "Teraz!",
@@ -182,7 +189,7 @@
     "auto": "Auto",
     "board_orientation": {
         "title": "Orientacja",
-        "description": "Preferowana orientacja planszy dla ekranów w orientacji pionowej i poziomej.",
+        "description": "Preferowany obrót planszy dla orientacji pionowej i poziomej ekranu.",
         "flat": "Płaska",
         "flat_2": "Płaska 2",
         "diamond": "Diamentowa"
@@ -259,5 +266,48 @@
         "resign": "{player} wygrywa!",
         "forfeit": "{player} wygrywa przez walkower!"
     },
-    "move_number": "{{n}} ruch"
+    "move_number": "{{n}} ruch",
+    "any": "Każda",
+    "handicap": {
+        "handicap_for_player": "{{n}} dla {{player}}",
+        "none": "Żadne",
+        "title": "Utrudnienie"
+    },
+    "player_loses_reason": {
+        "time": "{player} przekroczył limit czasu..",
+        "default": "{player} przegrywa.",
+        "resign": "{player} rezygnuje.",
+        "forfeit": "{player} przegrywa walkowerem."
+    },
+    "game_state": {
+        "playing": "Gra",
+        "created": "Utworzona",
+        "canceled": "Anulowana",
+        "ended": "Zakończone"
+    },
+    "1v1": "1v1",
+    "sort_date": {
+        "desc": "Ostatnie",
+        "asc": "Chronologicznie"
+    },
+    "no_yet_data": "Kto wie!",
+    "total_played_games": "Wszystkie rozegrane gry",
+    "preferred_board_sizes": "Preferowane rozmiary planszy",
+    "ranked_games": "Rankingowe",
+    "friendly_games": "Towarzyskie",
+    "bot_games": "Gry z botami",
+    "browse_all_ended_games": "Przeglądaj wszystkie zakończone gry",
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "page_page_of_max": "Strona {{page}} / {{max}}",
+    "boardsize": {
+        "large": "Duża",
+        "small": "Mała",
+        "medium": "Średnia"
+    },
+    "explore": "Odkryj",
+    "moves": "Ilość ruchów",
+    "friendly": "Towarzyska",
+    "overall": "Ogólnie",
+    "force_board_orientation_mode": "Wymuś wyświetlanie planszy w orientacji poziomej lub pionowej dla tego ekranu"
 }
