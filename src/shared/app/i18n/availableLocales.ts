@@ -101,6 +101,10 @@ export const availableLocales: AvailableLocales = {
         label: '🇷🇺 Русский (Russian) (beta)',
         loader: () => import(/* webpackChunkName: "locale-ru" */ 'date-fns/locale/ru') as unknown as DefaultExportLocale,
     },
+    sv: {
+        label: '🇸🇪 Svenska (Swedish) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-sv" */ 'date-fns/locale/sv') as unknown as DefaultExportLocale,
+    },
     ja: {
         label: '🇯🇵 日本語 (Japanese) (beta)',
         loader: () => import(/* webpackChunkName: "locale-ja" */ 'date-fns/locale/ja') as unknown as DefaultExportLocale,

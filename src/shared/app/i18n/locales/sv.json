@@ -1,0 +1,315 @@
+{
+    "lobby_title": "Lobby",
+    "lobby": {
+        "no_waiting_games": "Inga spel tillgängliga just nu. Skapa ett nytt!",
+        "watch_current_games": "Titta på pågående spel",
+        "join_a_game": "Gå med i ett spel",
+        "no_playing_games": "Det finns inga spel i gång just nu."
+    },
+    "game": {
+        "title": "Spel",
+        "info": "Info",
+        "opponent": "Motståndare",
+        "host": "Värd",
+        "size": "Storlek",
+        "board": "Spelbräde",
+        "board_size": "Brädstorlek",
+        "time_control": "Tidskontroll",
+        "rules": "Regler",
+        "created": "Skapad",
+        "accept": "Acceptera",
+        "red": "Röd",
+        "blue": "Blå",
+        "started": "Startad",
+        "played": "Spelad",
+        "finished": "Avslutad",
+        "duration": "Varaktighet",
+        "review": "Recension",
+        "won": "Vann",
+        "outcome": "Resultat",
+        "lost": "Förlorad",
+        "playing": "Spelar",
+        "watch": "Titta",
+        "title_your_turn": "Din tur!",
+        "title_waiting": "Väntar på en motståndare: värd är"
+    },
+    "game_rules": {
+        "normal": "standard",
+        "host_plays_first": "värden spelar först",
+        "host_plays_second": "värden spelar andra",
+        "no_swap": "ingen byte"
+    },
+    "game_state": {
+        "created": "Skapad",
+        "canceled": "Avbruten",
+        "playing": "Spelar",
+        "ended": "Avslutad"
+    },
+    "create_game": {
+        "custom_size": "Anpassad",
+        "less_options": "Färre alternativ",
+        "more_options": "Fler alternativ"
+    },
+    "player_settings": {
+        "title": "Inställningar"
+    },
+    "background_theme": {
+        "title": "Tema",
+        "dark": "Mörk",
+        "light": "Ljus"
+    },
+    "time_control": {
+        "custom": "Anpassad",
+        "use": "Använd {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Begränsad Fischer",
+        "capped_abbreviation": "begr.",
+        "initial_time": "Starttid",
+        "time_increment": "Tidsökning",
+        "periods": "Perioder",
+        "periods_time": "Periodtid",
+        "fast": "Snabb",
+        "normal": "Normal",
+        "long": "Lång"
+    },
+    "i_play": {
+        "title": "Jag spelar",
+        "random": "Slumpmässig",
+        "first": "Först",
+        "second": "Andra"
+    },
+    "swap_rule": "Bytesregel",
+    "enable_swap_rule": "Aktivera bytesregel",
+    "toggle_coords": "Växla visning av koordinater",
+    "toggle_coords_short": "Växla koordinater",
+    "share_game": "Dela spel",
+    "copied!": "Kopierat!",
+    "not_copied": "Misslyckades att kopiera, använd högerklick eller långtryck",
+    "handicap": {
+        "title": "Handikapp",
+        "none": "inget",
+        "handicap_for_player": "{{n}} för {{player}}"
+    },
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Spel skapat av {player}, {timeAgo}.",
+    "game_was_created_by_player_time_ago": "Spelet skapades av {player}, {timeAgo}.",
+    "log_out": "Logga ut",
+    "log_in": "Logga in",
+    "sign_up": "Registrera dig",
+    "feedback": "Feedback",
+    "hex_links": "Hex-länkar",
+    "project_under_development": "Projekt under utveckling",
+    "last_change": "Senaste ändring: {{date}}",
+    "privacy_policy": "Integritetspolicy",
+    "license_agpl": "Licens AGPL-3.0",
+    "create_account": "Skapa ett konto",
+    "already_have_account_login_instead": "Har du redan ett konto? {login} istället",
+    "already_have_account_login_instead_link_label": "Logga in",
+    "no_account_sign_up_instead": "Inget konto? {signUp} istället",
+    "no_account_sign_up_instead_link_label": "Registrera dig",
+    "add_your_language": "Saknas ditt språk? {link}!",
+    "add_your_language_link": "Lägg till det med Weblate",
+    "show_coords_by_default": "Visa koordinater som standard",
+    "username": "Användarnamn",
+    "password": "Lösenord",
+    "account_created_on": "Konto skapat den {{date}}",
+    "player_current_games": "Pågående spel",
+    "player_game_history": "Spelhistoria",
+    "waiting": "väntar…",
+    "initializing_game": "Initierar spel…",
+    "game_finished_overlay": {
+        "title": "Spelet avslutades"
+    },
+    "game_has_been_canceled": "Spelet har avbrutits.",
+    "waiting_for_an_opponent": "Väntar på en motståndare…",
+    "confirm_overlay": {
+        "confirmation": "Bekräftelse",
+        "are_you_sure?": "Är du säker?"
+    },
+    "workers": {
+        "slow_worker": "Ingen snabb AI är online just nu. Endast begränsad AI är tillgänglig.",
+        "no_worker": "Ingen AI kan beräkna drag just nu. Endast slumpmässiga bottar är tillgängliga.",
+        "see_how_to_spawn_a_worker": "Se hur du kan beräkna AI-drag för PlayHex från din dator"
+    },
+    "game_analysis": {
+        "game_analysis": "AI-spelanalys",
+        "request_analysis": "Begär AI-analys",
+        "requested": "Väntar på AI-analys…",
+        "errored": "AI-analysen misslyckades!",
+        "best_move": "bästa draget",
+        "best": "bästa:",
+        "how_it_works": "Så här fungerar det"
+    },
+    "try_again": "Försök igen",
+    "yes": "Ja",
+    "no": "Nej",
+    "language": "Språk",
+    "cancel": "Avbryt",
+    "pass": "Passera",
+    "explore": "Utforska",
+    "close": "Stäng",
+    "ranked": "Rankat",
+    "friendly": "Vänskapligt",
+    "any": "Vilket som helst",
+    "rating_n": "Rankning: {{rating}}",
+    "rating": "Rankning",
+    "new_game": "Nytt spel",
+    "players": "Spelare",
+    "player": "spelare",
+    "load_more": "Ladda fler",
+    "no_such_player": "Det verkar inte finnas någon sådan spelare.",
+    "n_online_players": "Online ({{n}})",
+    "guest": "Gäst",
+    "finished_games": "Avslutade spel",
+    "1v1": "1v1",
+    "sort_date": {
+        "asc": "Kronologisk",
+        "desc": "Senaste först"
+    },
+    "1v1_ranked": {
+        "title": "1v1",
+        "create": "Skapa 1v1"
+    },
+    "1v1_friendly": {
+        "title": "Anpassad 1v1",
+        "create": "Skapa anpassad 1v1"
+    },
+    "1vAI_ranked": {
+        "title": "Rankat mot AI",
+        "create": "Spela rankat mot AI"
+    },
+    "1vAI_friendly": {
+        "title": "Spela mot AI",
+        "create": "Spela mot AI"
+    },
+    "1vAI_offline": {
+        "title": "Offline-AI",
+        "create": "Spela mot offline-AI"
+    },
+    "offline_game_explain": "Offlinespel körs endast på din enhet, så att du kan spela utan internetanslutning. PlayHex-servern är inte inblandad.",
+    "loading_game": "Laddar spel…",
+    "tournament": "Turnering",
+    "now!": "Nu!",
+    "register_on_challonge": "Registrera dig på Challonge",
+    "see_progression_on_challonge": "Se progression på Challonge",
+    "move": "drag",
+    "moves": "Drag",
+    "move_number": "drag {{n}}",
+    "chat": "Chatt",
+    "system": "System",
+    "chat_message_placeholder": "Meddelande…",
+    "unread_messages": "olästa meddelanden",
+    "send_chat_message": "Skicka",
+    "n_characters_one": "{{count}} tecken",
+    "n_characters_other": "{{count}} tecken",
+    "landscape": "Liggande",
+    "portrait": "Stående",
+    "force_board_orientation_mode": "Tvinga visning av bräde i liggande eller stående för denna skärm",
+    "resign": "Ge upp",
+    "auto": "Auto",
+    "board_orientation": {
+        "title": "Orientering",
+        "description": "Din föredragna brädrotation för skärmorienteringarna liggande och stående.",
+        "flat": "Platt",
+        "flat_2": "Platt 2",
+        "diamond": "Diamant"
+    },
+    "shading_patterns": {
+        "title": "Skuggmönster",
+        "visibility": "Synlighet för skuggmönster",
+        "types": {
+            "null": "Ingen",
+            "tricolor_checkerboard": "Trefärgad schackbräda",
+            "concentrical_rings": "Koncentriska ringar (HexWorld)",
+            "height_5_lines": "Höjd 5 linjer",
+            "single_ring": "Enkel ring",
+            "custom": "Anpassad"
+        },
+        "custom_expression": "Anpassat uttryck",
+        "help_custom": "Matematiskt uttryck för det anpassade skuggmönstret.<br>Uttrycket måste utvärderas till ett tal mellan 0 (ingen skuggning) och 1 (full skuggning) för en given cell (rad, kol). Du kan t.ex. använda 0.5 för trefärgade skuggmönster. <code>true</code> och <code>false</code> är samma som <code>1</code> och <code>0</code>.<br>Följande variabler är tillgängliga:<br>- <code>row</code> och <code>col</code> (eller <code>r</code> och <code>c</code>) för rad- och kolumnnummer, börjar vid 0.<br>- <code>size</code> (eller <code>s</code>) för brädstorleken.<br>- <code>distToSide</code> för avståndet mellan den aktuella cellen och dess närmaste sida.<br>Se listan över tillgängliga operatorer på https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax<br>Exempel:<br>- Koncentriska ringar: <code>distToSide % 2</code><br>- Trefärgad schackbräda: <code>((size + row - col) % 3) / 2</code><br>- Disk med radie sqrt(20): <code>o = size / 2; (row - o) ^ 2 + (col - o) ^ 2 < 20</code><br>Öppna JavaScript-konsolen (F12 eller ⌥⌘I) för att se fel från exekveringen av ditt uttryck."
+    },
+    "show_44_dots": "Visa prickar på 4-4-celler",
+    "preview": "Förhandsvisning",
+    "change_password": "Ändra lösenord",
+    "old_password": "Gammalt lösenord",
+    "new_password": "Nytt lösenord",
+    "confirm_new_password": "Bekräfta nytt lösenord",
+    "update_password": "Uppdatera lösenord",
+    "contribute": "Bidra",
+    "contributors": "Bidragsgivare",
+    "no_yet_data": "Vem vet!",
+    "player_made_a_move": "{{player}} gjorde ett drag",
+    "game_with_player_has_started": "Spelet med {{player}} har börjat",
+    "last_move": "Senaste drag",
+    "total_played_games": "Totalt antal spelade spel",
+    "preferred_board_sizes": "Föredragna brädstorlekar",
+    "ranked_games": "Rankade",
+    "friendly_games": "Vänskapliga",
+    "bot_games": "Bot-spel",
+    "browse_all_ended_games": "Bläddra bland alla avslutade spel",
+    "n_total_games_zero": "Inga matchande spel.",
+    "n_total_games_one": "1 totalt spel.",
+    "n_total_games_other": "{{count}} totala spel.",
+    "previous": "Föregående",
+    "next": "Nästa",
+    "page_page_of_max": "Sida {{page}} / {{max}}",
+    "undo": {
+        "undo_move": "Ta tillbaka",
+        "accept": "Acceptera återgång",
+        "reject": "Avvisa"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Tidsförskjutning: {{ms}}ms"
+    },
+    "time_cadency": {
+        "blitz": "Blixtrunda",
+        "rapid": "Snabbt",
+        "slow": "Långsamt"
+    },
+    "overall": "Övergripande",
+    "boardsize": {
+        "small": "Liten",
+        "medium": "Medel",
+        "large": "Stor"
+    },
+    "confirm_move": {
+        "title": "Bekräfta drag",
+        "button_label": "Bekräfta drag",
+        "button_label_short": "Bekräfta",
+        "send_immediately": "Skicka omedelbart",
+        "ask_confirmation": "Begär bekräftelse",
+        "description": "För att förhindra felklick kan du kräva bekräftelse innan du skickar ett drag."
+    },
+    "rematch": {
+        "label": "Omgång",
+        "accept": "Acceptera omgång",
+        "view": "Visa omgång"
+    },
+    "short_time_unit": {
+        "day": "d",
+        "hour": "h",
+        "minute": "min",
+        "second": "s"
+    },
+    "outcome": {
+        "win": "vinst",
+        "loss": "förlust",
+        "resign": "avbryt",
+        "forfeit": "förverkande",
+        "time": "tidsgräns"
+    },
+    "player_wins_by": {
+        "default": "{player} vinner!",
+        "time": "{player} vinner på tid!",
+        "resign": "{player} vinner!",
+        "forfeit": "{player} vinner genom förverkande!"
+    },
+    "player_loses_reason": {
+        "default": "{player} förlorar.",
+        "time": "{player} överskrider tiden.",
+        "resign": "{player} ger upp.",
+        "forfeit": "{player} förverkar."
+    }
+}
