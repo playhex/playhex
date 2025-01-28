@@ -265,8 +265,8 @@
     },
     "time_cadency": {
         "blitz": "Blixtrunda",
-        "rapid": "Snabbt",
-        "slow": "Långsamt"
+        "normal": "Snabbt",
+        "correspondence": "Långsamt"
     },
     "overall": "Övergripande",
     "boardsize": {
