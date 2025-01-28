@@ -90,6 +90,7 @@ export const availableLocales: AvailableLocales = {
         translators: [
             { fullName: 'FlyPside', link: 'https://playhex.org/@flypside' },
             { fullName: 'Eryk Michalak', link: 'https://hosted.weblate.org/user/gnu-ewm/' },
+            { fullName: 'BlackHat', link: 'https://playhex.org/@blackhat' },
         ],
     },
     pt: {
@@ -107,5 +108,12 @@ export const availableLocales: AvailableLocales = {
     'zh-Hans': {
         label: '🇨🇳 简体中文 (Chinese) (beta)',
         loader: () => import(/* webpackChunkName: "locale-zh" */ 'date-fns/locale/zh-CN') as unknown as DefaultExportLocale,
+    },
+    ta: {
+        label: '🇮🇳 தமிழ் (Tamil) (beta)',
+        loader: () => import(/* webpackChunkName: "locale-ta" */ 'date-fns/locale/ta') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'TamilNeram', link: 'https://hosted.weblate.org/user/TamilNeram/' },
+        ],
     },
 };
