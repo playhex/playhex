@@ -171,7 +171,7 @@
     "friendly_games": "Amicales",
     "bot_games": "Contre l'IA",
     "browse_all_ended_games": "Parcourir toutes les parties terminées",
-    "n_total_games_one": "1 partie totale.",
+    "n_total_games_one": "{{count}} partie totale.",
     "n_total_games_many": "{{count}} parties totales.",
     "n_total_games_other": "{{count}} parties totales.",
     "previous": "Précédente",
