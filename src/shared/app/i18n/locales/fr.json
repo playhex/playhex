@@ -96,7 +96,7 @@
     "log_out": "Déconnexion",
     "log_in": "Connexion",
     "share_game": "Partager la partie",
-    "not_copied": "pas réussi à copier, utilisez le click droit ou appui long",
+    "not_copied": "pas réussi à copier, utilisez le clic droit ou appui long",
     "game_created_by_player_time_ago": "Partie créée par {player}, {timeAgo}.",
     "toggle_coords": "Afficher/masquer les coordonnées",
     "toggle_coords_short": "Coordonnées",
@@ -182,7 +182,7 @@
         "best": "meilleur :",
         "game_analysis": "Analyse de la partie par l'IA",
         "requested": "Analyse demandée…",
-        "errored": "L'analyse a échouée !",
+        "errored": "L'analyse a échoué !",
         "how_it_works": "Fonctionnement",
         "request_analysis": "Demander une analyse par l'IA"
     },
@@ -192,7 +192,7 @@
     "add_your_language_link": "Ajoutez là avec Weblate",
     "yes": "Oui",
     "close": "Fermer",
-    "no_such_player": "Apparament, ce joueur n'existe pas.",
+    "no_such_player": "Apparemment, ce joueur n'existe pas.",
     "loading_game": "Chargement de la partie…",
     "register_on_challonge": "S'enregistrer sur Challonge",
     "move": "coup",
@@ -233,7 +233,7 @@
         "send_immediately": "Envoyer tout de suite",
         "button_label_short": "Valider",
         "ask_confirmation": "Valider avant d'envoyer",
-        "description": "Pour éviter les erreurs de clics, vous pouvez valider vos coups avant de les envoyer."
+        "description": "Pour éviter les erreurs de clic, vous pouvez valider vos coups avant de les envoyer."
     },
     "rematch": {
         "accept": "Accepter la revanche",
@@ -292,7 +292,7 @@
     },
     "workers": {
         "slow_worker": "Pas de serveur puissant en ligne actuellement. Seules les IA limitées sont disponibles.",
-        "no_worker": "Aucun serveur ne peut calculer les coups de l'IA actuellement. Seules les IA de test sont disponibles.",
+        "no_worker": "Aucun serveur n'est disponible actuellement pour calculer les coups de l'IA. Seules les IA de test sont disponibles.",
         "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
     },
     "player_made_a_move": "{{player}} a joué",
