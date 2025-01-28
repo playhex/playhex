@@ -1,0 +1,314 @@
+{
+    "1v1_friendly": {
+        "create": "தனிப்பயன் 1v1 ஐ உருவாக்கவும்",
+        "title": "தனிப்பயன் 1 வி 1"
+    },
+    "1vAI_ranked": {
+        "title": "தரவரிசை Vs AI",
+        "create": "AI க்கு vs தரவரிசையில் விளையாடுங்கள்"
+    },
+    "1vAI_offline": {
+        "create": "இணைப்பில்லாத AI ஐ விளையாடுங்கள்",
+        "title": "இணைப்பில்லாத AI"
+    },
+    "loading_game": "விளையாட்டு ஏற்றுகிறது…",
+    "resign": "ராசினாமா",
+    "player_wins_by": {
+        "resign": "{player} வெற்றி!",
+        "forfeit": "{player} பறிமுதல் மூலம் வெற்றி!",
+        "default": "{player} வெற்றி!",
+        "time": "{பிளேயர் the சரியான நேரத்தில் வெற்றி!"
+    },
+    "player_loses_reason": {
+        "default": "{player} இழக்கிறது.",
+        "time": "{player} மடங்கு.",
+        "resign": "{player} ராசினாமா செய்கிறார்.",
+        "forfeit": "{player} பறிமுதல்."
+    },
+    "lobby_title": "லாபி",
+    "lobby": {
+        "no_waiting_games": "இப்போது எந்த விளையாட்டுகளும் கிடைக்கவில்லை. புதிய ஒன்றை உருவாக்கவும்!",
+        "watch_current_games": "தற்போதைய விளையாட்டுகளைப் பாருங்கள்",
+        "join_a_game": "ஒரு விளையாட்டில் சேரவும்",
+        "no_playing_games": "இப்போது எந்த விளையாட்டுகளும் முன்னேற்றத்தில் இல்லை."
+    },
+    "game": {
+        "title": "விளையாட்டு",
+        "info": "தகவல்",
+        "opponent": "எதிரி",
+        "host": "விருந்தோம்பி",
+        "size": "அளவு",
+        "board": "விளையாட்டு பலகை",
+        "board_size": "போர்டு அளவு",
+        "time_control": "நேரக் கட்டுப்பாடு",
+        "rules": "விதிகள்",
+        "created": "உருவாக்கப்பட்டது",
+        "accept": "ஏற்றுக்கொள்",
+        "red": "சிவப்பு",
+        "blue": "நீலம்",
+        "started": "தொடங்கியது",
+        "played": "விளையாடியது",
+        "finished": "முடிந்தது",
+        "duration": "காலம்",
+        "review": "சீராய்வு",
+        "won": "வோன்",
+        "outcome": "விளைவு",
+        "lost": "இழந்தது",
+        "playing": "விளையாடுவது",
+        "watch": "வாட்ச்",
+        "title_your_turn": "உங்கள் முறை!",
+        "title_waiting": "ஒரு எதிரிக்காக காத்திருக்கிறது: புரவலன் செய்தது"
+    },
+    "game_rules": {
+        "normal": "தரநிலை",
+        "host_plays_first": "புரவலன் முதலில் விளையாடுகிறது",
+        "host_plays_second": "புரவலன் இரண்டாவது விளையாடுகிறது",
+        "no_swap": "இடமாற்றம் இல்லை"
+    },
+    "game_state": {
+        "created": "உருவாக்கப்பட்டது",
+        "canceled": "ரத்து செய்யப்பட்டது",
+        "playing": "விளையாடுவது",
+        "ended": "முடிந்தது"
+    },
+    "create_game": {
+        "custom_size": "தனிப்பயன்",
+        "less_options": "குறைந்த விருப்பங்கள்",
+        "more_options": "மேலும் விருப்பங்கள்"
+    },
+    "player_settings": {
+        "title": "அமைப்புகள்"
+    },
+    "background_theme": {
+        "title": "கருப்பொருள்",
+        "dark": "இருண்ட",
+        "light": "ஒளி"
+    },
+    "time_control": {
+        "custom": "தனிப்பயன்",
+        "use": "{{type}} ஐப் பயன்படுத்தவும்",
+        "byo_yomi": "போ -ரீடிங்",
+        "fischer": "பிச்சர்",
+        "fischer_capped": "மூடிய பிச்சர்",
+        "capped_abbreviation": "தொப்பி.",
+        "initial_time": "ஆரம்ப நேரம்",
+        "time_increment": "நேர அதிகரிப்பு",
+        "periods": "காலங்கள்",
+        "periods_time": "கால நேரம்",
+        "fast": "வேகமாக",
+        "normal": "சாதாரண",
+        "long": "நீண்ட"
+    },
+    "i_play": {
+        "title": "நான் விளையாடுகிறேன்",
+        "random": "சீரற்ற",
+        "first": "முதல்",
+        "second": "இரண்டாவது"
+    },
+    "swap_rule": "இடமாற்று விதி",
+    "enable_swap_rule": "இடமாற்று விதியை இயக்கவும்",
+    "toggle_coords": "ஆயங்களின் காட்சியை மாற்றவும்",
+    "toggle_coords_short": "ஆயங்களை மாற்றவும்",
+    "share_game": "விளையாட்டைப் பகிரவும்",
+    "copied!": "நகலெடுக்கப்பட்டது!",
+    "not_copied": "நகலெடுக்கத் தவறிவிட்டது, வலது சொடுக்கு அல்லது நீண்ட தட்டவும்",
+    "handicap": {
+        "title": "ஊனமுற்றோர்",
+        "none": "எதுவுமில்லை",
+        "handicap_for_player": "{{n}} {{player}} க்கு"
+    },
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "விளையாட்டு {player}, {timeAgo} ஆல் உருவாக்கப்பட்டது.",
+    "game_was_created_by_player_time_ago": "விளையாட்டு {player}, {டைமோகோ by ஆல் உருவாக்கப்பட்டது.",
+    "log_out": "விடுபதிகை",
+    "log_in": "புகுபதிகை",
+    "sign_up": "பதிவு செய்க",
+    "feedback": "கருத்து",
+    "hex_links": "ஃச் இணைப்புகள்",
+    "project_under_development": "வளர்ச்சியின் கீழ் திட்டம்",
+    "last_change": "லாச்ட்சேஞ்ச்: {{date}}",
+    "privacy_policy": "தனியுரிமைக் கொள்கை",
+    "license_agpl": "உரிமம் AGPL-3.0",
+    "create_account": "ஒரு கணக்கை உருவாக்கவும்",
+    "already_have_account_login_instead": "ஏற்கனவே ஒரு கணக்கு இருக்கிறதா? {login} அதற்கு பதிலாக",
+    "already_have_account_login_instead_link_label": "புகுபதிகை",
+    "no_account_sign_up_instead": "கணக்கு இல்லையா? {signUp} அதற்கு பதிலாக",
+    "no_account_sign_up_instead_link_label": "பதிவு செய்க",
+    "add_your_language": "உங்கள் மொழி காணவில்லை? {link}!",
+    "add_your_language_link": "வெப்லேட்டுடன் சேர்க்கவும்",
+    "show_coords_by_default": "முன்னிருப்பாக ஆயத்தொலைவுகளைக் காட்டு",
+    "username": "பயனர்பெயர்",
+    "password": "கடவுச்சொல்",
+    "account_created_on": "{{date}} இல் உருவாக்கப்பட்ட கணக்கு",
+    "player_current_games": "தற்போதைய விளையாட்டுகள்",
+    "player_game_history": "விளையாட்டு வரலாறு",
+    "waiting": "காத்திருக்கிறது…",
+    "initializing_game": "விளையாட்டைத் தொடங்குதல்…",
+    "game_finished_overlay": {
+        "title": "விளையாட்டு முடிந்தது"
+    },
+    "game_has_been_canceled": "விளையாட்டு ரத்து செய்யப்பட்டுள்ளது.",
+    "waiting_for_an_opponent": "ஒரு எதிரிக்காக காத்திருக்கிறது…",
+    "confirm_overlay": {
+        "confirmation": "உறுதிப்படுத்தல்",
+        "are_you_sure?": "நீங்கள் உறுதியாக இருக்கிறீர்களா?"
+    },
+    "workers": {
+        "slow_worker": "வேகமான தொழிலாளி இப்போது ஆன்லைனில் இல்லை. வரையறுக்கப்பட்ட AI மட்டுமே கிடைக்கிறது.",
+        "no_worker": "எந்தவொரு தொழிலாளியும் இப்போது நகர்வுகளை கணக்கிட முடியாது. சீரற்ற போட்கள் மட்டுமே கிடைக்கின்றன.",
+        "see_how_to_spawn_a_worker": "எனது கணினியிலிருந்து பிளேஎக்சிற்கான AI நகர்வுகளை எவ்வாறு கணக்கிடுவது என்று பாருங்கள்"
+    },
+    "game_analysis": {
+        "game_analysis": "AI விளையாட்டு பகுப்பாய்வு",
+        "request_analysis": "AI பகுப்பாய்வைக் கோருங்கள்",
+        "requested": "AI பகுப்பாய்விற்காக காத்திருக்கிறது…",
+        "errored": "AI பகுப்பாய்வு தோல்வியடைந்தது!",
+        "best_move": "சிறந்த நடவடிக்கை",
+        "best": "சிறந்தது:",
+        "how_it_works": "இது எவ்வாறு இயங்குகிறது"
+    },
+    "try_again": "மீண்டும் முயற்சிக்கவும்",
+    "yes": "ஆம்",
+    "no": "இல்லை",
+    "language": "மொழி",
+    "cancel": "ரத்துசெய்",
+    "pass": "கணவாய்",
+    "explore": "ஆராயுங்கள்",
+    "close": "மூடு",
+    "ranked": "தரவரிசை",
+    "friendly": "நட்பு",
+    "any": "ஏதேனும்",
+    "rating_n": "மதிப்பீடு: {{rating}}",
+    "rating": "செயல்வரம்பு",
+    "new_game": "புதிய விளையாட்டு",
+    "players": "வீரர்கள்",
+    "player": "வீரர்",
+    "load_more": "மேலும் ஏற்றவும்",
+    "no_such_player": "அத்தகைய வீரர் இல்லை என்று தெரிகிறது.",
+    "n_online_players": "நிகழ்நிலை ({{n}})",
+    "guest": "விருந்தினர்",
+    "finished_games": "முடிக்கப்பட்ட விளையாட்டுகள்",
+    "1v1": "1 வி 1",
+    "sort_date": {
+        "asc": "காலவரிசை",
+        "desc": "அண்மைக் கால முதல்"
+    },
+    "1v1_ranked": {
+        "title": "1 வி 1",
+        "create": "1v1 ஐ உருவாக்கவும்"
+    },
+    "1vAI_friendly": {
+        "title": "AI Vs vs",
+        "create": "AI Vs vs"
+    },
+    "offline_game_explain": "இணைப்பில்லாத கேம்கள் உங்கள் சாதனத்தில் மட்டுமே இயங்கும், இதனால் நீங்கள் இணைய இணைப்பு இல்லாமல் விளையாட முடியும். பிளேஎக்ச் சேவையகம் சம்பந்தப்படவில்லை.",
+    "tournament": "போட்டி",
+    "now!": "இப்போது!",
+    "register_on_challonge": "சல்லோங் மீது பதிவு செய்யுங்கள்",
+    "see_progression_on_challonge": "சல்லோங் மீது முன்னேற்றத்தைக் காண்க",
+    "move": "நகர்த்தவும்",
+    "moves": "நகர்வுகள்",
+    "move_number": "{{n}} ஐ நகர்த்தவும்",
+    "chat": "அரட்டை",
+    "system": "மண்டலம்",
+    "chat_message_placeholder": "செய்தி…",
+    "unread_messages": "படிக்காத செய்திகள்",
+    "send_chat_message": "அனுப்பு",
+    "n_characters_one": "{{count}} எழுத்து",
+    "n_characters_other": "{{count}} எழுத்துக்கள்",
+    "landscape": "நிலப்பரப்பு",
+    "portrait": "உருவப்படம்",
+    "force_board_orientation_mode": "இந்தத் திரைக்கான நிலப்பரப்பில் அல்லது உருவப்படத்தில் பலகையை காண்பிக்கும் ஆற்றல்",
+    "auto": "தானி",
+    "board_orientation": {
+        "title": "நோக்குநிலை",
+        "description": "உருவப்படம் மற்றும் இயற்கை திரை நோக்குநிலைகளுக்கு நீங்கள் விரும்பும் பலகை சுழற்சி.",
+        "flat": "கிடைவளைவு",
+        "flat_2": "பிளாட் 2",
+        "diamond": "வைர"
+    },
+    "shading_patterns": {
+        "title": "நிழல் முறை",
+        "visibility": "நிழல் முறை தெரிவுநிலை",
+        "types": {
+            "null": "எதுவுமில்லை",
+            "tricolor_checkerboard": "ட்ரை-கலர் செக்கர்போர்டு",
+            "concentrical_rings": "செறிவான மோதிரங்கள் (எக்ச்வொர்ல்ட்)",
+            "height_5_lines": "உயரம் 5 கோடுகள்",
+            "single_ring": "ஒற்றை வளையம்",
+            "custom": "தனிப்பயன்"
+        },
+        "custom_expression": "தனிப்பயன் வெளிப்பாடு",
+        "help_custom": "தனிப்பயன் நிழல் வடிவத்திற்கான கணித வெளிப்பாடு. நீங்கள் எ.கா. முக்கோண நிழல் வடிவங்களுக்கு 0.5. <code> உண்மை </code> மற்றும் <code> தவறான </code> <குறியீடு> 1 </code> மற்றும் <code> 0 </code> போன்றவை. <br> பின்வரும் மாறிகள் கிடைக்கின்றன: <br >. <br>- <code> அளவு </code> (அல்லது <code> கள் </code>) போர்டு அளவிற்கு. பக்க. குறியீடு> disttoside % 2 </code> <br>- ட்ரை-கலர் செக்கர்போர்டு: <code> ((அளவு + வரிசை- கோல்) % 3)/2 </code> <br>- ஆரம் SQRT (20) உடன் வட்டு: <குறியீடு> o = அளவு / 2; ."
+    },
+    "show_44_dots": "4-4 கலங்களில் புள்ளிகளைக் காட்டு",
+    "preview": "முன்னோட்டம்",
+    "change_password": "கடவுச்சொல்லை மாற்றவும்",
+    "old_password": "பழைய கடவுச்சொல்",
+    "new_password": "புதிய கடவுச்சொல்",
+    "confirm_new_password": "புதிய கடவுச்சொல்லை உறுதிப்படுத்தவும்",
+    "update_password": "கடவுச்சொல்லைப் புதுப்பிக்கவும்",
+    "contribute": "பங்களிப்பு",
+    "contributors": "பங்களிப்பாளர்கள்",
+    "no_yet_data": "யாருக்குத் தெரியும்!",
+    "player_made_a_move": "{{player}} ஒரு நகர்வு",
+    "game_with_player_has_started": "{{player} with உடன் விளையாட்டு தொடங்கியது",
+    "last_move": "கடைசி நகர்வு",
+    "total_played_games": "மொத்தம் விளையாடியது",
+    "preferred_board_sizes": "விருப்பமான பலகை அளவுகள்",
+    "ranked_games": "தரவரிசை",
+    "friendly_games": "நட்பு",
+    "bot_games": "போட் கேம்ச்",
+    "browse_all_ended_games": "அனைத்து முடிவடைந்த விளையாட்டுகளையும் உலாவுக",
+    "n_total_games_one": "1 மொத்த விளையாட்டு.",
+    "n_total_games_other": "{{count}} மொத்த விளையாட்டுகள்.",
+    "previous": "முந்தைய",
+    "next": "அடுத்தது",
+    "page_page_of_max": "பக்கம் {{page}} / {{max}}}",
+    "undo": {
+        "undo_move": "தலைப்பு",
+        "accept": "செயல்தவிர்க்க ஏற்றுக்கொள்ளுங்கள்",
+        "reject": "நிராகரிக்கவும்"
+    },
+    "ping": {
+        "ping_ms": "பிங்: {{ms}} எம்.எச்",
+        "date_shift_ms": "நேர மாற்றம்: {{ms}} ms"
+    },
+    "time_cadency": {
+        "blitz": "பிளிட்ச்",
+        "normal": "வாழ",
+        "correspondence": "கடித தொடர்பு"
+    },
+    "overall": "ஒட்டுமொத்தமாக",
+    "boardsize": {
+        "small": "சிறிய",
+        "medium": "சராசரி",
+        "large": "பெரிய"
+    },
+    "confirm_move": {
+        "title": "நகர்வை உறுதிப்படுத்தவும்",
+        "button_label": "நகர்வை உறுதிப்படுத்தவும்",
+        "button_label_short": "உறுதிப்படுத்தவும்",
+        "send_immediately": "உடனடியாக அனுப்புங்கள்",
+        "ask_confirmation": "உறுதிப்படுத்தல் கேளுங்கள்",
+        "description": "தவறான கிளிக்குகளைத் தடுக்க, ஒரு நடவடிக்கையை சமர்ப்பிக்கும் முன் உறுதிப்படுத்தல் தேவைப்படலாம்."
+    },
+    "rematch": {
+        "label": "மறுபரிசீலனை",
+        "accept": "மறுபரிசீலனை செய்யுங்கள்",
+        "view": "மறுபரிசீலனை செய்யவும்"
+    },
+    "short_time_unit": {
+        "day": "டி",
+        "hour": "ம",
+        "minute": "மணித்துளி",
+        "second": "கள்"
+    },
+    "outcome": {
+        "win": "செய்",
+        "loss": "இழப்பு",
+        "resign": "ராசினாமா",
+        "forfeit": "பறிமுதல்",
+        "time": "நேரம் முடிந்தது"
+    }
+}
