@@ -115,7 +115,7 @@
     "handicap": {
         "title": "ஊனமுற்றோர்",
         "none": "எதுவுமில்லை",
-        "handicap_for_player": "{{{n}} {{player}}}"
+        "handicap_for_player": "{{n}} {{player}} க்கு"
     },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "விளையாட்டு {player}, {timeAgo} ஆல் உருவாக்கப்பட்டது.",
