@@ -7,6 +7,13 @@ export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     return hostedGame.hostedGameToPlayers.some(p => p.player.publicId === player.publicId);
 };
 
+/**
+ * @returns Index of player in hostedGame (0 or 1). Returns -1 if player not in game.
+ */
+export const getPlayerIndex = (hostedGame: HostedGame, player: Player): number => {
+    return hostedGame.hostedGameToPlayers.findIndex(p => p.player.publicId === player.publicId);
+};
+
 export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean => {
     if (!player) {
         return false;

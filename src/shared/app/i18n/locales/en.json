@@ -208,6 +208,8 @@
     "force_board_orientation_mode": "Force displaying board in landscape or portrait for this screen",
     "resign": "Resign",
     "auto": "Auto",
+    "conditional_moves": "Conditional moves",
+    "conditional_moves_short": "Moves",
     "board_orientation": {
         "title": "Orientation",
         "description": "Your preferred board rotation for the portrait and landscape screen orientations.",

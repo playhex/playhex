@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconSignpostSplit } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import AppPseudo from './AppPseudo.vue';
 import HostedGameClient from 'HostedGameClient';
-import { ChatMessage, Player } from '../../../shared/app/models';
+import { ChatMessage, ConditionalMoves, Player } from '../../../shared/app/models';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
@@ -29,6 +29,13 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
+import { apiGetConditionalMoves, apiPatchConditionalMoves } from '../../apiClient';
+import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
+import { conditionalMovesMergeMoves, conditionalMovesShift, cleanRedundantUnplayedLines, getNextMovesAfterLine } from '../../../shared/app/conditionalMovesUtils';
+import { toRaw } from 'vue';
+import { getPlayerIndex, hasPlayer } from '../../../shared/app/hostedGameUtils';
+import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
+import TextMark from '../../../shared/pixi-board/marks/TextMark';
 
 const props = defineProps({
     hostedGameClient: {
@@ -76,8 +83,11 @@ const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
 
     return formatDuration(duration, { format: units.slice(topUnit, topUnit + 2) });
 };
+
+const myIndex = (): number => getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer);
+
 const playerColor = (player: Player): string => {
-    const index = hostedGameClient.value.getPlayerIndex(player);
+    const index = getPlayerIndex(hostedGameClient.value.getHostedGame(), player);
 
     if (0 === index) {
         return 'text-danger';
@@ -286,7 +296,7 @@ gameView.on('movesHistoryCursorChanged', cursor => {
 /*
  * Tabs
  */
-type Tab = 'main' | 'info' | 'settings';
+type Tab = 'main' | 'conditional_moves' | 'info' | 'settings';
 
 const currentTab = ref<Tab>('main');
 
@@ -324,6 +334,130 @@ watch(
 
 const currentOrientation = ref<OrientationMode>(gameView.getComputedBoardOrientationMode());
 gameView.on('orientationChanged', () => currentOrientation.value = gameView.getComputedBoardOrientationMode());
+
+/*
+ * Conditional moves
+ */
+const isSimulationMode = ref(gameView.isSimulationMode());
+const conditionalMoves = ref<null | ConditionalMoves>(null);
+let conditionalMovesSubmitted: null | ConditionalMoves = null;
+const highlightedLine = ref<Move[]>([]);
+const conditionalMovesUpdated = ref(false);
+
+const shouldShowConditionalMoves = (): boolean => {
+    if ('correspondence' !== timeControlToCadencyName(hostedGameClient.value.getGameOptions())) {
+        return false;
+    }
+
+    if (!hasPlayer(hostedGameClient.value.getHostedGame(), loggedInPlayer)) {
+        return false;
+    }
+
+    return true;
+};
+
+watchEffect(async () => {
+    if (!shouldShowConditionalMoves()) {
+        return;
+    }
+
+    conditionalMoves.value = await apiGetConditionalMoves(hostedGameClient.value.getId());
+    conditionalMovesSubmitted = structuredClone(toRaw(conditionalMoves.value));
+});
+
+gameView.getGame().on('played', (move, _, byPlayerIndex) => {
+    if (null === conditionalMoves.value || null === conditionalMovesSubmitted) {
+        return;
+    }
+
+    if (!shouldShowConditionalMoves()) {
+        return;
+    }
+
+    const myIndex = getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer);
+
+    if (byPlayerIndex !== 1 - myIndex) {
+        return;
+    }
+
+    conditionalMovesShift(conditionalMoves.value, move);
+    conditionalMovesSubmitted = structuredClone(toRaw(conditionalMoves.value));
+});
+
+gameView.on('simulationModeChanged', enabled => {
+    isSimulationMode.value = enabled;
+    highlightedLine.value = [];
+});
+
+gameView.on('hexSimulated', coords => {
+    if (null === conditionalMoves.value) {
+        return;
+    }
+
+    highlightedLine.value.push(coords);
+    markNextConditionalMoves(highlightedLine.value.map(move => move.toString()));
+    conditionalMovesUpdated.value = true;
+    conditionalMovesMergeMoves(conditionalMoves.value.tree, highlightedLine.value.map(move => move.toString()));
+});
+
+const startNewLine = (): void => {
+    gameView.enableSimulationMode(1 - myIndex());
+    setHighlightedLine([]);
+};
+
+const submitSimulationMoves = async (): Promise<void> => {
+    gameView.removeMarks('cond');
+
+    if (null === conditionalMoves.value) {
+        return;
+    }
+
+    cleanRedundantUnplayedLines(conditionalMoves.value);
+
+    conditionalMoves.value = await apiPatchConditionalMoves(hostedGameClient.value.getId(), conditionalMoves.value);
+    conditionalMovesSubmitted = structuredClone(toRaw(conditionalMoves.value));
+
+    gameView.clearSimulationMoves();
+    highlightedLine.value = [];
+    conditionalMovesUpdated.value = false;
+};
+
+const cancelSimulationMoves = (): void => {
+    gameView.clearSimulationMoves();
+    gameView.removeMarks('cond');
+    highlightedLine.value = [];
+    conditionalMoves.value = structuredClone(conditionalMovesSubmitted);
+    conditionalMovesUpdated.value = false;
+};
+
+const setHighlightedLine = (line: string[]): void => {
+    if (null === conditionalMoves.value) {
+        return;
+    }
+
+    markNextConditionalMoves(line);
+    gameView.enableSimulationMode(1 - myIndex());
+    gameView.setSimulationMoves(line.map(move => Move.fromString(move)));
+    highlightedLine.value = line.map(move => Move.fromString(move));
+    conditionalMovesUpdated.value = true;
+    conditionalMovesMergeMoves(conditionalMoves.value.tree, highlightedLine.value.map(move => move.toString()));
+};
+
+const markNextConditionalMoves = (moves: string[]): void => {
+    gameView.removeMarks('cond');
+
+    if (null === conditionalMoves.value) {
+        return;
+    }
+
+    const next = getNextMovesAfterLine(conditionalMoves.value.tree, moves);
+    const nextNumberString = '' + (moves.length + 1);
+
+    for (const move of next) {
+        const mark = new TextMark(nextNumberString).setCoords(Move.fromString(move));
+        gameView.addMark(mark, 'cond');
+    }
+};
 </script>
 
 <template>
@@ -334,6 +468,16 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
         -->
         <nav class="nav nav-game-sidebar nav-pills nav-fill">
             <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><BIconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
+
+            <a class="nav-link" v-if="shouldShowConditionalMoves()" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
+                <BIconSignpostSplit />
+                {{ ' ' }}
+                <span class="d-none d-md-inline">
+                    {{ $t('conditional_moves_short') }}
+                </span>
+                <span v-if="null !== conditionalMoves && conditionalMoves.tree.length > 0"> ({{ conditionalMoves.tree.length }})</span>
+            </a>
+
             <a class="nav-link" :class="tabActiveClass('info')" @click.prevent="currentTab = 'info'" href="#"><BIconInfoLg /> <span class="d-none d-md-inline">{{ $t('game.info') }}</span></a>
             <a class="nav-link" :class="tabActiveClass('settings')" @click.prevent="currentTab = 'settings'" href="#"><BIconGear /> <span class="d-none d-md-inline">{{ $t('player_settings.title') }}</span></a>
         </nav>
@@ -672,6 +816,64 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
         </div>
 
         <!--
+            Conditional moves
+        -->
+        <div class="sidebar-block block-conditional-moves" v-if="isTab('conditional_moves')">
+            <div class="container-fluid">
+                <h3>{{ $t('conditional_moves') }}</h3>
+
+                <template v-if="null !== conditionalMoves">
+                    <button
+                        v-if="!isSimulationMode"
+                        @click="gameView.enableSimulationMode(1 - myIndex()); markNextConditionalMoves([]);"
+                        class="btn btn-outline-success"
+                    >Edit conditional moves</button>
+
+                    <button
+                        v-if="isSimulationMode"
+                        @click="async () => { await submitSimulationMoves(); gameView.disableSimulationMode() }"
+                        class="btn btn-success me-3"
+                    >Validate</button>
+
+                    <button
+                        v-if="isSimulationMode"
+                        @click="cancelSimulationMoves(); gameView.disableSimulationMode()"
+                        class="btn btn-outline-warning"
+                    >Cancel</button>
+
+                    <div v-if="conditionalMoves.tree.length > 0" class="conditional-move-tree-container">
+                        <AppConditionalMoveTree
+                            :tree="conditionalMoves.tree"
+                            :selectedLine="highlightedLine.map(move => move.toString())"
+                            :playerIndex="myIndex()"
+                            @lineClicked="lineClicked => setHighlightedLine(lineClicked)"
+                        />
+                    </div>
+
+                    <AppConditionalMoveButton
+                        label="+"
+                        :playerIndex="1 - myIndex()"
+                        @click="startNewLine"
+                        aria-label="Add new conditional move"
+                    />
+
+                    <div v-if="conditionalMoves.unplayedLines.length > 0">
+                        <h4>Inactive</h4>
+
+                        <AppConditionalMoveTree
+                            :tree="conditionalMoves.unplayedLines"
+                            :playerIndex="myIndex()"
+                            @lineClicked="lineClicked => setHighlightedLine(lineClicked)"
+                        />
+                    </div>
+                </template>
+
+                <p v-else>Loading...</p>
+            </div>
+        </div>
+
+
+        <!--
             Game chat
         -->
         <div class="sidebar-block block-fill-rest">
@@ -849,4 +1051,10 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
 @media (max-height: 600px)
     .block-game-date
         display none
+
+.conditional-move-tree-container
+    overflow-x auto
+    overflow-y hidden
+    white-space nowrap
+    padding-bottom 0.5em
 </style>

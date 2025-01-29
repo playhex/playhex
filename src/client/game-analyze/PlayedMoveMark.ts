@@ -1,4 +1,4 @@
-import { Graphics, PointData } from 'pixi.js';
+import { Container, Graphics, PointData } from 'pixi.js';
 import { Mark } from '../../shared/pixi-board/Mark';
 import Hex from '../../shared/pixi-board/Hex';
 import { colorAverage } from '../../shared/pixi-board/colorUtils';
@@ -12,12 +12,16 @@ export class PlayedMoveMark extends Mark
 {
     private whiteWinIndicator: Graphics;
 
-    override draw(): void
+    override draw()
     {
-        this.addChild(
+        const container = new Container();
+
+        container.addChild(
             this.createBackground(),
             this.whiteWinIndicator = this.createWhiteWinIndicator(),
         );
+
+        return container;
     }
 
     /**

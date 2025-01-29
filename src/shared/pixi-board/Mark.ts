@@ -4,13 +4,28 @@ import Hex from './Hex';
 
 export class Mark extends Container
 {
-    constructor(
-        private coords: Coords = { row: 0, col: 0 },
-    ) {
-        super();
+    private initialized = false;
+
+    private coords: Coords = { row: 0, col: 0 };
+
+    private rotationFixedContainer = new Container();
+
+    /**
+     * When board rotate, always keep mark at same rotation.
+     */
+    protected alwaysTop = false;
+
+    initOnce(): void
+    {
+        if (this.initialized) {
+            return;
+        }
+
+        this.initialized = true;
 
         this.updatePosition();
-        this.draw();
+        this.rotationFixedContainer.addChild(this.draw());
+        this.addChild(this.rotationFixedContainer);
     }
 
     getCoords()
@@ -18,10 +33,12 @@ export class Mark extends Container
         return this.coords;
     }
 
-    setCoords(coords: Coords): void
+    setCoords(coords: Coords): Mark
     {
         this.coords = coords;
         this.updatePosition();
+
+        return this;
     }
 
     private updatePosition(): void
@@ -29,27 +46,41 @@ export class Mark extends Container
         this.position = Hex.coords(this.coords.row, this.coords.col);
     }
 
-    show(): void
+    show(): Mark
     {
         this.visible = true;
+
+        return this;
     }
 
-    hide(): void
+    hide(): Mark
     {
         this.visible = false;
+
+        return this;
     }
 
     /**
-     * Called once.
-     * Must initialize its graphics and add as child.
+     * Called once, just before adding to gameView.
+     * Must returns its graphics.
+     * Rotation will be fixed.
      */
-    protected draw(): void
+    protected draw(): Container
     {
         const g = new Graphics();
 
         g.circle(0, 0, Hex.RADIUS * 0.5);
         g.fill({ color: 0x00ff00 });
 
-        this.addChild(g);
+        return g;
+    }
+
+    /**
+     * Rotate mark graphics to make it always upside.
+     * Can also make it always flat-topped or point-topped.
+     */
+    updateRotation(containerRotation: number): void
+    {
+        this.rotationFixedContainer.rotation = -containerRotation;
     }
 }

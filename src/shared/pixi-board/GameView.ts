@@ -8,6 +8,7 @@ import SwapedSprite from './SwapedSprite';
 import { createShadingPattern, ShadingPatternType } from './shading-patterns';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced';
 import { Mark } from './Mark';
+import TextMark from './marks/TextMark';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -34,6 +35,11 @@ type GameViewEvents = {
     hexClicked: (coords: Coords) => void;
 
     /**
+     * A hex has been clicked in simulation mode on the view.
+     */
+    hexSimulated: (move: Move) => void;
+
+    /**
      * Game has ended, and win animation is over.
      * Used to display win message after animation, and not at same time.
      */
@@ -42,6 +48,11 @@ type GameViewEvents = {
     orientationChanged: () => void;
 
     movesHistoryCursorChanged: (cursor: null | number) => void;
+
+    /**
+     * Simulation mode has been enabled or disabled.
+     */
+    simulationModeChanged: (enabled: boolean) => void;
 };
 
 const defer = () => {
@@ -117,6 +128,9 @@ const defaultOptions: GameViewOptions = {
  */
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
+    static MARKS_GROUP_DEFAULT = '_default';
+    static MARKS_GROUP_SIMULATION = '_simulation';
+
     private options: GameViewOptions;
 
     private containerElement: null | HTMLElement = null;
@@ -135,6 +149,25 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private swaped: SwapedSprite;
 
     private previewedMove: null | { move: Move, playerIndex: PlayerIndex } = null;
+
+    /**
+     * When enabled, moves are no longer played,
+     * but instead stack them in simulatedMoves.
+     * They will be displayed only.
+     */
+    private simulationMode = false;
+
+    /**
+     * Simulation move played so far.
+     */
+    private simulatedMoves: Move[] = [];
+
+    /**
+     * From which color play simulation moves.
+     * null: default, play next color after last played move
+     * 0 or 1: first simulated move is red or blue.
+     */
+    private simulationMoveFromPlayerIndex: null | number = null;
 
     /**
      * Show an earlier position on the board.
@@ -309,6 +342,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.updateOrientation();
 
         this.gameContainer.rotation = this.currentOrientation * PI_6;
+        this.updateMarksRotation();
 
         this.gameContainer.pivot = Hex.coords(
             this.game.getSize() / 2 - 0.5,
@@ -335,6 +369,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.createAndAddHexes();
         this.addAllMoves();
+        this.addAllSimulatedMoves();
         this.highlightSidesFromGame();
         this.showPreviewedMove();
 
@@ -691,7 +726,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         this.disableRewindMode();
                     }
 
-                    this.emit('hexClicked', { row, col });
+                    if (!this.simulationMode) {
+                        this.emit('hexClicked', { row, col });
+                    } else {
+                        if (this.isEmptyWithSimulation({ row, col })) {
+                            const move = new Move(row, col);
+                            this.playSimulatedMove(move);
+                            this.emit('hexSimulated', move);
+                        }
+                    }
                 });
             }
         }
@@ -1105,7 +1148,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             }
         }
 
-        this.highlightLastMove(move);
+        this.highlightLastMove(); // do not pass move to highlight last played and not simulated move when simulating
     }
 
     private addAllMoves(): void
@@ -1121,6 +1164,121 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
             this.addMove(movesHistory[i], i % 2 as PlayerIndex);
         }
+    }
+
+    isSimulationMode(): boolean
+    {
+        return this.simulationMode;
+    }
+
+    /**
+     * Will play next moves temporarily.
+     * Moves will be erased when simulation mode disabled.
+     */
+    enableSimulationMode(fromPlayerIndex: null | number = null): void
+    {
+        if (this.simulationMode) {
+            return;
+        }
+
+        this.simulationMode = true;
+        this.simulationMoveFromPlayerIndex = fromPlayerIndex;
+        this.emit('simulationModeChanged', this.simulationMode);
+    }
+
+    disableSimulationMode(): void
+    {
+        if (!this.simulationMode) {
+            return;
+        }
+
+        this.simulationMode = false;
+        this.simulatedMoves = [];
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.redraw();
+        this.emit('simulationModeChanged', this.simulationMode);
+    }
+
+    toggleSimulationMode(): void
+    {
+        if (this.simulationMode) {
+            this.disableSimulationMode();
+        } else {
+            this.enableSimulationMode();
+        }
+    }
+
+    getSimulationMoves(): Move[]
+    {
+        return this.simulatedMoves;
+    }
+
+    setSimulationMoves(moves: Move[]): void
+    {
+        this.simulatedMoves = moves;
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.redraw();
+    }
+
+    /**
+     * @param index Number of the simulation move from last played move. Starts from 0.
+     */
+    private addSimulatedMove(move: Move, byPlayerIndex: PlayerIndex, index: number): void
+    {
+        this.addMove(move, byPlayerIndex);
+        this.addMark(new TextMark('' + (index + 1)).setCoords(move), GameView.MARKS_GROUP_SIMULATION);
+    }
+
+    private addAllSimulatedMoves(): void
+    {
+        for (let i = 0; i < this.simulatedMoves.length; ++i) {
+            const byPlayerIndex = (this.game.getCurrentPlayerIndex() + i) % 2 as PlayerIndex;
+
+            this.addSimulatedMove(this.simulatedMoves[i], byPlayerIndex, i);
+        }
+    }
+
+    /**
+     * Play a simulation move.
+     *
+     * @param byPlayerIndex Which color. Let null for auto: will play colors alternately,
+     *                      depending on how much move are played already.
+     */
+    playSimulatedMove(move: Move, byPlayerIndex: null | PlayerIndex = null): void
+    {
+        if (null === byPlayerIndex) {
+            byPlayerIndex = (
+                (this.simulationMoveFromPlayerIndex ?? this.game.getCurrentPlayerIndex())
+                + this.simulatedMoves.length
+            ) % 2 as PlayerIndex;
+        }
+
+        this.simulatedMoves.push(move);
+        this.addSimulatedMove(move, byPlayerIndex, this.simulatedMoves.length - 1);
+    }
+
+    isEmptyWithSimulation(coords: Coords): boolean
+    {
+        const color = this.game.getBoard().getCell(coords.row, coords.col);
+
+        if (null !== color) {
+            return false;
+        }
+
+        for (const move of this.simulatedMoves) {
+            if (coords.row === move.row && coords.col === move.col) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    clearSimulationMoves(): void
+    {
+        this.simulatedMoves = [];
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.redraw();
     }
 
     listenArrowKeys(): void
@@ -1156,11 +1314,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.keyboardEventListener = null;
     }
 
-    addMark(mark: Mark, group: string = 'default'): void
+    addMark(mark: Mark, group: string = GameView.MARKS_GROUP_DEFAULT): void
     {
         if (undefined === this.marks[group]) {
             this.marks[group] = [];
         }
+
+        mark.initOnce();
+        mark.updateRotation(this.gameContainer.rotation);
 
         this.marks[group].push(mark);
         this.marksContainer.addChild(mark);
@@ -1175,14 +1336,29 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    removeAllMarks(group: null | string = null): void
+    removeMarks(group: null | string = null): void
     {
         if (null !== group) {
+            if (undefined === this.marks[group]) {
+                return;
+            }
+
             this.marksContainer.removeChild(...this.marks[group]);
             this.marks[group] = [];
-        } else {
-            this.marksContainer.removeChildren();
-            this.marks = {};
+
+            return;
+        }
+
+        this.marksContainer.removeChildren();
+        this.marks = {};
+    }
+
+    private updateMarksRotation(): void
+    {
+        for (const group in this.marks) {
+            for (const mark of this.marks[group]) {
+                mark.updateRotation(this.gameContainer.rotation);
+            }
         }
     }
 
