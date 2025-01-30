@@ -12,7 +12,7 @@
         "size": "Rozmiar",
         "board": "Plansza",
         "board_size": "Rozmiar planszy",
-        "time_control": "Kontrola czasu",
+        "time_control": "Ustawienia czasu",
         "rules": "Zasady",
         "created": "Utworzona",
         "accept": "Akceptuj",
@@ -267,7 +267,7 @@
         "forfeit": "{player} wygrywa przez walkower!"
     },
     "move_number": "{{n}} ruch",
-    "any": "Każda",
+    "any": "Wszystkie",
     "handicap": {
         "handicap_for_player": "{{n}} dla {{player}}",
         "none": "Żadne",
@@ -309,5 +309,8 @@
     "moves": "Ilość ruchów",
     "friendly": "Towarzyska",
     "overall": "Ogólnie",
-    "force_board_orientation_mode": "Wymuś wyświetlanie planszy w orientacji poziomej lub pionowej dla tego ekranu"
+    "force_board_orientation_mode": "Wymuś wyświetlanie planszy w orientacji poziomej lub pionowej dla tego ekranu",
+    "n_total_games_one": "1 gra.",
+    "n_total_games_few": "{{count}} gry.",
+    "n_total_games_many": "{{count}} gier."
 }
