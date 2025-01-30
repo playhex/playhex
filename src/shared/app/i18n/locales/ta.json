@@ -12,12 +12,12 @@
         "title": "இணைப்பில்லாத AI"
     },
     "loading_game": "விளையாட்டு ஏற்றுகிறது…",
-    "resign": "ராசினாமா",
+    "resign": "விலகு",
     "player_wins_by": {
         "resign": "{player} வெற்றி!",
         "forfeit": "{player} பறிமுதல் மூலம் வெற்றி!",
         "default": "{player} வெற்றி!",
-        "time": "{பிளேயர் the சரியான நேரத்தில் வெற்றி!"
+        "time": "{player} சரியான நேரத்தில் வெற்றி!"
     },
     "player_loses_reason": {
         "default": "{player} இழக்கிறது.",
@@ -119,7 +119,7 @@
     },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "விளையாட்டு {player}, {timeAgo} ஆல் உருவாக்கப்பட்டது.",
-    "game_was_created_by_player_time_ago": "விளையாட்டு {player}, {டைமோகோ by ஆல் உருவாக்கப்பட்டது.",
+    "game_was_created_by_player_time_ago": "{timeAgo}, விளையாட்டு {player}ஆல் உருவாக்கப்பட்டது.",
     "log_out": "விடுபதிகை",
     "log_in": "புகுபதிகை",
     "sign_up": "பதிவு செய்க",
@@ -176,7 +176,7 @@
     "explore": "ஆராயுங்கள்",
     "close": "மூடு",
     "ranked": "தரவரிசை",
-    "friendly": "நட்பு",
+    "friendly": "நட்புடன்",
     "any": "ஏதேனும்",
     "rating_n": "மதிப்பீடு: {{rating}}",
     "rating": "செயல்வரம்பு",
@@ -198,8 +198,8 @@
         "create": "1v1 ஐ உருவாக்கவும்"
     },
     "1vAI_friendly": {
-        "title": "AI Vs vs",
-        "create": "AI Vs vs"
+        "title": "செஅ எதிராக விளையாடு",
+        "create": "செஅ எதிராக விளையாடு"
     },
     "offline_game_explain": "இணைப்பில்லாத கேம்கள் உங்கள் சாதனத்தில் மட்டுமே இயங்கும், இதனால் நீங்கள் இணைய இணைப்பு இல்லாமல் விளையாட முடியும். பிளேஎக்ச் சேவையகம் சம்பந்தப்படவில்லை.",
     "tournament": "போட்டி",
@@ -252,7 +252,7 @@
     "contributors": "பங்களிப்பாளர்கள்",
     "no_yet_data": "யாருக்குத் தெரியும்!",
     "player_made_a_move": "{{player}} ஒரு நகர்வு",
-    "game_with_player_has_started": "{{player} with உடன் விளையாட்டு தொடங்கியது",
+    "game_with_player_has_started": "{{player}} உடன் விளையாட்டு தொடங்கியது",
     "last_move": "கடைசி நகர்வு",
     "total_played_games": "மொத்தம் விளையாடியது",
     "preferred_board_sizes": "விருப்பமான பலகை அளவுகள்",
@@ -264,9 +264,9 @@
     "n_total_games_other": "{{count}} மொத்த விளையாட்டுகள்.",
     "previous": "முந்தைய",
     "next": "அடுத்தது",
-    "page_page_of_max": "பக்கம் {{page}} / {{max}}}",
+    "page_page_of_max": "பக்கம் {{page}} / {{max}}",
     "undo": {
-        "undo_move": "தலைப்பு",
+        "undo_move": "திரும்பிஎடு",
         "accept": "செயல்தவிர்க்க ஏற்றுக்கொள்ளுங்கள்",
         "reject": "நிராகரிக்கவும்"
     },
@@ -307,7 +307,7 @@
     "outcome": {
         "win": "செய்",
         "loss": "இழப்பு",
-        "resign": "ராசினாமா",
+        "resign": "விலகு",
         "forfeit": "பறிமுதல்",
         "time": "நேரம் முடிந்தது"
     }
