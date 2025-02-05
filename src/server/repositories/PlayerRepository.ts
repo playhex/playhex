@@ -5,7 +5,7 @@ import { hashPassword, checkPassword, InvalidPasswordError } from '../services/s
 import logger from '../services/logger';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
-import { FindOptionsSelect, QueryFailedError, Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils';
 import SearchPlayersParameters from '@shared/app/SearchPlayersParameters';
 
@@ -152,7 +152,6 @@ export default class PlayerRepository
     /** @throws {InvalidPasswordError} */
     async changePassword(publicId: string, oldPassword: string, newPassword: string): Promise<Player> {
         const player = await this.playerRepository.findOne({
-            select: this.allColumnWithPassword(),
             where: {
                 publicId,
             },
@@ -209,24 +208,5 @@ export default class PlayerRepository
 
             throw e;
         }
-    }
-
-    /**
-     * By default, player password column is not selected in database queries.
-     * To force select password, use:
-     *  {
-     *      select: allColumnWithPassword(),
-     *  },
-     *  where: { where: ... }
-     */
-    allColumnWithPassword(): FindOptionsSelect<Player>
-    {
-        const allColumnsWithPassword: FindOptionsSelect<Player> = {};
-
-        this.playerRepository.metadata.columns.forEach(column => {
-            allColumnsWithPassword[column.propertyName as keyof Player] = true;
-        });
-
-        return allColumnsWithPassword;
     }
 }

@@ -57,7 +57,7 @@ export default class Player
     /**
      * BCrypt hashed password
      */
-    @Column({ type: 'char', length: 60, nullable: true, select: false })
+    @Column({ type: 'char', length: 60, nullable: true })
     password?: null | string;
 
     /**
