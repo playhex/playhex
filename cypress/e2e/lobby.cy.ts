@@ -11,7 +11,7 @@ describe('Lobby', () => {
 
         cy.createAIGameWithRandom();
 
-        cy.contains('10:00');
+        cy.contains(/10:0\d/); // "10:00" or "10:05" because of time increment, AI sometimes already played a move
 
         cy.contains('PlayHex')
             .click()
@@ -59,9 +59,13 @@ describe('Lobby', () => {
     it('displays created, playing and some ended games', () => {
         cy.mockSocketIO();
 
+        cy.intercept('/api/games?*', {
+            fixture: 'lobby/lobby-ended-games.json',
+        });
+
         cy.visit('/');
 
-        cy.receiveLobbyUpdate('lobby/lobby-games.json');
+        cy.receiveLobbyUpdate('lobby/lobby-active-games.json');
 
         cy
             // Waiting games
@@ -90,10 +94,6 @@ describe('Lobby', () => {
             .contains('Player C')
             .closest('tr')
             .contains('Review')
-
-            // should not display canceled games
-            .closest('table')
-            .contains(/Cancel A|Cancel B/).should('not.exist')
         ;
 
         cy.contains('Finished games').next('.table-responsive').contains('Player D');

@@ -113,8 +113,15 @@ const sendChat = () => {
 
 onMounted(() => scrollChatToBottom());
 
+/**
+ * Used to know whether object is a ChatMessage or a ChatHeader.
+ *
+ * Using instanceof won't work in cypress tests because mock ChatMessage has not same class as application ChatMessage.
+ * Using class name won't work in production mode because names are minified.
+ */
 const isChatMessage = (object: unknown): object is ChatMessage => {
-    return object instanceof ChatMessage;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return undefined === (object as any).type;
 };
 
 /*

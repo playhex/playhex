@@ -3,7 +3,7 @@ describe('Profile page', () => {
         cy.intercept('/api/auth/me-or-guest', {
             fixture: 'profile-page/player-test.json',
         });
-        cy.intercept('/api/games', {
+        cy.intercept('/api/games?*d63e9d50-0afd-48ff-88f4-706fbee620b2*', {
             fixture: 'profile-page/games.json',
         });
         cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/games?state=ended', {
@@ -23,7 +23,7 @@ describe('Profile page', () => {
     });
 
     it('see someone else profile page', () => {
-        cy.intercept('/api/games', {
+        cy.intercept('/api/games?*d63e9d50-0afd-48ff-88f4-706fbee620b2*', {
             fixture: 'profile-page/games.json',
         });
         cy.intercept('/api/players?slug=player-test', {

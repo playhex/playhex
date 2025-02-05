@@ -372,7 +372,7 @@ describe('Authentication', () => {
         /*
          * On persisted games (host, players)
          */
-        cy.request('GET', '/api/games?type=ended&take=5').as('persistedGamesResponse');
+        cy.request('GET', '/api/games?endedAtSort=desc&opponentType=player&states[0]=ended&paginationPageSize=5').as('persistedGamesResponse');
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cy.get('@persistedGamesResponse').then((persistedGamesResponse: any) => {

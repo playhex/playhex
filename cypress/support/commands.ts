@@ -176,6 +176,15 @@ Cypress.Commands.add('receiveSocketIoMessage', (type, ...args) => {
         throw new Error('Cannot emit mocked socket message, must call "cy.mockSocketIO()" at the beginning of the test');
     }
 
+    Cypress.log({
+        name: 'receiveSocketIoMessage',
+        message: type,
+        consoleProps: () => ({
+            eventName: type,
+            args,
+        }),
+    });
+
     socketIoMock.emit(type, ...args);
 });
 
