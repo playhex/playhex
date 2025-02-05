@@ -1,9 +1,8 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import GameView from '../../../shared/pixi-board/GameView';
-import { onMounted, onUnmounted, ref } from 'vue';
-import { PropType, toRefs } from 'vue';
-import { BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconTrophyFill, BIconX } from 'bootstrap-icons-vue';
+import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
+import { BIconCheck, BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconCrosshair, BIconScissors, BIconTrophyFill, BIconX } from 'bootstrap-icons-vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import AppChrono from './AppChrono.vue';
@@ -11,7 +10,8 @@ import AppPseudo from './AppPseudo.vue';
 import Player from '../../../shared/app/models/Player';
 import TimeControlType from '../../../shared/time-control/TimeControlType';
 import { GameTimeData } from '../../../shared/time-control/TimeControl';
-import type { Ref } from 'vue';
+import useConditionalMovesStore from '../../stores/conditionalMovesStore';
+import { storeToRefs } from 'pinia';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -127,10 +127,15 @@ window.addEventListener('keydown', keyboardEventListener);
 onUnmounted(() => {
     window.removeEventListener('keydown', keyboardEventListener);
 });
+
+/*
+ * Conditional moves
+ */
+const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls }">
+    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls || conditionalMovesEditor?.getIsSimulationMode() }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
@@ -196,6 +201,34 @@ onUnmounted(() => {
 
             <!-- Close rewind -->
             <button type="button" @click="rewindClose()" class="btn btn-outline-danger">
+                <BIconX />
+            </button>
+        </div>
+
+        <div class="rewind-controls" v-else-if="conditionalMovesEditor?.getIsSimulationMode()">
+
+            <!-- Back to original position -->
+            <button type="button" @click="conditionalMovesEditor.startNewLine()" class="btn btn-outline-primary">
+                <BIconCrosshair />
+            </button>
+
+            <!-- backward -->
+            <button type="button" @click="conditionalMovesEditor.back()" class="btn btn-outline-primary">
+                <BIconChevronLeft />
+            </button>
+
+            <!-- Cut move -->
+            <button type="button" @click="conditionalMovesEditor.cutMove()" class="btn btn-outline-danger" :disabled="0 === conditionalMovesEditor.getSelectedLine().length">
+                <BIconScissors />
+            </button>
+
+            <!-- Save -->
+            <button type="button" @click="conditionalMovesEditor.submitConditionalMoves()" class="btn" :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'">
+                <BIconCheck /> Save
+            </button>
+
+            <!-- Close conditional moves edition -->
+            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-danger">
                 <BIconX />
             </button>
         </div>

@@ -297,6 +297,11 @@
     },
     "player_made_a_move": "{{player}} a joué",
     "game_with_player_has_started": "La partie avec {{player}} a commencé",
+    "conditional_moves": {
+        "title": "Coups conditionnels",
+        "title_short": "Coups-si",
+        "cut_move": "Couper le coup"
+    },
     "contributors": "Contributeurs",
     "contribute": "Contribuer",
     "auto": "Auto",

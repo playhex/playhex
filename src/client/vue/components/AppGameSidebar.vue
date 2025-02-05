@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconSignpostSplit } from 'bootstrap-icons-vue';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore';
@@ -29,6 +29,10 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
+import { getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils';
+import AppConditionalMoves from './AppConditionalMoves.vue';
+import useConditionalMovesStore from '../../stores/conditionalMovesStore';
+import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor';
 
 const props = defineProps({
     hostedGameClient: {
@@ -76,8 +80,9 @@ const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
 
     return formatDuration(duration, { format: units.slice(topUnit, topUnit + 2) });
 };
+
 const playerColor = (player: Player): string => {
-    const index = hostedGameClient.value.getPlayerIndex(player);
+    const index = getPlayerIndex(hostedGameClient.value.getHostedGame(), player);
 
     if (0 === index) {
         return 'text-danger';
@@ -293,7 +298,7 @@ gameView.on('movesHistoryCursorChanged', cursor => {
 /*
  * Tabs
  */
-type Tab = 'main' | 'info' | 'settings';
+type Tab = 'main' | 'conditional_moves' | 'info' | 'settings';
 
 const currentTab = ref<Tab>('main');
 
@@ -331,6 +336,11 @@ watch(
 
 const currentOrientation = ref<OrientationMode>(gameView.getComputedBoardOrientationMode());
 gameView.on('orientationChanged', () => currentOrientation.value = gameView.getComputedBoardOrientationMode());
+
+/*
+ * Conditional moves
+ */
+const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>
@@ -341,8 +351,18 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
         -->
         <nav class="nav nav-game-sidebar nav-pills nav-fill">
             <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><BIconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
+
+            <a class="nav-link" v-if="shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
+                <BIconSignpostSplit />
+                {{ ' ' }}
+                <span class="d-none d-md-inline">
+                    {{ $t('conditional_moves.title_short') }}
+                </span>
+                <span v-if="null !== conditionalMovesEditor && conditionalMovesEditor.getConditionalMovesDirty().tree.length > 0"> ({{ conditionalMovesEditor.getConditionalMovesDirty().tree.length }})</span>
+            </a>
+
             <a class="nav-link" :class="tabActiveClass('info')" @click.prevent="currentTab = 'info'" href="#"><BIconInfoLg /> <span class="d-none d-md-inline">{{ $t('game.info') }}</span></a>
-            <a class="nav-link" :class="tabActiveClass('settings')" @click.prevent="currentTab = 'settings'" href="#"><BIconGear /> <span class="d-none d-md-inline">{{ $t('player_settings.title') }}</span></a>
+            <a class="nav-link" :class="tabActiveClass('settings')" @click.prevent="currentTab = 'settings'" href="#"><BIconGear /></a>
         </nav>
 
         <!--
@@ -677,6 +697,23 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
 
             </div>
         </div>
+
+        <!--
+            Conditional moves
+        -->
+        <div class="sidebar-block overflow-y-auto block-conditional-moves" v-if="isTab('conditional_moves')">
+            <div class="container-fluid">
+                <h3>{{ $t('conditional_moves.title') }}</h3>
+
+                <AppConditionalMoves
+                    v-if="null !== conditionalMovesEditor"
+                    :conditionalMovesEditor="(conditionalMovesEditor as ConditionalMovesEditor)"
+                />
+
+                <p v-else>{{ $t('loading') }}</p>
+            </div>
+        </div>
+
 
         <!--
             Game chat

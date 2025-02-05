@@ -1,5 +1,6 @@
 import AIConfig from './AIConfig';
 import ChatMessage from './ChatMessage';
+import ConditionalMoves from './ConditionalMoves';
 import Game from './Game';
 import GameAnalyze from './GameAnalyze';
 import HostedGame from './HostedGame';
@@ -22,6 +23,7 @@ import Rating from './Rating';
 export {
     AIConfig,
     ChatMessage,
+    ConditionalMoves,
     Game,
     GameAnalyze,
     HostedGame,
@@ -43,6 +45,7 @@ export {
 export const entities = {
     AIConfig,
     ChatMessage,
+    ConditionalMoves,
     Game,
     GameAnalyze,
     HostedGame,

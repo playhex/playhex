@@ -1,8 +1,8 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '@shared/app/Types';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats } from '../shared/app/models';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
-import { plainToInstance } from '../shared/app/class-transformer-custom';
+import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom';
 import { RatingCategory } from '../shared/app/ratingUtils';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters';
 import { parse } from 'content-range';
@@ -546,4 +546,32 @@ export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | 
     }
 
     return plainToInstance(PlayerStats, await response.json());
+};
+
+export const apiGetConditionalMoves = async (hostedGamePublicId: string): Promise<ConditionalMoves> => {
+    const response = await fetch(`/api/games/${hostedGamePublicId}/conditional-moves`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(ConditionalMoves, await response.json());
+};
+
+export const apiPatchConditionalMoves = async (hostedGamePublicId: string, conditionalMoves: ConditionalMoves): Promise<ConditionalMoves> => {
+    const response = await fetch(`/api/games/${hostedGamePublicId}/conditional-moves`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(instanceToPlain(conditionalMoves)),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(ConditionalMoves, await response.json());
 };
