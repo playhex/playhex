@@ -8,6 +8,7 @@ import SwapedSprite from './SwapedSprite';
 import { createShadingPattern, ShadingPatternType } from './shading-patterns';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced';
 import { Mark } from './Mark';
+import TextMark from './marks/TextMark';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -34,6 +35,15 @@ type GameViewEvents = {
     hexClicked: (coords: Coords) => void;
 
     /**
+     * A hex has been clicked in simulation mode on the view.
+     *
+     * @param played Whether the move has been simulated and added to simulated moves stack,
+     *               or just clicked because cell is already occupied by another simulation move.
+     *               Event is not emitted when clicking on an already played cell.
+     */
+    hexSimulated: (move: Move, played: boolean) => void;
+
+    /**
      * Game has ended, and win animation is over.
      * Used to display win message after animation, and not at same time.
      */
@@ -42,6 +52,11 @@ type GameViewEvents = {
     orientationChanged: () => void;
 
     movesHistoryCursorChanged: (cursor: null | number) => void;
+
+    /**
+     * Simulation mode has been enabled or disabled.
+     */
+    simulationModeChanged: (enabled: boolean) => void;
 };
 
 const defer = () => {
@@ -117,6 +132,9 @@ const defaultOptions: GameViewOptions = {
  */
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
+    static MARKS_GROUP_DEFAULT = '_default';
+    static MARKS_GROUP_SIMULATION = '_simulation';
+
     private options: GameViewOptions;
 
     private containerElement: null | HTMLElement = null;
@@ -135,6 +153,24 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private swaped: SwapedSprite;
 
     private previewedMove: null | { move: Move, playerIndex: PlayerIndex } = null;
+
+    /**
+     * When enabled, moves are no longer played, but instead stacked in simulatedMoves.
+     * They will be displayed temporarily only, until simulation mode is disabled.
+     */
+    private simulationMode = false;
+
+    /**
+     * Simulation moves played so far.
+     */
+    private simulatedMoves: { move: string, byPlayerIndex: PlayerIndex }[] = [];
+
+    /**
+     * From which color play simulation moves.
+     * null: default, play next color after last played move
+     * 0 or 1: first simulated move is red or blue.
+     */
+    private simulationMoveFromPlayerIndex: null | PlayerIndex = null;
 
     /**
      * Show an earlier position on the board.
@@ -181,7 +217,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         await this.pixi.init({
             antialias: true,
             backgroundAlpha: 0,
-            resolution: ceil(window.devicePixelRatio),
+            resolution: ceil(window.devicePixelRatio), // passing devicePixelRatio * 2 here, and no longer need to double resolution of PIXI.Text
             autoDensity: true,
             resizeTo: element,
             ...this.getWrapperSize(),
@@ -309,6 +345,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.updateOrientation();
 
         this.gameContainer.rotation = this.currentOrientation * PI_6;
+        this.updateMarksRotation();
 
         this.gameContainer.pivot = Hex.coords(
             this.game.getSize() / 2 - 0.5,
@@ -335,6 +372,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.createAndAddHexes();
         this.addAllMoves();
+        this.addAllSimulatedMoves();
         this.highlightSidesFromGame();
         this.showPreviewedMove();
 
@@ -691,7 +729,23 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         this.disableRewindMode();
                     }
 
-                    this.emit('hexClicked', { row, col });
+                    if (!this.simulationMode) {
+                        this.emit('hexClicked', { row, col });
+                    } else {
+                        const move = new Move(row, col);
+
+                        if (this.game.getBoard().isEmpty(move.row, move.col)) {
+                            const simulationMoveColor = this.getSimulationMoveColorAt(move);
+                            let played = false;
+
+                            if (null === simulationMoveColor) {
+                                this.playSimulatedMove(move);
+                                played = true;
+                            }
+
+                            this.emit('hexSimulated', move, played);
+                        }
+                    }
                 });
             }
         }
@@ -1105,7 +1159,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             }
         }
 
-        this.highlightLastMove(move);
+        this.highlightLastMove(); // do not pass move to highlight last played and not simulated move when simulating
     }
 
     private addAllMoves(): void
@@ -1123,6 +1177,137 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
+    isSimulationMode(): boolean
+    {
+        return this.simulationMode;
+    }
+
+    /**
+     * Will play next moves temporarily.
+     * Moves will be erased when simulation mode disabled.
+     */
+    enableSimulationMode(fromPlayerIndex: null | PlayerIndex = null): void
+    {
+        if (this.simulationMode) {
+            return;
+        }
+
+        this.disableRewindMode();
+        this.simulationMode = true;
+        this.simulationMoveFromPlayerIndex = fromPlayerIndex;
+        this.emit('simulationModeChanged', this.simulationMode);
+    }
+
+    disableSimulationMode(): void
+    {
+        if (!this.simulationMode) {
+            return;
+        }
+
+        this.simulationMode = false;
+        this.simulatedMoves = [];
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.redraw();
+        this.emit('simulationModeChanged', this.simulationMode);
+    }
+
+    getSimulationMoves(): { move: string, byPlayerIndex: PlayerIndex }[]
+    {
+        return this.simulatedMoves;
+    }
+
+    setSimulationMoves(moves: { move: string, byPlayerIndex: PlayerIndex }[]): void
+    {
+        this.simulatedMoves = moves;
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.redraw();
+    }
+
+    /**
+     * Set simulation moves from a list of moves,
+     * color are automatically defined.
+     */
+    setSimulationMovesAuto(moves: string[]): void
+    {
+        this.simulatedMoves = [];
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        moves.forEach(move => this.playSimulatedMove(Move.fromString(move)));
+        this.redraw();
+    }
+
+    /**
+     * @param index Number of the simulation move from last played move. Starts from 0.
+     */
+    private addSimulatedMove(move: string, byPlayerIndex: PlayerIndex, index: number): void
+    {
+        const moveInstance = Move.fromString(move);
+
+        this.addMove(moveInstance, byPlayerIndex);
+        this.addMark(new TextMark('' + (index + 1)).setCoords(moveInstance), GameView.MARKS_GROUP_SIMULATION);
+    }
+
+    private addAllSimulatedMoves(): void
+    {
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.simulatedMoves.forEach(({ move, byPlayerIndex }, index) => this.addSimulatedMove(move, byPlayerIndex, index));
+    }
+
+    /**
+     * Returns color of next simulation move,
+     * automatically guessed by last move.
+     */
+    private getNextAutoSimulationColor(): PlayerIndex
+    {
+        // returns next color than last simulated move color
+        if (this.simulatedMoves.length > 0) {
+            return 1 - this.simulatedMoves[this.simulatedMoves.length - 1].byPlayerIndex as PlayerIndex;
+        }
+
+        // if no simulation moves yet, returns simulationMoveFromPlayerIndex if defined
+        if (null !== this.simulationMoveFromPlayerIndex) {
+            return this.simulationMoveFromPlayerIndex;
+        }
+
+        // else return next player index from game
+        return 1 - this.game.getCurrentPlayerIndex() as PlayerIndex;
+    }
+
+    /**
+     * Play a simulation move.
+     *
+     * @param byPlayerIndex Which color. Let null for auto: will play colors alternately,
+     *                      depending on how much move are played already.
+     */
+    playSimulatedMove(move: Move, byPlayerIndex: null | PlayerIndex = null): void
+    {
+        if (null === byPlayerIndex) {
+            byPlayerIndex = this.getNextAutoSimulationColor();
+        }
+
+        this.simulatedMoves.push({ move: move.toString(), byPlayerIndex });
+        this.addSimulatedMove(move.toString(), byPlayerIndex, this.simulatedMoves.length - 1);
+    }
+
+    getSimulationMoveColorAt(coords: Coords): null | PlayerIndex
+    {
+        for (const { move, byPlayerIndex } of this.simulatedMoves) {
+            const { row, col } = Move.fromString(move);
+
+            if (coords.row === row && coords.col === col) {
+                return byPlayerIndex;
+            }
+        }
+
+        return null;
+    }
+
+    clearSimulationMoves(): void
+    {
+        this.simulatedMoves = [];
+        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
+        this.redraw();
+    }
+
     listenArrowKeys(): void
     {
         if (null !== this.keyboardEventListener) {
@@ -1134,11 +1319,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                 return;
             switch (event.key) {
                 case 'ArrowLeft':
-                    this.changeMovesHistoryCursor(-1);
+                    if (!this.simulationMode) {
+                        this.changeMovesHistoryCursor(-1);
+                    }
                     break;
 
                 case 'ArrowRight':
-                    this.changeMovesHistoryCursor(+1);
+                    if (!this.simulationMode) {
+                        this.changeMovesHistoryCursor(+1);
+                    }
                     break;
             }
         };
@@ -1156,11 +1345,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.keyboardEventListener = null;
     }
 
-    addMark(mark: Mark, group: string = 'default'): void
+    addMark(mark: Mark, group: string = GameView.MARKS_GROUP_DEFAULT): void
     {
         if (undefined === this.marks[group]) {
             this.marks[group] = [];
         }
+
+        mark.initOnce();
+        mark.updateRotation(this.gameContainer.rotation);
 
         this.marks[group].push(mark);
         this.marksContainer.addChild(mark);
@@ -1175,14 +1367,29 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    removeAllMarks(group: null | string = null): void
+    removeMarks(group: null | string = null): void
     {
         if (null !== group) {
+            if (undefined === this.marks[group]) {
+                return;
+            }
+
             this.marksContainer.removeChild(...this.marks[group]);
             this.marks[group] = [];
-        } else {
-            this.marksContainer.removeChildren();
-            this.marks = {};
+
+            return;
+        }
+
+        this.marksContainer.removeChildren();
+        this.marks = {};
+    }
+
+    private updateMarksRotation(): void
+    {
+        for (const group in this.marks) {
+            for (const mark of this.marks[group]) {
+                mark.updateRotation(this.gameContainer.rotation);
+            }
         }
     }
 

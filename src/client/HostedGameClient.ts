@@ -60,11 +60,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGame.state;
     }
 
-    getPlayerIndex(player: Player): number
-    {
-        return this.hostedGame.hostedGameToPlayers.findIndex(p => p.player.publicId === player.publicId);
-    }
-
     loadGame(): Game
     {
         return this.game ?? this.loadGameFromData(this.hostedGame);

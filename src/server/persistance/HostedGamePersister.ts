@@ -51,14 +51,6 @@ export default class HostedGamePersister
         logger.info('Persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
     }
 
-    async persistLinkToRematch(hostedGame: HostedGame): Promise<void>
-    {
-        await this.hostedGameRepository.save({
-            id: hostedGame.id,
-            rematch: hostedGame.rematch,
-        });
-    }
-
     async deleteIfExists(hostedGame: HostedGame): Promise<void>
     {
         logger.info('Delete a game if exists...', { publicId: hostedGame.publicId });

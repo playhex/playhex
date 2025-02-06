@@ -13,7 +13,7 @@ import useAuthStore from '@client/stores/authStore';
 import Rooms from '@shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp, BIconSignpostSplit } from 'bootstrap-icons-vue';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
@@ -30,10 +30,12 @@ import { isMyTurn } from '../../services/notifications/context-utils';
 import { canPassAgain } from '../../../shared/app/passUtils';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { apiPostRematch } from '../../apiClient';
-import { canJoin } from '../../../shared/app/hostedGameUtils';
+import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils';
 import { Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
+import useConditionalMovesStore from '../../stores/conditionalMovesStore';
+import { markRaw } from 'vue';
 
 useSeoMeta({
     robots: 'noindex',
@@ -151,7 +153,7 @@ const getLocalPlayerIndex = (): number => {
         return -1;
     }
 
-    return hostedGameClient.value.getPlayerIndex(loggedInPlayer.value);
+    return getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value);
 };
 
 const listenHexClick = () => {
@@ -219,7 +221,7 @@ const initGameView = async () => {
 
     const game = hostedGameClient.value.loadGame();
 
-    gameView = new CustomizedGameView(game);
+    gameView = markRaw(new CustomizedGameView(game));
 
     gameViewInitialized.value = true;
 
@@ -569,6 +571,30 @@ const {
     createGuestJoiningCorrepondenceWarningOverlay,
     isGuestJoiningCorrepondence,
 } = useGuestJoiningCorrespondenceWarning();
+
+/*
+ * Conditional moves
+ */
+const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
+
+watchEffect(() => {
+    if (null === hostedGameClient.value || null === loggedInPlayer.value || null === gameView) {
+        return;
+    }
+
+    if (!shouldShowConditionalMoves(hostedGameClient.value.getHostedGame(), loggedInPlayer.value)) {
+        return;
+    }
+
+    initConditionalMoves(
+        hostedGameClient.value.getHostedGame(),
+        gameView,
+        getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value) as PlayerIndex,
+    );
+});
+
+onUnmounted(() => resetConditionalMoves());
 </script>
 
 <template>
@@ -615,6 +641,11 @@ const {
                     <button type="button" class="btn btn-outline-warning" v-if="canCancel()" @click="cancel()">
                         <BIconXLg />
                         <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
+                    </button>
+
+                    <!-- Conditional moves -->
+                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="conditionalMovesEditor?.startNewLine()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
+                        <BIconSignpostSplit />
                     </button>
 
                     <!-- Confirm move -->

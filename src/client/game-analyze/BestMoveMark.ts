@@ -8,7 +8,7 @@ import Hex from '../../shared/pixi-board/Hex';
  */
 export class BestMoveMark extends Mark
 {
-    override draw(): void
+    override draw()
     {
         const g = new Graphics();
         const path: PointData[] = [];
@@ -20,6 +20,6 @@ export class BestMoveMark extends Mark
         g.poly(path);
         g.stroke({ color: '0x00ff00', width: Hex.INNER_RADIUS * 0.2 });
 
-        this.addChild(g);
+        return g;
     }
 }

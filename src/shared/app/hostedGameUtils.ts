@@ -1,10 +1,18 @@
-import { PlayerIndex } from 'game-engine';
 import { HostedGame, HostedGameToPlayer, Player } from './models';
-import { Outcome } from 'game-engine/Types';
+import { Outcome } from '../game-engine/Types';
+import { PlayerIndex } from '../game-engine';
 import SearchGamesParameters from './SearchGamesParameters';
+import { timeControlToCadencyName } from './timeControlUtils';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     return hostedGame.hostedGameToPlayers.some(p => p.player.publicId === player.publicId);
+};
+
+/**
+ * @returns Index of player in hostedGame (0 or 1). Returns -1 if player not in game.
+ */
+export const getPlayerIndex = (hostedGame: HostedGame, player: Player): number => {
+    return hostedGame.hostedGameToPlayers.findIndex(p => p.player.publicId === player.publicId);
 };
 
 export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean => {
@@ -145,6 +153,25 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
         if (hostedGame.gameData.endedAt < searchGamesParameters.toEndedAt) {
             return false;
         }
+    }
+
+    return true;
+};
+
+/**
+ * Whether given player should be able to view/edit conditional moves on a given game.
+ */
+export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Player): boolean => {
+    if ('correspondence' !== timeControlToCadencyName(hostedGame.gameOptions)) {
+        return false;
+    }
+
+    if (!['playing', 'ended'].includes(hostedGame.state)) {
+        return false;
+    }
+
+    if (!hasPlayer(hostedGame, player)) {
+        return false;
     }
 
     return true;

@@ -14,6 +14,7 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager';
 import { fromEngineMove, toEngineMove } from '../shared/app/models/Move';
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
+import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
 
 type HostedGameEvents = {
     played: () => void;
@@ -28,6 +29,7 @@ type HostedGameEvents = {
  * Re-emits some game event.
  *
  * Can, and should be persisted for following purposes:
+ *  - once created, to have an hostedGameId and persist relations (e.g correspondence moves)
  *  - archive games once finished (in database)
  *  - before server restart (probably not applicable for blitz. Redis should be suffisant, as optional)
  *  - at intervals to prevent game data loss on server crash (for long games, still playing but no players activity. Redis should be suffisant, as optional)
@@ -152,6 +154,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     }
 
     /**
+     * Check whether there is an automated move to play
+     * as soon as a it is a player turn.
+     *
+     * An automated move can be:
+     * - AI move
+     * - Conditional move
+     */
+    private async makeAutomatedMoves(): Promise<void>
+    {
+        await this.makeAIMoveIfApplicable();
+        await this.makeConditionalMovesIfApplicable();
+    }
+
+    /**
      * Should be called when player turn changed.
      * Check whether current player is a bot player, and request an AI move if true.
      */
@@ -201,6 +217,51 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             }
 
             this.playerResign(player);
+        }
+    }
+
+    /**
+     * If current player has valid conditional move, play it.
+     */
+    private async makeConditionalMovesIfApplicable(): Promise<void>
+    {
+        if (null === this.game) {
+            return;
+        }
+
+        const lastMove = this.game.getLastMove();
+
+        if (null === lastMove) {
+            return;
+        }
+
+        try {
+            this.logger.info('Conditional moves: checking', { lastMove });
+
+            const player = this.players[this.game.getCurrentPlayerIndex()];
+            const conditionalMovesRepository = Container.get(ConditionalMovesRepository);
+
+            const move = await conditionalMovesRepository.shift(player, this.hostedGame, lastMove);
+
+            if (null === move) {
+                this.logger.info('Conditional moves: no conditional move.', { lastMove });
+                return;
+            }
+
+            this.logger.info('Conditional moves: conditional move matched.', { lastMove, move });
+
+            // Game has ended, either win, or opponent resigned while fetching conditional move
+            if (this.game.isEnded()) {
+                return;
+            }
+
+            const result = this.playerMove(player, fromEngineMove(move));
+
+            if (true !== result) {
+                this.logger.error('Could not play conditional move', { result });
+            }
+        } catch (e) {
+            this.logger.warning('Error while checking conditional moves, ignoring.', { message: e.message, e });
         }
     }
 
@@ -281,7 +342,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
             if (!game.isEnded()) {
-                this.makeAIMoveIfApplicable();
+                this.makeAutomatedMoves();
             }
 
             this.cancelUndoRequestIfAny(byPlayerIndex);
@@ -363,7 +424,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.logger.info('Game Started.');
 
-        this.makeAIMoveIfApplicable();
+        this.makeAutomatedMoves();
     }
 
     private affectPlayersColors(): void
@@ -847,7 +908,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         if (null !== hostedGameServer.game) {
             hostedGameServer.bindTimeControl();
-            hostedGameServer.makeAIMoveIfApplicable();
+            hostedGameServer.makeAutomatedMoves();
         }
 
         return hostedGameServer;

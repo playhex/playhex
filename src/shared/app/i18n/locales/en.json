@@ -146,6 +146,8 @@
     "no": "No",
     "language": "Language",
     "cancel": "Cancel",
+    "save": "Save",
+    "discard": "Discard",
     "pass": "Pass",
     "explore": "Explore",
     "close": "Close",
@@ -189,6 +191,7 @@
     },
     "offline_game_explain": "Offline games run on your device only, so that you can play without internet connection. The PlayHex server is not involved.",
     "loading_game": "Loading game…",
+    "loading": "Loading…",
     "tournament": "Tournament",
     "now!": "Now!",
     "register_on_challonge": "Register on Challonge",
@@ -208,6 +211,13 @@
     "force_board_orientation_mode": "Force displaying board in landscape or portrait for this screen",
     "resign": "Resign",
     "auto": "Auto",
+    "conditional_moves": {
+        "title": "Conditional moves",
+        "title_short": "If-moves",
+        "cut_move": "Cut move",
+        "inactive_lines": "Inactive lines",
+        "clear_inactive_lines": "Clear inactive lines"
+    },
     "board_orientation": {
         "title": "Orientation",
         "description": "Your preferred board rotation for the portrait and landscape screen orientations.",

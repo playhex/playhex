@@ -243,13 +243,13 @@ export default class HostedGameRepository
 
     async createGame(host: Player, gameOptions: HostedGameOptions, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
     {
-        const hostedGame = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
+        const hostedGameServer = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
 
         if ('ai' === gameOptions.opponentType) {
             try {
                 const opponent = await findAIOpponent(gameOptions);
                 if (opponent == null) throw new GameError('No matching AI found');
-                hostedGame.playerJoin(opponent);
+                hostedGameServer.playerJoin(opponent);
             } catch (e) {
                 if (e instanceof FindAIError) {
                     throw new GameError(e.message);
@@ -258,11 +258,20 @@ export default class HostedGameRepository
             }
         }
 
-        this.activeGames[hostedGame.getPublicId()] = hostedGame;
+        this.activeGames[hostedGameServer.getPublicId()] = hostedGameServer;
 
-        this.listenHostedGameServer(hostedGame);
+        this.listenHostedGameServer(hostedGameServer);
 
-        return hostedGame;
+        try {
+            await this.hostedGamePersister.persist(hostedGameServer.getHostedGame());
+        } catch (e) {
+            logger.error('Could not persist game after creation', {
+                hostedGamePublicId: hostedGameServer.getPublicId(),
+                e,
+            });
+        }
+
+        return hostedGameServer;
     }
 
     async rematchGame(host: Player, gameId: string): Promise<HostedGame>
@@ -289,8 +298,7 @@ export default class HostedGameRepository
         game.rematch = rematch.getHostedGame();
 
         try {
-            await this.hostedGamePersister.persist(game.rematch);
-            await this.hostedGamePersister.persistLinkToRematch(game);
+            await this.hostedGamePersister.persist(game);
         } catch (e) {
             if (isDuplicateError(e)) {
                 // In case both players rematch at same time, 2 games are created in memory but with same rematchedFromId, so one game won't persist thanks to unicity constraint.
