@@ -42,6 +42,11 @@ notifier.on('gameEnd', (hostedGame) => {
 
     const loser = getLoser(hostedGame);
 
+    if (null === loser) {
+        play('/sounds/lisp/GenericNotify.ogg');
+        return;
+    }
+
     if (isMe(loser)) {
         play('/sounds/lisp/Defeat.ogg');
     } else {
@@ -51,6 +56,10 @@ notifier.on('gameEnd', (hostedGame) => {
 
 notifier.on('chatMessage', (hostedGame, chatMessage) => {
     if (!viewingGame(hostedGame)) {
+        return;
+    }
+
+    if (null === chatMessage.player) {
         return;
     }
 

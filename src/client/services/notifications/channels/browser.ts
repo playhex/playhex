@@ -102,6 +102,10 @@ notifier.on('move', (hostedGame) => {
 });
 
 notifier.on('chatMessage', (hostedGame, chatMessage) => {
+    if (null === chatMessage.player) {
+        return;
+    }
+
     if (isMe(chatMessage.player)) {
         return;
     }

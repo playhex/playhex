@@ -51,10 +51,10 @@ export const getOpponent = (hostedGame: HostedGame): null | Player => {
     return hostedGame.hostedGameToPlayers[1 - myIndex].player;
 };
 
-export const isMe = (player: null | Player): boolean => {
+export const isMe = (player: Player): boolean => {
     const { loggedInPlayer } = useAuthStore();
 
-    if (null === loggedInPlayer || null === player) {
+    if (null === loggedInPlayer) {
         return false;
     }
 

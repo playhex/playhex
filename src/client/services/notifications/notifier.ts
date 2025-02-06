@@ -6,6 +6,9 @@ type NotifiableEvents = {
 
     move: (hostedGame: HostedGame, move: Move) => void;
 
+    /**
+     * A game ended, or canceled.
+     */
     gameEnd: (hostedGame: HostedGame) => void;
 
     /**
