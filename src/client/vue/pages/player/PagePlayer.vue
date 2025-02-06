@@ -30,7 +30,6 @@ import { Directive } from 'vue';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters';
 import { getOtherPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination';
-import { useSearchGamesSyncHash } from '../../composables/searchGamesSyncHash';
 
 const { slug } = useRoute().params;
 
@@ -156,8 +155,6 @@ const searchGamesParameters = ref<SearchGamesParameters>({
     endedAtSort: 'desc',
     paginationPageSize: DEFAULT_PAGE_SIZE,
 });
-
-useSearchGamesSyncHash(searchGamesParameters);
 
 const { totalPages, goPagePrevious, goPageNext } = useSearchGamesPagination(
     searchGamesParameters,
