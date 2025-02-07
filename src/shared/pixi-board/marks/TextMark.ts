@@ -2,6 +2,9 @@ import { Container, Text, TextStyle } from 'pixi.js';
 import { Mark } from '../Mark';
 import Hex from '../Hex';
 
+/**
+ * Show a text, generally a letter, on given coordinates.
+ */
 export default class TextMark extends Mark
 {
     constructor(

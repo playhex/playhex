@@ -3,8 +3,8 @@ import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pi
 import Hex from './Hex';
 import { Theme, themes } from './BoardTheme';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import SwapableSprite from './SwapableSprite';
-import SwapedSprite from './SwapedSprite';
+import SwappableMark from './marks/SwappableMark';
+import SwappedMark from './marks/SwappedMark';
 import { createShadingPattern, ShadingPatternType } from './shading-patterns';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced';
 import { Mark } from './Mark';
@@ -132,8 +132,20 @@ const defaultOptions: GameViewOptions = {
  */
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
+    /**
+     * Name of marks group used when no group passed
+     */
     static MARKS_GROUP_DEFAULT = '_default';
+
+    /**
+     * Name of marks group used for simulation moves
+     */
     static MARKS_GROUP_SIMULATION = '_simulation';
+
+    /**
+     * Name of marks group used for swappable and swapped
+     */
+    static MARKS_GROUP_SWAP = '_swap';
 
     private options: GameViewOptions;
 
@@ -149,8 +161,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private sidesGraphics: [Graphics, Graphics];
 
     private lastSimpleMoveHighlighted: null | Coords = null;
-    private swapable: SwapableSprite;
-    private swaped: SwapedSprite;
 
     private previewedMove: null | { move: Move, playerIndex: PlayerIndex } = null;
 
@@ -367,9 +377,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.gameContainer.addChild(this.createCoords());
         }
 
-        this.swapable = this.createSwapable();
-        this.swaped = this.createSwaped();
-
         this.createAndAddHexes();
         this.addAllMoves();
         this.addAllSimulatedMoves();
@@ -377,8 +384,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.showPreviewedMove();
 
         this.gameContainer.addChild(
-            this.swapable,
-            this.swaped,
             this.marksContainer,
         );
     }
@@ -768,8 +773,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.lastSimpleMoveHighlighted = null;
         }
 
-        this.showSwapable(false);
-        this.showSwaped(false);
+        this.removeMarks(GameView.MARKS_GROUP_SWAP);
     }
 
     /**
@@ -777,7 +781,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * For swap move, shows arrows if possible to swap opponent move,
      * or show a "S" to show that last move was swapped.
      *
-     * @param {Move} move Override last move to highlight this move instead.
+     * @param move Override last move to highlight this move instead.
      */
     private highlightLastMove(move: null | Move = null): void
     {
@@ -790,7 +794,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         if (this.game.canSwapNow()) {
-            this.showSwapable(lastMove);
+            this.showSwappable(lastMove);
             return;
         }
 
@@ -800,7 +804,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         if ('swap-pieces' === lastMove.getSpecialMoveType()) {
             const { mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
-            this.showSwaped(mirror);
+            this.showSwapped(mirror);
             return;
         }
 
@@ -953,57 +957,28 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
     }
 
-    /**
-     * Returns opposite of board rotation to keep the top at the top,
-     * but fixes cases where cells are pointy-top oriented by removing PI/6 radians.
-     */
-    private fixedRotation(): number
+    showSwappable(swappable: Coords | false): this
     {
-        return -ceil(((this.gameContainer.rotation / PI_6) + 1) / 2) * PI_3 + PI_6;
-    }
+        this.removeMarks(GameView.MARKS_GROUP_SWAP);
 
-    private createSwapable(): SwapableSprite
-    {
-        const swapable = new SwapableSprite();
-
-        swapable.rotation = this.fixedRotation();
-        swapable.visible = false;
-
-        return swapable;
-    }
-
-    private createSwaped(): SwapedSprite
-    {
-        const swaped = new SwapedSprite();
-
-        swaped.rotation = -this.gameContainer.rotation;
-        swaped.visible = false;
-
-        return swaped;
-    }
-
-    showSwapable(swapable: Coords | false): this
-    {
-        if (false === swapable) {
-            this.swapable.visible = false;
+        if (!swappable) {
             return this;
         }
 
-        this.swapable.position = Hex.coords(swapable.row, swapable.col);
-        this.swapable.visible = true;
+        this.addMark(new SwappableMark().setCoords(swappable), GameView.MARKS_GROUP_SWAP);
 
         return this;
     }
 
-    showSwaped(swaped: Coords | false): this
+    showSwapped(swapped: Coords | false): this
     {
-        if (false === swaped) {
-            this.swaped.visible = false;
+        this.removeMarks(GameView.MARKS_GROUP_SWAP);
+
+        if (!swapped) {
             return this;
         }
 
-        this.swaped.position = Hex.coords(swaped.row, swaped.col);
-        this.swaped.visible = true;
+        this.addMark(new SwappedMark().setCoords(swapped), GameView.MARKS_GROUP_SWAP);
 
         return this;
     }
@@ -1159,7 +1134,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             }
         }
 
-        this.highlightLastMove(); // do not pass move to highlight last played and not simulated move when simulating
+        this.highlightLastMove(this.simulationMode
+            ? null // do not pass move to highlight last played and not simulated move when simulating
+            : move,
+        );
     }
 
     private addAllMoves(): void
@@ -1367,21 +1345,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    removeMarks(group: null | string = null): void
+    removeMarks(group: string = GameView.MARKS_GROUP_DEFAULT): void
     {
-        if (null !== group) {
-            if (undefined === this.marks[group]) {
-                return;
-            }
-
-            this.marksContainer.removeChild(...this.marks[group]);
-            this.marks[group] = [];
-
+        if (undefined === this.marks[group]) {
             return;
         }
 
-        this.marksContainer.removeChildren();
-        this.marks = {};
+        this.marksContainer.removeChild(...this.marks[group]);
+        this.marks[group] = [];
     }
 
     private updateMarksRotation(): void

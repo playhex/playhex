@@ -1,16 +1,20 @@
 import { Container, Text, TextStyle } from 'pixi.js';
-import Hex from './Hex';
+import { Mark } from '../Mark';
+import Hex from '../Hex';
 
-export default class SwapedSprite extends Container
+/**
+ * Show a 'S' on second player stone if she swapped.
+ */
+export default class SwappedMark extends Mark
 {
     constructor()
     {
         super();
 
-        this.draw();
+        this.alwaysTop = true;
     }
 
-    private draw(): void
+    protected override draw(): Container
     {
         const coordsTextStyle = new TextStyle({
             fontFamily: 'Arial',
@@ -24,6 +28,6 @@ export default class SwapedSprite extends Container
         S.anchor.set(0.5, 0.5);
         S.alpha = 0.4;
 
-        this.addChild(S);
+        return S;
     }
 }

@@ -1,16 +1,21 @@
 import { Container, Graphics } from 'pixi.js';
-import Hex from './Hex';
+import { Mark } from '../Mark';
+import Hex from '../Hex';
 
-export default class SwapableSprite extends Container
+/**
+ * Shows that first stone can be swapped if applicable.
+ */
+export default class SwappableMark extends Mark
 {
     constructor()
     {
         super();
 
-        this.draw();
+        this.alwaysFlatTop = true;
+        this.alwaysTop = true;
     }
 
-    private draw(): void
+    protected override draw(): Container
     {
         const g = new Graphics();
         const outside = Hex.RADIUS * (1 - 6 * Hex.PADDING);
@@ -31,10 +36,10 @@ export default class SwapableSprite extends Container
             Hex.cornerCoords(offset - 0, insideArrow),
         ]);
 
-        drawArrow(1.5);
-        drawArrow(4.5);
+        drawArrow(2.5);
+        drawArrow(5.5);
         g.fill({ color: 0xffffff, alpha: 0.4 });
 
-        this.addChild(g);
+        return g;
     }
 }

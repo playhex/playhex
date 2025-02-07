@@ -2,6 +2,9 @@ import { Container, Graphics } from 'pixi.js';
 import { Coords } from '../game-engine';
 import Hex from './Hex';
 
+const PI_6 = Math.PI / 6;
+const PI_3 = Math.PI / 3;
+
 export class Mark extends Container
 {
     private initialized = false;
@@ -14,6 +17,14 @@ export class Mark extends Container
      * When board rotate, always keep mark at same rotation.
      */
     protected alwaysTop = false;
+
+    /**
+     * When board rotate and hexagons are tilted 30°
+     * (flat-top vs pointy-top orientation),
+     * set this to true to make this mark always flat-top,
+     * and automatically add 30° or not depending on orientation.
+     */
+    protected alwaysFlatTop = false;
 
     initOnce(): void
     {
@@ -81,6 +92,12 @@ export class Mark extends Container
      */
     updateRotation(containerRotation: number): void
     {
-        this.rotationFixedContainer.rotation = -containerRotation;
+        if (this.alwaysTop) {
+            this.rotationFixedContainer.rotation = -containerRotation;
+        }
+
+        if (this.alwaysFlatTop) {
+            this.rotationFixedContainer.rotation = Math.ceil(((this.rotationFixedContainer.rotation / PI_6) + 1) / 2) * PI_3 + PI_6;
+        }
     }
 }
