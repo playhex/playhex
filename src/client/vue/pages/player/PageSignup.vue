@@ -56,9 +56,12 @@ const onSubmit = async () => {
 
                     <div class="mb-3">
                         <label for="form-pseudo" class="form-label">{{ $t('username') }}</label>
-                        <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="emailHelp">
-                        <div class="invalid-feedback">
+                        <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="usernameHelp usernameEmailWarning">
+                        <div id="usernameHelp" class="invalid-feedback">
                             {{ pseudoValidation?.reason }}
+                        </div>
+                        <div id="usernameEmailWarning" class="form-text text-warning">
+                            <span v-if="pseudo.match(/@/)">{{ $t('username_not_an_email_warning') }}</span>
                         </div>
                     </div>
 

@@ -104,6 +104,7 @@
     "privacy_policy": "Privacy policy",
     "license_agpl": "License AGPL-3.0",
     "create_account": "Create an account",
+    "username_not_an_email_warning": "Hey, it seems you are entering your email, but PlayHex only needs an username. Your email would be publicly visible…",
     "already_have_account_login_instead": "Already have an account? {login} instead",
     "already_have_account_login_instead_link_label": "Log in",
     "no_account_sign_up_instead": "No account? {signUp} instead",
