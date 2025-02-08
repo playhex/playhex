@@ -12,6 +12,51 @@ const localStorageKey = 'selectedLocale';
 
 const getPlayerSelectedLocale = (): null | string => localStorage?.getItem(localStorageKey);
 
+/**
+ * Get list of player used locales from its browser, and available in translations.
+ * Used to display in quick locales switcher.
+ */
+export const getQuickLocales = (): string[] => {
+    const availableLocalesCodes = Object.keys(availableLocales);
+    const locales: string[] = [];
+
+    for (const navigatorLocale of navigator.languages) {
+        if (availableLocalesCodes.includes(navigatorLocale)) {
+            locales.push(navigatorLocale);
+        }
+    }
+
+    if (!locales.includes('en')) {
+        // Always show english, at least at last choice, because source locale, always available.
+        locales.push('en');
+    }
+
+    return locales;
+};
+
+/**
+ * @returns Locale used by player but translation not exists yet
+ */
+export const getPlayerMissingLocale = (): null | string => {
+    const availableLocalesCodes = Object.keys(availableLocales);
+
+    for (const navigatorLocale of navigator.languages) {
+        // Exclude sub locales like "fr-FR", "en-US", keep only "fr", "en"
+        if (navigatorLocale.match(/(-|_)/)) {
+            continue;
+        }
+
+        // Locale already exists
+        if (availableLocalesCodes.includes(navigatorLocale)) {
+            continue;
+        }
+
+        return navigatorLocale;
+    }
+
+    return null;
+};
+
 const getSupportedBrowserLocale = (): null | string => {
     const availableLocalesCodes = Object.keys(availableLocales);
 

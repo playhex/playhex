@@ -9,7 +9,7 @@ import { watch, Ref, ref, onMounted, onUnmounted } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
 import { authChangePassword } from '@client/apiClient';
-import { availableLocales, setLocale } from '../../../../shared/app/i18n';
+import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n';
 import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns';
 import i18n from 'i18next';
 import { Game } from '../../../../shared/game-engine';
@@ -136,6 +136,23 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('hashchange', simulateTargetPseudoClassHandler);
 });
+
+/*
+ * Custom message for player when his locale is not yet translated
+ */
+const playerMissingLocale = getPlayerMissingLocale();
+
+/**
+ * For "fr", will show: 'French ("français")'
+ */
+const getLocaleName = (locale: string): string => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const languageNamesLocale = new (Intl as any).DisplayNames([locale], { type: 'language' });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const languageNamesEn = new (Intl as any).DisplayNames(['en'], { type: 'language' });
+
+    return `${languageNamesEn.of(locale)} ("${languageNamesLocale.of(locale)}")`;
+};
 </script>
 
 <template>
@@ -149,6 +166,18 @@ onUnmounted(() => {
 
             <div class="row">
                 <div class="col-sm-8 col-md-4">
+
+                    <!-- Quick selector -->
+                    <!-- should probably be moved in future player menu -->
+                    <small>Quick selector:</small>
+                    {{ ' ' }}
+                    <button
+                        class="btn btn-sm btn-link ps-0"
+                        v-for="locale of getQuickLocales()"
+                        :key="locale"
+                        @click="setLocale(locale)"
+                    >{{ availableLocales[locale].label.split('(')[0].trim() }}</button>
+
                     <select class="form-select" @change="e => e.target && setLocale((e.target as HTMLSelectElement).value)">
                         <option
                             v-for="({ label }, locale) in availableLocales"
@@ -160,13 +189,22 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <p class="mt-1"><small>
-                <i18next :translation="$t('add_your_language')">
-                    <template #link>
-                        <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">{{ $t('add_your_language_link') }}</a>
-                    </template>
-                </i18next>
-            </small></p>
+            <p v-if="null === playerMissingLocale" class="mt-1">
+                <small>
+                    <i18next :translation="$t('add_your_language')">
+                        <template #link>
+                            <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">{{ $t('add_your_language_link') }}</a>
+                        </template>
+                    </i18next>
+                </small>
+            </p>
+
+            <p v-else>
+                <small>
+                    Sorry, <strong>{{ getLocaleName(playerMissingLocale) }}</strong> translation doesn't exist yet.
+                    <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">Add it with Weblate</a>!
+                </small>
+            </p>
         </div>
     </section>
 
