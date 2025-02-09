@@ -115,6 +115,14 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     }
 
     /**
+     * Conditional moves, submitted.
+     */
+    getConditionalMoves(): ConditionalMovesStruct
+    {
+        return this.conditionalMoves;
+    }
+
+    /**
      * Current state, not yet submitted.
      */
     getConditionalMovesDirty(): ConditionalMovesStruct
@@ -197,7 +205,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     startNewLine(): void
     {
-        this.gameView.enableSimulationMode(this.getOpponentIndex());
+        this.enableSimulationMode();
         this.setSelectedLine([]);
         this.markNextConditionalMoves();
     }
@@ -207,7 +215,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     setSelectedLine(line: string[]): void
     {
-        this.gameView.enableSimulationMode(this.getOpponentIndex());
+        this.enableSimulationMode();
         this.selectedLine = [...line];
 
         if (line.length > 0) {
@@ -246,6 +254,14 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     }
 
     /**
+     * Start editing.
+     */
+    enableSimulationMode(): void
+    {
+        this.gameView.enableSimulationMode(this.getOpponentIndex());
+    }
+
+    /**
      * Stop editing.
      */
     disableSimulationMode(): void
@@ -259,7 +275,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     deleteAllInactives(): void
     {
-        this.gameView.enableSimulationMode(this.getOpponentIndex());
+        this.enableSimulationMode();
 
         this.conditionalMovesDirty.unplayedLines = [];
         this.hasChanges = true;

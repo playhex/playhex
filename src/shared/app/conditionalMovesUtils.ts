@@ -312,6 +312,11 @@ export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: string[])
         }
 
         cutRecursive(currentLine[2], currentMoves);
+
+        // do not keep empty sublines like: [a1, a2, []]
+        if (0 === currentLine[2].length) {
+            currentLine.splice(2);
+        }
     };
 
     cutRecursive(tree, [...moves]);

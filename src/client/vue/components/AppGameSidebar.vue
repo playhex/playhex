@@ -341,6 +341,20 @@ gameView.on('orientationChanged', () => currentOrientation.value = gameView.getC
  * Conditional moves
  */
 const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+
+watchEffect(() => {
+    if (null === conditionalMovesEditor.value) {
+        return;
+    }
+
+    if (currentTab.value === 'conditional_moves') {
+        conditionalMovesEditor.value.enableSimulationMode();
+    } else {
+        if (!conditionalMovesEditor.value.getHasChanges()) {
+            conditionalMovesEditor.value.disableSimulationMode();
+        }
+    }
+});
 </script>
 
 <template>
@@ -358,7 +372,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
                 <span class="d-none d-md-inline">
                     {{ $t('conditional_moves.title_short') }}
                 </span>
-                <span v-if="null !== conditionalMovesEditor && conditionalMovesEditor.getConditionalMovesDirty().tree.length > 0"> ({{ conditionalMovesEditor.getConditionalMovesDirty().tree.length }})</span>
+                <span v-if="null !== conditionalMovesEditor && conditionalMovesEditor.getConditionalMoves().tree.length > 0"> ({{ conditionalMovesEditor.getConditionalMoves().tree.length }})</span>
             </a>
 
             <a class="nav-link" :class="tabActiveClass('info')" @click.prevent="currentTab = 'info'" href="#"><BIconInfoLg /> <span class="d-none d-md-inline">{{ $t('game.info') }}</span></a>

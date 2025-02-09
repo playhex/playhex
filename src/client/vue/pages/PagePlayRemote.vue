@@ -631,6 +631,11 @@ onUnmounted(() => resetConditionalMoves());
                         <BIconRewind />
                     </button>
 
+                    <!-- Conditional moves -->
+                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="conditionalMovesEditor?.enableSimulationMode()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
+                        <BIconSignpostSplit />
+                    </button>
+
                     <!-- Resign -->
                     <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">
                         <BIconFlag />
@@ -641,11 +646,6 @@ onUnmounted(() => resetConditionalMoves());
                     <button type="button" class="btn btn-outline-warning" v-if="canCancel()" @click="cancel()">
                         <BIconXLg />
                         <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
-                    </button>
-
-                    <!-- Conditional moves -->
-                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="conditionalMovesEditor?.startNewLine()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
-                        <BIconSignpostSplit />
                     </button>
 
                     <!-- Confirm move -->

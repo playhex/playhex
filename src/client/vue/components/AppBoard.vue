@@ -228,7 +228,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
 
             <!-- Close conditional moves edition -->
-            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-danger">
+            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-warning">
                 <BIconX />
             </button>
         </div>

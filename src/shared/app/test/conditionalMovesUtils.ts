@@ -332,6 +332,16 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(tree, [['a1'], ['b1', 'b2']]);
         });
 
+        it('cut subline move', () => {
+            const tree: ConditionalMovesTree = [
+                ['a1', 'a2', [['a3', 'a4']]],
+            ];
+
+            conditionalMovesCut(tree, ['a1', 'a2', 'a3']);
+
+            assert.deepStrictEqual(tree, [['a1', 'a2']]);
+        });
+
         it('cuts all when passing empty', () => {
             const tree: ConditionalMovesTree = [
                 ['a1', 'a2'],
