@@ -46,6 +46,7 @@ i18next.on('languageChanged', () => {
         <p class="infos d-flex flex-column flex-md-row justify-content-center gap-md-4 text-center">
             <span>{{ $t('project_under_development') }}</span>
             <span v-if="date">{{ $t('last_change', { date }) }}</span>
+            <router-link :to="{ name: 'guide' }">PlayHex guide</router-link>
             <router-link :to="{ name: 'contribute' }">{{ $t('contribute') }}</router-link>
             <router-link :to="{ name: 'contributors' }">{{ $t('contributors') }}</router-link>
             <router-link :to="{ name: 'rescue' }">Rescue page</router-link>

@@ -96,6 +96,22 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        path: '/guide',
+        component: () => import('@client/vue/pages/guide/LayoutGuide.vue'),
+        children: [
+            {
+                name: 'guide',
+                path: '',
+                component: () => import('@client/vue/pages/guide/PageIndex.vue'),
+            },
+            {
+                name: 'guide_conditional_moves',
+                path: 'conditional-moves',
+                component: () => import('@client/vue/pages/guide/PageConditionalMoves.vue'),
+            },
+        ],
+    },
+    {
         name: 'rescue',
         path: '/rescue',
         component: () => import('@client/vue/pages/PageRescue.vue'),
