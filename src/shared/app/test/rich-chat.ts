@@ -41,11 +41,12 @@ describe('Rich Chat', () => {
             .filter(item => item instanceof ChatMessage || 'date' === item.type)
         ;
 
-        assert.strictEqual(richChat.length, 4);
-        assert.strictEqual(richChat[0], message0);
-        assert.strictEqual(richChat[1], message1);
-        assert.deepStrictEqual(richChat[2], { type: 'date', date: new Date('2024-08-25T10:00:00Z') });
-        assert.strictEqual(richChat[3], message2);
+        assert.strictEqual(richChat.length, 5);
+        assert.deepStrictEqual(richChat[0], { type: 'date', date: new Date('2024-08-24T12:01:00Z') });
+        assert.strictEqual(richChat[1], message0);
+        assert.strictEqual(richChat[2], message1);
+        assert.deepStrictEqual(richChat[3], { type: 'date', date: new Date('2024-08-25T10:00:00Z') });
+        assert.strictEqual(richChat[4], message2);
     });
 
     it('yield move number headers', () => {

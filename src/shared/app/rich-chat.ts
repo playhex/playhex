@@ -1,3 +1,4 @@
+import { isSameDay } from 'date-fns';
 import { ChatMessage, HostedGame } from './models';
 
 /*
@@ -89,16 +90,11 @@ abstract class AbstractChatHeaderGenerator
  */
 class DateHeader extends AbstractChatHeaderGenerator
 {
-    private currentDate: Date;
-
-    override init(): void
-    {
-        this.currentDate = this.hostedGame.gameData?.startedAt ?? this.hostedGame.createdAt;
-    }
+    private currentDate: null | Date = null;
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        if (this.isSameDay(chatMessage.createdAt)) {
+        if (null !== this.currentDate && isSameDay(this.currentDate, chatMessage.createdAt)) {
             return [];
         }
 
@@ -107,14 +103,6 @@ class DateHeader extends AbstractChatHeaderGenerator
         return [
             { type: 'date', date: this.currentDate },
         ];
-    }
-
-    private isSameDay(date: Date): boolean
-    {
-        return date.getFullYear() === this.currentDate.getFullYear()
-            && date.getMonth() === this.currentDate.getMonth()
-            && date.getDate() === this.currentDate.getDate()
-        ;
     }
 }
 

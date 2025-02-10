@@ -14,7 +14,7 @@ import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import Move from '@shared/game-engine/Move';
 import { canPlayerChatInGame } from '../../../shared/app/chatUtils';
-import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay } from 'date-fns';
+import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import useAnalyzeStore from '../../stores/analyzeStore';
 import useServerDateStore from '../../stores/serverDateStore';
@@ -60,7 +60,23 @@ if (null === loggedInPlayer) {
     throw new Error('Unexpected null logged in player');
 }
 
-const formatChatDateHeader = (date: Date): string => intlFormat(date, { day: 'numeric', month: 'long' }, { locale: autoLocale() });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const rtf = new (Intl as any).RelativeTimeFormat(autoLocale(), { numeric: 'auto' });
+
+/**
+ * @returns Localized "today", "yesterday", or "February 9"
+ */
+const formatChatDateHeader = (date: Date): string => {
+    if (isToday(date)) {
+        return rtf.format(0, 'day');
+    }
+
+    if (isYesterday(date)) {
+        return rtf.format(-1, 'day');
+    }
+
+    return intlFormat(date, { day: 'numeric', month: 'long' }, { locale: autoLocale() });
+};
 const formatDateInfo = (date: null | Date): string => null === date ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
