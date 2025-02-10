@@ -16,35 +16,35 @@ useSeoMeta({
 
     <p>Conditional moves are only available for <strong>correspondence games</strong>.</p>
 
-    <p>They are useful to plan your answers to some opponent moves while you are offline.</p>
+    <p>They are useful for planning your responses to some of your opponent's moves while you are offline.</p>
 
     <h2>Add conditional moves</h2>
 
     <AppGuideImage src="conditional-moves/tab.png" caption="Conditional moves tab" />
 
     <p>
-        First, enable conditional moves edition. To do so,
+        First, enable conditional moves editing. To do so,
     </p>
 
     <ul>
-        <li>either open "{{ $t('conditional_moves.title_short') }}" tab in game sidebar,</li>
-        <li>or use <button class="btn btn-outline-primary"><BIconSignpostSplit /></button> button under the game board.</li>
+        <li>either open the "{{ $t('conditional_moves.title_short') }}" tab in game sidebar,</li>
+        <li>or use the <button class="btn btn-outline-primary"><BIconSignpostSplit /></button> button under the game board.</li>
     </ul>
 
     <p>
-        The conditional moves menu under game board will also show up.
-        You are now in conditional moves edition mode.
+        The conditional moves menu under the game board will then appear.
+        You are now in conditional moves editing mode.
     </p>
 
     <AppGuideImage src="conditional-moves/lines.png" caption="Conditional moves interface. In this case, 2 conditional moves: e2 will trigger d3, d11 will trigger e11." />
 
     <p>
-        Now, add conditional moves by playing opponent move, and your answer.
+        Now, add conditional moves by playing your opponent's move and your response.
     </p>
 
     <p>
-        You can go deeper and playing a longer line.
-        In this case, next answers will be trigger only if opponent play exact same line.
+        You can go deeper by playing a longer sequence.
+        In this case, the next responses will be triggered only if your opponent plays the exact same sequence.
     </p>
 
     <p>
@@ -59,32 +59,32 @@ useSeoMeta({
     </p>
 
     <p>
-        To add other variants in a same line,
+        To add other variants in the same line,
     </p>
 
     <ul>
-        <li>either click on a move in the conditional move tree to add new moves after selected move,</li>
-        <li>or click on the conditional move on the board to go back to the position, and enter a new move.</li>
+        <li>either click on a move in the conditional move tree to add new moves after the selected move,</li>
+        <li>or click on the conditional move on the board to return to that position and enter a new move.</li>
     </ul>
 
     <p>
-        Note that there can be only one answer for a given opponent move.
-        So <strong>playing another answer will replace last answer</strong>,
+        Note that there can only be one response for a given opponent move.
+        So <strong>playing another response will replace last response</strong>,
         and remove subsequent lines.
     </p>
 
     <AppGuideImage src="conditional-moves/numbers.png" caption="There is two subsequent lines after moves 1 and 2." />
 
     <p>
-        From there, you can add new variants, other than both "3" cells,
-        or click on "3" to explore this line, then replace answer…
+        From there, you can click on '3' to explore this line, add variants inside, replace responses,
+        or click on an empty cell to create a new variant from this position…
     </p>
 
     <h2>Save conditional moves</h2>
 
     <p>
-        <strong>Save</strong> your conditional moves when you finished modifications.
-        It will replace last version, and make current moves ready to trigger.
+        <strong>Save</strong> your conditional moves when you have finished making modifications.
+        It will replace the last version and make the current moves ready to trigger.
     </p>
 
     <p><strong>Discard</strong> will revert to the last version of conditional moves.</p>
@@ -92,16 +92,16 @@ useSeoMeta({
     <h2>How they are triggered</h2>
 
     <p>
-        When opponent play a move, two cases:
+        When your opponent plays a move, there are two possibilities:
     </p>
 
     <ul>
-        <li>no conditional move match: no answer triggered, all your active lines go to "Inactive lines"</li>
-        <li>a conditional move matches: answer is played, and tree is updated:</li>
+        <li>No conditional move matches: no response is triggered, and all your active lines move to 'Inactive lines'.</li>
+        <li>A conditional move matches: the response is played, and the tree is updated:</li>
         <ul>
-            <li>move and answer are shifted, removed from tree,</li>
-            <li>if there is subsequent lines, they are still active.</li>
-            <li>All other unplayed lines go to "Inactive lines".</li>
+            <li>the move and response are shifted and removed from the tree,</li>
+            <li>if there is subsequent lines, they remain active.</li>
+            <li>All other unplayed lines move to 'Inactive lines'.</li>
         </ul>
     </ul>
 
@@ -112,7 +112,7 @@ useSeoMeta({
     />
 
     <p>
-        In this case, 2 conditional moves, opponent <code>e2</code> will trigger <code>d3</code>,
+        In this case, there are 2 conditional moves, opponent <code>e2</code> will trigger <code>d3</code>,
         and opponent <code>d11</code> will trigger <code>e11</code>.
     </p>
 
@@ -123,7 +123,7 @@ useSeoMeta({
     </p>
 
     <p>
-        If <code>d1</code> were played, nothing happens because, although it is in a subsequent line, it is relevant only after <code>e2 d3</code>.
+        If <code>d1</code> is played, nothing happens because, although it is in a subsequent line, it is relevant only after <code>e2 d3</code>.
         So all lines go to "Inactive lines".
     </p>
 
@@ -145,24 +145,24 @@ useSeoMeta({
     <h2>Why inactive lines</h2>
 
     <p>
-        You create conditional moves that are relevant at given position.
-        They maybe become no longer relevant in future position.
-        To prevent having previous conditional moves triggering later, when it is no longer relevant,
-        all unplayed lines are disabled, and go to "Inactive lines".
+        You create conditional moves that are relevant at a given position.
+        They may no longer be relevant in a future position.
+        To prevent previous conditional moves from triggering later when they are no longer relevant,
+        all unplayed lines are disabled and move to 'Inactive lines'.
     </p>
 
     <p>
-        Inactive lines are listed under active lines.
+        Inactive lines are listed below active lines.
         You can click on inactive lines to see/reuse them.
-        It will merge the line back to conditional moves,
-        and Save to make them active again (or Discard to cancel).
+        It will merge the line back into the conditional moves,
+        and you can Save to make them active again (or Discard to cancel).
     </p>
 
-    <h2>Other edition tools</h2>
+    <h2>Other editing tools</h2>
 
     <p>
         <button class="btn btn-outline-primary"><BIconSignpostSplit /></button>
-        Start conditional moves edition.
+        Start conditional moves editing.
     </p>
 
     <p>
@@ -172,27 +172,27 @@ useSeoMeta({
 
     <p>
         <button class="btn btn-outline-primary"><BIconChevronLeft /></button>
-        Rewind one move in conditional moves, to add a variant or replace an answer.
+        Rewind one move in conditional moves, to add a variant or replace an response.
     </p>
 
     <p>
         <button class="btn btn-outline-danger"><BIconScissors /></button>
-        Remove current move, and all subsequent moves/answers/lines.
+        Remove current move, and all subsequent moves/responses/lines.
     </p>
 
     <p>
         <button class="btn btn-outline-warning"><BIconX /></button>
-        Discard changes and stop conditional move edition.
+        Discard changes and stop conditional move editing.
     </p>
 
     <p>
-        On mobile, you can do all editions without sidebar:
+        On mobile, you can make all edits without the sidebar:
     </p>
 
     <ul>
         <li>click on numbers on empty cells to open existing lines,</li>
-        <li>replace answer or add new variants from there,</li>
-        <li>click on previous moves in line to go back in the line, and add variants,</li>
+        <li>replace response or add new variants from there,</li>
+        <li>click on previous moves in the sequence to go back and add variants,</li>
         <li>remove lines with scissors,</li>
         <li>then save or discard.</li>
     </ul>
