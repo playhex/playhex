@@ -300,7 +300,9 @@
     "conditional_moves": {
         "title": "Coups conditionnels",
         "title_short": "Coups-si",
-        "cut_move": "Couper le coup"
+        "cut_move": "Couper le coup",
+        "clear_inactive_lines": "Effacer les lignes inactives",
+        "inactive_lines": "Lignes inactives"
     },
     "contributors": "Contributeurs",
     "contribute": "Contribuer",
@@ -317,5 +319,9 @@
         "ended": "Terminée",
         "created": "Créée",
         "playing": "En cours"
-    }
+    },
+    "discard": "Annuler",
+    "save": "Enregistrer",
+    "loading": "Chargement…",
+    "username_not_an_email_warning": "Hey, on dirait que tu saisis ton email, mais PlayHex a juste besoin d'un nom d'utilisateur. Ton email serait visible de tous…"
 }
