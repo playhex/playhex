@@ -11,13 +11,8 @@ useSeoMeta({
     <h1>How AI analysis is done</h1>
 
     <p>
-        Once you finish a game, you can ask for AI analysis.
-        This tool helps you to get better at Hex by reviewing your games.
-        <br>
-        It shows when you took or lost the advantage, and which move you
-        could've played instead.
-
-        Note that as for now, the method used for analysis is relatively weak.
+        If you want to see how to use and read AI analysis, see
+        <router-link :to="{ name: 'guide-ai-analysis' }">AI analysis in PlayHex guide</router-link>.
     </p>
 
     <h2>Implementation details</h2>

@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
-import i18next from 'i18next';
 import AppGuideImage from './AppGuideImage.vue';
 import { BIconChevronLeft, BIconCrosshair, BIconScissors, BIconSignpostSplit, BIconX } from 'bootstrap-icons-vue';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
 import AppConditionalMoveTree from '../../components/AppConditionalMoveTree.vue';
 
 useSeoMeta({
-    title: i18next.t('conditional_moves.title'),
+    title: 'Conditional moves',
 });
 </script>
 
 <template>
-    <h1>{{ $t('conditional_moves.title') }}</h1>
+    <h1>Conditional moves</h1>
 
     <p>Conditional moves are only available for <strong>correspondence games</strong>.</p>
 

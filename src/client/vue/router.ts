@@ -105,7 +105,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@client/vue/pages/guide/PageIndex.vue'),
             },
             {
-                name: 'guide_conditional_moves',
+                name: 'guide-ai-analysis',
+                path: 'ai-analysis',
+                component: () => import('@client/vue/pages/guide/PageAIAnalysis.vue'),
+            },
+            {
+                name: 'guide-conditional-moves',
                 path: 'conditional-moves',
                 component: () => import('@client/vue/pages/guide/PageConditionalMoves.vue'),
             },
