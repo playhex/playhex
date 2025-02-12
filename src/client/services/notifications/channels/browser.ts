@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { getOpponent, hasFocus, iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils';
+import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../context-utils';
 import { notifier } from '../notifier';
 import { pseudoString } from '@shared/app/pseudoUtils';
 import router from '../../../vue/router';
@@ -61,35 +61,6 @@ notifier.on('gameStart', (hostedGame) => {
     sendNotification(
         {
             body: i18next.t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
-            tag: tags.game,
-        },
-        () => {
-            router.push({
-                name: 'online-game',
-                params: { gameId: hostedGame.publicId },
-            });
-        },
-    );
-});
-
-notifier.on('move', (hostedGame) => {
-    if (hasFocus()) {
-        return;
-    }
-
-    if (!isMyTurn(hostedGame)) {
-        return;
-    }
-
-    const opponent = getOpponent(hostedGame);
-
-    if (null === opponent) {
-        return;
-    }
-
-    sendNotification(
-        {
-            body: i18next.t('player_made_a_move', { player: pseudoString(opponent, 'pseudo') }),
             tag: tags.game,
         },
         () => {
