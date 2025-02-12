@@ -69,6 +69,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@client/vue/pages/content/PageHexLinks.vue'),
             },
             {
+                name: 'rating-simulator',
+                path: 'rating-simulator',
+                component: () => import('@client/vue/pages/content/PageRatingSimulator.vue'),
+            },
+            {
                 name: 'contribute',
                 path: 'contribute',
                 component: () => import('@client/vue/pages/content/PageContribute.vue'),

@@ -1,24 +1,14 @@
 <script setup lang="ts">
-import { BIconCaretDownFill, BIconCaretUpFill } from 'bootstrap-icons-vue';
+import AppNumberDiff from './AppNumberDiff.vue';
 
-const props = defineProps({
+defineProps({
     ratingChange: {
         type: Number,
         required: true,
     },
 });
-
-const { round, abs } = Math;
 </script>
 
 <template>
-    <span v-if="!props.ratingChange">
-        -
-    </span>
-    <span v-else-if="props.ratingChange > 0" class="text-success">
-        <small><BIconCaretUpFill /></small> {{ round(props.ratingChange) }}
-    </span>
-    <span v-else class="text-danger">
-        <small><BIconCaretDownFill /></small> {{ abs(round(props.ratingChange)) }}
-    </span>
+    <AppNumberDiff :n="ratingChange" />
 </template>

@@ -3,6 +3,7 @@
         <div class="col-12 col-sm-4 col-md-3 bg-dark-subtle">
             <nav class="nav flex-sm-column my-sm-3">
                 <router-link class="nav-link" :to="{ name: 'links' }">Hex resources</router-link>
+                <router-link class="nav-link" :to="{ name: 'rating-simulator' }">Rating simulator</router-link>
                 <router-link class="nav-link" :to="{ name: 'contribute' }">{{ $t('contribute') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'contributors' }">{{ $t('contributors') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'analysis-details' }">How AI analysis is done</router-link>
