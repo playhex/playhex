@@ -90,6 +90,10 @@ export const getStrictLoserPlayer = (hostedGame: HostedGame): Player => {
     return hostedGame.hostedGameToPlayers[1 - hostedGame.gameData.winner].player;
 };
 
+export const isBotGame = (hostedGame: HostedGame): boolean => {
+    return 'ai' === hostedGame.gameOptions.opponentType;
+};
+
 /**
  * Update local hosted game data from HostedGame received data
  */
