@@ -15,6 +15,7 @@ import { makeAIPlayerMove } from './services/AIManager';
 import { fromEngineMove, toEngineMove } from '../shared/app/models/Move';
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
+import { timeControlToCadencyName } from '../shared/app/timeControlUtils';
 
 type HostedGameEvents = {
     played: () => void;
@@ -225,6 +226,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private async makeConditionalMovesIfApplicable(): Promise<void>
     {
+        // Do not lose time querying database for conditional moves if game is not correspondence
+        if ('correspondence' !== timeControlToCadencyName(this.hostedGame.gameOptions)) {
+            return;
+        }
+
         if (null === this.game) {
             return;
         }
