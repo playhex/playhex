@@ -1,8 +1,25 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import Player from './Player';
 import { Expose } from '../class-transformer-custom';
-import { IsBoolean, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
 import { allShadingPatterns, type ShadingPatternType } from '../../../shared/pixi-board/shading-patterns';
+
+export enum MoveSettings {
+    /**
+     * Send immediately, and premove allowed
+     */
+    PREMOVE = 0,
+
+    /**
+     * Send immediately (no premove)
+     */
+    SEND_IMMEDIATELY = 1,
+
+    /**
+     * Must confirm moves before send
+     */
+    MUST_CONFIRM = 2,
+}
 
 @Entity()
 export default class PlayerSettings
@@ -14,23 +31,53 @@ export default class PlayerSettings
     @JoinColumn()
     player?: Player;
 
+    /**
+     * TODO remove when version with moveSettings adopted
+     * @deprecated use moveSettingsBlitz instead
+     */
     @Expose()
     @IsOptional()
     @IsBoolean()
     @Column({ default: false })
     confirmMoveBlitz: boolean = false;
 
+    /**
+     * TODO remove when version with moveSettings adopted
+     * @deprecated use confirmMoveNormal instead
+     */
     @Expose()
     @IsOptional()
     @IsBoolean()
     @Column({ default: false })
     confirmMoveNormal: boolean = false;
 
+    /**
+     * TODO remove when version with moveSettings adopted
+     * @deprecated use confirmMoveCorrespondence instead
+     */
     @Expose()
     @IsOptional()
     @IsBoolean()
     @Column({ default: true })
     confirmMoveCorrespondence: boolean = true;
+
+    @Expose()
+    @IsOptional()
+    @IsEnum(MoveSettings)
+    @Column({ default: MoveSettings.PREMOVE })
+    moveSettingsBlitz: MoveSettings = MoveSettings.PREMOVE;
+
+    @Expose()
+    @IsOptional()
+    @IsEnum(MoveSettings)
+    @Column({ default: MoveSettings.PREMOVE })
+    moveSettingsNormal: MoveSettings = MoveSettings.PREMOVE;
+
+    @Expose()
+    @IsOptional()
+    @IsEnum(MoveSettings)
+    @Column({ default: MoveSettings.MUST_CONFIRM })
+    moveSettingsCorrespondence: MoveSettings = MoveSettings.MUST_CONFIRM;
 
     @Expose()
     @IsOptional()

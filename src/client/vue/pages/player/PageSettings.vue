@@ -18,6 +18,7 @@ import AppBoard from '../../components/AppBoard.vue';
 import { CustomizedGameView } from '../../../services/CustomizedGameView';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler';
 import AppRhombus from '../../components/AppRhombus.vue';
+import { MoveSettings } from '../../../../shared/app/models/PlayerSettings';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
@@ -225,41 +226,69 @@ const getLocaleName = (locale: string): string => {
         </div>
     </section>
 
-    <section id="confirm-move">
+    <section id="move-settings">
         <div class="container">
-            <h3>{{ $t('confirm_move.title') }}</h3>
-
-            <p>{{ $t('confirm_move.description') }}</p>
+            <h3>{{ $t('move_settings.title') }}</h3>
 
             <template v-if="playerSettings">
                 <div class="mb-3 row">
-                    <label for="confirm-move-blitz" class="col-sm-4 col-md-3 col-form-label"><BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }}</label>
-                    <div class="col-sm-8 col-md-4">
-                        <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
-                            <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
-                            <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
-                        </select>
+                    <label for="move-settings-blitz" class="col-md-3 col-xl-2 col-form-label"><BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }}</label>
+                    <div class="col-md-9">
+                        <div class="btn-group" role="group">
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-blitz-1" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-blitz-1">{{ $t('premove.title') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-blitz-2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-blitz-2">{{ $t('confirm_move.send_immediately') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-blitz-3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-blitz-3">{{ $t('confirm_move.ask_confirmation') }}</label>
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="confirm-move-normal" class="col-sm-4 col-md-3 col-form-label"><BIconAlarmFill /> {{ $t('time_cadency.normal') }}</label>
-                    <div class="col-sm-8 col-md-4">
-                        <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
-                            <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
-                            <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
-                        </select>
+                    <label for="move-settings-normal" class="col-md-3 col-xl-2 col-form-label"><BIconAlarmFill /> {{ $t('time_cadency.normal') }}</label>
+                    <div class="col-md-9">
+                        <div class="btn-group" role="group">
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-normal-1" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-normal-1">{{ $t('premove.title') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-normal-2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-normal-2">{{ $t('confirm_move.send_immediately') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-normal-3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-normal-3">{{ $t('confirm_move.ask_confirmation') }}</label>
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="confirm-move-correspondace" class="col-sm-4 col-md-3 col-form-label"><BIconCalendar /> {{ $t('time_cadency.correspondence') }}</label>
-                    <div class="col-sm-8 col-md-4">
-                        <select v-model="playerSettings.confirmMoveCorrespondence" class="form-select" id="confirm-move-correspondace">
-                            <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
-                            <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
-                        </select>
+                    <label for="move-settings-correspondace" class="col-md-3 col-xl-2 col-form-label"><BIconCalendar /> {{ $t('time_cadency.correspondence') }}</label>
+                    <div class="col-md-9">
+                        <div class="btn-group" role="group">
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-correspondence-1" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-correspondence-1">{{ $t('premove.title') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-correspondence-2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-correspondence-2">{{ $t('confirm_move.send_immediately') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-correspondence-3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-correspondence-3">{{ $t('confirm_move.ask_confirmation') }}</label>
+                        </div>
                     </div>
                 </div>
             </template>
+
+            <dl class="row move-settings-help">
+                <dt class="col-md-3 col-xl-2">{{ $t('premove.title') }}</dt>
+                <dd class="col-md-9">{{ $t('premove.description') }}</dd>
+
+                <dt class="col-md-3 col-xl-2">{{ $t('confirm_move.send_immediately') }}</dt>
+                <dd class="col-md-9">{{ $t('confirm_move.send_immediately_description') }}</dd>
+
+                <dt class="col-md-3 col-xl-2">{{ $t('confirm_move.ask_confirmation') }}</dt>
+                <dd class="col-md-9">{{ $t('confirm_move.description') }}</dd>
+            </dl>
+
         </div>
     </section>
 
@@ -438,4 +467,8 @@ section
 
     &:last-child
         margin-bottom 3em
+
+.move-settings-help
+    font-size 0.9em
+    margin-top 2.5em
 </style>

@@ -290,8 +290,16 @@
         "button_label": "Confirm move",
         "button_label_short": "Confirm",
         "send_immediately": "Send immediately",
+        "send_immediately_description": "The move is sent as soon as you click on the cell.",
         "ask_confirmation": "Ask confirmation",
-        "description": "To prevent misclicks, you can require confirmation before submitting a move."
+        "description": "To prevent misclicks, you must confirm before submitting a move."
+    },
+    "premove": {
+        "title": "Premove",
+        "description": "Play a move during opponent turn: will be played instantly after opponent move."
+    },
+    "move_settings": {
+        "title": "Move settings"
     },
     "rematch": {
         "label": "Rematch",

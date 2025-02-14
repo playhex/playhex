@@ -14,9 +14,9 @@ describe('Confirm move', () => {
         cy.contains(/Guest \d+/).click();
         cy.contains('Settings').click();
 
-        cy.contains('Confirm move');
+        cy.contains('Move settings');
 
-        cy.get('[id="confirm-move-normal"]').select('true');
+        cy.get('[for="move-settings-normal-3"]').click();
 
         // Go back to game, Confirm move button should be there
         cy.contains(/Guest \d+/).click();

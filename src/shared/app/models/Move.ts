@@ -18,6 +18,10 @@ export default class Move implements Coords
     playedAt: Date;
 }
 
+export const moveFromString = (moveStr: string): Move => {
+    return fromEngineMove(EngineMove.fromString(moveStr));
+};
+
 export const fromEngineMove = (engineMove: EngineMove): Move => {
     const move = new Move();
 

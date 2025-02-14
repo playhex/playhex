@@ -12,7 +12,7 @@ import { canPassAgain } from '../shared/app/passUtils';
 import Container from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager';
-import { fromEngineMove, toEngineMove } from '../shared/app/models/Move';
+import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/models/Move';
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils';
@@ -59,6 +59,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private players: Player[] = [];
 
     private timeControl: AbstractTimeControl;
+
+    /**
+     * Players premoves, for live games.
+     */
+    private premoves: [null | string, null | string] = [null, null];
 
     private io: HexServer = Container.get(HexServer);
 
@@ -164,8 +169,37 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private async makeAutomatedMoves(): Promise<void>
     {
+        this.makePremoveIfApplicable();
         await this.makeAIMoveIfApplicable();
         await this.makeConditionalMovesIfApplicable();
+    }
+
+    private makePremoveIfApplicable()
+    {
+        if (null === this.game) {
+            return;
+        }
+
+        if (this.game.isEnded()) {
+            return;
+        }
+
+        const premove = this.premoves[this.game.getCurrentPlayerIndex()];
+
+        if (null === premove) {
+            return;
+        }
+
+        this.logger.info('Play premove', { premove });
+
+        this.premoves[this.game.getCurrentPlayerIndex()] = null; // Must reset premove before playerMove(), else getCurrentPlayerIndex() will point to other player
+
+        const player = this.players[this.game.getCurrentPlayerIndex()];
+        const result = this.playerMove(player, moveFromString(premove));
+
+        if (true !== result) {
+            this.logger.error('Could not play premove', { result });
+        }
     }
 
     /**
@@ -551,9 +585,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return true;
     }
 
-    playerMove(player: Player, move: Move): true | string
+    playerMove(player: Player, move: Move, moveDate: Date = new Date()): true | string
     {
-        move.playedAt = new Date();
+        move.playedAt = moveDate;
         this.logger.info('Move played', { move, player: player.pseudo });
 
         if ('playing' !== this.hostedGame.state) {
@@ -588,6 +622,40 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.logger.warning('Unexpected error from player.move', { err: e.message });
             return 'Unexpected error: ' + e.message;
         }
+    }
+
+    playerPremove(player: Player, move: Move): true | string
+    {
+        if ('playing' !== this.hostedGame.state) {
+            this.logger.notice('Player tried to register a premove but hosted game is not playing', { player: player.pseudo });
+            return 'Game is not playing';
+        }
+
+        if (!this.game) {
+            this.logger.warning('Tried to register a premove but game is not yet created.', { player: player.pseudo });
+            return 'Game not yet started, cannot make a move';
+        }
+
+        if (!this.isPlayerInGame(player)) {
+            this.logger.notice('A player not in the game tried to register a premove', { player: player.pseudo });
+            return 'you are not a player of this game';
+        }
+
+        this.premoves[this.getPlayerIndex(player) as PlayerIndex] = toEngineMove(move).toString();
+
+        return true;
+    }
+
+    playerCancelPremove(player: Player): true | string
+    {
+        if (!this.isPlayerInGame(player)) {
+            this.logger.notice('A player not in the game tried to cancel a premove', { player: player.pseudo });
+            return 'you are not a player of this game';
+        }
+
+        this.premoves[this.getPlayerIndex(player) as PlayerIndex] = null;
+
+        return true;
     }
 
     playerAskUndo(player: Player): true | string
