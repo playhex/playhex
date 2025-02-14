@@ -270,6 +270,39 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         });
     }
 
+    async sendPremove(move: Move): Promise<true | string>
+    {
+        // No need to send client playedAt date, server won't trust it
+        const moveWithoutDate = new Move();
+
+        moveWithoutDate.row = move.row;
+        moveWithoutDate.col = move.col;
+        moveWithoutDate.specialMoveType = move.specialMoveType;
+
+        return new Promise((resolve, reject) => {
+            this.socket.emit('premove', this.getId(), moveWithoutDate, answer => {
+                if (true === answer) {
+                    resolve(answer);
+                }
+
+                reject(answer);
+            });
+        });
+    }
+
+    async cancelPremove(): Promise<true | string>
+    {
+        return new Promise((resolve, reject) => {
+            this.socket.emit('cancelPremove', this.getId(), answer => {
+                if (true === answer) {
+                    resolve(answer);
+                }
+
+                reject(answer);
+            });
+        });
+    }
+
     async sendAskUndo(): Promise<string | true>
     {
         return apiPostAskUndo(this.getId());

@@ -33,6 +33,7 @@ import { getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor';
+import { MoveSettings } from '../../../shared/app/models/PlayerSettings';
 
 const props = defineProps({
     hostedGameClient: {
@@ -353,6 +354,14 @@ watch(
 const currentOrientation = ref<OrientationMode>(gameView.getComputedBoardOrientationMode());
 gameView.on('orientationChanged', () => currentOrientation.value = gameView.getComputedBoardOrientationMode());
 
+const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
+    return [
+        'premove.description',
+        'confirm_move.send_immediately_description',
+        'confirm_move.description',
+    ][moveSettings];
+};
+
 /*
  * Conditional moves
  */
@@ -594,33 +603,48 @@ watchEffect(() => {
             <div class="container-fluid">
 
                 <div class="mb-2" v-if="playerSettings">
-                    <div class="row" v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="confirm-move-blitz" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
-                        <div class="col-12">
-                            <select v-model="playerSettings.confirmMoveBlitz" class="form-select" id="confirm-move-blitz">
-                                <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
-                                <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
-                            </select>
+                    <template v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
+                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
+                        <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-2">{{ $t('confirm_move.send_immediately') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
-                    </div>
-                    <div class="row" v-if="'normal' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="confirm-move-normal" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
-                        <div class="col-12">
-                            <select v-model="playerSettings.confirmMoveNormal" class="form-select" id="confirm-move-normal">
-                                <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
-                                <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
-                            </select>
+                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsBlitz)) }}</div>
+                    </template>
+                    <template v-if="'normal' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
+                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<BIconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
+                        <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-2">{{ $t('confirm_move.send_immediately') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
-                    </div>
-                    <div class="row" v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="confirm-move-correspondace" class="col-12 col-form-label">{{ $t('confirm_move.title') }} <small>(<BIconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
-                        <div class="col-12">
-                            <select v-model="playerSettings.confirmMoveCorrespondence" class="form-select" id="confirm-move-correspondace">
-                                <option :value="false">{{ $t('confirm_move.send_immediately') }}</option>
-                                <option :value="true">{{ $t('confirm_move.ask_confirmation') }}</option>
-                            </select>
+                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsNormal)) }}</div>
+                    </template>
+                    <template v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
+                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<BIconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
+                        <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-2">{{ $t('confirm_move.send_immediately') }}</label>
+
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="move-settings-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
-                    </div>
+                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsCorrespondence)) }}</div>
+                    </template>
                 </div>
 
                 <h4>{{ $t('game.board') }}</h4>

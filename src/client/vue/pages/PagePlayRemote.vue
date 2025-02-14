@@ -36,6 +36,7 @@ import { HexClientToServerEvents, HexServerToClientEvents } from '../../../share
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore';
 import { markRaw } from 'vue';
+import { MoveSettings } from '../../../shared/app/models/PlayerSettings';
 
 useSeoMeta({
     robots: 'noindex',
@@ -68,8 +69,20 @@ const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 const { localSettings } = usePlayerLocalSettingsStore();
 const confirmMove: Ref<null | (() => void)> = ref(null);
 
-const shouldDisplayConfirmMove = (): boolean => {
+const getMoveSettings = (): null | MoveSettings => {
     if (null === hostedGameClient.value || null === playerSettings.value) {
+        return null;
+    }
+
+    return {
+        blitz: playerSettings.value.moveSettingsBlitz,
+        normal: playerSettings.value.moveSettingsNormal,
+        correspondence: playerSettings.value.moveSettingsCorrespondence,
+    }[timeControlToCadencyName(hostedGameClient.value.getHostedGame().gameOptions)];
+};
+
+const shouldDisplayConfirmMove = (): boolean => {
+    if (null === hostedGameClient.value) {
         return false;
     }
 
@@ -83,11 +96,7 @@ const shouldDisplayConfirmMove = (): boolean => {
         return false;
     }
 
-    return {
-        blitz: playerSettings.value.confirmMoveBlitz,
-        normal: playerSettings.value.confirmMoveNormal,
-        correspondence: playerSettings.value.confirmMoveCorrespondence,
-    }[timeControlToCadencyName(hostedGameClient.value.getHostedGame().gameOptions)];
+    return getMoveSettings() === MoveSettings.MUST_CONFIRM;
 };
 
 /*
@@ -161,7 +170,7 @@ const listenHexClick = () => {
         throw new Error('no game view');
     }
 
-    gameView.on('hexClicked', coords => {
+    gameView.on('hexClicked', async coords => {
         if (null === hostedGameClient.value) {
             throw new Error('hex clicked but hosted game is null');
         }
@@ -177,7 +186,44 @@ const listenHexClick = () => {
                 return;
             }
 
-            hostedGameClient.value.getGame().checkMove(move, localPlayerIndex as PlayerIndex);
+            /*
+             * Premove
+             */
+            const premovesEnabled = MoveSettings.PREMOVE === getMoveSettings();
+
+            if (premovesEnabled && !isMyTurn(hostedGameClient.value.getHostedGame())) {
+                if (game.isEnded()) {
+                    return;
+                }
+
+                // cancel premove when click on it
+                if (gameView?.hasPreviewedMove() && move.sameAs(gameView.getPreviewedMove()!.move)) {
+                    const answer = await hostedGameClient.value.cancelPremove();
+
+                    if (true === answer) {
+                        gameView?.removePreviewedMove();
+                    }
+
+                    return;
+                }
+
+                if (game.getBoard().isEmpty(move.row, move.col)) {
+                    // set or replace premove
+                    hostedGameClient.value.sendPremove(fromEngineMove(move));
+                    gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
+                } else if (gameView?.hasPreviewedMove()) {
+                    // cancel premove when click on occupied cell
+                    const answer = await hostedGameClient.value.cancelPremove();
+
+                    if (true === answer) {
+                        gameView?.removePreviewedMove();
+                    }
+                }
+
+                return;
+            }
+
+            game.checkMove(move, localPlayerIndex as PlayerIndex);
 
             // Send move if move preview is not enabled
             if (!shouldDisplayConfirmMove()) {

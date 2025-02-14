@@ -22,6 +22,28 @@ export default class GameWebsocketController implements WebsocketControllerInter
 
             answer(await this.hostedGameRepository.playerMove(player, gameId, move));
         });
+
+        socket.on('premove', async (gameId, move, answer) => {
+            const { player } = socket.data;
+
+            if (null === player) {
+                answer('Player not found');
+                return;
+            }
+
+            answer(await this.hostedGameRepository.playerPremove(player, gameId, move));
+        });
+
+        socket.on('cancelPremove', async (gameId, answer) => {
+            const { player } = socket.data;
+
+            if (null === player) {
+                answer('Player not found');
+                return;
+            }
+
+            answer(await this.hostedGameRepository.playerCancelPremove(player, gameId));
+        });
     }
 
     async onJoinRoom(socket: HexSocket, room: string)

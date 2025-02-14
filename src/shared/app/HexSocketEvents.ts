@@ -28,6 +28,20 @@ export type HexClientToServerEvents = {
     move: (gameId: string, move: Move, answer: (result: true | string) => void) => void;
 
     /**
+     * A player registers a premove.
+     * Answer contains either true on success premove register,
+     * or a string containing an error message.
+     */
+    premove: (gameId: string, move: Move, answer: (result: true | string) => void) => void;
+
+    /**
+     * A player cancel its registered premove.
+     * Answer contains either true on success premove register,
+     * or a string containing an error message.
+     */
+    cancelPremove: (gameId: string, answer: (result: true | string) => void) => void;
+
+    /**
      * A player send a chat message on a game
      */
     sendChat: (gameId: string, content: string, answer: (result: true | string) => void) => void;
