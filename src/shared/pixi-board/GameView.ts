@@ -983,6 +983,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this;
     }
 
+    hasPreviewedMove(): boolean
+    {
+        return null !== this.previewedMove;
+    }
+
     getPreviewedMove(): null | { move: Move, playerIndex: PlayerIndex }
     {
         return this.previewedMove;

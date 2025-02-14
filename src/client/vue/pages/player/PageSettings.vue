@@ -263,6 +263,22 @@ const getLocaleName = (locale: string): string => {
         </div>
     </section>
 
+    <section id="premove">
+        <div class="container">
+            <h3>{{ $t('premove.title') }}</h3>
+
+            <p>{{ $t('premove.description') }}</p>
+
+            <template v-if="playerSettings">
+                <div class="form-check form-switch my-3">
+                    <input class="form-check-input" type="checkbox" v-model="playerSettings.premoveEnabled" role="switch" id="premove-checkbox">
+                    <label class="form-check-label" for="premove-checkbox" aria-describedby="premoveHelp">{{ $t('premove.enabled') }}</label>
+                    <div class="form-text" id="premoveHelp">{{ $t('premove.confirm_move_should_be_disabled') }}</div>
+                </div>
+            </template>
+        </div>
+    </section>
+
     <section id="board">
         <div class="container">
             <h3>{{ $t('game.board') }}</h3>

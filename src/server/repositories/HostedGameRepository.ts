@@ -373,6 +373,32 @@ export default class HostedGameRepository
         return result;
     }
 
+    async playerPremove(player: Player, gameId: string, move: Move): Promise<string | true>
+    {
+        const hostedGame = this.activeGames[gameId];
+
+        if (!hostedGame) {
+            return 'no active game ' + gameId;
+        }
+
+        const result = hostedGame.playerPremove(player, move);
+
+        return result;
+    }
+
+    async playerCancelPremove(player: Player, gameId: string): Promise<string | true>
+    {
+        const hostedGame = this.activeGames[gameId];
+
+        if (!hostedGame) {
+            return 'no active game ' + gameId;
+        }
+
+        const result = hostedGame.playerCancelPremove(player);
+
+        return result;
+    }
+
     async playerAskUndo(player: Player, gameId: string): Promise<string | true>
     {
         const hostedGame = this.activeGames[gameId];

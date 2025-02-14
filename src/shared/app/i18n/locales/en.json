@@ -293,6 +293,12 @@
         "ask_confirmation": "Ask confirmation",
         "description": "To prevent misclicks, you can require confirmation before submitting a move."
     },
+    "premove": {
+        "title": "Premove",
+        "description": "Play a move during opponent turn: will be played instantly after opponent move.",
+        "enabled": "Premove enabled",
+        "confirm_move_should_be_disabled": "Only works when Confirm move is disabled."
+    },
     "rematch": {
         "label": "Rematch",
         "accept": "Accept rematch",

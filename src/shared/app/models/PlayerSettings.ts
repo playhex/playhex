@@ -32,6 +32,16 @@ export default class PlayerSettings
     @Column({ default: true })
     confirmMoveCorrespondence: boolean = true;
 
+    /**
+     * Allow premove,
+     * only for cadencies where confirmMove is not enabled.
+     */
+    @Expose()
+    @IsOptional()
+    @IsBoolean()
+    @Column({ default: true })
+    premoveEnabled: boolean = true;
+
     @Expose()
     @IsOptional()
     @IsNumber()
