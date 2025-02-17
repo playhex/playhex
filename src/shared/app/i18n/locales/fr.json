@@ -233,7 +233,8 @@
         "send_immediately": "Envoyer tout de suite",
         "button_label_short": "Valider",
         "ask_confirmation": "Valider avant d'envoyer",
-        "description": "Pour éviter les erreurs de clic, vous pouvez valider vos coups avant de les envoyer."
+        "description": "Pour éviter les erreurs de clic, vous pouvez valider vos coups avant de les envoyer.",
+        "send_immediately_description": "Le coup est envoyé dés que vous cliquez."
     },
     "rematch": {
         "accept": "Accepter la revanche",
