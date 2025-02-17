@@ -154,7 +154,7 @@ export default class Move implements Coords
     static fromData(moveData: MoveData): Move
     {
         if (moveData.specialMoveType) {
-            return Move.special(moveData.specialMoveType);
+            return Move.special(moveData.specialMoveType, moveData.playedAt);
         }
 
         return new Move(

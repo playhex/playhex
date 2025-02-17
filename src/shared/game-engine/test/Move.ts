@@ -24,4 +24,32 @@ describe('Move', () => {
         assert.strictEqual(Move.fromString('f6').cloneMirror().toString(), 'f6');
         assert.strictEqual(Move.fromString('ap39').cloneMirror().toString(), 'am42');
     });
+
+    it('conserves date when creating a move from MoveData', () => {
+        const playedAt = new Date('2020-01-01');
+
+        const move = Move.fromData({
+            row: 0,
+            col: 1,
+            playedAt,
+        });
+
+        const swapMove = Move.fromData({
+            row: -1,
+            col: -1,
+            specialMoveType: 'swap-pieces',
+            playedAt,
+        });
+
+        const passMove = Move.fromData({
+            row: -1,
+            col: -1,
+            specialMoveType: 'pass',
+            playedAt,
+        });
+
+        assert.strictEqual(playedAt, move.getPlayedAt());
+        assert.strictEqual(playedAt, swapMove.getPlayedAt());
+        assert.strictEqual(playedAt, passMove.getPlayedAt());
+    });
 });
