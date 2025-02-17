@@ -248,7 +248,6 @@
     "friendly_games": "Vänskapliga",
     "bot_games": "Bot-spel",
     "browse_all_ended_games": "Bläddra bland alla avslutade spel",
-    "n_total_games_zero": "Inga matchande spel.",
     "n_total_games_one": "1 totalt spel.",
     "n_total_games_other": "{{count}} totala spel.",
     "previous": "Föregående",
