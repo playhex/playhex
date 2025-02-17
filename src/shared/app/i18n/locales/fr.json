@@ -233,7 +233,7 @@
         "send_immediately": "Envoyer tout de suite",
         "button_label_short": "Valider",
         "ask_confirmation": "Valider avant d'envoyer",
-        "description": "Pour éviter les erreurs de clic, vous pouvez valider vos coups avant de les envoyer.",
+        "description": "Pour éviter les erreurs de clic, vous devez valider vos coups avant de les envoyer.",
         "send_immediately_description": "Le coup est envoyé dés que vous cliquez."
     },
     "rematch": {
@@ -324,5 +324,12 @@
     "discard": "Annuler",
     "save": "Enregistrer",
     "loading": "Chargement…",
-    "username_not_an_email_warning": "Hey, on dirait que tu saisis ton email, mais PlayHex a juste besoin d'un nom d'utilisateur. Ton email serait visible de tous…"
+    "username_not_an_email_warning": "Hey, on dirait que tu saisis ton email, mais PlayHex a juste besoin d'un nom d'utilisateur. Ton email serait visible de tous…",
+    "premove": {
+        "title": "Pré-coup",
+        "description": "Jouez un coup pendant le tour de votre adversaire : il sera envoyé instantanément après le coup de votre adversaire."
+    },
+    "move_settings": {
+        "title": "Paramètres de coup"
+    }
 }
