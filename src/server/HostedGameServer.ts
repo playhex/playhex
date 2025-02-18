@@ -1,10 +1,12 @@
+import winston from 'winston';
+import { File } from 'winston/lib/winston/transports';
 import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine';
 import { HostedGameState } from '../shared/app/Types';
 import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
 import { HexServer } from './server';
-import baseLogger from './services/logger';
+import baseLogger, { loggerOptions, loggerTransports } from './services/logger';
 import Rooms from '../shared/app/Rooms';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl';
 import { createTimeControl } from '../shared/time-control/createTimeControl';
@@ -70,6 +72,33 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private logger = baseLogger;
 
     /**
+     * To call on new instance, to add context in game logs.
+     */
+    private createChildLogger()
+    {
+        const { publicId, createdAt } = this.hostedGame;
+
+        if ('string' !== typeof publicId || !(createdAt instanceof Date)) {
+            throw new Error('hostedGame publicId must be defined');
+        }
+
+        this.logger = winston.createLogger({
+            ...loggerOptions,
+            transports: [
+                ...loggerTransports,
+                new File({
+                    filename: `${createdAt.toISOString().replace(/(T|:)/g, '-').replace(/\..*/g, '')}-${publicId}.log`,
+                    dirname: 'var/logs/games',
+                    level: 'debug',
+                }),
+            ],
+            defaultMeta: {
+                hostedGamePublicId: publicId,
+            },
+        });
+    }
+
+    /**
      * Officially creates a new hosted game, emit event to clients.
      */
     static hostNewGame(gameOptions: HostedGameOptions, host: Player, rematchedFrom: null | HostedGame = null): HostedGameServer
@@ -87,9 +116,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         hostedGame.chatMessages = [];
         hostedGame.hostedGameToPlayers = [];
 
-        hostedGameServer.logger = baseLogger.child({
-            hostedGamePublicId: hostedGame.publicId,
-        });
+        hostedGameServer.createChildLogger();
 
         hostedGameServer.players.push(host);
         hostedGameServer.timeControl = createTimeControl(gameOptions.timeControl);
@@ -952,6 +979,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         const hostedGameServer = new HostedGameServer();
 
         hostedGameServer.hostedGame = data;
+
+        hostedGameServer.createChildLogger();
 
         hostedGameServer.players = data.hostedGameToPlayers
             .sort((a, b) => a.order - b.order)
