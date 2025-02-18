@@ -1,4 +1,4 @@
-import winston, { Logger } from 'winston';
+import winston, { format, Logger } from 'winston';
 import { addSentryLoggerIfConfigured } from './logger-sentry';
 
 type SyslogLevels =
@@ -11,6 +11,26 @@ type SyslogLevels =
     | 'alert'
     | 'emerg'
 ;
+
+export const loggerTransports: winston.transport[] = [
+    new winston.transports.Console({
+        handleExceptions: true,
+        format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple(),
+        ),
+    }),
+];
+
+export const loggerOptions: winston.LoggerOptions = {
+    levels: winston.config.syslog.levels,
+    level: 'development' === process.env.NODE_ENV ? 'debug' : 'info',
+    format: format.combine(
+        format.timestamp(),
+        format.json(),
+    ),
+    transports: loggerTransports,
+};
 
 /**
  * Which log level to use?
@@ -33,19 +53,7 @@ type SyslogLevels =
  *
  * See https://en.wikipedia.org/wiki/Syslog for base interpretation.
  */
-const logger = winston.createLogger({
-    levels: winston.config.syslog.levels,
-    level: 'development' === process.env.NODE_ENV ? 'debug' : 'info',
-    transports: [
-        new winston.transports.Console({
-            handleExceptions: true,
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.simple(),
-            ),
-        }),
-    ],
-});
+const logger = winston.createLogger(loggerOptions);
 
 
 addSentryLoggerIfConfigured(logger);
