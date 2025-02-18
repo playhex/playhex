@@ -26,7 +26,9 @@
         "outcome": "Resultat",
         "lost": "Tabt",
         "playing": "Spiller",
-        "watch": "Se"
+        "watch": "Se",
+        "title_your_turn": "Din tur!",
+        "duration": "Varighed"
     },
     "game_rules": {
         "normal": "normal",
@@ -121,7 +123,8 @@
         "errored": "Analyse fejlede!",
         "best_move": "bedste træk",
         "best": "bedste:",
-        "how_it_works": "Sådan fungerer det"
+        "how_it_works": "Sådan fungerer det",
+        "request_analysis": "Anmod om AI analyse"
     },
     "try_again": "Prøv igen",
     "yes": "Ja",
@@ -233,7 +236,8 @@
         "button_label_short": "Bekræft",
         "send_immediately": "Send straks",
         "ask_confirmation": "Anmod om bekræftelse",
-        "description": "For at undgå fejlklik kan du kræve bekræftelse, før du sender et træk."
+        "description": "For at undgå fejlklik kan du kræve bekræftelse, før du sender et træk.",
+        "send_immediately_description": "Trækket bliver sendt så snart du trykker på cellen."
     },
     "rematch": {
         "label": "Rematch",
@@ -258,5 +262,35 @@
         "time": "{player} vinder på tid!",
         "resign": "{player} vinder!",
         "forfeit": "{player} vinder ved forfald!"
-    }
+    },
+    "any": "Enhver",
+    "boardsize": {
+        "large": "Stor",
+        "medium": "Middel",
+        "small": "Lille"
+    },
+    "game_state": {
+        "created": "Oprettet",
+        "ended": "Afsluttet"
+    },
+    "conditional_moves": {
+        "clear_inactive_lines": "Ryd inaktive linjer",
+        "inactive_lines": "Inaktive linjer"
+    },
+    "username_not_an_email_warning": "Hej, det ser ud til, at du indtaster din e-mail, men PlayHex behøver kun et brugernavn. Din e-mail ville være offentligt synlig…",
+    "save": "Gem",
+    "discard": "Kassér",
+    "1v1": "1v1",
+    "sort_date": {
+        "asc": "Kronologisk",
+        "desc": "Nyeste først"
+    },
+    "loading": "Indlæser…",
+    "next": "Næste",
+    "page_page_of_max": "Side {{page}} / {{max}}",
+    "browse_all_ended_games": "Gennemse alle afsluttede spil",
+    "explore": "Udforsk",
+    "friendly": "Venskabelig",
+    "moves": "Træk",
+    "force_board_orientation_mode": "Tving brættet til at vises i landskab eller portræt for denne skærm"
 }
