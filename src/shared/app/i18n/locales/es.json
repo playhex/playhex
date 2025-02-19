@@ -273,9 +273,9 @@
         "ended": "Terminado"
     },
     "player_loses_reason": {
-        "resign": "{player} abandonó.",
+        "resign": "{player} renunció.",
         "default": "{player} pierde(n).",
-        "time": "{player} agotó el tiempo.",
+        "time": "{player} se quedó sin tiempo.",
         "forfeit": "{player} pierde."
     },
     "handicap": {
