@@ -28,7 +28,9 @@
         "playing": "Spiller",
         "watch": "Se",
         "title_your_turn": "Din tur!",
-        "duration": "Varighed"
+        "duration": "Varighed",
+        "title": "Spil",
+        "info": "Info"
     },
     "game_rules": {
         "normal": "normal",
