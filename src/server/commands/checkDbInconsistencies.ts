@@ -1,7 +1,9 @@
-import { Player } from '../../shared/app/models';
+import Container from 'typedi';
 import { AppDataSource } from '../data-source';
 import hexProgram from './hexProgram';
-import { IsNull, Like, Not } from 'typeorm';
+import { AccountsMustHavePassword } from './data-inconsistency-checks/AccountsMustHavePassword';
+import { MoveTimestampsAreOrdered } from './data-inconsistency-checks/MoveTimestampsAreOrdered';
+import { DataInconsistenciesCheckerInterface } from './data-inconsistency-checks/DataInconsistenciesCheckerInterface';
 
 hexProgram
     .command('check-inconsistencies')
@@ -11,30 +13,37 @@ hexProgram
             await AppDataSource.initialize();
         }
 
-        const playerRepository = AppDataSource.getRepository(Player);
+        const checkers: DataInconsistenciesCheckerInterface[] = [
+            Container.get(AccountsMustHavePassword),
+            Container.get(MoveTimestampsAreOrdered),
+        ];
 
-        /*
-         * No accounts without password
-         */
-        const accountsWithoutPassword = await playerRepository.findBy({
-            isGuest: false,
-            isBot: false,
-            password: IsNull(),
-            slug: Not(Like('anonymous%')),
-        });
+        for (const checker of checkers) {
+            const inconsistencies = await checker.run();
 
-        console.log(0 === accountsWithoutPassword.length ? ' OK ' : 'FAIL', 'No accounts without password');
+            console.log(
+                0 === inconsistencies.length ? ' OK ' : `FAIL (${inconsistencies.length})`,
+                checker.getDescription(),
+            );
 
-        for (const player of accountsWithoutPassword) {
-            console.log('   -> ', player.pseudo);
+            for (const inconsistency of inconsistencies) {
+                console.log('      -> ', inconsistency);
+            }
         }
+
+        console.log('DONE');
 
         /*
          * No rating change if game is unranked or canceled
          */
 
         /*
-         * resigned games have 2 moves or more
+         * No ai game without opponentPublicId
+         * SELECT * FROM `hosted_game_options` WHERE `opponentType` = 'ai' AND `opponentPublicId` IS NULL LIMIT 50
+         */
+
+        /*
+         * resigned games should have 2 moves or more
          */
         /*
             select hg.id, g.endedAt, json_length(g.movesHistory) as moves, concat('http://localhost:3000/games/', hg.publicId)
@@ -43,5 +52,8 @@ hexProgram
             where g.outcome = 'resign'
             and json_length(g.movesHistory) < 2
          */
+
+
+        // games lost on time with < 2 moves must be canceled
     })
 ;
