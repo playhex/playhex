@@ -117,7 +117,7 @@ export const availableLocales: AvailableLocales = {
         loader: () => import(/* webpackChunkName: "locale-zh" */ 'date-fns/locale/zh-CN') as unknown as DefaultExportLocale,
     },
     ta: {
-        label: '🇮🇳 தமிழ் (Tamil) (beta)',
+        label: '🇮🇳 தமிழ் (Tamil)',
         loader: () => import(/* webpackChunkName: "locale-ta" */ 'date-fns/locale/ta') as unknown as DefaultExportLocale,
         translators: [
             { fullName: 'TamilNeram', link: 'https://hosted.weblate.org/user/TamilNeram/' },
