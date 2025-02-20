@@ -317,6 +317,36 @@ const makeTitle = (hostedGame: HostedGame) => {
     return `${yourTurn}${i18next.t('game_state.' + state)}: ${pairing}`;
 };
 
+/**
+ * Whether game can be indexed on search engines.
+ * Should not index all games to prevent too much content.
+ * Should not index games without content (no chat messages) to prevent duplicate content,
+ * because search engine won't see the board.
+ */
+const shouldBeIndexedOnSearchEngines = (hostedGame: HostedGame): boolean => {
+    // only index ended games
+    if ('ended' !== hostedGame.state) {
+        return false;
+    }
+
+    // index only if there is chat messages to prevent duplicate content with another game
+    if (hostedGame.chatMessages.length < 2) {
+        return false;
+    }
+
+    // do not index bot games
+    if ('player' !== hostedGame.gameOptions.opponentType) {
+        return false;
+    }
+
+    // index only if there is at least one registered player
+    if (hostedGame.hostedGameToPlayers.every(hostedGameToPlayer => hostedGameToPlayer.player.isGuest)) {
+        return false;
+    }
+
+    return true;
+};
+
 /*
  * Load game
  */
@@ -353,7 +383,12 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
     ;
 
     useSeoMeta({
-        robots: 'noindex',
+        robots: computed(() => {
+            return null !== hostedGameClient.value && shouldBeIndexedOnSearchEngines(hostedGameClient.value.getHostedGame())
+                ? 'index'
+                : 'noindex'
+            ;
+        }),
         title: computed(() => {
             if (hostedGameClient.value == null) return '';
             return makeTitle(hostedGameClient.value.getHostedGame());

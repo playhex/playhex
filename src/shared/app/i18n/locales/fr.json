@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Accueil",
+    "lobby_title": "Jouer au Hex en ligne",
     "lobby": {
         "no_waiting_games": "Pas de partie en attente pour l'instant. Créez-en une !",
         "watch_current_games": "Observer les parties",
