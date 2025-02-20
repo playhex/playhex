@@ -34,8 +34,11 @@ type AvailableLocales = {
  */
 export const availableLocales: AvailableLocales = {
     da: {
-        label: '🇩🇰 Dansk (Danish) (beta)',
+        label: '🇩🇰 Dansk (Danish)',
         loader: () => import(/* webpackChunkName: "locale-da" */ 'date-fns/locale/da') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'Kristoffer Marboe', link: 'https://github.com/KrisMarboe' },
+        ],
     },
     de: {
         label: '🇩🇪 Deutsch (German)',
