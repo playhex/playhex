@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc><%= baseUrl %>/</loc>
+    </url>
+    <% for (const game of games) { -%>
+<url><loc><%= baseUrl + '/games/' + game.publicId %></loc><lastmod><%= game.endedAt.toISOString() %></lastmod></url>
+    <% } %>
+</urlset>

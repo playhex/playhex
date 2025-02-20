@@ -7,6 +7,11 @@ import { Player } from '../../../shared/app/models';
 import { apiGetServerInfo } from '../../apiClient';
 import { CustomizedGameView } from '../../services/CustomizedGameView';
 import { shallowRef } from 'vue';
+import { useSeoMeta } from '@unhead/vue';
+
+useSeoMeta({
+    robots: 'noindex',
+});
 
 type LoggedError = {
     type: string;
