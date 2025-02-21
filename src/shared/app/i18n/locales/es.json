@@ -227,7 +227,7 @@
         "resign": "¡{player} gana!",
         "forfeit": "¡{player} gana por abandono!"
     },
-    "lobby_title": "Sala de espera",
+    "lobby_title": "Juega a Hex en línea",
     "last_change": "Última modificación: {{date}}",
     "create_account": "Crear una cuenta",
     "license_agpl": "Licencia AGPL-3.0",

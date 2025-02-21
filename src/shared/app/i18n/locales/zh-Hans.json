@@ -1,5 +1,5 @@
 {
-    "lobby_title": "大厅",
+    "lobby_title": "在线玩Hex",
     "lobby": {
         "no_waiting_games": "目前没有可用的游戏。创建一个新游戏吧！",
         "watch_current_games": "观看当前游戏",
