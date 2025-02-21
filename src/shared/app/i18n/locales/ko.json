@@ -1,5 +1,5 @@
 {
-    "lobby_title": "로비",
+    "lobby_title": "온라인에서 Hex 플레이",
     "lobby": {
         "no_waiting_games": "현재 이용 가능한 게임이 없습니다. 새 게임을 만들어보세요!",
         "watch_current_games": "현재 진행 중인 게임 보기",
