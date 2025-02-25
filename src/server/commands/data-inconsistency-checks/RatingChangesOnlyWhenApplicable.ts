@@ -31,7 +31,7 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
             .execute()
         ;
 
-        const unranked: Result[] = await this.hostedGameRepository
+        const unrated: Result[] = await this.hostedGameRepository
             .createQueryBuilder('hostedGame')
             .innerJoin('hostedGame.gameOptions', 'gameOptions')
             .innerJoin('hostedGame.ratings', 'rating')
@@ -40,6 +40,16 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
             .execute()
         ;
 
+        const missingRating: Result[] = await this.hostedGameRepository.query(`
+            select hg.publicId as hostedGame_publicId, hg.createdAt as hostedGame_createdAt
+            from hosted_game_options hgo
+            inner join hosted_game hg on hg.id = hgo.hostedgameid
+            left join rating_games_hosted_game r on hgo.hostedgameid = r.hostedgameid
+            where ranked
+            and r.hostedgameid is null
+            and hg.state = 'ended'
+        `);
+
         const hostedGameToString = (label: string, hostedGame: Result) => [
             label,
             hostedGame.hostedGame_publicId,
@@ -47,8 +57,9 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
         ].join(' ');
 
         return [
-            ...canceled.map(hostedGame => hostedGameToString('canceled but ranked', hostedGame)),
-            ...unranked.map(hostedGame => hostedGameToString('unranked but ranked', hostedGame)),
+            ...canceled.map(hostedGame => hostedGameToString('canceled but rated', hostedGame)),
+            ...unrated.map(hostedGame => hostedGameToString('unrated in options but having ratings', hostedGame)),
+            ...missingRating.map(hostedGame => hostedGameToString('rated in options but no ratings', hostedGame)),
         ];
     }
 }
