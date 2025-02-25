@@ -4,6 +4,10 @@ import hexProgram from './hexProgram';
 import { AccountsMustHavePassword } from './data-inconsistency-checks/AccountsMustHavePassword';
 import { MoveTimestampsAreOrdered } from './data-inconsistency-checks/MoveTimestampsAreOrdered';
 import { DataInconsistenciesCheckerInterface } from './data-inconsistency-checks/DataInconsistenciesCheckerInterface';
+import { RatingChangesOnlyWhenApplicable } from './data-inconsistency-checks/RatingChangesOnlyWhenApplicable';
+import { TimeoutGamesWithLessThan2MovesMustBeCanceled } from './data-inconsistency-checks/TimeoutGamesWithLessThan2MovesMustBeCanceled';
+import { GamesWithAIMustHaveOpponentId } from './data-inconsistency-checks/GamesWithAIMustHaveOpponentId';
+import { InconsistentWinnerStateOutcome } from './data-inconsistency-checks/InconsistentWinnerStateOutcome';
 
 hexProgram
     .command('check-inconsistencies')
@@ -15,6 +19,10 @@ hexProgram
 
         const checkers: DataInconsistenciesCheckerInterface[] = [
             Container.get(AccountsMustHavePassword),
+            Container.get(RatingChangesOnlyWhenApplicable),
+            Container.get(TimeoutGamesWithLessThan2MovesMustBeCanceled),
+            Container.get(GamesWithAIMustHaveOpponentId),
+            Container.get(InconsistentWinnerStateOutcome),
             Container.get(MoveTimestampsAreOrdered),
         ];
 
@@ -32,28 +40,5 @@ hexProgram
         }
 
         console.log('DONE');
-
-        /*
-         * No rating change if game is unranked or canceled
-         */
-
-        /*
-         * No ai game without opponentPublicId
-         * SELECT * FROM `hosted_game_options` WHERE `opponentType` = 'ai' AND `opponentPublicId` IS NULL LIMIT 50
-         */
-
-        /*
-         * resigned games should have 2 moves or more
-         */
-        /*
-            select hg.id, g.endedAt, json_length(g.movesHistory) as moves, concat('http://localhost:3000/games/', hg.publicId)
-            from game g
-            inner join hosted_game hg on hg.id = g.hostedGameId
-            where g.outcome = 'resign'
-            and json_length(g.movesHistory) < 2
-         */
-
-
-        // games lost on time with < 2 moves must be canceled
     })
 ;
