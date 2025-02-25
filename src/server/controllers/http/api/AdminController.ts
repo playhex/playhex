@@ -3,9 +3,10 @@ import { IsNumber, IsString, Max, Min } from 'class-validator';
 import HostedGameRepository from '../../../repositories/HostedGameRepository';
 import PlayerRepository from '../../../repositories/PlayerRepository';
 import HttpError from '../HttpError';
-import { Authorized, Body, JsonController, Post } from 'routing-controllers';
+import { Authorized, Body, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
 import { Player, HostedGameOptions } from '../../../../shared/app/models';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
+import ChatMessageRepository from '../../../repositories/ChatMessageRepository';
 
 class CreateAiVsAiInput
 {
@@ -29,6 +30,7 @@ export default class AdminController
     constructor(
         private hostedGameRepository: HostedGameRepository,
         private playerRepository: PlayerRepository,
+        private chatMessageRepository: ChatMessageRepository,
     ) {}
 
     @Post('/api/admin/persist-games')
@@ -74,5 +76,26 @@ export default class AdminController
         const hostedGameServer = await this.hostedGameRepository.createGame(ai0, options);
 
         return hostedGameServer.getHostedGame();
+    }
+
+    @Post('/api/admin/players/:publicId/shadow-ban')
+    async shadowBanPlayer(
+        @Param('publicId') publicId: string,
+    ) {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (null === player) {
+            throw new NotFoundError(`Player "${publicId}" not found`);
+        }
+
+        const playerShadowBanned = await this.playerRepository.shadowBan(publicId);
+        const activeGamesShadowDeleted = this.hostedGameRepository.shadowDeletePlayerChatMessages(publicId);
+        const persistedGamesShadowDeleted = await this.chatMessageRepository.shadowDeletePlayerMessages(player);
+
+        return {
+            playerShadowBanned,
+            activeGamesShadowDeleted,
+            persistedGamesShadowDeleted,
+        };
     }
 }

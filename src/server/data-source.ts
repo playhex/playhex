@@ -1,4 +1,5 @@
 import './config';
+import InMemoryCacheProvider from 'typeorm-in-memory-cache';
 import { DataSource } from 'typeorm';
 import Container from 'typedi';
 import { entities } from '../shared/app/models';
@@ -24,6 +25,9 @@ export const AppDataSource = new DataSource({
     entities: Object.values(entities),
     migrations: [],
     maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
+    cache: {
+        provider: () => new InMemoryCacheProvider(),
+    },
 });
 
 AppDataSource.initialize();

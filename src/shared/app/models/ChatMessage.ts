@@ -41,4 +41,12 @@ export default class ChatMessage
     @Expose()
     @Type(() => Date)
     createdAt: Date;
+
+    /**
+     * This message is hidden publicly,
+     * but still visible by its author.
+     */
+    @Expose()
+    @Column({ default: false })
+    shadowDeleted: boolean;
 }

@@ -3363,6 +3363,11 @@ clone-deep@^4.0.1:
     kind-of "^6.0.2"
     shallow-clone "^3.0.0"
 
+clone@2.x:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
+  integrity sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==
+
 cluster-key-slot@1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz#88ddaa46906e303b5de30d3153b7d9fe0a0c19ac"
@@ -5992,6 +5997,13 @@ no-case@^4.0.0:
   resolved "https://registry.yarnpkg.com/no-case/-/no-case-4.0.0.tgz#d728c0ca7e7a5475e392738d94113c29509e5232"
   integrity sha512-WmS3EUGw+vXHlTgiUPi3NzbZNwH6+uGX0QLGgqG+aFSJ5rkX/Ee0nuwHBJfZTfQwwR8lGO819NEIwQ7CGhkdEQ==
 
+node-cache@^5.1.0:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/node-cache/-/node-cache-5.1.2.tgz#f264dc2ccad0a780e76253a694e9fd0ed19c398d"
+  integrity sha512-t1QzWwnk4sjLWaQAS8CHgOJ+RAfmHpxFWmc36IWTiWHQfs0w5JDMBS1b1ZxQteo0vVVuWJvIUKHDkkeK7vIGCg==
+  dependencies:
+    clone "2.x"
+
 node-cleanup@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/node-cleanup/-/node-cleanup-2.1.2.tgz#7ac19abd297e09a7f72a71545d951b517e4dde2c"
@@ -7750,6 +7762,14 @@ typedi@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/typedi/-/typedi-0.10.0.tgz#e8f9a5ee100b84addbdfb57fe90d8d9ed2a21dea"
   integrity sha512-v3UJF8xm68BBj6AF4oQML3ikrfK2c9EmZUyLOfShpJuItAqVBHWP/KtpGinkSsIiP6EZyyb6Z3NXyW9dgS9X1w==
+
+typeorm-in-memory-cache@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/typeorm-in-memory-cache/-/typeorm-in-memory-cache-1.0.2.tgz#9bc7ca5804b5c0e46db977ac6384dbaac50a0540"
+  integrity sha512-GRSKpJ3PF9bk/CyK5g4W8DRistYFc2JoAUQPCYnMjfoH8u3F4eRxEZ3LTQZGEl8ljc92gZkFg/R566CSqsDz5w==
+  dependencies:
+    node-cache "^5.1.0"
+    tslib "^2.0.0"
 
 typeorm@^0.3.20:
   version "0.3.20"

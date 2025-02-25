@@ -16,6 +16,7 @@ import RatingRepository from './RatingRepository';
 import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames';
 import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames';
 import { isDuplicateError } from './typeormUtils';
+import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages';
 
 export class GameError extends Error {}
 
@@ -466,6 +467,11 @@ export default class HostedGameRepository
             return e.message;
         }
 
+        // shadow delete chat message if player is shadow banned for chat messages
+        if (chatMessage.player?.shadowBanned && !whitelistedChatMessage[chatMessage.content]) {
+            chatMessage.shadowDeleted = true;
+        }
+
         const hostedGameServer = this.activeGames[publicId];
 
         // Game is in memory, push chat message
@@ -500,5 +506,29 @@ export default class HostedGameRepository
         this.io.to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
 
         return true;
+    }
+
+    /**
+     * Shadow delete player chat messages in active games
+     */
+    shadowDeletePlayerChatMessages(playerPublicId: string): number
+    {
+        let shadowDeleted = 0;
+
+        for (const key in this.activeGames) {
+            const activeGame = this.activeGames[key];
+
+            for (const chatMessage of activeGame.getHostedGame().chatMessages) {
+                if (chatMessage.player?.publicId === playerPublicId
+                    && !whitelistedChatMessage[chatMessage.content]
+                    && !chatMessage.shadowDeleted
+                ) {
+                    chatMessage.shadowDeleted = true;
+                    ++shadowDeleted;
+                }
+            }
+        }
+
+        return shadowDeleted;
     }
 }

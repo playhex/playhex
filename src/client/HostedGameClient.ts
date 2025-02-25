@@ -17,6 +17,7 @@ import { toEngineMove } from '../shared/app/models/Move';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat';
 import { canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, updateHostedGame } from '@shared/app/hostedGameUtils';
 import useLobbyStore from './stores/lobbyStore';
+import useAuthStore from './stores/authStore';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -52,7 +53,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         super();
 
         this.readMessages = hostedGame.chatMessages?.length ?? 0;
-        this.richChat = new RichChat(hostedGame);
+        this.richChat = new RichChat(hostedGame, useAuthStore().loggedInPlayer);
     }
 
     getState(): HostedGameState

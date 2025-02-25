@@ -15,11 +15,6 @@ export class MustBeGuestError extends HandledError {}
 @Service()
 export default class PlayerRepository
 {
-    /**
-     * Cached players indexed by publicId
-     */
-    private playersCache: { [key: string]: Player } = {};
-
     constructor(
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
@@ -27,19 +22,12 @@ export default class PlayerRepository
 
     async getPlayer(publicId: string): Promise<null | Player>
     {
-        if (this.playersCache[publicId]) {
-            return this.playersCache[publicId];
-        }
-
-        const player = await this.playerRepository.findOneBy({
-            publicId,
+        return await this.playerRepository.findOne({
+            where: {
+                publicId,
+            },
+            cache: 30000,
         });
-
-        if (null !== player) {
-            this.playersCache[publicId] = player;
-        }
-
-        return player;
     }
 
     async getPlayerBySlug(slug: string): Promise<null | Player>
@@ -105,7 +93,7 @@ export default class PlayerRepository
 
                 await this.playerRepository.save(player);
 
-                return this.playersCache[player.publicId] = player;
+                return player;
             } catch (e) {
                 if (e instanceof QueryFailedError && e.message.includes('Duplicate entry')) {
                     ++exponent;
@@ -139,7 +127,7 @@ export default class PlayerRepository
 
             await this.playerRepository.save(player);
 
-            return this.playersCache[player.publicId] = player;
+            return player;
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
@@ -165,7 +153,7 @@ export default class PlayerRepository
             throw new InvalidPasswordError();
         }
         player.password = await hashPassword(newPassword);
-        return this.playersCache[publicId] = await this.playerRepository.save(player);
+        return await this.playerRepository.save(player);
     }
 
     /**
@@ -200,7 +188,7 @@ export default class PlayerRepository
         upgradedPlayer.createdAt = new Date();
 
         try {
-            return this.playersCache[publicId] = await this.playerRepository.save(upgradedPlayer);
+            return await this.playerRepository.save(upgradedPlayer);
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
@@ -208,5 +196,19 @@ export default class PlayerRepository
 
             throw e;
         }
+    }
+
+    async shadowBan(publicId: string)
+    {
+        const { affected } = await this.playerRepository.createQueryBuilder('player')
+            .update()
+            .where('publicId = :publicId', { publicId })
+            .set({
+                shadowBanned: true,
+            })
+            .execute()
+        ;
+
+        return affected;
     }
 }

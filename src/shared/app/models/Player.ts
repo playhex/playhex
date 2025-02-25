@@ -76,4 +76,13 @@ export default class Player
     @JoinColumn()
     @Expose()
     currentRating?: Rating;
+
+    /**
+     * Whether this player is shadow banned:
+     * - can send chat messages, but only visible to himself.
+    *       All chat messages posted while being shadow banned
+     *      are marked as shadow deleted.
+     */
+    @Column({ default: false })
+    shadowBanned: boolean;
 }
