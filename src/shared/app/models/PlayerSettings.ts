@@ -64,14 +64,14 @@ export default class PlayerSettings
     @Expose()
     @IsOptional()
     @IsEnum(MoveSettings)
-    @Column({ default: MoveSettings.PREMOVE })
-    moveSettingsBlitz: MoveSettings = MoveSettings.PREMOVE;
+    @Column({ default: MoveSettings.SEND_IMMEDIATELY })
+    moveSettingsBlitz: MoveSettings = MoveSettings.SEND_IMMEDIATELY;
 
     @Expose()
     @IsOptional()
     @IsEnum(MoveSettings)
-    @Column({ default: MoveSettings.PREMOVE })
-    moveSettingsNormal: MoveSettings = MoveSettings.PREMOVE;
+    @Column({ default: MoveSettings.SEND_IMMEDIATELY })
+    moveSettingsNormal: MoveSettings = MoveSettings.SEND_IMMEDIATELY;
 
     @Expose()
     @IsOptional()
