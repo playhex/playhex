@@ -22,3 +22,22 @@ export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, hostedGam
 
     return canPlayerChatInGame(chatMessage.player, hostedGame);
 };
+
+/**
+ * Check if a message is shadow deleted,
+ * and should be displayed to current player.
+ *
+ * @param shouldShowToPlayer Player currently viewing chat
+ * @returns true: should show message. false: should not show, nor emit notification
+ */
+export const checkShadowDeleted = (chatMessage: ChatMessage, shouldShowToPlayer: null | Player): boolean => {
+    if (!chatMessage.shadowDeleted) {
+        return true;
+    }
+
+    if (null === chatMessage.player || null === shouldShowToPlayer) {
+        return false;
+    }
+
+    return chatMessage.player.publicId === shouldShowToPlayer.publicId;
+};

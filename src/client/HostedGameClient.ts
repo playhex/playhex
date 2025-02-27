@@ -18,6 +18,7 @@ import { RichChat, RichChatMessage } from '../shared/app/rich-chat';
 import { canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, updateHostedGame } from '@shared/app/hostedGameUtils';
 import useLobbyStore from './stores/lobbyStore';
 import useAuthStore from './stores/authStore';
+import { checkShadowDeleted } from '../shared/app/chatUtils';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -52,8 +53,10 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     ) {
         super();
 
-        this.readMessages = hostedGame.chatMessages?.length ?? 0;
-        this.richChat = new RichChat(hostedGame, useAuthStore().loggedInPlayer);
+        this.removeShadowDeletedMessages();
+
+        this.readMessages = hostedGame.chatMessages.length ?? 0;
+        this.richChat = new RichChat(hostedGame);
     }
 
     getState(): HostedGameState
@@ -521,6 +524,15 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         });
     }
 
+    private removeShadowDeletedMessages(): void
+    {
+        const { loggedInPlayer } = useAuthStore();
+
+        this.hostedGame.chatMessages = this.hostedGame.chatMessages
+            .filter(chatMessage => checkShadowDeleted(chatMessage, loggedInPlayer))
+        ;
+    }
+
     async sendChatMessage(content: string): Promise<string | true>
     {
         return new Promise((resolve, reject) => {
@@ -536,6 +548,10 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onChatMessage(chatMessage: ChatMessage): void
     {
+        if (!checkShadowDeleted(chatMessage, useAuthStore().loggedInPlayer)) {
+            return;
+        }
+
         this.hostedGame.chatMessages.push(chatMessage);
         this.richChat.postChatMessage(chatMessage);
         this.emit('chatMessagePosted');

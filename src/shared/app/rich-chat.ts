@@ -1,5 +1,5 @@
 import { isSameDay } from 'date-fns';
-import { ChatMessage, HostedGame, Player } from './models';
+import { ChatMessage, HostedGame } from './models';
 
 /*
  * Take a game chat messages, and adds between chat messages:
@@ -40,11 +40,6 @@ export class RichChat
 
     constructor(
         hostedGame: HostedGame,
-
-        /**
-         * Which player is reading this chat.
-         */
-        private currentPlayer: null | Player = null,
     ) {
         this.generators = [
             new MoveNumberHeader(hostedGame),
@@ -63,31 +58,11 @@ export class RichChat
 
     postChatMessage(chatMessage: ChatMessage): void
     {
-        if (!this.checkShadowDeleted(chatMessage)) {
-            return;
-        }
-
         for (const generator of this.generators) {
             this.richChatMessages.push(...generator.yieldChatHeaders(chatMessage));
         }
 
         this.richChatMessages.push(chatMessage);
-    }
-
-    /**
-     * @returns True: can be displayed for this current player
-     */
-    private checkShadowDeleted(chatMessage: ChatMessage): boolean
-    {
-        if (!chatMessage.shadowDeleted) {
-            return true;
-        }
-
-        if (null === chatMessage.player || null === this.currentPlayer) {
-            return false;
-        }
-
-        return chatMessage.player.publicId === this.currentPlayer.publicId;
     }
 }
 
