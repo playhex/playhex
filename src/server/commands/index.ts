@@ -5,5 +5,6 @@ import './createMohexBotsCommand';
 import './createKatahexBotsCommand';
 import './anonymizeDB';
 import './checkDbInconsistencies';
+import './calculateRatings';
 
 hexProgram.parse();
