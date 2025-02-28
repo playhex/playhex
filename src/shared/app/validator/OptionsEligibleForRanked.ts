@@ -67,3 +67,21 @@ export class SwapRuleEligibleForRanked extends OptionsEligibleForRanked
         return 'Swap rule must be enabled for ranked games';
     }
 }
+
+@ValidatorConstraint({ name: 'opponentTypeEligibleForRanked', async: false })
+export class OpponentTypeEligibleForRanked extends OptionsEligibleForRanked
+{
+    validateOptions(options: HostedGameOptions): boolean
+    {
+        if ('true' === process.env.ALLOW_RANKED_BOT_GAMES) {
+            return true;
+        }
+
+        return 'player' === options.opponentType;
+    }
+
+    defaultMessage(): string
+    {
+        return 'Bot games cannot be ranked';
+    }
+}

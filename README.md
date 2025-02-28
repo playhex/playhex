@@ -123,10 +123,15 @@ yarn cypress open
 yarn hex create-random-bots
 ```
 
-- Random bots must play instantaneously, which is the default. If you changed this, make sure this env var is zero again:
+- Random bots must play instantaneously.
+- Ranked bot games must be allowed.
+
+Theses settings are the defaults.
+But if you have changed one of these, make sure to reset it before running tests:
 
 ```
 RANDOM_BOT_WAIT_BEFORE_PLAY=0
+ALLOW_RANKED_BOT_GAMES=true
 ```
 
 - A functional test in auth.cy.ts needs at least one game in database to run fully.

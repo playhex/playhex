@@ -171,12 +171,12 @@
         "desc": "Recent first"
     },
     "1v1_ranked": {
-        "title": "1v1",
-        "create": "Create 1v1"
+        "title": "Ranked",
+        "create": "Create 1v1 ranked"
     },
     "1v1_friendly": {
-        "title": "Custom 1v1",
-        "create": "Create custom 1v1"
+        "title": "Friendly",
+        "create": "Create 1v1 friendly"
     },
     "1vAI_ranked": {
         "title": "Ranked vs AI",

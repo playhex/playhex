@@ -29,6 +29,9 @@ export default class HostedGameOptions
     @Validate(BoardsizeEligibleForRanked)
     @Validate(FirstPlayerEligibleForRanked)
     @Validate(SwapRuleEligibleForRanked)
+    // TODO uncomment next line few time after the release that remove the create ranked bot game is removed
+    // to prevent blocking players that have not yet new client version
+    // @Validate(OpponentTypeEligibleForRanked)
     ranked: boolean = false;
 
     /**

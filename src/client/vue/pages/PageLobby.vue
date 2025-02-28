@@ -7,7 +7,6 @@ import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '@client/vue
 import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '@client/vue/components/overlay/Create1v1FriendlyOverlay.vue';
 import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
 import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '@client/vue/components/overlay/Create1vAIRankedOverlay.vue';
-import Create1vOfflineAIOverlay, { Create1vOfflineAIOverlayInput } from '@client/vue/components/overlay/Create1vOfflineAIOverlay.vue';
 import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
 import { HostedGame, HostedGameOptions } from '../../../shared/app/models';
 import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
@@ -81,10 +80,16 @@ const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new
     }
 };
 
+
+
 /*
- * 1 vs AI ranked
- */
+* 1 vs AI ranked
+*/
 const create1vAIRankedOverlay = defineOverlay<Create1vAIRankedOverlayInput, HostedGameOptions>(Create1vAIRankedOverlay);
+
+/* global ALLOW_RANKED_BOT_GAMES */
+// @ts-ignore: ALLOW_RANKED_BOT_GAMES replaced at build time by webpack.
+const allowRankedBotGames: boolean = 'true' === ALLOW_RANKED_BOT_GAMES;
 
 const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
     gameOptions.opponentType = 'ai';
@@ -114,26 +119,6 @@ const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = ne
 
         const hostedGame = await apiPostGame(gameOptions);
         goToGame(hostedGame.publicId);
-    } catch (e) {
-        // noop, player just closed popin
-    }
-};
-
-/*
- * Local play
- */
-const create1vOfflineAIOverlay = defineOverlay<Create1vOfflineAIOverlayInput, HostedGameOptions>(Create1vOfflineAIOverlay);
-
-const createAndJoinGameVsLocalAI = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
-    try {
-        gameOptions = await create1vOfflineAIOverlay({ gameOptions });
-
-        router.push({
-            name: 'play-vs-ai',
-            state: {
-                gameOptionsJson: JSON.stringify(gameOptions),
-            },
-        });
     } catch (e) {
         // noop, player just closed popin
     }
@@ -246,11 +231,7 @@ const createGameFromHash = () => {
             create1v1FriendlyAndJoinGame(gameOptions);
         }
     } else {
-        if (gameOptions.ranked) {
-            create1vAIRankedAndJoinGame(gameOptions);
-        } else {
-            create1vAIFriendlyAndJoinGame(gameOptions);
-        }
+        create1vAIFriendlyAndJoinGame(gameOptions);
     }
 };
 
@@ -272,23 +253,18 @@ const {
             <div class="col-sm-9">
                 <h3>{{ $t('new_game') }}</h3>
 
-                <div class="play-buttons row">
-                    <div class="col-6 col-md-4 mb-4">
+                <div class="play-buttons row mb-4 g-3">
+                    <div class="col">
                         <button type="button" class="btn w-100 btn-warning" @click="() => create1v1RankedAndJoinGame()"><BIconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
                     </div>
-                    <div class="col-6 col-md-4 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1v1FriendlyAndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
-                    </div>
-                </div>
-                <div class="play-buttons row">
-                    <div class="col-6 col-md-4 mb-4">
+                    <div class="col" v-if="allowRankedBotGames">
                         <button type="button" class="btn w-100 btn-warning" @click="() => create1vAIRankedAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
                     </div>
-                    <div class="col-6 col-md-4 mb-4">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIFriendlyAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
+                    <div class="col">
+                        <button type="button" class="btn w-100 btn-success" @click="() => create1v1FriendlyAndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
                     </div>
-                    <div class="col-6 col-md-4 mb-4">
-                        <button type="button" class="btn w-100 btn-outline-primary" @click="() => createAndJoinGameVsLocalAI()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_offline.title') }}</button>
+                    <div class="col">
+                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIFriendlyAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
                     </div>
                 </div>
 
@@ -452,7 +428,10 @@ const {
 <style lang="stylus" scoped>
 .play-buttons
     .btn
-        min-height 7em
+        min-height 6em
+
+        @media (min-width: 992px)
+            min-height 7em
 
 h4
     margin-top 1em

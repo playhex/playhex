@@ -26,12 +26,12 @@ describe('Cancel a game', () => {
         cy.get('.menu-top').contains(/Guest \d+/);
 
         cy
-            .contains('1v1')
+            .contains('Ranked')
             .click()
         ;
 
         cy
-            .contains('.modal button', 'Create 1v1')
+            .contains('.modal button', 'Create 1v1 ranked')
             .click()
         ;
 

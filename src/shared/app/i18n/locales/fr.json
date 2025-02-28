@@ -125,19 +125,19 @@
         "forfeit": "{player} déclare forfait."
     },
     "1v1_ranked": {
-        "title": "1c1",
-        "create": "Créer une partie 1c1"
+        "title": "Classée",
+        "create": "Créer une partie classée 1c1"
     },
     "1v1_friendly": {
-        "title": "1c1 personnalisée",
-        "create": "Créer une partie personnalisée 1c1"
+        "title": "Amicale",
+        "create": "Créer une partie amicale 1c1"
     },
     "1vAI_ranked": {
         "title": "IA classée",
         "create": "Jouer classé contre l'IA"
     },
     "1vAI_friendly": {
-        "title": "Jouer contre l'IA",
+        "title": "Contre l'IA",
         "create": "Jouer contre l'IA"
     },
     "1vAI_offline": {
