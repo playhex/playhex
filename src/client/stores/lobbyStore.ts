@@ -1,14 +1,14 @@
 import { PlayerIndex } from '@shared/game-engine';
 import { Outcome } from '@shared/game-engine/Types';
 import { defineStore } from 'pinia';
-import HostedGame from '../../shared/app/models/HostedGame';
-import Player from '../../shared/app/models/Player';
+import { HostedGame, Player, Move, ChatMessage } from '../../shared/app/models';
 import { getGame, getGames } from '@client/apiClient';
 import useSocketStore from './socketStore';
 import { ref, watchEffect } from 'vue';
 import Rooms from '@shared/app/Rooms';
 import { addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters';
+import { notifier } from '../services/notifications';
 
 /**
  * State synced with server, and methods to handle games and players.
@@ -105,11 +105,21 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             } else {
                 hostedGames.value[hostedGame.publicId] = hostedGame;
             }
+
+            notifier.emit('gameStart', hostedGame);
+        });
+
+        socket.on('moved', (gameId: string, move: Move) => {
+            if (hostedGames.value[gameId]) {
+                notifier.emit('move', hostedGames.value[gameId], move);
+            }
         });
 
         socket.on('gameCanceled', (gameId, { date }) => {
             if (hostedGames.value[gameId]) {
                 cancelGame(hostedGames.value[gameId], date);
+
+                notifier.emit('gameEnd', hostedGames.value[gameId]);
 
                 delete hostedGames.value[gameId];
             }
@@ -124,7 +134,15 @@ const useLobbyStore = defineStore('lobbyStore', () => {
                     endedHostedGames.value.pop();
                 }
 
+                notifier.emit('gameEnd', hostedGames.value[gameId]);
+
                 delete hostedGames.value[gameId];
+            }
+        });
+
+        socket.on('chat', (gameId: string, chatMessage: ChatMessage) => {
+            if (hostedGames.value[gameId]) {
+                notifier.emit('chatMessage', hostedGames.value[gameId], chatMessage);
             }
         });
     };

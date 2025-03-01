@@ -7,6 +7,7 @@ import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
 import { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
 import { requestBrowserNotificationPermission } from '../services/notifications';
+import { isBotGame } from '@shared/app/hostedGameUtils';
 
 export type CurrentGame = {
     publicId: string;
@@ -25,7 +26,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     const authStore = useAuthStore();
 
     const myGames = ref<{ [key: string]: CurrentGame }>({});
-    const mostUrgentGame = ref<null | CurrentGame>(null);
 
     /**
      * Number of games where I'm in, created or playing.
@@ -39,7 +39,11 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      */
     const myTurnCount = computed((): number => {
         return Object.values(myGames.value)
-            .filter(game => isPlaying(game) && game.isMyTurn)
+            .filter(game =>
+                isPlaying(game)
+                && !isBotGame(game.hostedGame)
+                && game.isMyTurn,
+            )
             .length
         ;
     });
@@ -75,13 +79,16 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      *
      * Or null if I have 0 current game.
      */
-    const getMostUrgentGame = (): null | CurrentGame => {
+    const mostUrgentGame = computed((): null | CurrentGame => {
         if (isEmpty()) {
             return null;
         }
 
         const playingGames = Object.values(myGames.value)
-            .filter(game => isPlaying(game))
+            .filter(game =>
+                isPlaying(game)
+                && !isBotGame(game.hostedGame),
+            )
             .sort(byRemainingTime(new Date()))
         ;
 
@@ -97,7 +104,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             // Not my turn, but game is playing and less remaining time
             ?? playingGames[0]
         ;
-    };
+    });
 
 
     socket.on('gameCreated', (hostedGame: HostedGame) => {
@@ -111,8 +118,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             myColor: null,
             hostedGame: hostedGame,
         };
-
-        mostUrgentGame.value = getMostUrgentGame();
 
         requestBrowserNotificationPermission();
     });
@@ -142,8 +147,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         myGames.value[publicId].myColor = myColor;
         myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === authStore.loggedInPlayer?.publicId;
         myGames.value[publicId].hostedGame = hostedGame;
-
-        mostUrgentGame.value = getMostUrgentGame();
     });
 
     socket.on('moved', (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => {
@@ -153,20 +156,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         const isMyTurn = myGames.value[gameId].myColor !== byPlayerIndex;
         myGames.value[gameId].isMyTurn = isMyTurn;
-
-        mostUrgentGame.value = getMostUrgentGame();
     });
 
     socket.on('ended', (gameId: string) => {
         delete myGames.value[gameId];
-
-        mostUrgentGame.value = getMostUrgentGame();
     });
 
     socket.on('gameCanceled', (gameId: string) => {
         delete myGames.value[gameId];
-
-        mostUrgentGame.value = getMostUrgentGame();
     });
 
     socket.on('playerGamesUpdate', (initialGames: HostedGame[]) => {
@@ -175,7 +172,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         if (null === me) return;
 
         myGames.value = {};
-        mostUrgentGame.value = null;
 
         for (const hostedGame of initialGames) {
             const { publicId: id, gameData } = hostedGame;
@@ -200,8 +196,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
             myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: hostedGame };
         }
-
-        mostUrgentGame.value = getMostUrgentGame();
     });
 
     watch(

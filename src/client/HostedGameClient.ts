@@ -355,8 +355,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.doStartGame(hostedGame);
 
         this.emit('started');
-
-        notifier.emit('gameStart', hostedGame);
     }
 
     getTimeControlOptions(): TimeControlType
@@ -428,8 +426,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.game.move(toEngineMove(move), byPlayerIndex);
-
-        notifier.emit('move', this.hostedGame, move);
     }
 
     onServerAskUndo(byPlayerIndex: PlayerIndex): void
@@ -470,8 +466,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return;
         }
 
-        notifier.emit('gameEnd', this.hostedGame);
-
         // If game is not already ended locally by server response anticipation
         if (this.game.isEnded()) {
             return;
@@ -492,8 +486,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         if (null === this.game) {
             return;
         }
-
-        notifier.emit('gameEnd', this.hostedGame);
 
         // If game is not already ended locally by server response anticipation
         if (this.game.isEnded()) {
@@ -555,7 +547,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.hostedGame.chatMessages.push(chatMessage);
         this.richChat.postChatMessage(chatMessage);
         this.emit('chatMessagePosted');
-        notifier.emit('chatMessage', this.hostedGame, chatMessage);
     }
 
     getUnreadMessages(): number

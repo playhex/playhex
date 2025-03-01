@@ -12,7 +12,7 @@ const play = async (filename: string): Promise<void> => {
 
 notifier.on('gameStart', (hostedGame) => {
     if (!(
-        iAmInGame(hostedGame) || viewingGame(hostedGame)
+        iAmInGame(hostedGame)
     )) {
         return;
     }

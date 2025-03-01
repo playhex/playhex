@@ -106,7 +106,7 @@ describe('My turn notification', () => {
         });
     });
 
-    it('displays 1 and my color when I just created a game VS AI and I play first', () => {
+    it('does not take bot games into account', () => {
         cy.visit('/');
         cy.get('.menu-top').contains(/Guest \d+/);
 
@@ -135,14 +135,14 @@ describe('My turn notification', () => {
         cy.contains('random bot');
 
         cy.get('.my-turn-notif .btn-my-turn').then($a => {
-            if ('1' !== $a.text()) {
-                throw new Error('I should have one game where I have to play');
+            if ('0' !== $a.text()) {
+                throw new Error('It displays 0 because bot games should not be displayed here');
             }
         });
 
         cy.get('.my-turn-notif svg').then($element => {
-            if (!hasOnlyClass($element, 'text-danger')) {
-                throw new Error('Notification should be red');
+            if (!hasOnlyClass($element, 'text-secondary')) {
+                throw new Error('Notification should be grey (or gray)');
             }
 
             if (isEmptyHexagon($element)) {

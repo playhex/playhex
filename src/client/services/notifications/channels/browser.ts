@@ -3,6 +3,7 @@ import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../context-
 import { notifier } from '../notifier';
 import { pseudoString } from '@shared/app/pseudoUtils';
 import router from '../../../vue/router';
+import { isBotGame } from '../../../../shared/app/hostedGameUtils';
 
 const icon = '/images/logo-transparent.svg';
 
@@ -48,7 +49,11 @@ const sendNotification = (options: NotificationOptions, route: () => void, title
 };
 
 notifier.on('gameStart', (hostedGame) => {
-    if (hasFocus()) {
+    if (isBotGame(hostedGame)) {
+        return;
+    }
+
+    if (viewingGame(hostedGame) && hasFocus()) {
         return;
     }
 
