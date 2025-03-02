@@ -84,5 +84,5 @@ export default class Player
      *      are marked as shadow deleted.
      */
     @Column({ default: false })
-    shadowBanned: boolean;
+    shadowBanned?: boolean;
 }

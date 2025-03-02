@@ -1,4 +1,4 @@
-import Player from '../../shared/app/models/Player';
+import { Player } from '../../shared/app/models';
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication';

@@ -1,13 +1,14 @@
-/* eslint-disable */
-
 declare module '*.vue' {
-    import type { DefineComponent } from 'vue'
-    const component: DefineComponent<{}, {}, any>
-    export default component
+    import type { DefineComponent } from 'vue';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
+    const component: DefineComponent<{}, {}, any>;
+    export default component;
 }
 
-declare module 'vue-matomo' {
-    import {Plugin} from 'vue'
-    const VueMatomo: Plugin
-    export default VueMatomo
+import { Router, RouteRecordRaw } from 'vue-router';
+declare module '@vue/runtime-core' {
+    interface ComponentCustomProperties {
+        $router: Router;
+        $route: RouteRecordRaw;
+    }
 }

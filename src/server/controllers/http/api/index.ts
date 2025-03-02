@@ -9,7 +9,7 @@ import PlayerSettingsController from './PlayerSettingsController';
 import AdminController from './AdminController';
 import HttpError from '../HttpError';
 import PlayerRepository from '../../../repositories/PlayerRepository';
-import Player from '../../../../shared/app/models/Player';
+import { Player } from '../../../../shared/app/models';
 import ChatController from './ChatController';
 import AIConfigController from './AIConfigController';
 import GameAnalyzeController from './GameAnalyzeController';
@@ -34,7 +34,9 @@ export const registerApi = (app: Express) => {
         defaults: {
             undefinedResultCode: 204,
         },
-        currentUserChecker: async (action): Promise<null | Player> => {
+        // TODO remove eslint disablings, and "() as any" when this is fixed: https://github.com/typestack/routing-controllers/issues/1495
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        currentUserChecker: (async (action: any): Promise<null | Player> => {
             const { playerId } = action.request.session;
 
             if (!playerId) {
@@ -48,7 +50,8 @@ export const registerApi = (app: Express) => {
             }
 
             return player;
-        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any,
         authorizationChecker: (action, roles): boolean => {
             if (roles.includes('ADMIN')) {
                 const authorization = (action.request as Request).get('Authorization');
