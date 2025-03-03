@@ -8,6 +8,7 @@ import HandledError from '../../shared/app/Errors';
 import { QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils';
 import SearchPlayersParameters from '@shared/app/SearchPlayersParameters';
+import { instanceToPlain } from '../../shared/app/class-transformer-custom';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}
@@ -153,6 +154,7 @@ export default class PlayerRepository
             throw new InvalidPasswordError();
         }
         player.password = await hashPassword(newPassword);
+        logger.info('Player is changing password', { playerPublicId: publicId });
         return await this.playerRepository.save(player);
     }
 
@@ -177,7 +179,6 @@ export default class PlayerRepository
             throw new MustBeGuestError();
         }
 
-        // Do not mutate current in-memory player until upgraded successfully
         const upgradedPlayer = new Player();
         Object.assign(upgradedPlayer, player);
 
@@ -188,7 +189,15 @@ export default class PlayerRepository
         upgradedPlayer.createdAt = new Date();
 
         try {
-            return await this.playerRepository.save(upgradedPlayer);
+            await this.playerRepository.save(upgradedPlayer);
+
+            logger.info('Player created an account from guest', {
+                oldPlayer: player,
+                pseudo,
+                upgradedPlayer: instanceToPlain(upgradedPlayer), // do not log password hash
+            });
+
+            return upgradedPlayer;
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
