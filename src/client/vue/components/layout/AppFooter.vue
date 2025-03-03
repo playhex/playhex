@@ -43,7 +43,7 @@ i18next.on('languageChanged', () => {
                 {{ $t('hex_links') }}
             </router-link>
         </div>
-        <p class="infos d-flex flex-column flex-md-row justify-content-center gap-md-4 text-center">
+        <p class="infos">
             <span>{{ $t('project_under_development') }}</span>
             <span v-if="date">{{ $t('last_change', { date }) }}</span>
             <router-link :to="{ name: 'guide' }">PlayHex guide</router-link>
@@ -67,6 +67,11 @@ i18next.on('languageChanged', () => {
 .infos
     margin 2em 0 0 0
     text-align center
+
+    display flex
+    flex-wrap wrap
+    justify-content center
+    gap 0.5em 1.5em
 
 .link-icons
     svg
