@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 self.addEventListener('install', () => {
     // noop
 });
@@ -35,7 +33,7 @@ const CachePolicy = {
      *
      * Like CACHE_FIRST, but still update resource for next call.
      */
-    CACHE_AND_UPDATE: 'cache and update'
+    CACHE_AND_UPDATE: 'cache and update',
 };
 
 /**
@@ -109,6 +107,8 @@ const retrieveResponse = async (request, cachePolicy) => {
             }
         }
 
+        break;
+
         case CachePolicy.NETWORK_FIRST: {
             try {
                 const response = await fetch(request);
@@ -123,6 +123,8 @@ const retrieveResponse = async (request, cachePolicy) => {
                 }
             }
         }
+
+        break;
 
         case CachePolicy.CACHE_FIRST: {
             try {
@@ -139,6 +141,8 @@ const retrieveResponse = async (request, cachePolicy) => {
             } catch (error) {
             }
         }
+
+        break;
 
         case CachePolicy.CACHE_AND_UPDATE: {
             try {
@@ -160,6 +164,8 @@ const retrieveResponse = async (request, cachePolicy) => {
             } catch (error) {
             }
         }
+
+        break;
     }
 
     return { response: undefined, hit: false };
