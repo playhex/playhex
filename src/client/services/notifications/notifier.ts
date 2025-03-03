@@ -4,6 +4,13 @@ import { ChatMessage, HostedGame, Move } from '../../../shared/app/models';
 type NotifiableEvents = {
     gameStart: (hostedGame: HostedGame) => void;
 
+    /**
+     * A move have been played on a game.
+     * Can be either me, as soon as I click on a cell,
+     * or a move from another player on another game.
+     *
+     * move is not yet stacked in hostedGame.gameData.movesHistory
+     */
     move: (hostedGame: HostedGame, move: Move) => void;
 
     /**

@@ -19,6 +19,7 @@ import { canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlaye
 import useLobbyStore from './stores/lobbyStore';
 import useAuthStore from './stores/authStore';
 import { checkShadowDeleted } from '../shared/app/chatUtils';
+import { playAudio } from '../shared/app/audioPlayer';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -252,6 +253,14 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return canJoin(this.hostedGame, player);
     }
 
+    private playSoundForMove(move: Move): void
+    {
+        playAudio('pass' === move.specialMoveType
+            ? '/sounds/lisp/Check.ogg'
+            : '/sounds/lisp/Move.ogg',
+        );
+    }
+
     async sendMove(move: Move): Promise<true | string>
     {
         // No need to send client playedAt date, server won't trust it
@@ -270,7 +279,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
                 reject(answer);
             });
 
-            notifier.emit('move', this.hostedGame, moveWithoutDate);
+            this.playSoundForMove(move);
         });
     }
 
@@ -426,6 +435,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.game.move(toEngineMove(move), byPlayerIndex);
+
+        this.playSoundForMove(move);
     }
 
     onServerAskUndo(byPlayerIndex: PlayerIndex): void

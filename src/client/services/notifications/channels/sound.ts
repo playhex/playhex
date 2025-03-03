@@ -1,14 +1,6 @@
 import { getLoser, iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils';
 import { notifier } from '../notifier';
-
-const play = async (filename: string): Promise<void> => {
-    try {
-        const audio = new Audio(filename);
-        await audio.play();
-    } catch (e) {
-        // noop, browser says user has not allowed audio permission
-    }
-};
+import { playAudio } from '../../../../shared/app/audioPlayer';
 
 notifier.on('gameStart', (hostedGame) => {
     if (!(
@@ -17,20 +9,7 @@ notifier.on('gameStart', (hostedGame) => {
         return;
     }
 
-    play('/sounds/lisp/GenericNotify.ogg');
-});
-
-notifier.on('move', (hostedGame, move) => {
-    if (!(
-        viewingGame(hostedGame)
-    )) {
-        return;
-    }
-
-    play('pass' === move.specialMoveType
-        ? '/sounds/lisp/Check.ogg'
-        : '/sounds/lisp/Move.ogg',
-    );
+    playAudio('/sounds/lisp/GenericNotify.ogg');
 });
 
 notifier.on('gameEnd', (hostedGame) => {
@@ -43,14 +22,14 @@ notifier.on('gameEnd', (hostedGame) => {
     const loser = getLoser(hostedGame);
 
     if (null === loser) {
-        play('/sounds/lisp/GenericNotify.ogg');
+        playAudio('/sounds/lisp/GenericNotify.ogg');
         return;
     }
 
     if (isMe(loser)) {
-        play('/sounds/lisp/Defeat.ogg');
+        playAudio('/sounds/lisp/Defeat.ogg');
     } else {
-        play('/sounds/lisp/Victory.ogg');
+        playAudio('/sounds/lisp/Victory.ogg');
     }
 });
 
@@ -67,7 +46,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         return;
     }
 
-    play('/sounds/lisp/NewPM.ogg');
+    playAudio('/sounds/lisp/NewPM.ogg');
 });
 
 notifier.on('gameTimeControlWarning', (hostedGame) => {
@@ -75,5 +54,5 @@ notifier.on('gameTimeControlWarning', (hostedGame) => {
         return;
     }
 
-    play('/sounds/lisp/LowTime.ogg');
+    playAudio('/sounds/lisp/LowTime.ogg');
 });
