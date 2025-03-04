@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot } from 'bootstrap-icons-vue';
+import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck } from 'bootstrap-icons-vue';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
@@ -19,6 +19,7 @@ import { CustomizedGameView } from '../../../services/CustomizedGameView';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { MoveSettings } from '../../../../shared/app/models/PlayerSettings';
+import { usePushNotificationSettings } from '../../composables/pushNotificationSettings';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
@@ -154,6 +155,16 @@ const getLocaleName = (locale: string): string => {
 
     return `${languageNamesEn.of(locale)} ("${languageNamesLocale.of(locale)}")`;
 };
+
+/*
+ * Push notification
+ */
+const {
+    permission,
+    requestPermission,
+    subscribed,
+    subscribeToPushNotifications,
+} = usePushNotificationSettings();
 </script>
 
 <template>
@@ -409,6 +420,27 @@ const getLocaleName = (locale: string): string => {
                     :players="players"
                 />
             </div>
+        </div>
+    </section>
+
+    <section id="push-notifications">
+        <div class="container">
+            <h3>Push notifications</h3>
+
+            <p>{{ permission }}</p>
+
+            <button
+                v-if="permission === 'default'"
+                @click="requestPermission"
+                class="btn btn-outline-success"
+            >Request permission</button>
+
+            <button
+                v-if="permission === 'granted'"
+                @click="subscribeToPushNotifications"
+                class="btn btn-outline-success"
+                :disabled="subscribed"
+            ><BIconCheck v-if="subscribed" /> Subscribe to push</button>
         </div>
     </section>
 

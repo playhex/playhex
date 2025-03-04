@@ -4,17 +4,14 @@ import { notifier } from '../notifier';
 import { pseudoString } from '@shared/app/pseudoUtils';
 import router from '../../../vue/router';
 import { isBotGame } from '../../../../shared/app/hostedGameUtils';
+import { serviceWorkerRegistrationPromise } from '../../registerServiceWorker';
+import { RouteLocationAsRelativeTyped } from 'vue-router';
 
 const icon = '/images/logo-transparent.svg';
 
-const tags = { game: 'game notifications' };
-
-export const requestNotificationPermission = (): void => {
-    if ('undefined' === typeof Notification) {
-        return;
-    }
-
-    if (Notification.permission === 'default') Notification.requestPermission();
+const tags = {
+    default: 'hex default notifications',
+    game: 'game notifications',
 };
 
 /**
@@ -28,24 +25,31 @@ const sanitizeNotificationBody = (body: string): string => {
     return p.innerHTML;
 };
 
-const sendNotification = (options: NotificationOptions, route: () => void, title = 'PlayHex') => {
+const sendNotification = async (options: NotificationOptions, route: RouteLocationAsRelativeTyped, title = 'PlayHex') => {
     if ('undefined' === typeof Notification) {
         return;
     }
 
-    if (Notification.permission === 'default') {
-        Notification.requestPermission();
-    } else if (Notification.permission === 'granted') {
-        try {
-            new Notification(title, { ...options, icon }).onclick = function() {
-                if (route) route();
-                focus();
-                this.close();
-            };
-        } catch (e) {
-            // TODO check compatibility on mobile. https://stackoverflow.com/questions/29774836/failed-to-construct-notification-illegal-constructor
-        }
+    if ('granted' !== Notification.permission) {
+        return;
     }
+
+    const serviceWorkerRegistration = await serviceWorkerRegistrationPromise;
+
+    if (null === serviceWorkerRegistration) {
+        return;
+    }
+
+    const computedOptions: NotificationOptions = {
+        tag: tags.default,
+        ...options,
+        icon,
+        data: {
+            goToPath: router.resolve(route).fullPath,
+        },
+    };
+
+    await serviceWorkerRegistration.showNotification(title, computedOptions);
 };
 
 notifier.on('gameStart', (hostedGame) => {
@@ -68,11 +72,9 @@ notifier.on('gameStart', (hostedGame) => {
             body: i18next.t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
             tag: tags.game,
         },
-        () => {
-            router.push({
-                name: 'online-game',
-                params: { gameId: hostedGame.publicId },
-            });
+        {
+            name: 'online-game',
+            params: { gameId: hostedGame.publicId },
         },
     );
 });
@@ -99,11 +101,9 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
             body: sanitizeNotificationBody(chatMessage.content),
             tag: tags.game,
         },
-        () => {
-            router.push({
-                name: 'online-game',
-                params: { gameId: hostedGame.publicId },
-            });
+        {
+            name: 'online-game',
+            params: { gameId: hostedGame.publicId },
         },
         chatMessage.player ? pseudoString(chatMessage.player) : 'PlayHex',
     );

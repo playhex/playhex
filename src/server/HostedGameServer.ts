@@ -18,6 +18,7 @@ import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/mode
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils';
+import { PushNotificationSender } from './services/pushNotifications';
 
 type HostedGameEvents = {
     played: () => void;
@@ -414,6 +415,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             this.cancelUndoRequestIfAny(byPlayerIndex);
             this.emit('played');
+
+            if (!game.isEnded()) {
+                const player = this.players[game.getCurrentPlayerIndex()];
+                Container.get(PushNotificationSender).pushTurnToPlay(player, this.hostedGame, move.getPlayedAt());
+            }
         });
 
         /**

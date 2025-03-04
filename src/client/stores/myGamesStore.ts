@@ -6,7 +6,6 @@ import { HostedGame, Move } from '@shared/app/models';
 import Rooms from '@shared/app/Rooms';
 import { PlayerIndex } from '@shared/game-engine';
 import { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
-import { requestBrowserNotificationPermission } from '../services/notifications';
 import { isBotGame } from '@shared/app/hostedGameUtils';
 
 export type CurrentGame = {
@@ -118,8 +117,6 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             myColor: null,
             hostedGame: hostedGame,
         };
-
-        requestBrowserNotificationPermission();
     });
 
     socket.on('gameStarted', (hostedGame: HostedGame) => {

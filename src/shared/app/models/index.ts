@@ -16,6 +16,7 @@ import HostedGameToPlayer from './HostedGameToPlayer';
 import Move from './Move';
 import OnlinePlayers from './OnlinePlayers';
 import Player from './Player';
+import PlayerPushSubscription from './PlayerPushSubscription';
 import PlayerSettings from './PlayerSettings';
 import PlayerStats from './PlayerStats';
 import Rating from './Rating';
@@ -39,6 +40,7 @@ export {
     Player,
     PlayerSettings,
     PlayerStats,
+    PlayerPushSubscription,
     Rating,
 };
 
@@ -59,6 +61,7 @@ export const entities = {
     Move,
     OnlinePlayers,
     Player,
+    PlayerPushSubscription,
     PlayerSettings,
     PlayerStats,
     Rating,

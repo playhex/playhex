@@ -575,3 +575,15 @@ export const apiPatchConditionalMoves = async (hostedGamePublicId: string, condi
 
     return plainToInstance(ConditionalMoves, await response.json());
 };
+
+export const apiPostPushSubscription = async (pushSubscription: PushSubscription): Promise<void> => {
+    const response = await fetch(`/api/push-subscriptions`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pushSubscription),
+    });
+
+    await checkResponse(response);
+};

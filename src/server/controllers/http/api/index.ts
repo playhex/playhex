@@ -18,6 +18,7 @@ import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '..
 import ServerInfoController from './ServerInfoController';
 import SearchController from './SearchController';
 import GameConditionalMovesController from './GameConditionalMovesController';
+import PushController from './PushController';
 
 export const registerApi = (app: Express) => {
 
@@ -83,6 +84,7 @@ export const registerApi = (app: Express) => {
             PlayerSettingsController,
             AdminController,
             AIConfigController,
+            PushController,
             RatingController,
             SearchController,
             ServerInfoController,

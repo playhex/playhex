@@ -14,6 +14,7 @@ const plugins = [
     new DefinePlugin({
         BASE_URL: JSON.stringify(process.env.BASE_URL),
         SITE_TITLE_SUFFIX: JSON.stringify(process.env.SITE_TITLE_SUFFIX),
+        PUSH_VAPID_PUBLIC_KEY: JSON.stringify(process.env.PUSH_VAPID_PUBLIC_KEY),
         ALLOW_RANKED_BOT_GAMES: JSON.stringify(process.env.ALLOW_RANKED_BOT_GAMES),
         MATOMO_WEBSITE_ID: JSON.stringify(process.env.MATOMO_WEBSITE_ID),
         MATOMO_SRC: JSON.stringify(process.env.MATOMO_SRC),

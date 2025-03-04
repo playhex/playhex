@@ -182,3 +182,115 @@ self.addEventListener('fetch', event => {
         return result.response;
     })());
 });
+
+self.addEventListener('push', (event) => {
+    // src/shared/app/PushPayload.ts
+    const {
+        body,
+        title,
+        goToPath,
+        date,
+        lang,
+    } = event.data.json();
+
+    event.waitUntil(self.registration.showNotification(title, {
+        body,
+        icon: '/images/logo-transparent.svg',
+        lang,
+        timestamp: new Date(date).valueOf(),
+        data: {
+            goToPath,
+        },
+    }));
+});
+
+// Keep track url changes in clients, because client.url is the url when the tab was created.
+const clientUpdatedUrls = {};
+
+self.addEventListener('message', (event) => {
+    if (event.data?.type === 'ROUTE_UPDATE') {
+        clientUpdatedUrls[event.source.id] = event.data.url;
+    }
+});
+
+/**
+ * Delete clients that have been closed to prevent clientUpdatedUrls growing.
+ *
+ * @param {Client[]} windowClients
+ */
+const cleanClientUpdatedUrls = windowClients => {
+    const stillOpenClientIds = {};
+
+    for (const client of windowClients) {
+        stillOpenClientIds[client.id] = true;
+    }
+
+    for (const clientId in clientUpdatedUrls) {
+        if (!stillOpenClientIds[clientId]) {
+            self.console.log('delete', clientId);
+            delete clientUpdatedUrls[clientId];
+        }
+    }
+};
+
+// On notification click, navigate to the url.
+self.addEventListener('notificationclick', event => {
+    const { goToPath } = event.notification.data;
+    event.notification.close(); // Android needs explicit close.
+
+    /* global clients */
+
+    event.waitUntil(
+        clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(windowClients => {
+
+            cleanClientUpdatedUrls(windowClients);
+
+            // no tab open on the application, just open a new one.
+            if (0 === windowClients.length) {
+                if (clients.openWindow) {
+                    return clients.openWindow(goToPath ?? '/');
+                }
+
+                return;
+            }
+
+            let focusedClient = null;
+
+            // Check if there is already a window/tab open with the target URL
+            for (const client of windowClients) {
+
+                /**
+                 * Contains either full url, or relative path of client current url.
+                 *
+                 * client.url is the absolute url, not only the path.
+                 * client.url don't change when url changes with vue.
+                 * So it's the first url when tab is created.
+                 * It's the expected behaviour according to the spec, but chromium keeps it updated.
+                 *
+                 * @type {string}
+                 */
+                const clientUrl = clientUpdatedUrls[client.id] ?? client.url;
+
+                // If so, just focus it.
+                if (null !== goToPath && clientUrl.includes(goToPath) && 'focus' in client) {
+                    return client.focus();
+                }
+
+                if (client.focused) {
+                    focusedClient = client;
+                }
+            }
+
+            // If no focused client, focus to first one
+            if (null === focusedClient) {
+                focusedClient = windowClients[0];
+                focusedClient.focus();
+            }
+
+            // navigate to the url in the focused client
+            if (null !== goToPath) {
+                focusedClient.postMessage({ type: 'NAVIGATE', goToPath });
+            }
+        }),
+    );
+});
