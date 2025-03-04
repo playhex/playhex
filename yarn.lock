@@ -6887,10 +6887,10 @@ rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
-routing-controllers@^0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/routing-controllers/-/routing-controllers-0.11.1.tgz#7d883de258604f1538df556435da25640a9facab"
-  integrity sha512-IGHHR+SpLsmDLUpYmGCwAwg1d6bobugNLlBfljnWnXEwQJhx1FGHOc93aQrErixkT3GiNxkgkVlZeFBXYcZ0LA==
+routing-controllers@^0.11.2:
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/routing-controllers/-/routing-controllers-0.11.2.tgz#7d1b178b58336a8852ef6dd4f60cdef216185e7e"
+  integrity sha512-VXwORuOHQfFYUdIFgf65uf7XK87X7tekCjVhN75bHKOlIkwF3JmrOkmY1wv0LVgn7Q3vf5qq8yxf2QASi1jiyw==
   dependencies:
     cookie "^1.0.2"
     glob "^11.0.0"

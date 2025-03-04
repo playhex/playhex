@@ -34,9 +34,7 @@ export const registerApi = (app: Express) => {
         defaults: {
             undefinedResultCode: 204,
         },
-        // TODO remove eslint disablings, and "() as any" when this is fixed: https://github.com/typestack/routing-controllers/issues/1495
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        currentUserChecker: (async (action: any): Promise<null | Player> => {
+        currentUserChecker: async (action): Promise<null | Player> => {
             const { playerId } = action.request.session;
 
             if (!playerId) {
@@ -50,8 +48,7 @@ export const registerApi = (app: Express) => {
             }
 
             return player;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        }) as any,
+        },
         authorizationChecker: (action, roles): boolean => {
             if (roles.includes('ADMIN')) {
                 const authorization = (action.request as Request).get('Authorization');
