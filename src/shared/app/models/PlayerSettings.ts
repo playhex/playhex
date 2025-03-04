@@ -31,36 +31,6 @@ export default class PlayerSettings
     @JoinColumn()
     player?: Player;
 
-    /**
-     * TODO remove when version with moveSettings adopted
-     * @deprecated use moveSettingsBlitz instead
-     */
-    @Expose()
-    @IsOptional()
-    @IsBoolean()
-    @Column({ default: false })
-    confirmMoveBlitz: boolean = false;
-
-    /**
-     * TODO remove when version with moveSettings adopted
-     * @deprecated use confirmMoveNormal instead
-     */
-    @Expose()
-    @IsOptional()
-    @IsBoolean()
-    @Column({ default: false })
-    confirmMoveNormal: boolean = false;
-
-    /**
-     * TODO remove when version with moveSettings adopted
-     * @deprecated use confirmMoveCorrespondence instead
-     */
-    @Expose()
-    @IsOptional()
-    @IsBoolean()
-    @Column({ default: true })
-    confirmMoveCorrespondence: boolean = true;
-
     @Expose()
     @IsOptional()
     @IsEnum(MoveSettings)
