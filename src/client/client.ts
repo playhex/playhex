@@ -13,15 +13,7 @@ import I18NextVue from 'i18next-vue';
 import i18next from 'i18next';
 import { head } from './services/head';
 import useMatomo from './vue/useMatomo';
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-        .catch((error) => {
-            // eslint-disable-next-line no-console
-            console.error('Error while worker registering', error);
-        })
-    ;
-}
+import './services/registerServiceWorker';
 
 const pinia = createPinia();
 
