@@ -49,9 +49,6 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     constructor()
     {
         super();
-
-        this.on('playerConnected', player => this.emit('playerActive', player, false));
-        this.on('playerDisconnected', player => this.emit('playerInactive', player));
     }
 
     socketHasConnected(socket: HexSocket): void

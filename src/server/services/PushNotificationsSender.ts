@@ -1,11 +1,8 @@
 import webPush from 'web-push';
 import { Service } from 'typedi';
-import { HostedGame, Player } from '../../shared/app/models';
+import { Player } from '../../shared/app/models';
 import PlayerPushSubscriptionRepository from '../repositories/PlayerPushSubscriptionRepository';
-import { getOtherPlayer } from '../../shared/app/hostedGameUtils';
-import logger from './logger';
 import { PushPayload } from '../../shared/app/PushPayload';
-import { PushNotificationFactory } from '../../shared/app/PushNotificationFactory';
 
 const {
     PUSH_VAPID_PUBLIC_KEY,
