@@ -34,6 +34,25 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                 );
             })
 
+            .on('playerActive', (player, lastState) => {
+                // Ignore when player was already active
+                if (lastState) {
+                    return;
+                }
+
+                this.hexServer.to(Rooms.onlinePlayers).emit(
+                    'playerActive',
+                    player,
+                );
+            })
+
+            .on('playerInactive', (player) => {
+                this.hexServer.to(Rooms.onlinePlayers).emit(
+                    'playerInactive',
+                    player,
+                );
+            })
+
         ;
     }
 
@@ -41,6 +60,16 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
     {
         this.onlinePlayersService.socketHasConnected(socket);
         socket.on('disconnect', () => this.onlinePlayersService.socketHasDisconnected(socket));
+
+        socket.on('activity', () => {
+            const { player } = socket.data;
+
+            if (null === player) {
+                return;
+            }
+
+            this.onlinePlayersService.notifyPlayerActivity(player);
+        });
     }
 
     onJoinRoom(socket: HexSocket, room: string): void

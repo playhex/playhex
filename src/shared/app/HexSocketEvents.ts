@@ -47,6 +47,11 @@ export type HexClientToServerEvents = {
     sendChat: (gameId: string, content: string, answer: (result: true | string) => void) => void;
 
     /**
+     * I am active
+     */
+    activity: () => void;
+
+    /**
      * Returns info about server:
      *  - serverDate: Used to allow client to synchronize with server date,
      *      and prevent displaying a shifted chrono in games.
@@ -121,6 +126,16 @@ export type HexServerToClientEvents = {
      * totalPlayers is the count of players connected now.
      */
     playerDisconnected: (player: Player | null, totalPlayers: number) => void;
+
+    /**
+     * A player become active.
+     */
+    playerActive: (player: Player) => void;
+
+    /**
+     * A player become inactive.
+     */
+    playerInactive: (player: Player) => void;
 
     /**
      * A chat message has been posted in a game.

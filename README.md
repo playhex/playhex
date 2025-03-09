@@ -102,6 +102,29 @@ curl --location --request POST 'http://localhost:3000/api/admin/persist-games' \
 
 See available admin endpoints in postman collection, in "Admin" folder.
 
+## Push notifications
+
+To test push notifications:
+
+- Generate and configure VAPID keys
+
+Run:
+
+```
+yarn web-push generate-vapid-keys
+```
+
+Then put public keys, private keys in your .env, with any email:
+
+```
+PUSH_VAPID_PUBLIC_KEY=BAFGnysW3...qfMIgTE
+PUSH_VAPID_PRIVATE_KEY=E-YiR...2I
+PUSH_VAPID_EMAIL=test@example.org
+```
+
+- You must be in secure context (https enabled). You can use ngrok.
+- Make sure your client have subscribed push notifications: request permission again in player settings.
+
 ## Test
 
 ``` bash

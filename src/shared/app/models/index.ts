@@ -14,9 +14,10 @@ import {
 } from './HostedGameOptionsTimeControl';
 import HostedGameToPlayer from './HostedGameToPlayer';
 import Move from './Move';
-import OnlinePlayers from './OnlinePlayers';
+import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers';
 import Player from './Player';
-import PlayerSettings from './PlayerSettings';
+import PlayerPushSubscription from './PlayerPushSubscription';
+import PlayerSettings, { MoveSettings } from './PlayerSettings';
 import PlayerStats from './PlayerStats';
 import Rating from './Rating';
 
@@ -35,10 +36,13 @@ export {
     HostedGameOptionsTimeControlByoYomi,
     HostedGameToPlayer,
     Move,
+    MoveSettings,
     OnlinePlayers,
+    OnlinePlayer,
     Player,
     PlayerSettings,
     PlayerStats,
+    PlayerPushSubscription,
     Rating,
 };
 
@@ -59,6 +63,7 @@ export const entities = {
     Move,
     OnlinePlayers,
     Player,
+    PlayerPushSubscription,
     PlayerSettings,
     PlayerStats,
     Rating,

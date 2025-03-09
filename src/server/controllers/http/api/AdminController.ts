@@ -7,6 +7,8 @@ import { Authorized, Body, JsonController, NotFoundError, Param, Post } from 'ro
 import { Player, HostedGameOptions } from '../../../../shared/app/models';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository';
+import { PushNotificationSender } from '../../../services/PushNotificationsSender';
+import { PushPayload } from '../../../../shared/app/PushPayload';
 
 class CreateAiVsAiInput
 {
@@ -31,6 +33,7 @@ export default class AdminController
         private hostedGameRepository: HostedGameRepository,
         private playerRepository: PlayerRepository,
         private chatMessageRepository: ChatMessageRepository,
+        private pushNotificationSender: PushNotificationSender,
     ) {}
 
     @Post('/api/admin/persist-games')
@@ -97,5 +100,19 @@ export default class AdminController
             activeGamesShadowDeleted,
             persistedGamesShadowDeleted,
         };
+    }
+
+    @Post('/api/admin/players/:publicId/push-notification')
+    async postPush(
+        @Param('publicId') publicId: string,
+        @Body() payload: PushPayload,
+    ) {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (null === player) {
+            throw new NotFoundError(`Player "${publicId}" not found`);
+        }
+
+        return await this.pushNotificationSender.sendPush(player, payload);
     }
 }

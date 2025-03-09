@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '@shared/app/Types';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves } from '../shared/app/models';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription } from '../shared/app/models';
 import { ErrorResponse, HandledErrorType } from '@shared/app/Errors';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom';
 import { RatingCategory } from '../shared/app/ratingUtils';
@@ -574,4 +574,41 @@ export const apiPatchConditionalMoves = async (hostedGamePublicId: string, condi
     await checkResponse(response);
 
     return plainToInstance(ConditionalMoves, await response.json());
+};
+
+export const apiGetPushSubscriptions = async (): Promise<PlayerPushSubscription[]> => {
+    const response = await fetch(`/api/push-subscriptions`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as PlayerPushSubscription[])
+        .map(subscription => plainToInstance(PlayerPushSubscription, subscription))
+    ;
+};
+
+export const apiPutPushSubscription = async (pushSubscription: PushSubscription): Promise<PlayerPushSubscription> => {
+    const response = await fetch(`/api/push-subscriptions`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pushSubscription),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(PlayerPushSubscription, await response.json());
+};
+
+export const apiPostPushTest = async (): Promise<void> => {
+    const response = await fetch(`/api/push/test`, {
+        method: 'post',
+    });
+
+    await checkResponse(response);
 };
