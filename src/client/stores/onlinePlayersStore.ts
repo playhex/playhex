@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import useSocketStore from './socketStore';
 import useAuthStore from './authStore';
-import { Player } from '../../shared/app/models';
+import { OnlinePlayer } from '../../shared/app/models';
 import Rooms from '../../shared/app/Rooms';
 
 /**
@@ -16,7 +16,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     /**
      * List of connected players
      */
-    const players = ref<{ [key: string]: Player }>({});
+    const players = ref<{ [key: string]: OnlinePlayer }>({});
 
     /**
      * Total connected players count. Null if not yet loaded
@@ -27,7 +27,10 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         totalPlayers.value = totalPlayersUpdate;
 
         if (null !== player) {
-            players.value[player.publicId] = player;
+            players.value[player.publicId] = {
+                player,
+                active: true,
+            };
         }
     });
 
@@ -39,12 +42,25 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         }
     });
 
+    socket.on('playerActive', player => {
+        if (players.value[player.publicId]) {
+            players.value[player.publicId].active = true;
+        }
+    });
+
+    socket.on('playerInactive', player => {
+        if (players.value[player.publicId]) {
+            players.value[player.publicId].active = false;
+        }
+    });
+
     socket.on('onlinePlayersUpdate', onlinePlayers => {
         totalPlayers.value = onlinePlayers.totalPlayers;
         players.value = onlinePlayers.players;
     });
 
     const isPlayerOnline = (playerId: string): boolean => playerId in players.value;
+    const isPlayerActive = (playerId: string): boolean => players.value[playerId]?.active ?? false;
 
     /*
      * Explicitely display my player disconnection
@@ -71,6 +87,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         players,
         totalPlayers,
         isPlayerOnline,
+        isPlayerActive,
     };
 });
 

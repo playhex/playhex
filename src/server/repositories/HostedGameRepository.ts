@@ -17,6 +17,7 @@ import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGa
 import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames';
 import { isDuplicateError } from './typeormUtils';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages';
+import OnlinePlayersService from '../services/OnlinePlayersService';
 
 export class GameError extends Error {}
 
@@ -45,6 +46,7 @@ export default class HostedGameRepository
         private ratingRepository: RatingRepository,
         private autoCancelStaleGames: AutoCancelStaleGames,
         private autoCancelStaleCorrespondenceGames: AutoCancelStaleCorrespondenceGames,
+        private onlinePlayerService: OnlinePlayersService,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
@@ -244,6 +246,8 @@ export default class HostedGameRepository
 
     async createGame(host: Player, gameOptions: HostedGameOptions, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
     {
+        this.onlinePlayerService.notifyPlayerActivity(host);
+
         const hostedGameServer = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
 
         if ('ai' === gameOptions.opponentType) {
@@ -352,6 +356,8 @@ export default class HostedGameRepository
             return 'no active game ' + gameId;
         }
 
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
         const joinResult = hostedGame.playerJoin(player);
 
         if ('string' === typeof joinResult) {
@@ -369,6 +375,8 @@ export default class HostedGameRepository
             return 'no active game ' + gameId;
         }
 
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
         const result = hostedGame.playerMove(player, move);
 
         return result;
@@ -381,6 +389,8 @@ export default class HostedGameRepository
         if (!hostedGame) {
             return 'no active game ' + gameId;
         }
+
+        this.onlinePlayerService.notifyPlayerActivity(player);
 
         const result = hostedGame.playerPremove(player, move);
 
@@ -395,6 +405,8 @@ export default class HostedGameRepository
             return 'no active game ' + gameId;
         }
 
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
         const result = hostedGame.playerCancelPremove(player);
 
         return result;
@@ -407,6 +419,8 @@ export default class HostedGameRepository
         if (!hostedGame) {
             return 'no active game ' + gameId;
         }
+
+        this.onlinePlayerService.notifyPlayerActivity(player);
 
         const result = hostedGame.playerAskUndo(player);
 
@@ -421,6 +435,8 @@ export default class HostedGameRepository
             return 'no active game ' + gameId;
         }
 
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
         const result = hostedGame.playerAnswerUndo(player, accept);
 
         return result;
@@ -434,6 +450,8 @@ export default class HostedGameRepository
             return 'no active game ' + gameId;
         }
 
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
         const result = hostedGame.playerResign(player);
 
         return result;
@@ -446,6 +464,8 @@ export default class HostedGameRepository
         if (!hostedGame) {
             return 'no active game ' + gameId;
         }
+
+        this.onlinePlayerService.notifyPlayerActivity(player);
 
         const result = hostedGame.playerCancel(player);
 
@@ -465,6 +485,10 @@ export default class HostedGameRepository
         } catch (e) {
             logger.error('Validation failed', { validationError: e });
             return e.message;
+        }
+
+        if (null !== chatMessage.player) {
+            this.onlinePlayerService.notifyPlayerActivity(chatMessage.player);
         }
 
         // shadow delete chat message if player is shadow banned for chat messages

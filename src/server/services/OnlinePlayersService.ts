@@ -1,4 +1,4 @@
-import { Player, OnlinePlayers } from '../../shared/app/models';
+import { Player, OnlinePlayers, OnlinePlayer } from '../../shared/app/models';
 import { HexSocket } from '../server';
 import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -7,7 +7,25 @@ interface OnlinePlayersServiceEvents
 {
     playerConnected: (player: Player) => void;
     playerDisconnected: (player: Player) => void;
+
+    /**
+     * Player is now active, or connected, or made something.
+     *
+     * @param lastState Last active state. If false, player wake up. If true, player is still active and did something
+     */
+    playerActive: (player: Player, lastState: boolean) => void;
+
+    /**
+     * Player seems inactive, did nothing for a while, or disconnected.
+     */
+    playerInactive: (player: Player) => void;
 }
+
+/**
+ * Delay to wait after last player activity
+ * before consider him inactive.
+ */
+const DELAY_BEFORE_PLAYER_INACTIVE = 5 * 60 * 1000;
 
 /**
  * onConnection can be trigerred with a player already connected,
@@ -23,9 +41,18 @@ interface OnlinePlayersServiceEvents
 export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServiceEvents>
 {
     private onlinePlayers: { [publicId: string]: {
-        player: Player;
+        onlinePlayer: OnlinePlayer;
         sockets: HexSocket[];
+        activityTimeout: null | NodeJS.Timeout;
     } } = {};
+
+    constructor()
+    {
+        super();
+
+        this.on('playerConnected', player => this.emit('playerActive', player, false));
+        this.on('playerDisconnected', player => this.emit('playerInactive', player));
+    }
 
     socketHasConnected(socket: HexSocket): void
     {
@@ -39,13 +66,20 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         // player already connected (probably on another tab)
         if (this.onlinePlayers[player.publicId]) {
             this.onlinePlayers[player.publicId].sockets.push(socket);
+            this.notifyPlayerActivity(player);
             return;
         }
 
         this.onlinePlayers[player.publicId] = {
-            player,
+            onlinePlayer: {
+                player,
+                active: true,
+            },
             sockets: [socket],
+            activityTimeout: null,
         };
+
+        this.notifyPlayerActivity(player);
 
         this.emit('playerConnected', player);
     }
@@ -80,11 +114,14 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
 
     getOnlinePlayers(): OnlinePlayers
     {
-        const players: { [key: string]: Player } = {};
+        const players: { [key: string]: OnlinePlayer } = {};
 
-        Object.values(this.onlinePlayers).forEach(p => {
-            players[p.player.publicId] = p.player;
-        });
+        for (const publicId in this.onlinePlayers) {
+            players[publicId] = this.onlinePlayers[publicId].onlinePlayer;
+
+            // TODO tmp retrocompat, remove later, prevent breaking online players section if client not yet updated
+            Object.assign(players[publicId], this.onlinePlayers[publicId].onlinePlayer.player);
+        }
 
         return {
             totalPlayers: Object.keys(this.onlinePlayers).length,
@@ -100,5 +137,35 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     isOnline(player: Player): boolean
     {
         return player.publicId in this.onlinePlayers;
+    }
+
+    isActive(player: Player): boolean
+    {
+        return this.onlinePlayers[player.publicId]?.onlinePlayer.active ?? false;
+    }
+
+    /**
+     * Notifies that a player just made something and is currently active.
+     */
+    notifyPlayerActivity(player: Player): void
+    {
+        const onlinePlayer = this.onlinePlayers[player.publicId];
+
+        if (!onlinePlayer) {
+            return;
+        }
+
+        if (null !== onlinePlayer.activityTimeout) {
+            clearTimeout(onlinePlayer.activityTimeout);
+        }
+
+        onlinePlayer.activityTimeout = setTimeout(() => {
+            onlinePlayer.onlinePlayer.active = false;
+            this.emit('playerInactive', player);
+        }, DELAY_BEFORE_PLAYER_INACTIVE);
+
+        const lastState = onlinePlayer.onlinePlayer.active;
+        onlinePlayer.onlinePlayer.active = true;
+        this.emit('playerActive', player, lastState);
     }
 }

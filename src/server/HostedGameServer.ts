@@ -18,6 +18,8 @@ import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/mode
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils';
+import { PushNotificationsPool } from './services/PushNotificationsPool';
+import { PushNotificationFactory } from '../shared/app/PushNotificationFactory';
 
 type HostedGameEvents = {
     played: () => void;
@@ -414,6 +416,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             this.cancelUndoRequestIfAny(byPlayerIndex);
             this.emit('played');
+
+            if (!game.isEnded()) {
+                const player = this.players[game.getCurrentPlayerIndex()];
+                const pushPayload = PushNotificationFactory.createTurnToPlayNotification(player, this.hostedGame, move.getPlayedAt());
+                Container.get(PushNotificationsPool).poolNotification(player, pushPayload);
+            }
         });
 
         /**
@@ -429,6 +437,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.logger.info('Game ended.', { winner, outcome });
 
             this.emit('ended');
+
+            this.players.forEach(player => {
+                const pushPayload = PushNotificationFactory.createGameEndedNotification(player, this.hostedGame);
+                Container.get(PushNotificationsPool).poolNotification(player, pushPayload);
+            });
+
         });
 
         /**
@@ -490,6 +504,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
         this.logger.info('Game Started.');
+
+        this.players.forEach(player => {
+            const pushPayload = PushNotificationFactory.createGameStartedNotification(player, this.hostedGame);
+            Container.get(PushNotificationsPool).poolNotification(player, pushPayload);
+        });
 
         this.makeAutomatedMoves();
     }

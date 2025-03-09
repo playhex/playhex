@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot } from 'bootstrap-icons-vue';
+import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX } from 'bootstrap-icons-vue';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
+import useNotificationStore from '../../../stores/notificationStore';
 import useAuthStore from '../../../stores/authStore';
-import { ApiClientError } from '../../../apiClient';
+import { ApiClientError, apiPostPushTest } from '../../../apiClient';
 import { watch, Ref, ref, onMounted, onUnmounted } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils';
-import { authChangePassword } from '@client/apiClient';
+import { authChangePassword } from '../../../apiClient';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n';
 import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns';
 import i18n from 'i18next';
 import { Game } from '../../../../shared/game-engine';
-import { Player } from '../../../../shared/app/models';
+import { Player, MoveSettings } from '../../../../shared/app/models';
 import AppBoard from '../../components/AppBoard.vue';
 import { CustomizedGameView } from '../../../services/CustomizedGameView';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler';
 import AppRhombus from '../../components/AppRhombus.vue';
-import { MoveSettings } from '../../../../shared/app/models/PlayerSettings';
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
@@ -154,6 +154,18 @@ const getLocaleName = (locale: string): string => {
 
     return `${languageNamesEn.of(locale)} ("${languageNamesLocale.of(locale)}")`;
 };
+
+/*
+ * Push notification
+ */
+const {
+    permission,
+    subscribed,
+} = storeToRefs(useNotificationStore());
+
+const {
+    requestPermission,
+} = useNotificationStore();
 </script>
 
 <template>
@@ -409,6 +421,29 @@ const getLocaleName = (locale: string): string => {
                     :players="players"
                 />
             </div>
+        </div>
+    </section>
+
+    <section id="push-notifications">
+        <div class="container">
+            <h3>Notifications</h3>
+
+            <p v-if="'granted' === permission"><BIconCheck class="text-success" /> Notifications granted</p>
+            <button
+                v-else-if="'default' === permission"
+                class="btn btn-outline-success"
+                @click="requestPermission"
+            >Allow notifications</button>
+            <p v-else><BIconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
+
+            <p v-if="subscribed"><BIconCheck class="text-success" /> Push notifications subscribed</p>
+            <p v-else><BIconX class="text-danger" /> Notifications denied.</p>
+
+            <button
+                class="btn btn-sm btn-info"
+                :disabled="!subscribed"
+                @click="apiPostPushTest"
+            >Test push notification</button>
         </div>
     </section>
 

@@ -2,23 +2,22 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import useOnlinePlayersStore from '@client/stores/onlinePlayersStore';
-import { BIconCircleFill } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
 import AppTournamentCard from '../AppTournamentCard.vue';
-import type { Player } from '@shared/app/models';
+import type { OnlinePlayer } from '@shared/app/models';
 
 const {
     players,
     totalPlayers,
 } = storeToRefs(useOnlinePlayersStore());
 
-const orderedPlayers = computed<Player[]>(() => {
-    return Object.values<Player>(players.value)
+const orderedPlayers = computed<OnlinePlayer[]>(() => {
+    return Object.values<OnlinePlayer>(players.value)
         .sort((a, b) => {
             // Guests go after non-guests
-            if (!a.isGuest && b.isGuest) return -1;
-            if (a.isGuest && !b.isGuest) return 1;
-            return a.pseudo.localeCompare(b.pseudo);
+            if (!a.player.isGuest && b.player.isGuest) return -1;
+            if (a.player.isGuest && !b.player.isGuest) return 1;
+            return a.player.pseudo.localeCompare(b.player.pseudo);
         });
 });
 
@@ -70,14 +69,10 @@ const nextHexMonthlyNumber = getNextHexMonthlyNumber(nextHexMonthlyDate);
 
         <p
             v-for="player in orderedPlayers"
-            :key="player.publicId"
+            :key="player.player.publicId"
             class="mb-1"
         >
-            <BIconCircleFill
-                class="online-status-icon text-success"
-                aria-hidden="true"
-            />
-            <AppPseudo rating :player="player" />
+            <AppPseudo rating :player="player.player" onlineStatus />
         </p>
     </div>
 </template>

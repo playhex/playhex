@@ -2,6 +2,20 @@ import { Transform } from 'class-transformer';
 import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom';
 import Player from './Player';
 
+export class OnlinePlayer
+{
+    @Expose()
+    player: Player;
+
+    /**
+     * Whether this player is currently active or idle.
+     * Used to show him as inactive,
+     * or to know if we can send push notification to him.
+     */
+    @Expose()
+    active: boolean;
+}
+
 export default class OnlinePlayers
 {
     /**
@@ -25,5 +39,5 @@ export default class OnlinePlayers
         },
         { toClassOnly: true, groups: [GROUP_DEFAULT] },
     )
-    players: { [publicId: string]: Player } = {};
+    players: { [publicId: string]: OnlinePlayer } = {};
 }
