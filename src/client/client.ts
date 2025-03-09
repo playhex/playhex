@@ -14,6 +14,7 @@ import i18next from 'i18next';
 import { head } from './services/head';
 import useMatomo from './vue/useMatomo';
 import './services/registerServiceWorker';
+import './services/playerActivity';
 
 const pinia = createPinia();
 
