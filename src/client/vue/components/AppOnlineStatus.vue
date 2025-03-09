@@ -25,14 +25,24 @@ const onlinePlayersStore = useOnlinePlayersStore();
         class="online-status-icon text-secondary"
         aria-hidden="true"
     />
+
+    <!-- TODO remove this once active status fixed -->
     <BIconCircleFill
-        v-else-if="onlinePlayersStore.isPlayerActive(props.player.publicId)"
+        v-else
         class="online-status-icon text-success"
         aria-hidden="true"
     />
-    <BIconMoonFill
-        v-else
-        class="online-status-icon text-warning"
-        aria-hidden="true"
-    />
+
+    <!-- TODO restore this once active status fixed
+        <BIconCircleFill
+            v-else-if="onlinePlayersStore.isPlayerActive(props.player.publicId)"
+            class="online-status-icon text-success"
+            aria-hidden="true"
+        />
+        <BIconMoonFill
+            v-else
+            class="online-status-icon text-warning"
+            aria-hidden="true"
+        />
+    -->
 </template>
