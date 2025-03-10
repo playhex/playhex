@@ -7,7 +7,7 @@ import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Vali
 import { Expose } from '../class-transformer-custom';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl';
 import type TimeControlType from '../../time-control/TimeControlType';
-import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked';
+import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
@@ -29,9 +29,7 @@ export default class HostedGameOptions
     @Validate(BoardsizeEligibleForRanked)
     @Validate(FirstPlayerEligibleForRanked)
     @Validate(SwapRuleEligibleForRanked)
-    // TODO uncomment next line few time after the release that remove the create ranked bot game is removed
-    // to prevent blocking players that have not yet new client version
-    // @Validate(OpponentTypeEligibleForRanked)
+    @Validate(OpponentTypeEligibleForRanked)
     ranked: boolean = false;
 
     /**
