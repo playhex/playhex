@@ -10,10 +10,14 @@ import { mustAnswerYes } from './utils/question';
  * Reset ratings with:
 
     update player set currentRatingId = null;
+    set foreign_key_checks = 0;
     truncate rating_games_hosted_game;
     truncate rating;
+    set foreign_key_checks = 1;
 
- * then recalc all with this command.
+ * then recalc all with this command:
+
+    yarn hex calculate-ratings
  */
 hexProgram
     .command('calculate-ratings')

@@ -47,12 +47,20 @@ export default class Player
     slug: string;
 
     /**
-     * Displayed on profile page
+     * When player came on PlayHex for the first time.
+     * In most case, this is the date of the creation of the guest session.
+     * Displayed on profile page.
      */
-    @Column({ default: () => 'current_timestamp(3)', precision: 3 })
+    @Column({ default: () => 'current_timestamp()' })
     @Expose()
     @IsDate()
     createdAt: Date;
+
+    /**
+     * When player registered an account.
+     */
+    @Column({ type: Date, nullable: true })
+    registeredAt?: null | Date;
 
     /**
      * BCrypt hashed password

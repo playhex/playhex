@@ -125,8 +125,15 @@ export default class PlayerRepository
             player.pseudo = pseudo;
             player.slug = pseudoSlug(pseudo);
             player.password = await hashPassword(password);
+            player.registeredAt = new Date();
 
             await this.playerRepository.save(player);
+
+            logger.info('Player created an account from anonymous', {
+                oldPlayer: player,
+                pseudo,
+                upgradedPlayer: instanceToPlain(player), // do not log password hash
+            });
 
             return player;
         } catch (e) {
@@ -186,7 +193,7 @@ export default class PlayerRepository
         upgradedPlayer.pseudo = pseudo;
         upgradedPlayer.slug = pseudoSlug(pseudo);
         upgradedPlayer.password = await hashPassword(password);
-        upgradedPlayer.createdAt = new Date();
+        upgradedPlayer.registeredAt = new Date();
 
         try {
             await this.playerRepository.save(upgradedPlayer);
