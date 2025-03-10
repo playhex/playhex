@@ -53,6 +53,12 @@ const syncServiceWorkerClientUrl = async () => {
  * Listen to messages received from service worker.
  */
 const listenServiceWorkerMessages = () => {
+    if (!('serviceWorker' in navigator)) {
+        // eslint-disable-next-line no-console
+        console.warn('serviceWorker is not supported');
+        return;
+    }
+
     try {
         navigator.serviceWorker.addEventListener('message', (event) => {
             // Listen to service worker message NAVIGATE to go to route when he wants
@@ -85,6 +91,10 @@ export const getSubscription = async (): Promise<PushSubscription | null> => {
  * and post it to server so that server can send me push notifications.
  */
 export const subscribeToPushNotifications = async (): Promise<null | PushSubscription> => {
+    if ('undefined' === typeof Notification) {
+        return null;
+    }
+
     if ('granted' !== Notification.permission) {
         return null;
     }

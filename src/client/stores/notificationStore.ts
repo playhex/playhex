@@ -10,7 +10,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     /**
      * Whether player has granted, denied permission, or has not yet been asked.
      */
-    const permission = ref(Notification.permission);
+    const permission = ref(Notification?.permission ?? 'denied');
 
     /**
      * Whether push subscription has been successfully sent to server.
@@ -18,6 +18,10 @@ const useNotificationStore = defineStore('notificationStore', () => {
     const subscribed = ref(false);
 
     const requestPermission = async () => {
+        if ('undefined' === typeof Notification) {
+            return;
+        }
+
         permission.value = await Notification.requestPermission();
     };
 

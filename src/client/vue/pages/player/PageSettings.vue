@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX } from 'bootstrap-icons-vue';
+import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX, BIconExclamationTriangleFill } from 'bootstrap-icons-vue';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
@@ -166,6 +166,8 @@ const {
 const {
     requestPermission,
 } = useNotificationStore();
+
+const isNotificationSupported = 'undefined' !== typeof Notification;
 </script>
 
 <template>
@@ -428,6 +430,8 @@ const {
         <div class="container">
             <h3>Notifications</h3>
 
+            <p v-if="!isNotificationSupported"><BIconExclamationTriangleFill class="text-warning" /> It seems that this browser does not support notifications.</p>
+
             <p v-if="'granted' === permission"><BIconCheck class="text-success" /> Notifications granted</p>
             <button
                 v-else-if="'default' === permission"
@@ -436,8 +440,8 @@ const {
             >Allow notifications</button>
             <p v-else><BIconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
 
-            <p v-if="subscribed"><BIconCheck class="text-success" /> Push notifications subscribed.</p>
-            <p v-else><BIconX class="text-danger" /> No push subscription.</p>
+            <p v-if="subscribed"><BIconCheck class="text-success" /> Subscribed to push notifications.</p>
+            <p v-else><BIconX class="text-danger" /> Not subscribed to push notifications.</p>
 
             <button
                 class="btn btn-sm btn-info"
