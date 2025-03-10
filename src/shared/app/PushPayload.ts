@@ -20,6 +20,13 @@ export class PushPayload
     title = 'PlayHex';
 
     /**
+     * Set same tag to prevent displaying multiple notifications for a same subject.
+     */
+    @IsString()
+    @IsOptional()
+    tag?: string;
+
+    /**
      * Relative url we wish to redirect on click on notification
      */
     @IsString()

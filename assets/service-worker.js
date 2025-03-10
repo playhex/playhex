@@ -188,6 +188,7 @@ self.addEventListener('push', (event) => {
     const {
         body,
         title,
+        tag,
         goToPath,
         date,
         lang,
@@ -197,6 +198,7 @@ self.addEventListener('push', (event) => {
         body,
         icon: '/images/logo-transparent.svg',
         lang,
+        tag: tag ?? 'default',
         timestamp: new Date(date).valueOf(),
         data: {
             goToPath,

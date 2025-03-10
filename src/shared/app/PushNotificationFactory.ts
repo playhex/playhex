@@ -3,12 +3,14 @@ import { HostedGame, Player } from './models';
 import { pseudoString } from './pseudoUtils';
 import { PushPayload } from './PushPayload';
 
+const gameTag = (hostedGame: HostedGame): string => `game-${hostedGame.publicId}`;
+
 /**
  * Create push notifications payload for given event
  */
 export class PushNotificationFactory
 {
-    static createGameStartedNotification(player: Player, hostedGame: HostedGame): PushPayload
+    static createPlayerJoinedAndGameStartedNotification(player: Player, hostedGame: HostedGame): PushPayload
     {
         const otherPlayer = getOtherPlayer(hostedGame, player);
 
@@ -22,6 +24,8 @@ export class PushNotificationFactory
 
         push.title = 'Your game has started';
         push.goToPath = `/games/${hostedGame.publicId}`;
+        push.date = hostedGame.gameData?.startedAt ?? new Date();
+        push.tag = gameTag(hostedGame);
 
         return push;
     }
@@ -41,6 +45,7 @@ export class PushNotificationFactory
         push.title = 'Your turn';
         push.goToPath = `/games/${hostedGame.publicId}`;
         push.date = movePlayedAt;
+        push.tag = gameTag(hostedGame);
 
         return push;
     }
@@ -60,6 +65,8 @@ export class PushNotificationFactory
 
         push.title = 'Your game has ended';
         push.goToPath = `/games/${hostedGame.publicId}`;
+        push.date = hostedGame.gameData?.endedAt ?? new Date();
+        push.tag = gameTag(hostedGame);
 
         return push;
     }

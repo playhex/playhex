@@ -11,12 +11,10 @@ notifier.on('gameStart', hostedGame => {
         return;
     }
 
-    hostedGame.hostedGameToPlayers.forEach(hostedGameToPlayer => {
-        const { player } = hostedGameToPlayer;
-        const pushPayload = PushNotificationFactory.createGameStartedNotification(player, hostedGame);
+    const { host } = hostedGame;
+    const pushPayload = PushNotificationFactory.createPlayerJoinedAndGameStartedNotification(host, hostedGame);
 
-        pushNotificationsPool.poolNotification(player, pushPayload);
-    });
+    pushNotificationsPool.poolNotification(host, pushPayload);
 });
 
 notifier.on('move', (hostedGame, move) => {

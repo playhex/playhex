@@ -42,6 +42,7 @@ export default class PushController
     ) {
         const push = new PushPayload('This is a test notification');
 
+        push.tag = 'test';
         push.goToPath = '/settings';
 
         this.pushNotificationSender.sendPush(player, push);
