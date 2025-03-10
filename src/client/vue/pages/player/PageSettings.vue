@@ -436,8 +436,8 @@ const {
             >Allow notifications</button>
             <p v-else><BIconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
 
-            <p v-if="subscribed"><BIconCheck class="text-success" /> Push notifications subscribed</p>
-            <p v-else><BIconX class="text-danger" /> Notifications denied.</p>
+            <p v-if="subscribed"><BIconCheck class="text-success" /> Push notifications subscribed.</p>
+            <p v-else><BIconX class="text-danger" /> No push subscription.</p>
 
             <button
                 class="btn btn-sm btn-info"
