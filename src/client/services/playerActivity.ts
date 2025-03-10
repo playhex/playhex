@@ -1,9 +1,5 @@
 import useSocketStore from '../stores/socketStore';
-
-/**
- * Won't notify activity to server more than once every N milliseconds.
- */
-const SEND_ACTIVITY_COOLDOWN = 30000;
+import { SEND_ACTIVITY_COOLDOWN } from '../../shared/app/playerActivityConfig';
 
 let cooldownTimeout: null | NodeJS.Timeout = null;
 let hadActivityWhileCooldown = false;
@@ -35,3 +31,4 @@ export const notifyActivity = (): void => {
 
 addEventListener('mousemove', () => notifyActivity());
 addEventListener('mousedown', () => notifyActivity());
+addEventListener('focus', () => notifyActivity());

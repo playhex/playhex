@@ -2,6 +2,7 @@ import { Player, OnlinePlayers, OnlinePlayer } from '../../shared/app/models';
 import { HexSocket } from '../server';
 import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
+import { DELAY_BEFORE_PLAYER_INACTIVE } from '../../shared/app/playerActivityConfig';
 
 interface OnlinePlayersServiceEvents
 {
@@ -22,12 +23,6 @@ interface OnlinePlayersServiceEvents
 }
 
 /**
- * Delay to wait after last player activity
- * before consider him inactive.
- */
-const DELAY_BEFORE_PLAYER_INACTIVE = 5 * 60 * 1000;
-
-/**
  * onConnection can be trigerred with a player already connected,
  * i.e already having a socket on another browser tab.
  *
@@ -45,11 +40,6 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         sockets: HexSocket[];
         activityTimeout: null | NodeJS.Timeout;
     } } = {};
-
-    constructor()
-    {
-        super();
-    }
 
     socketHasConnected(socket: HexSocket): void
     {
@@ -104,9 +94,20 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
             return;
         }
 
-        delete this.onlinePlayers[player.publicId];
+        this.deleteOnlinePlayer(player);
 
         this.emit('playerDisconnected', player);
+    }
+
+    private deleteOnlinePlayer(player: Player): void
+    {
+        const onlinePlayer = this.onlinePlayers[player.publicId];
+
+        if (null !== onlinePlayer.activityTimeout) {
+            clearTimeout(onlinePlayer.activityTimeout);
+        }
+
+        delete this.onlinePlayers[player.publicId];
     }
 
     getOnlinePlayers(): OnlinePlayers
