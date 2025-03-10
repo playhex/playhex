@@ -58,28 +58,42 @@ export class PushNotificationSender
 
                 return response;
             } catch (e) {
-                if (!(e instanceof WebPushError)) {
-                    logger.warning('sendNotification unexpected error type', {
-                        subscription,
-                        message: e.message,
-                    });
+                await (async () => {
+                    if (!(e instanceof WebPushError)) {
+                        logger.warning('sendNotification unexpected error type', {
+                            subscription,
+                            message: e.message,
+                        });
 
-                    ++errors;
-                } else {
+                        ++errors;
+                        return;
+                    }
+
+                    // Normal case: player revoked this subscription, e.g disabled notifications (he may have re-enabled again with another subscription)
                     if (410 === e.statusCode) {
                         await this.playerPushSubscriptionRepository.remove(subscription);
 
                         ++removed;
-                    } else {
-                        logger.warning('sendNotification unexpected WebPushError', {
-                            subscription,
-                            statusCode: e.statusCode,
-                            errorMessage: e.body,
-                        });
-
-                        ++errors;
+                        return;
                     }
-                }
+
+                    let subscriptionRemoved = false;
+
+                    // Endpoint seems invalid, maybe posted manually, remove subscription
+                    if (404 === e.statusCode) {
+                        await this.playerPushSubscriptionRepository.remove(subscription);
+                        subscriptionRemoved = true;
+                    }
+
+                    logger.warning('sendNotification unexpected WebPushError', {
+                        subscription,
+                        statusCode: e.statusCode,
+                        errorMessage: e.body,
+                        subscriptionRemoved,
+                    });
+
+                    ++errors;
+                })();
 
                 throw e;
             }
@@ -87,6 +101,7 @@ export class PushNotificationSender
 
         logger.info('Sent push notification to player', {
             playerPublicId: player.publicId,
+            playerSlug: player.slug,
             notification: {
                 title: pushPayload.title,
                 body: pushPayload.body,
