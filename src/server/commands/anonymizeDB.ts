@@ -14,9 +14,14 @@ hexProgram
         await mustAnswerYes('This will remove data, not to do on real database!');
 
         console.log('Replacing all account passwords to "test"...');
-        AppDataSource.query(
+        await AppDataSource.query(
             'update player set password = ? where password is not null',
             [await hashPassword('test')],
+        );
+
+        console.log('Remove all push notifications');
+        await AppDataSource.query(
+            'truncate player_push_subscription',
         );
 
         console.log('done');
