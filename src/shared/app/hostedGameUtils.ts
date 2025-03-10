@@ -5,6 +5,10 @@ import SearchGamesParameters from './SearchGamesParameters';
 import { timeControlToCadencyName } from './timeControlUtils';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
+    if (hostedGame.host.publicId === player.publicId) {
+        return true;
+    }
+
     return hostedGame.hostedGameToPlayers.some(p => p.player.publicId === player.publicId);
 };
 
@@ -56,6 +60,21 @@ export const getOtherPlayer = (hostedGame: HostedGame, player: Player): null | P
     }
 
     return hostedGame.hostedGameToPlayers[0].player;
+};
+
+/**
+ * Returns player which is current turn to play.
+ *
+ * @returns {null | Player} Null if game is not playing.
+ */
+export const getCurrentPlayer = (hostedGame: HostedGame): null | Player => {
+    const { gameData, state } = hostedGame;
+
+    if (null === gameData || 'playing' !== state) {
+        return null;
+    }
+
+    return hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player;
 };
 
 export const getWinnerPlayer = (hostedGame: HostedGame): null | Player => {

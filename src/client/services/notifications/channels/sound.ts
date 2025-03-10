@@ -1,6 +1,7 @@
-import { getLoser, iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils';
+import { iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils';
 import { notifier } from '../notifier';
 import { playAudio } from '../../../../shared/app/audioPlayer';
+import { getLoserPlayer } from '../../../../shared/app/hostedGameUtils';
 
 notifier.on('gameStart', (hostedGame) => {
     if (!(
@@ -19,7 +20,7 @@ notifier.on('gameEnd', (hostedGame) => {
         return;
     }
 
-    const loser = getLoser(hostedGame);
+    const loser = getLoserPlayer(hostedGame);
 
     if (null === loser) {
         playAudio('/sounds/lisp/GenericNotify.ogg');

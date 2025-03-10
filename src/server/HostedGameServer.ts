@@ -18,8 +18,7 @@ import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/mode
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils';
-import { PushNotificationsPool } from './services/PushNotificationsPool';
-import { PushNotificationFactory } from '../shared/app/PushNotificationFactory';
+import { notifier } from './services/notifications';
 
 type HostedGameEvents = {
     played: () => void;
@@ -407,6 +406,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * Listen on played event, move can come from AI
          */
         game.on('played', (move, moveIndex, byPlayerIndex) => {
+            this.saveState();
+
             this.io.to(this.gameRooms()).emit('moved', this.getPublicId(), fromEngineMove(move), moveIndex, byPlayerIndex);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
@@ -418,9 +419,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.emit('played');
 
             if (!game.isEnded()) {
-                const player = this.players[game.getCurrentPlayerIndex()];
-                const pushPayload = PushNotificationFactory.createTurnToPlayNotification(player, this.hostedGame, move.getPlayedAt());
-                Container.get(PushNotificationsPool).poolNotification(player, pushPayload);
+                notifier.emit('move', this.hostedGame, fromEngineMove(move));
             }
         });
 
@@ -429,6 +428,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * or time control that elapsed and made a winner.
          */
         game.on('ended', (winner, outcome, date) => {
+            this.saveState();
+
             this.hostedGame.state = 'ended';
 
             this.io.to(this.gameRooms(true)).emit('ended', this.getPublicId(), winner, outcome, { date });
@@ -438,11 +439,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             this.emit('ended');
 
-            this.players.forEach(player => {
-                const pushPayload = PushNotificationFactory.createGameEndedNotification(player, this.hostedGame);
-                Container.get(PushNotificationsPool).poolNotification(player, pushPayload);
-            });
-
+            notifier.emit('gameEnd', this.hostedGame);
         });
 
         /**
@@ -450,6 +447,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * or player canceled because nobody joined.
          */
         game.on('canceled', (date) => {
+            this.saveState();
+
             this.logger.info('Game canceled.');
             this.doCancel(date);
         });
@@ -505,10 +504,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.logger.info('Game Started.');
 
-        this.players.forEach(player => {
-            const pushPayload = PushNotificationFactory.createGameStartedNotification(player, this.hostedGame);
-            Container.get(PushNotificationsPool).poolNotification(player, pushPayload);
-        });
+        notifier.emit('gameStart', this.hostedGame);
 
         this.makeAutomatedMoves();
     }

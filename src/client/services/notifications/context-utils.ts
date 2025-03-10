@@ -1,37 +1,29 @@
 import { HostedGame, Player } from '../../../shared/app/models';
+import { getCurrentPlayer, getOtherPlayer, hasPlayer } from '../../../shared/app/hostedGameUtils';
 import useAuthStore from '../../stores/authStore';
 import router from '../../vue/router';
 
 export const hasFocus = () => document.hasFocus();
 
 export const iAmInGame = (hostedGame: HostedGame): boolean => {
-    const { gameData } = hostedGame;
     const { loggedInPlayer } = useAuthStore();
 
     if (null === loggedInPlayer) {
         return false;
     }
 
-    if (hostedGame.host.publicId === loggedInPlayer.publicId) {
-        return true;
-    }
-
-    if (null === gameData) {
-        return false;
-    }
-
-    return hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.publicId;
+    return hasPlayer(hostedGame, loggedInPlayer);
 };
 
 export const isMyTurn = (hostedGame: HostedGame): boolean => {
-    const { gameData } = hostedGame;
     const { loggedInPlayer } = useAuthStore();
+    const currentPlayer = getCurrentPlayer(hostedGame);
 
-    if (null === gameData || null === loggedInPlayer) {
+    if (null === loggedInPlayer || null === currentPlayer) {
         return false;
     }
 
-    return hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === loggedInPlayer.publicId;
+    return currentPlayer.publicId === loggedInPlayer.publicId;
 };
 
 export const getOpponent = (hostedGame: HostedGame): null | Player => {
@@ -42,13 +34,7 @@ export const getOpponent = (hostedGame: HostedGame): null | Player => {
         return null;
     }
 
-    const myIndex = hostedGame.hostedGameToPlayers.findIndex(hostedGameToPlayer => hostedGameToPlayer.player.publicId === loggedInPlayer.publicId);
-
-    if (0 !== myIndex && 1 !== myIndex) {
-        return null;
-    }
-
-    return hostedGame.hostedGameToPlayers[1 - myIndex].player;
+    return getOtherPlayer(hostedGame, loggedInPlayer);
 };
 
 export const isMe = (player: Player): boolean => {
@@ -59,15 +45,6 @@ export const isMe = (player: Player): boolean => {
     }
 
     return player.publicId === loggedInPlayer.publicId;
-};
-
-export const getLoser = (hostedGame: HostedGame): null | Player => {
-    const { gameData } = hostedGame;
-    if (null === gameData || null === gameData.winner) {
-        return null;
-    }
-
-    return hostedGame.hostedGameToPlayers[1 - gameData.winner].player;
 };
 
 /**
