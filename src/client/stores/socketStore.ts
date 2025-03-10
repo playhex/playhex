@@ -34,7 +34,14 @@ const useSocketStore = defineStore('socketStore', () => {
 
     const authStore = useAuthStore();
 
-    watch(() => authStore.loggedInPlayer, reconnectSocket);
+    watch(() => authStore.loggedInPlayer, player => {
+        if (null === player) {
+            socket.disconnect();
+            return;
+        }
+
+        reconnectSocket();
+    });
 
     socket.on('connect', () => {
         connected.value = true;
