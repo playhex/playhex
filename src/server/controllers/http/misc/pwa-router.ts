@@ -4,7 +4,7 @@ import { seo } from '../../../../shared/app/seo';
 export function pwaRouter(): Router {
     const router = Router();
 
-    router.get('/pwa-manifest.json', async (_, res) => {
+    router.get('/pwa-manifest.json', (_, res) => {
         const pwaManifest = {
             id: '/',
             short_name: seo.title,
