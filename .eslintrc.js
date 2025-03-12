@@ -50,6 +50,7 @@ module.exports = {
         'no-console': 'warn',
         'deprecation/deprecation': 'warn',
         'mocha/no-exclusive-tests': 'warn',
+        'indent': ['warn', 4, { SwitchCase: 1, ignoredNodes: ['PropertyDefinition'] }],
         'vue/script-indent': ['warn', 4, { 'baseIndent': 0, 'switchCase': 1 }],
         'vue/html-indent': ['warn', 4, { 'baseIndent': 1 }],
         'vue/max-attributes-per-line': 'off',

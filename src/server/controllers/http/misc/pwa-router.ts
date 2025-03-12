@@ -36,6 +36,12 @@ export function pwaRouter(): Router {
                 ]
                 : undefined
             ,
+            url_handlers: BASE_URL
+                ? [
+                    { origin: BASE_URL },
+                ]
+                : undefined
+            ,
             shortcuts: [
                 {
                     name: 'Play offline vs AI',
@@ -125,11 +131,22 @@ export function pwaRouter(): Router {
      * https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md#association-file
      */
     if (BASE_URL) {
-        router.get('/.well-known/web-app-origin-association', (_, res) => {
+        // Serve web-app-origin-association
+        // Using the "next" form
+        // https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md#future-work-under-consideration
+        router.get([
+            '/.well-known/web-app-origin-association',
+            '/web-app-origin-association', // handles this alternate but obsolete path
+        ], (_, res) => {
             res.send({
-                [BASE_URL]: {
-                    scope: '/',
-                },
+                web_apps: [
+                    {
+                        web_app_identity: BASE_URL,
+                        authorize: [
+                            'intercept-links',
+                        ],
+                    },
+                ],
             });
         });
     }
@@ -150,4 +167,11 @@ type PwaManifest = WebAppManifest & {
         type: 'origin';
         value: string;
     }[];
+
+    /**
+     * Obsolete, seems to be replaced by handle_links + scope_extensions
+     *
+     * https://github.com/WICG/pwa-url-handler/blob/main/explainer.md
+     */
+    url_handlers?: { origin: string }[];
 };
