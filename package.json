@@ -101,6 +101,7 @@
     "@types/node": "^22.13.8",
     "@types/seedrandom": "^3.0.8",
     "@types/uuid": "^10.0.0",
+    "@types/web-app-manifest": "^1.0.9",
     "@types/webpack": "^5.18.0",
     "@types/webpack-bundle-analyzer": "^4.4.0",
     "@typescript-eslint/eslint-plugin": "^7.5.0",

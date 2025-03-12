@@ -1,11 +1,14 @@
 import { Router } from 'express';
+import type { WebAppManifest } from 'web-app-manifest';
 import { seo } from '../../../../shared/app/seo';
+
+const { BASE_URL } = process.env;
 
 export function pwaRouter(): Router {
     const router = Router();
-
+    // https://localhost:3000/games/fb9f7bac-65d1-45ef-bf55-5747f6381070
     router.get('/pwa-manifest.json', (_, res) => {
-        const pwaManifest = {
+        const pwaManifest: PwaManifest = {
             id: '/',
             short_name: seo.title,
             name: seo.title,
@@ -23,6 +26,16 @@ export function pwaRouter(): Router {
             launch_handler: {
                 client_mode: ['navigate-existing', 'auto'],
             },
+            handle_links: BASE_URL ? 'preferred' : 'auto',
+            scope_extensions: BASE_URL
+                ? [
+                    {
+                        type: 'origin',
+                        value: BASE_URL,
+                    },
+                ]
+                : undefined
+            ,
             shortcuts: [
                 {
                     name: 'Play offline vs AI',
@@ -106,5 +119,35 @@ export function pwaRouter(): Router {
         res.send(pwaManifest);
     });
 
+    /*
+     * Open links in PWA.
+     *
+     * https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md#association-file
+     */
+    if (BASE_URL) {
+        router.get('/.well-known/web-app-origin-association', (_, res) => {
+            res.send({
+                [BASE_URL]: {
+                    scope: '/',
+                },
+            });
+        });
+    }
+
     return router;
 }
+
+type PwaManifest = WebAppManifest & {
+    /**
+     * https://github.com/WICG/pwa-url-handler/blob/main/handle_links/explainer.md#handle_links-manifest-member
+     */
+    handle_links?: 'auto' | 'preferred' | 'not-preferred';
+
+    /**
+     * https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md#proposed-solution
+     */
+    scope_extensions?: {
+        type: 'origin';
+        value: string;
+    }[];
+};
