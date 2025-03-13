@@ -9,17 +9,17 @@ export function pwaRouter(): Router {
     // https://localhost:3000/games/fb9f7bac-65d1-45ef-bf55-5747f6381070
     router.get('/pwa-manifest.json', (_, res) => {
         const pwaManifest: PwaManifest = {
-            id: '/',
+            id: BASE_URL ?? '/',
+            scope: BASE_URL ?? '/',
+            start_url: BASE_URL ?? '/',
             short_name: seo.title,
             name: seo.title,
             description: seo.description,
             lang: 'en',
-            start_url: '/',
             theme_color: '#DC3545',
             background_color: '#212529',
             display: 'standalone',
             display_override: ['window-controls-overlay', 'standalone', 'minimal-ui'],
-            scope: '/',
             prefer_related_applications: false,
             categories: ['games', 'entertainment'],
             dir: 'auto',
