@@ -79,7 +79,7 @@ const listenServiceWorkerMessages = () => {
 export const getSubscription = async (): Promise<PushSubscription | null> => {
     const registration = await serviceWorkerRegistrationPromise;
 
-    if (null === registration) {
+    if (!registration?.pushManager) {
         return null;
     }
 
@@ -104,7 +104,7 @@ export const subscribeToPushNotifications = async (): Promise<null | PushSubscri
     if (null === pushSubscription) {
         const registration = await serviceWorkerRegistrationPromise;
 
-        if (null === registration || 'string' !== typeof pushValidPublicKey || 0 === pushValidPublicKey.length) {
+        if (!registration?.pushManager || 'string' !== typeof pushValidPublicKey || 0 === pushValidPublicKey.length) {
             return null;
         }
 
