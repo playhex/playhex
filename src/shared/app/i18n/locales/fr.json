@@ -331,5 +331,7 @@
     },
     "move_settings": {
         "title": "Paramètres de coup"
-    }
+    },
+    "go_to_the_game": "Aller à la partie",
+    "player_passed_his_turn": "{{player}} a passé son tour"
 }
