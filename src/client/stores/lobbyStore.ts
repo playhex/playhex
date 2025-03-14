@@ -1,12 +1,12 @@
 import { PlayerIndex } from '@shared/game-engine';
 import { Outcome } from '@shared/game-engine/Types';
 import { defineStore } from 'pinia';
-import { HostedGame, Player, Move, ChatMessage } from '../../shared/app/models';
+import { HostedGame, Player, ChatMessage } from '../../shared/app/models';
 import { getGame, getGames } from '@client/apiClient';
 import useSocketStore from './socketStore';
 import { ref, watchEffect } from 'vue';
 import Rooms from '@shared/app/Rooms';
-import { addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils';
+import { addMove, addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters';
 import { notifier } from '../services/notifications';
 
@@ -109,8 +109,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             notifier.emit('gameStart', hostedGame);
         });
 
-        socket.on('moved', (gameId: string, move: Move) => {
+        socket.on('moved', (gameId, move, moveIndex, byPlayerIndex) => {
             if (hostedGames.value[gameId]) {
+                addMove(hostedGames.value[gameId], move, moveIndex, byPlayerIndex);
                 notifier.emit('move', hostedGames.value[gameId], move);
             }
         });

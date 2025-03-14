@@ -1,5 +1,5 @@
 import '../shared/app/i18n';
-import './bootstrap.scss';
+import 'bootstrap/scss/bootstrap.scss';
 import './base.styl';
 
 import 'reflect-metadata';

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppHeader from '@client/vue/components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
+import AppToasts from './components/layout/AppToasts.vue';
 import { useRouter } from 'vue-router';
 
 const { currentRoute } = useRouter();
@@ -20,6 +21,8 @@ const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
         <footer v-if="displayFooter()">
             <AppFooter />
         </footer>
+
+        <AppToasts />
     </div>
 </template>
 

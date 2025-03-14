@@ -1,4 +1,4 @@
-import { HostedGame, HostedGameToPlayer, Player } from './models';
+import { HostedGame, HostedGameToPlayer, Move, Player } from './models';
 import { Outcome } from '../game-engine/Types';
 import { PlayerIndex } from '../game-engine';
 import SearchGamesParameters from './SearchGamesParameters';
@@ -127,6 +127,22 @@ export const addPlayer = (hostedGame: HostedGame, player: Player): void => {
     hostedGameToPlayer.player = player;
 
     hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
+};
+
+export const addMove = (hostedGame: HostedGame, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void => {
+    const { gameData } = hostedGame;
+
+    if (null === gameData) {
+        return;
+    }
+
+    if (moveIndex < gameData.movesHistory.length) {
+        return;
+    }
+
+    gameData.movesHistory.push(move);
+    gameData.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
+    gameData.lastMoveAt = move.playedAt;
 };
 
 export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Outcome, endedAt: Date): void => {

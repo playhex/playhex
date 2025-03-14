@@ -15,7 +15,7 @@ import useServerDateStore from './stores/serverDateStore';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue';
 import { toEngineMove } from '../shared/app/models/Move';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat';
-import { canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, updateHostedGame } from '@shared/app/hostedGameUtils';
+import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, updateHostedGame } from '../shared/app/hostedGameUtils';
 import useLobbyStore from './stores/lobbyStore';
 import useAuthStore from './stores/authStore';
 import { checkShadowDeleted } from '../shared/app/chatUtils';
@@ -416,13 +416,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
     {
-        const { gameData } = this.hostedGame;
-
-        if (null !== gameData) {
-            gameData.movesHistory.push(move);
-            gameData.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
-            gameData.lastMoveAt = move.playedAt;
-        }
+        addMove(this.hostedGame, move, moveIndex, byPlayerIndex);
 
         // Do nothing if game not loaded
         if (null === this.game) {
