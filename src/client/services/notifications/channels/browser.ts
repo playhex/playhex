@@ -61,6 +61,11 @@ notifier.on('gameStart', (hostedGame) => {
         return;
     }
 
+    // Only notify game host. Player who just joined don't need to be notified, neither are watchers.
+    if (!isMe(hostedGame.host)) {
+        return;
+    }
+
     const opponent = getOpponent(hostedGame);
 
     if (null === opponent) {
