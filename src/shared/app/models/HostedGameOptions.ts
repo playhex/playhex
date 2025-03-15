@@ -11,7 +11,7 @@ import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeE
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
-export const MAX_BOARDSIZE = 42;
+export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176627/1263010163875381288/1350473700457316413
 
 @Entity()
 export default class HostedGameOptions
