@@ -68,10 +68,3 @@ notifier.on('move', (hostedGame, move) => {
         ));
     }
 });
-
-// TODO remove
-notifier.on('chatMessage', (hostedGame, chatMessage) => {
-    useToastsStore().addToast(new Toast(chatMessage.content, {
-        level: 'warning',
-    }));
-});
