@@ -1,7 +1,6 @@
 import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import Player from '../shared/app/models/Player';
-import { Server, Socket } from 'socket.io';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { Server, Socket, DefaultEventsMap } from 'socket.io';
 import { Service } from 'typedi';
 
 interface SocketData {

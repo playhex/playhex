@@ -3,7 +3,6 @@
     "compilerOptions": {
         "target": "ES2019",
         "sourceMap": true,
-        "module": "commonjs",
         "declaration": true,
         "resolveJsonModule": true,
         "removeComments": true,
@@ -15,7 +14,6 @@
             "dom",
             "ES2019"
         ],
-        "moduleResolution": "node",
         "types": [
             "node"
         ],
