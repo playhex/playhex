@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Game, Move } from '@shared/game-engine';
+import { Game, Move } from '../../../shared/game-engine';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
 import { CustomizedGameView } from '../../services/CustomizedGameView';

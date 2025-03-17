@@ -1,17 +1,17 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import useLobbyStore from '@client/stores/lobbyStore';
+import useLobbyStore from '../../stores/lobbyStore';
 import { useRouter } from 'vue-router';
 import { defineOverlay } from '@overlastic/vue';
-import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '@client/vue/components/overlay/Create1v1RankedOverlay.vue';
-import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '@client/vue/components/overlay/Create1v1FriendlyOverlay.vue';
-import Create1vAIOverlay, { Create1vAIOverlayInput } from '@client/vue/components/overlay/Create1vAIOverlay.vue';
-import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '@client/vue/components/overlay/Create1vAIRankedOverlay.vue';
-import { timeControlToCadencyName } from '@shared/app/timeControlUtils';
+import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '../components/overlay/Create1v1RankedOverlay.vue';
+import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '../components/overlay/Create1v1FriendlyOverlay.vue';
+import Create1vAIOverlay, { Create1vAIOverlayInput } from '../components/overlay/Create1vAIOverlay.vue';
+import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '../components/overlay/Create1vAIRankedOverlay.vue';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { HostedGame, HostedGameOptions } from '../../../shared/app/models';
-import AppSidebar from '@client/vue/components/layout/AppSidebar.vue';
-import AppGameRulesSummary from '@client/vue/components/AppGameRulesSummary.vue';
-import useAuthStore from '@client/stores/authStore';
+import AppSidebar from '../components/layout/AppSidebar.vue';
+import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
+import useAuthStore from '../../stores/authStore';
 import AppPseudo from '../components/AppPseudo.vue';
 import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from 'bootstrap-icons-vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';

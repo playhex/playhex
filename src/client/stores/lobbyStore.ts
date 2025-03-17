@@ -1,11 +1,11 @@
-import { PlayerIndex } from '@shared/game-engine';
-import { Outcome } from '@shared/game-engine/Types';
+import { PlayerIndex } from '../../shared/game-engine';
+import { Outcome } from '../../shared/game-engine/Types';
 import { defineStore } from 'pinia';
 import { HostedGame, Player, ChatMessage } from '../../shared/app/models';
-import { getGame, getGames } from '@client/apiClient';
+import { getGame, getGames } from '../../client/apiClient';
 import useSocketStore from './socketStore';
 import { ref, watchEffect } from 'vue';
-import Rooms from '@shared/app/Rooms';
+import Rooms from '../../shared/app/Rooms';
 import { addMove, addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters';
 import { notifier } from '../services/notifications';

@@ -2,7 +2,7 @@ import { Get, JsonController } from 'routing-controllers';
 import { Service } from 'typedi';
 import { commitRef } from '../../../lastCommitInfo';
 import { fetchGithubContributors, fetchWeblateContributors } from '../../../contributors';
-import { PlayHexContributors } from '@shared/app/Types';
+import { PlayHexContributors } from '../../../../shared/app/Types';
 
 @JsonController()
 @Service()

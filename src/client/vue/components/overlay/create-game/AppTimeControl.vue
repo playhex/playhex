@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { PropType, Ref, ref, toRefs } from 'vue';
 import { BIconHourglass } from 'bootstrap-icons-vue';
-import { msToDuration } from '@shared/app/timeControlUtils';
-import TimeControlType from '@shared/time-control/TimeControlType';
+import { msToDuration } from '../../../../../shared/app/timeControlUtils';
+import TimeControlType from '../../../../../shared/time-control/TimeControlType';
 import HostedGameOptions from '../../../../../shared/app/models/HostedGameOptions';
 import { t } from 'i18next';
 

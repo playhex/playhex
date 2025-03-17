@@ -9,7 +9,7 @@ import AppSwapRule from './create-game/AppSwapRule.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore';
 import { storeToRefs } from 'pinia';
-import { AIConfigStatusData } from '@shared/app/Types';
+import { AIConfigStatusData } from '../../../../shared/app/Types';
 import { apiGetAiConfigsStatus } from '../../../apiClient';
 import AIConfig from '../../../../shared/app/models/AIConfig';
 

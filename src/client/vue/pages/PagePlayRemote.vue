@@ -1,16 +1,16 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import 'bootstrap/js/dist/dropdown';
-import useLobbyStore from '@client/stores/lobbyStore';
+import useLobbyStore from '../../stores/lobbyStore';
 import { ref, computed } from 'vue';
-import AppBoard from '@client/vue/components/AppBoard.vue';
-import ConfirmationOverlay from '@client/vue/components/overlay/ConfirmationOverlay.vue';
+import AppBoard from '../components/AppBoard.vue';
+import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient';
 import { defineOverlay } from '@overlastic/vue';
 import { Ref, onUnmounted, watch, watchEffect } from 'vue';
-import useSocketStore from '@client/stores/socketStore';
-import useAuthStore from '@client/stores/authStore';
-import Rooms from '@shared/app/Rooms';
+import useSocketStore from '../../stores/socketStore';
+import useAuthStore from '../../stores/authStore';
+import Rooms from '../../../shared/app/Rooms';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
 import { useRoute, useRouter } from 'vue-router';
 import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp, BIconSignpostSplit } from 'bootstrap-icons-vue';
@@ -18,7 +18,7 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
 import { storeToRefs } from 'pinia';
 import i18next from 'i18next';
-import { Move, PlayerIndex } from '@shared/game-engine';
+import { Move, PlayerIndex } from '../../../shared/game-engine';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';

@@ -17,11 +17,6 @@
         ],
         "composite": true
     },
-    "paths": {
-        "@shared/*": [
-            "../shared/*"
-        ]
-    },
     "include": [
         "**/*.ts"
     ]

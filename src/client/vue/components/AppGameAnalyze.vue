@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 /* eslint-env browser */
-import { GameAnalyzeData } from '@shared/app/models/GameAnalyze';
+import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze';
 import GameAnalyzeView, { AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeView';
 import { PropType, onMounted, ref } from 'vue';
-import GameView from '@shared/pixi-board/GameView';
+import GameView from '../../../shared/pixi-board/GameView';
 
 const props = defineProps({
     analyze: {

@@ -13,7 +13,7 @@ import { getGames, getGamesStats } from '../../apiClient';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { getStrictWinnerPlayer } from '@shared/app/hostedGameUtils';
+import { getStrictWinnerPlayer } from '../../../shared/app/hostedGameUtils';
 import { useSearchGamesPagination } from '../composables/searchGamesPagination';
 import { useSearchGamesSyncHash } from '../composables/searchGamesSyncHash';
 

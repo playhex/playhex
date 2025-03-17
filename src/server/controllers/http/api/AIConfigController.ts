@@ -1,6 +1,6 @@
 import { Get, JsonController, ResponseClassTransformOptions } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
-import { AIConfigStatusData } from '@shared/app/Types';
+import { AIConfigStatusData } from '../../../../shared/app/Types';
 import HexAiApiClient from '../../../services/HexAiApiClient';
 import logger from '../../../services/logger';
 import AIConfig from '../../../../shared/app/models/AIConfig';

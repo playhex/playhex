@@ -5,16 +5,16 @@ const routes: RouteRecordRaw[] = [
     {
         name: 'home',
         path: '/',
-        component: () => import('@client/vue/pages/PageLobby.vue'),
+        component: () => import('./pages/PageLobby.vue'),
     },
     {
         path: '/',
-        component: () => import('@client/vue/ReloadOnRouteChange.vue'),
+        component: () => import('./ReloadOnRouteChange.vue'),
         children: [
             {
                 name: 'online-game',
                 path: '/games/:gameId',
-                component: () => import('@client/vue/pages/PagePlayRemote.vue'),
+                component: () => import('./pages/PagePlayRemote.vue'),
                 meta: {
                     displayFooter: false,
                 },
@@ -22,14 +22,14 @@ const routes: RouteRecordRaw[] = [
             {
                 name: 'player',
                 path: '/@:slug(.{1,32})', // Regex to avoid matching players public ids
-                component: () => import('@client/vue/pages/player/PagePlayer.vue'),
+                component: () => import('./pages/player/PagePlayer.vue'),
             },
         ],
     },
     {
         name: 'play-vs-ai',
         path: '/play-vs-ai',
-        component: () => import('@client/vue/pages/PagePlayOffline.vue'),
+        component: () => import('./pages/PagePlayOffline.vue'),
         meta: {
             displayFooter: false,
         },
@@ -37,104 +37,104 @@ const routes: RouteRecordRaw[] = [
     {
         name: 'games-archive',
         path: '/games-archive',
-        component: () => import('@client/vue/pages/PageGamesArchive.vue'),
+        component: () => import('./pages/PageGamesArchive.vue'),
     },
     {
         name: 'login',
         path: '/login',
-        component: () => import('@client/vue/pages/player/PageLogin.vue'),
+        component: () => import('./pages/player/PageLogin.vue'),
     },
     {
         name: 'signup',
         path: '/signup',
-        component: () => import('@client/vue/pages/player/PageSignup.vue'),
+        component: () => import('./pages/player/PageSignup.vue'),
     },
     {
         name: 'settings',
         path: '/settings',
-        component: () => import('@client/vue/pages/player/PageSettings.vue'),
+        component: () => import('./pages/player/PageSettings.vue'),
     },
     {
         path: '/',
-        component: () => import('@client/vue/pages/content/LayoutContent.vue'),
+        component: () => import('./pages/content/LayoutContent.vue'),
         children: [
             {
                 name: 'license',
                 path: 'about/license',
-                component: () => import('@client/vue/pages/content/PageLicense.vue'),
+                component: () => import('./pages/content/PageLicense.vue'),
             },
             {
                 name: 'links',
                 path: 'resources/hex-links',
-                component: () => import('@client/vue/pages/content/PageHexLinks.vue'),
+                component: () => import('./pages/content/PageHexLinks.vue'),
             },
             {
                 name: 'rating-simulator',
                 path: 'rating-simulator',
-                component: () => import('@client/vue/pages/content/PageRatingSimulator.vue'),
+                component: () => import('./pages/content/PageRatingSimulator.vue'),
             },
             {
                 name: 'contribute',
                 path: 'contribute',
-                component: () => import('@client/vue/pages/content/PageContribute.vue'),
+                component: () => import('./pages/content/PageContribute.vue'),
             },
             {
                 name: 'contributors',
                 path: 'contributors',
-                component: () => import('@client/vue/pages/content/PageContributors.vue'),
+                component: () => import('./pages/content/PageContributors.vue'),
             },
             {
                 name: 'spawn-worker',
                 path: 'spawn-worker',
-                component: () => import('@client/vue/pages/content/PageSpawnWorker.vue'),
+                component: () => import('./pages/content/PageSpawnWorker.vue'),
             },
             {
                 name: 'analysis-details',
                 path: 'hex-game-analysis',
-                component: () => import('@client/vue/pages/content/PageAnalysisDetails.vue'),
+                component: () => import('./pages/content/PageAnalysisDetails.vue'),
             },
             {
                 name: 'privacy',
                 path: 'privacy',
-                component: () => import('@client/vue/pages/content/PagePrivacyPolicy.vue'),
+                component: () => import('./pages/content/PagePrivacyPolicy.vue'),
             },
         ],
     },
     {
         path: '/guide',
-        component: () => import('@client/vue/pages/guide/LayoutGuide.vue'),
+        component: () => import('./pages/guide/LayoutGuide.vue'),
         children: [
             {
                 name: 'guide',
                 path: '',
-                component: () => import('@client/vue/pages/guide/PageIndex.vue'),
+                component: () => import('./pages/guide/PageIndex.vue'),
             },
             {
                 name: 'guide-ai-analysis',
                 path: 'ai-analysis',
-                component: () => import('@client/vue/pages/guide/PageAIAnalysis.vue'),
+                component: () => import('./pages/guide/PageAIAnalysis.vue'),
             },
             {
                 name: 'guide-conditional-moves',
                 path: 'conditional-moves',
-                component: () => import('@client/vue/pages/guide/PageConditionalMoves.vue'),
+                component: () => import('./pages/guide/PageConditionalMoves.vue'),
             },
         ],
     },
     {
         name: 'rescue',
         path: '/rescue',
-        component: () => import('@client/vue/pages/PageRescue.vue'),
+        component: () => import('./pages/PageRescue.vue'),
     },
     {
         name: 'test',
         path: '/test',
-        component: () => import('@client/vue/pages/PageTest.vue'),
+        component: () => import('./pages/PageTest.vue'),
     },
     {
         name: 'not-found',
         path: '/:pathMatch(.*)',
-        component: () => import('@client/vue/pages/PageNotFound.vue'),
+        component: () => import('./pages/PageNotFound.vue'),
     },
 ];
 

@@ -1,4 +1,4 @@
-import useToastsStore from '@client/stores/toastsStore';
+import useToastsStore from '../../../../client/stores/toastsStore';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils';
 import { pseudoString } from '../../../../shared/app/pseudoUtils';
 import { Toast } from '../../../../shared/app/Toast';

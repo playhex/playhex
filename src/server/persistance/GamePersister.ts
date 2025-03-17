@@ -1,5 +1,5 @@
 import { IsNull, Not, Repository } from 'typeorm';
-import { Game } from '@shared/app/models';
+import { Game } from '../../shared/app/models';
 import { AnalyzeGameRequest } from '../services/HexAiApiClient';
 import { Move } from '../../shared/game-engine';
 import { Inject, Service } from 'typedi';

@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../context-utils';
 import { notifier } from '../notifier';
-import { pseudoString } from '@shared/app/pseudoUtils';
+import { pseudoString } from '../../../../shared/app/pseudoUtils';
 import router from '../../../vue/router';
 import { isBotGame } from '../../../../shared/app/hostedGameUtils';
 import { serviceWorkerRegistrationPromise } from '../../registerServiceWorker';

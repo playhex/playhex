@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useAuthStore from '@client/stores/authStore';
+import useAuthStore from '../../../stores/authStore';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore';
 import { useRouter } from 'vue-router';

@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { HexClientToServerEvents, HexServerToClientEvents } from '../../shared/app/HexSocketEvents';
-import * as CustomParser from '@shared/app/socketCustomParser';
+import * as CustomParser from '../../shared/app/socketCustomParser';
 import { defineStore } from 'pinia';
 import useAuthStore from './authStore';
 import { watch, ref } from 'vue';

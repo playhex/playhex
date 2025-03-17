@@ -15,15 +15,7 @@
         ],
         "types": [],
         "composite": true,
-        "baseUrl": "./",
-        "paths": {
-            "@client/*": [
-                "../client/*"
-            ],
-            "@shared/*": [
-                "../shared/*"
-            ]
-        }
+        "baseUrl": "./"
     },
     "include": [
         "**/*.ts",

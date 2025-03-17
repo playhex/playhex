@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppHeader from '@client/vue/components/layout/AppHeader.vue';
+import AppHeader from './components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
 import AppToasts from './components/layout/AppToasts.vue';
 import { useRouter } from 'vue-router';

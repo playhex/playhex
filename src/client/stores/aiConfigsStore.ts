@@ -1,4 +1,4 @@
-import { WithRequired } from '@shared/app/Types';
+import { WithRequired } from '../../shared/app/Types';
 import AIConfig from '../../shared/app/models/AIConfig';
 import { apiGetAiConfigs } from '../apiClient';
 import { defineStore } from 'pinia';

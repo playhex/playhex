@@ -1,4 +1,4 @@
-import { HexClientToServerEvents, HexServerToClientEvents } from '@shared/app/HexSocketEvents';
+import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
 import Player from '../shared/app/models/Player';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';

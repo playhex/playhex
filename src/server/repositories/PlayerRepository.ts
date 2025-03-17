@@ -7,7 +7,7 @@ import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
 import HandledError from '../../shared/app/Errors';
 import { QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils';
-import SearchPlayersParameters from '@shared/app/SearchPlayersParameters';
+import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom';
 
 export class PseudoAlreadyTakenError extends HandledError {}

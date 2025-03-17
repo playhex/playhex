@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import AppBoard from '../components/AppBoard.vue';
-import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '@shared/game-engine';
+import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '../../../shared/game-engine';
 import { HostedGameOptions, Player } from '../../../shared/app/models';
 import { Ref, ref } from 'vue';
 import useAuthStore from '../../stores/authStore';

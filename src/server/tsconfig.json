@@ -21,15 +21,7 @@
         ],
         "incremental": true,
         "composite": true,
-        "baseUrl": "./",
-        "paths": {
-            "@server/*": [
-                "../server/*"
-            ],
-            "@shared/*": [
-                "../shared/*"
-            ]
-        }
+        "baseUrl": "./"
     },
     "include": [
         "**/*.ts",

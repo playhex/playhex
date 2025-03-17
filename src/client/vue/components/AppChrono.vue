@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import TimeValue, { timeValueToMilliseconds } from '@shared/time-control/TimeValue';
+import TimeValue, { timeValueToMilliseconds } from '../../../shared/time-control/TimeValue';
 import { PropType, onUnmounted, ref, toRefs, watch } from 'vue';
-import { PlayerTimeData } from '@shared/time-control/TimeControl';
-import { ByoYomiPlayerTimeData } from '@shared/time-control/time-controls/ByoYomiTimeControl';
-import TimeControlType from '@shared/time-control/TimeControlType';
-import { ByoYomiChrono } from '@shared/time-control/ByoYomiChrono';
-import { msToDuration, msToTime } from '@shared/app/timeControlUtils';
+import { PlayerTimeData } from '../../../shared/time-control/TimeControl';
+import { ByoYomiPlayerTimeData } from '../../../shared/time-control/time-controls/ByoYomiTimeControl';
+import TimeControlType from '../../../shared/time-control/TimeControlType';
+import { ByoYomiChrono } from '../../../shared/time-control/ByoYomiChrono';
+import { msToDuration, msToTime } from '../../../shared/app/timeControlUtils';
 import useServerDateStore from '../../stores/serverDateStore';
 
 const props = defineProps({

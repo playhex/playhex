@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { timeControlToCadencyName, timeControlToString } from '@shared/app/timeControlUtils';
+import { timeControlToCadencyName, timeControlToString } from '../../../shared/app/timeControlUtils';
 import { PropType, toRefs } from 'vue';
 import { BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from 'bootstrap-icons-vue';
 import HostedGameOptions from '../../../shared/app/models/HostedGameOptions';
-import { calcAverageSecondsPerMove } from '@shared/app/timeControlUtils';
-import { msToDuration } from '@shared/app/timeControlUtils';
+import { calcAverageSecondsPerMove } from '../../../shared/app/timeControlUtils';
+import { msToDuration } from '../../../shared/app/timeControlUtils';
 
 const props = defineProps({
     gameOptions: {
