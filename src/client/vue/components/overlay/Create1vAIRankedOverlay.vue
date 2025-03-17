@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePrograms } from '@overlastic/vue';
-import { PropType, Ref, ref, watch } from 'vue';
+import { PropType, Ref, ref, toRefs, watch } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconExclamationTriangle, BIconTrophy } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
@@ -18,14 +18,14 @@ const { visible, resolve, reject } = usePrograms();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<Partial<HostedGameOptions>>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
 });
 
 export type Create1vAIRankedOverlayInput = typeof props;
 
-const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions, ranked: true });
+const { gameOptions } = toRefs(props);
 
 const timeControlComponent = ref<typeof AppTimeControl>();
 

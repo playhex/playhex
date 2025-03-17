@@ -15,7 +15,8 @@ useSeoMeta({
 
 let gameView: null | CustomizedGameView = null;
 const selectedGameOptions: Partial<HostedGameOptions> = JSON.parse(history.state.gameOptionsJson ?? '{}');
-const gameOptions: HostedGameOptions = { ...new HostedGameOptions(), ...selectedGameOptions };
+const gameOptions: HostedGameOptions = new HostedGameOptions();
+Object.assign(gameOptions, selectedGameOptions);
 const players: Ref<Player[]> = ref([]);
 
 const makeAIMoveIfApplicable = async (game: Game, players: Player[]): Promise<void> => {

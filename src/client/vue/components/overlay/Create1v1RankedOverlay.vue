@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePrograms } from '@overlastic/vue';
 import { PropType, ref } from 'vue';
-import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
+import { HostedGameOptions } from '../../../../shared/app/models';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils';
@@ -11,14 +11,12 @@ const { visible, resolve, reject } = usePrograms();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<Partial<HostedGameOptions>>,
+        type: Object as PropType<HostedGameOptions>,
         required: true,
     },
 });
 
 export type Create1v1RankedOverlayInput = typeof props;
-
-const gameOptions = ref<HostedGameOptions>({ ...new HostedGameOptions(), ...props.gameOptions, ranked: true });
 
 /*
  * Set data before sumbit form
