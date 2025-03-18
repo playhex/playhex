@@ -1,4 +1,4 @@
-import { Expose } from '../class-transformer-custom';
+import { Expose } from '../class-transformer-custom.js';
 
 /**
  * Player stats: played games, preferred settings...

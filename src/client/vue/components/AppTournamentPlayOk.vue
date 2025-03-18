@@ -3,7 +3,7 @@
 import { onUnmounted, ref } from 'vue';
 import { BIconTrophy, BIconCircleFill } from 'bootstrap-icons-vue';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
-import { autoLocale } from '../../../shared/app/i18n';
+import { autoLocale } from '../../../shared/app/i18n/index.js';
 
 const props = defineProps({
     name: {

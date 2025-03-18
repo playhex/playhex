@@ -1,6 +1,6 @@
 import { Graphics, PointData } from 'pixi.js';
-import { Mark } from '../../shared/pixi-board/Mark';
-import Hex from '../../shared/pixi-board/Hex';
+import { Mark } from '../../shared/pixi-board/Mark.js';
+import Hex from '../../shared/pixi-board/Hex.js';
 
 /**
  * Computer best move.

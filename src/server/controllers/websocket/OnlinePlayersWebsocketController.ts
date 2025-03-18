@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
-import { WebsocketControllerInterface } from '.';
-import { HexServer, HexSocket } from '../../server';
-import OnlinePlayersService from '../../services/OnlinePlayersService';
-import Rooms from '../../../shared/app/Rooms';
+import { WebsocketControllerInterface } from './index.js';
+import { HexServer, HexSocket } from '../../server.js';
+import OnlinePlayersService from '../../services/OnlinePlayersService.js';
+import Rooms from '../../../shared/app/Rooms.js';
 
 @Service()
 export default class OnlinePlayersWebsocketController implements WebsocketControllerInterface

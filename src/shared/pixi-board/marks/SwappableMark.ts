@@ -1,6 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
-import { Mark } from '../Mark';
-import Hex from '../Hex';
+import { Mark } from '../Mark.js';
+import Hex from '../Hex.js';
 
 /**
  * Shows that first stone can be swapped if applicable.

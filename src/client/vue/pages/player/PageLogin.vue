@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import useAuthStore from '../../../stores/authStore';
+import useAuthStore from '../../../stores/authStore.js';
 import { Ref, ref } from 'vue';
-import { ApiClientError } from '../../../apiClient';
-import { InputValidation, toInputClass } from '../../../vue/formUtils';
+import { ApiClientError } from '../../../apiClient.js';
+import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({

@@ -1,8 +1,8 @@
-import { HostedGame, HostedGameToPlayer, Move, Player } from './models';
-import { Outcome } from '../game-engine/Types';
-import { PlayerIndex } from '../game-engine';
-import SearchGamesParameters from './SearchGamesParameters';
-import { timeControlToCadencyName } from './timeControlUtils';
+import { HostedGame, HostedGameToPlayer, Move, Player } from './models/index.js';
+import { Outcome } from '../game-engine/Types.js';
+import { PlayerIndex } from '../game-engine/index.js';
+import SearchGamesParameters from './SearchGamesParameters.js';
+import { timeControlToCadencyName } from './timeControlUtils.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     if (hostedGame.host.publicId === player.publicId) {

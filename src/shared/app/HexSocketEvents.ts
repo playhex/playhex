@@ -1,8 +1,8 @@
-import { Outcome } from '../game-engine/Types';
-import { PlayerIndex } from '../game-engine';
-import { GameTimeData } from 'time-control/TimeControl';
-import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models';
-import type { OnlinePlayers } from './models';
+import { Outcome } from '../game-engine/Types.js';
+import { PlayerIndex } from '../game-engine/index.js';
+import { GameTimeData } from '../time-control/TimeControl.js';
+import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models/index.js';
+import type { OnlinePlayers } from './models/index.js';
 
 export type HexClientToServerEvents = {
     /**

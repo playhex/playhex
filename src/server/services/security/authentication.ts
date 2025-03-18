@@ -1,7 +1,7 @@
-import Player from '../../../shared/app/models/Player';
+import Player from '../../../shared/app/models/Player.js';
 import bcrypt from 'bcryptjs';
-import HandledError from '../../../shared/app/Errors';
-import { AppDataSource } from '../../data-source';
+import HandledError from '../../../shared/app/Errors.js';
+import { AppDataSource } from '../../data-source.js';
 
 export class PseudoNotExistingError extends HandledError {}
 export class InvalidPasswordError extends HandledError {}

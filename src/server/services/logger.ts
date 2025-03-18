@@ -1,5 +1,5 @@
 import winston, { format, Logger } from 'winston';
-import { addSentryLoggerIfConfigured } from './logger-sentry';
+import { addSentryLoggerIfConfigured } from './logger-sentry.js';
 
 type SyslogLevels =
     'debug'

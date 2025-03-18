@@ -1,10 +1,10 @@
-import hexProgram from './hexProgram';
+import hexProgram from './hexProgram.js';
 
-import './createRandomBotsCommand';
-import './createMohexBotsCommand';
-import './createKatahexBotsCommand';
-import './anonymizeDB';
-import './checkDbInconsistencies';
-import './calculateRatings';
+import './createRandomBotsCommand.js';
+import './createMohexBotsCommand.js';
+import './createKatahexBotsCommand.js';
+import './anonymizeDB.js';
+import './checkDbInconsistencies.js';
+import './calculateRatings.js';
 
 hexProgram.parse();

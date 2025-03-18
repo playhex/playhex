@@ -1,7 +1,7 @@
 import { IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
-import { Expose } from '../class-transformer-custom';
-import { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl';
-import { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl';
+import { Expose } from '../class-transformer-custom.js';
+import { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl.js';
+import { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 
 export class HostedGameOptionsTimeControl
 {
@@ -42,10 +42,10 @@ export class OptionsFischer implements FischerTimeControlOptions
 export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeControl
 {
     @Expose()
-    override type: 'fischer';
+    declare type: 'fischer';
 
     @ValidateNested()
-    override options: OptionsFischer;
+    declare options: OptionsFischer;
 }
 
 export class OptionsByoYomi implements ByoYomiTimeControlOptions
@@ -72,8 +72,8 @@ export class OptionsByoYomi implements ByoYomiTimeControlOptions
 export class HostedGameOptionsTimeControlByoYomi extends HostedGameOptionsTimeControl
 {
     @Expose()
-    override type: 'byoyomi';
+    declare type: 'byoyomi';
 
     @ValidateNested()
-    override options: OptionsByoYomi;
+    declare options: OptionsByoYomi;
 }

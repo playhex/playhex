@@ -1,5 +1,5 @@
 import { createHead, useHead, useSeoMeta } from '@unhead/vue';
-import { seo, jsonLd } from '../../shared/app/seo';
+import { seo, jsonLd } from '../../shared/app/seo.js';
 import { Thing, WithContext } from 'schema-dts';
 
 export const head = createHead();

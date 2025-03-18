@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { usePrograms } from '@overlastic/vue';
 import { PropType, ref } from 'vue';
-import { HostedGameOptions } from '../../../../shared/app/models';
+import { HostedGameOptions } from '../../../../shared/app/models/index.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';
-import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils';
+import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
 import { BIconTrophy } from 'bootstrap-icons-vue';
 
 const { visible, resolve, reject } = usePrograms();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps({
     gameOptions: {
         type: Object as PropType<HostedGameOptions>,

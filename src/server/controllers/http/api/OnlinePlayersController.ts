@@ -1,5 +1,5 @@
 import { JsonController, Get } from 'routing-controllers';
-import OnlinePlayersService from '../../../services/OnlinePlayersService';
+import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
 import { Service } from 'typedi';
 
 @JsonController()

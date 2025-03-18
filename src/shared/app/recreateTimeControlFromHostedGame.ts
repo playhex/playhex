@@ -1,7 +1,7 @@
-import { PlayerIndex } from '../game-engine';
-import { createTimeControl } from '../time-control/createTimeControl';
-import { AbstractTimeControl, TimeControlError } from '../time-control/TimeControl';
-import { HostedGame } from './models';
+import { PlayerIndex } from '../game-engine/index.js';
+import { createTimeControl } from '../time-control/createTimeControl.js';
+import { AbstractTimeControl, TimeControlError } from '../time-control/TimeControl.js';
+import { HostedGame } from './models/index.js';
 
 /**
  * While undoing moves, we need to revert the chrono state like it was before playing undone move(s).

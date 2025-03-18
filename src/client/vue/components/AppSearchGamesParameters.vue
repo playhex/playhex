@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PropType, toRefs, ref, watchEffect } from 'vue';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters';
-import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters';
-import { getSearchPlayers } from '../../apiClient';
+import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
+import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters.js';
+import { getSearchPlayers } from '../../apiClient.js';
 import { BIconArrowRight, BIconX } from 'bootstrap-icons-vue';
 
 const props = defineProps({

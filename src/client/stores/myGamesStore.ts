@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
-import useAuthStore from './authStore';
-import useSocketStore from './socketStore';
-import { HostedGame, Move } from '../../shared/app/models';
-import Rooms from '../../shared/app/Rooms';
-import { PlayerIndex } from '../../shared/game-engine';
-import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue';
-import { isBotGame } from '../../shared/app/hostedGameUtils';
+import useAuthStore from './authStore.js';
+import useSocketStore from './socketStore.js';
+import { HostedGame, Move } from '../../shared/app/models/index.js';
+import Rooms from '../../shared/app/Rooms.js';
+import { PlayerIndex } from '../../shared/game-engine/index.js';
+import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
+import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 
 export type CurrentGame = {
     publicId: string;

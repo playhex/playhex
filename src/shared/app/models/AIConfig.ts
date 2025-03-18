@@ -1,5 +1,5 @@
-import { Expose, GROUP_DEFAULT } from '../../../shared/app/class-transformer-custom';
-import Player from './Player';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
+import Player from './Player.js';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()

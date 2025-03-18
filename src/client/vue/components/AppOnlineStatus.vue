@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Player from '../../../shared/app/models/Player';
-import useOnlinePlayersStore from '../../stores/onlinePlayersStore';
+import Player from '../../../shared/app/models/Player.js';
+import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import { PropType } from 'vue';
 import { BIconCircleFill, BIconMoonFill, BIconRobot } from 'bootstrap-icons-vue';
 

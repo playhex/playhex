@@ -1,14 +1,14 @@
-import { Game, Move, PlayerIndex, Coords } from '../game-engine';
+import { Game, Move, PlayerIndex, Coords } from '../game-engine/index.js';
 import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pixi.js';
-import Hex from './Hex';
-import { Theme, themes } from './BoardTheme';
+import Hex from './Hex.js';
+import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import SwappableMark from './marks/SwappableMark';
-import SwappedMark from './marks/SwappedMark';
-import { createShadingPattern, ShadingPatternType } from './shading-patterns';
-import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced';
-import { Mark } from './Mark';
-import TextMark from './marks/TextMark';
+import SwappableMark from './marks/SwappableMark.js';
+import SwappedMark from './marks/SwappedMark.js';
+import { createShadingPattern, ShadingPatternType } from './shading-patterns.js';
+import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
+import { Mark } from './Mark.js';
+import TextMark from './marks/TextMark.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;

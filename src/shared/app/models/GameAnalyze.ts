@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { Expose } from '../../../shared/app/class-transformer-custom';
-import HostedGame from './HostedGame';
+import { Expose } from '../class-transformer-custom.js';
+import HostedGame from './HostedGame.js';
 
 export type GameAnalyzeData = ({
     moveIndex: number;

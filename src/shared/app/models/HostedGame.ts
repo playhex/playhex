@@ -1,16 +1,17 @@
 import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad } from 'typeorm';
-import { ColumnUUID } from '../custom-typeorm';
-import Player from './Player';
-import type { HostedGameState } from '../../app/Types';
-import HostedGameOptions from './HostedGameOptions';
-import type { GameTimeData } from '../../time-control/TimeControl';
-import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl';
-import Game from './Game';
-import ChatMessage from './ChatMessage';
-import HostedGameToPlayer from './HostedGameToPlayer';
-import { Expose } from '../../../shared/app/class-transformer-custom';
+import { ColumnUUID } from '../custom-typeorm.js';
+import Player from './Player.js';
+import type PlayerType from './Player.js';
+import type { HostedGameState } from '../Types.js';
+import HostedGameOptions from './HostedGameOptions.js';
+import type { GameTimeData } from '../../time-control/TimeControl.js';
+import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
+import Game from './Game.js';
+import ChatMessage from './ChatMessage.js';
+import HostedGameToPlayer from './HostedGameToPlayer.js';
+import { Expose } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
-import Rating from './Rating';
+import Rating from './Rating.js';
 
 @Entity()
 export default class HostedGame
@@ -24,7 +25,7 @@ export default class HostedGame
 
     @ManyToOne(() => Player, { nullable: false })
     @Expose()
-    host: Player;
+    host: PlayerType;
 
     @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
     @Expose()

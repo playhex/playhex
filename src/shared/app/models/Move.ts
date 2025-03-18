@@ -1,7 +1,7 @@
-import type { Coords } from '../../game-engine/Types';
-import { Expose } from '../class-transformer-custom';
-import { Move as EngineMove } from '../../game-engine';
-import type { SpecialMoveType } from '../../game-engine';
+import type { Coords } from '../../game-engine/Types.js';
+import { Expose } from '../class-transformer-custom.js';
+import { Move as EngineMove } from '../../game-engine/index.js';
+import type { SpecialMoveType } from '../../game-engine/index.js';
 
 export default class Move implements Coords
 {

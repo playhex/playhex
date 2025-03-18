@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onBeforeMount, onUnmounted, ref, Ref } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
-import GameView from '../../../shared/pixi-board/GameView';
-import { Game, Move } from '../../../shared/game-engine';
-import { Player } from '../../../shared/app/models';
-import { apiGetServerInfo } from '../../apiClient';
-import { CustomizedGameView } from '../../services/CustomizedGameView';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import { Game, Move } from '../../../shared/game-engine/index.js';
+import { Player } from '../../../shared/app/models/index.js';
+import { apiGetServerInfo } from '../../apiClient.js';
+import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { shallowRef } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 

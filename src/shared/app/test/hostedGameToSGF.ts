@@ -1,7 +1,7 @@
 import assert from 'assert';
-import { HostedGame } from '../models';
-import { plainToInstance } from '../class-transformer-custom';
-import { hostedGameToSGF } from '../hostedGameToSGF';
+import { HostedGame } from '../models/index.js';
+import { plainToInstance } from '../class-transformer-custom.js';
+import { hostedGameToSGF } from '../hostedGameToSGF.js';
 
 describe('hostedGameToSGF', () => {
     it('generates SGF from an HostedGame instance', () => {

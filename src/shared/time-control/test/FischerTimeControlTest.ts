@@ -1,8 +1,8 @@
 import { describe, it } from 'mocha';
 import assert from 'assert';
-import { FischerTimeControl } from '../time-controls/FischerTimeControl';
-import { dateDiff } from './utils';
-import { createTimeControl } from '../createTimeControl';
+import { FischerTimeControl } from '../time-controls/FischerTimeControl.js';
+import { dateDiff } from './utils.js';
+import { createTimeControl } from '../createTimeControl.js';
 
 describe('FischerTimeControl', () => {
     it('elapses instantly at expected date, when started at past date', () => {

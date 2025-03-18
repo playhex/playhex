@@ -1,6 +1,6 @@
 import { t } from 'i18next';
-import TimeControlType from '../time-control/TimeControlType';
-import HostedGameOptions from './models/HostedGameOptions';
+import TimeControlType from '../time-control/TimeControlType.js';
+import HostedGameOptions from './models/HostedGameOptions.js';
 
 /**
  * Returns average seconds per move

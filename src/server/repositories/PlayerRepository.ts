@@ -1,14 +1,14 @@
-import { Player } from '../../shared/app/models';
+import { Player } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
-import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication';
-import logger from '../services/logger';
-import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils';
-import HandledError from '../../shared/app/Errors';
+import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
+import logger from '../services/logger.js';
+import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils.js';
+import HandledError from '../../shared/app/Errors.js';
 import { QueryFailedError, Repository } from 'typeorm';
-import { isDuplicateError } from './typeormUtils';
-import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters';
-import { instanceToPlain } from '../../shared/app/class-transformer-custom';
+import { isDuplicateError } from './typeormUtils.js';
+import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters.js';
+import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 
 export class PseudoAlreadyTakenError extends HandledError {}
 export class MustBeGuestError extends HandledError {}

@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha';
-import { Chrono } from '../Chrono';
+import { Chrono } from '../Chrono.js';
 import assert from 'assert';
 
 describe('Chrono', () => {

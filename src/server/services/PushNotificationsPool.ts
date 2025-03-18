@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
-import { Player } from '../../shared/app/models';
-import { PushPayload } from '../../shared/app/PushPayload';
-import { PushNotificationSender } from './PushNotificationsSender';
-import OnlinePlayersService from './OnlinePlayersService';
+import { Player } from '../../shared/app/models/index.js';
+import { PushPayload } from '../../shared/app/PushPayload.js';
+import { PushNotificationSender } from './PushNotificationsSender.js';
+import OnlinePlayersService from './OnlinePlayersService.js';
 
 /**
  * Instead of sending immediately push notifications to players,

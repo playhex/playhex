@@ -1,13 +1,13 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
-import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced';
-import { Move } from '../../shared/game-engine';
-import { themes } from '../../shared/pixi-board/BoardTheme';
+import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced.js';
+import { Move } from '../../shared/game-engine/index.js';
+import { themes } from '../../shared/pixi-board/BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze';
-import GameView from '../../shared/pixi-board/GameView';
-import { BestMoveMark } from './BestMoveMark';
-import { PlayedMoveMark } from './PlayedMoveMark';
-import { defer } from '../../shared/app/defer';
+import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
+import GameView from '../../shared/pixi-board/GameView.js';
+import { BestMoveMark } from './BestMoveMark.js';
+import { PlayedMoveMark } from './PlayedMoveMark.js';
+import { defer } from '../../shared/app/defer.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.

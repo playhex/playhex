@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { debounceResize } from '../debounceResize';
+import { debounceResize } from '../debounceResize.js';
 import { setTimeout as wait } from 'timers/promises';
 
 describe('debounceResize', () => {

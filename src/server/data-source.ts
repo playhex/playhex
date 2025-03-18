@@ -1,8 +1,8 @@
-import './config';
+import './config.js';
 import InMemoryCacheProvider from 'typeorm-in-memory-cache';
 import { DataSource } from 'typeorm';
-import Container from 'typedi';
-import { entities } from '../shared/app/models';
+import { Container } from 'typedi';
+import { entities } from '../shared/app/models/index.js';
 
 const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
 
@@ -26,7 +26,7 @@ export const AppDataSource = new DataSource({
     migrations: [],
     maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
     cache: {
-        provider: () => new InMemoryCacheProvider(),
+        provider: () => new InMemoryCacheProvider.default(),
     },
 });
 

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { BIconBookmarks, BIconChatDots, BIconGithub, BIconDiscord } from 'bootstrap-icons-vue';
 import { ref } from 'vue';
-import { seo } from '../../../../shared/app/seo';
+import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';
 import i18next from 'i18next';
 

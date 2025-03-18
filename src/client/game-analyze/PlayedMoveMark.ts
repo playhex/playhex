@@ -1,7 +1,7 @@
 import { Container, Graphics, PointData } from 'pixi.js';
-import { Mark } from '../../shared/pixi-board/Mark';
-import Hex from '../../shared/pixi-board/Hex';
-import { colorAverage } from '../../shared/pixi-board/colorUtils';
+import { Mark } from '../../shared/pixi-board/Mark.js';
+import Hex from '../../shared/pixi-board/Hex.js';
+import { colorAverage } from '../../shared/pixi-board/colorUtils.js';
 
 /**
  * Where player actually played.

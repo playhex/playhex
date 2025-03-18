@@ -1,9 +1,9 @@
-import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from '.';
+import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from './index.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import Board from './Board';
-import { Coords, Outcome } from './Types';
-import { GameData } from './normalization';
-import IllegalUndo from './IllegalUndo';
+import Board from './Board.js';
+import { Coords, Outcome } from './Types.js';
+import { GameData } from './normalization.js';
+import IllegalUndo from './IllegalUndo.js';
 
 type GameEvents = {
     /**

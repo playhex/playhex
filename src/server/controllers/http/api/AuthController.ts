@@ -1,11 +1,11 @@
 import { Service } from 'typedi';
 import { Body, CurrentUser, Delete, Get, JsonController, Post, Req, Session } from 'routing-controllers';
-import { SessionData } from 'express-session';
-import PlayerRepository from '../../../repositories/PlayerRepository';
-import { authenticate } from '../../../services/security/authentication';
-import Player from '../../../../shared/app/models/Player';
-import { AuthenticatedPlayer } from '../middlewares';
-import { Request } from 'express';
+import type { SessionData } from 'express-session';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
+import { authenticate } from '../../../services/security/authentication.js';
+import Player from '../../../../shared/app/models/Player.js';
+import { AuthenticatedPlayer } from '../middlewares.js';
+import type { Request } from 'express';
 import { IsString } from 'class-validator';
 
 class PseudoPasswordInput

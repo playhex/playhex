@@ -103,11 +103,11 @@ const retrieveResponse = async (request, cachePolicy) => {
         case CachePolicy.NETWORK_ONLY: {
             try {
                 return { response: await fetch(request), hit: false };
-            } catch (error) {
+            } catch (e) {
             }
         }
 
-        break;
+            break;
 
         case CachePolicy.NETWORK_FIRST: {
             try {
@@ -115,7 +115,7 @@ const retrieveResponse = async (request, cachePolicy) => {
                 cacheResponse(request, response.clone());
 
                 return { response, hit: false };
-            } catch (error) {
+            } catch (e) {
                 const cachedResponse = await caches.match(request);
 
                 if (cachedResponse) {
@@ -124,7 +124,7 @@ const retrieveResponse = async (request, cachePolicy) => {
             }
         }
 
-        break;
+            break;
 
         case CachePolicy.CACHE_FIRST: {
             try {
@@ -138,11 +138,11 @@ const retrieveResponse = async (request, cachePolicy) => {
                 cacheResponse(request, response.clone());
 
                 return { response, hit: false };
-            } catch (error) {
+            } catch (e) {
             }
         }
 
-        break;
+            break;
 
         case CachePolicy.CACHE_AND_UPDATE: {
             try {
@@ -161,11 +161,11 @@ const retrieveResponse = async (request, cachePolicy) => {
                 cacheResponse(request, response.clone());
 
                 return { response, hit: false };
-            } catch (error) {
+            } catch (e) {
             }
         }
 
-        break;
+            break;
     }
 
     return { response: undefined, hit: false };

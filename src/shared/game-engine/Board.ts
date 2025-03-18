@@ -1,4 +1,4 @@
-import { Coords, PathItem, PlayerIndex } from './Types';
+import { Coords, PathItem, PlayerIndex } from './Types.js';
 
 export const BOARD_DEFAULT_SIZE = 11;
 

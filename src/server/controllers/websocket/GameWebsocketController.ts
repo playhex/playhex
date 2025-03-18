@@ -1,7 +1,7 @@
-import HostedGameRepository from '../../repositories/HostedGameRepository';
+import HostedGameRepository from '../../repositories/HostedGameRepository.js';
 import { Service } from 'typedi';
-import { WebsocketControllerInterface } from '.';
-import { HexSocket } from '../../server';
+import { WebsocketControllerInterface } from './index.js';
+import { HexSocket } from '../../server.js';
 
 @Service()
 export default class GameWebsocketController implements WebsocketControllerInterface

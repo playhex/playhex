@@ -1,10 +1,10 @@
-import { Game } from '../../shared/game-engine';
-import GameView from '../../shared/pixi-board/GameView';
-import usePlayerSettingsStore from '../../client/stores/playerSettingsStore';
-import usePlayerLocalSettingsStore, { LocalSettings } from '../../client/stores/playerLocalSettingsStore';
+import { Game } from '../../shared/game-engine/index.js';
+import GameView from '../../shared/pixi-board/GameView.js';
+import usePlayerSettingsStore from '../../client/stores/playerSettingsStore.js';
+import usePlayerLocalSettingsStore, { LocalSettings } from '../../client/stores/playerLocalSettingsStore.js';
 import { watch, WatchStopHandle } from 'vue';
-import { themes } from '../../shared/pixi-board/BoardTheme';
-import { PlayerSettings } from '../../shared/app/models';
+import { themes } from '../../shared/pixi-board/BoardTheme.js';
+import { PlayerSettings } from '../../shared/app/models/index.js';
 
 /**
  * Create a GameView customized with player current settings

@@ -1,15 +1,15 @@
-import { Response } from 'express';
+import type { Response } from 'express';
 import { format } from 'content-range';
-import HostedGameRepository, { GameError } from '../../../repositories/HostedGameRepository';
-import { AuthenticatedPlayer } from '../middlewares';
-import HttpError from '../HttpError';
+import HostedGameRepository, { GameError } from '../../../repositories/HostedGameRepository.js';
+import { AuthenticatedPlayer } from '../middlewares.js';
+import HttpError from '../HttpError.js';
 import { Body, Get, JsonController, Param, Post, QueryParams, Res } from 'routing-controllers';
-import { Player, Move, HostedGameOptions } from '../../../../shared/app/models';
+import { Player, Move, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { Service } from 'typedi';
-import { Expose } from '../../../../shared/app/class-transformer-custom';
-import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters';
+import { Expose } from '../../../../shared/app/class-transformer-custom.js';
+import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
-import HostedGamePersister from '../../../persistance/HostedGamePersister';
+import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
 
 class AnswerUndoBody
 {

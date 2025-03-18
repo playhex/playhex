@@ -1,4 +1,4 @@
-import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze';
+import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import { Service } from 'typedi';
 
 /*

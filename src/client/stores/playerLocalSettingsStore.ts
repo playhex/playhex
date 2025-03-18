@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
-import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class-transformer-custom';
+import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class-transformer-custom.js';
 
 const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 

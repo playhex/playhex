@@ -1,23 +1,23 @@
 import { Inject, Service } from 'typedi';
-import HostedGameServer from '../HostedGameServer';
-import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models';
-import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils';
-import HostedGamePersister from '../persistance/HostedGamePersister';
-import logger from '../services/logger';
+import HostedGameServer from '../HostedGameServer.js';
+import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models/index.js';
+import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
+import HostedGamePersister from '../persistance/HostedGamePersister.js';
+import logger from '../services/logger.js';
 import { validateOrReject } from 'class-validator';
-import Rooms from '../../shared/app/Rooms';
-import { HexServer } from '../server';
-import { FindAIError, findAIOpponent } from '../services/AIManager';
+import Rooms from '../../shared/app/Rooms.js';
+import { HexServer } from '../server.js';
+import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
-import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions';
-import { AppDataSource } from '../data-source';
-import { plainToInstance } from '../../shared/app/class-transformer-custom';
-import RatingRepository from './RatingRepository';
-import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames';
-import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames';
-import { isDuplicateError } from './typeormUtils';
-import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages';
-import OnlinePlayersService from '../services/OnlinePlayersService';
+import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
+import { AppDataSource } from '../data-source.js';
+import { plainToInstance } from '../../shared/app/class-transformer-custom.js';
+import RatingRepository from './RatingRepository.js';
+import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames.js';
+import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames.js';
+import { isDuplicateError } from './typeormUtils.js';
+import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
+import OnlinePlayersService from '../services/OnlinePlayersService.js';
 
 export class GameError extends Error {}
 

@@ -1,6 +1,6 @@
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import { HostedGameOptions } from '../models';
-import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../ratingUtils';
+import { HostedGameOptions } from '../models/index.js';
+import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../ratingUtils.js';
 
 /**
  * When enabling "ranked" game option, these validators check others options are eligible for a ranked game.

@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Board, Move } from '..';
+import { Board, Move } from '../index.js';
 
 const _ = null;
 

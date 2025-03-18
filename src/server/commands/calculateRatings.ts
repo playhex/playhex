@@ -1,10 +1,10 @@
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../data-source';
-import hexProgram from './hexProgram';
-import { HostedGame, Player } from '../../shared/app/models';
-import RatingRepository from '../repositories/RatingRepository';
-import { mustAnswerYes } from './utils/question';
+import { AppDataSource } from '../data-source.js';
+import hexProgram from './hexProgram.js';
+import { HostedGame, Player } from '../../shared/app/models/index.js';
+import RatingRepository from '../repositories/RatingRepository.js';
+import { mustAnswerYes } from './utils/question.js';
 
 /*
  * Reset ratings with:

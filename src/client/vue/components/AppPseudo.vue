@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Player from '../../../shared/app/models/Player';
+import Player from '../../../shared/app/models/Player.js';
 import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
-import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils';
-import usePlayersStore from '../../stores/playersStore';
+import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils.js';
+import usePlayersStore from '../../stores/playersStore.js';
 import { ref } from 'vue';
 import { watchEffect } from 'vue';
 

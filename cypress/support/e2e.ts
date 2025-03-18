@@ -15,4 +15,4 @@
 
 // Import commands.js using ES2015 syntax:
 import 'reflect-metadata';
-import './commands';
+import './commands.js';

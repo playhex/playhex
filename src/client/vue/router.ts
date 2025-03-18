@@ -1,5 +1,5 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import { useHeadDefault } from '../services/head';
+import { useHeadDefault } from '../services/head.js';
 
 const routes: RouteRecordRaw[] = [
     {

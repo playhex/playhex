@@ -2,12 +2,12 @@
 import { PropType, ref, watchEffect } from 'vue';
 import { Chart, Tooltip, Legend, LinearScale, Colors, ChartOptions, ChartData, TimeScale, PointElement, LineElement } from 'chart.js';
 import { Line } from 'vue-chartjs';
-import 'chartjs-adapter-date-fns';
+import '../../services/chartJsDateFnsAdapter.js';
 import { BIconZoomOut } from 'bootstrap-icons-vue';
 import zoomPlugin from 'chartjs-plugin-zoom';
-import { Player } from '../../../shared/app/models';
-import { apiGetPlayerRatingHistory } from '../../apiClient';
-import { RatingCategory } from '../../../shared/app/ratingUtils';
+import { Player } from '../../../shared/app/models/index.js';
+import { apiGetPlayerRatingHistory } from '../../apiClient.js';
+import { RatingCategory } from '../../../shared/app/ratingUtils.js';
 
 const { player } = defineProps({
     player: {
@@ -106,7 +106,6 @@ const resetZoom = () => {
     emit('timeRangeUpdated', null, null);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isZoomed = ref(false);
 
 const showRatingCategory = (category: RatingCategory): void => {

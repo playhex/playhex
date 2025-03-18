@@ -1,5 +1,5 @@
-import useSocketStore from '../stores/socketStore';
-import { SEND_ACTIVITY_COOLDOWN } from '../../shared/app/playerActivityConfig';
+import useSocketStore from '../stores/socketStore.js';
+import { SEND_ACTIVITY_COOLDOWN } from '../../shared/app/playerActivityConfig.js';
 
 let cooldownTimeout: null | NodeJS.Timeout = null;
 let hadActivityWhileCooldown = false;

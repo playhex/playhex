@@ -1,17 +1,17 @@
 import 'reflect-metadata';
-import './config';
+import './config.js';
 import express from 'express';
 import http from 'http';
-import { registerHttpControllers } from './controllers/http';
-import Container from 'typedi';
-import { registerWebsocketControllers } from './controllers/websocket';
-import { HexServer } from './server';
-import * as CustomParser from '../shared/app/socketCustomParser';
-import socketIoAdminUi from './services/socketIoAdminUi';
-import logger from './services/logger';
-import { addSessionMiddlewares } from './services/security/middlewares';
-import monitorConnectedSockets from './services/monitorConnectedSockets';
-import { initTimeControl } from './services/initTimeControl';
+import { registerHttpControllers } from './controllers/http/index.js';
+import { Container } from 'typedi';
+import { registerWebsocketControllers } from './controllers/websocket/index.js';
+import { HexServer } from './server.js';
+import * as CustomParser from '../shared/app/socketCustomParser.js';
+import socketIoAdminUi from './services/socketIoAdminUi.js';
+import logger from './services/logger.js';
+import { addSessionMiddlewares } from './services/security/middlewares.js';
+import monitorConnectedSockets from './services/monitorConnectedSockets.js';
+import { initTimeControl } from './services/initTimeControl.js';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);

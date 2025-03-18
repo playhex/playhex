@@ -1,12 +1,12 @@
-import { HexServer, HexSocket } from '../../server';
-import Container from 'typedi';
-import RoomWebsocketController from './RoomWebsocketController';
-import LobbyWebsocketController from './LobbyWebsocketController';
-import GameWebsocketController from './GameWebsocketController';
-import OnlinePlayersWebsocketController from './OnlinePlayersWebsocketController';
-import ChatWebsocketController from './ChatWebsocketController';
-import PlayerGamesWebsocketController from './PlayerGamesWebsocketController';
-import ServerStatusWebsocketController from './ServerStatusWebsocketController';
+import { HexServer, HexSocket } from '../../server.js';
+import { Container } from 'typedi';
+import RoomWebsocketController from './RoomWebsocketController.js';
+import LobbyWebsocketController from './LobbyWebsocketController.js';
+import GameWebsocketController from './GameWebsocketController.js';
+import OnlinePlayersWebsocketController from './OnlinePlayersWebsocketController.js';
+import ChatWebsocketController from './ChatWebsocketController.js';
+import PlayerGamesWebsocketController from './PlayerGamesWebsocketController.js';
+import ServerStatusWebsocketController from './ServerStatusWebsocketController.js';
 
 export interface WebsocketControllerInterface
 {

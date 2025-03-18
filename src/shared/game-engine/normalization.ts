@@ -1,5 +1,5 @@
-import { SpecialMoveType } from './Move';
-import { Outcome, PlayerIndex } from './Types';
+import { SpecialMoveType } from './Move.js';
+import { Outcome, PlayerIndex } from './Types.js';
 
 /*
  * Used to transform a game instance to a plain object

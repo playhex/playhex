@@ -1,4 +1,4 @@
-import { Game } from '../game-engine';
+import { Game } from '../game-engine/index.js';
 
 /**
  * Number of consecutive pass moves allowed in a game.

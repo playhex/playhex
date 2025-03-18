@@ -1,5 +1,5 @@
-import { Game, PlayerIndex } from '../game-engine';
-import { AbstractTimeControl } from '../time-control/TimeControl';
+import { Game, PlayerIndex } from '../game-engine/index.js';
+import { AbstractTimeControl } from '../time-control/TimeControl.js';
 
 /**
  * Connect a TimeControl to a Game

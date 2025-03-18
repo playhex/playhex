@@ -2,9 +2,7 @@ import path from 'path';
 import express from 'express';
 import { Router } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { IS_DEV, WEBPACK_PORT } from '../../../config';
-
-/* eslint-disable */
+import { IS_DEV, WEBPACK_PORT } from '../../../config.js';
 
 export function staticsRouter(): Router {
     const router = Router();

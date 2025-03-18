@@ -1,7 +1,7 @@
-import { AbstractTimeControl, GameTimeData } from './TimeControl';
-import TimeControlType from './TimeControlType';
-import { ByoYomiTimeControl } from './time-controls/ByoYomiTimeControl';
-import { FischerTimeControl } from './time-controls/FischerTimeControl';
+import { AbstractTimeControl, GameTimeData } from './TimeControl.js';
+import TimeControlType from './TimeControlType.js';
+import { ByoYomiTimeControl } from './time-controls/ByoYomiTimeControl.js';
+import { FischerTimeControl } from './time-controls/FischerTimeControl.js';
 
 export type CreateTimeControlOptions = {
     /**

@@ -1,13 +1,13 @@
-import HttpError from '../HttpError';
+import HttpError from '../HttpError.js';
 import { Get, JsonController, OnUndefined, Param, Put } from 'routing-controllers';
 import { Service } from 'typedi';
-import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister';
-import HexAiApiClient from '../../../services/HexAiApiClient';
-import GamePersister from '../../../persistance/GamePersister';
-import GameAnalyze, { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze';
-import { HexServer } from '../../../server';
-import Rooms from '../../../../shared/app/Rooms';
-import logger from '../../../services/logger';
+import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister.js';
+import HexAiApiClient from '../../../services/HexAiApiClient.js';
+import GamePersister from '../../../persistance/GamePersister.js';
+import GameAnalyze, { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
+import { HexServer } from '../../../server.js';
+import Rooms from '../../../../shared/app/Rooms.js';
+import logger from '../../../services/logger.js';
 
 @JsonController()
 @Service()

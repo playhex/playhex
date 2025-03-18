@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
-import PlayerSettingsRepository from '../../../repositories/PlayerSettingsRepository';
-import { AuthenticatedPlayer } from '../middlewares';
+import PlayerSettingsRepository from '../../../repositories/PlayerSettingsRepository.js';
+import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, JsonController, Patch } from 'routing-controllers';
-import { PlayerSettings, Player } from '../../../../shared/app/models';
+import { PlayerSettings, Player } from '../../../../shared/app/models/index.js';
 
 @JsonController()
 @Service()

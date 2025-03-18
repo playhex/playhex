@@ -2,7 +2,7 @@
 import { BIconCheck, BIconScissors, BIconTrash } from 'bootstrap-icons-vue';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
-import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor';
+import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
 
 defineProps({
     conditionalMovesEditor: {

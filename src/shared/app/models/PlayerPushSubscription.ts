@@ -1,7 +1,7 @@
 import { PushSubscription } from 'web-push';
 import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import Player from './Player';
-import { Expose } from '../class-transformer-custom';
+import Player from './Player.js';
+import { Expose } from '../class-transformer-custom.js';
 
 @Entity()
 @Unique(['player', 'endpoint'])

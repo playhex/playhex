@@ -1,7 +1,7 @@
-import { HostedGame, Player } from '../../../shared/app/models';
-import { getCurrentPlayer, getOtherPlayer, hasPlayer } from '../../../shared/app/hostedGameUtils';
-import useAuthStore from '../../stores/authStore';
-import router from '../../vue/router';
+import { HostedGame, Player } from '../../../shared/app/models/index.js';
+import { getCurrentPlayer, getOtherPlayer, hasPlayer } from '../../../shared/app/hostedGameUtils.js';
+import useAuthStore from '../../stores/authStore.js';
+import router from '../../vue/router.js';
 
 export const hasFocus = () => document.hasFocus();
 

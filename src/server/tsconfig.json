@@ -1,25 +1,14 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "target": "ES2019",
-        "sourceMap": true,
-        "declaration": true,
-        "resolveJsonModule": true,
-        "removeComments": true,
-        "importHelpers": true,
-        "skipLibCheck": true,
-        "noErrorTruncation": true,
+        "target": "ESNext",
+        "baseUrl": "./",
         "outDir": "../../dist/server",
-        "lib": [
-            "dom",
-            "ES2019"
-        ],
         "types": [
             "node"
         ],
-        "incremental": true,
-        "composite": true,
-        "baseUrl": "./"
+        "importHelpers": true,
+        "noErrorTruncation": true
     },
     "include": [
         "**/*.ts",

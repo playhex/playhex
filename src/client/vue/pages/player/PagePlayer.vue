@@ -2,13 +2,13 @@
 /* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import { Person, WithContext } from 'schema-dts';
-import useAuthStore from '../../../stores/authStore';
+import useAuthStore from '../../../stores/authStore.js';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
-import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models';
-import { getPlayerBySlug, ApiClientError, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient';
+import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
+import { getPlayerBySlug, ApiClientError, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
 import { Ref, ref, watch } from 'vue';
 import { format } from 'date-fns';
-import useLobbyStore from '../../../stores/lobbyStore';
+import useLobbyStore from '../../../stores/lobbyStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppTimeControlLabelVue from '../../components/AppTimeControlLabel.vue';
@@ -18,18 +18,18 @@ import AppPlayerRatingChart from '../../components/AppPlayerRatingChart.vue';
 import AppTablePlayerRating from '../../components/AppTablePlayerRating.vue';
 import AppSearchGamesParameters from '../../components/AppSearchGamesParameters.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useJsonLd } from '../../../services/head';
+import { useJsonLd } from '../../../services/head.js';
 import { useSeoMeta } from '@unhead/vue';
-import { pseudoString } from '../../../../shared/app/pseudoUtils';
+import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
-import useServerDateStore from '../../../stores/serverDateStore';
+import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils.js';
+import useServerDateStore from '../../../stores/serverDateStore.js';
 import { watchEffect } from 'vue';
-import { RatingCategory } from '../../../../shared/app/ratingUtils';
+import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
-import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters';
-import { getOtherPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils';
-import { useSearchGamesPagination } from '../../composables/searchGamesPagination';
+import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
+import { getOtherPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 
 const { slug } = useRoute().params;
 

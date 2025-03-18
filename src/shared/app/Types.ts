@@ -1,6 +1,6 @@
-import { GameTimeData } from '../time-control/TimeControl';
-import TimeControlType from '../time-control/TimeControlType';
-import { Translator } from './i18n/availableLocales';
+import { GameTimeData } from '../time-control/TimeControl.js';
+import TimeControlType from '../time-control/TimeControlType.js';
+import { Translator } from './i18n/availableLocales.js';
 
 export type Tuple<T> = [T, T];
 

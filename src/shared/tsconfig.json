@@ -2,18 +2,8 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "target": "ES2019",
-        "declaration": true,
-        "sourceMap": true,
-        "skipLibCheck": true,
-        "allowSyntheticDefaultImports": true,
-        "isolatedModules": true,
-        "outDir": "../../dist/shared",
         "baseUrl": "./",
-        "lib": [
-            "ES2019",
-            "dom"
-        ],
-        "composite": true
+        "outDir": "../../dist/shared"
     },
     "include": [
         "**/*.ts"

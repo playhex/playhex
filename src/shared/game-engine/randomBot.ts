@@ -1,5 +1,5 @@
 import seedrandom from 'seedrandom';
-import { Game, Move } from '../game-engine';
+import { Game, Move } from '../game-engine/index.js';
 
 /**
  * Returns a random number in [0;1[

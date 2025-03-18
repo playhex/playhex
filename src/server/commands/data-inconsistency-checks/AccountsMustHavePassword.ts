@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { IsNull, Like, Not, Repository } from 'typeorm';
-import { Player } from '../../../shared/app/models';
-import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface';
+import { Player } from '../../../shared/app/models/index.js';
+import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
  * A bug with typeorm set some account passwords to null.

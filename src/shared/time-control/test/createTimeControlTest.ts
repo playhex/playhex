@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha';
-import { createTimeControl } from '../createTimeControl';
+import { createTimeControl } from '../createTimeControl.js';
 import assert from 'assert';
 
 describe('createTimeControl', () => {

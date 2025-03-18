@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SuperJSON } from 'superjson';
-import { JSONObject, SuperJSONResult } from 'superjson/dist/types';
-import { instanceToPlain, plainToInstance } from './class-transformer-custom';
-import { entities } from './models';
+import { JSONObject, SuperJSONResult } from 'superjson/dist/types.js';
+import { instanceToPlain, plainToInstance } from './class-transformer-custom.js';
+import { entities } from './models/index.js';
 
 /*
  * Used to serialize/deserialize messages through socket,

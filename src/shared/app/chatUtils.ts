@@ -1,6 +1,4 @@
-import HostedGame from './models/HostedGame';
-import Player from './models/Player';
-import ChatMessage from './models/ChatMessage';
+import { HostedGame, Player, ChatMessage } from './models/index.js';
 
 export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
     if (

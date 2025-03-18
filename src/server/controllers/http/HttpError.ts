@@ -1,8 +1,8 @@
-import HandledError, { ErrorResponse, HandledErrorType, handledErrors } from '../../../shared/app/Errors';
-import { InvalidPseudoError, PseudoTooLongError, PseudoTooShortError } from '../../../shared/app/pseudoUtils';
+import HandledError, { ErrorResponse, HandledErrorType, handledErrors } from '../../../shared/app/Errors.js';
+import { InvalidPseudoError, PseudoTooLongError, PseudoTooShortError } from '../../../shared/app/pseudoUtils.js';
 import { ClassConstructor } from 'class-transformer';
-import { MustBeGuestError, PseudoAlreadyTakenError } from '../../repositories/PlayerRepository';
-import { InvalidPasswordError, PseudoNotExistingError } from '../../services/security/authentication';
+import { MustBeGuestError, PseudoAlreadyTakenError } from '../../repositories/PlayerRepository.js';
+import { InvalidPasswordError, PseudoNotExistingError } from '../../services/security/authentication.js';
 
 /**
  * Represent a client error sent from API.

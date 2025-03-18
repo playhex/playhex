@@ -1,10 +1,10 @@
 import { Service } from 'typedi';
 import { Body, ForbiddenError, Get, JsonController, NotFoundError, Param, Patch } from 'routing-controllers';
-import { ConditionalMoves, Player } from '../../../../shared/app/models';
-import { AuthenticatedPlayer } from '../middlewares';
-import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import ConditionalMovesRepository from '../../../repositories/ConditionalMovesRepository';
-import { hasPlayer } from '../../../../shared/app/hostedGameUtils';
+import { ConditionalMoves, Player } from '../../../../shared/app/models/index.js';
+import { AuthenticatedPlayer } from '../middlewares.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import ConditionalMovesRepository from '../../../repositories/ConditionalMovesRepository.js';
+import { hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
 
 @JsonController()
 @Service()

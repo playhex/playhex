@@ -1,12 +1,12 @@
 import qs from 'qs';
-import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription } from '../shared/app/models';
-import { ErrorResponse, HandledErrorType } from '../shared/app/Errors';
-import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom';
-import { RatingCategory } from '../shared/app/ratingUtils';
-import SearchGamesParameters from '../shared/app/SearchGamesParameters';
+import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription } from '../shared/app/models/index.js';
+import { ErrorResponse, HandledErrorType } from '../shared/app/Errors.js';
+import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
+import { RatingCategory } from '../shared/app/ratingUtils.js';
+import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
 import { parse } from 'content-range';
-import SearchPlayersParameters from '../shared/app/SearchPlayersParameters';
+import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 
 export class ApiClientError extends Error
 {

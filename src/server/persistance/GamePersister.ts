@@ -1,7 +1,7 @@
 import { IsNull, Not, Repository } from 'typeorm';
-import { Game } from '../../shared/app/models';
-import { AnalyzeGameRequest } from '../services/HexAiApiClient';
-import { Move } from '../../shared/game-engine';
+import { Game } from '../../shared/app/models/index.js';
+import { AnalyzeGameRequest } from '../services/HexAiApiClient.js';
+import { Move } from '../../shared/game-engine/index.js';
 import { Inject, Service } from 'typedi';
 
 @Service()

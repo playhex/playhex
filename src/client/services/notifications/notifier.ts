@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, HostedGame, Move } from '../../../shared/app/models';
+import { ChatMessage, HostedGame, Move } from '../../../shared/app/models/index.js';
 
 type NotifiableEvents = {
     gameStart: (hostedGame: HostedGame) => void;

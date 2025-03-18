@@ -5,17 +5,17 @@ import { useSeoMeta } from '@unhead/vue';
 import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartData, ChartOptions, TimeScale, Colors } from 'chart.js';
 import { Bar } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
-import 'chartjs-adapter-date-fns';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters';
-import { HostedGame } from '../../../shared/app/models';
+import '../../services/chartJsDateFnsAdapter.js';
+import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
+import { HostedGame } from '../../../shared/app/models/index.js';
 import AppSearchGamesParameters from '../components/AppSearchGamesParameters.vue';
-import { getGames, getGamesStats } from '../../apiClient';
+import { getGames, getGamesStats } from '../../apiClient.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { getStrictWinnerPlayer } from '../../../shared/app/hostedGameUtils';
-import { useSearchGamesPagination } from '../composables/searchGamesPagination';
-import { useSearchGamesSyncHash } from '../composables/searchGamesSyncHash';
+import { getStrictWinnerPlayer } from '../../../shared/app/hostedGameUtils.js';
+import { useSearchGamesPagination } from '../composables/searchGamesPagination.js';
+import { useSearchGamesSyncHash } from '../composables/searchGamesSyncHash.js';
 
 useSeoMeta({
     title: 'Games archive',

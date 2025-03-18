@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { usePrograms } from '@overlastic/vue';
 import { PropType, Ref, ref, toRefs, watch } from 'vue';
-import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconExclamationTriangle, BIconTrophy } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';
-import useAiConfigsStore from '../../../stores/aiConfigsStore';
+import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
 import { storeToRefs } from 'pinia';
-import { AIConfigStatusData } from '../../../../shared/app/Types';
-import { apiGetAiConfigsStatus } from '../../../apiClient';
-import AIConfig from '../../../../shared/app/models/AIConfig';
-import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils';
+import { AIConfigStatusData } from '../../../../shared/app/Types.js';
+import { apiGetAiConfigsStatus } from '../../../apiClient.js';
+import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
 
 const { min, max } = Math;
 

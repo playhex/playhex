@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { BootstrapLevel } from '../../shared/app/bootstrapLevels';
+import { BootstrapLevel } from './bootstrapLevels.js';
 import { RouteLocationAsRelativeTyped } from 'vue-router';
 
 export type ToastOptions = {

@@ -1,7 +1,7 @@
-import './channels/browser';
-import './channels/sound';
-import './channels/toast';
-import { notifier } from './notifier';
+import './channels/browser.js';
+import './channels/sound.js';
+import './channels/toast.js';
+import { notifier } from './notifier.js';
 
 export {
     notifier,

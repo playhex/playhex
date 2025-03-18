@@ -1,4 +1,4 @@
-import { validateTreeFormat } from '../conditionalMovesUtils';
+import { validateTreeFormat } from '../conditionalMovesUtils.js';
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
 
 @ValidatorConstraint()

@@ -3,8 +3,8 @@
 import { PropType } from 'vue';
 import { usePrograms } from '@overlastic/vue';
 import AppPseudo from '../AppPseudo.vue';
-import Player from '../../../../shared/app/models/Player';
-import { Game } from '../../../../shared/game-engine';
+import Player from '../../../../shared/app/models/Player.js';
+import { Game } from '../../../../shared/game-engine/index.js';
 
 const { visible, resolve } = usePrograms();
 

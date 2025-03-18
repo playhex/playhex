@@ -2,7 +2,7 @@
 import { Player } from 'glicko2';
 import { computed, reactive } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
-import { createRanking } from '../../../../shared/app/ratingUtils';
+import { createRanking } from '../../../../shared/app/ratingUtils.js';
 import AppNumberDiff from '../../components/AppNumberDiff.vue';
 
 useSeoMeta({

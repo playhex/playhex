@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { ByoYomiChrono } from '../ByoYomiChrono';
-import { dateDiff } from './utils';
+import { ByoYomiChrono } from '../ByoYomiChrono.js';
+import { dateDiff } from './utils.js';
 
 describe('ByoYomiChrono', () => {
     it('can recreate ByoYomi Chrono from values, and consume periods if needed', () => {

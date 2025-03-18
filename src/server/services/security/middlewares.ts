@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response, Express } from 'express';
-import { HexServer } from '../../server';
-import { sessionMiddleware } from '../sessionMiddleware';
-import Container from 'typedi';
-import PlayerRepository from '../../repositories/PlayerRepository';
+import { HexServer } from '../../server.js';
+import { sessionMiddleware } from '../sessionMiddleware.js';
+import { Container } from 'typedi';
+import PlayerRepository from '../../repositories/PlayerRepository.js';
 
 const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     // Makes express and socketio aware of session in cookie

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useSocketStore from '../../stores/socketStore';
+import useSocketStore from '../../stores/socketStore.js';
 
 const socketStore = useSocketStore();
 </script>

@@ -1,5 +1,5 @@
 import { Locale } from 'date-fns';
-import { availableLocales } from './availableLocales';
+import { availableLocales } from './availableLocales.js';
 
 export const loadDateFnsLocale = async (locale: string): Promise<undefined | Locale> => {
     if (availableLocales[locale]) {

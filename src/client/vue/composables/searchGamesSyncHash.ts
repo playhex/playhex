@@ -1,7 +1,7 @@
 import qs from 'qs';
 import { Ref, watchEffect } from 'vue';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters';
-import { plainToInstance } from '../../../shared/app/class-transformer-custom';
+import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
+import { plainToInstance } from '../../../shared/app/class-transformer-custom.js';
 
 /**
  * On page load, set searchGamesParameters values to the ones in url hash if defined.

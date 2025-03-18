@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { Rating } from '../../../shared/app/models';
-import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils';
+import { Rating } from '../../../shared/app/models/index.js';
+import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils.js';
 
 defineProps({
     rating: {

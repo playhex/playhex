@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models';
-import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface';
+import { HostedGame } from '../../../shared/app/models/index.js';
+import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
  * When a game timeouts but at least one players didn't made a move,

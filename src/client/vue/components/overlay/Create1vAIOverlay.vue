@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { usePrograms } from '@overlastic/vue';
 import { PropType, Ref, ref, toRefs, watch } from 'vue';
-import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
 import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';
-import useAiConfigsStore from '../../../stores/aiConfigsStore';
+import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
 import { storeToRefs } from 'pinia';
-import { AIConfigStatusData } from '../../../../shared/app/Types';
-import { apiGetAiConfigsStatus } from '../../../apiClient';
-import AIConfig from '../../../../shared/app/models/AIConfig';
+import { AIConfigStatusData } from '../../../../shared/app/Types.js';
+import { apiGetAiConfigsStatus } from '../../../apiClient.js';
+import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
 
 const { visible, resolve, reject } = usePrograms();
 

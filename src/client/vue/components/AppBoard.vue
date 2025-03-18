@@ -1,16 +1,16 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '../../../shared/pixi-board/GameView';
+import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { BIconCheck, BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconCrosshair, BIconScissors, BIconTrophyFill, BIconX } from 'bootstrap-icons-vue';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
-import Player from '../../../shared/app/models/Player';
-import TimeControlType from '../../../shared/time-control/TimeControlType';
-import { GameTimeData } from '../../../shared/time-control/TimeControl';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore';
+import { Player } from '../../../shared/app/models/index.js';
+import TimeControlType from '../../../shared/time-control/TimeControlType.js';
+import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
+import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { storeToRefs } from 'pinia';
 
 const pixiApp = ref<HTMLElement>();

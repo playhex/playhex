@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
-import PlayerRepository from '../../../repositories/PlayerRepository';
-import HttpError from '../HttpError';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
+import HttpError from '../HttpError.js';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
-import StatsRepository from '../../../repositories/StatsRepository';
+import StatsRepository from '../../../repositories/StatsRepository.js';
 
 @JsonController()
 @Service()

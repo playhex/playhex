@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { PlayerStats } from '../../../shared/app/models';
+import { PlayerStats } from '../../../shared/app/models/index.js';
 import { ref } from 'vue';
 
 const { playerStats } = defineProps({

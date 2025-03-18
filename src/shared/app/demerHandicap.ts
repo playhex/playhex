@@ -1,4 +1,4 @@
-import { HostedGame, Move } from './models';
+import { HostedGame, Move } from './models/index.js';
 
 /**
  * Guess Demer handicap from game options and pass moves.

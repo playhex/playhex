@@ -2,14 +2,14 @@ import 'express-async-errors';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import path from 'path';
 import { HttpError as RoutingControllersHttpError } from 'routing-controllers';
-import { registerApi } from './api';
-import { staticsRouter } from './misc/statics-router';
-import { pagesRouter } from './misc/pages-router';
-import { seoRouter } from './misc/seo-router';
-import { pwaRouter } from './misc/pwa-router';
-import HttpError from './HttpError';
-import logger from '../../services/logger';
-import HandledError from '../../../shared/app/Errors';
+import { registerApi } from './api/index.js';
+import { staticsRouter } from './misc/statics-router.js';
+import { pagesRouter } from './misc/pages-router.js';
+import { seoRouter } from './misc/seo-router.js';
+import { pwaRouter } from './misc/pwa-router.js';
+import HttpError from './HttpError.js';
+import logger from '../../services/logger.js';
+import HandledError from '../../../shared/app/Errors.js';
 
 export const registerHttpControllers = (app: Express): void => {
     app.use(express.static(path.join(process.cwd(), 'assets')));

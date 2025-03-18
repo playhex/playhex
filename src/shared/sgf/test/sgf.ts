@@ -1,6 +1,6 @@
 import assert from 'assert';
-import { sgfToString, writeNodesRecursive } from '../sgf';
-import { SGF } from '../types';
+import { sgfToString, writeNodesRecursive } from '../sgf.js';
+import { SGF } from '../types.js';
 
 describe('SGF', () => {
     it('generate SGF string from simple SGF object', () => {

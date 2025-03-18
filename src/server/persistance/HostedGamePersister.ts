@@ -1,8 +1,8 @@
-import { HostedGame, HostedGameToPlayer } from '../../shared/app/models';
+import { HostedGame, HostedGameToPlayer } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
-import logger from '../services/logger';
+import logger from '../services/logger.js';
 import { FindManyOptions, FindOptionsRelations, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
-import SearchGamesParameters from '../../shared/app/SearchGamesParameters';
+import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 
 /**
  * Relations to load in order to recreate an HostedGame in memory.

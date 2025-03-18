@@ -1,5 +1,5 @@
 import { computed, Ref, watch } from 'vue';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters';
+import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
 
 /**
  * Pagination helper.

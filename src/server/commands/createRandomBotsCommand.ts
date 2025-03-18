@@ -1,5 +1,5 @@
-import hexProgram from './hexProgram';
-import createAiConfigIfNotExists from './utils/createAiConfigIfNotExists';
+import hexProgram from './hexProgram.js';
+import createAiConfigIfNotExists from './utils/createAiConfigIfNotExists.js';
 
 hexProgram
     .command('create-random-bots')

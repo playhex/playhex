@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { PlayerSettings } from '../../shared/app/models';
+import { PlayerSettings } from '../../shared/app/models/index.js';
 
 @Service()
 export default class PlayerSettingsRepository

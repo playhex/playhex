@@ -1,7 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import HostedGame from './HostedGame';
-import Player from './Player';
-import { Expose } from '../class-transformer-custom';
+import HostedGame from './HostedGame.js';
+import type HostedGameType from './HostedGame.js';
+import Player from './Player.js';
+import type PlayerType from './Player.js';
+import { Expose } from '../class-transformer-custom.js';
 
 @Entity()
 export default class HostedGameToPlayer
@@ -11,14 +13,14 @@ export default class HostedGameToPlayer
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.hostedGameToPlayers)
     @JoinColumn()
-    hostedGame: HostedGame;
+    hostedGame: HostedGameType;
 
     @Column()
     playerId: number;
 
     @ManyToOne(() => Player)
     @Expose()
-    player: Player;
+    player: PlayerType;
 
     @PrimaryColumn('smallint')
     order: number;

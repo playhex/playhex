@@ -1,10 +1,10 @@
 import { Service } from 'typedi';
-import { AuthenticatedPlayer } from '../middlewares';
+import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, JsonController, Post, Put } from 'routing-controllers';
-import { Player, PlayerPushSubscription } from '../../../../shared/app/models';
-import PlayerPushSubscriptionRepository from '../../../repositories/PlayerPushSubscriptionRepository';
-import { PushNotificationSender } from '../../../services/PushNotificationsSender';
-import { PushPayload } from '../../../../shared/app/PushPayload';
+import { Player, PlayerPushSubscription } from '../../../../shared/app/models/index.js';
+import PlayerPushSubscriptionRepository from '../../../repositories/PlayerPushSubscriptionRepository.js';
+import { PushNotificationSender } from '../../../services/PushNotificationsSender.js';
+import { PushPayload } from '../../../../shared/app/PushPayload.js';
 
 @JsonController()
 @Service()

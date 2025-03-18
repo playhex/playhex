@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { WebAppManifest } from 'web-app-manifest';
-import { seo } from '../../../../shared/app/seo';
+import { seo } from '../../../../shared/app/seo.js';
 
 const { BASE_URL } = process.env;
 

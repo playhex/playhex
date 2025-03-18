@@ -1,5 +1,5 @@
-import { ByoYomiTimeControlOptions } from './time-controls/ByoYomiTimeControl';
-import { FischerTimeControlOptions } from './time-controls/FischerTimeControl';
+import { ByoYomiTimeControlOptions } from './time-controls/ByoYomiTimeControl.js';
+import { FischerTimeControlOptions } from './time-controls/FischerTimeControl.js';
 
 type FischerTimeControlType = {
     type: 'fischer';

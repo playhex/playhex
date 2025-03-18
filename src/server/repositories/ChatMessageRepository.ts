@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { ChatMessage, Player } from '../../shared/app/models';
-import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages';
+import { ChatMessage, Player } from '../../shared/app/models/index.js';
+import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 
 @Service()
 export default class ChatMessageRepository

@@ -1,12 +1,12 @@
 import { ref } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
-import { HostedGame } from '../../shared/app/models';
-import useAuthStore from './authStore';
-import { shouldShowConditionalMoves } from '../../shared/app/hostedGameUtils';
-import { apiGetConditionalMoves, apiPatchConditionalMoves } from '../apiClient';
-import GameView from '../../shared/pixi-board/GameView';
-import { PlayerIndex } from '../../shared/game-engine';
-import ConditionalMovesEditor, { listenGameViewEvents } from '../../shared/app/ConditionalMovesEditor';
+import { HostedGame } from '../../shared/app/models/index.js';
+import useAuthStore from './authStore.js';
+import { shouldShowConditionalMoves } from '../../shared/app/hostedGameUtils.js';
+import { apiGetConditionalMoves, apiPatchConditionalMoves } from '../apiClient.js';
+import GameView from '../../shared/pixi-board/GameView.js';
+import { PlayerIndex } from '../../shared/game-engine/index.js';
+import ConditionalMovesEditor, { listenGameViewEvents } from '../../shared/app/ConditionalMovesEditor.js';
 
 /**
  * Context for conditional moves of current game.

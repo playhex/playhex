@@ -1,27 +1,27 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import useLobbyStore from '../../stores/lobbyStore';
+import useLobbyStore from '../../stores/lobbyStore.js';
 import { useRouter } from 'vue-router';
 import { defineOverlay } from '@overlastic/vue';
 import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '../components/overlay/Create1v1RankedOverlay.vue';
 import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '../components/overlay/Create1v1FriendlyOverlay.vue';
 import Create1vAIOverlay, { Create1vAIOverlayInput } from '../components/overlay/Create1vAIOverlay.vue';
 import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '../components/overlay/Create1vAIRankedOverlay.vue';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
-import { HostedGame, HostedGameOptions } from '../../../shared/app/models';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import { HostedGame, HostedGameOptions } from '../../../shared/app/models/index.js';
 import AppSidebar from '../components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
-import useAuthStore from '../../stores/authStore';
+import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from 'bootstrap-icons-vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useSeoMeta } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import i18next from 'i18next';
-import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash';
-import { apiPostGame } from '../../apiClient';
-import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils';
-import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
+import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash.js';
+import { apiPostGame } from '../../apiClient.js';
+import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
+import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 
 const updateSeoMeta = () => useSeoMeta({
     title: i18next.t('lobby_title'),

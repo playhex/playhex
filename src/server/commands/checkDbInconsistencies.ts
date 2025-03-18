@@ -1,13 +1,13 @@
-import Container from 'typedi';
-import { AppDataSource } from '../data-source';
-import hexProgram from './hexProgram';
-import { AccountsMustHavePassword } from './data-inconsistency-checks/AccountsMustHavePassword';
-import { MoveTimestampsAreOrdered } from './data-inconsistency-checks/MoveTimestampsAreOrdered';
-import { DataInconsistenciesCheckerInterface } from './data-inconsistency-checks/DataInconsistenciesCheckerInterface';
-import { RatingChangesOnlyWhenApplicable } from './data-inconsistency-checks/RatingChangesOnlyWhenApplicable';
-import { TimeoutGamesWithLessThan2MovesMustBeCanceled } from './data-inconsistency-checks/TimeoutGamesWithLessThan2MovesMustBeCanceled';
-import { GamesWithAIMustHaveOpponentId } from './data-inconsistency-checks/GamesWithAIMustHaveOpponentId';
-import { InconsistentWinnerStateOutcome } from './data-inconsistency-checks/InconsistentWinnerStateOutcome';
+import { Container } from 'typedi';
+import { AppDataSource } from '../data-source.js';
+import hexProgram from './hexProgram.js';
+import { AccountsMustHavePassword } from './data-inconsistency-checks/AccountsMustHavePassword.js';
+import { MoveTimestampsAreOrdered } from './data-inconsistency-checks/MoveTimestampsAreOrdered.js';
+import { DataInconsistenciesCheckerInterface } from './data-inconsistency-checks/DataInconsistenciesCheckerInterface.js';
+import { RatingChangesOnlyWhenApplicable } from './data-inconsistency-checks/RatingChangesOnlyWhenApplicable.js';
+import { TimeoutGamesWithLessThan2MovesMustBeCanceled } from './data-inconsistency-checks/TimeoutGamesWithLessThan2MovesMustBeCanceled.js';
+import { GamesWithAIMustHaveOpponentId } from './data-inconsistency-checks/GamesWithAIMustHaveOpponentId.js';
+import { InconsistentWinnerStateOutcome } from './data-inconsistency-checks/InconsistentWinnerStateOutcome.js';
 
 hexProgram
     .command('check-inconsistencies')

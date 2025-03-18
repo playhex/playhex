@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
-import useSocketStore from './socketStore';
-import useAuthStore from './authStore';
-import { OnlinePlayer } from '../../shared/app/models';
-import Rooms from '../../shared/app/Rooms';
+import useSocketStore from './socketStore.js';
+import useAuthStore from './authStore.js';
+import { OnlinePlayer } from '../../shared/app/models/index.js';
+import Rooms from '../../shared/app/Rooms.js';
 
 /**
  * Online players displayed on home sidebar.

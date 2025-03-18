@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { pseudoSlug } from '../pseudoUtils';
+import { pseudoSlug } from '../pseudoUtils.js';
 import { describe, it } from 'mocha';
 
 describe('pseudoUtils', () => {

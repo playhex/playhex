@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
-import HostedGameServer from '../../HostedGameServer';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
-import logger from '../logger';
+import HostedGameServer from '../../HostedGameServer.js';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import logger from '../logger.js';
 
 type GetGamesCallback = () => HostedGameServer[];
 

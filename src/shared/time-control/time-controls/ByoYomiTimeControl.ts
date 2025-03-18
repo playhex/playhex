@@ -1,7 +1,7 @@
-import TimeValue from '../TimeValue';
-import { AbstractTimeControl, GameTimeData, PlayerIndex, PlayerTimeData } from '../TimeControl';
-import { ByoYomiChrono } from '../ByoYomiChrono';
-import TimeControlType from '../TimeControlType';
+import TimeValue from '../TimeValue.js';
+import { AbstractTimeControl, GameTimeData, PlayerIndex, PlayerTimeData } from '../TimeControl.js';
+import { ByoYomiChrono } from '../ByoYomiChrono.js';
+import TimeControlType from '../TimeControlType.js';
 
 export interface ByoYomiTimeControlOptions
 {

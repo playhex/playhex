@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import useToastsStore from '../../../stores/toastsStore';
-import { Toast } from '../../../../shared/app/Toast';
+import useToastsStore from '../../../stores/toastsStore.js';
+import { Toast } from '../../../../shared/app/Toast.js';
 import { useRouter } from 'vue-router';
 
 const { toasts } = storeToRefs(useToastsStore());

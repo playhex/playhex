@@ -1,6 +1,6 @@
 import { Container, Text, TextStyle } from 'pixi.js';
-import { Mark } from '../Mark';
-import Hex from '../Hex';
+import { Mark } from '../Mark.js';
+import Hex from '../Hex.js';
 
 /**
  * Show a 'S' on second player stone if she swapped.

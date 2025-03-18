@@ -1,21 +1,10 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "target": "ES2019",
-        "module": "ESNext",
-        "moduleResolution": "node",
-        "noEmit": true,
-        "skipLibCheck": true,
-        "allowSyntheticDefaultImports": true,
-        "isolatedModules": true,
+        "target": "ESNext",
+        "baseUrl": "./",
         "outDir": "../../dist/client",
-        "lib": [
-            "ES2019",
-            "DOM"
-        ],
-        "types": [],
-        "composite": true,
-        "baseUrl": "./"
+        "noEmit": true
     },
     "include": [
         "**/*.ts",

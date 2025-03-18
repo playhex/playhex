@@ -1,14 +1,14 @@
 import { Service } from 'typedi';
 import { IsNumber, IsString, Max, Min } from 'class-validator';
-import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import PlayerRepository from '../../../repositories/PlayerRepository';
-import HttpError from '../HttpError';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
+import HttpError from '../HttpError.js';
 import { Authorized, Body, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
-import { Player, HostedGameOptions } from '../../../../shared/app/models';
-import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
-import ChatMessageRepository from '../../../repositories/ChatMessageRepository';
-import { PushNotificationSender } from '../../../services/PushNotificationsSender';
-import { PushPayload } from '../../../../shared/app/PushPayload';
+import { Player, HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
+import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
+import { PushNotificationSender } from '../../../services/PushNotificationsSender.js';
+import { PushPayload } from '../../../../shared/app/PushPayload.js';
 
 class CreateAiVsAiInput
 {

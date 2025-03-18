@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import AppBoard from '../components/AppBoard.vue';
-import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '../../../shared/game-engine';
-import { HostedGameOptions, Player } from '../../../shared/app/models';
+import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '../../../shared/game-engine/index.js';
+import { HostedGameOptions, Player } from '../../../shared/app/models/index.js';
 import { Ref, ref } from 'vue';
-import useAuthStore from '../../stores/authStore';
+import useAuthStore from '../../stores/authStore.js';
 import { useSeoMeta } from '@unhead/vue';
-import { CustomizedGameView } from '../../services/CustomizedGameView';
+import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 
 useSeoMeta({
     title: 'Play offline',

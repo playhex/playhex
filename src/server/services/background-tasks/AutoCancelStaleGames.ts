@@ -1,9 +1,9 @@
 import { Service } from 'typedi';
-import HostedGameServer from '../../HostedGameServer';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
-import OnlinePlayersService from '../OnlinePlayersService';
-import logger from '../logger';
-import { Player } from '../../../shared/app/models';
+import HostedGameServer from '../../HostedGameServer.js';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import OnlinePlayersService from '../OnlinePlayersService.js';
+import logger from '../logger.js';
+import { Player } from '../../../shared/app/models/index.js';
 
 type StaleGames = { [playerPublicId: string]: {
     player: Player;

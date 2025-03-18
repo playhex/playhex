@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { denormalize, normalize } from '../serializer';
+import { denormalize, normalize } from '../serializer.js';
 import assert from 'assert';
 import { describe, it } from 'mocha';
 

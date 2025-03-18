@@ -1,5 +1,5 @@
-import router from '../vue/router';
-import { apiPutPushSubscription } from '../apiClient';
+import router from '../vue/router.js';
+import { apiPutPushSubscription } from '../apiClient.js';
 
 /* global PUSH_VAPID_PUBLIC_KEY */
 // @ts-ignore: PUSH_VAPID_PUBLIC_KEY replaced at build time by webpack.

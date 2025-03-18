@@ -1,11 +1,11 @@
 import { Repository } from 'typeorm';
 import { Get, JsonController, Param } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
-import PlayerRepository from '../../../repositories/PlayerRepository';
-import RatingRepository from '../../../repositories/RatingRepository';
-import HttpError from '../HttpError';
-import { ratingCategories, validateRatingCategory } from '../../../../shared/app/ratingUtils';
-import { HostedGame } from '../../../../shared/app/models';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
+import RatingRepository from '../../../repositories/RatingRepository.js';
+import HttpError from '../HttpError.js';
+import { ratingCategories, validateRatingCategory } from '../../../../shared/app/ratingUtils.js';
+import { HostedGame } from '../../../../shared/app/models/index.js';
 
 @JsonController()
 @Service()

@@ -1,8 +1,9 @@
 import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import type { RatingCategory } from '../ratingUtils';
-import Player from './Player';
-import HostedGame from './HostedGame';
-import { Expose } from '../class-transformer-custom';
+import type { RatingCategory } from '../ratingUtils.js';
+import Player from './Player.js';
+import type PlayerType from './Player.js';
+import HostedGame from './HostedGame.js';
+import { Expose } from '../class-transformer-custom.js';
 
 @Entity()
 @Index(['player', 'category', 'createdAt'])
@@ -13,7 +14,7 @@ export default class Rating
 
     @ManyToOne(() => Player)
     @Expose()
-    player: Player;
+    player: PlayerType;
 
     /**
      * Which game(s) have issued this new player rating

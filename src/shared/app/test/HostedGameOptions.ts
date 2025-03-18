@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { HostedGameOptions, HostedGameOptionsTimeControlFischer } from '../models';
+import { HostedGameOptions, HostedGameOptionsTimeControlFischer } from '../models/index.js';
 import assert from 'assert';
 
 describe('HostedGameOptions', () => {

@@ -1,9 +1,9 @@
 import { Inject, Service } from 'typedi';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { ConditionalMoves, HostedGame, Player } from '../../shared/app/models';
-import { Move } from '../../shared/game-engine';
-import { conditionalMovesShift, getNextMovesAfterLine } from '../../shared/app/conditionalMovesUtils';
-import logger from '../services/logger';
+import { ConditionalMoves, HostedGame, Player } from '../../shared/app/models/index.js';
+import { Move } from '../../shared/game-engine/index.js';
+import { conditionalMovesShift, getNextMovesAfterLine } from '../../shared/app/conditionalMovesUtils.js';
+import logger from '../services/logger.js';
 
 @Service()
 export default class ConditionalMovesRepository

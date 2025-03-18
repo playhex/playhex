@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import useSocketStore from './socketStore';
+import useSocketStore from './socketStore.js';
 import { ref } from 'vue';
 
 /**

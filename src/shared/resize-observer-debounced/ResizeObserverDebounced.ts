@@ -1,4 +1,4 @@
-import { debounceResize, DEFAULT_WAIT } from './debounceResize';
+import { debounceResize, DEFAULT_WAIT } from './debounceResize.js';
 
 /**
  * Same as ResizeObserver, but debounced:

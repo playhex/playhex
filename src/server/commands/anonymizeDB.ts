@@ -1,7 +1,7 @@
-import { hashPassword } from '../services/security/authentication';
-import { AppDataSource } from '../data-source';
-import hexProgram from './hexProgram';
-import { mustAnswerYes } from './utils/question';
+import { hashPassword } from '../services/security/authentication.js';
+import { AppDataSource } from '../data-source.js';
+import hexProgram from './hexProgram.js';
+import { mustAnswerYes } from './utils/question.js';
 
 hexProgram
     .command('db-anonymize')

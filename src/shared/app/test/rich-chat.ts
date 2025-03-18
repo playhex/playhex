@@ -1,6 +1,6 @@
 import assert from 'assert';
-import { ChatMessage, Game, HostedGame, Player } from '../models';
-import { RichChat } from '../rich-chat';
+import { ChatMessage, Game, HostedGame, Player } from '../models/index.js';
+import { RichChat } from '../rich-chat.js';
 
 describe('Rich Chat', () => {
     it('yield date headers', () => {

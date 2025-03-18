@@ -1,4 +1,4 @@
-import { defaultCreateOptions } from '../../shared/time-control/createTimeControl';
+import { defaultCreateOptions } from '../../shared/time-control/createTimeControl.js';
 
 export const initTimeControl = () => {
     const { GAME_CLOCK_SYSTEM_MAX_TIME } = process.env;

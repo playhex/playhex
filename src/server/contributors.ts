@@ -1,5 +1,5 @@
-import type { GithubContributor, WeblateContributors } from '../shared/app/Types';
-import { availableLocales } from '../shared/app/i18n/availableLocales';
+import type { GithubContributor, WeblateContributors } from '../shared/app/Types.js';
+import { availableLocales } from '../shared/app/i18n/availableLocales.js';
 
 const { FETCH_CONTRIBUTORS } = process.env;
 

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Move } from '..';
+import { Move } from '../index.js';
 
 describe('Move', () => {
     it('associates well row/col to coords like c2...', () => {

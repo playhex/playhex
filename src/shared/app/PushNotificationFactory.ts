@@ -1,7 +1,7 @@
-import { getOtherPlayer, getStrictWinnerPlayer } from './hostedGameUtils';
-import { HostedGame, Player } from './models';
-import { pseudoString } from './pseudoUtils';
-import { PushPayload } from './PushPayload';
+import { getOtherPlayer, getStrictWinnerPlayer } from './hostedGameUtils.js';
+import { HostedGame, Player } from './models/index.js';
+import { pseudoString } from './pseudoUtils.js';
+import { PushPayload } from './PushPayload.js';
 
 const gameTag = (hostedGame: HostedGame): string => `game-${hostedGame.publicId}`;
 

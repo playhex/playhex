@@ -1,9 +1,9 @@
-import Player from '../../shared/app/models/Player';
-import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '../../client/apiClient';
+import { Player } from '../../shared/app/models/index.js';
+import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '../../client/apiClient.js';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import useSocketStore from './socketStore';
-import usePlayersStore from './playersStore';
+import useSocketStore from './socketStore.js';
+import usePlayersStore from './playersStore.js';
 
 const useAuthStore = defineStore('authStore', () => {
 

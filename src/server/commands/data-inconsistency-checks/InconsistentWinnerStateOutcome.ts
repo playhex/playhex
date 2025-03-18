@@ -1,9 +1,9 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models';
-import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface';
-import { HostedGameState } from '../../../shared/app/Types';
-import { Outcome, PlayerIndex } from '../../../shared/game-engine/Types';
+import { HostedGame } from '../../../shared/app/models/index.js';
+import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
+import { HostedGameState } from '../../../shared/app/Types.js';
+import { Outcome, PlayerIndex } from '../../../shared/game-engine/Types.js';
 
 /**
  * Possible values for winner, outcome and state:

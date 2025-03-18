@@ -1,5 +1,5 @@
 import { isSameDay } from 'date-fns';
-import { ChatMessage, HostedGame } from './models';
+import { ChatMessage, HostedGame } from './models/index.js';
 
 /*
  * Take a game chat messages, and adds between chat messages:

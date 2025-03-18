@@ -1,5 +1,5 @@
-import { Coords } from './Types';
-import { MoveData } from './normalization';
+import { Coords } from './Types.js';
+import { MoveData } from './normalization.js';
 
 export type SpecialMoveType = 'swap-pieces' | 'pass';
 

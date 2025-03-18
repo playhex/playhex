@@ -1,25 +1,25 @@
-import AIConfig from './AIConfig';
-import ChatMessage from './ChatMessage';
-import ConditionalMoves from './ConditionalMoves';
-import Game from './Game';
-import GameAnalyze from './GameAnalyze';
-import HostedGame from './HostedGame';
-import HostedGameOptions from './HostedGameOptions';
+import AIConfig from './AIConfig.js';
+import ChatMessage from './ChatMessage.js';
+import ConditionalMoves from './ConditionalMoves.js';
+import Game from './Game.js';
+import GameAnalyze from './GameAnalyze.js';
+import HostedGame from './HostedGame.js';
+import HostedGameOptions from './HostedGameOptions.js';
 import {
     HostedGameOptionsTimeControl,
     OptionsFischer,
     HostedGameOptionsTimeControlFischer,
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
-} from './HostedGameOptionsTimeControl';
-import HostedGameToPlayer from './HostedGameToPlayer';
-import Move from './Move';
-import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers';
-import Player from './Player';
-import PlayerPushSubscription from './PlayerPushSubscription';
-import PlayerSettings, { MoveSettings } from './PlayerSettings';
-import PlayerStats from './PlayerStats';
-import Rating from './Rating';
+} from './HostedGameOptionsTimeControl.js';
+import HostedGameToPlayer from './HostedGameToPlayer.js';
+import Move from './Move.js';
+import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
+import Player from './Player.js';
+import PlayerPushSubscription from './PlayerPushSubscription.js';
+import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
+import PlayerStats from './PlayerStats.js';
+import Rating from './Rating.js';
 
 export {
     AIConfig,
@@ -74,8 +74,8 @@ const errored = Object.keys(entities).filter(name => !entities[name as keyof typ
 if (errored.length > 0) {
     /*
      * Occurs not sure why, but i.e when adding both lines, in this order:
-     * import HostedGame from '../shared/app/models/HostedGame';
-     * import { HostedGameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models';
+     * import HostedGame from '../shared/app/models/HostedGame.js';
+     * import { HostedGameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models/index.js';
      */
     throw new Error(`Error while generating entities list: ${errored.join(', ')}`);
 }

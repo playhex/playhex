@@ -1,23 +1,23 @@
 <script lang="ts" setup>
 import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX, BIconExclamationTriangleFill } from 'bootstrap-icons-vue';
-import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore';
+import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
-import usePlayerSettingsStore from '../../../stores/playerSettingsStore';
-import useNotificationStore from '../../../stores/notificationStore';
-import useAuthStore from '../../../stores/authStore';
-import { ApiClientError, apiPostPushTest } from '../../../apiClient';
+import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
+import useNotificationStore from '../../../stores/notificationStore.js';
+import useAuthStore from '../../../stores/authStore.js';
+import { ApiClientError, apiPostPushTest } from '../../../apiClient.js';
 import { watch, Ref, ref, onMounted, onUnmounted } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
-import { InputValidation, toInputClass } from '../../../vue/formUtils';
-import { authChangePassword } from '../../../apiClient';
-import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n';
-import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns';
+import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
+import { authChangePassword } from '../../../apiClient.js';
+import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
+import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns.js';
 import i18n from 'i18next';
-import { Game } from '../../../../shared/game-engine';
-import { Player, MoveSettings } from '../../../../shared/app/models';
+import { Game } from '../../../../shared/game-engine/index.js';
+import { Player, MoveSettings } from '../../../../shared/app/models/index.js';
 import AppBoard from '../../components/AppBoard.vue';
-import { CustomizedGameView } from '../../../services/CustomizedGameView';
-import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler';
+import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
+import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 
 const updateSeoMeta = () => useSeoMeta({

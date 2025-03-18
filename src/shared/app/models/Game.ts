@@ -1,9 +1,10 @@
 import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import HostedGame from './HostedGame';
-import type { Outcome, PlayerIndex } from '../../game-engine/Types';
-import { Expose, plainToInstance } from '../class-transformer-custom';
+import HostedGame from './HostedGame.js';
+import type HostedGameType from './HostedGame.js';
+import type { Outcome, PlayerIndex } from '../../game-engine/Types.js';
+import { Expose, plainToInstance } from '../class-transformer-custom.js';
 import { Type } from 'class-transformer';
-import Move from './Move';
+import Move from './Move.js';
 
 @Entity()
 export default class Game
@@ -13,7 +14,7 @@ export default class Game
 
     @OneToOne(() => HostedGame)
     @JoinColumn()
-    hostedGame?: HostedGame;
+    hostedGame?: HostedGameType;
 
     @Column('smallint')
     @Expose()

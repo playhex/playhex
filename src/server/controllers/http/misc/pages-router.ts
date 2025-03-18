@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getManifest } from './manifest-manager';
-import { seo, jsonLd } from '../../../../shared/app/seo';
+import { getManifest } from './manifest-manager.js';
+import { seo, jsonLd } from '../../../../shared/app/seo.js';
 
 export function pagesRouter(): Router {
     const router = Router();

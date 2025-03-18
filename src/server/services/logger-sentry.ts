@@ -26,5 +26,5 @@ export const addSentryLoggerIfConfigured = (logger: Logger): void => {
         handleExceptions: true,
     };
 
-    logger.add(new Sentry(options));
+    logger.add(new Sentry.default(options));
 };

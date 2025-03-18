@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { IsArray, IsOptional, Validate } from 'class-validator';
-import HostedGame from './HostedGame';
-import Player from './Player';
-import { Expose } from '../class-transformer-custom';
-import { IsValidConditionalMovesTree } from '../validator/IsValidConditionalMovesTree';
+import HostedGame from './HostedGame.js';
+import Player from './Player.js';
+import { Expose } from '../class-transformer-custom.js';
+import { IsValidConditionalMovesTree } from '../validator/IsValidConditionalMovesTree.js';
 
 export type ConditionalMovesLine = [
     // move

@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
-import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom';
-import Player from './Player';
+import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom.js';
+import Player from './Player.js';
 
 export class OnlinePlayer
 {

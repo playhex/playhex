@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { Game, HostedGame } from '../../../shared/app/models';
-import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface';
+import { Game, HostedGame } from '../../../shared/app/models/index.js';
+import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
  * In some games, move playedAt were not ordered in two cases:

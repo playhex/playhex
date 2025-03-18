@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import useAuthStore from '../../../stores/authStore';
+import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
-import useMyGamesStore from '../../../stores/myGamesStore';
+import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
 import { BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';

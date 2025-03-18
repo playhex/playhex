@@ -1,14 +1,14 @@
-import { PlayerIndex } from '../../shared/game-engine';
-import { Outcome } from '../../shared/game-engine/Types';
+import { PlayerIndex } from '../../shared/game-engine/index.js';
+import { Outcome } from '../../shared/game-engine/Types.js';
 import { defineStore } from 'pinia';
-import { HostedGame, Player, ChatMessage } from '../../shared/app/models';
-import { getGame, getGames } from '../../client/apiClient';
-import useSocketStore from './socketStore';
+import { HostedGame, Player, ChatMessage } from '../../shared/app/models/index.js';
+import { getGame, getGames } from '../../client/apiClient.js';
+import useSocketStore from './socketStore.js';
 import { ref, watchEffect } from 'vue';
-import Rooms from '../../shared/app/Rooms';
-import { addMove, addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils';
-import SearchGamesParameters from '../../shared/app/SearchGamesParameters';
-import { notifier } from '../services/notifications';
+import Rooms from '../../shared/app/Rooms.js';
+import { addMove, addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
+import { notifier } from '../services/notifications/index.js';
 
 /**
  * State synced with server, and methods to handle games and players.

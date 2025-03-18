@@ -1,7 +1,7 @@
 import assert from 'assert';
-import { SpecialMoveType } from '../../game-engine';
-import { Move } from '../models';
-import { guessDemerHandicap } from '../demerHandicap';
+import { SpecialMoveType } from '../../game-engine/index.js';
+import { Move } from '../models/index.js';
+import { guessDemerHandicap } from '../demerHandicap.js';
 
 const createMove = (specialMoveType?: SpecialMoveType): Move => {
     const move = new Move();

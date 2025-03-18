@@ -1,24 +1,23 @@
 import winston from 'winston';
-import { File } from 'winston/lib/winston/transports';
-import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine';
-import { HostedGameState } from '../shared/app/Types';
-import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models';
+import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
+import { HostedGameState } from '../shared/app/Types.js';
+import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
 import { v4 as uuidv4 } from 'uuid';
-import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame';
-import { HexServer } from './server';
-import baseLogger, { loggerOptions, loggerTransports } from './services/logger';
-import Rooms from '../shared/app/Rooms';
-import { AbstractTimeControl } from '../shared/time-control/TimeControl';
-import { createTimeControl } from '../shared/time-control/createTimeControl';
-import { canPassAgain } from '../shared/app/passUtils';
-import Container from 'typedi';
+import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
+import { HexServer } from './server.js';
+import baseLogger, { loggerOptions } from './services/logger.js';
+import Rooms from '../shared/app/Rooms.js';
+import { AbstractTimeControl } from '../shared/time-control/TimeControl.js';
+import { createTimeControl } from '../shared/time-control/createTimeControl.js';
+import { canPassAgain } from '../shared/app/passUtils.js';
+import { Container } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { makeAIPlayerMove } from './services/AIManager';
-import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/models/Move';
-import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame';
-import ConditionalMovesRepository from './repositories/ConditionalMovesRepository';
-import { timeControlToCadencyName } from '../shared/app/timeControlUtils';
-import { notifier } from './services/notifications';
+import { makeAIPlayerMove } from './services/AIManager.js';
+import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/models/Move.js';
+import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame.js';
+import ConditionalMovesRepository from './repositories/ConditionalMovesRepository.js';
+import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
+import { notifier } from './services/notifications/index.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -85,14 +84,6 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.logger = winston.createLogger({
             ...loggerOptions,
-            transports: [
-                ...loggerTransports,
-                new File({
-                    filename: `${createdAt.toISOString().replace(/(T|:)/g, '-').replace(/\..*/g, '')}-${publicId}.log`,
-                    dirname: `var/logs/games/${createdAt.toISOString().substring(0, 7)}`,
-                    level: 'debug',
-                }),
-            ],
             defaultMeta: {
                 hostedGamePublicId: publicId,
             },

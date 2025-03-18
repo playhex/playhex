@@ -1,4 +1,4 @@
-import { ConditionalMovesLine, ConditionalMovesTree } from './models/ConditionalMoves';
+import { ConditionalMovesLine, ConditionalMovesTree } from './models/ConditionalMoves.js';
 
 export type ConditionalMovesStruct = {
     tree: ConditionalMovesTree;

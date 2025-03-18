@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { Toast } from '../../shared/app/Toast';
+import { Toast } from '../../shared/app/Toast.js';
 
 const useToastsStore = defineStore('toastsStore', () => {
 

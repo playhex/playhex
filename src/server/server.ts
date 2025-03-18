@@ -1,5 +1,5 @@
-import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents';
-import Player from '../shared/app/models/Player';
+import { HexClientToServerEvents, HexServerToClientEvents } from '../shared/app/HexSocketEvents.js';
+import Player from '../shared/app/models/Player.js';
 import { Server, Socket, DefaultEventsMap } from 'socket.io';
 import { Service } from 'typedi';
 

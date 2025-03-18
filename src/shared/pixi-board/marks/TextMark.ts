@@ -1,6 +1,6 @@
 import { Container, Text, TextStyle } from 'pixi.js';
-import { Mark } from '../Mark';
-import Hex from '../Hex';
+import { Mark } from '../Mark.js';
+import Hex from '../Hex.js';
 
 /**
  * Show a text, generally a letter, on given coordinates.

@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { gameToHexworldLink } from '../hexworld';
-import { Game, Move } from '../../game-engine';
+import { gameToHexworldLink } from '../hexworld.js';
+import { Game, Move } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
 

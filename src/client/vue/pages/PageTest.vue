@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Game, Move } from '../../../shared/game-engine';
+import { Game, Move } from '../../../shared/game-engine/index.js';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
-import { CustomizedGameView } from '../../services/CustomizedGameView';
-import { themes } from '../../../shared/pixi-board/BoardTheme';
+import { CustomizedGameView } from '../../services/CustomizedGameView.js';
+import { themes } from '../../../shared/pixi-board/BoardTheme.js';
 
 const game = new Game();
 const container = ref<HTMLElement>();

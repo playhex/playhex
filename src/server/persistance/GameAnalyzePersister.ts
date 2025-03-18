@@ -1,7 +1,6 @@
 import { Inject, Service } from 'typedi';
-import GameAnalyze from '../../shared/app/models/GameAnalyze';
+import { GameAnalyze, HostedGame } from '../../shared/app/models/index.js';
 import { Repository } from 'typeorm';
-import HostedGame from '../../shared/app/models/HostedGame';
 
 @Service()
 export default class GameAnalyzePersister

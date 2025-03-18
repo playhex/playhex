@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it } from 'mocha';
 import assert from 'assert';
-import { calcAverageSecondsPerMove } from '../timeControlUtils';
+import { calcAverageSecondsPerMove } from '../timeControlUtils.js';
 
 describe('timeControlUtils', () => {
     it('calculates average seconds per move for a given time control and a board size', () => {

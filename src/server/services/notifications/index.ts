@@ -1,5 +1,5 @@
-import './channels/push';
-import { notifier } from './notifier';
+import './channels/push.js';
+import { notifier } from './notifier.js';
 
 export {
     notifier,

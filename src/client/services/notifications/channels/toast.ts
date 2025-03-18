@@ -1,9 +1,9 @@
-import useToastsStore from '../../../../client/stores/toastsStore';
-import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils';
-import { pseudoString } from '../../../../shared/app/pseudoUtils';
-import { Toast } from '../../../../shared/app/Toast';
-import { getOpponent, isMe, viewingGame } from '../context-utils';
-import { notifier } from '../notifier';
+import useToastsStore from '../../../../client/stores/toastsStore.js';
+import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
+import { Toast } from '../../../../shared/app/Toast.js';
+import { getOpponent, isMe, viewingGame } from '../context-utils.js';
+import { notifier } from '../notifier.js';
 import i18next from 'i18next';
 
 notifier.on('gameStart', hostedGame => {

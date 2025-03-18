@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import Player from './Player';
-import { Expose } from '../class-transformer-custom';
+import Player from './Player.js';
+import { Expose } from '../class-transformer-custom.js';
 import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
-import { allShadingPatterns, type ShadingPatternType } from '../../../shared/pixi-board/shading-patterns';
+import { allShadingPatterns, type ShadingPatternType } from '../../pixi-board/shading-patterns.js';
 
 export enum MoveSettings {
     /**

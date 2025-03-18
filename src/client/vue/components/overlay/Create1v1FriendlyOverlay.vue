@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePrograms } from '@overlastic/vue';
 import { PropType, ref, toRefs } from 'vue';
-import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions';
+import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from './create-game/AppTimeControl.vue';

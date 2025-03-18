@@ -1,8 +1,8 @@
-import { Player, OnlinePlayers, OnlinePlayer } from '../../shared/app/models';
-import { HexSocket } from '../server';
+import { Player, OnlinePlayers, OnlinePlayer } from '../../shared/app/models/index.js';
+import { HexSocket } from '../server.js';
 import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { DELAY_BEFORE_PLAYER_INACTIVE } from '../../shared/app/playerActivityConfig';
+import { DELAY_BEFORE_PLAYER_INACTIVE } from '../../shared/app/playerActivityConfig.js';
 
 interface OnlinePlayersServiceEvents
 {

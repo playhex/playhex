@@ -1,5 +1,5 @@
 import { InfluxDBClient, Point } from '@influxdata/influxdb3-client';
-import logger from './logger';
+import logger from './logger.js';
 
 let influxDBClient: null | InfluxDBClient = null;
 

@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { AppDataSource } from '../../data-source';
-import Player from '../../../shared/app/models/Player';
-import AIConfig from '../../../shared/app/models/AIConfig';
+import { AppDataSource } from '../../data-source.js';
+import { Player, AIConfig } from '../../../shared/app/models/index.js';
 
 type CreateAiConfigParameters = {
     config: { [key: string]: unknown };

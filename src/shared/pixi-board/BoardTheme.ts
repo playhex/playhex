@@ -1,4 +1,4 @@
-import { darken } from './colorUtils';
+import { darken } from './colorUtils.js';
 
 export type Theme = {
     /**

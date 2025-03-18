@@ -1,11 +1,10 @@
 import assert from 'assert';
 import { it } from 'mocha';
-import { TimeControlError } from '../TimeControl';
-import { FischerTimeControl } from '../time-controls/FischerTimeControl';
-import TimeValue, { timeValueToMilliseconds } from '../TimeValue';
-import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const parallel = require('mocha.parallel');
+import { TimeControlError } from '../TimeControl.js';
+import { FischerTimeControl } from '../time-controls/FischerTimeControl.js';
+import TimeValue, { timeValueToMilliseconds } from '../TimeValue.js';
+import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl.js';
+import parallel from 'mocha.parallel';
 
 const wait = async (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 

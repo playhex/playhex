@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Game, Move } from '..';
+import { Game, Move } from '../index.js';
 
 describe('Game', () => {
     it('Runs an entire game', () => {

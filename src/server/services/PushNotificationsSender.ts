@@ -1,9 +1,9 @@
 import webPush, { WebPushError } from 'web-push';
 import { Service } from 'typedi';
-import { Player } from '../../shared/app/models';
-import PlayerPushSubscriptionRepository from '../repositories/PlayerPushSubscriptionRepository';
-import { PushPayload } from '../../shared/app/PushPayload';
-import logger from './logger';
+import { Player } from '../../shared/app/models/index.js';
+import PlayerPushSubscriptionRepository from '../repositories/PlayerPushSubscriptionRepository.js';
+import { PushPayload } from '../../shared/app/PushPayload.js';
+import logger from './logger.js';
 
 const {
     PUSH_VAPID_PUBLIC_KEY,

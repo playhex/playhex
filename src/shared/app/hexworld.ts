@@ -1,5 +1,5 @@
-import { Game } from '../game-engine';
-import type { Outcome, PlayerIndex } from '../game-engine/Types';
+import { Game } from '../game-engine/index.js';
+import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
 
 const outcomeToHexworld = (outcome: Outcome, winner: PlayerIndex | null) => {
     if (winner == null)

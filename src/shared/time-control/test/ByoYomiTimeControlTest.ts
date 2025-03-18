@@ -1,8 +1,8 @@
 import { describe, it } from 'mocha';
 import assert from 'assert';
-import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl';
-import { timeValueToMilliseconds } from '../TimeValue';
-import { dateDiff } from './utils';
+import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl.js';
+import { timeValueToMilliseconds } from '../TimeValue.js';
+import { dateDiff } from './utils.js';
 
 describe('ByoYomiTimeControl', () => {
     it('elapses instantly at expected date, when started at past date', () => {

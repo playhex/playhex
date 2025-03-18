@@ -1,8 +1,8 @@
 import { defineStore, storeToRefs } from 'pinia';
-import { PlayerSettings } from '../../shared/app/models';
+import { PlayerSettings } from '../../shared/app/models/index.js';
 import { Ref, ref, watch } from 'vue';
-import { apiGetPlayerSettings, apiPatchPlayerSettings } from '../apiClient';
-import useAuthStore from './authStore';
+import { apiGetPlayerSettings, apiPatchPlayerSettings } from '../apiClient.js';
+import useAuthStore from './authStore.js';
 
 /**
  * Player settings stored in database, so shared accross his devices

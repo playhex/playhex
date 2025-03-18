@@ -1,4 +1,4 @@
-import { HostedGameToPlayer, PlayerStats } from '../../shared/app/models';
+import { HostedGameToPlayer, PlayerStats } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 

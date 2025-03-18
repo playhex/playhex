@@ -1,8 +1,8 @@
 import { reactive, Reactive } from 'vue';
 import { defineStore } from 'pinia';
-import { Player } from '../../shared/app/models';
-import useSocketStore from './socketStore';
-import { createInitialRating } from '../../shared/app/ratingUtils';
+import { Player } from '../../shared/app/models/index.js';
+import useSocketStore from './socketStore.js';
+import { createInitialRating } from '../../shared/app/ratingUtils.js';
 
 /**
  * Keep a same instance of players objects.

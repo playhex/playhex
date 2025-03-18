@@ -1,9 +1,9 @@
-import logger from './logger';
-import { Game, IllegalMove, Move } from '../../shared/game-engine';
-import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient';
-import { TimeMeasureMetric } from './metrics';
+import logger from './logger.js';
+import { Game, IllegalMove, Move } from '../../shared/game-engine/index.js';
+import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
+import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
-import HostedGameServer from '../HostedGameServer';
+import HostedGameServer from '../HostedGameServer.js';
 
 @Service()
 export default class RemoteApiPlayer

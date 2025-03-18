@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { Player, PlayerPushSubscription } from '../../shared/app/models';
+import { Player, PlayerPushSubscription } from '../../shared/app/models/index.js';
 
 @Service()
 export default class PlayerPushSubscriptionRepository

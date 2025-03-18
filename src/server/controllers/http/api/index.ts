@@ -1,24 +1,24 @@
 import { Express, Request } from 'express';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { useContainer, useExpressServer } from 'routing-controllers';
-import GameController from './GameController';
-import PlayerController from './PlayerController';
-import AuthController from './AuthController';
-import OnlinePlayersController from './OnlinePlayersController';
-import PlayerSettingsController from './PlayerSettingsController';
-import AdminController from './AdminController';
-import HttpError from '../HttpError';
-import PlayerRepository from '../../../repositories/PlayerRepository';
-import { Player } from '../../../../shared/app/models';
-import ChatController from './ChatController';
-import AIConfigController from './AIConfigController';
-import GameAnalyzeController from './GameAnalyzeController';
-import RatingController from './RatingController';
-import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom';
-import ServerInfoController from './ServerInfoController';
-import SearchController from './SearchController';
-import GameConditionalMovesController from './GameConditionalMovesController';
-import PushController from './PushController';
+import GameController from './GameController.js';
+import PlayerController from './PlayerController.js';
+import AuthController from './AuthController.js';
+import OnlinePlayersController from './OnlinePlayersController.js';
+import PlayerSettingsController from './PlayerSettingsController.js';
+import AdminController from './AdminController.js';
+import HttpError from '../HttpError.js';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
+import { Player } from '../../../../shared/app/models/index.js';
+import ChatController from './ChatController.js';
+import AIConfigController from './AIConfigController.js';
+import GameAnalyzeController from './GameAnalyzeController.js';
+import RatingController from './RatingController.js';
+import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom.js';
+import ServerInfoController from './ServerInfoController.js';
+import SearchController from './SearchController.js';
+import GameConditionalMovesController from './GameConditionalMovesController.js';
+import PushController from './PushController.js';
 
 export const registerApi = (app: Express) => {
 

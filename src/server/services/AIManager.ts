@@ -1,12 +1,11 @@
-import HostedGameOptions from '../../shared/app/models/HostedGameOptions';
-import Player from '../../shared/app/models/Player';
-import { Move, calcRandomMove } from '../../shared/game-engine';
-import Container from 'typedi';
-import RemoteApiPlayer from './RemoteApiPlayer';
-import logger from './logger';
-import HostedGameServer from '../HostedGameServer';
-import HexAiApiClient from './HexAiApiClient';
-import { AppDataSource } from '../data-source';
+import { HostedGameOptions, Player } from '../../shared/app/models/index.js';
+import { Move, calcRandomMove } from '../../shared/game-engine/index.js';
+import { Container } from 'typedi';
+import RemoteApiPlayer from './RemoteApiPlayer.js';
+import logger from './logger.js';
+import HostedGameServer from '../HostedGameServer.js';
+import HexAiApiClient from './HexAiApiClient.js';
+import { AppDataSource } from '../data-source.js';
 
 export class FindAIError extends Error {}
 

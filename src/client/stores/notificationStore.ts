@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-import { subscribeToPushNotifications as baseSubscribeToPushNotifications } from '../services/registerServiceWorker';
+import { subscribeToPushNotifications as baseSubscribeToPushNotifications } from '../services/registerServiceWorker.js';
 
 /**
  * Manage Notifications permission, push subscription

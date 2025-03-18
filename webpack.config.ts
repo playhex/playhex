@@ -1,17 +1,21 @@
-import path from 'path';
-import { Configuration, DefinePlugin } from 'webpack';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import webpack from 'webpack';
 import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
-import { commitRef } from './src/server/lastCommitInfo';
+import { commitRef } from './src/server/lastCommitInfo.js';
 import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 
-import { IS_DEV, WEBPACK_PORT } from './src/server/config';
+import { IS_DEV, WEBPACK_PORT } from './src/server/config.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const plugins = [
     new WebpackManifestPlugin({}),
     new VueLoaderPlugin(),
-    new DefinePlugin({
+    new webpack.DefinePlugin({
         BASE_URL: JSON.stringify(process.env.BASE_URL),
         SITE_TITLE_SUFFIX: JSON.stringify(process.env.SITE_TITLE_SUFFIX),
         PUSH_VAPID_PUBLIC_KEY: JSON.stringify(process.env.PUSH_VAPID_PUBLIC_KEY),
@@ -39,11 +43,14 @@ if (SENTRY_AUTH_TOKEN && SENTRY_ORG && SENTRY_PROJECT) {
     }));
 }
 
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-// plugins.push(new BundleAnalyzerPlugin());
-
-const nodeModulesPath = path.resolve(__dirname, 'node_modules');
-const targets = IS_DEV ? { chrome: '79', firefox: '72' } : '> 0.25%, not dead';
+// https://babeljs.io/docs/babel-preset-env#modules
+const babelOptions = {
+    modules: false,
+    targets: IS_DEV
+        ? { chrome: '79', firefox: '72' }
+        : '> 0.25%, not dead'
+    ,
+};
 
 const devServer: DevServerConfiguration = {
     port: WEBPACK_PORT,
@@ -51,7 +58,7 @@ const devServer: DevServerConfiguration = {
     allowedHosts: ['all'],
 };
 
-const config: Configuration = {
+const config: webpack.Configuration = {
     mode: process.env.NODE_ENV as 'development' | 'production',
     devtool: IS_DEV ? 'inline-source-map' : 'source-map',
     entry: ['./src/client/client'],
@@ -63,6 +70,9 @@ const config: Configuration = {
     },
     resolve: {
         extensions: ['.js', '.ts'],
+        extensionAlias: {
+            '.js': ['.ts', '.js'], // Makes webpack can resolve import 'x.js' to 'x.ts'
+        },
         alias: {
             'typeorm': path.resolve(__dirname, 'node_modules/typeorm/typeorm-model-shim'), // To prevent typeorm decorators "not found" error on frontside
         },
@@ -94,19 +104,13 @@ const config: Configuration = {
             },
             {
                 test: /\.ts$/,
-                exclude: [/node_modules/, nodeModulesPath],
+                exclude: [/node_modules/, path.resolve(__dirname, 'node_modules')],
                 use: [
                     {
                         loader: 'babel-loader',
                         options: {
-                            presets: [['@babel/env', { modules: false, targets }], '@babel/typescript'],
-                            plugins: [
-                                '@babel/proposal-numeric-separator',
-                                '@babel/plugin-transform-runtime',
-                                ['@babel/plugin-proposal-decorators', { legacy: true }],
-                                ['@babel/plugin-proposal-class-properties'],
-                                '@babel/plugin-proposal-object-rest-spread',
-                            ],
+                            presets: [['@babel/env', babelOptions], '@babel/typescript'],
+                            sourceType: 'unambiguous',
                         },
                     },
                     {
@@ -117,12 +121,6 @@ const config: Configuration = {
                         },
                     },
                 ],
-            },
-            {
-                test: /\.m?js/,
-                resolve: {
-                    fullySpecified: false,
-                },
             },
             {
                 test: /\.styl(us)?$/,
@@ -167,6 +165,9 @@ const config: Configuration = {
                 type: 'asset/inline',
             },
         ],
+    },
+    stats: {
+        errorDetails: true,
     },
     devServer,
     plugins,

@@ -1,9 +1,9 @@
-import Board, { BOARD_DEFAULT_SIZE } from './Board';
-import Game from './Game';
-import IllegalMove from './IllegalMove';
-import Move, { SpecialMoveType } from './Move';
-import { PlayerIndex, Coords } from './Types';
-import { calcRandomMove } from './randomBot';
+import Board, { BOARD_DEFAULT_SIZE } from './Board.js';
+import Game from './Game.js';
+import IllegalMove from './IllegalMove.js';
+import Move, { SpecialMoveType } from './Move.js';
+import { PlayerIndex, Coords } from './Types.js';
+import { calcRandomMove } from './randomBot.js';
 
 export {
     Board,

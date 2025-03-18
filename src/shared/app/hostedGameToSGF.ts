@@ -1,10 +1,10 @@
 import { isSameDay } from 'date-fns';
-import { SGF, SGFColor, sgfToString } from '../sgf';
-import { HostedGame, ChatMessage } from './models';
-import { pseudoString } from './pseudoUtils';
-import { Move } from '../game-engine';
-import { guessDemerHandicapFromHostedGame } from './demerHandicap';
-import { isRatingConfident } from './ratingUtils';
+import { SGF, SGFColor, sgfToString } from '../sgf/index.js';
+import { HostedGame, ChatMessage } from './models/index.js';
+import { pseudoString } from './pseudoUtils.js';
+import { Move } from '../game-engine/index.js';
+import { guessDemerHandicapFromHostedGame } from './demerHandicap.js';
+import { isRatingConfident } from './ratingUtils.js';
 
 const baseSGF: SGF = {
     FF: 4,

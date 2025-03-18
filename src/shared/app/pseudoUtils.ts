@@ -1,6 +1,6 @@
 import diacritics from 'diacritics';
-import HandledError from './Errors';
-import Player from './models/Player';
+import HandledError from './Errors.js';
+import Player from './models/Player.js';
 
 export class InvalidPseudoError extends HandledError {}
 

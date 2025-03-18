@@ -1,7 +1,7 @@
 import { Container, DestroyOptions, Graphics, PointData, Ticker } from 'pixi.js';
-import { PlayerIndex } from '../game-engine';
-import { colorAverage } from './colorUtils';
-import { Theme } from './BoardTheme';
+import { PlayerIndex } from '../game-engine/index.js';
+import { colorAverage } from './colorUtils.js';
+import { Theme } from './BoardTheme.js';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Encoder as BaseEncoder, Decoder as BaseDecoder, Packet, PacketType } from 'socket.io-parser';
-import { denormalize, normalize } from './serializer';
+import { denormalize, normalize } from './serializer.js';
 
 interface SerializablePacket extends Packet
 {

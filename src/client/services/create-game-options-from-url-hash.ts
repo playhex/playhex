@@ -1,4 +1,4 @@
-import { HostedGameOptions } from '../../shared/app/models';
+import { HostedGameOptions } from '../../shared/app/models/index.js';
 
 export const createGameOptionsFromUrlHash = (hash: string = document.location.hash): null | HostedGameOptions => {
     if (!hash || !hash.startsWith('#create-')) {

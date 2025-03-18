@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame, Player, Rating } from '../../shared/app/models';
-import { RatingCategory, createInitialRating, createRanking, getRatingCategoriesFromGame } from '../../shared/app/ratingUtils';
+import { HostedGame, Player, Rating } from '../../shared/app/models/index.js';
+import { RatingCategory, createInitialRating, createRanking, getRatingCategoriesFromGame } from '../../shared/app/ratingUtils.js';
 
 @Service()
 export default class RatingRepository

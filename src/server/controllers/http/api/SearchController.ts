@@ -1,7 +1,7 @@
 import { Get, JsonController, QueryParams } from 'routing-controllers';
 import { Service } from 'typedi';
-import SearchPlayersParameters from '../../../../shared/app/SearchPlayersParameters';
-import PlayerRepository from '../../../repositories/PlayerRepository';
+import SearchPlayersParameters from '../../../../shared/app/SearchPlayersParameters.js';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
 
 @JsonController()
 @Service()

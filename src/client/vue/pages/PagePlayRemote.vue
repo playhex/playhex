@@ -1,42 +1,42 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import 'bootstrap/js/dist/dropdown';
-import useLobbyStore from '../../stores/lobbyStore';
+import useLobbyStore from '../../stores/lobbyStore.js';
 import { ref, computed } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
-import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient';
+import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient.js';
 import { defineOverlay } from '@overlastic/vue';
 import { Ref, onUnmounted, watch, watchEffect } from 'vue';
-import useSocketStore from '../../stores/socketStore';
-import useAuthStore from '../../stores/authStore';
-import Rooms from '../../../shared/app/Rooms';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
+import useSocketStore from '../../stores/socketStore.js';
+import useAuthStore from '../../stores/authStore.js';
+import Rooms from '../../../shared/app/Rooms.js';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { useRoute, useRouter } from 'vue-router';
 import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp, BIconSignpostSplit } from 'bootstrap-icons-vue';
-import usePlayerSettingsStore from '../../stores/playerSettingsStore';
-import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore';
+import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
+import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import i18next from 'i18next';
-import { Move, PlayerIndex } from '../../../shared/game-engine';
+import { Move, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
-import { HostedGame } from '../../../shared/app/models';
-import { fromEngineMove } from '../../../shared/app/models/Move';
-import { pseudoString } from '../../../shared/app/pseudoUtils';
-import { CustomizedGameView } from '../../services/CustomizedGameView';
-import { isMyTurn } from '../../services/notifications/context-utils';
-import { canPassAgain } from '../../../shared/app/passUtils';
+import { HostedGame } from '../../../shared/app/models/index.js';
+import { fromEngineMove } from '../../../shared/app/models/Move.js';
+import { pseudoString } from '../../../shared/app/pseudoUtils.js';
+import { CustomizedGameView } from '../../services/CustomizedGameView.js';
+import { isMyTurn } from '../../services/notifications/context-utils.js';
+import { canPassAgain } from '../../../shared/app/passUtils.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
-import { apiPostRematch } from '../../apiClient';
-import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils';
+import { apiPostRematch } from '../../apiClient.js';
+import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import { Socket } from 'socket.io-client';
-import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents';
-import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore';
+import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents.js';
+import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
+import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { markRaw } from 'vue';
-import { MoveSettings } from '../../../shared/app/models/PlayerSettings';
+import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 
 useSeoMeta({
     robots: 'noindex',

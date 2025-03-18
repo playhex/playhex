@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { HostedGame } from '../../../../shared/app/models';
-import Container from 'typedi';
+import { HostedGame } from '../../../../shared/app/models/index.js';
+import { Container } from 'typedi';
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../../../data-source';
+import { AppDataSource } from '../../../data-source.js';
 
 const getGamesToIndex = async (): Promise<{ publicId: string, endedAt: Date }[]> => {
     const hostedGameRepository = Container.get<Repository<HostedGame>>('Repository<HostedGame>');

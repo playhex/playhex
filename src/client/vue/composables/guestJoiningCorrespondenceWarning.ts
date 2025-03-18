@@ -1,8 +1,8 @@
 import { defineOverlay } from '@overlastic/vue';
 import { storeToRefs } from 'pinia';
-import { HostedGame } from '../../../shared/app/models';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
-import useAuthStore from '../../stores/authStore';
+import { HostedGame } from '../../../shared/app/models/index.js';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import useAuthStore from '../../stores/authStore.js';
 import GuestJoiningCorrepondenceWarningOverlay from '../components/overlay/GuestJoiningCorrepondenceWarningOverlay.vue';
 
 export const useGuestJoiningCorrespondenceWarning = () => {

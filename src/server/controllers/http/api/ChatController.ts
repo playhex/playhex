@@ -1,10 +1,9 @@
 import { Body, JsonController, Param, Post } from 'routing-controllers';
 import { Service } from 'typedi';
-import { AuthenticatedPlayer } from '../middlewares';
-import Player from '../../../../shared/app/models/Player';
-import ChatMessage from '../../../../shared/app/models/ChatMessage';
-import HostedGameRepository from '../../../repositories/HostedGameRepository';
-import HttpError from '../HttpError';
+import { AuthenticatedPlayer } from '../middlewares.js';
+import { ChatMessage, Player } from '../../../../shared/app/models/index.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import HttpError from '../HttpError.js';
 
 @JsonController()
 @Service()

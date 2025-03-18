@@ -1,9 +1,9 @@
 import { Get, JsonController, ResponseClassTransformOptions } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
-import { AIConfigStatusData } from '../../../../shared/app/Types';
-import HexAiApiClient from '../../../services/HexAiApiClient';
-import logger from '../../../services/logger';
-import AIConfig from '../../../../shared/app/models/AIConfig';
+import { AIConfigStatusData } from '../../../../shared/app/Types.js';
+import HexAiApiClient from '../../../services/HexAiApiClient.js';
+import logger from '../../../services/logger.js';
+import AIConfig from '../../../../shared/app/models/AIConfig.js';
 import { Repository } from 'typeorm';
 
 const { HEX_AI_API } = process.env;

@@ -1,8 +1,8 @@
-import Container from 'typedi';
-import { getCurrentPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils';
-import { PushNotificationFactory } from '../../../../shared/app/PushNotificationFactory';
-import { PushNotificationsPool } from '../../../services/PushNotificationsPool';
-import { notifier } from '../notifier';
+import { Container } from 'typedi';
+import { getCurrentPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import { PushNotificationFactory } from '../../../../shared/app/PushNotificationFactory.js';
+import { PushNotificationsPool } from '../../../services/PushNotificationsPool.js';
+import { notifier } from '../notifier.js';
 
 const pushNotificationsPool = Container.get(PushNotificationsPool);
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
-import { apiGetContributors } from '../../../apiClient';
-import type { PlayHexContributors } from '../../../../shared/app/Types';
+import { apiGetContributors } from '../../../apiClient.js';
+import type { PlayHexContributors } from '../../../../shared/app/Types.js';
 import { ref } from 'vue';
 
 useSeoMeta({

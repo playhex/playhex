@@ -1,6 +1,6 @@
-import { Chrono } from '../Chrono';
-import TimeControlType from '../TimeControlType';
-import { AbstractTimeControl, GameTimeData, PlayerIndex, TimeControlError } from '../TimeControl';
+import { Chrono } from '../Chrono.js';
+import TimeControlType from '../TimeControlType.js';
+import { AbstractTimeControl, GameTimeData, PlayerIndex, TimeControlError } from '../TimeControl.js';
 
 export interface FischerTimeControlOptions
 {

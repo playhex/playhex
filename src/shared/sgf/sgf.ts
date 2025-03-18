@@ -1,4 +1,4 @@
-import type { SGF, SGFMove, SGFProperty } from './types';
+import type { SGF, SGFMove, SGFProperty } from './types.js';
 
 /*
  * SGF docs:

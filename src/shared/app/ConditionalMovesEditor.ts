@@ -1,8 +1,8 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { Move, PlayerIndex } from '../game-engine';
-import GameView from '../pixi-board/GameView';
-import TextMark from '../pixi-board/marks/TextMark';
-import { clearDuplicatedUnplayedLines, conditionalMovesCut, conditionalMovesMergeMoves, conditionalMovesShift, ConditionalMovesStruct, getNextMovesAfterLine } from './conditionalMovesUtils';
+import { Move, PlayerIndex } from '../game-engine/index.js';
+import GameView from '../pixi-board/GameView.js';
+import TextMark from '../pixi-board/marks/TextMark.js';
+import { clearDuplicatedUnplayedLines, conditionalMovesCut, conditionalMovesMergeMoves, conditionalMovesShift, ConditionalMovesStruct, getNextMovesAfterLine } from './conditionalMovesUtils.js';
 
 type ConditionalMovesEditorEvents = {
 

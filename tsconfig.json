@@ -2,14 +2,25 @@
     "compilerOptions": {
         "module": "NodeNext",
         "moduleResolution": "nodenext",
+        "declaration": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitReturns": true,
         "noImplicitOverride": true,
         "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
         "emitDecoratorMetadata": true,
         "esModuleInterop": true,
         "experimentalDecorators": true,
-        "strictNullChecks": true
+        "sourceMap": true,
+        "strictNullChecks": true,
+        "incremental": true,
+        "composite": true,
+        "lib": [
+            "ES2019",
+            "DOM"
+        ]
     }
 }

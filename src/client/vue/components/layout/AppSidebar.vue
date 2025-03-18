@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import useOnlinePlayersStore from '../../../stores/onlinePlayersStore';
+import useOnlinePlayersStore from '../../../stores/onlinePlayersStore.js';
 import AppPseudo from '../AppPseudo.vue';
 import AppTournamentCard from '../AppTournamentCard.vue';
-import type { OnlinePlayer } from '../../../../shared/app/models';
+import type { OnlinePlayer } from '../../../../shared/app/models/index.js';
 
 const {
     players,

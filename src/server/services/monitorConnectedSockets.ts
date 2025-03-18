@@ -1,6 +1,6 @@
-import Container from 'typedi';
-import OnlinePlayersService from './OnlinePlayersService';
-import { isMonitoringEnabled, sendConnectedSocketsPoint } from './metrics';
+import { Container } from 'typedi';
+import OnlinePlayersService from './OnlinePlayersService.js';
+import { isMonitoringEnabled, sendConnectedSocketsPoint } from './metrics.js';
 
 const onlinePlayersService = Container.get(OnlinePlayersService);
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { PropType, ref, toRefs, watchEffect } from 'vue';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils';
-import { gameToHexworldLink } from '../../../shared/app/hexworld';
-import HostedGameClient from '../../HostedGameClient';
-import useAuthStore from '../../stores/authStore';
-import GameView from '../../../shared/pixi-board/GameView';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import { gameToHexworldLink } from '../../../shared/app/hexworld.js';
+import HostedGameClient from '../../HostedGameClient.js';
+import useAuthStore from '../../stores/authStore.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
 
 const props = defineProps({
     hostedGameClient: {

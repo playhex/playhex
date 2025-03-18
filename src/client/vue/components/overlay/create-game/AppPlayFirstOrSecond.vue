@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import HostedGameOptions from '../../../../../shared/app/models/HostedGameOptions';
+import HostedGameOptions from '../../../../../shared/app/models/HostedGameOptions.js';
 import { PropType, toRefs } from 'vue';
 
 const props = defineProps({

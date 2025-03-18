@@ -1,8 +1,8 @@
 import { Get, JsonController } from 'routing-controllers';
 import { Service } from 'typedi';
-import { commitRef } from '../../../lastCommitInfo';
-import { fetchGithubContributors, fetchWeblateContributors } from '../../../contributors';
-import { PlayHexContributors } from '../../../../shared/app/Types';
+import { commitRef } from '../../../lastCommitInfo.js';
+import { fetchGithubContributors, fetchWeblateContributors } from '../../../contributors.js';
+import { PlayHexContributors } from '../../../../shared/app/Types.js';
 
 @JsonController()
 @Service()
