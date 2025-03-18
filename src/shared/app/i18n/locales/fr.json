@@ -297,7 +297,7 @@
         "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
     },
     "player_made_a_move": "{{player}} a joué",
-    "game_with_player_has_started": "La partie avec {{player}} a commencé",
+    "game_with_player_has_started": "{{player}} a rejoint votre partie et la partie a commencé",
     "conditional_moves": {
         "title": "Coups conditionnels",
         "title_short": "Coups-si",
@@ -331,5 +331,7 @@
     },
     "move_settings": {
         "title": "Paramètres de coup"
-    }
+    },
+    "go_to_the_game": "Aller à la partie",
+    "player_passed_his_turn": "{{player}} a passé son tour"
 }
