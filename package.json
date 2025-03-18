@@ -14,7 +14,7 @@
   },
   "scripts": {
     "hex": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/server/tsconfig.json\" ts-node src/server/commands",
-    "analyse-size": "NODE_OPTIONS='--import=./register.js' NODE_ENV=production TS_NODE_PROJECT=\"src/client/tsconfig.json\" webpack --mode production --profile --json | grep -E '^{' | sed -E 's/Done in .+//' > size-stats-$DATE.json && webpack-bundle-analyzer size-stats-$DATE.json dist/statics/",
+    "analyse-size": "DATE=$(date '+%Y%m%d-%H%M%S'); NODE_OPTIONS='--import=./register.js' NODE_ENV=production TS_NODE_PROJECT=\"src/client/tsconfig.json\" webpack --mode production --profile --json | grep -E '^{' | sed -E 's/Done in .+//' > size-stats-$DATE.json && webpack-bundle-analyzer size-stats-$DATE.json dist/statics/",
     "lint": "eslint && vue-tsc -p src/client --noEmit",
     "start": "node index.js",
     "start:prod": "NODE_ENV=production node index.js",
