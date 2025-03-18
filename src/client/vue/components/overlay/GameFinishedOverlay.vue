@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType } from 'vue';
-import { usePrograms } from '@overlastic/vue';
+import { useExtendOverlay } from '@overlastic/vue';
 import AppPseudo from '../AppPseudo.vue';
 import Player from '../../../../shared/app/models/Player.js';
 import { Game } from '../../../../shared/game-engine/index.js';
 
-const { visible, resolve } = usePrograms();
+const { visible, resolve } = useExtendOverlay();
 
 const props = defineProps({
     game: {

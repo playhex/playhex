@@ -1,5 +1,5 @@
 import session from 'express-session';
-import RedisStore from 'connect-redis';
+import { RedisStore } from 'connect-redis';
 import { createClient } from 'redis';
 import type { RequestHandler } from 'express';
 

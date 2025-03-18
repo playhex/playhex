@@ -19,7 +19,7 @@ import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.j
 import { storeToRefs } from 'pinia';
 import i18next from 'i18next';
 import { Move, PlayerIndex } from '../../../shared/game-engine/index.js';
-import { useSeoMeta } from '@unhead/vue';
+import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
@@ -41,6 +41,8 @@ import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 useSeoMeta({
     robots: 'noindex',
 });
+
+const head = injectHead();
 
 const { gameId } = useRoute().params;
 
@@ -370,7 +372,7 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
     // to prevent losing updates between game initialization and next socket event.
     unlistenGameUpdates = listenGameUpdates(
         hostedGameClient as Ref<HostedGameClient>,
-        socketStore.socket as Socket<HexServerToClientEvents, HexClientToServerEvents>,
+        socketStore.socket as unknown as Socket<HexServerToClientEvents, HexClientToServerEvents>,
     );
 
     await initGameView();
@@ -395,7 +397,7 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
         }),
         description,
         ogDescription: description,
-    });
+    }, { head });
 });
 
 /*

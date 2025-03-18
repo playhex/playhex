@@ -77,7 +77,7 @@ const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 gameView.on('endedAndWinAnimationOver', () => {
     gameFinishedOverlay({
         game,
-        players: players.value,
+        players: players.value as Player[],
     });
 });
 

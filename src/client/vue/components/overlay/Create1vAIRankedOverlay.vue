@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePrograms } from '@overlastic/vue';
+import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, Ref, ref, toRefs, watch } from 'vue';
 import { BIconExclamationTriangle, BIconTrophy } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
@@ -13,7 +13,7 @@ import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/a
 
 const { min, max } = Math;
 
-const { visible, resolve, reject } = usePrograms();
+const { visible, resolve, reject } = useExtendOverlay();
 
 const props = defineProps({
     gameOptions: {
@@ -21,8 +21,6 @@ const props = defineProps({
         required: true,
     },
 });
-
-export type Create1vAIRankedOverlayInput = typeof props;
 
 const { gameOptions } = toRefs(props);
 

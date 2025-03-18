@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { usePrograms } from '@overlastic/vue';
+import { useExtendOverlay } from '@overlastic/vue';
 
-const { visible, resolve, reject } = usePrograms();
+const { visible, resolve, reject } = useExtendOverlay();
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePrograms } from '@overlastic/vue';
+import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, ref } from 'vue';
 import { HostedGameOptions } from '../../../../shared/app/models/index.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
@@ -7,7 +7,7 @@ import AppTimeControl from './create-game/AppTimeControl.vue';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
 import { BIconTrophy } from 'bootstrap-icons-vue';
 
-const { visible, resolve, reject } = usePrograms();
+const { visible, resolve, reject } = useExtendOverlay();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps({
@@ -16,8 +16,6 @@ const props = defineProps({
         required: true,
     },
 });
-
-export type Create1v1RankedOverlayInput = typeof props;
 
 /*
  * Set data before sumbit form

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SuperJSON } from 'superjson';
-import { JSONObject, SuperJSONResult } from 'superjson/dist/types.js';
+import { SuperJSON, SuperJSONResult } from 'superjson';
 import { instanceToPlain, plainToInstance } from './class-transformer-custom.js';
 import { entities } from './models/index.js';
 
@@ -16,7 +15,7 @@ import { entities } from './models/index.js';
 for (const typeName in entities) {
     const type = entities[typeName as keyof typeof entities];
 
-    SuperJSON.registerCustom<typeof type, JSONObject>(
+    SuperJSON.registerCustom<typeof type, any>(
         {
             isApplicable: (v): v is typeof type => v instanceof type,
             serialize: v => instanceToPlain(v),

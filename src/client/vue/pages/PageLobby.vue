@@ -3,10 +3,10 @@
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { useRouter } from 'vue-router';
 import { defineOverlay } from '@overlastic/vue';
-import Create1v1RankedOverlay, { Create1v1RankedOverlayInput } from '../components/overlay/Create1v1RankedOverlay.vue';
-import Create1v1FriendlyOverlay, { Create1v1FriendlyOverlayInput } from '../components/overlay/Create1v1FriendlyOverlay.vue';
-import Create1vAIOverlay, { Create1vAIOverlayInput } from '../components/overlay/Create1vAIOverlay.vue';
-import Create1vAIRankedOverlay, { Create1vAIRankedOverlayInput } from '../components/overlay/Create1vAIRankedOverlay.vue';
+import Create1v1RankedOverlay from '../components/overlay/Create1v1RankedOverlay.vue';
+import Create1v1FriendlyOverlay from '../components/overlay/Create1v1FriendlyOverlay.vue';
+import Create1vAIOverlay from '../components/overlay/Create1vAIOverlay.vue';
+import Create1vAIRankedOverlay from '../components/overlay/Create1vAIRankedOverlay.vue';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { HostedGame, HostedGameOptions } from '../../../shared/app/models/index.js';
 import AppSidebar from '../components/layout/AppSidebar.vue';
@@ -15,7 +15,7 @@ import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from 'bootstrap-icons-vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { useSeoMeta } from '@unhead/vue';
+import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import i18next from 'i18next';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash.js';
@@ -23,12 +23,9 @@ import { apiPostGame } from '../../apiClient.js';
 import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 
-const updateSeoMeta = () => useSeoMeta({
+useHead({
     title: i18next.t('lobby_title'),
 });
-
-updateSeoMeta();
-i18next.on('languageChanged', () => updateSeoMeta());
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
@@ -45,7 +42,7 @@ const goToGame = (gameId: string) => {
 /*
  * 1 vs 1 - ranked
  */
-const create1v1RankedOverlay = defineOverlay<Create1v1RankedOverlayInput, HostedGameOptions>(Create1v1RankedOverlay);
+const create1v1RankedOverlay = defineOverlay(Create1v1RankedOverlay);
 
 const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
     gameOptions.opponentType = 'player';
@@ -64,7 +61,7 @@ const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new H
 /*
  * 1 vs 1 - friendly
  */
-const create1v1FriendlyOverlay = defineOverlay<Create1v1FriendlyOverlayInput, HostedGameOptions>(Create1v1FriendlyOverlay);
+const create1v1FriendlyOverlay = defineOverlay(Create1v1FriendlyOverlay);
 
 const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
     gameOptions.opponentType = 'player';
@@ -85,7 +82,7 @@ const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new
 /*
 * 1 vs AI ranked
 */
-const create1vAIRankedOverlay = defineOverlay<Create1vAIRankedOverlayInput, HostedGameOptions>(Create1vAIRankedOverlay);
+const create1vAIRankedOverlay = defineOverlay(Create1vAIRankedOverlay);
 
 /* global ALLOW_RANKED_BOT_GAMES */
 // @ts-ignore: ALLOW_RANKED_BOT_GAMES replaced at build time by webpack.
@@ -108,7 +105,7 @@ const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new 
 /*
  * 1 vs AI
  */
-const create1vAIOverlay = defineOverlay<Create1vAIOverlayInput, HostedGameOptions>(Create1vAIOverlay);
+const create1vAIOverlay = defineOverlay(Create1vAIOverlay);
 
 const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
     gameOptions.opponentType = 'ai';

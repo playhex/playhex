@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
-import findUp from 'find-up';
+import { findUpSync } from 'find-up';
 
 dotenv.config({
-    path: findUp.sync('.env.dist'),
+    path: findUpSync('.env.dist'),
 });
 dotenv.config({
-    path: findUp.sync('.env'),
+    path: findUpSync('.env'),
     override: true,
 });
 

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 /* eslint-env browser */
 import { storeToRefs } from 'pinia';
-import { Person, WithContext } from 'schema-dts';
 import useAuthStore from '../../../stores/authStore.js';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
@@ -18,8 +17,8 @@ import AppPlayerRatingChart from '../../components/AppPlayerRatingChart.vue';
 import AppTablePlayerRating from '../../components/AppTablePlayerRating.vue';
 import AppSearchGamesParameters from '../../components/AppSearchGamesParameters.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useJsonLd } from '../../../services/head.js';
-import { useSeoMeta } from '@unhead/vue';
+import { injectHead, useSeoMeta } from '@unhead/vue';
+import { definePerson, useSchemaOrg } from '@unhead/schema-org';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils.js';
@@ -37,6 +36,8 @@ if (Array.isArray(slug)) {
     throw new Error('Unexpected array in "slug" param');
 }
 
+const head = injectHead();
+
 /*
  * Player meta tags
  */
@@ -53,17 +54,14 @@ const updateMeta = (player: Player): void => {
         ogType: 'profile',
         ogUrl: window.location.href,
         twitterCard: 'summary',
-    });
+    }, { head });
 
-    const jsonLd: WithContext<Person> = {
-        '@context': 'https://schema.org',
-        '@type': 'Person',
-        name: pseudoString(player, 'pseudo'),
-        url: window.location.href,
-        identifier: pseudoString(player, 'slug'),
-    };
-
-    useJsonLd(jsonLd);
+    useSchemaOrg(head, [
+        definePerson({
+            name: pseudoString(player, 'pseudo'),
+            url: window.location.href,
+        }),
+    ]);
 };
 
 /*

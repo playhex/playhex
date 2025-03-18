@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePrograms } from '@overlastic/vue';
+import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, ref, toRefs } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
@@ -7,7 +7,7 @@ import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 
-const { visible, resolve, reject } = usePrograms();
+const { visible, resolve, reject } = useExtendOverlay();
 
 const props = defineProps({
     gameOptions: {
@@ -15,8 +15,6 @@ const props = defineProps({
         required: true,
     },
 });
-
-export type Create1vOfflineAIOverlayInput = typeof props;
 
 const { gameOptions } = toRefs(props);
 

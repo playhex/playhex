@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getManifest } from './manifest-manager.js';
-import { seo, jsonLd } from '../../../../shared/app/seo.js';
+import { seo } from '../../../../shared/app/seo.js';
 
 export function pagesRouter(): Router {
     const router = Router();
@@ -12,7 +12,6 @@ export function pagesRouter(): Router {
         res.render('page.ejs', {
             manifest,
             seo,
-            jsonLd,
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,
             blockRobotsIndex: 'true' === process.env.BLOCK_ROBOTS_INDEX,

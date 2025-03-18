@@ -143,7 +143,7 @@ const config: webpack.Configuration = {
                         loader: 'sass-loader',
                         options: {
                             sassOptions: {
-                                silenceDeprecations: ['mixed-decls'],
+                                silenceDeprecations: ['mixed-decls', 'color-functions', 'global-builtin', 'import'],
                             },
                         },
                     },

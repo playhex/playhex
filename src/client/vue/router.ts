@@ -1,5 +1,4 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
-import { useHeadDefault } from '../services/head.js';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -150,10 +149,6 @@ const router = createRouter({
         // Yes, eslint, I return nothing here.
         return;
     },
-});
-
-router.beforeEach(() => {
-    useHeadDefault();
 });
 
 export default router;

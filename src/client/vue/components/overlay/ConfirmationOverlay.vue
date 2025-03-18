@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { t } from 'i18next';
-import { usePrograms } from '@overlastic/vue';
+import { useExtendOverlay } from '@overlastic/vue';
 
-const { visible, resolve, reject } = usePrograms();
+const { visible, resolve, reject } = useExtendOverlay();
 
 const props = defineProps({
     title: {
