@@ -1,6 +1,6 @@
-import diacritics from 'diacritics';
 import HandledError from './Errors.js';
 import Player from './models/Player.js';
+import { slugify } from './slugify.js';
 
 export class InvalidPseudoError extends HandledError {}
 
@@ -41,14 +41,7 @@ export const validatePseudo = (pseudo: string): boolean => {
     }
 };
 
-export const pseudoSlug = (pseudo: string): string => {
-    return diacritics.remove(pseudo)
-        .replace(/[^a-zA-Z0-9]+/g, ' ')
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-    ;
-};
+export const pseudoSlug = (pseudo: string): string => slugify(pseudo);
 
 /**
  * Get a pseudo string, depending on if it is a guest or not, and so...
