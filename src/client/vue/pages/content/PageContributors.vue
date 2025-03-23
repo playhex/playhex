@@ -19,6 +19,11 @@ apiGetContributors().then(result => contributors.value = result);
     <p>Who is behind PlayHex, or has helped make it grow?</p>
 
     <p>
+        <strong><a href="https://github.com/alcalyn" target="_blank" class="text-decoration-none">Alcalyn</a></strong>,
+        initiated this project and main contributor.
+    </p>
+
+    <p>
         <strong><a href="https://github.com/ursi" target="_blank" class="text-decoration-none">Mason</a></strong>
         for hosting his Hex Monthly tournament at PlayHex since the very beginning.
         It has provided valuable feedback, helping illuminate which features are missing.
