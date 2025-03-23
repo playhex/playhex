@@ -439,11 +439,18 @@ watchEffect(() => {
 
                 <!-- created -->
                 <template v-if="'created' === hostedGameClient.getState()">
-                    <p>
+                    <p v-if="null !== hostedGameClient.getHostedGame().host">
                         <i18next :translation="$t('game_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host" />
+                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host!" />
                             </template>
+                            <template #timeAgo>
+                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                            </template>
+                        </i18next>
+                    </p>
+                    <p v-else>
+                        <i18next :translation="$t('game_created_by_system_time_ago')">
                             <template #timeAgo>
                                 {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
                             </template>
@@ -453,11 +460,18 @@ watchEffect(() => {
 
                 <!-- canceled -->
                 <template v-if="'canceled' === hostedGameClient.getState()">
-                    <p>
+                    <p v-if="null !== hostedGameClient.getHostedGame().host">
                         <i18next :translation="$t('game_was_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host" />
+                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host!" />
                             </template>
+                            <template #timeAgo>
+                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                            </template>
+                        </i18next>
+                    </p>
+                    <p v-else>
+                        <i18next :translation="$t('game_created_by_system_time_ago')">
                             <template #timeAgo>
                                 {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
                             </template>
@@ -561,7 +575,10 @@ watchEffect(() => {
             <div class="container-fluid">
                 <dl class="row">
                     <dt class="col-md-5">{{ $t('game.host') }}</dt>
-                    <dd class="col-md-7"><AppPseudo :player="hostedGameClient.getHostedGame().host" :classes="playerColor(hostedGameClient.getHostedGame().host)" /></dd>
+                    <dd class="col-md-7">
+                        <AppPseudo v-if="hostedGameClient.getHostedGame().host" :player="hostedGameClient.getHostedGame().host!" :classes="playerColor(hostedGameClient.getHostedGame().host!)" />
+                        <i v-else>System</i>
+                    </dd>
 
                     <dt class="col-md-5">{{ $t('game.time_control') }}</dt>
                     <dd class="col-md-7"><AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></dd>

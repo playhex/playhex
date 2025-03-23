@@ -23,9 +23,15 @@ export default class HostedGame
     @Expose()
     publicId: string;
 
-    @ManyToOne(() => Player, { nullable: false })
+    /**
+     * Player who created this game.
+     * Null if game has not been created by someone, but by system,
+     * e.g during a tournament, or by a script than trigger a bot vs bot game.
+     */
+    @ManyToOne(() => Player, { nullable: true })
     @Expose()
-    host: PlayerType;
+    @Type(() => Player)
+    host: null | PlayerType;
 
     @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
     @Expose()

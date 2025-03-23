@@ -2,7 +2,7 @@ import useToastsStore from '../../../../client/stores/toastsStore.js';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { Toast } from '../../../../shared/app/Toast.js';
-import { getOpponent, isMe, viewingGame } from '../context-utils.js';
+import { getOpponent, iAmInGame, isMe, viewingGame } from '../context-utils.js';
 import { notifier } from '../notifier.js';
 import i18next from 'i18next';
 
@@ -15,9 +15,16 @@ notifier.on('gameStart', hostedGame => {
         return;
     }
 
-    // Do not notify player who just joined, because he is now aware that game started obviously
-    if (!isMe(hostedGame.host)) {
-        return;
+    if (null === hostedGame.host) {
+        // If no host, notify if I am in the game
+        if (!iAmInGame(hostedGame)) {
+            return;
+        }
+    } else {
+        // Do not notify player who just joined, because he is now aware that game started obviously
+        if (!isMe(hostedGame.host)) {
+            return;
+        }
     }
 
     const opponent = getOpponent(hostedGame);

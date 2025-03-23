@@ -93,7 +93,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
-    static hostNewGame(gameOptions: HostedGameOptions, host: Player, rematchedFrom: null | HostedGame = null): HostedGameServer
+    static hostNewGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): HostedGameServer
     {
         const hostedGameServer = new HostedGameServer();
         const hostedGame = new HostedGame();
@@ -110,12 +110,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         hostedGameServer.createChildLogger();
 
-        hostedGameServer.players.push(host);
+        if (null !== host) {
+            hostedGameServer.players.push(host);
+        }
+
         hostedGameServer.timeControl = createTimeControl(gameOptions.timeControl);
 
         hostedGameServer.saveState();
 
-        hostedGameServer.logger.info('Hosted game created.', { host: host.pseudo });
+        hostedGameServer.logger.info('Hosted game created.', { host: host?.pseudo ?? null });
 
         hostedGameServer.io.to(Rooms.lobby).emit('gameCreated', hostedGame);
 

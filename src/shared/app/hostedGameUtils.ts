@@ -5,7 +5,7 @@ import SearchGamesParameters from './SearchGamesParameters.js';
 import { timeControlToCadencyName } from './timeControlUtils.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
-    if (hostedGame.host.publicId === player.publicId) {
+    if (null !== hostedGame.host && hostedGame.host.publicId === player.publicId) {
         return true;
     }
 

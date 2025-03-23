@@ -302,7 +302,10 @@ const {
                                     >{{ $t('game.watch') }}</router-link>
                                 </td>
                                 <td><span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
-                                <td><AppPseudo onlineStatus rating :player="hostedGame.host" /></td>
+                                <td>
+                                    <AppPseudo v-if="hostedGame.host" onlineStatus rating :player="hostedGame.host" />
+                                    <i v-else>System</i>
+                                </td>
                                 <td :class="isUncommonBoardsize(hostedGame) ? 'text-warning' : ''">{{ hostedGame.gameOptions.boardsize }}</td>
                                 <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
                                 <td><AppGameRulesSummary :gameOptions="hostedGame.gameOptions" /></td>

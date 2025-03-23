@@ -380,7 +380,7 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
     const playerPseudos = hostedGameClient.value.getPlayers().map(p => p.pseudo);
     const { state, host } = hostedGameClient.value.getHostedGame();
     const description = 'created' === state
-        ? `Hex game, hosted by ${host.pseudo}, waiting for an opponent.`
+        ? `Hex game, hosted by ${host?.pseudo ?? 'system'}, waiting for an opponent.`
         : `Hex game, ${playerPseudos.join(' versus ')}.`
     ;
 

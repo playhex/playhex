@@ -84,10 +84,14 @@ export default class AutoCancelStaleGames
 
             // Created game but host disconnected
             if ('created' === game.getState()) {
-                const player = game.getHostedGame().host;
+                const { host } = game.getHostedGame();
 
-                if (!this.onlinePlayersService.isOnline(player)) {
-                    add(player, game);
+                if (null === host) {
+                    continue;
+                }
+
+                if (!this.onlinePlayersService.isOnline(host)) {
+                    add(host, game);
                 }
 
                 continue;

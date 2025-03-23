@@ -30,6 +30,26 @@ export class PushNotificationFactory
         return push;
     }
 
+    static createGameCreatedBySystemStartedNotification(player: Player, hostedGame: HostedGame): PushPayload
+    {
+        const otherPlayer = getOtherPlayer(hostedGame, player);
+
+        if (null === otherPlayer) {
+            throw new Error('No other player, cannot create push');
+        }
+
+        const description = `You play against ${pseudoString(otherPlayer)}`;
+
+        const push = new PushPayload(description);
+
+        push.title = 'Your game has started';
+        push.goToPath = `/games/${hostedGame.publicId}`;
+        push.date = hostedGame.gameData?.startedAt ?? new Date();
+        push.tag = gameTag(hostedGame);
+
+        return push;
+    }
+
     static createTurnToPlayNotification(player: Player, hostedGame: HostedGame, movePlayedAt: Date): PushPayload
     {
         const otherPlayer = getOtherPlayer(hostedGame, player);

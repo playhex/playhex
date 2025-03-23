@@ -93,6 +93,7 @@
     },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Game created by {player}, {timeAgo}.",
+    "game_created_by_system_time_ago": "Game created by system, {timeAgo}.",
     "game_was_created_by_player_time_ago": "Game was created by {player}, {timeAgo}.",
     "log_out": "Log out",
     "log_in": "Log in",

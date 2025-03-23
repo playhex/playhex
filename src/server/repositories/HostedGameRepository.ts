@@ -244,9 +244,17 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    async createGame(host: Player, gameOptions: HostedGameOptions, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
+    /**
+     * Create a game.
+     *
+     * @param host The player who created the game. Host automatically joins the game. Can be null when created by system, in this case, playerJoin() should be called to add players in the game.
+     * @param rematchedFrom If provided, the created game will linked together with previous game, and colors will alternate.
+     */
+    async createGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
     {
-        this.onlinePlayerService.notifyPlayerActivity(host);
+        if (null !== host) {
+            this.onlinePlayerService.notifyPlayerActivity(host);
+        }
 
         const hostedGameServer = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
 
@@ -299,7 +307,7 @@ export default class HostedGameRepository
             throw new GameError('Cannot rematch an active game');
         }
 
-        const rematch = await this.createGame(host, cloneGameOptions(game.gameOptions), game);
+        const rematch = await this.createGame(cloneGameOptions(game.gameOptions), host, game);
         game.rematch = rematch.getHostedGame();
 
         try {

@@ -76,7 +76,10 @@ export default class AdminController
             },
         };
 
-        const hostedGameServer = await this.hostedGameRepository.createGame(ai0, options);
+        const hostedGameServer = await this.hostedGameRepository.createGame(options);
+
+        hostedGameServer.playerJoin(ai0);
+        hostedGameServer.playerJoin(ai1);
 
         return hostedGameServer.getHostedGame();
     }

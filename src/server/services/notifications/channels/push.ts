@@ -12,8 +12,19 @@ notifier.on('gameStart', hostedGame => {
     }
 
     const { host } = hostedGame;
-    const pushPayload = PushNotificationFactory.createPlayerJoinedAndGameStartedNotification(host, hostedGame);
 
+    // Game created by system, push both players
+    if (null === host) {
+        for (const hostedGameToPlayer of hostedGame.hostedGameToPlayers) {
+            const pushPayload = PushNotificationFactory.createGameCreatedBySystemStartedNotification(hostedGameToPlayer.player, hostedGame);
+            pushNotificationsPool.poolNotification(hostedGameToPlayer.player, pushPayload);
+        }
+
+        return;
+    }
+
+    // Game created by someone, only push player who joined the game
+    const pushPayload = PushNotificationFactory.createPlayerJoinedAndGameStartedNotification(host, hostedGame);
     pushNotificationsPool.poolNotification(host, pushPayload);
 });
 
