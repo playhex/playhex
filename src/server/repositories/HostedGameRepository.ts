@@ -31,14 +31,14 @@ export default class HostedGameRepository
      * Each playing game can contains a persisted copy,
      * but the most updated game should be in memory.
      */
-    private activeGames: { [key: string]: HostedGameServer } = {};
+    private activeGames: { [publicId: string]: HostedGameServer } = {};
 
     /**
      * Keep timeout thread id of hosted games to persist in N minutes
      * if no activity.
      * Prevent too much data loss in case server crashes.
      */
-    private persistWhenNoActivity: { [key: string]: ReturnType<typeof setTimeout> } = {};
+    private persistWhenNoActivity: { [publicId: string]: ReturnType<typeof setTimeout> } = {};
 
     constructor(
         private hostedGamePersister: HostedGamePersister,
