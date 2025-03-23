@@ -7,7 +7,7 @@ import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { ApiClientError, apiPostPushTest } from '../../../apiClient.js';
 import { watch, Ref, ref, onMounted, onUnmounted } from 'vue';
-import { useSeoMeta } from '@unhead/vue';
+import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { authChangePassword } from '../../../apiClient.js';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
@@ -20,10 +20,12 @@ import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 
+const head = injectHead();
+
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
     title: i18n.t('player_settings.title'),
-});
+}, { head });
 
 updateSeoMeta();
 i18n.on('languageChanged', () => updateSeoMeta());
