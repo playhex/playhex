@@ -2412,22 +2412,22 @@
     "@typescript-eslint/types" "8.26.1"
     eslint-visitor-keys "^4.2.0"
 
-"@unhead/schema-org@^2.0.0-rc.13":
-  version "2.0.0-rc.13"
-  resolved "https://registry.yarnpkg.com/@unhead/schema-org/-/schema-org-2.0.0-rc.13.tgz#dd701217ef315360bb9ba24b0c28f975fe4a5078"
-  integrity sha512-t3LVdQvzOASmr4N2PWCMW+lUtvgWyCxWqCx1B3rWmmHQ5Wwy81fn6oswldZ8EtB6xjFbQbM3uxRF/WM4IHOLsg==
+"@unhead/schema-org@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@unhead/schema-org/-/schema-org-2.0.0.tgz#ec5fd6fe01fc37cdfb54ac637347423191377e80"
+  integrity sha512-itPIlLd4z3x0vWzxfmCXJBOGNpc0JkwhtDnkzmzkeMKk+u8O3cIbf/43uyuCYrjtPaexwkR6gBEyIsTD1k9tXw==
   dependencies:
     defu "^6.1.4"
     ohash "^2.0.11"
     ufo "^1.5.4"
 
-"@unhead/vue@^2.0.0-rc.13":
-  version "2.0.0-rc.13"
-  resolved "https://registry.yarnpkg.com/@unhead/vue/-/vue-2.0.0-rc.13.tgz#2a7a874f37eedc064391518f48768572714f4f79"
-  integrity sha512-9jF2Y85HtEdxfaa6Y4wn2Gh1eXJHVNvvecWs3+qfEV83kSOFFowOpm6nIYmNpVGPQtnS0OW1JeIZjQEPZR+LAQ==
+"@unhead/vue@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@unhead/vue/-/vue-2.0.0.tgz#4a99a9024027b8666d20374a96e850e70837d273"
+  integrity sha512-QkgWNZ9ZWXhhTYZL2JJs33YwmJP7Ix8l28hofV0qM2txlIVhp747bdxdD/eMysMusbvvtHtMgvPEQE6kByqUTw==
   dependencies:
     hookable "^5.5.3"
-    unhead "2.0.0-rc.13"
+    unhead "2.0.0"
 
 "@volar/language-core@2.4.12", "@volar/language-core@~2.4.11":
   version "2.4.12"
@@ -7906,10 +7906,10 @@ undici-types@~6.20.0:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.20.0.tgz#8171bf22c1f588d1554d55bf204bc624af388433"
   integrity sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==
 
-unhead@2.0.0-rc.13:
-  version "2.0.0-rc.13"
-  resolved "https://registry.yarnpkg.com/unhead/-/unhead-2.0.0-rc.13.tgz#97f54a86823215ab8e511ed2edf21d7bb8fb2fb8"
-  integrity sha512-cuG4Uu6kS9/zF2+XL/5od6S1J4GJqm3xB/I6PVoXgqEVCKryziGdLo+uaqewgOWnv5y5kDRiSuRQz/7fh0nUfw==
+unhead@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/unhead/-/unhead-2.0.0.tgz#918f33bf1bbbab329a6aeb396c1498637a9b87f1"
+  integrity sha512-3H+CpXTMq1FPWc6tWj4VjG+NfWrIXswfpNWC29Ux8Dq0RyWcU1pF00Qx/KjaXprkXH53pE/lTT+1+D8BJ430ew==
   dependencies:
     hookable "^5.5.3"
 
