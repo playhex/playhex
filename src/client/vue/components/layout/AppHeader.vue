@@ -54,7 +54,7 @@ const color = (): string => null === mostUrgentGame.value
 <template>
     <nav class="menu-top navbar bg-body-tertiary">
         <div class="container-fluid justify-content-space-between">
-            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">Play<span class="text-danger">Hex</span><small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small></router-link>
+            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">Blind<span class="text-danger">Hex</span><small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small></router-link>
 
             <span class="my-turn-notif">
                 <component

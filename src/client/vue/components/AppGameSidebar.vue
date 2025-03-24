@@ -530,7 +530,7 @@ watchEffect(() => {
             <div class="container-fluid">
 
                 <!-- HexWorld link -->
-                <AppHexWorldExplore :hostedGameClient :gameView class="btn btn-sm btn-outline-primary me-2 mb-2" />
+                <AppHexWorldExplore v-if="'ended' === hostedGameClient.getState()" :hostedGameClient :gameView class="btn btn-sm btn-outline-primary me-2 mb-2" />
 
                 <!-- Download SGF -->
                 <button

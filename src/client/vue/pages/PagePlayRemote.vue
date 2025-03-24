@@ -710,7 +710,7 @@ onUnmounted(() => resetConditionalMoves());
                 <div class="buttons container-fluid">
 
                     <!-- rewind mode -->
-                    <button type="button" v-if="null !== gameView" @click="() => enableRewindMode()" class="btn btn-outline-primary">
+                    <button type="button" v-if="'ended' === hostedGameClient.getState() && null !== gameView" @click="() => enableRewindMode()" class="btn btn-outline-primary">
                         <BIconRewind />
                     </button>
 
@@ -813,7 +813,7 @@ onUnmounted(() => resetConditionalMoves());
                             </button>
 
                             <!-- Explore -->
-                            <AppHexWorldExplore v-if="gameViewInitialized && gameView" :hostedGameClient :gameView :label="$t('explore')" class="dropdown-item" />
+                            <AppHexWorldExplore v-if="'ended' === hostedGameClient.getState() && gameViewInitialized && gameView" :hostedGameClient :gameView :label="$t('explore')" class="dropdown-item" />
                         </div>
                     </div>
 

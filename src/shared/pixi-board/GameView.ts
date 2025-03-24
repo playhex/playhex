@@ -379,6 +379,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.createAndAddHexes();
         this.addAllMoves();
+
+        if (!this.game.isEnded()) {
+            this.keepOnlyTwoLastMoves();
+        }
+
         this.addAllSimulatedMoves();
         this.highlightSidesFromGame();
         this.showPreviewedMove();
@@ -627,6 +632,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.game.on('played', (move, moveIndex, byPlayerIndex) => {
             this.addMove(move, byPlayerIndex);
+            this.keepOnlyTwoLastMoves();
             this.removePreviewedMove();
             this.highlightSidesFromGame();
         });
@@ -664,6 +670,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.game.on('ended', () => this.endedCallback());
         this.game.on('canceled', () => this.endedCallback());
+
+        this.game.on('ended', () => this.addAllMoves());
+        this.game.on('canceled', () => this.addAllMoves());
     }
 
     /**
@@ -1157,6 +1166,28 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             }
 
             this.addMove(movesHistory[i], i % 2 as PlayerIndex);
+        }
+    }
+
+    private keepOnlyTwoLastMoves(): void
+    {
+        const movesHistory = this.game.getMovesHistory();
+        const { length } = movesHistory;
+
+        for (let i = 0; i < movesHistory.length - 2; ++i) {
+            if (0 === i && length > 0 && movesHistory[1].getSpecialMoveType() === 'swap-pieces') {
+                if (length > 3) {
+                    const swaped = movesHistory[0].cloneMirror();
+                    this.hexes[swaped.row][swaped.col].setPlayer(null);
+                }
+                continue;
+            }
+
+            if (1 === i && movesHistory[1].getSpecialMoveType() === 'swap-pieces') {
+                continue;
+            }
+
+            this.hexes[movesHistory[i].row][movesHistory[i].col].setPlayer(null);
         }
     }
 
