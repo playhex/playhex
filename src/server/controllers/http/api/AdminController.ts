@@ -118,4 +118,17 @@ export default class AdminController
 
         return await this.pushNotificationSender.sendPush(player, payload);
     }
+
+    @Post('/api/admin/games/:publicId/cancel')
+    async cancelGame(
+        @Param('publicId') publicId: string,
+    ) {
+        const hostedGameServer = this.hostedGameRepository.getActiveGame(publicId);
+
+        if (null === hostedGameServer) {
+            throw new NotFoundError(`HostedGame "${publicId}" not found`);
+        }
+
+        hostedGameServer.systemCancel();
+    }
 }
