@@ -112,6 +112,11 @@ export default class HostedGameRepository
         return allSuccess;
     }
 
+    async persist(hostedGame: HostedGame): Promise<void>
+    {
+        await this.hostedGamePersister.persist(hostedGame);
+    }
+
     private listenHostedGameServer(hostedGameServer: HostedGameServer): void
     {
         if ('ended' === hostedGameServer.getState()) {
@@ -252,6 +257,10 @@ export default class HostedGameRepository
      */
     async createGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
     {
+        if (undefined !== gameOptions.hostedGameId && gameOptions.hostedGameId === gameOptions.hostedGame.id) {
+            logger.warning('Provided gameOptions instance seem to be already linked to another hostedGame');
+        }
+
         if (null !== host) {
             this.onlinePlayerService.notifyPlayerActivity(host);
         }
