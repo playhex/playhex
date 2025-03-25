@@ -10,6 +10,7 @@ type DomainHttpErrorTypes =
     | 'pseudo_too_long'
     | 'invalid_pseudo'
     | 'player_not_found'
+    | 'tournament_title_duplicate'
 ;
 
 type DomainHttpErrorType = {

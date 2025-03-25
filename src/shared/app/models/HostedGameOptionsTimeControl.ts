@@ -1,5 +1,5 @@
 import { IsIn, IsInt, IsObject, IsOptional, Max, Min, ValidateNested } from 'class-validator';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import type { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl.js';
 import type { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 
@@ -56,6 +56,7 @@ export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeCo
 
     @ValidateNested({ always: true })
     @IsObject({ always: true })
+    @Type(() => OptionsFischer)
     override options: OptionsFischer;
 }
 
@@ -87,5 +88,6 @@ export class HostedGameOptionsTimeControlByoYomi extends HostedGameOptionsTimeCo
 
     @ValidateNested({ always: true })
     @IsObject({ always: true })
+    @Type(() => OptionsByoYomi)
     override options: OptionsByoYomi;
 }
