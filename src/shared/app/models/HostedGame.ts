@@ -11,6 +11,7 @@ import HostedGameToPlayer from './HostedGameToPlayer.js';
 import { Expose } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
+import TournamentGame from './TournamentGame.js';
 
 @Entity()
 export default class HostedGame
@@ -66,6 +67,14 @@ export default class HostedGame
     @Expose()
     @Type(() => Game)
     gameData: null | Game = null;
+
+    /**
+     * When this game is played in a tournament, else null.
+     */
+    @OneToOne(() => TournamentGame, tournamentGame => tournamentGame.hostedGame)
+    @Expose()
+    @Type(() => TournamentGame)
+    tournamentGame: null | Relation<TournamentGame> = null;
 
     /**
      * Whether there is a current player undo request.

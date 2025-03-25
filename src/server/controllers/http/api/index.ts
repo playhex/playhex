@@ -18,6 +18,7 @@ import ServerInfoController from './ServerInfoController.js';
 import SearchController from './SearchController.js';
 import GameConditionalMovesController from './GameConditionalMovesController.js';
 import PushController from './PushController.js';
+import TournamentController from './TournamentController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -74,6 +75,7 @@ export const registerApi = (app: Express) => {
             GameController,
             GameConditionalMovesController,
             GameAnalyzeController,
+            TournamentController,
             ChatController,
             PlayerController,
             AuthController,
