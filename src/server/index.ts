@@ -12,6 +12,7 @@ import logger from './services/logger.js';
 import { addSessionMiddlewares } from './services/security/middlewares.js';
 import monitorConnectedSockets from './services/monitorConnectedSockets.js';
 import { initTimeControl } from './services/initTimeControl.js';
+import TournamentRepository from './repositories/TournamentRepository.js';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -21,6 +22,7 @@ const app = express();
 app.disable('x-powered-by');
 
 initTimeControl();
+Container.get(TournamentRepository);
 
 const server = http.createServer(app);
 const io = new HexServer(server, {
