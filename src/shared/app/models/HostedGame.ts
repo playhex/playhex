@@ -11,6 +11,7 @@ import HostedGameToPlayer from './HostedGameToPlayer.js';
 import { Expose } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
+import TournamentGame from './TournamentGame.js';
 
 @Entity()
 export default class HostedGame
@@ -26,6 +27,8 @@ export default class HostedGame
      * Player who created this game.
      * Null if game has not been created by someone, but by system,
      * e.g during a tournament, or by a script than trigger a bot vs bot game.
+     *
+     * Player cannot join system game by itself.
      */
     @ManyToOne(() => Player, { nullable: true })
     @Expose()
@@ -64,6 +67,11 @@ export default class HostedGame
     @Expose()
     @Type(() => Game)
     gameData: null | Game = null;
+
+    @OneToOne(() => TournamentGame, tournamentGame => tournamentGame.hostedGame)
+    @Expose()
+    @Type(() => TournamentGame)
+    tournamentGame: null | Relation<TournamentGame> = null;
 
     /**
      * Whether there is a current player undo request.
