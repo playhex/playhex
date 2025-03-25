@@ -505,6 +505,25 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private affectPlayersColors(): void
     {
+        // Do not alternate when game is created by system.
+        // Assume system has already set random colors as needed.
+        // Currently, games are created by system only in tournaments,
+        // and we assume tournament library already affect players colors randomly or depending on last match.
+        if (null === this.hostedGame.host) {
+            if (null === this.hostedGame.gameOptions.firstPlayer) {
+                this.logger.info('Game created by system, do not shuffle players color');
+                return;
+            }
+
+            this.logger.info('Game created by system, but fixed colors, set fixed colors');
+
+            if (1 === this.hostedGame.gameOptions.firstPlayer) {
+                this.players.reverse();
+            }
+
+            return;
+        }
+
         // In case of rematch, alternate colors from previous game instead of random
         if (null !== this.hostedGame.rematchedFrom) {
             this.logger.info('Rematch alternate colors: should alternate?');
