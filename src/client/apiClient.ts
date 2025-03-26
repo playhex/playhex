@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription } from '../shared/app/models/index.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament } from '../shared/app/models/index.js';
 import { ErrorResponse, HandledErrorType } from '../shared/app/Errors.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
@@ -611,4 +611,26 @@ export const apiPostPushTest = async (): Promise<void> => {
     });
 
     await checkResponse(response);
+};
+
+export const apiGetTournaments = async (): Promise<null | Tournament[]> => {
+    const response = await fetch(`/api/tournaments`);
+
+    await checkResponse(response);
+
+    return (await response.json() as Tournament[])
+        .map(subscription => plainToInstance(Tournament, subscription))
+    ;
+};
+
+export const apiGetTournament = async (slug: string): Promise<null | Tournament> => {
+    const response = await fetch(`/api/tournaments/${slug}`);
+
+    if (404 === response.status) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(Tournament, await response.json());
 };
