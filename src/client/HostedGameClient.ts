@@ -523,6 +523,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private removeShadowDeletedMessages(): void
     {
+        // Append '#unban' to the url and refresh to see shadow banned chat messages
+        if ('#unban' === window.location.hash) {
+            return;
+        }
+
         const { loggedInPlayer } = useAuthStore();
 
         this.hostedGame.chatMessages = this.hostedGame.chatMessages
