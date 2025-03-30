@@ -9,6 +9,8 @@ import Rooms from '../../shared/app/Rooms.js';
 import { addMove, addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { notifier } from '../services/notifications/index.js';
+import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
+import useAuthStore from './authStore.js';
 
 /**
  * State synced with server, and methods to handle games and players.
@@ -143,6 +145,10 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
         socket.on('chat', (gameId: string, chatMessage: ChatMessage) => {
             if (hostedGames.value[gameId]) {
+                if (!checkShadowDeleted(chatMessage, useAuthStore().loggedInPlayer)) {
+                    return;
+                }
+
                 notifier.emit('chatMessage', hostedGames.value[gameId], chatMessage);
             }
         });

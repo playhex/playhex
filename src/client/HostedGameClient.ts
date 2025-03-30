@@ -686,6 +686,10 @@ export const listenGameUpdates = (
             return;
         }
 
+        if (!checkShadowDeleted(chatMessage, useAuthStore().loggedInPlayer)) {
+            return;
+        }
+
         hostedGameClient.value.onChatMessage(chatMessage);
     });
 
