@@ -28,13 +28,14 @@ type MetricsTags = {
     };
 };
 
-export const sendConnectedSocketsPoint = (count: number): void => {
+export const sendConnectedSocketsPoint = (active: number, inactive: number): void => {
     if (null === influxDBClient) {
         return;
     }
 
     const point = Point.measurement('connected_sockets')
-        .setIntegerField('value', count)
+        .setIntegerField('value', active)
+        .setIntegerField('inactive', inactive)
     ;
 
     logger.debug('sending metric', {

@@ -5,7 +5,9 @@ import { isMonitoringEnabled, sendConnectedSocketsPoint } from './metrics.js';
 const onlinePlayersService = Container.get(OnlinePlayersService);
 
 const updateCount = (): void => {
-    sendConnectedSocketsPoint(onlinePlayersService.getOnlinePlayersCount());
+    const { active, inactive } = onlinePlayersService.getActiveAndInactivePlayersCount();
+
+    sendConnectedSocketsPoint(active, inactive);
 };
 
 const monitorConnectedSockets = (): void => {
@@ -14,8 +16,12 @@ const monitorConnectedSockets = (): void => {
     }
 
     onlinePlayersService
-        .on('playerConnected', () => updateCount())
-        .on('playerDisconnected', () => updateCount())
+        .on('playerActive', (_, lastState) => {
+            if (!lastState) {
+                updateCount();
+            }
+        })
+        .on('playerInactive', () => updateCount())
     ;
 };
 

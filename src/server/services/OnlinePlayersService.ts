@@ -11,6 +11,9 @@ interface OnlinePlayersServiceEvents
 
     /**
      * Player is now active, or connected, or made something.
+     * Emited every time player made something, with a cooldown time.
+     * Use "lastState" to know if player has become active, or was already active.
+     * If player was already active, maybe the event can be ignored.
      *
      * @param lastState Last active state. If false, player wake up. If true, player is still active and did something
      */
@@ -60,15 +63,15 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         this.onlinePlayers[player.publicId] = {
             onlinePlayer: {
                 player,
-                active: true,
+                active: false, // Player was inactive because offline. Makes playerActive event emit when player connects.
             },
             sockets: [socket],
             activityTimeout: null,
         };
 
-        this.notifyPlayerActivity(player);
-
         this.emit('playerConnected', player);
+
+        this.notifyPlayerActivity(player);
     }
 
     socketHasDisconnected(socket: HexSocket): void
@@ -107,6 +110,10 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
             clearTimeout(onlinePlayer.activityTimeout);
         }
 
+        if (onlinePlayer.onlinePlayer.active) {
+            this.emit('playerInactive', player);
+        }
+
         delete this.onlinePlayers[player.publicId];
     }
 
@@ -127,6 +134,24 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     getOnlinePlayersCount(): number
     {
         return Object.keys(this.onlinePlayers).length;
+    }
+
+    getActiveAndInactivePlayersCount(): { active: number, inactive: number }
+    {
+        const count = {
+            active: 0,
+            inactive: 0,
+        };
+
+        for (const key in this.onlinePlayers) {
+            if (this.onlinePlayers[key].onlinePlayer.active) {
+                ++count.active;
+            } else {
+                ++count.inactive;
+            }
+        }
+
+        return count;
     }
 
     isOnline(player: Player): boolean
