@@ -116,9 +116,6 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
 
         for (const publicId in this.onlinePlayers) {
             players[publicId] = this.onlinePlayers[publicId].onlinePlayer;
-
-            // TODO tmp retrocompat, remove later, prevent breaking online players section if client not yet updated
-            Object.assign(players[publicId], this.onlinePlayers[publicId].onlinePlayer.player);
         }
 
         return {
