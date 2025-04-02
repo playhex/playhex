@@ -52,9 +52,20 @@ const color = (): string => null === mostUrgentGame.value
 </script>
 
 <template>
-    <nav class="menu-top navbar bg-body-tertiary">
-        <div class="container-fluid justify-content-space-between">
-            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">Play<span class="text-danger">Hex</span><small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small></router-link>
+    <nav class="navbar navbar-expand-sm menu-top bg-body-tertiary">
+        <div class="container-fluid">
+            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">
+                Play<span class="text-danger">Hex</span>
+                <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
+            </router-link>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <router-link :to="{ name: 'tournaments' }" class="nav-link">Tournaments</router-link>
+                    </li>
+                </ul>
+            </div>
 
             <span class="my-turn-notif">
                 <component
@@ -87,9 +98,6 @@ const color = (): string => null === mostUrgentGame.value
 nav
     a
         text-decoration none
-
-.navbar-brand
-    margin-right 0
 
 .nav-player-item
     font-size 1.1em
