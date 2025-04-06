@@ -111,6 +111,8 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         }
 
         if (onlinePlayer.onlinePlayer.active) {
+            onlinePlayer.onlinePlayer.active = false;
+
             this.emit('playerInactive', player);
         }
 

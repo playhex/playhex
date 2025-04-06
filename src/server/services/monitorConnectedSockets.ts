@@ -22,6 +22,7 @@ const monitorConnectedSockets = (): void => {
             }
         })
         .on('playerInactive', () => updateCount())
+        .on('playerDisconnected', () => updateCount())
     ;
 };
 
