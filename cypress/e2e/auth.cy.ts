@@ -313,7 +313,7 @@ describe('Authentication', () => {
         cy.get('.menu-top').contains(pseudo);
     });
 
-    it.only('should not return password nor player id in api results', () => {
+    it('should not return password nor player id in api results', () => {
         cy.visit('/');
 
         /*

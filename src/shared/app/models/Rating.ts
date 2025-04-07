@@ -27,7 +27,7 @@ export default class Rating
      * Category of rating, "overall" for overall rating,
      * or a category name like "blitz", "small", "normal.medium", ...
      */
-    @Column()
+    @Column({ type: String })
     @Expose()
     category: RatingCategory;
 

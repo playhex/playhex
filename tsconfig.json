@@ -20,7 +20,13 @@
         "composite": true,
         "lib": [
             "ES2019",
-            "DOM"
-        ]
-    }
+            "DOM",
+        ],
+    },
+    "ts-node": {
+        "experimentalSpecifierResolution": "node",
+        "transpileOnly": true,
+        "esm": true,
+        "logError": true,
+    },
 }

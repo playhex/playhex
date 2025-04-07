@@ -38,7 +38,7 @@ export default class HostedGame
     @Type(() => HostedGameToPlayer)
     hostedGameToPlayers: HostedGameToPlayer[];
 
-    @Column({ length: 15 })
+    @Column({ type: String, length: 15 })
     @Index()
     @Expose()
     state: HostedGameState;
