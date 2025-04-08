@@ -10,6 +10,7 @@ import {
     differenceInMonths, differenceInQuarters, differenceInYears,
     endOfSecond, endOfMinute, endOfHour, endOfDay,
     endOfWeek, endOfMonth, endOfQuarter, endOfYear,
+    Day,
 } from 'date-fns';
 
 /**
@@ -32,13 +33,12 @@ const FORMATS = {
 };
 
 _adapters._date.override({
-    _id: 'date-fns', // DEBUG
-
     formats: function () {
         return FORMATS;
     },
 
-    parse: function (value, fmt) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parse: function (value: any, fmt) {
         if (value === null || typeof value === 'undefined') {
             return null;
         }
@@ -61,15 +61,15 @@ _adapters._date.override({
 
     add: function (time, amount, unit) {
         switch (unit) {
-            case 'millisecond': return addMilliseconds(time, amount);
-            case 'second': return addSeconds(time, amount);
-            case 'minute': return addMinutes(time, amount);
-            case 'hour': return addHours(time, amount);
-            case 'day': return addDays(time, amount);
-            case 'week': return addWeeks(time, amount);
-            case 'month': return addMonths(time, amount);
-            case 'quarter': return addQuarters(time, amount);
-            case 'year': return addYears(time, amount);
+            case 'millisecond': return addMilliseconds(time, amount).getTime();
+            case 'second': return addSeconds(time, amount).getTime();
+            case 'minute': return addMinutes(time, amount).getTime();
+            case 'hour': return addHours(time, amount).getTime();
+            case 'day': return addDays(time, amount).getTime();
+            case 'week': return addWeeks(time, amount).getTime();
+            case 'month': return addMonths(time, amount).getTime();
+            case 'quarter': return addQuarters(time, amount).getTime();
+            case 'year': return addYears(time, amount).getTime();
             default: return time;
         }
     },
@@ -91,29 +91,29 @@ _adapters._date.override({
 
     startOf: function (time, unit, weekday) {
         switch (unit) {
-            case 'second': return startOfSecond(time);
-            case 'minute': return startOfMinute(time);
-            case 'hour': return startOfHour(time);
-            case 'day': return startOfDay(time);
-            case 'week': return startOfWeek(time);
-            case 'isoWeek': return startOfWeek(time, { weekStartsOn: +weekday });
-            case 'month': return startOfMonth(time);
-            case 'quarter': return startOfQuarter(time);
-            case 'year': return startOfYear(time);
+            case 'second': return startOfSecond(time).getTime();
+            case 'minute': return startOfMinute(time).getTime();
+            case 'hour': return startOfHour(time).getTime();
+            case 'day': return startOfDay(time).getTime();
+            case 'week': return startOfWeek(time).getTime();
+            case 'isoWeek': return startOfWeek(time, { weekStartsOn: +(weekday ?? 0) as Day }).getTime();
+            case 'month': return startOfMonth(time).getTime();
+            case 'quarter': return startOfQuarter(time).getTime();
+            case 'year': return startOfYear(time).getTime();
             default: return time;
         }
     },
 
     endOf: function (time, unit) {
         switch (unit) {
-            case 'second': return endOfSecond(time);
-            case 'minute': return endOfMinute(time);
-            case 'hour': return endOfHour(time);
-            case 'day': return endOfDay(time);
-            case 'week': return endOfWeek(time);
-            case 'month': return endOfMonth(time);
-            case 'quarter': return endOfQuarter(time);
-            case 'year': return endOfYear(time);
+            case 'second': return endOfSecond(time).getTime();
+            case 'minute': return endOfMinute(time).getTime();
+            case 'hour': return endOfHour(time).getTime();
+            case 'day': return endOfDay(time).getTime();
+            case 'week': return endOfWeek(time).getTime();
+            case 'month': return endOfMonth(time).getTime();
+            case 'quarter': return endOfQuarter(time).getTime();
+            case 'year': return endOfYear(time).getTime();
             default: return time;
         }
     },
