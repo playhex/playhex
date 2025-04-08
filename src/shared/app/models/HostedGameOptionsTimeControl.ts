@@ -1,7 +1,7 @@
 import { IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom.js';
-import { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl.js';
-import { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl.js';
+import type { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl.js';
+import type { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 
 export class HostedGameOptionsTimeControl
 {

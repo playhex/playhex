@@ -1,8 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { IsDate, IsNotEmpty, IsObject, IsString, Length } from 'class-validator';
 import HostedGame from './HostedGame.js';
-import type HostedGameType from './HostedGame.js';
 import { Expose } from '../class-transformer-custom.js';
 import { Type } from 'class-transformer';
 
@@ -18,7 +17,7 @@ export default class ChatMessage
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
     @JoinColumn()
-    hostedGame: HostedGameType;
+    hostedGame: Relation<HostedGame>;
 
     @Column({ nullable: true })
     playerId: null | number;

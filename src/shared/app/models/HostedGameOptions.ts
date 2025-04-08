@@ -1,9 +1,8 @@
-import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { Type } from 'class-transformer';
 import { ColumnUUID } from '../custom-typeorm.js';
 import HostedGame from './HostedGame.js';
-import type HostedGameType from './HostedGame.js';
-import { BOARD_DEFAULT_SIZE, PlayerIndex } from '../../game-engine/index.js';
+import { BOARD_DEFAULT_SIZE, type PlayerIndex } from '../../game-engine/index.js';
 import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom.js';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
@@ -22,7 +21,7 @@ export default class HostedGameOptions
 
     @OneToOne(() => HostedGame, hostedGame => hostedGame.gameOptions)
     @JoinColumn({ name: 'hostedGameId' })
-    hostedGame: HostedGameType;
+    hostedGame: Relation<HostedGame>;
 
     @Column()
     @Expose()

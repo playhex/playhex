@@ -1,7 +1,6 @@
-import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad, type Relation } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm.js';
 import Player from './Player.js';
-import type PlayerType from './Player.js';
 import type { HostedGameState } from '../Types.js';
 import HostedGameOptions from './HostedGameOptions.js';
 import type { GameTimeData } from '../../time-control/TimeControl.js';
@@ -31,7 +30,7 @@ export default class HostedGame
     @ManyToOne(() => Player, { nullable: true })
     @Expose()
     @Type(() => Player)
-    host: null | PlayerType;
+    host: null | Relation<Player>;
 
     @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
     @Expose()

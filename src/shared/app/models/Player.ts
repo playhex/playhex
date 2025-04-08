@@ -1,8 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm.js';
 import { Expose, GROUP_DEFAULT as GROUP_DEFAULT } from '../class-transformer-custom.js';
 import AIConfig from './AIConfig.js';
-import type AIConfigType from './AIConfig.js';
 import { IsDate } from 'class-validator';
 import Rating from './Rating.js';
 
@@ -74,7 +73,7 @@ export default class Player
      * Should not be null for AI players: they must all have a AIConfig entry.
      */
     @OneToOne(() => AIConfig, aiConfig => aiConfig.player)
-    aiConfig?: AIConfigType;
+    aiConfig?: Relation<AIConfig>;
 
     /**
      * Link to current player overall rating.

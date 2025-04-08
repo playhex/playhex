@@ -22,12 +22,12 @@ import PlayerStats from './PlayerStats.js';
 import Rating from './Rating.js';
 
 export {
+    HostedGame,
     AIConfig,
     ChatMessage,
     ConditionalMoves,
     Game,
     GameAnalyze,
-    HostedGame,
     HostedGameOptions,
     HostedGameOptionsTimeControl,
     OptionsFischer,
@@ -47,12 +47,12 @@ export {
 };
 
 export const entities = {
+    HostedGame,
     AIConfig,
     ChatMessage,
     ConditionalMoves,
     Game,
     GameAnalyze,
-    HostedGame,
     HostedGameOptions,
     HostedGameOptionsTimeControl,
     OptionsFischer,
