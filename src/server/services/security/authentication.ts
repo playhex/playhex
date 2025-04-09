@@ -1,4 +1,4 @@
-import Player from '../../../shared/app/models/Player.js';
+import { Player } from '../../../shared/app/models/index.js';
 import bcrypt from 'bcryptjs';
 import HandledError from '../../../shared/app/Errors.js';
 import { AppDataSource } from '../../data-source.js';

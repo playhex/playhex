@@ -76,6 +76,9 @@ if (errored.length > 0) {
      * Occurs not sure why, but i.e when adding both lines, in this order:
      * import HostedGame from '../shared/app/models/HostedGame.js';
      * import { HostedGameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models/index.js';
+     *
+     * Also, 'ReferenceError: Cannot access 'X' before initialization' is related,
+     * we must use 'index.js' import to prevent error.
      */
     throw new Error(`Error while generating entities list: ${errored.join(', ')}`);
 }

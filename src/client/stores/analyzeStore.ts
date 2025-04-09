@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import useSocketStore from './socketStore.js';
-import GameAnalyze from '../../shared/app/models/GameAnalyze.js';
+import { GameAnalyze } from '../../shared/app/models/index.js';
 import { Ref, ref } from 'vue';
 import { apiGetGameAnalyze, apiRequestGameAnalyze } from '../apiClient.js';
 

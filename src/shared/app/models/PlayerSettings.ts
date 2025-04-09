@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
@@ -29,7 +29,7 @@ export default class PlayerSettings
 
     @OneToOne(() => Player)
     @JoinColumn()
-    player?: Player;
+    player?: Relation<Player>;
 
     @Expose()
     @IsOptional()

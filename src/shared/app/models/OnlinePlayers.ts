@@ -1,3 +1,4 @@
+import { type Relation } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom.js';
 import Player from './Player.js';
@@ -5,7 +6,7 @@ import Player from './Player.js';
 export class OnlinePlayer
 {
     @Expose()
-    player: Player;
+    player: Relation<Player>;
 
     /**
      * Whether this player is currently active or idle.

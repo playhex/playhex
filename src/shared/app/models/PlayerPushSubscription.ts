@@ -1,5 +1,5 @@
 import { PushSubscription } from 'web-push';
-import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, type Relation, Unique } from 'typeorm';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 
@@ -14,7 +14,7 @@ export default class PlayerPushSubscription implements PushSubscription
     playerId: null | number;
 
     @ManyToOne(() => Player)
-    player: Player;
+    player: Relation<Player>;
 
     @Expose()
     @Column({ type: String, length: 512 })

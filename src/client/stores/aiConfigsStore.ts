@@ -1,5 +1,5 @@
 import { WithRequired } from '../../shared/app/Types.js';
-import AIConfig from '../../shared/app/models/AIConfig.js';
+import { AIConfig } from '../../shared/app/models/index.js';
 import { apiGetAiConfigs } from '../apiClient.js';
 import { defineStore } from 'pinia';
 import { Ref, ref } from 'vue';

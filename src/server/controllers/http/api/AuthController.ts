@@ -3,7 +3,7 @@ import { Body, CurrentUser, Delete, Get, JsonController, Post, Req, Session } fr
 import type { SessionData } from 'express-session';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { authenticate } from '../../../services/security/authentication.js';
-import Player from '../../../../shared/app/models/Player.js';
+import { Player } from '../../../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import type { Request } from 'express';
 import { IsString } from 'class-validator';
