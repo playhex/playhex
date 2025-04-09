@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { Expose } from '../class-transformer-custom.js';
 import HostedGame from './HostedGame.js';
 
@@ -30,7 +30,7 @@ export default class GameAnalyze
 
     @OneToOne(() => HostedGame)
     @JoinColumn()
-    hostedGame: HostedGame;
+    hostedGame: Relation<HostedGame>;
 
     /**
      * If null but endedAt is not,

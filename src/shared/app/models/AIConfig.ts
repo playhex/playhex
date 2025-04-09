@@ -1,6 +1,6 @@
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import Player from './Player.js';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 
 @Entity()
 export default class AIConfig
@@ -11,7 +11,7 @@ export default class AIConfig
     @OneToOne(() => Player, { cascade: ['insert', 'update'] })
     @JoinColumn()
     @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
-    player?: Player;
+    player?: Relation<Player>;
 
     @Column({ type: String, length: 191 })
     @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })

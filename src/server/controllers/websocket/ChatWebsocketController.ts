@@ -2,7 +2,7 @@ import HostedGameRepository from '../../repositories/HostedGameRepository.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
-import ChatMessage from '../../../shared/app/models/ChatMessage.js';
+import { ChatMessage } from '../../../shared/app/models/index.js';
 
 @Service()
 export default class ChatWebsocketController implements WebsocketControllerInterface
