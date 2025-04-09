@@ -33,9 +33,8 @@ export default class TournamentController
         const activeTournament = this.tournamentRepository.getActiveTournament(tournament.publicId);
         if (null !== activeTournament) {
             await activeTournament.iterateTournament();
+            await this.tournamentRepository.save(tournament);
         }
-
-        await this.tournamentRepository.save(tournament);
 
         return tournament;
     }

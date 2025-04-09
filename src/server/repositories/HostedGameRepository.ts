@@ -114,7 +114,9 @@ export default class HostedGameRepository
 
     async persist(hostedGame: HostedGame): Promise<void>
     {
+        console.log('persist ', hostedGame.publicId, ' ...');
         await this.hostedGamePersister.persist(hostedGame);
+        console.log('persist ', hostedGame.publicId, ' DONE');
     }
 
     private listenHostedGameServer(hostedGameServer: HostedGameServer): void

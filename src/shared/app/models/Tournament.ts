@@ -12,8 +12,8 @@ import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, Host
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import TournamentParticipant from './TournamentParticipant.js';
 import TournamentGame from './TournamentGame.js';
-import TournamentCreateDTO from './TournamentCreateDTO.js';
-import { slugifyTournamentName } from '../tournamentUtils.js';
+import type TournamentCreateDTO from './TournamentCreateDTO.js';
+import { slugifyTournamentName, tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2 } from '../tournamentUtils.js';
 import TournamentSubscription from './TournamentSubscription.js';
 
 export type TournamentState =
@@ -38,24 +38,6 @@ export type TournamentState =
      */
     | 'ended'
 ;
-
-export const tournamentFormatStage1Values = [
-    'single-elimination',
-    'double-elimination',
-    'stepladder',
-    'swiss',
-    'round-robin',
-    'double-round-robin',
-] as const;
-
-export const tournamentFormatStage2Values = [
-    'single-elimination',
-    'double-elimination',
-    'stepladder',
-] as const;
-
-export type TournamentFormatStage1 = (typeof tournamentFormatStage1Values)[number];
-export type TournamentFormatStage2 = (typeof tournamentFormatStage2Values)[number];
 
 @Entity()
 export default class Tournament

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { TournamentCreateDTO } from '../../../../shared/app/models';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
-import { TournamentFormatStage1 } from '../../../../shared/app/models/Tournament';
+import { TournamentFormatStage1 } from '../../../../shared/app/tournamentUtils';
 import { apiPostTournament } from '../../../apiClient';
 import AppTimeControl from '../components/AppTimeControl.vue';
 import { useRouter } from 'vue-router';

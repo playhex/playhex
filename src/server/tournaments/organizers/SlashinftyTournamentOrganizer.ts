@@ -1,12 +1,11 @@
 import TournamentOrganizer from 'tournament-organizer';
 import { StandingsValues } from 'tournament-organizer/interfaces';
 import { Tournament as TOTournament, Player as TOPlayer, Match } from 'tournament-organizer/components';
-import Tournament, { tournamentFormatStage1Values, tournamentFormatStage2Values } from '../../../shared/app/models/Tournament.js';
+import { tournamentFormatStage1Values, tournamentFormatStage2Values } from '../../../shared/app/tournamentUtils.js';
 import { TournamentOrganizerInterface } from './TournamentOrganizerInterface.js';
 import { TournamentError } from '../TournamentError.js';
 import { Service } from 'typedi';
-import TournamentGame from '../../../shared/app/models/TournamentGame.js';
-import Player from '../../../shared/app/models/Player.js';
+import { Tournament, TournamentGame, Player } from '../../../shared/app/models/index.js';
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
 
 const tournamentOrganizer = new TournamentOrganizer();

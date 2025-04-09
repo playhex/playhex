@@ -1,5 +1,5 @@
 import { Container } from 'typedi';
-import Tournament from '../../../shared/app/models/Tournament.js';
+import { Tournament } from '../../../shared/app/models/index.js';
 import { TournamentOrganizerInterface } from './TournamentOrganizerInterface.js';
 import { SlashinftyTournamentOrganizer } from './SlashinftyTournamentOrganizer.js';
 

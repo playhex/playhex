@@ -3,6 +3,7 @@ import baseLogger from '../services/logger.js';
 import { getStrictWinnerIndex } from '../../shared/app/hostedGameUtils.js';
 import { TournamentError } from './TournamentError.js';
 import { TournamentOrganizerInterface } from './organizers/TournamentOrganizerInterface.js';
+import { createGameOptionsForTournament, sortAndRankParticipants } from '../../shared/app/tournamentUtils.js';
 
 /**
  * A tournament that can be started, games can end and results reported...
@@ -92,9 +93,9 @@ export class ActiveTournament
 
         if (this.tournamentOrganizer.isFinished(this.tournament)) {
             this.tournament.state = 'ended';
-            // TODO add endedAt date, and unit test for it
+            this.tournament.endedAt = new Date();
 
-            this.logger.debug('Tournament has ended');
+            this.logger.info('Tournament has ended');
         }
 
         this.logger.debug('Workflow end');
@@ -119,6 +120,10 @@ export class ActiveTournament
         this.tournament.state = 'running';
     }
 
+    /**
+     * If game is waiting and both participants are known,
+     * start the game.
+     */
     private async checkWaitingGameCanStart(tournamentGame: TournamentGame): Promise<void>
     {
         this.logger.debug('Check if waiting game can start', { round: tournamentGame.round, number: tournamentGame.number });
@@ -138,6 +143,10 @@ export class ActiveTournament
         });
     }
 
+    /**
+     * If game was playing and is now over,
+     * mark tournament game as finished and report winner to tournament engine.
+     */
     private async checkPlayingGameHasEnded(tournamentGame: TournamentGame): Promise<void>
     {
         this.logger.debug('Check if game has ended', { hostedGame: tournamentGame.hostedGame });
@@ -192,41 +201,16 @@ export class ActiveTournament
             return;
         }
 
-        const hostedGame = await this.createGame(this.createGameOptions(), tournamentGame);
+        const hostedGame = await this.createGame(createGameOptionsForTournament(this.tournament), tournamentGame);
 
         tournamentGame.state = 'playing';
         tournamentGame.hostedGame = hostedGame;
-    }
-
-    private createGameOptions(): HostedGameOptions
-    {
-        const gameOptions = new HostedGameOptions();
-
-        gameOptions.boardsize = this.tournament.boardsize;
-        gameOptions.timeControl = this.tournament.timeControl;
-        gameOptions.ranked = this.tournament.ranked;
-
-        return gameOptions;
     }
 
     private updateRanking(): void
     {
         this.tournamentOrganizer.updateParticipantsScore(this.tournament);
 
-        this.tournament.participants.sort((a, b) => {
-            let scoreA = a.score ?? 0;
-            let scoreB = b.score ?? 0;
-
-            if (scoreA === scoreB) {
-                scoreA += a.tiebreak ?? 0;
-                scoreB += b.tiebreak ?? 0;
-            }
-
-            return scoreB - scoreA;
-        });
-
-        for (let i = 0; i < this.tournament.participants.length; ++i) {
-            this.tournament.participants[i].rank = i + 1;
-        }
+        sortAndRankParticipants(this.tournament);
     }
 }

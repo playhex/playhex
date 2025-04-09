@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import Tournament from './Tournament.js';
 import type TournamentType from './Tournament.js';
@@ -23,7 +23,7 @@ export default class TournamentSubscription
 
     @ManyToOne(() => Player)
     @Expose()
-    player: Player;
+    player: Relation<Player>;
 
     /**
      * Player has checked in,

@@ -1,5 +1,4 @@
-import Tournament from '../../../shared/app/models/Tournament.js';
-import TournamentGame from '../../../shared/app/models/TournamentGame.js';
+import { Tournament, TournamentGame } from '../../../shared/app/models/index.js';
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
 
 export interface TournamentOrganizerInterface

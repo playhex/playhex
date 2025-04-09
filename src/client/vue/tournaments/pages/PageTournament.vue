@@ -68,7 +68,7 @@ const subscribe = () => {
                         v-for="participant in tournament.participants.sort(byRank)"
                         :key="participant.player.publicId"
                     >
-                        {{ participant.rank ?? '-' }} - <strong>{{ participant.player.pseudo }}</strong>: {{ participant.score ?? '-' }} points (tiebreak {{ participant.tiebreak ?? '-' }})
+                        {{ participant.rank ?? '-' }} - <strong>{{ participant.player.pseudo }}</strong>: {{ participant.score }} points (tiebreak {{ participant.tiebreak }})
                     </li>
                 </ul>
             </template>

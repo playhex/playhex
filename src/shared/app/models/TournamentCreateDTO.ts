@@ -1,7 +1,7 @@
 import { IsBoolean, IsDate, IsIn, IsInt, IsObject, IsOptional, IsString, Length, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom.js';
 import { Type } from 'class-transformer';
-import { tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2 } from './Tournament.js';
+import { tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2 } from '../tournamentUtils.js';
 import type TimeControlType from 'time-control/TimeControlType.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../ratingUtils.js';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';

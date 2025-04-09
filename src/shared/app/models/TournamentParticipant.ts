@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { Expose } from '../class-transformer-custom.js';
 import Player from './Player.js';
 import Tournament from './Tournament.js';
@@ -21,7 +21,7 @@ export default class TournamentParticipant
 
     @Expose()
     @ManyToOne(() => Player)
-    player: Player;
+    player: Relation<Player>;
 
     /**
      * Rank of the player base on score and tiebreak.
@@ -31,11 +31,11 @@ export default class TournamentParticipant
     @Expose()
     rank?: number;
 
-    @Column({ nullable: true })
+    @Column({ default: 0 })
     @Expose()
-    score?: number;
+    score: number = 0;
 
-    @Column({ nullable: true })
+    @Column({ default: 0 })
     @Expose()
-    tiebreak?: number;
+    tiebreak: number = 0;
 }

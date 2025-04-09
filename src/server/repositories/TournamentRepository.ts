@@ -49,7 +49,9 @@ export default class TournamentRepository
                 games: {
                     player1: true,
                     player2: true,
-                    hostedGame: true,
+                    hostedGame: {
+                        gameData: true,
+                    },
                 },
             },
         });
@@ -58,7 +60,7 @@ export default class TournamentRepository
             this.activeTournaments[tournament.publicId] = new ActiveTournament(
                 tournament,
                 getTournamentOrganizer(tournament),
-                this.createGame,
+                this.createGame.bind(this),
             );
         }
 
@@ -90,7 +92,7 @@ export default class TournamentRepository
         return Object.values(this.activeTournaments).map(activeTournament => activeTournament.getTournament());
     }
 
-    getActiveTournament(publicId: string): ActiveTournament
+    getActiveTournament(publicId: string): null | ActiveTournament
     {
         return this.activeTournaments[publicId] ?? null;
     }
@@ -120,7 +122,9 @@ export default class TournamentRepository
                 games: {
                     player1: true,
                     player2: true,
-                    hostedGame: true,
+                    hostedGame: {
+                        gameData: true,
+                    },
                 },
             },
         });
@@ -155,7 +159,7 @@ export default class TournamentRepository
         this.activeTournaments[tournament.publicId] = new ActiveTournament(
             tournament,
             getTournamentOrganizer(tournament),
-            this.createGame,
+            this.createGame.bind(this),
         );
 
         return tournament;

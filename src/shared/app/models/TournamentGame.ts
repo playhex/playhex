@@ -24,7 +24,7 @@ export default class TournamentGame
 
     @ManyToOne(() => HostedGame)
     @Expose()
-    hostedGame?: HostedGame;
+    hostedGame: null | HostedGame;
 
     @ManyToOne(() => Player)
     @Expose()
