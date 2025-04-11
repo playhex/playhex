@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { In, Repository } from 'typeorm';
+import { FindOptionsRelations, In, Repository } from 'typeorm';
 import { HostedGame, HostedGameOptions, Player, Tournament, TournamentCreateDTO, TournamentGame, TournamentSubscription } from '../../shared/app/models/index.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
 import logger from '../services/logger.js';
@@ -7,6 +7,23 @@ import { AppDataSource } from '../data-source.js';
 import { createTournamentFromDTO } from '../../shared/app/models/Tournament.js';
 import { getTournamentOrganizer } from '../tournaments/organizers/getTournamentOrganizer.js';
 import HostedGameRepository from './HostedGameRepository.js';
+
+const relations: FindOptionsRelations<Tournament> = {
+    host: true,
+    subscriptions: {
+        player: true,
+    },
+    participants: {
+        player: true,
+    },
+    games: {
+        player1: true,
+        player2: true,
+        hostedGame: {
+            gameData: true,
+        },
+    },
+};
 
 @Service()
 export default class TournamentRepository
@@ -35,24 +52,9 @@ export default class TournamentRepository
         await AppDataSource.initialize();
 
         const tournaments = await this.tournamentRepository.find({
+            relations,
             where: {
                 state: In(['created', 'running']),
-            },
-            relations: {
-                host: true,
-                subscriptions: {
-                    player: true,
-                },
-                participants: {
-                    player: true,
-                },
-                games: {
-                    player1: true,
-                    player2: true,
-                    hostedGame: {
-                        gameData: true,
-                    },
-                },
             },
         });
 
@@ -110,23 +112,8 @@ export default class TournamentRepository
         }
 
         return await this.tournamentRepository.findOne({
+            relations,
             where: { slug },
-            relations: {
-                host: true,
-                subscriptions: {
-                    player: true,
-                },
-                participants: {
-                    player: true,
-                },
-                games: {
-                    player1: true,
-                    player2: true,
-                    hostedGame: {
-                        gameData: true,
-                    },
-                },
-            },
         });
     }
 
