@@ -95,13 +95,13 @@ export default class AdminController
         }
 
         const playerShadowBanned = await this.playerRepository.shadowBan(publicId);
-        const activeGamesShadowDeleted = this.hostedGameRepository.shadowDeletePlayerChatMessages(publicId);
-        const persistedGamesShadowDeleted = await this.chatMessageRepository.shadowDeletePlayerMessages(player);
+        const shadowDeletedChatMessagesInActiveGames = this.hostedGameRepository.shadowDeletePlayerChatMessages(publicId);
+        const shadowDeletedChatMessagesInPersistedGames = await this.chatMessageRepository.shadowDeletePlayerMessages(player);
 
         return {
             playerShadowBanned,
-            activeGamesShadowDeleted,
-            persistedGamesShadowDeleted,
+            shadowDeletedChatMessagesInActiveGames,
+            shadowDeletedChatMessagesInPersistedGames,
         };
     }
 
