@@ -20,6 +20,11 @@ import PlayerPushSubscription from './PlayerPushSubscription.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import Rating from './Rating.js';
+import Tournament from './Tournament.js';
+import TournamentCreateDTO from './TournamentCreateDTO.js';
+import TournamentGame from './TournamentGame.js';
+import TournamentSubscription from './TournamentSubscription.js';
+import TournamentParticipant from './TournamentParticipant.js';
 
 export {
     HostedGame,
@@ -44,6 +49,11 @@ export {
     PlayerStats,
     PlayerPushSubscription,
     Rating,
+    Tournament,
+    TournamentCreateDTO,
+    TournamentGame,
+    TournamentSubscription,
+    TournamentParticipant,
 };
 
 export const entities = {
@@ -67,6 +77,10 @@ export const entities = {
     PlayerSettings,
     PlayerStats,
     Rating,
+    Tournament,
+    TournamentGame,
+    TournamentSubscription,
+    TournamentParticipant,
 };
 
 const errored = Object.keys(entities).filter(name => !entities[name as keyof typeof entities]);
@@ -76,6 +90,9 @@ if (errored.length > 0) {
      * Occurs not sure why, but i.e when adding both lines, in this order:
      * import HostedGame from '../shared/app/models/HostedGame.js';
      * import { HostedGameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models/index.js';
+     *
+     * Also, 'ReferenceError: Cannot access 'X' before initialization' is related,
+     * we must use 'index.js' import to prevent error.
      */
     throw new Error(`Error while generating entities list: ${errored.join(', ')}`);
 }

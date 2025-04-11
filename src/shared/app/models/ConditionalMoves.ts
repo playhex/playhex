@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { IsArray, IsOptional, Validate } from 'class-validator';
 import HostedGame from './HostedGame.js';
 import Player from './Player.js';
@@ -30,13 +30,13 @@ export default class ConditionalMoves
     hostedGameId: number;
 
     @ManyToOne(() => HostedGame)
-    hostedGame: HostedGame;
+    hostedGame: Relation<HostedGame>;
 
     @PrimaryColumn()
     playerId: number;
 
     @ManyToOne(() => Player)
-    player: Player;
+    player: Relation<Player>;
 
     /**
      * Active conditional moves.

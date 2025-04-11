@@ -3,7 +3,7 @@ import { Inject, Service } from 'typedi';
 import { AIConfigStatusData } from '../../../../shared/app/Types.js';
 import HexAiApiClient from '../../../services/HexAiApiClient.js';
 import logger from '../../../services/logger.js';
-import AIConfig from '../../../../shared/app/models/AIConfig.js';
+import { AIConfig } from '../../../../shared/app/models/index.js';
 import { Repository } from 'typeorm';
 
 const { HEX_AI_API } = process.env;

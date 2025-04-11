@@ -1,13 +1,20 @@
-import { IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { IsIn, IsInt, IsOptional, Max, Min, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom.js';
 import type { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl.js';
 import type { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 
+export const timeControlTypeValues = [
+    'fischer',
+    'byoyomi',
+] as const;
+
+export type TimeControlTypeType = (typeof timeControlTypeValues)[number];
+
 export class HostedGameOptionsTimeControl
 {
     @Expose()
-    @IsString()
-    type: string;
+    @IsIn(timeControlTypeValues)
+    type: TimeControlTypeType;
 
     @Expose()
     @ValidateNested()
@@ -19,20 +26,20 @@ const twoWeeks = 14 * 86400 * 1000;
 
 export class OptionsFischer implements FischerTimeControlOptions
 {
-    @IsNumber()
+    @IsInt()
     @Min(oneSecond)
     @Max(twoWeeks)
     @Expose()
     initialTime: number;
 
-    @IsNumber()
+    @IsInt()
     @Min(0)
     @Max(twoWeeks)
     @Expose()
     timeIncrement?: number;
 
     @IsOptional()
-    @IsNumber()
+    @IsInt()
     @Min(oneSecond)
     @Max(twoWeeks)
     @Expose()
@@ -50,20 +57,20 @@ export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeCo
 
 export class OptionsByoYomi implements ByoYomiTimeControlOptions
 {
-    @IsNumber()
+    @IsInt()
     @Min(oneSecond)
     @Max(twoWeeks)
     @Expose()
     initialTime: number;
 
-    @IsNumber()
+    @IsInt()
     @Min(oneSecond)
     @Max(twoWeeks)
     @Expose()
     periodTime: number;
 
-    @IsNumber()
-    @Min(1)
+    @IsInt()
+    @Min(0)
     @Max(50)
     @Expose()
     periodsCount: number;

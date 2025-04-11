@@ -1,8 +1,7 @@
 import { Ref } from 'vue';
 import { Game, Move as GameMove, PlayerIndex } from '../shared/game-engine/index.js';
-import { HostedGame } from '../shared/app/models/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { Player, HostedGameOptions, ChatMessage, Move, Rating } from '../shared/app/models/index.js';
+import { Player, HostedGameOptions, ChatMessage, Move, Rating, HostedGame } from '../shared/app/models/index.js';
 import { Outcome } from '../shared/game-engine/Types.js';
 import { GameTimeData } from '../shared/time-control/TimeControl.js';
 import { TypedEmitter } from 'tiny-typed-emitter';

@@ -1,4 +1,4 @@
-import { HostedGame, HostedGameToPlayer } from '../../shared/app/models/index.js';
+import { HostedGame } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
 import { FindManyOptions, FindOptionsRelations, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
@@ -37,9 +37,6 @@ export default class HostedGamePersister
     constructor(
         @Inject('Repository<HostedGame>')
         private hostedGameRepository: Repository<HostedGame>,
-
-        @Inject('Repository<HostedGameToPlayer>')
-        private hostedGameToPlayerRepository: Repository<HostedGameToPlayer>,
     ) {}
 
     async persist(hostedGame: HostedGame): Promise<void>
