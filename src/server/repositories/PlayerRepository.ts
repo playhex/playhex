@@ -214,7 +214,10 @@ export default class PlayerRepository
         }
     }
 
-    async shadowBan(publicId: string)
+    /**
+     * @returns Number of players shadow deleted (0 or 1)
+     */
+    async shadowBan(publicId: string): Promise<number | undefined>
     {
         const { affected } = await this.playerRepository.createQueryBuilder('player')
             .update()
