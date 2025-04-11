@@ -36,6 +36,10 @@ export const createGameOptionsForTournament = (tournament: Tournament): HostedGa
  * and set them a rank.
  */
 export const sortAndRankParticipants = (tournament: Tournament): void => {
+    if (0 === tournament.participants.length) {
+        return;
+    }
+
     tournament.participants.sort((a, b) => {
         let scoreA = a.score;
         let scoreB = b.score;

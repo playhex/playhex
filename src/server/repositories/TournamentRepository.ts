@@ -7,20 +7,34 @@ import { AppDataSource } from '../data-source.js';
 import { createTournamentFromDTO } from '../../shared/app/models/Tournament.js';
 import { getTournamentOrganizer } from '../tournaments/organizers/getTournamentOrganizer.js';
 import HostedGameRepository from './HostedGameRepository.js';
+import { inspect } from 'node:util';
 
 const relations: FindOptionsRelations<Tournament> = {
     host: true,
     subscriptions: {
-        player: true,
+        player: {
+            currentRating: true,
+        },
     },
     participants: {
-        player: true,
+        player: {
+            currentRating: true,
+        },
     },
     games: {
-        player1: true,
-        player2: true,
+        player1: {
+            currentRating: true,
+        },
+        player2: {
+            currentRating: true,
+        },
         hostedGame: {
             gameData: true,
+            hostedGameToPlayers: {
+                player: {
+                    currentRating: true,
+                },
+            },
         },
     },
 };
@@ -59,6 +73,7 @@ export default class TournamentRepository
         });
 
         for (const tournament of tournaments) {
+            console.log(inspect(tournament, false, 8, true));
             this.activeTournaments[tournament.publicId] = new ActiveTournament(
                 tournament,
                 getTournamentOrganizer(tournament),

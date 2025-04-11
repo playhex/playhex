@@ -61,31 +61,31 @@ export class ActiveTournament
 
         this.logger.debug('Tournament is playing');
 
+        this.logger.debug('Progress tournament games');
+
+        this.logger.debug('Check if playing games have ended');
+
+        for (const tournamentGame of this.tournament.games) {
+            if ('playing' === tournamentGame.state) {
+                await this.checkPlayingGameHasEnded(tournamentGame);
+                continue;
+            }
+        }
+
         this.logger.debug('Add/update tournament games');
 
         this.tournamentOrganizer.updateTournamentGames(this.tournament);
 
-        this.logger.debug('Progress tournament games');
+        this.logger.debug('Check if created games can be started');
 
         for (const tournamentGame of this.tournament.games) {
-            const { state } = tournamentGame;
-
-            if ('waiting' === state) {
+            if ('waiting' === tournamentGame.state) {
                 await this.checkWaitingGameCanStart(tournamentGame);
                 continue;
             }
-
-            if ('playing' === state) {
-                await this.checkPlayingGameHasEnded(tournamentGame);
-                continue;
-            }
-
-            if ('done' === state) {
-                continue;
-            }
-
-            this.logger.warning('Unexpected tournamentGame.state, do nothing', { state, tournamentGame });
         }
+
+        this.logger.debug('Update scores and rankings');
 
         this.updateRanking();
 

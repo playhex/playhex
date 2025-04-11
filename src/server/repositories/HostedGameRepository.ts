@@ -18,6 +18,7 @@ import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/Aut
 import { isDuplicateError } from './typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
+import { inspect } from 'node:util';
 
 export class GameError extends Error {}
 
@@ -114,9 +115,7 @@ export default class HostedGameRepository
 
     async persist(hostedGame: HostedGame): Promise<void>
     {
-        console.log('persist ', hostedGame.publicId, ' ...');
         await this.hostedGamePersister.persist(hostedGame);
-        console.log('persist ', hostedGame.publicId, ' DONE');
     }
 
     private listenHostedGameServer(hostedGameServer: HostedGameServer): void
@@ -186,6 +185,8 @@ export default class HostedGameRepository
     private async onGameEnded(hostedGameServer: HostedGameServer): Promise<void>
     {
         await this.flushHostedGame(hostedGameServer);
+
+        console.log(inspect(hostedGameServer.getHostedGame().hostedGameToPlayers, false, 8, true));
 
         if (hostedGameServer.getHostedGame().gameOptions.ranked) {
             const newRatings = await this.updateRatings(hostedGameServer);
