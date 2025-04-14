@@ -2,7 +2,7 @@ import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGenerat
 import type { RatingCategory } from '../ratingUtils.js';
 import Player from './Player.js';
 import HostedGame from './HostedGame.js';
-import { Expose } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 
 @Entity()
 @Index(['player', 'category', 'createdAt'])
@@ -12,7 +12,7 @@ export default class Rating
     id: number;
 
     @ManyToOne(() => Player)
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     player: Relation<Player>;
 
     /**
@@ -27,23 +27,23 @@ export default class Rating
      * or a category name like "blitz", "small", "normal.medium", ...
      */
     @Column({ type: String })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     category: RatingCategory;
 
     @Column()
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     createdAt: Date;
 
     @Column({ type: 'float' })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     rating: number;
 
     @Column({ type: 'float' })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     deviation: number;
 
     @Column({ type: 'float' })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     volatility: number;
 
     /**
@@ -51,6 +51,6 @@ export default class Rating
      * Used to show "+17" next to player username on finished games.
      */
     @Column({ type: 'float', nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     ratingChange?: number;
 }

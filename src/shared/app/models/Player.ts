@@ -15,35 +15,35 @@ export default class Player
      * Used for displays
      */
     @Column({ length: 34, unique: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     pseudo: string;
 
     /**
      * Used to identify a player
      */
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating'] })
     publicId: string;
 
     /**
      * Show an italized "Guest" before pseudo
      */
     @Column({ default: false })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     isGuest: boolean;
 
     /**
      * Used to know that we use an AI to generate moves. Show a robot icon before pseudo
      */
     @Column({ default: false })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     isBot: boolean;
 
     /**
      * Used for link to profile page, SGF file name
      */
     @Column({ length: 34, unique: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     slug: string;
 
     /**
@@ -52,7 +52,7 @@ export default class Player
      * Displayed on profile page.
      */
     @Column({ default: () => 'current_timestamp()' })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
     @IsDate()
     createdAt: Date;
 

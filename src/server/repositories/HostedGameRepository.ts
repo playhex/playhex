@@ -11,7 +11,7 @@ import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
 import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
 import { AppDataSource } from '../data-source.js';
-import { plainToInstance } from '../../shared/app/class-transformer-custom.js';
+import { instanceToInstance, plainToInstance } from '../../shared/app/class-transformer-custom.js';
 import RatingRepository from './RatingRepository.js';
 import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames.js';
 import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames.js';
@@ -191,7 +191,9 @@ export default class HostedGameRepository
                 .emit(
                     'ratingsUpdated',
                     hostedGameServer.getPublicId(),
-                    newRatings.filter(rating => 'overall' === rating.category),
+                    instanceToInstance(newRatings.filter(rating => 'overall' === rating.category), {
+                        groups: ['rating'],
+                    }),
                 )
             ;
         }

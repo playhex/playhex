@@ -2,6 +2,7 @@ import {
     Expose as BaseExpose,
     plainToInstance as basePlainToInstance,
     instanceToPlain as baseInstanceToPlain,
+    instanceToInstance as baseInstanceToInstance,
     ClassConstructor,
     ClassTransformOptions,
     ExposeOptions,
@@ -32,8 +33,8 @@ export const defaultPlainToInstanceOptions: ClassTransformOptions = {
  * to allow Expose a property to only a single endpoint:
  *
  * @Expose() => same as base expose
- * @Expose(['custom']) => expose only if 'custom' group is used (base expose will also expose if not group is used)
- * @Expose([GROUP_DEFAULT, 'custom']) => same as base @Expose(['custom']), expose when no group is provided, or if custom is provided
+ * @Expose({ groups: ['custom'] }) => expose only if 'custom' group is used (base expose will also expose if not group is used)
+ * @Expose({ groups: [GROUP_DEFAULT, 'custom'] }) => same as base @Expose(['custom']), expose when no group is provided, or if custom is provided
  *
  * This implies GROUP_DEFAULT group is provided in base configuration.
  */
@@ -56,6 +57,14 @@ export const instanceToPlain = <T>(object: T, options?: ClassTransformOptions): 
     object,
     {
         ...defaultInstanceToPlainOptions,
+        ...options,
+    },
+);
+
+export const instanceToInstance = <T>(object: T, options?: ClassTransformOptions): T => baseInstanceToInstance(
+    object,
+    {
+        ...defaultClassTransformOptions,
         ...options,
     },
 );
