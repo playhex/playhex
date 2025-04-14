@@ -159,6 +159,14 @@ ALLOW_RANKED_BOT_GAMES=true
 
 - A functional test in auth.cy.ts needs at least one game in database to run fully.
 
+### Debug server with breakpoints
+
+In package.json, script `serve`, replace "dev-server" by "dev-server-debug".
+
+Then open Chromium go to: `chrome://inspect` and click "inspect" in "Remote Target" section.
+
+Then go to "Sources" tab, browse source files add breakpoints, and do what is needed in the application.
+
 ### Optimize js size
 
 ``` bash
