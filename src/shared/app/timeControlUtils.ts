@@ -1,6 +1,5 @@
 import { t } from 'i18next';
 import TimeControlType from '../time-control/TimeControlType.js';
-import HostedGameOptions from './models/HostedGameOptions.js';
 
 /**
  * Returns average seconds per move
@@ -37,13 +36,22 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
 export type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
 
 /**
+ * Required parameters to compute time control cadency.
+ * Should be compatible with HostedGameOptions.
+ */
+export type TimeControlBoardsize = {
+    timeControl: TimeControlType;
+    boardsize: number;
+};
+
+/**
  * Naive function that guess if a game is a blitz or correspondence
  * given its time control and board size.
  */
-export const timeControlToCadencyName = (gameOptions: HostedGameOptions): TimeControlCadencyName => {
+export const timeControlToCadencyName = (timeControlBoardsize: TimeControlBoardsize): TimeControlCadencyName => {
     const averageSecondsPerMove = calcAverageSecondsPerMove(
-        gameOptions.timeControl,
-        gameOptions.boardsize,
+        timeControlBoardsize.timeControl,
+        timeControlBoardsize.boardsize,
     );
 
     if (averageSecondsPerMove < 10) {

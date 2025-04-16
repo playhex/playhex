@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
-import AppTimeControlLabelVue from '../../components/AppTimeControlLabel.vue';
+import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
 import AppGameRulesSummary from '../../components/AppGameRulesSummary.vue';
 import AppPlayerStats from '../../components/AppPlayerStats.vue';
 import AppPlayerRatingChart from '../../components/AppPlayerRatingChart.vue';
@@ -465,7 +465,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         </td>
                         <td><AppPseudo rating onlineStatus :player="getOtherPlayer(game, player)!" /></td>
                         <td>{{ game.gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
+                        <td><AppTimeControlLabel :timeControlBoardsize="game.gameOptions" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
                         <td>{{
                             formatDistanceToNowStrict(game.gameData?.startedAt ?? 0, { addSuffix: true })
@@ -525,7 +525,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <td v-else><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
 
                         <td>{{ game.gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabelVue :gameOptions="game.gameOptions" /></td>
+                        <td><AppTimeControlLabel :timeControlBoardsize="game.gameOptions" /></td>
                         <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
                         <td>{{
                             game.gameData?.endedAt ? format(game.gameData.endedAt, 'd MMMM yyyy p') : '-'

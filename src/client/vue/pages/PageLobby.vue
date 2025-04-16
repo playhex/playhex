@@ -307,7 +307,7 @@ const {
                                     <i v-else>System</i>
                                 </td>
                                 <td :class="isUncommonBoardsize(hostedGame) ? 'text-warning' : ''">{{ hostedGame.gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame.gameOptions" /></td>
                                 <td><AppGameRulesSummary :gameOptions="hostedGame.gameOptions" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGame.createdAt, { addSuffix: true })
@@ -357,7 +357,7 @@ const {
                                     <AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" />
                                 </td>
                                 <td>{{ hostedGame.gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame.gameOptions" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGame.gameData?.startedAt ?? 0, { addSuffix: true })
                                 }}</td>
@@ -406,7 +406,7 @@ const {
                                     <td>-</td>
                                 </template>
                                 <td>{{ hostedGame.gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabel :gameOptions="hostedGame.gameOptions" /></td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame.gameOptions" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGame.gameData?.endedAt ?? 0, { addSuffix: true })
                                 }}</td>

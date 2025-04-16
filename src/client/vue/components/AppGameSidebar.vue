@@ -581,7 +581,7 @@ watchEffect(() => {
                     </dd>
 
                     <dt class="col-md-5">{{ $t('game.time_control') }}</dt>
-                    <dd class="col-md-7"><AppTimeControlLabel :gameOptions="hostedGameClient.getGameOptions()" /></dd>
+                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="hostedGameClient.getGameOptions()" /></dd>
 
                     <dt class="col-md-5">{{ $t('game.board_size') }}</dt>
                     <dd class="col-md-7">{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</dd>

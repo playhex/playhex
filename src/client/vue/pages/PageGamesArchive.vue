@@ -212,7 +212,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
 
                         <td>{{ game.gameOptions.boardsize }}</td>
 
-                        <td><AppTimeControlLabel :gameOptions="game.gameOptions" /></td>
+                        <td><AppTimeControlLabel :timeControlBoardsize="game.gameOptions" /></td>
 
                         <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
 
