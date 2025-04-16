@@ -8,13 +8,14 @@ import { Expose } from '../class-transformer-custom.js';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked.js';
+import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
 export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176627/1263010163875381288/1350473700457316413
 
 @Entity()
-export default class HostedGameOptions
+export default class HostedGameOptions implements TimeControlBoardsize
 {
     @PrimaryColumn()
     hostedGameId?: number;
