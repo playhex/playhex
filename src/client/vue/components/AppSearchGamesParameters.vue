@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { PropType, toRefs, ref, watchEffect } from 'vue';
+import { PropType, toRefs, ref } from 'vue';
 import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
 import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters.js';
-import { getSearchPlayers } from '../../apiClient.js';
 import { BIconArrowRight, BIconX } from 'bootstrap-icons-vue';
 
 const props = defineProps({
@@ -24,10 +23,6 @@ const searchPlayersParameters = ref(new SearchPlayersParameters());
 
 searchPlayersParameters.value.isBot = false;
 searchPlayersParameters.value.isGuest = false;
-
-watchEffect(() => {
-    getSearchPlayers(searchPlayersParameters.value);
-});
 </script>
 
 <template>
