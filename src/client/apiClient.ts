@@ -1,38 +1,35 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
 import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription } from '../shared/app/models/index.js';
-import { ErrorResponse, HandledErrorType } from '../shared/app/Errors.js';
+import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
 import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 
-export class ApiClientError extends Error
-{
-    type: HandledErrorType;
-    reason: string;
-
-    constructor(errorResponse: ErrorResponse)
-    {
-        super(`${errorResponse.type}: ${errorResponse.reason}`);
-
-        this.type = errorResponse.type as HandledErrorType;
-        this.reason = errorResponse.reason;
-    }
-}
-
 const checkResponse = async (response: Response): Promise<void> => {
     if (response.ok) {
         return;
     }
 
-    if (response.status >= 400 && response.status < 500) {
-        throw new ApiClientError(await response.json());
-    }
-
     if (response.status >= 500) {
         throw new Error('Server error');
+    }
+
+    if (response.status >= 400) {
+        const body = await response.clone().text();
+        let payload = null;
+
+        try {
+            payload = JSON.parse(body);
+        } catch (e) {
+            throw new Error(`Api error ${response.status}: "${body}"`);
+        }
+
+        if (isDomainHttpErrorPayload(payload)) {
+            throw denormalizeDomainHttpError(payload);
+        }
     }
 };
 
@@ -190,6 +187,8 @@ export const getPlayer = async (publicId: string): Promise<Player> => {
             'Accept': 'application/json',
         },
     });
+
+    await checkResponse(response);
 
     return plainToInstance(Player, await response.json());
 };
@@ -410,15 +409,7 @@ export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | Ga
         return null;
     }
 
-    try {
-        await checkResponse(response);
-    } catch (e) {
-        if (!(e instanceof ApiClientError)) {
-            throw e;
-        }
-
-        return null;
-    }
+    await checkResponse(response);
 
     return plainToInstance(GameAnalyze, await response.json());
 };
@@ -444,15 +435,11 @@ export const apiGetGameRatingUpdates = async (gamePublicId: string, category: Ra
         },
     });
 
-    try {
-        await checkResponse(response);
-    } catch (e) {
-        if (!(e instanceof ApiClientError)) {
-            throw e;
-        }
-
+    if (404 === response.status) {
         return null;
     }
+
+    await checkResponse(response);
 
     return (await response.json() as Rating[])
         .map(rating => plainToInstance(Rating, rating))
@@ -467,15 +454,11 @@ export const apiGetPlayerRatingHistory = async (playerPublicId: string, category
         },
     });
 
-    try {
-        await checkResponse(response);
-    } catch (e) {
-        if (!(e instanceof ApiClientError)) {
-            throw e;
-        }
-
+    if (404 === response.status) {
         return null;
     }
+
+    await checkResponse(response);
 
     return (await response.json() as Rating[])
         .map(rating => plainToInstance(Rating, rating))
@@ -490,15 +473,11 @@ export const apiGetPlayerCurrentRatings = async (playerPublicId: string): Promis
         },
     });
 
-    try {
-        await checkResponse(response);
-    } catch (e) {
-        if (!(e instanceof ApiClientError)) {
-            throw e;
-        }
-
+    if (404 === response.status) {
         return null;
     }
+
+    await checkResponse(response);
 
     return (await response.json() as Rating[])
         .map(rating => plainToInstance(Rating, rating))
@@ -535,15 +514,11 @@ export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | 
         },
     });
 
-    try {
-        await checkResponse(response);
-    } catch (e) {
-        if (!(e instanceof ApiClientError)) {
-            throw e;
-        }
-
+    if (404 === response.status) {
         return null;
     }
+
+    await checkResponse(response);
 
     return plainToInstance(PlayerStats, await response.json());
 };

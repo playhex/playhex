@@ -1,10 +1,9 @@
 import { Player } from '../../../shared/app/models/index.js';
 import bcrypt from 'bcryptjs';
-import HandledError from '../../../shared/app/Errors.js';
 import { AppDataSource } from '../../data-source.js';
 
-export class PseudoNotExistingError extends HandledError {}
-export class InvalidPasswordError extends HandledError {}
+export class PseudoNotExistingError extends Error {}
+export class InvalidPasswordError extends Error {}
 
 export const hashPassword = async (password: string): Promise<string> => {
     const salt = await bcrypt.genSalt();

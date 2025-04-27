@@ -1,12 +1,14 @@
 import { Service } from 'typedi';
 import { Body, CurrentUser, Delete, Get, JsonController, Post, Req, Session } from 'routing-controllers';
 import type { SessionData } from 'express-session';
-import PlayerRepository from '../../../repositories/PlayerRepository.js';
-import { authenticate } from '../../../services/security/authentication.js';
+import PlayerRepository, { MustBeGuestError, PseudoAlreadyTakenError } from '../../../repositories/PlayerRepository.js';
+import { authenticate, InvalidPasswordError, PseudoNotExistingError } from '../../../services/security/authentication.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import type { Request } from 'express';
 import { IsString } from 'class-validator';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import { InvalidPseudoError, PseudoTooLongError, PseudoTooShortError } from '../../../../shared/app/pseudoUtils.js';
 
 class PseudoPasswordInput
 {
@@ -64,11 +66,31 @@ export default class AuthController
         @Body() body: PseudoPasswordInput,
         @Session() session: SessionData,
     ) {
-        const player = await this.playerRepository.createPlayer(body.pseudo, body.password);
+        try {
+            const player = await this.playerRepository.createPlayer(body.pseudo, body.password);
 
-        session.playerId = player.publicId;
+            session.playerId = player.publicId;
 
-        return player;
+            return player;
+        } catch (e) {
+            if (e instanceof PseudoAlreadyTakenError) {
+                throw new DomainHttpError(409, 'pseudo_already_taken');
+            }
+
+            if (e instanceof PseudoTooShortError) {
+                throw new DomainHttpError(400, 'pseudo_too_short');
+            }
+
+            if (e instanceof PseudoTooLongError) {
+                throw new DomainHttpError(400, 'pseudo_too_long');
+            }
+
+            if (e instanceof InvalidPseudoError) {
+                throw new DomainHttpError(400, 'invalid_pseudo');
+            }
+
+            throw e;
+        }
     }
 
     @Post('/api/auth/signup-from-guest')
@@ -76,9 +98,33 @@ export default class AuthController
         @AuthenticatedPlayer() player: Player,
         @Body() body: PseudoPasswordInput,
     ) {
-        const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo, body.password);
+        try {
+            const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo, body.password);
 
-        return upgradedPlayer;
+            return upgradedPlayer;
+        } catch (e) {
+            if (e instanceof MustBeGuestError) {
+                throw new DomainHttpError(403, 'must_be_logged_in_as_guest');
+            }
+
+            if (e instanceof PseudoAlreadyTakenError) {
+                throw new DomainHttpError(409, 'pseudo_already_taken');
+            }
+
+            if (e instanceof PseudoTooShortError) {
+                throw new DomainHttpError(400, 'pseudo_too_short');
+            }
+
+            if (e instanceof PseudoTooLongError) {
+                throw new DomainHttpError(400, 'pseudo_too_long');
+            }
+
+            if (e instanceof InvalidPseudoError) {
+                throw new DomainHttpError(400, 'invalid_pseudo');
+            }
+
+            throw e;
+        }
     }
 
     @Post('/api/auth/login')
@@ -86,11 +132,23 @@ export default class AuthController
         @Body() body: PseudoPasswordInput,
         @Session() session: SessionData,
     ) {
-        const player = await authenticate(body.pseudo, body.password);
+        try {
+            const player = await authenticate(body.pseudo, body.password);
 
-        session.playerId = player.publicId;
+            session.playerId = player.publicId;
 
-        return player;
+            return player;
+        } catch (e) {
+            if (e instanceof PseudoNotExistingError) {
+                throw new DomainHttpError(403, 'pseudo_not_existing');
+            }
+
+            if (e instanceof InvalidPasswordError) {
+                throw new DomainHttpError(403, 'invalid_password');
+            }
+
+            throw e;
+        }
     }
 
     @Get('/api/auth/me')
@@ -125,7 +183,16 @@ export default class AuthController
         @AuthenticatedPlayer() player: Player,
         @Body() body: ChangePasswordInput,
     ) {
-        const newPlayer = await this.playerRepository.changePassword(player.publicId, body.oldPassword, body.newPassword);
-        return newPlayer;
+        try {
+            const newPlayer = await this.playerRepository.changePassword(player.publicId, body.oldPassword, body.newPassword);
+
+            return newPlayer;
+        } catch (e) {
+            if (e instanceof InvalidPasswordError) {
+                throw new DomainHttpError(403, 'invalid_password');
+            }
+
+            throw e;
+        }
     }
 }

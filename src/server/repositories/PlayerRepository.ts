@@ -4,14 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
 import logger from '../services/logger.js';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils.js';
-import HandledError from '../../shared/app/Errors.js';
 import { QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils.js';
 import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 
-export class PseudoAlreadyTakenError extends HandledError {}
-export class MustBeGuestError extends HandledError {}
+export class PseudoAlreadyTakenError extends Error {}
+export class MustBeGuestError extends Error {}
 
 @Service()
 export default class PlayerRepository
@@ -113,6 +112,7 @@ export default class PlayerRepository
      * @throws {PseudoAlreadyTakenError}
      * @throws {PseudoTooShortError}
      * @throws {PseudoTooLongError}
+     * @throws {InvalidPseudoError}
      */
     async createPlayer(pseudo: string, password: string): Promise<Player>
     {
@@ -170,6 +170,7 @@ export default class PlayerRepository
      * @throws {PseudoAlreadyTakenError}
      * @throws {PseudoTooShortError}
      * @throws {PseudoTooLongError}
+     * @throws {InvalidPseudoError}
      */
     async upgradeGuest(publicId: string, pseudo: string, password: string): Promise<Player>
     {

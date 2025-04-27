@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
-import HttpError from '../HttpError.js';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
 import StatsRepository from '../../../repositories/StatsRepository.js';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 @JsonController()
 @Service()
@@ -24,7 +24,7 @@ export default class PlayerController
         const player = await this.playerRepository.getPlayerBySlug(slug);
 
         if (null === player) {
-            throw new HttpError(404, 'Player not found');
+            throw new DomainHttpError(404, 'player_not_found');
         }
 
         return player;
@@ -37,7 +37,7 @@ export default class PlayerController
         const player = await this.playerRepository.getPlayer(publicId);
 
         if (null === player) {
-            throw new HttpError(404, 'Player not found');
+            throw new DomainHttpError(404, 'player_not_found');
         }
 
         return player;
@@ -50,7 +50,7 @@ export default class PlayerController
         const player = await this.playerRepository.getPlayer(publicId);
 
         if (null === player) {
-            throw new HttpError(404, 'Player not found');
+            throw new DomainHttpError(404, 'player_not_found');
         }
 
         if (!player.id) {

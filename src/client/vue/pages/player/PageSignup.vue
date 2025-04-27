@@ -2,9 +2,9 @@
 import { useRouter } from 'vue-router';
 import useAuthStore from '../../../stores/authStore.js';
 import { Ref, ref } from 'vue';
-import { ApiClientError } from '../../../apiClient.js';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { useSeoMeta } from '@unhead/vue';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 useSeoMeta({
     title: 'Sign up',
@@ -28,7 +28,7 @@ const onSubmit = async () => {
 
         router.push({ name: 'home' });
     } catch (e) {
-        if (!(e instanceof ApiClientError)) {
+        if (!(e instanceof DomainHttpError)) {
             throw e;
         }
 
@@ -37,11 +37,11 @@ const onSubmit = async () => {
             case 'pseudo_too_short':
             case 'pseudo_too_long':
             case 'invalid_pseudo':
-                pseudoValidation.value = { ok: false, reason: e.reason };
+                pseudoValidation.value = { ok: false, reason: e.type };
                 break;
 
             default:
-                globalError.value = e.reason;
+                globalError.value = e.type;
         }
     }
 };
@@ -57,8 +57,8 @@ const onSubmit = async () => {
                     <div class="mb-3">
                         <label for="form-pseudo" class="form-label">{{ $t('username') }}</label>
                         <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="usernameHelp usernameEmailWarning">
-                        <div id="usernameHelp" class="invalid-feedback">
-                            {{ pseudoValidation?.reason }}
+                        <div v-if="pseudoValidation?.reason" id="usernameHelp" class="invalid-feedback">
+                            {{ $t(pseudoValidation.reason) }}
                         </div>
                         <div id="usernameEmailWarning" class="form-text text-warning">
                             <span v-if="pseudo.match(/@/)">{{ $t('username_not_an_email_warning') }}</span>

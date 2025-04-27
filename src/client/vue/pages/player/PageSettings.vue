@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
-import { ApiClientError, apiPostPushTest } from '../../../apiClient.js';
+import { apiPostPushTest } from '../../../apiClient.js';
 import { watch, Ref, ref, onMounted, onUnmounted } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
@@ -19,6 +19,7 @@ import AppBoard from '../../components/AppBoard.vue';
 import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 const head = injectHead();
 
@@ -71,13 +72,13 @@ const newPasswordConfirmed = ref('');
 const oldPasswordValidation: Ref<InputValidation> = ref(null);
 const confirmPasswordValidation: Ref<InputValidation> = ref(null);
 const changePasswordError: Ref<null | string> = ref(null);
-const changePasswordSuccess: Ref<null | string> = ref(null);
+const changePasswordSuccess: Ref<boolean> = ref(false);
 
 const submitPasswordChange = async () => {
     oldPasswordValidation.value = null;
     confirmPasswordValidation.value = null;
     changePasswordError.value = null;
-    changePasswordSuccess.value = null;
+    changePasswordSuccess.value = false;
 
     if (newPasswordConfirmed.value !== newPassword.value) {
         confirmPasswordValidation.value = {
@@ -89,22 +90,22 @@ const submitPasswordChange = async () => {
 
     try {
         await authChangePassword(oldPassword.value, newPassword.value);
-        changePasswordSuccess.value = 'The password has been changed.';
+        changePasswordSuccess.value = true;
         oldPassword.value = '';
         newPassword.value = '';
         newPasswordConfirmed.value = '';
     } catch (e) {
-        if (!(e instanceof ApiClientError)) {
+        if (!(e instanceof DomainHttpError)) {
             throw e;
         }
 
         switch (e.type) {
             case 'invalid_password':
-                oldPasswordValidation.value = { ok: false, reason: e.reason };
+                oldPasswordValidation.value = { ok: false, reason: e.type };
                 break;
 
             default:
-                changePasswordError.value = e.reason;
+                changePasswordError.value = e.type;
         }
     }
 };
@@ -461,8 +462,8 @@ const isNotificationSupported = 'undefined' !== typeof Notification;
                     <label class="col-sm-4 col-md-3 col-form-label" for="change-password-old">{{ $t('old_password') }}</label>
                     <div class="col-sm-8 col-md-4">
                         <input v-model="oldPassword" required type="password" class="form-control" :class="toInputClass(oldPasswordValidation)" id="change-password-old">
-                        <div class="invalid-feedback">
-                            {{ oldPasswordValidation?.reason }}
+                        <div v-if="oldPasswordValidation?.reason" class="invalid-feedback">
+                            {{ $t(oldPasswordValidation.reason) }}
                         </div>
                     </div>
                 </div>
@@ -476,13 +477,13 @@ const isNotificationSupported = 'undefined' !== typeof Notification;
                     <label class="col-sm-4 col-md-3 col-form-label" for="change-password-new-confirm">{{ $t('confirm_new_password') }}</label>
                     <div class="col-sm-8 col-md-4">
                         <input v-model="newPasswordConfirmed" required type="password" class="form-control" :class="toInputClass(confirmPasswordValidation)" id="change-password-new-confirm">
-                        <div class="invalid-feedback">
-                            {{ confirmPasswordValidation?.reason }}
+                        <div v-if="confirmPasswordValidation?.reason" class="invalid-feedback">
+                            {{ $t(confirmPasswordValidation.reason) }}
                         </div>
                     </div>
                 </div>
-                <p v-if="changePasswordError" class="text-danger">{{ changePasswordError }}</p>
-                <p v-if="changePasswordSuccess" class="text-success">{{ changePasswordSuccess }}</p>
+                <p v-if="changePasswordError" class="text-danger">{{ $t(changePasswordError) }}</p>
+                <p v-if="changePasswordSuccess" class="text-success">{{ $t('password_changed_success') }}</p>
                 <button type="submit" class="btn btn-outline-primary">{{ $t('update_password') }}</button>
             </form>
         </div>

@@ -2,9 +2,9 @@
 import { useRouter } from 'vue-router';
 import useAuthStore from '../../../stores/authStore.js';
 import { Ref, ref } from 'vue';
-import { ApiClientError } from '../../../apiClient.js';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { useSeoMeta } from '@unhead/vue';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 useSeoMeta({
     title: 'Log in',
@@ -30,7 +30,7 @@ const onSubmit = async () => {
 
         router.push({ name: 'home' });
     } catch (e) {
-        if (!(e instanceof ApiClientError)) {
+        if (!(e instanceof DomainHttpError)) {
             throw e;
         }
 
@@ -39,16 +39,16 @@ const onSubmit = async () => {
             case 'pseudo_too_short':
             case 'pseudo_too_long':
             case 'pseudo_not_existing':
-                pseudoValidation.value = { ok: false, reason: e.reason };
+                pseudoValidation.value = { ok: false, reason: e.type };
                 break;
 
             case 'invalid_password':
                 pseudoValidation.value = { ok: true };
-                passwordValidation.value = { ok: false, reason: e.reason };
+                passwordValidation.value = { ok: false, reason: e.type };
                 break;
 
             default:
-                globalError.value = e.reason;
+                globalError.value = e.type;
         }
     }
 };
@@ -64,20 +64,20 @@ const onSubmit = async () => {
                     <div class="mb-3">
                         <label for="form-pseudo" class="form-label">{{ $t('username') }}</label>
                         <input v-model="pseudo" required class="form-control form-control-lg" :class="toInputClass(pseudoValidation)" id="form-pseudo" aria-describedby="emailHelp">
-                        <div class="invalid-feedback">
-                            {{ pseudoValidation?.reason }}
+                        <div v-if="pseudoValidation?.reason" class="invalid-feedback">
+                            {{ $t(pseudoValidation.reason) }}
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="form-password" class="form-label">{{ $t('password') }}</label>
                         <input v-model="password" required type="password" class="form-control form-control-lg" :class="toInputClass(passwordValidation)" id="form-password">
-                        <div class="invalid-feedback">
-                            {{ passwordValidation?.reason }}
+                        <div v-if="passwordValidation?.reason" class="invalid-feedback">
+                            {{ $t(passwordValidation.reason) }}
                         </div>
                     </div>
 
-                    <p v-if="globalError" class="text-danger">{{ globalError }}</p>
+                    <p v-if="globalError" class="text-danger">{{ $t(globalError) }}</p>
 
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-lg btn-primary">{{ $t('log_in') }}</button>

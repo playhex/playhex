@@ -36,74 +36,13 @@
 //   }
 // }
 
-/* eslint-disable @typescript-eslint/no-var-requires */
 const { socketIoMock } = require('./socketIoMock');
 const { plainToInstance } = require('../../src/shared/app/class-transformer-custom');
 const { HostedGame, OnlinePlayers } = require('../../src/shared/app/models');
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-declare namespace Cypress {
-    interface Chainable {
-        /**
-         * Open AI game creation popin, select determinist bot.
-         * Pass submit=false to keep game options popin open.
-         */
-        createAIGameWithRandom(submit?: boolean): Chainable<unknown>;
-
-        /**
-         * To use after createAIGameWithRandom(false),
-         * submit game options and create game.
-         */
-        submitAIGame(): Chainable<unknown>;
-
-        /**
-         * Click on screen to play a move.
-         * x and y are coords of pixel on screen.
-         */
-        play(x: number, y: number): Chainable<unknown>;
-
-        /**
-         * When on game page, open game sidebar.
-         */
-        openGameSidebar(): Chainable<unknown>;
-
-        /**
-         * When on game page, close game sidebar.
-         */
-        closeGameSidebar(): Chainable<unknown>;
-
-        /**
-         * Add this at the beginning of the test in order to received mocked socket io messages.
-         */
-        mockSocketIO(): Chainable<unknown>;
-
-        /**
-         * Simulate a websocket message received from socket.io.
-         * Warning: payload is not denormalized, so will be raw objects, string instead of js Date, ...
-         */
-        receiveSocketIoMessage(type: string, ...args: unknown[]): Chainable<unknown>;
-
-        /**
-         * Simulate a "gameUpdate" message, for a gameId, and a fixture file (will be denormalized).
-         */
-        receiveGameUpdate(fixtureFile: string): Chainable<unknown>;
-
-        /**
-         * Simulate a "lobbyUpdate" message with a fixture file (will be denormalized).
-         */
-        receiveLobbyUpdate(fixtureFile: string): Chainable<unknown>;
-
-        /**
-         * Simulate a "playerGamesUpdate" message with a fixture file (will be denormalized).
-         */
-        receivePlayerGamesUpdate(fixtureFile: string): Chainable<unknown>;
-
-        /**
-         * Simulate a "onlinePlayersUpdate" message with a fixture file (will be denormalized).
-         */
-        receiveOnlinePlayersUpdate(fixtureFile: string): Chainable<unknown>;
-    }
-}
+/*
+ * To add a command, also add declaration in ./index.d.ts
+ */
 
 Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
     cy.contains('Play vs AI').click();

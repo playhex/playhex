@@ -1,5 +1,4 @@
-import HttpError from '../HttpError.js';
-import { Get, JsonController, OnUndefined, Param, Put } from 'routing-controllers';
+import { Get, HttpError, JsonController, OnUndefined, Param, Put } from 'routing-controllers';
 import { Service } from 'typedi';
 import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister.js';
 import HexAiApiClient from '../../../services/HexAiApiClient.js';

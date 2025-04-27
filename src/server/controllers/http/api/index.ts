@@ -1,13 +1,12 @@
 import { Express, Request } from 'express';
 import { Container } from 'typedi';
-import { useContainer, useExpressServer } from 'routing-controllers';
+import { HttpError, useContainer, useExpressServer } from 'routing-controllers';
 import GameController from './GameController.js';
 import PlayerController from './PlayerController.js';
 import AuthController from './AuthController.js';
 import OnlinePlayersController from './OnlinePlayersController.js';
 import PlayerSettingsController from './PlayerSettingsController.js';
 import AdminController from './AdminController.js';
-import HttpError from '../HttpError.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import ChatController from './ChatController.js';

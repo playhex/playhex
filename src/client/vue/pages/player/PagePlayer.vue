@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
-import { getPlayerBySlug, ApiClientError, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
+import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
 import { Ref, ref, watch } from 'vue';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore.js';
@@ -29,6 +29,7 @@ import { Directive } from 'vue';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { getOtherPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 const { slug } = useRoute().params;
 
@@ -85,11 +86,14 @@ const playerNotFound = ref(false);
 
         updateMeta(player.value);
     } catch (e) {
-        if (!(e instanceof ApiClientError)) {
-            throw e;
+        if (e instanceof DomainHttpError) {
+            if ('player_not_found' === e.type) {
+                playerNotFound.value = true;
+                return;
+            }
         }
 
-        playerNotFound.value = true;
+        throw e;
     }
 })();
 

@@ -1,11 +1,11 @@
 import { Repository } from 'typeorm';
-import { Get, JsonController, Param } from 'routing-controllers';
+import { Get, HttpError, JsonController, Param } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import RatingRepository from '../../../repositories/RatingRepository.js';
-import HttpError from '../HttpError.js';
 import { ratingCategories, validateRatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { HostedGame } from '../../../../shared/app/models/index.js';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 @JsonController()
 @Service()
@@ -26,7 +26,7 @@ export default class RatingController
         const player = await this.playerRepository.getPlayer(publicId);
 
         if (null === player) {
-            throw new HttpError(404, 'Player not found');
+            throw new DomainHttpError(404, 'player_not_found');
         }
 
         return await this.ratingRepository.findPlayerRatings(player, ratingCategories);
@@ -44,7 +44,7 @@ export default class RatingController
         const player = await this.playerRepository.getPlayer(publicId);
 
         if (null === player) {
-            throw new HttpError(404, 'Player not found');
+            throw new DomainHttpError(404, 'player_not_found');
         }
 
         return await this.ratingRepository.findPlayerRating(player, category);
@@ -62,7 +62,7 @@ export default class RatingController
         const player = await this.playerRepository.getPlayer(publicId);
 
         if (null === player) {
-            throw new HttpError(404, 'Player not found');
+            throw new DomainHttpError(404, 'player_not_found');
         }
 
         return await this.ratingRepository.findPlayerRatingHistory(player, category);

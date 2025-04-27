@@ -1,8 +1,7 @@
-import HandledError from './Errors.js';
 import Player from './models/Player.js';
 import { slugify } from './slugify.js';
 
-export class InvalidPseudoError extends HandledError {}
+export class InvalidPseudoError extends Error {}
 
 export class PseudoTooShortError extends InvalidPseudoError {}
 export class PseudoTooLongError extends InvalidPseudoError {}
@@ -10,6 +9,7 @@ export class PseudoTooLongError extends InvalidPseudoError {}
 /**
  * @throws {PseudoTooShortError}
  * @throws {PseudoTooLongError}
+ * @throws {InvalidPseudoError}
  */
 export const checkPseudo = (pseudo: string): void => {
     if ('' === pseudo) {
