@@ -76,21 +76,3 @@ const nextHexMonthlyNumber = getNextHexMonthlyNumber(nextHexMonthlyDate);
         </p>
     </div>
 </template>
-
-<style lang="stylus" scoped>
-.feedback
-    height 8em
-    display flex
-    justify-content center
-    text-align center
-
-    i::before
-        vertical-align 0
-
-    p
-        display flex
-        flex-flow column
-        justify-content center
-        z-index 5
-        margin 0
-</style>
