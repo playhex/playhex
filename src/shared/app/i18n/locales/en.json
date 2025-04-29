@@ -305,6 +305,10 @@
         "ask_confirmation": "Ask confirmation",
         "description": "To prevent misclicks, you must confirm before submitting a move."
     },
+    "hex_tournament_paris": {
+        "title": "Hex tournament in Paris",
+        "read_more": "read more"
+    },
     "premove": {
         "title": "Premove",
         "description": "Play a move during opponent turn: will be played instantly after opponent move."

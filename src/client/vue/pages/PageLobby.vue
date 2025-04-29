@@ -247,7 +247,7 @@ const {
 <template>
     <div class="container-fluid my-3">
         <div class="row">
-            <div class="col-sm-9">
+            <div class="col-sm-8 col-md-9">
                 <h3>{{ $t('new_game') }}</h3>
 
                 <div class="play-buttons row mb-4 g-3">
@@ -418,7 +418,7 @@ const {
                     </router-link>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4 col-md-3">
                 <AppSidebar />
             </div>
         </div>

@@ -203,6 +203,10 @@
         "button_label_short": "Confirmar",
         "send_immediately": "Enviar inmediatamente"
     },
+    "hex_tournament_paris": {
+        "title": "Torneo de Hex en París",
+        "read_more": "leer más"
+    },
     "rematch": {
         "label": "Revancha",
         "accept": "Aceptar revancha",

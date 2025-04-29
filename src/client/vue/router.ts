@@ -121,6 +121,11 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        name: 'cijm',
+        path: '/tournoi-hex-paris-2025',
+        component: () => import('./pages/content/PageCijm.vue'),
+    },
+    {
         name: 'rescue',
         path: '/rescue',
         component: () => import('./pages/PageRescue.vue'),

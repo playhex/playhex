@@ -291,6 +291,10 @@
         "confirmation": "Confirmation",
         "are_you_sure?": "Êtes-vous sûr ?"
     },
+    "hex_tournament_paris": {
+        "title": "Tournoi de Hex à Paris",
+        "read_more": "voir plus"
+    },
     "workers": {
         "slow_worker": "Pas de serveur puissant en ligne actuellement. Seules les IA limitées sont disponibles.",
         "no_worker": "Aucun serveur n'est disponible actuellement pour calculer les coups de l'IA. Seules les IA de test sont disponibles.",

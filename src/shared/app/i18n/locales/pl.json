@@ -247,6 +247,10 @@
         "accept": "Zaakceptuj rewanż",
         "view": "Zobacz rewanż"
     },
+    "hex_tournament_paris": {
+        "title": "Turniej Hex w Paryżu",
+        "read_more": "czytaj więcej"
+    },
     "short_time_unit": {
         "day": "d",
         "hour": "h",
