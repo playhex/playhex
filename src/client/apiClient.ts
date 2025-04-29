@@ -24,12 +24,14 @@ const checkResponse = async (response: Response): Promise<void> => {
         try {
             payload = JSON.parse(body);
         } catch (e) {
-            throw new Error(`Api error ${response.status}: "${body}"`);
+            throw new Error(`Api error ${response.status}: "${body.substring(0, 128)}"`);
         }
 
         if (isDomainHttpErrorPayload(payload)) {
             throw denormalizeDomainHttpError(payload);
         }
+
+        throw new Error(payload.message ?? payload.reason ?? 'API error');
     }
 };
 
