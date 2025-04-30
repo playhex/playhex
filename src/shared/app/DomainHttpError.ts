@@ -45,14 +45,16 @@ export type DomainHttpErrorPayload = DomainHttpErrorType & {
 /**
  * Error thrown from controllers that can be identified front side.
  */
-export class DomainHttpError implements DomainHttpErrorType
+export class DomainHttpError extends Error implements DomainHttpErrorType
 {
     constructor(
         public httpCode: number,
         public type: DomainHttpErrorTypes,
         public reason?: string,
         public details?: unknown,
-    ) {}
+    ) {
+        super(reason ?? type);
+    }
 }
 
 export const isDomainHttpErrorPayload = (payload: unknown): payload is DomainHttpErrorPayload => {
