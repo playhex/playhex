@@ -3,7 +3,7 @@
     "lobby": {
         "no_waiting_games": "現在利用可能なゲームはありません。新しいゲームを作成しましょう！",
         "watch_current_games": "現在のゲームを観戦する",
-        "join_a_game": "ゲームに参加する",
+        "join_a_game": "ゲームに参加",
         "no_playing_games": "現在進行中のゲームはありません。"
     },
     "game": {
@@ -257,5 +257,10 @@
         "time": "{player} が時間切れで勝利！",
         "resign": "{player} の勝利！",
         "forfeit": "{player} が没収勝ち！"
+    },
+    "boardsize": {
+        "small": "小",
+        "medium": "中",
+        "large": "大"
     }
 }
