@@ -26,6 +26,31 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        path: '/tournaments',
+        children: [
+            {
+                name: 'tournaments',
+                path: '',
+                component: () => import('./tournaments/pages/PageTournaments.vue'),
+            },
+            {
+                name: 'tournaments-create',
+                path: 'create',
+                component: () => import('./tournaments/pages/PageCreateTournament.vue'),
+            },
+            {
+                name: 'tournament',
+                path: ':slug',
+                component: () => import('./tournaments/pages/PageTournament.vue'),
+            },
+            {
+                name: 'tournament-manage',
+                path: ':slug/edit',
+                component: () => import('./tournaments/pages/PageManageTournament.vue'),
+            },
+        ],
+    },
+    {
         name: 'play-vs-ai',
         path: '/play-vs-ai',
         component: () => import('./pages/PagePlayOffline.vue'),

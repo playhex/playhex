@@ -197,6 +197,10 @@
     "loading_game": "Loading game…",
     "loading": "Loading…",
     "tournament": "Tournament",
+    "tournament_title_duplicate": "A tournament with the same title already exists",
+    "tournament_history": {
+        "created": "Created by {{hostPseudo}}"
+    },
     "now!": "Now!",
     "register_on_challonge": "Register on Challonge",
     "see_progression_on_challonge": "See progression on Challonge",
