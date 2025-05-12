@@ -21,9 +21,8 @@ type AvailableLocales = {
  * - Locale key must have same name a translation file
  *
  * - Label is displayed to player in select menu.
- *      Should use form "<utf8 flag> <native name> (<english name>) (beta?)".
+ *      Should use form "<utf8 flag> <native name> (<english name>)".
  *      Native names are listed i.e here: https://matomo.org/translations/
- *      "(beta)" is added when translated with AI, and not yet verified by community.
  *      Flags can be copied from i.e here: https://emojipedia.org/search?q=poland
  *
  * - Loader is file used for date-fns, to translate date/times
@@ -77,15 +76,15 @@ export const availableLocales: AvailableLocales = {
         ],
     },
     it: {
-        label: '🇮🇹 Italiano (Italian) (beta)',
+        label: '🇮🇹 Italiano (Italian)',
         loader: () => import(/* webpackChunkName: "locale-it" */ 'date-fns/locale/it') as unknown as DefaultExportLocale,
     },
     ko: {
-        label: '🇰🇷 한국어 (Korean) (beta)',
+        label: '🇰🇷 한국어 (Korean)',
         loader: () => import(/* webpackChunkName: "locale-ko" */ 'date-fns/locale/ko') as unknown as DefaultExportLocale,
     },
     nl: {
-        label: '🇳🇱 Nederlands (Dutch) (beta)',
+        label: '🇳🇱 Nederlands (Dutch)',
         loader: () => import(/* webpackChunkName: "locale-nl" */ 'date-fns/locale/nl') as unknown as DefaultExportLocale,
     },
     pl: {
@@ -98,7 +97,7 @@ export const availableLocales: AvailableLocales = {
         ],
     },
     pt: {
-        label: '🇵🇹 Português (Portuguese) (beta)',
+        label: '🇵🇹 Português (Portuguese)',
         loader: () => import(/* webpackChunkName: "locale-pt" */ 'date-fns/locale/pt') as unknown as DefaultExportLocale,
     },
     ru: {
@@ -109,7 +108,7 @@ export const availableLocales: AvailableLocales = {
         ],
     },
     sv: {
-        label: '🇸🇪 Svenska (Swedish) (beta)',
+        label: '🇸🇪 Svenska (Swedish)',
         loader: () => import(/* webpackChunkName: "locale-sv" */ 'date-fns/locale/sv') as unknown as DefaultExportLocale,
     },
     ja: {
@@ -120,7 +119,7 @@ export const availableLocales: AvailableLocales = {
         ],
     },
     'zh-Hans': {
-        label: '🇨🇳 简体中文 (Chinese) (beta)',
+        label: '🇨🇳 简体中文 (Chinese)',
         loader: () => import(/* webpackChunkName: "locale-zh" */ 'date-fns/locale/zh-CN') as unknown as DefaultExportLocale,
     },
     ta: {
