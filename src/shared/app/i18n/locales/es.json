@@ -115,22 +115,22 @@
     "new_game": "Nueva partida",
     "no_such_player": "Parece que no existe tal jugador.",
     "n_online_players": "En línea ({{n}})",
-    "guest": "Invitad@",
+    "guest": "Invitado",
     "1v1_ranked": {
-        "title": "1 contra 1",
-        "create": "Crear 1 contra 1"
+        "title": "Clasificatoria",
+        "create": "Crear 1vs1 clasificatoria"
     },
     "1v1_friendly": {
-        "title": "Personalizar 1 contra 1",
-        "create": "Crear 1 contra 1 personalizado"
+        "title": "Amistosa ^^",
+        "create": "Crear partida 1vs1 amistosa"
     },
     "1vAI_ranked": {
         "create": "Jugar partida clasificada contra IA",
         "title": "Clasificatoria contra IA"
     },
     "1vAI_friendly": {
-        "create": "Jugar contra IA",
-        "title": "Jugar contra IA"
+        "create": "Jugar contra una IA",
+        "title": "Jugar contra una IA"
     },
     "1vAI_offline": {
         "title": "IA sin conexión",
@@ -199,7 +199,7 @@
         "title": "Confirmar jugada",
         "button_label": "Confirmar jugada",
         "ask_confirmation": "Pedir confirmación",
-        "description": "Para evitar errores, puedes pedir confirmación antes de enviar una jugada.",
+        "description": "Para evitar errores, puedes pedir confirmación antes de enviar un movimiento insano.",
         "button_label_short": "Confirmar",
         "send_immediately": "Enviar inmediatamente"
     },
@@ -290,5 +290,16 @@
     "explore": "Explorar",
     "friendly": "Amigable",
     "moves": "Movimientos",
-    "force_board_orientation_mode": "Forzar la visualización del tablero en horizontal o vertical para esta pantalla"
+    "force_board_orientation_mode": "Forzar la visualización del tablero en horizontal o vertical para esta pantalla",
+    "1v1": "1vs1",
+    "sort_date": {
+        "desc": "Los más recientes"
+    },
+    "username_not_an_email_warning": "Hepa! tratas de poner tu email? PlayHex simplemente necesita un usuario, de otra forma, tu email seria público…",
+    "save": "Guardado",
+    "discard": "Desechado",
+    "loading": "Cargando…",
+    "game_created_by_system_time_ago": "Juego creado por el sistema hace, {timeAgo}.",
+    "player_passed_his_turn": "{{player}} ha pasado",
+    "go_to_the_game": "Ir a la partida"
 }

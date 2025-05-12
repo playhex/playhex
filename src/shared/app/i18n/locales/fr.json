@@ -337,5 +337,14 @@
         "title": "Paramètres de coup"
     },
     "go_to_the_game": "Aller à la partie",
-    "player_passed_his_turn": "{{player}} a passé son tour"
+    "player_passed_his_turn": "{{player}} a passé son tour",
+    "game_created_by_system_time_ago": "Partie créée par le système, {timeAgo}.",
+    "must_be_logged_in_as_guest": "Vous devez être connecté en tant qu'invité",
+    "pseudo_already_taken": "Ce pseudo est déjà utilisé par un autre joueur",
+    "pseudo_not_existing": "Aucun joueur connu sous ce pseudo",
+    "pseudo_too_short": "Ce pseudo est trop court",
+    "invalid_password": "Mot de passe invalide pour ce compte",
+    "password_changed_success": "Le mot de passe a été changé.",
+    "invalid_pseudo": "Ce pseudo est invalide",
+    "pseudo_too_long": "Ce pseudo est trop long"
 }
