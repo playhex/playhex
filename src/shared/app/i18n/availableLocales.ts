@@ -59,6 +59,7 @@ export const availableLocales: AvailableLocales = {
             { fullName: 'gallegonovato', link: 'https://hosted.weblate.org/user/gallegonovato/' },
             { fullName: 'Guille', link: 'https://hosted.weblate.org/user/guillevg/' },
             { fullName: '2swap', link: 'http://localhost:3000/@2swap' },
+            { fullName: 'Marco', link: 'https://hosted.weblate.org/user/60825138Mmm./' },
         ],
     },
     fr: {
@@ -101,16 +102,22 @@ export const availableLocales: AvailableLocales = {
         loader: () => import(/* webpackChunkName: "locale-pt" */ 'date-fns/locale/pt') as unknown as DefaultExportLocale,
     },
     ru: {
-        label: '🇷🇺 Русский (Russian) (beta)',
+        label: '🇷🇺 Русский (Russian)',
         loader: () => import(/* webpackChunkName: "locale-ru" */ 'date-fns/locale/ru') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'Maksim Кабанов', link: 'https://hosted.weblate.org/user/law820314/' },
+        ],
     },
     sv: {
         label: '🇸🇪 Svenska (Swedish) (beta)',
         loader: () => import(/* webpackChunkName: "locale-sv" */ 'date-fns/locale/sv') as unknown as DefaultExportLocale,
     },
     ja: {
-        label: '🇯🇵 日本語 (Japanese) (beta)',
+        label: '🇯🇵 日本語 (Japanese)',
         loader: () => import(/* webpackChunkName: "locale-ja" */ 'date-fns/locale/ja') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'Enpitu Mr', link: 'https://hosted.weblate.org/user/mr.enpitu/' },
+        ],
     },
     'zh-Hans': {
         label: '🇨🇳 简体中文 (Chinese) (beta)',
