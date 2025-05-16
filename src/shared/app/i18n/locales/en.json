@@ -197,6 +197,15 @@
     "loading_game": "Loading game…",
     "loading": "Loading…",
     "tournament": "Tournament",
+    "tournament_title_duplicate": "A tournament with the same title already exists",
+    "tournament_history": {
+        "created": "{{hostPseudo}} created the tournament",
+        "edited": "Host changed tournament '{{ field }}': new value is '{{ value }}'. (Old value was '{{ oldValue }}')",
+        "player_subscribed": "{{ playerPseudo }} subscribed",
+        "player_checked_in": "{{ playerPseudo }} checked in",
+        "started": "Tournament has started!",
+        "match_ended": "Match {{ round }}.{{ number }} ended: {{ winnerPseudo }} won against {{ loserPseudo }}."
+    },
     "now!": "Now!",
     "register_on_challonge": "Register on Challonge",
     "see_progression_on_challonge": "See progression on Challonge",

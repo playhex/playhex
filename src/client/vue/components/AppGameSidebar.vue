@@ -555,9 +555,17 @@ watchEffect(() => {
 
         <!--
             Game ranked/friendly, and custom options
+            Link to tournament if this game is from a tournament
         -->
         <div class="sidebar-block block-game-options" v-if="isTab('main', 'info')">
+            <router-link
+                v-for="tournamentGame in hostedGameClient.getHostedGame().tournamentGame ? [hostedGameClient.getHostedGame().tournamentGame!] : []"
+                :to="{ name: 'tournament', params: { slug: tournamentGame.tournament.slug }, hash: `#match-${tournamentGame.round}.${tournamentGame.number}` }"
+                class="btn btn-warning btn-block btn-tournament"
+            ><BIconTrophyFill class="icon" /> {{ tournamentGame.tournament.title }}</router-link>
+
             <div class="container-fluid">
+
                 <p v-if="hostedGameClient.isRanked()" class="text-warning">
                     <BIconTrophyFill /> {{ $t('ranked') }}
                 </p>
@@ -964,4 +972,21 @@ watchEffect(() => {
 @media (max-height: 600px)
     .block-game-date
         display none
+
+.btn-tournament
+    width 100%
+    border-radius 0
+    background-color #ffc10780
+    border none
+    margin 0.5em 0
+    position relative
+    overflow hidden
+    text-align left
+
+    .icon
+        opacity 0.15
+        font-size 2.5em
+        position absolute
+        left 0.25em
+        top 0
 </style>
