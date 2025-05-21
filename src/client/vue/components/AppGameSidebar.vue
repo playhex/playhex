@@ -306,10 +306,10 @@ const doAnalyzeGame = async () => {
     analyzeStore.loadAnalyze(gameId, true);
 };
 
-const timeControlComponent = ref<typeof AppGameAnalyze>();
+const appGameAnalyzeComponent = ref<typeof AppGameAnalyze>();
 
 gameView.on('movesHistoryCursorChanged', cursor => {
-    timeControlComponent.value?.selectMove(cursor);
+    appGameAnalyzeComponent.value?.selectMove(cursor);
 });
 
 /*
