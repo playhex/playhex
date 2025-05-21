@@ -5,8 +5,6 @@ hexProgram
     .command('create-mohex-bots')
     .description('Create Mohex bots config in database')
     .action(async () => {
-        let created: boolean;
-
         const configs: { level: string, maxGames: number, description?: string, pseudo?: string, slug?: string, label?: string }[] = [
             { level: '1', maxGames: 8 },
             { level: '1.5', maxGames: 12, slug: 'mohex-1-5' },
@@ -18,11 +16,16 @@ hexProgram
             { level: 'Full', label: 'Full', maxGames: 500000, description: 'not limited, ~25s per move', slug: 'mohex', pseudo: 'Mohex' },
         ];
 
-        configs.forEach(async ({ level, maxGames, label, description, pseudo, slug }, index) => {
+        let index = 0;
+
+        for (const config of configs) {
+            const { level, maxGames, description, pseudo, slug } = config;
+            let { label } = config;
+
             label ??= `Level ${level}`;
             console.log(`Creating bot "${label}"...`);
 
-            created = await createAiConfigIfNotExists({
+            const created = await createAiConfigIfNotExists({
                 config: { maxGames },
                 engine: 'mohex',
                 label,
@@ -38,7 +41,9 @@ hexProgram
             if (!created) {
                 console.log(`Bot "${label}" already created`);
             }
-        });
+
+            ++index;
+        }
 
         console.log('Mohex bots created.');
     })
