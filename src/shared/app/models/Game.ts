@@ -11,7 +11,7 @@ export default class Game
     @PrimaryColumn()
     hostedGameId?: number;
 
-    @OneToOne(() => HostedGame)
+    @OneToOne(() => HostedGame, hostedGame => hostedGame.gameData)
     @JoinColumn()
     hostedGame?: Relation<HostedGame>;
 
