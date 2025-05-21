@@ -85,12 +85,26 @@ export const getWinnerPlayer = (hostedGame: HostedGame): null | Player => {
     return hostedGame.hostedGameToPlayers[hostedGame.gameData.winner].player;
 };
 
+/**
+ * @throws {Error} If not yet a winner in hostedGame
+ */
 export const getStrictWinnerPlayer = (hostedGame: HostedGame): Player => {
     if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
         throw new Error('getStrictWinnerPlayer(): No winner');
     }
 
     return hostedGame.hostedGameToPlayers[hostedGame.gameData.winner].player;
+};
+
+/**
+ * @throws {Error} If not yet a winner in hostedGame
+ */
+export const getStrictWinnerIndex = (hostedGame: HostedGame): PlayerIndex => {
+    if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
+        throw new Error('getStrictWinnerIndex(): No winner');
+    }
+
+    return hostedGame.gameData.winner;
 };
 
 export const getLoserPlayer = (hostedGame: HostedGame): null | Player => {
@@ -101,6 +115,9 @@ export const getLoserPlayer = (hostedGame: HostedGame): null | Player => {
     return hostedGame.hostedGameToPlayers[1 - hostedGame.gameData.winner].player;
 };
 
+/**
+ * @throws {Error} If not yet a loser in hostedGame
+ */
 export const getStrictLoserPlayer = (hostedGame: HostedGame): Player => {
     if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
         throw new Error('getStrictWinnerPlayer(): No winner');
