@@ -52,14 +52,13 @@ export const plainToInstance = <T, V>(cls: ClassConstructor<T>, plain: V, option
     },
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const instanceToPlain = <T>(object: T, options?: ClassTransformOptions): Record<string, any> => baseInstanceToPlain(
+export const instanceToPlain = <T>(object: T, options?: ClassTransformOptions): T => baseInstanceToPlain(
     object,
     {
         ...defaultInstanceToPlainOptions,
         ...options,
     },
-);
+) as T;
 
 export const instanceToInstance = <T>(object: T, options?: ClassTransformOptions): T => baseInstanceToInstance(
     object,
