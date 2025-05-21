@@ -7,7 +7,7 @@ export class HostedGameOptionsTimeControl
 {
     @Expose()
     @IsString()
-    type: string;
+    family: string;
 
     @Expose()
     @ValidateNested()
@@ -42,7 +42,7 @@ export class OptionsFischer implements FischerTimeControlOptions
 export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeControl
 {
     @Expose()
-    override type: 'fischer';
+    override family: 'fischer';
 
     @ValidateNested()
     override options: OptionsFischer;
@@ -72,7 +72,7 @@ export class OptionsByoYomi implements ByoYomiTimeControlOptions
 export class HostedGameOptionsTimeControlByoYomi extends HostedGameOptionsTimeControl
 {
     @Expose()
-    override type: 'byoyomi';
+    override family: 'byoyomi';
 
     @ValidateNested()
     override options: OptionsByoYomi;

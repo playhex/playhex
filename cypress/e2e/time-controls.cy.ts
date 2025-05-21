@@ -63,16 +63,6 @@ describe('Time controls', () => {
         cy
             .contains('h5', 'Play vs AI')
             .closest('.modal-content')
-
-            .contains('Time control')
-            .closest('div')
-            .contains('Custom')
-            .click()
-        ;
-
-        cy
-            .contains('h5', 'Play vs AI')
-            .closest('.modal-content')
             .contains('Use Byo-Yomi')
             .click()
         ;
@@ -93,23 +83,6 @@ describe('Time controls', () => {
         cy.contains('.chrono-time', 'NaN').should('not.exist');
     });
 
-    it('create a game with custom time control, Fischer', () => {
-        cy
-            .contains('h5', 'Play vs AI')
-            .closest('.modal-content')
-
-            .contains('Time control')
-            .closest('div')
-            .contains('Custom')
-            .click()
-        ;
-
-        cy.submitAIGame();
-
-        cy.contains('Determinist random bot');
-        cy.contains('10:00');
-    });
-
     it('cancels a game when timeout with only one move', () => {
         // Plays a second to make a one-move game
         cy
@@ -120,16 +93,6 @@ describe('Time controls', () => {
         ;
 
         // Put minimal time
-        cy
-            .contains('h5', 'Play vs AI')
-            .closest('.modal-content')
-
-            .contains('Time control')
-            .closest('div')
-            .contains('Custom')
-            .click()
-        ;
-
         cy
             .get('input#custom-fischer-initial-time')
             .invoke('val', 0)

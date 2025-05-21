@@ -350,7 +350,7 @@ describe('Authentication', () => {
         cy.request('POST', '/api/games', {
             opponentType: 'player',
             timeControl: {
-                type: 'fischer',
+                family: 'fischer',
                 options: {
                     initialTime: 600000,
                     timeIncrement: 5000,

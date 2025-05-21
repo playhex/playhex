@@ -69,7 +69,7 @@ export default class AdminController
         options.ranked = true;
         options.boardsize = body.boardsize;
         options.timeControl = {
-            type: 'fischer',
+            family: 'fischer',
             options: {
                 initialTime: 3600000, // Fixed time so we can compare time consumed by both ai
             },

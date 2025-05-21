@@ -35,10 +35,10 @@ export const createTimeControl = (
     createOptions: CreateTimeControlOptions = defaultCreateOptions,
 ): AbstractTimeControl => {
 
-    const { type, options } = timeControlType;
+    const { family, options } = timeControlType;
     let timeControl: AbstractTimeControl;
 
-    switch (type) {
+    switch (family) {
         case 'fischer':
             if (undefined !== options.maxTime
                 && undefined !== defaultCreateOptions.systemMaxTime

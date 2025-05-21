@@ -123,7 +123,7 @@ describe('FischerTimeControl', () => {
     it('does not increment clock more than systemMaxTime', () => {
         const now = new Date();
         const timeControl = createTimeControl({
-            type: 'fischer',
+            family: 'fischer',
             options: {
                 initialTime: 10000,
                 timeIncrement: 10000,
@@ -141,7 +141,7 @@ describe('FischerTimeControl', () => {
     it('does not increment clock more than maxTime, with systemMaxTime also defined', () => {
         const now = new Date();
         const timeControl = createTimeControl({
-            type: 'fischer',
+            family: 'fischer',
             options: {
                 initialTime: 10000,
                 timeIncrement: 10000,

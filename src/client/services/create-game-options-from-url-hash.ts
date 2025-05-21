@@ -27,7 +27,7 @@ export const createGameOptionsFromUrlHash = (hash: string = document.location.ha
         // Parse fischer time control, i.e "10+5", supports only minutes + seconds
         if ((match = parameter.match(/^(\d+)\+(\d+)$/))) {
             gameOptions.timeControl = {
-                type: 'fischer',
+                family: 'fischer',
                 options: {
                     initialTime: parseInt(match[1], 10) * 60000,
                     timeIncrement: parseInt(match[2], 10) * 1000,
@@ -66,7 +66,7 @@ export const createGameOptionsFromUrlHash = (hash: string = document.location.ha
                 gameOptions.boardsize = 14;
                 gameOptions.ranked = true;
                 gameOptions.timeControl = {
-                    type: 'fischer',
+                    family: 'fischer',
                     options: {
                         initialTime: 300000,
                         timeIncrement: 30000,

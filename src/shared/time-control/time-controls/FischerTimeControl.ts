@@ -129,7 +129,7 @@ export class FischerTimeControl extends AbstractTimeControl
     getOptions(): TimeControlType
     {
         return {
-            type: 'fischer',
+            family: 'fischer',
             options: this.options,
         };
     }

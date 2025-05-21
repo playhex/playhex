@@ -11,7 +11,7 @@ describe('HostedGameOptions', () => {
         options.swapRule = true;
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.type = 'fischer';
+        options.timeControl.family = 'fischer';
         options.timeControl.options = {
             initialTime: 600000,
             maxTime: 600000,
@@ -33,7 +33,7 @@ describe('HostedGameOptions', () => {
         options.swapRule = true;
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.type = 'fischer';
+        options.timeControl.family = 'fischer';
         options.timeControl.options = {
             initialTime: 600000,
             maxTime: 600000,
@@ -55,7 +55,7 @@ describe('HostedGameOptions', () => {
         options.swapRule = true;
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.type = 'fischer';
+        options.timeControl.family = 'fischer';
         options.timeControl.options = {
             initialTime: 600000,
             maxTime: 600000,
@@ -77,7 +77,7 @@ describe('HostedGameOptions', () => {
         options.swapRule = false;
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.type = 'fischer';
+        options.timeControl.family = 'fischer';
         options.timeControl.options = {
             initialTime: 600000,
             maxTime: 600000,

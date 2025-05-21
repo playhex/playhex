@@ -56,7 +56,7 @@ const chronoDisplay = ref<ChronoData>({ time: '…' });
 
 let byoYomiChrono: null | ByoYomiChrono = null;
 
-if ('byoyomi' === timeControlOptions.value.type) {
+if ('byoyomi' === timeControlOptions.value.family) {
     const { initialTime, periodTime, periodsCount } = timeControlOptions.value.options;
     const { remainingMainTime, remainingPeriods } = (playerTimeData.value as ByoYomiPlayerTimeData);
 
@@ -89,7 +89,7 @@ onUnmounted(() => clearInterval(chronoThread));
     <p :class="{ 'text-secondary': chronoDisplay.isPaused, 'text-warning': chronoDisplay.warning }">
         <span class="chrono-time">{{ chronoDisplay.time }}</span>
         <span v-if="chronoDisplay.ms">{{ chronoDisplay.ms }}</span>
-        <span v-if="timeControlOptions.type === 'byoyomi' && null !== byoYomiChrono">
+        <span v-if="timeControlOptions.family === 'byoyomi' && null !== byoYomiChrono">
             + <strong>{{ byoYomiChrono.getRemainingPeriods() }}</strong> × {{ msToDuration(timeControlOptions.options.periodTime) }}</span>
     </p>
 </template>

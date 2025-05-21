@@ -9,6 +9,7 @@ import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, Host
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
+import { defaultTimeControlTypes } from '../timeControlUtils.js';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
@@ -88,13 +89,13 @@ export default class HostedGameOptions implements TimeControlBoardsize
     @ValidateNested()
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
-        switch (type?.object.timeControl.type) {
+        switch ((type?.object.timeControl as TimeControlType).family) {
             case 'fischer': return HostedGameOptionsTimeControlFischer;
             case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
             default: return HostedGameOptionsTimeControl;
         }
     })
-    timeControl: TimeControlType;
+    timeControl: TimeControlType = structuredClone(defaultTimeControlTypes.normal);
 }
 
 /**

@@ -53,7 +53,7 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
     getOptions(): TimeControlType
     {
         return {
-            type: 'byoyomi',
+            family: 'byoyomi',
             options: this.options,
         };
     }

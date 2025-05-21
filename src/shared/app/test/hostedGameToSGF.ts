@@ -98,7 +98,7 @@ describe('hostedGameToSGF', () => {
                 opponentType: 'ai',
                 opponentPublicId: '53ccc84c-c73b-40b2-9ee2-21ca2182ac85',
                 timeControl: {
-                    type: 'fischer',
+                    family: 'fischer',
                     options: {
                         initialTime: 600000,
                         timeIncrement: 5000,
@@ -222,7 +222,7 @@ describe('hostedGameToSGF', () => {
                 opponentType: 'ai',
                 opponentPublicId: '53ccc84c-c73b-40b2-9ee2-21ca2182ac85',
                 timeControl: {
-                    type: 'fischer',
+                    family: 'fischer',
                     options: {
                         initialTime: 600000,
                         timeIncrement: 5000,

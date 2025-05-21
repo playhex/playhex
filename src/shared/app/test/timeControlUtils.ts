@@ -10,7 +10,7 @@ describe('timeControlUtils', () => {
          */
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'fischer',
+                family: 'fischer',
                 options: {
                     initialTime: 300000,
                     timeIncrement: 10000,
@@ -21,7 +21,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'fischer',
+                family: 'fischer',
                 options: {
                     initialTime: 300000,
                     timeIncrement: 1000,
@@ -32,7 +32,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'fischer',
+                family: 'fischer',
                 options: {
                     initialTime: 0,
                     timeIncrement: 1000,
@@ -43,7 +43,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'fischer',
+                family: 'fischer',
                 options: {
                     initialTime: 240000,
                 },
@@ -56,7 +56,7 @@ describe('timeControlUtils', () => {
          */
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'byoyomi',
+                family: 'byoyomi',
                 options: {
                     initialTime: 100000,
                     periodsCount: 2,
@@ -68,7 +68,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'byoyomi',
+                family: 'byoyomi',
                 options: {
                     initialTime: 300000,
                     periodsCount: 4,
@@ -80,7 +80,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'byoyomi',
+                family: 'byoyomi',
                 options: {
                     initialTime: 0,
                     periodsCount: 1,
@@ -92,7 +92,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'byoyomi',
+                family: 'byoyomi',
                 options: {
                     initialTime: 0,
                     periodsCount: 3,
@@ -104,7 +104,7 @@ describe('timeControlUtils', () => {
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                type: 'byoyomi',
+                family: 'byoyomi',
                 options: {
                     initialTime: 240000,
                     periodsCount: 0,

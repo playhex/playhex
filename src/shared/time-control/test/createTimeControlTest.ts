@@ -6,7 +6,7 @@ describe('createTimeControl', () => {
     it('creates elapsed time control and set elapsedPlayer', () => {
         const timeControl = createTimeControl(
             {
-                type: 'fischer',
+                family: 'fischer',
                 options: { initialTime: 5000, timeIncrement: 3000, maxTime: 5000 },
             },
             {

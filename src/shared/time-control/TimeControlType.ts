@@ -2,12 +2,12 @@ import { ByoYomiTimeControlOptions } from './time-controls/ByoYomiTimeControl.js
 import { FischerTimeControlOptions } from './time-controls/FischerTimeControl.js';
 
 type FischerTimeControlType = {
-    type: 'fischer';
+    family: 'fischer';
     options: FischerTimeControlOptions;
 };
 
 type ByoYomiTimeControlType = {
-    type: 'byoyomi';
+    family: 'byoyomi';
     options: ByoYomiTimeControlOptions;
 };
 

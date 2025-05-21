@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
-import { PropType, Ref, ref, toRefs, watch } from 'vue';
+import { PropType, Ref, ref, toRef, toRefs, watch } from 'vue';
 import { BIconExclamationTriangle, BIconTrophy } from 'bootstrap-icons-vue';
 import AppBoardsize from './create-game/AppBoardsize.vue';
-import AppTimeControl from './create-game/AppTimeControl.vue';
+import AppTimeControl from '../AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
 import { storeToRefs } from 'pinia';
 import { AIConfigStatusData } from '../../../../shared/app/Types.js';
 import { apiGetAiConfigsStatus } from '../../../apiClient.js';
 import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
+import TimeControlType from '../../../../shared/time-control/TimeControlType';
 
 const { min, max } = Math;
 
@@ -24,17 +25,8 @@ const props = defineProps({
 
 const { gameOptions } = toRefs(props);
 
-const timeControlComponent = ref<typeof AppTimeControl>();
-
-const submitForm = (gameOptions: HostedGameOptions): void => {
-    if (undefined === timeControlComponent.value) {
-        throw new Error('No element with ref="timeControlComponent" found in template');
-    }
-
-    timeControlComponent.value.compileOptions();
-
-    resolve(gameOptions);
-};
+const timeControl = toRef(gameOptions.value.timeControl);
+watch<TimeControlType>(timeControl, t => gameOptions.value.timeControl = t);
 
 /*
  * AI configs
@@ -106,7 +98,7 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
     <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit="e => { e.preventDefault(); submitForm(gameOptions); }">
+                <form class="modal-content" @submit.prevent="resolve(gameOptions)">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $t('1vAI_ranked.title') }}</h5>
                         <button type="button" class="btn-close" @click="reject()"></button>
@@ -160,7 +152,7 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                         </div>
 
                         <div class="mb-3">
-                            <AppTimeControl :gameOptions="gameOptions" ref="timeControlComponent" />
+                            <AppTimeControl v-model="timeControl" />
                         </div>
 
                     </div>
