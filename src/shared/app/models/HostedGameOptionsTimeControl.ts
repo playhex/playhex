@@ -1,16 +1,26 @@
-import { IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
-import { Expose } from '../class-transformer-custom.js';
+import { IsIn, IsInt, IsObject, IsOptional, Max, Min, ValidateNested } from 'class-validator';
+import { Expose } from 'class-transformer';
 import type { FischerTimeControlOptions } from '../../time-control/time-controls/FischerTimeControl.js';
 import type { ByoYomiTimeControlOptions } from '../../time-control/time-controls/ByoYomiTimeControl.js';
+
+export const timeControlTypeValues = [
+    'fischer',
+    'byoyomi',
+] as const;
+
+export type TimeControlTypeFamily = (typeof timeControlTypeValues)[number];
+
+// These object use @Expose from class-transformer instead of custom @Expose to always expose fields no matter if there is a serialization group.
 
 export class HostedGameOptionsTimeControl
 {
     @Expose()
-    @IsString()
-    family: string;
+    @IsIn(timeControlTypeValues, { always: true })
+    family: TimeControlTypeFamily;
 
     @Expose()
-    @ValidateNested()
+    @ValidateNested({ always: true })
+    @IsObject({ always: true })
     options: object;
 }
 
@@ -19,22 +29,22 @@ const twoWeeks = 14 * 86400 * 1000;
 
 export class OptionsFischer implements FischerTimeControlOptions
 {
-    @IsNumber()
-    @Min(oneSecond)
-    @Max(twoWeeks)
+    @IsInt({ always: true })
+    @Min(oneSecond, { always: true })
+    @Max(twoWeeks, { always: true })
     @Expose()
     initialTime: number;
 
-    @IsNumber()
-    @Min(0)
-    @Max(twoWeeks)
+    @IsInt({ always: true })
+    @Min(0, { always: true })
+    @Max(twoWeeks, { always: true })
     @Expose()
     timeIncrement?: number;
 
-    @IsOptional()
-    @IsNumber()
-    @Min(oneSecond)
-    @Max(twoWeeks)
+    @IsOptional({ always: true })
+    @IsInt({ always: true })
+    @Min(oneSecond, { always: true })
+    @Max(twoWeeks, { always: true })
     @Expose()
     maxTime?: number;
 }
@@ -44,27 +54,28 @@ export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeCo
     @Expose()
     override family: 'fischer';
 
-    @ValidateNested()
+    @ValidateNested({ always: true })
+    @IsObject({ always: true })
     override options: OptionsFischer;
 }
 
 export class OptionsByoYomi implements ByoYomiTimeControlOptions
 {
-    @IsNumber()
-    @Min(oneSecond)
-    @Max(twoWeeks)
+    @IsInt({ always: true })
+    @Min(oneSecond, { always: true })
+    @Max(twoWeeks, { always: true })
     @Expose()
     initialTime: number;
 
-    @IsNumber()
-    @Min(oneSecond)
-    @Max(twoWeeks)
+    @IsInt({ always: true })
+    @Min(oneSecond, { always: true })
+    @Max(twoWeeks, { always: true })
     @Expose()
     periodTime: number;
 
-    @IsNumber()
-    @Min(1)
-    @Max(50)
+    @IsInt({ always: true })
+    @Min(0, { always: true })
+    @Max(50, { always: true })
     @Expose()
     periodsCount: number;
 }
@@ -74,6 +85,7 @@ export class HostedGameOptionsTimeControlByoYomi extends HostedGameOptionsTimeCo
     @Expose()
     override family: 'byoyomi';
 
-    @ValidateNested()
+    @ValidateNested({ always: true })
+    @IsObject({ always: true })
     override options: OptionsByoYomi;
 }
