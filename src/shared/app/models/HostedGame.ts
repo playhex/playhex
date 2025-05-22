@@ -26,6 +26,8 @@ export default class HostedGame
      * Player who created this game.
      * Null if game has not been created by someone, but by system,
      * e.g during a tournament, or by a script than trigger a bot vs bot game.
+     *
+     * Player cannot join system game by itself.
      */
     @ManyToOne(() => Player, { nullable: true })
     @Expose()
