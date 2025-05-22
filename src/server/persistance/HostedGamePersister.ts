@@ -45,7 +45,7 @@ export default class HostedGamePersister
 
         await this.hostedGameRepository.save(hostedGame);
 
-        logger.info('Persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
+        logger.info('Hosted game persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
     }
 
     async deleteIfExists(hostedGame: HostedGame): Promise<void>

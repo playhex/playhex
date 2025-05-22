@@ -107,7 +107,7 @@ export default class HostedGameRepository
             }
         }
 
-        logger.info('Persisting done.');
+        logger.info('All playing games persisting done.');
 
         return allSuccess;
     }
