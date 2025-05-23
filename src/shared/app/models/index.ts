@@ -20,6 +20,11 @@ import PlayerPushSubscription from './PlayerPushSubscription.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import Rating from './Rating.js';
+import Tournament from './Tournament.js';
+import TournamentGame from './TournamentGame.js';
+import TournamentHistory from './TournamentHistory.js';
+import TournamentSubscription from './TournamentSubscription.js';
+import TournamentParticipant from './TournamentParticipant.js';
 
 export {
     HostedGame,
@@ -44,6 +49,11 @@ export {
     PlayerStats,
     PlayerPushSubscription,
     Rating,
+    Tournament,
+    TournamentGame,
+    TournamentHistory,
+    TournamentSubscription,
+    TournamentParticipant,
 };
 
 export const entities = {
@@ -67,6 +77,11 @@ export const entities = {
     PlayerSettings,
     PlayerStats,
     Rating,
+    Tournament,
+    TournamentGame,
+    TournamentHistory,
+    TournamentSubscription,
+    TournamentParticipant,
 };
 
 const errored = Object.keys(entities).filter(name => !entities[name as keyof typeof entities]);
