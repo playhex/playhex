@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue';
 import { BIconYoutube } from 'bootstrap-icons-vue';
-import i18next from 'i18next';
 import { autoLocale } from '../../../../shared/app/i18n';
 
 useHead({
@@ -17,7 +16,7 @@ const locale = autoLocale();
     -->
     <div v-if="'fr' === locale" class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2025/02/Affiche-Maths-Hors-les-murs_A4_logos1_page-0001-scaled.jpg"
                     alt="26e salon Culture et jeux mathématiques"
@@ -28,12 +27,14 @@ const locale = autoLocale();
 
         <h1>Tournoi de Hex – Paris 2025</h1>
 
-        <p class="lead">Le <strong>CIJM</strong> organise un <strong>tournoi de Hex</strong> lors du Salon Culture & Jeux Mathématiques.</p>
+        <p class="lead">Le <strong>CIJM</strong> organise 2 <strong>tournois de Hex</strong> lors du Salon Culture & Jeux Mathématiques.</p>
 
         <h3>📅 Quand ?</h3>
 
         <p>
-            <strong>Dimanche 15 juin 2025</strong>, après-midi
+            <strong>Samedi 14 juin 2025</strong>, 14h,
+            <br>
+            et <strong>dimanche 15 juin 2025</strong>, 14h.
             <br>
             Lors du <strong>Salon Culture &amp; Jeux Mathématiques</strong>,
             qui se tient du <strong>12 au 15 juin 2025</strong>
@@ -92,7 +93,7 @@ const locale = autoLocale();
     -->
     <div v-else-if="'pl' === locale" class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2025/02/Affiche-Maths-Hors-les-murs_A4_logos1_page-0001-scaled.jpg"
                     alt="26e salon Culture et jeux mathématiques"
@@ -103,12 +104,14 @@ const locale = autoLocale();
 
         <h1>Turniej Hex – Paryż 2025</h1>
 
-        <p class="lead"><strong>CIJM</strong> organizuje <strong>turniej gry Hex</strong> podczas Salon Culture & Jeux Mathématiques.</p>
+        <p class="lead"><strong>CIJM</strong> organizuje 2 <strong>turnieje Hex</strong> podczas Salon Culture & Jeux Mathématiques.</p>
 
         <h3>📅 Kiedy?</h3>
 
         <p>
-            <strong>Niedziela, 15 czerwca 2025</strong>, po południu
+            <strong>Sobota, 14 czerwca 2025</strong>, godz. 14:00,
+            <br>
+            oraz <strong>niedziela, 15 czerwca 2025</strong>, godz. 14:00.
             <br>
             Podczas <strong>Salon Culture &amp; Jeux Mathématiques</strong>,
             który odbywa się w dniach <strong>12–15 czerwca 2025</strong>
@@ -167,7 +170,7 @@ const locale = autoLocale();
     -->
     <div v-else-if="'es' === locale" class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2025/02/Affiche-Maths-Hors-les-murs_A4_logos1_page-0001-scaled.jpg"
                     alt="26e salon Culture et jeux mathématiques"
@@ -178,12 +181,14 @@ const locale = autoLocale();
 
         <h1>Torneo de Hex – París 2025</h1>
 
-        <p class="lead"><strong>CIJM</strong> organiza un <strong>torneo de Hex</strong> durante el Salon Culture & Jeux Mathématiques.</p>
+        <p class="lead">El <strong>CIJM</strong> organiza 2 <strong>torneos de Hex</strong> durante el Salon Culture & Jeux Mathématiques.</p>
 
         <h3>📅 ¿Cuándo?</h3>
 
         <p>
-            <strong>Domingo 15 de junio de 2025</strong>, por la tarde
+            <strong>Sábado 14 de junio de 2025</strong>, 14:00 h,
+            <br>
+            y <strong>domingo 15 de junio de 2025</strong>, 14:00 h.
             <br>
             Durante el <strong>Salon Culture &amp; Jeux Mathématiques</strong>,
             que se celebra del <strong>12 al 15 de junio de 2025</strong>
@@ -242,7 +247,7 @@ const locale = autoLocale();
     -->
     <div v-else class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2025/02/Affiche-Maths-Hors-les-murs_A4_logos1_page-0001-scaled.jpg"
                     alt="26th Culture and Mathematical Games Fair"
@@ -253,12 +258,15 @@ const locale = autoLocale();
 
         <h1>Hex Tournament – Paris 2025</h1>
 
-        <p class="lead">The <strong>CIJM</strong> is organizing a <strong>Hex tournament</strong> during the Salon Culture & Jeux Mathématiques.</p>
+        <p class="lead"><strong>CIJM</strong> is organizing 2 <strong>Hex tournaments</strong> during the Salon Culture & Jeux Mathématiques.</p>
 
         <h3>📅 When?</h3>
 
         <p>
-            <strong>Sunday, June 15, 2025</strong>, in the afternoon<br>
+            <strong>Saturday, June 14, 2025</strong>, 2:00 PM,
+            <br>
+            and <strong>Sunday, June 15, 2025</strong>, 2:00 PM.
+            <br>
             During the <strong>Salon Culture & Jeux Mathématiques</strong>,<br>
             which takes place from <strong>June 12 to 15, 2025</strong>
         </p>
