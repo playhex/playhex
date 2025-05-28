@@ -10,6 +10,10 @@ type DomainHttpErrorTypes =
     | 'pseudo_too_long'
     | 'invalid_pseudo'
     | 'player_not_found'
+    | 'tournament_title_duplicate'
+    | 'tournament_player_is_banned'
+    | 'tournament_account_required'
+    | 'tournament_not_enough_participants_to_start'
 ;
 
 type DomainHttpErrorType = {
@@ -44,6 +48,23 @@ export type DomainHttpErrorPayload = DomainHttpErrorType & {
 
 /**
  * Error thrown from controllers that can be identified front side.
+ *
+ * Example:
+ *
+ *  - from server controller:
+ * ```
+ * throw new DomainHttpError(403, 'invalid_password');
+ * ```
+ *
+ *  - from client:
+ * ```
+ * try {
+ *   fetch(...);
+ * } catch (e) {
+ *   if (e instanceof DomainHttpError) {
+ *     i18next.t(e.type);
+ *   }
+ * }
  */
 export class DomainHttpError extends Error implements DomainHttpErrorType
 {
