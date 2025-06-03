@@ -5,10 +5,14 @@ import { HostedGame, Move } from './models/index.js';
  *
  * https://www.hexwiki.net/index.php/Handicap
  *
- * Returns:
+ * @returns Demer handicap:
  *  - 0: no handicap
  *  - "N/S": no-swap, not a handicap, just swap disabled but colors still random
  *  - number: Demer handicap
+ *
+ * @param swapRule Whether swap is enabled
+ * @param firstPlayerPredefined Whether first player is pre-defined, false if first player is random
+ * @param movesHistory Played moves. If not provided, assume the game is empty, and returns a provisional handicap based on game settings
  */
 export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boolean, movesHistory?: Move[]): number | 'N/S' => {
     if (!swapRule) {
