@@ -5,3 +5,4 @@ yarn-error.log
 cypress/screenshots/
 size-stats-*.json
 var/
+/assets/export-data/

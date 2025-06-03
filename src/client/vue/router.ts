@@ -93,6 +93,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('./pages/content/PageAnalysisDetails.vue'),
             },
             {
+                name: 'export-games-data',
+                path: 'export-games-data',
+                component: () => import('./pages/content/PageExportGamesData.vue'),
+            },
+            {
                 name: 'privacy',
                 path: 'privacy',
                 component: () => import('./pages/content/PagePrivacyPolicy.vue'),

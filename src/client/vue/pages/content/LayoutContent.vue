@@ -8,6 +8,7 @@
                 <router-link class="nav-link" :to="{ name: 'contributors' }">{{ $t('contributors') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'analysis-details' }">How AI analysis is done</router-link>
                 <router-link class="nav-link" :to="{ name: 'spawn-worker' }">Spawn an AI worker</router-link>
+                <router-link class="nav-link" :to="{ name: 'export-games-data' }">Export PlayHex games data</router-link>
                 <router-link class="nav-link" :to="{ name: 'privacy' }">{{ $t('privacy_policy') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'license' }">{{ $t('license_agpl') }}</router-link>
             </nav>
