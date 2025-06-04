@@ -18,6 +18,8 @@ type FileStat = {
 
 const fileStat = ref<null | false | FileStat>(null);
 
+// To make an export file available here, run command: yarn hex export-games
+
 (async () => {
     const response = await fetch('/export-data/manifest.json');
 
