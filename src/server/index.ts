@@ -38,6 +38,7 @@ monitorConnectedSockets();
 Container.set(HexServer, io);
 
 app.set('view engine', 'ejs');
+app.set('query parser', 'extended'); // to allow parsing url with "?param[]=value". No the default since express v5
 
 registerHttpControllers(app);
 registerWebsocketControllers();

@@ -132,20 +132,36 @@ const config: webpack.Configuration = {
             },
             {
                 test: /\.s[ac]ss$/i,
-                use: [
-                    // Creates `style` nodes from JS strings
-                    'style-loader',
-                    // Translates CSS into CommonJS
-                    'css-loader',
-                    // Compiles Sass to CSS
-                    //'sass-loader', // TODO uncomment this and remove following sass loader with silenced depreciations when bootstrap 5.3.4 is released. See https://github.com/twbs/bootstrap/issues/40621#issuecomment-2289654044
+                oneOf: [
                     {
-                        loader: 'sass-loader',
-                        options: {
-                            sassOptions: {
-                                silenceDeprecations: ['mixed-decls', 'color-functions', 'global-builtin', 'import'],
+                        exclude: /node_modules/,
+                        use: [
+                            // Creates `style` nodes from JS strings
+                            'style-loader',
+                            // Translates CSS into CommonJS
+                            'css-loader',
+                            // Compiles Sass to CSS
+                            'sass-loader',
+                        ],
+                    },
+                    // Duplicate config, to silence deprecations from node modules:
+                    {
+                        include: /node_modules/,
+                        use: [
+                            // Creates `style` nodes from JS strings
+                            'style-loader',
+                            // Translates CSS into CommonJS
+                            'css-loader',
+                            // Compiles Sass to CSS
+                            {
+                                loader: 'sass-loader',
+                                options: {
+                                    sassOptions: {
+                                        silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
+                                    },
+                                },
                             },
-                        },
+                        ],
                     },
                 ],
             },

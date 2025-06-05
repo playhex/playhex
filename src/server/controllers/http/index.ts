@@ -1,4 +1,3 @@
-import 'express-async-errors';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import path from 'path';
 import { registerApi } from './api/index.js';

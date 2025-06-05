@@ -88,13 +88,13 @@ export const registerApi = (app: Express) => {
     });
 
     // If an api endpoint has already been called, stop routing chain
-    app.all('/**', (req, res, next) => {
+    app.all('/{*path}', (_, res, next) => {
         if (!res.headersSent) {
             next();
         }
     });
 
-    app.all('/api/**', req => {
+    app.all('/api/{*path}', req => {
         throw new HttpError(404, `Route ${req.method} ${req.originalUrl} not found.`);
     });
 };

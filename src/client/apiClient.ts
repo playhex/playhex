@@ -156,6 +156,8 @@ export const getGames = async (searchGamesParameters: SearchGamesParameters = {}
         },
     });
 
+    await checkResponse(response);
+
     const hostedGames = (await response.json() as HostedGame[])
         .map(hostedGame => plainToInstance(HostedGame, hostedGame))
     ;

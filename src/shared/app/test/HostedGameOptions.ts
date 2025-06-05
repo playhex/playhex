@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { HostedGameOptions, HostedGameOptionsTimeControlFischer } from '../models/index.js';
+import { HostedGameOptions, HostedGameOptionsTimeControlFischer, OptionsFischer } from '../models/index.js';
 import assert from 'assert';
 
 describe('HostedGameOptions', () => {
@@ -12,11 +12,10 @@ describe('HostedGameOptions', () => {
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
         options.timeControl.family = 'fischer';
-        options.timeControl.options = {
-            initialTime: 600000,
-            maxTime: 600000,
-            timeIncrement: 5000,
-        };
+        options.timeControl.options = new OptionsFischer();
+        options.timeControl.options.initialTime = 600000;
+        options.timeControl.options.maxTime = 600000;
+        options.timeControl.options.timeIncrement = 5000;
 
         options.ranked = true;
 
@@ -34,11 +33,10 @@ describe('HostedGameOptions', () => {
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
         options.timeControl.family = 'fischer';
-        options.timeControl.options = {
-            initialTime: 600000,
-            maxTime: 600000,
-            timeIncrement: 5000,
-        };
+        options.timeControl.options = new OptionsFischer();
+        options.timeControl.options.initialTime = 600000;
+        options.timeControl.options.maxTime = 600000;
+        options.timeControl.options.timeIncrement = 5000;
 
         options.ranked = true;
 
@@ -56,11 +54,10 @@ describe('HostedGameOptions', () => {
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
         options.timeControl.family = 'fischer';
-        options.timeControl.options = {
-            initialTime: 600000,
-            maxTime: 600000,
-            timeIncrement: 5000,
-        };
+        options.timeControl.options = new OptionsFischer();
+        options.timeControl.options.initialTime = 600000;
+        options.timeControl.options.maxTime = 600000;
+        options.timeControl.options.timeIncrement = 5000;
 
         options.ranked = true;
 
@@ -78,11 +75,10 @@ describe('HostedGameOptions', () => {
 
         options.timeControl = new HostedGameOptionsTimeControlFischer();
         options.timeControl.family = 'fischer';
-        options.timeControl.options = {
-            initialTime: 600000,
-            maxTime: 600000,
-            timeIncrement: 5000,
-        };
+        options.timeControl.options = new OptionsFischer();
+        options.timeControl.options.initialTime = 600000;
+        options.timeControl.options.maxTime = 600000;
+        options.timeControl.options.timeIncrement = 5000;
 
         options.ranked = true;
 

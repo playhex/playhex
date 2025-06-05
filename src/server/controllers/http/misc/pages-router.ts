@@ -6,7 +6,7 @@ export function pagesRouter(): Router {
     const router = Router();
 
     // Render main page for any routes for html5 navigation
-    router.get('/**', async (_, res) => {
+    router.get('/{*path}', async (_, res) => {
         const manifest = await getManifest();
 
         res.render('page.ejs', {
