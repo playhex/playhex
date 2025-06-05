@@ -1,7 +1,7 @@
 import winston from 'winston';
 import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
+import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame, TournamentGame } from '../shared/app/models/index.js';
 import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
@@ -93,7 +93,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
-    static hostNewGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): HostedGameServer
+    static hostNewGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null, tournamentGame: null | TournamentGame = null): HostedGameServer
     {
         const hostedGameServer = new HostedGameServer();
         const hostedGame = new HostedGame();
@@ -107,6 +107,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         hostedGame.rematchedFrom = rematchedFrom;
         hostedGame.chatMessages = [];
         hostedGame.hostedGameToPlayers = [];
+        hostedGame.tournamentGame = tournamentGame;
 
         hostedGameServer.createChildLogger();
 
@@ -500,11 +501,41 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         notifier.emit('gameStart', this.hostedGame);
 
-        this.makeAutomatedMoves();
+        // TODO persist here, without deadlock
+
+        // TODO remove setTimeout:
+        // when a new bot game starts, and AI plays first,
+        // but fails to request ai server (can be reproduced locally, no internet, any mohex),
+        // this throws, and try to persist game, but at same time,
+        // another query is running to also persist game, which happens when game starts.
+        // So I get duplication error.
+        // Should be fixed by, maybe, wait game is persisted before start or run makeAutomatedMove, but will slow first ai move.
+        // or do not persist when game starts,
+        // though it was useful to make sure game is persisted with both player and state started.
+        setTimeout(() => this.makeAutomatedMoves(), 800);
     }
 
     private affectPlayersColors(): void
     {
+        // Do not alternate when game is created by system.
+        // Assume system has already set random colors as needed.
+        // Currently, games are created by system only in tournaments,
+        // and we assume tournament library already affect players colors randomly or depending on last match.
+        if (null === this.hostedGame.host) {
+            if (null === this.hostedGame.gameOptions.firstPlayer) {
+                this.logger.info('Game created by system, do not shuffle players color');
+                return;
+            }
+
+            this.logger.info('Game created by system, but fixed colors, set fixed colors');
+
+            if (1 === this.hostedGame.gameOptions.firstPlayer) {
+                this.players.reverse();
+            }
+
+            return;
+        }
+
         // In case of rematch, alternate colors from previous game instead of random
         if (null !== this.hostedGame.rematchedFrom) {
             this.logger.info('Rematch alternate colors: should alternate?');
@@ -587,8 +618,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     /**
      * A player join this game.
+     *
+     * @param isSystem Set true when playerJoin is called by system, not from a player action.
      */
-    playerJoin(player: Player): true | string
+    playerJoin(player: Player, isSystem = false): true | string
     {
         if ('created' !== this.hostedGame.state) {
             this.logger.notice('Player tried to join but hosted game has started or ended', { joiner: player.pseudo });
@@ -605,6 +638,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         if (this.isPlayerInGame(player)) {
             this.logger.notice('Player tried to join twice', { joiner: player.pseudo });
             return 'You already joined this game.';
+        }
+
+        // Cannot join games created by system
+        if (null === this.hostedGame.host && !isSystem) {
+            this.logger.notice('Player tried to join game created by system', { joiner: player.pseudo });
+            return 'Cannot join game created by system.';
         }
 
         this.players.push(player);

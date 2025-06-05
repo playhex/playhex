@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
-import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models/index.js';
+import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating, TournamentGame } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
 import HostedGamePersister from '../persistance/HostedGamePersister.js';
 import logger from '../services/logger.js';
@@ -110,6 +110,11 @@ export default class HostedGameRepository
         logger.info('All playing games persisting done.');
 
         return allSuccess;
+    }
+
+    async persist(hostedGame: HostedGame): Promise<void>
+    {
+        await this.hostedGamePersister.persist(hostedGame);
     }
 
     private listenHostedGameServer(hostedGameServer: HostedGameServer): void
@@ -252,13 +257,17 @@ export default class HostedGameRepository
      * @param host The player who created the game. Host automatically joins the game. Can be null when created by system, in this case, playerJoin() should be called to add players in the game.
      * @param rematchedFrom If provided, the created game will linked together with previous game, and colors will alternate.
      */
-    async createGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
+    async createGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null, tournamentGame: null | TournamentGame = null): Promise<HostedGameServer>
     {
+        if (undefined !== gameOptions.hostedGameId && gameOptions.hostedGameId === gameOptions.hostedGame.id) {
+            logger.warning('Provided gameOptions instance seem to be already linked to another hostedGame');
+        }
+
         if (null !== host) {
             this.onlinePlayerService.notifyPlayerActivity(host);
         }
 
-        const hostedGameServer = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
+        const hostedGameServer = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom, tournamentGame);
 
         if ('ai' === gameOptions.opponentType) {
             try {
