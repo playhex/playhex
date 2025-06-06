@@ -570,8 +570,6 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return false;
         }
 
-        // TODO bug when joining a created game loaded from db (after restart): hostedGameToPlayers is not loaded
-
         // Alternate only if players are same. If another player joined rematch, just use random colors
         const previousPlayersIds = this.hostedGame.rematchedFrom.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
         const currentPlayersIds = this.players.map(player => player.id ?? 0);
