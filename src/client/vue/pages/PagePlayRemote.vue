@@ -31,8 +31,6 @@ import { canPassAgain } from '../../../shared/app/passUtils.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { apiPostRematch } from '../../apiClient.js';
 import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
-import { Socket } from 'socket.io-client';
-import { HexClientToServerEvents, HexServerToClientEvents } from '../../../shared/app/HexSocketEvents.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { markRaw } from 'vue';
@@ -366,13 +364,15 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
         return;
     }
 
-    hostedGameClient.value = new HostedGameClient(hostedGame, socketStore.socket as Socket<HexServerToClientEvents, HexClientToServerEvents>);
+    // @ts-ignore
+    hostedGameClient.value = new HostedGameClient(hostedGame, socketStore.socket);
 
     // I think `listenGameUpdates()` must be called synchronously here (i.e do not put await before this call)
     // to prevent losing updates between game initialization and next socket event.
     unlistenGameUpdates = listenGameUpdates(
         hostedGameClient as Ref<HostedGameClient>,
-        socketStore.socket as unknown as Socket<HexServerToClientEvents, HexClientToServerEvents>,
+        // @ts-ignore
+        socketStore.socket,
     );
 
     await initGameView();
