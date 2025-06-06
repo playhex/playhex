@@ -10,6 +10,7 @@ export type ToastOptions = {
 
     /**
      * In milliseconds, automatically close toast.
+     * Defaults to 4000.
      */
     autoCloseAfter: number;
 
@@ -17,6 +18,9 @@ export type ToastOptions = {
      * Show links or buttons.
      */
     actions: {
+        /**
+         * Text in the button
+         */
         label: string;
 
         /**
@@ -24,6 +28,11 @@ export type ToastOptions = {
          * Url: navigate to this url
          */
         action: RouteLocationAsRelativeTyped | (() => void);
+
+        /**
+         * Add classes to button. Defaults to "btn btn-link text-body"
+         */
+        classes?: string;
     }[];
 };
 

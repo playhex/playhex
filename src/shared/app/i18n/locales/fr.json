@@ -50,6 +50,7 @@
     "guest": "Invité",
     "finished_games": "Parties terminées",
     "tournament": "Tournoi",
+    "tournament_title_duplicate": "Un tournoi avec le même nom existe déjà",
     "account_created_on": "Compte créé le {{date}}",
     "board_orientation": {
         "title": "Orientation",
