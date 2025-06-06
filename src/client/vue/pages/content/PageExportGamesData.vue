@@ -41,7 +41,7 @@ const getFilesize = (size: number): string => {
         ++unit;
     }
 
-    return v.toFixed(1) + ' ' + ['o', 'Kio', 'Mio', 'Gio', 'Tio'][unit];
+    return v.toFixed(1) + ' ' + ['B', 'KiB', 'MiB', 'GiB', 'TiB'][unit];
 };
 </script>
 
