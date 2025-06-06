@@ -28,7 +28,11 @@ const fileStat = ref<null | false | FileStat>(null);
         return;
     }
 
-    fileStat.value = await response.json();
+    try {
+        fileStat.value = await response.json();
+    } catch (e) {
+        fileStat.value = false;
+    }
 })();
 
 const getFilename = (filename: string): string => filename.split('/').pop() ?? filename;
