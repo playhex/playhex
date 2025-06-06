@@ -26,7 +26,7 @@ describe('Lobby', () => {
         // My game is listed when I come back to lobby
         cy.get('@myUsername').then(myUsername => {
             cy
-                .contains(new RegExp(`${usernameMatch(myUsername)}.+Determinist random bot|Determinist random bot.+${usernameMatch(myUsername)}`))
+                .contains(new RegExp(`${usernameMatch(myUsername)}.+TestBot|TestBot.+${usernameMatch(myUsername)}`))
                 .closest('tr')
                 .contains('Watch')
                 .closest('tr')
@@ -47,7 +47,7 @@ describe('Lobby', () => {
         // My game is listed when I load page
         cy.get('@myUsername').then(myUsername => {
             cy
-                .contains(new RegExp(`${usernameMatch(myUsername)}.+Determinist random bot|Determinist random bot.+${usernameMatch(myUsername)}`))
+                .contains(new RegExp(`${usernameMatch(myUsername)}.+TestBot|TestBot.+${usernameMatch(myUsername)}`))
                 .closest('tr')
                 .contains('Watch')
                 .closest('tr')

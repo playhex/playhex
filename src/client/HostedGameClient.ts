@@ -448,6 +448,10 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         this.hostedGame.undoRequest = null;
+
+        if (this.hostedGame.gameData && this.game) {
+            this.hostedGame.gameData.currentPlayerIndex = this.game.getCurrentPlayerIndex();
+        }
     }
 
     onServerCancelUndo(): void

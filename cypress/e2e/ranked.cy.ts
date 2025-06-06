@@ -32,7 +32,7 @@ describe('Ranked games', () => {
         cy
             .contains('h5', 'Ranked vs AI')
             .closest('.modal-content')
-            .contains('Determinist')
+            .contains('TestBot Determinist instant')
             .click()
         ;
 
@@ -63,7 +63,7 @@ describe('Ranked games', () => {
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
-        cy.contains('.sidebar', /Determinist random bot loses. \d+/).closest('div');
+        cy.contains('.sidebar', /TestBot Determinist instant loses. \d+/).closest('div');
         cy.contains('.sidebar', /Guest \d+ wins! \d+/).closest('div');
     });
 

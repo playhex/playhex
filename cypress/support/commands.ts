@@ -44,7 +44,7 @@ const { HostedGame, OnlinePlayers } = require('../../src/shared/app/models');
  * To add a command, also add declaration in ./index.d.ts
  */
 
-Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
+Cypress.Commands.add('createAIGameWithRandom', (submit = true, wait = false) => {
     cy.contains('Play vs AI').click();
 
     cy
@@ -57,7 +57,7 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true) => {
     cy
         .contains('h5', 'Play vs AI')
         .closest('.modal-content')
-        .contains('Determinist')
+        .contains('TestBot Determinist ' + (wait ? 'wait' : 'instant'))
         .click()
     ;
 

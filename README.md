@@ -140,20 +140,17 @@ yarn cypress open
 
 **Warning**: For e2e/cypress tests, there is some configuration requirements:
 
-- Random bots must exists in database, if not, run:
+- Test bots must exists in database, if not, run:
 
 ``` bash
-yarn hex create-random-bots
+yarn hex create-test-bots
 ```
 
-- Random bots must play instantaneously.
 - Ranked bot games must be allowed.
 
-Theses settings are the defaults.
-But if you have changed one of these, make sure to reset it before running tests:
+This is the default, but if you have changed it, make sure you have in `.env`:
 
 ```
-RANDOM_BOT_WAIT_BEFORE_PLAY=0
 ALLOW_RANKED_BOT_GAMES=true
 ```
 

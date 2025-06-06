@@ -2,9 +2,11 @@ declare namespace Cypress {
     interface Chainable {
         /**
          * Open AI game creation popin, select determinist bot.
-         * Pass submit=false to keep game options popin open.
+         *
+         * @param submit Pass submit=false to keep game options popin open. Defaults to true.
+         * @param wait Pass wait=true to make bot wait 1s before play. Defaults to false
          */
-        createAIGameWithRandom(submit?: boolean): Chainable;
+        createAIGameWithRandom(submit?: boolean, wait?: boolean): Chainable;
 
         /**
          * To use after createAIGameWithRandom(false),

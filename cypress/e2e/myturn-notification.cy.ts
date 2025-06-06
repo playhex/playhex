@@ -132,7 +132,7 @@ describe('My turn notification', () => {
 
         cy.submitAIGame();
 
-        cy.contains('random bot');
+        cy.contains('TestBot Determinist');
 
         cy.get('.my-turn-notif .btn-my-turn').then($a => {
             if ('0' !== $a.text()) {

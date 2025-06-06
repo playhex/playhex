@@ -69,4 +69,37 @@ describe('Undo', () => {
 
         cy.wait(500); // Wait to make sure cypress capture js error and fail if any
     });
+
+    it('player plays, and undo his move before opponent played', () => {
+        cy.visit('/');
+
+        cy.createAIGameWithRandom(false, true);
+
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+            .contains('More options')
+            .click()
+        ;
+
+        cy.contains('.modal-content .btn', 'First').click();
+
+        cy.submitAIGame();
+
+        cy.contains('.sidebar', 'Playing');
+
+        cy.play(367, 390);
+
+        cy.wait(50); // Wait AI plays
+
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Takeback').click();
+
+        cy.wait(500); // Wait to make sure cypress capture js error and fail if any
+
+        // Pass button is not disabled, and I can pass
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Pass').should('be.enabled').click();
+        cy.contains(/passed his turn/);
+    });
 });

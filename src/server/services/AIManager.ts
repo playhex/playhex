@@ -57,7 +57,7 @@ export const findAIOpponent = async (gameOptions: HostedGameOptions): Promise<nu
     return player;
 };
 
-export const validateConfigRandom = (config: unknown): config is { determinist: boolean } => {
+export const validateConfigRandom = (config: unknown): config is { determinist: boolean, wait?: number } => {
     return 'object' === typeof config
         && null !== config
         && 'determinist' in config
@@ -65,27 +65,34 @@ export const validateConfigRandom = (config: unknown): config is { determinist: 
     ;
 };
 
-const waitTimeBeforeRandomMove = (() => {
+const waitTimeBeforeRandomMove = (aiConfig: { wait?: number }): number => {
+    // if aiConfig.wait is defined, use it
+    if ('number' === typeof aiConfig.wait) {
+        return aiConfig.wait;
+    }
+
+    // wait from .env var "RANDOM_BOT_WAIT_BEFORE_PLAY=1000", or "RANDOM_BOT_WAIT_BEFORE_PLAY=1000-2000" for wait between 1 and 2s
     const { RANDOM_BOT_WAIT_BEFORE_PLAY } = process.env;
 
-    if (!RANDOM_BOT_WAIT_BEFORE_PLAY) {
-        return () => 0;
+    if (RANDOM_BOT_WAIT_BEFORE_PLAY) {
+        const matches = RANDOM_BOT_WAIT_BEFORE_PLAY.match(/\d+/g);
+
+        if (!matches) {
+            return 0;
+        }
+
+        if (2 === matches.length) {
+            const [min, max] = matches.map(s => parseInt(s, 10));
+
+            return min + Math.random() * (max - min);
+        }
+
+        return parseInt(matches[0], 10);
     }
 
-    const matches = RANDOM_BOT_WAIT_BEFORE_PLAY.match(/\d+/g);
-
-    if (!matches) {
-        return () => 0;
-    }
-
-    if (2 === matches.length) {
-        const [min, max] = matches.map(s => parseInt(s, 10));
-
-        return () => min + Math.random() * (max - min);
-    }
-
-    return () => parseInt(matches[0], 10);
-})();
+    // by default, no wait
+    return 0;
+};
 
 export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedGameServer): Promise<null | Move> => {
     const { isBot } = player;
@@ -124,7 +131,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
                 throw new Error('Invalid config for aiConfig');
             }
 
-            return await calcRandomMove(game, waitTimeBeforeRandomMove(), aiConfig.config.determinist);
+            return await calcRandomMove(game, waitTimeBeforeRandomMove(aiConfig.config), aiConfig.config.determinist);
     }
 
     logger.error(`No local AI play for bot with slug = "${player.slug}"`);

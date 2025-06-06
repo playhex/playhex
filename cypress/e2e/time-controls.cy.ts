@@ -38,7 +38,7 @@ describe('Time controls', () => {
 
         cy.submitAIGame();
 
-        cy.contains('Determinist random bot');
+        cy.contains('TestBot Determinist instant');
         cy.contains('10:00');
     });
 
@@ -55,7 +55,7 @@ describe('Time controls', () => {
 
         cy.submitAIGame();
 
-        cy.contains('Determinist random bot');
+        cy.contains('TestBot Determinist instant');
         cy.contains('5:00');
     });
 
@@ -71,7 +71,7 @@ describe('Time controls', () => {
 
         cy.submitAIGame();
 
-        cy.contains('Determinist random bot');
+        cy.contains('TestBot Determinist instant');
         cy.contains('10:00 + 5 × 5s');
 
         // byo yomi dates are well deserialized
