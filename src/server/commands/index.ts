@@ -8,5 +8,6 @@ import './anonymizeDB.js';
 import './checkDbInconsistencies.js';
 import './calculateRatings.js';
 import './exportGamesCommand.js';
+import './checkTestsRequirements.js';
 
 hexProgram.parse();

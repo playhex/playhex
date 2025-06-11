@@ -29,7 +29,7 @@
     "db:diff": "yarn build-server && typeorm schema:log -d dist/server/data-source.js",
     "db:sync": "yarn build-server && typeorm schema:sync -d dist/server/data-source.js",
     "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/shared/tsconfig.json\" mocha src/**/**/test/**/*.ts --extension ts",
-    "test:e2e": "cypress run",
+    "test:e2e": "yarn hex check-tests-requirements && cypress run",
     "test:all": "yarn test:unit && yarn test:e2e",
     "test": "yarn test:unit"
   },
