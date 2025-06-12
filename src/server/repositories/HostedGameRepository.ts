@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
 import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
@@ -18,6 +18,8 @@ import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/Aut
 import { isDuplicateError } from './typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
+import { createHostedGame, CreateHostedGameParams } from '../../shared/app/models/HostedGame.js';
+import { AutoSave } from '../auto-save/AutoSave.js';
 
 export class GameError extends Error {}
 
@@ -42,7 +44,6 @@ export default class HostedGameRepository
 
     constructor(
         private hostedGamePersister: HostedGamePersister,
-        private io: HexServer,
         private ratingRepository: RatingRepository,
         private autoCancelStaleGames: AutoCancelStaleGames,
         private autoCancelStaleCorrespondenceGames: AutoCancelStaleCorrespondenceGames,
@@ -77,7 +78,16 @@ export default class HostedGameRepository
                 return;
             }
 
-            this.activeGames[hostedGame.publicId] = HostedGameServer.fromData(hostedGame);
+            // Check whether data.createdAt is an instance of Date and not a string,
+            // to check whether denormalization with superjson worked.
+            if (!(hostedGame.createdAt instanceof Date)) {
+                logger.error(
+                    'HostedGame.fromData(): Error while trying to recreate a HostedGame from data,'
+                    + ' createdAt is not an instance of Date.',
+                );
+            }
+
+            this.activeGames[hostedGame.publicId] = this.createHostedGameServerForHostedGame(hostedGame);
 
             this.listenHostedGameServer(this.activeGames[hostedGame.publicId]);
         }
@@ -100,7 +110,7 @@ export default class HostedGameRepository
 
         for (const key in this.activeGames) {
             try {
-                await this.hostedGamePersister.persist(this.activeGames[key].getHostedGame());
+                await this.activeGames[key].persist();
             } catch (e) {
                 allSuccess = false;
                 logger.error('Could not persist a game. Continue with others.', { gameId: key, e, errorMessage: e.message });
@@ -137,7 +147,7 @@ export default class HostedGameRepository
     {
         this.clearActivityTimeout(hostedGameServer);
         this.persistWhenNoActivity[hostedGameServer.getPublicId()] = setTimeout(
-            () => this.hostedGamePersister.persist(hostedGameServer.getHostedGame()),
+            () => hostedGameServer.persist(),
             300 * 1000, // Persist after 5min inactivity
         );
     }
@@ -168,8 +178,7 @@ export default class HostedGameRepository
     private async flushHostedGame(hostedGameServer: HostedGameServer): Promise<void>
     {
         this.clearActivityTimeout(hostedGameServer);
-        const hostedGame = hostedGameServer.getHostedGame();
-        await this.hostedGamePersister.persist(hostedGame);
+        await hostedGameServer.persist();
         delete this.activeGames[hostedGameServer.getPublicId()];
     }
 
@@ -183,7 +192,7 @@ export default class HostedGameRepository
         if (hostedGameServer.getHostedGame().gameOptions.ranked) {
             const newRatings = await this.updateRatings(hostedGameServer);
 
-            this.io
+            Container.get(HexServer)
                 .to([
                     Rooms.game(hostedGameServer.getPublicId()),
                     Rooms.lobby,
@@ -246,23 +255,39 @@ export default class HostedGameRepository
         return await this.hostedGamePersister.findUnique(publicId);
     }
 
-    /**
-     * Create a game.
-     *
-     * @param host The player who created the game. Host automatically joins the game. Can be null when created by system, in this case, playerJoin() should be called to add players in the game.
-     * @param rematchedFrom If provided, the created game will linked together with previous game, and colors will alternate.
-     */
-    async createGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): Promise<HostedGameServer>
+    private createHostedGameServerForHostedGame(hostedGame: HostedGame): HostedGameServer
     {
-        if (null !== host) {
-            this.onlinePlayerService.notifyPlayerActivity(host);
+        return new HostedGameServer(
+            hostedGame,
+            new AutoSave<HostedGame>(() => this.hostedGamePersister.persist(hostedGame)),
+        );
+    }
+
+    /**
+     * Officially creates a new hosted game, emit event to clients.
+     */
+    async createGame(params: CreateHostedGameParams & { gameOptions: HostedGameOptions }): Promise<HostedGameServer>
+    {
+        if (undefined !== params.gameOptions.hostedGameId && params.gameOptions.hostedGameId === params.gameOptions.hostedGame.id) {
+            logger.warning('Provided gameOptions instance seem to be already linked to another hostedGame');
         }
 
-        const hostedGameServer = HostedGameServer.hostNewGame(gameOptions, host, rematchedFrom);
+        if (params.host) {
+            this.onlinePlayerService.notifyPlayerActivity(params.host);
+        }
 
-        if ('ai' === gameOptions.opponentType) {
+        const hostedGame = createHostedGame(params);
+        const hostedGameServer = this.createHostedGameServerForHostedGame(hostedGame);
+
+        hostedGameServer.saveState();
+
+        logger.info('Hosted game created.', { host: params.host?.pseudo ?? null });
+
+        Container.get(HexServer).to(Rooms.lobby).emit('gameCreated', hostedGame);
+
+        if ('ai' === params.gameOptions.opponentType) {
             try {
-                const opponent = await findAIOpponent(gameOptions);
+                const opponent = await findAIOpponent(params.gameOptions);
                 if (opponent == null) throw new GameError('No matching AI found');
                 hostedGameServer.playerJoin(opponent);
             } catch (e) {
@@ -278,7 +303,7 @@ export default class HostedGameRepository
         this.listenHostedGameServer(hostedGameServer);
 
         try {
-            await this.hostedGamePersister.persist(hostedGameServer.getHostedGame());
+            await hostedGameServer.persist();
         } catch (e) {
             logger.error('Could not persist game after creation', {
                 hostedGamePublicId: hostedGameServer.getPublicId(),
@@ -309,7 +334,7 @@ export default class HostedGameRepository
             throw new GameError('Cannot rematch an active game');
         }
 
-        const rematch = await this.createGame(cloneGameOptions(game.gameOptions), host, game);
+        const rematch = await this.createGame({ gameOptions: cloneGameOptions(game.gameOptions), host, rematchedFrom: game });
         game.rematch = rematch.getHostedGame();
 
         try {
@@ -337,7 +362,7 @@ export default class HostedGameRepository
             }
         }
 
-        this.io.to(Rooms.game(game.publicId))
+        Container.get(HexServer).to(Rooms.game(game.publicId))
             .emit('rematchAvailable', game.publicId, game.rematch.publicId);
 
         return game.rematch;
@@ -537,7 +562,7 @@ export default class HostedGameRepository
         // Game is in database, insert chat message into database
         await this.chatMessageRepository.save(chatMessage);
 
-        this.io.to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
+        Container.get(HexServer).to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
 
         return true;
     }

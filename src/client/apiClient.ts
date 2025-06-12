@@ -1,13 +1,19 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription } from '../shared/app/models/index.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer } from '../shared/app/models/index.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
 import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
+import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 
+/**
+ * @throws {DomainHttpError}
+ * @throws {AppValidationError}
+ * @throws {Error}
+ */
 const checkResponse = async (response: Response): Promise<void> => {
     if (response.ok) {
         return;
@@ -29,6 +35,10 @@ const checkResponse = async (response: Response): Promise<void> => {
 
         if (isDomainHttpErrorPayload(payload)) {
             throw denormalizeDomainHttpError(payload);
+        }
+
+        if (isValidationError(payload)) {
+            throw new AppValidationError(payload.errors);
         }
 
         throw new Error(payload.message ?? payload.reason ?? 'API error');
@@ -587,6 +597,166 @@ export const apiPutPushSubscription = async (pushSubscription: PushSubscription)
 export const apiPostPushTest = async (): Promise<void> => {
     const response = await fetch(`/api/push/test`, {
         method: 'post',
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetActiveTournaments = async (playerUuid: null | string = null): Promise<Tournament[]> => {
+    let url = '/api/tournaments/active';
+
+    if (null !== playerUuid) {
+        url += '?player=' + playerUuid;
+    }
+
+    const response = await fetch(url);
+
+    await checkResponse(response);
+
+    return (await response.json() as Tournament[])
+        .map(subscription => plainToInstance(Tournament, subscription))
+    ;
+};
+
+export const apiGetEndedTournaments = async (): Promise<null | Tournament[]> => {
+    const response = await fetch(`/api/tournaments`);
+
+    await checkResponse(response);
+
+    return (await response.json() as Tournament[])
+        .map(subscription => plainToInstance(Tournament, subscription))
+    ;
+};
+
+export const apiGetTournament = async (slug: string): Promise<null | Tournament> => {
+    const response = await fetch(`/api/tournaments/${slug}`);
+
+    if (404 === response.status) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(Tournament, await response.json());
+};
+
+export const apiPostTournament = async (tournament: Tournament): Promise<null | Tournament> => {
+    const response = await fetch(`/api/tournaments`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(instanceToPlain(tournament, { groups: ['tournament:create'] })),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Tournament, await response.json());
+};
+
+export const apiPatchTournament = async (tournament: Tournament): Promise<null | Tournament> => {
+    const response = await fetch(`/api/tournaments/${tournament.slug}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(instanceToPlain(tournament, { groups: ['tournament:edit'] })),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Tournament, await response.json());
+};
+
+export const apiPutTournamentSubscription = async (tournamentSlug: string): Promise<TournamentSubscription> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/subscriptions`, {
+        method: 'put',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(TournamentSubscription, await response.json());
+};
+
+/**
+ * Unsubscribe or kick
+ */
+export const apiDeleteTournamentSubscription = async (tournamentSlug: string, subscriptionId: string): Promise<null | TournamentSubscription> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/subscriptions/${subscriptionId}`, {
+        method: 'delete',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    const json = await response.json();
+
+    if (null === json) {
+        return null;
+    }
+
+    return plainToInstance(TournamentSubscription, json);
+};
+
+export const apiPostStartTournament = async (tournamentSlug: string): Promise<Tournament> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/start`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Tournament, await response.json());
+};
+
+export const apiPostIterateTournament = async (tournamentSlug: string): Promise<Tournament> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/iterate`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Tournament, await response.json());
+};
+
+export const apiGetTournamentBannedPlayers = async (tournamentSlug: string): Promise<TournamentBannedPlayer[]> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/banned-players`);
+
+    await checkResponse(response);
+
+    return (await response.json() as TournamentBannedPlayer[])
+        .map(tournamentBannedPlayer => plainToInstance(TournamentBannedPlayer, tournamentBannedPlayer))
+    ;
+};
+
+export const apiPutTournamentBannedPlayer = async (tournamentSlug: string, player: Player): Promise<TournamentBannedPlayer> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/banned-players/${player.publicId}`, {
+        method: 'put',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(TournamentBannedPlayer, await response.json());
+};
+
+export const apiDeleteTournamentBannedPlayer = async (tournamentSlug: string, player: Player): Promise<void> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/banned-players/${player.publicId}`, {
+        method: 'delete',
     });
 
     await checkResponse(response);
