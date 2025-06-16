@@ -246,4 +246,8 @@ watch(capped, isCapped => {
 .min-w
     display inline-block
     min-width 6em
+
+// Prevent scrolling when sliding a range input.
+input[type=range]
+    touch-action none
 </style>
