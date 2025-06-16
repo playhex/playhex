@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import 'bootstrap/js/dist/dropdown';
 import useLobbyStore from '../../stores/lobbyStore.js';
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient.js';
@@ -298,6 +298,10 @@ const initGameView = async () => {
         hostedGameClient.value.on('started', () => listenHexClick());
     }
 };
+
+onBeforeUnmount(() => {
+    hostedGameClient.value?.destroy();
+});
 
 const makeTitle = (hostedGame: HostedGame) => {
     const players = hostedGame.hostedGameToPlayers.map(h => h.player);

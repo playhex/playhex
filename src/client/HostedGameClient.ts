@@ -585,6 +585,16 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         this.readMessages = this.hostedGame.chatMessages.length;
     }
+
+    /**
+     * Should be called when hosted game client is unloaded
+     */
+    destroy(): void
+    {
+        // Make sure we don't play "low time" sound when it's not the case,
+        // after leaving game and turn changed
+        this.resetLowTimeNotificationThread();
+    }
 }
 
 /**
