@@ -372,11 +372,20 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getTimeControlValues(): GameTimeData
     {
+        if (null === this.hostedGame.timeControl) {
+            throw new Error('getTimeControlValues(): this.hostedGame.timeControl is null');
+        }
+
         return this.hostedGame.timeControl;
     }
 
     onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
+        if (null === this.hostedGame.timeControl) {
+            this.hostedGame.timeControl = gameTimeData;
+            return;
+        }
+
         Object.assign(this.hostedGame.timeControl, gameTimeData);
 
         this.notifyWhenLowTime(gameTimeData);

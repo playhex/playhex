@@ -62,20 +62,20 @@ export default class AdminController
         const ai0 = await findAIBySlug(body.ai0Slug);
         const ai1 = await findAIBySlug(body.ai1Slug);
 
-        const options = new HostedGameOptions();
+        const gameOptions = new HostedGameOptions();
 
-        options.opponentType = 'ai';
-        options.opponentPublicId = ai1.publicId;
-        options.ranked = true;
-        options.boardsize = body.boardsize;
-        options.timeControl = {
+        gameOptions.opponentType = 'ai';
+        gameOptions.opponentPublicId = ai1.publicId;
+        gameOptions.ranked = true;
+        gameOptions.boardsize = body.boardsize;
+        gameOptions.timeControl = {
             family: 'fischer',
             options: {
                 initialTime: 3600000, // Fixed time so we can compare time consumed by both ai
             },
         };
 
-        const hostedGameServer = await this.hostedGameRepository.createGame(options);
+        const hostedGameServer = await this.hostedGameRepository.createGame({ gameOptions });
 
         hostedGameServer.playerJoin(ai0);
         hostedGameServer.playerJoin(ai1);

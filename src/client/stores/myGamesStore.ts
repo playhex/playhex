@@ -53,8 +53,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return 0;
         }
 
-        const time0 = game0.hostedGame.timeControl.players[game0.myColor].totalRemainingTime;
-        const time1 = game1.hostedGame.timeControl.players[game1.myColor].totalRemainingTime;
+        const time0 = game0.hostedGame.timeControl?.players[game0.myColor].totalRemainingTime ?? Infinity;
+        const time1 = game1.hostedGame.timeControl?.players[game1.myColor].totalRemainingTime ?? Infinity;
 
         return timeValueToMilliseconds(time0, now) - timeValueToMilliseconds(time1, now);
     };

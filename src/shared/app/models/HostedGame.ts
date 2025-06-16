@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad, type Relation } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm.js';
 import Player from './Player.js';
@@ -52,7 +53,7 @@ export default class HostedGame
     @Column({ type: 'json', transformer: { from: (value: null | GameTimeData) => deserializeTimeControlValue(value), to: value => value } })
     @Expose()
     @Transform(({ value }: { value: GameTimeData }) => deserializeTimeControlValue(value), { toClassOnly: true })
-    timeControl: GameTimeData; // TODO create model for transform
+    timeControl: null | GameTimeData; // TODO create model for transform
 
     @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
     @Expose()
@@ -115,6 +116,40 @@ export default class HostedGame
         }
     }
 }
+
+export type CreateHostedGameParams = {
+    gameOptions?: HostedGameOptions;
+    host?: null | Player;
+    rematchedFrom?: null | HostedGame;
+};
+
+/**
+ * Create a new HostedGame.
+ */
+export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGame => {
+    const hostedGame = new HostedGame();
+
+    hostedGame.publicId = uuidv4();
+    hostedGame.state = 'created';
+    hostedGame.gameOptions = params.gameOptions ?? new HostedGameOptions();
+    hostedGame.timeControl = null;
+    hostedGame.host = params.host ?? null;
+    hostedGame.chatMessages = [];
+    hostedGame.hostedGameToPlayers = [];
+    hostedGame.rematchedFrom = params.rematchedFrom ?? null;
+
+    if (params.host) {
+        const hostedGameToPlayer = new HostedGameToPlayer();
+
+        hostedGameToPlayer.hostedGame = hostedGame;
+        hostedGameToPlayer.player = params.host;
+        hostedGameToPlayer.order = 0;
+
+        hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
+    }
+
+    return hostedGame;
+};
 
 const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {
     if (null === timeControlValue) {

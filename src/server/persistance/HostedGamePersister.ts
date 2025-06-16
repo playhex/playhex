@@ -11,7 +11,9 @@ const relations: FindOptionsRelations<HostedGame> = {
     chatMessages: {
         player: true,
     },
-    rematch: true,
+    rematch: {
+        host: true,
+    },
     rematchedFrom: {
         hostedGameToPlayers: {
             player: {
@@ -45,13 +47,15 @@ export default class HostedGamePersister
         private hostedGameRepository: Repository<HostedGame>,
     ) {}
 
-    async persist(hostedGame: HostedGame): Promise<void>
+    async persist(hostedGame: HostedGame): Promise<HostedGame>
     {
         logger.info('Persisting a game...', { publicId: hostedGame.publicId });
 
-        await this.hostedGameRepository.save(hostedGame);
+        const result = await this.hostedGameRepository.save(hostedGame);
 
         logger.info('Hosted game persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
+
+        return result;
     }
 
     async deleteIfExists(hostedGame: HostedGame): Promise<void>

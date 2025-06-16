@@ -2,7 +2,6 @@ import winston from 'winston';
 import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
 import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
-import { v4 as uuidv4 } from 'uuid';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
 import baseLogger, { loggerOptions } from './services/logger.js';
@@ -18,6 +17,8 @@ import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlF
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository.js';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
 import { notifier } from './services/notifications/index.js';
+import { AutoSaveInterface } from 'auto-save/AutoSaveInterface.js';
+import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -47,8 +48,6 @@ type HostedGameEvents = {
  */
 export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 {
-    private hostedGame: HostedGame;
-
     /**
      * Null if not yet started, or ended and reloaded from database
      */
@@ -71,14 +70,67 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private logger = baseLogger;
 
+    constructor(
+        private hostedGame: HostedGame,
+        private autoSave: AutoSaveInterface<HostedGame>,
+    ) {
+        super();
+
+        this.createChildLogger();
+        this.init();
+    }
+
+    private init(): void
+    {
+        this.players = this.hostedGame.hostedGameToPlayers
+            .sort((a, b) => a.order - b.order)
+            .map(h => h.player)
+        ;
+
+        try {
+            this.timeControl = createTimeControl(
+                this.hostedGame.gameOptions.timeControl,
+                this.hostedGame.timeControl,
+            );
+        } catch (e) {
+            baseLogger.error('Could not recreate time control instance from persisted data', {
+                reason: e.message,
+                hostedGamePublicId: this.hostedGame.publicId,
+                hostedGame: this.hostedGame,
+            });
+
+            throw e;
+        }
+
+        this.timeControl = createTimeControl(
+            this.hostedGame.gameOptions.timeControl,
+            this.hostedGame.timeControl,
+        );
+
+        if (null !== this.hostedGame.gameData) {
+            try {
+                this.game = EngineGame.fromData(this.hostedGame.gameData);
+                this.listenGame(this.game);
+            } catch (e) {
+                baseLogger.error('Could not recreate game from data', { data: this.hostedGame });
+                throw e;
+            }
+        }
+
+        if (null !== this.game) {
+            this.bindTimeControl();
+            this.makeAutomatedMoves();
+        }
+    }
+
     /**
      * To call on new instance, to add context in game logs.
      */
     private createChildLogger()
     {
-        const { publicId, createdAt } = this.hostedGame;
+        const { publicId } = this.hostedGame;
 
-        if ('string' !== typeof publicId || !(createdAt instanceof Date)) {
+        if ('string' !== typeof publicId) {
             throw new Error('hostedGame publicId must be defined');
         }
 
@@ -88,41 +140,6 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 hostedGamePublicId: publicId,
             },
         });
-    }
-
-    /**
-     * Officially creates a new hosted game, emit event to clients.
-     */
-    static hostNewGame(gameOptions: HostedGameOptions, host: null | Player = null, rematchedFrom: null | HostedGame = null): HostedGameServer
-    {
-        const hostedGameServer = new HostedGameServer();
-        const hostedGame = new HostedGame();
-
-        hostedGameServer.hostedGame = hostedGame;
-
-        hostedGame.publicId = uuidv4();
-        hostedGame.state = 'created';
-        hostedGame.gameOptions = gameOptions;
-        hostedGame.host = host;
-        hostedGame.rematchedFrom = rematchedFrom;
-        hostedGame.chatMessages = [];
-        hostedGame.hostedGameToPlayers = [];
-
-        hostedGameServer.createChildLogger();
-
-        if (null !== host) {
-            hostedGameServer.players.push(host);
-        }
-
-        hostedGameServer.timeControl = createTimeControl(gameOptions.timeControl);
-
-        hostedGameServer.saveState();
-
-        hostedGameServer.logger.info('Hosted game created.', { host: host?.pseudo ?? null });
-
-        hostedGameServer.io.to(Rooms.lobby).emit('gameCreated', hostedGame);
-
-        return hostedGameServer;
     }
 
     getPublicId(): string
@@ -493,12 +510,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.bindTimeControl();
 
-        this.io.to(this.gameRooms(true)).emit('gameStarted', this.getHostedGame());
+        this.io.to(this.gameRooms(true)).emit('gameStarted', instanceToPlain(this.getHostedGame()));
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
         this.logger.info('Game Started.');
 
         notifier.emit('gameStart', this.hostedGame);
+
+        this.autoSave.save();
 
         this.makeAutomatedMoves();
     }
@@ -957,12 +976,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     /**
      * Save players, game and time control state from this attributes to entity attributes.
+     * Should be called to have a fresh hostedGame entity, e.g before sending it as an event,
+     * or before persisting to database.
      */
-    private saveState(): void
+    saveState(): void
     {
         this.saveGameState();
         this.savePlayersState();
         this.saveTimeControlState();
+    }
+
+    persist(): Promise<HostedGame>
+    {
+        this.saveState();
+        return this.autoSave.save();
     }
 
     getHostedGame(): HostedGame
@@ -970,57 +997,5 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.saveState();
 
         return this.hostedGame;
-    }
-
-    static fromData(data: HostedGame): HostedGameServer
-    {
-        // Check whether data.createdAt is an instance of Date and not a string,
-        // to check whether denormalization with superjson worked.
-        if (!(data.createdAt instanceof Date)) {
-            baseLogger.error(
-                'HostedGame.fromData(): Error while trying to recreate a HostedGame from data,'
-                + ' createdAt is not an instance of Date.',
-            );
-        }
-
-        const hostedGameServer = new HostedGameServer();
-
-        hostedGameServer.hostedGame = data;
-
-        hostedGameServer.createChildLogger();
-
-        hostedGameServer.players = data.hostedGameToPlayers
-            .sort((a, b) => a.order - b.order)
-            .map(h => h.player)
-        ;
-
-        if (null !== data.gameData) {
-            try {
-                hostedGameServer.game = EngineGame.fromData(data.gameData);
-                hostedGameServer.listenGame(hostedGameServer.game);
-            } catch (e) {
-                baseLogger.error('Could not recreate game from data', { data });
-                throw e;
-            }
-        }
-
-        try {
-            hostedGameServer.timeControl = createTimeControl(data.gameOptions.timeControl, data.timeControl);
-        } catch (e) {
-            baseLogger.error('Could not recreate time control instance from persisted data', {
-                reason: e.message,
-                hostedGamePublicId: data.publicId,
-                data,
-            });
-
-            throw e;
-        }
-
-        if (null !== hostedGameServer.game) {
-            hostedGameServer.bindTimeControl();
-            hostedGameServer.makeAutomatedMoves();
-        }
-
-        return hostedGameServer;
     }
 }
