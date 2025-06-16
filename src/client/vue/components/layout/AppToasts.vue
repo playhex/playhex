@@ -60,12 +60,11 @@ const clickToast = (toast: Toast): void => {
                 <div class="toast-body">
                     {{ toast.message }}
 
-                    <br>
-
-                    <template v-for="{ label, action }, key in toast.options.actions" :key>
+                    <template v-for="{ label, action, classes }, key in toast.options.actions" :key>
                         <button
                             v-if="('function' === typeof action)"
-                            class="btn btn-link"
+                            :class="classes ?? 'btn btn-link text-body'"
+                            class="d-block"
                             @click.stop="() => { action(); deleteToast(toast); }"
                         >{{ label }}</button>
 
