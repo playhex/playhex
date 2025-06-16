@@ -7,7 +7,13 @@ import { RatingCategory } from '../shared/app/ratingUtils.js';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
 import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
+import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 
+/**
+ * @throws {DomainHttpError}
+ * @throws {AppValidationError}
+ * @throws {Error}
+ */
 const checkResponse = async (response: Response): Promise<void> => {
     if (response.ok) {
         return;
@@ -29,6 +35,10 @@ const checkResponse = async (response: Response): Promise<void> => {
 
         if (isDomainHttpErrorPayload(payload)) {
             throw denormalizeDomainHttpError(payload);
+        }
+
+        if (isValidationError(payload)) {
+            throw new AppValidationError(payload.errors);
         }
 
         throw new Error(payload.message ?? payload.reason ?? 'API error');
