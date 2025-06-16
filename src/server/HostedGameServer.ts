@@ -524,6 +524,25 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private affectPlayersColors(): void
     {
+        // Do not alternate when game is created by system.
+        // Assume system has already set random colors as needed.
+        // If games are created by a tournament system,
+        // we assume tournament system already affect players colors randomly or depending on last match.
+        if (null === this.hostedGame.host) {
+            if (null === this.hostedGame.gameOptions.firstPlayer) {
+                this.logger.info('Game created by system, do not shuffle players color');
+                return;
+            }
+
+            this.logger.info('Game created by system, but fixed colors, set fixed colors');
+
+            if (1 === this.hostedGame.gameOptions.firstPlayer) {
+                this.players.reverse();
+            }
+
+            return;
+        }
+
         // In case of rematch, alternate colors from previous game instead of random
         if (null !== this.hostedGame.rematchedFrom) {
             this.logger.info('Rematch alternate colors: should alternate?');
@@ -604,8 +623,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     /**
      * A player join this game.
+     *
+     * @param isSystem Set true when playerJoin is called by system, not from a player action.
      */
-    playerJoin(player: Player): true | string
+    playerJoin(player: Player, isSystem = false): true | string
     {
         if ('created' !== this.hostedGame.state) {
             this.logger.notice('Player tried to join but hosted game has started or ended', { joiner: player.pseudo });
@@ -622,6 +643,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         if (this.isPlayerInGame(player)) {
             this.logger.notice('Player tried to join twice', { joiner: player.pseudo });
             return 'You already joined this game.';
+        }
+
+        // Cannot join games created by system
+        if (null === this.hostedGame.host && !isSystem) {
+            this.logger.notice('Player tried to join game created by system', { joiner: player.pseudo });
+            return 'Cannot join game created by system.';
         }
 
         this.players.push(player);
