@@ -19,6 +19,7 @@ import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
 import { notifier } from './services/notifications/index.js';
 import { AutoSaveInterface } from 'auto-save/AutoSaveInterface.js';
 import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
+import { Outcome } from '../shared/game-engine/Types.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -160,6 +161,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     getPlayers(): Player[]
     {
         return this.players;
+    }
+
+    getPlayerByPublicId(publicId: string): null | Player
+    {
+        return this.players
+            .find(player => player.publicId === publicId)
+            ?? null
+        ;
     }
 
     getPlayerIndex(player: Player): null | number
@@ -441,16 +450,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         game.on('ended', (winner, outcome, date) => {
             this.saveState();
 
-            this.hostedGame.state = 'ended';
-
-            this.io.to(this.gameRooms(true)).emit('ended', this.getPublicId(), winner, outcome, { date });
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
-
-            this.logger.info('Game ended.', { winner, outcome });
-
-            this.emit('ended');
-
-            notifier.emit('gameEnd', this.hostedGame);
+            this.doEnd(winner, outcome, date);
         });
 
         /**
@@ -463,6 +463,24 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.logger.info('Game canceled.');
             this.doCancel(date);
         });
+    }
+
+    private doEnd(winner: PlayerIndex, outcome: Outcome, date: Date): void
+    {
+        this.hostedGame.state = 'ended';
+
+        if ('forfeit' === outcome) {
+            this.hostedGame.state = 'forfeited';
+        }
+
+        this.io.to(this.gameRooms(true)).emit('ended', this.getPublicId(), winner, outcome, { date });
+        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
+
+        this.logger.info('Game ended.', { winner, outcome });
+
+        this.emit('ended');
+
+        notifier.emit('gameEnd', this.hostedGame);
     }
 
     bindTimeControl(): void
@@ -951,6 +969,32 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.logger.info('hosted game server canceled', { date });
 
         this.emit('canceled');
+    }
+
+    systemForfeit(player: Player): void
+    {
+        this.logger.info('System cancel game');
+
+        if (!this.isPlayerInGame(player)) {
+            throw new Error('Cannot forfeit this player, not in game');
+        }
+
+        if ('playing' !== this.hostedGame.state && 'created' !== this.hostedGame.state) {
+            throw new Error('Game is not playing nor created');
+        }
+
+        const now = new Date();
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (null === playerIndex) {
+            throw new Error('Cannot forfeit this player, not in game');
+        }
+
+        if (null !== this.game) {
+            this.game.forfeit(playerIndex as PlayerIndex, now);
+        } else {
+            this.doEnd(1 - playerIndex as PlayerIndex, 'forfeit', now);
+        }
     }
 
     postChatMessage(chatMessage: ChatMessage)

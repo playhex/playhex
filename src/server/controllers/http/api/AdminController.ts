@@ -45,6 +45,26 @@ export default class AdminController
         }
     }
 
+    @Post('/api/admin/games/:hostedGamePublicId/players/:playerPublicId/forfeit')
+    async forfeitGame(
+        @Param('hostedGamePublicId') hostedGamePublicId: string,
+        @Param('playerPublicId') playerPublicId: string,
+    ) {
+        const activeGame = this.hostedGameRepository.getActiveGame(hostedGamePublicId);
+
+        if (!activeGame) {
+            throw new HttpError(400, 'No active game with this public id');
+        }
+
+        const player = activeGame.getPlayerByPublicId(playerPublicId);
+
+        if (!player) {
+            throw new HttpError(400, 'This game has no player with this public id');
+        }
+
+        activeGame.systemForfeit(player);
+    }
+
     @Post('/api/admin/create-ai-vs-ai')
     async createAIvsAI(
         @Body() body: CreateAiVsAiInput,

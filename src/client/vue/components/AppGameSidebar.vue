@@ -412,7 +412,7 @@ watchEffect(() => {
                 <h3 v-if="'created' === hostedGameClient.getState()">{{ $t('waiting_for_an_opponent') }}</h3>
                 <h3 v-if="'canceled' === hostedGameClient.getState()">{{ $t('game_has_been_canceled') }}</h3>
                 <h3 v-if="'playing' === hostedGameClient.getState()">{{ $t('game.playing') }}</h3>
-                <h3 v-if="'ended' === hostedGameClient.getState()">
+                <h3 v-if="hostedGameClient.isStateEnded()">
                     <i18next :translation="$t('player_wins_by.default')">
                         <template #player>
                             <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
@@ -420,7 +420,7 @@ watchEffect(() => {
                     </i18next>
                     <AppRatingChange v-if="hostedGameClient.isRanked()" :ratingChange="hostedGameClient.getRating(hostedGameClient.getStrictWinnerPlayer())?.ratingChange ?? 0" class="smaller ms-2" />
                 </h3>
-                <p v-if="'ended' === hostedGameClient.getState()" class="mb-0">
+                <p v-if="hostedGameClient.isStateEnded()" class="mb-0">
                     <i18next :translation="$t('player_loses_reason.' + (hostedGameClient.getHostedGame().gameData?.outcome ?? 'default'))">
                         <template #player>
                             <AppPseudo :player="hostedGameClient.getStrictLoserPlayer()" :classes="playerColor(hostedGameClient.getStrictLoserPlayer())" />
@@ -493,7 +493,7 @@ watchEffect(() => {
                 </template>
 
                 <!-- ended -->
-                <template v-if="'ended' === hostedGameClient.getState()">
+                <template v-if="hostedGameClient.isStateEnded()">
                     <p>
                         <small v-if="hostedGameClient.getHostedGame().gameData?.startedAt && hostedGameClient.getHostedGame().gameData?.endedAt">
 
@@ -534,7 +534,7 @@ watchEffect(() => {
 
                 <!-- Download SGF -->
                 <button
-                    v-if="'ended' === hostedGameClient.getState()"
+                    v-if="hostedGameClient.isStateEnded()"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"

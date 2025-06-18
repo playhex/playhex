@@ -122,7 +122,7 @@
         "default": "{player} perd.",
         "time": "{player} n'a plus de temps.",
         "resign": "{player} abandonne.",
-        "forfeit": "{player} déclare forfait."
+        "forfeit": "{player} est déclaré forfait."
     },
     "1v1_ranked": {
         "title": "Classée",
@@ -323,6 +323,7 @@
         "canceled": "Annulée",
         "ended": "Terminée",
         "created": "Créée",
+        "forfeited": "Forfait",
         "playing": "En cours"
     },
     "discard": "Annuler",

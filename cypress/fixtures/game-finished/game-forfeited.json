@@ -1,0 +1,141 @@
+{
+    "publicId": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "pseudo": "aa",
+        "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "aa",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "hostedGameToPlayers": [
+        {
+            "player": {
+                "publicId": "determinist-random-bot|d6902ed2-5e33-46f3-998f-3739cb24d50b",
+                "pseudo": "The winner",
+                "slug": "the-winner",
+                "isBot": false,
+                "isGuest": false,
+                "createdAt": "2024-01-24T20:25:06.632Z"
+            }
+        },
+        {
+            "player": {
+                "pseudo": "aa",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aa",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
+        }
+    ],
+    "timeControl": {
+        "state": "over",
+        "currentPlayer": 1,
+        "players": [
+            {
+                "totalRemainingTime": 600000
+            },
+            {
+                "totalRemainingTime": 598216
+            }
+        ]
+    },
+    "gameOptions": {
+        "boardsize": 11,
+        "firstPlayer": 1,
+        "swapRule": true,
+        "opponent": {
+            "type": "ai"
+        },
+        "timeControl": {
+            "type": "fischer",
+            "options": {
+                "initialTime": 600000,
+                "timeIncrement": 5000,
+                "maxTime": 600000
+            }
+        }
+    },
+    "gameData": {
+        "size": 11,
+        "movesHistory": [
+            {
+                "row": 2,
+                "col": 6,
+                "playedAt": "2024-01-24T20:25:06.634Z"
+            },
+            {
+                "row": 6,
+                "col": 8,
+                "playedAt": "2024-01-24T20:25:07.228Z"
+            },
+            {
+                "row": 3,
+                "col": 9,
+                "playedAt": "2024-01-24T20:25:07.229Z"
+            },
+            {
+                "row": 6,
+                "col": 9,
+                "playedAt": "2024-01-24T20:25:07.467Z"
+            },
+            {
+                "row": 7,
+                "col": 6,
+                "playedAt": "2024-01-24T20:25:07.468Z"
+            },
+            {
+                "row": 4,
+                "col": 6,
+                "playedAt": "2024-01-24T20:25:07.696Z"
+            },
+            {
+                "row": 0,
+                "col": 3,
+                "playedAt": "2024-01-24T20:25:07.697Z"
+            },
+            {
+                "row": 6,
+                "col": 3,
+                "playedAt": "2024-01-24T20:25:07.930Z"
+            },
+            {
+                "row": 5,
+                "col": 0,
+                "playedAt": "2024-01-24T20:25:07.931Z"
+            },
+            {
+                "row": 6,
+                "col": 1,
+                "playedAt": "2024-01-24T20:25:08.172Z"
+            },
+            {
+                "row": 1,
+                "col": 10,
+                "playedAt": "2024-01-24T20:25:08.173Z"
+            },
+            {
+                "row": 10,
+                "col": 2,
+                "playedAt": "2024-01-24T20:25:08.449Z"
+            },
+            {
+                "row": 4,
+                "col": 5,
+                "playedAt": "2024-01-24T20:25:08.450Z"
+            }
+        ],
+        "allowSwap": true,
+        "currentPlayerIndex": 1,
+        "winner": 0,
+        "outcome": "forfeit",
+        "startedAt": "2024-01-24T20:25:06.633Z",
+        "lastMoveAt": "2024-01-24T20:25:08.450Z",
+        "endedAt": "2024-01-24T20:25:10.234Z"
+    },
+    "chatMessages": [],
+    "state": "forfeited",
+    "createdAt": "2024-01-24T20:25:06.632Z"
+}

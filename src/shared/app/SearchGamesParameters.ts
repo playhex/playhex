@@ -4,6 +4,7 @@ import { IsBoolean, IsDate, IsIn, IsNumber, IsOptional, IsUUID, Max, Min, Valida
 export const gameStates = [
     'ended',
     'canceled',
+    'forfeited',
 ] as const;
 
 export type GameStates = typeof gameStates[number];

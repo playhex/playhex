@@ -42,6 +42,7 @@
     "game_state": {
         "created": "Created",
         "canceled": "Canceled",
+        "forfeited": "Forfeited",
         "playing": "Playing",
         "ended": "Ended"
     },
@@ -344,6 +345,6 @@
         "default": "{player} loses.",
         "time": "{player} times out.",
         "resign": "{player} resigns.",
-        "forfeit": "{player} forfeits."
+        "forfeit": "{player} is declared a forfeit."
     }
 }

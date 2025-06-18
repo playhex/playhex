@@ -18,6 +18,7 @@ export const hostedGameStates = [
     'canceled',
     'playing',
     'ended',
+    'forfeited',
 ] as const;
 
 export type HostedGameState = typeof hostedGameStates[number];

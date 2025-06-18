@@ -92,7 +92,7 @@ const shouldDisplayConfirmMove = (): boolean => {
     }
 
     // Game has ended. Still display button when game is not yet started to make sure it works
-    if ('ended' === hostedGameClient.value.getState()) {
+    if (hostedGameClient.value.isStateEnded()) {
         return false;
     }
 

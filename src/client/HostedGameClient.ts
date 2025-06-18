@@ -14,7 +14,7 @@ import useServerDateStore from './stores/serverDateStore.js';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue.js';
 import { toEngineMove } from '../shared/app/models/Move.js';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat.js';
-import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, updateHostedGame } from '../shared/app/hostedGameUtils.js';
+import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, isStateEnded, updateHostedGame } from '../shared/app/hostedGameUtils.js';
 import useLobbyStore from './stores/lobbyStore.js';
 import useAuthStore from './stores/authStore.js';
 import { checkShadowDeleted } from '../shared/app/chatUtils.js';
@@ -62,6 +62,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     getState(): HostedGameState
     {
         return this.hostedGame.state;
+    }
+
+    isStateEnded(): boolean
+    {
+        return isStateEnded(this.hostedGame);
     }
 
     loadGame(): Game

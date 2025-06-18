@@ -507,6 +507,14 @@ export default class Game extends TypedEmitter<GameEvents>
     }
 
     /**
+     * Makes playerIndex forfeit
+     */
+    forfeit(playerIndex: PlayerIndex, date: Date): void
+    {
+        this.declareWinner(0 === playerIndex ? 1 : 0, 'forfeit', date);
+    }
+
+    /**
      * Makes current player lose on time
      */
     loseByTime(date: Date): void

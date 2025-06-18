@@ -1,5 +1,5 @@
 import { Container } from 'typedi';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { HostedGame, Player } from '../../shared/app/models/index.js';
@@ -47,7 +47,7 @@ hexProgram
                 gameOptions: {
                     ranked: true,
                 },
-                state: 'ended',
+                state: In(['ended', 'forfeited']),
             },
             order: {
                 hostedGameToPlayers: {

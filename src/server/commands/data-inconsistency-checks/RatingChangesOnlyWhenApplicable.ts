@@ -47,7 +47,7 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
             left join rating_games_hosted_game r on hgo.hostedgameid = r.hostedgameid
             where ranked
             and r.hostedgameid is null
-            and hg.state = 'ended'
+            and hg.state in ('ended', 'forfeited')
         `);
 
         const hostedGameToString = (label: string, hostedGame: Result) => [

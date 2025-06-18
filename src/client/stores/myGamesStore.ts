@@ -6,7 +6,7 @@ import { HostedGame, Move } from '../../shared/app/models/index.js';
 import Rooms from '../../shared/app/Rooms.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
-import { isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { isBotGame, isStateEnded } from '../../shared/app/hostedGameUtils.js';
 import { iAmInGame } from '../services/notifications/context-utils.js';
 
 export type CurrentGame = {
@@ -180,7 +180,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             }
 
             // Game finished
-            if ('ended' === hostedGame.state) {
+            if (isStateEnded(hostedGame)) {
                 continue;
             }
 
