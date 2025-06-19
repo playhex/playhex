@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, toRefs, ref } from 'vue';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
+import SearchGamesParameters, { gameStates } from '../../../shared/app/SearchGamesParameters.js';
 import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters.js';
 import { BIconArrowRight, BIconX } from 'bootstrap-icons-vue';
 
@@ -58,13 +58,9 @@ searchPlayersParameters.value.isGuest = false;
         </div>
 
         <div class="col-12 col-sm-4 col-md-2">
-            <div class="form-check">
-                <input type="checkbox" v-model="searchGamesParameters.states" value="ended" class="form-check-input" id="states-ended" autocomplete="off">
-                <label class="form-check-label" for="states-ended">{{ $t('game_state.ended') }}</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" v-model="searchGamesParameters.states" value="canceled" class="form-check-input" id="states-canceled" autocomplete="off">
-                <label class="form-check-label" for="states-canceled">{{ $t('game_state.canceled') }}</label>
+            <div v-for="gameState in gameStates" :key="gameState" class="form-check">
+                <input type="checkbox" v-model="searchGamesParameters.states" :value="gameState" class="form-check-input" :id="'states-' + gameState" autocomplete="off">
+                <label class="form-check-label" :for="'states-' + gameState">{{ $t('game_state.' + gameState) }}</label>
             </div>
         </div>
 
