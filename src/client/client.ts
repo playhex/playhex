@@ -1,5 +1,7 @@
 import '../shared/app/i18n/index.js';
 import 'bootstrap/scss/bootstrap.scss';
+import 'bootstrap/js/src/collapse.js';
+import 'bootstrap/js/src/offcanvas.js';
 import './base.styl';
 
 import 'reflect-metadata';
