@@ -2,7 +2,7 @@
 import { ref, toRefs } from 'vue';
 import { Tournament, TournamentGame } from '../../../../shared/app/models';
 import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
-import { apiPostForfeitTournamentGamePlayer, apiPostResetAndRecreateGame } from '../../../apiClient';
+import { apiPostExcludeParticipant, apiPostForfeitTournamentGamePlayer, apiPostResetAndRecreateGame } from '../../../apiClient';
 
 const props = defineProps({
     tournamentGame: {
@@ -50,6 +50,19 @@ const showManage = ref(false);
                 :disabled="'done' !== tournamentGame.state"
                 class="btn btn-outline-danger mt-1"
             >Reset and recreate</button>
+
+            <button
+                v-if="tournamentGame.player1"
+                @click="apiPostExcludeParticipant(tournament.slug, tournamentGame.player1.publicId)"
+                :disabled="'running' !== tournament.state"
+                class="btn btn-outline-danger mt-1"
+            >Exclude {{ tournamentGame.player1.pseudo }}</button>
+            <button
+                v-if="tournamentGame.player2"
+                @click="apiPostExcludeParticipant(tournament.slug, tournamentGame.player2.publicId)"
+                :disabled="'running' !== tournament.state"
+                class="btn btn-outline-danger mt-1"
+            >Exclude {{ tournamentGame.player2.pseudo }}</button>
         </template>
     </div>
 </template>

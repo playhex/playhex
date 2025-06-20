@@ -63,4 +63,10 @@ export interface TournamentEngineInterface
      * Reverses the progression of players in the bracket.
      */
     resetAndRecreateGame(tournament: Tournament, tournamentGame: TournamentGame): void;
+
+    /**
+     * Exclude a participant from a playing tournament.
+     * Should adjust brackets.
+     */
+    excludeParticipant(tournament: Tournament, playerPublicId: string): void;
 }

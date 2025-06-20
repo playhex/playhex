@@ -32,6 +32,7 @@ class MockedOrganizer implements TournamentEngineInterface
     reportWinner(): void {}
     updateParticipantsScore(): void {}
     resetAndRecreateGame(): void {}
+    excludeParticipant(): void {}
 }
 
 describe('ActiveTournament', () => {

@@ -138,15 +138,15 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         const tournamentGames = this.getTournamentGamesByRoundAndNumber(tournament);
 
-        // Create new tournamentGames for new matches
         for (const match of toTournament.matches) {
             const roundAndNumber = `${match.round}.${match.match}`;
             let tournamentGame = tournamentGames[roundAndNumber];
 
+            // Create new tournamentGames for new matches
             if (!tournamentGame) {
                 tournamentGame = this.doCreateTournamentGame(tournament, match);
                 tournamentGames[roundAndNumber] = tournamentGame;
-            } else if ('waiting' === tournamentGame.state) {
+            } else if ('done' !== tournamentGame.state) {
                 this.doUpdateTournamentGame(tournament, tournamentGame, match);
             }
         }
@@ -175,13 +175,18 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     private doUpdateTournamentGame(tournament: Tournament, tournamentGame: TournamentGame, match: Match): void
     {
-        if (!tournamentGame.player1 && match.player1.id) {
-            tournamentGame.player1 = this.getParticipant(tournament, match.player1.id);
-        }
+        tournamentGame.player1 = match.player1.id
+            ? this.getParticipant(tournament, match.player1.id)
+            : null
+        ;
 
-        if (!tournamentGame.player2 && match.player2.id) {
-            tournamentGame.player2 = this.getParticipant(tournament, match.player2.id);
-        }
+        tournamentGame.player2 = match.player2.id
+            ? this.getParticipant(tournament, match.player2.id)
+            : null
+        ;
+
+        tournamentGame.bye = match.bye;
+        tournamentGame.state = this.getTournamentStateFromMatch(match);
     }
 
     private doCreateTournamentGame(tournament: Tournament, match: Match): TournamentGame
@@ -189,18 +194,10 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         const tournamentGame = new TournamentGame();
 
         tournamentGame.tournament = tournament;
-        tournamentGame.state = match.bye ? 'done' : 'waiting';
         tournamentGame.round = match.round;
         tournamentGame.number = match.match;
-        tournamentGame.bye = match.bye;
 
-        if (match.player1.id) {
-            tournamentGame.player1 = this.getParticipant(tournament, match.player1.id);
-        }
-
-        if (match.player2.id) {
-            tournamentGame.player2 = this.getParticipant(tournament, match.player2.id);
-        }
+        this.doUpdateTournamentGame(tournament, tournamentGame, match);
 
         tournament.games.push(tournamentGame);
 
@@ -284,6 +281,27 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         const toTournament = this.getTournament(tournament);
 
         return 'complete' === toTournament.status;
+    }
+
+    private getTournamentStateFromMatch(match: Match): TournamentGame['state']
+    {
+        const { player1, player2, bye, active } = match;
+
+        if (bye) {
+            return 'done';
+        }
+
+        if (active) {
+            return 'playing';
+        }
+
+        if (player1.win || player1.loss || player1.draw
+            || player2.win || player2.loss || player2.draw
+        ) {
+            return 'done';
+        }
+
+        return 'waiting';
     }
 
     private isMatchDone(match: Match): boolean
@@ -379,6 +397,22 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         resetChildMatch(match.path.win);
         resetChildMatch(match.path.loss);
+
+        tournament.engineData = toTournament;
+    }
+
+    excludeParticipant(tournament: Tournament, playerPublicId: string): void
+    {
+        const toTournament = this.getTournament(tournament);
+        const toPlayer = toTournament.players.find(p => p.id = playerPublicId);
+
+        if (!toPlayer) {
+            throw new TournamentEngineError('No player with this id in tournament');
+        }
+
+        toTournament.removePlayer(toPlayer.id);
+
+        this.updateTournamentGames(tournament);
 
         tournament.engineData = toTournament;
     }

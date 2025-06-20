@@ -270,4 +270,27 @@ export default class TournamentController
 
         return activeTournament.getTournament();
     }
+
+    @Post('/api/tournaments/:slug/players/:playerPublicId/exclude')
+    async postExcludeParticipant(
+        @AuthenticatedPlayer() player: Player,
+        @Param('slug') slug: string,
+        @Param('playerPublicId') playerPublicId: string,
+    ): Promise<Tournament> {
+        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+
+        if (null === activeTournament) {
+            throw new NotFoundError(`No active tournament "${slug}"`);
+        }
+
+        mustBeTournamentHost(activeTournament.getTournament(), player);
+
+        if ('running' !== activeTournament.getTournament().state) {
+            throw new BadRequestError('Tournament must be in playing state');
+        }
+
+        activeTournament.excludeParticipant(playerPublicId);
+
+        return await activeTournament.save();
+    }
 }

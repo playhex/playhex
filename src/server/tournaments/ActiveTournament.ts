@@ -628,6 +628,11 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     forfeitGamePlayer(hostedGamePublicId: string, playerPublicId: string): void
     {
+        this.logger.notice('Forfeit a player in a game', {
+            hostedGamePublicId,
+            playerPublicId,
+        });
+
         const tournamentGame = this.tournament.games
             .find(g => g.hostedGame?.publicId === hostedGamePublicId)
         ;
@@ -670,6 +675,10 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     async resetAndRecreateGame(hostedGamePublicId: string): Promise<void>
     {
+        this.logger.notice('Reset and recreate game', {
+            hostedGamePublicId,
+        });
+
         const tournamentGame = this.tournament.games
             .find(g => g.hostedGame?.publicId === hostedGamePublicId)
         ;
@@ -689,5 +698,14 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         this.tournamentEngine.resetAndRecreateGame(this.tournament, tournamentGame);
 
         await this.doStartTournamentGame(tournamentGame);
+    }
+
+    excludeParticipant(playerPublicId: string): void
+    {
+        this.logger.notice('Excluding participant', {
+            playerPublicId,
+        });
+
+        this.tournamentEngine.excludeParticipant(this.tournament, playerPublicId);
     }
 }

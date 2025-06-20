@@ -777,3 +777,11 @@ export const apiPostResetAndRecreateGame = async (tournamentSlug: string, hosted
 
     await checkResponse(response);
 };
+
+export const apiPostExcludeParticipant = async (tournamentSlug: string, playerPublicId: string): Promise<void> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/players/${playerPublicId}/exclude`, {
+        method: 'post',
+    });
+
+    await checkResponse(response);
+};
