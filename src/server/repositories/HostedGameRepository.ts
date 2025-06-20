@@ -20,6 +20,7 @@ import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
 import { createHostedGame, CreateHostedGameParams } from '../../shared/app/models/HostedGame.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
+import { isStateEnded } from '../../shared/app/hostedGameUtils.js';
 
 export class GameError extends Error {}
 
@@ -124,7 +125,7 @@ export default class HostedGameRepository
 
     private listenHostedGameServer(hostedGameServer: HostedGameServer): void
     {
-        if ('ended' === hostedGameServer.getState()) {
+        if (isStateEnded(hostedGameServer.getHostedGame())) {
             this.onGameEnded(hostedGameServer);
             return;
         }
