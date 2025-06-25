@@ -222,12 +222,22 @@ export default class HostedGameRepository
      */
     private async updateRatings(hostedGameServer: HostedGameServer): Promise<Rating[]>
     {
-        const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.getHostedGame());
+        try {
+            const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.getHostedGame());
 
-        await this.ratingRepository.persistRatings(newRatings);
-        await this.playerRepository.save(hostedGameServer.getPlayers());
+            await this.ratingRepository.persistRatings(newRatings);
+            await this.playerRepository.save(hostedGameServer.getPlayers());
 
-        return newRatings;
+            return newRatings;
+        } catch (e) {
+            logger.error('Error while persist ratings for game', {
+                hostedGamePublicId: hostedGameServer.getPublicId(),
+                players: hostedGameServer.getPlayers().map(player => player.pseudo),
+                reason: e.message,
+            });
+
+            throw new Error('Error while persist ratings for game ' + hostedGameServer.getPublicId());
+        }
     }
 
     getActiveGames(): { [key: string]: HostedGameServer }
