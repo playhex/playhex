@@ -32,4 +32,54 @@ describe('AutoSave', () => {
         const duration = Date.now() - start;
         assert.ok(duration >= 180 && duration < 220, 'should last about 200ms');
     });
+
+    it('persists when I wait first callback is resolved', async () => {
+        let called = 0;
+        let resolved = 0;
+        const t0 = new Date();
+        const msElapsed = () => new Date().getTime() - t0.getTime();
+
+        const autoSave = new AutoSave<number>(async () => {
+            const call = ++called;
+            await wait(100);
+            ++resolved;
+            return call;
+        });
+
+        const p1 = autoSave.save(); // call now
+
+        assert.strictEqual(called, 1, 'first call');
+        assert.strictEqual(resolved, 0);
+
+        const p2 = autoSave.save(); // queue
+
+        assert.strictEqual(called, 1, 'still called once');
+        assert.strictEqual(resolved, 0);
+        assert.ok(msElapsed() < 50, 'still in the beginning');
+
+        const r1 = await p1; // first call done, second call starts
+
+        assert.ok(msElapsed() > 50 && msElapsed() < 150, 'only waited for 1 call');
+        assert.strictEqual(r1, 1, 'first call returns first response');
+        assert.strictEqual(called, 2, 'first call ended, second call already sent');
+        assert.strictEqual(resolved, 1, '2nd call not yet resolved');
+
+        const p3 = autoSave.save(); // queue
+        const p4 = autoSave.save(); // should returns same result as p3
+
+        const r2 = await p2;
+
+        assert.ok(msElapsed() > 150 && msElapsed() < 250, 'waited for 2 calls');
+        assert.strictEqual(r2, 2, 'second call returns second response');
+        assert.strictEqual(called, 3, 'second call ended, third call already sent');
+        assert.strictEqual(resolved, 2);
+
+        const r3 = await p3;
+        const r4 = await p4;
+
+        assert.ok(msElapsed() > 250 && msElapsed() < 350, 'waited for 3 calls');
+        assert.strictEqual(called, 3, 'no more call should have been sent');
+        assert.strictEqual(r3, r4, 'same results');
+        assert.strictEqual(resolved, 3);
+    });
 });

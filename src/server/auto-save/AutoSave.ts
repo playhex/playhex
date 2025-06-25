@@ -34,12 +34,21 @@ import { AutoSaveInterface } from './AutoSaveInterface.js';
  */
 export class AutoSave<T> implements AutoSaveInterface<T>
 {
-    private currentPromise: Promise<T> | null = null;
-    private nextCallQueued = false;
-    private nextPromise: Promise<T> | null = null;
-    private resolveNext: ((value: T) => void) | null = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private rejectNext: ((reason?: any) => void) | null = null;
+    /**
+     * Currently running callback.
+     * If null, next save() will run callback immediately.
+     * If defined, next save() will run callback once this current is done.
+     */
+    private currentPromise: null | Promise<T> = null;
+
+    /**
+     * Queued callback, to run after current callback.
+     * If null, next save() will queue callback here.
+     * If defined, all next save() will return this same queued callback.
+     */
+    private nextPromise: null | Promise<T> = null;
+
+    private isCallbackRunning = false;
 
     constructor(
         /**
@@ -50,46 +59,40 @@ export class AutoSave<T> implements AutoSaveInterface<T>
 
     save(): Promise<T>
     {
-        if (!this.currentPromise) {
-            this.currentPromise = this.runCallback();
+        if (null !== this.nextPromise) {
+            return this.nextPromise;
+        }
+
+        if (null === this.currentPromise) {
+            this.currentPromise = this.doRunCallback();
+
             return this.currentPromise;
         }
 
-        if (!this.nextCallQueued) {
-            this.nextCallQueued = true;
-            this.nextPromise = new Promise<T>((resolve, reject) => {
-                this.resolveNext = resolve;
-                this.rejectNext = reject;
-            });
-        }
+        this.nextPromise = (async () => {
+            await this.currentPromise;
 
-        return this.nextPromise!;
+            this.currentPromise = this.nextPromise;
+            this.nextPromise = null;
+
+            return this.doRunCallback();
+        })();
+
+        return this.nextPromise;
     }
 
-    private async runCallback(): Promise<T>
+    private async doRunCallback(): Promise<T>
     {
-        try {
-            const result = await this.callback();
-            return result;
-        } catch (err) {
-            throw err;
-        } finally {
-            this.currentPromise = null;
-
-            if (this.nextCallQueued) {
-                this.nextCallQueued = false;
-
-                try {
-                    const result = await this.runCallback();
-                    this.resolveNext?.(result);
-                } catch (err) {
-                    this.rejectNext?.(err);
-                } finally {
-                    this.nextPromise = null;
-                    this.resolveNext = null;
-                    this.rejectNext = null;
-                }
-            }
+        if (this.isCallbackRunning) {
+            throw new Error('A callback is already running');
         }
+
+        this.isCallbackRunning = true;
+
+        const result = await this.callback();
+
+        this.isCallbackRunning = false;
+
+        return result;
     }
 }
