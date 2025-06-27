@@ -151,7 +151,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
     scrollBehavior: async to => {
-        if (to.hash) {
+        if (to.hash && null !== document.querySelector(to.hash)) {
             await new Promise(r => setTimeout(r, 100));
             return { el: to.hash };
         }
