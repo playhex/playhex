@@ -59,7 +59,7 @@ describe('Time controls', () => {
         cy.contains('5:00');
     });
 
-    it.only('creates a game with capped Fischer', () => {
+    it('creates a game with capped Fischer', () => {
         cy
             .contains('h5', 'Play vs AI')
             .closest('.modal-content')
