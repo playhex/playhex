@@ -6,53 +6,44 @@ hexProgram
     .command('check-tests-requirements')
     .description('Check whether config is ok to run integration tests')
     .action(async () => {
-        let ok = true;
-
         if (!AppDataSource.isInitialized) {
             await AppDataSource.initialize();
         }
 
-        // ALLOW_RANKED_BOT_GAMES must be true
-        const { ALLOW_RANKED_BOT_GAMES } = process.env;
-
-        if ('true' !== ALLOW_RANKED_BOT_GAMES) {
-            ok = false;
-            console.log('[FAIL] env var "ALLOW_RANKED_BOT_GAMES" must be true');
+        if ('true' !== process.env.ALLOW_RANKED_BOT_GAMES) {
+            throw new Error('[FAIL] env var "ALLOW_RANKED_BOT_GAMES" must be true');
         }
 
-        // Test bosts must be created
-        if (!await checkBots()) {
-            ok = false;
-            console.log('[FAIL] test bots missing, run: "yarn hex create-test-bots"');
-        }
+        await checkBots();
 
-        // Result
-        if (!ok) {
-            throw new Error('Some requirements are not met');
-        } else {
-            console.log('OK.');
-        }
+        console.log('[ OK ] environment should be ok to run integration tests.');
     })
 ;
 
-const checkBots = async (): Promise<boolean> => {
+const checkBots = async (): Promise<void> => {
     if (!AppDataSource.isInitialized) {
         await AppDataSource.initialize();
     }
 
     const playerRepository = AppDataSource.getRepository(Player);
 
-    if (null === await playerRepository.findOneBy({
-        slug: 'test-determinist-instant',
-    })) {
-        return false;
+    const findBot = async (slug: string): Promise<Player | null> => playerRepository.findOne({
+        where: { slug },
+        relations: { aiConfig: true },
+    });
+
+    const randomInstant = await findBot('test-determinist-instant');
+    const randomWait = await findBot('test-determinist-wait');
+
+    if (!randomInstant || !randomWait) {
+        throw new Error('[FAIL] test bots missing, run: "yarn hex create-test-bots"');
     }
 
-    if (null === await playerRepository.findOneBy({
-        slug: 'test-determinist-wait',
-    })) {
-        return false;
+    if (randomInstant.aiConfig?.config.wait !== 0) {
+        throw new Error('[FAIL] test-determinist-instant ai config changed, be sure that it is: { "wait": 0, "determinist": true }');
     }
 
-    return true;
+    if (randomWait.aiConfig?.config.wait !== 1000) {
+        throw new Error('[FAIL] test-determinist-wait ai config changed, be sure that it is: { "wait": 1000, "determinist": true }');
+    }
 };
