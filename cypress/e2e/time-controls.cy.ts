@@ -59,6 +59,40 @@ describe('Time controls', () => {
         cy.contains('5:00');
     });
 
+    it.only('creates a game with capped Fischer', () => {
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+
+            .contains('Time control')
+            .closest('div')
+            .contains('Fast 5 + 2')
+            .click()
+
+            .closest('.modal-content')
+            .contains('Capped Fischer')
+            .click()
+        ;
+
+        // Change initial time AFTER checking Capped Fischer to make sure maxTime updates
+        // Initial time: 1d
+        cy
+            .get('input#custom-fischer-initial-time')
+            .invoke('val', 26)
+            .trigger('input')
+        ;
+
+        cy.contains('Initial time: 1d');
+
+        cy.submitAIGame();
+
+        cy.contains('.sidebar', 'Playing');
+        cy.get('.nav-game-sidebar').contains('Info').click();
+
+        cy.contains('1d + 2s cap. 5min').should('not.exist');
+        cy.contains('1d + 2s cap.');
+    });
+
     it('create a game with custom time control, Byo Yomi', () => {
         cy
             .contains('h5', 'Play vs AI')

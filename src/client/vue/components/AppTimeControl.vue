@@ -84,6 +84,10 @@ watch(initialTimeStep, step => {
     timeControlType.value = {
         ...timeControlType.value,
     };
+
+    if ('fischer' === timeControlType.value.family && capped.value) {
+        timeControlType.value.options.maxTime = timeControlType.value.options.initialTime;
+    }
 });
 
 // update secondary time when sliding
