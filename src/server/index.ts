@@ -12,6 +12,7 @@ import logger from './services/logger.js';
 import { addSessionMiddlewares } from './services/security/middlewares.js';
 import monitorConnectedSockets from './services/monitorConnectedSockets.js';
 import { initTimeControl } from './services/initTimeControl.js';
+import { enableSwaggerStats } from './swagger-stats/enableSwaggerStats.js';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -31,6 +32,7 @@ const io = new HexServer(server, {
     },
 });
 
+enableSwaggerStats(app);
 addSessionMiddlewares(app, io);
 socketIoAdminUi(io);
 monitorConnectedSockets();
