@@ -11,6 +11,27 @@ const props = defineProps({
         type: Object as PropType<TimeControlBoardsize>,
         required: true,
     },
+
+    /**
+     * Whether to show an icon next to time control,
+     * that represents the type of the time cadency:
+     * a blitz, live or correspondence icon.
+     */
+    showIcon: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
+
+    /**
+     * Whether to show average time to play a move.
+     * Gives an indication of how fast the game may be.
+     */
+    showAverage: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
 });
 
 const cadency = timeControlToCadencyName(props.timeControlBoardsize);
@@ -18,13 +39,18 @@ const cadency = timeControlToCadencyName(props.timeControlBoardsize);
 
 <template>
     <span>
-        <BIconLightningChargeFill v-if="cadency === 'blitz'" class="d-none d-sm-inline" />
-        <BIconAlarmFill v-else-if="cadency === 'normal'" class="d-none d-sm-inline" />
-        <BIconCalendar v-else-if="cadency === 'correspondence'" class="d-none d-sm-inline" />
+        <span v-if="showIcon" class="d-none d-sm-inline">
+            <BIconLightningChargeFill v-if="cadency === 'blitz'" />
+            <BIconAlarmFill v-else-if="cadency === 'normal'" />
+            <BIconCalendar v-else-if="cadency === 'correspondence'" />
+            <span>&nbsp;</span>
+        </span>
 
-        {{ timeControlToString(timeControlBoardsize.timeControl) }}
+        <span>{{ timeControlToString(timeControlBoardsize.timeControl) }}</span>
 
-        <small class="text-body-secondary d-none d-sm-inline">(~{{ msToDuration(1000 * Math.round(calcAverageSecondsPerMove(timeControlBoardsize.timeControl, timeControlBoardsize.boardsize)), 1) }}&nbsp;/&nbsp;{{ $t('move') }})</small>
+        <template v-if="showAverage">
+            <small class="text-body-secondary d-none d-sm-inline">(~{{ msToDuration(1000 * Math.round(calcAverageSecondsPerMove(timeControlBoardsize.timeControl, timeControlBoardsize.boardsize)), 1) }}&nbsp;/&nbsp;{{ $t('move') }})</small>
+        </template>
     </span>
 </template>
 
