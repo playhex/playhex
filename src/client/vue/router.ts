@@ -151,7 +151,17 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
     scrollBehavior: async to => {
-        if (to.hash && null !== document.querySelector(to.hash)) {
+        let elementExists = false;
+
+        try {
+            elementExists = null !== document.querySelector(to.hash);
+        } catch {
+            // Ignore error when hash is "invalid", because of e.g a dot, example:
+            // Document.querySelector: '#match-1.6' is not a valid selector
+            return;
+        }
+
+        if (to.hash && elementExists) {
             await new Promise(r => setTimeout(r, 100));
             return { el: to.hash };
         }
