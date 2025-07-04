@@ -3,8 +3,12 @@ import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
+import { BIconPersonFill, BIconHexagonFill, BIconHexagon, BIconTrophyFill } from 'bootstrap-icons-vue';
 import AppPseudo from '../AppPseudo.vue';
+import { computed } from 'vue';
+import usePlayerTournamentsStore from '../../../stores/playerTournamentsStore.js';
+import Tournament from '../../../../shared/app/models/Tournament.js';
+import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils.js';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -32,6 +36,24 @@ const goToMostUrgentGame = (): void => {
 };
 
 /**
+ * Just adding data-bs-toggle="offcanvas" on offcanvas links
+ * does not work (close offcanvas but prevent navigation).
+ */
+const closeOffcanvas = () => {
+    const navbarToggler: null | HTMLButtonElement = document.querySelector('button.navbar-toggler');
+
+    if (null === navbarToggler) {
+        throw new Error('navbar toggle not found, cannot close offcanvas');
+    }
+
+    // do not click when button is hidden, i.e on larger devices
+    // to prevent showing backdrop on large screen when click on expanded menu items
+    if (navbarToggler.checkVisibility()) {
+        navbarToggler.click();
+    }
+};
+
+/**
  * No game => filled
  * Turn to play => filled
  * No turn to play, but I have current game => empty
@@ -49,36 +71,182 @@ const color = (): string => null === mostUrgentGame.value
         : 'text-primary'
     )
 ;
+
+const routeName = computed<null | string>(() => {
+    const { name } = router.currentRoute.value;
+
+    if ('string' !== typeof name) {
+        return null;
+    }
+
+    return name;
+});
+
+/*
+ * My tournaments
+ */
+const { myTournaments } = storeToRefs(usePlayerTournamentsStore());
+
+/**
+ * Tournament that should show/redirect by default in the app header.
+ * null if there is no, or multiple tournaments: in this case, should redirect to tournaments page.
+ */
+const currentTournament = computed<null | Tournament>(() => {
+    let current: null | Tournament = null;
+
+    // Returns the only running live tournament
+    for (const tournament of myTournaments.value) {
+        if ('running' === tournament.state && 'correspondence' !== timeControlToCadencyName(tournament)) {
+            if (null === current) {
+                current = tournament;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    if (null !== current) {
+        return current;
+    }
+
+    // Returns the only waiting live tournament
+    for (const tournament of myTournaments.value) {
+        if ('created' === tournament.state && 'correspondence' !== timeControlToCadencyName(tournament)) {
+            if (null === current) {
+                current = tournament;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    if (null !== current) {
+        return current;
+    }
+
+    // Returns the only running correspondence tournament
+    for (const tournament of myTournaments.value) {
+        if ('running' === tournament.state && 'correspondence' === timeControlToCadencyName(tournament)) {
+            if (null === current) {
+                current = tournament;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    if (null !== current) {
+        return current;
+    }
+
+    // Returns the only waiting correspondence tournament
+    for (const tournament of myTournaments.value) {
+        if ('created' === tournament.state && 'correspondence' === timeControlToCadencyName(tournament)) {
+            if (null === current) {
+                current = tournament;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    return current;
+});
 </script>
 
 <template>
-    <nav class="menu-top navbar bg-body-tertiary">
-        <div class="container-fluid justify-content-space-between">
-            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">Play<span class="text-danger">Hex</span><small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small></router-link>
+    <nav class="navbar navbar-expand-sm bg-body-tertiary menu-top">
+        <div class="container-fluid">
 
-            <span class="my-turn-notif">
-                <component
-                    :is="isFilled() ? BIconHexagonFill : BIconHexagon"
-                    class="hexagon"
-                    :class="color()"
-                />
-                <button
-                    class="btn-my-turn btn btn-link"
-                    @click="goToMostUrgentGame()"
-                    :class="isFilled() ? 'text-white' : 'text-body'"
-                >{{ myTurnCount }}</button>
-            </span>
+            <!-- PlayHex -->
+            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">
+                Play<span class="text-danger">Hex</span>
+                <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
+            </router-link>
 
-            <p class="nav-player-item">
-                <template v-if="loggedInPlayer">
-                    <BIconPersonFill />
-                    <span>&nbsp;</span>
-                    <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }">
-                        <AppPseudo :player="loggedInPlayer" />
+            <div class="d-sm-none flex-grow-1">
+                <!-- Toggle button in small devices -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <!-- Menu, collapses into offcanvas on small devices -->
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header py-0">
+
+                    <!-- PlayHex in offcanvas -->
+                    <router-link to="/" @click="closeOffcanvas" class="navbar-brand" aria-label="Go to PlayHex lobby">
+                        Play<span class="text-danger">Hex</span>
+                        <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
                     </router-link>
-                </template>
-                <template v-else>logging in…</template>
-            </p>
+
+                    <!-- Close offcanvas -->
+                    <button type="button" class="btn-close p-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+                </div>
+                <div class="offcanvas-body">
+
+                    <!-- Header menu items-->
+                    <ul class="navbar-nav flex-grow-1 pe-3">
+
+                        <li class="nav-item">
+                            <router-link
+                                :to="{ name: 'tournaments' }"
+                                :class="{ active: routeName?.startsWith('tournament') }"
+                                class="nav-link"
+                                @click="closeOffcanvas"
+                            >{{ $t('tournaments') }}</router-link>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <!-- My turn notif -->
+                <span class="my-turn-notif">
+                    <component
+                        :is="isFilled() ? BIconHexagonFill : BIconHexagon"
+                        class="hexagon"
+                        :class="color()"
+                    />
+                    <button
+                        class="btn-my-turn btn btn-link"
+                        @click="goToMostUrgentGame()"
+                        :class="isFilled() ? 'text-white' : 'text-body'"
+                    >{{ myTurnCount }}</button>
+                </span>
+
+                <router-link
+                    v-if="myTournaments.length > 0"
+                    :to="null === currentTournament
+                        ? { name: 'tournaments' }
+                        : { name: 'tournament', params: { slug: currentTournament.slug } }
+                    "
+                    class="link-warning position-relative me-3"
+                >
+                    <BIconTrophyFill style="font-size: 1.5em" />
+                    <!--
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        1
+                        <span class="visually-hidden">playing tournaments</span>
+                    </span>
+                    -->
+                </router-link>
+
+                <!-- Player nickname -->
+                <p class="nav-player-item">
+                    <template v-if="loggedInPlayer">
+                        <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }" class="link-body-emphasis">
+                            <BIconPersonFill style="font-size: 1.5em" />
+                            <AppPseudo :player="loggedInPlayer" classes="d-none d-sm-inline" />
+                        </router-link>
+                    </template>
+                    <template v-else>{{ $t('logging_in') }}</template>
+                </p>
+            </div>
         </div>
     </nav>
 </template>
@@ -88,8 +256,8 @@ nav
     a
         text-decoration none
 
-.navbar-brand
-    margin-right 0
+.navbar-toggler
+    font-size 1em
 
 .nav-player-item
     font-size 1.1em
