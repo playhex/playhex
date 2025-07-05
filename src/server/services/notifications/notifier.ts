@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, HostedGame, Move } from '../../../shared/app/models/index.js';
+import { ChatMessage, HostedGame, Move, Tournament } from '../../../shared/app/models/index.js';
 
 type NotifiableEvents = {
     gameStart: (hostedGame: HostedGame) => void;
@@ -28,6 +28,12 @@ type NotifiableEvents = {
      * Notified once, at 10 seconds, for any player of any game.
      */
     gameTimeControlWarning: (hostedGame: HostedGame) => void;
+
+    /**
+     * When a tournament check-in period just opened,
+     * and subscribed players should check-in.
+     */
+    tournamentCheckInOpen: (tournament: Tournament) => void;
 };
 
 export const notifier = new TypedEmitter<NotifiableEvents>();
