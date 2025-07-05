@@ -88,6 +88,7 @@
     "uuid": "^11.1.0",
     "vue": "^3.5.4",
     "vue-chartjs": "^5.3.2",
+    "vue-component-type-helpers": "^3.0.1",
     "vue-matomo": "^4.2.0",
     "vue-router": "^4.4.4",
     "vue-style-loader": "^4.1.3",

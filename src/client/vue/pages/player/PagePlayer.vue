@@ -5,7 +5,8 @@ import useAuthStore from '../../../stores/authStore.js';
 import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
-import { Ref, ref, watch } from 'vue';
+import { Ref, ref, useTemplateRef, watch } from 'vue';
+import type { ComponentExposed } from 'vue-component-type-helpers';
 import { format } from 'date-fns';
 import useLobbyStore from '../../../stores/lobbyStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
@@ -289,7 +290,7 @@ watchEffect(async () => {
     }
 });
 
-const ratingChart = ref<typeof AppPlayerRatingChart>();
+const ratingChart = useTemplateRef<ComponentExposed<typeof AppPlayerRatingChart>>('ratingChart');
 
 const showRatingCategory = (category: RatingCategory): void => {
     if (!ratingChart.value) {
