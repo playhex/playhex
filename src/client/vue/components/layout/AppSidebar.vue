@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useOnlinePlayersStore from '../../../stores/onlinePlayersStore.js';
 import AppPseudo from '../AppPseudo.vue';
 import AppTournamentCard from '../AppTournamentCard.vue';
-import type { OnlinePlayer } from '../../../../shared/app/models/index.js';
+import { Tournament, type OnlinePlayer } from '../../../../shared/app/models/index.js';
+import { apiGetActiveTournaments } from '../../../apiClient.js';
+import AppFeaturedTournamentCard from '../../tournaments/components/AppFeaturedTournamentCard.vue';
 
 const {
     players,
@@ -55,6 +57,15 @@ const getNextHexMonthlyNumber = (month: Date): number => {
 
 const nextHexMonthlyDate = getHexMonthlyDate();
 const nextHexMonthlyNumber = getNextHexMonthlyNumber(nextHexMonthlyDate);
+
+// Featured tournaments
+const featuredTournaments = ref<Tournament[]>([]);
+
+(async () => {
+    featuredTournaments.value = await apiGetActiveTournaments({
+        featured: true,
+    });
+})();
 </script>
 
 <template>
@@ -63,6 +74,12 @@ const nextHexMonthlyNumber = getNextHexMonthlyNumber(nextHexMonthlyDate);
             :name="'Hex Monthly ' + nextHexMonthlyNumber"
             :startDate="nextHexMonthlyDate"
             :registerLink="'https://challonge.com/hex_monthly_' + nextHexMonthlyNumber"
+        />
+
+        <AppFeaturedTournamentCard
+            v-for="tournament in featuredTournaments"
+            :key="tournament.publicId"
+            :tournament
         />
 
         <h3>{{ $t('n_online_players', { n: null === totalPlayers ? '…' : totalPlayers }) }}</h3>
