@@ -61,6 +61,8 @@ export const timeControlToCadencyName = (timeControlBoardsize: TimeControlBoards
 /**
  * Show seconds like time. For in game elapsing time.
  * "5:02", "1h06", "1d 5h"
+ *
+ * Cannot be called server-side because of the need of unit translations.
  */
 export const msToTime = (ms: number): string => {
     const { floor } = Math;
@@ -95,6 +97,8 @@ export const msToTime = (ms: number): string => {
 /**
  * Show seconds like duration. For lobby or time increments.
  * "5min", "1h", "1d12h"
+ *
+ * Cannot be called server-side because of the need of unit translations.
  */
 export const msToDuration = (ms: number, precision = 2): string => {
     if (ms <= 0) {
@@ -136,6 +140,9 @@ export const msToDuration = (ms: number, precision = 2): string => {
 
 const twoWeeks = 86400 * 14 * 1000;
 
+/**
+ * Cannot be called server-side because of the need of unit translations.
+ */
 export const timeControlToString = (timeControl: TimeControlType): string => {
     switch (timeControl.family) {
         case 'fischer': {
