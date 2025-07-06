@@ -2,7 +2,7 @@
 import Player from '../../../shared/app/models/Player.js';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import { PropType } from 'vue';
-import { BIconMoonFill, BIconRecordFill, BIconRobot } from 'bootstrap-icons-vue';
+import { BIconMoonFill, BIconCircleFill, BIconRobot } from 'bootstrap-icons-vue';
 
 const props = defineProps({
     player: {
@@ -20,19 +20,24 @@ const onlinePlayersStore = useOnlinePlayersStore();
         class="me-1 text-success"
         aria-hidden="true"
     />
-    <BIconRecordFill
+    <BIconCircleFill
         v-else-if="!onlinePlayersStore.isPlayerOnline(props.player.publicId)"
-        class="text-secondary"
+        class="lower me-1 text-secondary"
         aria-hidden="true"
     />
-    <BIconRecordFill
+    <BIconCircleFill
         v-else-if="onlinePlayersStore.isPlayerActive(props.player.publicId)"
-        class="text-success"
+        class="lower me-1 text-success"
         aria-hidden="true"
     />
     <BIconMoonFill
         v-else
-        class="text-warning"
+        class="lower me-1 text-warning"
         aria-hidden="true"
     />
 </template>
+
+<style lang="stylus" scoped>
+.lower
+    font-size 0.6em
+</style>
