@@ -5,7 +5,6 @@ import useOnlinePlayersStore from '../../../stores/onlinePlayersStore.js';
 import AppPseudo from '../AppPseudo.vue';
 import AppTournamentCard from '../AppTournamentCard.vue';
 import type { OnlinePlayer } from '../../../../shared/app/models/index.js';
-import AppCijmTournamentCard from '../AppCijmTournamentCard.vue';
 
 const {
     players,
@@ -65,8 +64,6 @@ const nextHexMonthlyNumber = getNextHexMonthlyNumber(nextHexMonthlyDate);
             :startDate="nextHexMonthlyDate"
             :registerLink="'https://challonge.com/hex_monthly_' + nextHexMonthlyNumber"
         />
-
-        <AppCijmTournamentCard />
 
         <h3>{{ $t('n_online_players', { n: null === totalPlayers ? '…' : totalPlayers }) }}</h3>
 
