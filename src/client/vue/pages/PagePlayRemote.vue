@@ -665,7 +665,7 @@ const {
 const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
 
-watchEffect(() => {
+watch([hostedGameClient, loggedInPlayer], () => {
     if (null === hostedGameClient.value || null === loggedInPlayer.value || null === gameView) {
         return;
     }

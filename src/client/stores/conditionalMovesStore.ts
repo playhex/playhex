@@ -10,6 +10,12 @@ import ConditionalMovesEditor, { listenGameViewEvents } from '../../shared/app/C
 
 /**
  * Context for conditional moves of current game.
+ * Store is shared between many parts of the UI that interact with conditional moves:
+ * - game sidebar (edit conditional moves tree)
+ * - bottom game menu (navigate through moves, cut)
+ *
+ * Allow to load and init conditional moves for a game,
+ * and to reset it when leaving game page.
  */
 const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
 
