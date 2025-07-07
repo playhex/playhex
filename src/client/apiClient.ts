@@ -423,6 +423,10 @@ export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | Ga
         return null;
     }
 
+    if (204 === response.status) {
+        return null;
+    }
+
     await checkResponse(response);
 
     return plainToInstance(GameAnalyze, await response.json());

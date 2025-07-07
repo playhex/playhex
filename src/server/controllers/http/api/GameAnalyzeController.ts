@@ -20,7 +20,7 @@ export default class GameAnalyzeController
     ) {}
 
     @Get('/api/games/:publicId/analyze')
-    @OnUndefined(404)
+    @OnUndefined(204)
     async getOne(
         @Param('publicId') publicId: string,
     ) {
