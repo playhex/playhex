@@ -569,9 +569,9 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
     .player-status
         position absolute
-        top 72%
-        left 72%
-        font-size 2em
+        top 77%
+        left 77%
+        font-size 1.25em
 
 td:first-child, th:first-child
     width 6em
