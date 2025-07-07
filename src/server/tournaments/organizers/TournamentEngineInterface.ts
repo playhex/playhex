@@ -34,6 +34,9 @@ export interface TournamentEngineInterface
      * TournamentGame are added with 0, 1 or 2 players, and without HostedGame.
      * HostedGame should be created/started once players are known and ready.
      *
+     * TournamentGame players seating may also switch right before a match starts,
+     * for example to balance players played colors in tournament.
+     *
      * Also fill winnerPath and loserPath.
      *
      * Should be called when brackets is updated:

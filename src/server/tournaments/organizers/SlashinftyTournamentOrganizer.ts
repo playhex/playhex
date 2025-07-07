@@ -1,6 +1,6 @@
 import TournamentOrganizer from 'tournament-organizer';
-import { StandingsValues } from 'tournament-organizer/interfaces';
-import { Tournament as TOTournament, Player as TOPlayer, Match } from 'tournament-organizer/components';
+import { LoadableTournamentValues, StandingsValues } from 'tournament-organizer/interfaces';
+import { Tournament as TOTournament, Match } from 'tournament-organizer/components';
 import { findTournamentGameByRoundAndNumber, getDoubleEliminationFinalRound, getLastRound, tournamentFormatStage1Values, tournamentFormatStage2Values, tournamentMatchNumber } from '../../../shared/app/tournamentUtils.js';
 import { TournamentEngineInterface } from './TournamentEngineInterface.js';
 import { CannotStartTournamentGameError, NotEnoughParticipantsToStartTournamentError, TooDeepResetError, TournamentEngineError } from '../TournamentError.js';
@@ -8,6 +8,7 @@ import { Service } from 'typedi';
 import { Tournament, TournamentGame, Player } from '../../../shared/app/models/index.js';
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import logger from '../../services/logger.js';
 
 const tournamentOrganizer = new TournamentOrganizer();
 
@@ -38,10 +39,12 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 format: tournament.stage2Format ?? undefined,
                 consolation: tournament.consolation ?? undefined,
             } : undefined,
-            players: tournament.participants.map(participant => {
-                return new TOPlayer(participant.player.publicId, participant.player.pseudo);
-            }),
+            seating: true,
         }, tournament.publicId);
+
+        for (const participant of tournament.participants) {
+            toTournament.createPlayer(participant.player.pseudo, participant.player.publicId);
+        }
 
         toTournaments[tournament.publicId] = toTournament;
 
@@ -54,7 +57,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             throw new Error('Tried to reload tournament but no tournament engine data');
         }
 
-        const toTournament = tournamentOrganizer.reloadTournament(tournament.engineData);
+        const toTournament = tournamentOrganizer.loadTournament(tournament.engineData as LoadableTournamentValues);
 
         toTournaments[tournament.publicId] = toTournament;
 
@@ -79,7 +82,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     private findMatchByRoundAndNumber(toTournament: TOTournament, round: number, number: number): null | Match
     {
-        return toTournament.matches.find(match => match.round === round && match.match === number) ?? null;
+        return toTournament.matches.find(match => match.roundNumber === round && match.matchNumber === number) ?? null;
     }
 
     initTournamentEngine(tournament: Tournament)
@@ -94,7 +97,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         const toTournament = this.createToTournament(tournament);
 
         try {
-            toTournament.start();
+            toTournament.startTournament();
         } catch (e) {
             const error = 'string' === typeof e
                 ? new TournamentEngineError(e)
@@ -108,7 +111,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             throw error;
         }
 
-        tournament.engineData = toTournament;
+        tournament.engineData = toTournament.getValues();
     }
 
     /**
@@ -147,7 +150,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         // Create new tournamentGames for new matches
         for (const match of toTournament.matches) {
-            const roundAndNumber = `${match.round}.${match.match}`;
+            const roundAndNumber = `${match.roundNumber}.${match.matchNumber}`;
             let tournamentGame = tournamentGames[roundAndNumber];
 
             if (!tournamentGame) {
@@ -162,20 +165,20 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         // Create winner and loser paths
         for (const match of toTournament.matches) {
-            const roundAndNumber = `${match.round}.${match.match}`;
+            const roundAndNumber = `${match.roundNumber}.${match.matchNumber}`;
             const tournamentGame = tournamentGames[roundAndNumber];
             const { win, loss } = match.path;
 
             if (win) {
                 const winMatch = matches[win];
-                tournamentGame.winnerPath = `${winMatch.round}.${winMatch.match}`;
+                tournamentGame.winnerPath = `${winMatch.roundNumber}.${winMatch.matchNumber}`;
             } else {
                 tournamentGame.winnerPath = null;
             }
 
             if (loss) {
                 const lossMatch = matches[loss];
-                tournamentGame.loserPath = `${lossMatch.round}.${lossMatch.match}`;
+                tournamentGame.loserPath = `${lossMatch.roundNumber}.${lossMatch.matchNumber}`;
             } else {
                 tournamentGame.loserPath = null;
             }
@@ -183,7 +186,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         this.updateTournamentGameLabels(tournament);
 
-        tournament.engineData = toTournament;
+        tournament.engineData = toTournament.getValues();
     }
 
     checkBeforeStart(tournament: Tournament, tournamentGame: TournamentGame): void
@@ -253,22 +256,24 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         if (toTournament.matches.every(match => !match.active)) {
             try {
-                toTournament.next();
+                toTournament.nextRound();
             } catch (e) {
-                toTournament.end();
+                toTournament.endTournament();
             }
         }
 
-        tournament.engineData = toTournament;
+        tournament.engineData = toTournament.getValues();
     }
 
     private doUpdateTournamentGame(tournament: Tournament, tournamentGame: TournamentGame, match: Match): void
     {
-        if (!tournamentGame.player1 && match.player1.id) {
+        // player1 and player2 may switch before match starts
+
+        if (match.player1.id) {
             tournamentGame.player1 = this.getParticipant(tournament, match.player1.id);
         }
 
-        if (!tournamentGame.player2 && match.player2.id) {
+        if (match.player2.id) {
             tournamentGame.player2 = this.getParticipant(tournament, match.player2.id);
         }
     }
@@ -279,8 +284,8 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         tournamentGame.tournament = tournament;
         tournamentGame.state = match.bye ? 'done' : 'waiting';
-        tournamentGame.round = match.round;
-        tournamentGame.number = match.match;
+        tournamentGame.round = match.roundNumber;
+        tournamentGame.number = match.matchNumber;
         tournamentGame.bye = match.bye;
 
         if (match.player1.id) {
@@ -356,7 +361,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         for (const match of toTournament.matches) {
             if (match.active) {
-                const tournamentGame = tournamentGamesIndexed[`${match.round}.${match.match}`];
+                const tournamentGame = tournamentGamesIndexed[`${match.roundNumber}.${match.matchNumber}`];
 
                 if (tournamentGame) {
                     tournamentGames.push(tournamentGame);
@@ -389,23 +394,34 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         this.nextRoundOrEndTournament(tournament);
 
-        tournament.engineData = toTournament;
+        tournament.engineData = toTournament.getValues();
     }
 
     updateParticipantsScore(tournament: Tournament): void
     {
         const toTournament = this.getTournament(tournament);
 
-        const standings = toTournament.standings(false);
-        const playerStanding: { [playerPublicId: string]: StandingsValues } = {};
+        try {
+            const standings = toTournament.getStandings();
 
-        for (const standing of standings) {
-            playerStanding[standing.player.id] = standing;
-        }
+            const playerStanding: { [playerPublicId: string]: StandingsValues } = {};
 
-        for (const participant of tournament.participants) {
-            participant.score = playerStanding[participant.player.publicId].matchPoints;
-            participant.tiebreak = playerStanding[participant.player.publicId].tiebreaks.medianBuchholz;
+            for (const standing of standings) {
+                playerStanding[standing.player.id] = standing;
+            }
+
+            for (const participant of tournament.participants) {
+                participant.score = playerStanding[participant.player.publicId].matchPoints;
+                participant.tiebreak = playerStanding[participant.player.publicId].tiebreaks.medianBuchholz;
+            }
+        } catch (e) {
+            logger.error('Error while getStandings()', {
+                tournamentSlug: tournament.slug,
+                reason: e.message,
+                stack: e.stack,
+            });
+
+            throw e;
         }
     }
 
@@ -489,10 +505,10 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 throw new Error('child match id refers to an inexistent match');
             }
 
-            const childTournamentGame = findTournamentGameByRoundAndNumber(tournament, childMatch.round, childMatch.match);
+            const childTournamentGame = findTournamentGameByRoundAndNumber(tournament, childMatch.roundNumber, childMatch.matchNumber);
 
             if (!childTournamentGame) {
-                throw new Error(`Expected to have a tournament game for ${childMatch.round}.${childMatch.match}`);
+                throw new Error(`Expected to have a tournament game for ${childMatch.roundNumber}.${childMatch.matchNumber}`);
             }
 
             childTournamentGame.state = 'waiting';
@@ -514,6 +530,6 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         resetChildMatch(match.path.win);
         resetChildMatch(match.path.loss);
 
-        tournament.engineData = toTournament;
+        tournament.engineData = toTournament.getValues();
     }
 }

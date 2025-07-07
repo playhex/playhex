@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-import { type LoadableTournamentValues } from 'tournament-organizer/interfaces';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import { IsArray, IsBoolean, IsDate, IsIn, IsInt, IsObject, IsOptional, IsString, IsUUID, Length, Max, Min, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
@@ -273,7 +272,7 @@ export default class Tournament implements TimeControlBoardsize
     @Column({ type: 'json', nullable: true })
     @Transform(({ value }) => JSON.parse(JSON.stringify(value))) // Force expose all fields when value is an instance of Tournament, and not a pojo
     @IsOptional()
-    engineData: null | LoadableTournamentValues;
+    engineData: null | object;
 }
 
 /**
