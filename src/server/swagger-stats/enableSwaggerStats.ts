@@ -21,5 +21,7 @@ export const enableSwaggerStats = (app: Express) => {
                 && SWAGGER_STATS_PASSWORD === password
             ;
         },
+
+        timelineBucketDuration: 60000 * 12,
     }));
 };
