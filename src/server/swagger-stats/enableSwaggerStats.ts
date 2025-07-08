@@ -23,5 +23,6 @@ export const enableSwaggerStats = (app: Express) => {
         },
 
         timelineBucketDuration: 60000 * 12,
+        sessionMaxAge: 86400 * 30,
     }));
 };
