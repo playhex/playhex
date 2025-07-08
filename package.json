@@ -21,7 +21,7 @@
     "build-client": "NODE_OPTIONS='--import=./register.js' NODE_ENV=production TS_NODE_PROJECT=\"src/client/tsconfig.json\" webpack --mode production",
     "build-server": "tsc -b src/server",
     "dev-client": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/client/tsconfig.json\" webpack serve",
-    "dev-server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps index.js\"",
+    "dev-server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps --trace-warnings index.js\"",
     "dev-server-debug": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --inspect --enable-source-maps index.js\"",
     "serve": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev-server\" \"yarn dev-client\"",
     "serve:prod": "yarn build && yarn start:prod",
