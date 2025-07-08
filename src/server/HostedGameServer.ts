@@ -1,10 +1,9 @@
-import winston from 'winston';
 import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
 import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
-import baseLogger, { loggerOptions } from './services/logger.js';
+import baseLogger from './services/logger.js';
 import Rooms from '../shared/app/Rooms.js';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl.js';
 import { createTimeControl } from '../shared/time-control/createTimeControl.js';
@@ -135,11 +134,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             throw new Error('hostedGame publicId must be defined');
         }
 
-        this.logger = winston.createLogger({
-            ...loggerOptions,
-            defaultMeta: {
-                hostedGamePublicId: publicId,
-            },
+        this.logger = baseLogger.child({
+            hostedGamePublicId: publicId,
         });
     }
 
