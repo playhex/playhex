@@ -1,7 +1,15 @@
 {
     "lobby_title": "Play Hex çevrimiçi",
     "lobby": {
-        "no_waiting_games": "Şu anda aktif oyun bulunmamaktadır. Yeni bir tane oluştur!",
-        "watch_current_games": "Aktif oyunları izle"
+        "no_waiting_games": "Şu anda açık oyun bulunmamaktadır. Yeni bir tane oluştur!",
+        "watch_current_games": "Aktif oyunları izle",
+        "join_a_game": "Bir oyuna katıl",
+        "no_playing_games": "Şu anda aktif oyun bulunmamaktadır."
+    },
+    "game": {
+        "title": "Oyun",
+        "info": "Bilgi",
+        "opponent": "Rakip",
+        "size": "Boyut"
     }
 }
