@@ -8,8 +8,10 @@ import { pwaRouter } from './misc/pwa-router.js';
 import logger from '../../services/logger.js';
 import { DomainHttpError, normalizeDomainHttpError } from '../../../shared/app/DomainHttpError.js';
 import { HttpError } from 'routing-controllers';
+import { preRenderedRouter } from './misc/pre-rendered-router.js';
 
 export const registerHttpControllers = (app: Express): void => {
+    app.use(preRenderedRouter());
     app.use(express.static(path.join(process.cwd(), 'assets')));
     registerApi(app);
     app.use(staticsRouter());
