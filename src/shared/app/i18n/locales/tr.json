@@ -76,7 +76,11 @@
     "i_play": {
         "title": "Ben oynuyorum",
         "random": "Rastgele",
-        "first": "İlk",
+        "first": "Birinci",
         "second": "İkinci"
-    }
+    },
+    "swap_rule": "Değiştirme kuralı",
+    "enable_swap_rule": "Değiştirme kuralını etkinleştir",
+    "toggle_coords": "Koordinat gösterimini aç/kapa",
+    "toggle_coords_short": "Koordinatları aç/kapat"
 }
