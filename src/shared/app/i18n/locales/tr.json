@@ -81,6 +81,17 @@
     },
     "swap_rule": "Değiştirme kuralı",
     "enable_swap_rule": "Değiştirme kuralını etkinleştir",
-    "toggle_coords": "Koordinat gösterimini aç/kapa",
-    "toggle_coords_short": "Koordinatları aç/kapat"
+    "toggle_coords": "Koordinat gösterimini aç/kapat",
+    "toggle_coords_short": "Koordinatları aç/kapat",
+    "share_game": "Oyunu paylaş",
+    "copied!": "Kopyalandı!",
+    "not_copied": "Kopyalama başarısız, sağ tıkla veya basılı tut",
+    "handicap": {
+        "title": "Engel",
+        "none": "hiçbiri",
+        "handicap_for_player": "{{player}} için {{n}}"
+    },
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Oyun {player} tarafından {timeAgo} oluşturuldu.",
+    "game_created_by_system_time_ago": "Oyun {timeAgo} sistem tarafından oluşturuldu."
 }
