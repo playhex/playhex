@@ -34,7 +34,49 @@
     },
     "game_rules": {
         "normal": "standart",
-        "host_plays_first": "ev sahibi ilk hamleyi yapar",
-        "host_plays_second": "ev sahibi ikince hamleyi yapar"
+        "host_plays_first": "ev sahibi ilk hamleyi oynar",
+        "host_plays_second": "ev sahibi ikince hamleyi oynar",
+        "no_swap": "değiştirme yok"
+    },
+    "game_state": {
+        "created": "Oluşturuldu",
+        "canceled": "İptal edildi",
+        "forfeited": "Pes edildi",
+        "playing": "Oynanıyor",
+        "ended": "Bitti"
+    },
+    "create_game": {
+        "custom_size": "Özel",
+        "less_options": "Daha az seçenek",
+        "more_options": "Daha çok seçenek"
+    },
+    "player_settings": {
+        "title": "Ayarlar"
+    },
+    "background_theme": {
+        "title": "Tema",
+        "dark": "Karanlık",
+        "light": "Aydınlık"
+    },
+    "time_control": {
+        "custom": "Özel",
+        "use": "Kullan {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Sınırlı Fischer",
+        "capped_abbreviation": "sın.",
+        "initial_time": "Başlangıç süresi",
+        "time_increment": "Süre artışı",
+        "periods": "Periyotlar",
+        "periods_time": "Periyot zamanı",
+        "fast": "Hızlı",
+        "normal": "Normal",
+        "long": "Uzun"
+    },
+    "i_play": {
+        "title": "Ben oynuyorum",
+        "random": "Rastgele",
+        "first": "İlk",
+        "second": "İkinci"
     }
 }
