@@ -10,6 +10,21 @@
         "title": "Oyun",
         "info": "Bilgi",
         "opponent": "Rakip",
-        "size": "Boyut"
+        "size": "Büyüklük",
+        "board": "Oyun tahtası",
+        "board_size": "Tahta büyüklüğü",
+        "time_control": "Zaman kontrolü",
+        "rules": "Kurallar",
+        "created": "Oluşturdu",
+        "accept": "Kabul et",
+        "red": "Kırmızı",
+        "blue": "Mavi",
+        "started": "Başladı",
+        "played": "Oynadı",
+        "finished": "Bitti",
+        "duration": "Süre",
+        "review": "İnceleme",
+        "won": "Kazandı",
+        "outcome": "Sonuç"
     }
 }
