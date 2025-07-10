@@ -15,7 +15,7 @@
         "board_size": "Tahta büyüklüğü",
         "time_control": "Zaman kontrolü",
         "rules": "Kurallar",
-        "created": "Oluşturdu",
+        "created": "Oluşturuldu",
         "accept": "Kabul et",
         "red": "Kırmızı",
         "blue": "Mavi",
@@ -23,8 +23,18 @@
         "played": "Oynadı",
         "finished": "Bitti",
         "duration": "Süre",
-        "review": "İnceleme",
+        "review": "İncele",
         "won": "Kazandı",
-        "outcome": "Sonuç"
+        "outcome": "Sonuç",
+        "lost": "Kaybetti",
+        "playing": "Oynuyor",
+        "watch": "İzle",
+        "title_your_turn": "Senin sıran!",
+        "title_waiting": "Bir rakip bekleniyor: ev sahibi"
+    },
+    "game_rules": {
+        "normal": "standart",
+        "host_plays_first": "ev sahibi ilk hamleyi yapar",
+        "host_plays_second": "ev sahibi ikince hamleyi yapar"
     }
 }
