@@ -1,8 +1,9 @@
 import { Service } from 'typedi';
 import { IsNumber, IsString, Max, Min } from 'class-validator';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import { PreRenderedService } from '../../../services/PreRenderedService.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
-import { Authorized, Body, HttpError, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
+import { Authorized, Body, Delete, HttpError, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
 import { Player, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
@@ -29,11 +30,24 @@ class CreateAiVsAiInput
 export default class AdminController
 {
     constructor(
+        private preRenderedService: PreRenderedService,
         private hostedGameRepository: HostedGameRepository,
         private playerRepository: PlayerRepository,
         private chatMessageRepository: ChatMessageRepository,
         private pushNotificationSender: PushNotificationSender,
     ) {}
+
+    /**
+     * Reset pre rendered pages in cache.
+     * Will only update content of already defined pages.
+     * Won't add new pages, and may break if pages have been deleted,
+     * because express routes don't change (possible but not worth it).
+     */
+    @Delete('/api/admin/pre-rendered-pages-cache')
+    async deletePreRenderedPagesCache()
+    {
+        await this.preRenderedService.preloadTemplatesInMemory();
+    }
 
     @Post('/api/admin/persist-games')
     async persistGames()

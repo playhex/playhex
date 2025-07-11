@@ -126,6 +126,27 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        path: '/',
+        component: () => import('./pages/guide/LayoutGuide.vue'),
+        children: [
+            {
+                name: 'landing',
+                path: 'landing',
+                component: () => import('./pages/guide/landing/PageLandingEn.vue'),
+            },
+            {
+                name: 'landing-en',
+                path: 'en/landing',
+                component: () => import('./pages/guide/landing/PageLandingEn.vue'),
+            },
+            {
+                name: 'landing-fr',
+                path: 'fr/landing',
+                component: () => import('./pages/guide/landing/PageLandingFr.vue'),
+            },
+        ],
+    },
+    {
         name: 'cijm',
         path: '/tournoi-hex-paris-2025',
         component: () => import('./pages/content/PageCijm.vue'),
