@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc><%= baseUrl %>/</loc>
-    </url>
-    <url>
-        <loc><%= baseUrl %>/games-archive</loc>
-    </url>
+    <% for (const url of urls) { -%>
+        <url><loc><%= baseUrl %><%= url %></loc></url>
+    <% } %>
 </urlset>

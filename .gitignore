@@ -6,3 +6,4 @@ cypress/screenshots/
 size-stats-*.json
 var/
 /assets/export-data/
+/views/pre-rendered/

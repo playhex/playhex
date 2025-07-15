@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="<%- lang %>" data-bs-theme="dark">
+
+<head>
+    <%- head %>
+</head>
+
+<body>
+    <div id="vue-app">
+        <%- body %>
+    </div>
+
+    <%- include('partials/sentry.ejs') %>
+
+    <% for(var jsLocation of Object.values(manifest)) {%>
+        <script type="text/javascript" src="<%- jsLocation %>"></script>
+    <% } %>
+</body>
+
+</html>
