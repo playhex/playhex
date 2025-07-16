@@ -1,10 +1,33 @@
 <script setup lang="ts">
-import { useHead } from '@unhead/vue';
+import { defineOrganization, useSchemaOrg } from '@unhead/schema-org';
+import { injectHead, useHead, useSeoMeta } from '@unhead/vue';
 import { BIconDownload } from 'bootstrap-icons-vue';
 import { ref } from 'vue';
 
 useHead({
     title: 'Export PlayHex games data',
+});
+
+useSeoMeta({
+    description: 'Download dataset of all Hex games played on PlayHex.',
+});
+
+useSchemaOrg(injectHead(), {
+    '@type': 'Dataset',
+    name: 'PlayHex.org Hex games',
+    description: 'Hex games played on PlayHex.org. Can be player vs player, or player vs bot. Ranked or Friendly. Variable board size. All games are ended, either by regular victory, resign, timeout or forfeited.',
+    alternateName: ['PlayHex games archive'],
+    creator: defineOrganization({
+        name: 'PlayHex',
+        url: 'https://playhex.org',
+        logo: 'https://playhex.org/images/logo.png',
+    }),
+    isAccessibleForFree: true,
+    keywords: ['board game', 'hex'],
+    license: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    temporalCoverage: '2023-11-22/..',
+    version: () => fileStat.value ? fileStat.value.generated_at.split('.')[0] : undefined,
+    url: 'https://playhex.org/export-games-data',
 });
 
 type FileStat = {
