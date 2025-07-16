@@ -3,7 +3,7 @@ import { useSeoMeta } from '@unhead/vue';
 import { useLandingPages } from '../../../composables/landingPages';
 
 useSeoMeta({
-    title: 'Play Hex Online',
+    title: 'Hraj Hex online',
 });
 
 useLandingPages();
@@ -11,29 +11,29 @@ useLandingPages();
 
 <template>
     <div class="p-3 p-md-5 text-center bg-body-tertiary rounded-3">
-        <h1 class="text-body-emphasis">Play Hex Online</h1>
+        <h1 class="text-body-emphasis">Hraj Hex online</h1>
 
         <p class="fs-5">
-            Enjoy the classic Hex board game online — challenge other players or face off against a computer opponent.
-            Hex is easy to learn but challenging to master.
+            Užij si klasickou deskovou hru Hex online — vyzvi ostatní hráče nebo hraj proti počítači.
+            Hex je snadné na naučení, ale těžké na zvládnutí.
         </p>
 
-        <router-link :to="{ name: 'home' }" class="btn btn-lg btn-success mt-3 px-4 rounded-pill">Start playing now</router-link>
+        <router-link :to="{ name: 'home' }" class="btn btn-lg btn-success mt-3 px-4 rounded-pill">Začni hrát hned</router-link>
     </div>
 
     <div class="row mt-4">
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-            <h2 class="mt-0">Live, Real-Time Matches</h2>
+            <h2 class="mt-0">Živé, Reálné zápasy</h2>
 
             <p class="mb-0">
-                Engage in fast-paced real-time matches, including blitz games, with customizable time controls.
-                Enable pre-moves for faster play. Chat with your opponent during the game.
+                Zapoj se do rychlých reálných zápasů, včetně bleskových her, s nastavitelným časem.
+                Povoli předtahy pro rychlejší hru. Během hry si můžeš psát s protihráčem.
             </p>
         </div>
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
             <img
                 src="/images/screenshots/game-reduced.png"
-                alt="Hex game with AI analysis"
+                alt="Hra Hex s analýzou od AI"
                 class="img-thumbnail"
             />
         </div>
@@ -41,18 +41,18 @@ useLandingPages();
 
     <div class="row mt-4">
         <div class="col-12 col-md-6 order-md-1 d-flex flex-column justify-content-center">
-            <h2 class="mt-0">Turn-Based (Correspondence) Games</h2>
+            <h2 class="mt-0">Tahové (korespondenční) hry</h2>
 
             <p class="mb-0">
-                Prefer a slower pace? Play correspondence games at your own rhythm.
-                Sign in to continue your games across desktop and mobile.
-                Automate obvious plays with conditional moves to play ladders faster.
+                Máš raději pomalejší tempo? Hraj korespondenční hry vlastním tempem.
+                Přihlaš se a pokračuj ve hrách na počítači i mobilu.
+                Automatizuj zřejmé tahy pomocí podmíněných tahů pro rychlejší hraní žebříků.
             </p>
         </div>
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
             <img
                 src="/images/guide/conditional-moves/lines-reduced.png"
-                alt="Turn-based Hex game with conditional moves"
+                alt="Tahová hra Hex s podmíněnými tahy"
                 class="img-thumbnail"
             />
         </div>
@@ -60,17 +60,17 @@ useLandingPages();
 
     <div class="row mt-4">
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-            <h2 class="mt-0">AI-Powered Game Analysis</h2>
+            <h2 class="mt-0">Analýza hry pomocí AI</h2>
 
             <p class="mb-0">
-                After each game, receive an AI-powered review showing the winning player at each move.
-                Discover your strongest moves, blunders, and the optimal alternatives you could have played.
+                Po každé hře obdržíš analýzu poháněnou AI, která ukáže vítězného hráče po každém tahu.
+                Objev své nejlepší tahy, chyby a optimální alternativy, které jsi mohl zahrát.
             </p>
         </div>
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
             <img
                 src="/images/guide/ai-analysis/example.png"
-                alt="AI review of a Hex match"
+                alt="AI analýza zápasu Hex"
                 class="img-thumbnail"
             />
         </div>
@@ -78,17 +78,17 @@ useLandingPages();
 
     <div class="row mt-4">
         <div class="col-12 col-md-6 order-md-1 d-flex flex-column justify-content-center">
-            <h2 class="mt-0">Ranked Games & Progress Tracking</h2>
+            <h2 class="mt-0">Hodnocené hry & sledování pokroku</h2>
 
             <p class="mb-0">
-                Play ranked matches to earn a rating and get matched with players of similar skill.
-                Track your improvement and growth as a Hex player over time.
+                Hraj hodnocené zápasy, získávej hodnocení a hraj proti hráčům podobné úrovně.
+                Sleduj svůj pokrok a zlepšení jako hráč Hexu v průběhu času.
             </p>
         </div>
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
             <img
                 src="/images/screenshots/glicko2-player-history-chart.png"
-                alt="Hex player rating history chart"
+                alt="Graf historie hodnocení hráče Hex"
                 class="img-thumbnail"
             />
         </div>
@@ -96,29 +96,29 @@ useLandingPages();
 
     <div class="row mt-4">
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-            <h2 class="mt-0">Play on Mobile and Desktop</h2>
+            <h2 class="mt-0">Hraj na mobilu i počítači</h2>
 
             <p>
-                Enjoy PlayHex on any device.
-                The platform is fully responsive and optimized for both desktop and mobile.
-                No installation required; just open your browser and start playing.
+                Užij si PlayHex na jakémkoli zařízení.
+                Platforma je plně responzivní a optimalizovaná pro počítače i mobily.
+                Není potřeba instalace — stačí otevřít prohlížeč a začít hrát.
             </p>
 
             <p class="mb-0">
-                Your games are synced across devices when you're logged in,
-                allowing you to start a match on your desktop and continue it later on your phone or tablet.
+                Tvé hry se synchronizují mezi zařízeními, když jsi přihlášený.
+                Můžeš tak začít hru na počítači a pokračovat později na telefonu nebo tabletu.
             </p>
         </div>
         <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
             <img
                 src="/images/screenshots/game-narrow-2.png"
-                alt="Play Hex on mobile"
+                alt="Hraní Hexu na mobilu"
                 class="img-thumbnail"
             />
         </div>
     </div>
 
     <div class="text-center">
-        <router-link :to="{ name: 'home' }" class="btn btn-lg btn-success my-3 px-4 rounded-pill">Go to lobby</router-link>
+        <router-link :to="{ name: 'home' }" class="btn btn-lg btn-success my-3 px-4 rounded-pill">Jít do lobby</router-link>
     </div>
 </template>

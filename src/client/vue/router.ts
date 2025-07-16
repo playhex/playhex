@@ -135,6 +135,16 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('./pages/guide/landing/PageLandingEn.vue'),
             },
             {
+                name: 'landing-cs',
+                path: 'cs/landing',
+                component: () => import('./pages/guide/landing/PageLandingCs.vue'),
+            },
+            {
+                name: 'landing-de',
+                path: 'de/landing',
+                component: () => import('./pages/guide/landing/PageLandingDe.vue'),
+            },
+            {
                 name: 'landing-en',
                 path: 'en/landing',
                 component: () => import('./pages/guide/landing/PageLandingEn.vue'),
@@ -143,6 +153,31 @@ const routes: RouteRecordRaw[] = [
                 name: 'landing-fr',
                 path: 'fr/landing',
                 component: () => import('./pages/guide/landing/PageLandingFr.vue'),
+            },
+            {
+                name: 'landing-ja',
+                path: 'ja/landing',
+                component: () => import('./pages/guide/landing/PageLandingJa.vue'),
+            },
+            {
+                name: 'landing-ko',
+                path: 'ko/landing',
+                component: () => import('./pages/guide/landing/PageLandingKo.vue'),
+            },
+            {
+                name: 'landing-pl',
+                path: 'pl/landing',
+                component: () => import('./pages/guide/landing/PageLandingPl.vue'),
+            },
+            {
+                name: 'landing-tr',
+                path: 'tr/landing',
+                component: () => import('./pages/guide/landing/PageLandingTr.vue'),
+            },
+            {
+                name: 'landing-zh',
+                path: 'zh/landing',
+                component: () => import('./pages/guide/landing/PageLandingZh.vue'),
             },
         ],
     },
