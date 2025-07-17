@@ -1,0 +1,97 @@
+{
+    "lobby_title": "Play Hex çevrimiçi",
+    "lobby": {
+        "no_waiting_games": "Şu anda açık oyun bulunmamaktadır. Yeni bir tane oluştur!",
+        "watch_current_games": "Aktif oyunları izle",
+        "join_a_game": "Bir oyuna katıl",
+        "no_playing_games": "Şu anda aktif oyun bulunmamaktadır."
+    },
+    "game": {
+        "title": "Oyun",
+        "info": "Bilgi",
+        "opponent": "Rakip",
+        "size": "Büyüklük",
+        "board": "Oyun tahtası",
+        "board_size": "Tahta büyüklüğü",
+        "time_control": "Zaman kontrolü",
+        "rules": "Kurallar",
+        "created": "Oluşturuldu",
+        "accept": "Kabul et",
+        "red": "Kırmızı",
+        "blue": "Mavi",
+        "started": "Başladı",
+        "played": "Oynadı",
+        "finished": "Bitti",
+        "duration": "Süre",
+        "review": "İncele",
+        "won": "Kazandı",
+        "outcome": "Sonuç",
+        "lost": "Kaybetti",
+        "playing": "Oynuyor",
+        "watch": "İzle",
+        "title_your_turn": "Senin sıran!",
+        "title_waiting": "Bir rakip bekleniyor: ev sahibi"
+    },
+    "game_rules": {
+        "normal": "standart",
+        "host_plays_first": "ev sahibi ilk hamleyi oynar",
+        "host_plays_second": "ev sahibi ikince hamleyi oynar",
+        "no_swap": "değiştirme yok"
+    },
+    "game_state": {
+        "created": "Oluşturuldu",
+        "canceled": "İptal edildi",
+        "forfeited": "Pes edildi",
+        "playing": "Oynanıyor",
+        "ended": "Bitti"
+    },
+    "create_game": {
+        "custom_size": "Özel",
+        "less_options": "Daha az seçenek",
+        "more_options": "Daha çok seçenek"
+    },
+    "player_settings": {
+        "title": "Ayarlar"
+    },
+    "background_theme": {
+        "title": "Tema",
+        "dark": "Karanlık",
+        "light": "Aydınlık"
+    },
+    "time_control": {
+        "custom": "Özel",
+        "use": "Kullan {{type}}",
+        "byo_yomi": "Byo-Yomi",
+        "fischer": "Fischer",
+        "fischer_capped": "Sınırlı Fischer",
+        "capped_abbreviation": "sın.",
+        "initial_time": "Başlangıç süresi",
+        "time_increment": "Süre artışı",
+        "periods": "Periyotlar",
+        "periods_time": "Periyot zamanı",
+        "fast": "Hızlı",
+        "normal": "Normal",
+        "long": "Uzun"
+    },
+    "i_play": {
+        "title": "Ben oynuyorum",
+        "random": "Rastgele",
+        "first": "Birinci",
+        "second": "İkinci"
+    },
+    "swap_rule": "Değiştirme kuralı",
+    "enable_swap_rule": "Değiştirme kuralını etkinleştir",
+    "toggle_coords": "Koordinat gösterimini aç/kapat",
+    "toggle_coords_short": "Koordinatları aç/kapat",
+    "share_game": "Oyunu paylaş",
+    "copied!": "Kopyalandı!",
+    "not_copied": "Kopyalama başarısız, sağ tıkla veya basılı tut",
+    "handicap": {
+        "title": "Engel",
+        "none": "hiçbiri",
+        "handicap_for_player": "{{player}} için {{n}}"
+    },
+    "2dots": "{{s}}:",
+    "game_created_by_player_time_ago": "Oyun {player} tarafından {timeAgo} oluşturuldu.",
+    "game_created_by_system_time_ago": "Oyun {timeAgo} sistem tarafından oluşturuldu."
+}
