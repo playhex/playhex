@@ -1,11 +1,11 @@
 import TournamentOrganizer from 'tournament-organizer';
 import { StandingsValues } from 'tournament-organizer/interfaces';
 import { Tournament as TOTournament, Player as TOPlayer, Match } from 'tournament-organizer/components';
-import { findTournamentGameByRoundAndNumber, getDoubleEliminationFinalRound, getLastRound, tournamentMatchNumber } from '../../../shared/app/tournamentUtils.js';
+import { findParticipantByPublicIdStrict, findTournamentGameByRoundAndNumber, getDoubleEliminationFinalRound, getLastRound, getTournamentGamesByRoundAndNumber, tournamentMatchNumber } from '../../../shared/app/tournamentUtils.js';
 import { TournamentEngineInterface } from './TournamentEngineInterface.js';
 import { CannotStartTournamentGameError, NotEnoughParticipantsToStartTournamentError, TooDeepResetError, TournamentEngineError } from '../TournamentError.js';
 import { Service } from 'typedi';
-import { Tournament, TournamentGame, Player } from '../../../shared/app/models/index.js';
+import { Tournament, TournamentGame } from '../../../shared/app/models/index.js';
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 
@@ -18,14 +18,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 {
     supports(tournament: Tournament): boolean
     {
-        return [
-            'single-elimination',
-            'double-elimination',
-            'swiss',
-            'double-round-robin',
-        ].includes(tournament.stage1Format)
-            && null === tournament.stage2Format
-        ;
+        return (
+            'single-elimination' === tournament.stage1Format
+            || 'swiss' === tournament.stage1Format
+            || 'round-robin' === tournament.stage1Format
+        ) && null === tournament.stage2Format;
     }
 
     private createToTournament(tournament: Tournament): TOTournament
@@ -84,14 +81,14 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return toTournament.matches.find(match => match.round === round && match.match === number) ?? null;
     }
 
-    initTournamentEngine(tournament: Tournament)
+    async reloadTournament(tournament: Tournament)
     {
         if ('running' === tournament.state) {
             this.reloadToTournament(tournament);
         }
     }
 
-    start(tournament: Tournament): void
+    async start(tournament: Tournament): Promise<void>
     {
         const toTournament = this.createToTournament(tournament);
 
@@ -113,21 +110,6 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         tournament.engineData = toTournament;
     }
 
-    /**
-     * Create a list of TournamentGame indexed by "round.number"
-     * to allow fast retrieve from a given TournamentGame round and number
-     */
-    private getTournamentGamesByRoundAndNumber(tournament: Tournament): { [roundAndNumber: string]: TournamentGame }
-    {
-        const tournamentGames: { [roundAndNumber: string]: TournamentGame } = {};
-
-        for (const tournamentGame of tournament.games) {
-            tournamentGames[tournamentMatchNumber(tournamentGame)] = tournamentGame;
-        }
-
-        return tournamentGames;
-    }
-
     private getMatchesById(toTournament: TOTournament): { [matchId: string]: Match }
     {
         const matches: { [matchId: string]: Match } = {};
@@ -139,13 +121,13 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return matches;
     }
 
-    updateTournamentGames(tournament: Tournament): void
+    async updateTournamentGames(tournament: Tournament): Promise<void>
     {
         const toTournament = this.getTournament(tournament);
 
         this.nextRoundOrEndTournament(tournament);
 
-        const tournamentGames = this.getTournamentGamesByRoundAndNumber(tournament);
+        const tournamentGames = getTournamentGamesByRoundAndNumber(tournament);
 
         // Create new tournamentGames for new matches
         for (const match of toTournament.matches) {
@@ -190,18 +172,6 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     checkBeforeStart(tournament: Tournament, tournamentGame: TournamentGame): void
     {
-        if ('waiting' !== tournamentGame.state) {
-            throw new Error('checkBeforeStart() called with a non-waiting game');
-        }
-
-        if (null === tournamentGame.player1) {
-            throw new CannotStartTournamentGameError('Player1 not yet known');
-        }
-
-        if (null === tournamentGame.player2) {
-            throw new CannotStartTournamentGameError('Player2 not yet known');
-        }
-
         this.checkBeforeStartRoundRobinLiveTournamentGame(tournament, tournamentGame);
     }
 
@@ -215,7 +185,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     private checkBeforeStartRoundRobinLiveTournamentGame(tournament: Tournament, tournamentGame: TournamentGame): void
     {
         if (!tournamentGame.player1 || !tournamentGame.player2) {
-            return;
+            throw new TournamentEngineError('checkBeforeStartRoundRobinLiveTournamentGame(): Missing a player');
         }
 
         // Ignore correspondence tournaments
@@ -267,11 +237,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     private doUpdateTournamentGame(tournament: Tournament, tournamentGame: TournamentGame, match: Match): void
     {
         if (!tournamentGame.player1 && match.player1.id) {
-            tournamentGame.player1 = this.getParticipant(tournament, match.player1.id);
+            tournamentGame.player1 = findParticipantByPublicIdStrict(tournament, match.player1.id);
         }
 
         if (!tournamentGame.player2 && match.player2.id) {
-            tournamentGame.player2 = this.getParticipant(tournament, match.player2.id);
+            tournamentGame.player2 = findParticipantByPublicIdStrict(tournament, match.player2.id);
         }
     }
 
@@ -286,11 +256,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         tournamentGame.bye = match.bye;
 
         if (match.player1.id) {
-            tournamentGame.player1 = this.getParticipant(tournament, match.player1.id);
+            tournamentGame.player1 = findParticipantByPublicIdStrict(tournament, match.player1.id);
         }
 
         if (match.player2.id) {
-            tournamentGame.player2 = this.getParticipant(tournament, match.player2.id);
+            tournamentGame.player2 = findParticipantByPublicIdStrict(tournament, match.player2.id);
         }
 
         tournament.games.push(tournamentGame);
@@ -339,22 +309,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
     }
 
-    private getParticipant(tournament: Tournament, publicId: string): Player
-    {
-        for (const participant of tournament.participants) {
-            if (participant.player.publicId === publicId) {
-                return participant.player;
-            }
-        }
-
-        throw new Error(`Player with public id "${publicId}" not in tournament participants`);
-    }
-
-    getActiveGames(tournament: Tournament): TournamentGame[]
+    async getStillActiveGames(tournament: Tournament): Promise<TournamentGame[]>
     {
         const toTournament = this.getTournament(tournament);
         const tournamentGames: TournamentGame[] = [];
-        const tournamentGamesIndexed = this.getTournamentGamesByRoundAndNumber(tournament);
+        const tournamentGamesIndexed = getTournamentGamesByRoundAndNumber(tournament);
 
         for (const match of toTournament.matches) {
             if (match.active) {
@@ -369,7 +328,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return tournamentGames;
     }
 
-    reportWinner(tournament: Tournament, tournamentGame: TournamentGame, winnerIndex: PlayerIndex): void
+    async reportWinner(tournament: Tournament, tournamentGame: TournamentGame, winnerIndex: PlayerIndex): Promise<void>
     {
         const toTournament = this.getTournament(tournament);
         const match = this.findMatchByRoundAndNumber(toTournament, tournamentGame.round, tournamentGame.number);

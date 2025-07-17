@@ -66,7 +66,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        this.tournamentEngine.initTournamentEngine(this.tournament);
+        await this.tournamentEngine.reloadTournament(this.tournament);
 
         // Must listen before startOnDate or iterateTournament because they may emit those events
         this.on('started', () => this.save());
@@ -319,7 +319,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     {
         this.logger.info('Tournament started now, with startNow()');
 
-        this.doStartTournament();
+        await this.doStartTournament();
         await this.createNextGames();
     }
 
@@ -363,7 +363,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.logger.info('Tournament auto start date is past, start it');
 
             try {
-                this.doStartTournament();
+                await this.doStartTournament();
             } catch (e) {
                 if (e instanceof TournamentError) {
                     this.logger.error('Could not start tournament', { reason: e.message });
@@ -399,8 +399,10 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             }
         }
 
+        const activeTournamentGames = await this.tournamentEngine.getStillActiveGames(this.tournament);
+
         // Check that we have not missed to report winner to tournament engine
-        for (const tournamentGame of this.tournamentEngine.getActiveGames(this.tournament)) {
+        for (const tournamentGame of activeTournamentGames) {
             if ('done' === tournamentGame.state) {
                 this.logger.warning('A game was done, but still active in tournament engine. Reporting winner.', {
                     tournamentGameId: tournamentGame.id,
@@ -409,7 +411,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                     number: tournamentGame.number,
                 });
 
-                this.doMarkGameAsEnded(tournamentGame);
+                await this.doMarkGameAsEnded(tournamentGame);
             }
         }
     }
@@ -422,7 +424,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     {
         this.logger.debug('Add/update tournament games');
 
-        this.tournamentEngine.updateTournamentGames(this.tournament);
+        await this.tournamentEngine.updateTournamentGames(this.tournament);
 
         this.logger.debug('Check if created games can be started');
 
@@ -434,6 +436,16 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             const matchNumber = tournamentMatchNumber(tournamentGame);
 
             this.logger.debug('Check if waiting game can start', { matchNumber });
+
+            if (null === tournamentGame.player1) {
+                this.logger.debug('No, player1 not yet known');
+                continue;
+            }
+
+            if (null === tournamentGame.player2) {
+                this.logger.debug('No, player2 not yet known');
+                continue;
+            }
 
             try {
                 this.tournamentEngine.checkBeforeStart(this.tournament, tournamentGame);
@@ -485,7 +497,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      * Either automatically when start date is now,
      * or manually by host.
      */
-    private doStartTournament(): void
+    private async doStartTournament(): Promise<void>
     {
         if ('created' !== this.tournament.state) {
             throw new Error('Cannot start, already started');
@@ -505,7 +517,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         try {
-            this.tournamentEngine.start(this.tournament);
+            await this.tournamentEngine.start(this.tournament);
             this.tournament.state = 'running';
             this.tournament.startedAt = new Date();
 
@@ -519,18 +531,14 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.emit('started');
         } catch (e) {
             // If tournament hasn't started, participants array must be empty because will be rebuilt again
+            this.tournament.participants = [];
 
             if (e instanceof NotEnoughParticipantsToStartTournamentError) {
                 this.logger.notice('Tried to start tournament, but could not: not enough participants');
-                this.tournament.participants = [];
                 throw e;
             }
 
-            if (e instanceof TournamentError) {
-                this.tournament.participants = [];
-                this.logger.error(e.message, e);
-            }
-
+            this.logger.error(e.message, e);
             throw e;
         }
     }
@@ -579,10 +587,10 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        this.doMarkGameAsEnded(tournamentGame);
+        await this.doMarkGameAsEnded(tournamentGame);
     }
 
-    private doMarkGameAsEnded(tournamentGame: TournamentGame): void
+    private async doMarkGameAsEnded(tournamentGame: TournamentGame): Promise<void>
     {
         const { hostedGame } = tournamentGame;
         const matchNumber = tournamentMatchNumber(tournamentGame);
@@ -601,7 +609,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         this.logger.info('Tournament game has ended, report winner', { matchNumber, winnerIndex });
 
-        this.tournamentEngine.reportWinner(this.tournament, tournamentGame, winnerIndex);
+        await this.tournamentEngine.reportWinner(this.tournament, tournamentGame, winnerIndex);
         tournamentGame.state = 'done';
         let endedAt = hostedGame.gameData?.endedAt;
 
@@ -650,7 +658,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     private listenHostedGameServer(tournamentGame: TournamentGame, hostedGameServer: HostedGameServer): void
     {
         hostedGameServer.on('ended', async () => {
-            this.doMarkGameAsEnded(tournamentGame);
+            await this.doMarkGameAsEnded(tournamentGame);
             await this.createNextGames();
             this.endTournamentIfEnded();
         });

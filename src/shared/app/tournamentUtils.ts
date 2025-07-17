@@ -1,6 +1,9 @@
 import { HostedGameOptions, Player, Tournament, TournamentGame, TournamentParticipant } from './models/index.js';
 import { slugify } from './slugify.js';
 
+/**
+ * All tournament formats supported
+ */
 export const tournamentFormatStage1Values = [
     'single-elimination',
     'double-elimination',
@@ -10,6 +13,9 @@ export const tournamentFormatStage1Values = [
     // 'double-round-robin',
 ] as const;
 
+/**
+ * All tournament formats supported for a second stage
+ */
 export const tournamentFormatStage2Values = [
     // 'single-elimination',
     // 'double-elimination',
@@ -102,6 +108,35 @@ export const tournamentStartsAutomatically = (tournament: Tournament): null | Da
  */
 export const tournamentMatchNumber = (tournamentGame: TournamentGame): string => {
     return tournamentGame.round + '.' + tournamentGame.number;
+};
+
+/**
+ * Creates a list of TournamentGame indexed by "round.number"
+ * to allow fast retrieve from a given TournamentGame round and number
+ */
+export const getTournamentGamesByRoundAndNumber = (tournament: Tournament): { [roundAndNumber: string]: TournamentGame } => {
+    const tournamentGames: { [roundAndNumber: string]: TournamentGame } = {};
+
+    for (const tournamentGame of tournament.games) {
+        tournamentGames[tournamentMatchNumber(tournamentGame)] = tournamentGame;
+    }
+
+    return tournamentGames;
+};
+
+/**
+ * Find a participant in given tournament.
+ *
+ * @throws {Error} If no participant found with this public id
+ */
+export const findParticipantByPublicIdStrict = (tournament: Tournament, publicId: string): Player => {
+    for (const participant of tournament.participants) {
+        if (participant.player.publicId === publicId) {
+            return participant.player;
+        }
+    }
+
+    throw new Error(`Player with public id "${publicId}" not in tournament participants`);
 };
 
 /**

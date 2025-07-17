@@ -1,6 +1,13 @@
 import { Tournament, TournamentGame } from '../../../shared/app/models/index.js';
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
 
+/**
+ * Bridge between application and tournament library.
+ * Can support a format of tournament and not another.
+ *
+ * Application will interact with a TournamentEngine implementation
+ * by sending update, and the implementation can read/update a Tournament instance.
+ */
 export interface TournamentEngineInterface
 {
     /**
@@ -10,22 +17,27 @@ export interface TournamentEngineInterface
 
     /**
      * An active tournament has been initialized.
-     * Should init/reload tournament engine.
+     * Tournament can be in "created" or "running" state.
+     * Should reload tournament from `tournament.engineData`.
+     * May do nothing if tournament is not started and no initialization work is necessary.
      */
-    initTournamentEngine(tournament: Tournament): void;
+    reloadTournament(tournament: Tournament): Promise<void>;
 
     /**
      * Tournament has started,
      * should start tournament in the engine.
+     * tournament.participants are now set.
      *
      * @throws {TournamentEngineError} If tournament could not start
      */
-    start(tournament: Tournament): void;
+    start(tournament: Tournament): Promise<void>;
 
     /**
-     * Returns all currently active games.
+     * Returns all games currently in an "playing" state in the engine.
+     * Used to make sure we have reported the game as "ended" in the engine,
+     * and not be stuck.
      */
-    getActiveGames(tournament: Tournament): TournamentGame[];
+    getStillActiveGames(tournament: Tournament): Promise<TournamentGame[]>;
 
     /**
      * Will add/update TournamentGame in tournament.games
@@ -40,12 +52,16 @@ export interface TournamentEngineInterface
      * (game has ended, player has moved)
      * to create new tournament games, update players in games.
      */
-    updateTournamentGames(tournament: Tournament): void;
+    updateTournamentGames(tournament: Tournament): Promise<void>;
 
     /**
      * Tells if a TournamentGame can start.
-     * Provided TournamentGame should be in state waiting,
-     * then throws an error with the reason if a game cannot start yet.
+     * Provided TournamentGame is in waiting state, and both players known.
+     *
+     * In most case that won't do anything, but some extra conditions can be added here,
+     * depending on tournament format.
+     *
+     * Throws an error with the reason if a game cannot start yet.
      *
      * @throws {CannotStartTournamentGameError} If tournament game cannot start
      */
@@ -57,7 +73,7 @@ export interface TournamentEngineInterface
      *
      * Should be called once a game has ended.
      */
-    reportWinner(tournament: Tournament, tournamentGame: TournamentGame, winnerIndex: PlayerIndex): void;
+    reportWinner(tournament: Tournament, tournamentGame: TournamentGame, winnerIndex: PlayerIndex): Promise<void>;
 
     /**
      * Update participant scores and tiebreaks values.

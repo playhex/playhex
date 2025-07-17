@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Tournament, TournamentGame } from '../../../shared/app/models/index.js';
+import { Tournament } from '../../../shared/app/models/index.js';
 import { createTournamentFromCreateInput } from '../../../shared/app/models/Tournament.js';
 import { ActiveTournament } from '../../tournaments/ActiveTournament.js';
 import { TournamentEngineInterface } from '../../tournaments/organizers/TournamentEngineInterface.js';
@@ -11,28 +11,28 @@ class MockedOrganizer implements TournamentEngineInterface
 {
     finished = false;
 
-    supports(): boolean
+    supports()
     {
         return true;
     }
 
-    getActiveGames(): TournamentGame[]
+    async getStillActiveGames()
     {
         return [];
     }
 
-    isFinished(): boolean
+    isFinished()
     {
         return this.finished;
     }
 
-    initTournamentEngine(): void {}
-    start(): void {}
-    updateTournamentGames(): void {}
-    checkBeforeStart(): boolean { return true; }
-    reportWinner(): void {}
-    updateParticipantsScore(): void {}
-    resetAndRecreateGame(): void {}
+    async reloadTournament() {}
+    async start() {}
+    async updateTournamentGames() {}
+    checkBeforeStart() { return true; }
+    async reportWinner() {}
+    updateParticipantsScore() {}
+    resetAndRecreateGame() {}
 }
 
 describe('ActiveTournament', () => {
