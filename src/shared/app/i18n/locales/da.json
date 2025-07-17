@@ -140,7 +140,7 @@
     "rating": "Bedømmelse",
     "new_game": "Nyt spil",
     "players": "Spillere",
-    "player": "spiller",
+    "player": "Spiller",
     "load_more": "Indlæs mere",
     "no_such_player": "Det ser ud til, at der ikke er en sådan spiller.",
     "n_online_players": "Online ({{n}})",
