@@ -45,6 +45,8 @@
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.2",
     "bootstrap-icons-vue": "^1.11.1",
+    "brackets-manager": "^1.6.4",
+    "brackets-memory-db": "^1.0.5",
     "chart.js": "^4.4.8",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-zoom": "^2.2.0",
