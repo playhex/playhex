@@ -111,6 +111,13 @@ export const availableLocales: AvailableLocales = {
         label: '🇸🇪 Svenska (Swedish)',
         loader: () => import(/* webpackChunkName: "locale-sv" */ 'date-fns/locale/sv') as unknown as DefaultExportLocale,
     },
+    tr: {
+        label: '🇹🇷 Türkçe (Turkish)',
+        loader: () => import(/* webpackChunkName: "locale-tr" */ 'date-fns/locale/tr') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'AtomGutan', link: 'https://hosted.weblate.org/user/kmete2105/' },
+        ],
+    },
     ja: {
         label: '🇯🇵 日本語 (Japanese)',
         loader: () => import(/* webpackChunkName: "locale-ja" */ 'date-fns/locale/ja') as unknown as DefaultExportLocale,
