@@ -10,6 +10,7 @@
         "title": "Oyun",
         "info": "Bilgi",
         "opponent": "Rakip",
+        "host": "Ev sahibi",
         "size": "Büyüklük",
         "board": "Oyun tahtası",
         "board_size": "Tahta büyüklüğü",
@@ -35,7 +36,7 @@
     "game_rules": {
         "normal": "standart",
         "host_plays_first": "ev sahibi ilk hamleyi oynar",
-        "host_plays_second": "ev sahibi ikince hamleyi oynar",
+        "host_plays_second": "ev sahibi ikinci hamleyi oynar",
         "no_swap": "değiştirme yok"
     },
     "game_state": {
@@ -93,5 +94,257 @@
     },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Oyun {player} tarafından {timeAgo} oluşturuldu.",
-    "game_created_by_system_time_ago": "Oyun {timeAgo} sistem tarafından oluşturuldu."
+    "game_created_by_system_time_ago": "Oyun {timeAgo} sistem tarafından oluşturuldu.",
+    "game_was_created_by_player_time_ago": "Oyun {{player}} tarafından oluşturulmuştu, {{timeAgo}}.",
+    "log_out": "Çıkış yap",
+    "log_in": "Giriş yap",
+    "sign_up": "Kayıt ol",
+    "feedback": "Geri bildirim",
+    "hex_links": "Hex bağlantıları",
+    "project_under_development": "Proje geliştiriliyor",
+    "last_change": "Son değişiklik: {{date}}",
+    "privacy_policy": "Gizlilik politikası",
+    "license_agpl": "AGPL-3.0 Lisansı",
+    "create_account": "Hesap oluştur",
+    "username_not_an_email_warning": "Hey, e-posta giriyor gibisin ama PlayHex sadece kullanıcı adı ister. E-postan herkese açık olur...",
+    "already_have_account_login_instead": "Zaten hesabın var mı? {login}",
+    "already_have_account_login_instead_link_label": "Giriş yap",
+    "no_account_sign_up_instead": "Hesabın yok mu? {signUp}",
+    "no_account_sign_up_instead_link_label": "Kayıt ol",
+    "add_your_language": "Diliniz eksik mi? {link}!",
+    "add_your_language_link": "Weblate ile ekleyin",
+    "show_coords_by_default": "Koordinatları varsayılan olarak göster",
+    "username": "Kullanıcı adı",
+    "password": "Şifre",
+    "account_created_on": "Hesap oluşturulma tarihi: {{date}}",
+    "player_current_games": "Mevcut oyunlar",
+    "player_game_history": "Oyun geçmişi",
+    "waiting": "bekleniyor…",
+    "initializing_game": "Oyun başlatılıyor…",
+    "game_finished_overlay": {
+        "title": "Oyun bitti"
+    },
+    "game_has_been_canceled": "Oyun iptal edildi.",
+    "waiting_for_an_opponent": "Rakip bekleniyor…",
+    "confirm_overlay": {
+        "confirmation": "Onay",
+        "are_you_sure?": "Emin misin?"
+    },
+    "workers": {
+        "slow_worker": "Şu anda hızlı çalışan yok. Sadece sınırlı yapay zekâ mevcut.",
+        "no_worker": "Hiçbir çalışan şu anda hamle hesaplayamıyor. Sadece rastgele botlar mevcut.",
+        "see_how_to_spawn_a_worker": "Kendi bilgisayarından AI hamlelerini nasıl hesaplayabileceğini öğren"
+    },
+    "game_analysis": {
+        "game_analysis": "AI oyun analizi",
+        "request_analysis": "AI analizi iste",
+        "requested": "AI analizi bekleniyor…",
+        "errored": "AI analizi başarısız oldu!",
+        "best_move": "en iyi hamle",
+        "best": "en iyi:",
+        "how_it_works": "Nasıl çalışır"
+    },
+    "try_again": "Tekrar dene",
+    "yes": "Evet",
+    "no": "Hayır",
+    "language": "Dil",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "discard": "Vazgeç",
+    "pass": "Pas",
+    "player_passed_his_turn": "{{player}} sırasını pas geçti",
+    "go_to_the_game": "Oyuna git",
+    "explore": "Keşfet",
+    "close": "Kapat",
+    "ranked": "Sıralı",
+    "friendly": "Dostluk",
+    "any": "Herhangi",
+    "rating_n": "Puan: {{rating}}",
+    "rating": "Puan",
+    "new_game": "Yeni oyun",
+    "players": "Oyuncular",
+    "player": "oyuncu",
+    "load_more": "Daha fazla yükle",
+    "no_such_player": "Böyle bir oyuncu yok gibi görünüyor.",
+    "n_online_players": "Çevrimiçi ({{n}})",
+    "guest": "Misafir",
+    "finished_games": "Biten oyunlar",
+    "1v1": "1v1",
+    "sort_date": {
+        "asc": "Kronolojik",
+        "desc": "En yeni önce"
+    },
+    "1v1_ranked": {
+        "title": "Sıralı",
+        "create": "1v1 sıralı oluştur"
+    },
+    "1v1_friendly": {
+        "title": "Dostluk",
+        "create": "1v1 dostluk oluştur"
+    },
+    "1vAI_ranked": {
+        "title": "AI'ya karşı sıralı",
+        "create": "AI'ya karşı sıralı oyna"
+    },
+    "1vAI_friendly": {
+        "title": "AI'ya karşı oyna",
+        "create": "AI'ya karşı oyna"
+    },
+    "1vAI_offline": {
+        "title": "Çevrimdışı AI",
+        "create": "Çevrimdışı AI'ya karşı oyna"
+    },
+    "offline_game_explain": "Çevrimdışı oyunlar yalnızca cihazınızda çalışır, yani internet bağlantısı olmadan oynayabilirsiniz. PlayHex sunucusu dahil değildir.",
+    "loading_game": "Oyun yükleniyor…",
+    "loading": "Yükleniyor…",
+    "tournament": "Turnuva",
+    "now!": "Şimdi!",
+    "register_on_challonge": "Challonge’a kayıt ol",
+    "see_progression_on_challonge": "Challonge’da ilerlemeyi gör",
+    "move": "hamle",
+    "moves": "Hamleler",
+    "move_number": "{{n}}. hamle",
+    "chat": "Sohbet",
+    "system": "Sistem",
+    "chat_message_placeholder": "Mesaj…",
+    "unread_messages": "okunmamış mesajlar",
+    "send_chat_message": "Gönder",
+    "n_characters_one": "{{count}} karakter",
+    "n_characters_other": "{{count}} karakter",
+    "landscape": "Yatay",
+    "portrait": "Dikey",
+    "force_board_orientation_mode": "Bu ekran için tahtayı yatay veya dikey göstermeyi zorla",
+    "resign": "Terk et",
+    "auto": "Otomatik",
+    "conditional_moves": {
+        "title": "Koşullu hamleler",
+        "title_short": "Eğer-hamleler",
+        "cut_move": "Hamleyi kes",
+        "inactive_lines": "Etkin olmayan hamle dizileri",
+        "clear_inactive_lines": "Etkin olmayanları temizle"
+    },
+    "board_orientation": {
+        "title": "Yönlendirme",
+        "description": "Portre ve yatay ekran yönleri için tercih ettiğiniz tahta dönüşü.",
+        "flat": "Düz",
+        "flat_2": "Düz 2",
+        "diamond": "Elmas"
+    },
+    "shading_patterns": {
+        "title": "Gölgeleme deseni",
+        "visibility": "Gölgeleme görünürlüğü",
+        "types": {
+            "null": "Yok",
+            "tricolor_checkerboard": "Üç renkli dama",
+            "concentrical_rings": "Eşmerkezli halkalar (HexWorld)",
+            "height_5_lines": "Yükseklik 5 çizgileri",
+            "single_ring": "Tek halka",
+            "custom": "Özel"
+        },
+        "custom_expression": "Özel ifade",
+        "help_custom": "Özel gölgeleme için matematiksel ifade.<br>Her hücre (satır, sütun) için 0 ile 1 arasında değer döndürmelidir.<br>Kullanılabilir değişkenler:<br>- <code>row</code> / <code>col</code><br>- <code>size</code><br>- <code>distToSide</code><br>Operatörler için: https://github.com/silentmatt/expr-eval?tab=readme-ov-file#expression-syntax"
+    },
+    "show_44_dots": "4-4 hücrelerinde noktaları göster",
+    "preview": "Önizleme",
+    "change_password": "Şifreyi değiştir",
+    "old_password": "Eski şifre",
+    "new_password": "Yeni şifre",
+    "confirm_new_password": "Yeni şifreyi onayla",
+    "update_password": "Şifreyi güncelle",
+    "password_changed_success": "Şifre değiştirildi.",
+    "contribute": "Katkıda bulun",
+    "contributors": "Katkıda bulunanlar",
+    "no_yet_data": "Kim bilir!",
+    "player_made_a_move": "{{player}} bir hamle yaptı",
+    "game_with_player_has_started": "{{player}} oyuna katıldı ve oyun başladı",
+    "last_move": "Son hamle",
+    "total_played_games": "Toplam oynanan oyun",
+    "preferred_board_sizes": "Tercih edilen tahta boyutları",
+    "ranked_games": "Sıralı",
+    "friendly_games": "Dostluk",
+    "bot_games": "Bot oyunları",
+    "browse_all_ended_games": "Biten tüm oyunlara göz at",
+    "n_total_games_zero": "Eşleşen oyun yok.",
+    "n_total_games_one": "1 toplam oyun.",
+    "n_total_games_other": "{{count}} toplam oyun.",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "page_page_of_max": "{{page}} / {{max}}. sayfa",
+    "must_be_logged_in_as_guest": "Misafir olarak giriş yapmış olmalısınız",
+    "pseudo_already_taken": "Bu kullanıcı adı zaten kullanılıyor",
+    "pseudo_not_existing": "Bu kullanıcı adına sahip bir oyuncu yok",
+    "invalid_password": "Bu hesap için geçersiz şifre",
+    "pseudo_too_short": "Kullanıcı adı çok kısa",
+    "pseudo_too_long": "Kullanıcı adı çok uzun",
+    "invalid_pseudo": "Geçersiz kullanıcı adı",
+    "undo": {
+        "undo_move": "Hamleyi geri al",
+        "accept": "Geri almayı kabul et",
+        "reject": "Reddet"
+    },
+    "ping": {
+        "ping_ms": "Ping: {{ms}}ms",
+        "date_shift_ms": "Zaman farkı: {{ms}}ms"
+    },
+    "time_cadency": {
+        "blitz": "Blitz",
+        "normal": "Canlı",
+        "correspondence": "Mektuplaşma"
+    },
+    "overall": "Genel",
+    "boardsize": {
+        "small": "Küçük",
+        "medium": "Orta",
+        "large": "Büyük"
+    },
+    "confirm_move": {
+        "title": "Hamleyi onayla",
+        "button_label": "Hamleyi onayla",
+        "button_label_short": "Onayla",
+        "send_immediately": "Anında gönder",
+        "send_immediately_description": "Bir hücreye tıklayınca hamle anında gönderilir.",
+        "ask_confirmation": "Onay iste",
+        "description": "Yanlış tıklamaları önlemek için hamleleri onaylaman gerekir."
+    },
+    "hex_tournament_paris": {
+        "title": "Paris’te Hex turnuvası",
+        "read_more": "daha fazla oku"
+    },
+    "premove": {
+        "title": "Ön hamle",
+        "description": "Rakip hamlesi sırasında hamle yap: rakip oynar oynamaz uygulanır."
+    },
+    "move_settings": {
+        "title": "Hamle ayarları"
+    },
+    "rematch": {
+        "label": "Rövanş",
+        "accept": "Rövanşı kabul et",
+        "view": "Rövanşı görüntüle"
+    },
+    "short_time_unit": {
+        "day": "g",
+        "hour": "s",
+        "minute": "dk",
+        "second": "sn"
+    },
+    "outcome": {
+        "win": "galibiyet",
+        "loss": "mağlubiyet",
+        "resign": "terk",
+        "forfeit": "hükmen",
+        "time": "süre doldu"
+    },
+    "player_wins_by": {
+        "default": "{player} kazandı!",
+        "time": "{player} süreyle kazandı!",
+        "resign": "{player} kazandı!",
+        "forfeit": "{player} hükmen kazandı!"
+    },
+    "player_loses_reason": {
+        "default": "{player} kaybetti.",
+        "time": "{player} süresi doldu.",
+        "resign": "{player} oyunu terk etti.",
+        "forfeit": "{player} hükmen kaybetti."
+    }
 }
