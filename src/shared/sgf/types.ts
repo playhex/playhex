@@ -149,6 +149,21 @@ export type SGF = SGFNode & {
     PL?: SGFTypeColor;
 
     /**
+     * If this game is from an event, like a tournament, meet, ..., name of this event.
+     *
+     * https://www.red-bean.com/sgf/properties.html#EV
+     */
+    EV?: string;
+
+    /**
+     * Round number, and type of round. Example:
+     * `5 (final)` for round 5, and this is the final.
+     *
+     * https://www.red-bean.com/sgf/properties.html#RO
+     */
+    RO?: string;
+
+    /**
      * Game comments.
      * Provide some background information and/or to summarize the game itself.
      *
