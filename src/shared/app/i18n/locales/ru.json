@@ -142,7 +142,7 @@
     "rating": "Рейтинг",
     "new_game": "Новая игра",
     "players": "Игроки",
-    "player": "игрок",
+    "player": "Игрок",
     "load_more": "Загрузить больше",
     "no_such_player": "Похоже, такого игрока нет.",
     "n_online_players": "В сети ({{n}})",

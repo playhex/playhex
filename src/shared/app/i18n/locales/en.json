@@ -163,7 +163,7 @@
     "rating": "Rating",
     "new_game": "New game",
     "players": "Players",
-    "player": "player",
+    "player": "Player",
     "load_more": "Load more",
     "no_such_player": "Looks like there is no such player.",
     "n_online_players": "Online ({{n}})",

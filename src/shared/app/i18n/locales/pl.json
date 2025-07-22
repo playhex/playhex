@@ -142,7 +142,7 @@
     "rating": "Ocena",
     "new_game": "Nowa gra",
     "players": "Gracze",
-    "player": "gracz",
+    "player": "Gracz",
     "load_more": "Załaduj więcej",
     "no_such_player": "Wygląda na to, że nie ma takiego gracza.",
     "n_online_players": "Online ({{n}})",

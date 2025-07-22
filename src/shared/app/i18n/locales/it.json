@@ -135,7 +135,7 @@
     "rating": "Valutazione",
     "new_game": "Nuovo gioco",
     "players": "Giocatori",
-    "player": "giocatore",
+    "player": "Giocatore",
     "load_more": "Carica di più",
     "no_such_player": "Sembra che non ci sia un tale giocatore.",
     "n_online_players": "Online ({{n}})",
