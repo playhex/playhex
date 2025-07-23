@@ -25,26 +25,26 @@ export class HostedGameOptionsTimeControl
 }
 
 const oneSecond = 1000;
-const twoWeeks = 14 * 86400 * 1000;
+export const maxTimeControlInputTime = 14 * 86400 * 1000;
 
 export class OptionsFischer implements FischerTimeControlOptions
 {
     @IsInt({ always: true })
     @Min(oneSecond, { always: true })
-    @Max(twoWeeks, { always: true })
+    @Max(maxTimeControlInputTime, { always: true })
     @Expose()
     initialTime: number;
 
     @IsInt({ always: true })
     @Min(0, { always: true })
-    @Max(twoWeeks, { always: true })
+    @Max(maxTimeControlInputTime, { always: true })
     @Expose()
     timeIncrement?: number;
 
     @IsOptional({ always: true })
     @IsInt({ always: true })
     @Min(oneSecond, { always: true })
-    @Max(twoWeeks, { always: true })
+    @Max(maxTimeControlInputTime, { always: true })
     @Expose()
     maxTime?: number;
 }
@@ -64,13 +64,13 @@ export class OptionsByoYomi implements ByoYomiTimeControlOptions
 {
     @IsInt({ always: true })
     @Min(oneSecond, { always: true })
-    @Max(twoWeeks, { always: true })
+    @Max(maxTimeControlInputTime, { always: true })
     @Expose()
     initialTime: number;
 
     @IsInt({ always: true })
     @Min(oneSecond, { always: true })
-    @Max(twoWeeks, { always: true })
+    @Max(maxTimeControlInputTime, { always: true })
     @Expose()
     periodTime: number;
 
