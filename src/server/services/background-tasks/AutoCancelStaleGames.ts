@@ -3,7 +3,7 @@ import HostedGameServer from '../../HostedGameServer.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import OnlinePlayersService from '../OnlinePlayersService.js';
 import logger from '../logger.js';
-import { Player } from '../../../shared/app/models/index.js';
+import { HostedGame, Player } from '../../../shared/app/models/index.js';
 
 type StaleGames = { [playerPublicId: string]: {
     player: Player;
@@ -19,6 +19,8 @@ const { AUTO_CANCEL_STALE_GAMES_AFTER } = process.env;
  *
  * - when someone creates a live game (not correspondence) and disconnect for too long,
  * - when someone does not plays its first move for too long.
+ *
+ * Tournament games are not canceled.
  */
 @Service()
 export default class AutoCancelStaleGames
@@ -78,7 +80,7 @@ export default class AutoCancelStaleGames
         };
 
         for (const game of loadedGames) {
-            if (this.isCorrespondence(game)) {
+            if (!this.canCancelGame(game.getHostedGame())) {
                 continue;
             }
 
@@ -126,7 +128,7 @@ export default class AutoCancelStaleGames
         this.onlinePlayersService.on('playerDisconnected', player => {
             const playerStaleGames = this.getPlayerActiveGames(player)
                 .filter(game => {
-                    if (this.isCorrespondence(game)) {
+                    if (!this.canCancelGame(game.getHostedGame())) {
                         return false;
                     }
 
@@ -179,9 +181,17 @@ export default class AutoCancelStaleGames
         }
     }
 
-    private isCorrespondence(hostedGameServer: HostedGameServer): boolean
+    private canCancelGame(hostedGame: HostedGame): boolean
     {
-        return 'correspondence' === timeControlToCadencyName(hostedGameServer.getHostedGameOptions());
+        if ('correspondence' === timeControlToCadencyName(hostedGame.gameOptions)) {
+            return false;
+        }
+
+        if (hostedGame.tournamentMatch) {
+            return false;
+        }
+
+        return true;
     }
 
     private showStaleGamesInLogs(staleGames: StaleGames): void
