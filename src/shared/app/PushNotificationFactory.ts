@@ -1,9 +1,11 @@
 import { getOtherPlayer, getStrictWinnerPlayer } from './hostedGameUtils.js';
-import { HostedGame, Player } from './models/index.js';
+import { HostedGame, Player, Tournament } from './models/index.js';
 import { pseudoString } from './pseudoUtils.js';
 import { PushPayload } from './PushPayload.js';
+import { getCheckInOpensDate } from './tournamentUtils.js';
 
 const gameTag = (hostedGame: HostedGame): string => `game-${hostedGame.publicId}`;
+const tournamentTag = (tournament: Tournament): string => `tournament-${tournament.publicId}`;
 
 /**
  * Create push notifications payload for given event
@@ -87,6 +89,18 @@ export class PushNotificationFactory
         push.goToPath = `/games/${hostedGame.publicId}`;
         push.date = hostedGame.gameData?.endedAt ?? new Date();
         push.tag = gameTag(hostedGame);
+
+        return push;
+    }
+
+    static createTournamentCheckInOpen(tournament: Tournament): PushPayload
+    {
+        const push = new PushPayload('You must check-in now to participate!');
+
+        push.title = `${tournament.title} tournament starts soon`;
+        push.goToPath = `/tournaments/${tournament.slug}`;
+        push.date = getCheckInOpensDate(tournament);
+        push.tag = tournamentTag(tournament);
 
         return push;
     }

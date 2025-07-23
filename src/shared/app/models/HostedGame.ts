@@ -12,6 +12,7 @@ import HostedGameToPlayer from './HostedGameToPlayer.js';
 import { Expose } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
+import TournamentMatch from './TournamentMatch.js';
 
 @Entity()
 export default class HostedGame
@@ -69,6 +70,14 @@ export default class HostedGame
     gameData: null | Game = null;
 
     /**
+     * When this game is played in a tournament, else null.
+     */
+    @OneToOne(() => TournamentMatch, tournamentMatch => tournamentMatch.hostedGame)
+    @Expose()
+    @Type(() => TournamentMatch)
+    tournamentMatch: null | Relation<TournamentMatch> = null;
+
+    /**
      * Whether there is a current player undo request.
      * Equals to the index of the player who asked for undo.
      */
@@ -121,6 +130,7 @@ export type CreateHostedGameParams = {
     gameOptions?: HostedGameOptions;
     host?: null | Player;
     rematchedFrom?: null | HostedGame;
+    tournamentMatch?: null | TournamentMatch;
 };
 
 /**
@@ -137,6 +147,7 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
     hostedGame.chatMessages = [];
     hostedGame.hostedGameToPlayers = [];
     hostedGame.rematchedFrom = params.rematchedFrom ?? null;
+    hostedGame.tournamentMatch = params.tournamentMatch ?? null;
 
     if (params.host) {
         const hostedGameToPlayer = new HostedGameToPlayer();

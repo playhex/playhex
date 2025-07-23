@@ -56,3 +56,15 @@ notifier.on('gameEnd', hostedGame => {
         pushNotificationsPool.poolNotification(player, pushPayload);
     });
 });
+
+notifier.on('tournamentCheckInOpen', tournament => {
+    for (const subscription of tournament.subscriptions) {
+        const pushPayload = PushNotificationFactory.createTournamentCheckInOpen(tournament);
+
+        if (subscription.checkedIn) {
+            continue;
+        }
+
+        pushNotificationsPool.poolNotification(subscription.player, pushPayload);
+    }
+});

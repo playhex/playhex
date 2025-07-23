@@ -135,5 +135,20 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     // HA, guess Demer handicap from game settings and pass moves
     sgf.HA = guessDemerHandicapFromHostedGame(hostedGame);
 
+
+    // EV, RO, tournament
+    if (hostedGame.tournamentMatch) {
+        const tournamentTitle = hostedGame.tournamentMatch.tournament.title;
+        const roundNumber = hostedGame.tournamentMatch.round;
+        const matchType = hostedGame.tournamentMatch.label;
+
+        sgf.EV = tournamentTitle;
+        sgf.RO = '' + roundNumber;
+
+        if (matchType) {
+            sgf.RO += ' (' + matchType.replace(/\)/g, '\\)') + ')';
+        }
+    }
+
     return sgfToString(sgf);
 };
