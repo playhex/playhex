@@ -9,6 +9,8 @@ const { AUTO_CANCEL_STALE_CORRESPONDENCE_GAMES_AFTER } = process.env;
 
 /**
  * Cancel a correspondence game when it has not ativity for too long.
+ *
+ * Tournament games are not canceled.
  */
 @Service()
 export default class AutoCancelStaleCorrespondenceGames
@@ -66,6 +68,10 @@ export default class AutoCancelStaleCorrespondenceGames
         }
 
         if ('playing' !== hostedGameServer.getState()) {
+            return false;
+        }
+
+        if (hostedGameServer.getHostedGame().tournamentMatch) {
             return false;
         }
 

@@ -29,6 +29,6 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
     {
         if (room !== Rooms.lobby) return;
         const games = this.hostedGameRepository.getActiveGamesData();
-        socket.emit('lobbyUpdate', games);
+        socket.emit('lobbyUpdate', games); // TODO serialization group "hosted-game:socket-update" to prevent sending full tournament
     }
 }

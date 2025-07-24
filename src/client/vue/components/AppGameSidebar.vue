@@ -34,6 +34,7 @@ import AppConditionalMoves from './AppConditionalMoves.vue';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
+import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 
 const props = defineProps({
     hostedGameClient: {
@@ -555,8 +556,25 @@ watchEffect(() => {
 
         <!--
             Game ranked/friendly, and custom options
+            Link to tournament if this game is from a tournament
         -->
         <div class="sidebar-block block-game-options" v-if="isTab('main', 'info')">
+            <router-link
+                v-for="tournamentMatch in hostedGameClient.getHostedGame().tournamentMatch ? [hostedGameClient.getHostedGame().tournamentMatch!] : []"
+                :to="{ name: 'tournament', params: { slug: tournamentMatch.tournament.slug }, hash: '#match-' + tournamentMatchKey(tournamentMatch) }"
+                class="btn btn-warning btn-block btn-tournament"
+            >
+                <BIconTrophyFill class="icon" />
+                {{ tournamentMatch.tournament.title }}
+                <small>
+                    -
+                    {{ $t(`match_title.${tournamentMatch.label ?? 'default'}`, {
+                        round: tournamentMatch.round,
+                        number: tournamentMatch.number,
+                    }) }}
+                </small>
+            </router-link>
+
             <div class="container-fluid">
                 <p v-if="hostedGameClient.isRanked()" class="text-warning">
                     <BIconTrophyFill /> {{ $t('ranked') }}
@@ -964,4 +982,21 @@ watchEffect(() => {
 @media (max-height: 600px)
     .block-game-date
         display none
+
+.btn-tournament
+    width 100%
+    border-radius 0
+    background-color #ffc10780
+    border none
+    margin 0.5em 0
+    position relative
+    overflow hidden
+    text-align left
+
+    .icon
+        opacity 0.15
+        font-size 2.5em
+        position absolute
+        left 0.25em
+        top 0
 </style>
