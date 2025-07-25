@@ -227,6 +227,7 @@ defineExpose({
             id="startDate"
             v-model="startsAtDatetimeLocal"
         >
+        <p class="mb-0 mt-1">UTC date: <code>{{ tournament.startOfficialAt?.toISOString().substring(0, '2025-07-26T09:00'.length).replace('T', ' ') ?? '-' }}</code></p>
         <div class="form-text mb-3">When tournament officially starts, in your current timezone. May start sooner or later if you decide to.</div>
     </div>
 
