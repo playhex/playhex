@@ -247,7 +247,6 @@
     "tournament_organized_by": "组织者：{ player }",
     "checkin_opens_time_before": "签到将在 {{ time }} 前开放。",
     "tournament_subscribe": "订阅",
-    "tournament_unsubscribe": "取消订阅",
     "tournament_checkin": "签到",
     "tournament_checkedin": "已签到",
     "no_player_checked_in_yet": "尚无玩家签到。",

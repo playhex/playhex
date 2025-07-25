@@ -361,7 +361,6 @@
     "tournament_organized_by": "Организатор: { player }",
     "checkin_opens_time_before": "Регистрация откроется за {{ time }}.",
     "tournament_subscribe": "Подписаться",
-    "tournament_unsubscribe": "Отписаться",
     "tournament_checkin": "Подтвердить участие",
     "tournament_checkedin": "Участие подтверждено",
     "no_player_checked_in_yet": "Ни один игрок ещё не подтвердил участие.",

@@ -278,7 +278,6 @@
     "tournament_organized_by": "Organiserad av { player }",
     "checkin_opens_time_before": "Incheckning öppnar {{ time }} innan.",
     "tournament_subscribe": "Prenumerera",
-    "tournament_unsubscribe": "Avprenumerera",
     "tournament_checkin": "Checka in",
     "tournament_checkedin": "Incheckad",
     "no_player_checked_in_yet": "Ingen spelare har checkat in ännu.",

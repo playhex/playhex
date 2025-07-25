@@ -92,7 +92,6 @@
     "tournament_organized_by": "Organisé par { player }",
     "checkin_opens_time_before": "L'enregistrement ouvre {{ time }} avant.",
     "tournament_subscribe": "S’abonner",
-    "tournament_unsubscribe": "Se désabonner",
     "tournament_checkin": "Enregistrement",
     "tournament_checkedin": "Enregistré",
     "no_player_checked_in_yet": "Aucun joueur encore enregistré.",

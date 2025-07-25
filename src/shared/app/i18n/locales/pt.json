@@ -250,7 +250,6 @@
     "tournament_organized_by": "Organizado por { player }",
     "checkin_opens_time_before": "Check-in abre {{ time }} antes.",
     "tournament_subscribe": "Inscrever-se",
-    "tournament_unsubscribe": "Cancelar inscrição",
     "tournament_checkin": "Fazer check-in",
     "tournament_checkedin": "Presença confirmada",
     "no_player_checked_in_yet": "Nenhum jogador confirmou presença ainda.",

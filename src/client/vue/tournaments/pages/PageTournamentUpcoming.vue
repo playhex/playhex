@@ -10,7 +10,7 @@ import i18n from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentFormatImage from '../components/AppTournamentFormatImage.vue';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
-import { BIconCalendarEvent, BIconExclamationTriangleFill, BIconPeopleFill, BIconTrophyFill } from 'bootstrap-icons-vue';
+import { BIconBell, BIconCalendarEvent, BIconCheck, BIconExclamationTriangleFill, BIconPeopleFill, BIconTrophyFill } from 'bootstrap-icons-vue';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
@@ -158,7 +158,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
                                     @click="subscribeCheckIn"
                                     class="btn btn-success"
-                                >{{ $t('tournament_subscribe') }}</button>
+                                ><BIconBell /> {{ $t('tournament_subscribe') }}</button>
 
                                 <button
                                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
@@ -170,8 +170,8 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                 <button
                                     v-else-if="null !== currentTournamentSubscription"
                                     @click="unsub"
-                                    class="btn btn-outline-danger"
-                                >{{ $t('tournament_unsubscribe') }}</button>
+                                    class="btn btn-outline-success"
+                                ><BIconCheck /> {{ $t('tournament_subscribe') }}</button>
                             </p>
 
                             <!-- Current player status on this tournament -->

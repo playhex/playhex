@@ -322,7 +322,6 @@
     "tournament_organized_by": "Organisiert von { player }",
     "checkin_opens_time_before": "Check-in öffnet {{ time }} vorher.",
     "tournament_subscribe": "Benachrichtigen",
-    "tournament_unsubscribe": "Benachrichtigung abbestellen",
     "tournament_checkin": "Einchecken",
     "tournament_checkedin": "Eingecheckt",
     "no_player_checked_in_yet": "Noch kein Spieler eingecheckt.",

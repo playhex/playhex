@@ -249,7 +249,6 @@
     "tournament_organized_by": "{ player } が主催",
     "checkin_opens_time_before": "チェックインは{{ time }}前に開始されます。",
     "tournament_subscribe": "通知登録",
-    "tournament_unsubscribe": "登録解除",
     "tournament_checkin": "チェックイン",
     "tournament_checkedin": "チェックイン済み",
     "no_player_checked_in_yet": "まだ誰もチェックインしていません。",

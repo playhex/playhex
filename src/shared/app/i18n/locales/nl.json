@@ -252,7 +252,6 @@
     "tournament_organized_by": "Georganiseerd door { player }",
     "checkin_opens_time_before": "Inchecken opent {{ time }} van tevoren.",
     "tournament_subscribe": "Abonneren",
-    "tournament_unsubscribe": "Afmelden",
     "tournament_checkin": "Inchecken",
     "tournament_checkedin": "Ingecheckt",
     "no_player_checked_in_yet": "Nog geen speler ingecheckt.",

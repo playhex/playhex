@@ -251,7 +251,6 @@
     "tournament_organized_by": "{ player } 주최",
     "checkin_opens_time_before": "참가 확인은 {{ time }} 전에 열립니다.",
     "tournament_subscribe": "알림 신청",
-    "tournament_unsubscribe": "신청 취소",
     "tournament_checkin": "참가 확인",
     "tournament_checkedin": "참가 확인 완료",
     "no_player_checked_in_yet": "아직 참가 확인한 플레이어가 없습니다.",

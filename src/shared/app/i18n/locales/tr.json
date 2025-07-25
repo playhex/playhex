@@ -294,7 +294,6 @@
     "tournament_organized_by": "{ player } tarafından düzenlendi",
     "checkin_opens_time_before": "Check-in {{ time }} önce açılır.",
     "tournament_subscribe": "Abone ol",
-    "tournament_unsubscribe": "Abonelikten çık",
     "tournament_checkin": "Check-in yap",
     "tournament_checkedin": "Check-in yapıldı",
     "no_player_checked_in_yet": "Henüz hiçbir oyuncu check-in yapmadı.",

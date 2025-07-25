@@ -329,7 +329,6 @@
     "tournament_organized_by": "Arrangeret af { player }",
     "checkin_opens_time_before": "Indtjekning åbner {{ time }} før.",
     "tournament_subscribe": "Tilmeld",
-    "tournament_unsubscribe": "Afmeld",
     "tournament_checkin": "Tjek ind",
     "tournament_checkedin": "Indtjekket",
     "no_player_checked_in_yet": "Ingen spillere har tjekket ind endnu.",
