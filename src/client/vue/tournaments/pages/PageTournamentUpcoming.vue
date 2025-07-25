@@ -10,7 +10,7 @@ import i18n from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentFormatImage from '../components/AppTournamentFormatImage.vue';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
-import { BIconCalendarEvent, BIconExclamationTriangleFill, BIconPeopleFill } from 'bootstrap-icons-vue';
+import { BIconCalendarEvent, BIconExclamationTriangleFill, BIconPeopleFill, BIconTrophyFill } from 'bootstrap-icons-vue';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
@@ -119,6 +119,13 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                         v-if="'single-elimination' === tournament.stage1Format && !tournament.consolation"
                                         class="card-subtitle mb-2 text-body-secondary"
                                     >{{ $t('consolation_disabled') }}</h6>
+
+                                    <p v-if="tournament.ranked" class="text-warning m-0">
+                                        <BIconTrophyFill /> {{ $t('ranked') }}
+                                    </p>
+                                    <p v-else class="text-success m-0">
+                                        <BIconPeopleFill /> {{ $t('friendly') }}
+                                    </p>
 
                                     <p class="card-text">
                                         {{ $t('time_cadency.' + timeControlToCadencyName(tournament)) }}
