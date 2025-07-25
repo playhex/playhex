@@ -16,6 +16,7 @@ import AppTournamentHistorySection from '../components/AppTournamentHistorySecti
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
 import AppMySubscriptionStatus from '../components/AppMySubscriptionStatus.vue';
 import AppTournamentStartsAt from '../components/AppTournamentStartsAt.vue';
+import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 
 const {
     tournament,
@@ -238,17 +239,9 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
         </div>
 
         <div class="container my-3">
-            <template v-if="tournament.description">
-                <h2>{{ $t('tournament_description') }}</h2>
-                <p class="tournament-description">{{ tournament.description }}</p>
-            </template>
+            <AppTournamentDescription :tournament />
 
             <AppTournamentHistorySection :tournament />
         </div>
     </template>
 </template>
-
-<style lang="stylus" scoped>
-.tournament-description
-    white-space pre-line
-</style>

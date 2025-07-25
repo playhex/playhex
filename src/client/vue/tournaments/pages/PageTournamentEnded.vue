@@ -12,6 +12,7 @@ import { formatDurationPrecision } from '../../../../shared/app/dateUtils';
 import { computed } from 'vue';
 import { Tournament, TournamentParticipant } from '../../../../shared/app/models';
 import i18n from 'i18next';
+import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 
 const {
     tournament,
@@ -117,17 +118,9 @@ const colClasses = [
 
             <AppTournamentStandings :tournament />
 
-            <template v-if="tournament.description">
-                <h2>{{ $t('tournament_description') }}</h2>
-                <p class="tournament-description">{{ tournament.description }}</p>
-            </template>
+            <AppTournamentDescription :tournament />
 
             <AppTournamentHistorySection :tournament />
         </div>
     </template>
 </template>
-
-<style lang="stylus" scoped>
-.tournament-description
-    white-space pre-line
-</style>

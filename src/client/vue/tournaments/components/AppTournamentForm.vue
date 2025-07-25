@@ -307,10 +307,13 @@ defineExpose({
 
     <h3>Description, rules</h3>
 
+    <p class="text-body-secondary mb-1"><small>Markdown format is supported.</small></p>
+
     <textarea
         v-model="tournament.description"
         class="form-control mb-3"
         id="tournament-description"
+        rows="8"
     ></textarea>
 
     <p class="text-danger" v-if="globalError">{{ globalError }}</p>

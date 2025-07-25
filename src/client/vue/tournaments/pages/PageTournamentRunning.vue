@@ -8,6 +8,7 @@ import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
 import { BIconRecordFill } from 'bootstrap-icons-vue';
 import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
+import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 
 const {
     tournament,
@@ -63,17 +64,9 @@ useHead({
 
             <AppTournamentStandings :tournament />
 
-            <template v-if="tournament.description">
-                <h2>{{ $t('tournament_description') }}</h2>
-                <p class="tournament-description">{{ tournament.description }}</p>
-            </template>
+            <AppTournamentDescription :tournament />
 
             <AppTournamentHistorySection :tournament />
         </div>
     </template>
 </template>
-
-<style lang="stylus" scoped>
-.tournament-description
-    white-space pre-line
-</style>
