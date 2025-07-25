@@ -133,7 +133,7 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
                 >
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-0">{{ tournament.title }}</h5>
-                        {{ $t('n_participants', { count: tournament.subscriptions.length }) }}
+                        {{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}
                     </div>
                     <p class="mb-0">
                         <small><AppCountdown :date="tournament.startOfficialAt" /></small>

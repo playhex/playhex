@@ -221,8 +221,6 @@
     "participants": "参加者",
     "n_people_are_interested_one": "{{count}} 人が興味を持っています。",
     "n_people_are_interested_other": "{{count}} 人が興味を持っています。",
-    "n_people_are_participating_one": "{{count}} 人が参加しています。",
-    "n_people_are_participating_other": "{{count}} 人が参加しています。",
     "n_participants_one": "{{ count }} 人の参加者",
     "n_participants_other": "{{ count }} 人の参加者",
     "n_playing_games_one": "{{ count }} 試合進行中",
