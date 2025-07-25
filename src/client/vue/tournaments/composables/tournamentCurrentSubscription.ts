@@ -49,6 +49,14 @@ export const iAmParticipant = (tournament: Tournament): boolean => {
 };
 
 export const useTournamentCurrentSubscription = (tournament: Ref<null | false | Tournament>) => {
+    const router = useRouter();
+
+    const goToLoginPage = (): void => {
+        router.push({
+            name: 'login',
+        });
+    };
+
     const currentTournamentSubscription = computed<null | TournamentSubscription>(() => {
         if (!tournament.value) {
             return null;
@@ -102,6 +110,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
                                         action: () => goToLoginPage(),
                                     },
                                 ],
+                                autoCloseAfter: 8000,
                             },
                         ));
 
@@ -134,12 +143,4 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
             ;
         },
     };
-};
-
-const router = useRouter();
-
-const goToLoginPage = (): void => {
-    router.push({
-        name: 'login',
-    });
 };
