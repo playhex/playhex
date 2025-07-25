@@ -43,6 +43,8 @@ watchEffect(() => {
             logo: baseUrl + '/images/logo.png',
         }),
         isAccessibleForFree: true,
+        datePublished: fileStat.value.generated_at,
+        dateModified: fileStat.value.generated_at,
         keywords: ['board game', 'hex'],
         license: 'https://creativecommons.org/publicdomain/zero/1.0/',
         temporalCoverage: '2023-11-22/..',
