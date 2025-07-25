@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
 import i18next from 'i18next';
-import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer } from '../../../apiClient.js';
+import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiDeleteTournament } from '../../../apiClient.js';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
 import TournamentBannedPlayer from '../../../../shared/app/models/TournamentBannedPlayer.js';
 import Player from '../../../../shared/app/models/Player.js';
@@ -165,6 +165,20 @@ const unbanPlayer = async (player: Player): Promise<void> => {
     }
 
 };
+
+/**
+ * Delete tournament
+ */
+const deleteTournament = async () => {
+    await apiDeleteTournament(slug);
+
+    useToastsStore().addToast(new Toast(
+        `Tournament ${slug} has been deleted.`,
+        {
+            level: 'warning',
+        },
+    ));
+};
 </script>
 
 <template>
@@ -234,6 +248,13 @@ const unbanPlayer = async (player: Player): Promise<void> => {
         <template v-if="tournament && 'ended' !== tournament.state">
             <button @click="iterateTournament" class="btn btn-warning">Progress now</button>
             <p><small>In case tournament seems stuck (next games not starting), this button should fix it by checking whole tournament state</small></p>
+        </template>
+
+        <br>
+
+        <template v-if="tournament && 'ended' !== tournament.state">
+            <button @click="deleteTournament" class="btn btn-danger">Delete</button>
+            <p><small>Just delete all the tournament. It won't appear again in tournaments list, and won't be accessible anymore.</small></p>
         </template>
     </div>
 </template>

@@ -85,6 +85,7 @@ export default class TournamentRepository
             relations,
             where: {
                 state: In(['created', 'running']),
+                softDeleted: false,
             },
             relationLoadStrategy: 'query',
         });
@@ -222,6 +223,7 @@ export default class TournamentRepository
             },
             where: {
                 state: 'ended',
+                softDeleted: false,
             },
             order: {
                 endedAt: 'desc',
@@ -248,7 +250,7 @@ export default class TournamentRepository
 
         return await this.tournamentRepository.findOne({
             relations,
-            where: { slug },
+            where: { slug, softDeleted: false },
             relationLoadStrategy: 'query',
         });
     }
@@ -268,7 +270,7 @@ export default class TournamentRepository
         }
 
         return await this.tournamentRepository.findOne({
-            where: { slug },
+            where: { slug, softDeleted: false },
             relations: {
                 organizer: true,
             },
@@ -365,5 +367,16 @@ export default class TournamentRepository
         await this.tournamentRepository.save(tournament); // TODO replace by autosave
 
         return tournamentSubscription;
+    }
+
+    async deleteActiveTournament(activeTournament: ActiveTournament): Promise<void>
+    {
+        const tournament = activeTournament.getTournament();
+
+        tournament.softDeleted = true;
+
+        await activeTournament.save();
+
+        delete this.activeTournaments[tournament.publicId];
     }
 }

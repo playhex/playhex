@@ -274,4 +274,20 @@ export default class TournamentController
 
         return activeTournament.getTournament();
     }
+
+    @Delete('/api/tournaments/:slug')
+    async deleteTournament(
+        @AuthenticatedPlayer() player: Player,
+        @Param('slug') slug: string,
+    ): Promise<void> {
+        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+
+        if (null === activeTournament) {
+            throw new NotFoundError(`No active tournament "${slug}"`);
+        }
+
+        mustBeTournamentOrganizer(activeTournament.getTournament(), player);
+
+        await this.tournamentRepository.deleteActiveTournament(activeTournament);
+    }
 }
