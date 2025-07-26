@@ -166,6 +166,11 @@ export default class AutoCancelStaleGames
 
         this.playerStaleGamesTimeouts[player.publicId] = setTimeout(() => {
             for (const game of playerStaleGames) {
+                // Ignore if game has been canceled by player already (after opponent go offline, and before auto stale canceled it)
+                if (game.getHostedGame().state !== 'created') {
+                    continue;
+                }
+
                 logger.info('Cancel game because stale', { gameId: game.getPublicId() });
 
                 game.systemCancel();

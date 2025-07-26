@@ -477,6 +477,11 @@ export default class Game extends TypedEmitter<GameEvents>
         this.emit('ended', playerIndex, outcome, date);
     }
 
+    /**
+     * @param date At which date exactly the game has been canceled.
+     *
+     * @throws {Error} If game is already ended (or already canceled).
+     */
     cancel(date: Date): void
     {
         if (this.isEnded()) {

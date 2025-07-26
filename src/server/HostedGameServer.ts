@@ -949,7 +949,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         const now = new Date();
 
         if (this.game !== null) {
-            this.game.cancel(now);
+            if (this.game.isEnded()) {
+                this.logger.warning('systemCancel() but game is already canceled. Ignore');
+            } else {
+                this.game.cancel(now);
+            }
         } else {
             this.doCancel(now);
         }
