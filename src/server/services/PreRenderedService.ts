@@ -114,7 +114,7 @@ export class PreRenderedService
             seo,
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,
-            blockRobotsIndex: 'true' === process.env.BLOCK_ROBOTS_INDEX,
+            blockRobotsIndex: process.env.BLOCK_ROBOTS_INDEX === 'true',
 
             lang: templateParts.lang,
             head: await this.readTemplatePart(templateParts.head),
@@ -142,7 +142,7 @@ export class PreRenderedService
      */
     getManifest(): Promise<PreRenderedPagesManifest>
     {
-        if (null !== this.manifestPromise) {
+        if (this.manifestPromise !== null) {
             return this.manifestPromise;
         }
 

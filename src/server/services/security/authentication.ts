@@ -32,7 +32,7 @@ export const authenticate = async (pseudo: string, password: string): Promise<Pl
         },
     });
 
-    if (null === player) {
+    if (player === null) {
         throw new PseudoNotExistingError();
     }
 

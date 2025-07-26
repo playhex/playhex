@@ -66,7 +66,7 @@ export const ratingCategories: RatingCategory[] = [
 ];
 
 export const validateRatingCategory = (category: unknown): category is RatingCategory => {
-    return 'string' === typeof category && ratingCategories.includes(category as RatingCategory);
+    return typeof category === 'string' && ratingCategories.includes(category as RatingCategory);
 };
 
 /**

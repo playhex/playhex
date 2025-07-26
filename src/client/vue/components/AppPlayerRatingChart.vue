@@ -38,7 +38,7 @@ const currentRatingCategory = ref<RatingCategory>('overall');
 watchEffect(async () => {
     const ratings = await apiGetPlayerRatingHistory(player.publicId, currentRatingCategory.value);
 
-    if (null === ratings) {
+    if (ratings === null) {
         return;
     }
 
@@ -75,7 +75,7 @@ const ratingChartOptions: ChartOptions<'line'> = {
                     enabled: true,
                 },
                 onZoom: ({ chart }) => {
-                    if (1 === chart.getZoomLevel()) {
+                    if (chart.getZoomLevel() === 1) {
                         isZoomed.value = false;
                         emit('timeRangeUpdated', null, null);
                     } else {

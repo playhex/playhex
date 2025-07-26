@@ -18,11 +18,11 @@ export const useGuestJoiningCorrespondenceWarning = () => {
     const createGuestJoiningCorrepondenceWarningOverlay: () => void = defineOverlay(GuestJoiningCorrepondenceWarningOverlay);
 
     const isGuestJoiningCorrepondence = (hostedGame: HostedGame): boolean => {
-        if (null === loggedInPlayer.value) {
+        if (loggedInPlayer.value === null) {
             return false;
         }
 
-        if (loggedInPlayer.value.isGuest && 'correspondence' === timeControlToCadencyName(hostedGame.gameOptions)) {
+        if (loggedInPlayer.value.isGuest && timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence') {
             return true;
         }
 

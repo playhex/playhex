@@ -19,7 +19,7 @@ export type GameAnalyzeData = ({
 } | null)[];
 
 export const hasGameAnalyzeErrored = (gameAnalyze: GameAnalyze): boolean =>
-    null !== gameAnalyze.endedAt && null === gameAnalyze.analyze
+    gameAnalyze.endedAt !== null && gameAnalyze.analyze === null
 ;
 
 @Entity()

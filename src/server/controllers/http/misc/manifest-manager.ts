@@ -41,7 +41,7 @@ export async function getManifest(): Promise<ManifestType> {
         return getManifestFromWebpack();
     }
 
-    if (null !== manifestCache) {
+    if (manifestCache !== null) {
         return manifestCache;
     }
 

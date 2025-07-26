@@ -60,7 +60,7 @@ export default class Board
 
     isEmpty(row: number, col: number): boolean
     {
-        return null === this.hexes[row][col];
+        return this.hexes[row][col] === null;
     }
 
     containsCoords(row: number, col: number): boolean
@@ -87,7 +87,7 @@ export default class Board
 
         return Array(this.size)
             .fill(0)
-            .map((_, i) => 0 === playerIndex
+            .map((_, i) => playerIndex === 0
                 ? sideIndex
                     ? { row: z, col: i } // bottom
                     : { row: 0, col: i } // top
@@ -170,7 +170,7 @@ export default class Board
     {
         const winnerIndex = this.calculateWinner();
 
-        if (null === winnerIndex) {
+        if (winnerIndex === null) {
             return null;
         }
 
@@ -218,7 +218,7 @@ export default class Board
     {
         const z = this.size - 1;
 
-        return 0 === playerIndex
+        return playerIndex === 0
             ? sideIndex
                 ? cell.row === z // bottom
                 : cell.row === 0 // top

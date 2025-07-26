@@ -13,7 +13,7 @@ if (INFLUX_HOST && INFLUX_TOKEN && INFLUX_DATABASE) {
     });
 }
 
-export const isMonitoringEnabled = (): boolean => null !== influxDBClient;
+export const isMonitoringEnabled = (): boolean => influxDBClient !== null;
 
 type MetricsTags = {
     ai_time_to_respond: {
@@ -29,7 +29,7 @@ type MetricsTags = {
 };
 
 export const sendConnectedSocketsPoint = (active: number, inactive: number): void => {
-    if (null === influxDBClient) {
+    if (influxDBClient === null) {
         return;
     }
 
@@ -57,7 +57,7 @@ export class TimeMeasureMetric<T extends keyof MetricsTags>
         private name: T,
         private tags: MetricsTags[T],
     ) {
-        if (null === influxDBClient) {
+        if (influxDBClient === null) {
             return;
         }
 
@@ -70,7 +70,7 @@ export class TimeMeasureMetric<T extends keyof MetricsTags>
 
     finished(success = true): void
     {
-        if (null === influxDBClient || this.isFinished) {
+        if (influxDBClient === null || this.isFinished) {
             return;
         }
 

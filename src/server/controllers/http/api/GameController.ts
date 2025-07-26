@@ -44,7 +44,7 @@ export default class GameController
             end: results.length,
         });
 
-        if (null !== contentRange) {
+        if (contentRange !== null) {
             res.set('Content-Range', contentRange);
         }
 
@@ -75,7 +75,7 @@ export default class GameController
     ) {
         const game = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
 
-        if (null === game) {
+        if (game === null) {
             throw new HttpError(404, 'Game not found');
         }
 
@@ -120,7 +120,7 @@ export default class GameController
     ) {
         const result = await this.hostedGameRepository.playerJoinGame(player, publicId);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }
@@ -133,7 +133,7 @@ export default class GameController
     ) {
         const result = await this.hostedGameRepository.playerMove(player, publicId, move);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }
@@ -145,7 +145,7 @@ export default class GameController
     ) {
         const result = await this.hostedGameRepository.playerAskUndo(player, publicId);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }
@@ -158,7 +158,7 @@ export default class GameController
     ) {
         const result = await this.hostedGameRepository.playerAnswerUndo(player, publicId, answerUndoBody.accept);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }
@@ -170,7 +170,7 @@ export default class GameController
     ) {
         const result = await this.hostedGameRepository.playerResign(player, publicId);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }
@@ -182,7 +182,7 @@ export default class GameController
     ) {
         const result = await this.hostedGameRepository.playerCancel(player, publicId);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }

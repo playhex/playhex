@@ -20,11 +20,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     supports(tournament: Tournament): boolean
     {
         return (
-            'single-elimination' === tournament.stage1Format
-            || 'double-elimination' === tournament.stage1Format
-            || 'swiss' === tournament.stage1Format
-            || 'round-robin' === tournament.stage1Format
-        ) && null === tournament.stage2Format;
+            tournament.stage1Format === 'single-elimination'
+            || tournament.stage1Format === 'double-elimination'
+            || tournament.stage1Format === 'swiss'
+            || tournament.stage1Format === 'round-robin'
+        ) && tournament.stage2Format === null;
     }
 
     private createToTournament(tournament: Tournament): TOTournament
@@ -89,7 +89,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         const { group, number } = tournamentMatch;
         let { round } = tournamentMatch;
 
-        if ('double-elimination' === toTournament.stageOne.format && group > 0) {
+        if (toTournament.stageOne.format === 'double-elimination' && group > 0) {
             round = firstLoserBracketRound + round - 1;
         }
 
@@ -106,7 +106,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     async reloadTournament(tournament: Tournament)
     {
-        if ('running' === tournament.state) {
+        if (tournament.state === 'running') {
             this.reloadToTournament(tournament);
         }
     }
@@ -118,7 +118,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         try {
             toTournament.start();
         } catch (e) {
-            const error = 'string' === typeof e
+            const error = typeof e === 'string'
                 ? new TournamentEngineError(e)
                 : new TournamentEngineError(e.message)
             ;
@@ -153,7 +153,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         // Get first match with no paths for loser and winner: this is final match.
         // Then return next round
         for (const match of toTournament.matches) {
-            if (null === match.path.win && null === match.path.loss) {
+            if (match.path.win === null && match.path.loss === null) {
                 return match.round + 1;
             }
         }
@@ -173,7 +173,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         let round = match.round;
         const number = match.match;
 
-        if ('double-elimination' === toTournament.stageOne.format && match.round >= firstLoserBracketRound) {
+        if (toTournament.stageOne.format === 'double-elimination' && match.round >= firstLoserBracketRound) {
             group = 1;
             round = match.round - firstLoserBracketRound + 1;
         }
@@ -218,7 +218,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 );
 
                 newTournamentMatchesAdded = true;
-            } else if ('waiting' === tournamentMatch.state) {
+            } else if (tournamentMatch.state === 'waiting') {
                 this.doUpdateTournamentMatch(tournament, tournamentMatch, match);
             }
         }
@@ -261,7 +261,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 );
 
                 newTournamentMatchesAdded = true;
-            } else if ('waiting' === tournamentMatch.state) {
+            } else if (tournamentMatch.state === 'waiting') {
                 this.doUpdateTournamentMatch(tournament, tournamentMatch, secondFinalMatch);
             }
         }
@@ -288,12 +288,12 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     private checkBeforeStartRoundRobinLiveTournamentMatch(tournament: Tournament, tournamentMatch: TournamentMatch): void
     {
         // Ignore when tournament is not round robin
-        if ('round-robin' !== tournament.stage1Format) {
+        if (tournament.stage1Format !== 'round-robin') {
             return;
         }
 
         // Ignore correspondence tournaments
-        if ('correspondence' === timeControlToCadencyName(tournament)) {
+        if (timeControlToCadencyName(tournament) === 'correspondence') {
             return;
         }
 
@@ -302,7 +302,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
 
         for (const { state, player1, player2 } of tournament.matches) {
-            if ('playing' !== state || !player1 || !player2) {
+            if (state !== 'playing' || !player1 || !player2) {
                 continue;
             }
 
@@ -320,7 +320,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     {
         const toTournament = this.getTournament(tournament);
 
-        if (0 === toTournament.matches.length) {
+        if (toTournament.matches.length === 0) {
             return;
         }
 
@@ -372,7 +372,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     private updateTournamentMatchLabels(tournament: Tournament): void
     {
-        if ('single-elimination' === tournament.stage1Format) {
+        if (tournament.stage1Format === 'single-elimination') {
             const [rounds] = groupAndSortTournamentMatches(tournament.matches);
             const finalRound = rounds[rounds.length - 1];
             const semiFinalRound = rounds[rounds.length - 2];
@@ -390,7 +390,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             }
         }
 
-        if ('double-elimination' === tournament.stage1Format) {
+        if (tournament.stage1Format === 'double-elimination') {
             const [winnerBracket, loserBracket] = groupAndSortTournamentMatches(tournament.matches);
 
             // First, set "Match WB x.x" and LB to all matches
@@ -427,7 +427,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             let label;
 
             // no loser bracket rounds means not enough participants for a semi final
-            if (0 === loserBracket.length) {
+            if (loserBracket.length === 0) {
                 labels.shift();
             }
 
@@ -493,8 +493,8 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         toTournament.enterResult(
             match.id,
-            0 === winnerIndex ? 1 : 0,
-            1 === winnerIndex ? 1 : 0,
+            winnerIndex === 0 ? 1 : 0,
+            winnerIndex === 1 ? 1 : 0,
         );
 
         this.nextRoundOrEndTournament(tournament);
@@ -519,13 +519,13 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
 
         // Make sure 1st, 2nd are well defined. And 3rd and 4th also in case there is a consolation match.
-        if ('single-elimination' === toTournament.stageOne.format) {
+        if (toTournament.stageOne.format === 'single-elimination') {
             const increaseScore = (tournamentMatch: TournamentMatch, weight: number, to: 'winner' | 'loser'): void => {
-                if ('done' !== tournamentMatch.state) {
+                if (tournamentMatch.state !== 'done') {
                     return;
                 }
 
-                const player = 'winner' === to
+                const player = to === 'winner'
                     ? getMatchWinnerStrict(tournamentMatch)
                     : getMatchLoserStrict(tournamentMatch)
                 ;
@@ -561,11 +561,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
      */
     private isSecondGrandFinalMatchNecessary(toTournament: TOTournament): boolean
     {
-        if ('double-elimination' !== toTournament.stageOne.format) {
+        if (toTournament.stageOne.format !== 'double-elimination') {
             return false;
         }
 
-        if ('complete' !== toTournament.status) {
+        if (toTournament.status !== 'complete') {
             return false;
         }
 
@@ -612,7 +612,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     private getSecondGrandFinalTournamentMatch(tournament: Tournament): null | TournamentMatch
     {
-        if ('double-elimination' !== tournament.stage1Format) {
+        if (tournament.stage1Format !== 'double-elimination') {
             throw new TournamentEngineError('Call getSecondGrandFinalTournamentMatch() but tournament is not double elim');
         }
 
@@ -621,7 +621,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         const lastRoundsMatches: TournamentMatch[] = [];
         let i = winnerBracket.length - 1;
 
-        while (winnerBracket[i] && 1 === winnerBracket[i].length) {
+        while (winnerBracket[i] && winnerBracket[i].length === 1) {
             lastRoundsMatches.push(winnerBracket[i][0]);
             --i;
         }
@@ -687,10 +687,10 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 return false;
             }
 
-            return 'done' === secondFinal.state;
+            return secondFinal.state === 'done';
         }
 
-        return 'complete' === toTournament.status;
+        return toTournament.status === 'complete';
     }
 
     private isMatchDone(match: Match): boolean
@@ -746,14 +746,14 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             throw new TooDeepResetError('Cannot reset and clear this game, next match is already done. Can only reset matches when both next matches are not yet done.');
         }
 
-        if ('stage-one' !== toTournament.status) {
+        if (toTournament.status !== 'stage-one') {
             throw new TournamentEngineError('Cannot reset when tournament is not playing');
         }
 
         toTournament.clearResult(match.id);
 
         const resetChildMatch = (childMatchId: null | string): void => {
-            if (null === childMatchId) {
+            if (childMatchId === null) {
                 return;
             }
 

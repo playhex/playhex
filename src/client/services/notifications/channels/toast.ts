@@ -15,7 +15,7 @@ notifier.on('gameStart', hostedGame => {
         return;
     }
 
-    if (null === hostedGame.host) {
+    if (hostedGame.host === null) {
         // If no host, notify if I am in the game
         if (!iAmInGame(hostedGame)) {
             return;
@@ -29,7 +29,7 @@ notifier.on('gameStart', hostedGame => {
 
     const opponent = getOpponent(hostedGame);
 
-    if (null === opponent) {
+    if (opponent === null) {
         return;
     }
 
@@ -50,23 +50,23 @@ notifier.on('gameStart', hostedGame => {
 
 // Toast when my opponent passed, or, if I'm watching, any player passed
 notifier.on('move', (hostedGame, move) => {
-    if ('pass' !== move.specialMoveType) {
+    if (move.specialMoveType !== 'pass') {
         return;
     }
 
     const currentPlayer = getCurrentPlayer(hostedGame);
 
-    if (null === currentPlayer) {
+    if (currentPlayer === null) {
         return;
     }
 
     const passingPlayer = getOtherPlayer(hostedGame, currentPlayer);
 
-    if (null === passingPlayer || isMe(passingPlayer)) {
+    if (passingPlayer === null || isMe(passingPlayer)) {
         return;
     }
 
-    if ('pass' === move.specialMoveType) {
+    if (move.specialMoveType === 'pass') {
         useToastsStore().addToast(new Toast(
             i18next.t('player_passed_his_turn', { player: pseudoString(passingPlayer, 'pseudo') }),
             {

@@ -34,7 +34,7 @@ const toReadableText = (seconds: number): string => {
     if (seconds >= 86400) {
         const days = Math.floor(seconds / 86400);
         text = `${text} ${days} day`;
-        if (1 !== days) {
+        if (days !== 1) {
             text += 's';
         }
         seconds -= days * 86400;
@@ -43,7 +43,7 @@ const toReadableText = (seconds: number): string => {
     if (seconds >= 3600) {
         const hours = Math.floor(seconds / 3600);
         text = `${text} ${hours} hour`;
-        if (1 !== hours) {
+        if (hours !== 1) {
             text += 's';
         }
         seconds -= hours * 3600;
@@ -52,7 +52,7 @@ const toReadableText = (seconds: number): string => {
     if (seconds >= 60) {
         const minutes = Math.floor(seconds / 60);
         text = `${text} ${minutes} minute`;
-        if (1 !== minutes) {
+        if (minutes !== 1) {
             text += 's';
         }
         seconds -= minutes * 60;
@@ -60,7 +60,7 @@ const toReadableText = (seconds: number): string => {
 
     if (seconds > 0) {
         text = `${text} ${seconds} second`;
-        if (1 !== seconds) {
+        if (seconds !== 1) {
             text += 's';
         }
     }
@@ -74,7 +74,7 @@ const displayedValue = ref(toReadableText(modelValue.value ?? 0));
 
 // Update text when parent update model value
 watch(modelValue, (newValue) => {
-    if (null === newValue) {
+    if (newValue === null) {
         return;
     }
 
@@ -88,7 +88,7 @@ watch(modelValue, (newValue) => {
 watchEffect(() => {
     const parsedSeconds = parse(displayedValue.value, 's');
 
-    if (null === parsedSeconds || isNaN(parsedSeconds)) {
+    if (parsedSeconds === null || isNaN(parsedSeconds)) {
         validFormat.value = false;
         return;
     }

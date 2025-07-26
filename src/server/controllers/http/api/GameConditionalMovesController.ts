@@ -22,13 +22,13 @@ export default class GameConditionalMovesController
     ): Promise<ConditionalMoves> {
         const hostedGame = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
 
-        if (null === hostedGame) {
+        if (hostedGame === null) {
             throw new NotFoundError(`No active game with id '${publicId}'.`);
         }
 
         let conditionalMoves = await this.conditionalMovesRepository.find(player, hostedGame);
 
-        if (null !== conditionalMoves) {
+        if (conditionalMoves !== null) {
             return conditionalMoves;
         }
 
@@ -48,7 +48,7 @@ export default class GameConditionalMovesController
     ): Promise<ConditionalMoves> {
         const hostedGame = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
 
-        if (null === hostedGame) {
+        if (hostedGame === null) {
             throw new NotFoundError(`No active game with id '${publicId}'.`);
         }
 
@@ -58,7 +58,7 @@ export default class GameConditionalMovesController
 
         const entity = await this.conditionalMovesRepository.find(player, hostedGame);
 
-        if (null === entity) {
+        if (entity === null) {
             conditionalMoves.player = player;
             conditionalMoves.hostedGame = hostedGame;
         } else {

@@ -28,7 +28,7 @@ onMounted(async () => {
 
     const gameAnalyzeView = new GameAnalyzeView(analyze);
 
-    if (null !== gameView) {
+    if (gameView !== null) {
         gameAnalyzeView.linkGameViewCursor(gameView);
     }
 

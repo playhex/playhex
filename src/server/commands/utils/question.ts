@@ -7,7 +7,7 @@ export const mustAnswerYes = async (question: string): Promise<void> => {
 
     rl.close();
 
-    if ('yes' !== answer) {
+    if (answer !== 'yes') {
         throw new Error('Aborting (type "yes" if you wanted to continue).');
     }
 };

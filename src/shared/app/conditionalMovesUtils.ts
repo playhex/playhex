@@ -34,7 +34,7 @@ export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, 
     conditionalMoves.unplayedLines.unshift(...tree.filter(line => line[0] !== lastMove));
     conditionalMoves.tree = playedLine[2] ?? [];
 
-    if (null === answer) {
+    if (answer === null) {
         conditionalMoves.unplayedLines = conditionalMoves.unplayedLines.filter(unplayedLine => !lineContainsMove(unplayedLine, lastMove));
         conditionalMoves.unplayedLines = clearDuplicatedUnplayedLines(conditionalMoves.unplayedLines);
 
@@ -53,7 +53,7 @@ export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, 
  * replace answer if different answer, or add a new line.
  */
 export const conditionalMovesMergeMoves = (tree: ConditionalMovesTree, moves: string[]): void => {
-    if (0 === moves.length) {
+    if (moves.length === 0) {
         return;
     }
 
@@ -262,7 +262,7 @@ const flatMovesToTree = (moves: string[]): undefined | ConditionalMovesLine => {
  * @param moves Line to remove: will cut last move from this line, and all children.
  */
 export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: string[]): void => {
-    if (0 === moves.length) {
+    if (moves.length === 0) {
         tree.splice(0);
         return;
     }
@@ -301,7 +301,7 @@ export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: string[])
         }
 
         // line fully matched, cut answer
-        if (0 === currentMoves.length) {
+        if (currentMoves.length === 0) {
             currentLine.splice(1);
             return;
         }
@@ -314,7 +314,7 @@ export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: string[])
         cutRecursive(currentLine[2], currentMoves);
 
         // do not keep empty sublines like: [a1, a2, []]
-        if (0 === currentLine[2].length) {
+        if (currentLine[2].length === 0) {
             currentLine.splice(2);
         }
     };
@@ -326,27 +326,27 @@ export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: string[])
  * Validate an object against conditional moves line formatting
  */
 export const validateLineFormat = (line: unknown): line is ConditionalMovesLine => {
-    if (!Array.isArray(line) || 0 === line.length || line.length > 3) {
+    if (!Array.isArray(line) || line.length === 0 || line.length > 3) {
         return false;
     }
 
     const move = line[0];
 
-    if ('string' !== typeof move) {
+    if (typeof move !== 'string') {
         return false;
     }
 
     if (line.length > 1) {
         const answer = line[1];
 
-        if ('string' !== typeof answer) {
+        if (typeof answer !== 'string') {
             return false;
         }
 
         if (line.length > 2) {
             const sublines = line[2];
 
-            if (!Array.isArray(sublines) || 0 === sublines.length) {
+            if (!Array.isArray(sublines) || sublines.length === 0) {
                 return false;
             }
 

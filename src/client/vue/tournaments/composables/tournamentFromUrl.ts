@@ -26,7 +26,7 @@ export const useTournamentFromUrl = () => {
 
         const { loggedInPlayer } = useAuthStore();
 
-        if (null === loggedInPlayer) {
+        if (loggedInPlayer === null) {
             return false;
         }
 

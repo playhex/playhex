@@ -10,7 +10,7 @@ hexProgram
             await AppDataSource.initialize();
         }
 
-        if ('true' !== process.env.ALLOW_RANKED_BOT_GAMES) {
+        if (process.env.ALLOW_RANKED_BOT_GAMES !== 'true') {
             throw new Error('[FAIL] env var "ALLOW_RANKED_BOT_GAMES" must be true');
         }
 

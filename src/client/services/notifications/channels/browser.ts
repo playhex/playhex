@@ -26,17 +26,17 @@ const sanitizeNotificationBody = (body: string): string => {
 };
 
 const sendNotification = async (options: NotificationOptions, route: RouteLocationAsRelativeTyped, title = 'PlayHex') => {
-    if ('undefined' === typeof Notification) {
+    if (typeof Notification === 'undefined') {
         return;
     }
 
-    if ('granted' !== Notification.permission) {
+    if (Notification.permission !== 'granted') {
         return;
     }
 
     const serviceWorkerRegistration = await serviceWorkerRegistrationPromise;
 
-    if (null === serviceWorkerRegistration) {
+    if (serviceWorkerRegistration === null) {
         return;
     }
 
@@ -61,7 +61,7 @@ notifier.on('gameStart', (hostedGame) => {
         return;
     }
 
-    if (null === hostedGame.host) {
+    if (hostedGame.host === null) {
         // If no host, notify if I am in the game.
         if (!iAmInGame(hostedGame)) {
             return;
@@ -75,7 +75,7 @@ notifier.on('gameStart', (hostedGame) => {
 
     const opponent = getOpponent(hostedGame);
 
-    if (null === opponent) {
+    if (opponent === null) {
         return;
     }
 
@@ -92,7 +92,7 @@ notifier.on('gameStart', (hostedGame) => {
 });
 
 notifier.on('chatMessage', (hostedGame, chatMessage) => {
-    if (null === chatMessage.player) {
+    if (chatMessage.player === null) {
         return;
     }
 

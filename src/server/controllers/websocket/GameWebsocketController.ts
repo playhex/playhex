@@ -15,7 +15,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
         socket.on('move', async (gameId, move, answer) => {
             const { player } = socket.data;
 
-            if (null === player) {
+            if (player === null) {
                 answer('Player not found');
                 return;
             }
@@ -26,7 +26,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
         socket.on('premove', async (gameId, move, answer) => {
             const { player } = socket.data;
 
-            if (null === player) {
+            if (player === null) {
                 answer('Player not found');
                 return;
             }
@@ -37,7 +37,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
         socket.on('cancelPremove', async (gameId, answer) => {
             const { player } = socket.data;
 
-            if (null === player) {
+            if (player === null) {
                 answer('Player not found');
                 return;
             }

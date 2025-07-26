@@ -16,7 +16,7 @@ const sessionOptions: session.SessionOptions = {
     proxy: true,
     cookie: {
         maxAge: 365 * 86400 * 1000,
-        secure: 'true' === SESSION_HTTPS_ONLY,
+        secure: SESSION_HTTPS_ONLY === 'true',
     },
 };
 

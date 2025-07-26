@@ -180,14 +180,14 @@ export const timeControlToString = (timeControl: TimeControlType): string => {
 };
 
 export const isSameTimeControlType = (a: TimeControlType, b: TimeControlType): boolean => {
-    if ('fischer' === a.family && 'fischer' === b.family) {
+    if (a.family === 'fischer' && b.family === 'fischer') {
         return a.options.initialTime === b.options.initialTime
             && a.options.maxTime === b.options.maxTime
             && (a.options.timeIncrement ?? 0) === (b.options.timeIncrement ?? 0)
         ;
     }
 
-    if ('byoyomi' === a.family && 'byoyomi' === b.family) {
+    if (a.family === 'byoyomi' && b.family === 'byoyomi') {
         return a.options.initialTime === b.options.initialTime
             && a.options.periodTime === b.options.periodTime
             && a.options.periodsCount === b.options.periodsCount
@@ -351,7 +351,7 @@ export const getInitialTimeStep = (timeControlType: TimeControlType): number => 
  */
 export const getSecondaryTimeStep = (timeControlType: TimeControlType): number => {
     const { family, options } = timeControlType;
-    const secondaryTime = 'fischer' === family
+    const secondaryTime = family === 'fischer'
         ? (options.timeIncrement ?? 0)
         : options.periodTime
     ;

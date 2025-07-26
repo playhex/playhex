@@ -41,13 +41,13 @@ export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist
 
     for (let row = 0; row < game.getSize(); ++row) {
         for (let col = 0; col < game.getSize(); ++col) {
-            if (null === game.getBoard().getCell(row, col)) {
+            if (game.getBoard().getCell(row, col) === null) {
                 possibleMoves.push(new Move(row, col));
             }
         }
     }
 
-    if (0 === possibleMoves.length) {
+    if (possibleMoves.length === 0) {
         throw new Error('Cannot play a random move, no possible move');
     }
 

@@ -248,7 +248,7 @@ self.addEventListener('notificationclick', event => {
             cleanClientUpdatedUrls(windowClients);
 
             // no tab open on the application, just open a new one.
-            if (0 === windowClients.length) {
+            if (windowClients.length === 0) {
                 if (clients.openWindow) {
                     return clients.openWindow(goToPath ?? '/');
                 }
@@ -274,7 +274,7 @@ self.addEventListener('notificationclick', event => {
                 const clientUrl = clientUpdatedUrls[client.id] ?? client.url;
 
                 // If so, just focus it.
-                if (null !== goToPath && clientUrl.includes(goToPath) && 'focus' in client) {
+                if (goToPath !== null && clientUrl.includes(goToPath) && 'focus' in client) {
                     return client.focus();
                 }
 
@@ -284,13 +284,13 @@ self.addEventListener('notificationclick', event => {
             }
 
             // If no focused client, focus to first one
-            if (null === focusedClient) {
+            if (focusedClient === null) {
                 focusedClient = windowClients[0];
                 focusedClient.focus();
             }
 
             // navigate to the url in the focused client
-            if (null !== goToPath) {
+            if (goToPath !== null) {
                 focusedClient.postMessage({ type: 'NAVIGATE', goToPath });
             }
         }),

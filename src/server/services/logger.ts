@@ -24,7 +24,7 @@ export const loggerTransports: winston.transport[] = [
 
 export const loggerOptions: winston.LoggerOptions = {
     levels: winston.config.syslog.levels,
-    level: 'development' === process.env.NODE_ENV ? 'debug' : 'info',
+    level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     format: format.combine(
         format.timestamp(),
         format.json(),

@@ -79,10 +79,10 @@ export class DomainHttpError extends Error implements DomainHttpErrorType
 }
 
 export const isDomainHttpErrorPayload = (payload: unknown): payload is DomainHttpErrorPayload => {
-    return 'object' === typeof payload
-        && null !== payload
-        && false === (payload as { success?: unknown }).success
-        && 'string' === typeof (payload as DomainHttpErrorPayload).type
+    return typeof payload === 'object'
+        && payload !== null
+        && (payload as { success?: unknown }).success === false
+        && typeof (payload as DomainHttpErrorPayload).type === 'string'
     ;
 };
 

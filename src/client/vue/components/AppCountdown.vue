@@ -13,7 +13,7 @@ const props = defineProps({
 const { date } = toRefs(props);
 
 const formatCountdown = (): string => {
-    if (null === date.value) {
+    if (date.value === null) {
         return '';
     }
 

@@ -27,7 +27,7 @@ const suggestedTimeControls: { label: string, timeControl: TimeControlType }[] =
 const capped = ref(false);
 
 const setCappedFromTimeControl = (timeControlType: TimeControlType): void => {
-    if ('fischer' === timeControlType.family) {
+    if (timeControlType.family === 'fischer') {
         const { maxTime, initialTime } = timeControlType.options;
 
         capped.value = maxTime === initialTime;
@@ -54,7 +54,7 @@ const selectTimeControl = (timeControl: TimeControlType): void => {
 };
 
 const changeFamily = (family: 'fischer' | 'byoyomi'): void => {
-    if ('fischer' === family && 'byoyomi' === timeControlType.value.family) {
+    if (family === 'fischer' && timeControlType.value.family === 'byoyomi') {
         selectTimeControl({
             family,
             options: {
@@ -63,7 +63,7 @@ const changeFamily = (family: 'fischer' | 'byoyomi'): void => {
                 maxTime: capped.value ? timeControlType.value.options.initialTime : undefined,
             },
         });
-    } else if ('byoyomi' === family && 'fischer' === timeControlType.value.family) {
+    } else if (family === 'byoyomi' && timeControlType.value.family === 'fischer') {
         selectTimeControl({
             family,
             options: {
@@ -85,18 +85,18 @@ watch(initialTimeStep, step => {
         ...timeControlType.value,
     };
 
-    if ('fischer' === timeControlType.value.family && capped.value) {
+    if (timeControlType.value.family === 'fischer' && capped.value) {
         timeControlType.value.options.maxTime = timeControlType.value.options.initialTime;
     }
 });
 
 // update secondary time when sliding
 watch(secondaryTimeStep, step => {
-    if ('fischer' === timeControlType.value.family) {
+    if (timeControlType.value.family === 'fischer') {
         timeControlType.value.options.timeIncrement = secondaryTimeSteps[step];
     }
 
-    if ('byoyomi' === timeControlType.value.family) {
+    if (timeControlType.value.family === 'byoyomi') {
         timeControlType.value.options.periodTime = secondaryTimeSteps[step];
     }
 
@@ -107,7 +107,7 @@ watch(secondaryTimeStep, step => {
 
 // set/unset maxTime when checking capped
 watch(capped, isCapped => {
-    if ('fischer' !== timeControlType.value.family) {
+    if (timeControlType.value.family !== 'fischer') {
         return;
     }
 

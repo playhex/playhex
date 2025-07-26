@@ -27,7 +27,7 @@ export const recreateTimeControlAfterUndo = (hostedGame: HostedGame, ignoreLastM
         const timeControl = createTimeControl(gameOptions.timeControl);
         const totalMovesCount = movesHistory.length - ignoreLastMoves;
 
-        if (0 === totalMovesCount) {
+        if (totalMovesCount === 0) {
             return timeControl;
         }
 
@@ -43,7 +43,7 @@ export const recreateTimeControlAfterUndo = (hostedGame: HostedGame, ignoreLastM
             );
         }
 
-        if ('elapsed' === timeControl.getState()) {
+        if (timeControl.getState() === 'elapsed') {
             return null;
         }
 

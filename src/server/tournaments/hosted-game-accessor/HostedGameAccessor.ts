@@ -31,7 +31,7 @@ export class HostedGameAccessor implements HostedGameAccessorInterface
         const result1 = hostedGameServer.playerJoin(tournamentMatch.player1, true);
         const result2 = hostedGameServer.playerJoin(tournamentMatch.player2, true);
 
-        if (true !== result1 || true !== result2) {
+        if (result1 !== true || result2 !== true) {
             throw new Error(`Could not add player in game: "${result1}", "${result2}`);
         }
 

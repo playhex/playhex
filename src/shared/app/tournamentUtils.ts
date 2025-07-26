@@ -148,7 +148,7 @@ export const findParticipantByPublicIdStrict = (tournament: Tournament, publicId
  * and set them a rank.
  */
 export const sortAndRankParticipants = (participants: TournamentParticipant[]): void => {
-    if (0 === participants.length) {
+    if (participants.length === 0) {
         return;
     }
 
@@ -240,7 +240,7 @@ export const getActiveTournamentMatches = (tournament: Tournament): TournamentMa
  */
 export const getTopPlayers = (tournament: Tournament, top = 3): TournamentParticipant[] => {
     return tournament.participants
-        .filter(participant => ('number' === typeof participant.rank) && participant.rank <= top)
+        .filter(participant => (typeof participant.rank === 'number') && participant.rank <= top)
         .sort(byRank)
         .slice(0, 3)
     ;
@@ -249,7 +249,7 @@ export const getTopPlayers = (tournament: Tournament, top = 3): TournamentPartic
 export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player => {
     const winner = tournamentMatch.hostedGame?.gameData?.winner;
 
-    if (0 !== winner && 1 !== winner) {
+    if (winner !== 0 && winner !== 1) {
         throw new Error('getMatchWinnerStrict called but no winner');
     }
 
@@ -259,7 +259,7 @@ export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player =
         throw new Error('getMatchWinnerStrict called but missing player');
     }
 
-    return 0 === winner
+    return winner === 0
         ? player1
         : player2
     ;
@@ -268,7 +268,7 @@ export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player =
 export const getMatchLoserStrict = (tournamentMatch: TournamentMatch): Player => {
     const winner = tournamentMatch.hostedGame?.gameData?.winner;
 
-    if (0 !== winner && 1 !== winner) {
+    if (winner !== 0 && winner !== 1) {
         throw new Error('getMatchLoserStrict called but no winner');
     }
 
@@ -278,7 +278,7 @@ export const getMatchLoserStrict = (tournamentMatch: TournamentMatch): Player =>
         throw new Error('getMatchLoserStrict called but missing player');
     }
 
-    return 1 === winner
+    return winner === 1
         ? player1
         : player2
     ;

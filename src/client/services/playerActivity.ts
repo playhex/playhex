@@ -12,7 +12,7 @@ let hadActivityWhileCooldown = false;
  * (route change, mouse move, ...)
  */
 export const notifyActivity = (): void => {
-    if (null !== cooldownTimeout) {
+    if (cooldownTimeout !== null) {
         hadActivityWhileCooldown = true;
         return;
     }

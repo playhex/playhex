@@ -18,7 +18,7 @@ export default class RemoteApiPlayer
             game: {
                 size: game.getSize(),
                 movesHistory: game.getMovesHistoryAsString(),
-                currentPlayer: 0 === game.getCurrentPlayerIndex() ? 'black' : 'white',
+                currentPlayer: game.getCurrentPlayerIndex() === 0 ? 'black' : 'white',
                 swapRule: game.getAllowSwap(),
             },
             ai: {
@@ -32,11 +32,11 @@ export default class RemoteApiPlayer
         try {
             moveString = await this.hexRemotePlayerApi.calculateMove(payload);
 
-            if ('swap-pieces' === moveString) {
+            if (moveString === 'swap-pieces') {
                 return Move.swapPieces();
             }
 
-            if ('resign' === moveString) {
+            if (moveString === 'resign') {
                 throw new Error('ok, remote player expressely resigned.');
             }
 
@@ -51,7 +51,7 @@ export default class RemoteApiPlayer
     {
         const game = hostedGameServer.getGame();
 
-        if (null === game) {
+        if (game === null) {
             throw new Error('Cannot send move request to api, no game');
         }
 

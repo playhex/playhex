@@ -14,7 +14,7 @@ notifier.on('gameStart', hostedGame => {
     const { host } = hostedGame;
 
     // Game created by system, push both players
-    if (null === host) {
+    if (host === null) {
         for (const hostedGameToPlayer of hostedGame.hostedGameToPlayers) {
             const pushPayload = PushNotificationFactory.createGameCreatedBySystemStartedNotification(hostedGameToPlayer.player, hostedGame);
             pushNotificationsPool.poolNotification(hostedGameToPlayer.player, pushPayload);
@@ -35,7 +35,7 @@ notifier.on('move', (hostedGame, move) => {
 
     const player = getCurrentPlayer(hostedGame);
 
-    if (null === player) {
+    if (player === null) {
         return;
     }
 

@@ -216,7 +216,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private async doMount(element: HTMLElement): Promise<void>
     {
-        if (null !== this.containerElement) {
+        if (this.containerElement !== null) {
             throw new Error('GameView already mounted.');
         }
 
@@ -295,7 +295,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const { selectedBoardOrientationMode: selectedBoardOrientation } = this.options;
 
         // If "portrait" or "landscape" explicitely selected, returns it
-        if ('auto' !== selectedBoardOrientation) {
+        if (selectedBoardOrientation !== 'auto') {
             return selectedBoardOrientation;
         }
 
@@ -339,7 +339,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         const wrapperSize = this.getWrapperSize();
 
-        if (null === wrapperSize) {
+        if (wrapperSize === null) {
             throw new Error('Cannot redraw, no wrapper size, seems not yet mounted');
         }
 
@@ -396,7 +396,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         const wrapperSize = this.getWrapperSize();
 
-        if (!this.pixi.renderer || null === wrapperSize) {
+        if (!this.pixi.renderer || wrapperSize === null) {
             throw new Error('Missing renderer or wrapper size');
         }
 
@@ -406,7 +406,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private destroyResizeObserver(): void
     {
-        if (null !== this.resizeObserver) {
+        if (this.resizeObserver !== null) {
             this.resizeObserver.disconnect();
             this.resizeObserver = null;
         }
@@ -430,7 +430,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private getWrapperSize(): null | GameViewSize
     {
-        if (null === this.containerElement) {
+        if (this.containerElement === null) {
             return null;
         }
 
@@ -443,7 +443,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         const wrapperSize = this.getWrapperSize();
 
-        if (null === wrapperSize) {
+        if (wrapperSize === null) {
             return 'landscape';
         }
 
@@ -516,7 +516,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const boardWidth = Hex.RADIUS * this.game.getSize() * SQRT_3_2;
         const wrapperSize = this.getWrapperSize();
 
-        if (null === wrapperSize) {
+        if (wrapperSize === null) {
             return;
         }
 
@@ -599,14 +599,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return swapCoords;
         }
 
-        if (null === undoneMoves) {
+        if (undoneMoves === null) {
             throw new Error('Cannot get swap coords from game: no swap move, or has been undone but no undoneMoves provided.');
         }
 
         let firstMove: null | Move = null;
 
         for (let i = 0; i < undoneMoves.length; ++i) {
-            if ('swap-pieces' === undoneMoves[i].getSpecialMoveType()) {
+            if (undoneMoves[i].getSpecialMoveType() === 'swap-pieces') {
                 firstMove = undoneMoves[i + 1] ?? null;
             }
         }
@@ -675,7 +675,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         const winningPath = this.game.getBoard().getShortestWinningPath();
 
-        if (null === winningPath) {
+        if (winningPath === null) {
             // No winning path, winner has won by another outcome (opponent resigned, time out, ...)
             return;
         }
@@ -725,7 +725,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                 hex.on('pointertap', () => {
 
                     // Disable play in rewind mode. May change when simulation mode is implemented.
-                    if (null !== this.movesHistoryCursor) {
+                    if (this.movesHistoryCursor !== null) {
                         if (this.movesHistoryCursor !== this.game.getMovesHistory().length - 1) {
                             return;
                         }
@@ -743,7 +743,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                             const simulationMoveColor = this.getSimulationMoveColorAt(move);
                             let played = false;
 
-                            if (null === simulationMoveColor) {
+                            if (simulationMoveColor === null) {
                                 this.playSimulatedMove(move);
                                 played = true;
                             }
@@ -767,7 +767,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private unhighlightLastMove(): void
     {
-        if (null !== this.lastSimpleMoveHighlighted) {
+        if (this.lastSimpleMoveHighlighted !== null) {
             const { row, col } = this.lastSimpleMoveHighlighted;
             this.hexes[row][col].setHighlighted(false);
             this.lastSimpleMoveHighlighted = null;
@@ -789,7 +789,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         const lastMove = move ?? this.game.getLastMove();
 
-        if (null === lastMove) {
+        if (lastMove === null) {
             return;
         }
 
@@ -798,11 +798,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return;
         }
 
-        if ('pass' === lastMove.getSpecialMoveType()) {
+        if (lastMove.getSpecialMoveType() === 'pass') {
             return;
         }
 
-        if ('swap-pieces' === lastMove.getSpecialMoveType()) {
+        if (lastMove.getSpecialMoveType() === 'swap-pieces') {
             const { mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
             this.showSwapped(mirror);
             return;
@@ -937,8 +937,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     highlightSideForPlayer(playerIndex: PlayerIndex): void
     {
         this.highlightSides(
-            0 === playerIndex,
-            1 === playerIndex,
+            playerIndex === 0,
+            playerIndex === 1,
         );
     }
 
@@ -985,7 +985,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     hasPreviewedMove(): boolean
     {
-        return null !== this.previewedMove;
+        return this.previewedMove !== null;
     }
 
     getPreviewedMove(): null | { move: Move, playerIndex: PlayerIndex }
@@ -995,7 +995,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     setPreviewedMove(move: Move, playerIndex: PlayerIndex): this
     {
-        if (null !== this.previewedMove) {
+        if (this.previewedMove !== null) {
             if (this.previewedMove.move.sameAs(move) && playerIndex === this.previewedMove.playerIndex) {
                 return this;
             }
@@ -1015,7 +1015,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     removePreviewedMove(undoneMoves: null | Move[] = null): this
     {
-        if (null === this.previewedMove) {
+        if (this.previewedMove === null) {
             return this;
         }
 
@@ -1043,7 +1043,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private showPreviewedMove(): void
     {
-        if (null === this.previewedMove) {
+        if (this.previewedMove === null) {
             return;
         }
 
@@ -1057,7 +1057,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             case 'swap-pieces': {
                 const swapCoords = this.game.getSwapCoords(false);
 
-                if (null === swapCoords) {
+                if (swapCoords === null) {
                     throw new Error('Unexpected null swapCoords');
                 }
 
@@ -1088,7 +1088,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private boundMovesHistoryCursor(): void
     {
-        if (null === this.movesHistoryCursor) {
+        if (this.movesHistoryCursor === null) {
             return;
         }
 
@@ -1106,14 +1106,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     enableRewindMode(): void
     {
-        if (null === this.movesHistoryCursor) {
+        if (this.movesHistoryCursor === null) {
             this.setMovesHistoryCursor(Infinity);
         }
     }
 
     disableRewindMode(): void
     {
-        if (null !== this.movesHistoryCursor) {
+        if (this.movesHistoryCursor !== null) {
             this.setMovesHistoryCursor(null);
         }
     }
@@ -1152,7 +1152,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const movesHistory = this.game.getMovesHistory();
 
         for (let i = 0; i < movesHistory.length; ++i) {
-            if (null !== this.movesHistoryCursor && i > this.movesHistoryCursor) {
+            if (this.movesHistoryCursor !== null && i > this.movesHistoryCursor) {
                 break;
             }
 
@@ -1247,7 +1247,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         // if no simulation moves yet, returns simulationMoveFromPlayerIndex if defined
-        if (null !== this.simulationMoveFromPlayerIndex) {
+        if (this.simulationMoveFromPlayerIndex !== null) {
             return this.simulationMoveFromPlayerIndex;
         }
 
@@ -1263,7 +1263,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     playSimulatedMove(move: Move, byPlayerIndex: null | PlayerIndex = null): void
     {
-        if (null === byPlayerIndex) {
+        if (byPlayerIndex === null) {
             byPlayerIndex = this.getNextAutoSimulationColor();
         }
 
@@ -1293,7 +1293,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     listenArrowKeys(): void
     {
-        if (null !== this.keyboardEventListener) {
+        if (this.keyboardEventListener !== null) {
             return;
         }
 
@@ -1320,7 +1320,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     unlistenArrowKeys(): void
     {
-        if (null === this.keyboardEventListener) {
+        if (this.keyboardEventListener === null) {
             return;
         }
 

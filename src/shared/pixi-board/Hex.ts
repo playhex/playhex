@@ -197,10 +197,10 @@ export default class Hex extends Container
 
     private updateColor(): void
     {
-        this.hexColor.visible = null !== this.playerIndex;
+        this.hexColor.visible = this.playerIndex !== null;
         this.hexColor.alpha = 1;
 
-        if (null !== this.playerIndex) {
+        if (this.playerIndex !== null) {
             this.hexColor.tint = [
                 this.theme.colorA,
                 this.theme.colorB,
@@ -245,7 +245,7 @@ export default class Hex extends Container
 
     private clearAnimationLoop(): void
     {
-        if (null !== this.animationLoop) {
+        if (this.animationLoop !== null) {
             if (this.destroyed) {
                 // Call animationLoop to resolve promise if destroyed and prevent let it unresolved
                 this.animationLoop();

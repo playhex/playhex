@@ -74,7 +74,7 @@ export const normalize = (data: any, root = true): any => {
         return data;
     }
 
-    if ('object' !== typeof data || 'Date' === data.constructor.name) {
+    if (typeof data !== 'object' || data.constructor.name === 'Date') {
         return data;
     }
 

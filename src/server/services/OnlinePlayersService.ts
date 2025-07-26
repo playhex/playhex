@@ -49,7 +49,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         const { player } = socket.data;
 
         // socket not authenticated, ignoring
-        if (null === player) {
+        if (player === null) {
             return;
         }
 
@@ -79,7 +79,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         const { player } = socket.data;
 
         // socket not authenticated, ignoring
-        if (null === player) {
+        if (player === null) {
             return;
         }
 
@@ -106,7 +106,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     {
         const onlinePlayer = this.onlinePlayers[player.publicId];
 
-        if (null !== onlinePlayer.activityTimeout) {
+        if (onlinePlayer.activityTimeout !== null) {
             clearTimeout(onlinePlayer.activityTimeout);
         }
 
@@ -177,7 +177,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
             return;
         }
 
-        if (null !== onlinePlayer.activityTimeout) {
+        if (onlinePlayer.activityTimeout !== null) {
             clearTimeout(onlinePlayer.activityTimeout);
         }
 

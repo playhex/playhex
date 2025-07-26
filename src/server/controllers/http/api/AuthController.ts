@@ -41,7 +41,7 @@ export default class AuthController
         @CurrentUser() player: Player,
         @Session() session: SessionData,
     ) {
-        if (null === player) {
+        if (player === null) {
             player = await this.playerRepository.createGuest();
         }
 

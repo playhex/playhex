@@ -85,10 +85,10 @@ export default class AutoCancelStaleGames
             }
 
             // Created game but host disconnected
-            if ('created' === game.getState()) {
+            if (game.getState() === 'created') {
                 const { host } = game.getHostedGame();
 
-                if (null === host) {
+                if (host === null) {
                     continue;
                 }
 
@@ -100,11 +100,11 @@ export default class AutoCancelStaleGames
             }
 
             // Started games but first player disconnected without playing first move
-            if ('playing' === game.getState()) {
+            if (game.getState() === 'playing') {
                 const player = game.getPlayers()[0];
 
                 if (
-                    0 === game.getGame()?.getMovesHistory().length
+                    game.getGame()?.getMovesHistory().length === 0
                     && !this.onlinePlayersService.isOnline(player)
                 ) {
                     add(player, game);
@@ -133,14 +133,14 @@ export default class AutoCancelStaleGames
                     }
 
                     // Created game but host disconnected
-                    if ('created' === game.getState()) {
+                    if (game.getState() === 'created') {
                         return true;
                     }
 
                     // Started games but first player disconnected without playing first move
-                    if ('playing' === game.getState()) {
-                        return 0 === game.getGame()?.getMovesHistory().length
-                            && 0 === game.getPlayerIndex(player)
+                    if (game.getState() === 'playing') {
+                        return game.getGame()?.getMovesHistory().length === 0
+                            && game.getPlayerIndex(player) === 0
                         ;
                     }
 
@@ -148,7 +148,7 @@ export default class AutoCancelStaleGames
                 })
             ;
 
-            if (0 === playerStaleGames.length) {
+            if (playerStaleGames.length === 0) {
                 return;
             }
 
@@ -183,7 +183,7 @@ export default class AutoCancelStaleGames
 
     private canCancelGame(hostedGame: HostedGame): boolean
     {
-        if ('correspondence' === timeControlToCadencyName(hostedGame.gameOptions)) {
+        if (timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence') {
             return false;
         }
 
@@ -196,7 +196,7 @@ export default class AutoCancelStaleGames
 
     private showStaleGamesInLogs(staleGames: StaleGames): void
     {
-        if (0 === Object.keys(staleGames).length) {
+        if (Object.keys(staleGames).length === 0) {
             logger.info(`no stale games found into loaded games.`);
             return;
         }

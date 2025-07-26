@@ -13,7 +13,7 @@ export const by = <T>(field: (t: T) => number, ascOrDesc: 'asc' | 'desc' = 'asc'
 
         const diff = aValue - bValue;
 
-        if ('desc' === ascOrDesc) {
+        if (ascOrDesc === 'desc') {
             return -diff;
         }
 

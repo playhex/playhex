@@ -14,7 +14,7 @@ import useToastsStore from '../../../stores/toastsStore.js';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
-const isMe = (player: Player): boolean => null !== loggedInPlayer.value && loggedInPlayer.value.publicId === player.publicId;
+const isMe = (player: Player): boolean => loggedInPlayer.value !== null && loggedInPlayer.value.publicId === player.publicId;
 
 export const getCurrentTournamentSubscription = (tournament: Tournament): null | TournamentSubscription => {
     for (const subscription of tournament.subscriptions) {
@@ -29,7 +29,7 @@ export const getCurrentTournamentSubscription = (tournament: Tournament): null |
 export const getCurrentTournamentSubscriptionStatus = (tournament: Tournament): null | 'subscribed' | 'must_check_in' | 'checked_in' => {
     const currentTournamentSubscription = getCurrentTournamentSubscription(tournament);
 
-    if (null === currentTournamentSubscription) {
+    if (currentTournamentSubscription === null) {
         return null;
     }
 
@@ -88,7 +88,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
                 }
             } catch (e) {
                 if (e instanceof DomainHttpError) {
-                    if ('tournament_player_is_banned' === e.type) {
+                    if (e.type === 'tournament_player_is_banned') {
                         useToastsStore().addToast(new Toast(
                             i18n.t(e.type),
                             {
@@ -99,7 +99,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
                         return;
                     }
 
-                    if ('tournament_account_required' === e.type) {
+                    if (e.type === 'tournament_account_required') {
                         useToastsStore().addToast(new Toast(
                             i18n.t(e.type),
                             {

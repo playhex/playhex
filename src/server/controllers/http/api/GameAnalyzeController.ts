@@ -26,7 +26,7 @@ export default class GameAnalyzeController
     ) {
         const gameAnalyze = await this.gameAnalyzePersister.findByGamePublicId(publicId);
 
-        if (null === gameAnalyze) {
+        if (gameAnalyze === null) {
             return;
         }
 
@@ -39,13 +39,13 @@ export default class GameAnalyzeController
     ) {
         let gameAnalyze = await this.gameAnalyzePersister.findByGamePublicId(publicId);
 
-        if (null !== gameAnalyze && !hasGameAnalyzeErrored(gameAnalyze)) {
+        if (gameAnalyze !== null && !hasGameAnalyzeErrored(gameAnalyze)) {
             return gameAnalyze;
         }
 
         const analyzeGameRequest = await this.gamePersister.getAnalyzeGameRequest(publicId);
 
-        if (null === analyzeGameRequest) {
+        if (analyzeGameRequest === null) {
             throw new HttpError(404, 'Game not found or not finished');
         }
 

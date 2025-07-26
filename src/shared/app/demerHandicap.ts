@@ -27,7 +27,7 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
         }
 
         // Counting white pass moves
-        for (let i = 1; i < movesHistory.length && 'pass' === movesHistory[i].specialMoveType; i += 2) {
+        for (let i = 1; i < movesHistory.length && movesHistory[i].specialMoveType === 'pass'; i += 2) {
             ++handicap;
         }
 
@@ -49,10 +49,10 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
             ++consecutiveMoves;
         }
 
-        if ('pass' === specialMoveType) {
+        if (specialMoveType === 'pass') {
             consecutiveMoves = 0;
 
-            if (0 === (i % 2)) {
+            if ((i % 2) === 0) {
                 --handicap;
             } else {
                 ++handicap;
@@ -66,7 +66,7 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
 export const guessDemerHandicapFromHostedGame = (hostedGame: HostedGame): number | 'N/S' => {
     return guessDemerHandicap(
         hostedGame.gameOptions.swapRule,
-        null !== hostedGame.gameOptions.firstPlayer,
+        hostedGame.gameOptions.firstPlayer !== null,
         hostedGame.gameData?.movesHistory,
     );
 };

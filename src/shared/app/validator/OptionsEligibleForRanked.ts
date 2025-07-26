@@ -45,7 +45,7 @@ export class FirstPlayerEligibleForRanked extends OptionsEligibleForRanked
 {
     validateOptions(options: HostedGameOptions): boolean
     {
-        return null === options.firstPlayer;
+        return options.firstPlayer === null;
     }
 
     defaultMessage(): string
@@ -59,7 +59,7 @@ export class SwapRuleEligibleForRanked extends OptionsEligibleForRanked
 {
     validateOptions(options: HostedGameOptions): boolean
     {
-        return true === options.swapRule;
+        return options.swapRule === true;
     }
 
     defaultMessage(): string
@@ -73,11 +73,11 @@ export class OpponentTypeEligibleForRanked extends OptionsEligibleForRanked
 {
     validateOptions(options: HostedGameOptions): boolean
     {
-        if ('true' === process.env.ALLOW_RANKED_BOT_GAMES) {
+        if (process.env.ALLOW_RANKED_BOT_GAMES === 'true') {
             return true;
         }
 
-        return 'player' === options.opponentType;
+        return options.opponentType === 'player';
     }
 
     defaultMessage(): string

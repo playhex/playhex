@@ -236,7 +236,7 @@ const router = createRouter({
         let elementExists = false;
 
         try {
-            elementExists = null !== document.querySelector(to.hash);
+            elementExists = document.querySelector(to.hash) !== null;
         } catch {
             // Ignore error when hash is "invalid", because of e.g a dot, example:
             // Document.querySelector: '#match-1.6' is not a valid selector

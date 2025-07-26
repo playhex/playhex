@@ -16,7 +16,7 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
         socket.on('joinGame', async (gameId, answer) => {
             const { player } = socket.data;
 
-            if (null === player) {
+            if (player === null) {
                 answer('Player not found');
                 return;
             }

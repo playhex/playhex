@@ -42,17 +42,17 @@ const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
 })();
 
 const capSelectedBoardsize = () => {
-    if (null === selectedAiConfig.value) {
+    if (selectedAiConfig.value === null) {
         return;
     }
 
     const { boardsizeMin, boardsizeMax } = selectedAiConfig.value;
 
-    if ('number' === typeof boardsizeMin && gameOptions.value.boardsize < boardsizeMin) {
+    if (typeof boardsizeMin === 'number' && gameOptions.value.boardsize < boardsizeMin) {
         gameOptions.value.boardsize = boardsizeMin;
     }
 
-    if ('number' === typeof boardsizeMax && gameOptions.value.boardsize > boardsizeMax) {
+    if (typeof boardsizeMax === 'number' && gameOptions.value.boardsize > boardsizeMax) {
         gameOptions.value.boardsize = boardsizeMax;
     }
 };
@@ -79,7 +79,7 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
         return true;
     }
 
-    if (null === aiConfigsStatus.value) {
+    if (aiConfigsStatus.value === null) {
         return false;
     }
 

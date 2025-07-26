@@ -62,7 +62,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     async init(): Promise<void>
     {
-        if ('ended' === this.tournament.state) {
+        if (this.tournament.state === 'ended') {
             return;
         }
 
@@ -74,21 +74,21 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         this.on('gameEnded', () => this.save());
         this.on('ended', () => this.save());
 
-        if ('created' === this.tournament.state) {
+        if (this.tournament.state === 'created') {
             this.autoNotifyCheckInPeriodOpens();
             this.autoStartOnDate();
             return;
         }
 
-        if ('running' !== this.tournament.state) {
+        if (this.tournament.state !== 'running') {
             throw new Error(`Unexpected tournament state: "${this.tournament.state}".`);
         }
 
         for (const tournamentMatch of this.tournament.matches) {
-            if (null !== tournamentMatch.hostedGame && 'playing' === tournamentMatch.state) {
+            if (tournamentMatch.hostedGame !== null && tournamentMatch.state === 'playing') {
                 const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(tournamentMatch.hostedGame.publicId);
 
-                if (null === hostedGameServer) {
+                if (hostedGameServer === null) {
                     this.logger.notice('While tournament initialization, no active hosted game for this tournamentMatch. Assume it will be solved in next iteration and continue with other tournamentMatches', {
                         matchKey: tournamentMatchKey(tournamentMatch),
                         tournamentMatchState: tournamentMatch.state,
@@ -124,13 +124,13 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     async playerSelfSubscribe(playerPublicId: string): Promise<null | TournamentSubscription>
     {
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             throw new TournamentError('Too late to unsubscribe, tournament started');
         }
 
         const subscription = await this.removeSubscription(playerPublicId);
 
-        if (null === subscription) {
+        if (subscription === null) {
             return null;
         }
 
@@ -147,13 +147,13 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     async playerSelfUnsubscribe(playerPublicId: string): Promise<null | TournamentSubscription>
     {
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             throw new TournamentError('Too late to unsubscribe, tournament started');
         }
 
         const subscription = await this.removeSubscription(playerPublicId);
 
-        if (null === subscription) {
+        if (subscription === null) {
             return null;
         }
 
@@ -172,13 +172,13 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     async hostKick(playerPublicId: string): Promise<null | TournamentSubscription>
     {
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             throw new TournamentError('Cannot ban player, tournament already started');
         }
 
         const subscription = await this.removeSubscription(playerPublicId);
 
-        if (null === subscription) {
+        if (subscription === null) {
             return null;
         }
 
@@ -246,18 +246,18 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     private autoStartOnDate(): void
     {
-        if (null !== this.startTournamentTimeout) {
+        if (this.startTournamentTimeout !== null) {
             clearTimeout(this.startTournamentTimeout);
             this.startTournamentTimeout = null;
         }
 
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             return;
         }
 
         const autoStartDate = tournamentStartsAutomatically(this.tournament);
 
-        if (null === autoStartDate) {
+        if (autoStartDate === null) {
             return;
         }
 
@@ -281,7 +281,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     private autoNotifyCheckInPeriodOpens(): void
     {
-        if (null !== this.checkInPeriodOpensTimeout) {
+        if (this.checkInPeriodOpensTimeout !== null) {
             clearTimeout(this.checkInPeriodOpensTimeout);
             this.startTournamentTimeout = null;
         }
@@ -290,7 +290,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             return;
         }
 
@@ -330,14 +330,14 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     {
         this.logger.debug('Workflow begin');
 
-        if ('ended' === this.tournament.state) {
+        if (this.tournament.state === 'ended') {
             this.logger.debug('Ended, do nothing');
             return;
         }
 
         const now = new Date();
 
-        if ('created' === this.tournament.state) {
+        if (this.tournament.state === 'created') {
             if (now < this.tournament.startOfficialAt) {
                 this.logger.debug('Tournament not yet started, do nothing');
                 return;
@@ -345,7 +345,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
             const autoStartDate = tournamentStartsAutomatically(this.tournament);
 
-            if (null === autoStartDate) {
+            if (autoStartDate === null) {
                 this.logger.debug('Tournament do not starts automatically, waiting for host to start manually');
                 return;
             }
@@ -392,7 +392,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         // Check playing games has ended
         for (const tournamentMatch of this.tournament.matches) {
-            if ('playing' === tournamentMatch.state) {
+            if (tournamentMatch.state === 'playing') {
                 await this.checkPlayingGameHasEnded(tournamentMatch);
             }
         }
@@ -401,7 +401,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         // Check that we have not missed to report winner to tournament engine
         for (const tournamentMatch of activeTournamentMatches) {
-            if ('done' === tournamentMatch.state) {
+            if (tournamentMatch.state === 'done') {
                 this.logger.warning('A game was done, but still active in tournament engine. Reporting winner.', {
                     tournamentMatchId: tournamentMatch.id,
                     hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
@@ -426,7 +426,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         this.logger.debug('Check if created games can be started');
 
         for (const tournamentMatch of this.tournament.matches) {
-            if ('waiting' !== tournamentMatch.state) {
+            if (tournamentMatch.state !== 'waiting') {
                 continue;
             }
 
@@ -496,7 +496,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     private async doStartTournament(): Promise<void>
     {
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             throw new Error('Cannot start, already started');
         }
 
@@ -518,7 +518,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.tournament.state = 'running';
             this.tournament.startedAt = new Date();
 
-            if (null !== this.startTournamentTimeout) {
+            if (this.startTournamentTimeout !== null) {
                 clearTimeout(this.startTournamentTimeout);
                 this.startTournamentTimeout = null;
             }
@@ -559,17 +559,17 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        if ('playing' === hostedGame.state) {
+        if (hostedGame.state === 'playing') {
             this.logger.debug('still playing, do nothing.', { matchKey });
             return;
         }
 
-        if ('created' === hostedGame.state) {
+        if (hostedGame.state === 'created') {
             this.logger.error('Unexpected tournament match state: "created"', { matchKey, hostedGamePublicId: hostedGame.publicId });
             return;
         }
 
-        if ('canceled' === hostedGame.state) {
+        if (hostedGame.state === 'canceled') {
             this.logger.info('game has been canceled, recreate', { matchKey, hostedGamePublicId: hostedGame.publicId });
             await this.doStartTournamentMatch(tournamentMatch);
             addTournamentHistory(this.tournament, 'match_canceled_recreated', {
@@ -713,7 +713,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             throw new GamePlayerNotFoundTournamentError('No hosted game with this public id');
         }
 
-        if ('playing' !== tournamentMatch.state) {
+        if (tournamentMatch.state !== 'playing') {
             throw new TournamentError('Cannot forfeit now, tournament match is not playing');
         }
 
@@ -756,7 +756,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             throw new GamePlayerNotFoundTournamentError('No hosted game with this public id');
         }
 
-        if ('done' !== tournamentMatch.state) {
+        if (tournamentMatch.state !== 'done') {
             throw new TournamentError('Cannot clear results now, tournament match is not ended');
         }
 
@@ -765,7 +765,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         const cancelNextGame = (matchKey: null | string): void => {
-            if (null === matchKey) {
+            if (matchKey === null) {
                 return;
             }
 
@@ -813,7 +813,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     async editTournament(edited: Tournament): Promise<Tournament>
     {
-        if ('created' !== this.tournament.state) {
+        if (this.tournament.state !== 'created') {
             throw new TournamentError('Cannot edit, tournament has already started');
         }
 

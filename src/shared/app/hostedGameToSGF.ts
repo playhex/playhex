@@ -28,7 +28,7 @@ const getMovesChatMessages = (hostedGame: HostedGame): ChatMessage[][] => {
 
     const { movesHistory } = hostedGame.gameData;
 
-    if (0 === movesHistory.length) {
+    if (movesHistory.length === 0) {
         // If there is no move, there is no move node in sgf to contain chat messages.
         // So returns empty.
         return [];
@@ -66,7 +66,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
 
         sgf.moves = movesHistory.map((move, index) => ({
             [colors[index % 2]]: Move.fromData(move).toString(),
-            C: 0 === movesChatMessages[index].length
+            C: movesChatMessages[index].length === 0
                 ? undefined
                 : movesChatMessages[index].map(chat => `${chat.player?.pseudo}: ${chat.content}`).join('\n')
             ,
@@ -94,7 +94,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
 
     // RE, outcome
     if (hostedGame.gameData?.endedAt) {
-        if (null === hostedGame.gameData.winner) {
+        if (hostedGame.gameData.winner === null) {
             sgf.RE = 'Void';
         } else {
             sgf.RE = hostedGame.gameData.winner === 0 ? 'B+' : 'W+';

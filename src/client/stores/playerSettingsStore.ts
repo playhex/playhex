@@ -25,7 +25,7 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
         return promise;
     };
 
-    if (null !== loggedInPlayer.value) {
+    if (loggedInPlayer.value !== null) {
         reloadPlayerSettings();
     }
 
@@ -33,7 +33,7 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
     watch(loggedInPlayer, player => {
         playerSettings.value = null;
 
-        if (null === player) {
+        if (player === null) {
             return;
         }
 
@@ -41,7 +41,7 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
     });
 
     const updatePlayerSettings = async (): Promise<void> => {
-        if (null === playerSettings.value) {
+        if (playerSettings.value === null) {
             throw new Error('Cannot update player settings, no value');
         }
 

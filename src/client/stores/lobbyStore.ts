@@ -42,7 +42,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const joinGame = async (hostedGamePublicId: string): Promise<true | string> => {
         return new Promise((resolve, reject) => {
             socket.emit('joinGame', hostedGamePublicId, (answer: true | string) => {
-                if (true === answer) {
+                if (answer === true) {
                     resolve(answer);
                 }
 
@@ -80,7 +80,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
 
         socket.on('gameUpdate', (gameId, hostedGame) => {
-            if (null === hostedGame) {
+            if (hostedGame === null) {
                 return;
             }
 

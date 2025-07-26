@@ -192,7 +192,7 @@ export default class HostedGamePersister
         }
 
         if (undefined !== params.endedAtSort) {
-            queryBuilder.orderBy('gameData.endedAt', 'desc' === params.endedAtSort ? 'DESC' : 'ASC');
+            queryBuilder.orderBy('gameData.endedAt', params.endedAtSort === 'desc' ? 'DESC' : 'ASC');
         }
 
         return queryBuilder;

@@ -21,7 +21,7 @@ export const canPassAgain = (game: Game): boolean => {
     }
 
     for (let i = 0; i < MAX_CONSECUTIVE_PASSES; ++i) {
-        if ('pass' !== movesHistory[length - i - 1].getSpecialMoveType()) {
+        if (movesHistory[length - i - 1].getSpecialMoveType() !== 'pass') {
             return true;
         }
     }

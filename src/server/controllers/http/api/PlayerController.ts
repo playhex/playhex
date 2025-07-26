@@ -23,7 +23,7 @@ export default class PlayerController
     ) {
         const player = await this.playerRepository.getPlayerBySlug(slug);
 
-        if (null === player) {
+        if (player === null) {
             throw new DomainHttpError(404, 'player_not_found');
         }
 
@@ -36,7 +36,7 @@ export default class PlayerController
     ) {
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new DomainHttpError(404, 'player_not_found');
         }
 
@@ -49,7 +49,7 @@ export default class PlayerController
     ) {
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new DomainHttpError(404, 'player_not_found');
         }
 

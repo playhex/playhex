@@ -19,7 +19,7 @@ export default class RatingRepository
     {
         const { id } = player;
 
-        if ('number' !== typeof id) {
+        if (typeof id !== 'number') {
             throw new Error('Player have no id');
         }
 
@@ -34,7 +34,7 @@ export default class RatingRepository
             },
         });
 
-        if (null === rating) {
+        if (rating === null) {
             rating = createInitialRating(player, category);
             await this.persistRatings([rating]);
         }
@@ -50,7 +50,7 @@ export default class RatingRepository
     {
         const { id } = player;
 
-        if ('number' !== typeof id) {
+        if (typeof id !== 'number') {
             throw new Error('Player have no id');
         }
 
@@ -65,7 +65,7 @@ export default class RatingRepository
             },
         });
 
-        if (0 === ratings.length) {
+        if (ratings.length === 0) {
             ratings = [createInitialRating(player, category)];
             await this.persistRatings(ratings);
         }
@@ -105,7 +105,7 @@ export default class RatingRepository
         const winner = hostedGame.gameData?.winner;
         const endedAt = hostedGame.gameData?.endedAt;
 
-        if ('number' !== typeof winner || !endedAt) {
+        if (typeof winner !== 'number' || !endedAt) {
             throw new Error('Cannot update players rating, game must have ended');
         }
 
@@ -146,7 +146,7 @@ export default class RatingRepository
                 rating.volatility = glicko2Player.getVol();
                 rating.games = [hostedGame];
 
-                if ('overall' === category) {
+                if (category === 'overall') {
                     rating.player.currentRating = rating;
                 }
 

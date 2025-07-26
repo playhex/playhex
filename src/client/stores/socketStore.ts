@@ -35,7 +35,7 @@ const useSocketStore = defineStore('socketStore', () => {
     const authStore = useAuthStore();
 
     watch(() => authStore.loggedInPlayer, player => {
-        if (null === player) {
+        if (player === null) {
             socket.disconnect();
             return;
         }

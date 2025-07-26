@@ -11,7 +11,7 @@ export const useSearchGamesSyncHash = (searchGamesParameters: Ref<SearchGamesPar
 
     // Set parameters from url hash if set
     // Must also replace default parameters from above because when using "Any" filter, undefined won't replace default parameter
-    if ('' !== window.location.hash) {
+    if (window.location.hash !== '') {
         searchGamesParameters.value = plainToInstance(SearchGamesParameters, qs.parse(window.location.hash.substring(1)));
     }
 

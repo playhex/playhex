@@ -16,7 +16,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
         socket.on('sendChat', async (gameId, content, answer) => {
             const { player } = socket.data;
 
-            if (null === player) {
+            if (player === null) {
                 answer('Player not found');
                 return;
             }
@@ -29,7 +29,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
 
             const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
 
-            if (true !== result) {
+            if (result !== true) {
                 answer(result);
                 return;
             }

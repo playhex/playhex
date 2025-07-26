@@ -59,11 +59,11 @@ export class AutoSave<T> implements AutoSaveInterface<T>
 
     save(): Promise<T>
     {
-        if (null !== this.nextPromise) {
+        if (this.nextPromise !== null) {
             return this.nextPromise;
         }
 
-        if (null === this.currentPromise) {
+        if (this.currentPromise === null) {
             this.currentPromise = this.doRunCallback();
 
             return this.currentPromise;

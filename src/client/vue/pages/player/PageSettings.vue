@@ -42,7 +42,7 @@ watch(
     playerSettings,
     (settings, oldSettings) => {
         // Do nothing if no settings, or on initial settings load
-        if (null === settings || null === oldSettings) {
+        if (settings === null || oldSettings === null) {
             return;
         }
 
@@ -170,7 +170,7 @@ const {
     requestPermission,
 } = useNotificationStore();
 
-const isNotificationSupported = 'undefined' !== typeof Notification;
+const isNotificationSupported = typeof Notification !== 'undefined';
 </script>
 
 <template>

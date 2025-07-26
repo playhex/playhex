@@ -24,7 +24,7 @@ export default class TournamentBanController {
     ): Promise<TournamentBannedPlayer[]> {
         const tournament = await this.tournamentRepository.findBySlug(slug);
 
-        if (null === tournament) {
+        if (tournament === null) {
             throw new NotFoundError(`Tournament "${slug}" not found`);
         }
 
@@ -41,7 +41,7 @@ export default class TournamentBanController {
     ): Promise<TournamentBannedPlayer> {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`Tournament "${slug}" not found`);
         }
 
@@ -51,7 +51,7 @@ export default class TournamentBanController {
             publicId: playerPublicId,
         });
 
-        if (null === player) {
+        if (player === null) {
             throw new NotFoundError('No player with this publicId');
         }
 
@@ -66,7 +66,7 @@ export default class TournamentBanController {
     ) {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`Tournament "${slug}" not found`);
         }
 
@@ -76,7 +76,7 @@ export default class TournamentBanController {
             publicId: playerPublicId,
         });
 
-        if (null === player) {
+        if (player === null) {
             throw new NotFoundError('No player with this publicId');
         }
 

@@ -38,7 +38,7 @@ describe('Rich Chat', () => {
 
         const richChat = new RichChat(hostedGame)
             .getRichChatMessages()
-            .filter(item => item instanceof ChatMessage || 'date' === item.type)
+            .filter(item => item instanceof ChatMessage || item.type === 'date')
         ;
 
         assert.strictEqual(richChat.length, 5);
@@ -94,7 +94,7 @@ describe('Rich Chat', () => {
 
         const richChat = new RichChat(hostedGame)
             .getRichChatMessages()
-            .filter(item => item instanceof ChatMessage || 'move' === item.type)
+            .filter(item => item instanceof ChatMessage || item.type === 'move')
         ;
 
         assert.strictEqual(richChat.length, 4);

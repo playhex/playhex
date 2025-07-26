@@ -46,7 +46,7 @@ export default class TournamentController
     ) {
         const tournament = await this.tournamentRepository.findBySlugFull(slug);
 
-        if (null === tournament) {
+        if (tournament === null) {
             throw new HttpError(404, `No tournament with slug "${slug}"`);
         }
 
@@ -83,7 +83,7 @@ export default class TournamentController
     ) {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
@@ -107,7 +107,7 @@ export default class TournamentController
     ): Promise<TournamentSubscription> {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
@@ -137,13 +137,13 @@ export default class TournamentController
     ): Promise<null | TournamentSubscription> {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
         const subscription = activeTournament.findSubscriptionByPlayerPublicId(playerPublicId);
 
-        if (null === subscription) {
+        if (subscription === null) {
             return null;
         }
 
@@ -163,13 +163,13 @@ export default class TournamentController
     ): Promise<Tournament> {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
-        if ('created' !== activeTournament.getTournament().state) {
+        if (activeTournament.getTournament().state !== 'created') {
             throw new HttpError(409, 'Cannot start tournament, already started');
         }
 
@@ -201,7 +201,7 @@ export default class TournamentController
     ) {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
@@ -230,7 +230,7 @@ export default class TournamentController
     ) {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
@@ -262,7 +262,7 @@ export default class TournamentController
     ): Promise<Tournament> {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
@@ -282,7 +282,7 @@ export default class TournamentController
     ): Promise<void> {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 

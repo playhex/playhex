@@ -86,7 +86,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
     otherPlayerIndex(): PlayerIndex
     {
-        return 0 === this.currentPlayerIndex
+        return this.currentPlayerIndex === 0
             ? 1
             : 0
         ;
@@ -121,7 +121,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
     getLastMove(): null | Move
     {
-        if (0 === this.movesHistory.length) {
+        if (this.movesHistory.length === 0) {
             return null;
         }
 
@@ -229,7 +229,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
         // Emit "ended" event after "played" event to keep order between events.
         if (this.hasWinner()) {
-            if (null === this.endedAt) {
+            if (this.endedAt === null) {
                 throw new Error('Ended at expected to be set');
             }
 
@@ -250,8 +250,8 @@ export default class Game extends TypedEmitter<GameEvents>
     canSwapNow(): boolean
     {
         return this.allowSwap
-            && 1 === this.movesHistory.length
-            && 'pass' !== this.movesHistory[0].getSpecialMoveType()
+            && this.movesHistory.length === 1
+            && this.movesHistory[0].getSpecialMoveType() !== 'pass'
         ;
     }
 
@@ -264,7 +264,7 @@ export default class Game extends TypedEmitter<GameEvents>
             return false;
         }
 
-        return 'swap-pieces' === this.movesHistory[1].getSpecialMoveType();
+        return this.movesHistory[1].getSpecialMoveType() === 'swap-pieces';
     }
 
     createMoveOrSwapMove(coords: Coords): Move
@@ -281,7 +281,7 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     getSwapCoords(checkIsSwap = true): null | { swapped: Coords, mirror: Coords }
     {
-        if (checkIsSwap && ('swap-pieces' !== this.getLastMove()?.getSpecialMoveType())) {
+        if (checkIsSwap && (this.getLastMove()?.getSpecialMoveType() !== 'swap-pieces')) {
             return null;
         }
 
@@ -312,7 +312,7 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new IllegalUndo('Cannot undo, no move to undo yet');
         }
 
-        if (this.movesHistory.length < 2 && 1 === playerIndex) {
+        if (this.movesHistory.length < 2 && playerIndex === 1) {
             throw new IllegalUndo('Second player cannot undo his move because he has not played any move yet');
         }
     }
@@ -336,7 +336,7 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         const lastMove = this.getLastMove();
 
-        if (null === lastMove) {
+        if (lastMove === null) {
             throw new Error('Cannot undo, board is empty');
         }
 
@@ -348,7 +348,7 @@ export default class Game extends TypedEmitter<GameEvents>
             case 'swap-pieces': {
                 const firstMove = this.getFirstMove();
 
-                if (null === firstMove) {
+                if (firstMove === null) {
                     throw new Error('Unexpected null first move');
                 }
 
@@ -380,7 +380,7 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         const undoneMoves = [];
 
-        if (this.movesHistory.length < 2 && 1 === playerIndex) {
+        if (this.movesHistory.length < 2 && playerIndex === 1) {
             throw new Error('player 1 cannot undo, player 1 has not played yet');
         }
 
@@ -402,7 +402,7 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         const undoneMoves: Move[] = [];
 
-        if (this.movesHistory.length < 2 && 1 === playerIndex) {
+        if (this.movesHistory.length < 2 && playerIndex === 1) {
             return undoneMoves;
         }
 
@@ -426,12 +426,12 @@ export default class Game extends TypedEmitter<GameEvents>
 
     hasWinner(): boolean
     {
-        return null !== this.winner;
+        return this.winner !== null;
     }
 
     isEnded(): boolean
     {
-        return null !== this.endedAt;
+        return this.endedAt !== null;
     }
 
     getWinner(): null | PlayerIndex
@@ -441,7 +441,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
     getStrictWinner(): PlayerIndex
     {
-        if (null === this.winner) {
+        if (this.winner === null) {
             throw new Error('Trying to strictly get the winner but game not finished or canceled');
         }
 
@@ -464,7 +464,7 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     declareWinner(playerIndex: PlayerIndex, outcome: Outcome, date: Date): void
     {
-        if (null !== this.winner) {
+        if (this.winner !== null) {
             throw new Error('Cannot set a winner again, there is already a winner');
         }
 
@@ -490,7 +490,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
     isCanceled(): boolean
     {
-        return this.isEnded() && null === this.winner;
+        return this.isEnded() && this.winner === null;
     }
 
     getOutcome(): Outcome
@@ -503,7 +503,7 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     resign(playerIndex: PlayerIndex, date: Date): void
     {
-        this.declareWinner(0 === playerIndex ? 1 : 0, 'resign', date);
+        this.declareWinner(playerIndex === 0 ? 1 : 0, 'resign', date);
     }
 
     /**
@@ -511,7 +511,7 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     forfeit(playerIndex: PlayerIndex, date: Date): void
     {
-        this.declareWinner(0 === playerIndex ? 1 : 0, 'forfeit', date);
+        this.declareWinner(playerIndex === 0 ? 1 : 0, 'forfeit', date);
     }
 
     /**

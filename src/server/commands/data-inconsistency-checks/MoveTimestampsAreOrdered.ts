@@ -67,7 +67,7 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
                     },
                 });
 
-                if (null === hostedGame) {
+                if (hostedGame === null) {
                     throw new Error('No hostedGame with id = ' + game.hostedGameId);
                 }
 

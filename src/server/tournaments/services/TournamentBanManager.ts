@@ -63,7 +63,7 @@ export class TournamentBanManager
     {
         const tournament = activeTournament.getTournament();
 
-        if ('created' !== tournament.state) {
+        if (tournament.state !== 'created') {
             throw new TournamentError('Cannot ban player, tournament already started');
         }
 
@@ -75,7 +75,7 @@ export class TournamentBanManager
             })
         ;
 
-        if (null === tournamentBannedPlayer) {
+        if (tournamentBannedPlayer === null) {
             tournamentBannedPlayer = new TournamentBannedPlayer();
 
             tournamentBannedPlayer.tournament = tournament;
@@ -106,7 +106,7 @@ export class TournamentBanManager
     {
         const tournament = activeTournament.getTournament();
 
-        if ('created' !== tournament.state) {
+        if (tournament.state !== 'created') {
             throw new TournamentError('Cannot ban player, tournament already started');
         }
 

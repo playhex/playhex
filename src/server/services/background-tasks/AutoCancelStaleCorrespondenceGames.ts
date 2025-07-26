@@ -63,11 +63,11 @@ export default class AutoCancelStaleCorrespondenceGames
 
     shouldAutoCancel(hostedGameServer: HostedGameServer): boolean
     {
-        if ('correspondence' !== timeControlToCadencyName(hostedGameServer.getHostedGameOptions())) {
+        if (timeControlToCadencyName(hostedGameServer.getHostedGameOptions()) !== 'correspondence') {
             return false;
         }
 
-        if ('playing' !== hostedGameServer.getState()) {
+        if (hostedGameServer.getState() !== 'playing') {
             return false;
         }
 

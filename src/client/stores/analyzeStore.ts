@@ -38,7 +38,7 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
     const loadAnalyze = async (gamePublicId: string, request = false): Promise<Ref<null | GameAnalyze>> => {
         const gameAnalyze = getAnalyze(gamePublicId);
 
-        if (null !== (gameAnalyze.value?.analyze ?? null)) {
+        if ((gameAnalyze.value?.analyze ?? null) !== null) {
             return gameAnalyze;
         }
 

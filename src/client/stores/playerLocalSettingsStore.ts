@@ -76,7 +76,7 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
      * Dark/light theme
      */
     const displayedTheme = (): DarkOrLight => {
-        if ('auto' !== localSettings.value.selectedTheme) {
+        if (localSettings.value.selectedTheme !== 'auto') {
             return localSettings.value.selectedTheme;
         }
 

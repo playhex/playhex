@@ -21,7 +21,7 @@ const props = defineProps({
 
 const { swapRule, firstPlayer } = props.gameOptions;
 
-let isDefaultRules = swapRule && null === firstPlayer;
+let isDefaultRules = swapRule && firstPlayer === null;
 </script>
 
 <template>

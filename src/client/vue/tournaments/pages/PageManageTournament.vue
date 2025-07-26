@@ -21,7 +21,7 @@ const {
 } = useTournamentFromUrl();
 
 useHead({
-    title: () => (false === tournament.value ? null : tournament.value?.title) ?? 'Manage tournament',
+    title: () => (tournament.value === false ? null : tournament.value?.title) ?? 'Manage tournament',
 });
 
 const router = useRouter();
@@ -43,7 +43,7 @@ const editTournament = async () => {
     try {
         const updated = await apiPatchTournament(tournament.value);
 
-        if (null === updated) {
+        if (updated === null) {
             throw new Error('Error while updating tournament');
         }
 
@@ -97,7 +97,7 @@ const startTournament = async () => {
         await apiPostStartTournament(slug);
     } catch (e) {
         if (e instanceof DomainHttpError) {
-            if ('tournament_not_enough_participants_to_start' === e.type) {
+            if (e.type === 'tournament_not_enough_participants_to_start') {
                 useToastsStore().addToast(new Toast(
                     i18next.t(e.type),
                     {
@@ -136,7 +136,7 @@ const tournamentBannedPlayers = ref<null | TournamentBannedPlayer[]>(null);
 const banPlayer = async (player: Player): Promise<void> => {
     const tournamentBannedPlayer = await apiPutTournamentBannedPlayer(slug, player);
 
-    if (null === tournamentBannedPlayers.value) {
+    if (tournamentBannedPlayers.value === null) {
         return;
     }
 
@@ -158,7 +158,7 @@ const banPlayer = async (player: Player): Promise<void> => {
 const unbanPlayer = async (player: Player): Promise<void> => {
     await apiDeleteTournamentBannedPlayer(slug, player);
 
-    if (null !== tournamentBannedPlayers.value) {
+    if (tournamentBannedPlayers.value !== null) {
         tournamentBannedPlayers.value = tournamentBannedPlayers.value
             .filter(bannedPlayer => bannedPlayer.player.publicId !== player.publicId)
         ;

@@ -34,7 +34,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
 
     private clearElapseTimeout(): void
     {
-        if (null !== this.timeout) {
+        if (this.timeout !== null) {
             clearTimeout(this.timeout);
             this.timeout = null;
         }
@@ -56,7 +56,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
     {
         this.clearElapseTimeout();
 
-        if (null !== now && this.value instanceof Date) {
+        if (now !== null && this.value instanceof Date) {
             if (this.value > now) {
                 // Chrono will elapse at given date
                 const elapsesAt = this.value;
@@ -158,7 +158,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
 
         this.clearElapseTimeout();
 
-        if (null !== elapsedAt) {
+        if (elapsedAt !== null) {
             // emit after all internal changes because listeners may update chrono
             this.emit('elapsed', elapsedAt);
         }
@@ -197,7 +197,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
      */
     isElapsedAt(now: Date = new Date()): boolean
     {
-        return null !== this.getElapsedAtDate(now);
+        return this.getElapsedAtDate(now) !== null;
     }
 
     /**
@@ -218,7 +218,7 @@ export class Chrono extends TypedEmitter<ChronoEvents>
     {
         const at = this.getElapsedAtDate(now);
 
-        if (null === at) {
+        if (at === null) {
             return null;
         }
 

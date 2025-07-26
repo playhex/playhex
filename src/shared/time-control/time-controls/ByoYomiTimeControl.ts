@@ -116,7 +116,7 @@ export class ByoYomiTimeControl extends AbstractTimeControl<GameTimeData<ByoYomi
         this.playerChronos[this.currentPlayer].pauseByMovePlayed(date);
 
         // If pushing made player elapsing, do not run other player chrono
-        if (null !== this.elapsedPlayer) {
+        if (this.elapsedPlayer !== null) {
             return;
         }
 

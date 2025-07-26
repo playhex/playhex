@@ -86,7 +86,7 @@ export default class AdminController
         const findAIBySlug = async (slug: string): Promise<Player> => {
             const ai = await this.playerRepository.getAIPlayerBySlug(slug);
 
-            if (null === ai) {
+            if (ai === null) {
                 throw new HttpError(400, `No AI with slug '${slug}'.`);
             }
 
@@ -123,7 +123,7 @@ export default class AdminController
     ) {
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new NotFoundError(`Player "${publicId}" not found`);
         }
 
@@ -145,7 +145,7 @@ export default class AdminController
     ) {
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new NotFoundError(`Player "${publicId}" not found`);
         }
 
@@ -158,7 +158,7 @@ export default class AdminController
     ) {
         const hostedGameServer = this.hostedGameRepository.getActiveGame(publicId);
 
-        if (null === hostedGameServer) {
+        if (hostedGameServer === null) {
             throw new NotFoundError(`HostedGame "${publicId}" not found`);
         }
 
@@ -185,7 +185,7 @@ export default class AdminController
     ) {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
@@ -200,7 +200,7 @@ export default class AdminController
     ) {
         const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
 
-        if (null === activeTournament) {
+        if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 

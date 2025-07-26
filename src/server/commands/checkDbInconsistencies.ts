@@ -30,7 +30,7 @@ hexProgram
             const inconsistencies = await checker.run();
 
             console.log(
-                0 === inconsistencies.length ? ' OK ' : `FAIL (${inconsistencies.length})`,
+                inconsistencies.length === 0 ? ' OK ' : `FAIL (${inconsistencies.length})`,
                 checker.getDescription(),
             );
 

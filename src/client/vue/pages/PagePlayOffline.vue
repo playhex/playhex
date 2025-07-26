@@ -53,9 +53,9 @@ const initGame = () => {
         },
     ];
 
-    if (1 === gameOptions.firstPlayer) {
+    if (gameOptions.firstPlayer === 1) {
         players.value.reverse();
-    } else if (null === gameOptions.firstPlayer) {
+    } else if (gameOptions.firstPlayer === null) {
         if (Math.random() < 0.5) {
             players.value.reverse();
         }
@@ -63,7 +63,7 @@ const initGame = () => {
 
     const playerIndex = players.value.indexOf(player);
 
-    if (0 !== playerIndex && 1 !== playerIndex) {
+    if (playerIndex !== 0 && playerIndex !== 1) {
         throw new Error('Unexpected player index');
     }
 

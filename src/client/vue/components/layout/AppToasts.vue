@@ -15,16 +15,16 @@ const clickToast = (toast: Toast): void => {
     const { actions } = toast.options;
 
     // no action: just close it
-    if (0 === actions.length) {
+    if (actions.length === 0) {
         deleteToast(toast);
         return;
     }
 
     // single action: do it
-    if (1 === actions.length) {
+    if (actions.length === 1) {
         const { action } = actions[0];
 
-        if ('function' === typeof action) {
+        if (typeof action === 'function') {
             action();
             deleteToast(toast);
             return;

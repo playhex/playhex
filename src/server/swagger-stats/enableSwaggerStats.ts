@@ -6,7 +6,7 @@ import swStats from 'swagger-stats';
 const { SWAGGER_STATS_PASSWORD } = process.env;
 
 export const enableSwaggerStats = (app: Express) => {
-    if (undefined === SWAGGER_STATS_PASSWORD || '' === SWAGGER_STATS_PASSWORD) {
+    if (undefined === SWAGGER_STATS_PASSWORD || SWAGGER_STATS_PASSWORD === '') {
         return;
     }
 
@@ -15,9 +15,9 @@ export const enableSwaggerStats = (app: Express) => {
 
     app.use(swStats.getMiddleware({
         swaggerSpec,
-        authentication: 'no_password' !== SWAGGER_STATS_PASSWORD,
+        authentication: SWAGGER_STATS_PASSWORD !== 'no_password',
         onAuthenticate(req, username, password) {
-            return 'admin' === username
+            return username === 'admin'
                 && SWAGGER_STATS_PASSWORD === password
             ;
         },

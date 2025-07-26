@@ -21,7 +21,7 @@ export default class PlayerPushSubscriptionRepository
             endpoint: playerPushSubscription.endpoint,
         });
 
-        if (null !== alreadyInserted) {
+        if (alreadyInserted !== null) {
             return alreadyInserted;
         }
 

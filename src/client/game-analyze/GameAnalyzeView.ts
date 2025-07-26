@@ -116,7 +116,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     async mount(element: HTMLElement): Promise<void>
     {
-        if (null !== this.containerElement) {
+        if (this.containerElement !== null) {
             throw new Error('Game analyze view already mounted');
         }
 
@@ -155,7 +155,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         for (let i = 0; i < this.analyze.length; ++i) {
             const moveAnalyze = this.analyze[i];
 
-            if (null === moveAnalyze) {
+            if (moveAnalyze === null) {
                 continue;
             }
 
@@ -197,7 +197,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             width: 1,
         });
 
-        if (null !== this.highlightedMove) {
+        if (this.highlightedMove !== null) {
             this.highlightMove(this.highlightedMove, true);
         }
 
@@ -211,7 +211,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     getWrapperSize()
     {
-        if (null === this.containerElement) {
+        if (this.containerElement === null) {
             throw new Error('Not yet mounted');
         }
 
@@ -230,7 +230,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         gameView.addMark(this.bestMoveMark, 'analyze');
 
         gameView.on('movesHistoryCursorChanged', cursor => {
-            if (null === cursor) {
+            if (cursor === null) {
                 return;
             }
 
@@ -241,7 +241,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             this.bestMoveMark.hide();
             this.playedMoveMark.hide();
 
-            if (null === move) {
+            if (move === null) {
                 return;
             }
 
@@ -300,7 +300,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     private highlightMove(moveIndex: number, force = false): void
     {
-        if (null === this.highlight) {
+        if (this.highlight === null) {
             return;
         }
 
@@ -318,7 +318,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     private destroyResizeObserver(): void
     {
-        if (null !== this.resizeObserver) {
+        if (this.resizeObserver !== null) {
             this.resizeObserver.disconnect();
             this.resizeObserver = null;
         }
@@ -326,7 +326,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     private listenContainerElementResize(): void
     {
-        if (null === this.containerElement) {
+        if (this.containerElement === null) {
             throw new Error('Not yet mounted');
         }
 

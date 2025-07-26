@@ -131,13 +131,13 @@ export default class TournamentRepository
         for (const tournamentMatch of tournament.matches) {
             const { hostedGame } = tournamentMatch;
 
-            if (null === hostedGame) {
+            if (hostedGame === null) {
                 continue;
             }
 
             const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(hostedGame.publicId);
 
-            if (null === hostedGameServer) {
+            if (hostedGameServer === null) {
                 if (!isStateEnded(hostedGame)) {
                     logger.warning('Could not find tournament active game', {
                         tournamentPublicId: hostedGame.publicId,
@@ -322,7 +322,7 @@ export default class TournamentRepository
      */
     async subscribeCheckIn(tournament: Tournament, player: Player): Promise<TournamentSubscription>
     {
-        if ('created' !== tournament.state) {
+        if (tournament.state !== 'created') {
             throw new Error('Cannot subscribe or checkIn, tournament already started');
         }
 

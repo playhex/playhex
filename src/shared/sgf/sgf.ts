@@ -16,7 +16,7 @@ import type { SGF, SGFMove, SGFProperty } from './types.js';
  * https://www.red-bean.com/sgf/sgf4.html#text
  */
 const escapeSgfValue = (value: unknown): unknown => {
-    if ('string' !== typeof value) {
+    if (typeof value !== 'string') {
         return value;
     }
 
@@ -33,7 +33,7 @@ const escapeSgfValue = (value: unknown): unknown => {
 const write = <T extends (SGF & SGFMove)>(sgf: T, properties: (keyof T)[]): string => {
     return properties
         .map((property: SGFProperty) => {
-            if (undefined === sgf[property] || null === sgf[property]) {
+            if (undefined === sgf[property] || sgf[property] === null) {
                 return '';
             }
 

@@ -70,7 +70,7 @@ const updateMeta = (player: Player): void => {
  * Player data
  */
 const { loggedInPlayer } = storeToRefs(useAuthStore());
-const isMe = (): boolean => null !== loggedInPlayer.value && loggedInPlayer.value.slug === slug;
+const isMe = (): boolean => loggedInPlayer.value !== null && loggedInPlayer.value.slug === slug;
 
 const player: Ref<null | Player> = isMe()
     ? loggedInPlayer
@@ -81,14 +81,14 @@ const playerNotFound = ref(false);
 
 (async () => {
     try {
-        if (null === player.value) {
+        if (player.value === null) {
             player.value = await getPlayerBySlug(slug);
         }
 
         updateMeta(player.value);
     } catch (e) {
         if (e instanceof DomainHttpError) {
-            if ('player_not_found' === e.type) {
+            if (e.type === 'player_not_found') {
                 playerNotFound.value = true;
                 return;
             }
@@ -124,14 +124,14 @@ const currentGameComparator = (a: HostedGame, b: HostedGame): number => {
 };
 
 const getCurrentGames = (): HostedGame[] => {
-    if (null === player.value) {
+    if (player.value === null) {
         return [];
     }
 
     const currentGames: HostedGame[] = [];
 
     for (const hostedGame of Object.values(hostedGames.value)) {
-        if ('playing' !== hostedGame.state || !hasPlayer(hostedGame, player.value)) {
+        if (hostedGame.state !== 'playing' || !hasPlayer(hostedGame, player.value)) {
             continue;
         }
 
@@ -149,7 +149,7 @@ const totalResults = ref<null | number>(null);
 const DEFAULT_PAGE_SIZE = 15;
 
 const searchGamesParameters = ref<SearchGamesParameters>({
-    players: null === player.value
+    players: player.value === null
         ? undefined
         : [{ publicId: player.value.publicId }]
     ,
@@ -167,7 +167,7 @@ const { totalPages, goPagePrevious, goPageNext } = useSearchGamesPagination(
 
 // Set filter to current player, but keep same filter if already set on this player
 watch(player, newPlayer => {
-    if (null === newPlayer) {
+    if (newPlayer === null) {
         return;
     }
 
@@ -184,7 +184,7 @@ watch(player, newPlayer => {
 watchEffect(async () => {
     // Do not search yet to prevent having games without current player,
     // which is impossible to display in this page table because we need to display the opponent to currentPlayer
-    if (undefined === searchGamesParameters.value.players || 0 === searchGamesParameters.value.players.length) {
+    if (undefined === searchGamesParameters.value.players || searchGamesParameters.value.players.length === 0) {
         return;
     }
 
@@ -195,15 +195,15 @@ watchEffect(async () => {
 });
 
 const hasWon = (game: HostedGame): boolean => {
-    if (null === player.value) {
+    if (player.value === null) {
         throw new Error('player must be set');
     }
 
-    if (null === game.gameData) {
+    if (game.gameData === null) {
         throw new Error('no gameData');
     }
 
-    if (null === game.gameData.winner) {
+    if (game.gameData.winner === null) {
         return false;
     }
 
@@ -213,7 +213,7 @@ const hasWon = (game: HostedGame): boolean => {
 };
 
 const getOpponent = (game: HostedGame): Player => {
-    if (null === player.value) {
+    if (player.value === null) {
         throw new Error('player must be set');
     }
 
@@ -228,7 +228,7 @@ const getOpponent = (game: HostedGame): Player => {
         }
     }
 
-    if (null === me || null === opponent) {
+    if (me === null || opponent === null) {
         throw new Error('Player not in the game, or no opponent');
     }
 
@@ -260,7 +260,7 @@ const { pingTime, medianShift } = storeToRefs(useServerDateStore());
 const playerStats = ref<null | PlayerStats>(null);
 
 watchEffect(async () => {
-    if (null === player.value) {
+    if (player.value === null) {
         playerStats.value = null;
         return;
     }
@@ -271,7 +271,7 @@ watchEffect(async () => {
 const playerCurrentRatings = ref<null | Partial<Record<RatingCategory, Rating>>>(null);
 
 watchEffect(async () => {
-    if (null === player.value) {
+    if (player.value === null) {
         playerStats.value = null;
         return;
     }
@@ -279,7 +279,7 @@ watchEffect(async () => {
     playerCurrentRatings.value = null;
     const ratings = await apiGetPlayerCurrentRatings(player.value.publicId);
 
-    if (null === ratings) {
+    if (ratings === null) {
         return;
     }
 

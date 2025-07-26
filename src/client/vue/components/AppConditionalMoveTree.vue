@@ -29,7 +29,7 @@ const props = defineProps({
 const { selectedLine } = toRefs(props);
 
 const isSelectedMove = (currentLine: ConditionalMovesLine): boolean => {
-    if (null === selectedLine.value) {
+    if (selectedLine.value === null) {
         return false;
     }
 

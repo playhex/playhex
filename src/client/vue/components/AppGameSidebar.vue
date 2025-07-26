@@ -58,7 +58,7 @@ const emits = defineEmits([
 const { loggedInPlayer } = useAuthStore();
 const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 
-if (null === loggedInPlayer) {
+if (loggedInPlayer === null) {
     throw new Error('Unexpected null logged in player');
 }
 
@@ -79,7 +79,7 @@ const formatChatDateHeader = (date: Date): string => {
 
     return intlFormat(date, { day: 'numeric', month: 'long' }, { locale: autoLocale() });
 };
-const formatDateInfo = (date: null | Date): string => null === date ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
+const formatDateInfo = (date: null | Date): string => date === null ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
     const { gameData } = hostedGameClient.getHostedGame();
@@ -102,11 +102,11 @@ const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
 const playerColor = (player: Player): string => {
     const index = getPlayerIndex(hostedGameClient.value.getHostedGame(), player);
 
-    if (0 === index) {
+    if (index === 0) {
         return 'text-danger';
     }
 
-    if (1 === index) {
+    if (index === 1) {
         return 'text-primary';
     }
 
@@ -125,7 +125,7 @@ const scrollChatToBottom = () => nextTick(() => {
 watch(hostedGameClient.value.getChatMessages(), () => scrollChatToBottom());
 
 const sendChat = () => {
-    if ('' === chatInput.value) {
+    if (chatInput.value === '') {
         return;
     }
 
@@ -198,7 +198,7 @@ const shareWithShareApi = async (): Promise<CopyResult> => {
 const shareGameLink = async (): Promise<CopyResult> => {
     const result = await shareWithShareApi();
 
-    if ('unsupported' !== result) {
+    if (result !== 'unsupported') {
         return result;
     }
 
@@ -207,7 +207,7 @@ const shareGameLink = async (): Promise<CopyResult> => {
 
 const shareGameLinkAndShowResult = async (): Promise<void> => {
     // In case "copied!" is already displayed, make it blink before copy again to show it worked again
-    if (null !== copiedResultTimeout) {
+    if (copiedResultTimeout !== null) {
         clearTimeout(copiedResultTimeout);
         copiedResult.value = null;
         await new Promise(resolve => setTimeout(resolve, 80));
@@ -215,23 +215,23 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
 
     const result = await shareGameLink();
 
-    if ('shared' === result || 'canceled' === result) {
+    if (result === 'shared' || result === 'canceled') {
         copiedResult.value = null;
         return;
     }
 
-    if ('copied' === result) {
+    if (result === 'copied') {
         copiedResult.value = true;
     }
 
-    if ('unsupported' === result) {
+    if (result === 'unsupported') {
         copiedResult.value = false;
     }
 
     copiedResultTimeout = window.setTimeout(() => {
         copiedResult.value = null;
 
-        if (null !== copiedResultTimeout) {
+        if (copiedResultTimeout !== null) {
             clearTimeout(copiedResultTimeout);
             copiedResultTimeout = null;
         }
@@ -343,7 +343,7 @@ watch(
     playerSettings,
     (settings, oldSettings) => {
         // Do nothing if no settings, or on initial settings load
-        if (null === settings || null === oldSettings) {
+        if (settings === null || oldSettings === null) {
             return;
         }
 
@@ -369,7 +369,7 @@ const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
 const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 
 watchEffect(() => {
-    if (null === conditionalMovesEditor.value) {
+    if (conditionalMovesEditor.value === null) {
         return;
     }
 

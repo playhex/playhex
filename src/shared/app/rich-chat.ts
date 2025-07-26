@@ -95,7 +95,7 @@ class DateHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        if (null !== this.currentDate && isSameDay(this.currentDate, chatMessage.createdAt)) {
+        if (this.currentDate !== null && isSameDay(this.currentDate, chatMessage.createdAt)) {
             return [];
         }
 
@@ -116,7 +116,7 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        if (null === this.hostedGame.gameData) {
+        if (this.hostedGame.gameData === null) {
             return [];
         }
 

@@ -37,7 +37,7 @@ const registerServiceWorker = async (): Promise<null | ServiceWorkerRegistration
 const syncServiceWorkerClientUrl = async () => {
     const registration = await serviceWorkerRegistrationPromise;
 
-    if (null === registration) {
+    if (registration === null) {
         return;
     }
 
@@ -91,20 +91,20 @@ export const getSubscription = async (): Promise<PushSubscription | null> => {
  * and post it to server so that server can send me push notifications.
  */
 export const subscribeToPushNotifications = async (): Promise<null | PushSubscription> => {
-    if ('undefined' === typeof Notification) {
+    if (typeof Notification === 'undefined') {
         return null;
     }
 
-    if ('granted' !== Notification.permission) {
+    if (Notification.permission !== 'granted') {
         return null;
     }
 
     let pushSubscription = await getSubscription();
 
-    if (null === pushSubscription) {
+    if (pushSubscription === null) {
         const registration = await serviceWorkerRegistrationPromise;
 
-        if (!registration?.pushManager || 'string' !== typeof pushValidPublicKey || 0 === pushValidPublicKey.length) {
+        if (!registration?.pushManager || typeof pushValidPublicKey !== 'string' || pushValidPublicKey.length === 0) {
             return null;
         }
 

@@ -26,7 +26,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     socket.on('playerConnected', (player, totalPlayersUpdate) => {
         totalPlayers.value = totalPlayersUpdate;
 
-        if (null !== player) {
+        if (player !== null) {
             players.value[player.publicId] = {
                 player,
                 active: true,
@@ -37,7 +37,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     socket.on('playerDisconnected', (player, totalPlayersUpdate) => {
         totalPlayers.value = totalPlayersUpdate;
 
-        if (null !== player) {
+        if (player !== null) {
             delete players.value[player.publicId];
         }
     });
@@ -69,10 +69,10 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
     watch(
         () => useAuthStore().loggedInPlayer,
         (_, oldMe) => {
-            if (null !== oldMe && players.value[oldMe.publicId]) {
+            if (oldMe !== null && players.value[oldMe.publicId]) {
                 delete players.value[oldMe.publicId];
 
-                if (null !== totalPlayers.value) {
+                if (totalPlayers.value !== null) {
                     --totalPlayers.value;
                 }
             }

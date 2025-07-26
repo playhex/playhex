@@ -178,7 +178,7 @@ export default class PlayerRepository
 
         const player = await this.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             // Should not happen: a session linked to a non-existing player
             throw new Error('Player not found');
         }

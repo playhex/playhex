@@ -139,7 +139,7 @@ export default class Tournament implements TimeControlBoardsize
     @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @IsObject({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @ValidateNested({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
-    @Transform(({ value }) => !value ? null : 'fischer' === value.family
+    @Transform(({ value }) => !value ? null : value.family === 'fischer'
         ? plainToInstance(HostedGameOptionsTimeControlFischer, value)
         : plainToInstance(HostedGameOptionsTimeControlByoYomi, value),
     ) // make sure timeControl is a HostedGameOptionsTimeControl and not a raw object, and make validation works
@@ -384,7 +384,7 @@ export const cloneTournament = (target: Tournament, source: Tournament): void =>
     target.timeControl = structuredClone(source.timeControl);
 
     // Prevents "maxTime must not be greater than [2 weeks]" error when cloning a tournament and submit it
-    if ('fischer' === target.timeControl.family && undefined !== target.timeControl.options.maxTime && target.timeControl.options.maxTime > maxTimeControlInputTime) {
+    if (target.timeControl.family === 'fischer' && undefined !== target.timeControl.options.maxTime && target.timeControl.options.maxTime > maxTimeControlInputTime) {
         target.timeControl.options.maxTime = undefined;
     }
 

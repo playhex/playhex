@@ -29,7 +29,7 @@ export const findAIOpponent = async (gameOptions: HostedGameOptions): Promise<nu
 
     const player = await findPlayerWithAIConfig(publicId);
 
-    if (null === player) {
+    if (player === null) {
         return null;
     }
 
@@ -45,12 +45,12 @@ export const findAIOpponent = async (gameOptions: HostedGameOptions): Promise<nu
     const aiConfigStatus = await Container.get(HexAiApiClient).getPeersStatus();
 
     // No peer at all
-    if (0 === aiConfigStatus.totalPeers) {
+    if (aiConfigStatus.totalPeers === 0) {
         throw new FindAIError('Cannot use this remote AI player, AI api currently has no worker');
     }
 
     // AI requires more computation power, check there is powerful-enough peers, which should be the case of any primary peer.
-    if (player.aiConfig.requireMorePower && 0 === aiConfigStatus.totalPeersPrimary) {
+    if (player.aiConfig.requireMorePower && aiConfigStatus.totalPeersPrimary === 0) {
         throw new FindAIError('Cannot use this remote AI player, AI api currently has no powerful enough worker');
     }
 
@@ -58,16 +58,16 @@ export const findAIOpponent = async (gameOptions: HostedGameOptions): Promise<nu
 };
 
 export const validateConfigRandom = (config: unknown): config is { determinist: boolean, wait?: number } => {
-    return 'object' === typeof config
-        && null !== config
+    return typeof config === 'object'
+        && config !== null
         && 'determinist' in config
-        && 'boolean' === typeof config.determinist
+        && typeof config.determinist === 'boolean'
     ;
 };
 
 const waitTimeBeforeRandomMove = (aiConfig: { wait?: number }): number => {
     // if aiConfig.wait is defined, use it
-    if ('number' === typeof aiConfig.wait) {
+    if (typeof aiConfig.wait === 'number') {
         return aiConfig.wait;
     }
 
@@ -81,7 +81,7 @@ const waitTimeBeforeRandomMove = (aiConfig: { wait?: number }): number => {
             return 0;
         }
 
-        if (2 === matches.length) {
+        if (matches.length === 2) {
             const [min, max] = matches.map(s => parseInt(s, 10));
 
             return min + Math.random() * (max - min);
@@ -107,7 +107,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
         // player.aiConfig won't be loaded when fetching authenticated player.
         const playerFull = await findPlayerWithAIConfig(player.publicId);
 
-        if (null === playerFull || !playerFull.aiConfig) {
+        if (playerFull === null || !playerFull.aiConfig) {
             throw new Error('makeAIPlayerMove() called with a ai player without ai config');
         }
 
@@ -121,7 +121,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
 
     const game = hostedGameServer.getGame();
 
-    if (null === game) {
+    if (game === null) {
         throw new Error('makeAIPlayerMove() called with a HostedGame without game');
     }
 

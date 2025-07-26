@@ -86,7 +86,7 @@ const create1vAIRankedOverlay = defineOverlay(Create1vAIRankedOverlay);
 
 /* global ALLOW_RANKED_BOT_GAMES */
 // @ts-ignore: ALLOW_RANKED_BOT_GAMES replaced at build time by webpack.
-const allowRankedBotGames: boolean = 'true' === ALLOW_RANKED_BOT_GAMES;
+const allowRankedBotGames: boolean = ALLOW_RANKED_BOT_GAMES === 'true';
 
 const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
     gameOptions.opponentType = 'ai';
@@ -125,15 +125,15 @@ const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = ne
  * Utils functions
  */
 const isWaiting = (hostedGame: HostedGame) =>
-    'created' === hostedGame.state
+    hostedGame.state === 'created'
 ;
 
 const isPlaying = (hostedGame: HostedGame) =>
-    'playing' === hostedGame.state
+    hostedGame.state === 'playing'
 ;
 
 const isFinished = (hostedGame: HostedGame) =>
-    'ended' === hostedGame.state
+    hostedGame.state === 'ended'
 ;
 
 const joinGame = async (hostedGame: HostedGame) => {
@@ -147,7 +147,7 @@ const joinGame = async (hostedGame: HostedGame) => {
 
     const result = await lobbyStore.joinGame(hostedGame.publicId);
 
-    if (true !== result) {
+    if (result !== true) {
         throw new Error('Could not join game: ' + result);
     }
 
@@ -214,14 +214,14 @@ const byEndedAt = (a: HostedGame, b: HostedGame): number => {
 const createGameFromHash = () => {
     const gameOptions = createGameOptionsFromUrlHash();
 
-    if (null === gameOptions) {
+    if (gameOptions === null) {
         return;
     }
 
     // Remove hash to allow re-open create game overlay in case of clicking on a link again
     document.location.hash = '';
 
-    if ('player' === gameOptions.opponentType) {
+    if (gameOptions.opponentType === 'player') {
         if (gameOptions.ranked) {
             create1v1RankedAndJoinGame(gameOptions);
         } else {

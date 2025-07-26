@@ -22,7 +22,7 @@ const useServerDateStore = defineStore('serverDateStore', () => {
      * Get current shift in milliseconds, between client and server date.
      */
     const getMedianShift = (): number => {
-        if (0 === lastShifts.length) {
+        if (lastShifts.length === 0) {
             return 0;
         }
 

@@ -37,12 +37,12 @@ const useAuthStore = defineStore('authStore', () => {
     };
 
     socket.on('ratingsUpdated', (gameId, ratings) => {
-        if (null === loggedInPlayer.value) {
+        if (loggedInPlayer.value === null) {
             return;
         }
 
         for (const rating of ratings) {
-            if ('overall' !== rating.category) {
+            if (rating.category !== 'overall') {
                 continue;
             }
 

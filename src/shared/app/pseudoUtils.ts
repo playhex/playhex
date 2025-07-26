@@ -12,7 +12,7 @@ export class PseudoTooLongError extends InvalidPseudoError {}
  * @throws {InvalidPseudoError}
  */
 export const checkPseudo = (pseudo: string): void => {
-    if ('' === pseudo) {
+    if (pseudo === '') {
         throw new PseudoTooShortError();
     }
 
@@ -22,7 +22,7 @@ export const checkPseudo = (pseudo: string): void => {
 
     const slug = pseudoSlug(pseudo);
 
-    if ('' === slug) {
+    if (slug === '') {
         // Pseudo ")" will generate a blank slug, so make it invalid
         throw new InvalidPseudoError();
     }

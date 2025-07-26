@@ -5,7 +5,7 @@ import SearchGamesParameters from './SearchGamesParameters.js';
 import { timeControlToCadencyName } from './timeControlUtils.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
-    if (null !== hostedGame.host && hostedGame.host.publicId === player.publicId) {
+    if (hostedGame.host !== null && hostedGame.host.publicId === player.publicId) {
         return true;
     }
 
@@ -25,7 +25,7 @@ export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean 
     }
 
     // Cannot join if game has been canceled
-    if ('canceled' === hostedGame.state) {
+    if (hostedGame.state === 'canceled') {
         return false;
     }
 
@@ -51,7 +51,7 @@ export const getPlayer = (hostedGame: HostedGame, position: number): null | Play
  * Or null if player is not in the game, or game has not yet 2 players.
  */
 export const getOtherPlayer = (hostedGame: HostedGame, player: Player): null | Player => {
-    if (2 !== hostedGame.hostedGameToPlayers.length) {
+    if (hostedGame.hostedGameToPlayers.length !== 2) {
         return null;
     }
 
@@ -70,7 +70,7 @@ export const getOtherPlayer = (hostedGame: HostedGame, player: Player): null | P
 export const getCurrentPlayer = (hostedGame: HostedGame): null | Player => {
     const { gameData, state } = hostedGame;
 
-    if (null === gameData || 'playing' !== state) {
+    if (gameData === null || state !== 'playing') {
         return null;
     }
 
@@ -127,7 +127,7 @@ export const getStrictLoserPlayer = (hostedGame: HostedGame): Player => {
 };
 
 export const isBotGame = (hostedGame: HostedGame): boolean => {
-    return 'ai' === hostedGame.gameOptions.opponentType;
+    return hostedGame.gameOptions.opponentType === 'ai';
 };
 
 /**
@@ -149,7 +149,7 @@ export const addPlayer = (hostedGame: HostedGame, player: Player): void => {
 export const addMove = (hostedGame: HostedGame, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void => {
     const { gameData } = hostedGame;
 
-    if (null === gameData) {
+    if (gameData === null) {
         return;
     }
 
@@ -165,7 +165,7 @@ export const addMove = (hostedGame: HostedGame, move: Move, moveIndex: number, b
 export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Outcome, endedAt: Date): void => {
     hostedGame.state = 'ended';
 
-    if ('forfeit' === outcome) {
+    if (outcome === 'forfeit') {
         hostedGame.state = 'forfeited';
     }
 
@@ -185,8 +185,8 @@ export const cancelGame = (hostedGame: HostedGame, canceledAt: Date): void => {
 };
 
 export const isStateEnded = (hostedGame: HostedGame): boolean => {
-    return 'ended' === hostedGame.state
-        || 'forfeited' === hostedGame.state
+    return hostedGame.state === 'ended'
+        || hostedGame.state === 'forfeited'
     ;
 };
 
@@ -228,7 +228,7 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
  * Whether given player should be able to view/edit conditional moves on a given game.
  */
 export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Player): boolean => {
-    if ('correspondence' !== timeControlToCadencyName(hostedGame.gameOptions)) {
+    if (timeControlToCadencyName(hostedGame.gameOptions) !== 'correspondence') {
         return false;
     }
 

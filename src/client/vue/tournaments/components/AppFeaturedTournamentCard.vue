@@ -18,7 +18,7 @@ const props = defineProps({
 const { tournament } = toRefs(props);
 
 const started = (): boolean => {
-    return 'running' === tournament.value.state;
+    return tournament.value.state === 'running';
 };
 
 const {

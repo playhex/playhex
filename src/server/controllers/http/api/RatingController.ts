@@ -25,7 +25,7 @@ export default class RatingController
     ) {
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new DomainHttpError(404, 'player_not_found');
         }
 
@@ -43,7 +43,7 @@ export default class RatingController
 
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new DomainHttpError(404, 'player_not_found');
         }
 
@@ -61,7 +61,7 @@ export default class RatingController
 
         const player = await this.playerRepository.getPlayer(publicId);
 
-        if (null === player) {
+        if (player === null) {
             throw new DomainHttpError(404, 'player_not_found');
         }
 
@@ -79,7 +79,7 @@ export default class RatingController
 
         const game = await this.hostedGameRepository.findOneBy({ publicId });
 
-        if (null === game) {
+        if (game === null) {
             throw new HttpError(404, 'Game not found');
         }
 

@@ -24,10 +24,10 @@ export const gameToHexworldLink = (game: Game, orientation: number = 11): string
         throw new Error('Invalid board orientation');
     const moves = game.getMovesHistory()
         .map(move => {
-            if ('swap-pieces' === move.getSpecialMoveType()) {
+            if (move.getSpecialMoveType() === 'swap-pieces') {
                 return ':s';
             }
-            if ('pass' === move.getSpecialMoveType()) {
+            if (move.getSpecialMoveType() === 'pass') {
                 return ':p';
             }
             return move.toString();

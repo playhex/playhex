@@ -19,8 +19,8 @@ const endedTournaments = ref<null | Tournament[]>(null);
     endedTournaments.value = await apiGetEndedTournaments();
 })();
 
-const isUpcoming = (tournament: Tournament): boolean => 'created' === tournament.state;
-const isActive = (tournament: Tournament): boolean => 'running' === tournament.state;
+const isUpcoming = (tournament: Tournament): boolean => tournament.state === 'created';
+const isActive = (tournament: Tournament): boolean => tournament.state === 'running';
 
 const formatEndedAtDate = (date: Date): string => {
     return intlFormat(date, {

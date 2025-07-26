@@ -2,7 +2,7 @@ import { HostedGame, Player, ChatMessage } from './models/index.js';
 
 export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
     if (
-        'created' !== hostedGame.state
+        hostedGame.state !== 'created'
         && player.isGuest
         && hostedGame.hostedGameToPlayers.every(p => p.player.publicId !== player.publicId)
     ) {
@@ -14,7 +14,7 @@ export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): tru
 
 export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, hostedGame: HostedGame): true | string => {
     // Allow all "system" messages
-    if (null === chatMessage.player) {
+    if (chatMessage.player === null) {
         return true;
     }
 
@@ -33,7 +33,7 @@ export const checkShadowDeleted = (chatMessage: ChatMessage, shouldShowToPlayer:
         return true;
     }
 
-    if (null === chatMessage.player || null === shouldShowToPlayer) {
+    if (chatMessage.player === null || shouldShowToPlayer === null) {
         return false;
     }
 

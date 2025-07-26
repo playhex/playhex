@@ -13,14 +13,14 @@ if (!DATABASE_URL) {
 const scheme = DATABASE_URL.split('://').shift();
 const type = scheme === 'postgresql' ? 'postgres' : scheme;
 
-if ('mysql' !== type && 'postgres' !== type) {
+if (type !== 'mysql' && type !== 'postgres') {
     throw new Error('DATABASE_URL expected to be like "mysql://... or postgresql://...');
 }
 
 export const AppDataSource = new DataSource({
     type,
     url: DATABASE_URL,
-    logging: 'true' === DATABASE_SHOW_SQL,
+    logging: DATABASE_SHOW_SQL === 'true',
     timezone: 'Z',
     entities: Object.values(entities),
     migrations: [],

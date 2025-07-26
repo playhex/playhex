@@ -117,7 +117,7 @@ export const setLocale = async (locale: string, remember = true) => {
         .use(HttpBackend)
         .init({
             lng: autoLocale(),
-            debug: 'development' === process.env.NODE_ENV,
+            debug: process.env.NODE_ENV === 'development',
             fallbackLng: 'en',
         })
     ;

@@ -16,7 +16,7 @@ export const useSearchGamesPagination = (
     defaultPageSize: number,
 ) => {
     const totalPages = computed(() => {
-        if (null === totalResults.value || 0 === totalResults.value) {
+        if (totalResults.value === null || totalResults.value === 0) {
             return 0;
         }
 

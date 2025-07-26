@@ -31,7 +31,7 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
      * Reset context, to call when leaving a game.
      */
     const resetConditionalMoves = (): void => {
-        if (null !== unlistenGameView) {
+        if (unlistenGameView !== null) {
             unlistenGameView();
             unlistenGameView = null;
         }
@@ -48,7 +48,7 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
 
         currentHostedGame = hostedGame;
 
-        if (null === loggedInPlayer.value || !shouldShowConditionalMoves(currentHostedGame, loggedInPlayer.value)) {
+        if (loggedInPlayer.value === null || !shouldShowConditionalMoves(currentHostedGame, loggedInPlayer.value)) {
             resetConditionalMoves();
             return;
         }

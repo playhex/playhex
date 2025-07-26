@@ -18,7 +18,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     const subscribed = ref(false);
 
     const requestPermission = async () => {
-        if ('undefined' === typeof Notification) {
+        if (typeof Notification === 'undefined') {
             return;
         }
 
@@ -28,7 +28,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     // Listens notification permission change
     navigator.permissions.query({ name: 'notifications' }).then(permissionStatus => {
         permissionStatus.addEventListener('change', () => {
-            if ('prompt' === permissionStatus.state) {
+            if (permissionStatus.state === 'prompt') {
                 permission.value = 'default';
             } else {
                 permission.value = permissionStatus.state;
@@ -44,7 +44,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     const subscribeToPushNotifications = async () => {
         const result = await baseSubscribeToPushNotifications();
 
-        if (null === result) {
+        if (result === null) {
             return;
         }
 
@@ -53,7 +53,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
 
     // On load, or when notification granted, subscribe to push
     watch(permission, async (newPermission) => {
-        if ('granted' !== newPermission) {
+        if (newPermission !== 'granted') {
             return;
         }
 

@@ -81,11 +81,11 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         /**
          * No game server side, create an empty one to show client side
          */
-        if (null === gameData) {
+        if (gameData === null) {
             this.game = new Game(hostedGame.gameOptions.boardsize);
 
             // Cancel here in case game has been canceled before started
-            if ('canceled' === hostedGame.state) {
+            if (hostedGame.state === 'canceled') {
                 this.game.cancel(hostedGame.createdAt);
             }
 
@@ -105,12 +105,12 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Cancel game if canceled
-        if ('canceled' === hostedGame.state && !this.game.isEnded()) {
+        if (hostedGame.state === 'canceled' && !this.game.isEnded()) {
             this.game.cancel(gameData.endedAt ?? gameData.lastMoveAt ?? new Date());
         }
 
         // Set a winner if not yet set because timeout or resignation
-        if (null !== gameData.winner && !this.game.isEnded()) {
+        if (gameData.winner !== null && !this.game.isEnded()) {
             this.game.declareWinner(gameData.winner, gameData.outcome, gameData.endedAt ?? new Date());
         }
 
@@ -206,7 +206,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getGame(): Game
     {
-        if (null === this.game) {
+        if (this.game === null) {
             return this.loadGame();
         }
 
@@ -225,7 +225,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     canCancel(): boolean
     {
-        if (null === this.game) {
+        if (this.game === null) {
             return true;
         }
 
@@ -259,7 +259,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private playSoundForMove(move: Move): void
     {
-        playAudio('pass' === move.specialMoveType
+        playAudio(move.specialMoveType === 'pass'
             ? '/sounds/lisp/Check.ogg'
             : '/sounds/lisp/Move.ogg',
         );
@@ -276,7 +276,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         return new Promise((resolve, reject) => {
             this.socket.emit('move', this.getId(), moveWithoutDate, answer => {
-                if (true === answer) {
+                if (answer === true) {
                     resolve(answer);
                 }
 
@@ -298,7 +298,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         return new Promise((resolve, reject) => {
             this.socket.emit('premove', this.getId(), moveWithoutDate, answer => {
-                if (true === answer) {
+                if (answer === true) {
                     resolve(answer);
                 }
 
@@ -311,7 +311,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         return new Promise((resolve, reject) => {
             this.socket.emit('cancelPremove', this.getId(), answer => {
-                if (true === answer) {
+                if (answer === true) {
                     resolve(answer);
                 }
 
@@ -351,12 +351,12 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         const { gameData } = hostedGame;
 
-        if (null === gameData) {
+        if (gameData === null) {
             throw new Error('game started but no game data');
         }
 
         // Do nothing if game not yet loaded
-        if (null === this.game) {
+        if (this.game === null) {
             return;
         }
 
@@ -377,7 +377,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getTimeControlValues(): GameTimeData
     {
-        if (null === this.hostedGame.timeControl) {
+        if (this.hostedGame.timeControl === null) {
             throw new Error('getTimeControlValues(): this.hostedGame.timeControl is null');
         }
 
@@ -386,7 +386,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     onServerUpdateTimeControl(gameTimeData: GameTimeData): void
     {
-        if (null === this.hostedGame.timeControl) {
+        if (this.hostedGame.timeControl === null) {
             this.hostedGame.timeControl = gameTimeData;
             return;
         }
@@ -398,7 +398,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private resetLowTimeNotificationThread(): void
     {
-        if (null !== this.lowTimeNotificationThread) {
+        if (this.lowTimeNotificationThread !== null) {
             clearTimeout(this.lowTimeNotificationThread);
             this.lowTimeNotificationThread = null;
         }
@@ -432,7 +432,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         addMove(this.hostedGame, move, moveIndex, byPlayerIndex);
 
         // Do nothing if game not loaded
-        if (null === this.game) {
+        if (this.game === null) {
             return;
         }
 
@@ -454,7 +454,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onServerAnswerUndo(accept: boolean): void
     {
         if (accept && this.game) {
-            if (null === this.hostedGame.undoRequest) {
+            if (this.hostedGame.undoRequest === null) {
                 throw new Error('undo answered but no undo request');
             }
 
@@ -484,7 +484,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Do nothing if game not loaded
-        if (null === this.game) {
+        if (this.game === null) {
             return;
         }
 
@@ -505,7 +505,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         }
 
         // Do nothing if game not loaded
-        if (null === this.game) {
+        if (this.game === null) {
             return;
         }
 
@@ -541,7 +541,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     private removeShadowDeletedMessages(): void
     {
         // Append '#unban' to the url and refresh to see shadow banned chat messages
-        if ('#unban' === window.location.hash) {
+        if (window.location.hash === '#unban') {
             return;
         }
 
@@ -556,7 +556,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         return new Promise((resolve, reject) => {
             this.socket.emit('sendChat', this.hostedGame.publicId, content, (answer: true | string) => {
-                if (true === answer) {
+                if (answer === true) {
                     resolve(answer);
                 }
 

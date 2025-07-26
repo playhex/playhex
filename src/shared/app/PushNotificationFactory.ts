@@ -16,7 +16,7 @@ export class PushNotificationFactory
     {
         const otherPlayer = getOtherPlayer(hostedGame, player);
 
-        if (null === otherPlayer) {
+        if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
         }
 
@@ -36,7 +36,7 @@ export class PushNotificationFactory
     {
         const otherPlayer = getOtherPlayer(hostedGame, player);
 
-        if (null === otherPlayer) {
+        if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
         }
 
@@ -56,7 +56,7 @@ export class PushNotificationFactory
     {
         const otherPlayer = getOtherPlayer(hostedGame, player);
 
-        if (null === otherPlayer) {
+        if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
         }
 
@@ -77,7 +77,7 @@ export class PushNotificationFactory
         const otherPlayer = getOtherPlayer(hostedGame, player);
         const winner = getStrictWinnerPlayer(hostedGame);
 
-        if (null === otherPlayer) {
+        if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
         }
 

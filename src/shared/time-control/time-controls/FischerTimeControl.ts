@@ -101,7 +101,7 @@ export class FischerTimeControl extends AbstractTimeControl
         this.playerChronos[this.currentPlayer].pause(date);
 
         // Check if pause() call has not elapsed, which occurs when pausing at a date when chrono already have elapsed
-        if ('elapsed' === this.state) {
+        if (this.state === 'elapsed') {
             return;
         }
 

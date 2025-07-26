@@ -116,10 +116,10 @@ export abstract class AbstractTimeControl<
      */
     protected setElapsedPlayerFromValues(values: T, now: Date): void
     {
-        if ('elapsed' === values.state) {
+        if (values.state === 'elapsed') {
             let elapsedAt = values.players[values.currentPlayer].totalRemainingTime;
 
-            if ('number' === typeof elapsedAt) {
+            if (typeof elapsedAt === 'number') {
                 // eslint-disable-next-line no-console
                 console.warn('setValues with an elapsed time control values, but unable to get exact elapsed date because chrono was paused. Using "now" date.');
 
@@ -173,7 +173,7 @@ export abstract class AbstractTimeControl<
 
     protected elapse(byPlayer: PlayerIndex, date: Date): void
     {
-        if ('elapsed' === this.state) {
+        if (this.state === 'elapsed') {
             throw new TimeControlError(
                 `elapsed() called, but time control already elapsed.`,
             );
@@ -186,7 +186,7 @@ export abstract class AbstractTimeControl<
 
     getStrictElapsedPlayer(): PlayerIndex
     {
-        if (null === this.elapsedPlayer) {
+        if (this.elapsedPlayer === null) {
             throw new Error('Trying to strictly get elapsed player, but there is not');
         }
 
@@ -195,7 +195,7 @@ export abstract class AbstractTimeControl<
 
     getStrictElapsedAt(): Date
     {
-        if (null === this.elapsedPlayer) {
+        if (this.elapsedPlayer === null) {
             throw new Error('Trying to strictly get elapsed date, but chrono has not elapsed');
         }
 

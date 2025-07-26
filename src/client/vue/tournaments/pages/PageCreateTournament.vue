@@ -33,7 +33,7 @@ const createTournament = async (): Promise<void> => {
     try {
         const created = await apiPostTournament(tournament.value);
 
-        if (null === created) {
+        if (created === null) {
             throw new Error('Could not create tournament');
         }
 

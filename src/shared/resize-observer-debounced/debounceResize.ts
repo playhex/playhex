@@ -5,7 +5,7 @@ export const debounceResize = (onResize: () => void, wait: number = DEFAULT_WAIT
     let shouldCallAfter = false;
 
     const resetTimeout = () => {
-        if (null === timeout) {
+        if (timeout === null) {
             return;
         }
 
@@ -28,7 +28,7 @@ export const debounceResize = (onResize: () => void, wait: number = DEFAULT_WAIT
     };
 
     return () => {
-        if (null !== timeout) {
+        if (timeout !== null) {
             shouldCallAfter = true;
             return;
         }

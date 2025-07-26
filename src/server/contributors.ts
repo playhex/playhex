@@ -6,11 +6,11 @@ const { FETCH_CONTRIBUTORS } = process.env;
 let cachedGithubContributors: null | GithubContributor[] = null;
 
 const fetchGithubContributors = async (): Promise<GithubContributor[]> => {
-    if (null !== cachedGithubContributors) {
+    if (cachedGithubContributors !== null) {
         return cachedGithubContributors;
     }
 
-    if ('true' !== FETCH_CONTRIBUTORS) {
+    if (FETCH_CONTRIBUTORS !== 'true') {
         return [];
     }
 

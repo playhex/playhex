@@ -36,7 +36,7 @@ export default class ConditionalMovesRepository
     {
         const conditionalMoves = await this.find(player, hostedGame);
 
-        if (null === conditionalMoves) {
+        if (conditionalMoves === null) {
             return null;
         }
 
@@ -52,7 +52,7 @@ export default class ConditionalMovesRepository
         // save() should be awaited to make sure we get up-to-date conditional moves if we recall shift() right after
         await this.conditionalMovesRepository.save(conditionalMoves);
 
-        return null === result
+        return result === null
             ? null
             : Move.fromString(result)
         ;

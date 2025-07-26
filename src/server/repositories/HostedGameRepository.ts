@@ -130,7 +130,7 @@ export default class HostedGameRepository
             return;
         }
 
-        if ('canceled' === hostedGameServer.getState()) {
+        if (hostedGameServer.getState() === 'canceled') {
             this.onGameCanceled(hostedGameServer);
             return;
         }
@@ -201,7 +201,7 @@ export default class HostedGameRepository
                 .emit(
                     'ratingsUpdated',
                     hostedGameServer.getPublicId(),
-                    instanceToInstance(newRatings.filter(rating => 'overall' === rating.category), {
+                    instanceToInstance(newRatings.filter(rating => rating.category === 'overall'), {
                         groups: ['rating'],
                     }),
                 )
@@ -296,7 +296,7 @@ export default class HostedGameRepository
 
         Container.get(HexServer).to(Rooms.lobby).emit('gameCreated', hostedGame);
 
-        if ('ai' === params.gameOptions.opponentType) {
+        if (params.gameOptions.opponentType === 'ai') {
             try {
                 const opponent = await findAIOpponent(params.gameOptions);
                 if (opponent == null) throw new GameError('No matching AI found');
@@ -329,7 +329,7 @@ export default class HostedGameRepository
     {
         const game = await this.getActiveOrArchivedGame(gameId);
 
-        if (null === game) {
+        if (game === null) {
             throw new GameError(`no game ${gameId}`);
         }
         if (!game.hostedGameToPlayers.some(p => p.player.publicId === host.publicId)) {
@@ -362,7 +362,7 @@ export default class HostedGameRepository
 
                 game.rematch = await this.hostedGamePersister.findRematch(game.id);
 
-                if (null === game.rematch) {
+                if (game.rematch === null) {
                     throw new Error('Game has already rematched, but could not find rematch game');
                 }
             } else {
@@ -406,7 +406,7 @@ export default class HostedGameRepository
 
         const joinResult = hostedGame.playerJoin(player);
 
-        if ('string' === typeof joinResult) {
+        if (typeof joinResult === 'string') {
             return joinResult;
         }
 
@@ -533,7 +533,7 @@ export default class HostedGameRepository
             return e.message;
         }
 
-        if (null !== chatMessage.player) {
+        if (chatMessage.player !== null) {
             this.onlinePlayerService.notifyPlayerActivity(chatMessage.player);
         }
 
@@ -547,7 +547,7 @@ export default class HostedGameRepository
         // Game is in memory, push chat message
         if (hostedGameServer) {
             let error: true | string;
-            if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.getHostedGame()))) {
+            if ((error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.getHostedGame())) !== true) {
                 return error;
             }
 
@@ -558,13 +558,13 @@ export default class HostedGameRepository
         // Game is not in memory, store chat message directly in database, on persisted game
         const hostedGame = await this.hostedGamePersister.findUnique(publicId);
 
-        if (null === hostedGame) {
+        if (hostedGame === null) {
             logger.notice('Tried to chat on a non-existant game', { chatMessage });
             return `Game ${publicId} not found`;
         }
 
         let error: true | string;
-        if (true !== (error = canChatMessageBePostedInGame(chatMessage, hostedGame))) {
+        if ((error = canChatMessageBePostedInGame(chatMessage, hostedGame)) !== true) {
             return error;
         }
 

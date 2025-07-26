@@ -32,7 +32,7 @@ export default class GamePersister
             },
         });
 
-        if (null === data) {
+        if (data === null) {
             return null;
         }
 

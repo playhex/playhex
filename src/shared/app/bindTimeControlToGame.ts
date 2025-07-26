@@ -37,7 +37,7 @@ export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeContr
         }
     };
 
-    if ('elapsed' === timeControl.getState()) {
+    if (timeControl.getState() === 'elapsed') {
         onElapsed(timeControl.getStrictElapsedPlayer(), timeControl.getStrictElapsedAt());
     } else {
         timeControl.on('elapsed', onElapsed);

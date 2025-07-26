@@ -5,7 +5,7 @@ import AppToasts from './components/layout/AppToasts.vue';
 import { useRouter } from 'vue-router';
 
 const { currentRoute } = useRouter();
-const displayFooter = () => false !== currentRoute.value.meta.displayFooter;
+const displayFooter = () => currentRoute.value.meta.displayFooter !== false;
 </script>
 
 <template>

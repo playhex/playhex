@@ -67,22 +67,22 @@ export default class Move implements Coords
      */
     static fromString(moveString: string | SpecialMoveType): Move
     {
-        if ('swap-pieces' === moveString) {
+        if (moveString === 'swap-pieces') {
             return Move.swapPieces();
         }
 
-        if ('pass' === moveString) {
+        if (moveString === 'pass') {
             return Move.pass();
         }
 
         const match = moveString.match(/^"?([a-z]{1,2})(\d{1,2})"?$/);
 
-        if (null === match) {
+        if (match === null) {
             throw new Error(`Invalid move coords: "${moveString}", expected a move like "c2"`);
         }
 
         const [, letter, number] = match;
-        const letterCol = 1 === letter.length
+        const letterCol = letter.length === 1
             ? letter.charCodeAt(0) - 97
             : letter.charCodeAt(1) - 97 + 26 * (letter.charCodeAt(0) - 97 + 1)
         ;
@@ -117,11 +117,11 @@ export default class Move implements Coords
 
     clone(): Move
     {
-        if ('swap-pieces' === this.specialMoveType) {
+        if (this.specialMoveType === 'swap-pieces') {
             return Move.swapPieces(this.playedAt);
         }
 
-        if ('pass' === this.specialMoveType) {
+        if (this.specialMoveType === 'pass') {
             return Move.pass(this.playedAt);
         }
 
@@ -130,11 +130,11 @@ export default class Move implements Coords
 
     cloneMirror(): Move
     {
-        if ('swap-pieces' === this.specialMoveType) {
+        if (this.specialMoveType === 'swap-pieces') {
             return Move.swapPieces(this.playedAt);
         }
 
-        if ('pass' === this.specialMoveType) {
+        if (this.specialMoveType === 'pass') {
             return Move.pass(this.playedAt);
         }
 

@@ -242,7 +242,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     cutMove(): void
     {
-        if (0 === this.selectedLine.length) {
+        if (this.selectedLine.length === 0) {
             return;
         }
 

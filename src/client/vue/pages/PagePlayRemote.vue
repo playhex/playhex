@@ -70,7 +70,7 @@ const { localSettings } = usePlayerLocalSettingsStore();
 const confirmMove: Ref<null | (() => void)> = ref(null);
 
 const getMoveSettings = (): null | MoveSettings => {
-    if (null === hostedGameClient.value || null === playerSettings.value) {
+    if (hostedGameClient.value === null || playerSettings.value === null) {
         return null;
     }
 
@@ -82,12 +82,12 @@ const getMoveSettings = (): null | MoveSettings => {
 };
 
 const shouldDisplayConfirmMove = (): boolean => {
-    if (null === hostedGameClient.value) {
+    if (hostedGameClient.value === null) {
         return false;
     }
 
     // I am watcher
-    if (-1 === getLocalPlayerIndex()) {
+    if (getLocalPlayerIndex() === -1) {
         return false;
     }
 
@@ -103,16 +103,16 @@ const shouldDisplayConfirmMove = (): boolean => {
  * Undo move
  */
 const shouldDisplayUndoMove = (): boolean => {
-    if (null === hostedGameClient.value || null === playerSettings.value) {
+    if (hostedGameClient.value === null || playerSettings.value === null) {
         return false;
     }
 
     // I am watcher
-    if (-1 === getLocalPlayerIndex()) {
+    if (getLocalPlayerIndex() === -1) {
         return false;
     }
 
-    if ('playing' !== hostedGameClient.value.getState()) {
+    if (hostedGameClient.value.getState() !== 'playing') {
         return false;
     }
 
@@ -133,7 +133,7 @@ const shouldDisableUndoMove = (): boolean => {
     const game = hostedGameClient.value.getGame();
 
     return hostedGameClient.value.getUndoRequest() === getLocalPlayerIndex()
-        || true !== game.canPlayerUndo(getLocalPlayerIndex() as PlayerIndex)
+        || game.canPlayerUndo(getLocalPlayerIndex() as PlayerIndex) !== true
     ;
 };
 
@@ -142,7 +142,7 @@ const shouldDisplayAnswerUndoMove = (): boolean => {
         return false;
     }
 
-    if ('playing' !== hostedGameClient.value.getState()) {
+    if (hostedGameClient.value.getState() !== 'playing') {
         return false;
     }
 
@@ -158,7 +158,7 @@ const answerUndo = (accept: boolean): void => {
 };
 
 const getLocalPlayerIndex = (): number => {
-    if (null === loggedInPlayer.value || !hostedGameClient.value) {
+    if (loggedInPlayer.value === null || !hostedGameClient.value) {
         return -1;
     }
 
@@ -166,12 +166,12 @@ const getLocalPlayerIndex = (): number => {
 };
 
 const listenHexClick = () => {
-    if (null === gameView) {
+    if (gameView === null) {
         throw new Error('no game view');
     }
 
     gameView.on('hexClicked', async coords => {
-        if (null === hostedGameClient.value) {
+        if (hostedGameClient.value === null) {
             throw new Error('hex clicked but hosted game is null');
         }
 
@@ -182,7 +182,7 @@ const listenHexClick = () => {
             // Must get local player again in case player joined after (click "Watch", then "Join")
             const localPlayerIndex = getLocalPlayerIndex();
 
-            if (-1 === localPlayerIndex) {
+            if (localPlayerIndex === -1) {
                 return;
             }
 
@@ -200,7 +200,7 @@ const listenHexClick = () => {
                 if (gameView?.hasPreviewedMove() && move.sameAs(gameView.getPreviewedMove()!.move)) {
                     const answer = await hostedGameClient.value.cancelPremove();
 
-                    if (true === answer) {
+                    if (answer === true) {
                         gameView?.removePreviewedMove();
                     }
 
@@ -215,7 +215,7 @@ const listenHexClick = () => {
                     // cancel premove when click on occupied cell
                     const answer = await hostedGameClient.value.cancelPremove();
 
-                    if (true === answer) {
+                    if (answer === true) {
                         gameView?.removePreviewedMove();
                     }
                 }
@@ -271,7 +271,7 @@ const initGameView = async () => {
 
     gameViewInitialized.value = true;
 
-    if (null !== playerSettings.value) {
+    if (playerSettings.value !== null) {
         gameView.updateOptionsFromPlayerSettings(playerSettings.value);
     }
 
@@ -281,7 +281,7 @@ const initGameView = async () => {
     gameView.animateWinningPath();
 
     watch(playerSettings, settings => {
-        if (null === gameView || null === settings) {
+        if (gameView === null || settings === null) {
             return;
         }
 
@@ -292,7 +292,7 @@ const initGameView = async () => {
         });
     });
 
-    if ('playing' === hostedGameClient.value.getState()) {
+    if (hostedGameClient.value.getState() === 'playing') {
         listenHexClick();
     } else {
         hostedGameClient.value.on('started', () => listenHexClick());
@@ -307,10 +307,10 @@ const makeTitle = (hostedGame: HostedGame) => {
     const players = hostedGame.hostedGameToPlayers.map(h => h.player);
     const { state } = hostedGame;
     const playerPseudos = players.map(p => pseudoString(p, 'pseudo'));
-    if (players.length < 2 && 'created' === state)
+    if (players.length < 2 && state === 'created')
         return `${i18next.t('game.title_waiting')} ${playerPseudos[0]}`;
     let yourTurn = '';
-    if ('playing' === state && loggedInPlayer.value != null) {
+    if (state === 'playing' && loggedInPlayer.value != null) {
         const player = loggedInPlayer.value;
         const index = players.findIndex(p => p.publicId === player.publicId);
         if (index != null && hostedGame.gameData?.currentPlayerIndex === index) {
@@ -329,7 +329,7 @@ const makeTitle = (hostedGame: HostedGame) => {
  */
 const shouldBeIndexedOnSearchEngines = (hostedGame: HostedGame): boolean => {
     // only index ended games
-    if ('ended' !== hostedGame.state) {
+    if (hostedGame.state !== 'ended') {
         return false;
     }
 
@@ -339,7 +339,7 @@ const shouldBeIndexedOnSearchEngines = (hostedGame: HostedGame): boolean => {
     }
 
     // do not index bot games
-    if ('player' !== hostedGame.gameOptions.opponentType) {
+    if (hostedGame.gameOptions.opponentType !== 'player') {
         return false;
     }
 
@@ -358,12 +358,12 @@ let unlistenGameUpdates: null | (() => void) = null;
 
 socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
     // ignore if not my game, or already initialized
-    if (publicId !== gameId || null !== hostedGameClient.value) {
+    if (publicId !== gameId || hostedGameClient.value !== null) {
         return;
     }
 
     // I received update but game seems not to exists.
-    if (null === hostedGame) {
+    if (hostedGame === null) {
         router.push({ name: 'home' });
         return;
     }
@@ -383,14 +383,14 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
 
     const playerPseudos = hostedGameClient.value.getPlayers().map(p => p.pseudo);
     const { state, host } = hostedGameClient.value.getHostedGame();
-    const description = 'created' === state
+    const description = state === 'created'
         ? `Hex game, hosted by ${host?.pseudo ?? 'system'}, waiting for an opponent.`
         : `Hex game, ${playerPseudos.join(' versus ')}.`
     ;
 
     useSeoMeta({
         robots: computed(() => {
-            return null !== hostedGameClient.value && shouldBeIndexedOnSearchEngines(hostedGameClient.value.getHostedGame())
+            return hostedGameClient.value !== null && shouldBeIndexedOnSearchEngines(hostedGameClient.value.getHostedGame())
                 ? 'index'
                 : 'noindex'
             ;
@@ -418,7 +418,7 @@ watchEffect(() => {
 onUnmounted(() => {
     socketStore.leaveRoom(Rooms.game(gameId));
 
-    if (null !== unlistenGameUpdates) {
+    if (unlistenGameUpdates !== null) {
         unlistenGameUpdates();
         unlistenGameUpdates = null;
     }
@@ -428,7 +428,7 @@ onUnmounted(() => {
  * Join game
  */
 const join = async () => {
-    if (null === hostedGameClient.value) {
+    if (hostedGameClient.value === null) {
         return;
     }
 
@@ -449,7 +449,7 @@ const confirmationOverlay = defineOverlay(ConfirmationOverlay);
  * Resign
  */
 const canResign = (): boolean => {
-    if (-1 === getLocalPlayerIndex() || null === hostedGameClient.value) {
+    if (getLocalPlayerIndex() === -1 || hostedGameClient.value === null) {
         return false;
     }
 
@@ -459,7 +459,7 @@ const canResign = (): boolean => {
 const resign = async (): Promise<void> => {
     const localPlayerIndex = getLocalPlayerIndex();
 
-    if (-1 === localPlayerIndex) {
+    if (localPlayerIndex === -1) {
         return;
     }
 
@@ -483,7 +483,7 @@ const resign = async (): Promise<void> => {
  * Cancel
  */
 const canCancel = (): boolean => {
-    if (-1 === getLocalPlayerIndex() || null === hostedGameClient.value) {
+    if (getLocalPlayerIndex() === -1 || hostedGameClient.value === null) {
         return false;
     }
 
@@ -509,7 +509,7 @@ const cancel = async (): Promise<void> => {
 };
 
 const toggleCoords = () => {
-    if (null !== gameView) {
+    if (gameView !== null) {
         gameView.toggleDisplayCoords();
     }
 };
@@ -529,7 +529,7 @@ watchEffect(() => {
 });
 
 const canRematch = (): boolean => {
-    if (-1 === getLocalPlayerIndex() || null === hostedGameClient.value) {
+    if (getLocalPlayerIndex() === -1 || hostedGameClient.value === null) {
         return false;
     }
     return hostedGameClient.value.canRematch();
@@ -583,7 +583,7 @@ const isSidebarCurrentlyOpen = (): boolean => {
  * Chat
  */
 watch(hostedGameClient, game => {
-    if (null === game) {
+    if (game === null) {
         return;
     }
 
@@ -601,7 +601,7 @@ watch(hostedGameClient, game => {
 });
 
 const unreadMessages = (): number => {
-    if (null === hostedGameClient.value) {
+    if (hostedGameClient.value === null) {
         return 0;
     }
 
@@ -621,7 +621,7 @@ const enableRewindMode = () => {
  * Pass
  */
 const pass = async () => {
-    if (null === hostedGameClient.value) {
+    if (hostedGameClient.value === null) {
         return;
     }
 
@@ -631,21 +631,21 @@ const pass = async () => {
 };
 
 const shouldShowPass = (): boolean => {
-    if (null === hostedGameClient.value) {
+    if (hostedGameClient.value === null) {
         return false;
     }
 
-    return 'playing' === hostedGameClient.value.getState()
-        && -1 !== getLocalPlayerIndex()
+    return hostedGameClient.value.getState() === 'playing'
+        && getLocalPlayerIndex() !== -1
     ;
 };
 
 const shouldEnablePass = (): boolean => {
-    if (null === hostedGameClient.value) {
+    if (hostedGameClient.value === null) {
         return false;
     }
 
-    return 'playing' === hostedGameClient.value.getState()
+    return hostedGameClient.value.getState() === 'playing'
         && isMyTurn(hostedGameClient.value.getHostedGame())
         && canPassAgain(hostedGameClient.value.getGame())
     ;
@@ -666,7 +666,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
 
 watch([hostedGameClient, loggedInPlayer], () => {
-    if (null === hostedGameClient.value || null === loggedInPlayer.value || null === gameView) {
+    if (hostedGameClient.value === null || loggedInPlayer.value === null || gameView === null) {
         return;
     }
 

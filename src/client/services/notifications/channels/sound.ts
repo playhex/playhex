@@ -22,7 +22,7 @@ notifier.on('gameEnd', (hostedGame) => {
 
     const loser = getLoserPlayer(hostedGame);
 
-    if (null === loser) {
+    if (loser === null) {
         playAudio('/sounds/lisp/GenericNotify.ogg');
         return;
     }
@@ -39,7 +39,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         return;
     }
 
-    if (null === chatMessage.player) {
+    if (chatMessage.player === null) {
         return;
     }
 

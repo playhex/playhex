@@ -4,7 +4,7 @@ export type InputValidation = null | {
 };
 
 export const toInputClass = (inputValidation: InputValidation): string => {
-    if (null === inputValidation) {
+    if (inputValidation === null) {
         return '';
     }
 

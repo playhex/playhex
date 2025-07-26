@@ -102,7 +102,7 @@ export const useTournamentBracketsHelpers = (tournament: Tournament) => {
                 endSocketGravity: gravity,
             };
 
-            return 'win' === winOrLose
+            return winOrLose === 'win'
 
                 // win arrow
                 ? new LeaderLine({

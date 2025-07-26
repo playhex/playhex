@@ -49,7 +49,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     const byRemainingTime = (now: Date) => (game0: CurrentGame, game1: CurrentGame): number => {
-        if (null === game0.myColor || null === game1.myColor) {
+        if (game0.myColor === null || game1.myColor === null) {
             return 0;
         }
 
@@ -92,7 +92,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             .sort(byRemainingTime(new Date()))
         ;
 
-        if (0 === playingGames.length) {
+        if (playingGames.length === 0) {
             return null;
         }
 
@@ -124,7 +124,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         const { gameData, publicId } = hostedGame;
         const me = authStore.loggedInPlayer;
 
-        if (null === me || null === gameData) {
+        if (me === null || gameData === null) {
             return;
         }
 
@@ -148,7 +148,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     socket.on('moved', (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => {
-        if (!myGames.value[gameId] || null === myGames.value[gameId].myColor) {
+        if (!myGames.value[gameId] || myGames.value[gameId].myColor === null) {
             return;
         }
 
@@ -167,7 +167,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     socket.on('playerGamesUpdate', (initialGames: HostedGame[]) => {
         const me = authStore.loggedInPlayer;
 
-        if (null === me) return;
+        if (me === null) return;
 
         myGames.value = {};
 
@@ -187,7 +187,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             let isMyTurn = false;
             let myColor: null | PlayerIndex = null;
 
-            if (null !== gameData) {
+            if (gameData !== null) {
                 myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
                 isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === me.publicId;
             }
@@ -200,10 +200,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         [() => socketStore.connected, () => authStore.loggedInPlayer],
         ([connected, me], [, oldMe]) => {
             if (!connected) return;
-            if (null != oldMe) {
+            if (oldMe != null) {
                 leaveRoom(Rooms.playerGames(oldMe.publicId));
             }
-            if (null != me) {
+            if (me != null) {
                 joinRoom(Rooms.playerGames(me.publicId));
             }
         },

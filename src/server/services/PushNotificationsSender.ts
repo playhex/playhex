@@ -12,9 +12,9 @@ const {
 } = process.env;
 
 const isPushNotificationEnabled: boolean =
-    'string' === typeof PUSH_VAPID_PUBLIC_KEY && PUSH_VAPID_PUBLIC_KEY.length > 0
-    && 'string' === typeof PUSH_VAPID_PRIVATE_KEY && PUSH_VAPID_PRIVATE_KEY.length > 0
-    && 'string' === typeof PUSH_VAPID_EMAIL && PUSH_VAPID_EMAIL.includes('@')
+    typeof PUSH_VAPID_PUBLIC_KEY === 'string' && PUSH_VAPID_PUBLIC_KEY.length > 0
+    && typeof PUSH_VAPID_PRIVATE_KEY === 'string' && PUSH_VAPID_PRIVATE_KEY.length > 0
+    && typeof PUSH_VAPID_EMAIL === 'string' && PUSH_VAPID_EMAIL.includes('@')
 ;
 
 @Service()
@@ -42,7 +42,7 @@ export class PushNotificationSender
 
         const subscriptions = await this.playerPushSubscriptionRepository.findForPlayer(player);
 
-        if (0 === subscriptions.length) {
+        if (subscriptions.length === 0) {
             return;
         }
 
@@ -70,7 +70,7 @@ export class PushNotificationSender
                     }
 
                     // Normal case: player revoked this subscription, e.g disabled notifications (he may have re-enabled again with another subscription)
-                    if (410 === e.statusCode) {
+                    if (e.statusCode === 410) {
                         await this.playerPushSubscriptionRepository.remove(subscription);
 
                         ++removed;
@@ -80,7 +80,7 @@ export class PushNotificationSender
                     let subscriptionRemoved = false;
 
                     // Endpoint seems invalid, maybe posted manually, remove subscription
-                    if (404 === e.statusCode) {
+                    if (e.statusCode === 404) {
                         await this.playerPushSubscriptionRepository.remove(subscription);
                         subscriptionRemoved = true;
                     }

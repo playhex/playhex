@@ -11,7 +11,7 @@ const props = defineProps({
 });
 
 const moveClass = (whiteWin: null | number): string => {
-    if (null === whiteWin) {
+    if (whiteWin === null) {
         return '';
     }
 

@@ -91,10 +91,10 @@ export const toFailedProperties = (validationErrors: ValidationError[]): FailedP
 };
 
 export const isValidationError = (payload: unknown): payload is ValidationErrorPayload => {
-    return 'object' === typeof payload
-        && null !== payload
-        && 400 === (payload as { httpCode?: number }).httpCode
-        && 'BadRequestError' === (payload as { name?: string }).name
-        && 'object' === typeof (payload as { errors?: object } ).errors
+    return typeof payload === 'object'
+        && payload !== null
+        && (payload as { httpCode?: number }).httpCode === 400
+        && (payload as { name?: string }).name === 'BadRequestError'
+        && typeof (payload as { errors?: object } ).errors === 'object'
     ;
 };

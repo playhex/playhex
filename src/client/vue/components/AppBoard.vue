@@ -98,7 +98,7 @@ const blinkButton = (button: Ref<HTMLElement | undefined>) => {
     setTimeout(() => button.value?.classList.remove('active'), 80);
 };
 
-gameView.on('movesHistoryCursorChanged', cursor => hasRewindControls.value = null !== cursor);
+gameView.on('movesHistoryCursorChanged', cursor => hasRewindControls.value = cursor !== null);
 
 const rewindZero = () => gameView.setMovesHistoryCursor(-1);
 const backward = () => gameView.changeMovesHistoryCursor(-1);

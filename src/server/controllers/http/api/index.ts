@@ -45,7 +45,7 @@ export const registerApi = (app: Express) => {
 
             const player = await Container.get(PlayerRepository).getPlayer(playerId);
 
-            if (null === player) {
+            if (player === null) {
                 return null;
             }
 
@@ -62,7 +62,7 @@ export const registerApi = (app: Express) => {
                 const { ADMIN_PASSWORD } = process.env;
                 const token = authorization.substring('Bearer '.length);
 
-                if ('string' !== typeof ADMIN_PASSWORD || token !== ADMIN_PASSWORD) {
+                if (typeof ADMIN_PASSWORD !== 'string' || token !== ADMIN_PASSWORD) {
                     throw new HttpError(403, 'Invalid admin token');
                 }
 

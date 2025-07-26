@@ -8,7 +8,7 @@ export const hasFocus = () => document.hasFocus();
 export const iAmInGame = (hostedGame: HostedGame): boolean => {
     const { loggedInPlayer } = useAuthStore();
 
-    if (null === loggedInPlayer) {
+    if (loggedInPlayer === null) {
         return false;
     }
 
@@ -19,7 +19,7 @@ export const isMyTurn = (hostedGame: HostedGame): boolean => {
     const { loggedInPlayer } = useAuthStore();
     const currentPlayer = getCurrentPlayer(hostedGame);
 
-    if (null === loggedInPlayer || null === currentPlayer) {
+    if (loggedInPlayer === null || currentPlayer === null) {
         return false;
     }
 
@@ -30,7 +30,7 @@ export const getOpponent = (hostedGame: HostedGame): null | Player => {
     const { gameData } = hostedGame;
     const { loggedInPlayer } = useAuthStore();
 
-    if (null === gameData || null === loggedInPlayer) {
+    if (gameData === null || loggedInPlayer === null) {
         return null;
     }
 
@@ -40,7 +40,7 @@ export const getOpponent = (hostedGame: HostedGame): null | Player => {
 export const isMe = (player: Player): boolean => {
     const { loggedInPlayer } = useAuthStore();
 
-    if (null === loggedInPlayer) {
+    if (loggedInPlayer === null) {
         return false;
     }
 
@@ -53,5 +53,5 @@ export const isMe = (player: Player): boolean => {
 export const viewingGame = (hostedGame: HostedGame): boolean => {
     const { name, params } = router.currentRoute.value;
 
-    return 'online-game' === name && params.gameId === hostedGame.publicId;
+    return name === 'online-game' && params.gameId === hostedGame.publicId;
 };

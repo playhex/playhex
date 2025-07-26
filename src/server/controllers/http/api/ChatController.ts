@@ -23,7 +23,7 @@ export default class ChatController
 
         const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
 
-        if (true !== result) {
+        if (result !== true) {
             throw new HttpError(400, result);
         }
     }

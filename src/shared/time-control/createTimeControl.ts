@@ -56,7 +56,7 @@ export const createTimeControl = (
             break;
     }
 
-    if (null !== timeControlValues) {
+    if (timeControlValues !== null) {
         timeControl.setValues(timeControlValues, new Date());
     }
 

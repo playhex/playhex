@@ -65,9 +65,9 @@ updateStartAutomatically();
 
 // Update tournament.startDelayInSeconds when changing input yes/no/delay, or delay time.
 watchEffect(() => {
-    if ('delay' === startAutomatically.value) {
+    if (startAutomatically.value === 'delay') {
         tournament.value.startDelayInSeconds = delayStartInputSeconds.value;
-    } else if ('never' === startAutomatically.value) {
+    } else if (startAutomatically.value === 'never') {
         tournament.value.startDelayInSeconds = -1;
     } else {
         tournament.value.startDelayInSeconds = 0;
@@ -121,7 +121,7 @@ onMounted(async () => {
 
     const sourceTournament = await apiGetTournament(hash.substring(7));
 
-    if (null === sourceTournament) {
+    if (sourceTournament === null) {
         useToastsStore().addToast(new Toast(
             `No tournaments with slug "${hash.substring(7)}"`,
             { level: 'warning' },

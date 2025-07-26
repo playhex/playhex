@@ -36,7 +36,7 @@ const playerGamesHistory = (player: Player) => {
 
         let endedAt = game.hostedGame.gameData?.endedAt;
 
-        if ('string' === typeof endedAt) {
+        if (typeof endedAt === 'string') {
             endedAt = new Date(endedAt);
         }
 

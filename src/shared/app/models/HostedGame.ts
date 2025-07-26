@@ -163,16 +163,16 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
 };
 
 const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {
-    if (null === timeControlValue) {
+    if (timeControlValue === null) {
         return null;
     }
 
     timeControlValue.players.forEach(player => {
-        if ('string' === typeof player.totalRemainingTime) {
+        if (typeof player.totalRemainingTime === 'string') {
             player.totalRemainingTime = new Date(player.totalRemainingTime);
         }
 
-        if ('string' === typeof (player as ByoYomiPlayerTimeData).remainingMainTime) {
+        if (typeof (player as ByoYomiPlayerTimeData).remainingMainTime === 'string') {
             (player as ByoYomiPlayerTimeData).remainingMainTime = new Date((player as ByoYomiPlayerTimeData).remainingMainTime);
         }
     });

@@ -27,7 +27,7 @@ const { gameView, label } = props;
 const { loggedInPlayer } = toRefs(useAuthStore());
 
 const shouldDisplayHexworldLink = (): boolean => {
-    if (null === hostedGameClient.value || null === loggedInPlayer.value) {
+    if (hostedGameClient.value === null || loggedInPlayer.value === null) {
         return true;
     }
 
@@ -39,7 +39,7 @@ const shouldDisplayHexworldLink = (): boolean => {
         return true;
     }
 
-    if ('correspondence' === timeControlToCadencyName(hostedGameClient.value.getGameOptions())) {
+    if (timeControlToCadencyName(hostedGameClient.value.getGameOptions()) === 'correspondence') {
         return true;
     }
 

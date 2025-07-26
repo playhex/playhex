@@ -30,11 +30,11 @@ const { gameOptions, boardsizeMin, boardsizeMax, sizesSelection } = toRefs(props
 const showCustomBoardsize: Ref<boolean> = ref(!sizesSelection.value.includes(gameOptions.value.boardsize));
 
 const isBoardsizeAllowed = (boardsize: number): boolean => {
-    if ('number' === typeof boardsizeMin?.value && boardsize < boardsizeMin.value) {
+    if (typeof boardsizeMin?.value === 'number' && boardsize < boardsizeMin.value) {
         return false;
     }
 
-    if ('number' === typeof boardsizeMax?.value && boardsize > boardsizeMax.value) {
+    if (typeof boardsizeMax?.value === 'number' && boardsize > boardsizeMax.value) {
         return false;
     }
 

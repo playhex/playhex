@@ -33,7 +33,7 @@ export default async (parameters: CreateAiConfigParameters): Promise<boolean> =>
         slug: parameters.slug,
     });
 
-    if (null !== alreadyExists) {
+    if (alreadyExists !== null) {
         return false;
     }
 

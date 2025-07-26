@@ -41,7 +41,7 @@ const toChrono = (timeValue: TimeValue): ChronoData => {
 
     const chrono: ChronoData = {
         time: `${sign}${msToTime(ms)}`,
-        isPaused: 'number' === typeof timeValue,
+        isPaused: typeof timeValue === 'number',
     };
 
     if (ms < 10000) {
@@ -56,7 +56,7 @@ const chronoDisplay = ref<ChronoData>({ time: '…' });
 
 let byoYomiChrono: null | ByoYomiChrono = null;
 
-if ('byoyomi' === timeControlOptions.value.family) {
+if (timeControlOptions.value.family === 'byoyomi') {
     const { initialTime, periodTime, periodsCount } = timeControlOptions.value.options;
     const { remainingMainTime, remainingPeriods } = (playerTimeData.value as ByoYomiPlayerTimeData);
 
@@ -66,7 +66,7 @@ if ('byoyomi' === timeControlOptions.value.family) {
     byoYomiChrono.setRemainingPeriods(remainingPeriods);
 
     watch(playerTimeData, (newValue: ByoYomiPlayerTimeData) => {
-        if (null === byoYomiChrono) {
+        if (byoYomiChrono === null) {
             return;
         }
 
@@ -76,7 +76,7 @@ if ('byoyomi' === timeControlOptions.value.family) {
 }
 
 const chronoThread = setInterval(() => {
-    chronoDisplay.value = toChrono(null !== byoYomiChrono
+    chronoDisplay.value = toChrono(byoYomiChrono !== null
         ? byoYomiChrono.getMainValue()
         : playerTimeData.value.totalRemainingTime,
     );

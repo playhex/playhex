@@ -107,7 +107,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                     enabled: true,
                 },
                 onZoom: ({ chart }) => {
-                    if (1 === chart.getZoomLevel()) {
+                    if (chart.getZoomLevel() === 1) {
                         timeRangeReset();
                     } else {
                         timeRangeUpdated(new Date(chart.scales.x.min), new Date(chart.scales.x.max));

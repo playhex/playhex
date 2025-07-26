@@ -63,7 +63,7 @@ export class Height5Lines extends AbstractShadingPattern
         const oppositeRow = this.size - row - 1;
         const oppositeCol = this.size - col - 1;
 
-        if (4 === row || 4 === col || 4 === oppositeRow || 4 === oppositeCol) {
+        if (row === 4 || col === 4 || oppositeRow === 4 || oppositeCol === 4) {
             return 1;
         }
 
@@ -97,7 +97,7 @@ export class CustomShadingPattern extends AbstractShadingPattern
     ) {
         super(size, options);
 
-        if ('string' !== typeof this.options) {
+        if (typeof this.options !== 'string') {
             return;
         }
 
@@ -113,7 +113,7 @@ export class CustomShadingPattern extends AbstractShadingPattern
 
     calc(row: number, col: number): number
     {
-        if (null === this.expr) {
+        if (this.expr === null) {
             return 0;
         }
 
@@ -154,7 +154,7 @@ export class CustomShadingPattern extends AbstractShadingPattern
      */
     private warnThrottled(...args: unknown[]): void
     {
-        if (null !== this.warnCooldown) {
+        if (this.warnCooldown !== null) {
             return;
         }
 

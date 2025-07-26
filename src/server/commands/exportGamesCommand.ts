@@ -128,12 +128,12 @@ hexProgram
         const exportedGames: ExportedGame[] = [];
 
         for (const gameResult of gameResults) {
-            if (!gamePlayers[gameResult.id] || null === gamePlayers[gameResult.id][0] || null === gamePlayers[gameResult.id][1]) {
+            if (!gamePlayers[gameResult.id] || gamePlayers[gameResult.id][0] === null || gamePlayers[gameResult.id][1] === null) {
                 console.error('gamePlayers[] = ', gamePlayers[gameResult.id]);
                 throw new Error(`Missing player for game #${gameResult.id}`);
             }
 
-            if (0 !== gameResult.winner && 1 !== gameResult.winner) {
+            if (gameResult.winner !== 0 && gameResult.winner !== 1) {
                 console.error(gameResult);
                 throw new Error('winner is not 0 or 1');
             }
@@ -155,11 +155,11 @@ hexProgram
                 playerBlueType: gamePlayers[gameResult.id][1]!.type,
                 winner: ['red', 'blue'][gameResult.winner] as 'red' | 'blue',
                 outcome: gameResult.outcome ?? 'path',
-                allowSwap: 1 === gameResult.allowSwap,
-                rated: 1 === gameResult.ranked,
+                allowSwap: gameResult.allowSwap === 1,
+                rated: gameResult.ranked === 1,
                 handicap: guessDemerHandicap(
-                    1 === gameResult.swapRule,
-                    null !== gameResult.firstPlayer,
+                    gameResult.swapRule === 1,
+                    gameResult.firstPlayer !== null,
                     moves,
                 ),
                 startedAt: gameResult.startedAt,

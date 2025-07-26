@@ -64,7 +64,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
         socket.on('activity', () => {
             const { player } = socket.data;
 
-            if (null === player) {
+            if (player === null) {
                 return;
             }
 

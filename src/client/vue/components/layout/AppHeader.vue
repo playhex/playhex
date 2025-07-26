@@ -20,7 +20,7 @@ const { myTurnCount, mostUrgentGame } = storeToRefs(useMyGamesStore());
 const router = useRouter();
 
 const goToMostUrgentGame = (): void => {
-    if (null === mostUrgentGame.value) {
+    if (mostUrgentGame.value === null) {
         return;
     }
 
@@ -39,7 +39,7 @@ const goToMostUrgentGame = (): void => {
 const closeOffcanvas = () => {
     const navbarToggler: null | HTMLButtonElement = document.querySelector('button.navbar-toggler');
 
-    if (null === navbarToggler) {
+    if (navbarToggler === null) {
         throw new Error('navbar toggle not found, cannot close offcanvas');
     }
 
@@ -55,15 +55,15 @@ const closeOffcanvas = () => {
  * Turn to play => filled
  * No turn to play, but I have current game => empty
  */
-const isFilled = (): boolean => null === mostUrgentGame.value || myTurnCount.value > 0;
+const isFilled = (): boolean => mostUrgentGame.value === null || myTurnCount.value > 0;
 
 /**
  * No game => grey
  * Most urgent game => my color in this game
  */
-const color = (): string => null === mostUrgentGame.value
+const color = (): string => mostUrgentGame.value === null
     ? 'text-secondary'
-    : (0 === mostUrgentGame.value.myColor
+    : (mostUrgentGame.value.myColor === 0
         ? 'text-danger'
         : 'text-primary'
     )
@@ -72,7 +72,7 @@ const color = (): string => null === mostUrgentGame.value
 const routeName = computed<null | string>(() => {
     const { name } = router.currentRoute.value;
 
-    if ('string' !== typeof name) {
+    if (typeof name !== 'string') {
         return null;
     }
 

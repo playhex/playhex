@@ -38,7 +38,7 @@ export class CustomizedGameView extends GameView
          */
         const { playerSettings } = usePlayerSettingsStore();
 
-        if (null !== playerSettings) {
+        if (playerSettings !== null) {
             this.updateOptionsFromPlayerSettings(playerSettings);
         }
 

@@ -31,6 +31,8 @@ export default tseslint.config([
             'key-spacing': ['warn', {
                 singleLine: { beforeColon: false, afterColon: true },
             }],
+            'yoda': 'warn',
+            'no-cond-assign': 'warn',
             '@typescript-eslint/no-unused-vars': ['warn', { caughtErrorsIgnorePattern: '^(_|e)$' }],
             '@typescript-eslint/ban-ts-comment': 'off',
             'space-infix-ops': 'off',

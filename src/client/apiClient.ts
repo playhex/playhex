@@ -270,7 +270,7 @@ export const apiPostAskUndo = async (gameId: string): Promise<true | string> => 
         },
     });
 
-    if (204 === response.status) {
+    if (response.status === 204) {
         return true;
     }
 
@@ -289,7 +289,7 @@ export const apiPostAnswerUndo = async (gameId: string, accept: boolean): Promis
         }),
     });
 
-    if (204 === response.status) {
+    if (response.status === 204) {
         return true;
     }
 
@@ -304,7 +304,7 @@ export const apiPostResign = async (gameId: string): Promise<true | string> => {
         },
     });
 
-    if (204 === response.status) {
+    if (response.status === 204) {
         return true;
     }
 
@@ -319,7 +319,7 @@ export const apiPostCancel = async (gameId: string): Promise<true | string> => {
         },
     });
 
-    if (204 === response.status) {
+    if (response.status === 204) {
         return true;
     }
 
@@ -420,11 +420,11 @@ export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | Ga
         },
     });
 
-    if (404 === response.status) {
+    if (response.status === 404) {
         return null;
     }
 
-    if (204 === response.status) {
+    if (response.status === 204) {
         return null;
     }
 
@@ -454,7 +454,7 @@ export const apiGetGameRatingUpdates = async (gamePublicId: string, category: Ra
         },
     });
 
-    if (404 === response.status) {
+    if (response.status === 404) {
         return null;
     }
 
@@ -473,7 +473,7 @@ export const apiGetPlayerRatingHistory = async (playerPublicId: string, category
         },
     });
 
-    if (404 === response.status) {
+    if (response.status === 404) {
         return null;
     }
 
@@ -492,7 +492,7 @@ export const apiGetPlayerCurrentRatings = async (playerPublicId: string): Promis
         },
     });
 
-    if (404 === response.status) {
+    if (response.status === 404) {
         return null;
     }
 
@@ -533,7 +533,7 @@ export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | 
         },
     });
 
-    if (404 === response.status) {
+    if (response.status === 404) {
         return null;
     }
 
@@ -640,7 +640,7 @@ export const apiGetEndedTournaments = async (): Promise<null | Tournament[]> => 
 export const apiGetTournament = async (slug: string): Promise<null | Tournament> => {
     const response = await fetch(`/api/tournaments/${slug}`);
 
-    if (404 === response.status) {
+    if (response.status === 404) {
         return null;
     }
 
@@ -707,7 +707,7 @@ export const apiDeleteTournamentSubscription = async (tournamentSlug: string, pl
 
     const json = await response.json();
 
-    if (null === json) {
+    if (json === null) {
         return null;
     }
 
