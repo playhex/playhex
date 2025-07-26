@@ -82,7 +82,7 @@ describe('ActiveTournament', () => {
     });
 
     describe('start', () => {
-        it.only('can start tournament and initialize matches', async () => {
+        it('can start tournament and initialize matches', async () => {
             const tournament = createTournamentFromCreateInput({
                 ...createTournamentDefaultsCreate(),
                 title: 'Test',

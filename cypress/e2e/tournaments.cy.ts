@@ -2,7 +2,7 @@ const randomString = (): string => (1E24 * Math.random()).toString(36);
 const tournamentSlug = (tournamentTitle: string): string => tournamentTitle.toLocaleLowerCase().replace(/ /g, '-');
 
 describe('Tournaments', () => {
-    it.only('can create, check-in, and edit a tournament', () => {
+    it('can create, check-in, and edit a tournament', () => {
         cy.visit('/');
         cy.get('.menu-top').contains('Tournaments').click();
 
@@ -44,15 +44,15 @@ describe('Tournaments', () => {
         cy.contains('11×11');
 
         // Check-in
-        cy.contains('0 people are interested.');
+        cy.contains('0 people are interested');
         cy.contains('Check-in now to play this tournament!');
         cy.contains('button', 'Check-in').click();
-        cy.contains('1 person is interested.');
+        cy.contains('1 person is interested');
         cy.contains('Your participation is confirmed!');
 
         // Unsubscribe
-        cy.contains('button', 'Unsubscribe').click();
-        cy.contains('0 people are interested.');
+        cy.contains('button', 'I am interested!').click();
+        cy.contains('0 people are interested');
         cy.contains('Check-in now to play this tournament!');
 
         // Change tournament format to Swiss

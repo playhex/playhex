@@ -11,6 +11,7 @@ describe('Lobby', () => {
 
         cy.createAIGameWithRandom();
 
+        cy.url().should('include', '/games/');
         cy.contains(/10:0\d/); // "10:00" or "10:05" because of time increment, AI sometimes already played a move
 
         cy.contains('PlayHex')
