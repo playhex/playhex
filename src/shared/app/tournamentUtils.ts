@@ -294,3 +294,22 @@ export const getMatchLoserStrict = (tournamentMatch: TournamentMatch): Player =>
         : player2
     ;
 };
+
+/**
+ * Get number of rounds planned for a Swiss tournament.
+ *
+ * If organizer defined a number of rounds, returns this value.
+ * Else, returns number of rounds based on numbers of players,
+ * same value as how many rounds will be played.
+ */
+export const getSwissTotalRounds = (tournament: Tournament): number => {
+    if (tournament.stage1Format !== 'swiss') {
+        throw new Error('getSwissTotalRounds called on an non-swiss tournament');
+    }
+
+    if (tournament.stage1Rounds !== null && tournament.stage1Rounds > 0) {
+        return tournament.stage1Rounds;
+    }
+
+    return Math.ceil(Math.log2(tournament.participants.length));
+};

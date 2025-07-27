@@ -55,6 +55,8 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         this.logger = baseLogger.child({
             tournamentSlug: tournament.slug,
         });
+
+        this.logger.debug('ActiveTournament initialized');
     }
 
     /**

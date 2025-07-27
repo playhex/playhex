@@ -4,6 +4,7 @@ import AppBracketDefault from './brackets/AppBracketDefault.vue';
 import AppBracketDoubleElimination from './brackets/AppBracketDoubleElimination.vue';
 import AppBracketSingleElimination from './brackets/AppBracketSingleElimination.vue';
 import { onBeforeUnmount, onMounted } from 'vue';
+import AppBracketSwiss from './brackets/AppBracketSwiss.vue';
 
 defineProps({
     tournament: {
@@ -108,6 +109,10 @@ onBeforeUnmount(() => destroyCallbacks.forEach(callback => callback()));
             />
             <AppBracketDoubleElimination
                 v-else-if="'double-elimination' === tournament.stage1Format"
+                :tournament
+            />
+            <AppBracketSwiss
+                v-else-if="'swiss' === tournament.stage1Format"
                 :tournament
             />
             <AppBracketDefault

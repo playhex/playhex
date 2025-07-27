@@ -1,7 +1,7 @@
 import TournamentOrganizer from 'tournament-organizer';
 import { StandingsValues } from 'tournament-organizer/interfaces';
 import { Tournament as TOTournament, Player as TOPlayer, Match } from 'tournament-organizer/components';
-import { findParticipantByPublicIdStrict, findTournamentMatchByRoundAndNumber, getMatchLoserStrict, getMatchWinnerStrict, groupAndSortTournamentMatches, tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
+import { findParticipantByPublicIdStrict, findTournamentMatchByRoundAndNumber, getMatchLoserStrict, getMatchWinnerStrict, getSwissTotalRounds, groupAndSortTournamentMatches, tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { TournamentEngineInterface } from './TournamentEngineInterface.js';
 import { CannotStartTournamentMatchError, NotEnoughParticipantsToStartTournamentError, TooDeepResetError, TournamentEngineError } from '../TournamentError.js';
 import { Service } from 'typedi';
@@ -32,7 +32,10 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         const toTournament = tournamentOrganizer.createTournament(tournament.title, {
             stageOne: {
                 format: tournament.stage1Format ?? undefined,
-                rounds: tournament.stage1Rounds ?? undefined,
+                rounds: tournament.stage1Format === 'swiss'
+                    ? getSwissTotalRounds(tournament) // Explicitely set number of rounds, because when letting undefined, I get weird number of rounds
+                    : undefined
+                ,
                 consolation: tournament.consolation ?? undefined,
             },
             stageTwo: tournament.stage2Format ? {
