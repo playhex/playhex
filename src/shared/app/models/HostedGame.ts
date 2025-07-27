@@ -117,6 +117,13 @@ export default class HostedGame
     @Expose()
     ratings: Rating[];
 
+    /**
+     * Notes from admin relative to this game.
+     * Only used by admin for now.
+     */
+    @Column({ type: 'text', nullable: true })
+    adminComments: null | string;
+
     @AfterLoad()
     sortPlayersPosition()
     {
