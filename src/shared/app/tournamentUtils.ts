@@ -71,10 +71,21 @@ export const isCheckInOpen = (tournament: Tournament, date: Date = new Date()): 
  * Whether a tournament should be featured now, depending on `tournament.featuredFromInSeconds` field.
  */
 export const isFeaturedNow = (tournament: Tournament, date: Date = new Date()): boolean => {
+    // Only feature tournaments with a strictly positive value defined in featuredFromInSeconds
     if (tournament.featuredFromInSeconds <= 0) {
         return false;
     }
 
+    // Do not feature a tournament ended too long before
+    if (tournament.endedAt) {
+        const stopFeaturing = new Date(tournament.endedAt.getTime() + 86400 * 1000);
+
+        if (date > stopFeaturing) {
+            return false;
+        }
+    }
+
+    // Start featuring a tournament featuredFromInSeconds seconds before tournament starts
     const featuredAfter = new Date(tournament.startOfficialAt.getTime() - tournament.featuredFromInSeconds * 1000);
 
     return date >= featuredAfter;
