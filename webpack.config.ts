@@ -32,7 +32,7 @@ const plugins = [
 /**
  * Push release with map.js files to sentry.
  */
-const { SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT } = process.env;
+const { SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT, USE_CDN } = process.env;
 
 if (SENTRY_AUTH_TOKEN && SENTRY_ORG && SENTRY_PROJECT) {
     // Put the Sentry Webpack plugin after all other plugins
@@ -68,6 +68,12 @@ const config: webpack.Configuration = {
         chunkFilename: '[name]-[chunkhash]-bundle.js',
         publicPath: '/statics/',
     },
+    externals: USE_CDN === 'true'
+        ? {
+            'bootstrap/scss/bootstrap.scss': 'window',
+        }
+        : undefined
+    ,
     resolve: {
         extensions: ['.js', '.ts'],
         extensionAlias: {

@@ -173,6 +173,25 @@ yarn analyse-size
 
 Compare two json files with: <https://happy-water-0887b0b1e.azurestaticapps.net>.
 
+### Using CDN
+
+To prevent bundling some large dependencies, we can turn on using CDN.
+
+To do so, in `.env`:
+
+``` properties
+USE_CDN=true
+```
+
+(defaults to `false`).
+
+Currently, only these dependencies have a CDN import:
+- bootstrap, only css
+
+So when upgrading dependencies, bundled and CDN versions should match, so we must upgrade both:
+- with yarn
+- version in `views/partials/cdn.ejs`
+
 ## License
 
 This project is under [AGPL-3.0 license](LICENSE).
