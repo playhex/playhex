@@ -533,11 +533,17 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.tournament.participants = [];
 
             if (e instanceof NotEnoughParticipantsToStartTournamentError) {
-                this.logger.notice('Tried to start tournament, but could not: not enough participants');
+                this.logger.notice('Tried to start tournament, but could not: not enough participants', {
+                    tournamentSlug: this.tournament.slug,
+                });
                 throw e;
             }
 
-            this.logger.error(e.message, e);
+            this.logger.error('Unexpected error when starting tournament', {
+                message: e.message,
+                errorFull: e,
+                tournamentSlug: this.tournament.slug,
+            });
             throw e;
         }
     }
