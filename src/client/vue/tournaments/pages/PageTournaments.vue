@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconPeopleFill, BIconPlus, BIconRecordFill, BIconTrophyFill } from 'bootstrap-icons-vue';
+import { BIconPeopleFill, BIconPlus, BIconRecordFill, BIconTrophyFill } from '../../icons';
 import { ref } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient';

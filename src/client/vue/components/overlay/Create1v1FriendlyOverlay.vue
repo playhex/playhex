@@ -2,7 +2,7 @@
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, ref, toRef, toRefs, watch } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
-import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
+import { BIconCaretDownFill, BIconCaretRight } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';

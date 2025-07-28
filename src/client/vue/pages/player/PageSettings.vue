@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX, BIconExclamationTriangleFill } from 'bootstrap-icons-vue';
+import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX, BIconExclamationTriangleFill } from '../../icons';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';

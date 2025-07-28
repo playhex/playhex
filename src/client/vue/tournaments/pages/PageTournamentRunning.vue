@@ -6,7 +6,7 @@ import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
-import { BIconRecordFill } from 'bootstrap-icons-vue';
+import { BIconRecordFill } from '../../icons';
 import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 

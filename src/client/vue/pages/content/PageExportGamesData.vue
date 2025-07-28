@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineOrganization, useSchemaOrg } from '@unhead/schema-org';
 import { injectHead, useHead, useSeoMeta } from '@unhead/vue';
-import { BIconDownload } from 'bootstrap-icons-vue';
+import { BIconDownload } from '../../icons';
 import { ref, watchEffect } from 'vue';
 
 type FileStat = {

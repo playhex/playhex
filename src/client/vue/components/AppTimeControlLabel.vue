@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { timeControlToCadencyName, timeControlToString } from '../../../shared/app/timeControlUtils.js';
 import { PropType } from 'vue';
-import { BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from 'bootstrap-icons-vue';
+import { BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from '../icons';
 import { calcAverageSecondsPerMove } from '../../../shared/app/timeControlUtils.js';
 import { msToDuration } from '../../../shared/app/timeControlUtils.js';
 import { TimeControlBoardsize } from '../../../shared/app/models/TimeControlBoardsize.js';

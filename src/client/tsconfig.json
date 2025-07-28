@@ -4,6 +4,9 @@
         "target": "ESNext",
         "baseUrl": "./",
         "outDir": "../../dist/client",
+        "types": [
+            "unplugin-icons/types/vue",
+        ],
         "noEmit": true
     },
     "include": [

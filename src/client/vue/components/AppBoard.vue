@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
-import { BIconCheck, BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconCrosshair, BIconScissors, BIconTrophyFill, BIconX } from 'bootstrap-icons-vue';
+import { BIconCheck, BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconCrosshair, BIconScissors, BIconTrophyFill, BIconX } from '../icons';
 import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import AppChrono from './AppChrono.vue';

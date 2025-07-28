@@ -2,7 +2,7 @@
 import { PropType, toRefs } from 'vue';
 import { Player, Tournament, TournamentMatch } from '../../../../shared/app/models';
 import AppBracketManageGame from './AppBracketManageGame.vue';
-import { BIconCheck, BIconPlayFill, BIconThreeDots, BIconTrophyFill } from 'bootstrap-icons-vue';
+import { BIconCheck, BIconPlayFill, BIconThreeDots, BIconTrophyFill } from '../../icons';
 import AppPseudo from '../../components/AppPseudo.vue';
 
 const props = defineProps({

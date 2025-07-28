@@ -3,7 +3,7 @@ import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { BIconPersonFill, BIconHexagonFill, BIconHexagon } from 'bootstrap-icons-vue';
+import { BIconPersonFill, BIconHexagonFill, BIconHexagon } from '../../icons';
 import AppPseudo from '../AppPseudo.vue';
 import { computed } from 'vue';
 

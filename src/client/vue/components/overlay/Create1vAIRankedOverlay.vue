@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, Ref, ref, toRef, toRefs, watch } from 'vue';
-import { BIconExclamationTriangle, BIconTrophy } from 'bootstrap-icons-vue';
+import { BIconExclamationTriangle, BIconTrophy } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore.js';

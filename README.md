@@ -83,6 +83,13 @@ Here are all available translations, just click the following image to help tran
 You can contribute to translations without any coding,
 thanks to [Weblate](https://weblate.org).
 
+## Icons
+
+- https://icones.js.org/collection/bi
+- Then copy "Components > Unplugin Icons"
+- Add it to `src/client/vue/icons/index.ts`
+- Then use it in templates
+
 ## Admin endpoints
 
 Some API endpoints exists for admin tasks (i.e persist all memory games into database manually).

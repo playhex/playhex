@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconCheck, BIconExclamationTriangleFill } from 'bootstrap-icons-vue';
+import { BIconCheck, BIconExclamationTriangleFill } from '../icons';
 import HostedGameOptions from '../../../shared/app/models/HostedGameOptions.js';
 import { PropType } from 'vue';
 

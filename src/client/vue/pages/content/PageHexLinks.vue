@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { BIconFileEarmarkText, BIconDiscord, BIconHexagon } from 'bootstrap-icons-vue';
+import { BIconFileEarmarkText, BIconDiscord, BIconHexagon } from '../../icons';
 import { Component as ComponentType } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 

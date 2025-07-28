@@ -2,7 +2,7 @@
 import { PropType, toRefs, ref } from 'vue';
 import SearchGamesParameters, { gameStates } from '../../../shared/app/SearchGamesParameters.js';
 import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters.js';
-import { BIconArrowRight, BIconX } from 'bootstrap-icons-vue';
+import { BIconArrowRight, BIconX } from '../icons';
 
 const props = defineProps({
     searchGamesParameters: {

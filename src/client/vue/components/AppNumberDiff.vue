@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconCaretDownFill, BIconCaretUpFill } from 'bootstrap-icons-vue';
+import { BIconCaretDownFill, BIconCaretUpFill } from '../icons';
 
 defineProps({
     n: {

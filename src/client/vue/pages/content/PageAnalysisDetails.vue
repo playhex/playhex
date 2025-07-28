@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
-import { BIconInfoCircleFill } from 'bootstrap-icons-vue';
+import { BIconInfoCircleFill } from '../../icons';
 
 useSeoMeta({
     title: 'AI game analysis',

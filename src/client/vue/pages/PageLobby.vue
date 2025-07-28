@@ -13,7 +13,7 @@ import AppSidebar from '../components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
-import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from 'bootstrap-icons-vue';
+import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from '../icons';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';

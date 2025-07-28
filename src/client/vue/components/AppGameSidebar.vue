@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconSignpostSplit } from 'bootstrap-icons-vue';
+import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconSignpostSplit } from '../icons';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';

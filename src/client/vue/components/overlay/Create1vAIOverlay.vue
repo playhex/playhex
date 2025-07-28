@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, Ref, ref, toRef, toRefs, watch } from 'vue';
-import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from 'bootstrap-icons-vue';
+import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';

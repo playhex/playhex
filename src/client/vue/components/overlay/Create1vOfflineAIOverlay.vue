@@ -2,7 +2,7 @@
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, ref, toRefs } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
-import { BIconCaretDownFill, BIconCaretRight } from 'bootstrap-icons-vue';
+import { BIconCaretDownFill, BIconCaretRight } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';

@@ -5,6 +5,7 @@ import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import { VueLoaderPlugin } from 'vue-loader';
 import { commitRef } from './src/server/lastCommitInfo.js';
+import unpluginIcons from 'unplugin-icons/webpack';
 import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 
 import { IS_DEV, WEBPACK_PORT } from './src/server/config.js';
@@ -15,6 +16,10 @@ const __dirname = path.dirname(__filename);
 const plugins = [
     new WebpackManifestPlugin({}),
     new VueLoaderPlugin(),
+    unpluginIcons({
+        compiler: 'vue3',
+        scale: 1,
+    }),
     new webpack.DefinePlugin({
         BASE_URL: JSON.stringify(process.env.BASE_URL),
         SITE_TITLE_SUFFIX: JSON.stringify(process.env.SITE_TITLE_SUFFIX),

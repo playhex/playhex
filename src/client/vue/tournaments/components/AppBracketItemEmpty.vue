@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconThreeDots } from 'bootstrap-icons-vue';
+import { BIconThreeDots } from '../../icons';
 
 /*
  * Empty bracket item, used as placeholder,

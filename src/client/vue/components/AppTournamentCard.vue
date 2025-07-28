@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { onUnmounted, ref } from 'vue';
-import { BIconTrophy, BIconCircleFill } from 'bootstrap-icons-vue';
+import { BIconTrophy, BIconCircleFill } from '../icons';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 

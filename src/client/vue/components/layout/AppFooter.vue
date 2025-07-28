@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBookmarks, BIconChatDots, BIconGithub, BIconDiscord } from 'bootstrap-icons-vue';
+import { BIconBookmarks, BIconChatDots, BIconGithub, BIconDiscord } from '../../icons';
 import { ref } from 'vue';
 import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';

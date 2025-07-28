@@ -2,7 +2,7 @@
 import Player from '../../../shared/app/models/Player.js';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import { PropType } from 'vue';
-import { BIconMoonFill, BIconCircleFill, BIconRobot, BIconCircle } from 'bootstrap-icons-vue';
+import { BIconMoonFill, BIconCircleFill, BIconRobot, BIconCircle } from '../icons';
 
 const props = defineProps({
     player: {

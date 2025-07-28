@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconCheck, BIconScissors, BIconTrash } from 'bootstrap-icons-vue';
+import { BIconCheck, BIconScissors, BIconTrash } from '../icons';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';

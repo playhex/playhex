@@ -3,7 +3,7 @@ import { toRefs } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils';
-import { BIconBell, BIconCheck, BIconExclamationTriangleFill } from 'bootstrap-icons-vue';
+import { BIconBell, BIconCheck, BIconExclamationTriangleFill } from '../../icons';
 
 /*
  * Shows a text like "You are subscribed" on a tournament,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { BIconPeopleFill, BIconRecordFill, BIconTrophy } from 'bootstrap-icons-vue';
+import { BIconPeopleFill, BIconRecordFill, BIconTrophy } from '../../icons';
 import { Tournament } from '../../../../shared/app/models';
 import AppMySubscriptionStatus from './AppMySubscriptionStatus.vue';
 import AppCountdown from '../../components/AppCountdown.vue';

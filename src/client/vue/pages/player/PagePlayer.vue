@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from 'bootstrap-icons-vue';
+import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from '../../icons';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
 import { Ref, ref, useTemplateRef, watch } from 'vue';

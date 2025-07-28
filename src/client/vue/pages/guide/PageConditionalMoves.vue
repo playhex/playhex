@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
 import AppGuideImage from './AppGuideImage.vue';
-import { BIconChevronLeft, BIconCrosshair, BIconScissors, BIconSignpostSplit, BIconX } from 'bootstrap-icons-vue';
+import { BIconChevronLeft, BIconCrosshair, BIconScissors, BIconSignpostSplit, BIconX } from '../../icons';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
 import AppConditionalMoveTree from '../../components/AppConditionalMoveTree.vue';
 

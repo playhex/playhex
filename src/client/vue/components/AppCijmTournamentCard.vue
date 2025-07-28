@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconChevronRight, BIconTrophy } from 'bootstrap-icons-vue';
+import { BIconChevronRight, BIconTrophy } from '../icons';
 import { formatDistanceStrict } from 'date-fns';
 
 const saturday = new Date('2025-06-14T14:00:00+0200');

@@ -13,7 +13,7 @@ import useAuthStore from '../../stores/authStore.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp, BIconSignpostSplit } from 'bootstrap-icons-vue';
+import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp, BIconSignpostSplit } from '../icons';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';

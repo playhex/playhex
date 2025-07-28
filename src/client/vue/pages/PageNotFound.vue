@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconSignTurnLeft } from 'bootstrap-icons-vue';
+import { BIconSignTurnLeft } from '../icons';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
