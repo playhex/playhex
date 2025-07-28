@@ -57,6 +57,8 @@ watchEffect(() => {
                 contentUrl: baseUrl + fileStat.value.filename,
             },
         ],
+    }, {
+        tagPosition: 'head', // Should be the default, but not the case: https://github.com/unjs/unhead/issues/563
     });
 });
 

@@ -63,7 +63,9 @@ const updateMeta = (player: Player): void => {
             name: pseudoString(player, 'pseudo'),
             url: window.location.href,
         }),
-    ]);
+    ], {
+        tagPosition: 'head', // Should be the default, but not the case: https://github.com/unjs/unhead/issues/563
+    });
 };
 
 /*
