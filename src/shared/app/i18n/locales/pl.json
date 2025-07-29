@@ -352,7 +352,8 @@
         "button_label_short": "Potwierdź",
         "send_immediately": "Wyślij natychmiast",
         "ask_confirmation": "Zapytaj o potwierdzenie",
-        "description": "Aby zapobiec błędnym kliknięciom, możesz wymagać potwierdzenia przed przesłaniem ruchu."
+        "description": "Aby zapobiec błędnym kliknięciom, możesz wymagać potwierdzenia przed przesłaniem ruchu.",
+        "send_immediately_description": "Ruch zostanie wysłany natychmiast po kliknięciu pola."
     },
     "rematch": {
         "label": "Rewanż",
@@ -399,7 +400,8 @@
         "playing": "Gra",
         "created": "Utworzona",
         "canceled": "Anulowana",
-        "ended": "Zakończone"
+        "ended": "Zakończone",
+        "forfeited": "Przegrana przez poddanie"
     },
     "1v1": "1v1",
     "sort_date": {
@@ -428,5 +430,30 @@
     "force_board_orientation_mode": "Wymuś wyświetlanie planszy w orientacji poziomej lub pionowej dla tego ekranu",
     "n_total_games_one": "1 gra.",
     "n_total_games_few": "{{count}} gry.",
-    "n_total_games_many": "{{count}} gier."
+    "n_total_games_many": "{{count}} gier.",
+    "username_not_an_email_warning": "Hej, wygląda na to, że wpisujesz swój adres e-mail, ale PlayHex potrzebuje tylko nazwy użytkownika. Twój e-mail byłby publicznie widoczny…",
+    "save": "Zapisz",
+    "discard": "Porzuć",
+    "player_passed_his_turn": "{{player}} pominął swoją turę",
+    "go_to_the_game": "Przejdź do gry",
+    "loading": "Ładowanie…",
+    "losers_bracket": "Drabinka przegranych",
+    "conditional_moves": {
+        "title": "Ruchy warunkowe"
+    },
+    "password_changed_success": "Hasło zostało zmienione.",
+    "must_be_logged_in_as_guest": "Musisz być zalogowany jako gość",
+    "pseudo_already_taken": "Ta nazwa użytkownika jest już używana przez innego gracza",
+    "pseudo_not_existing": "Nie znaleziono gracza o takiej nazwie",
+    "invalid_password": "Nieprawidłowe hasło dla tego konta",
+    "pseudo_too_short": "Nazwa użytkownika jest za krótka",
+    "pseudo_too_long": "Nazwa użytkownika jest za długa",
+    "invalid_pseudo": "Nazwa użytkownika jest nieprawidłowa",
+    "premove": {
+        "title": "Przedruch",
+        "description": "Zagraj ruch w trakcie tury przeciwnika: zostanie zagrany natychmiast po ruchu przeciwnika."
+    },
+    "move_settings": {
+        "title": "Ustawienia ruchu"
+    }
 }
