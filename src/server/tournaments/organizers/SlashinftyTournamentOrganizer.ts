@@ -29,6 +29,15 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
     private createToTournament(tournament: Tournament): TOTournament
     {
+        if (toTournaments[tournament.publicId]) {
+            // Calling start() again on same tournament.
+            // Happens when we tried to start tournament automatically,
+            // but could not because not enough participants,
+            // then renaming it: calls start() again.
+            tournamentOrganizer.removeTournament(tournament.publicId);
+            delete toTournaments[tournament.publicId];
+        }
+
         const toTournament = tournamentOrganizer.createTournament(tournament.title, {
             stageOne: {
                 format: tournament.stage1Format ?? undefined,
