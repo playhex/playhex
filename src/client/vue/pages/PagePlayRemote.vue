@@ -17,7 +17,7 @@ import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconA
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
-import i18next from 'i18next';
+import { t } from 'i18next';
 import { Move, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
@@ -308,17 +308,17 @@ const makeTitle = (hostedGame: HostedGame) => {
     const { state } = hostedGame;
     const playerPseudos = players.map(p => pseudoString(p, 'pseudo'));
     if (players.length < 2 && state === 'created')
-        return `${i18next.t('game.title_waiting')} ${playerPseudos[0]}`;
+        return `${t('game.title_waiting')} ${playerPseudos[0]}`;
     let yourTurn = '';
     if (state === 'playing' && loggedInPlayer.value != null) {
         const player = loggedInPlayer.value;
         const index = players.findIndex(p => p.publicId === player.publicId);
         if (index != null && hostedGame.gameData?.currentPlayerIndex === index) {
-            yourTurn = `• ${i18next.t('game.title_your_turn')} • `;
+            yourTurn = `• ${t('game.title_your_turn')} • `;
         }
     }
     const pairing = playerPseudos.join(' VS ');
-    return `${yourTurn}${i18next.t('game_state.' + state)}: ${pairing}`;
+    return `${yourTurn}${t('game_state.' + state)}: ${pairing}`;
 };
 
 /**

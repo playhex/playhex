@@ -6,7 +6,7 @@ import { isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
 import useAuthStore from '../../../stores/authStore';
-import i18n from 'i18next';
+import { t } from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentFormatImage from '../components/AppTournamentFormatImage.vue';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
@@ -25,7 +25,7 @@ const {
 } = useTournamentFromUrl();
 
 useHead({
-    title: () => tournament.value ? tournament.value.title : i18n.t('tournament'),
+    title: () => tournament.value ? tournament.value.title : t('tournament'),
 });
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());

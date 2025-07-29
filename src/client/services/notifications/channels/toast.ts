@@ -4,7 +4,7 @@ import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { Toast } from '../../../../shared/app/Toast.js';
 import { getOpponent, iAmInGame, isMe, viewingGame } from '../context-utils.js';
 import { notifier } from '../notifier.js';
-import i18next from 'i18next';
+import { t } from 'i18next';
 
 notifier.on('gameStart', hostedGame => {
     if (isBotGame(hostedGame)) {
@@ -34,12 +34,12 @@ notifier.on('gameStart', hostedGame => {
     }
 
     useToastsStore().addToast(new Toast(
-        i18next.t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
+        t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
         {
             level: 'success',
             autoCloseAfter: 10000,
             actions: [
-                { label: i18next.t('go_to_the_game'), action: {
+                { label: t('go_to_the_game'), action: {
                     name: 'online-game',
                     params: { gameId: hostedGame.publicId },
                 } },
@@ -68,7 +68,7 @@ notifier.on('move', (hostedGame, move) => {
 
     if (move.specialMoveType === 'pass') {
         useToastsStore().addToast(new Toast(
-            i18next.t('player_passed_his_turn', { player: pseudoString(passingPlayer, 'pseudo') }),
+            t('player_passed_his_turn', { player: pseudoString(passingPlayer, 'pseudo') }),
             {
                 level: 'warning',
             },

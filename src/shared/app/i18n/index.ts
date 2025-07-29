@@ -1,5 +1,5 @@
 import { setDefaultOptions as setDateFnsDefaultOptions } from 'date-fns';
-import i18next from 'i18next';
+import i18n from 'i18next';
 import HttpBackend from 'i18next-http-backend';
 import { loadDateFnsLocale } from './dateFns.js';
 import { availableLocales } from './availableLocales.js';
@@ -76,7 +76,7 @@ const getSupportedBrowserLocale = (): null | string => {
 export const autoLocale = (): string => getPlayerSelectedLocale() ?? getSupportedBrowserLocale() ?? 'en';
 
 const setI18nLanguage = (locale: string) => {
-    i18next.changeLanguage(locale);
+    i18n.changeLanguage(locale);
     document.querySelector('html')!.setAttribute('lang', locale);
 };
 
@@ -86,7 +86,7 @@ const loadLocaleMessages = async (locale: string) => {
     );
 
     // set locale and locale message
-    i18next.addResourceBundle(locale, 'translation', messages.default);
+    i18n.addResourceBundle(locale, 'translation', messages.default);
 };
 
 /**
@@ -113,7 +113,7 @@ export const setLocale = async (locale: string, remember = true) => {
     // Always load en locales for fallbacks (in case of missing translation)
     loadLocaleMessages('en');
 
-    await i18next
+    await i18n
         .use(HttpBackend)
         .init({
             lng: autoLocale(),

@@ -17,14 +17,14 @@ import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconS
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
-import i18next from 'i18next';
+import { t } from 'i18next';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash.js';
 import { apiPostGame } from '../../apiClient.js';
 import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 
 useHead({
-    title: i18next.t('lobby_title'),
+    title: t('lobby_title'),
 });
 
 const router = useRouter();

@@ -3,7 +3,7 @@ import { ref, useTemplateRef } from 'vue';
 import { apiPostTournament } from '../../../apiClient';
 import { useRouter } from 'vue-router';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError';
-import i18next from 'i18next';
+import { t } from 'i18next';
 import { createTournamentDefaultsCreate } from '../../../../shared/app/models/Tournament';
 import { useHead } from '@unhead/vue';
 import AppTournamentForm from '../components/AppTournamentForm.vue';
@@ -14,7 +14,7 @@ import { Toast } from '../../../../shared/app/Toast';
 const tournament = ref(createTournamentDefaultsCreate());
 
 useHead({
-    title: () => tournament.value.title ?? i18next.t('tournament_create'),
+    title: () => tournament.value.title ?? t('tournament_create'),
 });
 
 const router = useRouter();
@@ -54,7 +54,7 @@ const createTournament = async (): Promise<void> => {
         if (e instanceof DomainHttpError) {
             if (e.type === 'tournament_title_duplicate') {
                 useToastsStore().addToast(new Toast(
-                    i18next.t('tournament_title_duplicate'),
+                    t('tournament_title_duplicate'),
                     {
                         level: 'danger',
                     },

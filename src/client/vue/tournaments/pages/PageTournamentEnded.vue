@@ -11,7 +11,7 @@ import { getTopPlayers } from '../../../../shared/app/tournamentUtils';
 import { formatDurationPrecision } from '../../../../shared/app/dateUtils';
 import { computed } from 'vue';
 import { Tournament, TournamentParticipant } from '../../../../shared/app/models';
-import i18n from 'i18next';
+import { t } from 'i18next';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 
 const {
@@ -53,7 +53,7 @@ const getTournamentOrdinal = (tournamentParticipant: TournamentParticipant): str
         return '' + rank;
     }
 
-    return i18n.t('tournament_ordinal.' + rank);
+    return t('tournament_ordinal.' + rank);
 };
 
 const isFirst = (tournamentParticipant: TournamentParticipant): boolean => {

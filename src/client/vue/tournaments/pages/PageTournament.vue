@@ -4,14 +4,14 @@ import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
 import PageTournamentUpcoming from './PageTournamentUpcoming.vue';
 import PageTournamentRunning from './PageTournamentRunning.vue';
 import PageTournamentEnded from './PageTournamentEnded.vue';
-import i18next from 'i18next';
+import { t } from 'i18next';
 
 const {
     tournament,
 } = useTournamentFromUrl();
 
 useHead({
-    title: () => tournament.value ? tournament.value.title : i18next.t('tournament'),
+    title: () => tournament.value ? tournament.value.title : t('tournament'),
 });
 </script>
 

@@ -12,7 +12,7 @@ import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { authChangePassword } from '../../../apiClient.js';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
 import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns.js';
-import i18n from 'i18next';
+import i18n, { t } from 'i18next';
 import { Game } from '../../../../shared/game-engine/index.js';
 import { Player, MoveSettings } from '../../../../shared/app/models/index.js';
 import AppBoard from '../../components/AppBoard.vue';
@@ -25,7 +25,7 @@ const head = injectHead();
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
-    title: i18n.t('player_settings.title'),
+    title: t('player_settings.title'),
 }, { head });
 
 updateSeoMeta();
@@ -389,7 +389,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                 <div class="row" v-if="'custom' === (playerSettings.boardShadingPattern ?? 'null')">
                     <div class="col-md-6">
                         <!-- eslint-disable-next-line vue/no-v-html translated content comes from translation files, that should be reviewed -->
-                        <div class="form-text mb-3" v-html="i18n.t('shading_patterns.help_custom')"></div>
+                        <div class="form-text mb-3" v-html="t('shading_patterns.help_custom')"></div>
                         <label for="shading-pattern-option" class="form-label">{{ $t(`shading_patterns.custom_expression`) }}</label>
                         <textarea
                             class="form-control font-monospace"

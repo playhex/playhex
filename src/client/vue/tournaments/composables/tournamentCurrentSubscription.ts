@@ -1,4 +1,4 @@
-import i18n from 'i18next';
+import { t } from 'i18next';
 import { computed, Ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
@@ -90,7 +90,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
                 if (e instanceof DomainHttpError) {
                     if (e.type === 'tournament_player_is_banned') {
                         useToastsStore().addToast(new Toast(
-                            i18n.t(e.type),
+                            t(e.type),
                             {
                                 level: 'danger',
                             },
@@ -101,12 +101,12 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
 
                     if (e.type === 'tournament_account_required') {
                         useToastsStore().addToast(new Toast(
-                            i18n.t(e.type),
+                            t(e.type),
                             {
                                 level: 'danger',
                                 actions: [
                                     {
-                                        label: i18n.t('log_in'),
+                                        label: t('log_in'),
                                         action: () => goToLoginPage(),
                                     },
                                 ],

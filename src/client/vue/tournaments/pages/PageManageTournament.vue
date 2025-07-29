@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
-import i18next from 'i18next';
+import { t } from 'i18next';
 import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiDeleteTournament } from '../../../apiClient.js';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
 import TournamentBannedPlayer from '../../../../shared/app/models/TournamentBannedPlayer.js';
@@ -66,7 +66,7 @@ const editTournament = async () => {
         if (e instanceof DomainHttpError) {
             if (e.type === 'tournament_title_duplicate') {
                 useToastsStore().addToast(new Toast(
-                    i18next.t('tournament_title_duplicate'),
+                    t('tournament_title_duplicate'),
                     {
                         level: 'danger',
                     },
@@ -99,7 +99,7 @@ const startTournament = async () => {
         if (e instanceof DomainHttpError) {
             if (e.type === 'tournament_not_enough_participants_to_start') {
                 useToastsStore().addToast(new Toast(
-                    i18next.t(e.type),
+                    t(e.type),
                     {
                         level: 'danger',
                         autoCloseAfter: 6000,

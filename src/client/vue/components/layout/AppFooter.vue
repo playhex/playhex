@@ -3,7 +3,7 @@ import { BIconBookmarks, BIconChatDots, BIconGithub, BIconDiscord } from '../../
 import { ref } from 'vue';
 import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';
-import i18next from 'i18next';
+import i18n from 'i18next';
 
 /* global LAST_COMMIT_DATE */
 // @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
@@ -11,7 +11,7 @@ const lastCommitDate: string = LAST_COMMIT_DATE;
 
 const date = ref<string>(lastCommitDate);
 
-i18next.on('languageChanged', () => {
+i18n.on('languageChanged', () => {
     date.value = format(new Date(`${lastCommitDate} 12:00:00`), 'd MMM y');
 });
 </script>

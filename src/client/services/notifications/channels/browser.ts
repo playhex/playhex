@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import { t } from 'i18next';
 import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../context-utils.js';
 import { notifier } from '../notifier.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
@@ -81,7 +81,7 @@ notifier.on('gameStart', (hostedGame) => {
 
     sendNotification(
         {
-            body: i18next.t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
+            body: t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
             tag: tags.game,
         },
         {
