@@ -11,7 +11,7 @@
 
     <%- include('partials/seo-tags.ejs') %>
 
-    <% if (process.env.USE_CDN === 'true') { %>
+    <% if (useCDN) { %>
         <%- include('partials/cdn.ejs') %>
     <% } %>
 </head>

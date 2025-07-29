@@ -15,6 +15,7 @@ export function pagesRouter(): Router {
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,
             blockRobotsIndex: process.env.BLOCK_ROBOTS_INDEX === 'true',
+            useCDN: process.env.USE_CDN === 'true',
         });
     });
 
