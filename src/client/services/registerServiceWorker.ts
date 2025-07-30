@@ -114,7 +114,13 @@ export const subscribeToPushNotifications = async (): Promise<null | PushSubscri
         });
     }
 
-    await apiPutPushSubscription(pushSubscription);
+    try {
+        await apiPutPushSubscription(pushSubscription);
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Error while subscribing to push notifications');
+        return null;
+    }
 
     return pushSubscription;
 };
