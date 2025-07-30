@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSeoMeta } from '@unhead/vue';
+import { useHead, useSeoMeta } from '@unhead/vue';
 import { useLandingPages } from '../../../composables/landingPages';
 
 useSeoMeta({
@@ -7,6 +7,15 @@ useSeoMeta({
 });
 
 useLandingPages();
+
+useHead({
+    link: [
+        {
+            rel: 'canonical',
+            href: '/landing',
+        },
+    ],
+});
 </script>
 
 <template>
