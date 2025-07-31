@@ -228,11 +228,14 @@
     "past_tournaments": "Zakończone turnieje",
     "participants": "Uczestnicy",
     "n_people_are_interested_one": "{{count}} osoba jest zainteresowana",
-    "n_people_are_interested_other": "{{count}} osób jest zainteresowanych",
+    "n_people_are_interested_few": "",
+    "n_people_are_interested_many": "",
     "n_participants_one": "{{ count }} uczestnik",
-    "n_participants_other": "{{ count }} uczestników",
+    "n_participants_few": "",
+    "n_participants_many": "",
     "n_playing_games_one": "{{ count }} gra w toku",
-    "n_playing_games_other": "{{ count }} gier w toku",
+    "n_playing_games_few": "",
+    "n_playing_games_many": "",
     "view_tournament_as_participant": "Zagraj w turnieju",
     "view_tournament": "Zobacz turniej",
     "tournament_started_ago": "Rozpoczął się {{ date }} temu",
@@ -240,13 +243,14 @@
     "tournament_ended_at": "Zakończył się {{ date }}",
     "tournament_duration": "Czas trwania turnieju: {{ duration }}",
     "n_matches_played_one": "Rozegrano {{ count }} mecz",
-    "n_matches_played_other": "Rozegrano {{ count }} meczów",
+    "n_matches_played_few": "",
+    "n_matches_played_many": "",
     "tournament_subscription": {
-      "subscribed": "Jesteś subskrybowany",
-      "checked_in": "Twoje uczestnictwo zostało potwierdzone!",
-      "must_check_in": "Musisz się potwierdzić!",
-      "can_subscribe": "Nie możesz się jeszcze potwierdzić, ale możesz się zapisać, aby otrzymać powiadomienie, gdy rozpoczną się zapisy.",
-      "can_check_in": "Potwierdź udział, aby zagrać w tym turnieju!"
+        "subscribed": "Jesteś subskrybowany",
+        "checked_in": "Twoje uczestnictwo zostało potwierdzone!",
+        "must_check_in": "Musisz się potwierdzić!",
+        "can_subscribe": "Nie możesz się jeszcze potwierdzić, ale możesz się zapisać, aby otrzymać powiadomienie, gdy rozpoczną się zapisy.",
+        "can_check_in": "Potwierdź udział, aby zagrać w tym turnieju!"
     },
     "tournament_history_logs": "Historia",
     "tournament_history_logs_empty": "Brak historii",
@@ -266,58 +270,59 @@
     "tournament_description": "Opis",
     "tournament_requires_account": "Do udziału w tym turnieju wymagane jest konto.",
     "tournament_ordinal": {
-      "1": "1.",
-      "2": "2.",
-      "3": "3."
+        "1": "1.",
+        "2": "2.",
+        "3": "3."
     },
     "round_n": "Runda {{ n }}",
     "n_rounds_one": "Jedna runda",
-    "n_rounds_other": "{{ count }} rundy",
+    "n_rounds_few": "",
+    "n_rounds_many": "",
     "rounds_number_auto": "Rundy: na podstawie liczby uczestników",
     "consolation_enabled": "Z meczem pocieszenia",
     "consolation_disabled": "Bez meczu pocieszenia",
     "match_title": {
-      "default": "Mecz {{ round }}.{{ number }}",
-      "wb": "Mecz WB {{ round }}.{{ number }}",
-      "lb": "Mecz LB {{ round }}.{{ number }}",
-      "final": "Finał",
-      "petite_final": "Mały finał",
-      "semi_final": "Półfinał {{ number }}",
-      "winners_final": "Finał zwycięzców",
-      "grand_final": "Wielki finał",
-      "grand_final_reset": "Wielki finał (reset)",
-      "losers_final": "Finał przegranych"
+        "default": "Mecz {{ round }}.{{ number }}",
+        "wb": "Mecz WB {{ round }}.{{ number }}",
+        "lb": "Mecz LB {{ round }}.{{ number }}",
+        "final": "Finał",
+        "petite_final": "Mały finał",
+        "semi_final": "Półfinał {{ number }}",
+        "winners_final": "Finał zwycięzców",
+        "grand_final": "Wielki finał",
+        "grand_final_reset": "Wielki finał (reset)",
+        "losers_final": "Finał przegranych"
     },
     "tournament_create": "Utwórz turniej",
     "tournament_title_duplicate": "Turniej o takiej nazwie już istnieje",
     "tournament_format": {
-      "single-elimination": "Pojedyncza eliminacja",
-      "double-elimination": "Podwójna eliminacja",
-      "stepladder": "Drabinkowy",
-      "swiss": "Szwajcarski",
-      "round-robin": "Każdy z każdym",
-      "double-round-robin": "Podwójny każdy z każdym"
+        "single-elimination": "Pojedyncza eliminacja",
+        "double-elimination": "Podwójna eliminacja",
+        "stepladder": "Drabinkowy",
+        "swiss": "Szwajcarski",
+        "round-robin": "Każdy z każdym",
+        "double-round-robin": "Podwójny każdy z każdym"
     },
     "tournament_start_delay_choice": {
-      "yes": "Tak",
-      "yes_help": "Turniej rozpocznie się automatycznie o zadanej godzinie 'Rozpoczęcie'.",
-      "delay": "Opóźnienie",
-      "delay_help": "Turniej rozpocznie się automatycznie, N sekund po czasie 'Rozpoczęcia'. Będzie oznaczony jako 'zaraz się zacznie', a organizator będzie mógł go uruchomić ręcznie.",
-      "never": "Nigdy",
-      "never_help": "Turniej nie rozpocznie się automatycznie. Organizator musi go uruchomić ręcznie. Do tego czasu będzie oznaczony jako 'zaraz się zacznie'."
+        "yes": "Tak",
+        "yes_help": "Turniej rozpocznie się automatycznie o zadanej godzinie 'Rozpoczęcie'.",
+        "delay": "Opóźnienie",
+        "delay_help": "Turniej rozpocznie się automatycznie, N sekund po czasie 'Rozpoczęcia'. Będzie oznaczony jako 'zaraz się zacznie', a organizator będzie mógł go uruchomić ręcznie.",
+        "never": "Nigdy",
+        "never_help": "Turniej nie rozpocznie się automatycznie. Organizator musi go uruchomić ręcznie. Do tego czasu będzie oznaczony jako 'zaraz się zacznie'."
     },
     "tournament_history": {
-      "created": "{{organizerPseudo}} utworzył turniej",
-      "edited": "Organizator zmienił '{{ field }}' turnieju: nowa wartość to '{{ value }}'. (Poprzednia wartość: '{{ oldValue }}')",
-      "player_subscribed": "{{ playerPseudo }} zapisał się",
-      "player_unsubscribed": "{{ playerPseudo }} wypisał się",
-      "player_kicked": "{{ playerPseudo }} został wyrzucony",
-      "player_checked_in": "{{ playerPseudo }} potwierdził udział",
-      "player_banned": "{{ playerPseudo }} został zbanowany w tym turnieju",
-      "started": "Turniej się rozpoczął!",
-      "match_ended": "Mecz {{ round }}.{{ number }} zakończony: {{ winnerPseudo }} wygrał z {{ loserPseudo }}.",
-      "match_canceled_recreated": "Mecz {{ round }}.{{ number }} został odtworzony po anulowaniu.",
-      "ended": "Turniej się zakończył."
+        "created": "{{organizerPseudo}} utworzył turniej",
+        "edited": "Organizator zmienił '{{ field }}' turnieju: nowa wartość to '{{ value }}'. (Poprzednia wartość: '{{ oldValue }}')",
+        "player_subscribed": "{{ playerPseudo }} zapisał się",
+        "player_unsubscribed": "{{ playerPseudo }} wypisał się",
+        "player_kicked": "{{ playerPseudo }} został wyrzucony",
+        "player_checked_in": "{{ playerPseudo }} potwierdził udział",
+        "player_banned": "{{ playerPseudo }} został zbanowany w tym turnieju",
+        "started": "Turniej się rozpoczął!",
+        "match_ended": "Mecz {{ round }}.{{ number }} zakończony: {{ winnerPseudo }} wygrał z {{ loserPseudo }}.",
+        "match_canceled_recreated": "Mecz {{ round }}.{{ number }} został odtworzony po anulowaniu.",
+        "ended": "Turniej się zakończył."
     },
     "tournament_player_is_banned": "Zbanowany w tym turnieju",
     "tournament_account_required": "Ten turniej wymaga konta. Goście nie są dozwoleni. Zaloguj się lub utwórz konto.",
@@ -347,7 +352,8 @@
         "button_label_short": "Potwierdź",
         "send_immediately": "Wyślij natychmiast",
         "ask_confirmation": "Zapytaj o potwierdzenie",
-        "description": "Aby zapobiec błędnym kliknięciom, możesz wymagać potwierdzenia przed przesłaniem ruchu."
+        "description": "Aby zapobiec błędnym kliknięciom, możesz wymagać potwierdzenia przed przesłaniem ruchu.",
+        "send_immediately_description": "Ruch zostanie wysłany natychmiast po kliknięciu pola."
     },
     "rematch": {
         "label": "Rewanż",
@@ -394,7 +400,8 @@
         "playing": "Gra",
         "created": "Utworzona",
         "canceled": "Anulowana",
-        "ended": "Zakończone"
+        "ended": "Zakończone",
+        "forfeited": "Przegrana przez poddanie"
     },
     "1v1": "1v1",
     "sort_date": {
@@ -423,5 +430,30 @@
     "force_board_orientation_mode": "Wymuś wyświetlanie planszy w orientacji poziomej lub pionowej dla tego ekranu",
     "n_total_games_one": "1 gra.",
     "n_total_games_few": "{{count}} gry.",
-    "n_total_games_many": "{{count}} gier."
+    "n_total_games_many": "{{count}} gier.",
+    "username_not_an_email_warning": "Hej, wygląda na to, że wpisujesz swój adres e-mail, ale PlayHex potrzebuje tylko nazwy użytkownika. Twój e-mail byłby publicznie widoczny…",
+    "save": "Zapisz",
+    "discard": "Porzuć",
+    "player_passed_his_turn": "{{player}} pominął swoją turę",
+    "go_to_the_game": "Przejdź do gry",
+    "loading": "Ładowanie…",
+    "losers_bracket": "Drabinka przegranych",
+    "conditional_moves": {
+        "title": "Ruchy warunkowe"
+    },
+    "password_changed_success": "Hasło zostało zmienione.",
+    "must_be_logged_in_as_guest": "Musisz być zalogowany jako gość",
+    "pseudo_already_taken": "Ta nazwa użytkownika jest już używana przez innego gracza",
+    "pseudo_not_existing": "Nie znaleziono gracza o takiej nazwie",
+    "invalid_password": "Nieprawidłowe hasło dla tego konta",
+    "pseudo_too_short": "Nazwa użytkownika jest za krótka",
+    "pseudo_too_long": "Nazwa użytkownika jest za długa",
+    "invalid_pseudo": "Nazwa użytkownika jest nieprawidłowa",
+    "premove": {
+        "title": "Przedruch",
+        "description": "Zagraj ruch w trakcie tury przeciwnika: zostanie zagrany natychmiast po ruchu przeciwnika."
+    },
+    "move_settings": {
+        "title": "Ustawienia ruchu"
+    }
 }

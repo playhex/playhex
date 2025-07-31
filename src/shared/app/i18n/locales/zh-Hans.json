@@ -217,11 +217,8 @@
     "upcoming_tournaments": "即将开始的锦标赛",
     "past_tournaments": "已结束的锦标赛",
     "participants": "参赛者",
-    "n_people_are_interested_one": "{{count}} 人感兴趣",
     "n_people_are_interested_other": "{{count}} 人感兴趣",
-    "n_participants_one": "{{ count }} 位参赛者",
     "n_participants_other": "{{ count }} 位参赛者",
-    "n_playing_games_one": "{{ count }} 场正在进行的比赛",
     "n_playing_games_other": "{{ count }} 场正在进行的比赛",
     "view_tournament_as_participant": "参与锦标赛",
     "view_tournament": "查看锦标赛",
@@ -229,7 +226,6 @@
     "tournament_started_at": "开始于 {{ date }}",
     "tournament_ended_at": "结束于 {{ date }}",
     "tournament_duration": "锦标赛时长：{{ duration }}",
-    "n_matches_played_one": "{{ count }} 场比赛已完成",
     "n_matches_played_other": "{{ count }} 场比赛已完成",
     "tournament_subscription": {
         "subscribed": "你已订阅",
@@ -261,7 +257,6 @@
         "3": "第3名"
     },
     "round_n": "第 {{ n }} 轮",
-    "n_rounds_one": "一轮",
     "n_rounds_other": "{{ count }} 轮",
     "rounds_number_auto": "轮数：根据参赛人数自动确定",
     "consolation_enabled": "含安慰赛",
