@@ -70,11 +70,6 @@ const featuredTournaments = ref<Tournament[]>([]);
 
 <template>
     <div>
-        <AppTournamentCard
-            :name="'Hex Monthly ' + nextHexMonthlyNumber"
-            :startDate="nextHexMonthlyDate"
-            :registerLink="'https://challonge.com/hex_monthly_' + nextHexMonthlyNumber"
-        />
 
         <AppFeaturedTournamentCard
             v-for="tournament in featuredTournaments"
