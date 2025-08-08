@@ -1,6 +1,6 @@
 import { HostedGameOptions, Player } from '../../shared/app/models/index.js';
 import { Move, calcRandomMove } from '../../shared/game-engine/index.js';
-import { getBestMove } from '../../shared/ai/getBestMove.js';
+import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { Container } from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer.js';
 import logger from './logger.js';
@@ -151,7 +151,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
 
             return Move.fromString(
                 getBestMove(
-                    game.getCurrentPlayerIndex() === 0 ? 'red' : 'blue',
+                    game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
                     game.getMovesHistory().map(move => move.toString()),
                     aiConfig.config.level,
                 ),
