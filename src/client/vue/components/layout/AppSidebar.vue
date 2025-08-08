@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useOnlinePlayersStore from '../../../stores/onlinePlayersStore.js';
 import AppPseudo from '../AppPseudo.vue';
-import AppTournamentCard from '../AppTournamentCard.vue';
 import { Tournament, type OnlinePlayer } from '../../../../shared/app/models/index.js';
 import { apiGetActiveTournaments } from '../../../apiClient.js';
 import AppFeaturedTournamentCard from '../../tournaments/components/AppFeaturedTournamentCard.vue';
@@ -23,41 +22,6 @@ const orderedPlayers = computed<OnlinePlayer[]>(() => {
         });
 });
 
-/*
- * Hex Monthly card.
- * every 3rd saturday, at 17h utc
- *
- * to test it, mock Date by copy pasting mockdate/lib/mockdate.js content in browser:
- * https://www.npmjs.com/package/mockdate?activeTab=code
- *
- * then:
- * MockDate.set('2025-01-17')
- */
-const pad = (n: number) => String(n).padStart(2, '0');
-
-const getNthDayInMonth = (nth: number, day: number, month = new Date()): Date => {
-    const d = new Date(month.getFullYear(), month.getMonth());
-
-    d.setDate(1 + (7 - d.getDay() + day) % 7 + (nth - 1) * 7);
-
-
-    return new Date(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T17:00:00Z`);
-};
-
-const getHexMonthlyDate = (month = new Date()): Date => {
-    const third = 3;
-    const saturday = 6;
-
-    return getNthDayInMonth(third, saturday, month);
-};
-
-const getNextHexMonthlyNumber = (month: Date): number => {
-    return month.getFullYear() * 12 + month.getMonth() - 24275;
-};
-
-const nextHexMonthlyDate = getHexMonthlyDate();
-const nextHexMonthlyNumber = getNextHexMonthlyNumber(nextHexMonthlyDate);
-
 // Featured tournaments
 const featuredTournaments = ref<Tournament[]>([]);
 
@@ -70,7 +34,6 @@ const featuredTournaments = ref<Tournament[]>([]);
 
 <template>
     <div>
-
         <AppFeaturedTournamentCard
             v-for="tournament in featuredTournaments"
             :key="tournament.publicId"
