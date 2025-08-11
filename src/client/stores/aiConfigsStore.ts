@@ -9,18 +9,10 @@ const useAiConfigsStore = defineStore('aiConfigsStore', () => {
     /**
      * List of available bots.
      */
-    const aiConfigs: Ref<{ [engine: string]: WithRequired<AIConfig, 'player'>[] }> = ref({});
+    const aiConfigs: Ref<WithRequired<AIConfig, 'player'>[]> = ref([]);
 
     const loadAiConfigs = async (): Promise<void> => {
-        const configs = await apiGetAiConfigs();
-
-        for (const config of configs) {
-            if (!aiConfigs.value[config.engine]) {
-                aiConfigs.value[config.engine] = [];
-            }
-
-            aiConfigs.value[config.engine].push(config);
-        }
+        aiConfigs.value = await apiGetAiConfigs();
     };
 
     loadAiConfigs();

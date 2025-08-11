@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
-import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle } from '../../icons';
+import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle, BIconRobot } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
@@ -33,7 +33,6 @@ const showSecondaryOptions = ref(false);
  * AI configs
  */
 const { aiConfigs } = storeToRefs(useAiConfigsStore());
-const selectedEngine = ref<null | string>(null);
 const selectedAiConfig = ref<AIConfig | null>(null);
 const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
 
@@ -61,18 +60,6 @@ const selectAiConfig = (aiConfig: AIConfig): void => {
     selectedAiConfig.value = aiConfig;
     capSelectedBoardsize();
 };
-
-const selectEngine = (engine: string): void => {
-    selectedEngine.value = engine;
-};
-
-if (Object.keys(aiConfigs.value).length > 0) {
-    selectEngine(Object.keys(aiConfigs.value)[0]);
-} else {
-    watch(aiConfigs.value, newAiConfig => {
-        selectEngine(Object.keys(newAiConfig)[0]);
-    });
-}
 
 const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
     if (!aiConfig.isRemote) {
@@ -119,14 +106,10 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
                             </p>
                         </template>
 
-                        <ul class="nav nav-pills nav-justified ai-engine-choice">
-                            <li v-for="(_, engine) in aiConfigs" :key="engine" class="nav-item">
-                                <button type="button" class="nav-link" :class="{ active: engine === selectedEngine }" @click="selectEngine(engine as string)">{{ engine }}</button>
-                            </li>
-                        </ul>
+                        <div class="mb-3">
+                            <h6><BIconRobot class="me-1" /> AI engine and level</h6>
 
-                        <div v-if="selectedEngine" class="engine-configs">
-                            <div v-for="aiConfig in aiConfigs[selectedEngine]" :key="aiConfig.player.publicId" class="form-check">
+                            <div v-for="aiConfig in aiConfigs" :key="aiConfig.player.publicId" class="form-check">
                                 <input
                                     v-model="gameOptions.opponentPublicId"
                                     @click="selectAiConfig(aiConfig)"
@@ -193,7 +176,4 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
 .ai-engine-choice
     .nav-link::first-letter
         text-transform capitalize
-
-.engine-configs
-    margin 1em 0 2em 1em
 </style>

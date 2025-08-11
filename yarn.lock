@@ -4328,6 +4328,11 @@ date-fns@^4.1.0:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.1.0.tgz#64b3d83fff5aa80438f5b1a633c2e83b8a1c2d14"
   integrity sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==
 
+davies-hex-ai@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/davies-hex-ai/-/davies-hex-ai-1.2.5.tgz#5ef02a472cdbffc4b9913caa8293269659bbdae8"
+  integrity sha512-iamzL76F5qagE7Dwf269/pwD7ldJX8lN0UWWkbFKeidzmxlgKqKd8lxGOB2H2Cg4qesc7fBAbhyOKZ3moGDYNQ==
+
 dayjs@^1.10.4, dayjs@^1.11.13:
   version "1.11.13"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.13.tgz#92430b0139055c3ebb60150aa13e860a4b5a366c"

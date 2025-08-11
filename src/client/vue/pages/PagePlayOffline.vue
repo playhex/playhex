@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import AppBoard from '../components/AppBoard.vue';
-import { Game, IllegalMove, PlayerIndex, calcRandomMove } from '../../../shared/game-engine/index.js';
+import { Game, IllegalMove, Move, PlayerIndex } from '../../../shared/game-engine/index.js';
+import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { HostedGameOptions, Player } from '../../../shared/app/models/index.js';
 import { Ref, ref } from 'vue';
 import useAuthStore from '../../stores/authStore.js';
@@ -26,9 +27,15 @@ const makeAIMoveIfApplicable = async (game: Game, players: Player[]): Promise<vo
         return;
     }
 
-    const move = await calcRandomMove(game);
+    setTimeout(() => {
+        const move = getBestMove(
+            game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
+            game.getMovesHistory().map(move => move.toString()),
+            10,
+        );
 
-    game.move(move, game.getCurrentPlayerIndex());
+        game.move(Move.fromString(move), game.getCurrentPlayerIndex());
+    }, 150);
 };
 
 const initGame = () => {

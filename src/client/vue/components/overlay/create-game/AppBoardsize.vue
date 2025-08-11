@@ -43,7 +43,7 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
 </script>
 
 <template>
-    <h6><BIconAspectRatio /> {{ $t('game.board_size') }}</h6>
+    <h6><BIconAspectRatio class="me-1" /> {{ $t('game.board_size') }}</h6>
 
     <div class="btn-group" role="group">
         <template v-for="size in sizesSelection" :key="size">

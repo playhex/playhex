@@ -1,5 +1,6 @@
 import { HostedGameOptions, Player } from '../../shared/app/models/index.js';
 import { Move, calcRandomMove } from '../../shared/game-engine/index.js';
+import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { Container } from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer.js';
 import logger from './logger.js';
@@ -62,6 +63,16 @@ export const validateConfigRandom = (config: unknown): config is { determinist: 
         && config !== null
         && 'determinist' in config
         && typeof config.determinist === 'boolean'
+    ;
+};
+
+export const validateConfigDavies = (config: unknown): config is { level: number } => {
+    return typeof config === 'object'
+        && config !== null
+        && 'level' in config
+        && typeof config.level === 'number'
+        && config.level >= 1
+        && config.level <= 10
     ;
 };
 
@@ -132,6 +143,19 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
             }
 
             return await calcRandomMove(game, waitTimeBeforeRandomMove(aiConfig.config), aiConfig.config.determinist);
+
+        case 'davies':
+            if (!validateConfigDavies(aiConfig.config)) {
+                throw new Error('Invalid config for aiConfig');
+            }
+
+            return Move.fromString(
+                getBestMove(
+                    game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
+                    game.getMovesHistory().map(move => move.toString()),
+                    aiConfig.config.level,
+                ),
+            );
     }
 
     logger.error(`No local AI play for bot with slug = "${player.slug}"`);

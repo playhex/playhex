@@ -119,7 +119,7 @@ watch(capped, isCapped => {
 </script>
 
 <template>
-    <h6><BIconHourglass /> {{ $t('game.time_control') }}</h6>
+    <h6><BIconHourglass class="me-1" /> {{ $t('game.time_control') }}</h6>
 
     <button
         v-for="{ timeControl, label } in suggestedTimeControls" :key="label"
