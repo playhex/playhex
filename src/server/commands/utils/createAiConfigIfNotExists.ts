@@ -6,7 +6,7 @@ type CreateAiConfigParameters = {
     config: { [key: string]: unknown };
     engine: string;
     label: string;
-    description: string;
+    description?: string;
     order: number;
     boardsizeMin?: number;
     boardsizeMax?: number;
@@ -51,7 +51,7 @@ export default async (parameters: CreateAiConfigParameters): Promise<boolean> =>
     aiConfig.config = parameters.config;
     aiConfig.engine = parameters.engine;
     aiConfig.label = parameters.label;
-    aiConfig.description = parameters.description;
+    aiConfig.description = parameters.description ?? null;
     aiConfig.order = parameters.order;
     aiConfig.boardsizeMin = parameters.boardsizeMin;
     aiConfig.boardsizeMax = parameters.boardsizeMax;
