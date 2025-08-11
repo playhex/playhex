@@ -48,7 +48,7 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
     <div class="btn-group" role="group">
         <template v-for="size in sizesSelection" :key="size">
             <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="size" :id="'size-' + size" :disabled="!isBoardsizeAllowed(size)">
-            <label class="btn btn-outline-primary" :class="isBoardsizeAllowed(size) ? 'btn-outline-primary' : 'btn-outline-secondary'" :for="'size-' + size">{{ size }}</label>
+            <label class="btn" :class="isBoardsizeAllowed(size) ? 'btn-outline-primary' : 'btn-outline-secondary'" :for="'size-' + size">{{ size }}</label>
         </template>
 
         <input type="radio" name="boardsize-radio" class="btn-check" @click="showCustomBoardsize = true" id="size-custom">

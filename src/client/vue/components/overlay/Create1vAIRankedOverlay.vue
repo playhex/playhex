@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
-import { PropType, Ref, ref, toRef, toRefs, watch } from 'vue';
+import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
 import { BIconExclamationTriangle, BIconTrophy } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
@@ -23,10 +23,10 @@ const props = defineProps({
     },
 });
 
-const { gameOptions } = toRefs(props);
+const gameOptions = reactive(props.gameOptions);
 
-const timeControl = toRef(gameOptions.value.timeControl);
-watch<TimeControlType>(timeControl, t => gameOptions.value.timeControl = t);
+const timeControl = toRef(gameOptions.timeControl);
+watch<TimeControlType>(timeControl, t => gameOptions.timeControl = t);
 
 /*
  * AI configs
@@ -47,12 +47,12 @@ const capSelectedBoardsize = () => {
 
     const { boardsizeMin, boardsizeMax } = selectedAiConfig.value;
 
-    if (typeof boardsizeMin === 'number' && gameOptions.value.boardsize < boardsizeMin) {
-        gameOptions.value.boardsize = boardsizeMin;
+    if (typeof boardsizeMin === 'number' && gameOptions.boardsize < boardsizeMin) {
+        gameOptions.boardsize = boardsizeMin;
     }
 
-    if (typeof boardsizeMax === 'number' && gameOptions.value.boardsize > boardsizeMax) {
-        gameOptions.value.boardsize = boardsizeMax;
+    if (typeof boardsizeMax === 'number' && gameOptions.boardsize > boardsizeMax) {
+        gameOptions.boardsize = boardsizeMax;
     }
 };
 
