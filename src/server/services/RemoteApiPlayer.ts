@@ -57,7 +57,7 @@ export default class RemoteApiPlayer
 
         const measure = new TimeMeasureMetric('ai_time_to_respond', {
             engine,
-            level: config.maxGames ?? (config.treeSearch ? 500000 : 0) ?? -1,
+            level: config.maxGames ?? (config.treeSearch ? 500000 : 0),
             boardsize: game.getSize(),
             gameId: hostedGameServer.getPublicId(),
         });
