@@ -37,7 +37,7 @@ const showSecondaryOptions = ref(false);
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <AppBoardsize :gameOptions="gameOptions" />
+                            <AppBoardsize v-model="gameOptions.boardsize" />
                         </div>
 
                         <div class="mb-3">

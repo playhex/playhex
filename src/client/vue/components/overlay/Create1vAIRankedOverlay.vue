@@ -145,7 +145,7 @@ watch(aiConfigs, () => {
 
                         <div class="mb-3">
                             <AppBoardsize
-                                :gameOptions="gameOptions"
+                                v-model="gameOptions.boardsize"
                                 :boardsizeMin="max(selectedAiConfig?.boardsizeMin ?? RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MIN)"
                                 :boardsizeMax="min(selectedAiConfig?.boardsizeMax ?? RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MAX)"
                                 :sizesSelection="[11, 13, 14, 17, 19]"

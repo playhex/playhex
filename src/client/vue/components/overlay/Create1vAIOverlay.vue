@@ -146,7 +146,7 @@ watch(aiConfigs, () => {
 
                         <div class="mb-3">
                             <AppBoardsize
-                                :gameOptions="gameOptions"
+                                v-model="gameOptions.boardsize"
                                 :boardsizeMin="selectedAiConfig?.boardsizeMin ?? undefined"
                                 :boardsizeMax="selectedAiConfig?.boardsizeMax ?? undefined"
                             />

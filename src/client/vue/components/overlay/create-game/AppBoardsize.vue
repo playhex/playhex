@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { PropType, Ref, ref, toRefs } from 'vue';
 import { BIconAspectRatio } from '../../../icons';
-import HostedGameOptions, { MAX_BOARDSIZE } from '../../../../../shared/app/models/HostedGameOptions.js';
+import { MIN_BOARDSIZE, MAX_BOARDSIZE } from '../../../../../shared/app/models/HostedGameOptions.js';
+
+const boardsize = defineModel<number>({
+    required: true,
+});
 
 const props = defineProps({
-    gameOptions: {
-        type: Object as PropType<HostedGameOptions>,
-        required: true,
-    },
     boardsizeMin: {
         type: Number,
         required: false,
@@ -25,9 +25,9 @@ const props = defineProps({
     },
 });
 
-const { gameOptions, boardsizeMin, boardsizeMax, sizesSelection } = toRefs(props);
+const { boardsizeMin, boardsizeMax, sizesSelection } = toRefs(props);
 
-const showCustomBoardsize: Ref<boolean> = ref(!sizesSelection.value.includes(gameOptions.value.boardsize));
+const showCustomBoardsize: Ref<boolean> = ref(!sizesSelection.value.includes(boardsize.value));
 
 const isBoardsizeAllowed = (boardsize: number): boolean => {
     if (typeof boardsizeMin?.value === 'number' && boardsize < boardsizeMin.value) {
@@ -47,7 +47,7 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
 
     <div class="btn-group" role="group">
         <template v-for="size in sizesSelection" :key="size">
-            <input type="radio" name="boardsize-radio" class="btn-check" v-model="gameOptions.boardsize" :value="size" :id="'size-' + size" :disabled="!isBoardsizeAllowed(size)">
+            <input type="radio" name="boardsize-radio" class="btn-check" v-model="boardsize" :value="size" :id="'size-' + size" :disabled="!isBoardsizeAllowed(size)">
             <label class="btn" :class="isBoardsizeAllowed(size) ? 'btn-outline-primary' : 'btn-outline-secondary'" :for="'size-' + size">{{ size }}</label>
         </template>
 
@@ -55,12 +55,11 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
         <label class="btn btn-outline-primary" for="size-custom">{{ $t('create_game.custom_size') }}</label>
     </div>
 
-
     <div v-if="showCustomBoardsize" class="mt-3">
         <input
-            v-model="gameOptions.boardsize"
+            v-model="boardsize"
             type="number"
-            :min="boardsizeMin ?? 1"
+            :min="boardsizeMin ?? MIN_BOARDSIZE"
             :max="boardsizeMax ?? MAX_BOARDSIZE"
             class="form-control"
         >

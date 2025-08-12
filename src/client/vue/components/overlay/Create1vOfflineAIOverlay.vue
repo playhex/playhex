@@ -40,7 +40,7 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                         </p>
 
                         <div class="mb-3">
-                            <AppBoardsize :gameOptions="gameOptions" />
+                            <AppBoardsize v-model="gameOptions.boardsize" />
                         </div>
 
                         <button
