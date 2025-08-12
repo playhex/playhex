@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
-import { PropType, toRef, toRefs, watch } from 'vue';
+import { PropType, reactive, toRef, watch } from 'vue';
 import { HostedGameOptions } from '../../../../shared/app/models/index.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
@@ -17,10 +17,10 @@ const props = defineProps({
     },
 });
 
-const { gameOptions } = toRefs(props);
+const gameOptions = reactive(props.gameOptions);
 
-const timeControl = toRef(gameOptions.value.timeControl);
-watch<TimeControlType>(timeControl, t => gameOptions.value.timeControl = t);
+const timeControl = toRef(gameOptions.timeControl);
+watch<TimeControlType>(timeControl, t => gameOptions.timeControl = t);
 </script>
 
 <template>
