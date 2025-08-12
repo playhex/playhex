@@ -36,10 +36,6 @@ import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { markRaw } from 'vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 
-useSeoMeta({
-    robots: 'noindex',
-});
-
 const head = injectHead();
 
 const { gameId } = useRoute().params;
@@ -321,36 +317,6 @@ const makeTitle = (hostedGame: HostedGame) => {
     return `${yourTurn}${t('game_state.' + state)}: ${pairing}`;
 };
 
-/**
- * Whether game can be indexed on search engines.
- * Should not index all games to prevent too much content.
- * Should not index games without content (no chat messages) to prevent duplicate content,
- * because search engine won't see the board.
- */
-const shouldBeIndexedOnSearchEngines = (hostedGame: HostedGame): boolean => {
-    // only index ended games
-    if (hostedGame.state !== 'ended') {
-        return false;
-    }
-
-    // index only if there is chat messages to prevent duplicate content with another game
-    if (hostedGame.chatMessages.length < 2) {
-        return false;
-    }
-
-    // do not index bot games
-    if (hostedGame.gameOptions.opponentType !== 'player') {
-        return false;
-    }
-
-    // index only if there is at least one registered player
-    if (hostedGame.hostedGameToPlayers.every(hostedGameToPlayer => hostedGameToPlayer.player.isGuest)) {
-        return false;
-    }
-
-    return true;
-};
-
 /*
  * Load game
  */
@@ -389,12 +355,6 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
     ;
 
     useSeoMeta({
-        robots: computed(() => {
-            return hostedGameClient.value !== null && shouldBeIndexedOnSearchEngines(hostedGameClient.value.getHostedGame())
-                ? 'index'
-                : 'noindex'
-            ;
-        }),
         title: computed(() => {
             if (hostedGameClient.value == null) return '';
             return makeTitle(hostedGameClient.value.getHostedGame());
