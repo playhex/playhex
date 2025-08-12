@@ -6,7 +6,7 @@ const socketStore = useSocketStore();
 
 <template>
     <div v-if="!socketStore.connected" class="connection-alert btn btn-danger">
-        Offline
+        {{ $t('offline') }}
     </div>
 </template>
 

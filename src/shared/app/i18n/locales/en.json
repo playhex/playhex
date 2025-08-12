@@ -194,6 +194,7 @@
         "title": "Offline AI",
         "create": "Play vs offline AI"
     },
+    "offline": "Offline",
     "offline_game_explain": "Offline games run on your device only, so that you can play without internet connection. The PlayHex server is not involved.",
     "loading_game": "Loading game…",
     "loading": "Loading…",
