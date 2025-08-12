@@ -1,5 +1,5 @@
 describe('Create game', () => {
-    describe.only('Boardsize', () => {
+    describe('Boardsize', () => {
         it('predefined sizes are reactive with custom input in create AI game form', () => {
             cy.visit('/');
             cy.get('.menu-top').contains(/Guest \d+/);

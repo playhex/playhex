@@ -50,13 +50,6 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true, wait = false) => 
     cy
         .contains('h5', 'Play vs AI')
         .closest('.modal-content')
-        .contains('button', 'random')
-        .click()
-    ;
-
-    cy
-        .contains('h5', 'Play vs AI')
-        .closest('.modal-content')
         .contains('TestBot Determinist ' + (wait ? 'wait' : 'instant'))
         .click()
     ;

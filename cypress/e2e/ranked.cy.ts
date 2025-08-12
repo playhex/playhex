@@ -25,13 +25,6 @@ describe('Ranked games', () => {
         cy
             .contains('h5', 'Ranked vs AI')
             .closest('.modal-content')
-            .contains('button', 'random')
-            .click()
-        ;
-
-        cy
-            .contains('h5', 'Ranked vs AI')
-            .closest('.modal-content')
             .contains('TestBot Determinist instant')
             .click()
         ;
