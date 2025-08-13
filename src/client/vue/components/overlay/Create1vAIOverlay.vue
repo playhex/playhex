@@ -171,11 +171,11 @@ watch(aiConfigs, () => {
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <AppPlayFirstOrSecond :gameOptions="gameOptions" />
+                            <AppPlayFirstOrSecond v-model="gameOptions.firstPlayer" />
                         </div>
 
                         <div class="mb-3">
-                            <AppSwapRule :gameOptions="gameOptions" />
+                            <AppSwapRule v-model="gameOptions.swapRule" />
                         </div>
                     </div>
                     <div class="modal-footer">
