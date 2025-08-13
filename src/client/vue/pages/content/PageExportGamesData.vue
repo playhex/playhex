@@ -146,6 +146,7 @@ const getFilesize = (size: number): string => {
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "time": loser player ran out of time</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "resign": loser player resigned</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "path": winner player won by connecting his sides</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "forfeit": loser may have not been here in time and has been forfeited manually, e.g in a tournament</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"outcome"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"resign"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// whether swap has been allowed</span>
