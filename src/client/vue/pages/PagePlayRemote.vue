@@ -18,11 +18,11 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
-import { Move, PlayerIndex } from '../../../shared/game-engine/index.js';
+import { Game, Move, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { HostedGame, Player } from '../../../shared/app/models/index.js';
 import { fromEngineMove } from '../../../shared/app/models/Move.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
@@ -35,6 +35,8 @@ import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoinin
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { markRaw } from 'vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
+import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
+import GameView from '../../../shared/pixi-board/GameView.js';
 
 const head = injectHead();
 
@@ -270,6 +272,8 @@ const initGameView = async () => {
     if (playerSettings.value !== null) {
         gameView.updateOptionsFromPlayerSettings(playerSettings.value);
     }
+
+    initWinOverlay(gameView, game, hostedGameClient.value.getPlayers());
 
     await gameView.ready();
 
@@ -642,6 +646,25 @@ watch([hostedGameClient, loggedInPlayer], () => {
 });
 
 onUnmounted(() => resetConditionalMoves());
+
+/*
+ * Game end: win popin
+ */
+const unlisteners: (() => void)[] = [];
+const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
+
+const initWinOverlay = (gameView: GameView, game: Game, players: Player[]) => {
+    gameView.on('endedAndWinAnimationOver', () => {
+        gameFinishedOverlay({
+            game,
+            players,
+        });
+    });
+
+    unlisteners.push(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
+};
+
+onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 </script>
 
 <template>

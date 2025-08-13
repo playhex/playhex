@@ -3,8 +3,6 @@
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { BIconCheck, BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconCrosshair, BIconScissors, BIconTrophyFill, BIconX } from '../icons';
-import GameFinishedOverlay from './overlay/GameFinishedOverlay.vue';
-import { defineOverlay } from '@overlastic/vue';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
 import { Player } from '../../../shared/app/models/index.js';
@@ -68,20 +66,6 @@ gameView.on('orientationChanged', updateOrientation);
 onUnmounted(() => {
     gameView.off('orientationChanged', updateOrientation);
 });
-
-/*
- * Game end: win popin
- */
-const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
-
-gameView.on('endedAndWinAnimationOver', () => {
-    gameFinishedOverlay({
-        game,
-        players: players.value as Player[],
-    });
-});
-
-onUnmounted(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
 
 /*
  * Rewind
