@@ -28,7 +28,7 @@ import BIconChevronBarLeft from '~icons/bi/chevron-bar-left';
 import BIconChevronBarRight from '~icons/bi/chevron-bar-right';
 import BIconChevronLeft from '~icons/bi/chevron-left';
 import BIconChevronRight from '~icons/bi/chevron-right';
-import BIconCircle from '~icons/bi/circle';
+import BIconCircle from '~icons/fa/circle-o';
 import BIconCircleFill from '~icons/bi/circle-fill';
 import BIconCircleHalf from '~icons/bi/circle-half';
 import BIconCrosshair from '~icons/bi/crosshair';
