@@ -6,6 +6,8 @@ import AppPseudo from '../AppPseudo.vue';
 import { Tournament, type OnlinePlayer } from '../../../../shared/app/models/index.js';
 import { apiGetActiveTournaments } from '../../../apiClient.js';
 import AppFeaturedTournamentCard from '../../tournaments/components/AppFeaturedTournamentCard.vue';
+import AppConnectionLostPlayOffline from '../AppConnectionLostPlayOffline.vue';
+import { useConnectionLostPlayOfflineStore } from '../../offline-lobby/stores/connectionLostPlayOfflineStore.js';
 
 const {
     players,
@@ -30,10 +32,15 @@ const featuredTournaments = ref<Tournament[]>([]);
         featured: true,
     });
 })();
+
+// Display link "Play offline" when lose connection
+const { shouldDisplayPlayOffline } = storeToRefs(useConnectionLostPlayOfflineStore());
 </script>
 
 <template>
     <div>
+        <AppConnectionLostPlayOffline v-if="shouldDisplayPlayOffline" />
+
         <AppFeaturedTournamentCard
             v-for="tournament in featuredTournaments"
             :key="tournament.publicId"

@@ -252,6 +252,12 @@
         "title": "IA hors-ligne",
         "create": "Jouer hors-ligne contre l'IA"
     },
+    "connection_lost": "Connexion perdue",
+    "play_offline": "Jouer hors-ligne",
+    "new_game_vs_ai": "Nouvelle partie contre l'IA",
+    "continue_game_vs_x": "Continuer la partie contre {{ playerNickname }}",
+    "restart": "Recommencer",
+    "back_to_menu": "Revenir au menu",
     "offline": "Déconnecté",
     "offline_game_explain": "Une partie hors-ligne se déroule uniquement sur votre appareil, vous pouvez donc jouer sans internet. Le serveur PlayHex n'est pas appelé.",
     "cancel": "Annuler",

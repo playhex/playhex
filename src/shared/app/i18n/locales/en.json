@@ -195,6 +195,12 @@
         "create": "Play vs offline AI"
     },
     "offline": "Offline",
+    "connection_lost": "Connection lost",
+    "play_offline": "Play offline",
+    "new_game_vs_ai": "New game vs AI",
+    "continue_game_vs_x": "Continue game vs {{ playerNickname }}",
+    "restart": "Restart",
+    "back_to_menu": "Back to menu",
     "offline_game_explain": "Offline games run on your device only, so that you can play without internet connection. The PlayHex server is not involved.",
     "loading_game": "Loading game…",
     "loading": "Loading…",

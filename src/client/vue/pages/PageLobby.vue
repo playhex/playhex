@@ -1,5 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
+import { storeToRefs } from 'pinia';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { useRouter } from 'vue-router';
 import { defineOverlay } from '@overlastic/vue';
@@ -13,7 +14,7 @@ import AppSidebar from '../components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
-import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch } from '../icons';
+import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch, BIconWifiOff } from '../icons';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
@@ -22,6 +23,7 @@ import { createGameOptionsFromUrlHash } from '../../services/create-game-options
 import { apiPostGame } from '../../apiClient.js';
 import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
+import { useConnectionLostPlayOfflineStore } from '../offline-lobby/stores/connectionLostPlayOfflineStore.js';
 
 useHead({
     title: t('lobby_title'),
@@ -242,26 +244,47 @@ const {
     createGuestJoiningCorrepondenceWarningOverlay,
     isGuestJoiningCorrepondence,
 } = useGuestJoiningCorrespondenceWarning();
+
+// Display link "Play offline" when lose connection
+const { shouldDisplayPlayOffline } = storeToRefs(useConnectionLostPlayOfflineStore());
+
+const btnClassUnlessOffline = (btnClass: string): string => {
+    return shouldDisplayPlayOffline.value
+        ? 'btn-secondary'
+        : btnClass
+    ;
+};
 </script>
 
 <template>
     <div class="container-fluid my-3">
         <div class="row">
             <div class="col-sm-8 col-md-9">
-                <h3>{{ $t('new_game') }}</h3>
+                <div class="d-flex align-items-start">
+                    <h3>{{ $t('new_game') }}</h3>
+
+                    <router-link
+                        v-if="shouldDisplayPlayOffline"
+                        :to="{ name: 'offline-lobby' }"
+                        class="btn btn-sm btn-warning ms-3 d-sm-none"
+                    >
+                        <BIconWifiOff />
+                        {{ $t('play_offline') }}
+                    </router-link>
+                </div>
 
                 <div class="play-buttons row mb-4 g-3">
                     <div class="col">
-                        <button type="button" class="btn w-100 btn-warning" @click="() => create1v1RankedAndJoinGame()"><BIconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1v1RankedAndJoinGame()"><BIconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
                     </div>
                     <div class="col" v-if="allowRankedBotGames">
-                        <button type="button" class="btn w-100 btn-warning" @click="() => create1vAIRankedAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1vAIRankedAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn w-100 btn-success" @click="() => create1v1FriendlyAndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-success')" @click="() => create1v1FriendlyAndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn w-100 btn-primary" @click="() => create1vAIFriendlyAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-primary')" @click="() => create1vAIFriendlyAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
                     </div>
                 </div>
 

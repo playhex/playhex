@@ -52,14 +52,6 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
-        name: 'play-vs-ai',
-        path: '/play-vs-ai',
-        component: () => import('./pages/PagePlayOffline.vue'),
-        meta: {
-            displayFooter: false,
-        },
-    },
-    {
         name: 'games-archive',
         path: '/games-archive',
         component: () => import('./pages/PageGamesArchive.vue'),
@@ -206,6 +198,19 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('./pages/guide/landing/PageLandingZh.vue'),
             },
         ],
+    },
+    {
+        name: 'offline-lobby',
+        path: '/offline-lobby',
+        component: import('./offline-lobby/pages/PageOfflineLobby.vue'),
+    },
+    {
+        name: 'play-vs-offline-ai',
+        path: '/play-vs-ai',
+        component: import('./offline-lobby/pages/PagePlayOffline.vue'),
+        meta: {
+            displayFooter: false,
+        },
     },
     {
         name: 'cijm',

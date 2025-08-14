@@ -77,6 +77,7 @@ import BIconTrash from '~icons/bi/trash';
 import BIconTrophy from '~icons/bi/trophy';
 import BIconTrophyFill from '~icons/bi/trophy-fill';
 import BIconX from '~icons/bi/x';
+import BIconWifiOff from '~icons/bi/wifi-off';
 import BIconXLg from '~icons/bi/x-lg';
 import BIconYoutube from '~icons/bi/youtube';
 import BIconZoomOut from '~icons/bi/zoom-out';
@@ -154,6 +155,7 @@ export {
     BIconTrash,
     BIconTrophy,
     BIconTrophyFill,
+    BIconWifiOff,
     BIconX,
     BIconXLg,
     BIconYoutube,

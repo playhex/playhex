@@ -1,26 +1,45 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
-import { PropType, ref, toRefs } from 'vue';
-import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
-import { BIconCaretDownFill, BIconCaretRight } from '../../icons';
-import AppBoardsize from './create-game/AppBoardsize.vue';
-import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
-import AppSwapRule from './create-game/AppSwapRule.vue';
+import { PropType, reactive, ref } from 'vue';
+import { BIconCaretDownFill, BIconCaretRight, BIconRobot } from '../../icons/index.js';
+import AppBoardsize from '../../components/overlay/create-game/AppBoardsize.vue';
+import AppPlayFirstOrSecond from '../../components/overlay/create-game/AppPlayFirstOrSecond.vue';
+import AppSwapRule from '../../components/overlay/create-game/AppSwapRule.vue';
+import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
+import { LocalAI, localAIs } from '../localAi.js';
 
 const { visible, resolve, reject } = useExtendOverlay();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<HostedGameOptions>,
+        type: Object as PropType<OfflineAIGameOptions>,
         required: true,
     },
 });
 
-const { gameOptions } = toRefs(props);
+const gameOptions = reactive(props.gameOptions);
 
 const showSecondaryOptions = ref(false);
 
-const submitForm = (gameOptions: HostedGameOptions): void => {
+const boardsizeMin = ref<undefined | number>();
+const boardsizeMax = ref<undefined | number>();
+
+const selectLocalAI = (localAI: LocalAI): void => {
+    boardsizeMin.value = localAI.boardsizeMin;
+    boardsizeMax.value = localAI.boardsizeMax;
+
+    if (localAI.boardsizeMax && gameOptions.boardsize < localAI.boardsizeMax) {
+        gameOptions.boardsize = localAI.boardsizeMax;
+    }
+
+    if (localAI.boardsizeMax && gameOptions.boardsize > localAI.boardsizeMax) {
+        gameOptions.boardsize = localAI.boardsizeMax;
+    }
+};
+
+selectLocalAI(localAIs[0]);
+
+const submitForm = (gameOptions: OfflineAIGameOptions): void => {
     resolve(gameOptions);
 };
 </script>
@@ -40,7 +59,31 @@ const submitForm = (gameOptions: HostedGameOptions): void => {
                         </p>
 
                         <div class="mb-3">
-                            <AppBoardsize v-model="gameOptions.boardsize" />
+                            <h6><BIconRobot class="me-1" /> AI engine and level</h6>
+
+                            <div v-for="localAI in localAIs" :key="localAI.name" class="form-check">
+                                <input
+                                    v-model="gameOptions.ai"
+                                    @click="selectLocalAI(localAI)"
+                                    required
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="flexRadioDefault"
+                                    :id="localAI.name"
+                                    :value="localAI.name"
+                                >
+                                <label class="form-check-label" :for="localAI.name">
+                                    {{ localAI.label }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <AppBoardsize
+                                v-model="gameOptions.boardsize"
+                                :boardsizeMin
+                                :boardsizeMax
+                            />
                         </div>
 
                         <button
