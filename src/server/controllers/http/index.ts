@@ -12,7 +12,7 @@ import { preRenderedRouter } from './misc/pre-rendered-router.js';
 
 export const registerHttpControllers = (app: Express): void => {
     app.use(preRenderedRouter());
-    app.use(express.static(path.join(process.cwd(), 'assets')));
+    app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
     registerApi(app);
     app.use(staticsRouter());
     app.use(pwaRouter());
