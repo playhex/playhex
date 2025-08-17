@@ -202,12 +202,12 @@ const routes: RouteRecordRaw[] = [
     {
         name: 'offline-lobby',
         path: '/offline-lobby',
-        component: import('./offline-lobby/pages/PageOfflineLobby.vue'),
+        component: () => import('./offline-lobby/pages/PageOfflineLobby.vue'),
     },
     {
         name: 'play-vs-offline-ai',
         path: '/play-vs-ai',
-        component: import('./offline-lobby/pages/PagePlayOffline.vue'),
+        component: () => import('./offline-lobby/pages/PagePlayOffline.vue'),
         meta: {
             displayFooter: false,
         },
