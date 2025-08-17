@@ -13,7 +13,7 @@ import useAuthStore from '../../stores/authStore.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { useRoute, useRouter } from 'vue-router';
-import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons';
+import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';

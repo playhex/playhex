@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import { IconRobot } from '../../icons';
+import { IconRobot } from '../../icons.js';
 import Create1vOfflineAIOverlay from '../overlay/Create1vOfflineAIOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import { useRouter } from 'vue-router';

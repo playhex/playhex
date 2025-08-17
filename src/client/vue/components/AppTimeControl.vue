@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { IconHourglass } from '../icons';
+import { IconHourglass } from '../icons.js';
 import { BYO_YOMI_PERIODS_MAX, BYO_YOMI_PERIODS_MIN, defaultTimeControlTypes, getInitialTimeStep, getSecondaryTimeStep, initialTimeSteps, isSameTimeControlType, msToDuration, secondaryTimeSteps } from '../../../shared/app/timeControlUtils.js';
 import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { t } from 'i18next';

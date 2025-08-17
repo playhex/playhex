@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
-import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons';
+import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
 import { Player } from '../../../shared/app/models/index.js';

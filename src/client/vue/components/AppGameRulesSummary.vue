@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconCheck, IconExclamationTriangleFill } from '../icons';
+import { IconCheck, IconExclamationTriangleFill } from '../icons.js';
 import HostedGameOptions from '../../../shared/app/models/HostedGameOptions.js';
 import { PropType } from 'vue';
 

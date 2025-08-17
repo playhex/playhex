@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconCaretDownFill, IconCaretUpFill } from '../icons';
+import { IconCaretDownFill, IconCaretUpFill } from '../icons.js';
 
 defineProps({
     n: {

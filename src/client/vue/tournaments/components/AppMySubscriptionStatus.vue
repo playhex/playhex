@@ -3,7 +3,7 @@ import { toRefs } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils';
-import { IconBellCheckFill, IconCheck, IconExclamationTriangleFill } from '../../icons';
+import { IconBellCheckFill, IconCheck, IconExclamationTriangleFill } from '../../icons.js';
 
 /*
  * Shows a text like "You are subscribed" on a tournament,

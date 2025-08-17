@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconThreeDots } from '../../icons';
+import { IconThreeDots } from '../../icons.js';
 
 /*
  * Empty bracket item, used as placeholder,

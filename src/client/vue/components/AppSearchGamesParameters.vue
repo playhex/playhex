@@ -2,7 +2,7 @@
 import { PropType, toRefs, ref } from 'vue';
 import SearchGamesParameters, { gameStates } from '../../../shared/app/SearchGamesParameters.js';
 import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters.js';
-import { IconArrowRight, IconX } from '../icons';
+import { IconArrowRight, IconX } from '../icons.js';
 
 const props = defineProps({
     searchGamesParameters: {

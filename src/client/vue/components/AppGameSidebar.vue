@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit } from '../icons';
+import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';

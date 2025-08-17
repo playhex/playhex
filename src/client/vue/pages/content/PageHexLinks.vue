@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { IconFileEarmarkText, IconDiscord, IconHexagon } from '../../icons';
+import { IconFileEarmarkText, IconDiscord, IconHexagon } from '../../icons.js';
 import { Component as ComponentType } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { IconBell, IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons';
+import { IconBell, IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons.js';
 import { Tournament } from '../../../../shared/app/models';
 import AppMySubscriptionStatus from './AppMySubscriptionStatus.vue';
 import AppCountdown from '../../components/AppCountdown.vue';

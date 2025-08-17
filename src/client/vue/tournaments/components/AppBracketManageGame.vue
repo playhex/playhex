@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, toRefs } from 'vue';
 import { Tournament, TournamentMatch } from '../../../../shared/app/models';
-import { IconCaretDownFill, IconCaretRight } from '../../icons';
+import { IconCaretDownFill, IconCaretRight } from '../../icons.js';
 import { apiPostForfeitTournamentMatchPlayer, apiPostResetAndRecreateGame } from '../../../apiClient';
 
 const props = defineProps({

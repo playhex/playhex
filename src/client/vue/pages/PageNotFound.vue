@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconSignTurnLeft } from '../icons';
+import { IconSignTurnLeft } from '../icons.js';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({

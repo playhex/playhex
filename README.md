@@ -87,7 +87,7 @@ thanks to [Weblate](https://weblate.org).
 
 - https://icones.js.org/
 - Then copy "Components > Unplugin Icons"
-- Add it to `src/client/vue/icons/index.ts`
+- Add it to `src/client/vue/icons.ts`
 - Then use it in templates
 
 ## Admin endpoints

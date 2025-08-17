@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, reactive, ref } from 'vue';
-import { IconCaretDownFill, IconCaretRight, IconRobot } from '../../icons/index.js';
+import { IconCaretDownFill, IconCaretRight, IconRobot } from '../../icons.js';
 import AppBoardsize from '../../components/overlay/create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from '../../components/overlay/create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from '../../components/overlay/create-game/AppSwapRule.vue';

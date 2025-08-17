@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill } from '../../icons';
+import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill } from '../../icons.js';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
 import { Ref, ref, useTemplateRef, watch } from 'vue';

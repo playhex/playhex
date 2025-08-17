@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue';
-import { IconYoutube } from '../../icons';
+import { IconYoutube } from '../../icons.js';
 import { autoLocale } from '../../../../shared/app/i18n';
 
 useHead({

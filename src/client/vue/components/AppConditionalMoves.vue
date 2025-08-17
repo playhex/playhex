@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconCheck, IconScissors, IconTrash } from '../icons';
+import { IconCheck, IconScissors, IconTrash } from '../icons.js';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';

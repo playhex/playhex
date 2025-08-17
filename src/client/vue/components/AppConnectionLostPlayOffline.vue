@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconWifiOff } from '../icons';
+import { IconWifiOff } from '../icons.js';
 </script>
 
 <template>

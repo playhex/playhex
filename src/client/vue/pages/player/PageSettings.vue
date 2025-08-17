@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill } from '../../icons';
+import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill } from '../../icons.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';

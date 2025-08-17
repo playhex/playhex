@@ -3,7 +3,7 @@ import { PropType, ref, watchEffect } from 'vue';
 import { Chart, Tooltip, Legend, LinearScale, Colors, ChartOptions, ChartData, TimeScale, PointElement, LineElement } from 'chart.js';
 import { Line } from 'vue-chartjs';
 import '../../services/chartJsDateFnsAdapter.js';
-import { IconZoomOut } from '../icons';
+import { IconZoomOut } from '../icons.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { Player } from '../../../shared/app/models/index.js';
 import { apiGetPlayerRatingHistory } from '../../apiClient.js';

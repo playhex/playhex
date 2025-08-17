@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { PropType, Ref, ref, toRefs } from 'vue';
-import { IconAspectRatio } from '../../../icons';
+import { IconAspectRatio } from '../../../icons.js';
 import { MIN_BOARDSIZE, MAX_BOARDSIZE } from '../../../../../shared/app/models/HostedGameOptions.js';
 
 const boardsize = defineModel<number>({

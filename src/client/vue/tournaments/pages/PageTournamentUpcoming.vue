@@ -10,7 +10,7 @@ import { t } from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentFormatImage from '../components/AppTournamentFormatImage.vue';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
-import { IconBell, IconCalendarEvent, IconExclamationTriangleFill, IconPeopleFill, IconTrophyFill } from '../../icons';
+import { IconBell, IconCalendarEvent, IconExclamationTriangleFill, IconPeopleFill, IconTrophyFill } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';

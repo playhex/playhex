@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../icons';
+import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../icons.js';
 import { ref } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient';

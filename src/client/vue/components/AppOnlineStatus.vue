@@ -2,7 +2,7 @@
 import Player from '../../../shared/app/models/Player.js';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import { PropType } from 'vue';
-import { IconMoonFill, IconCircleFill, IconRobot, IconCircle } from '../icons';
+import { IconMoonFill, IconCircleFill, IconRobot, IconCircle } from '../icons.js';
 
 const props = defineProps({
     player: {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconBookmarks, IconChatDots, IconGithub, IconDiscord } from '../../icons';
+import { IconBookmarks, IconChatDots, IconGithub, IconDiscord } from '../../icons.js';
 import { ref } from 'vue';
 import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';
