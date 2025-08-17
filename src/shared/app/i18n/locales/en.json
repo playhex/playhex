@@ -247,12 +247,12 @@
     "tournament_organized_by": "Organized by { player }",
     "checkin_opens_time_before": "Check-in opens {{ time }} before.",
     "tournament_subscribe": "I am interested!",
+    "tournament_unsubscribe": "I am no longer interested.",
     "tournament_checkin": "Check-in",
     "tournament_checkedin": "Checked-in",
     "no_player_checked_in_yet": "No player checked-in yet.",
     "not_yet_checked_in": "Not yet checked-in",
     "every_subscribers_checked_in": "Every interested person has checked in.",
-    "no_subscriptions_yet": "No one is interested yet.",
     "tournament_description": "Description",
     "tournament_requires_account": "This tournament requires an account in to participate.",
     "tournament_ordinal": {

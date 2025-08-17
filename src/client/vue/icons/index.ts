@@ -13,7 +13,8 @@ import IconArrowCounterclockwise from '~icons/bi/arrow-counterclockwise';
 import IconArrowDownUp from '~icons/bi/arrow-down-up';
 import IconArrowRight from '~icons/bi/arrow-right';
 import IconAspectRatio from '~icons/bi/aspect-ratio';
-import IconBell from '~icons/bi/bell';
+import IconBell from '~icons/mdi/bell-outline';
+import IconBellCheckFill from '~icons/mdi/bell-check';
 import IconBookmarks from '~icons/bi/bookmarks';
 import IconBoxArrowRight from '~icons/bi/box-arrow-right';
 import IconBrightnessHighFill from '~icons/bi/brightness-high-fill';
@@ -93,6 +94,7 @@ export {
     IconArrowRight,
     IconAspectRatio,
     IconBell,
+    IconBellCheckFill,
     IconBookmarks,
     IconBoxArrowRight,
     IconBrightnessHighFill,

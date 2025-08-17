@@ -10,7 +10,7 @@ import { t } from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentFormatImage from '../components/AppTournamentFormatImage.vue';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
-import { IconBell, IconCalendarEvent, IconCheck, IconExclamationTriangleFill, IconPeopleFill, IconTrophyFill } from '../../icons';
+import { IconBell, IconCalendarEvent, IconExclamationTriangleFill, IconPeopleFill, IconTrophyFill } from '../../icons';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
@@ -33,7 +33,6 @@ const { loggedInPlayer } = storeToRefs(useAuthStore());
 const {
     currentTournamentSubscription,
     subscribeCheckIn,
-    unsub,
 } = useTournamentCurrentSubscription(tournament);
 
 const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: true });
@@ -157,7 +156,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                 <button
                                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
                                     @click="subscribeCheckIn"
-                                    class="btn btn-success"
+                                    class="btn btn-outline-info"
                                 ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                                 <button
@@ -165,17 +164,10 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     @click="subscribeCheckIn"
                                     class="btn btn-success me-3"
                                 >{{ $t('tournament_checkin') }}</button>
-
-                                <!-- do not display if "Check-in" is displayed to prevent 2 buttons -->
-                                <button
-                                    v-else-if="null !== currentTournamentSubscription"
-                                    @click="unsub"
-                                    class="btn btn-outline-success"
-                                ><IconCheck /> {{ $t('tournament_subscribe') }}</button>
                             </p>
 
                             <!-- Current player status on this tournament -->
-                            <p><AppMySubscriptionStatus :tournament full /></p>
+                            <p class="card-text"><AppMySubscriptionStatus :tournament full /></p>
 
                             <p v-if="tournament.accountRequired && (loggedInPlayer?.isGuest ?? true)">
                                 <IconExclamationTriangleFill class="text-warning me-1" />
@@ -220,7 +212,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                             </template>
 
                             <template v-else>
-                                <ul class="list-inline mt-3 card-text">
+                                <ul v-if="tournament.subscriptions.length > 0" class="list-inline mt-3 card-text">
                                     <li
                                         v-for="subscription in tournament.subscriptions"
                                         :key="subscription.player.publicId"
@@ -229,8 +221,6 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                         <AppPseudo :player="subscription.player" onlineStatus rating />
                                     </li>
                                 </ul>
-
-                                <p v-if="0 === tournament.subscriptions.length" class="card-text"><i>{{ $t('no_subscriptions_yet') }}</i></p>
                             </template>
                         </div>
                     </div>

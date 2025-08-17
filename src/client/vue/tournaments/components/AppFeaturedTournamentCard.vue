@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons';
+import { IconBell, IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons';
 import { Tournament } from '../../../../shared/app/models';
 import AppMySubscriptionStatus from './AppMySubscriptionStatus.vue';
 import AppCountdown from '../../components/AppCountdown.vue';
@@ -41,8 +41,8 @@ const {
                 <button
                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
                     @click="subscribeCheckIn"
-                    class="btn btn-success"
-                >{{ $t('tournament_subscribe') }}</button>
+                    class="btn btn-outline-info"
+                ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                 <button
                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"

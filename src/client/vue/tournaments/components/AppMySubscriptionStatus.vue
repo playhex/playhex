@@ -3,7 +3,7 @@ import { toRefs } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils';
-import { IconBell, IconCheck, IconExclamationTriangleFill } from '../../icons';
+import { IconBellCheckFill, IconCheck, IconExclamationTriangleFill } from '../../icons';
 
 /*
  * Shows a text like "You are subscribed" on a tournament,
@@ -31,7 +31,7 @@ const props = defineProps({
 });
 
 const { tournament } = toRefs(props);
-const { currentTournamentSubscription } = useTournamentCurrentSubscription(tournament);
+const { currentTournamentSubscription, unsub } = useTournamentCurrentSubscription(tournament);
 </script>
 
 <template>
@@ -39,7 +39,8 @@ const { currentTournamentSubscription } = useTournamentCurrentSubscription(tourn
 
         <!-- before check in period -->
         <template v-if="!isCheckInOpen(tournament)">
-            <span class="text-info"><IconBell /> {{ $t('tournament_subscription.subscribed') }}</span>
+            <span class="text-info"><IconBellCheckFill /> {{ $t('tournament_subscription.subscribed') }}</span>
+            <small v-if="full" class="ms-3"><a href="#" @click.prevent="unsub" class="link-secondary">{{ $t('tournament_unsubscribe') }}</a></small>
         </template>
 
         <!-- check in period open -->

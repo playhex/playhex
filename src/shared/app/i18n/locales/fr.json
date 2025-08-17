@@ -92,12 +92,12 @@
     "tournament_organized_by": "Organisé par { player }",
     "checkin_opens_time_before": "L'enregistrement ouvre {{ time }} avant.",
     "tournament_subscribe": "Je suis intéressé !",
+    "tournament_unsubscribe": "Je ne suis plus intéressé.",
     "tournament_checkin": "Enregistrement",
     "tournament_checkedin": "Enregistré",
     "no_player_checked_in_yet": "Aucun joueur encore enregistré.",
     "not_yet_checked_in": "Pas encore enregistré",
     "every_subscribers_checked_in": "Toute personne intéressée a vérifié.",
-    "no_subscriptions_yet": "Personne n'est intéressé pour l'instant.",
     "tournament_description": "Description",
     "tournament_requires_account": "Ce tournoi nécessite un compte pour participer.",
     "tournament_ordinal": {
