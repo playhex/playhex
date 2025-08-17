@@ -45,7 +45,10 @@ const { currentTournamentSubscription, unsub } = useTournamentCurrentSubscriptio
 
         <!-- check in period open -->
         <template v-else>
-            <span v-if="currentTournamentSubscription.checkedIn" class="text-success"><IconCheck /> {{ $t('tournament_subscription.checked_in') }}</span>
+            <template v-if="currentTournamentSubscription.checkedIn">
+                <span class="text-success"><IconCheck /> {{ $t('tournament_subscription.checked_in') }}</span>
+                <small v-if="full" class="ms-3"><a href="#" @click.prevent="unsub" class="link-secondary">{{ $t('tournament_unsubscribe') }}</a></small>
+            </template>
             <span v-else class="text-warning"><IconExclamationTriangleFill /> {{ $t('tournament_subscription.must_check_in') }}</span>
         </template>
 
