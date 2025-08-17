@@ -149,7 +149,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                 {{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}
                             </p>
                             <p v-else class="card-text">
-                                {{ $t('n_people_are_interested', { count: tournament.subscriptions.filter(subscription => subscription.checkedIn).length }) }}
+                                {{ $t('n_participants', { count: tournament.subscriptions.filter(subscription => subscription.checkedIn).length }) }}
                             </p>
 
                             <!-- subscribe / ckeck-in / unsubscribe -->
