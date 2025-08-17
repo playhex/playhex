@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconCheck, BIconExclamationTriangleFill } from '../icons';
+import { IconCheck, IconExclamationTriangleFill } from '../icons';
 import HostedGameOptions from '../../../shared/app/models/HostedGameOptions.js';
 import { PropType } from 'vue';
 
@@ -26,12 +26,12 @@ let isDefaultRules = swapRule && firstPlayer === null;
 
 <template>
     <span class="game-rules" v-if="isDefaultRules">
-        <BIconCheck v-if="showIcon" class="text-success" />
+        <IconCheck v-if="showIcon" class="text-success" />
         <span>{{ $t('game_rules.normal') }}</span>
     </span>
 
     <span class="game-rules" v-else>
-        <BIconExclamationTriangleFill v-if="showIcon" class="text-warning" />
+        <IconExclamationTriangleFill v-if="showIcon" class="text-warning" />
         <span v-if="!swapRule"> {{ ' ' + $t('game_rules.no_swap') }}</span>
         <span v-if="0 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_first') }}</span>
         <span v-if="1 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_second') }}</span>

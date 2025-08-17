@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { timeControlToCadencyName, timeControlToString } from '../../../shared/app/timeControlUtils.js';
 import { PropType } from 'vue';
-import { BIconLightningChargeFill, BIconAlarmFill, BIconCalendar } from '../icons';
+import { IconLightningChargeFill, IconAlarmFill, IconCalendar } from '../icons';
 import { calcAverageSecondsPerMove } from '../../../shared/app/timeControlUtils.js';
 import { msToDuration } from '../../../shared/app/timeControlUtils.js';
 import { TimeControlBoardsize } from '../../../shared/app/models/TimeControlBoardsize.js';
@@ -40,9 +40,9 @@ const cadency = timeControlToCadencyName(props.timeControlBoardsize);
 <template>
     <span>
         <span v-if="showIcon" class="d-none d-sm-inline">
-            <BIconLightningChargeFill v-if="cadency === 'blitz'" />
-            <BIconAlarmFill v-else-if="cadency === 'normal'" />
-            <BIconCalendar v-else-if="cadency === 'correspondence'" />
+            <IconLightningChargeFill v-if="cadency === 'blitz'" />
+            <IconAlarmFill v-else-if="cadency === 'normal'" />
+            <IconCalendar v-else-if="cadency === 'correspondence'" />
             <span>&nbsp;</span>
         </span>
 

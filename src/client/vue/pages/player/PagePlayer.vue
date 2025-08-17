@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { BIconPerson, BIconPersonUp, BIconBoxArrowRight, BIconGear, BIconTrophyFill } from '../../icons';
+import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill } from '../../icons';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
 import { Ref, ref, useTemplateRef, watch } from 'vue';
@@ -339,7 +339,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
     <div v-if="!playerNotFound" class="container-fluid my-3">
         <div class="d-flex mb-4">
             <div class="avatar-wrapper">
-                <BIconPerson class="icon img-thumbnail" />
+                <IconPerson class="icon img-thumbnail" />
                 <AppOnlineStatus v-if="player" :player class="player-status" />
             </div>
             <div>
@@ -363,7 +363,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <router-link
                             :to="{ name: 'signup' }"
                             class="btn btn-success"
-                        ><BIconPersonUp /> {{ $t('create_account') }}</router-link>
+                        ><IconPersonUp /> {{ $t('create_account') }}</router-link>
 
                         <router-link
                             :to="{ name: 'login' }"
@@ -376,13 +376,13 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                             type="button"
                             class="btn btn-sm btn-outline-warning"
                             @click="clickLogout()"
-                        >{{ $t('log_out') }} <BIconBoxArrowRight /></button>
+                        >{{ $t('log_out') }} <IconBoxArrowRight /></button>
                     </template>
 
                     <router-link
                         :to="{ name: 'settings' }"
                         class="btn btn-sm btn-outline-primary"
-                    ><BIconGear /> {{ $t('player_settings.title') }}</router-link>
+                    ><IconGear /> {{ $t('player_settings.title') }}</router-link>
                 </div>
             </div>
         </div>
@@ -468,7 +468,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                             >{{ $t('game.watch') }}</router-link>
                         </td>
                         <td>
-                            <span v-if="game.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                            <span v-if="game.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
                         <td><AppPseudo rating onlineStatus :player="getOtherPlayer(game, player)!" /></td>
                         <td>{{ game.gameOptions.boardsize }}</td>
@@ -521,7 +521,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                             >{{ $t('game.review') }}</router-link>
                         </td>
                         <td>
-                            <span v-if="game.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                            <span v-if="game.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
 
                         <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>

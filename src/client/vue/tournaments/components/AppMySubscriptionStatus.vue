@@ -3,7 +3,7 @@ import { toRefs } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils';
-import { BIconBell, BIconCheck, BIconExclamationTriangleFill } from '../../icons';
+import { IconBell, IconCheck, IconExclamationTriangleFill } from '../../icons';
 
 /*
  * Shows a text like "You are subscribed" on a tournament,
@@ -39,13 +39,13 @@ const { currentTournamentSubscription } = useTournamentCurrentSubscription(tourn
 
         <!-- before check in period -->
         <template v-if="!isCheckInOpen(tournament)">
-            <span class="text-info"><BIconBell /> {{ $t('tournament_subscription.subscribed') }}</span>
+            <span class="text-info"><IconBell /> {{ $t('tournament_subscription.subscribed') }}</span>
         </template>
 
         <!-- check in period open -->
         <template v-else>
-            <span v-if="currentTournamentSubscription.checkedIn" class="text-success"><BIconCheck /> {{ $t('tournament_subscription.checked_in') }}</span>
-            <span v-else class="text-warning"><BIconExclamationTriangleFill /> {{ $t('tournament_subscription.must_check_in') }}</span>
+            <span v-if="currentTournamentSubscription.checkedIn" class="text-success"><IconCheck /> {{ $t('tournament_subscription.checked_in') }}</span>
+            <span v-else class="text-warning"><IconExclamationTriangleFill /> {{ $t('tournament_subscription.must_check_in') }}</span>
         </template>
 
     </template>

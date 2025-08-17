@@ -14,7 +14,7 @@ import AppSidebar from '../components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
-import { BIconEye, BIconTrophy, BIconPeople, BIconRobot, BIconTrophyFill, BIconSearch, BIconWifiOff } from '../icons';
+import { IconEye, IconTrophy, IconPeople, IconRobot, IconTrophyFill, IconSearch, IconWifiOff } from '../icons';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
@@ -268,23 +268,23 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                         :to="{ name: 'offline-lobby' }"
                         class="btn btn-sm btn-warning ms-3 d-sm-none"
                     >
-                        <BIconWifiOff />
+                        <IconWifiOff />
                         {{ $t('play_offline') }}
                     </router-link>
                 </div>
 
                 <div class="play-buttons row mb-4 g-3">
                     <div class="col">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1v1RankedAndJoinGame()"><BIconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1v1RankedAndJoinGame()"><IconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
                     </div>
                     <div class="col" v-if="allowRankedBotGames">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1vAIRankedAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1vAIRankedAndJoinGame()"><IconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-success')" @click="() => create1v1FriendlyAndJoinGame()"><BIconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-success')" @click="() => create1v1FriendlyAndJoinGame()"><IconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-primary')" @click="() => create1vAIFriendlyAndJoinGame()"><BIconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
+                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-primary')" @click="() => create1vAIFriendlyAndJoinGame()"><IconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
                     </div>
                 </div>
 
@@ -324,7 +324,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.watch') }}</router-link>
                                 </td>
-                                <td><span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
+                                <td><span v-if="hostedGame.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
                                 <td>
                                     <AppPseudo v-if="hostedGame.host" onlineStatus rating :player="hostedGame.host" />
                                     <i v-else>System</i>
@@ -341,7 +341,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                 </div>
                 <p v-else>{{ $t('lobby.no_waiting_games') }}</p>
 
-                <h4><BIconEye /> {{ $t('lobby.watch_current_games') }}</h4>
+                <h4><IconEye /> {{ $t('lobby.watch_current_games') }}</h4>
 
                 <!--
                     Currently playing games
@@ -370,7 +370,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.watch') }}</router-link>
 
-                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
                                 <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 0)!" /></td>
                                 <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" /></td>
@@ -390,7 +390,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                 </div>
                 <p v-else>{{ $t('lobby.no_playing_games') }}</p>
 
-                <h4><BIconTrophy /> {{ $t('finished_games') }}</h4>
+                <h4><IconTrophy /> {{ $t('finished_games') }}</h4>
 
                 <!--
                     Finished games
@@ -418,7 +418,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.review') }}</router-link>
 
-                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><BIconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
                                 <template v-if="hostedGame?.gameData?.winner != null">
                                     <td><AppPseudo rating onlineStatus :player="getStrictWinnerPlayer(hostedGame)" is="strong" /></td>
@@ -437,7 +437,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                         </tbody>
                     </table>
                     <router-link class="btn btn-link text-decoration-none" :to="{ name: 'games-archive' }">
-                        <BIconSearch /> {{ $t('browse_all_ended_games') }}
+                        <IconSearch /> {{ $t('browse_all_ended_games') }}
                     </router-link>
                 </div>
             </div>

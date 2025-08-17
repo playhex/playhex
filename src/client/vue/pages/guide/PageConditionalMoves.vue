@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
 import AppGuideImage from './AppGuideImage.vue';
-import { BIconChevronLeft, BIconCrosshair, BIconScissors, BIconSignpostSplit, BIconX } from '../../icons';
+import { IconChevronLeft, IconCrosshair, IconScissors, IconSignpostSplit, IconX } from '../../icons';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
 import AppConditionalMoveTree from '../../components/AppConditionalMoveTree.vue';
 
@@ -27,7 +27,7 @@ useSeoMeta({
 
     <ul>
         <li>either open the "{{ $t('conditional_moves.title_short') }}" tab in game sidebar,</li>
-        <li>or use the <button class="btn btn-outline-primary"><BIconSignpostSplit /></button> button under the game board.</li>
+        <li>or use the <button class="btn btn-outline-primary"><IconSignpostSplit /></button> button under the game board.</li>
     </ul>
 
     <p>
@@ -48,7 +48,7 @@ useSeoMeta({
 
     <p>
         To add a new line, go back to current position with either
-        <button class="btn btn-outline-primary"><BIconCrosshair /></button>,
+        <button class="btn btn-outline-primary"><IconCrosshair /></button>,
         or:
         <AppConditionalMoveButton
             label="+"
@@ -160,27 +160,27 @@ useSeoMeta({
     <h2>Other editing tools</h2>
 
     <p>
-        <button class="btn btn-outline-primary"><BIconSignpostSplit /></button>
+        <button class="btn btn-outline-primary"><IconSignpostSplit /></button>
         Start conditional moves editing.
     </p>
 
     <p>
-        <button class="btn btn-outline-primary"><BIconCrosshair /></button>
+        <button class="btn btn-outline-primary"><IconCrosshair /></button>
         Go back to current position, to add a new line from current position, same as "+" in sidebar.
     </p>
 
     <p>
-        <button class="btn btn-outline-primary"><BIconChevronLeft /></button>
+        <button class="btn btn-outline-primary"><IconChevronLeft /></button>
         Rewind one move in conditional moves, to add a variant or replace an response.
     </p>
 
     <p>
-        <button class="btn btn-outline-danger"><BIconScissors /></button>
+        <button class="btn btn-outline-danger"><IconScissors /></button>
         Remove current move, and all subsequent moves/responses/lines.
     </p>
 
     <p>
-        <button class="btn btn-outline-warning"><BIconX /></button>
+        <button class="btn btn-outline-warning"><IconX /></button>
         Discard changes and stop conditional move editing.
     </p>
 

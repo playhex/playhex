@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, toRefs } from 'vue';
 import { Tournament, TournamentMatch } from '../../../../shared/app/models';
-import { BIconCaretDownFill, BIconCaretRight } from '../../icons';
+import { IconCaretDownFill, IconCaretRight } from '../../icons';
 import { apiPostForfeitTournamentMatchPlayer, apiPostResetAndRecreateGame } from '../../../apiClient';
 
 const props = defineProps({
@@ -26,8 +26,8 @@ const showManage = ref(false);
             @click="showManage = !showManage"
             class="btn btn-outline-primary btn-sm manage-button"
         >
-            <BIconCaretDownFill v-if="showManage" />
-            <BIconCaretRight v-else />
+            <IconCaretDownFill v-if="showManage" />
+            <IconCaretRight v-else />
             Manage
         </button>
 

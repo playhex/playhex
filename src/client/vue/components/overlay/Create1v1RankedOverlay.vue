@@ -5,7 +5,7 @@ import { HostedGameOptions } from '../../../../shared/app/models/index.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
-import { BIconTrophy } from '../../icons';
+import { IconTrophy } from '../../icons';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 
 const { visible, resolve, reject } = useExtendOverlay();
@@ -44,7 +44,7 @@ watch<TimeControlType>(timeControl, t => gameOptions.timeControl = t);
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="reject()">{{ $t('cancel') }}</button>
-                        <button type="submit" class="btn btn-warning"><BIconTrophy /> {{ $t('1v1_ranked.create') }}</button>
+                        <button type="submit" class="btn btn-warning"><IconTrophy /> {{ $t('1v1_ranked.create') }}</button>
                     </div>
                 </form>
             </div>

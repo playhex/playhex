@@ -10,7 +10,7 @@ import { t } from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentFormatImage from '../components/AppTournamentFormatImage.vue';
 import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
-import { BIconBell, BIconCalendarEvent, BIconCheck, BIconExclamationTriangleFill, BIconPeopleFill, BIconTrophyFill } from '../../icons';
+import { IconBell, IconCalendarEvent, IconCheck, IconExclamationTriangleFill, IconPeopleFill, IconTrophyFill } from '../../icons';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
@@ -74,7 +74,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <BIconCalendarEvent class="me-1" />
+                                <IconCalendarEvent class="me-1" />
                                 <AppTournamentStartsAt :tournament class="ms-2" />
                             </h5>
                             <p class="text-secondary">
@@ -122,10 +122,10 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     >{{ $t('consolation_disabled') }}</h6>
 
                                     <p v-if="tournament.ranked" class="text-warning m-0">
-                                        <BIconTrophyFill /> {{ $t('ranked') }}
+                                        <IconTrophyFill /> {{ $t('ranked') }}
                                     </p>
                                     <p v-else class="text-success m-0">
-                                        <BIconPeopleFill /> {{ $t('friendly') }}
+                                        <IconPeopleFill /> {{ $t('friendly') }}
                                     </p>
 
                                     <p class="card-text">
@@ -144,7 +144,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                 <div class="col-12">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title"><BIconPeopleFill class="me-1" /> {{ $t('participants') }}</h5>
+                            <h5 class="card-title"><IconPeopleFill class="me-1" /> {{ $t('participants') }}</h5>
                             <p v-if="!isCheckInOpen(tournament)" class="card-text">
                                 {{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}
                             </p>
@@ -158,7 +158,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
                                     @click="subscribeCheckIn"
                                     class="btn btn-success"
-                                ><BIconBell /> {{ $t('tournament_subscribe') }}</button>
+                                ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                                 <button
                                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
@@ -171,14 +171,14 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     v-else-if="null !== currentTournamentSubscription"
                                     @click="unsub"
                                     class="btn btn-outline-success"
-                                ><BIconCheck /> {{ $t('tournament_subscribe') }}</button>
+                                ><IconCheck /> {{ $t('tournament_subscribe') }}</button>
                             </p>
 
                             <!-- Current player status on this tournament -->
                             <p><AppMySubscriptionStatus :tournament full /></p>
 
                             <p v-if="tournament.accountRequired && (loggedInPlayer?.isGuest ?? true)">
-                                <BIconExclamationTriangleFill class="text-warning me-1" />
+                                <IconExclamationTriangleFill class="text-warning me-1" />
                                 <small>{{ $t('tournament_requires_account') }}</small>
                             </p>
 

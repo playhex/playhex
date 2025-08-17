@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, reactive, ref } from 'vue';
-import { BIconCaretDownFill, BIconCaretRight, BIconRobot } from '../../icons/index.js';
+import { IconCaretDownFill, IconCaretRight, IconRobot } from '../../icons/index.js';
 import AppBoardsize from '../../components/overlay/create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from '../../components/overlay/create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from '../../components/overlay/create-game/AppSwapRule.vue';
@@ -59,7 +59,7 @@ const submitForm = (gameOptions: OfflineAIGameOptions): void => {
                         </p>
 
                         <div class="mb-3">
-                            <h6><BIconRobot class="me-1" /> AI engine and level</h6>
+                            <h6><IconRobot class="me-1" /> AI engine and level</h6>
 
                             <div v-for="localAI in localAIs" :key="localAI.name" class="form-check">
                                 <input
@@ -91,13 +91,13 @@ const submitForm = (gameOptions: OfflineAIGameOptions): void => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
+                        ><IconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> {{ $t('create_game.more_options') }}</button>
+                        ><IconCaretRight /> {{ $t('create_game.more_options') }}</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">

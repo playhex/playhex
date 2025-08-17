@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconPeopleFill, BIconPlus, BIconRecordFill, BIconTrophyFill } from '../../icons';
+import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../icons';
 import { ref } from 'vue';
 import { Tournament } from '../../../../shared/app/models';
 import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient';
@@ -54,7 +54,7 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
 
             <div>
                 <router-link :to="{ name: 'tournaments-create' }" class="btn btn-sm btn-outline-success float-end">
-                    <BIconPlus />
+                    <IconPlus />
                     {{ $t('create_tournament') }}
                 </router-link>
             </div>
@@ -85,11 +85,11 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
                         <div class="card-body">
                             <h3 class="card-title">{{ tournament.title }}</h3>
                             <p class="card-text">
-                                <BIconPeopleFill />
+                                <IconPeopleFill />
                                 {{ $t('n_participants', { count: tournament.participants.length }) }}
                             </p>
                             <p class="card-text lead">
-                                <BIconRecordFill class="text-danger" />
+                                <IconRecordFill class="text-danger" />
                                 {{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}
                             </p>
                             <p class="card-text">
@@ -167,7 +167,7 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
                                 <small>{{ $t('n_participants', { count: tournament.participants.length }) }}</small>
                             </p>
 
-                            <BIconTrophyFill class="text-warning bg-icon" />
+                            <IconTrophyFill class="text-warning bg-icon" />
                             <p class="m-0"><small>{{ $t('tournament_ordinal.1') }}</small></p>
                             <p class="lead">{{ tournament.participants.find(p => 1 === p.rank)?.player.pseudo }}</p>
 

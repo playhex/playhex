@@ -2,7 +2,7 @@
 import { PropType, toRefs, ref } from 'vue';
 import SearchGamesParameters, { gameStates } from '../../../shared/app/SearchGamesParameters.js';
 import SearchPlayersParameters from '../../../shared/app/SearchPlayersParameters.js';
-import { BIconArrowRight, BIconX } from '../icons';
+import { IconArrowRight, IconX } from '../icons';
 
 const props = defineProps({
     searchGamesParameters: {
@@ -72,14 +72,14 @@ searchPlayersParameters.value.isGuest = false;
                     :value="searchGamesParameters.fromEndedAt?.toISOString().slice(0,10) ?? ''"
                     @input="searchGamesParameters.fromEndedAt = new Date(($event.target as HTMLInputElement).value)"
                 />
-                <span class="input-group-text"><BIconArrowRight /></span>
+                <span class="input-group-text"><IconArrowRight /></span>
                 <input
                     type="date"
                     class="form-control"
                     :value="searchGamesParameters.toEndedAt?.toISOString().slice(0,10) ?? ''"
                     @input="searchGamesParameters.toEndedAt = new Date(($event.target as HTMLInputElement).value)"
                 />
-                <button class="btn btn-sm btn-outline-danger" @click="resetDateRange"><BIconX /></button>
+                <button class="btn btn-sm btn-outline-danger" @click="resetDateRange"><IconX /></button>
             </div>
 
             <div class="form-check">

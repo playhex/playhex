@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconCaretDownFill, BIconCaretUpFill } from '../icons';
+import { IconCaretDownFill, IconCaretUpFill } from '../icons';
 
 defineProps({
     n: {
@@ -27,9 +27,9 @@ const { round, abs } = Math;
         -
     </span>
     <span v-else-if="n > 0" :class="{ 'text-success': colors }">
-        <small><BIconCaretUpFill /></small> {{ round(n * (10 ** precision)) / (10 ** precision) }}
+        <small><IconCaretUpFill /></small> {{ round(n * (10 ** precision)) / (10 ** precision) }}
     </span>
     <span v-else :class="{ 'text-danger': colors }">
-        <small><BIconCaretDownFill /></small> {{ abs(round(n * (10 ** precision)) / (10 ** precision)) }}
+        <small><IconCaretDownFill /></small> {{ abs(round(n * (10 ** precision)) / (10 ** precision)) }}
     </span>
 </template>

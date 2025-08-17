@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { BIconHourglass } from '../icons';
+import { IconHourglass } from '../icons';
 import { BYO_YOMI_PERIODS_MAX, BYO_YOMI_PERIODS_MIN, defaultTimeControlTypes, getInitialTimeStep, getSecondaryTimeStep, initialTimeSteps, isSameTimeControlType, msToDuration, secondaryTimeSteps } from '../../../shared/app/timeControlUtils.js';
 import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { t } from 'i18next';
@@ -119,7 +119,7 @@ watch(capped, isCapped => {
 </script>
 
 <template>
-    <h6><BIconHourglass class="me-1" /> {{ $t('game.time_control') }}</h6>
+    <h6><IconHourglass class="me-1" /> {{ $t('game.time_control') }}</h6>
 
     <button
         v-for="{ timeControl, label } in suggestedTimeControls" :key="label"

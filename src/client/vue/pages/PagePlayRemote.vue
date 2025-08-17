@@ -13,7 +13,7 @@ import useAuthStore from '../../stores/authStore.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { useRoute, useRouter } from 'vue-router';
-import { BIconFlag, BIconXLg, BIconCheck, BIconArrowBarLeft, BIconRepeat, BIconArrowCounterclockwise, BIconX, BIconRewind, BIconList, BIconArrowDownUp, BIconSignpostSplit } from '../icons';
+import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
@@ -698,48 +698,48 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 
                     <!-- rewind mode -->
                     <button type="button" v-if="null !== gameView" @click="() => enableRewindMode()" class="btn btn-outline-primary">
-                        <BIconRewind />
+                        <IconRewind />
                     </button>
 
                     <!-- Conditional moves -->
                     <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="conditionalMovesEditor?.enableSimulationMode()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
-                        <BIconSignpostSplit />
+                        <IconSignpostSplit />
                     </button>
 
                     <!-- Resign -->
                     <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">
-                        <BIconFlag />
+                        <IconFlag />
                         <span class="hide-sm">{{ ' ' + $t('resign') }}</span>
                     </button>
 
                     <!-- Cancel -->
                     <button type="button" class="btn btn-outline-warning" v-if="canCancel()" @click="cancel()">
-                        <BIconXLg />
+                        <IconXLg />
                         <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
                     </button>
 
                     <!-- Confirm move -->
                     <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()">
-                        <BIconCheck />
+                        <IconCheck />
                         <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
                         <span class="hide-sm">{{ ' ' + $t('confirm_move.button_label') }}</span>
                     </button>
 
                     <!-- Undo accept -->
                     <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(true)">
-                        <BIconCheck />
+                        <IconCheck />
                         <span class="hide-sm">{{ $t('undo.accept') }}</span>
                     </button>
 
                     <!-- Undo reject -->
                     <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(false)">
-                        <BIconX />
+                        <IconX />
                         <span class="hide-sm">{{ $t('undo.reject') }}</span>
                     </button>
 
                     <!-- Rematch -->
                     <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
-                        <BIconRepeat />
+                        <IconRepeat />
                         <span class="hide-sm">{{ ' ' + $t('rematch.label') }}</span>
                     </button>
 
@@ -755,7 +755,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 
                     <!-- Right button, open sidebar -->
                     <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat">
-                        <BIconArrowBarLeft />
+                        <IconArrowBarLeft />
                         <span v-if="unreadMessages() > 0" class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
                             {{ unreadMessages() }}
                             <span class="d-none">{{ ' ' + $t('unread_messages') }}</span>
@@ -767,7 +767,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 
                         <!-- Dropup button -->
                         <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Secondary actions" aria-expanded="false" data-bs-auto-close="true">
-                            <BIconList />
+                            <IconList />
                         </button>
 
                         <!-- Secondary actions -->
@@ -782,7 +782,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                                 :disabled="shouldDisableUndoMove()"
                                 @click="askUndo()"
                             >
-                                <BIconArrowCounterclockwise />
+                                <IconArrowCounterclockwise />
                                 {{ $t('undo.undo_move') }}
                             </button>
 
@@ -795,7 +795,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                                 :disabled="!shouldEnablePass()"
                                 @click="pass()"
                             >
-                                <BIconArrowDownUp />
+                                <IconArrowDownUp />
                                 {{ $t('pass') }}
                             </button>
 

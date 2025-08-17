@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { onUnmounted, ref } from 'vue';
-import { BIconTrophy, BIconCircleFill } from '../icons';
+import { IconTrophy, IconCircleFill } from '../icons';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 
@@ -66,13 +66,13 @@ const isReallySoon = (): boolean => {
 
 <template>
     <div v-if="shouldDisplay()" class="card card-bg-icon border-warning mb-4">
-        <BIconTrophy style="top: 1rem; right: 0.5rem; font-size: 8rem" class="text-warning" />
+        <IconTrophy style="top: 1rem; right: 0.5rem; font-size: 8rem" class="text-warning" />
         <div class="card-body">
             <h6 class="card-subtitle mb-2 text-body-secondary">{{ $t('tournament') }}</h6>
             <h4 class="card-title">{{ name }}</h4>
 
             <p v-if="!started()" :class="isReallySoon() ? 'text-warning lead' : 'text-body-secondary'">{{ tournamentStartsStr }}</p>
-            <p v-else class="m-0"><BIconCircleFill class="text-danger" /> <span class="lead">{{ $t('now!') }}</span></p>
+            <p v-else class="m-0"><IconCircleFill class="text-danger" /> <span class="lead">{{ $t('now!') }}</span></p>
 
             <a href="https://www.playok.com/en/hex/" target="_blank" class="btn btn-playok">PlayOk</a>
         </div>

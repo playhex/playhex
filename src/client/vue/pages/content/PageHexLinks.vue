@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { BIconFileEarmarkText, BIconDiscord, BIconHexagon } from '../../icons';
+import { IconFileEarmarkText, IconDiscord, IconHexagon } from '../../icons';
 import { Component as ComponentType } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 
@@ -69,7 +69,7 @@ const resources: Resource[] = [
         link_show: 'mseymour.ca/hex_book',
         title: 'Hex: A Strategy Guide',
         subTitle: 'Interactive book to learn Hex',
-        illustration: { icon: BIconFileEarmarkText },
+        illustration: { icon: IconFileEarmarkText },
         paragraph: [
             `
                 By the same author of "500 Hex puzzles", a very exhaustive guide
@@ -87,7 +87,7 @@ const resources: Resource[] = [
         link_show: 'discord.gg/59SJ9KwvVq',
         title: 'Hex Discord Server',
         subTitle: 'Discord server with ~200 Hex players',
-        illustration: { icon: BIconDiscord },
+        illustration: { icon: IconDiscord },
         paragraph: [
             'To talk to other Hex players, see tournaments or events related to Hex.',
         ],
@@ -97,7 +97,7 @@ const resources: Resource[] = [
         link_show: 'hexwiki.net',
         title: 'HexWiki',
         subTitle: 'Wiki dedicated to Hex',
-        illustration: { icon: BIconHexagon },
+        illustration: { icon: IconHexagon },
         paragraph: [
             'Detailed wiki on Hex. See the main page to have a list of good pages to explore.',
         ],

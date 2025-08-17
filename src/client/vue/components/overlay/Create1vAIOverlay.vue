@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
-import { BIconCaretDownFill, BIconCaretRight, BIconExclamationTriangle, BIconRobot } from '../../icons';
+import { IconCaretDownFill, IconCaretRight, IconExclamationTriangle, IconRobot } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
@@ -110,8 +110,8 @@ watch(aiConfigs, () => {
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
-                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger mb-0"><BIconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
-                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning mb-0"><BIconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
+                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
+                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
 
                             <p v-if="!aiConfigsStatus.aiApiAvailable || !aiConfigsStatus.powerfulPeerAvailable">
                                 <small>
@@ -124,7 +124,7 @@ watch(aiConfigs, () => {
                         </template>
 
                         <div class="mb-3">
-                            <h6><BIconRobot class="me-1" /> AI engine and level</h6>
+                            <h6><IconRobot class="me-1" /> AI engine and level</h6>
 
                             <div v-for="aiConfig in aiConfigs" :key="aiConfig.player.publicId" class="form-check">
                                 <input
@@ -161,13 +161,13 @@ watch(aiConfigs, () => {
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
+                        ><IconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> {{ $t('create_game.more_options') }}</button>
+                        ><IconCaretRight /> {{ $t('create_game.more_options') }}</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">

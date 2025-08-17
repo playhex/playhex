@@ -2,7 +2,7 @@
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, reactive, ref, toRef, watch } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
-import { BIconCaretDownFill, BIconCaretRight } from '../../icons';
+import { IconCaretDownFill, IconCaretRight } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
@@ -49,13 +49,13 @@ const showSecondaryOptions = ref(false);
                             @click="showSecondaryOptions = false"
                             type="button"
                             class="btn btn-primary btn-sm mt-3"
-                        ><BIconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
+                        ><IconCaretDownFill /> {{ $t('create_game.less_options') }}</button>
                         <button
                             v-else
                             @click="showSecondaryOptions = true"
                             type="button"
                             class="btn btn-outline-primary btn-sm mt-3"
-                        ><BIconCaretRight /> {{ $t('create_game.more_options') }}</button>
+                        ><IconCaretRight /> {{ $t('create_game.more_options') }}</button>
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">

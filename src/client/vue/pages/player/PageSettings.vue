@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBrightnessHighFill, BIconMoonStarsFill, BIconCircleHalf, BIconPcDisplayHorizontal, BIconPhone, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconAlphabet, BIconDot, BIconCheck, BIconX, BIconExclamationTriangleFill } from '../../icons';
+import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill } from '../../icons';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
@@ -232,13 +232,13 @@ const isNotificationSupported = typeof Notification !== 'undefined';
 
             <div class="btn-group" role="group" aria-label="Dark or light theme switcher">
                 <input type="radio" class="btn-check" v-model="localSettings.selectedTheme" value="light" id="btn-theme-light" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btn-theme-light"><BIconBrightnessHighFill /> {{ $t('background_theme.light') }}</label>
+                <label class="btn btn-outline-primary" for="btn-theme-light"><IconBrightnessHighFill /> {{ $t('background_theme.light') }}</label>
 
                 <input type="radio" class="btn-check" v-model="localSettings.selectedTheme" value="dark" id="btn-theme-dark" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btn-theme-dark"><BIconMoonStarsFill /> {{ $t('background_theme.dark') }}</label>
+                <label class="btn btn-outline-primary" for="btn-theme-dark"><IconMoonStarsFill /> {{ $t('background_theme.dark') }}</label>
 
                 <input type="radio" class="btn-check" v-model="localSettings.selectedTheme" value="auto" id="btn-theme-auto" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btn-theme-auto"><BIconCircleHalf /> {{ $t('auto') }}</label>
+                <label class="btn btn-outline-primary" for="btn-theme-auto"><IconCircleHalf /> {{ $t('auto') }}</label>
             </div>
         </div>
     </section>
@@ -249,7 +249,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
 
             <template v-if="playerSettings">
                 <div class="mb-3 row">
-                    <label for="move-settings-blitz" class="col-md-3 col-xl-2 col-form-label"><BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }}</label>
+                    <label for="move-settings-blitz" class="col-md-3 col-xl-2 col-form-label"><IconLightningChargeFill /> {{ $t('time_cadency.blitz') }}</label>
                     <div class="col-md-9">
                         <div class="btn-group" role="group">
                             <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-blitz-1" autocomplete="off">
@@ -264,7 +264,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="move-settings-normal" class="col-md-3 col-xl-2 col-form-label"><BIconAlarmFill /> {{ $t('time_cadency.normal') }}</label>
+                    <label for="move-settings-normal" class="col-md-3 col-xl-2 col-form-label"><IconAlarmFill /> {{ $t('time_cadency.normal') }}</label>
                     <div class="col-md-9">
                         <div class="btn-group" role="group">
                             <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-normal-1" autocomplete="off">
@@ -279,7 +279,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label for="move-settings-correspondace" class="col-md-3 col-xl-2 col-form-label"><BIconCalendar /> {{ $t('time_cadency.correspondence') }}</label>
+                    <label for="move-settings-correspondace" class="col-md-3 col-xl-2 col-form-label"><IconCalendar /> {{ $t('time_cadency.correspondence') }}</label>
                     <div class="col-md-9">
                         <div class="btn-group" role="group">
                             <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-correspondence-1" autocomplete="off">
@@ -316,12 +316,12 @@ const isNotificationSupported = typeof Notification !== 'undefined';
             <template v-if="playerSettings">
                 <div class="form-check form-switch my-3">
                     <input class="form-check-input" type="checkbox" v-model="playerSettings.showCoords" role="switch" id="show-coords-checkbox">
-                    <label class="form-check-label" for="show-coords-checkbox"><BIconAlphabet /> {{ $t('show_coords_by_default') }}</label>
+                    <label class="form-check-label" for="show-coords-checkbox"><IconAlphabet /> {{ $t('show_coords_by_default') }}</label>
                 </div>
 
                 <div class="form-check form-switch my-3">
                     <input class="form-check-input" type="checkbox" v-model="playerSettings.show44dots" role="switch" id="show-board-dots">
-                    <label class="form-check-label" for="show-board-dots"><BIconDot /> {{ $t('show_44_dots') }}</label>
+                    <label class="form-check-label" for="show-board-dots"><IconDot /> {{ $t('show_44_dots') }}</label>
                 </div>
             </template>
         </div>
@@ -335,7 +335,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
 
             <template v-if="playerSettings">
                 <div class="mb-3 row">
-                    <label class="col-sm-4 col-md-3 col-form-label"><BIconPcDisplayHorizontal /> {{ $t('landscape') }}</label>
+                    <label class="col-sm-4 col-md-3 col-form-label"><IconPcDisplayHorizontal /> {{ $t('landscape') }}</label>
                     <div class="col-sm-8 col-md-9">
                         <div class="btn-group" role="group">
                             <template v-for="orientation in landscapeOrientations" :key="orientation.value">
@@ -351,7 +351,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                 </div>
 
                 <div class="mb-3 row">
-                    <label class="col-sm-4 col-md-3 col-form-label"><BIconPhone /> {{ $t('portrait') }}</label>
+                    <label class="col-sm-4 col-md-3 col-form-label"><IconPhone /> {{ $t('portrait') }}</label>
                     <div class="col-sm-8 col-md-9">
                         <div class="btn-group" role="group">
                             <template v-for="orientation in portraitOrientations" :key="orientation.value">
@@ -433,18 +433,18 @@ const isNotificationSupported = typeof Notification !== 'undefined';
         <div class="container">
             <h3>Notifications</h3>
 
-            <p v-if="!isNotificationSupported"><BIconExclamationTriangleFill class="text-warning" /> It seems that this browser does not support notifications.</p>
+            <p v-if="!isNotificationSupported"><IconExclamationTriangleFill class="text-warning" /> It seems that this browser does not support notifications.</p>
 
-            <p v-if="'granted' === permission"><BIconCheck class="text-success" /> Notifications granted</p>
+            <p v-if="'granted' === permission"><IconCheck class="text-success" /> Notifications granted</p>
             <button
                 v-else-if="'default' === permission"
                 class="btn btn-outline-success"
                 @click="requestPermission"
             >Allow notifications</button>
-            <p v-else><BIconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
+            <p v-else><IconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
 
-            <p v-if="subscribed"><BIconCheck class="text-success" /> Subscribed to push notifications.</p>
-            <p v-else><BIconX class="text-danger" /> Not subscribed to push notifications.</p>
+            <p v-if="subscribed"><IconCheck class="text-success" /> Subscribed to push notifications.</p>
+            <p v-else><IconX class="text-danger" /> Not subscribed to push notifications.</p>
 
             <button
                 class="btn btn-sm btn-info"

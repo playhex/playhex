@@ -3,7 +3,7 @@ import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { BIconPersonFill, BIconHexagonFill, BIconHexagon } from '../../icons';
+import { IconPersonFill, IconHexagonFill, IconHexagon } from '../../icons';
 import AppPseudo from '../AppPseudo.vue';
 import { computed } from 'vue';
 
@@ -134,7 +134,7 @@ const routeName = computed<null | string>(() => {
                 <!-- My turn notif -->
                 <span class="my-turn-notif">
                     <component
-                        :is="isFilled() ? BIconHexagonFill : BIconHexagon"
+                        :is="isFilled() ? IconHexagonFill : IconHexagon"
                         class="hexagon"
                         :class="color()"
                     />
@@ -149,7 +149,7 @@ const routeName = computed<null | string>(() => {
                 <p class="nav-player-item">
                     <template v-if="loggedInPlayer">
                         <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }" class="link-body-emphasis">
-                            <BIconPersonFill style="font-size: 1.5em" />
+                            <IconPersonFill style="font-size: 1.5em" />
                             <AppPseudo :player="loggedInPlayer" classes="d-none d-sm-inline" />
                         </router-link>
                     </template>

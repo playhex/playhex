@@ -3,7 +3,7 @@ import { PropType, ref, watchEffect } from 'vue';
 import { Chart, Tooltip, Legend, LinearScale, Colors, ChartOptions, ChartData, TimeScale, PointElement, LineElement } from 'chart.js';
 import { Line } from 'vue-chartjs';
 import '../../services/chartJsDateFnsAdapter.js';
-import { BIconZoomOut } from '../icons';
+import { IconZoomOut } from '../icons';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { Player } from '../../../shared/app/models/index.js';
 import { apiGetPlayerRatingHistory } from '../../apiClient.js';
@@ -127,7 +127,7 @@ defineExpose({
                 @click="resetZoom"
                 class="btn btn-outline-primary btn-sm"
                 title="Reset zoom"
-            ><BIconZoomOut /></button>
+            ><IconZoomOut /></button>
         </div>
         <Line
             v-if="null !== ratingChartData"

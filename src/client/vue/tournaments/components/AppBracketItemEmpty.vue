@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconThreeDots } from '../../icons';
+import { IconThreeDots } from '../../icons';
 
 /*
  * Empty bracket item, used as placeholder,
@@ -16,7 +16,7 @@ import { BIconThreeDots } from '../../icons';
         </div>
         <div class="card-footer">
             <span class="text-secondary">
-                <BIconThreeDots />
+                <IconThreeDots />
             </span>
         </div>
     </div>

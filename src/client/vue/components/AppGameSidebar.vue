@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { BIconAlphabet, BIconSendFill, BIconArrowBarRight, BIconShareFill, BIconCheck, BIconDownload, BIconInfoCircle, BIconGear, BIconTrophyFill, BIconPeopleFill, BIconInfoLg, BIconHouse, BIconLightningChargeFill, BIconAlarmFill, BIconCalendar, BIconSignpostSplit } from '../icons';
+import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit } from '../icons';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
@@ -390,10 +390,10 @@ watchEffect(() => {
             Tabs
         -->
         <nav class="nav nav-game-sidebar nav-pills nav-fill">
-            <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><BIconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
+            <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><IconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
 
             <a class="nav-link" v-if="shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
-                <BIconSignpostSplit />
+                <IconSignpostSplit />
                 {{ ' ' }}
                 <span class="d-none d-md-inline">
                     {{ $t('conditional_moves.title_short') }}
@@ -401,8 +401,8 @@ watchEffect(() => {
                 <span v-if="null !== conditionalMovesEditor && conditionalMovesEditor.getConditionalMoves().tree.length > 0"> ({{ conditionalMovesEditor.getConditionalMoves().tree.length }})</span>
             </a>
 
-            <a class="nav-link" :class="tabActiveClass('info')" @click.prevent="currentTab = 'info'" href="#"><BIconInfoLg /> <span class="d-none d-md-inline">{{ $t('game.info') }}</span></a>
-            <a class="nav-link" :class="tabActiveClass('settings')" @click.prevent="currentTab = 'settings'" href="#"><BIconGear /></a>
+            <a class="nav-link" :class="tabActiveClass('info')" @click.prevent="currentTab = 'info'" href="#"><IconInfoLg /> <span class="d-none d-md-inline">{{ $t('game.info') }}</span></a>
+            <a class="nav-link" :class="tabActiveClass('settings')" @click.prevent="currentTab = 'settings'" href="#"><IconGear /></a>
         </nav>
 
         <!--
@@ -539,7 +539,7 @@ watchEffect(() => {
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"
-                ><BIconDownload /> SGF</button>
+                ><IconDownload /> SGF</button>
 
                 <!-- Share -->
                 <a
@@ -548,8 +548,8 @@ watchEffect(() => {
                     @click.prevent="shareGameLinkAndShowResult()"
                     :aria-label="$t('share_game')"
                     :title="$t('share_game')"
-                ><BIconShareFill /></a>
-                <small v-if="true === copiedResult" class="text-success me-2"><BIconCheck /> {{ $t('copied!') }}</small>
+                ><IconShareFill /></a>
+                <small v-if="true === copiedResult" class="text-success me-2"><IconCheck /> {{ $t('copied!') }}</small>
                 <small v-else-if="false === copiedResult" class="text-warning me-2"> {{ $t('not_copied') }}</small>
             </div>
         </div>
@@ -564,7 +564,7 @@ watchEffect(() => {
                 :to="{ name: 'tournament', params: { slug: tournamentMatch.tournament.slug }, hash: '#match-' + tournamentMatchKey(tournamentMatch) }"
                 class="btn btn-warning btn-block btn-tournament"
             >
-                <BIconTrophyFill class="icon" />
+                <IconTrophyFill class="icon" />
                 {{ tournamentMatch.tournament.title }}
                 <small>
                     -
@@ -577,10 +577,10 @@ watchEffect(() => {
 
             <div class="container-fluid">
                 <p v-if="hostedGameClient.isRanked()" class="text-warning">
-                    <BIconTrophyFill /> {{ $t('ranked') }}
+                    <IconTrophyFill /> {{ $t('ranked') }}
                 </p>
                 <p v-else>
-                    <span class="text-success"><BIconPeopleFill /> {{ $t('friendly') }}</span>
+                    <span class="text-success"><IconPeopleFill /> {{ $t('friendly') }}</span>
                     <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="hostedGameClient.getGameOptions()" /></small>
                 </p>
             </div>
@@ -639,7 +639,7 @@ watchEffect(() => {
 
                 <div class="mb-2" v-if="playerSettings">
                     <template v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<BIconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
+                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
@@ -653,7 +653,7 @@ watchEffect(() => {
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsBlitz)) }}</div>
                     </template>
                     <template v-if="'normal' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<BIconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
+                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
@@ -667,7 +667,7 @@ watchEffect(() => {
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsNormal)) }}</div>
                     </template>
                     <template v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
-                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<BIconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
+                        <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
@@ -691,7 +691,7 @@ watchEffect(() => {
                     @click.prevent="emits('toggleCoords')"
                     :aria-label="$t('toggle_coords')"
                     :title="$t('toggle_coords')"
-                ><BIconAlphabet /> {{ $t('toggle_coords_short') }}</button>
+                ><IconAlphabet /> {{ $t('toggle_coords_short') }}</button>
 
                 <div class="row mt-2" v-if="playerSettings">
                     <div class="col-12" v-if="'landscape' === currentOrientation">
@@ -730,7 +730,7 @@ watchEffect(() => {
                 </div>
 
                 <p class="mt-4">
-                    <router-link class="btn btn-outline-primary" :to="{ name: 'settings' }"><BIconGear /> {{ $t('player_settings.title') }}</router-link>
+                    <router-link class="btn btn-outline-primary" :to="{ name: 'settings' }"><IconGear /> {{ $t('player_settings.title') }}</router-link>
                 </p>
             </div>
         </div>
@@ -770,7 +770,7 @@ watchEffect(() => {
                                 class="text-decoration-none"
                                 :title="$t('game_analysis.how_it_works')"
                                 :aria-label="$t('game_analysis.how_it_works')"
-                            ><BIconInfoCircle /></router-link>
+                            ><IconInfoCircle /></router-link>
                             <a href="#" class="ps-2" @click.prevent="analyzeSummarized = true">Collapse</a>
                         </small>
 
@@ -843,7 +843,7 @@ watchEffect(() => {
                 <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer as Player, hostedGameClient.getHostedGame())">
                     <div class="input-group">
                         <input v-model="chatInput" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />
-                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><BIconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
+                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
                     </div>
                     <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / {{ $t('n_characters', { count: 250 }) }}</div>
                 </form>
@@ -854,7 +854,7 @@ watchEffect(() => {
             Close game sidebar
         -->
         <div class="sidebar-block block-close bg-dark-subtle">
-            <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">{{ $t('close') }} <BIconArrowBarRight /></button>
+            <button type="button" class="btn btn-link text-body" aria-label="Close" @click="emits('close')">{{ $t('close') }} <IconArrowBarRight /></button>
         </div>
     </div>
 </template>

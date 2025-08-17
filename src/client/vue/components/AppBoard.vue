@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
-import { BIconCheck, BIconChevronBarLeft, BIconChevronBarRight, BIconChevronLeft, BIconChevronRight, BIconCrosshair, BIconScissors, BIconTrophyFill, BIconX } from '../icons';
+import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
 import { Player } from '../../../shared/app/models/index.js';
@@ -133,7 +133,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
                         classes="text-danger"
                     />
                     <span v-else class="fst-italic">{{ $t('waiting') }}</span>
-                    <span v-if="game.getWinner() === 0">&nbsp;<BIconTrophyFill class="text-warning" /></span>
+                    <span v-if="game.getWinner() === 0">&nbsp;<IconTrophyFill class="text-warning" /></span>
                 </p>
                 <AppChrono
                     v-if="timeControlOptions && timeControlValues"
@@ -143,7 +143,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </div>
             <div class="player player-b">
                 <p class="h5" v-if="players">
-                    <span v-if="game.getWinner() === 1"><BIconTrophyFill class="text-warning" />&nbsp;</span>
+                    <span v-if="game.getWinner() === 1"><IconTrophyFill class="text-warning" />&nbsp;</span>
                     <AppPseudo
                         v-if="players[1]"
                         rating
@@ -165,27 +165,27 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
         <div class="rewind-controls" v-if="hasRewindControls">
             <!-- backward initial -->
             <button type="button" @click="rewindZero()" class="btn btn-outline-primary">
-                <BIconChevronBarLeft />
+                <IconChevronBarLeft />
             </button>
 
             <!-- backward -->
             <button type="button" @click="backward()" class="btn btn-outline-primary" ref="btnRewindBack">
-                <BIconChevronLeft />
+                <IconChevronLeft />
             </button>
 
             <!-- forward -->
             <button type="button" @click="forward()" class="btn btn-outline-primary" ref="btnRewindForward">
-                <BIconChevronRight />
+                <IconChevronRight />
             </button>
 
             <!-- forward max -->
             <button type="button" @click="rewindCurrent()" class="btn btn-outline-primary">
-                <BIconChevronBarRight />
+                <IconChevronBarRight />
             </button>
 
             <!-- Close rewind -->
             <button type="button" @click="rewindClose()" class="btn btn-outline-danger">
-                <BIconX />
+                <IconX />
             </button>
         </div>
 
@@ -193,27 +193,27 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 
             <!-- Back to original position -->
             <button type="button" @click="conditionalMovesEditor.startNewLine()" class="btn btn-outline-primary">
-                <BIconCrosshair />
+                <IconCrosshair />
             </button>
 
             <!-- backward -->
             <button type="button" @click="conditionalMovesEditor.back()" class="btn btn-outline-primary">
-                <BIconChevronLeft />
+                <IconChevronLeft />
             </button>
 
             <!-- Cut move -->
             <button type="button" @click="conditionalMovesEditor.cutMove()" class="btn btn-outline-danger" :disabled="0 === conditionalMovesEditor.getSelectedLine().length">
-                <BIconScissors />
+                <IconScissors />
             </button>
 
             <!-- Save -->
             <button type="button" @click="conditionalMovesEditor.submitConditionalMoves()" class="btn" :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'">
-                <BIconCheck /> Save
+                <IconCheck /> Save
             </button>
 
             <!-- Close conditional moves edition -->
             <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-warning">
-                <BIconX />
+                <IconX />
             </button>
         </div>
     </div>

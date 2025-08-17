@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue';
-import { BIconYoutube } from '../../icons';
+import { IconYoutube } from '../../icons';
 import { autoLocale } from '../../../../shared/app/i18n';
 
 useHead({
@@ -70,7 +70,7 @@ const locale = autoLocale();
             <li>Parties sur plateaux physiques, organisées dans l’après-midi</li>
             <li>Durée variable en fonction du nombre d&#39;inscrits</li>
             <li>Voir la vidéo du tournoi de Hex d'une précédente édition :
-                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><BIconYoutube /> Youtube</a>
+                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><IconYoutube /> Youtube</a>
             </li>
         </ul>
 
@@ -147,7 +147,7 @@ const locale = autoLocale();
             <li>Partie rozgrywane na fizycznych planszach, zorganizowane po południu</li>
             <li>Czas trwania zależny od liczby zgłoszeń</li>
             <li>Zobacz wideo z turnieju Hex z poprzedniej edycji:
-                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><BIconYoutube /> Youtube</a>
+                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><IconYoutube /> Youtube</a>
             </li>
         </ul>
 
@@ -224,7 +224,7 @@ const locale = autoLocale();
             <li>Partidas en tableros físicos, organizadas por la tarde</li>
             <li>Duración variable en función del número de inscritos</li>
             <li>Mira el video del torneo de Hex de una edición anterior:
-                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><BIconYoutube /> Youtube</a>
+                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><IconYoutube /> Youtube</a>
             </li>
         </ul>
 
@@ -299,7 +299,7 @@ const locale = autoLocale();
             <li>Games on physical boards, organized in the afternoon</li>
             <li>Duration varies based on the number of participants</li>
             <li>Watch the video of a previous Hex tournament:
-                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><BIconYoutube /> YouTube</a>
+                <a href="https://www.youtube.com/watch?v=BvJ1tBPqr2U" target="_blank"><IconYoutube /> YouTube</a>
             </li>
         </ul>
 

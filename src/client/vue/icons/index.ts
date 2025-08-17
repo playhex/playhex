@@ -4,160 +4,160 @@
  * Using unplugin-icons: this solution supports tree-shaking.
  */
 
-import BIcon0CircleFill from '~icons/bi/0-circle-fill';
-import BIconAlarmFill from '~icons/bi/alarm-fill';
-import BIconAlphabet from '~icons/bi/alphabet';
-import BIconArrowBarLeft from '~icons/bi/arrow-bar-left';
-import BIconArrowBarRight from '~icons/bi/arrow-bar-right';
-import BIconArrowCounterclockwise from '~icons/bi/arrow-counterclockwise';
-import BIconArrowDownUp from '~icons/bi/arrow-down-up';
-import BIconArrowRight from '~icons/bi/arrow-right';
-import BIconAspectRatio from '~icons/bi/aspect-ratio';
-import BIconBell from '~icons/bi/bell';
-import BIconBookmarks from '~icons/bi/bookmarks';
-import BIconBoxArrowRight from '~icons/bi/box-arrow-right';
-import BIconBrightnessHighFill from '~icons/bi/brightness-high-fill';
-import BIconCalendar from '~icons/bi/calendar';
-import BIconCalendarEvent from '~icons/bi/calendar-event';
-import BIconCaretDownFill from '~icons/bi/caret-down-fill';
-import BIconCaretRight from '~icons/bi/caret-right';
-import BIconCaretUpFill from '~icons/bi/caret-up-fill';
-import BIconChatDots from '~icons/bi/chat-dots';
-import BIconCheck from '~icons/bi/check';
-import BIconChevronBarLeft from '~icons/bi/chevron-bar-left';
-import BIconChevronBarRight from '~icons/bi/chevron-bar-right';
-import BIconChevronLeft from '~icons/bi/chevron-left';
-import BIconChevronRight from '~icons/bi/chevron-right';
-import BIconCircle from '~icons/fa/circle-o';
-import BIconCircleFill from '~icons/bi/circle-fill';
-import BIconCircleHalf from '~icons/bi/circle-half';
-import BIconCrosshair from '~icons/bi/crosshair';
-import BIconDiscord from '~icons/bi/discord';
-import BIconDot from '~icons/bi/dot';
-import BIconDownload from '~icons/bi/download';
-import BIconExclamationTriangle from '~icons/bi/exclamation-triangle';
-import BIconExclamationTriangleFill from '~icons/bi/exclamation-triangle-fill';
-import BIconEye from '~icons/bi/eye';
-import BIconFileEarmarkText from '~icons/bi/file-earmark-text';
-import BIconFlag from '~icons/bi/flag';
-import BIconGear from '~icons/bi/gear';
-import BIconGithub from '~icons/bi/github';
-import BIconHexagon from '~icons/bi/hexagon';
-import BIconHexagonFill from '~icons/bi/hexagon-fill';
-import BIconHourglass from '~icons/bi/hourglass';
-import BIconHouse from '~icons/bi/house';
-import BIconInfoCircle from '~icons/bi/info-circle';
-import BIconInfoCircleFill from '~icons/bi/info-circle-fill';
-import BIconInfoLg from '~icons/bi/info-lg';
-import BIconLightningChargeFill from '~icons/bi/lightning-charge-fill';
-import BIconList from '~icons/bi/list';
-import BIconMoonFill from '~icons/bi/moon-fill';
-import BIconMoonStarsFill from '~icons/bi/moon-stars-fill';
-import BIconPcDisplayHorizontal from '~icons/bi/pc-display-horizontal';
-import BIconPeople from '~icons/bi/people';
-import BIconPeopleFill from '~icons/bi/people-fill';
-import BIconPerson from '~icons/bi/person';
-import BIconPersonFill from '~icons/bi/person-fill';
-import BIconPersonUp from '~icons/bi/person-up';
-import BIconPhone from '~icons/bi/phone';
-import BIconPlayFill from '~icons/bi/play-fill';
-import BIconPlus from '~icons/bi/plus';
-import BIconRecordFill from '~icons/bi/record-fill';
-import BIconRepeat from '~icons/bi/repeat';
-import BIconRewind from '~icons/bi/rewind';
-import BIconRobot from '~icons/bi/robot';
-import BIconScissors from '~icons/bi/scissors';
-import BIconSearch from '~icons/bi/search';
-import BIconSendFill from '~icons/bi/send-fill';
-import BIconShareFill from '~icons/bi/share-fill';
-import BIconSignpostSplit from '~icons/bi/signpost-split';
-import BIconSignTurnLeft from '~icons/bi/sign-turn-left';
-import BIconThreeDots from '~icons/bi/three-dots';
-import BIconTrash from '~icons/bi/trash';
-import BIconTrophy from '~icons/bi/trophy';
-import BIconTrophyFill from '~icons/bi/trophy-fill';
-import BIconX from '~icons/bi/x';
-import BIconWifiOff from '~icons/bi/wifi-off';
-import BIconXLg from '~icons/bi/x-lg';
-import BIconYoutube from '~icons/bi/youtube';
-import BIconZoomOut from '~icons/bi/zoom-out';
+import Icon0CircleFill from '~icons/bi/0-circle-fill';
+import IconAlarmFill from '~icons/bi/alarm-fill';
+import IconAlphabet from '~icons/bi/alphabet';
+import IconArrowBarLeft from '~icons/bi/arrow-bar-left';
+import IconArrowBarRight from '~icons/bi/arrow-bar-right';
+import IconArrowCounterclockwise from '~icons/bi/arrow-counterclockwise';
+import IconArrowDownUp from '~icons/bi/arrow-down-up';
+import IconArrowRight from '~icons/bi/arrow-right';
+import IconAspectRatio from '~icons/bi/aspect-ratio';
+import IconBell from '~icons/bi/bell';
+import IconBookmarks from '~icons/bi/bookmarks';
+import IconBoxArrowRight from '~icons/bi/box-arrow-right';
+import IconBrightnessHighFill from '~icons/bi/brightness-high-fill';
+import IconCalendar from '~icons/bi/calendar';
+import IconCalendarEvent from '~icons/bi/calendar-event';
+import IconCaretDownFill from '~icons/bi/caret-down-fill';
+import IconCaretRight from '~icons/bi/caret-right';
+import IconCaretUpFill from '~icons/bi/caret-up-fill';
+import IconChatDots from '~icons/bi/chat-dots';
+import IconCheck from '~icons/bi/check';
+import IconChevronBarLeft from '~icons/bi/chevron-bar-left';
+import IconChevronBarRight from '~icons/bi/chevron-bar-right';
+import IconChevronLeft from '~icons/bi/chevron-left';
+import IconChevronRight from '~icons/bi/chevron-right';
+import IconCircle from '~icons/fa/circle-o';
+import IconCircleFill from '~icons/bi/circle-fill';
+import IconCircleHalf from '~icons/bi/circle-half';
+import IconCrosshair from '~icons/bi/crosshair';
+import IconDiscord from '~icons/bi/discord';
+import IconDot from '~icons/bi/dot';
+import IconDownload from '~icons/bi/download';
+import IconExclamationTriangle from '~icons/bi/exclamation-triangle';
+import IconExclamationTriangleFill from '~icons/bi/exclamation-triangle-fill';
+import IconEye from '~icons/bi/eye';
+import IconFileEarmarkText from '~icons/bi/file-earmark-text';
+import IconFlag from '~icons/bi/flag';
+import IconGear from '~icons/bi/gear';
+import IconGithub from '~icons/bi/github';
+import IconHexagon from '~icons/bi/hexagon';
+import IconHexagonFill from '~icons/bi/hexagon-fill';
+import IconHourglass from '~icons/bi/hourglass';
+import IconHouse from '~icons/bi/house';
+import IconInfoCircle from '~icons/bi/info-circle';
+import IconInfoCircleFill from '~icons/bi/info-circle-fill';
+import IconInfoLg from '~icons/bi/info-lg';
+import IconLightningChargeFill from '~icons/bi/lightning-charge-fill';
+import IconList from '~icons/bi/list';
+import IconMoonFill from '~icons/bi/moon-fill';
+import IconMoonStarsFill from '~icons/bi/moon-stars-fill';
+import IconPcDisplayHorizontal from '~icons/bi/pc-display-horizontal';
+import IconPeople from '~icons/bi/people';
+import IconPeopleFill from '~icons/bi/people-fill';
+import IconPerson from '~icons/bi/person';
+import IconPersonFill from '~icons/bi/person-fill';
+import IconPersonUp from '~icons/bi/person-up';
+import IconPhone from '~icons/bi/phone';
+import IconPlayFill from '~icons/bi/play-fill';
+import IconPlus from '~icons/bi/plus';
+import IconRecordFill from '~icons/bi/record-fill';
+import IconRepeat from '~icons/bi/repeat';
+import IconRewind from '~icons/bi/rewind';
+import IconRobot from '~icons/bi/robot';
+import IconScissors from '~icons/bi/scissors';
+import IconSearch from '~icons/bi/search';
+import IconSendFill from '~icons/bi/send-fill';
+import IconShareFill from '~icons/bi/share-fill';
+import IconSignpostSplit from '~icons/bi/signpost-split';
+import IconSignTurnLeft from '~icons/bi/sign-turn-left';
+import IconThreeDots from '~icons/bi/three-dots';
+import IconTrash from '~icons/bi/trash';
+import IconTrophy from '~icons/bi/trophy';
+import IconTrophyFill from '~icons/bi/trophy-fill';
+import IconX from '~icons/bi/x';
+import IconWifiOff from '~icons/bi/wifi-off';
+import IconXLg from '~icons/bi/x-lg';
+import IconYoutube from '~icons/bi/youtube';
+import IconZoomOut from '~icons/bi/zoom-out';
 
 export {
-    BIcon0CircleFill,
-    BIconAlarmFill,
-    BIconAlphabet,
-    BIconArrowBarLeft,
-    BIconArrowBarRight,
-    BIconArrowCounterclockwise,
-    BIconArrowDownUp,
-    BIconArrowRight,
-    BIconAspectRatio,
-    BIconBell,
-    BIconBookmarks,
-    BIconBoxArrowRight,
-    BIconBrightnessHighFill,
-    BIconCalendar,
-    BIconCalendarEvent,
-    BIconCaretDownFill,
-    BIconCaretRight,
-    BIconCaretUpFill,
-    BIconChatDots,
-    BIconCheck,
-    BIconChevronBarLeft,
-    BIconChevronBarRight,
-    BIconChevronLeft,
-    BIconChevronRight,
-    BIconCircle,
-    BIconCircleFill,
-    BIconCircleHalf,
-    BIconCrosshair,
-    BIconDiscord,
-    BIconDot,
-    BIconDownload,
-    BIconExclamationTriangle,
-    BIconExclamationTriangleFill,
-    BIconEye,
-    BIconFileEarmarkText,
-    BIconFlag,
-    BIconGear,
-    BIconGithub,
-    BIconHexagon,
-    BIconHexagonFill,
-    BIconHourglass,
-    BIconHouse,
-    BIconInfoCircle,
-    BIconInfoCircleFill,
-    BIconInfoLg,
-    BIconLightningChargeFill,
-    BIconList,
-    BIconMoonFill,
-    BIconMoonStarsFill,
-    BIconPcDisplayHorizontal,
-    BIconPeople,
-    BIconPeopleFill,
-    BIconPerson,
-    BIconPersonFill,
-    BIconPersonUp,
-    BIconPhone,
-    BIconPlayFill,
-    BIconPlus,
-    BIconRecordFill,
-    BIconRepeat,
-    BIconRewind,
-    BIconRobot,
-    BIconScissors,
-    BIconSearch,
-    BIconSendFill,
-    BIconShareFill,
-    BIconSignpostSplit,
-    BIconSignTurnLeft,
-    BIconThreeDots,
-    BIconTrash,
-    BIconTrophy,
-    BIconTrophyFill,
-    BIconWifiOff,
-    BIconX,
-    BIconXLg,
-    BIconYoutube,
-    BIconZoomOut,
+    Icon0CircleFill,
+    IconAlarmFill,
+    IconAlphabet,
+    IconArrowBarLeft,
+    IconArrowBarRight,
+    IconArrowCounterclockwise,
+    IconArrowDownUp,
+    IconArrowRight,
+    IconAspectRatio,
+    IconBell,
+    IconBookmarks,
+    IconBoxArrowRight,
+    IconBrightnessHighFill,
+    IconCalendar,
+    IconCalendarEvent,
+    IconCaretDownFill,
+    IconCaretRight,
+    IconCaretUpFill,
+    IconChatDots,
+    IconCheck,
+    IconChevronBarLeft,
+    IconChevronBarRight,
+    IconChevronLeft,
+    IconChevronRight,
+    IconCircle,
+    IconCircleFill,
+    IconCircleHalf,
+    IconCrosshair,
+    IconDiscord,
+    IconDot,
+    IconDownload,
+    IconExclamationTriangle,
+    IconExclamationTriangleFill,
+    IconEye,
+    IconFileEarmarkText,
+    IconFlag,
+    IconGear,
+    IconGithub,
+    IconHexagon,
+    IconHexagonFill,
+    IconHourglass,
+    IconHouse,
+    IconInfoCircle,
+    IconInfoCircleFill,
+    IconInfoLg,
+    IconLightningChargeFill,
+    IconList,
+    IconMoonFill,
+    IconMoonStarsFill,
+    IconPcDisplayHorizontal,
+    IconPeople,
+    IconPeopleFill,
+    IconPerson,
+    IconPersonFill,
+    IconPersonUp,
+    IconPhone,
+    IconPlayFill,
+    IconPlus,
+    IconRecordFill,
+    IconRepeat,
+    IconRewind,
+    IconRobot,
+    IconScissors,
+    IconSearch,
+    IconSendFill,
+    IconShareFill,
+    IconSignpostSplit,
+    IconSignTurnLeft,
+    IconThreeDots,
+    IconTrash,
+    IconTrophy,
+    IconTrophyFill,
+    IconWifiOff,
+    IconX,
+    IconXLg,
+    IconYoutube,
+    IconZoomOut,
 };

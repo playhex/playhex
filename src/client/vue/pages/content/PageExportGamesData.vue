@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineOrganization, useSchemaOrg } from '@unhead/schema-org';
 import { injectHead, useHead, useSeoMeta } from '@unhead/vue';
-import { BIconDownload } from '../../icons';
+import { IconDownload } from '../../icons';
 import { ref, watchEffect } from 'vue';
 
 type FileStat = {
@@ -104,7 +104,7 @@ const getFilesize = (size: number): string => {
             :href="fileStat.filename"
             class="btn btn-success"
         >
-            <BIconDownload class="me-1" />
+            <IconDownload class="me-1" />
             {{ getFilename(fileStat.filename) }}
         </a>
         <p>

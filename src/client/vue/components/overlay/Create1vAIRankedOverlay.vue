@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useExtendOverlay } from '@overlastic/vue';
 import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
-import { BIconExclamationTriangle, BIconRobot, BIconTrophy } from '../../icons';
+import { IconExclamationTriangle, IconRobot, IconTrophy } from '../../icons';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
@@ -109,8 +109,8 @@ watch(aiConfigs, () => {
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
-                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger mb-0"><BIconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
-                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning mb-0"><BIconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
+                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
+                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
 
                             <p v-if="!aiConfigsStatus.aiApiAvailable || !aiConfigsStatus.powerfulPeerAvailable">
                                 <small>
@@ -123,7 +123,7 @@ watch(aiConfigs, () => {
                         </template>
 
                         <div class="mb-3">
-                            <h6><BIconRobot class="me-1" /> AI engine and level</h6>
+                            <h6><IconRobot class="me-1" /> AI engine and level</h6>
 
                             <div v-for="aiConfig in aiConfigs" :key="aiConfig.player.publicId" class="form-check">
                                 <input
@@ -159,7 +159,7 @@ watch(aiConfigs, () => {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="reject()">{{ $t('cancel') }}</button>
-                        <button type="submit" class="btn btn-warning"><BIconTrophy /> {{ $t('1vAI_ranked.create') }}</button>
+                        <button type="submit" class="btn btn-warning"><IconTrophy /> {{ $t('1vAI_ranked.create') }}</button>
                     </div>
                 </form>
             </div>

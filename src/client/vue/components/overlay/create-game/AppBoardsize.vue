@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { PropType, Ref, ref, toRefs } from 'vue';
-import { BIconAspectRatio } from '../../../icons';
+import { IconAspectRatio } from '../../../icons';
 import { MIN_BOARDSIZE, MAX_BOARDSIZE } from '../../../../../shared/app/models/HostedGameOptions.js';
 
 const boardsize = defineModel<number>({
@@ -43,7 +43,7 @@ const isBoardsizeAllowed = (boardsize: number): boolean => {
 </script>
 
 <template>
-    <h6><BIconAspectRatio class="me-1" /> {{ $t('game.board_size') }}</h6>
+    <h6><IconAspectRatio class="me-1" /> {{ $t('game.board_size') }}</h6>
 
     <div class="btn-group" role="group">
         <template v-for="size in sizesSelection" :key="size">

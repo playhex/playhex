@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { BIconWifiOff } from '../icons';
+import { IconWifiOff } from '../icons';
 </script>
 
 <template>
     <div class="card border-warning mb-4">
         <div class="card-body text-center">
-            <p class="lead"><BIconWifiOff /> {{ $t('connection_lost') }}</p>
+            <p class="lead"><IconWifiOff /> {{ $t('connection_lost') }}</p>
             <div class="d-flex">
                 <router-link :to="{ name: 'offline-lobby' }" class="btn btn-warning flex-grow-1">{{ $t('play_offline') }}</router-link>
             </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { BIconPeopleFill, BIconRecordFill, BIconTrophy } from '../../icons';
+import { IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons';
 import { Tournament } from '../../../../shared/app/models';
 import AppMySubscriptionStatus from './AppMySubscriptionStatus.vue';
 import AppCountdown from '../../components/AppCountdown.vue';
@@ -25,7 +25,7 @@ const {
 
 <template>
     <div class="card card-bg-icon border-warning mb-4">
-        <BIconTrophy class="bg-trophy text-warning" />
+        <IconTrophy class="bg-trophy text-warning" />
         <div class="card-body">
             <h6 class="card-subtitle text-body-secondary">{{ $t('tournament') }}</h6>
             <h4 class="card-title">{{ tournament.title }}</h4>
@@ -61,12 +61,12 @@ const {
             <!-- Running -->
             <template v-else-if="tournament.state === 'running'">
                 <p class="card-text">
-                    <BIconPeopleFill />
+                    <IconPeopleFill />
                     {{ $t('n_participants', { count: tournament.participants.length }) }}
                 </p>
 
                 <p class="card-text lead">
-                    <BIconRecordFill class="text-danger" />
+                    <IconRecordFill class="text-danger" />
                     {{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}
                 </p>
             </template>

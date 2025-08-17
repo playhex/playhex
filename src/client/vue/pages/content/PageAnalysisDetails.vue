@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
-import { BIconInfoCircleFill } from '../../icons';
+import { IconInfoCircleFill } from '../../icons';
 
 useSeoMeta({
     title: 'AI game analysis',
@@ -28,7 +28,7 @@ useSeoMeta({
     </p>
 
     <div class="alert alert-primary">
-        <BIconInfoCircleFill /> You can also
+        <IconInfoCircleFill /> You can also
         <router-link :to="{ name: 'spawn-worker' }">spawn a worker for PlayHex</router-link>
         to complete the analysis faster.
     </div>

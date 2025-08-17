@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import { BIconRobot } from '../../icons';
+import { IconRobot } from '../../icons';
 import Create1vOfflineAIOverlay from '../overlay/Create1vOfflineAIOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import { useRouter } from 'vue-router';
@@ -68,7 +68,7 @@ onMounted(() => {
         <div class="play-buttons row mb-4">
             <div class="col col-sm-6 col-md-4">
                 <button type="button" class="btn w-100 btn-primary" @click="() => create1vOfflineAIAndJoinGame()">
-                    <BIconRobot class="fs-3" />
+                    <IconRobot class="fs-3" />
                     <br>
                     {{ $t('new_game_vs_ai') }}
                 </button>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconSignTurnLeft } from '../icons';
+import { IconSignTurnLeft } from '../icons';
 import { useSeoMeta } from '@unhead/vue';
 
 useSeoMeta({
@@ -13,7 +13,7 @@ useSeoMeta({
         <h1 class="mt-4">Not found</h1>
 
         <p class="lead mt-4">
-            <a href="#" @click="$router.back()"><BIconSignTurnLeft /> Go back</a>
+            <a href="#" @click="$router.back()"><IconSignTurnLeft /> Go back</a>
         </p>
 
         <p class="lead mt-4">

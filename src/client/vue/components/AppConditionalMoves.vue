@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BIconCheck, BIconScissors, BIconTrash } from '../icons';
+import { IconCheck, IconScissors, IconTrash } from '../icons';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
@@ -34,7 +34,7 @@ defineProps({
         @click="conditionalMovesEditor.submitConditionalMoves()"
         class="btn me-2"
         :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'"
-    ><BIconCheck /> {{ $t('save') }}</button>
+    ><IconCheck /> {{ $t('save') }}</button>
 
     <button
         v-if="conditionalMovesEditor.getIsSimulationMode()"
@@ -47,7 +47,7 @@ defineProps({
         v-if="conditionalMovesEditor.getSelectedLine().length > 0"
         @click="conditionalMovesEditor.cutMove()"
         class="btn btn-sm btn-outline-danger ms-2"
-    ><BIconScissors /> {{ $t('conditional_moves.cut_move') }}</button>
+    ><IconScissors /> {{ $t('conditional_moves.cut_move') }}</button>
 
     <div v-if="conditionalMovesEditor.getConditionalMovesDirty().unplayedLines.length > 0" class="conditional-move-tree-container">
         <h4>{{ $t('conditional_moves.inactive_lines') }}</h4>
@@ -55,7 +55,7 @@ defineProps({
         <button
             @click="conditionalMovesEditor.deleteAllInactives()"
             class="btn btn-sm btn-outline-danger ms-2"
-        ><BIconTrash /> {{ $t('conditional_moves.clear_inactive_lines') }}</button>
+        ><IconTrash /> {{ $t('conditional_moves.clear_inactive_lines') }}</button>
 
         <AppConditionalMoveTree
             theme="inactive"

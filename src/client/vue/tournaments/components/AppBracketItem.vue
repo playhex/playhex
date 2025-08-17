@@ -2,7 +2,7 @@
 import { PropType, toRefs } from 'vue';
 import { Player, Tournament, TournamentMatch } from '../../../../shared/app/models';
 import AppBracketManageGame from './AppBracketManageGame.vue';
-import { BIconCheck, BIconPlayFill, BIconThreeDots, BIconTrophyFill } from '../../icons';
+import { IconCheck, IconPlayFill, IconThreeDots, IconTrophyFill } from '../../icons';
 import AppPseudo from '../../components/AppPseudo.vue';
 
 const props = defineProps({
@@ -97,7 +97,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
             >
                 <AppPseudo v-if="tournamentMatch.player1" :player="tournamentMatch.player1" />
                 <span v-else>-</span>
-                <BIconTrophyFill
+                <IconTrophyFill
                     v-if="'done' === tournamentMatch.state && 0 === tournamentMatch.hostedGame?.gameData?.winner"
                     class="text-warning ms-1"
                 />
@@ -111,7 +111,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
             >
                 <AppPseudo v-if="tournamentMatch.player2" :player="tournamentMatch.player2" />
                 <span v-else>-</span>
-                <BIconTrophyFill
+                <IconTrophyFill
                     v-if="'done' === tournamentMatch.state && 1 === tournamentMatch.hostedGame?.gameData?.winner"
                     class="text-warning ms-1"
                 />
@@ -121,9 +121,9 @@ const playerHighlightClasses = (player: null | Player = null): string => {
             <AppBracketManageGame v-if="isOrganizer" :tournament :tournamentMatch />
 
             <span :class="'text-' + tournamentMatchStateClasses[tournamentMatch.state]">
-                <BIconThreeDots v-if="'waiting' === tournamentMatch.state" />
-                <BIconPlayFill v-if="'playing' === tournamentMatch.state" />
-                <BIconCheck v-if="'done' === tournamentMatch.state" />
+                <IconThreeDots v-if="'waiting' === tournamentMatch.state" />
+                <IconPlayFill v-if="'playing' === tournamentMatch.state" />
+                <IconCheck v-if="'done' === tournamentMatch.state" />
             </span>
 
             <RouterLink

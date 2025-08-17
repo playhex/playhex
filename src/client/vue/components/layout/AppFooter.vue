@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BIconBookmarks, BIconChatDots, BIconGithub, BIconDiscord } from '../../icons';
+import { IconBookmarks, IconChatDots, IconGithub, IconDiscord } from '../../icons';
 import { ref } from 'vue';
 import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';
@@ -23,22 +23,22 @@ i18n.on('languageChanged', () => {
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
             <a href="https://feedback.alcalyn.app" target="_blank">
-                <BIconChatDots class="text-body" />
+                <IconChatDots class="text-body" />
                 <br>
                 {{ $t('feedback') }}
             </a>
             <a href="https://discord.gg/59SJ9KwvVq" target="_blank">
-                <BIconDiscord class="text-body" />
+                <IconDiscord class="text-body" />
                 <br>
                 Discord
             </a>
             <a href="https://github.com/playhex/playhex" target="_blank">
-                <BIconGithub class="text-body" />
+                <IconGithub class="text-body" />
                 <br>
                 GitHub
             </a>
             <router-link :to="{ name: 'links' }">
-                <BIconBookmarks class="text-body" />
+                <IconBookmarks class="text-body" />
                 <br>
                 {{ $t('hex_links') }}
             </router-link>

@@ -6,7 +6,7 @@ import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
-import { BIconRecordFill } from '../../icons';
+import { IconRecordFill } from '../../icons';
 import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 
@@ -52,7 +52,7 @@ useHead({
             <AppTournamentFormat :tournament />
 
             <p class="card-text lead">
-                <BIconRecordFill class="text-danger" />
+                <IconRecordFill class="text-danger" />
                 {{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}
             </p>
         </div>

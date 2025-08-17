@@ -85,7 +85,7 @@ thanks to [Weblate](https://weblate.org).
 
 ## Icons
 
-- https://icones.js.org/collection/bi
+- https://icones.js.org/
 - Then copy "Components > Unplugin Icons"
 - Add it to `src/client/vue/icons/index.ts`
 - Then use it in templates
