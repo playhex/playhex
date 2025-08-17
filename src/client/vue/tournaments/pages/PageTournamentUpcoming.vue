@@ -2,6 +2,7 @@
 import { formatDistance } from 'date-fns';
 import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
+import { by } from '../../../../shared/app/utils.js';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
@@ -174,6 +175,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                 <small>{{ $t('tournament_requires_account') }}</small>
                             </p>
 
+                            <!-- Subscribed/Checked-in players list -->
                             <template v-if="isCheckInOpen(tournament)">
                                 <!-- players who checked in -->
                                 <h6>{{ $t('tournament_checkedin') }}</h6>
@@ -183,7 +185,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     class="list-inline card-text"
                                 >
                                     <li
-                                        v-for="subscription in tournament.subscriptions.filter(subscription => subscription.checkedIn)"
+                                        v-for="subscription in tournament.subscriptions.filter(subscription => subscription.checkedIn).sort(by(sub => sub.player.pseudo))"
                                         :key="subscription.player.publicId"
                                         class="list-inline-item me-4"
                                     >
@@ -199,11 +201,11 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
 
                                     <ul class="list-inline card-text">
                                         <li
-                                            v-for="subscription in tournament.subscriptions.filter(subscription => !subscription.checkedIn)"
+                                            v-for="subscription in tournament.subscriptions.filter(subscription => !subscription.checkedIn).sort(by(sub => sub.player.pseudo))"
                                             :key="subscription.player.publicId"
                                             class="list-inline-item me-4"
                                         >
-                                            <AppPseudo :player="subscription.player" onlineStatus rating />
+                                            <AppPseudo :player="subscription.player" onlineStatus rating classes="text-body-secondary" />
                                         </li>
                                     </ul>
                                 </div>
@@ -214,7 +216,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                             <template v-else>
                                 <ul v-if="tournament.subscriptions.length > 0" class="list-inline mt-3 card-text">
                                     <li
-                                        v-for="subscription in tournament.subscriptions"
+                                        v-for="subscription in tournament.subscriptions.sort(by(sub => sub.player.pseudo))"
                                         :key="subscription.player.publicId"
                                         class="list-inline-item me-4"
                                     >

@@ -6,17 +6,16 @@
  *
  * list.sort(by(item => item.field));
  */
-export const by = <T>(field: (t: T) => number, ascOrDesc: 'asc' | 'desc' = 'asc') => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const by = <T>(field: (t: T) => any, ascOrDesc: 'asc' | 'desc' = 'asc') => {
     return (a: T, b: T) => {
         const aValue = field(a);
         const bValue = field(b);
 
-        const diff = aValue - bValue;
-
         if (ascOrDesc === 'desc') {
-            return -diff;
+            return aValue < bValue ? 1 : -1;
         }
 
-        return diff;
+        return aValue > bValue ? 1 : -1;
     };
 };
