@@ -348,10 +348,12 @@ export default class TournamentRepository
 
             tournament.subscriptions.push(tournamentSubscription);
 
-            addTournamentHistory(tournament, 'player_subscribed', {
-                playerPublicId: player.publicId,
-                playerPseudo: pseudoString(player),
-            }, now);
+            if (!isCheckInOpen(tournament, now)) {
+                addTournamentHistory(tournament, 'player_subscribed', {
+                    playerPublicId: player.publicId,
+                    playerPseudo: pseudoString(player),
+                }, now);
+            }
         }
 
         // check in
