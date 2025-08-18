@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import { ColumnUUID } from '../custom-typeorm.js';
 import { Expose, GROUP_DEFAULT as GROUP_DEFAULT } from '../class-transformer-custom.js';
 import AIConfig from './AIConfig.js';
@@ -6,6 +6,7 @@ import { IsDate } from 'class-validator';
 import Rating from './Rating.js';
 
 @Entity()
+@Index(['isGuest', 'isBot', 'pseudo'])
 export default class Player
 {
     @PrimaryGeneratedColumn()

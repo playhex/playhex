@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import AppTournamentBracket from '../components/AppTournamentBracket.vue';
 import { useHead } from '@unhead/vue';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
-import AppPseudo from '../../components/AppPseudo.vue';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
@@ -13,6 +12,7 @@ import { computed } from 'vue';
 import { Tournament, TournamentParticipant } from '../../../../shared/app/models';
 import { t } from 'i18next';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
+import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 
 const {
     tournament,
@@ -79,13 +79,7 @@ const colClasses = [
 
             <h1 class="m-0">{{ tournament.title }}</h1>
 
-            <p><small>
-                <i18next :translation="$t('tournament_organized_by')">
-                    <template #player>
-                        <AppPseudo :player="tournament.organizer" is="strong" />
-                    </template>
-                </i18next>
-            </small></p>
+            <AppTournamentOrganizerAndAdmins :tournament />
 
             <p class="lead">{{ $t('tournament_ended_at', { date: tournament.endedAt ? format(tournament.endedAt, 'd MMMM yyyy p') : '-' }) }}</p>
 

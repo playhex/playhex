@@ -9104,6 +9104,11 @@ vue-matomo@^4.2.0:
   resolved "https://registry.yarnpkg.com/vue-matomo/-/vue-matomo-4.2.0.tgz#d65e369e4ead1d95ef790bef3627512cac3d25e9"
   integrity sha512-m5hCw7LH3wPDcERaF4sp/ojR9sEx7Rl8TpOyH/4jjQxMF2DuY/q5pO+i9o5Dx+BXLSa9+IQ0qhAbWYRyESQXmA==
 
+vue-multiselect@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/vue-multiselect/-/vue-multiselect-3.3.1.tgz#25a04d2e5e6caeba4fd2eec949300d5aa6b81bcf"
+  integrity sha512-QZPxG60HK4HCeBNq4rkpzHSzh3ow8blipZbKmYdRvN65If/aFWO/Bzz6eUCED4LQNYlvXG7UJuiFlbqFkAeKXg==
+
 vue-router@^4.4.4:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.5.1.tgz#47bffe2d3a5479d2886a9a244547a853aa0abf69"

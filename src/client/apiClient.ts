@@ -794,3 +794,16 @@ export const apiDeleteTournament = async (tournamentSlug: string): Promise<void>
 
     await checkResponse(response);
 };
+
+export const apiPutTournamentAdmins = async (tournamentSlug: string, players: Player[]): Promise<void> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/admins`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(players.map(player => ({ publicId: player.publicId }))),
+    });
+
+    await checkResponse(response);
+};

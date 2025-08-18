@@ -48,15 +48,12 @@ export default class PlayerRepository
     async searchPlayers(params: SearchPlayersParameters): Promise<Player[]>
     {
         const queryBuilder = this.playerRepository.createQueryBuilder('player')
-            .take(10)
+            .take(Math.min(params.limit ?? 10, 10))
         ;
 
         if (undefined !== params.nicknameLike) {
             queryBuilder
-                .andWhere(`(
-                    player.pseudo like :nicknameLike
-                    or player.slug like :nicknameLike
-                )`)
+                .andWhere('player.pseudo like :nicknameLike')
                 .setParameter('nicknameLike', params.nicknameLike + '%')
             ;
         }

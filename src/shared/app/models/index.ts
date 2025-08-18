@@ -21,6 +21,7 @@ import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import Rating from './Rating.js';
 import Tournament from './Tournament.js';
+import TournamentAdmin from './TournamentAdmin.js';
 import TournamentBannedPlayer from './TournamentBannedPlayer.js';
 import TournamentMatch from './TournamentMatch.js';
 import TournamentHistory from './TournamentHistory.js';
@@ -51,6 +52,7 @@ export {
     PlayerPushSubscription,
     Rating,
     Tournament,
+    TournamentAdmin,
     TournamentBannedPlayer,
     TournamentMatch,
     TournamentHistory,
@@ -80,6 +82,7 @@ export const entities = {
     PlayerStats,
     Rating,
     Tournament,
+    TournamentAdmin,
     TournamentBannedPlayer,
     TournamentMatch,
     TournamentHistory,

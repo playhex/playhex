@@ -30,7 +30,9 @@ export const useTournamentFromUrl = () => {
             return false;
         }
 
-        return tournament.value.organizer.publicId === loggedInPlayer.publicId;
+        return tournament.value.organizer.publicId === loggedInPlayer.publicId
+            || tournament.value.admins.some(admin => admin.player.publicId === loggedInPlayer.publicId)
+        ;
     };
 
     return {

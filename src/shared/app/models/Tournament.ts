@@ -16,6 +16,7 @@ import TournamentSubscription from './TournamentSubscription.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import TournamentHistory from './TournamentHistory.js';
 import { defaultTimeControlTypes } from '../timeControlUtils.js';
+import TournamentAdmin from './TournamentAdmin.js';
 
 export type TournamentState =
     /**
@@ -87,6 +88,17 @@ export default class Tournament implements TimeControlBoardsize
     @ManyToOne(() => Player, { nullable: false })
     @Expose()
     organizer: Relation<Player>;
+
+    /**
+     * Admins of a tournament.
+     * Can help organizer doing tasks if organizer is afk or occupied in a tournament game
+     * (start tournament, forfeit games...)
+     */
+    @OneToMany(() => TournamentAdmin, tournamentAdmin => tournamentAdmin.tournament, { cascade: true })
+    @Expose()
+    @Type(() => TournamentAdmin)
+    @IsArray()
+    admins: TournamentAdmin[];
 
     @Column({ type: String, length: 32 })
     @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
@@ -319,6 +331,7 @@ export const createTournamentDefaultsCreate = (): Tournament => {
     const tournament = new Tournament();
 
     tournament.description = '';
+    tournament.admins = [];
     tournament.stage1Format = 'single-elimination';
     tournament.stage1Rounds = null;
     tournament.stage2Format = null;
@@ -345,6 +358,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.title = input.title;
     tournament.description = input.description;
     tournament.slug = slugifyTournamentName(input.title);
+    tournament.admins = [];
     tournament.stage1Format = input.stage1Format;
     tournament.stage1Rounds = input.stage1Rounds;
     tournament.stage2Format = input.stage2Format;
@@ -374,6 +388,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
 export const cloneTournament = (target: Tournament, source: Tournament): void => {
     target.title = source.title + ' (clone)';
     target.description = source.description;
+    target.admins = [];
     target.stage1Format = source.stage1Format;
     target.stage1Rounds = source.stage1Rounds;
     target.stage2Format = source.stage2Format;

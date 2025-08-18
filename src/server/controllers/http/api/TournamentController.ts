@@ -2,6 +2,7 @@ import { BadRequestError, Body, Delete, Get, HttpError, JsonController, NotFound
 import { Service } from 'typedi';
 import { AuthenticatedPlayer, mustBeTournamentOrganizer } from '../middlewares.js';
 import { Player, Tournament, TournamentSubscription } from '../../../../shared/app/models/index.js';
+import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
 import { isDuplicateError } from '../../../repositories/typeormUtils.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
@@ -15,6 +16,7 @@ export default class TournamentController
 {
     constructor(
         private tournamentRepository: TournamentRepository,
+        private playerRepository: PlayerRepository,
     ) {}
 
     /**
@@ -289,5 +291,33 @@ export default class TournamentController
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
         await this.tournamentRepository.deleteActiveTournament(activeTournament);
+    }
+
+    @Put('/api/tournaments/:slug/admins')
+    async putTournamentAdmins(
+        @AuthenticatedPlayer() player: Player,
+        @Param('slug') slug: string,
+        @Body() players: Player[],
+    ) {
+        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+
+        if (activeTournament === null) {
+            throw new NotFoundError(`No active tournament "${slug}"`);
+        }
+
+        mustBeTournamentOrganizer(activeTournament.getTournament(), player);
+
+        const loadedPlayers = await Promise.all(players.map(player => this.playerRepository.getPlayer(player.publicId)));
+
+        if (!this.isAllPlayersLoaded(loadedPlayers)) {
+            throw new NotFoundError(`On of these publicIds does not belong to a player: "${players.map(p => p.publicId).join('", "')}"`);
+        }
+
+        await activeTournament.changeTournamentAdmins(loadedPlayers);
+    }
+
+    private isAllPlayersLoaded(players: (null | Player)[]): players is Player[]
+    {
+        return players.every(player => player !== null);
     }
 }

@@ -29,7 +29,7 @@ const plugins = [
         MATOMO_SRC: JSON.stringify(process.env.MATOMO_SRC),
         LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
         VERSION: JSON.stringify(commitRef.version),
-        __VUE_OPTIONS_API__: false,
+        __VUE_OPTIONS_API__: true, // needed for vue-multiselect because it uses options api and mixins
         __VUE_PROD_DEVTOOLS__: false,
     }),
 ];
