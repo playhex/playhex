@@ -30,6 +30,7 @@ describe('pseudoUtils', () => {
             testHelloWorld('hello-world', 'Hello world--');
 
             testHelloWorld('bjjcvjgjxb-jjjfkjkdcuf9-95', 'Bjjcvjgjxb jjjfkjkdcuf9#95&');
+            testHelloWorld('mr-宏基', 'mr．宏基');
         });
     });
 });
