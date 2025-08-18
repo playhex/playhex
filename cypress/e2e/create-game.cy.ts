@@ -5,6 +5,7 @@ describe('Create game', () => {
             cy.get('.menu-top').contains(/Guest \d+/);
 
             cy.contains('Play vs AI').click();
+            cy.contains('.modal-body', 'TestBot Determinist instant').click();
 
             // open custom boardsize input
             cy.contains('[for="size-custom"]', 'Custom').click();
