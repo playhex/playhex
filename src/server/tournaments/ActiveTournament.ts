@@ -1,5 +1,6 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { Tournament, TournamentMatch, TournamentParticipant, TournamentSubscription } from '../../shared/app/models/index.js';
+import { areSamePlayers, deduplicatePlayers } from '../../shared/app/playerUtils.js';
+import { Player, Tournament, TournamentAdmin, TournamentMatch, TournamentParticipant, TournamentSubscription } from '../../shared/app/models/index.js';
 import baseLogger from '../services/logger.js';
 import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer, isStateEnded } from '../../shared/app/hostedGameUtils.js';
 import { CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
@@ -936,6 +937,9 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         return this.tournament;
     }
 
+    /**
+     * Change some tournament values from admin API (not tournament admins)
+     */
     async editTournamentAdmin(edited: Tournament): Promise<Tournament>
     {
         if (undefined !== edited.featuredFromInSeconds) {
@@ -943,5 +947,61 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         return await this.autoSave.save();
+    }
+
+    /**
+     * Replace tournament admins by these new ones.
+     * Players must have been loaded from database to link them to tournament.
+     */
+    async changeTournamentAdmins(players: Player[]): Promise<void>
+    {
+        if (areSamePlayers(players, this.tournament.admins.map(admin => admin.player))) {
+            return;
+        }
+
+        if (players.some(player => !player.id)) {
+            throw new Error('Players must have been loaded from database to link them to tournament');
+        }
+
+        players = deduplicatePlayers(players);
+
+        const previousAdmins = this.tournament.admins;
+        this.tournament.admins = [];
+
+        for (const player of players) {
+            const previousAdmin = previousAdmins.find(admin => admin.player.publicId === player.publicId);
+
+            if (previousAdmin) {
+                this.tournament.admins.push(previousAdmin);
+                continue;
+            }
+
+            const admin = new TournamentAdmin();
+
+            admin.player = player;
+            admin.tournament = this.tournament;
+
+            this.tournament.admins.push(admin);
+        }
+
+        try {
+            await this.save();
+
+            addTournamentHistory(this.tournament, 'changed_admins', {
+                newAdmins: this.tournament.admins.length === 0
+                    ? '- none -'
+                    : this.tournament.admins
+                        .map(admin => admin.player.pseudo)
+                        .join(', ')
+                ,
+            }, new Date());
+        } catch (e) {
+            this.tournament.admins = previousAdmins;
+
+            this.logger.error('Error while changing tournament admins', {
+                message: e.message,
+                e,
+            });
+        }
     }
 }

@@ -11,6 +11,7 @@ export const historyTypes = [
     'player_checked_in',
     'player_kicked',
     'player_banned',
+    'changed_admins',
     'started',
     'match_canceled_recreated',
     'match_ended',

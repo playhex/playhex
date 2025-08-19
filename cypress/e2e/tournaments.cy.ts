@@ -44,15 +44,15 @@ describe('Tournaments', () => {
         cy.contains('11×11');
 
         // Check-in
-        cy.contains('0 people are interested');
+        cy.contains('0 participants');
         cy.contains('Check-in now to play this tournament!');
         cy.contains('button', 'Check-in').click();
-        cy.contains('1 person is interested');
+        cy.contains('1 participant');
         cy.contains('Your participation is confirmed!');
 
         // Unsubscribe
-        cy.contains('button', 'I am interested!').click();
-        cy.contains('0 people are interested');
+        cy.contains('I am no longer interested').click();
+        cy.contains('0 participants');
         cy.contains('Check-in now to play this tournament!');
 
         // Change tournament format to Swiss

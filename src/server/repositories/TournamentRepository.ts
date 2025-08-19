@@ -36,6 +36,9 @@ const relations: FindOptionsRelations<Tournament> = {
             currentRating: true,
         },
     },
+    admins: {
+        player: true,
+    },
     matches: {
         player1: {
             currentRating: true,

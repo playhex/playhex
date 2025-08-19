@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export default class SearchPlayersParameters
 {
@@ -13,4 +13,14 @@ export default class SearchPlayersParameters
     @IsBoolean()
     @IsOptional()
     isBot?: boolean;
+
+    /**
+     * Take N first players.
+     * Defaults to 10.
+     */
+    @IsInt()
+    @Min(0)
+    @Max(10)
+    @IsOptional()
+    limit?: number;
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue';
+import { ref, useTemplateRef, watch } from 'vue';
 import { t } from 'i18next';
-import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiDeleteTournament } from '../../../apiClient.js';
+import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiDeleteTournament, apiPutTournamentAdmins } from '../../../apiClient.js';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
 import TournamentBannedPlayer from '../../../../shared/app/models/TournamentBannedPlayer.js';
 import Player from '../../../../shared/app/models/Player.js';
@@ -13,6 +13,7 @@ import TournamentSubscription from '../../../../shared/app/models/TournamentSubs
 import AppTournamentForm from '../components/AppTournamentForm.vue';
 import { ComponentExposed } from 'vue-component-type-helpers';
 import { useRouter } from 'vue-router';
+import AppPlayerSelectMultiple from '../components/AppPlayerSelectMultiple.vue';
 
 const {
     tournament,
@@ -179,6 +180,29 @@ const deleteTournament = async () => {
         },
     ));
 };
+
+/**
+ * Admins
+ */
+const selectedAdmins = ref<Player[]>([]);
+
+watch(tournament, (newValue, oldValue) => {
+    if (!oldValue && newValue) {
+        selectedAdmins.value = newValue.admins.map(admin => admin.player);
+    }
+});
+
+const updateAdmins = async () => {
+    const admins = selectedAdmins.value;
+    await apiPutTournamentAdmins(slug, admins);
+
+    useToastsStore().addToast(new Toast(
+        `Admins updated. Now they are: ${admins.length === 0 ? '- none -' : admins.map(admin => admin.pseudo).join(', ')}`,
+        {
+            level: 'success',
+        },
+    ));
+};
 </script>
 
 <template>
@@ -202,6 +226,23 @@ const deleteTournament = async () => {
 
                 <button type="submit" class="btn btn-success">Submit modifications</button>
             </form>
+        </template>
+
+        <template v-if="tournament">
+            <h2>{{ $t('tournament_admins') }}</h2>
+
+            <AppPlayerSelectMultiple
+                v-model="selectedAdmins"
+                placeholder="Add admins"
+            />
+
+            <p>
+                Admins can do the same things than organizer.
+                You can add admins to manage tournament
+                in case you are not here, or playing a tournament game.
+            </p>
+
+            <button @click="updateAdmins" class="btn btn-success">Update admins</button>
         </template>
 
         <template v-if="tournament && 'created' === tournament.state">

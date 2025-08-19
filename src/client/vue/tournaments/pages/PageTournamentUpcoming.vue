@@ -18,6 +18,7 @@ import { useTournamentCurrentSubscription } from '../composables/tournamentCurre
 import AppMySubscriptionStatus from '../components/AppMySubscriptionStatus.vue';
 import AppTournamentStartsAt from '../components/AppTournamentStartsAt.vue';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
+import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 
 const {
     tournament,
@@ -59,13 +60,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
 
             <h1 class="display-4 m-0">{{ tournament.title }}</h1>
 
-            <p><small>
-                <i18next :translation="$t('tournament_organized_by')">
-                    <template #player>
-                        <AppPseudo :player="tournament.organizer" is="strong" />
-                    </template>
-                </i18next>
-            </small></p>
+            <AppTournamentOrganizerAndAdmins :tournament />
 
             <div class="row">
                 <div class="col-md-6 mb-3">
