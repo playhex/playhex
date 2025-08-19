@@ -164,6 +164,8 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             playerPseudo: pseudoString(subscription.player),
         });
 
+        await this.save();
+
         return subscription;
     }
 
