@@ -121,30 +121,6 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     }
 
     /**
-     * A player subscribe to a tournament.
-     * If tournament is in check-in period, player os also checked-in.
-     */
-    async playerSelfSubscribe(playerPublicId: string): Promise<null | TournamentSubscription>
-    {
-        if (this.tournament.state !== 'created') {
-            throw new TournamentError('Too late to unsubscribe, tournament started');
-        }
-
-        const subscription = await this.removeSubscription(playerPublicId);
-
-        if (subscription === null) {
-            return null;
-        }
-
-        addTournamentHistory(this.tournament, 'player_unsubscribed', {
-            playerPublicId: subscription.player.publicId,
-            playerPseudo: pseudoString(subscription.player),
-        });
-
-        return subscription;
-    }
-
-    /**
      * A player decided to not play the tournament anymore
      */
     async playerSelfUnsubscribe(playerPublicId: string): Promise<null | TournamentSubscription>
