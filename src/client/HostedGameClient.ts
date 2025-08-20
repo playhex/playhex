@@ -12,7 +12,7 @@ import TimeControlType from '../shared/time-control/TimeControlType.js';
 import { notifier } from './services/notifications/index.js';
 import useServerDateStore from './stores/serverDateStore.js';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue.js';
-import { toEngineMove } from '../shared/app/models/Move.js';
+import { fromEngineMove, toEngineMove } from '../shared/app/models/Move.js';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat.js';
 import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, isStateEnded, updateHostedGame } from '../shared/app/hostedGameUtils.js';
 import useLobbyStore from './stores/lobbyStore.js';
@@ -465,6 +465,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         if (this.hostedGame.gameData && this.game) {
             this.hostedGame.gameData.currentPlayerIndex = this.game.getCurrentPlayerIndex();
+            this.hostedGame.gameData.movesHistory = this.game.getMovesHistory().map(move => fromEngineMove(move));
         }
     }
 

@@ -66,12 +66,10 @@ notifier.on('move', (hostedGame, move) => {
         return;
     }
 
-    if (move.specialMoveType === 'pass') {
-        useToastsStore().addToast(new Toast(
-            t('player_passed_his_turn', { player: pseudoString(passingPlayer, 'pseudo') }),
-            {
-                level: 'warning',
-            },
-        ));
-    }
+    useToastsStore().addToast(new Toast(
+        t('player_passed_his_turn', { player: pseudoString(passingPlayer, 'pseudo') }),
+        {
+            level: 'warning',
+        },
+    ));
 });
