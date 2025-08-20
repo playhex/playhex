@@ -13,8 +13,6 @@ import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
 import { AppDataSource } from '../data-source.js';
 import { instanceToInstance, plainToInstance } from '../../shared/app/class-transformer-custom.js';
 import RatingRepository from './RatingRepository.js';
-import AutoCancelStaleGames from '../services/background-tasks/AutoCancelStaleGames.js';
-import AutoCancelStaleCorrespondenceGames from '../services/background-tasks/AutoCancelStaleCorrespondenceGames.js';
 import { isDuplicateError } from './typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
@@ -46,8 +44,6 @@ export default class HostedGameRepository
     constructor(
         private hostedGamePersister: HostedGamePersister,
         private ratingRepository: RatingRepository,
-        private autoCancelStaleGames: AutoCancelStaleGames,
-        private autoCancelStaleCorrespondenceGames: AutoCancelStaleCorrespondenceGames,
         private onlinePlayerService: OnlinePlayersService,
 
         @Inject('Repository<ChatMessage>')
@@ -94,9 +90,6 @@ export default class HostedGameRepository
         }
 
         logger.info(`${games.length} games loaded.`);
-
-        this.autoCancelStaleGames.start(player => this.getPlayerActiveGames(player), Object.values(this.activeGames));
-        this.autoCancelStaleCorrespondenceGames.start(() => Object.values(this.activeGames));
     }
 
     /**

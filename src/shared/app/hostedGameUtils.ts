@@ -130,6 +130,14 @@ export const isBotGame = (hostedGame: HostedGame): boolean => {
     return hostedGame.gameOptions.opponentType === 'ai';
 };
 
+export const is1v1Game = (hostedGame: HostedGame): boolean => {
+    return hostedGame.gameOptions.opponentType === 'player';
+};
+
+export const isCorrespondenceGame = (hostedGame: HostedGame): boolean => {
+    return timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence';
+};
+
 /**
  * Update local hosted game data from HostedGame received data
  */

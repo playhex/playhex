@@ -156,11 +156,20 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         return count;
     }
 
+    /**
+     * Whether a player is online:
+     * he has a socket connected,
+     * but may be either afk, doing something else, or active.
+     */
     isOnline(player: Player): boolean
     {
         return player.publicId in this.onlinePlayers;
     }
 
+    /**
+     * Whether a player is active:
+     * he did something in last minutes.
+     */
     isActive(player: Player): boolean
     {
         return this.onlinePlayers[player.publicId]?.onlinePlayer.active ?? false;

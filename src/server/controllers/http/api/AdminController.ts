@@ -11,6 +11,8 @@ import { PushNotificationSender } from '../../../services/PushNotificationsSende
 import { PushPayload } from '../../../../shared/app/PushPayload.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
+import { GameStaleEvaluator } from '../../../services/auto-cancel-stale-games/GameStaleEvaluator.js';
+import { AutoCancelStaleGames } from '../../../services/auto-cancel-stale-games/AutoCancelStaleGames.js';
 
 class CreateAiVsAiInput
 {
@@ -38,6 +40,8 @@ export default class AdminController
         private playerRepository: PlayerRepository,
         private chatMessageRepository: ChatMessageRepository,
         private pushNotificationSender: PushNotificationSender,
+        private gameStaleEvaluator: GameStaleEvaluator,
+        private autoCancelStaleGames: AutoCancelStaleGames,
     ) {}
 
     /**
@@ -207,5 +211,24 @@ export default class AdminController
         await activeTournament.iterateTournament();
 
         return await activeTournament.save();
+    }
+
+    @Post('/api/admin/games/debug-staleness')
+    async postDebugStalenessAllGames()
+    {
+        return this.autoCancelStaleGames.checkAllGames(false);
+    }
+
+    @Post('/api/admin/games/:hostedGamePublicId/debug-staleness')
+    async postDebugStaleness(
+        @Param('hostedGamePublicId') hostedGamePublicId: string,
+    ) {
+        const activeGame = this.hostedGameRepository.getActiveGame(hostedGamePublicId);
+
+        if (!activeGame) {
+            throw new HttpError(400, 'No active game with this public id');
+        }
+
+        return this.gameStaleEvaluator.isStale(activeGame);
     }
 }
