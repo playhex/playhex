@@ -340,6 +340,12 @@
     "portrait": "Portrait",
     "force_board_orientation_mode": "Force displaying board in landscape or portrait for this screen",
     "resign": "Resign",
+    "resign_confirm_overlay": {
+        "title": "Resign game",
+        "message": "Are you sure you want to resign the game?",
+        "confirmLabel": "Yes, I resign",
+        "cancelLabel": "No, continue playing"
+    },
     "auto": "Auto",
     "conditional_moves": {
         "title": "Conditional moves",

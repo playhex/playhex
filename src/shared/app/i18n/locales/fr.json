@@ -321,6 +321,12 @@
     "chat": "Tchat",
     "system": "Système",
     "resign": "Abandonner",
+    "resign_confirm_overlay": {
+        "title": "Abandonner la partie",
+        "message": "Êtes-vous sûr de vouloir abandonner la partie ?",
+        "confirmLabel": "Oui, j'abandonne",
+        "cancelLabel": "Non, continuer à jouer"
+    },
     "show_coords_by_default": "Par défaut, afficher les coordonnées",
     "change_password": "Changer le mot de passe",
     "update_password": "Mettre à jour le mot de passe",

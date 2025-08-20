@@ -429,11 +429,11 @@ const resign = async (): Promise<void> => {
 
     try {
         await confirmationOverlay({
-            title: 'Resign game',
-            message: 'Are you sure you want to resign the game?',
-            confirmLabel: 'Yes, resign',
+            title: t('resign_confirm_overlay.title'),
+            message: t('resign_confirm_overlay.message'),
+            confirmLabel: t('resign_confirm_overlay.confirmLabel'),
             confirmClass: 'btn-danger',
-            cancelLabel: 'No, continue playing',
+            cancelLabel: t('resign_confirm_overlay.cancelLabel'),
             cancelClass: 'btn-outline-primary',
         });
 
