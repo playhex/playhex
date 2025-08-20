@@ -589,9 +589,22 @@ const pass = async () => {
         return;
     }
 
-    const passMove = Move.pass();
-    hostedGameClient.value.getGame().move(passMove, getLocalPlayerIndex() as PlayerIndex);
-    hostedGameClient.value.sendMove(fromEngineMove(passMove));
+    try {
+        await confirmationOverlay({
+            title: t('pass_confirm_overlay.title'),
+            message: t('pass_confirm_overlay.message'),
+            confirmLabel: t('pass_confirm_overlay.confirmLabel'),
+            confirmClass: 'btn-warning',
+            cancelLabel: t('pass_confirm_overlay.cancelLabel'),
+            cancelClass: 'btn-outline-primary',
+        });
+
+        const passMove = Move.pass();
+        hostedGameClient.value.getGame().move(passMove, getLocalPlayerIndex() as PlayerIndex);
+        hostedGameClient.value.sendMove(fromEngineMove(passMove));
+    } catch (e) {
+        // noop, player said no
+    }
 };
 
 const shouldShowPass = (): boolean => {
@@ -773,6 +786,19 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                         <!-- Secondary actions -->
                         <div class="dropdown-menu">
 
+                            <!-- Pass -->
+                            <button
+                                v-if="shouldShowPass()"
+                                type="button"
+                                class="dropdown-item"
+                                :class="shouldEnablePass() ? 'text-warning' : 'text-secondary disabled'"
+                                :disabled="!shouldEnablePass()"
+                                @click="pass()"
+                            >
+                                <IconArrowDownUp />
+                                {{ $t('pass') }}
+                            </button>
+
                             <!-- Undo -->
                             <button
                                 v-if="shouldDisplayUndoMove()"
@@ -786,18 +812,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                                 {{ $t('undo.undo_move') }}
                             </button>
 
-                            <!-- Pass -->
-                            <button
-                                v-if="shouldShowPass()"
-                                type="button"
-                                class="dropdown-item"
-                                :class="shouldEnablePass() ? 'text-warning' : 'text-secondary disabled'"
-                                :disabled="!shouldEnablePass()"
-                                @click="pass()"
-                            >
-                                <IconArrowDownUp />
-                                {{ $t('pass') }}
-                            </button>
+                            <div><hr class="dropdown-divider"></div>
 
                             <!-- Explore -->
                             <AppHexWorldExplore v-if="gameViewInitialized && gameView" :hostedGameClient :gameView :label="$t('explore')" class="dropdown-item" />

@@ -152,6 +152,12 @@
     "save": "Save",
     "discard": "Discard",
     "pass": "Pass",
+    "pass_confirm_overlay": {
+        "title": "Pass my turn?",
+        "message": "You are about to skip your current turn. Are you sure?",
+        "confirmLabel": "Yes, pass",
+        "cancelLabel": "Oops no, let me play"
+    },
     "player_passed_his_turn": "{{player}} passed his turn",
     "go_to_the_game": "Go to the game",
     "explore": "Explore",

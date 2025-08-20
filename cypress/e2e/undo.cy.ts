@@ -100,6 +100,7 @@ describe('Undo', () => {
         // Pass button is not disabled, and I can pass
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Pass').should('be.enabled').click();
+        cy.contains('Yes, pass').click();
         cy.wait(50);
         cy.contains(/passed his turn/, { timeout: 100 }).should('not.exist'); // should only appear when opponent pass his turn, not me
     });

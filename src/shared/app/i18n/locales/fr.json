@@ -433,6 +433,12 @@
         "reject": "Refuser"
     },
     "pass": "Passer",
+    "pass_confirm_overlay": {
+        "title": "Passer mon tour ?",
+        "message": "Vous êtes sur le point de passer votre tour. Êtes-vous sûr ?",
+        "confirmLabel": "Oui, passer",
+        "cancelLabel": "Oups non, je vais jouer"
+    },
     "explore": "Explorer",
     "game_state": {
         "canceled": "Annulée",

@@ -42,7 +42,7 @@ const props = defineProps({
                         <button type="button" class="btn-close" @click="reject()"></button>
                     </div>
                     <div class="modal-body">
-                        <p>{{ props.message }}</p>
+                        <p class="card-text">{{ props.message }}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn" :class="cancelClass" @click="reject()">{{ props.cancelLabel }}</button>
