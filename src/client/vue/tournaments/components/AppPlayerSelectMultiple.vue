@@ -56,40 +56,40 @@ const searchPlayer = async (input: string) => {
 </template>
 
 <style lang="stylus" scoped>
-.multiselect
-    & >>> .multiselect__tags
+.multiselect :deep()
+    .multiselect__tags
         background var(--bs-body-bg)
         color var(--bs-body-color)
 
-    & >>> .multiselect__content-wrapper
+    .multiselect__content-wrapper
         background var(--bs-body-bg)
         border var(--bs-border-width) solid var(--bs-border-color)
         color var(--bs-body-color)
 
-    & >>> .multiselect__input
+    .multiselect__input
         background var(--bs-body-bg)
         color var(--bs-body-color)
 
-    & >>> .multiselect__tag
+    .multiselect__tag
         background var(--bs-success)
 
-    & >>> .multiselect__option--selected
+    .multiselect__option--selected
         background var(--bs-success)
         color var(--bs-light)
 
-    & >>> .multiselect__tags
+    .multiselect__tags
         border var(--bs-border-width) solid var(--bs-border-color)
 
-    & >>> .multiselect__option--highlight,
-    & >>> .multiselect__option--highlight::after
+    .multiselect__option--highlight,
+    .multiselect__option--highlight::after
         background var(--bs-secondary-bg)
         color var(--bs-body-color)
 
-    & >>> .multiselect__option--selected.multiselect__option--highlight,
-    & >>> .multiselect__option--selected.multiselect__option--highlight::after
+    .multiselect__option--selected.multiselect__option--highlight,
+    .multiselect__option--selected.multiselect__option--highlight::after
         background var(--bs-danger)
         color var(--bs-light)
 
-    & >>> .multiselect__spinner
+    .multiselect__spinner
         background var(--bs-body-bg)
 </style>
