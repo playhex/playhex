@@ -67,7 +67,7 @@ export default class AuthController
         @Session() session: SessionData,
     ) {
         try {
-            const player = await this.playerRepository.createPlayer(body.pseudo, body.password);
+            const player = await this.playerRepository.createPlayer(body.pseudo.trim(), body.password);
 
             session.playerId = player.publicId;
 
@@ -99,7 +99,7 @@ export default class AuthController
         @Body() body: PseudoPasswordInput,
     ) {
         try {
-            const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo, body.password);
+            const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo.trim(), body.password);
 
             return upgradedPlayer;
         } catch (e) {
@@ -133,7 +133,7 @@ export default class AuthController
         @Session() session: SessionData,
     ) {
         try {
-            const player = await authenticate(body.pseudo, body.password);
+            const player = await authenticate(body.pseudo.trim(), body.password);
 
             session.playerId = player.publicId;
 
