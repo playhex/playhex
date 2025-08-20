@@ -116,7 +116,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // BR, WR, players ratings if available (rated games only)
-    if (hostedGame.ratings.length > 0) {
+    if (hostedGame.ratings?.length > 0) {
         const { ratings, hostedGameToPlayers } = hostedGame;
         const { round } = Math;
 
