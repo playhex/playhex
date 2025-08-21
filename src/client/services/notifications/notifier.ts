@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, HostedGame, Move } from '../../../shared/app/models/index.js';
+import { ChatMessage, HostedGame, Move, Player } from '../../../shared/app/models/index.js';
 
 type NotifiableEvents = {
     gameStart: (hostedGame: HostedGame) => void;
@@ -28,6 +28,18 @@ type NotifiableEvents = {
      * Notified once, at 10 seconds, for any player of any game.
      */
     gameTimeControlWarning: (hostedGame: HostedGame) => void;
+
+    /**
+     * A player want to takeback his move.
+     */
+    takebackRequested: (hostedGame: HostedGame, byPlayer: Player) => void;
+
+    /**
+     * Player accepted his opponent request to takeback his move.
+     *
+     * @param playerTakeback Player who wanted to takeback his move.
+     */
+    takebackAnswered: (hostedGame: HostedGame, accepted: boolean, playerTakeback: Player) => void;
 };
 
 export const notifier = new TypedEmitter<NotifiableEvents>();

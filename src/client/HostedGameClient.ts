@@ -449,6 +449,14 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onServerAskUndo(byPlayerIndex: PlayerIndex): void
     {
         this.hostedGame.undoRequest = byPlayerIndex;
+
+        const player = this.getPlayer(byPlayerIndex);
+
+        if (!player) {
+            throw new Error('No player at position ' + byPlayerIndex + ', cannot emit notification');
+        }
+
+        notifier.emit('takebackRequested', this.hostedGame, player);
     }
 
     onServerAnswerUndo(accept: boolean): void
@@ -461,12 +469,26 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             this.game.playerUndo(this.hostedGame.undoRequest as PlayerIndex);
         }
 
+        const { undoRequest } = this.hostedGame;
+
         this.hostedGame.undoRequest = null;
 
         if (this.hostedGame.gameData && this.game) {
             this.hostedGame.gameData.currentPlayerIndex = this.game.getCurrentPlayerIndex();
             this.hostedGame.gameData.movesHistory = this.game.getMovesHistory().map(move => fromEngineMove(move));
         }
+
+        if (undoRequest === null) {
+            throw new Error('There was no undo request, cannot emit notification');
+        }
+
+        const takebackPlayer = this.getPlayer(undoRequest);
+
+        if (!takebackPlayer) {
+            throw new Error('No player at position ' + undoRequest + ', cannot emit notification');
+        }
+
+        notifier.emit('takebackAnswered', this.hostedGame, accept, takebackPlayer);
     }
 
     onServerCancelUndo(): void

@@ -73,3 +73,38 @@ notifier.on('move', (hostedGame, move) => {
         },
     ));
 });
+
+notifier.on('takebackRequested', (hostedGame, byPlayer) => {
+    // Only display to my opponent and watchers
+    if (isMe(byPlayer)) {
+        return;
+    }
+
+    useToastsStore().addToast(new Toast(
+        t('undo.player_wants_to_takeback', { player: pseudoString(byPlayer, 'pseudo') }),
+        {
+            level: 'warning',
+        },
+    ));
+});
+
+notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
+    const opponent = getOtherPlayer(hostedGame, playerTakeback);
+
+    // Only display to player who requested takeback and watchers (so: everyone except playerTakeback's opponent)
+    if (opponent && isMe(opponent)) {
+        return;
+    }
+
+    if (accepted) {
+        useToastsStore().addToast(new Toast(
+            t('undo.player_takeback_his_move', { player: pseudoString(playerTakeback, 'pseudo') }),
+            { level: 'success' },
+        ));
+    } else {
+        useToastsStore().addToast(new Toast(
+            t('undo.takeback_request_denied', { player: pseudoString(playerTakeback, 'pseudo') }),
+            { level: 'danger' },
+        ));
+    }
+});

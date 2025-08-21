@@ -409,6 +409,9 @@
     "pseudo_too_long": "Username is too long",
     "invalid_pseudo": "Username is invalid",
     "undo": {
+        "player_wants_to_takeback": "{{ player }} wants to takeback their move",
+        "player_takeback_his_move": "{{ player }} took back their move.",
+        "takeback_request_denied": "{{ player }}'s request to takeback their move has been denied.",
         "undo_move": "Takeback",
         "accept": "Accept undo",
         "reject": "Reject"

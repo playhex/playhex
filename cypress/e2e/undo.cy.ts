@@ -39,7 +39,9 @@ describe('Undo', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Takeback').click();
 
-        cy.wait(500); // Wait to make sure cypress capture js error and fail if any
+        cy.contains(/Guest \d+ took back their move/);
+
+        cy.wait(200); // Wait to make sure cypress capture js error and fail if any
     });
 
     it('player undo his swap move after opponent played', () => {
@@ -67,7 +69,9 @@ describe('Undo', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Takeback').click();
 
-        cy.wait(500); // Wait to make sure cypress capture js error and fail if any
+        cy.contains(/Guest \d+ took back their move/);
+
+        cy.wait(200); // Wait to make sure cypress capture js error and fail if any
     });
 
     it('player plays, and undo his move before opponent played', () => {
@@ -95,7 +99,9 @@ describe('Undo', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Takeback').click();
 
-        cy.wait(500); // Wait to make sure cypress capture js error and fail if any
+        cy.contains(/Guest \d+ took back their move/);
+
+        cy.wait(200); // Wait to make sure cypress capture js error and fail if any
 
         // Pass button is not disabled, and I can pass
         cy.get('[aria-label="Secondary actions"]').click();
