@@ -5,6 +5,10 @@ import { pseudoString } from './pseudoUtils.js';
 import { Move } from '../game-engine/index.js';
 import { guessDemerHandicapFromHostedGame } from './demerHandicap.js';
 import { isRatingConfident } from './ratingUtils.js';
+import { SGFMove } from 'sgf/types.js';
+import { createTimeControl } from '../time-control/createTimeControl.js';
+import { PlayerIndex } from '../time-control/TimeControl.js';
+import { ByoYomiTimeControl } from '../time-control/time-controls/ByoYomiTimeControl.js';
 
 const baseSGF: SGF = {
     FF: 4,
@@ -61,16 +65,44 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     const movesHistory = hostedGame.gameData?.movesHistory;
 
     if (movesHistory && movesHistory.length > 0) {
+        const timeControl = createTimeControl(hostedGame.gameOptions.timeControl);
+        timeControl.start(movesHistory[0].playedAt, movesHistory[0].playedAt);
+
         const colors: SGFColor[] = ['B', 'W'];
         const movesChatMessages = getMovesChatMessages(hostedGame);
 
-        sgf.moves = movesHistory.map((move, index) => ({
-            [colors[index % 2]]: Move.fromData(move).toString(),
-            C: movesChatMessages[index].length === 0
-                ? undefined
-                : movesChatMessages[index].map(chat => `${chat.player?.pseudo}: ${chat.content}`).join('\n')
-            ,
-        }));
+        sgf.moves = movesHistory.map((move, index) => {
+            const sgfMove: SGFMove = {};
+
+            // Move
+            sgfMove[colors[index % 2]] = Move.fromData(move).toString();
+
+            // Chat messages as comment
+            if (movesChatMessages[index].length > 0) {
+                sgfMove.C = movesChatMessages[index].map(chat => `${chat.player?.pseudo}: ${chat.content}`).join('\n');
+            }
+
+            // Remaining time
+            timeControl.push(index % 2 as PlayerIndex, move.playedAt, move.playedAt);
+
+            if (timeControl instanceof ByoYomiTimeControl) {
+                const { remainingMainTime, remainingPeriods } = timeControl.getValues().players[index % 2];
+
+                if (typeof remainingMainTime === 'number') {
+                    sgfMove[colors[index % 2] + 'L' as 'BL' | 'WL'] = msToSeconds(remainingMainTime);
+                }
+
+                sgfMove['O' + colors[index % 2] as 'OB' | 'OW'] = remainingPeriods;
+            } else {
+                const { totalRemainingTime } = timeControl.getValues().players[index % 2];
+
+                if (typeof totalRemainingTime === 'number') {
+                    sgfMove[colors[index % 2] + 'L' as 'BL' | 'WL'] = msToSeconds(totalRemainingTime);
+                }
+            }
+
+            return sgfMove;
+        });
     }
 
     // DT, date of the game
@@ -132,6 +164,24 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
         }
     }
 
+    // TM, OT, LC, LT, time control
+    const { timeControl } = hostedGame.gameOptions;
+    sgf.TM = msToSeconds(timeControl.options.initialTime);
+
+    if (timeControl.family === 'fischer') {
+        sgf.OT = 'fischer ' + msToSeconds(timeControl.options.timeIncrement ?? 0);
+
+        if (timeControl.options.maxTime === timeControl.options.initialTime) {
+            sgf.OT += ' capped';
+        } else if (timeControl.options.maxTime !== undefined) {
+            sgf.OT += ' capped ' + msToSeconds(timeControl.options.maxTime);
+        }
+    } else if (timeControl.family === 'byoyomi') {
+        const { periodsCount, periodTime } = timeControl.options;
+
+        sgf.OT = `${periodsCount}x${msToSeconds(periodTime)} byo-yomi`;
+    }
+
     // HA, guess Demer handicap from game settings and pass moves
     sgf.HA = guessDemerHandicapFromHostedGame(hostedGame);
 
@@ -152,3 +202,5 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
 
     return sgfToString(sgf);
 };
+
+const msToSeconds = (ms: number): number => Math.ceil(ms / 1000);

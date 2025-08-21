@@ -60,6 +60,9 @@ const writeRoot = (sgf: SGF): string => {
         // Game details
         'DT', 'HA', 'RE', 'PL',
 
+        // Time control
+        'TM', 'OT', 'LC', 'LT',
+
         // Game event
         'EV', 'RO',
 
@@ -71,23 +74,32 @@ const writeRoot = (sgf: SGF): string => {
 /**
  * Render single move node properties, i.e `B[a1]C[comment]`
  */
-const writeNode = (sgfNode: SGFMove): string => {
-    return write(sgfNode, ['B', 'W', 'N', 'C']);
+const writeNode = (sgfMove: SGFMove): string => {
+    return write(sgfMove, [
+        // Move
+        'B', 'W',
+
+        // Time control values
+        'BL', 'WL', 'OB', 'OW',
+
+        // Node name and comment
+        'N', 'C',
+    ]);
 };
 
 /**
  * Renders either `;B[a1]...`
  * or `(;B[a1]...)(...)` if there is a variation.
  */
-export const writeNodesRecursive = (sgfNodes: SGFMove[], variations: SGFMove[][] = []): string => {
+export const writeNodesRecursive = (sgfMoves: SGFMove[], variations: SGFMove[][] = []): string => {
     let output = '';
 
-    if (sgfNodes.length > 0) {
-        const node = sgfNodes[0];
+    if (sgfMoves.length > 0) {
+        const node = sgfMoves[0];
         const variations = node.variations ?? [];
 
         output += ';' + writeNode(node);
-        output += writeNodesRecursive(sgfNodes.slice(1), variations);
+        output += writeNodesRecursive(sgfMoves.slice(1), variations);
 
         if (variations.length > 0) {
             output = '(' + output + ')';

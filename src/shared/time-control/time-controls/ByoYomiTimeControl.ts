@@ -5,8 +5,21 @@ import TimeControlType from '../TimeControlType.js';
 
 export interface ByoYomiTimeControlOptions
 {
+    /**
+     * Initial time in clock before periods start.
+     * In milliseconds
+     */
     initialTime: number;
+
+    /**
+     * Duration of a period.
+     * In milliseconds
+     */
     periodTime: number;
+
+    /**
+     * Number of ByoYomi periods
+     */
     periodsCount: number;
 }
 

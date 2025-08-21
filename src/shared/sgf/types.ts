@@ -146,7 +146,7 @@ export type SGF = SGFNode & {
      *
      * https://www.red-bean.com/sgf/properties.html#PL
      */
-    PL?: SGFTypeColor;
+    PL?: SGFColor;
 
     /**
      * If this game is from an event, like a tournament, meet, ..., name of this event.
@@ -162,6 +162,44 @@ export type SGF = SGFNode & {
      * https://www.red-bean.com/sgf/properties.html#RO
      */
     RO?: string;
+
+    /**
+     * Time limits of the game.
+     * In seconds.
+     *
+     * https://www.red-bean.com/sgf/properties.html#TM
+     */
+    TM?: number;
+
+    /**
+     * Method used for overtime (byo-yomi).
+     * In seconds.
+     *
+     * Examples:
+     *  - OT[86400 fischer]     (from OGS)
+     *  - OT[5x30 byo-yomi]     (from OGS)
+     *  - OT[5 mins Japanese style, 1 move / min]   (from red-bean)
+     *  - OT[25 moves / 10 min]                     (from red-bean)
+     *
+     * https://www.red-bean.com/sgf/properties.html#OT
+     */
+    OT?: string;
+
+    /**
+     * For byo yomi, number of periods.
+     *
+     * not specified in FF[4]
+     * https://homepages.cwi.nl/~aeb/go/misc/sgf.html#game
+     */
+    LC?: number;
+
+    /**
+     * For byo yomi, time of a period.
+     *
+     * not specified in FF[4]
+     * https://homepages.cwi.nl/~aeb/go/misc/sgf.html#game
+     */
+    LT?: number;
 
     /**
      * Game comments.
@@ -194,6 +232,38 @@ export type SGFMove = SGFNode & {
     W?: string;
 
     /**
+     * Time left for black after the move was made.
+     * In seconds.
+     *
+     * https://www.red-bean.com/sgf/properties.html#BL
+     */
+    BL?: number;
+
+    /**
+     * Time left for white after the move was made.
+     * In seconds.
+     *
+     * https://www.red-bean.com/sgf/properties.html#WL
+     */
+    WL?: number;
+
+    /**
+     * Number of black moves left (after the move of this node was
+     * played) to play in this byo-yomi period.
+     *
+     * https://www.red-bean.com/sgf/properties.html#OB
+     */
+    OB?: number;
+
+    /**
+     * Number of white moves left (after the move of this node was
+     * played) to play in this byo-yomi period.
+     *
+     * https://www.red-bean.com/sgf/properties.html#OW
+     */
+    OW?: number;
+
+    /**
      * List of variations.
      */
     variations?: SGFMove[][];
@@ -201,4 +271,4 @@ export type SGFMove = SGFNode & {
 
 export type SGFProperty = keyof SGF | keyof SGFMove;
 
-export type SGFTypeColor = 'B' | 'W';
+export type SGFColor = 'B' | 'W';
