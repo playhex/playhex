@@ -108,3 +108,28 @@ notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
         ));
     }
 });
+
+notifier.on('rematchOffer', hostedGame => {
+    const rematchRequester = hostedGame.rematch?.host;
+
+    if (!rematchRequester) {
+        return;
+    }
+
+    // Displays a toast to opponent
+    if (isMe(rematchRequester)) {
+        return;
+    }
+
+    if (iAmInGame(hostedGame)) {
+        useToastsStore().addToast(new Toast(
+            t('player_sent_you_rematch_offer', { player: pseudoString(rematchRequester, 'pseudo') }),
+            { level: 'success' },
+        ));
+    } else {
+        useToastsStore().addToast(new Toast(
+            t('player_sent_rematch_offer', { player: pseudoString(rematchRequester, 'pseudo') }),
+            { level: 'info' },
+        ));
+    }
+});

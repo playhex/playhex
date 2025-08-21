@@ -425,6 +425,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onServerRematchAvailable(hostedGame: HostedGame): void
     {
         this.hostedGame.rematch = hostedGame;
+
+        notifier.emit('rematchOffer', this.hostedGame);
     }
 
     onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void

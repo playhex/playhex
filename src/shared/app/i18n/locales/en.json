@@ -456,6 +456,8 @@
         "accept": "Accept rematch",
         "view": "View rematch"
     },
+    "player_sent_you_rematch_offer": "{{ player }} challenged you to a rematch!",
+    "player_sent_rematch_offer": "{{ player }} sent a rematch offer",
     "short_time_unit": {
         "day": "d",
         "hour": "h",

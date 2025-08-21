@@ -76,6 +76,12 @@ describe('Rematch', () => {
             .then(p => currentFirstPlayer = p)
         ;
 
+        // toast should not appear for player who sent the rematch offer
+        cy
+            .contains(/(challenged you to a rematch|sent a rematch offer)/, { timeout: 100 })
+            .should('not.exist')
+        ;
+
         cy.then(() => {
             if (previousFirstPlayer === currentFirstPlayer) {
                 throw new Error('Players have not switched color after rematch');

@@ -19,6 +19,13 @@ type NotifiableEvents = {
     gameEnd: (hostedGame: HostedGame) => void;
 
     /**
+     * A player offers a rematch.
+     * Rematch hostedGame is available in hostedGame.rematch
+     * To know who offered the rematch, check hostedGame.rematch.host
+     */
+    rematchOffer: (hostedGame: HostedGame) => void;
+
+    /**
      * Chat message received on a game
      */
     chatMessage: (hostedGame: HostedGame, chatMessage: ChatMessage) => void;
