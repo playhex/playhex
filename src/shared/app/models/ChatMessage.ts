@@ -24,6 +24,7 @@ export default class ChatMessage
 
     /**
      * Author of the message
+     * If null, it is a message posted by system (e.g: a player took back their move)
      */
     @IsObject({ groups: ['post'] })
     @ManyToOne(() => Player)
@@ -35,6 +36,24 @@ export default class ChatMessage
     @Column()
     @Expose()
     content: string;
+
+    /**
+     * If provided, replaces "content" on the UI, and is translated.
+     * Used e.g for system messages: they should be translated.
+     *
+     * "content" should also be filled in case translation is not applicable (server side)
+     * or where there is no locale (SGF export may not be translated).
+     */
+    @Column({ type: String, length: 64, nullable: true })
+    @Expose()
+    contentTranslationKey: null | string;
+
+    /**
+     * Parameters used for "contentTranslationKey"
+     */
+    @Column({ type: 'json', nullable: true })
+    @Expose()
+    translationParameters: null | object;
 
     @IsDate({ groups: ['post'] })
     @Column({ default: () => 'current_timestamp(3)', precision: 3 })

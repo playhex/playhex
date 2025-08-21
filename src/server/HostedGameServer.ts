@@ -19,6 +19,8 @@ import { notifier } from './services/notifications/index.js';
 import { AutoSaveInterface } from 'auto-save/AutoSaveInterface.js';
 import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
 import { Outcome } from '../shared/game-engine/Types.js';
+import { pseudoString } from '../shared/app/pseudoUtils.js';
+import { isBotGame } from '../shared/app/hostedGameUtils.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -839,6 +841,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.game.playerUndo(hostedGame.undoRequest as PlayerIndex);
         }
 
+        const playerUndoing = this.players[hostedGame.undoRequest];
         hostedGame.gameData = this.game.toData() ?? null;
         hostedGame.undoRequest = null;
         this.io.to(this.gameRooms()).emit('answerUndo', this.getPublicId(), accept);
@@ -847,6 +850,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.timeControl.setValues(timeControlAfterUndo!.getValues(), now);
             hostedGame.timeControl = this.timeControl.getValues();
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), hostedGame.timeControl);
+
+            if (!isBotGame(this.hostedGame)) {
+                this.postSystemChatMessage(
+                    pseudoString(playerUndoing) + ' took back their move.',
+                    'undo.player_takeback_his_move',
+                    { player: pseudoString(playerUndoing) },
+                    now,
+                );
+            }
         }
 
         return true;
@@ -995,6 +1007,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         } else {
             this.doEnd(1 - playerIndex as PlayerIndex, 'forfeit', now);
         }
+    }
+
+    postSystemChatMessage(content: string, translationKey: string, translationParameters: null | object = null, now = new Date())
+    {
+        const chatMessage = new ChatMessage();
+
+        chatMessage.player = null;
+        chatMessage.content = content;
+        chatMessage.hostedGame = this.hostedGame;
+        chatMessage.createdAt = now;
+        chatMessage.contentTranslationKey = translationKey;
+        chatMessage.translationParameters = translationParameters;
+
+        this.postChatMessage(chatMessage);
     }
 
     postChatMessage(chatMessage: ChatMessage)

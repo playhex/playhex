@@ -435,8 +435,11 @@
     "auto": "Auto",
     "undo": {
         "undo_move": "Reprendre",
-        "accept": "Accepter reprise",
-        "reject": "Refuser"
+        "accept": "Accepter la reprise",
+        "reject": "Refuser",
+        "player_wants_to_takeback": "{{ player }} souhaite reprendre son coup",
+        "player_takeback_his_move": "{{ player }} a repris son coup.",
+        "takeback_request_denied": "La demande de reprise de {{ player }} a été refusée."
     },
     "pass": "Passer",
     "pass_confirm_overlay": {

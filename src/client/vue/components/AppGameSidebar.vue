@@ -821,10 +821,11 @@ watchEffect(() => {
                                 <small class="time text-secondary">{{ formatHour(message.createdAt) }}</small>
                                 <span>&nbsp;</span>
                                 <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
-                                <span class="player fst-italic" v-else>{{ $t('system') }}</span>
-                                <span>&nbsp;</span>
+                                <span v-if="message.player">&nbsp;</span>
+
+                                <span class="content text-body-secondary fst-italic text-center" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
                                 <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
-                                <span class="content" v-html="renderMessage(message.content)"></span>
+                                <span class="content" v-else v-html="renderMessage(message.content)"></span>
                             </template>
 
                             <template v-else-if="message.type === 'move'">

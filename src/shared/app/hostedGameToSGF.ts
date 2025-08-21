@@ -79,7 +79,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
 
             // Chat messages as comment
             if (movesChatMessages[index].length > 0) {
-                sgfMove.C = movesChatMessages[index].map(chat => `${chat.player?.pseudo}: ${chat.content}`).join('\n');
+                sgfMove.C = movesChatMessages[index].map(chat => `${chat.player ? pseudoString(chat.player) : 'System'}: ${chat.content}`).join('\n');
             }
 
             // Remaining time
