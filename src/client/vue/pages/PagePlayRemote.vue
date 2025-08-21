@@ -22,7 +22,7 @@ import { Game, Move, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
-import { HostedGame, Player } from '../../../shared/app/models/index.js';
+import { HostedGame } from '../../../shared/app/models/index.js';
 import { fromEngineMove } from '../../../shared/app/models/Move.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
@@ -273,7 +273,7 @@ const initGameView = async () => {
         gameView.updateOptionsFromPlayerSettings(playerSettings.value);
     }
 
-    initWinOverlay(gameView, game, hostedGameClient.value.getPlayers());
+    initWinOverlay(gameView, game);
 
     await gameView.ready();
 
@@ -666,15 +666,23 @@ onUnmounted(() => resetConditionalMoves());
 const unlisteners: (() => void)[] = [];
 const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 
-const initWinOverlay = (gameView: GameView, game: Game, players: Player[]) => {
-    gameView.on('endedAndWinAnimationOver', () => {
+const initWinOverlay = (gameView: GameView, game: Game) => {
+    const listener = () => {
+        const players = hostedGameClient.value?.getPlayers();
+
+        if (!players) {
+            throw new Error('Unexpected no players, but needed to show the winner');
+        }
+
         gameFinishedOverlay({
             game,
             players,
         });
-    });
+    };
 
-    unlisteners.push(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
+    gameView.on('endedAndWinAnimationOver', listener);
+
+    unlisteners.push(() => gameView.off('endedAndWinAnimationOver', listener));
 };
 
 onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
