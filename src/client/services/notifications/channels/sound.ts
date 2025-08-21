@@ -1,7 +1,7 @@
 import { iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils.js';
 import { notifier } from '../notifier.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
-import { getLoserPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { getLoserPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 
 notifier.on('gameStart', (hostedGame) => {
     if (!(
@@ -56,4 +56,18 @@ notifier.on('gameTimeControlWarning', (hostedGame) => {
     }
 
     playAudio('/sounds/lisp/LowTime.ogg');
+});
+
+notifier.on('rematchOffer', hostedGame => {
+    // Play sound to both players in game
+    if (!iAmInGame(hostedGame)) {
+        return;
+    }
+
+    // Only play sound for 1v1 games
+    if (isBotGame(hostedGame)) {
+        return;
+    }
+
+    playAudio('/sounds/lisp/NewChallenge.ogg');
 });
