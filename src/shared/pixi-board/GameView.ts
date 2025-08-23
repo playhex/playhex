@@ -35,6 +35,12 @@ type GameViewEvents = {
     hexClicked: (coords: Coords) => void;
 
     /**
+     * A hex has been clicked on the view, as secondary action: long pressed or ctrl clicked.
+     * Can be used to make some secondary actions.
+     */
+    hexClickedSecondary: (coords: Coords) => void;
+
+    /**
      * A hex has been clicked in simulation mode on the view.
      *
      * @param played Whether the move has been simulated and added to simulated moves stack,
@@ -198,6 +204,26 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private resizeObserver: null | ResizeObserver = null;
 
     private initPromise = defer();
+
+    /**
+     * Long press handling, to make secondary action available on mobile,
+     * works also as long click on desktop
+     * (on desktop, ctrl click is better).
+     *
+     * Starts when pointer down,
+     * cleared when pointer up too quickly, or secondary action triggered.
+     */
+    private longPressTimeout: null | NodeJS.Timeout = null;
+
+    /**
+     * How much milliseconds need to hold to trigger secondary action.
+     */
+    private longPressDelay = 700;
+
+    /**
+     * Flag to prevent trigger both hexClicked and hexClickedSecondary.
+     */
+    private longPressed = false;
 
     private marksContainer = new Container();
     private marks: { [group: string]: Mark[] } = {};
@@ -689,6 +715,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         await Promise.all(promises);
     }
 
+    private clearLongPressTimeout(): void
+    {
+        if (!this.longPressTimeout) {
+            return;
+        }
+
+        clearTimeout(this.longPressTimeout);
+        this.longPressTimeout = null;
+    }
+
     private createAndAddHexes(): void
     {
         if (this.hexes.length > 0) {
@@ -722,7 +758,22 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
                 hexesContainer.addChild(hex);
 
-                hex.on('pointertap', () => {
+                hex.on('pointerdown', () => {
+                    this.longPressTimeout = setTimeout(() => {
+                        this.emit('hexClickedSecondary', { row, col });
+                        this.longPressed = true;
+                        this.clearLongPressTimeout();
+                    }, this.longPressDelay);
+                });
+
+                hex.on('pointerup', () => this.clearLongPressTimeout());
+
+                hex.on('pointertap', e => {
+
+                    if (this.longPressed) {
+                        this.longPressed = false;
+                        return;
+                    }
 
                     // Disable play in rewind mode. May change when simulation mode is implemented.
                     if (this.movesHistoryCursor !== null) {
@@ -734,7 +785,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         this.disableRewindMode();
                     }
 
-                    if (!this.simulationMode) {
+                    if (e.ctrlKey) {
+                        this.emit('hexClickedSecondary', { row, col });
+                    } else if (!this.simulationMode) {
                         this.emit('hexClicked', { row, col });
                     } else {
                         const move = new Move(row, col);

@@ -37,6 +37,7 @@ import { markRaw } from 'vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
 import GameView from '../../../shared/pixi-board/GameView.js';
+import { useChatInputStore } from '../../stores/chatInputStore.js';
 
 const head = injectHead();
 
@@ -258,6 +259,29 @@ const listenHexClick = () => {
     });
 };
 
+/**
+ * Ctrl+hex click to paste coords in chat
+ */
+const listenHexSecondaryClick = () => {
+    if (gameView === null) {
+        throw new Error('no game view');
+    }
+
+    gameView.on('hexClickedSecondary', coords => {
+        if (!hostedGameClient.value) {
+            return;
+        }
+
+        const chatInput = useChatInputStore().getChatInput(hostedGameClient.value.getId());
+
+        if (chatInput.value.length > 0 && !chatInput.value.match(/\s$/)) {
+            chatInput.value += ' ';
+        }
+
+        chatInput.value += new Move(coords.row, coords.col).toString() + ' ';
+    });
+};
+
 const initGameView = async () => {
     if (!hostedGameClient.value) {
         throw new Error('Cannot init game view now, no hostedGameClient');
@@ -297,6 +321,8 @@ const initGameView = async () => {
     } else {
         hostedGameClient.value.on('started', () => listenHexClick());
     }
+
+    listenHexSecondaryClick();
 };
 
 onBeforeUnmount(() => {

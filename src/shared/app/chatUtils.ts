@@ -39,3 +39,26 @@ export const checkShadowDeleted = (chatMessage: ChatMessage, shouldShowToPlayer:
 
     return chatMessage.player.publicId === shouldShowToPlayer.publicId;
 };
+
+/**
+ * Parse coords in chat to wrap them in <span class="coords">
+ * and allow to highlight them and make them interactive.
+ * Do not match coords inside url (to not break hexworld links for example).
+ * See unit tests for examples.
+ *
+ * Matches up to 99x99 coords.
+ *
+ * Should take boardsize a input to make sure not to match outside hexes.
+ */
+export const makesCoordsInteractive = (str: string): string => {
+    return str.replace(
+        /(https?:\/\/\S+)|\b([a-c]?[a-z]\d{1,2})\b/gi,
+        (_, url, coords) => {
+            if (url) {
+                return url;
+            }
+
+            return '<span class="coords">' + coords + '</span>';
+        },
+    );
+};

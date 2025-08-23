@@ -13,7 +13,7 @@ import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import Move from '../../../shared/game-engine/Move.js';
-import { canPlayerChatInGame } from '../../../shared/app/chatUtils.js';
+import { canPlayerChatInGame, makesCoordsInteractive } from '../../../shared/app/chatUtils.js';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
@@ -35,6 +35,8 @@ import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
+import { useChatInputStore } from '../../stores/chatInputStore.js';
+import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
 
 const props = defineProps({
     hostedGameClient: {
@@ -113,8 +115,9 @@ const playerColor = (player: Player): string => {
     return '';
 };
 
-const chatInput = ref('');
+const chatInput = useChatInputStore().getChatInput(hostedGameClient.value.getId());
 const chatMessagesElement = ref<HTMLElement>();
+const chatInputElement = ref<HTMLElement>();
 
 const scrollChatToBottom = () => nextTick(() => {
     if (chatMessagesElement.value) {
@@ -132,6 +135,63 @@ const sendChat = () => {
     hostedGameClient.value.sendChatMessage(chatInput.value);
 
     chatInput.value = '';
+};
+
+// Focus/Keep focus when pasting coords into chat
+watch(chatInput, () => {
+    if (!chatInputElement.value) {
+        return;
+    }
+
+    chatInputElement.value.focus();
+});
+
+let marksTimeout: null | NodeJS.Timeout = null;
+
+const clearMarksTimeout = () => {
+    if (marksTimeout === null) {
+        return;
+    }
+
+    clearTimeout(marksTimeout);
+    marksTimeout = null;
+};
+
+const removeMarksLater = () => {
+    clearMarksTimeout();
+
+    marksTimeout = setTimeout(() => {
+        gameView.removeMarks('coords-show');
+        clearMarksTimeout();
+    }, 3000);
+};
+
+const chatClick = (e: PointerEvent) => {
+    const { target } = e;
+
+    if (!(target instanceof HTMLSpanElement)) {
+        return;
+    }
+
+    if (!target.classList.contains('coords')) {
+        return;
+    }
+
+    const coords = target.innerText;
+
+    const mark = new TriangleMark(0x0dcaf0);
+    mark.setCoords(Move.fromString(coords));
+
+    // ctrl click to show multiple marks when click on multiple coords in chat
+    if (!e.ctrlKey) {
+        gameView.removeMarks('coords-show');
+    }
+
+    gameView.addMark(mark, 'coords-show');
+
+    removeMarksLater();
+
+    e.stopPropagation();
 };
 
 onMounted(() => scrollChatToBottom());
@@ -279,6 +339,9 @@ const renderMessage = (str: string): string => {
     });
     if (str.includes('['))
         str = relCoordsTranslate(str);
+
+    str = makesCoordsInteractive(str);
+
     return str;
 };
 
@@ -809,7 +872,7 @@ watchEffect(() => {
         -->
         <div class="sidebar-block block-fill-rest">
             <template v-if="isTab('main')">
-                <div class="chat-messages" ref="chatMessagesElement">
+                <div class="chat-messages" ref="chatMessagesElement" @click="chatClick">
                     <div class="container-fluid">
                         <div
                             v-for="message, key in hostedGameClient.getRichChatMessages()"
@@ -843,7 +906,7 @@ watchEffect(() => {
 
                 <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer as Player, hostedGameClient.getHostedGame())">
                     <div class="input-group">
-                        <input v-model="chatInput" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />
+                        <input v-model="chatInput" ref="chatInputElement" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />
                         <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
                     </div>
                     <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / {{ $t('n_characters', { count: 250 }) }}</div>
@@ -1000,4 +1063,14 @@ watchEffect(() => {
         position absolute
         left 0.25em
         top 0
+</style>
+
+<!-- Unscoped because .coords class is added by javascript -->
+<style lang="stylus">
+.chat-messages
+    .chat-message
+        .coords
+            font-weight bold
+            color var(--bs-info)
+            cursor pointer
 </style>
