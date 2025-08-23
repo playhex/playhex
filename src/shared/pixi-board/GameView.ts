@@ -206,9 +206,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private initPromise = defer();
 
     /**
-     * Long press handling, to make secondary action available on mobile,
-     * works also as long click on desktop
-     * (on desktop, ctrl click is better).
+     * Long press handling, to make secondary action available on mobile.
      *
      * Starts when pointer down,
      * cleared when pointer up too quickly, or secondary action triggered.
@@ -758,7 +756,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
                 hexesContainer.addChild(hex);
 
-                hex.on('pointerdown', () => {
+                hex.on('touchstart', () => {
                     this.longPressTimeout = setTimeout(() => {
                         this.emit('hexClickedSecondary', { row, col });
                         this.longPressed = true;
@@ -766,7 +764,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                     }, this.longPressDelay);
                 });
 
-                hex.on('pointerup', () => this.clearLongPressTimeout());
+                hex.on('touchend', () => this.clearLongPressTimeout());
 
                 hex.on('pointertap', e => {
 

@@ -261,6 +261,7 @@ const listenHexClick = () => {
 
 /**
  * Ctrl+hex click to paste coords in chat
+ * (long press on mobile)
  */
 const listenHexSecondaryClick = () => {
     if (gameView === null) {
