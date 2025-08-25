@@ -17,6 +17,7 @@ import i18next, { type i18n } from 'i18next';
 import useMatomo from './vue/useMatomo.js';
 import './services/registerServiceWorker.js';
 import './services/playerActivity.js';
+import { preloadAssets } from './services/preload-assets.js';
 
 const pinia = createPinia();
 
@@ -31,5 +32,7 @@ useMatomo(vueApp);
 
 // Load store now to set dark/light theme early enough and prevent blinking
 usePlayerLocalSettingsStore();
+
+preloadAssets();
 
 vueApp.mount('#vue-app');
