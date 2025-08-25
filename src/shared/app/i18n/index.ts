@@ -119,6 +119,7 @@ export const setLocale = async (locale: string, remember = true) => {
             lng: autoLocale(),
             debug: process.env.NODE_ENV === 'development',
             fallbackLng: 'en',
+            interpolation: { escapeValue: false },
         })
     ;
 
