@@ -156,11 +156,11 @@ const getFilesize = (size: number): string => {
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"rated"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;"><span style="color: rgb(255, 123, 114); font-weight: 400;">false</span></span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// guessed handicap from moves and game settings.</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// See https://www.hexwiki.net/index.php/Handicap</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// 0: no handicap</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// 1.5: for red</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// -2: 2 for blue</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// "N/S" no swap because swap disabled.</span>
-        <span style="color: rgb(139, 148, 158); font-weight: 400;">// See https://www.hexwiki.net/index.php/Handicap</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"handicap"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">0</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// when game started and ended</span>
