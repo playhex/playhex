@@ -175,7 +175,7 @@
     },
     "time_cadency": {
         "blitz": "Blitz",
-        "correspondence": "Fernschach",
+        "correspondence": "Korrespondenzspiel",
         "normal": "Normal"
     },
     "rematch": {
@@ -193,13 +193,13 @@
         "win": "Sieg",
         "loss": "Niederlage",
         "resign": "aufgegeben",
-        "forfeit": "verloren",
+        "forfeit": "Forfait",
         "time": "Zeitüberschreitung"
     },
     "player_wins_by": {
         "time": "{player} gewinnt auf Zeit!",
         "resign": "{player} gewinnt!",
-        "forfeit": "{player} gewinnt durch Aufgabe!",
+        "forfeit": "{player} gewinnt durch Forfait!",
         "default": "{player} gewinnt!"
     },
     "i_play": {
@@ -274,7 +274,7 @@
         "created": "Erstellt",
         "ended": "Beendet",
         "playing": "Spiel im Gang",
-        "forfeited": "Verwirkt"
+        "forfeited": "Forfaitiert"
     },
     "force_board_orientation_mode": "Anzeigen des Spielbretts im Querformat oder Hochformat für diesen Bildschirm erzwingen",
     "move_number": "Zug {{n}}",
@@ -397,7 +397,7 @@
         "default": "{player} verliert.",
         "time": "{player} überschreitet die Zeit.",
         "resign": "{player} gibt auf.",
-        "forfeit": "{player} hat das Spiel verwirkt."
+        "forfeit": "{player} verliert durch Forfait."
     },
     "game_created_by_system_time_ago": "Spiel vom System erstellt, {timeAgo}.",
     "username_not_an_email_warning": "Achtung, du scheinst deine Email einzugeben, aber PlayHex braucht nur einen Benutzernamen. Deine Email würde öffentlich sichtbar…",
