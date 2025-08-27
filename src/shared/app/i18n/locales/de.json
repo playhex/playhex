@@ -77,8 +77,8 @@
     "privacy_policy": "Datenschutzerklärung",
     "license_agpl": "Lizenz AGPL-3.0",
     "create_account": "Konto erstellen",
-    "already_have_account_login_instead": "Bereits ein Konto? Stattdessen {login}",
-    "no_account_sign_up_instead": "Kein Konto? Stattdessen {signUp}",
+    "already_have_account_login_instead": "Bereits ein Konto? Dann {login}",
+    "no_account_sign_up_instead": "Kein Konto? Dann {signUp}",
     "add_your_language": "Fehlt deine Sprache? {link}!",
     "add_your_language_link": "Füge sie mit Weblate hinzu",
     "show_coords_by_default": "Koordinaten standardmäßig anzeigen",
@@ -144,7 +144,7 @@
         "types": {
             "tricolor_checkerboard": "Dreifarbiges Schachbrettmuster",
             "concentrical_rings": "Konzentrische Ringe (HexWorld)",
-            "height_5_lines": "Höhe 5 Linien",
+            "height_5_lines": "5er Linien",
             "single_ring": "Einzelner Ring",
             "custom": "Benutzerdefiniert",
             "null": "Keine"
@@ -176,7 +176,7 @@
     "time_cadency": {
         "blitz": "Blitz",
         "correspondence": "Korrespondenzspiel",
-        "normal": "Normal"
+        "normal": "Echtzeit"
     },
     "rematch": {
         "label": "Revanche",
