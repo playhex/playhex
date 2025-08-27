@@ -20,12 +20,12 @@
         "blue": "Blau",
         "played": "Gespielt",
         "finished": "Abgeschlossen",
-        "review": "Überprüfung",
+        "review": "Ansehen",
         "won": "Gewonnen",
         "outcome": "Ergebnis",
         "started": "Gestartet",
         "playing": "Spielend",
-        "watch": "Beobachten",
+        "watch": "Zusehen",
         "lost": "Verloren",
         "title_your_turn": "Du bist dran!",
         "title_waiting": "Suche Gegner: gehosted von",
@@ -34,7 +34,7 @@
         "duration": "Spieldauer"
     },
     "game_rules": {
-        "normal": "standard",
+        "normal": "Standard",
         "host_plays_first": "Host spielt zuerst",
         "host_plays_second": "Host spielt als Zweiter",
         "no_swap": "Kein Tausch"
@@ -88,7 +88,7 @@
         "title": "Spiel abgeschlossen"
     },
     "initializing_game": "Spiel wird initialisiert …",
-    "waiting_for_an_opponent": "Warten auf einen Gegner…",
+    "waiting_for_an_opponent": "Suche Gegner…",
     "confirm_overlay": {
         "are_you_sure?": "Bist du sicher?",
         "confirmation": "Bestätigung"
@@ -184,10 +184,10 @@
         "view": "Revanche ansehen"
     },
     "short_time_unit": {
-        "day": "T",
-        "hour": "Std",
-        "second": "Sek",
-        "minute": "Min."
+        "day": "d",
+        "hour": "h",
+        "second": "s",
+        "minute": "min"
     },
     "outcome": {
         "win": "Sieg",
