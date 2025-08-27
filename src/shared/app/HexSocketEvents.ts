@@ -139,6 +139,15 @@ export type HexServerToClientEvents = {
 
     /**
      * A chat message has been posted in a game.
+     *
+     * Should not be used to notify player directly:
+     * message is sent on the game room, and player's active games.
+     * When game is ended and player not watching it, he won't receive
+     * the message, and not be notified.
+     *
+     * Instead, we should create a new event for ended game
+     * that is sent directly to players of the games
+     * (and later, to players who subscribed to the game).
      */
     chat: (gameId: string, chatMessage: ChatMessage) => void;
 
