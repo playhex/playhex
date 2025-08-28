@@ -1,16 +1,15 @@
 import { Container } from 'typedi';
-import { Repository } from 'typeorm';
 import { notifier } from '../notifier.js';
-import { PlayerNotification } from '../../../../shared/app/models/index.js';
 import { truncateText } from '../../../../shared/app/utils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { createPlayerNotification } from '../../../../shared/app/models/PlayerNotification.js';
 import { getLoserPlayer, getOtherPlayer, getWinnerPlayer } from '../../../../shared/app/hostedGameUtils.js';
 import logger from '../../../services/logger.js';
 import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
+import { PlayerNotificationsService } from '../../../services/PlayerNotificationsService.js';
 
-const playerNotificationRepository = Container.get<Repository<PlayerNotification>>('Repository<PlayerNotification>');
 const onlinePlayerService = Container.get(OnlinePlayersService);
+const playerNotificationService = Container.get(PlayerNotificationsService);
 
 /*
  * Adds notifications in the player header, in the UI.
@@ -27,7 +26,7 @@ const onlinePlayerService = Container.get(OnlinePlayersService);
  * - offline or inactive => always
  * - active => in ended games only, if not already on this game page
  */
-notifier.on('chatMessage', (hostedGame, chatMessage) => {
+notifier.on('chatMessage', async (hostedGame, chatMessage) => {
 
     // No notification for system messages
     if (chatMessage.player === null) {
@@ -72,8 +71,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
             chatMessage.createdAt,
         );
 
-        // async to not slow down the call to notifier.emit
-        playerNotificationRepository.save(playerNotification);
+        await playerNotificationService.addNotification(playerNotification);
     }
 });
 
@@ -115,7 +113,7 @@ notifier.on('gameEnd', async hostedGame => {
             hostedGame.gameData?.endedAt ?? new Date(),
         );
 
-        await playerNotificationRepository.save(playerNotification);
+        await playerNotificationService.addNotification(playerNotification);
     }
 });
 
@@ -140,6 +138,6 @@ notifier.on('gameCanceled', async hostedGame => {
             hostedGame.gameData?.endedAt ?? new Date(),
         );
 
-        await playerNotificationRepository.save(playerNotification);
+        await playerNotificationService.addNotification(playerNotification);
     }
 });

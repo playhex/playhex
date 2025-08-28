@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
-import { Expose } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { HostedGame, Player } from './index.js';
 import { Type } from 'class-transformer';
 import { ColumnUUID } from '../../app/custom-typeorm.js';
@@ -65,7 +65,7 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * Used to identify a notification on the front
      */
     @ColumnUUID({ unique: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     publicId: string;
 
     @Column()
@@ -80,7 +80,7 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * Can be used to group notifications per game.
      */
     @ManyToOne(() => HostedGame, { nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     hostedGame: null | Relation<HostedGame>;
 
     /**
@@ -89,7 +89,7 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * which text to use.
      */
     @Column({ length: 64 })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     type: NotificationType;
 
     /**
@@ -98,7 +98,7 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * For example: text of the chat message, link parameters...
      */
     @Column({ type: 'json', nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     parameters: PlayerNotificationTypes[NotificationType];
 
     /**
@@ -106,7 +106,7 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * and should no longer be displayed as "new"
      */
     @Column({ default: false })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     isRead: boolean;
 
     /**
@@ -114,7 +114,7 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * Or in case of doubt, use new Date().
      */
     @Column({ type: Date, default: () => 'current_timestamp()' })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     @Type(() => Date)
     createdAt: Date;
 }

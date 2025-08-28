@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
 import HostedGame from './HostedGame.js';
 import Player from './Player.js';
-import { Expose } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 
 @Entity()
 export default class HostedGameToPlayer
@@ -17,7 +17,7 @@ export default class HostedGameToPlayer
     playerId: number;
 
     @ManyToOne(() => Player)
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     player: Relation<Player>;
 
     @PrimaryColumn('smallint')

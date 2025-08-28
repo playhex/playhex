@@ -4,6 +4,7 @@ import * as CustomParser from '../../shared/app/socketCustomParser.js';
 import { defineStore } from 'pinia';
 import useAuthStore from './authStore.js';
 import { watch, ref } from 'vue';
+import Rooms from '../../shared/app/Rooms.js';
 
 /**
  * Use global io if overriden, else use normal io.
@@ -41,6 +42,7 @@ const useSocketStore = defineStore('socketStore', () => {
         }
 
         reconnectSocket();
+        joinRoom(Rooms.player(player.publicId));
     });
 
     socket.on('connect', () => {

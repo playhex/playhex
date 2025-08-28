@@ -143,7 +143,7 @@ const ack = async (hostedGamePublicId?: string) => {
 
 .player-notifications-container
     position absolute
-    width 32em
+    width 30em
     max-width 100%
     padding 0.5em
     top 3em

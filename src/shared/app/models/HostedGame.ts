@@ -9,7 +9,7 @@ import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/Byo
 import Game from './Game.js';
 import ChatMessage from './ChatMessage.js';
 import HostedGameToPlayer from './HostedGameToPlayer.js';
-import { Expose } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
@@ -21,7 +21,7 @@ export default class HostedGame
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     publicId: string;
 
     /**
@@ -37,7 +37,7 @@ export default class HostedGame
     host: null | Relation<Player>;
 
     @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     @Type(() => HostedGameToPlayer)
     hostedGameToPlayers: HostedGameToPlayer[];
 
@@ -104,7 +104,7 @@ export default class HostedGame
     rematchedFrom: null | HostedGame = null;
 
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     @Type(() => Date)
     createdAt: Date = new Date();
 

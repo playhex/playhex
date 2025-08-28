@@ -4,10 +4,15 @@ import { computed, Ref, ref, watch } from 'vue';
 import { apiGetPlayerNotifications } from '../apiClient.js';
 import useAuthStore from './authStore.js';
 import { GamePlayerNotifications, groupPlayerNotificationByGame } from '../../shared/app/playerNotificationUtils.js';
+import useSocketStore from './socketStore.js';
 
+/**
+ * Stores player notifications: the ones in the header.
+ */
 const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () => {
 
     const { loggedInPlayer } = storeToRefs(useAuthStore());
+    const { socket } = useSocketStore();
 
     const playerNotifications: Ref<null | PlayerNotification[]> = ref(null);
 
@@ -40,6 +45,14 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
         }
 
         reloadPlayerNotifications();
+    });
+
+    socket.on('playerNotification', playerNotification => {
+        if (playerNotifications.value === null) {
+            return;
+        }
+
+        playerNotifications.value.push(playerNotification);
     });
 
     return {

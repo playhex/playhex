@@ -30,6 +30,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
             players.value[player.publicId] = {
                 player,
                 active: true,
+                currentPage: null,
             };
         }
     });

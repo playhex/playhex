@@ -811,7 +811,13 @@ export const apiPutTournamentAdmins = async (tournamentSlug: string, players: Pl
 export const apiGetPlayerNotifications = async (): Promise<PlayerNotification[]> => {
     const response = await fetch('/api/player-notifications');
 
-    await checkResponse(response);
+    if (!response.ok) {
+        if (response.status >= 500) {
+            throw new Error('Server error');
+        }
+
+        return [];
+    }
 
     return (await response.json() as PlayerNotification[])
         .map(playerNotification => plainToInstance(PlayerNotification, playerNotification))

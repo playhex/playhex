@@ -3,7 +3,7 @@ import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models/index.js';
-import type { OnlinePlayers } from './models/index.js';
+import type { OnlinePlayers, PlayerNotification } from './models/index.js';
 
 export type HexClientToServerEvents = {
     /**
@@ -177,6 +177,12 @@ export type HexServerToClientEvents = {
      * to know if game analyze has finished, or is just requested.
      */
     analyze: (gameId: string, gameAnalyze: GameAnalyze) => void;
+
+    /**
+     * Player just received a player notification,
+     * should add it in header.
+     */
+    playerNotification: (playerNotification: PlayerNotification) => void;
 
     // Room updates
 

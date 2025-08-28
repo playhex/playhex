@@ -22,7 +22,12 @@ export default class Rooms
     static readonly game = (gameId: string) => `games/${gameId}`;
 
     /**
-     * Full game info for all games of a given player.
+     * Channel for a specific player.
+     */
+    static readonly player = (playerId: string) => `players/${playerId}`;
+
+    /**
+     * Full game info for all **active** games of a given player.
      * Used to know when a player needs to play on one of his games.
      */
     static readonly playerGames = (playerId: string) => `players/${playerId}/games`;
