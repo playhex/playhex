@@ -395,7 +395,6 @@
     "friendly_games": "Friendlies",
     "bot_games": "Bot games",
     "browse_all_ended_games": "Browse all ended games",
-    "n_total_games_zero": "No matching game.",
     "n_total_games_one": "1 total game.",
     "n_total_games_other": "{{count}} total games.",
     "previous": "Previous",

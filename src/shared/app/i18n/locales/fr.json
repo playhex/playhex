@@ -64,10 +64,13 @@
     "participants": "Participants",
     "n_people_are_interested_one": "{{count}} personne est intéressée",
     "n_people_are_interested_many": "{{count}} personnes sont intéressées",
+    "n_people_are_interested_other": "",
     "n_participants_one": "{{ count }} participant",
     "n_participants_many": "{{ count }} participants",
+    "n_participants_other": "",
     "n_playing_games_one": "{{ count }} partie en cours",
     "n_playing_games_many": "{{ count }} parties en cours",
+    "n_playing_games_other": "",
     "view_tournament_as_participant": "Jouer le tournoi",
     "view_tournament": "Voir le tournoi",
     "tournament_started_ago": "Commencé {{ date }}",
@@ -76,6 +79,7 @@
     "tournament_duration": "Durée du tournoi : {{ duration }}",
     "n_matches_played_one": "{{ count }} match joué",
     "n_matches_played_many": "{{ count }} matchs joués",
+    "n_matches_played_other": "",
     "tournament_subscription": {
         "subscribed": "Vous êtes intéressé",
         "checked_in": "Votre participation est confirmée !",
@@ -108,6 +112,7 @@
     "round_n": "Manche {{ n }}",
     "n_rounds_one": "Une manche",
     "n_rounds_many": "{{ count }} manches",
+    "n_rounds_other": "",
     "rounds_number_auto": "Manches : basé sur le nombre de participants",
     "losers_bracket": "Tournoi des perdants",
     "consolation_enabled": "Avec match de consolation",
@@ -153,7 +158,8 @@
         "started": "Le tournoi a commencé !",
         "match_ended": "Match {{ round }}.{{ number }} terminé : {{ winnerPseudo }} a battu {{ loserPseudo }}.",
         "match_canceled_recreated": "Le match {{ round }}.{{ number }} a été recréé suite à une annulation.",
-        "ended": "Le tournoi est terminé."
+        "ended": "Le tournoi est terminé.",
+        "changed_admins": "L'organisateur a désigné les admins : {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Banni de ce tournoi",
     "tournament_account_required": "Ce tournoi nécessite un compte, les invités ne sont pas autorisés. Veuillez vous connecter ou créer un compte.",
@@ -477,5 +483,11 @@
     "invalid_password": "Mot de passe invalide pour ce compte",
     "password_changed_success": "Le mot de passe a été changé.",
     "invalid_pseudo": "Ce pseudo est invalide",
-    "pseudo_too_long": "Ce pseudo est trop long"
+    "pseudo_too_long": "Ce pseudo est trop long",
+    "tournament_admins": "Administrateurs du tournoi",
+    "admins_one": "Admin : { players }",
+    "admins_many": "Admins : { players }",
+    "admins_other": "Admins : { players }",
+    "player_sent_you_rematch_offer": "{{ player }} vous propose une revanche !",
+    "player_sent_rematch_offer": "{{ player }} a proposé une revanche"
 }

@@ -20,12 +20,12 @@
         "blue": "Blau",
         "played": "Gespielt",
         "finished": "Abgeschlossen",
-        "review": "Überprüfung",
+        "review": "Ansehen",
         "won": "Gewonnen",
         "outcome": "Ergebnis",
         "started": "Gestartet",
         "playing": "Spielend",
-        "watch": "Beobachten",
+        "watch": "Zusehen",
         "lost": "Verloren",
         "title_your_turn": "Du bist dran!",
         "title_waiting": "Suche Gegner: gehosted von",
@@ -34,7 +34,7 @@
         "duration": "Spieldauer"
     },
     "game_rules": {
-        "normal": "standard",
+        "normal": "Standard",
         "host_plays_first": "Host spielt zuerst",
         "host_plays_second": "Host spielt als Zweiter",
         "no_swap": "Kein Tausch"
@@ -56,7 +56,7 @@
         "custom": "Benutzerdefiniert",
         "byo_yomi": "Byo-Yomi",
         "fischer": "Fischer",
-        "fischer_capped": "Gedeckelter Fischer",
+        "fischer_capped": "Gekappter Fischer",
         "initial_time": "Anfangszeit",
         "periods": "Perioden",
         "periods_time": "Periodenzeit",
@@ -64,7 +64,8 @@
         "normal": "Normal",
         "long": "Lang",
         "use": "{{type}} verwenden",
-        "time_increment": "Zeitinkrement"
+        "time_increment": "Zeitinkrement",
+        "capped_abbreviation": "Gek."
     },
     "game_was_created_by_player_time_ago": "Spiel wurde erstellt von {player}, {timeAgo}.",
     "log_out": "Abmelden",
@@ -73,11 +74,11 @@
     "feedback": "Rückmeldung",
     "hex_links": "Hex-Links",
     "last_change": "Letzte Änderung: {{date}}",
-    "privacy_policy": "Datenschutzrichtlinie",
+    "privacy_policy": "Datenschutzerklärung",
     "license_agpl": "Lizenz AGPL-3.0",
     "create_account": "Konto erstellen",
-    "already_have_account_login_instead": "Bereits ein Konto? {login} stattdessen",
-    "no_account_sign_up_instead": "Kein Konto? {signUp} stattdessen",
+    "already_have_account_login_instead": "Bereits ein Konto? Dann {login}",
+    "no_account_sign_up_instead": "Kein Konto? Dann {signUp}",
     "add_your_language": "Fehlt deine Sprache? {link}!",
     "add_your_language_link": "Füge sie mit Weblate hinzu",
     "show_coords_by_default": "Koordinaten standardmäßig anzeigen",
@@ -87,35 +88,35 @@
         "title": "Spiel abgeschlossen"
     },
     "initializing_game": "Spiel wird initialisiert …",
-    "waiting_for_an_opponent": "Warten auf einen Gegner…",
+    "waiting_for_an_opponent": "Suche Gegner…",
     "confirm_overlay": {
         "are_you_sure?": "Bist du sicher?",
         "confirmation": "Bestätigung"
     },
     "workers": {
-        "slow_worker": "Kein schneller Worker ist momentan online. Nur begrenzte KI ist verfügbar.",
-        "no_worker": "Kein Worker kann derzeit Züge berechnen. Nur zufällige Bots sind verfügbar.",
+        "slow_worker": "Es ist gerade kein Schnellworker online. Nur begrenzte KI ist verfügbar.",
+        "no_worker": "Kein Worker kann derzeit Züge berechnen. Nur Zufalls-Bots sind verfügbar.",
         "see_how_to_spawn_a_worker": "Zeige mir, wie ich KI-Züge für PlayHex auf meinem Computer berechnen kann"
     },
     "try_again": "Erneut versuchen",
     "no": "Nein",
     "pass": "Passen",
-    "ranked": "Rangliste",
+    "ranked": "Gewertet",
     "load_more": "Mehr laden",
     "no_such_player": "Sieht so aus, als gäbe es diesen Spieler nicht.",
     "n_online_players": "Online ({{n}})",
     "finished_games": "Beendete Spiele",
     "1v1_ranked": {
-        "title": "1v1",
-        "create": "Erstelle 1v1"
+        "title": "Gewertet",
+        "create": "Erstelle 1zu1 gewertet"
     },
     "1v1_friendly": {
-        "title": "Benutzerdefiniertes 1v1",
-        "create": "Erstelle benutzerdefiniertes 1v1"
+        "title": "Freundschaftsspiel",
+        "create": "Erstelle 1zu1 Freundschaftspiel"
     },
     "1vAI_ranked": {
-        "title": "Rangliste vs KI",
-        "create": "Gegen KI im Ranglistenspiel spielen"
+        "title": "Gewertet gegen KI",
+        "create": "Gewertet gegen KI spielen"
     },
     "1vAI_friendly": {
         "title": "Gegen KI spielen",
@@ -143,7 +144,7 @@
         "types": {
             "tricolor_checkerboard": "Dreifarbiges Schachbrettmuster",
             "concentrical_rings": "Konzentrische Ringe (HexWorld)",
-            "height_5_lines": "Höhe 5 Linien",
+            "height_5_lines": "5er Linien",
             "single_ring": "Einzelner Ring",
             "custom": "Benutzerdefiniert",
             "null": "Keine"
@@ -154,24 +155,28 @@
     "contribute": "Beitragen",
     "contributors": "Beitragende",
     "player_made_a_move": "{{player}} hat einen Zug gemacht",
-    "game_with_player_has_started": "Das Spiel mit {{player}} hat begonnen",
+    "game_with_player_has_started": "{{player}} ist deinen Spiel beigetreten und das Spiel hat begonnen",
     "confirm_move": {
         "title": "Zug bestätigen",
         "button_label": "Zug bestätigen",
         "send_immediately": "Sofort senden",
         "ask_confirmation": "Bestätigung anfordern",
-        "description": "Um Fehleingaben zu vermeiden, kannst du eine Bestätigung vor dem Absenden eines Zugs verlangen.",
-        "button_label_short": "Bestätigen"
+        "description": "Um Fehleingaben zu vermeiden, musst du den Zug vor dem Absenden bestätigen.",
+        "button_label_short": "Bestätigen",
+        "send_immediately_description": "Der Zug wird sofort gesendet, wenn du auf das Feld klickst."
     },
     "undo": {
         "accept": "Rückgängig machen akzeptieren",
         "reject": "Ablehnen",
-        "undo_move": "Zurücknahme"
+        "undo_move": "Zurücknahme",
+        "player_wants_to_takeback": "{{ player }} möchte den Zug zurücknehmen",
+        "player_takeback_his_move": "{{ player }} hat den Zug zurückgenommen.",
+        "takeback_request_denied": "Die Anfrage von {{ player }}, den Zug zurückzunehmen, wurde abgelehnt."
     },
     "time_cadency": {
         "blitz": "Blitz",
-        "correspondence": "Fernschach",
-        "normal": "Normal"
+        "correspondence": "Korrespondenzspiel",
+        "normal": "Echtzeit"
     },
     "rematch": {
         "label": "Revanche",
@@ -179,22 +184,22 @@
         "view": "Revanche ansehen"
     },
     "short_time_unit": {
-        "day": "T",
-        "hour": "Std",
-        "second": "Sek",
-        "minute": "Min."
+        "day": "d",
+        "hour": "h",
+        "second": "s",
+        "minute": "min"
     },
     "outcome": {
         "win": "Sieg",
         "loss": "Niederlage",
         "resign": "aufgegeben",
-        "forfeit": "verloren",
+        "forfeit": "Forfait",
         "time": "Zeitüberschreitung"
     },
     "player_wins_by": {
         "time": "{player} gewinnt auf Zeit!",
         "resign": "{player} gewinnt!",
-        "forfeit": "{player} gewinnt durch Aufgabe!",
+        "forfeit": "{player} gewinnt durch Forfait!",
         "default": "{player} gewinnt!"
     },
     "i_play": {
@@ -204,7 +209,7 @@
         "random": "Zufällig"
     },
     "swap_rule": "Tauschregel",
-    "enable_swap_rule": "Tausch von Spielsteinen erlauben",
+    "enable_swap_rule": "Tauschregel erlauben",
     "toggle_coords": "Anzeige der Koordinaten umschalten",
     "toggle_coords_short": "Koordinaten ein/ausschalten",
     "share_game": "Spiel teilen",
@@ -213,15 +218,15 @@
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Spiel erstellt von {player}, {timeAgo}.",
     "project_under_development": "Projekt in Entwicklung",
-    "already_have_account_login_instead_link_label": "Anmelden",
+    "already_have_account_login_instead_link_label": "anmelden",
     "account_created_on": "Konto erstellt am {{date}}",
     "game_has_been_canceled": "Spiel wurde abgebrochen.",
     "game_analysis": {
         "how_it_works": "Wie es funktioniert",
         "best_move": "bester Zug",
-        "game_analysis": "Spielanalyse durch KI",
-        "requested": "Analyse angefordert…",
-        "errored": "Analyse fehlgeschlagen!",
+        "game_analysis": "KI-Spielanalyse",
+        "requested": "KI-Analyse angefordert…",
+        "errored": "KI-Analyse fehlgeschlagen!",
         "best": "beste:",
         "request_analysis": "KI-Analyse anfordern"
     },
@@ -247,7 +252,7 @@
     },
     "old_password": "Altes Passwort",
     "last_move": "Letzter Zug",
-    "no_account_sign_up_instead_link_label": "Registrieren",
+    "no_account_sign_up_instead_link_label": "registrieren",
     "username": "Benutzername",
     "now!": "Jetzt!",
     "player_current_games": "Aktuelle Spiele",
@@ -268,7 +273,8 @@
         "canceled": "Abgebrochen",
         "created": "Erstellt",
         "ended": "Beendet",
-        "playing": "Spiel im Gang"
+        "playing": "Spiel im Gang",
+        "forfeited": "Forfaitiert"
     },
     "force_board_orientation_mode": "Anzeigen des Spielbretts im Querformat oder Hochformat für diesen Bildschirm erzwingen",
     "move_number": "Zug {{n}}",
@@ -278,7 +284,7 @@
         "handicap_for_player": "{{n}} für {{player}}"
     },
     "explore": "Erkunden",
-    "friendly": "Freundlich",
+    "friendly": "Freundschaftsspiel",
     "moves": "Züge",
     "loading_tournaments": "Turniere werden geladen…",
     "loading_tournament": "Turnier wird geladen…",
@@ -307,10 +313,10 @@
     "n_matches_played_one": "{{ count }} Spiel gespielt",
     "n_matches_played_other": "{{ count }} Spiele gespielt",
     "tournament_subscription": {
-        "subscribed": "Du bist benachrichtigt (nicht eingecheckt)",
+        "subscribed": "Du bist interessiert",
         "checked_in": "Deine Teilnahme ist bestätigt!",
         "must_check_in": "Du musst einchecken!",
-        "can_subscribe": "Du kannst noch nicht einchecken, aber dich benachrichtigen lassen, sobald der Check-in geöffnet ist.",
+        "can_subscribe": "Einchecken ist noch nicht möglich, aber interessierte Spieler können sich benachrichtigen lassen, wenn der Check-in geöffnet ist.",
         "can_check_in": "Jetzt einchecken, um an diesem Turnier teilzunehmen!"
     },
     "tournament_history_logs": "Verlaufsprotokolle",
@@ -321,12 +327,12 @@
     "tournament_player_games_win_history": "Verlauf",
     "tournament_organized_by": "Organisiert von { player }",
     "checkin_opens_time_before": "Check-in öffnet {{ time }} vorher.",
-    "tournament_subscribe": "Benachrichtigen",
+    "tournament_subscribe": "Ich bin interessiert!",
     "tournament_checkin": "Einchecken",
     "tournament_checkedin": "Eingecheckt",
     "no_player_checked_in_yet": "Noch kein Spieler eingecheckt.",
     "not_yet_checked_in": "Noch nicht eingecheckt",
-    "every_subscribers_checked_in": "Alle Benachrichtigten sind eingecheckt.",
+    "every_subscribers_checked_in": "Alle Interessenten sind eingecheckt.",
     "tournament_description": "Beschreibung",
     "tournament_requires_account": "Dieses Turnier erfordert ein Konto zur Teilnahme.",
     "tournament_ordinal": {
@@ -373,23 +379,107 @@
     "tournament_history": {
         "created": "{{organizerPseudo}} hat das Turnier erstellt",
         "edited": "Organisator hat das Feld '{{ field }}' geändert: Neuer Wert ist '{{ value }}'. (Alter Wert war '{{ oldValue }}')",
-        "player_subscribed": "{{ playerPseudo }} hat sich benachrichtigen lassen",
-        "player_unsubscribed": "{{ playerPseudo }} hat die Benachrichtigung abbestellt",
+        "player_subscribed": "{{ playerPseudo }} ist interessiert",
+        "player_unsubscribed": "{{ playerPseudo }} ist nicht mehr interessiert",
         "player_kicked": "{{ playerPseudo }} wurde entfernt",
         "player_checked_in": "{{ playerPseudo }} hat eingecheckt",
         "player_banned": "{{ playerPseudo }} wurde vom Turnier ausgeschlossen",
         "started": "Turnier wurde gestartet!",
         "match_ended": "Spiel {{ round }}.{{ number }} beendet: {{ winnerPseudo }} hat gegen {{ loserPseudo }} gewonnen.",
         "match_canceled_recreated": "Spiel {{ round }}.{{ number }} wurde aufgrund einer Absage neu erstellt.",
-        "ended": "Turnier ist beendet."
+        "ended": "Turnier ist beendet.",
+        "changed_admins": "Vom Organisator berufene Administratoren: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Vom Turnier ausgeschlossen",
     "tournament_account_required": "Dieses Turnier erfordert ein Konto. Gäste sind nicht erlaubt. Bitte melde dich an oder erstelle ein Konto.",
-    "tournament_not_enough_participants_to_start": "Turnier konnte nicht gestartet werden. Es sind derzeit nicht genügend eingecheckte Teilnehmer vorhanden.",
+    "tournament_not_enough_participants_to_start": "Turnier konnte nicht gestartet werden. Zu wenig eingecheckte Teilnehmer für dieses Format.",
     "player_loses_reason": {
         "default": "{player} verliert.",
         "time": "{player} überschreitet die Zeit.",
         "resign": "{player} gibt auf.",
-        "forfeit": "{player} verliert kampflos."
-    }
+        "forfeit": "{player} verliert durch Forfait."
+    },
+    "game_created_by_system_time_ago": "Spiel vom System erstellt, {timeAgo}.",
+    "username_not_an_email_warning": "Achtung, du scheinst deine Email einzugeben, aber PlayHex braucht nur einen Benutzernamen. Deine Email würde öffentlich sichtbar…",
+    "save": "Sichern",
+    "discard": "Verwerfen",
+    "pass_confirm_overlay": {
+        "title": "Passen?",
+        "message": "Bist du sicher, dass du wirklich passen willst?",
+        "confirmLabel": "Ja, passen",
+        "cancelLabel": "Ups, nein, ich will ziehen"
+    },
+    "player_passed_his_turn": "{{player}} hat gepasst",
+    "go_to_the_game": "Gehe zum Spiel",
+    "1v1": "1zu1",
+    "sort_date": {
+        "asc": "Chronologisch",
+        "desc": "Jüngste zuerst"
+    },
+    "ranked_games": "Gewertet",
+    "offline": "Offline",
+    "connection_lost": "Verbindung verloren",
+    "play_offline": "Offline spielen",
+    "new_game_vs_ai": "Neues Spiel gegen KI",
+    "continue_game_vs_x": "Weiterspielen gegen {{ playerNickname }}",
+    "restart": "Neu starten",
+    "back_to_menu": "Zurück zum Menü",
+    "loading": "Laden…",
+    "tournament_admins": "Turnier-Administratoren",
+    "admins_one": "Administrator: { players }",
+    "admins_other": "Administratoren: { players }",
+    "tournament_unsubscribe": "Ich bin nicht mehr interessiert.",
+    "losers_bracket": "Verlierergruppe",
+    "resign_confirm_overlay": {
+        "title": "Spiel aufgeben",
+        "message": "Bist du sicher, dass du das Spiel aufgeben willst?",
+        "confirmLabel": "Ja, ich gebe auf",
+        "cancelLabel": "Nein, ich will weiterspielen"
+    },
+    "conditional_moves": {
+        "title": "Bedingte Züge",
+        "title_short": "Wenn-Züge",
+        "cut_move": "Zug entfernen",
+        "inactive_lines": "Inaktive Spiellinien",
+        "clear_inactive_lines": "Inaktive Spiellinien entfernen"
+    },
+    "password_changed_success": "Das Passwort wurde geändert.",
+    "no_yet_data": "Keine Ahnung!",
+    "total_played_games": "Insgesamt gepielte Spiele",
+    "preferred_board_sizes": "Bevorzugte Brettgrößen",
+    "friendly_games": "Freundschaftsspiele",
+    "bot_games": "Bot-Spiele",
+    "any": "Alle",
+    "browse_all_ended_games": "Alle beendeten Spiele anschauen",
+    "n_total_games_one": "Insgesamt 1 Spiel.",
+    "n_total_games_other": "Insgesamt {{count}} Spiele.",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "page_page_of_max": "Seite {{page}} / {{max}}",
+    "must_be_logged_in_as_guest": "Du must als Gast eingeloggt sein",
+    "pseudo_already_taken": "Dieser Benutzername wird bereits von einem anderen Spieler verwendet",
+    "pseudo_not_existing": "Kein Spieler mit diesem Benutzernamen",
+    "invalid_password": "Passwort für dieses Konto ungültig",
+    "pseudo_too_short": "Benutzername zu kurz",
+    "pseudo_too_long": "Benutzername zu lang",
+    "invalid_pseudo": "Ungültiger Benutzername",
+    "overall": "Insgesamt",
+    "boardsize": {
+        "small": "Klein",
+        "medium": "Mittel",
+        "large": "Groß"
+    },
+    "hex_tournament_paris": {
+        "title": "Hex-Tourier in Paris",
+        "read_more": "weiterlesen"
+    },
+    "premove": {
+        "description": "Spiele einen Zug während dein Gegner dran ist: er wird sofort nach dem Zug des Gegners gepielt.",
+        "title": "Vorab-Zug"
+    },
+    "move_settings": {
+        "title": "Zug-Einstellungen"
+    },
+    "player_sent_you_rematch_offer": "{{ player }} fordert dich zu einer Revanche heraus!",
+    "player_sent_rematch_offer": "{{ player }} bietet eine Revanche an"
 }
