@@ -52,6 +52,8 @@ export { default as IconInfoCircleFill } from '~icons/bi/info-circle-fill';
 export { default as IconInfoLg } from '~icons/bi/info-lg';
 export { default as IconLightningChargeFill } from '~icons/bi/lightning-charge-fill';
 export { default as IconList } from '~icons/bi/list';
+export { default as IconMailbox } from '~icons/bi/mailbox';
+export { default as IconMailboxFlag } from '~icons/bi/mailbox-flag';
 export { default as IconMoonFill } from '~icons/bi/moon-fill';
 export { default as IconMoonStarsFill } from '~icons/bi/moon-stars-fill';
 export { default as IconPcDisplayHorizontal } from '~icons/bi/pc-display-horizontal';

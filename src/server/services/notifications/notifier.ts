@@ -14,12 +14,19 @@ type NotifiableEvents = {
     move: (hostedGame: HostedGame, move: Move) => void;
 
     /**
-     * A game ended, or canceled.
+     * A game ended. Only ended: not canceled.
      */
     gameEnd: (hostedGame: HostedGame) => void;
 
     /**
-     * Chat message received on a game
+     * A game has been canceled.
+     */
+    gameCanceled: (hostedGame: HostedGame) => void;
+
+    /**
+     * Chat message received on a game.
+     *
+     * Be careful to not emit event for shadow deleted chat messages.
      */
     chatMessage: (hostedGame: HostedGame, chatMessage: ChatMessage) => void;
 

@@ -93,6 +93,7 @@
         "handicap_for_player": "{{n}} for {{player}}"
     },
     "2dots": "{{s}}:",
+    "game_created_short": "created {{ date }}",
     "game_created_by_player_time_ago": "Game created by {player}, {timeAgo}.",
     "game_created_by_system_time_ago": "Game created by system, {timeAgo}.",
     "game_was_created_by_player_time_ago": "Game was created by {player}, {timeAgo}.",
@@ -454,6 +455,15 @@
         "label": "Rematch",
         "accept": "Accept rematch",
         "view": "View rematch"
+    },
+    "notifications": "Notifications",
+    "mark_all_as_read": "Mark as read",
+    "no_notifications": "No notifications.",
+    "game_against_player": "Game vs {{ player }}",
+    "notifications_misc": "Other notifications",
+    "notification": {
+        "you_won": "You have won the game!",
+        "you_lost": "You have lost the game :("
     },
     "player_sent_you_rematch_offer": "{{ player }} challenged you to a rematch!",
     "player_sent_rematch_offer": "{{ player }} sent a rematch offer",

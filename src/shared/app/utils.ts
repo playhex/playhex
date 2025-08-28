@@ -19,3 +19,14 @@ export const by = <T>(field: (t: T) => any, ascOrDesc: 'asc' | 'desc' = 'asc') =
         return aValue > bValue ? 1 : -1;
     };
 };
+
+/**
+ * Truncate text and add "…" if needed.
+ */
+export const truncateText = (text: string, maxLength = 24): string => {
+    if (text.length <= maxLength) {
+        return text;
+    }
+
+    return text.substring(0, maxLength) + '…';
+};

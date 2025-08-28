@@ -2660,6 +2660,11 @@
   resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz#f066abfcd1cbe66267cdbbf0de010d8a41b41597"
   integrity sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==
 
+"@types/web-bluetooth@^0.0.21":
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.21.tgz#525433c784aed9b457aaa0ee3d92aeb71f346b63"
+  integrity sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==
+
 "@types/web-push@^3.6.4":
   version "3.6.4"
   resolved "https://registry.yarnpkg.com/@types/web-push/-/web-push-3.6.4.tgz#4c6e10d3963ba51e7b4b8fff185f43612c0d1346"
@@ -2980,10 +2985,24 @@
     "@vueuse/shared" "10.11.1"
     vue-demi ">=0.14.8"
 
+"@vueuse/core@^13.7.0":
+  version "13.7.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/core/-/core-13.7.0.tgz#fcb63184443144858645ea87b382535226d523f7"
+  integrity sha512-myagn09+c6BmS6yHc1gTwwsdZilAovHslMjyykmZH3JNyzI5HoWhv114IIdytXiPipdHJ2gDUx0PB93jRduJYg==
+  dependencies:
+    "@types/web-bluetooth" "^0.0.21"
+    "@vueuse/metadata" "13.7.0"
+    "@vueuse/shared" "13.7.0"
+
 "@vueuse/metadata@10.11.1":
   version "10.11.1"
   resolved "https://registry.yarnpkg.com/@vueuse/metadata/-/metadata-10.11.1.tgz#209db7bb5915aa172a87510b6de2ca01cadbd2a7"
   integrity sha512-IGa5FXd003Ug1qAZmyE8wF3sJ81xGLSqTqtQ6jaVfkeZ4i5kS2mwQF61yhVqojRnenVew5PldLyRgvdl4YYuSw==
+
+"@vueuse/metadata@13.7.0":
+  version "13.7.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/metadata/-/metadata-13.7.0.tgz#5c825d3706ecbf6ea6c969c0080f4f3ef414c37d"
+  integrity sha512-8okFhS/1ite8EwUdZZfvTYowNTfXmVCOrBFlA31O0HD8HKXhY+WtTRyF0LwbpJfoFPc+s9anNJIXMVrvP7UTZg==
 
 "@vueuse/shared@10.11.1":
   version "10.11.1"
@@ -2991,6 +3010,11 @@
   integrity sha512-LHpC8711VFZlDaYUXEBbFBCQ7GS3dVU9mjOhhMhXP6txTV4EhYQg/KGnQuvt/sPAtoUKq7VVUnL6mVtFoL42sA==
   dependencies:
     vue-demi ">=0.14.8"
+
+"@vueuse/shared@13.7.0":
+  version "13.7.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/shared/-/shared-13.7.0.tgz#b7466ec90361a69621cd09d5b396fbda6d8f2f9c"
+  integrity sha512-Wi2LpJi4UA9kM0OZ0FCZslACp92HlVNw1KPaDY6RAzvQ+J1s7seOtcOpmkfbD5aBSmMn9NvOakc8ZxMxmDXTIg==
 
 "@webassemblyjs/ast@1.14.1", "@webassemblyjs/ast@^1.14.1":
   version "1.14.1"

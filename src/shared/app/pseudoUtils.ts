@@ -61,3 +61,20 @@ export const pseudoString = (player: Player, type: 'slug' | 'pseudo' = 'pseudo')
 
     return prefix[type] + player[type];
 };
+
+export const pseudoStringOptional = (player: null | Player, type: 'slug' | 'pseudo' = 'pseudo', fallback = '-'): string => {
+    if (player === null) {
+        return fallback;
+    }
+
+    if (!player.isGuest) {
+        return player[type];
+    }
+
+    const prefix = {
+        slug: 'guest-',
+        pseudo: 'Guest ',
+    };
+
+    return prefix[type] + player[type];
+};

@@ -19,6 +19,7 @@ import OnlinePlayersService from '../services/OnlinePlayersService.js';
 import { createHostedGame, CreateHostedGameParams } from '../../shared/app/models/HostedGame.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { isStateEnded } from '../../shared/app/hostedGameUtils.js';
+import { notifier } from '../services/notifications/notifier.js';
 
 export class GameError extends Error {}
 
@@ -565,6 +566,8 @@ export default class HostedGameRepository
 
         // Game is in database, insert chat message into database
         await this.chatMessageRepository.save(chatMessage);
+
+        notifier.emit('chatMessage', hostedGame, chatMessage);
 
         Container.get(HexServer).to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
 

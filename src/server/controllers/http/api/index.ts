@@ -3,6 +3,7 @@ import { Container } from 'typedi';
 import { HttpError, useContainer, useExpressServer } from 'routing-controllers';
 import GameController from './GameController.js';
 import PlayerController from './PlayerController.js';
+import PlayerNotificationController from './PlayerNotificationController.js';
 import AuthController from './AuthController.js';
 import OnlinePlayersController from './OnlinePlayersController.js';
 import PlayerSettingsController from './PlayerSettingsController.js';
@@ -80,6 +81,7 @@ export const registerApi = (app: Express) => {
             TournamentBanController,
             ChatController,
             PlayerController,
+            PlayerNotificationController,
             AuthController,
             PlayerSettingsController,
             AdminController,

@@ -473,8 +473,14 @@
     "move_settings": {
         "title": "Paramètres de coup"
     },
+    "notifications": "Notifications",
+    "mark_all_as_read": "Marquer comme lues",
+    "no_notifications": "Aucune notification.",
+    "game_against_player": "Partie vs {{ player }}",
+    "notifications_misc": "Autres notifications",
     "go_to_the_game": "Aller à la partie",
     "player_passed_his_turn": "{{player}} a passé son tour",
+    "game_created_short": "créée {{ date }}",
     "game_created_by_system_time_ago": "Partie créée par le système, {timeAgo}.",
     "must_be_logged_in_as_guest": "Vous devez être connecté en tant qu'invité",
     "pseudo_already_taken": "Ce pseudo est déjà utilisé par un autre joueur",

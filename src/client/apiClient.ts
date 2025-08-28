@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer } from '../shared/app/models/index.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification } from '../shared/app/models/index.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
@@ -803,6 +803,30 @@ export const apiPutTournamentAdmins = async (tournamentSlug: string, players: Pl
             'Accept': 'application/json',
         },
         body: JSON.stringify(players.map(player => ({ publicId: player.publicId }))),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetPlayerNotifications = async (): Promise<PlayerNotification[]> => {
+    const response = await fetch('/api/player-notifications');
+
+    await checkResponse(response);
+
+    return (await response.json() as PlayerNotification[])
+        .map(playerNotification => plainToInstance(PlayerNotification, playerNotification))
+    ;
+};
+
+export const apiPostPlayerNotificationsAcknowledge = async (hostedGamePublicId?: string): Promise<void> => {
+    let url = '/api/player-notifications/acknowledge';
+
+    if (hostedGamePublicId) {
+        url += '?hostedGamePublicId=' + hostedGamePublicId;
+    }
+
+    const response = await fetch(url, {
+        method: 'post',
     });
 
     await checkResponse(response);

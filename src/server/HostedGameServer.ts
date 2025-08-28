@@ -981,6 +981,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.logger.info('hosted game server canceled', { date });
 
         this.emit('canceled');
+
+        notifier.emit('gameCanceled', this.hostedGame);
     }
 
     systemForfeit(player: Player): void
@@ -1027,6 +1029,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     {
         this.logger.info('Chat message posted', { gamePublicId: this.getPublicId(), author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
         this.hostedGame.chatMessages.push(chatMessage);
+        notifier.emit('chatMessage', this.hostedGame, chatMessage);
         this.io.to(this.gameRooms()).emit('chat', this.getPublicId(), chatMessage);
         this.emit('chat');
     }

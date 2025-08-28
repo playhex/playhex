@@ -27,10 +27,9 @@ export const isMyTurn = (hostedGame: HostedGame): boolean => {
 };
 
 export const getOpponent = (hostedGame: HostedGame): null | Player => {
-    const { gameData } = hostedGame;
     const { loggedInPlayer } = useAuthStore();
 
-    if (gameData === null || loggedInPlayer === null) {
+    if (loggedInPlayer === null) {
         return null;
     }
 

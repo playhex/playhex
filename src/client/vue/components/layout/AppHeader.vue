@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import { IconPersonFill, IconHexagonFill, IconHexagon } from '../../icons.js';
 import AppPseudo from '../AppPseudo.vue';
 import { computed } from 'vue';
+import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -145,6 +146,9 @@ const routeName = computed<null | string>(() => {
                     >{{ myTurnCount }}</button>
                 </span>
 
+                <!-- Player notifications -->
+                <AppPlayerNotifications />
+
                 <!-- Player nickname -->
                 <p class="nav-player-item">
                     <template v-if="loggedInPlayer">
@@ -174,7 +178,7 @@ nav
 .my-turn-notif
     position relative
     font-size 2em
-    width 2em
+    width 1.5em
     display flex
     justify-content center
     align-items center
