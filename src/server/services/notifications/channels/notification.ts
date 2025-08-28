@@ -83,6 +83,11 @@ notifier.on('chatMessage', async (hostedGame, chatMessage) => {
  * May notify both players, e.g in case of a player timeout while offline.
  */
 notifier.on('gameEnd', async hostedGame => {
+    // No notification for bot game ended
+    if (hostedGame.gameOptions.opponentType === 'ai') {
+        return;
+    }
+
     const winner = getWinnerPlayer(hostedGame);
     const loser = getLoserPlayer(hostedGame);
 
@@ -124,6 +129,11 @@ notifier.on('gameEnd', async hostedGame => {
  * Should send only when player is offline.
  */
 notifier.on('gameCanceled', async hostedGame => {
+    // No notification for bot game canceled
+    if (hostedGame.gameOptions.opponentType === 'ai') {
+        return;
+    }
+
     for (const { player } of hostedGame.hostedGameToPlayers) {
         // Do not notify player if active
         if (onlinePlayerService.isActive(player)) {
