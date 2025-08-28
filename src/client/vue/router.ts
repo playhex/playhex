@@ -1,4 +1,6 @@
-import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
+import { RouteLocationNormalizedLoadedGeneric, RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
+import { notifyActivity } from '../services/playerActivity.js';
+import { OnlinePlayerPage } from '../../shared/app/OnlinePlayerPage.js';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -257,5 +259,26 @@ const router = createRouter({
         return;
     },
 });
+
+// Update player current page if needed (for now, just tells which game page we are watching)
+router.afterEach((to, from, failure) => {
+    if (failure) {
+        return;
+    }
+
+    notifyActivity(getPlayerCurrentPage(to));
+});
+
+const getPlayerCurrentPage = (route: RouteLocationNormalizedLoadedGeneric): OnlinePlayerPage => {
+    if (route.name === 'online-game') {
+        const { gameId } = route.params;
+
+        if (typeof gameId === 'string') {
+            return { page: 'game', gameId };
+        }
+    }
+
+    return null;
+};
 
 export default router;

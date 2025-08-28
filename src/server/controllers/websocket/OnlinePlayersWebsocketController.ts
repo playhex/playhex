@@ -61,14 +61,14 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
         this.onlinePlayersService.socketHasConnected(socket);
         socket.on('disconnect', () => this.onlinePlayersService.socketHasDisconnected(socket));
 
-        socket.on('activity', () => {
+        socket.on('activity', onlinePlayerPage => {
             const { player } = socket.data;
 
             if (player === null) {
                 return;
             }
 
-            this.onlinePlayersService.notifyPlayerActivity(player);
+            this.onlinePlayersService.notifyPlayerActivity(player, onlinePlayerPage);
         });
     }
 

@@ -3,6 +3,7 @@ import { HexSocket } from '../server.js';
 import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { DELAY_BEFORE_PLAYER_INACTIVE } from '../../shared/app/playerActivityConfig.js';
+import { OnlinePlayerPage } from '../../shared/app/OnlinePlayerPage.js';
 
 interface OnlinePlayersServiceEvents
 {
@@ -64,6 +65,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
             onlinePlayer: {
                 player,
                 active: false, // Player was inactive because offline. Makes playerActive event emit when player connects.
+                currentPage: null,
             },
             sockets: [socket],
             activityTimeout: null,
@@ -178,7 +180,7 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     /**
      * Notifies that a player just made something and is currently active.
      */
-    notifyPlayerActivity(player: Player): void
+    notifyPlayerActivity(player: Player, currentPage?: OnlinePlayerPage): void
     {
         const onlinePlayer = this.onlinePlayers[player.publicId];
 
@@ -197,6 +199,11 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
 
         const lastState = onlinePlayer.onlinePlayer.active;
         onlinePlayer.onlinePlayer.active = true;
+
+        if (currentPage !== undefined) {
+            onlinePlayer.onlinePlayer.currentPage = currentPage;
+        }
+
         this.emit('playerActive', player, lastState);
     }
 }

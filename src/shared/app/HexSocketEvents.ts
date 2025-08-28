@@ -1,6 +1,7 @@
 import { Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
+import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models/index.js';
 import type { OnlinePlayers } from './models/index.js';
 
@@ -47,9 +48,11 @@ export type HexClientToServerEvents = {
     sendChat: (gameId: string, content: string, answer: (result: true | string) => void) => void;
 
     /**
-     * I am active
+     * I am active.
+     *
+     * If currentPage is provided, it changes the player current page on server.
      */
-    activity: () => void;
+    activity: (currentPage?: OnlinePlayerPage) => void;
 
     /**
      * Returns info about server:
