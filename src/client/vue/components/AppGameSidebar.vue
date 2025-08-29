@@ -177,7 +177,7 @@ const chatClick = (e: PointerEvent) => {
         return;
     }
 
-    const coords = target.innerText;
+    const coords = target.innerText.toLowerCase();
 
     const mark = new TriangleMark(0x0dcaf0);
     mark.setCoords(Move.fromString(coords));
