@@ -187,6 +187,19 @@ export default class Hex extends Container
         };
     }
 
+    /**
+     * Get coords of hex corner
+     *
+     * @param i From 0 to 5:
+     * ```
+     * ..0
+     * 5   1
+     * 4   2
+     * ..3
+     * ```
+     *
+     * @param dist Distance to hex center, defaults to hex radius
+     */
     static cornerCoords(i: number, dist: number = Hex.RADIUS): PointData
     {
         return {

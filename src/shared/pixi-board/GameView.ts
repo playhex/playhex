@@ -869,56 +869,85 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.sidesGraphics = [new Graphics(), new Graphics()];
 
         let g: Graphics;
-        const to = (a: PointData, b: PointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x, a.y + b.y);
+        const to = (a: PointData, b: PointData = { x: 0, y: 0 }, c: PointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x + c.x, a.y + b.y + c.y);
         const m = (a: PointData, b: PointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
+        const middle = (a: PointData, b: PointData): PointData => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
+        const sideRelativeWidth = 0.35;
+        const sideWidth = Hex.RADIUS * sideRelativeWidth;
+        const sideDist = Hex.RADIUS * (sideRelativeWidth + 1);
+        const { colorA, colorB } = this.options.theme;
+        const lastI = this.game.getSize() - 1;
 
         // Set sides colors
-        this.sidesGraphics[0].setStrokeStyle({ width: Hex.RADIUS * 0.6, color: this.options.theme.colorA });
-        this.sidesGraphics[1].setStrokeStyle({ width: Hex.RADIUS * 0.6, color: this.options.theme.colorB });
+        this.sidesGraphics[0].setStrokeStyle({ width: 0 });
+        this.sidesGraphics[0].setFillStyle({ color: colorA });
+        this.sidesGraphics[1].setStrokeStyle({ width: 0 });
+        this.sidesGraphics[1].setFillStyle({ color: colorB });
 
-        // From a1 to i1 (red)
+        // 1. Top: from a1 to i1 (red)
         g = this.sidesGraphics[0];
-        g.moveTo(Hex.cornerCoords(5).x, Hex.cornerCoords(5).y);
+        m(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
 
-        for (let i = 0; i < this.game.getSize(); ++i) {
-            to(Hex.coords(0, i), Hex.cornerCoords(5));
-            to(Hex.coords(0, i), Hex.cornerCoords(0));
+        for (let i = 0; i < lastI; ++i) {
+            to(Hex.coords(0, i), Hex.cornerCoords(0, sideDist));
+            to(Hex.coords(0, i), Hex.cornerCoords(1), Hex.cornerCoords(0, sideWidth));
         }
 
-        g.stroke();
+        to(Hex.coords(0, lastI), Hex.cornerCoords(0, sideDist));
+        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
+        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(3), Hex.cornerCoords(4)));
+        to(Hex.coords(0, 0), Hex.cornerCoords(2));
 
-        // From i1 to i9 (blue)
+        g.fill();
+
+        // 2. Right: from i1 to i9 (blue)
         g = this.sidesGraphics[1];
-        m(Hex.coords(0, this.game.getSize() - 1), Hex.cornerCoords(0));
+        m(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
 
-        for (let i = 0; i < this.game.getSize(); ++i) {
-            to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(1));
-            to(Hex.coords(i, this.game.getSize() - 1), Hex.cornerCoords(2));
+        for (let i = 0; i < lastI; ++i) {
+            to(Hex.coords(i, lastI), Hex.cornerCoords(1, sideDist));
+            to(Hex.coords(i, lastI), Hex.cornerCoords(2), Hex.cornerCoords(1, sideWidth));
         }
 
-        g.stroke();
+        to(Hex.coords(lastI, lastI), Hex.cornerCoords(1, sideDist));
+        to(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
+        to(Hex.coords(lastI, lastI), Hex.cornerCoords(5));
+        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(3), Hex.cornerCoords(4)));
 
-        // From i9 to a9 (red)
+        g.fill();
+
+        // 3. Bottom: from i9 to a9 (red)
         g = this.sidesGraphics[0];
-        m(Hex.coords(this.game.getSize() - 1, this.game.getSize() - 1), Hex.cornerCoords(2));
+        m(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
 
-        for (let i = 0; i < this.game.getSize(); ++i) {
-            to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(3));
-            to(Hex.coords(this.game.getSize() - 1, this.game.getSize() - i - 1), Hex.cornerCoords(4));
+        for (let i = lastI; i > 0; --i) {
+            to(Hex.coords(lastI, i), Hex.cornerCoords(3, sideDist));
+            to(Hex.coords(lastI, i), Hex.cornerCoords(4), Hex.cornerCoords(3, sideWidth));
         }
 
-        g.stroke();
+        to(Hex.coords(lastI, 0), Hex.cornerCoords(3, sideDist));
+        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
+        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(0), Hex.cornerCoords(1)));
+        to(Hex.coords(lastI, lastI), Hex.cornerCoords(5));
 
-        // From a9 to a1 (blue)
+        g.fill();
+
+        // 4. Left: from a9 to a1 (blue)
         g = this.sidesGraphics[1];
-        m(Hex.coords(this.game.getSize() - 1, 0), Hex.cornerCoords(4));
+        m(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
 
-        for (let i = 0; i < this.game.getSize(); ++i) {
-            if (i) to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(4));
-            to(Hex.coords(this.game.getSize() - i - 1, 0), Hex.cornerCoords(5));
+        for (let i = lastI; i > 0; --i) {
+            to(Hex.coords(i, 0), Hex.cornerCoords(4, sideDist));
+            to(Hex.coords(i, 0), Hex.cornerCoords(5), Hex.cornerCoords(4, sideWidth));
         }
 
-        g.stroke();
+        to(Hex.coords(0, 0), Hex.cornerCoords(4, sideDist));
+        to(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
+        to(Hex.coords(0, 0), Hex.cornerCoords(2));
+        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(0), Hex.cornerCoords(1)));
+
+        g.fill();
 
         // Add both sides into a single container
         const sidesContainer = new Container();
