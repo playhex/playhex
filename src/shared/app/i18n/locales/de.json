@@ -481,5 +481,15 @@
         "title": "Zug-Einstellungen"
     },
     "player_sent_you_rematch_offer": "{{ player }} fordert dich zu einer Revanche heraus!",
-    "player_sent_rematch_offer": "{{ player }} bietet eine Revanche an"
+    "player_sent_rematch_offer": "{{ player }} bietet eine Revanche an",
+    "game_created_short": "erstellt {{ date }}",
+    "notifications": "Benachrichtigungen",
+    "mark_all_as_read": "Als gelesen markieren",
+    "no_notifications": "Keine Benachrichtigungen.",
+    "game_against_player": "Spiel vs. {{ player }}",
+    "notifications_misc": "Sonstige Benachrichtigungen",
+    "notification": {
+        "you_won": "Du hast das Spiel gewonnen!",
+        "you_lost": "Du hast das Spiel verloren :("
+    }
 }
