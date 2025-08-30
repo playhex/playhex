@@ -23,7 +23,13 @@ export const notifyActivity = (currentPage?: OnlinePlayerPage): void => {
 
     const { socket } = useSocketStore();
 
-    socket.emit('activity', currentPage);
+    // Cannot just socket.emit('activity', currentPage) because if passing undefined as argument, json will replace it by null
+    if (currentPage === undefined) {
+        socket.emit('activity');
+    } else {
+        socket.emit('activity', currentPage);
+    }
+
     resetCooldown();
 
     if (currentPage !== undefined) {

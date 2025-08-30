@@ -51,6 +51,8 @@ export type HexClientToServerEvents = {
      * I am active.
      *
      * If currentPage is provided, it changes the player current page on server.
+     *
+     * Warning: don't do .emit('activity', undefined); because it will be replaced with null
      */
     activity: (currentPage?: OnlinePlayerPage) => void;
 
