@@ -24,8 +24,11 @@ export class OnlinePlayer
      *
      * `null` if player is on another page than the needed ones.
      *
-     * Public: others players can find this information.
-     * So should only expose useful pages (e.g not players pages).
+     * May be public, but for now, not needed.
+     * And we probably don't need to get the info from here (all online players), because may not scale.
+     * Instead we should get the info only when needed:
+     * - on game page to know who is watching, or if player is on the game page
+     * - on player page if we want to show a link "playing/watching game XXX"
      *
      * Can be used to:
      * - display to his opponent whether this player is here or not
@@ -33,7 +36,6 @@ export class OnlinePlayer
      * - know if we should send a notification on an ended game, or not because he is already on the page
      * - show "on lobby" or "watching game XXX" on player
      */
-    @Expose()
     currentPage: OnlinePlayerPage;
 }
 
