@@ -878,6 +878,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const sideDist = Hex.RADIUS * (sideRelativeWidth + 1);
         const { colorA, colorB } = this.options.theme;
         const lastI = this.game.getSize() - 1;
+        const boardMiddle: PointData = middle(Hex.coords(0, 0), Hex.coords(lastI, lastI));
 
         // Set sides colors
         this.sidesGraphics[0].setStrokeStyle({ width: 0 });
@@ -896,8 +897,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         to(Hex.coords(0, lastI), Hex.cornerCoords(0, sideDist));
         to(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
-        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(3), Hex.cornerCoords(4)));
-        to(Hex.coords(0, 0), Hex.cornerCoords(2));
+        to(boardMiddle);
 
         g.fill();
 
@@ -912,8 +912,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         to(Hex.coords(lastI, lastI), Hex.cornerCoords(1, sideDist));
         to(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
-        to(Hex.coords(lastI, lastI), Hex.cornerCoords(5));
-        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(3), Hex.cornerCoords(4)));
+        to(boardMiddle);
 
         g.fill();
 
@@ -928,8 +927,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         to(Hex.coords(lastI, 0), Hex.cornerCoords(3, sideDist));
         to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
-        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(0), Hex.cornerCoords(1)));
-        to(Hex.coords(lastI, lastI), Hex.cornerCoords(5));
+        to(boardMiddle);
 
         g.fill();
 
@@ -944,8 +942,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         to(Hex.coords(0, 0), Hex.cornerCoords(4, sideDist));
         to(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
-        to(Hex.coords(0, 0), Hex.cornerCoords(2));
-        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(0), Hex.cornerCoords(1)));
+        to(boardMiddle);
 
         g.fill();
 
