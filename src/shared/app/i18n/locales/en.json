@@ -490,6 +490,6 @@
         "default": "{player} loses.",
         "time": "{player} times out.",
         "resign": "{player} resigns.",
-        "forfeit": "{player} is declared a forfeit."
+        "forfeit": "{player} loses by forfeit."
     }
 }
