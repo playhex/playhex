@@ -495,5 +495,9 @@
     "admins_many": "Admins : { players }",
     "admins_other": "Admins : { players }",
     "player_sent_you_rematch_offer": "{{ player }} vous propose une revanche !",
-    "player_sent_rematch_offer": "{{ player }} a proposé une revanche"
+    "player_sent_rematch_offer": "{{ player }} a proposé une revanche",
+    "notification": {
+        "you_won": "Vous avez gagné la partie !",
+        "you_lost": "Vous avez perdu la partie :("
+    }
 }
