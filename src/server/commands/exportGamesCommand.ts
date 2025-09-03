@@ -5,6 +5,7 @@ import { MoveData } from '../../shared/game-engine/normalization.js';
 import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { guessDemerHandicap } from '../../shared/app/demerHandicap.js';
+import { pseudoString } from '../../shared/app/pseudoUtils.js';
 
 type ExportedGame = {
     /**
@@ -99,6 +100,7 @@ hexProgram
                 hg.id,
                 hgp.order,
                 p.isBot,
+                p.isGuest,
                 p.pseudo
             from hosted_game hg
             left join hosted_game_to_player hgp on hgp.hostedGameId = hg.id
@@ -120,7 +122,7 @@ hexProgram
             }
 
             gamePlayers[playerResult.id][playerResult.order] = {
-                pseudo: playerResult.pseudo,
+                pseudo: pseudoString(playerResult),
                 type: playerResult.isBot ? 'bot' : 'player',
             };
         }
