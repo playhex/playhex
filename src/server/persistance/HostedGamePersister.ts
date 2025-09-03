@@ -13,6 +13,11 @@ const relations: FindOptionsRelations<HostedGame> = {
     },
     rematch: {
         host: true,
+        hostedGameToPlayers: {
+            player: {
+                currentRating: true,
+            },
+        },
     },
     rematchedFrom: {
         hostedGameToPlayers: {
