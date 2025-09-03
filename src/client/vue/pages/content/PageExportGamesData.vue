@@ -131,6 +131,18 @@ const getFilesize = (size: number): string => {
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// Moves can be "a1", "swap-pieces", "pass"</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"moves"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"j2 swap-pieces f6 c8 h8 e7 g7 f7 ..."</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Time control, here is an example for Capped Fischer 10min + 5s increment, capped at 10min.</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// maxTime of 3 weeks (1814400000) means not capped.</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// For byo yomi 10min + 5 x 5s, it would be: "family": "byoyomi", "options": { "initialTime": 600000, "periodsCount": 5, "periodTime": 5000 }</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"timeControl"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(201, 209, 217); font-weight: 400;">{</span>
+            <span style="color: rgb(121, 192, 255); font-weight: 400;">"family"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"fischer"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+            <span style="color: rgb(121, 192, 255); font-weight: 400;">"options"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(201, 209, 217); font-weight: 400;">{</span>
+                <span style="color: rgb(121, 192, 255); font-weight: 400;">"initialTime"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">600000</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+                <span style="color: rgb(121, 192, 255); font-weight: 400;">"timeIncrement"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">5000</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+                <span style="color: rgb(121, 192, 255); font-weight: 400;">"maxTime"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">600000</span>
+            <span style="color: rgb(201, 209, 217); font-weight: 400;">}</span>
+        <span style="color: rgb(201, 209, 217); font-weight: 400;">}</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// Nicknames of players</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerRed"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"JRM"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlue"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"Mohex 1.5"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>

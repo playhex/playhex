@@ -6,6 +6,7 @@ import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { guessDemerHandicap } from '../../shared/app/demerHandicap.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
+import TimeControlType from '../../shared/time-control/TimeControlType.js';
 
 type ExportedGame = {
     /**
@@ -19,6 +20,8 @@ type ExportedGame = {
     url: string;
 
     boardsize: number;
+
+    timeControl: TimeControlType;
 
     /**
      * Number of moves
@@ -146,6 +149,7 @@ hexProgram
                 id: gameResult.publicId,
                 url: gameUrlPrefix + gameResult.publicId,
                 boardsize: gameResult.boardsize,
+                timeControl: JSON.parse(gameResult.timeControl),
                 movesCount: moves.length,
                 moves: moves
                     .map((m: MoveData) => EngineMove.fromData(m).toString())
