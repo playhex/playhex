@@ -145,11 +145,13 @@ hexProgram
 
             const moves = JSON.parse(gameResult.movesHistory);
 
+            const timeControl = JSON.parse(gameResult.timeControl);
+
             exportedGames.push({
                 id: gameResult.publicId,
                 url: gameUrlPrefix + gameResult.publicId,
                 boardsize: gameResult.boardsize,
-                timeControl: JSON.parse(gameResult.timeControl),
+                timeControl,
                 movesCount: moves.length,
                 moves: moves
                     .map((m: MoveData) => EngineMove.fromData(m).toString())
