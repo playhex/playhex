@@ -140,6 +140,7 @@
         "game_analysis": "AI game analysis",
         "request_analysis": "Request AI analysis",
         "requested": "Waiting for AI analysis…",
+        "available": "Game analysis is now available.",
         "errored": "AI analysis failed!",
         "best_move": "best move",
         "best": "best:",

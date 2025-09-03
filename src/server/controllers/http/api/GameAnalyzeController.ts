@@ -7,6 +7,8 @@ import GameAnalyze, { hasGameAnalyzeErrored } from '../../../../shared/app/model
 import { HexServer } from '../../../server.js';
 import Rooms from '../../../../shared/app/Rooms.js';
 import logger from '../../../services/logger.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import ChatMessage from '../../../../shared/app/models/ChatMessage.js';
 
 @JsonController()
 @Service()
@@ -16,6 +18,7 @@ export default class GameAnalyzeController
         private gameAnalyzePersister: GameAnalyzePersister,
         private gamePersister: GamePersister,
         private hexAiApiClient: HexAiApiClient,
+        private hostedGameRepository: HostedGameRepository,
         private io: HexServer,
     ) {}
 
@@ -73,8 +76,22 @@ export default class GameAnalyzeController
             await this.gameAnalyzePersister.persist(publicId, gameAnalyze);
 
             this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
+
+            await this.hostedGameRepository.postChatMessage(publicId, this.createGameAnalyzeAvailableChatMessage(gameAnalyze));
         })();
 
         return gameAnalyze;
+    }
+
+    private createGameAnalyzeAvailableChatMessage(gameAnalyze: GameAnalyze): ChatMessage
+    {
+        const chatMessage = new ChatMessage();
+
+        chatMessage.content = 'Game analysis is now available.';
+        chatMessage.contentTranslationKey = 'game_analysis.available';
+        chatMessage.createdAt = gameAnalyze.endedAt ?? new Date();
+        chatMessage.player = null;
+
+        return chatMessage;
     }
 }

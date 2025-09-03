@@ -303,6 +303,7 @@
         "best": "meilleur :",
         "game_analysis": "Analyse de la partie par l'IA",
         "requested": "Analyse demandée…",
+        "available": "L'analyse par l'IA est maintenant disponible.",
         "errored": "L'analyse a échoué !",
         "how_it_works": "Fonctionnement",
         "request_analysis": "Demander une analyse par l'IA"

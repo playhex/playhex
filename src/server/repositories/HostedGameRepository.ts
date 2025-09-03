@@ -4,14 +4,13 @@ import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
 import HostedGamePersister from '../persistance/HostedGamePersister.js';
 import logger from '../services/logger.js';
-import { validateOrReject } from 'class-validator';
 import Rooms from '../../shared/app/Rooms.js';
 import { HexServer } from '../server.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
 import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
 import { AppDataSource } from '../data-source.js';
-import { instanceToInstance, plainToInstance } from '../../shared/app/class-transformer-custom.js';
+import { instanceToInstance } from '../../shared/app/class-transformer-custom.js';
 import RatingRepository from './RatingRepository.js';
 import { isDuplicateError } from './typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
@@ -518,15 +517,6 @@ export default class HostedGameRepository
      */
     async postChatMessage(publicId: string, chatMessage: ChatMessage): Promise<string | true>
     {
-        try {
-            await validateOrReject(plainToInstance(ChatMessage, chatMessage), {
-                groups: ['post'],
-            });
-        } catch (e) {
-            logger.error('Validation failed', { validationError: e });
-            return e.message;
-        }
-
         if (chatMessage.player !== null) {
             this.onlinePlayerService.notifyPlayerActivity(chatMessage.player);
         }
