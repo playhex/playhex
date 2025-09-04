@@ -163,7 +163,7 @@ const getFilesize = (size: number): string => {
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// whether swap has been allowed</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"allowSwap"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;"><span style="color: rgb(255, 123, 114); font-weight: 400;">true</span></span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
-        <span style="color: rgb(139, 148, 158); font-weight: 400;">// whether it is a "ranked" game</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// whether it is a "ranked" game (true), or friendly (false)</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"rated"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;"><span style="color: rgb(255, 123, 114); font-weight: 400;">false</span></span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// guessed handicap from moves and game settings.</span>
