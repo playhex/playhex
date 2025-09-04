@@ -1,7 +1,7 @@
 import { HostedGame } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
-import { FindManyOptions, FindOptionsRelations, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
+import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 
 /**
@@ -44,6 +44,15 @@ const relations: FindOptionsRelations<HostedGame> = {
     },
 };
 
+const order: FindOptionsOrder<HostedGame> = {
+    chatMessages: {
+        createdAt: 'asc',
+    },
+    hostedGameToPlayers: {
+        order: 'asc',
+    },
+};
+
 /**
  * Layer between HostedGame and database.
  */
@@ -79,6 +88,7 @@ export default class HostedGamePersister
     {
         return await this.hostedGameRepository.findOne({
             relations,
+            order,
             where: {
                 publicId: publicId,
                 ratings: [
@@ -93,6 +103,7 @@ export default class HostedGamePersister
     {
         return await this.hostedGameRepository.findOne({
             relations,
+            order,
             where: {
                 rematchedFrom: {
                     id: rematchedFromId,
@@ -106,6 +117,7 @@ export default class HostedGamePersister
         return await this.hostedGameRepository.find({
             ...criteria,
             relations,
+            order,
         });
     }
 
