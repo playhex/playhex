@@ -250,3 +250,33 @@ export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Playe
 
     return true;
 };
+
+/**
+ * Whether player can use tools that allow explore, simulate or export game.
+ * Used to know e.g when to display HexWorld link, or download SGF file.
+ */
+export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Player): boolean => {
+    // Friendly games are allowed
+    if (!hostedGame.gameOptions.ranked) {
+        return true;
+    }
+
+    // Any ended games are allowed
+    if (['ended', 'canceled', 'forfeited'].includes(hostedGame.state)) {
+        return true;
+    }
+
+    // Correspondence games are allowed
+    if (timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence') {
+        return true;
+    }
+
+    // Playing games are allowed only for spectators,
+    // but not guests because it's too easy to open a tab as incognito
+    if (hostedGame.state === 'playing') {
+        return !hasPlayer(hostedGame, player) && !player.isGuest;
+    }
+
+    // In other cases, disable by default
+    return false;
+};

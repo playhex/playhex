@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { PropType, ref, toRefs, watchEffect } from 'vue';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { gameToHexworldLink } from '../../../shared/app/hexworld.js';
 import HostedGameClient from '../../HostedGameClient.js';
 import useAuthStore from '../../stores/authStore.js';
 import GameView from '../../../shared/pixi-board/GameView.js';
+import { canUseHexWorldOrDownloadSGF } from '../../../shared/app/hostedGameUtils.js';
 
 const props = defineProps({
     hostedGameClient: {
@@ -31,23 +31,7 @@ const shouldDisplayHexworldLink = (): boolean => {
         return true;
     }
 
-    if (!hostedGameClient.value.isRanked()) {
-        return true;
-    }
-
-    if (['ended', 'canceled', 'forfeited'].includes(hostedGameClient.value.getState())) {
-        return true;
-    }
-
-    if (timeControlToCadencyName(hostedGameClient.value.getGameOptions()) === 'correspondence') {
-        return true;
-    }
-
-    if (hostedGameClient.value.getState() === 'playing') {
-        return !hostedGameClient.value.hasPlayer(loggedInPlayer.value) && !loggedInPlayer.value.isGuest;
-    }
-
-    return false;
+    return canUseHexWorldOrDownloadSGF(hostedGameClient.value.getHostedGame(), loggedInPlayer.value);
 };
 
 const generateHexworldLink = () => gameToHexworldLink(

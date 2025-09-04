@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import { PropType, nextTick, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
+import { PropType, nextTick, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
@@ -29,7 +29,7 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
-import { getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
+import { canUseHexWorldOrDownloadSGF, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
@@ -214,16 +214,27 @@ const downloadSGF = (): void => {
     const game = hostedGameClient.value.getGame();
     const players = hostedGameClient.value.getPlayers();
 
-    const filename = [
-        'playhex',
-        game.getStartedAt().toISOString().substring(0, 10),
-        pseudoString(players[0], 'slug'),
-        'VS',
-        pseudoString(players[1], 'slug'),
-    ].join('-') + '.sgf';
+    if (!canUseHexWorldOrDownloadSGF(hostedGameClient.value.getHostedGame(), loggedInPlayer)) {
+        return;
+    }
+
+    let filename = 'playhex-' + game.getStartedAt().toISOString().substring(0, 10) + '-';
+
+    filename += players.map(player => pseudoString(player, 'slug')).join('-vs-');
+    filename += '.sgf';
 
     downloadString(hostedGameToSGF(hostedGameClient.value.getHostedGame()), filename);
 };
+
+const ctrlSListener = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        downloadSGF();
+    }
+};
+
+onMounted(() => document.addEventListener('keydown', ctrlSListener));
+onUnmounted(() => document.removeEventListener('keydown', ctrlSListener));
 
 /*
  * Share game link to send to a friend.
@@ -598,7 +609,7 @@ watchEffect(() => {
 
                 <!-- Download SGF -->
                 <button
-                    v-if="hostedGameClient.isStateEnded()"
+                    v-if="canUseHexWorldOrDownloadSGF(hostedGameClient.getHostedGame(), loggedInPlayer)"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"
