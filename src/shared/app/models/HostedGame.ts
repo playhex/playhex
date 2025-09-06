@@ -13,9 +13,14 @@ import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
+import type TimeControlType from '../../time-control/TimeControlType.js';
+import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
+import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 
 @Entity()
-export default class HostedGame
+@Index(['state', 'opponentType', 'ranked']) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
+@Index(['state', 'boardsize']) // For stats on boardsizes
+export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
 {
     @PrimaryGeneratedColumn()
     id?: number;
@@ -46,10 +51,58 @@ export default class HostedGame
     @Expose()
     state: HostedGameState;
 
-    @OneToOne(() => HostedGameOptions, hostedGameOptions => hostedGameOptions.hostedGame, { cascade: true })
     @Expose()
-    @Type(() => HostedGameOptions)
-    gameOptions: HostedGameOptions;
+    @Column()
+    ranked: boolean;
+
+    @Expose()
+    @Column({ type: 'smallint' })
+    boardsize: number;
+
+    /**
+     * Who plays first.
+     * null: random
+     * 0: Host begins
+     * 1: Opponent or bot begins
+     */
+    @Column({ type: 'smallint', nullable: true })
+    @Expose()
+    firstPlayer: null | 0 | 1;
+
+    /**
+     * Whether the swap rule is enabled or not.
+     * Should be true by default for 1v1 games.
+     */
+    @Column()
+    @Expose()
+    swapRule: boolean;
+
+    /**
+     * Which opponent type I want.
+     */
+    @Column({ length: 15 })
+    @Expose()
+    opponentType: 'player' | 'ai';
+
+    /**
+     * If set, only this player can join.
+     * If it is a bot player, it will automatically join.
+     */
+    @ColumnUUID({ nullable: true })
+    @Expose()
+    opponentPublicId: null | string;
+
+    @Column({ type: 'json' })
+    @Expose()
+    @Type((type) => {
+        // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
+        switch ((type?.object as HostedGame).timeControlType?.family) {
+            case 'fischer': return HostedGameOptionsTimeControlFischer;
+            case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
+            default: return HostedGameOptionsTimeControl;
+        }
+    })
+    timeControlType: TimeControlType;
 
     @Column({ type: 'json', transformer: { from: (value: null | GameTimeData) => deserializeTimeControlValue(value), to: value => value } })
     @Expose()
@@ -146,9 +199,17 @@ export type CreateHostedGameParams = {
 export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGame => {
     const hostedGame = new HostedGame();
 
+    const gameOptions = params.gameOptions ?? new HostedGameOptions();
+
     hostedGame.publicId = uuidv4();
     hostedGame.state = 'created';
-    hostedGame.gameOptions = params.gameOptions ?? new HostedGameOptions();
+    hostedGame.ranked = gameOptions.ranked;
+    hostedGame.boardsize = gameOptions.boardsize;
+    hostedGame.firstPlayer = gameOptions.firstPlayer;
+    hostedGame.swapRule = gameOptions.swapRule;
+    hostedGame.opponentType = gameOptions.opponentType;
+    hostedGame.opponentPublicId = gameOptions.opponentPublicId;
+    hostedGame.timeControlType = structuredClone(gameOptions.timeControlType);
     hostedGame.timeControl = null;
     hostedGame.host = params.host ?? null;
     hostedGame.chatMessages = [];

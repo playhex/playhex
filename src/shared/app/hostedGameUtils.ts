@@ -127,15 +127,15 @@ export const getStrictLoserPlayer = (hostedGame: HostedGame): Player => {
 };
 
 export const isBotGame = (hostedGame: HostedGame): boolean => {
-    return hostedGame.gameOptions.opponentType === 'ai';
+    return hostedGame.opponentType === 'ai';
 };
 
 export const is1v1Game = (hostedGame: HostedGame): boolean => {
-    return hostedGame.gameOptions.opponentType === 'player';
+    return hostedGame.opponentType === 'player';
 };
 
 export const isCorrespondenceGame = (hostedGame: HostedGame): boolean => {
-    return timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence';
+    return timeControlToCadencyName(hostedGame) === 'correspondence';
 };
 
 /**
@@ -206,13 +206,13 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
     }
 
     if (undefined !== searchGamesParameters.ranked) {
-        if (hostedGame.gameOptions.ranked !== searchGamesParameters.ranked) {
+        if (hostedGame.ranked !== searchGamesParameters.ranked) {
             return false;
         }
     }
 
     if (undefined !== searchGamesParameters.opponentType) {
-        if (hostedGame.gameOptions.opponentType !== searchGamesParameters.opponentType) {
+        if (hostedGame.opponentType !== searchGamesParameters.opponentType) {
             return false;
         }
     }
@@ -236,7 +236,7 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
  * Whether given player should be able to view/edit conditional moves on a given game.
  */
 export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Player): boolean => {
-    if (timeControlToCadencyName(hostedGame.gameOptions) !== 'correspondence') {
+    if (timeControlToCadencyName(hostedGame) !== 'correspondence') {
         return false;
     }
 
@@ -257,7 +257,7 @@ export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Playe
  */
 export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Player): boolean => {
     // Friendly games are allowed
-    if (!hostedGame.gameOptions.ranked) {
+    if (!hostedGame.ranked) {
         return true;
     }
 
@@ -267,7 +267,7 @@ export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Play
     }
 
     // Correspondence games are allowed
-    if (timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence') {
+    if (timeControlToCadencyName(hostedGame) === 'correspondence') {
         return true;
     }
 

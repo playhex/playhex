@@ -1,7 +1,7 @@
 import { Ref } from 'vue';
 import { Game, Move as GameMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { Player, HostedGameOptions, ChatMessage, Move, Rating, HostedGame } from '../shared/app/models/index.js';
+import { Player, ChatMessage, Move, Rating, HostedGame } from '../shared/app/models/index.js';
 import { Outcome } from '../shared/game-engine/Types.js';
 import { GameTimeData } from '../shared/time-control/TimeControl.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -82,7 +82,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
          * No game server side, create an empty one to show client side
          */
         if (gameData === null) {
-            this.game = new Game(hostedGame.gameOptions.boardsize);
+            this.game = new Game(hostedGame.boardsize);
 
             // Cancel here in case game has been canceled before started
             if (hostedGame.state === 'canceled') {
@@ -171,11 +171,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGame;
     }
 
-    getGameOptions(): HostedGameOptions
-    {
-        return this.hostedGame.gameOptions;
-    }
-
     getChatMessages(): ChatMessage[]
     {
         return this.hostedGame.chatMessages;
@@ -188,7 +183,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     isRanked(): boolean
     {
-        return this.hostedGame.gameOptions.ranked;
+        return this.hostedGame.ranked;
     }
 
     getRatings(): Rating[]
@@ -372,7 +367,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     getTimeControlOptions(): TimeControlType
     {
-        return this.hostedGame.gameOptions.timeControl;
+        return this.hostedGame.timeControlType;
     }
 
     getTimeControlValues(): GameTimeData

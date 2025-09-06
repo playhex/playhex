@@ -183,7 +183,7 @@ export default class HostedGameRepository
     {
         await this.flushHostedGame(hostedGameServer);
 
-        if (hostedGameServer.getHostedGame().gameOptions.ranked) {
+        if (hostedGameServer.getHostedGame().ranked) {
             const newRatings = await this.updateRatings(hostedGameServer);
 
             Container.get(HexServer)
@@ -272,10 +272,6 @@ export default class HostedGameRepository
      */
     async createGame(params: CreateHostedGameParams & { gameOptions: HostedGameOptions }): Promise<HostedGameServer>
     {
-        if (undefined !== params.gameOptions.hostedGameId && params.gameOptions.hostedGameId === params.gameOptions.hostedGame.id) {
-            logger.warning('Provided gameOptions instance seem to be already linked to another hostedGame');
-        }
-
         if (params.host) {
             this.onlinePlayerService.notifyPlayerActivity(params.host);
         }
@@ -338,7 +334,7 @@ export default class HostedGameRepository
             throw new GameError('Cannot rematch an active game');
         }
 
-        const rematch = await this.createGame({ gameOptions: cloneGameOptions(game.gameOptions), host, rematchedFrom: game });
+        const rematch = await this.createGame({ gameOptions: cloneGameOptions(game), host, rematchedFrom: game });
         game.rematch = rematch.getHostedGame();
 
         try {

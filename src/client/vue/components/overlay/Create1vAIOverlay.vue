@@ -24,8 +24,8 @@ const props = defineProps({
 
 const gameOptions = reactive(props.gameOptions);
 
-const timeControl = toRef(gameOptions.timeControl);
-watch<TimeControlType>(timeControl, t => gameOptions.timeControl = t);
+const timeControl = toRef(gameOptions.timeControlType);
+watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
 
 const showSecondaryOptions = ref(false);
 

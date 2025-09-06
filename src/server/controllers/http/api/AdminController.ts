@@ -4,7 +4,7 @@ import HostedGameRepository from '../../../repositories/HostedGameRepository.js'
 import { PreRenderedService } from '../../../services/PreRenderedService.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Authorized, Body, Delete, HttpError, JsonController, NotFoundError, Param, Patch, Post } from 'routing-controllers';
-import { Player, HostedGameOptions, Tournament } from '../../../../shared/app/models/index.js';
+import { Player, Tournament, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
 import { PushNotificationSender } from '../../../services/PushNotificationsSender.js';
@@ -106,7 +106,7 @@ export default class AdminController
         gameOptions.opponentPublicId = ai1.publicId;
         gameOptions.ranked = true;
         gameOptions.boardsize = body.boardsize;
-        gameOptions.timeControl = {
+        gameOptions.timeControlType = {
             family: 'fischer',
             options: {
                 initialTime: 3600000, // Fixed time so we can compare time consumed by both ai

@@ -291,7 +291,7 @@ defineExpose({
 
     <div class="mb-3">
         <label class="form-label">Time control</label>
-        <AppTimeControl v-if="timeControlReady" v-model="tournament.timeControl" />
+        <AppTimeControl v-if="timeControlReady" v-model="tournament.timeControlType" />
     </div>
 
     <div class="mb-3">

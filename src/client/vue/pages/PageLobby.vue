@@ -157,7 +157,7 @@ const joinGame = async (hostedGame: HostedGame) => {
 };
 
 const isUncommonBoardsize = (hostedGame: HostedGame): boolean => {
-    const { boardsize } = hostedGame.gameOptions;
+    const { boardsize } = hostedGame;
 
     return boardsize < 9 || boardsize > 19;
 };
@@ -177,8 +177,8 @@ const gameComparator = (a: HostedGame, b: HostedGame): number => {
     if (botA && !botB)
         return 1;
 
-    const timeA = timeControlToCadencyName(a.gameOptions);
-    const timeB = timeControlToCadencyName(b.gameOptions);
+    const timeA = timeControlToCadencyName(a);
+    const timeB = timeControlToCadencyName(b);
 
     if (timeA !== 'correspondence' && timeB === 'correspondence')
         return -1;
@@ -324,14 +324,14 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.watch') }}</router-link>
                                 </td>
-                                <td><span v-if="hostedGame.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
+                                <td><span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
                                 <td>
                                     <AppPseudo v-if="hostedGame.host" onlineStatus rating :player="hostedGame.host" />
                                     <i v-else>System</i>
                                 </td>
-                                <td :class="isUncommonBoardsize(hostedGame) ? 'text-warning' : ''">{{ hostedGame.gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame.gameOptions" /></td>
-                                <td><AppGameRulesSummary :gameOptions="hostedGame.gameOptions" /></td>
+                                <td :class="isUncommonBoardsize(hostedGame) ? 'text-warning' : ''">{{ hostedGame.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
+                                <td><AppGameRulesSummary :gameOptions="hostedGame" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGame.createdAt, { addSuffix: true })
                                 }}</td>
@@ -370,7 +370,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.watch') }}</router-link>
 
-                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                    <span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
                                 <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 0)!" /></td>
                                 <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" /></td>
@@ -379,8 +379,8 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                     <br>
                                     <AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" />
                                 </td>
-                                <td>{{ hostedGame.gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame.gameOptions" /></td>
+                                <td>{{ hostedGame.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGame.gameData?.startedAt ?? 0, { addSuffix: true })
                                 }}</td>
@@ -418,7 +418,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                         :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                     >{{ $t('game.review') }}</router-link>
 
-                                    <span v-if="hostedGame.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                    <span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
                                 <template v-if="hostedGame?.gameData?.winner != null">
                                     <td><AppPseudo rating onlineStatus :player="getStrictWinnerPlayer(hostedGame)" is="strong" /></td>
@@ -428,8 +428,8 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                     <td>-</td>
                                     <td>-</td>
                                 </template>
-                                <td>{{ hostedGame.gameOptions.boardsize }}</td>
-                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame.gameOptions" /></td>
+                                <td>{{ hostedGame.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
                                 <td>{{
                                     formatDistanceToNowStrict(hostedGame.gameData?.endedAt ?? 0, { addSuffix: true })
                                 }}</td>

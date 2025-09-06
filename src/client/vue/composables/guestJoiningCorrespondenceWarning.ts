@@ -22,7 +22,7 @@ export const useGuestJoiningCorrespondenceWarning = () => {
             return false;
         }
 
-        if (loggedInPlayer.value.isGuest && timeControlToCadencyName(hostedGame.gameOptions) === 'correspondence') {
+        if (loggedInPlayer.value.isGuest && timeControlToCadencyName(hostedGame) === 'correspondence') {
             return true;
         }
 

@@ -84,7 +84,7 @@ notifier.on('chatMessage', async (hostedGame, chatMessage) => {
  */
 notifier.on('gameEnd', async hostedGame => {
     // No notification for bot game ended
-    if (hostedGame.gameOptions.opponentType === 'ai') {
+    if (hostedGame.opponentType === 'ai') {
         return;
     }
 
@@ -130,7 +130,7 @@ notifier.on('gameEnd', async hostedGame => {
  */
 notifier.on('gameCanceled', async hostedGame => {
     // No notification for bot game canceled
-    if (hostedGame.gameOptions.opponentType === 'ai') {
+    if (hostedGame.opponentType === 'ai') {
         return;
     }
 

@@ -89,8 +89,8 @@ export const getBoardsizeCategory = (boardsize: number): BoardsizeCategory => {
  * I.e ["overall", "small", "blitz", "small.blitz"]
  */
 export const getRatingCategoriesFromGame = (hostedGame: HostedGame): RatingCategory[] => {
-    const cadency = timeControlToCadencyName(hostedGame.gameOptions);
-    const boardsize = getBoardsizeCategory(hostedGame.gameOptions.boardsize);
+    const cadency = timeControlToCadencyName(hostedGame);
+    const boardsize = getBoardsizeCategory(hostedGame.boardsize);
 
     return [
         'overall',

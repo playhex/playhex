@@ -38,20 +38,18 @@
             }
         ],
         "state": "created",
-        "gameOptions": {
-            "ranked": true,
-            "boardsize": 13,
-            "firstPlayer": null,
-            "swapRule": true,
-            "opponentType": "player",
-            "opponentPublicId": null,
-            "timeControl": {
-                "type": "fischer",
-                "options": {
-                    "initialTime": 600000,
-                    "timeIncrement": 5000,
-                    "maxTime": 600000
-                }
+        "ranked": true,
+        "boardsize": 13,
+        "firstPlayer": null,
+        "swapRule": true,
+        "opponentType": "player",
+        "opponentPublicId": null,
+        "timeControlType": {
+            "type": "fischer",
+            "options": {
+                "initialTime": 600000,
+                "timeIncrement": 5000,
+                "maxTime": 600000
             }
         },
         "timeControl": {
@@ -128,20 +126,18 @@
             }
         ],
         "state": "playing",
-        "gameOptions": {
-            "ranked": true,
-            "boardsize": 11,
-            "firstPlayer": null,
-            "swapRule": true,
-            "opponentType": "ai",
-            "opponentPublicId": "9c226258-d78b-4083-bd5e-4c4efdf66cec",
-            "timeControl": {
-                "type": "fischer",
-                "options": {
-                    "initialTime": 600000,
-                    "timeIncrement": 5000,
-                    "maxTime": 600000
-                }
+        "ranked": true,
+        "boardsize": 11,
+        "firstPlayer": null,
+        "swapRule": true,
+        "opponentType": "ai",
+        "opponentPublicId": "9c226258-d78b-4083-bd5e-4c4efdf66cec",
+        "timeControlType": {
+            "type": "fischer",
+            "options": {
+                "initialTime": 600000,
+                "timeIncrement": 5000,
+                "maxTime": 600000
             }
         },
         "timeControl": {

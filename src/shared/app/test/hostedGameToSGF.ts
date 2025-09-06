@@ -90,20 +90,18 @@ describe('hostedGameToSGF', () => {
                 },
             ],
             state: 'ended',
-            gameOptions: {
-                ranked: false,
-                boardsize: 11,
-                firstPlayer: 1,
-                swapRule: true,
-                opponentType: 'ai',
-                opponentPublicId: '53ccc84c-c73b-40b2-9ee2-21ca2182ac85',
-                timeControl: {
-                    family: 'fischer',
-                    options: {
-                        initialTime: 600000,
-                        timeIncrement: 5000,
-                        maxTime: 600000,
-                    },
+            ranked: false,
+            boardsize: 11,
+            firstPlayer: 1,
+            swapRule: true,
+            opponentType: 'ai',
+            opponentPublicId: '53ccc84c-c73b-40b2-9ee2-21ca2182ac85',
+            timeControlType: {
+                family: 'fischer',
+                options: {
+                    initialTime: 600000,
+                    timeIncrement: 5000,
+                    maxTime: 600000,
                 },
             },
             timeControl: {
@@ -165,20 +163,18 @@ describe('hostedGameToSGF', () => {
                 },
             ],
             state: 'ended',
-            gameOptions: {
-                ranked: false,
-                boardsize: 11,
-                firstPlayer: null,
-                swapRule: true,
-                opponentType: 'ai',
-                opponentPublicId: 'a45ce9f7-9167-46ad-9867-d35adc860037',
-                timeControl: {
-                    family: 'byoyomi',
-                    options: {
-                        initialTime: 10000,
-                        periodTime: 5000,
-                        periodsCount: 3,
-                    },
+            ranked: false,
+            boardsize: 11,
+            firstPlayer: null,
+            swapRule: true,
+            opponentType: 'ai',
+            opponentPublicId: 'a45ce9f7-9167-46ad-9867-d35adc860037',
+            timeControlType: {
+                family: 'byoyomi',
+                options: {
+                    initialTime: 10000,
+                    periodTime: 5000,
+                    periodsCount: 3,
                 },
             },
             timeControl: {
@@ -310,6 +306,20 @@ describe('hostedGameToSGF', () => {
                             remainingPeriods: 3,
                         },
                     ],
+                },
+                ranked: false,
+                boardsize: 11,
+                firstPlayer: null,
+                swapRule: true,
+                opponentType: 'ai',
+                opponentPublicId: 'a45ce9f7-9167-46ad-9867-d35adc860037',
+                timeControlType: {
+                    family: 'byoyomi',
+                    options: {
+                        initialTime: 10000,
+                        periodTime: 5000,
+                        periodsCount: 3,
+                    },
                 },
                 gameData: null,
                 tournamentMatch: null,

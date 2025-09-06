@@ -58,14 +58,14 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
         ...baseSGF,
         PC: `https://playhex.org/games/${hostedGame.publicId}`,
         GN: hostedGame.publicId,
-        SZ: hostedGame.gameOptions.boardsize,
+        SZ: hostedGame.boardsize,
     };
 
     // Moves
     const movesHistory = hostedGame.gameData?.movesHistory;
 
     if (movesHistory && movesHistory.length > 0) {
-        const timeControl = createTimeControl(hostedGame.gameOptions.timeControl);
+        const timeControl = createTimeControl(hostedGame.timeControlType);
         timeControl.start(movesHistory[0].playedAt, movesHistory[0].playedAt);
 
         const colors: SGFColor[] = ['B', 'W'];
@@ -165,19 +165,19 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // TM, OT, LC, LT, time control
-    const { timeControl } = hostedGame.gameOptions;
-    sgf.TM = msToSeconds(timeControl.options.initialTime);
+    const { timeControlType } = hostedGame;
+    sgf.TM = msToSeconds(timeControlType.options.initialTime);
 
-    if (timeControl.family === 'fischer') {
-        sgf.OT = 'fischer ' + msToSeconds(timeControl.options.timeIncrement ?? 0);
+    if (timeControlType.family === 'fischer') {
+        sgf.OT = 'fischer ' + msToSeconds(timeControlType.options.timeIncrement ?? 0);
 
-        if (timeControl.options.maxTime === timeControl.options.initialTime) {
+        if (timeControlType.options.maxTime === timeControlType.options.initialTime) {
             sgf.OT += ' capped';
-        } else if (timeControl.options.maxTime !== undefined) {
-            sgf.OT += ' capped ' + msToSeconds(timeControl.options.maxTime);
+        } else if (timeControlType.options.maxTime !== undefined) {
+            sgf.OT += ' capped ' + msToSeconds(timeControlType.options.maxTime);
         }
-    } else if (timeControl.family === 'byoyomi') {
-        const { periodsCount, periodTime } = timeControl.options;
+    } else if (timeControlType.family === 'byoyomi') {
+        const { periodsCount, periodTime } = timeControlType.options;
 
         sgf.OT = `${periodsCount}x${msToSeconds(periodTime)} byo-yomi`;
     }

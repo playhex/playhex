@@ -33,11 +33,10 @@ export default class StatsRepository
          * Total played games by 1v1 ranked/unranked
          */
         const totalByRanked: { ranked: number, total: string }[] = await playedGamesQueryBuilder.clone()
-            .select('gameOptions.ranked as ranked')
+            .select('hostedGame.ranked as ranked')
             .addSelect('count(*) as total')
-            .innerJoin('hostedGame.gameOptions', 'gameOptions')
-            .andWhere('gameOptions.opponentType = "player"')
-            .groupBy('gameOptions.ranked')
+            .andWhere('hostedGame.opponentType = "player"')
+            .groupBy('hostedGame.ranked')
             .getRawMany()
         ;
 
@@ -52,8 +51,7 @@ export default class StatsRepository
          * Total bot games
          */
         playerStats.totalBotGames = await playedGamesQueryBuilder.clone()
-            .innerJoin('hostedGame.gameOptions', 'gameOptions')
-            .andWhere('gameOptions.opponentType = "ai"')
+            .andWhere('hostedGame.opponentType = "ai"')
             .getCount()
         ;
 
@@ -61,10 +59,9 @@ export default class StatsRepository
          * Total played games by board size
          */
         const preferredBoardsizes: { boardsize: number, total: string }[] = await playedGamesQueryBuilder.clone()
-            .select('gameOptions.boardsize as boardsize, count(*) as total')
-            .innerJoin('hostedGame.gameOptions', 'gameOptions')
-            .groupBy('gameOptions.boardsize')
-            .orderBy('gameOptions.boardsize')
+            .select('hostedGame.boardsize as boardsize, count(*) as total')
+            .groupBy('hostedGame.boardsize')
+            .orderBy('hostedGame.boardsize')
             .getRawMany()
         ;
 

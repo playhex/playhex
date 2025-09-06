@@ -63,7 +63,6 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
                     },
                     relations: {
                         gameData: true,
-                        gameOptions: true,
                     },
                 });
 
@@ -78,7 +77,7 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
         return unordereds.map(unordered => {
             const { hostedGame, moves } = unordered;
 
-            return `publicId ${hostedGame.publicId} hostedGameId ${hostedGame.id} ; moves ${moves.join(', ')} (length = ${hostedGame.gameData!.movesHistory.length}, opponentType = ${hostedGame.gameOptions.opponentType})`;
+            return `publicId ${hostedGame.publicId} hostedGameId ${hostedGame.id} ; moves ${moves.join(', ')} (length = ${hostedGame.gameData!.movesHistory.length}, opponentType = ${hostedGame.opponentType})`;
         });
     }
 }

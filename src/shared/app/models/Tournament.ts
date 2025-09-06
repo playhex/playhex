@@ -157,13 +157,13 @@ export default class Tournament implements TimeControlBoardsize
     ) // make sure timeControl is a HostedGameOptionsTimeControl and not a raw object, and make validation works
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
-        switch (type?.object.timeControl?.type) {
+        switch ((type?.object as Tournament).timeControlType?.family) {
             case 'fischer': return HostedGameOptionsTimeControlFischer;
             case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
             default: return HostedGameOptionsTimeControl;
         }
     })
-    timeControl: TimeControlType;
+    timeControlType: TimeControlType;
 
     /**
      * Whether player needs an account to join tournament,
@@ -311,7 +311,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.accountRequired = false;
     tournament.ranked = true;
     tournament.boardsize = 11;
-    tournament.timeControl = structuredClone(defaultTimeControlTypes.normal);
+    tournament.timeControlType = structuredClone(defaultTimeControlTypes.normal);
     tournament.checkInOpenOffsetSeconds = 15 * 60;
     tournament.startDelayInSeconds = 0;
     tournament.createdAt = new Date();
@@ -341,7 +341,7 @@ export const createTournamentDefaultsCreate = (): Tournament => {
     tournament.boardsize = 11;
     tournament.startDelayInSeconds = 0;
     tournament.checkInOpenOffsetSeconds = 15 * 60;
-    tournament.timeControl = structuredClone(defaultTimeControlTypes.normal);
+    tournament.timeControlType = structuredClone(defaultTimeControlTypes.normal);
 
     return tournament;
 };
@@ -366,7 +366,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.accountRequired = input.accountRequired;
     tournament.ranked = input.ranked;
     tournament.boardsize = input.boardsize;
-    tournament.timeControl = input.timeControl;
+    tournament.timeControlType = input.timeControlType;
     tournament.subscriptions = [];
     tournament.participants = [];
     tournament.matches = [];
@@ -396,11 +396,11 @@ export const cloneTournament = (target: Tournament, source: Tournament): void =>
     target.accountRequired = source.accountRequired;
     target.ranked = source.ranked;
     target.boardsize = source.boardsize;
-    target.timeControl = structuredClone(source.timeControl);
+    target.timeControlType = structuredClone(source.timeControlType);
 
     // Prevents "maxTime must not be greater than [2 weeks]" error when cloning a tournament and submit it
-    if (target.timeControl.family === 'fischer' && undefined !== target.timeControl.options.maxTime && target.timeControl.options.maxTime > maxTimeControlInputTime) {
-        target.timeControl.options.maxTime = undefined;
+    if (target.timeControlType.family === 'fischer' && undefined !== target.timeControlType.options.maxTime && target.timeControlType.options.maxTime > maxTimeControlInputTime) {
+        target.timeControlType.options.maxTime = undefined;
     }
 
     target.checkInOpenOffsetSeconds = source.checkInOpenOffsetSeconds;

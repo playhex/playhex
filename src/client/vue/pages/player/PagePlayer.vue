@@ -107,8 +107,8 @@ const { hostedGames } = storeToRefs(useLobbyStore());
 
 const currentGameComparator = (a: HostedGame, b: HostedGame): number => {
     // Correspondence games go after real-time games, then sorted by "started at"
-    const timeA = timeControlToCadencyName(a.gameOptions);
-    const timeB = timeControlToCadencyName(b.gameOptions);
+    const timeA = timeControlToCadencyName(a);
+    const timeB = timeControlToCadencyName(b);
 
     if (timeA !== 'correspondence' && timeB === 'correspondence')
         return -1;
@@ -468,12 +468,12 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                             >{{ $t('game.watch') }}</router-link>
                         </td>
                         <td>
-                            <span v-if="game.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                            <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
                         <td><AppPseudo rating onlineStatus :player="getOtherPlayer(game, player)!" /></td>
-                        <td>{{ game.gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabel :timeControlBoardsize="game.gameOptions" /></td>
-                        <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
+                        <td>{{ game.boardsize }}</td>
+                        <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game" /></td>
                         <td>{{
                             formatDistanceToNowStrict(game.gameData?.startedAt ?? 0, { addSuffix: true })
                         }}</td>
@@ -521,7 +521,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                             >{{ $t('game.review') }}</router-link>
                         </td>
                         <td>
-                            <span v-if="game.gameOptions.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                            <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
 
                         <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
@@ -531,9 +531,9 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <td v-if="game.hostedGameToPlayers.length < 2">-</td>
                         <td v-else><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
 
-                        <td>{{ game.gameOptions.boardsize }}</td>
-                        <td><AppTimeControlLabel :timeControlBoardsize="game.gameOptions" /></td>
-                        <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
+                        <td>{{ game.boardsize }}</td>
+                        <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game" /></td>
                         <td>{{
                             game.gameData?.endedAt ? format(game.gameData.endedAt, 'd MMMM yyyy p') : '-'
                         }}</td>

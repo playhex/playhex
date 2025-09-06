@@ -1,7 +1,4 @@
-import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { Type } from 'class-transformer';
-import { ColumnUUID } from '../custom-typeorm.js';
-import HostedGame from './HostedGame.js';
 import { BOARD_DEFAULT_SIZE, type PlayerIndex } from '../../game-engine/index.js';
 import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom.js';
@@ -15,31 +12,26 @@ export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
 export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176627/1263010163875381288/1350473700457316413
 
-@Entity()
+/**
+ * DTO for game options, must have default values
+ * for when we POST a games through api with partial values:
+ * clas-transformer will use default values.
+ */
 export default class HostedGameOptions implements TimeControlBoardsize
 {
-    @PrimaryColumn()
-    hostedGameId?: number;
-
-    @OneToOne(() => HostedGame, hostedGame => hostedGame.gameOptions)
-    @JoinColumn({ name: 'hostedGameId' })
-    hostedGame: Relation<HostedGame>;
-
-    @Column()
     @Expose()
     @IsBoolean()
     @Validate(BoardsizeEligibleForRanked)
     @Validate(FirstPlayerEligibleForRanked)
     @Validate(SwapRuleEligibleForRanked)
     @Validate(OpponentTypeEligibleForRanked)
-    ranked: boolean = false;
+    ranked: boolean = true;
 
     /**
      * Defaults to BOARD_DEFAULT_SIZE.
      */
     @Min(MIN_BOARDSIZE)
     @Max(MAX_BOARDSIZE)
-    @Column({ type: 'smallint' })
     @Expose()
     boardsize: number = DEFAULT_BOARDSIZE;
 
@@ -51,7 +43,6 @@ export default class HostedGameOptions implements TimeControlBoardsize
      */
     @IsNumber()
     @IsOptional()
-    @Column({ type: 'smallint', nullable: true })
     @Expose()
     firstPlayer: null | PlayerIndex = null;
 
@@ -60,7 +51,6 @@ export default class HostedGameOptions implements TimeControlBoardsize
      * Should be true by default for 1v1 games.
      */
     @IsBoolean()
-    @Column()
     @Expose()
     swapRule: boolean = true;
 
@@ -68,8 +58,6 @@ export default class HostedGameOptions implements TimeControlBoardsize
      * Which opponent type I want.
      */
     @IsIn(['player', 'ai'])
-    @Column({ length: 15 })
-    @Index()
     @Expose()
     opponentType: 'player' | 'ai' = 'player';
 
@@ -79,23 +67,21 @@ export default class HostedGameOptions implements TimeControlBoardsize
      */
     @IsUUID()
     @IsOptional()
-    @ColumnUUID({ nullable: true })
     @Expose()
-    opponentPublicId?: null | string = null;
+    opponentPublicId: null | string = null;
 
-    @Column({ type: 'json' })
     @Expose()
     @IsObject()
     @ValidateNested()
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
-        switch ((type?.object.timeControl as TimeControlType).family) {
+        switch ((type?.object as HostedGameOptions).timeControlType.family) {
             case 'fischer': return HostedGameOptionsTimeControlFischer;
             case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
             default: return HostedGameOptionsTimeControl;
         }
     })
-    timeControl: TimeControlType = structuredClone(defaultTimeControlTypes.normal);
+    timeControlType: TimeControlType = structuredClone(defaultTimeControlTypes.normal);
 }
 
 /**
@@ -111,7 +97,7 @@ export const cloneGameOptions = (gameOptions: HostedGameOptions): HostedGameOpti
     clone.swapRule = gameOptions.swapRule;
     clone.opponentType = gameOptions.opponentType;
     clone.opponentPublicId = gameOptions.opponentPublicId;
-    clone.timeControl = gameOptions.timeControl;
+    clone.timeControlType = gameOptions.timeControlType;
 
     return clone;
 };

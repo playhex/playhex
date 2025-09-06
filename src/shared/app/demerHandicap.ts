@@ -65,8 +65,8 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
 
 export const guessDemerHandicapFromHostedGame = (hostedGame: HostedGame): number | 'N/S' => {
     return guessDemerHandicap(
-        hostedGame.gameOptions.swapRule,
-        hostedGame.gameOptions.firstPlayer !== null,
+        hostedGame.swapRule,
+        hostedGame.firstPlayer !== null,
         hostedGame.gameData?.movesHistory,
     );
 };

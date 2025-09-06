@@ -10,12 +10,12 @@ describe('HostedGameOptions', () => {
         options.firstPlayer = null;
         options.swapRule = true;
 
-        options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.family = 'fischer';
-        options.timeControl.options = new OptionsFischer();
-        options.timeControl.options.initialTime = 600000;
-        options.timeControl.options.maxTime = 600000;
-        options.timeControl.options.timeIncrement = 5000;
+        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType.family = 'fischer';
+        options.timeControlType.options = new OptionsFischer();
+        options.timeControlType.options.initialTime = 600000;
+        options.timeControlType.options.maxTime = 600000;
+        options.timeControlType.options.timeIncrement = 5000;
 
         options.ranked = true;
 
@@ -31,12 +31,12 @@ describe('HostedGameOptions', () => {
         options.firstPlayer = null;
         options.swapRule = true;
 
-        options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.family = 'fischer';
-        options.timeControl.options = new OptionsFischer();
-        options.timeControl.options.initialTime = 600000;
-        options.timeControl.options.maxTime = 600000;
-        options.timeControl.options.timeIncrement = 5000;
+        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType.family = 'fischer';
+        options.timeControlType.options = new OptionsFischer();
+        options.timeControlType.options.initialTime = 600000;
+        options.timeControlType.options.maxTime = 600000;
+        options.timeControlType.options.timeIncrement = 5000;
 
         options.ranked = true;
 
@@ -52,12 +52,12 @@ describe('HostedGameOptions', () => {
         options.firstPlayer = 0;
         options.swapRule = true;
 
-        options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.family = 'fischer';
-        options.timeControl.options = new OptionsFischer();
-        options.timeControl.options.initialTime = 600000;
-        options.timeControl.options.maxTime = 600000;
-        options.timeControl.options.timeIncrement = 5000;
+        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType.family = 'fischer';
+        options.timeControlType.options = new OptionsFischer();
+        options.timeControlType.options.initialTime = 600000;
+        options.timeControlType.options.maxTime = 600000;
+        options.timeControlType.options.timeIncrement = 5000;
 
         options.ranked = true;
 
@@ -73,12 +73,12 @@ describe('HostedGameOptions', () => {
         options.firstPlayer = null;
         options.swapRule = false;
 
-        options.timeControl = new HostedGameOptionsTimeControlFischer();
-        options.timeControl.family = 'fischer';
-        options.timeControl.options = new OptionsFischer();
-        options.timeControl.options.initialTime = 600000;
-        options.timeControl.options.maxTime = 600000;
-        options.timeControl.options.timeIncrement = 5000;
+        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType.family = 'fischer';
+        options.timeControlType.options = new OptionsFischer();
+        options.timeControlType.options.initialTime = 600000;
+        options.timeControlType.options.maxTime = 600000;
+        options.timeControlType.options.timeIncrement = 5000;
 
         options.ranked = true;
 

@@ -108,7 +108,7 @@ describe('Page Game finished', () => {
         cy.title().should('include', 'Forfeited');
 
         // Game sidebar
-        cy.contains('aa is declared a forfeit.');
+        cy.contains('aa loses by forfeit.');
 
         cy.contains('.nav-game-sidebar', 'Info').click();
         cy.contains('button', 'SGF');

@@ -39,12 +39,17 @@ Wait javascript to be bundled, then the application is available at:
 
 ### Play with AI
 
-For development you can use random and determinist random bots.
+For development you can use local AI:
+- random bots
+- Davies AI
+- tests bots for functionnal tests
 
 Enable them with:
 
 ``` bash
 yarn hex create-random-bots
+yarn hex create-davies-bots
+yarn hex create-test-bots
 ```
 
 Determinist random bot will always plays same games

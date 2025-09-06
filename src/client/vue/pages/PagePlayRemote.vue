@@ -77,7 +77,7 @@ const getMoveSettings = (): null | MoveSettings => {
         blitz: playerSettings.value.moveSettingsBlitz,
         normal: playerSettings.value.moveSettingsNormal,
         correspondence: playerSettings.value.moveSettingsCorrespondence,
-    }[timeControlToCadencyName(hostedGameClient.value.getHostedGame().gameOptions)];
+    }[timeControlToCadencyName(hostedGameClient.value.getHostedGame())];
 };
 
 const shouldDisplayConfirmMove = (): boolean => {

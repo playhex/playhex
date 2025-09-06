@@ -1,6 +1,6 @@
 import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { ChatMessage, Player, HostedGameOptions, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
+import { ChatMessage, Player, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
 import baseLogger from './services/logger.js';
@@ -91,7 +91,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         try {
             this.timeControl = createTimeControl(
-                this.hostedGame.gameOptions.timeControl,
+                this.hostedGame.timeControlType,
                 this.hostedGame.timeControl,
             );
         } catch (e) {
@@ -105,7 +105,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         this.timeControl = createTimeControl(
-            this.hostedGame.gameOptions.timeControl,
+            this.hostedGame.timeControlType,
             this.hostedGame.timeControl,
         );
 
@@ -149,11 +149,6 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     getGame(): null | EngineGame
     {
         return this.game;
-    }
-
-    getHostedGameOptions(): HostedGameOptions
-    {
-        return this.hostedGame.gameOptions;
     }
 
     getPlayers(): Player[]
@@ -307,7 +302,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private async makeConditionalMovesIfApplicable(): Promise<void>
     {
         // Do not lose time querying database for conditional moves if game is not correspondence
-        if (timeControlToCadencyName(this.hostedGame.gameOptions) !== 'correspondence') {
+        if (timeControlToCadencyName(this.hostedGame) !== 'correspondence') {
             return;
         }
 
@@ -393,7 +388,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
-        const { ranked } = this.hostedGame.gameOptions;
+        const { ranked } = this.hostedGame;
 
         if (!ranked) {
             this.playerAnswerUndo(player, true);
@@ -515,11 +510,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.affectPlayersColors();
 
-        this.game = new EngineGame(this.hostedGame.gameOptions.boardsize);
+        this.game = new EngineGame(this.hostedGame.boardsize);
 
         this.listenGame(this.game);
 
-        this.game.setAllowSwap(this.hostedGame.gameOptions.swapRule);
+        this.game.setAllowSwap(this.hostedGame.swapRule);
         this.hostedGame.state = 'playing';
 
         this.saveState();
@@ -545,14 +540,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         // If games are created by a tournament system,
         // we assume tournament system already affect players colors randomly or depending on last match.
         if (this.hostedGame.host === null) {
-            if (this.hostedGame.gameOptions.firstPlayer === null) {
+            if (this.hostedGame.firstPlayer === null) {
                 this.logger.info('Game created by system, do not shuffle players color');
                 return;
             }
 
             this.logger.info('Game created by system, but fixed colors, set fixed colors');
 
-            if (this.hostedGame.gameOptions.firstPlayer === 1) {
+            if (this.hostedGame.firstPlayer === 1) {
                 this.players.reverse();
             }
 
@@ -588,7 +583,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         // Random colors
-        if (this.hostedGame.gameOptions.firstPlayer === null) {
+        if (this.hostedGame.firstPlayer === null) {
             this.logger.info('Affect random colors');
 
             if (Math.random() < 0.5) {
@@ -602,7 +597,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         // Fixed colors
         this.logger.info('Set fixed colors');
 
-        if (this.hostedGame.gameOptions.firstPlayer === 1) {
+        if (this.hostedGame.firstPlayer === 1) {
             this.players.reverse();
         }
     }
@@ -613,7 +608,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return false;
         }
 
-        if (this.hostedGame.gameOptions.firstPlayer !== null) {
+        if (this.hostedGame.firstPlayer !== null) {
             this.logger.info('Rematch alternate colors: no, colors are fixed', { state: this.hostedGame.rematchedFrom.state });
             return false;
         }

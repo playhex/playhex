@@ -53,7 +53,7 @@ export const createGameOptionsForTournament = (tournament: Tournament): HostedGa
     const gameOptions = new HostedGameOptions();
 
     gameOptions.boardsize = tournament.boardsize;
-    gameOptions.timeControl = tournament.timeControl;
+    gameOptions.timeControlType = tournament.timeControlType;
     gameOptions.ranked = tournament.ranked;
 
     return gameOptions;

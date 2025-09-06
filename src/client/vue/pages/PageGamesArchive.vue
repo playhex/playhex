@@ -182,7 +182,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                         </td>
 
                         <td>
-                            <span v-if="game.gameOptions.ranked" class="text-warning">
+                            <span v-if="game.ranked" class="text-warning">
                                 {{ $t('ranked') }}
                             </span>
                             <span v-else class="text-success">
@@ -210,11 +210,11 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                             <span v-else>-</span>
                         </td>
 
-                        <td>{{ game.gameOptions.boardsize }}</td>
+                        <td>{{ game.boardsize }}</td>
 
-                        <td><AppTimeControlLabel :timeControlBoardsize="game.gameOptions" /></td>
+                        <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
 
-                        <td><AppGameRulesSummary :gameOptions="game.gameOptions" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game" /></td>
 
                         <td>{{
                             game.gameData?.endedAt ? format(game.gameData.endedAt, 'd MMMM yyyy p') : '-'

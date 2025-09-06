@@ -33,9 +33,8 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
 
         const unrated: Result[] = await this.hostedGameRepository
             .createQueryBuilder('hostedGame')
-            .innerJoin('hostedGame.gameOptions', 'gameOptions')
             .innerJoin('hostedGame.ratings', 'rating')
-            .where('not gameOptions.ranked')
+            .where('not hostedGame.ranked')
             .groupBy('hostedGame.id')
             .execute()
         ;

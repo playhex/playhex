@@ -877,14 +877,14 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.tournament.boardsize = edited.boardsize;
         }
 
-        if (!isSameTimeControlType(edited.timeControl, this.tournament.timeControl)) {
+        if (!isSameTimeControlType(edited.timeControlType, this.tournament.timeControlType)) {
             addTournamentHistory(this.tournament, 'edited', {
                 field: 'timeControl',
-                value: timeControlToString(edited.timeControl),
-                oldValue: timeControlToString(this.tournament.timeControl),
+                value: timeControlToString(edited.timeControlType),
+                oldValue: timeControlToString(this.tournament.timeControlType),
             }, now);
 
-            this.tournament.timeControl = edited.timeControl;
+            this.tournament.timeControlType = edited.timeControlType;
         }
 
         if (edited.accountRequired !== this.tournament.accountRequired) {

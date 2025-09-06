@@ -56,21 +56,19 @@
             }
         ]
     },
-    "gameOptions": {
-        "boardsize": 11,
-        "firstPlayer": null,
-        "swapRule": true,
-        "opponent": {
-            "type": "ai",
-            "publicId": "53ccc84c-c73b-40b2-9ee2-21ca2182ac85"
-        },
-        "timeControl": {
-            "type": "fischer",
-            "options": {
-                "initialTime": 600000,
-                "timeIncrement": 5000,
-                "maxTime": 600000
-            }
+    "boardsize": 11,
+    "firstPlayer": null,
+    "swapRule": true,
+    "opponent": {
+        "type": "ai",
+        "publicId": "53ccc84c-c73b-40b2-9ee2-21ca2182ac85"
+    },
+    "timeControlType": {
+        "type": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
         }
     },
     "gameData": {

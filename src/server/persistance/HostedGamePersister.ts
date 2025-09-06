@@ -27,7 +27,6 @@ const relations: FindOptionsRelations<HostedGame> = {
         },
     },
     gameData: true,
-    gameOptions: true,
     ratings: {
         player: true,
     },
@@ -132,22 +131,20 @@ export default class HostedGamePersister
             .comment('search hosted games')
             .leftJoin('hostedGame.gameData', 'gameData')
             .addSelect('gameData')
-            .leftJoin('hostedGame.gameOptions', 'gameOptions')
-            .addSelect('gameOptions')
             .take(params.paginationPageSize ?? 5)
             .skip((params.paginationPage ?? 0) * (params.paginationPageSize ?? 5))
         ;
 
         if (undefined !== params.opponentType) {
             queryBuilder
-                .andWhere('gameOptions.opponentType = :opponentType')
+                .andWhere('hostedGame.opponentType = :opponentType')
                 .setParameter('opponentType', params.opponentType)
             ;
         }
 
         if (undefined !== params.ranked) {
             queryBuilder
-                .andWhere('gameOptions.ranked = :ranked')
+                .andWhere('hostedGame.ranked = :ranked')
                 .setParameter('ranked', params.ranked)
             ;
         }

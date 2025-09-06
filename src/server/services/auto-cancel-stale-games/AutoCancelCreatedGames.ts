@@ -62,7 +62,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
                 && hostedGame.host
                 && !this.onlinePlayersService.isOnline(hostedGame.host)
                 && !hostedGame.tournamentMatch
-                && timeControlToCadencyName(hostedGame.gameOptions) !== 'correspondence'
+                && timeControlToCadencyName(hostedGame) !== 'correspondence'
             ) {
                 this.onPlayerDisconnect(hostedGame.host);
             }
@@ -96,7 +96,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
                 && hostedGame.host
                 && hostedGame.host.publicId === player.publicId
                 && !hostedGame.tournamentMatch
-                && timeControlToCadencyName(hostedGame.gameOptions) !== 'correspondence'
+                && timeControlToCadencyName(hostedGame) !== 'correspondence'
             ) {
                 logger.info('Auto cancel created games: cancel waiting or empty game because host left', {
                     hostedGamePublicId: hostedGame.publicId,

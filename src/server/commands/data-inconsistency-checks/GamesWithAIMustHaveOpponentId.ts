@@ -30,9 +30,8 @@ export class GamesWithAIMustHaveOpponentId implements DataInconsistenciesChecker
 
         const missingAiPublicId: Result[] = await this.hostedGameRepository
             .createQueryBuilder('hostedGame')
-            .innerJoin('hostedGame.gameOptions', 'gameOptions')
-            .where('gameOptions.opponentType = "ai"')
-            .andWhere('gameOptions.opponentPublicId is null')
+            .where('hostedGame.opponentType = "ai"')
+            .andWhere('hostedGame.opponentPublicId is null')
             .execute()
         ;
 

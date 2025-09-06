@@ -40,19 +40,17 @@
                 }
             ]
         },
-        "gameOptions": {
-            "boardsize": 9,
-            "firstPlayer": 0,
-            "opponent": {
-                "type": "ai"
-            },
-            "timeControl": {
-                "type": "fischer",
-                "options": {
-                    "initialTime": 900000,
-                    "timeIncrement": 900000,
-                    "maxTime": 900000
-                }
+        "boardsize": 9,
+        "firstPlayer": 0,
+        "opponent": {
+            "type": "ai"
+        },
+        "timeControlType": {
+            "type": "fischer",
+            "options": {
+                "initialTime": 900000,
+                "timeIncrement": 900000,
+                "maxTime": 900000
             }
         },
         "gameData": {

@@ -40,19 +40,17 @@
                 }
             ]
         },
-        "gameOptions": {
-            "boardsize": 11,
-            "firstPlayer": null,
-            "opponent": {
-                "type": "ai"
-            },
-            "timeControl": {
-                "type": "fischer",
-                "options": {
-                    "initialTime": 900000,
-                    "timeIncrement": 900000,
-                    "maxTime": 900000
-                }
+        "boardsize": 11,
+        "firstPlayer": null,
+        "opponent": {
+            "type": "ai"
+        },
+        "timeControlType": {
+            "type": "fischer",
+            "options": {
+                "initialTime": 900000,
+                "timeIncrement": 900000,
+                "maxTime": 900000
             }
         },
         "gameData": {
@@ -172,19 +170,17 @@
                 }
             ]
         },
-        "gameOptions": {
-            "boardsize": 11,
-            "firstPlayer": null,
-            "opponent": {
-                "type": "player"
-            },
-            "timeControl": {
-                "type": "fischer",
-                "options": {
-                    "initialTime": 900000,
-                    "timeIncrement": 900000,
-                    "maxTime": 900000
-                }
+        "boardsize": 11,
+        "firstPlayer": null,
+        "opponent": {
+            "type": "player"
+        },
+        "timeControlType": {
+            "type": "fischer",
+            "options": {
+                "initialTime": 900000,
+                "timeIncrement": 900000,
+                "maxTime": 900000
             }
         },
         "gameData": null,

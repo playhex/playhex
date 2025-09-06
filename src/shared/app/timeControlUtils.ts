@@ -42,7 +42,7 @@ export type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
  */
 export const timeControlToCadencyName = (timeControlBoardsize: TimeControlBoardsize): TimeControlCadencyName => {
     const averageSecondsPerMove = calcAverageSecondsPerMove(
-        timeControlBoardsize.timeControl,
+        timeControlBoardsize.timeControlType,
         timeControlBoardsize.boardsize,
     );
 

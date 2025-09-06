@@ -26,13 +26,12 @@ export class TimeoutGamesWithLessThan2MovesMustBeCanceled implements DataInconsi
         type Result = {
             hostedGame_publicId: string;
             hostedGame_createdAt: Date;
-            gameOptions_ranked: 0 | 1;
+            hostedGame_ranked: 0 | 1;
         };
 
         const uncanceled: Result[] = await this.hostedGameRepository
             .createQueryBuilder('hostedGame')
             .innerJoin('hostedGame.gameData', 'game')
-            .innerJoinAndSelect('hostedGame.gameOptions', 'gameOptions')
             .where('game.outcome = "time"')
             .andWhere('hostedGame.state = "ended"')
             .andWhere('json_length(game.movesHistory) < 2')
@@ -44,7 +43,7 @@ export class TimeoutGamesWithLessThan2MovesMustBeCanceled implements DataInconsi
             label,
             hostedGame.hostedGame_publicId,
             hostedGame.hostedGame_createdAt,
-            hostedGame.gameOptions_ranked ? '(ranked)' : '',
+            hostedGame.hostedGame_ranked ? '(ranked)' : '',
         ].join(' ');
 
         return uncanceled.map(hostedGame => hostedGameToString('timeout with <2 moves but not canceled', hostedGame));

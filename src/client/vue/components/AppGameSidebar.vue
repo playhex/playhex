@@ -655,7 +655,7 @@ watchEffect(() => {
                 </p>
                 <p v-else>
                     <span class="text-success"><IconPeopleFill /> {{ $t('friendly') }}</span>
-                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="hostedGameClient.getGameOptions()" /></small>
+                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="hostedGameClient.getHostedGame()" /></small>
                 </p>
             </div>
         </div>
@@ -673,10 +673,10 @@ watchEffect(() => {
                     </dd>
 
                     <dt class="col-md-5">{{ $t('game.time_control') }}</dt>
-                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="hostedGameClient.getGameOptions()" /></dd>
+                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="hostedGameClient.getHostedGame()" /></dd>
 
                     <dt class="col-md-5">{{ $t('game.board_size') }}</dt>
-                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().gameOptions.boardsize }}</dd>
+                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().boardsize }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.created') }}</dt>
                     <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().createdAt) }}</dd>
@@ -712,7 +712,7 @@ watchEffect(() => {
             <div class="container-fluid">
 
                 <div class="mb-2" v-if="playerSettings">
-                    <template v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
+                    <template v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getHostedGame())">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -726,7 +726,7 @@ watchEffect(() => {
                         </div>
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsBlitz)) }}</div>
                     </template>
-                    <template v-if="'normal' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
+                    <template v-if="'normal' === timeControlToCadencyName(hostedGameClient.getHostedGame())">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -740,7 +740,7 @@ watchEffect(() => {
                         </div>
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsNormal)) }}</div>
                     </template>
-                    <template v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getGameOptions())">
+                    <template v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getHostedGame())">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">

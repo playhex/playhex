@@ -32,20 +32,18 @@
             }
         ]
     },
-    "gameOptions": {
-        "boardsize": 11,
-        "firstPlayer": null,
-        "swapRule": true,
-        "opponent": {
-            "type": "player"
-        },
-        "timeControl": {
-            "type": "fischer",
-            "options": {
-                "initialTime": 600000,
-                "timeIncrement": 5000,
-                "maxTime": 600000
-            }
+    "boardsize": 11,
+    "firstPlayer": null,
+    "swapRule": true,
+    "opponent": {
+        "type": "player"
+    },
+    "timeControlType": {
+        "type": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
         }
     },
     "gameData": null,
