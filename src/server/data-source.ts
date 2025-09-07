@@ -3,6 +3,7 @@ import InMemoryCacheProvider from 'typeorm-in-memory-cache';
 import { DataSource } from 'typeorm';
 import { Container } from 'typedi';
 import { entities } from '../shared/app/models/index.js';
+import { StatsLogger } from './services/statslogger.js';
 
 const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
 
@@ -17,6 +18,10 @@ if (type !== 'mysql' && type !== 'postgres') {
     throw new Error('DATABASE_URL expected to be like "mysql://... or postgresql://...');
 }
 
+const logger = new StatsLogger();
+
+setInterval(() => logger.dump(), 2000);
+
 export const AppDataSource = new DataSource({
     type,
     url: DATABASE_URL,
@@ -24,10 +29,11 @@ export const AppDataSource = new DataSource({
     timezone: 'Z',
     entities: Object.values(entities),
     migrations: [],
-    maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
+    maxQueryExecutionTime: -1,
     cache: {
         provider: () => new InMemoryCacheProvider.default(),
     },
+    logger,
 });
 
 AppDataSource.initialize();
