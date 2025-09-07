@@ -4,9 +4,10 @@ import { Expose, GROUP_DEFAULT as GROUP_DEFAULT } from '../class-transformer-cus
 import AIConfig from './AIConfig.js';
 import { IsDate } from 'class-validator';
 import Rating from './Rating.js';
+import { keysOf } from '../utils.js';
 
 @Entity()
-@Index(['isGuest', 'isBot', 'pseudo'])
+@Index(keysOf<Player>()('isGuest', 'isBot', 'pseudo'))
 export default class Player
 {
     @PrimaryGeneratedColumn()

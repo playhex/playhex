@@ -3,9 +3,10 @@ import type { RatingCategory } from '../ratingUtils.js';
 import Player from './Player.js';
 import HostedGame from './HostedGame.js';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
+import { keysOf } from '../utils.js';
 
 @Entity()
-@Index(['player', 'category', 'createdAt'])
+@Index(keysOf<Rating>()('player', 'category', 'createdAt'))
 export default class Rating
 {
     @PrimaryGeneratedColumn()

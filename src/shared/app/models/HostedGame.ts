@@ -16,10 +16,11 @@ import TournamentMatch from './TournamentMatch.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
+import { keysOf } from '../utils.js';
 
 @Entity()
-@Index(['state', 'opponentType', 'ranked']) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
-@Index(['state', 'boardsize']) // For stats on boardsizes
+@Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
+@Index(keysOf<HostedGame>()('state', 'boardsize')) // For stats on boardsizes
 export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
 {
     @PrimaryGeneratedColumn()
@@ -47,7 +48,6 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     hostedGameToPlayers: HostedGameToPlayer[];
 
     @Column({ type: String, length: 15 })
-    @Index()
     @Expose()
     state: HostedGameState;
 

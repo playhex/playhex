@@ -30,3 +30,12 @@ export const truncateText = (text: string, maxLength = 24): string => {
 
     return text.substring(0, maxLength) + '…';
 };
+
+/**
+ * Used to type check type orm @Index.
+ * Usage:
+ * ```
+ *   @Index(keysOf<HostedGame>()('state', 'opponentType'))
+ * ```
+ */
+export const keysOf = <T>() => <K extends keyof T>(...keys: K[]) => keys;
