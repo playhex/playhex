@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn,
 import { ColumnUUID } from '../custom-typeorm.js';
 import Player from './Player.js';
 import type { HostedGameState } from '../Types.js';
-import HostedGameOptions from './HostedGameOptions.js';
+import HostedGameOptions, { cloneGameOptions } from './HostedGameOptions.js';
 import type { GameTimeData } from '../../time-control/TimeControl.js';
 import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 import Game from './Game.js';
@@ -169,6 +169,13 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @ManyToMany(() => Rating, rating => rating.games)
     @Expose()
     ratings: Rating[];
+
+    // TODO remove, tmp to fix backward retrocompat with older client that not yet updated
+    @Expose({ name: 'gameOptions' })
+    getGameOptions()
+    {
+        return cloneGameOptions(this);
+    }
 
     /**
      * Notes from admin relative to this game.
