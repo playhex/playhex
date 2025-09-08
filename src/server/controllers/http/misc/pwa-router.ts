@@ -102,6 +102,18 @@ export function pwaRouter(): Router {
                     purpose: 'any',
                 },
                 {
+                    src: '/images/logo.png',
+                    type: 'image/png',
+                    sizes: '512x512',
+                    purpose: 'any',
+                },
+                {
+                    src: '/images/logo-192.png',
+                    type: 'image/png',
+                    sizes: '192x192',
+                    purpose: 'any',
+                },
+                {
                     src: '/images/logo-transparent.svg',
                     type: 'image/svg+xml',
                     sizes: 'any',
