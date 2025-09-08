@@ -340,7 +340,7 @@ const makeTitle = (hostedGame: HostedGame) => {
     if (state === 'playing' && loggedInPlayer.value != null) {
         const player = loggedInPlayer.value;
         const index = players.findIndex(p => p.publicId === player.publicId);
-        if (index != null && hostedGame.gameData?.currentPlayerIndex === index) {
+        if (index != null && hostedGame.currentPlayerIndex === index) {
             yourTurn = `• ${t('game.title_your_turn')} • `;
         }
     }

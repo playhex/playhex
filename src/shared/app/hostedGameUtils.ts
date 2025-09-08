@@ -3,6 +3,7 @@ import { Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
 import { timeControlToCadencyName } from './timeControlUtils.js';
+import { GameData } from 'game-engine/normalization.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     if (hostedGame.host !== null && hostedGame.host.publicId === player.publicId) {
@@ -68,62 +69,62 @@ export const getOtherPlayer = (hostedGame: HostedGame, player: Player): null | P
  * @returns {null | Player} Null if game is not playing.
  */
 export const getCurrentPlayer = (hostedGame: HostedGame): null | Player => {
-    const { gameData, state } = hostedGame;
+    const { currentPlayerIndex, state } = hostedGame;
 
-    if (gameData === null || state !== 'playing') {
+    if (state !== 'playing') {
         return null;
     }
 
-    return hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player;
+    return hostedGame.hostedGameToPlayers[currentPlayerIndex].player;
 };
 
 export const getWinnerPlayer = (hostedGame: HostedGame): null | Player => {
-    if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
+    if (hostedGame.winner !== 0 && hostedGame.winner !== 1) {
         return null;
     }
 
-    return hostedGame.hostedGameToPlayers[hostedGame.gameData.winner].player;
+    return hostedGame.hostedGameToPlayers[hostedGame.winner].player;
 };
 
 /**
  * @throws {Error} If not yet a winner in hostedGame
  */
 export const getStrictWinnerPlayer = (hostedGame: HostedGame): Player => {
-    if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
+    if (hostedGame.winner !== 0 && hostedGame.winner !== 1) {
         throw new Error('getStrictWinnerPlayer(): No winner');
     }
 
-    return hostedGame.hostedGameToPlayers[hostedGame.gameData.winner].player;
+    return hostedGame.hostedGameToPlayers[hostedGame.winner].player;
 };
 
 /**
  * @throws {Error} If not yet a winner in hostedGame
  */
 export const getStrictWinnerIndex = (hostedGame: HostedGame): PlayerIndex => {
-    if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
+    if (hostedGame.winner !== 0 && hostedGame.winner !== 1) {
         throw new Error('getStrictWinnerIndex(): No winner');
     }
 
-    return hostedGame.gameData.winner;
+    return hostedGame.winner;
 };
 
 export const getLoserPlayer = (hostedGame: HostedGame): null | Player => {
-    if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
+    if (hostedGame.winner !== 0 && hostedGame.winner !== 1) {
         return null;
     }
 
-    return hostedGame.hostedGameToPlayers[1 - hostedGame.gameData.winner].player;
+    return hostedGame.hostedGameToPlayers[1 - hostedGame.winner].player;
 };
 
 /**
  * @throws {Error} If not yet a loser in hostedGame
  */
 export const getStrictLoserPlayer = (hostedGame: HostedGame): Player => {
-    if (hostedGame.gameData?.winner !== 0 && hostedGame.gameData?.winner !== 1) {
+    if (hostedGame.winner !== 0 && hostedGame.winner !== 1) {
         throw new Error('getStrictWinnerPlayer(): No winner');
     }
 
-    return hostedGame.hostedGameToPlayers[1 - hostedGame.gameData.winner].player;
+    return hostedGame.hostedGameToPlayers[1 - hostedGame.winner].player;
 };
 
 export const isBotGame = (hostedGame: HostedGame): boolean => {
@@ -155,19 +156,13 @@ export const addPlayer = (hostedGame: HostedGame, player: Player): void => {
 };
 
 export const addMove = (hostedGame: HostedGame, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void => {
-    const { gameData } = hostedGame;
-
-    if (gameData === null) {
+    if (moveIndex < hostedGame.movesHistory.length) {
         return;
     }
 
-    if (moveIndex < gameData.movesHistory.length) {
-        return;
-    }
-
-    gameData.movesHistory.push(move);
-    gameData.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
-    gameData.lastMoveAt = move.playedAt;
+    hostedGame.movesHistory.push(move);
+    hostedGame.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
+    hostedGame.lastMoveAt = move.playedAt;
 };
 
 export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Outcome, endedAt: Date): void => {
@@ -177,19 +172,14 @@ export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Ou
         hostedGame.state = 'forfeited';
     }
 
-    if (hostedGame.gameData) {
-        hostedGame.gameData.winner = winner;
-        hostedGame.gameData.outcome = outcome;
-        hostedGame.gameData.endedAt = endedAt;
-    }
+    hostedGame.winner = winner;
+    hostedGame.outcome = outcome;
+    hostedGame.endedAt = endedAt;
 };
 
 export const cancelGame = (hostedGame: HostedGame, canceledAt: Date): void => {
     hostedGame.state = 'canceled';
-
-    if (hostedGame.gameData) {
-        hostedGame.gameData.endedAt = canceledAt;
-    }
+    hostedGame.endedAt = canceledAt;
 };
 
 export const isStateEnded = (hostedGame: HostedGame): boolean => {
@@ -217,14 +207,14 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
         }
     }
 
-    if (undefined !== searchGamesParameters.fromEndedAt && hostedGame.gameData?.endedAt) {
-        if (hostedGame.gameData.endedAt < searchGamesParameters.fromEndedAt) {
+    if (undefined !== searchGamesParameters.fromEndedAt && hostedGame.endedAt) {
+        if (hostedGame.endedAt < searchGamesParameters.fromEndedAt) {
             return false;
         }
     }
 
-    if (undefined !== searchGamesParameters.toEndedAt && hostedGame.gameData?.endedAt) {
-        if (hostedGame.gameData.endedAt < searchGamesParameters.toEndedAt) {
+    if (undefined !== searchGamesParameters.toEndedAt && hostedGame.endedAt) {
+        if (hostedGame.endedAt < searchGamesParameters.toEndedAt) {
             return false;
         }
     }
@@ -279,4 +269,32 @@ export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Play
 
     // In other cases, disable by default
     return false;
+};
+
+/**
+ * Convert a HostedGame to GameData.
+ * GameData can be used to create a engine Game instance.
+ */
+export const toEngineGameData = (hostedGame: HostedGame): GameData => ({
+    size: hostedGame.boardsize,
+    movesHistory: hostedGame.movesHistory,
+    allowSwap: hostedGame.swapRule,
+    currentPlayerIndex: hostedGame.currentPlayerIndex,
+    winner: hostedGame.winner,
+    outcome: hostedGame.outcome,
+    startedAt: hostedGame.startedAt ?? hostedGame.createdAt,
+    lastMoveAt: hostedGame.lastMoveAt,
+    endedAt: hostedGame.endedAt,
+});
+
+export const assignEngineGameData = (hostedGame: HostedGame, gameData: GameData) => {
+    hostedGame.boardsize = gameData.size;
+    hostedGame.movesHistory = gameData.movesHistory;
+    hostedGame.swapRule = gameData.allowSwap;
+    hostedGame.currentPlayerIndex = gameData.currentPlayerIndex;
+    hostedGame.winner = gameData.winner;
+    hostedGame.outcome = gameData.outcome;
+    hostedGame.startedAt = gameData.startedAt;
+    hostedGame.lastMoveAt = gameData.lastMoveAt;
+    hostedGame.endedAt = gameData.endedAt;
 };

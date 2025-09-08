@@ -33,7 +33,6 @@ hexProgram
 
         const ratedGames = await hostedGameRepository.find({
             relations: {
-                gameData: true,
                 hostedGameToPlayers: {
                     player: {
                         currentRating: {
@@ -50,9 +49,7 @@ hexProgram
                 hostedGameToPlayers: {
                     order: 'asc',
                 },
-                gameData: {
-                    endedAt: 'asc',
-                },
+                endedAt: 'asc',
             },
         });
 

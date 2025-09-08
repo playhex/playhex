@@ -16,7 +16,6 @@ export default class StatsRepository
         const playedGamesQueryBuilder = this.hostedGameToPlayerRepository
             .createQueryBuilder('hgp')
             .innerJoin('hgp.hostedGame', 'hostedGame')
-            .innerJoin('hostedGame.gameData', 'game')
             .where('hgp.playerId = :playerId')
             .andWhere('hostedGame.state = "ended"')
             .setParameters({ playerId })

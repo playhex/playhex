@@ -1,7 +1,6 @@
 import AIConfig from './AIConfig.js';
 import ChatMessage from './ChatMessage.js';
 import ConditionalMoves from './ConditionalMoves.js';
-import Game from './Game.js';
 import GameAnalyze from './GameAnalyze.js';
 import HostedGame from './HostedGame.js';
 import HostedGameOptions from './HostedGameOptions.js';
@@ -34,7 +33,6 @@ export {
     AIConfig,
     ChatMessage,
     ConditionalMoves,
-    Game,
     GameAnalyze,
     HostedGameOptions,
     HostedGameOptionsTimeControl,
@@ -67,7 +65,6 @@ export const entities = {
     AIConfig,
     ChatMessage,
     ConditionalMoves,
-    Game,
     GameAnalyze,
     HostedGameOptions,
     HostedGameOptionsTimeControl,

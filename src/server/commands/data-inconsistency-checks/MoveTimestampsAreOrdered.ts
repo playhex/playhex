@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { Game, HostedGame } from '../../../shared/app/models/index.js';
+import { HostedGame } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
@@ -26,9 +26,6 @@ import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesChecke
 export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInterface
 {
     constructor(
-        @Inject('Repository<Game>')
-        private gameRepository: Repository<Game>,
-
         @Inject('Repository<HostedGame>')
         private hostedGameRepository: Repository<HostedGame>,
     ) {}
@@ -40,10 +37,10 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
 
     async run(): Promise<string[]>
     {
-        const games = await this.gameRepository.find();
+        const games = await this.hostedGameRepository.find();
 
         const unordereds: {
-            hostedGame: HostedGame;
+            game: HostedGame;
             moves: number[];
         }[] = [];
 
@@ -56,28 +53,13 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
                 }
             }
 
-            if (moves.length > 0) {
-                const hostedGame = await this.hostedGameRepository.findOne({
-                    where: {
-                        id: game.hostedGameId,
-                    },
-                    relations: {
-                        gameData: true,
-                    },
-                });
-
-                if (hostedGame === null) {
-                    throw new Error('No hostedGame with id = ' + game.hostedGameId);
-                }
-
-                unordereds.push({ hostedGame, moves });
-            }
+            unordereds.push({ game, moves });
         }
 
         return unordereds.map(unordered => {
-            const { hostedGame, moves } = unordered;
+            const { game, moves } = unordered;
 
-            return `publicId ${hostedGame.publicId} hostedGameId ${hostedGame.id} ; moves ${moves.join(', ')} (length = ${hostedGame.gameData!.movesHistory.length}, opponentType = ${hostedGame.opponentType})`;
+            return `publicId ${game.publicId} hostedGameId ${game.id} ; moves ${moves.join(', ')} (length = ${game.movesHistory.length}, opponentType = ${game.opponentType})`;
         });
     }
 }

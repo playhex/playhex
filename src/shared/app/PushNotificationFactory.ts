@@ -26,7 +26,7 @@ export class PushNotificationFactory
 
         push.title = 'Your game has started';
         push.goToPath = `/games/${hostedGame.publicId}`;
-        push.date = hostedGame.gameData?.startedAt ?? new Date();
+        push.date = hostedGame.startedAt ?? new Date();
         push.tag = gameTag(hostedGame);
 
         return push;
@@ -46,7 +46,7 @@ export class PushNotificationFactory
 
         push.title = 'Your game has started';
         push.goToPath = `/games/${hostedGame.publicId}`;
-        push.date = hostedGame.gameData?.startedAt ?? new Date();
+        push.date = hostedGame.startedAt ?? new Date();
         push.tag = gameTag(hostedGame);
 
         return push;
@@ -87,7 +87,7 @@ export class PushNotificationFactory
 
         push.title = 'Your game has ended';
         push.goToPath = `/games/${hostedGame.publicId}`;
-        push.date = hostedGame.gameData?.endedAt ?? new Date();
+        push.date = hostedGame.endedAt ?? new Date();
         push.tag = gameTag(hostedGame);
 
         return push;

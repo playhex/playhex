@@ -39,15 +39,14 @@ export class InconsistentWinnerStateOutcome implements DataInconsistenciesChecke
 
         const inconsistents: Result[] = await this.hostedGameRepository
             .createQueryBuilder('hostedGame')
-            .innerJoin('hostedGame.gameData', 'game')
             .orWhere('(hostedGame.state = "created" and (outcome is not null or winner is not null))')
             .orWhere('(hostedGame.state = "playing" and (outcome is not null or winner is not null))')
             .orWhere('(hostedGame.state = "canceled" and (outcome is not null or winner is not null))')
             .orWhere('(hostedGame.state = "ended" and winner is null)')
             .select('hostedGame.publicId')
             .addSelect('hostedGame.state')
-            .addSelect('game.outcome')
-            .addSelect('game.winner')
+            .addSelect('hostedGame.outcome')
+            .addSelect('hostedGame.winner')
             .addSelect('hostedGame.createdAt')
             .execute()
         ;

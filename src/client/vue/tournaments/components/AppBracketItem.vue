@@ -98,7 +98,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
                 <AppPseudo v-if="tournamentMatch.player1" :player="tournamentMatch.player1" />
                 <span v-else>-</span>
                 <IconTrophyFill
-                    v-if="'done' === tournamentMatch.state && 0 === tournamentMatch.hostedGame?.gameData?.winner"
+                    v-if="'done' === tournamentMatch.state && 0 === tournamentMatch.hostedGame?.winner"
                     class="text-warning ms-1"
                 />
             </p>
@@ -112,7 +112,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
                 <AppPseudo v-if="tournamentMatch.player2" :player="tournamentMatch.player2" />
                 <span v-else>-</span>
                 <IconTrophyFill
-                    v-if="'done' === tournamentMatch.state && 1 === tournamentMatch.hostedGame?.gameData?.winner"
+                    v-if="'done' === tournamentMatch.state && 1 === tournamentMatch.hostedGame?.winner"
                     class="text-warning ms-1"
                 />
             </p>

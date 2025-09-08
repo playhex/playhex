@@ -102,8 +102,7 @@ export default class RatingRepository
      */
     async updateAfterGame(hostedGame: HostedGame): Promise<Rating[]>
     {
-        const winner = hostedGame.gameData?.winner;
-        const endedAt = hostedGame.gameData?.endedAt;
+        const { winner, endedAt } = hostedGame;
 
         if (typeof winner !== 'number' || !endedAt) {
             throw new Error('Cannot update players rating, game must have ended');

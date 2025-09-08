@@ -67,6 +67,6 @@ export const guessDemerHandicapFromHostedGame = (hostedGame: HostedGame): number
     return guessDemerHandicap(
         hostedGame.swapRule,
         hostedGame.firstPlayer !== null,
-        hostedGame.gameData?.movesHistory,
+        hostedGame.movesHistory,
     );
 };

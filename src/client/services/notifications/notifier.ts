@@ -9,7 +9,7 @@ type NotifiableEvents = {
      * Can be either me, as soon as I click on a cell,
      * or a move from another player on another game.
      *
-     * move is not yet stacked in hostedGame.gameData.movesHistory
+     * move is not yet stacked in hostedGame.movesHistory
      */
     move: (hostedGame: HostedGame, move: Move) => void;
 

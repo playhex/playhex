@@ -1,8 +1,10 @@
 import { HostedGame } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
-import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Repository, SelectQueryBuilder } from 'typeorm';
+import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
+import { AnalyzeGameRequest } from 'services/HexAiApiClient.js';
+import Move from '../../shared/game-engine/Move.js';
 
 /**
  * Relations to load in order to recreate an HostedGame in memory.
@@ -26,7 +28,6 @@ const relations: FindOptionsRelations<HostedGame> = {
             },
         },
     },
-    gameData: true,
     ratings: {
         player: true,
     },
@@ -121,19 +122,59 @@ export default class HostedGamePersister
     }
 
     /**
+     * Get only data required for a game analyze.
+     * Game must have ended.
+     */
+    async getAnalyzeGameRequest(publicId: string): Promise<null | AnalyzeGameRequest>
+    {
+        const data = await this.hostedGameRepository.findOne({
+            select: {
+                boardsize: true,
+                movesHistory: true,
+            },
+            where: {
+                publicId,
+                endedAt: Not(IsNull()),
+            },
+        });
+
+        if (data === null) {
+            return null;
+        }
+
+        const { movesHistory, boardsize } = data;
+
+        if (!Array.isArray(movesHistory)) {
+            throw new Error('Unexpected data in game.movesHistory');
+        }
+
+        return {
+            size: boardsize,
+            movesHistory: Move.movesAsString(movesHistory
+                .map(moveData => Move.fromData(moveData)),
+            ),
+        };
+    }
+
+    /**
      * Query builder with only oneToOne relations, and minimal data to apply filters.
      * Can be used to perform a count(*) without counting oneToMany relations.
+     *
+     * @param withPagination Set false to ignore pagination parameters, used to count(*) all games
      */
-    private queryBuilderSearchMinimal(params: SearchGamesParameters): SelectQueryBuilder<HostedGame>
+    private queryBuilderSearchMinimal(params: SearchGamesParameters, withPagination = true): SelectQueryBuilder<HostedGame>
     {
         const queryBuilder = this.hostedGameRepository
             .createQueryBuilder('hostedGame')
             .comment('search hosted games')
-            .leftJoin('hostedGame.gameData', 'gameData')
-            .addSelect('gameData')
-            .take(params.paginationPageSize ?? 5)
-            .skip((params.paginationPage ?? 0) * (params.paginationPageSize ?? 5))
         ;
+
+        if (withPagination) {
+            queryBuilder
+                .take(params.paginationPageSize ?? 5)
+                .skip((params.paginationPage ?? 0) * (params.paginationPageSize ?? 5))
+            ;
+        }
 
         if (undefined !== params.opponentType) {
             queryBuilder
@@ -193,20 +234,20 @@ export default class HostedGamePersister
 
         if (undefined !== params.fromEndedAt) {
             queryBuilder
-                .andWhere('gameData.endedAt >= :fromEndedAt')
+                .andWhere('hostedGame.endedAt >= :fromEndedAt')
                 .setParameter('fromEndedAt', params.fromEndedAt)
             ;
         }
 
         if (undefined !== params.toEndedAt) {
             queryBuilder
-                .andWhere('gameData.endedAt <= :toEndedAt')
+                .andWhere('hostedGame.endedAt <= :toEndedAt')
                 .setParameter('toEndedAt', params.toEndedAt)
             ;
         }
 
         if (undefined !== params.endedAtSort) {
-            queryBuilder.orderBy('gameData.endedAt', params.endedAtSort === 'desc' ? 'DESC' : 'ASC');
+            queryBuilder.orderBy('hostedGame.endedAt', params.endedAtSort === 'desc' ? 'DESC' : 'ASC');
         }
 
         return queryBuilder;
@@ -234,25 +275,25 @@ export default class HostedGamePersister
 
     async search(params: SearchGamesParameters): Promise<{ results: HostedGame[], count: number }>
     {
-        const queryBuilder = this.queryBuilderSearch(params);
-
-        const [results, count] = await queryBuilder.getManyAndCount();
-
+        // cannot use getManyAndCount because the many is fast because indexed and paginated,
+        // but the count part will fetch all data relations, not paginated, just to count.
         return {
-            results,
-            count,
+            results: await this.queryBuilderSearch(params).getMany(),
+            count: await this.queryBuilderSearchMinimal(params).getCount(),
         };
     }
 
     async searchStatsByDay(params: SearchGamesParameters): Promise<{ date: string, totalGames: number }[]>
     {
-        const queryBuilder = this.queryBuilderSearchMinimal(params);
+        const queryBuilder = this.queryBuilderSearchMinimal(params, false);
 
+        // we search stats only on ended games, so endedAt should not be null
         queryBuilder
-            .select('date(coalesce(gameData.endedAt, hostedGame.createdAt))', 'date')
+            .select('date(hostedGame.endedAt)', 'date')
             .addSelect('count(*) as totalGames')
-            .groupBy('date(coalesce(gameData.endedAt, hostedGame.createdAt))')
-            .orderBy('date(coalesce(gameData.endedAt, hostedGame.createdAt))', 'ASC')
+            .andWhere('hostedGame.endedAt is not null')
+            .groupBy('date(hostedGame.endedAt)')
+            .orderBy('date(hostedGame.endedAt)', 'ASC')
         ;
 
         const results: { date: string, totalGames: string }[] = await queryBuilder.getRawMany();

@@ -26,11 +26,11 @@ const baseSGF: SGF = {
  * Then, all messages are on the move they are posted when given move was last played move.
  */
 const getMovesChatMessages = (hostedGame: HostedGame): ChatMessage[][] => {
-    if (!hostedGame.gameData) {
+    if (!hostedGame) {
         return [];
     }
 
-    const { movesHistory } = hostedGame.gameData;
+    const { movesHistory } = hostedGame;
 
     if (movesHistory.length === 0) {
         // If there is no move, there is no move node in sgf to contain chat messages.
@@ -62,7 +62,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     };
 
     // Moves
-    const movesHistory = hostedGame.gameData?.movesHistory;
+    const movesHistory = hostedGame.movesHistory;
 
     if (movesHistory && movesHistory.length > 0) {
         const timeControl = createTimeControl(hostedGame.timeControlType);
@@ -106,13 +106,13 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // DT, date of the game
-    if (hostedGame.gameData?.endedAt) {
-        if (isSameDay(hostedGame.gameData.endedAt, hostedGame.gameData.startedAt)) {
+    if (hostedGame.endedAt && hostedGame.startedAt) {
+        if (isSameDay(hostedGame.endedAt, hostedGame.startedAt)) {
             // Played in same day, outputs "YYYY-MM-DD"
-            sgf.DT = hostedGame.gameData.startedAt.toISOString().substring(0, 10);
+            sgf.DT = hostedGame.startedAt.toISOString().substring(0, 10);
         } else {
-            const startedAtStr = hostedGame.gameData.startedAt.toISOString().substring(0, 10);
-            const endedAtStr = hostedGame.gameData.endedAt.toISOString().substring(0, 10);
+            const startedAtStr = hostedGame.startedAt.toISOString().substring(0, 10);
+            const endedAtStr = hostedGame.endedAt.toISOString().substring(0, 10);
 
             if (startedAtStr.substring(0, 7) === endedAtStr.substring(0, 7)) {
                 // Played in multiple days of same month, outputs "YYYY-MM-DD,DD"
@@ -125,13 +125,13 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // RE, outcome
-    if (hostedGame.gameData?.endedAt) {
-        if (hostedGame.gameData.winner === null) {
+    if (hostedGame.endedAt) {
+        if (hostedGame.winner === null) {
             sgf.RE = 'Void';
         } else {
-            sgf.RE = hostedGame.gameData.winner === 0 ? 'B+' : 'W+';
+            sgf.RE = hostedGame.winner === 0 ? 'B+' : 'W+';
 
-            switch (hostedGame.gameData.outcome) {
+            switch (hostedGame.outcome) {
                 case 'resign': sgf.RE += 'Resign'; break;
                 case 'time': sgf.RE += 'Time'; break;
                 case 'forfeit': sgf.RE += 'Forfeit'; break;
@@ -142,7 +142,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // PB PW, players name
-    if (hostedGame.gameData?.startedAt) {
+    if (hostedGame.startedAt) {
         sgf.PB = pseudoString(hostedGame.hostedGameToPlayers[0].player, 'pseudo');
         sgf.PW = pseudoString(hostedGame.hostedGameToPlayers[1].player, 'pseudo');
     }

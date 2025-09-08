@@ -31,10 +31,9 @@ export class TimeoutGamesWithLessThan2MovesMustBeCanceled implements DataInconsi
 
         const uncanceled: Result[] = await this.hostedGameRepository
             .createQueryBuilder('hostedGame')
-            .innerJoin('hostedGame.gameData', 'game')
-            .where('game.outcome = "time"')
+            .where('hostedGame.outcome = "time"')
             .andWhere('hostedGame.state = "ended"')
-            .andWhere('json_length(game.movesHistory) < 2')
+            .andWhere('json_length(hostedGame.movesHistory) < 2')
             .groupBy('hostedGame.id')
             .execute()
         ;
