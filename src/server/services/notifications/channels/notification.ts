@@ -115,7 +115,7 @@ notifier.on('gameEnd', async hostedGame => {
             },
             player,
             hostedGame,
-            hostedGame.gameData?.endedAt ?? new Date(),
+            hostedGame.endedAt ?? new Date(),
         );
 
         await playerNotificationService.addNotification(playerNotification);
@@ -145,7 +145,7 @@ notifier.on('gameCanceled', async hostedGame => {
             null,
             player,
             hostedGame,
-            hostedGame.gameData?.endedAt ?? new Date(),
+            hostedGame.endedAt ?? new Date(),
         );
 
         await playerNotificationService.addNotification(playerNotification);

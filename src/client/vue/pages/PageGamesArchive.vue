@@ -202,10 +202,10 @@ const gamesChartOptions: ChartOptions<'bar'> = {
 
                         <td v-if="'canceled' === game.state">{{ $t('game_state.canceled') }}</td>
                         <td v-else>
-                            <span v-if="null !== game.gameData && null !== game.gameData.winner">
-                                <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="0 === game.gameData.winner ? 'text-danger' : 'text-primary'" />
+                            <span v-if="null !== game.winner">
+                                <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="0 === game.winner ? 'text-danger' : 'text-primary'" />
                                 {{ ' ' }}
-                                <small>+ {{ $t('outcome.' + (game.gameData.outcome ?? 'win')) }}</small>
+                                <small>+ {{ $t('outcome.' + (game.outcome ?? 'win')) }}</small>
                             </span>
                             <span v-else>-</span>
                         </td>
@@ -217,7 +217,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                         <td><AppGameRulesSummary :gameOptions="game" /></td>
 
                         <td>{{
-                            game.gameData?.endedAt ? format(game.gameData.endedAt, 'd MMMM yyyy p') : '-'
+                            game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
                         }}</td>
                     </tr>
                 </tbody>

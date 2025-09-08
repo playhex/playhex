@@ -1,5 +1,5 @@
 import { Ref } from 'vue';
-import { Game, Move as GameMove, PlayerIndex } from '../shared/game-engine/index.js';
+import { Game, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
 import { Player, ChatMessage, Move, Rating, HostedGame } from '../shared/app/models/index.js';
 import { Outcome } from '../shared/game-engine/Types.js';
@@ -14,7 +14,7 @@ import useServerDateStore from './stores/serverDateStore.js';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue.js';
 import { fromEngineMove, toEngineMove } from '../shared/app/models/Move.js';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat.js';
-import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, isStateEnded, updateHostedGame } from '../shared/app/hostedGameUtils.js';
+import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, isStateEnded, toEngineGameData, updateHostedGame } from '../shared/app/hostedGameUtils.js';
 import useLobbyStore from './stores/lobbyStore.js';
 import useAuthStore from './stores/authStore.js';
 import { checkShadowDeleted } from '../shared/app/chatUtils.js';
@@ -76,43 +76,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private loadGameFromData(hostedGame: HostedGame): Game
     {
-        const { gameData } = hostedGame;
-
-        /**
-         * No game server side, create an empty one to show client side
-         */
-        if (gameData === null) {
-            this.game = new Game(hostedGame.boardsize);
-
-            // Cancel here in case game has been canceled before started
-            if (hostedGame.state === 'canceled') {
-                this.game.cancel(hostedGame.createdAt);
-            }
-
-            return this.game;
-        }
-
-        this.game = new Game(gameData.size);
-
-        this.game.setAllowSwap(gameData.allowSwap);
-        this.game.setStartedAt(gameData.startedAt);
-
-        this.doStartGame(hostedGame);
-
-        // Replay game and fill history
-        for (const move of gameData.movesHistory) {
-            this.game.move(GameMove.fromData(move), this.game.getCurrentPlayerIndex());
-        }
-
-        // Cancel game if canceled
-        if (hostedGame.state === 'canceled' && !this.game.isEnded()) {
-            this.game.cancel(gameData.endedAt ?? gameData.lastMoveAt ?? new Date());
-        }
-
-        // Set a winner if not yet set because timeout or resignation
-        if (gameData.winner !== null && !this.game.isEnded()) {
-            this.game.declareWinner(gameData.winner, gameData.outcome, gameData.endedAt ?? new Date());
-        }
+        this.game = Game.fromData(toEngineGameData(hostedGame));
 
         return this.game;
     }
@@ -347,12 +311,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         updateHostedGame(this.hostedGame, hostedGame);
 
-        const { gameData } = hostedGame;
-
-        if (gameData === null) {
-            throw new Error('game started but no game data');
-        }
-
         // Do nothing if game not yet loaded
         if (this.game === null) {
             return;
@@ -473,9 +431,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         this.hostedGame.undoRequest = null;
 
-        if (this.hostedGame.gameData && this.game) {
-            this.hostedGame.gameData.currentPlayerIndex = this.game.getCurrentPlayerIndex();
-            this.hostedGame.gameData.movesHistory = this.game.getMovesHistory().map(move => fromEngineMove(move));
+        if (this.game) {
+            this.hostedGame.currentPlayerIndex = this.game.getCurrentPlayerIndex();
+            this.hostedGame.movesHistory = this.game.getMovesHistory().map(move => fromEngineMove(move));
         }
 
         if (undoRequest === null) {
@@ -500,11 +458,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     {
         this.hostedGame.state = 'ended';
 
-        if (this.hostedGame.gameData) {
-            this.hostedGame.gameData.winner = winner;
-            this.hostedGame.gameData.outcome = outcome;
-            this.hostedGame.gameData.endedAt = date;
-        }
+        this.hostedGame.winner = winner;
+        this.hostedGame.outcome = outcome;
+        this.hostedGame.endedAt = date;
 
         // Do nothing if game not loaded
         if (this.game === null) {
@@ -522,10 +478,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     onServerGameCanceled(date: Date): void
     {
         this.hostedGame.state = 'canceled';
-
-        if (this.hostedGame.gameData) {
-            this.hostedGame.gameData.endedAt = date;
-        }
+        this.hostedGame.endedAt = date;
 
         // Do nothing if game not loaded
         if (this.game === null) {

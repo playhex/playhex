@@ -80,15 +80,15 @@ const formatChatDateHeader = (date: Date): string => {
 const formatDateInfo = (date: null | Date): string => date === null ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
-    const { gameData } = hostedGameClient.getHostedGame();
+    const { startedAt, endedAt } = hostedGameClient.getHostedGame();
 
-    if (!gameData) {
+    if (!startedAt) {
         return '-';
     }
 
     const duration = intervalToDuration({
-        start: gameData.startedAt,
-        end: gameData.endedAt ?? useServerDateStore().newDate(),
+        start: startedAt,
+        end: endedAt ?? useServerDateStore().newDate(),
     });
 
     const units: DurationUnit[] = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
@@ -494,7 +494,7 @@ watchEffect(() => {
                     <AppRatingChange v-if="hostedGameClient.isRanked()" :ratingChange="hostedGameClient.getRating(hostedGameClient.getStrictWinnerPlayer())?.ratingChange ?? 0" class="smaller ms-2" />
                 </h3>
                 <p v-if="hostedGameClient.isStateEnded()" class="mb-0">
-                    <i18next :translation="$t('player_loses_reason.' + (hostedGameClient.getHostedGame().gameData?.outcome ?? 'default'))">
+                    <i18next :translation="$t('player_loses_reason.' + (hostedGameClient.getHostedGame().outcome ?? 'default'))">
                         <template #player>
                             <AppPseudo :player="hostedGameClient.getStrictLoserPlayer()" :classes="playerColor(hostedGameClient.getStrictLoserPlayer())" />
                         </template>
@@ -555,11 +555,11 @@ watchEffect(() => {
                 <!-- playing -->
                 <template v-if="'playing' === hostedGameClient.getState()">
                     <p>
-                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM yyyy p') }}</small>
                         <br>
                         <small>
                             {{ $t('2dots', { s: $t('last_move') }) }}
-                            <template v-if="hostedGameClient.getHostedGame().gameData?.lastMoveAt">{{ formatRelative(hostedGameClient.getHostedGame().gameData?.lastMoveAt as Date, useServerDateStore().newDate()) }}</template>
+                            <template v-if="hostedGameClient.getHostedGame().lastMoveAt">{{ formatRelative(hostedGameClient.getHostedGame().lastMoveAt!, useServerDateStore().newDate()) }}</template>
                             <template v-else>-</template>
                         </small>
                     </p>
@@ -568,28 +568,28 @@ watchEffect(() => {
                 <!-- ended -->
                 <template v-if="hostedGameClient.isStateEnded()">
                     <p>
-                        <small v-if="hostedGameClient.getHostedGame().gameData?.startedAt && hostedGameClient.getHostedGame().gameData?.endedAt">
+                        <small v-if="hostedGameClient.getHostedGame().startedAt && hostedGameClient.getHostedGame().endedAt">
 
                             <!-- Game played is same day, show short form: "Played date/hour -> hour" -->
-                            <template v-if="isSameDay(hostedGameClient.getHostedGame().gameData?.startedAt!, hostedGameClient.getHostedGame().gameData?.endedAt!)">
-                                {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}
+                            <template v-if="isSameDay(hostedGameClient.getHostedGame().startedAt!, hostedGameClient.getHostedGame().endedAt!)">
+                                {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM yyyy p') }}
                                 →
-                                {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'p') }}
+                                {{ format(hostedGameClient.getHostedGame().endedAt!, 'p') }}
                             </template>
 
                             <!-- Game played on multiple days, show dates, no times, and no need to repeat year -->
                             <template v-else>
-                                {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM') }}
+                                {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM') }}
                                 →
-                                {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM yyyy') }}
+                                {{ format(hostedGameClient.getHostedGame().endedAt!, 'd MMMM yyyy') }}
                             </template>
                         </small>
 
                         <!-- Fallback to naive form if missing a date, should not be used -->
                         <template v-else>
-                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.startedAt as Date, 'd MMMM yyyy p') }}</small>
+                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM yyyy p') }}</small>
                             <br>
-                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGameClient.getHostedGame().gameData?.endedAt as Date, 'd MMMM p') }}</small>
+                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGameClient.getHostedGame().endedAt!, 'd MMMM p') }}</small>
                         </template>
                     </p>
                 </template>
@@ -680,19 +680,19 @@ watchEffect(() => {
                     <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().createdAt) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.started') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().gameData?.startedAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().startedAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('last_move') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().gameData?.lastMoveAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().lastMoveAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.finished') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().gameData?.endedAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().endedAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.duration') }}</dt>
                     <dd class="col-md-7">{{ formatGameDuration(hostedGameClient) }}</dd>
 
                     <dt class="col-md-5">{{ $t('moves') }}</dt>
-                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().gameData?.movesHistory.length ?? 0 }}</dd>
+                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().movesHistory.length ?? 0 }}</dd>
 
                     <dt class="col-md-5">{{ $t('handicap.title') }}</dt>
                     <dd class="col-md-7" v-if="(0 === handicap)">{{ $t('handicap.none') }}</dd>

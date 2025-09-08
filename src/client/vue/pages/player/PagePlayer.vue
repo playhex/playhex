@@ -28,7 +28,7 @@ import { watchEffect } from 'vue';
 import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
-import { getOtherPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { getOtherPlayer, getWinnerPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
@@ -116,8 +116,8 @@ const currentGameComparator = (a: HostedGame, b: HostedGame): number => {
     if (timeA === 'correspondence' && timeB !== 'correspondence')
         return 1;
 
-    const startedAtA = a.gameData?.startedAt;
-    const startedAtB = b.gameData?.startedAt;
+    const startedAtA = a.startedAt;
+    const startedAtB = b.startedAt;
 
     if (startedAtA != null && startedAtB != null)
         return startedAtB.getTime() - startedAtA.getTime();
@@ -201,17 +201,7 @@ const hasWon = (game: HostedGame): boolean => {
         throw new Error('player must be set');
     }
 
-    if (game.gameData === null) {
-        throw new Error('no gameData');
-    }
-
-    if (game.gameData.winner === null) {
-        return false;
-    }
-
-    const winner = game.hostedGameToPlayers[game.gameData.winner].player;
-
-    return winner.publicId === player.value?.publicId;
+    return getWinnerPlayer(game)?.publicId === player.value.publicId;
 };
 
 const getOpponent = (game: HostedGame): Player => {
@@ -475,7 +465,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
                         <td><AppGameRulesSummary :gameOptions="game" /></td>
                         <td>{{
-                            formatDistanceToNowStrict(game.gameData?.startedAt ?? 0, { addSuffix: true })
+                            formatDistanceToNowStrict(game.startedAt ?? 0, { addSuffix: true })
                         }}</td>
                     </tr>
                 </tbody>
@@ -526,7 +516,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
                         <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
                         <td v-else-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
-                        <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + (game?.gameData?.outcome ?? 'loss')) }}</td>
+                        <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + (game.outcome ?? 'loss')) }}</td>
 
                         <td v-if="game.hostedGameToPlayers.length < 2">-</td>
                         <td v-else><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
@@ -535,7 +525,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
                         <td><AppGameRulesSummary :gameOptions="game" /></td>
                         <td>{{
-                            game.gameData?.endedAt ? format(game.gameData.endedAt, 'd MMMM yyyy p') : '-'
+                            game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
                         }}</td>
                     </tr>
                 </tbody>

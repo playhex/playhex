@@ -1,4 +1,4 @@
-import { Game as EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
+import { Game as EngineGame, Game, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
 import { ChatMessage, Player, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
@@ -20,8 +20,8 @@ import { AutoSaveInterface } from 'auto-save/AutoSaveInterface.js';
 import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
 import { Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
-import { isBotGame } from '../shared/app/hostedGameUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
+import { assignEngineGameData, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -110,9 +110,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.hostedGame.timeControl,
         );
 
-        if (this.hostedGame.gameData !== null) {
+        if (this.hostedGame.startedAt) {
             try {
-                this.game = EngineGame.fromData(this.hostedGame.gameData);
+                this.game = EngineGame.fromData(toEngineGameData(this.hostedGame));
                 this.listenGame(this.game);
             } catch (e) {
                 baseLogger.error('Could not recreate game from data', { data: this.hostedGame });
@@ -515,11 +515,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.affectPlayersColors();
 
-        this.game = new EngineGame(this.hostedGame.boardsize);
+        this.game = Game.fromData(toEngineGameData(this.hostedGame));
 
         this.listenGame(this.game);
 
-        this.game.setAllowSwap(this.hostedGame.swapRule);
         this.hostedGame.state = 'playing';
 
         this.saveState();
@@ -848,7 +847,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         const playerUndoing = this.players[hostedGame.undoRequest];
-        hostedGame.gameData = this.game.toData() ?? null;
+        this.saveGameState();
         hostedGame.undoRequest = null;
         this.io.to(this.gameRooms()).emit('answerUndo', this.getPublicId(), accept);
 
@@ -1041,7 +1040,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     }
 
     /**
-     * Save game state into hostedGame.gameData, or update it.
+     * Save game state into hostedGame.
      */
     private saveGameState(): void
     {
@@ -1049,11 +1048,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
-        if (this.hostedGame.gameData === null) {
-            this.hostedGame.gameData = this.game.toData();
-        } else {
-            Object.assign(this.hostedGame.gameData, this.game.toData());
-        }
+        assignEngineGameData(this.hostedGame, this.game.toData());
     }
 
     private savePlayersState(): void

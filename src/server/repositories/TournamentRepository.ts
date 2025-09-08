@@ -47,7 +47,6 @@ const relations: FindOptionsRelations<Tournament> = {
             currentRating: true,
         },
         hostedGame: {
-            gameData: true,
             hostedGameToPlayers: {
                 player: {
                     currentRating: true,

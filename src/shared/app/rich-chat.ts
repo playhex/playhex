@@ -116,11 +116,7 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        if (this.hostedGame.gameData === null) {
-            return [];
-        }
-
-        const { movesHistory } = this.hostedGame.gameData;
+        const { movesHistory } = this.hostedGame;
 
         let currentMoveNumber = this.lastMoveNumber;
 
