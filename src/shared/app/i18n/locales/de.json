@@ -228,7 +228,8 @@
         "requested": "KI-Analyse angefordert…",
         "errored": "KI-Analyse fehlgeschlagen!",
         "best": "beste:",
-        "request_analysis": "KI-Analyse anfordern"
+        "request_analysis": "KI-Analyse anfordern",
+        "available": "Spielanalyse jetzt verfügbar."
     },
     "language": "Sprache",
     "cancel": "Abbrechen",
