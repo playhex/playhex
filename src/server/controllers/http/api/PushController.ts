@@ -37,7 +37,7 @@ export default class PushController
     }
 
     @Post('/api/push/test')
-    postTestNotification(
+    async postTestNotification(
         @AuthenticatedPlayer() player: Player,
     ) {
         const push = new PushPayload('This is a test notification');
@@ -45,6 +45,6 @@ export default class PushController
         push.tag = 'test';
         push.goToPath = '/settings';
 
-        this.pushNotificationSender.sendPush(player, push);
+        await this.pushNotificationSender.sendPush(player, push);
     }
 }

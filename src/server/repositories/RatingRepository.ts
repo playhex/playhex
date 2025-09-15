@@ -73,14 +73,14 @@ export default class RatingRepository
         return ratings;
     }
 
-    async findPlayerRatings(player: Player, categories: RatingCategory[]): Promise<Rating[]>
+    findPlayerRatings(player: Player, categories: RatingCategory[]): Promise<Rating[]>
     {
         return Promise.all(
-            categories.map(async category => this.findPlayerRating(player, category)),
+            categories.map(category => this.findPlayerRating(player, category)),
         );
     }
 
-    async findGameRatingUpdates(hostedGame: HostedGame, category: RatingCategory): Promise<Rating[]>
+    findGameRatingUpdates(hostedGame: HostedGame, category: RatingCategory): Promise<Rating[]>
     {
         return this.ratingRepository.find({
             relations: {
@@ -116,7 +116,7 @@ export default class RatingRepository
             // Load players previous ratings for this category
             const ratings = await Promise.all(hostedGame
                 .hostedGameToPlayers
-                .map(async hostedGameToPlayer => this.findPlayerRating(hostedGameToPlayer.player, category)),
+                .map(hostedGameToPlayer => this.findPlayerRating(hostedGameToPlayer.player, category)),
             );
 
             // Keep previous rating to set ratingChange
@@ -159,6 +159,6 @@ export default class RatingRepository
 
     async persistRatings(ratings: Rating[]): Promise<Rating[]>
     {
-        return this.ratingRepository.save(ratings);
+        return await this.ratingRepository.save(ratings);
     }
 }

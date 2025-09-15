@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { FindOptionsRelations, In, Repository } from 'typeorm';
 import { Player, Tournament, TournamentSubscription } from '../../shared/app/models/index.js';
-import { by } from '../../shared/app/utils.js';
+import { by, errorToLogger } from '../../shared/app/utils.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
 import logger from '../services/logger.js';
 import { AppDataSource } from '../data-source.js';
@@ -75,7 +75,9 @@ export default class TournamentRepository
         @Inject(() => HostedGameAccessor)
         private hostedGameAccessor: HostedGameAccessorInterface,
     ) {
-        this.loadActiveTournaments();
+        this.loadActiveTournaments().catch(e => {
+            logger.error('Error while loading tournaments', errorToLogger(e));
+        });
     }
 
     private async loadActiveTournaments()
@@ -97,11 +99,7 @@ export default class TournamentRepository
             try {
                 this.activeTournaments[tournament.publicId] = await this.createActiveTournament(tournament);
             } catch (e) {
-                logger.error('Tournament could not be loaded, skipping', {
-                    tournamentSlug: tournament.slug,
-                    reason: e.message ?? e,
-                    stack: e.stack,
-                });
+                logger.error('Tournament could not be loaded, skipping', errorToLogger(e));
             }
         }
 
@@ -119,7 +117,7 @@ export default class TournamentRepository
                 await this.activeTournaments[key].save();
             } catch (e) {
                 allSuccess = false;
-                logger.error('Could not persist a tournament. Continue with others.', { tournamentPublicId: key, e, errorMessage: e.message });
+                logger.error('Could not persist a tournament. Continue with others.', { ...errorToLogger(e), tournamentPublicId: key });
             }
         }
 

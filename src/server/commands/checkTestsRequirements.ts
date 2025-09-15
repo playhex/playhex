@@ -27,7 +27,7 @@ const checkBots = async (): Promise<void> => {
 
     const playerRepository = AppDataSource.getRepository(Player);
 
-    const findBot = async (slug: string): Promise<Player | null> => playerRepository.findOne({
+    const findBot = async (slug: string): Promise<Player | null> => await playerRepository.findOne({
         where: { slug },
         relations: { aiConfig: true },
     });

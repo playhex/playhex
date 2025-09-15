@@ -19,7 +19,7 @@ export default class PlayerController
     ) {}
 
     @Get('/api/player-notifications')
-    async getAll(
+    getAll(
         @AuthenticatedPlayer() player: Player,
     ) {
         if (!player.id) {

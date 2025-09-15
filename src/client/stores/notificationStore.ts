@@ -26,7 +26,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     };
 
     // Listens notification permission change
-    navigator.permissions.query({ name: 'notifications' }).then(permissionStatus => {
+    void navigator.permissions.query({ name: 'notifications' }).then(permissionStatus => {
         permissionStatus.addEventListener('change', () => {
             if (permissionStatus.state === 'prompt') {
                 permission.value = 'default';

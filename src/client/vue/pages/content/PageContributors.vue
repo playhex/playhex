@@ -10,7 +10,9 @@ useSeoMeta({
 
 const contributors = ref<null | PlayHexContributors>(null);
 
-apiGetContributors().then(result => contributors.value = result);
+void (async () => {
+    contributors.value = await apiGetContributors();
+})();
 </script>
 
 <template>

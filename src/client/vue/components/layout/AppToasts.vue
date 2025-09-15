@@ -30,7 +30,7 @@ const clickToast = (toast: Toast): void => {
             return;
         }
 
-        router.push(action);
+        void router.push(action);
         deleteToast(toast);
         return;
     }

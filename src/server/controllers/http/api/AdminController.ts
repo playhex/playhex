@@ -64,7 +64,7 @@ export default class AdminController
     }
 
     @Post('/api/admin/games/:hostedGamePublicId/players/:playerPublicId/forfeit')
-    async forfeitGame(
+    forfeitGame(
         @Param('hostedGamePublicId') hostedGamePublicId: string,
         @Param('playerPublicId') playerPublicId: string,
     ) {
@@ -157,7 +157,7 @@ export default class AdminController
     }
 
     @Post('/api/admin/games/:publicId/cancel')
-    async cancelGame(
+    cancelGame(
         @Param('publicId') publicId: string,
     ) {
         const hostedGameServer = this.hostedGameRepository.getActiveGame(publicId);
@@ -214,13 +214,13 @@ export default class AdminController
     }
 
     @Post('/api/admin/games/debug-staleness')
-    async postDebugStalenessAllGames()
+    postDebugStalenessAllGames()
     {
         return this.autoCancelStaleGames.checkAllGames(false);
     }
 
     @Post('/api/admin/games/:hostedGamePublicId/debug-staleness')
-    async postDebugStaleness(
+    postDebugStaleness(
         @Param('hostedGamePublicId') hostedGamePublicId: string,
     ) {
         const activeGame = this.hostedGameRepository.getActiveGame(hostedGamePublicId);

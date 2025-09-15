@@ -17,6 +17,7 @@ export class NoopHostedGameAccessor implements HostedGameAccessorInterface
         );
     }
 
+    // eslint-disable-next-line require-await, @typescript-eslint/require-await
     async createHostedGameServer(): Promise<HostedGameServer>
     {
         return this.getHostedGameServer();

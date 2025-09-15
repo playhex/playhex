@@ -27,13 +27,13 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
     const reloadPlayerNotifications = async (): Promise<PlayerNotification[]> => {
         const promise = apiGetPlayerNotifications();
 
-        promise.then(notifications => playerNotifications.value = notifications);
+        void promise.then(notifications => playerNotifications.value = notifications);
 
-        return promise;
+        return await promise;
     };
 
     if (loggedInPlayer.value !== null) {
-        reloadPlayerNotifications();
+        void reloadPlayerNotifications();
     }
 
     // Update player notifications when logged in player change
@@ -44,7 +44,7 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
             return;
         }
 
-        reloadPlayerNotifications();
+        void reloadPlayerNotifications();
     });
 
     socket.on('playerNotification', playerNotification => {

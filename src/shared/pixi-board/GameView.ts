@@ -305,7 +305,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     /**
      * When pixi app created, board drawn, and mounted with `mount()`.
      */
-    async ready(): Promise<void>
+    ready(): Promise<void>
     {
         return this.initPromise.promise;
     }

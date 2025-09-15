@@ -19,6 +19,7 @@ import { createHostedGame, CreateHostedGameParams } from '../../shared/app/model
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { isStateEnded } from '../../shared/app/hostedGameUtils.js';
 import { notifier } from '../services/notifications/notifier.js';
+import { errorToLogger } from '../../shared/app/utils.js';
 
 export class GameError extends Error {}
 
@@ -52,7 +53,9 @@ export default class HostedGameRepository
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
     ) {
-        this.loadActiveGamesFromMemory();
+        this.loadActiveGamesFromMemory().catch(e => {
+            logger.error('Could not load active games', errorToLogger(e));
+        });
     }
 
     private async loadActiveGamesFromMemory(): Promise<void>
@@ -119,19 +122,34 @@ export default class HostedGameRepository
     private listenHostedGameServer(hostedGameServer: HostedGameServer): void
     {
         if (isStateEnded(hostedGameServer.getHostedGame())) {
-            this.onGameEnded(hostedGameServer);
+            this.onGameEnded(hostedGameServer).catch(e => {
+                logger.error('onGameEnded returned an error in isStateEnded', errorToLogger(e));
+            });
+
             return;
         }
 
         if (hostedGameServer.getState() === 'canceled') {
-            this.onGameCanceled(hostedGameServer);
+            this.onGameCanceled(hostedGameServer).catch(e => {
+                logger.error('onGameCanceled returned an error in canceled precheck', errorToLogger(e));
+            });
+
             return;
         }
 
         this.persistAfterDelayOfInactivity(hostedGameServer);
 
-        hostedGameServer.on('ended', () => this.onGameEnded(hostedGameServer));
-        hostedGameServer.on('canceled', () => this.onGameCanceled(hostedGameServer));
+        hostedGameServer.on('ended', () => {
+            this.onGameEnded(hostedGameServer).catch(e => {
+                logger.error('onGameEnded returned an error in ended event', errorToLogger(e));
+            });
+        });
+
+        hostedGameServer.on('canceled', () => {
+            this.onGameCanceled(hostedGameServer).catch(e => {
+                logger.error('onGameCanceled returned an error in cancelede event', errorToLogger(e));
+            });
+        });
     }
 
     /**
@@ -141,7 +159,7 @@ export default class HostedGameRepository
     {
         this.clearActivityTimeout(hostedGameServer);
         this.persistWhenNoActivity[hostedGameServer.getPublicId()] = setTimeout(
-            () => hostedGameServer.persist(),
+            () => void hostedGameServer.persist(),
             300 * 1000, // Persist after 5min inactivity
         );
     }
@@ -383,7 +401,7 @@ export default class HostedGameRepository
         return hostedGameServers;
     }
 
-    async playerJoinGame(player: Player, gameId: string): Promise<string | true>
+    playerJoinGame(player: Player, gameId: string): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -402,7 +420,7 @@ export default class HostedGameRepository
         return true;
     }
 
-    async playerMove(player: Player, gameId: string, move: Move): Promise<string | true>
+    playerMove(player: Player, gameId: string, move: Move): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -417,7 +435,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    async playerPremove(player: Player, gameId: string, move: Move): Promise<string | true>
+    playerPremove(player: Player, gameId: string, move: Move): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -432,7 +450,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    async playerCancelPremove(player: Player, gameId: string): Promise<string | true>
+    playerCancelPremove(player: Player, gameId: string): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -447,7 +465,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    async playerAskUndo(player: Player, gameId: string): Promise<string | true>
+    playerAskUndo(player: Player, gameId: string): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -462,7 +480,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    async playerAnswerUndo(player: Player, gameId: string, accept: boolean): Promise<string | true>
+    playerAnswerUndo(player: Player, gameId: string, accept: boolean): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -477,7 +495,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    async playerResign(player: Player, gameId: string): Promise<string | true>
+    playerResign(player: Player, gameId: string): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -492,7 +510,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    async playerCancel(player: Player, gameId: string): Promise<string | true>
+    playerCancel(player: Player, gameId: string): string | true
     {
         const hostedGame = this.activeGames[gameId];
 

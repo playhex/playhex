@@ -37,7 +37,7 @@ const write = <T extends (SGF & SGFMove)>(sgf: T, properties: (keyof T)[]): stri
                 return '';
             }
 
-            return `${String(property)}[${escapeSgfValue(sgf[property])}]`;
+            return property + '[' + String(escapeSgfValue(sgf[property])) + ']';
         })
         .join('')
     ;

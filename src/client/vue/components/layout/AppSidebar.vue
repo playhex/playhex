@@ -27,7 +27,7 @@ const orderedPlayers = computed<OnlinePlayer[]>(() => {
 // Featured tournaments
 const featuredTournaments = ref<Tournament[]>([]);
 
-(async () => {
+void (async () => {
     featuredTournaments.value = await apiGetActiveTournaments({
         featured: true,
     });

@@ -30,14 +30,14 @@ export interface TournamentEngineInterface
      *
      * @throws {TournamentEngineError} If tournament could not start
      */
-    start(tournament: Tournament): Promise<void>;
+    start(tournament: Tournament): void;
 
     /**
      * Returns all matches currently in an "playing" state in the engine.
      * Used to make sure we have reported the match as "ended" in the engine
      * when game has ended, and not be stuck.
      */
-    getActiveMatches(tournament: Tournament): Promise<TournamentMatch[]>;
+    getActiveMatches(tournament: Tournament): TournamentMatch[];
 
     /**
      * Will add/update TournamentMatch in tournament.matches
@@ -52,7 +52,7 @@ export interface TournamentEngineInterface
      * (game has ended, player has moved)
      * to create new tournament matches, update players in games.
      */
-    updateTournamentMatches(tournament: Tournament): Promise<void>;
+    updateTournamentMatches(tournament: Tournament): void;
 
     /**
      * Tells if a TournamentMatch can start.
@@ -73,7 +73,7 @@ export interface TournamentEngineInterface
      *
      * Should be called once a game has ended.
      */
-    reportWinner(tournament: Tournament, tournamentMatch: TournamentMatch, winnerIndex: PlayerIndex): Promise<void>;
+    reportWinner(tournament: Tournament, tournamentMatch: TournamentMatch, winnerIndex: PlayerIndex): void;
 
     /**
      * Update participant scores and tiebreaks values.

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { _adapters } from 'chart.js';
 import {
     parse, parseISO, toDate, isValid, format,
@@ -37,7 +38,6 @@ _adapters._date.override({
         return FORMATS;
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parse: function (value: any, fmt) {
         if (value === null || typeof value === 'undefined') {
             return null;

@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import router from '../vue/router.js';
 import { apiPutPushSubscription } from '../apiClient.js';
 
 /* global PUSH_VAPID_PUBLIC_KEY */
 // @ts-ignore: PUSH_VAPID_PUBLIC_KEY replaced at build time by webpack.
-const pushValidPublicKey: undefined | string = PUSH_VAPID_PUBLIC_KEY;
+const pushValidPublicKey: undefined | string = PUSH_VAPID_PUBLIC_KEY as string;
 
 /**
  * Register service worker, and returns a ServiceWorkerRegistration,

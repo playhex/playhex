@@ -38,7 +38,7 @@ const {
 } = useTournamentCurrentSubscription(tournament);
 
 const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: true });
-</script>
+</script>pages/PageTournamentUpcomi
 
 <template>
     <template v-if="tournament">

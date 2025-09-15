@@ -21,7 +21,7 @@ const { analyze, gameView } = props;
 const gameAnalyzeContainer = ref<HTMLElement>();
 const moveAnalyze = ref<null | AnalyzeMoveOutput>(null);
 
-onMounted(async () => {
+onMounted(() => {
     if (!gameAnalyzeContainer.value) {
         throw new Error('element with ref="gameAnalyzeContainer" not found');
     }
@@ -32,7 +32,7 @@ onMounted(async () => {
         gameAnalyzeView.linkGameViewCursor(gameView);
     }
 
-    gameAnalyzeView.mount(gameAnalyzeContainer.value);
+    void gameAnalyzeView.mount(gameAnalyzeContainer.value);
 
     gameAnalyzeView.on('highlightedMoveChanged', move => moveAnalyze.value = move);
 });

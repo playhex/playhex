@@ -47,7 +47,7 @@ export type CalculateMoveRequest = {
 /**
  * Can be "f6", "swap-pieces", "resign"
  */
-export type CalculateMoveResponse = 'swap-pieces' | 'resign' | string;
+export type CalculateMoveResponse = 'swap-pieces' | 'resign' | `${string}${number}`;
 
 export type AnalyzeGameRequest = {
     size: number;
@@ -83,7 +83,7 @@ export default class HexAiApiClient
             body: JSON.stringify(payload),
         });
 
-        return await response.text();
+        return await response.text() as CalculateMoveResponse;
     }
 
     async analyzeGame(payload: AnalyzeGameRequest): Promise<GameAnalyzeData>

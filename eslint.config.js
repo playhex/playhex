@@ -1,21 +1,16 @@
 import tseslint from 'typescript-eslint';
-import stylisticTs from '@stylistic/eslint-plugin-ts';
+import stylistic from '@stylistic/eslint-plugin';
 import vue from 'eslint-plugin-vue';
 import vueParser from 'vue-eslint-parser';
+import { defineConfig } from 'eslint/config';
 import tsParser from '@typescript-eslint/parser';
 import mocha from 'eslint-plugin-mocha';
 
 export default tseslint.config([
-    ...tseslint.configs.recommended,
-    {
-        ignores: [
-            'dist/',
-            'cypress/',
-        ],
-    },
+    tseslint.configs.recommendedTypeChecked,
     {
         plugins: {
-            '@stylistic/ts': stylisticTs,
+            '@stylistic': stylistic,
             vue,
             mocha,
         },
@@ -23,8 +18,14 @@ export default tseslint.config([
             'no-empty': 'off',
             'object-curly-spacing': 'off',
             'comma-dangle': ['warn', 'always-multiline'],
-            '@stylistic/ts/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
-            '@stylistic/ts/object-curly-spacing': ['warn', 'always'],
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-return': 'off',
+            '@typescript-eslint/no-unsafe-argument': 'off',
+            '@typescript-eslint/no-unsafe-member-access': 'off',
+            '@typescript-eslint/no-unsafe-call': 'off',
+            '@typescript-eslint/no-misused-promises': 'off',
+            '@stylistic/quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: 'always' }],
+            '@stylistic/object-curly-spacing': ['warn', 'always'],
             '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'no-public' }],
             '@typescript-eslint/no-empty-function': 'off',
             'no-unused-vars': 'off',
@@ -36,10 +37,10 @@ export default tseslint.config([
             '@typescript-eslint/no-unused-vars': ['warn', { caughtErrorsIgnorePattern: '^(_|e)$' }],
             '@typescript-eslint/ban-ts-comment': 'off',
             'space-infix-ops': 'off',
-            '@stylistic/ts/space-infix-ops': 'warn',
+            '@stylistic/space-infix-ops': 'warn',
             'semi': 'off',
-            '@stylistic/ts/semi': 'warn',
-            '@stylistic/ts/member-delimiter-style': ['warn', {
+            '@stylistic/semi': 'warn',
+            '@stylistic/member-delimiter-style': ['warn', {
                 'multiline': {
                     'delimiter': 'semi',
                     'requireLast': true,
@@ -50,6 +51,8 @@ export default tseslint.config([
                 },
                 'multilineDetection': 'last-member',
             }],
+            '@typescript-eslint/await-thenable': 'warn',
+            'require-await': 'warn',
             'no-console': 'warn',
             'mocha/no-exclusive-tests': 'warn',
             'indent': ['warn', 4, { SwitchCase: 1, ignoredNodes: ['PropertyDefinition'] }],
@@ -64,22 +67,36 @@ export default tseslint.config([
             'vue/v-on-event-hyphenation': ['warn', 'never'],
             'vue/component-name-in-template-casing': ['warn', 'PascalCase'],
         },
-    },
-    {
-        files: ['*.vue', '**/*.vue'],
-        languageOptions: {
-            parser: vueParser,
-            parserOptions: {
-                parser: {
-                    ts: tsParser,
-                },
-            },
-        },
+        files: [
+            '**/*.ts',
+            '**/*.vue',
+        ],
     },
     {
         files: ['src/server/commands/*'],
         rules: {
             'no-console': 'off',
         },
+    },
+    {
+        languageOptions: {
+            parser: vueParser,
+            parserOptions: {
+                parser: tseslint.parser,
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+                extraFileExtensions: ['.vue'],
+            },
+        },
+    },
+    {
+        ignores: [
+            'dist/',
+            'cypress/',
+            'eslint.config.js',
+            'assets/service-worker.js',
+            'index.js',
+            'register.js',
+        ],
     },
 ]);

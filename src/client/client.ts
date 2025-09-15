@@ -33,6 +33,6 @@ useMatomo(vueApp);
 // Load store now to set dark/light theme early enough and prevent blinking
 usePlayerLocalSettingsStore();
 
-preloadAssets();
+void preloadAssets();
 
 vueApp.mount('#vue-app');

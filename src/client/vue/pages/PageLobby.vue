@@ -33,7 +33,7 @@ const router = useRouter();
 const lobbyStore = useLobbyStore();
 
 const goToGame = (gameId: string) => {
-    router.push({
+    void router.push({
         name: 'online-game',
         params: {
             gameId,
@@ -141,16 +141,16 @@ const isFinished = (hostedGame: HostedGame) =>
 const joinGame = async (hostedGame: HostedGame) => {
     if (isGuestJoiningCorrepondence(hostedGame)) {
         try {
-            await createGuestJoiningCorrepondenceWarningOverlay();
+            createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
             return;
         }
     }
 
-    const result = await lobbyStore.joinGame(hostedGame.publicId);
-
-    if (result !== true) {
-        throw new Error('Could not join game: ' + result);
+    try {
+        await lobbyStore.joinGame(hostedGame.publicId);
+    } catch (e) {
+        throw new Error('Could not join game: ' + e.message);
     }
 
     goToGame(hostedGame.publicId);
@@ -225,12 +225,12 @@ const createGameFromHash = () => {
 
     if (gameOptions.opponentType === 'player') {
         if (gameOptions.ranked) {
-            create1v1RankedAndJoinGame(gameOptions);
+            void create1v1RankedAndJoinGame(gameOptions);
         } else {
-            create1v1FriendlyAndJoinGame(gameOptions);
+            void create1v1FriendlyAndJoinGame(gameOptions);
         }
     } else {
-        create1vAIFriendlyAndJoinGame(gameOptions);
+        void create1vAIFriendlyAndJoinGame(gameOptions);
     }
 };
 

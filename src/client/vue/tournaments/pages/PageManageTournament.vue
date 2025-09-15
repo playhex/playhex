@@ -50,7 +50,7 @@ const editTournament = async () => {
 
         // In case tournament title has been updated, slug has been modified,
         // so redirect organizer to the new tournament url.
-        router.push({
+        void router.push({
             name: 'tournament',
             params: {
                 slug: updated.slug,
@@ -130,7 +130,7 @@ const kickPlayer = async (subscription: TournamentSubscription): Promise<void> =
  */
 const tournamentBannedPlayers = ref<null | TournamentBannedPlayer[]>(null);
 
-(async () => {
+void (async () => {
     tournamentBannedPlayers.value = await apiGetTournamentBannedPlayers(slug);
 })();
 

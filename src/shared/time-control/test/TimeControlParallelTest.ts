@@ -6,7 +6,7 @@ import TimeValue, { timeValueToMilliseconds } from '../TimeValue.js';
 import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl.js';
 import parallel from 'mocha.parallel';
 
-const wait = async (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+const wait = async (seconds: number) => await new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
 /**
  * Asserts whether time is equals with some milliseconds tolerance.
@@ -211,7 +211,7 @@ parallel('TimeControl', () => {
     });
 
 
-    it('[FischerTimeControl] elapses player when restoring old time control already elapsed', async function (done) {
+    it('[FischerTimeControl] elapses player when restoring old time control already elapsed', function (done) {
         this.timeout(1000);
 
         const timeControl = new FischerTimeControl({ initialTime: 300, timeIncrement: 100 });

@@ -26,7 +26,7 @@ export default class TournamentController
      * /api/tournaments/active?player=UUID
      */
     @Get('/api/tournaments/active')
-    async getActiveTournaments(
+    getActiveTournaments(
         @QueryParam('playerPublicId') playerPublicId?: string,
         @QueryParam('featured') featured?: boolean,
     ) {
@@ -37,7 +37,7 @@ export default class TournamentController
     }
 
     @Get('/api/tournaments')
-    async getTournaments()
+    getTournaments()
     {
         return this.tournamentRepository.getEndedTournaments();
     }
@@ -195,7 +195,7 @@ export default class TournamentController
     }
 
     @Post('/api/tournaments/:slug/games/:hostedGamePublicId/players/:playerPublicId/forfeit')
-    async postForfeitGamePlayer(
+    postForfeitGamePlayer(
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
         @Param('hostedGamePublicId') hostedGamePublicId: string,

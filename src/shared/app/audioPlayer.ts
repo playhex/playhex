@@ -4,11 +4,10 @@ const getAudio = (filename: string): HTMLAudioElement => {
     return new Audio(filename);
 };
 
-export const playAudio = async (filename: string): Promise<void> => {
-    try {
-        const audio = getAudio(filename);
-        await audio.play();
-    } catch (e) {
+export const playAudio = (filename: string): void => {
+    const audio = getAudio(filename);
+
+    audio.play().catch(() => {
         // noop, browser says user has not allowed audio permission
-    }
+    });
 };

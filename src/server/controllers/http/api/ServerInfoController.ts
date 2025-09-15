@@ -28,7 +28,7 @@ export default class ServerInfoController
 
         const results = await Promise.all([
             fetchGithubContributors().catch(() => []),
-            fetchWeblateContributors().catch(() => ({})),
+            fetchWeblateContributors(),
         ]);
 
         contributors.github = results[0];

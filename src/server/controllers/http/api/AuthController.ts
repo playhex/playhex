@@ -152,14 +152,14 @@ export default class AuthController
     }
 
     @Get('/api/auth/me')
-    async me(
+    me(
         @AuthenticatedPlayer() player: Player,
     ) {
         return player;
     }
 
     @Delete('/api/auth/logout')
-    async logout(
+    logout(
         // Use express session to have the new req.session after regenerate.
         @Req() req: Request,
     ) {

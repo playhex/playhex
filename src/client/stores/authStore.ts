@@ -15,7 +15,7 @@ const useAuthStore = defineStore('authStore', () => {
      */
     const loggedInPlayer = ref<null | Player>(null);
 
-    (async () => {
+    void (async () => {
         try {
             const player = await authMeOrSignupGuest();
             loggedInPlayer.value = playerRef(player, true);

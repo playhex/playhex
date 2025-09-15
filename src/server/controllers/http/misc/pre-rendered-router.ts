@@ -32,7 +32,7 @@ export function preRenderedRouter(): Router {
         }
     });
 
-    preRenderedService.preloadTemplatesInMemory();
+    void preRenderedService.preloadTemplatesInMemory();
 
     return router;
 }

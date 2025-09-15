@@ -117,10 +117,15 @@ export default class Tournament implements TimeControlBoardsize
     @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     stage1Rounds: null | number;
 
+    /**
+     * Unused feature for now.
+     * The plan was to support 2-stages tournaments.
+     */
     @Column({ type: String, length: 32, nullable: true })
     @Type(() => String)
     @IsIn(tournamentFormatStage2Values)
     @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     stage2Format: null | TournamentFormatStage2;
 
     /**

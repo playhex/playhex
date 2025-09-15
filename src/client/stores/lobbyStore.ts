@@ -39,14 +39,15 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     /**
      * Join a game to play if there is a free slot.
      */
-    const joinGame = async (hostedGamePublicId: string): Promise<true | string> => {
-        return new Promise((resolve, reject) => {
+    const joinGame = async (hostedGamePublicId: string): Promise<void> => {
+        return await new Promise((resolve, reject) => {
             socket.emit('joinGame', hostedGamePublicId, (answer: true | string) => {
                 if (answer === true) {
-                    resolve(answer);
+                    resolve();
+                    return;
                 }
 
-                reject(answer);
+                reject(new Error(answer));
             });
         });
     };
@@ -76,7 +77,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
             // Done after lobbyUpdate event received to make sure I don't miss an ended game
             // finished just before I receive the lobbyUpdate event.
-            updateLastEndedGames();
+            void updateLastEndedGames();
         });
 
         socket.on('gameUpdate', (gameId, hostedGame) => {

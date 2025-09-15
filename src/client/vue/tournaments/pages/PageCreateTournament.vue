@@ -37,7 +37,7 @@ const createTournament = async (): Promise<void> => {
             throw new Error('Could not create tournament');
         }
 
-        router.push({
+        void router.push({
             name: 'tournament',
             params: {
                 slug: created.slug,

@@ -132,7 +132,7 @@ const sendChat = () => {
         return;
     }
 
-    hostedGameClient.value.sendChatMessage(chatInput.value);
+    void hostedGameClient.value.sendChatMessage(chatInput.value);
 
     chatInput.value = '';
 };
@@ -371,13 +371,11 @@ const shouldShowAnalyzeBlock = (): boolean => {
     ;
 };
 
-(async () => {
-    if (hostedGameClient.value.getGame().isEnded()) {
-        analyzeStore.loadAnalyze(gameId);
-    }
-})();
+if (hostedGameClient.value.getGame().isEnded()) {
+    analyzeStore.loadAnalyze(gameId);
+}
 
-const doAnalyzeGame = async () => {
+const doAnalyzeGame = () => {
     analyzeStore.loadAnalyze(gameId, true);
 };
 
@@ -421,7 +419,7 @@ watch(
             return;
         }
 
-        playerSettingsStore.updatePlayerSettings();
+        void playerSettingsStore.updatePlayerSettings();
     },
     { deep: true },
 );

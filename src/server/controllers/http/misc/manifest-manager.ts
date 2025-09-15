@@ -38,7 +38,7 @@ let manifestCache: null | ManifestType = null;
 export async function getManifest(): Promise<ManifestType> {
     if (IS_DEV) {
         // load from webpack dev server
-        return getManifestFromWebpack();
+        return await getManifestFromWebpack();
     }
 
     if (manifestCache !== null) {

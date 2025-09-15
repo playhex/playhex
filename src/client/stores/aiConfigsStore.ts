@@ -15,7 +15,7 @@ const useAiConfigsStore = defineStore('aiConfigsStore', () => {
         aiConfigs.value = await apiGetAiConfigs();
     };
 
-    loadAiConfigs();
+    void loadAiConfigs();
 
     return {
         aiConfigs,

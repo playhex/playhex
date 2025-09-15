@@ -35,14 +35,14 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
      *
      * Returned value is a ref which will update automatically.
      */
-    const loadAnalyze = async (gamePublicId: string, request = false): Promise<Ref<null | GameAnalyze>> => {
+    const loadAnalyze = (gamePublicId: string, request = false): Ref<null | GameAnalyze> => {
         const gameAnalyze = getAnalyze(gamePublicId);
 
         if ((gameAnalyze.value?.analyze ?? null) !== null) {
             return gameAnalyze;
         }
 
-        (async () => {
+        void (async () => {
             gameAnalyze.value = request
                 ? await apiRequestGameAnalyze(gamePublicId)
                 : await apiGetGameAnalyze(gamePublicId)

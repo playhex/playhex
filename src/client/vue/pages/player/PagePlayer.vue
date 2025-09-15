@@ -81,7 +81,7 @@ const player: Ref<null | Player> = isMe()
 
 const playerNotFound = ref(false);
 
-(async () => {
+void (async () => {
     try {
         if (player.value === null) {
             player.value = await getPlayerBySlug(slug);
@@ -243,7 +243,7 @@ const clickLogout = async () => {
     gamesHistory.value = [];
     const newPlayer = await useAuthStore().logout();
 
-    router.push({
+    void router.push({
         name: 'player',
         params: {
             slug: newPlayer.slug,

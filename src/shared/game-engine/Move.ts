@@ -65,7 +65,7 @@ export default class Move implements Coords
     /**
      * @throws Error if move is not like "f6", or like "swap-pieces"
      */
-    static fromString(moveString: string | SpecialMoveType): Move
+    static fromString(moveString: string): Move
     {
         if (moveString === 'swap-pieces') {
             return Move.swapPieces();
@@ -93,7 +93,7 @@ export default class Move implements Coords
         );
     }
 
-    toString(): string | SpecialMoveType
+    toString(): string
     {
         if (this.specialMoveType) {
             return this.specialMoveType;

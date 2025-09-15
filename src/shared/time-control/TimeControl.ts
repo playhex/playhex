@@ -307,6 +307,6 @@ export abstract class AbstractTimeControl<
      */
     override toString(date: Date): string
     {
-        return `TimeControl, state: ${this.state}, currentPlayer: ${this.currentPlayer} (at date ${date})`;
+        return `TimeControl, state: ${this.state}, currentPlayer: ${this.currentPlayer} (at date ${date.toISOString()})`;
     }
 }

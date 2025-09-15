@@ -149,11 +149,11 @@ const shouldDisplayAnswerUndoMove = (): boolean => {
 };
 
 const askUndo = (): void => {
-    hostedGameClient.value?.sendAskUndo();
+    void hostedGameClient.value?.sendAskUndo();
 };
 
 const answerUndo = (accept: boolean): void => {
-    hostedGameClient.value?.sendAnswerUndo(accept);
+    void hostedGameClient.value?.sendAnswerUndo(accept);
 };
 
 const getLocalPlayerIndex = (): number => {
@@ -197,26 +197,20 @@ const listenHexClick = () => {
 
                 // cancel premove when click on it
                 if (gameView?.hasPreviewedMove() && move.sameAs(gameView.getPreviewedMove()!.move)) {
-                    const answer = await hostedGameClient.value.cancelPremove();
-
-                    if (answer === true) {
-                        gameView?.removePreviewedMove();
-                    }
+                    await hostedGameClient.value.cancelPremove();
+                    gameView?.removePreviewedMove();
 
                     return;
                 }
 
                 if (game.getBoard().isEmpty(move.row, move.col)) {
                     // set or replace premove
-                    hostedGameClient.value.sendPremove(fromEngineMove(move));
+                    void hostedGameClient.value.sendPremove(fromEngineMove(move));
                     gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
                 } else if (gameView?.hasPreviewedMove()) {
                     // cancel premove when click on occupied cell
-                    const answer = await hostedGameClient.value.cancelPremove();
-
-                    if (answer === true) {
-                        gameView?.removePreviewedMove();
-                    }
+                    await hostedGameClient.value.cancelPremove();
+                    gameView?.removePreviewedMove();
                 }
 
                 return;
@@ -227,7 +221,7 @@ const listenHexClick = () => {
             // Send move if move preview is not enabled
             if (!shouldDisplayConfirmMove()) {
                 game.move(move, localPlayerIndex as PlayerIndex);
-                hostedGameClient.value.sendMove(fromEngineMove(move));
+                await hostedGameClient.value.sendMove(fromEngineMove(move));
                 return;
             }
 
@@ -249,7 +243,7 @@ const listenHexClick = () => {
                     return;
                 }
 
-                hostedGameClient.value.sendMove(fromEngineMove(move));
+                void hostedGameClient.value.sendMove(fromEngineMove(move));
             };
 
             gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
@@ -303,7 +297,7 @@ const initGameView = async () => {
     await gameView.ready();
 
     // Should be after setDisplayCoords and setPreferredOrientations to start after redraws
-    gameView.animateWinningPath();
+    void gameView.animateWinningPath();
 
     watch(playerSettings, settings => {
         if (gameView === null || settings === null) {
@@ -361,7 +355,7 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
 
     // I received update but game seems not to exists.
     if (hostedGame === null) {
-        router.push({ name: 'home' });
+        void router.push({ name: 'home' });
         return;
     }
 
@@ -418,14 +412,14 @@ onUnmounted(() => {
 /*
  * Join game
  */
-const join = async () => {
+const join = () => {
     if (hostedGameClient.value === null) {
         return;
     }
 
     if (isGuestJoiningCorrepondence(hostedGameClient.value.getHostedGame())) {
         try {
-            await createGuestJoiningCorrepondenceWarningOverlay();
+            createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
             return;
         }
@@ -464,7 +458,7 @@ const resign = async (): Promise<void> => {
             cancelClass: 'btn-outline-primary',
         });
 
-        hostedGameClient.value?.sendResign();
+        await hostedGameClient.value?.sendResign();
     } catch (e) {
         // resignation canceled
     }
@@ -496,7 +490,7 @@ const cancel = async (): Promise<void> => {
         return;
     }
 
-    hostedGameClient.value?.sendCancel();
+    await hostedGameClient.value?.sendCancel();
 };
 
 const toggleCoords = () => {
@@ -547,7 +541,7 @@ const createOrAcceptRematch = async (): Promise<void> => {
         await lobbyStore.joinGame(hostedGameRematch.publicId);
     }
 
-    router.push({
+    void router.push({
         name: 'online-game',
         params: {
             gameId: hostedGameRematch.publicId,
@@ -628,7 +622,7 @@ const pass = async () => {
 
         const passMove = Move.pass();
         hostedGameClient.value.getGame().move(passMove, getLocalPlayerIndex() as PlayerIndex);
-        hostedGameClient.value.sendMove(fromEngineMove(passMove));
+        void hostedGameClient.value.sendMove(fromEngineMove(passMove));
     } catch (e) {
         // noop, player said no
     }
@@ -678,7 +672,7 @@ watch([hostedGameClient, loggedInPlayer], () => {
         return;
     }
 
-    initConditionalMoves(
+    void initConditionalMoves(
         hostedGameClient.value.getHostedGame(),
         gameView,
         getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value) as PlayerIndex,
@@ -701,7 +695,7 @@ const initWinOverlay = (gameView: GameView, game: Game) => {
             throw new Error('Unexpected no players, but needed to show the winner');
         }
 
-        gameFinishedOverlay({
+        void gameFinishedOverlay({
             game,
             players,
         });

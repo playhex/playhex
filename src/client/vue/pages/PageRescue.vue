@@ -57,7 +57,7 @@ const clientVersion: string = VERSION;
 
 const serverVersion = ref<null | string>(null);
 
-(async () => {
+void (async () => {
     serverVersion.value = (await apiGetServerInfo()).version;
 })();
 
@@ -68,7 +68,7 @@ const cacheKeysFound = ref<null | number>(null);
 const cacheKeysDeleted = ref<null | number>(null);
 const reloading = ref(false);
 
-(async () => {
+void (async () => {
     const cache = await caches.open('cache');
     const keys = await cache.keys();
 

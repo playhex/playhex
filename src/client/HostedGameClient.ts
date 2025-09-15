@@ -260,7 +260,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         );
     }
 
-    async sendMove(move: Move): Promise<true | string>
+    async sendMove(move: Move): Promise<void>
     {
         // No need to send client playedAt date, server won't trust it
         const moveWithoutDate = new Move();
@@ -269,20 +269,21 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         moveWithoutDate.col = move.col;
         moveWithoutDate.specialMoveType = move.specialMoveType;
 
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             this.socket.emit('move', this.getId(), moveWithoutDate, answer => {
                 if (answer === true) {
-                    resolve(answer);
+                    resolve();
+                    return;
                 }
 
-                reject(answer);
+                reject(new Error(answer));
             });
 
             this.playSoundForMove(move);
         });
     }
 
-    async sendPremove(move: Move): Promise<true | string>
+    async sendPremove(move: Move): Promise<void>
     {
         // No need to send client playedAt date, server won't trust it
         const moveWithoutDate = new Move();
@@ -291,38 +292,40 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         moveWithoutDate.col = move.col;
         moveWithoutDate.specialMoveType = move.specialMoveType;
 
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             this.socket.emit('premove', this.getId(), moveWithoutDate, answer => {
                 if (answer === true) {
-                    resolve(answer);
+                    resolve();
+                    return;
                 }
 
-                reject(answer);
+                reject(new Error(answer));
             });
         });
     }
 
-    async cancelPremove(): Promise<true | string>
+    async cancelPremove(): Promise<void>
     {
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             this.socket.emit('cancelPremove', this.getId(), answer => {
                 if (answer === true) {
-                    resolve(answer);
+                    resolve();
+                    return;
                 }
 
-                reject(answer);
+                reject(new Error(answer));
             });
         });
     }
 
     async sendAskUndo(): Promise<string | true>
     {
-        return apiPostAskUndo(this.getId());
+        return await apiPostAskUndo(this.getId());
     }
 
     async sendAnswerUndo(accept: boolean): Promise<string | true>
     {
-        return apiPostAnswerUndo(this.getId(), accept);
+        return await apiPostAnswerUndo(this.getId(), accept);
     }
 
     getUndoRequest(): number | null
@@ -332,12 +335,12 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     async sendResign(): Promise<string | true>
     {
-        return apiPostResign(this.getId());
+        return await apiPostResign(this.getId());
     }
 
     async sendCancel(): Promise<string | true>
     {
-        return apiPostCancel(this.getId());
+        return await apiPostCancel(this.getId());
     }
 
     private doStartGame(hostedGame: HostedGame): void
@@ -572,15 +575,16 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         ;
     }
 
-    async sendChatMessage(content: string): Promise<string | true>
+    async sendChatMessage(content: string): Promise<void>
     {
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             this.socket.emit('sendChat', this.hostedGame.publicId, content, (answer: true | string) => {
                 if (answer === true) {
-                    resolve(answer);
+                    resolve();
+                    return;
                 }
 
-                reject(answer);
+                reject(new Error(answer));
             });
         });
     }

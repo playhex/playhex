@@ -116,6 +116,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return findTournamentMatchByRoundAndNumber(tournament, ...this.getGroupRoundNumber(toTournament, match));
     }
 
+    // eslint-disable-next-line require-await, @typescript-eslint/require-await
     async reloadTournament(tournament: Tournament)
     {
         if (tournament.state === 'running') {
@@ -123,7 +124,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
     }
 
-    async start(tournament: Tournament): Promise<void>
+    start(tournament: Tournament): void
     {
         const toTournament = this.createToTournament(tournament);
 
@@ -193,7 +194,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return [group, round, number];
     }
 
-    async updateTournamentMatches(tournament: Tournament): Promise<void>
+    updateTournamentMatches(tournament: Tournament): void
     {
         const toTournament = this.getTournament(tournament);
 
@@ -469,7 +470,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
     }
 
-    async getActiveMatches(tournament: Tournament): Promise<TournamentMatch[]>
+    getActiveMatches(tournament: Tournament): TournamentMatch[]
     {
         const toTournament = this.getTournament(tournament);
         const tournamentMatches = groupAndSortTournamentMatches(tournament.matches);
@@ -489,7 +490,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return activeTournamentMatches;
     }
 
-    async reportWinner(tournament: Tournament, tournamentMatch: TournamentMatch, winnerIndex: PlayerIndex): Promise<void>
+    reportWinner(tournament: Tournament, tournamentMatch: TournamentMatch, winnerIndex: PlayerIndex): void
     {
         const toTournament = this.getTournament(tournament);
         const match = this.findMatchFromTournamentMatch(toTournament, tournamentMatch);

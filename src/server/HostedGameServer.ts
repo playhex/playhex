@@ -21,6 +21,7 @@ import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
 import { Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { isBotGame } from '../shared/app/hostedGameUtils.js';
+import { errorToLogger, errorToString } from '../shared/app/utils.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -96,7 +97,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             );
         } catch (e) {
             baseLogger.error('Could not recreate time control instance from persisted data', {
-                reason: e.message,
+                ...errorToLogger(e),
                 hostedGamePublicId: this.hostedGame.publicId,
                 hostedGame: this.hostedGame,
             });
@@ -121,7 +122,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         if (this.game !== null) {
             this.bindTimeControl();
-            this.makeAutomatedMoves();
+            this.makeAutomatedMoves().catch(e => {
+                this.logger.error('Error in init, while makeAutomatedMoves()', errorToLogger(e));
+            });
         }
     }
 
@@ -289,7 +292,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             if (e instanceof IllegalMove) {
                 this.logger.error('From makeAIMoveIfApplicable(): an AI played an illegal move', { err: e.message, slug: player.slug });
             } else {
-                this.logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { err: e.message, slug: player.slug });
+                this.logger.error('From makeAIMoveIfApplicable(): an AI thrown an error', { ...errorToLogger(e), slug: player.slug });
             }
 
             this.playerResign(player);
@@ -342,7 +345,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 this.logger.error('Could not play conditional move', { result });
             }
         } catch (e) {
-            this.logger.warning('Error while checking conditional moves, ignoring.', { message: e.message, e });
+            this.logger.warning('Error while checking conditional moves, ignoring.', errorToLogger(e));
         }
     }
 
@@ -425,7 +428,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
             if (!game.isEnded()) {
-                this.makeAutomatedMoves();
+                this.makeAutomatedMoves().catch(e => {
+                    this.logger.error('Game played event: error in makeAutomatedMoves()', errorToLogger(e));
+                });
             }
 
             this.cancelUndoRequestIfAny(byPlayerIndex);
@@ -491,7 +496,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return this.players.some(p => p.publicId === player.publicId);
     }
 
-    private createAndStartGame(): void
+    private async createAndStartGame(): Promise<void>
     {
         if (this.hostedGame.state === 'canceled') {
             this.logger.warning('Cannot init game, canceled');
@@ -528,9 +533,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         notifier.emit('gameStart', this.hostedGame);
 
-        this.autoSave.save();
+        await this.autoSave.save();
 
-        this.makeAutomatedMoves();
+        this.makeAutomatedMoves().catch(e => {
+            this.logger.error('Error in makeAutomatedMoves() during createAndStartGame()', errorToLogger(e));
+        });
     }
 
     private affectPlayersColors(): void
@@ -670,7 +677,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         // Starts automatically when game is full
         if (this.players.length === 2) {
-            this.createAndStartGame();
+            this.createAndStartGame().catch(e => {
+                this.logger.error('Error in createAndStartGame() during playerJoin()', errorToLogger(e));
+            });
         }
 
         return true;
@@ -710,8 +719,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 return e.message;
             }
 
-            this.logger.warning('Unexpected error from player.move', { err: e.message });
-            return 'Unexpected error: ' + e.message;
+            this.logger.warning('Unexpected error from player.move', { err: errorToString(e) });
+            return 'Unexpected error: ' + errorToString(e);
         }
     }
 
@@ -786,7 +795,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         hostedGame.undoRequest = playerIndex;
         this.io.to(this.gameRooms()).emit('askUndo', this.getPublicId(), playerIndex);
 
-        this.makeAIAnswerUndoIfApplicable();
+        this.makeAIAnswerUndoIfApplicable().catch(e => {
+            this.logger.error('Error in makeAIAnswerUndoIfApplicable()', errorToLogger(e));
+        });
 
         return true;
     }
@@ -898,8 +909,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
             return true;
         } catch (e) {
-            this.logger.warning('Unexpected error from player.resign', { err: e.message });
-            return e.message;
+            this.logger.warning('Unexpected error from player.resign', errorToLogger(e));
+            return errorToString(e);
         }
     }
 

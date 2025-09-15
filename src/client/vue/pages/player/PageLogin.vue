@@ -28,7 +28,7 @@ const onSubmit = async () => {
     try {
         await useAuthStore().login(pseudo.value, password.value);
 
-        router.push({ name: 'home' });
+        void router.push({ name: 'home' });
     } catch (e) {
         if (!(e instanceof DomainHttpError)) {
             throw e;

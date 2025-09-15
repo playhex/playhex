@@ -52,6 +52,6 @@ export class InconsistentWinnerStateOutcome implements DataInconsistenciesChecke
             .execute()
         ;
 
-        return inconsistents.map(i => `${i.hostedGame_publicId} state:${i.hostedGame_state} outcome:${i.game_outcome ?? 'null'} winner:${i.game_winner ?? 'null'} (created at ${i.hostedGame_createdAt})`);
+        return inconsistents.map(i => `${i.hostedGame_publicId} state:${i.hostedGame_state} outcome:${i.game_outcome ?? 'null'} winner:${i.game_winner ?? 'null'} (created at ${i.hostedGame_createdAt.toISOString()})`);
     }
 }

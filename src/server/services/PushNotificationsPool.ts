@@ -27,7 +27,7 @@ export class PushNotificationsPool
 
             // Send pooled notifications as soon as player become inactive, since his last action
             .on('playerInactive', player => {
-                this.sendPlayerNotifications(player);
+                void this.sendPlayerNotifications(player);
             })
 
         ;
@@ -46,7 +46,7 @@ export class PushNotificationsPool
     poolNotification(player: Player, pushPayload: PushPayload): void
     {
         if (!this.onlinePlayersService.isActive(player)) {
-            this.sender.sendPush(player, pushPayload);
+            void this.sender.sendPush(player, pushPayload);
             return;
         }
 

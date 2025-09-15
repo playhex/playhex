@@ -19,7 +19,7 @@ class MockedOrganizer implements TournamentEngineInterface
         return true;
     }
 
-    async getActiveMatches()
+    getActiveMatches()
     {
         return [];
     }
@@ -30,10 +30,10 @@ class MockedOrganizer implements TournamentEngineInterface
     }
 
     async reloadTournament() {}
-    async start() {}
-    async updateTournamentMatches() {}
+    start() {}
+    updateTournamentMatches() {}
     checkBeforeStart() { return true; }
-    async reportWinner() {}
+    reportWinner() {}
     updateParticipantsScore() {}
     resetAndRecreateMatch() {}
 }

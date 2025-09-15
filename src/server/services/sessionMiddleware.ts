@@ -27,7 +27,7 @@ if (REDIS_URL) {
         url: REDIS_URL,
     });
 
-    redisClient.connect();
+    void redisClient.connect();
 
     sessionOptions.store = new RedisStore({
         client: redisClient,

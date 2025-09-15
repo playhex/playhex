@@ -79,6 +79,7 @@ notifier.on('gameStart', (hostedGame) => {
         return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     sendNotification(
         {
             body: t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
@@ -108,6 +109,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     sendNotification(
         {
             body: sanitizeNotificationBody(chatMessage.content),

@@ -31,7 +31,7 @@ const create1vOfflineAIAndJoinGame = async () => {
             gameOptions,
         });
 
-        router.push({
+        void router.push({
             name: 'play-vs-offline-ai',
             state: {
                 gameOptions: JSON.stringify(gameOptions),
@@ -57,7 +57,7 @@ onMounted(() => {
         throw new Error('No ref="pixiApp" element');
     }
 
-    gameView.mount(pixiApp.value);
+    void gameView.mount(pixiApp.value);
 });
 </script>
 

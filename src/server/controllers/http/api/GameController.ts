@@ -114,11 +114,11 @@ export default class GameController
     }
 
     @Post('/api/games/:publicId/join')
-    async join(
+    join(
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = await this.hostedGameRepository.playerJoinGame(player, publicId);
+        const result = this.hostedGameRepository.playerJoinGame(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -126,12 +126,12 @@ export default class GameController
     }
 
     @Post('/api/games/:publicId/move')
-    async move(
+    move(
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
         @Body() move: Move,
     ) {
-        const result = await this.hostedGameRepository.playerMove(player, publicId, move);
+        const result = this.hostedGameRepository.playerMove(player, publicId, move);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -139,11 +139,11 @@ export default class GameController
     }
 
     @Post('/api/games/:publicId/ask-undo')
-    async askUndo(
+    askUndo(
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
     ) {
-        const result = await this.hostedGameRepository.playerAskUndo(player, publicId);
+        const result = this.hostedGameRepository.playerAskUndo(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -151,12 +151,12 @@ export default class GameController
     }
 
     @Post('/api/games/:publicId/answer-undo')
-    async answerUndo(
+    answerUndo(
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
         @Body() answerUndoBody: AnswerUndoBody,
     ) {
-        const result = await this.hostedGameRepository.playerAnswerUndo(player, publicId, answerUndoBody.accept);
+        const result = this.hostedGameRepository.playerAnswerUndo(player, publicId, answerUndoBody.accept);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -164,11 +164,11 @@ export default class GameController
     }
 
     @Post('/api/games/:publicId/resign')
-    async resign(
+    resign(
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = await this.hostedGameRepository.playerResign(player, publicId);
+        const result = this.hostedGameRepository.playerResign(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -176,11 +176,11 @@ export default class GameController
     }
 
     @Post('/api/games/:publicId/cancel')
-    async cancel(
+    cancel(
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = await this.hostedGameRepository.playerCancel(player, publicId);
+        const result = this.hostedGameRepository.playerCancel(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);

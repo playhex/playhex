@@ -19,7 +19,7 @@ export default class Game
     @Expose()
     size: number;
 
-    @Column({ type: 'json', transformer: { from: (value: null | unknown) => deserializeMovesHistory(value), to: value => value } })
+    @Column({ type: 'json', transformer: { from: (value: unknown) => deserializeMovesHistory(value), to: value => value } })
     @Expose()
     @Type(() => Move)
     movesHistory: Move[] = [];
@@ -57,7 +57,7 @@ export default class Game
     endedAt: null | Date = null;
 }
 
-const deserializeMovesHistory = (value: null | unknown): Move[] => {
+const deserializeMovesHistory = (value: unknown): Move[] => {
     if (!value) {
         return [];
     }

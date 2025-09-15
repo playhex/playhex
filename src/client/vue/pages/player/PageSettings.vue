@@ -46,7 +46,7 @@ watch(
             return;
         }
 
-        playerSettingsStore.updatePlayerSettings();
+        void playerSettingsStore.updatePlayerSettings();
     },
     { deep: true },
 );

@@ -24,7 +24,7 @@ export default class GameAnalyzePersister
             },
         });
 
-        this.gameAnalyzeRepository.save(gameAnalyze);
+        await this.gameAnalyzeRepository.save(gameAnalyze);
     }
 
     async findByGamePublicId(publicId: string): Promise<null | GameAnalyze>

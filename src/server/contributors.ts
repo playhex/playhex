@@ -42,7 +42,7 @@ for (const locale in availableLocales) {
     }
 }
 
-const fetchWeblateContributors = async (): Promise<WeblateContributors> => {
+const fetchWeblateContributors = (): WeblateContributors => {
     return cachedWeblateContributors;
 };
 

@@ -6,7 +6,7 @@ export function seoRouter(): Router {
     const router = Router();
     const baseUrl = process.env.BASE_URL;
 
-    router.get('/robots.txt', async (_, res) => {
+    router.get('/robots.txt', (_, res) => {
         res.header('Content-Type', 'text/plain');
         res.render('seo/robots.txt.ejs', {
             baseUrl,

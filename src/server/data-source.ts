@@ -3,6 +3,8 @@ import InMemoryCacheProvider from 'typeorm-in-memory-cache';
 import { DataSource } from 'typeorm';
 import { Container } from 'typedi';
 import { entities } from '../shared/app/models/index.js';
+import logger from './services/logger.js';
+import { errorToString } from '../shared/app/utils.js';
 
 const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
 
@@ -30,7 +32,9 @@ export const AppDataSource = new DataSource({
     },
 });
 
-AppDataSource.initialize();
+AppDataSource.initialize().catch(reason => {
+    logger.crit('Could not initialize data source', { reason: errorToString(reason) });
+});
 
 /*
  * Waiting for this to be merged: https://github.com/typestack/typeorm-typedi-extensions/pull/69

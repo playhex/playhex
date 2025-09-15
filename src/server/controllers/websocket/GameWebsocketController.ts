@@ -12,7 +12,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
 
     onConnection(socket: HexSocket): void
     {
-        socket.on('move', async (gameId, move, answer) => {
+        socket.on('move', (gameId, move, answer) => {
             const { player } = socket.data;
 
             if (player === null) {
@@ -20,10 +20,10 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(await this.hostedGameRepository.playerMove(player, gameId, move));
+            answer(this.hostedGameRepository.playerMove(player, gameId, move));
         });
 
-        socket.on('premove', async (gameId, move, answer) => {
+        socket.on('premove', (gameId, move, answer) => {
             const { player } = socket.data;
 
             if (player === null) {
@@ -31,10 +31,10 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(await this.hostedGameRepository.playerPremove(player, gameId, move));
+            answer(this.hostedGameRepository.playerPremove(player, gameId, move));
         });
 
-        socket.on('cancelPremove', async (gameId, answer) => {
+        socket.on('cancelPremove', (gameId, answer) => {
             const { player } = socket.data;
 
             if (player === null) {
@@ -42,7 +42,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(await this.hostedGameRepository.playerCancelPremove(player, gameId));
+            answer(this.hostedGameRepository.playerCancelPremove(player, gameId));
         });
     }
 

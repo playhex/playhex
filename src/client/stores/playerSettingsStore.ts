@@ -20,13 +20,13 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
     const reloadPlayerSettings = async (): Promise<PlayerSettings> => {
         const promise = apiGetPlayerSettings();
 
-        promise.then(settings => playerSettings.value = settings);
+        void promise.then(settings => playerSettings.value = settings);
 
-        return promise;
+        return await promise;
     };
 
     if (loggedInPlayer.value !== null) {
-        reloadPlayerSettings();
+        void reloadPlayerSettings();
     }
 
     // Update player settings when logged in player change
@@ -37,7 +37,7 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
             return;
         }
 
-        reloadPlayerSettings();
+        void reloadPlayerSettings();
     });
 
     const updatePlayerSettings = async (): Promise<void> => {

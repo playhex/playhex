@@ -120,7 +120,7 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
         offlineGamesStorage.setCurrentGame(currentGame);
     };
 
-    makeAIMoveIfApplicable(game, players.value);
+    void makeAIMoveIfApplicable(game, players.value);
     game.on('played', () => makeAIMoveIfApplicable(game, players.value));
     game.on('played', () => saveGame());
     game.on('ended', () => offlineGamesStorage.clearCurrentGame());
@@ -154,7 +154,7 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
         }
     });
 
-    makeAIMoveIfApplicable(game, players.value);
+    void makeAIMoveIfApplicable(game, players.value);
     game.on('played', () => makeAIMoveIfApplicable(game, players.value));
     game.on('played', () => {
         const nextCurrentGame = new OfflineGame();
@@ -181,7 +181,7 @@ const gameFinishedOverlay = defineOverlay(OfflineGameFinishedOverlay);
 
 const initWinOverlay = (gameView: GameView, game: Game, players: Player[]) => {
     gameView.on('endedAndWinAnimationOver', () => {
-        gameFinishedOverlay({
+        void gameFinishedOverlay({
             game,
             players,
         });

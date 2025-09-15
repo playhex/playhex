@@ -47,7 +47,7 @@ onMounted(() => {
         throw new Error('No element with ref="pixiApp"');
     }
 
-    gameView.mount(pixiApp.value);
+    void gameView.mount(pixiApp.value);
 });
 
 onUnmounted(() => {

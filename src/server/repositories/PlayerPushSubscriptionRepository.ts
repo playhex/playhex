@@ -38,6 +38,6 @@ export default class PlayerPushSubscriptionRepository
 
     async remove(playerPushSubscription: PlayerPushSubscription)
     {
-        this.playerPushSubscriptionRepository.remove(playerPushSubscription);
+        await this.playerPushSubscriptionRepository.remove(playerPushSubscription);
     }
 }

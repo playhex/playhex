@@ -12,7 +12,7 @@ export const useTournamentFromUrl = () => {
         throw new Error('Unexpected array in slug parameter');
     }
 
-    (async () => {
+    void (async () => {
         tournament.value = await apiGetTournament(slug) ?? false;
     })();
 

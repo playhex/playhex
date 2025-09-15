@@ -32,14 +32,14 @@ export default class PlayerRepository
 
     async getPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return this.playerRepository.findOneBy({
+        return await this.playerRepository.findOneBy({
             slug,
         });
     }
 
     async getAIPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return this.playerRepository.findOneBy({
+        return await this.playerRepository.findOneBy({
             slug,
             isBot: true,
         });
@@ -72,7 +72,7 @@ export default class PlayerRepository
             ;
         }
 
-        return queryBuilder.getMany();
+        return await queryBuilder.getMany();
     }
 
     async createGuest(): Promise<Player>

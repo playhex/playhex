@@ -76,7 +76,7 @@ const getSupportedBrowserLocale = (): null | string => {
 export const autoLocale = (): string => getPlayerSelectedLocale() ?? getSupportedBrowserLocale() ?? 'en';
 
 const setI18nLanguage = (locale: string) => {
-    i18n.changeLanguage(locale);
+    void i18n.changeLanguage(locale);
     document.querySelector('html')!.setAttribute('lang', locale);
 };
 
@@ -106,12 +106,13 @@ export const setLocale = async (locale: string, remember = true) => {
     setI18nLanguage(locale); // Should be last so when "languageChanged" is emitted, date fns also has the new locale
 };
 
-(async () => {
+void (async () => {
+
     // Load current locale translation as soon as possible to prevent text blinking
-    loadLocaleMessages(autoLocale());
+    void loadLocaleMessages(autoLocale());
 
     // Always load en locales for fallbacks (in case of missing translation)
-    loadLocaleMessages('en');
+    void loadLocaleMessages('en');
 
     await i18n
         .use(HttpBackend)
@@ -123,5 +124,5 @@ export const setLocale = async (locale: string, remember = true) => {
         })
     ;
 
-    setLocale(autoLocale(), false);
+    await setLocale(autoLocale(), false);
 })();

@@ -52,7 +52,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
     const router = useRouter();
 
     const goToLoginPage = (): void => {
-        router.push({
+        void router.push({
             name: 'login',
         });
     };
@@ -68,8 +68,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
     return {
         currentTournamentSubscription,
 
-        async subscribeCheckIn()
-        {
+        subscribeCheckIn: async () => {
             if (!tournament.value) {
                 return;
             }
@@ -122,8 +121,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
             }
         },
 
-        async unsub()
-        {
+        unsub: async () => {
             if (!tournament.value) {
                 return;
             }

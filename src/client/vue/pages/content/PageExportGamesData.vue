@@ -64,7 +64,7 @@ watchEffect(() => {
 
 // To make an export file available here, run command: yarn hex export-games
 
-(async () => {
+void (async () => {
     const response = await fetch('/export-data/manifest.json');
 
     if (!response.ok) {

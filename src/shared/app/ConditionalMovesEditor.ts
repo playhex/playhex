@@ -170,7 +170,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      *
      * @emits ConditionalMovesStruct Conditional moves struct (tree and unplayed lines), should be persisted.
      */
-    async submitConditionalMoves(): Promise<void>
+    submitConditionalMoves(): void
     {
         this.gameView.removeMarks('nextConditionalMoves');
 

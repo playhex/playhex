@@ -6,8 +6,7 @@
  *
  * list.sort(by(item => item.field));
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const by = <T>(field: (t: T) => any, ascOrDesc: 'asc' | 'desc' = 'asc') => {
+export const by = <T>(field: (t: T) => string | number, ascOrDesc: 'asc' | 'desc' = 'asc') => {
     return (a: T, b: T) => {
         const aValue = field(a);
         const bValue = field(b);
@@ -39,3 +38,47 @@ export const truncateText = (text: string, maxLength = 24): string => {
  * ```
  */
 export const keysOf = <T>() => <K extends keyof T>(...keys: K[]) => keys;
+
+/**
+ * When catching, allow to log error as string, depending on its type (Error, string, ...).
+ *
+ * try { }
+ * catch (e) { log(anyErrorToString(e)) }
+ */
+export const errorToString = (e: unknown): string => {
+    if (e instanceof Error) {
+        return e.message;
+    }
+
+    return String(e);
+};
+
+/**
+ * Returns an object of params that can be sent to logger parameters.
+ *
+ * Example:
+ *
+ * ```
+ * logger.error('Failed to ...', errorToLogger(e));
+ *
+ * // or
+ *
+ * logger.error('Failed to ...', {
+ *     ...errorToLogger(e),
+ *     otherParam: 'xxx',
+ * });
+ * ```
+ */
+export const errorToLogger = (e: unknown): { message: string, stacktrace: string } => {
+    if (e instanceof Error) {
+        return {
+            message: e.message,
+            stacktrace: e.stack ?? 'No stack trace in this Error',
+        };
+    }
+
+    return {
+        message: String(e),
+        stacktrace: 'No stack trace because not an Error instance',
+    };
+};

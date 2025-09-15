@@ -14,7 +14,7 @@ import { getCurrentTournamentSubscriptionStatus, iAmParticipant } from '../compo
 const activeTournaments = ref<null | Tournament[]>(null);
 const endedTournaments = ref<null | Tournament[]>(null);
 
-(async () => {
+void (async () => {
     activeTournaments.value = await apiGetActiveTournaments();
     endedTournaments.value = await apiGetEndedTournaments();
 })();

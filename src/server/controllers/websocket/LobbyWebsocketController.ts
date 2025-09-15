@@ -13,7 +13,7 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
 
     onConnection(socket: HexSocket): void
     {
-        socket.on('joinGame', async (gameId, answer) => {
+        socket.on('joinGame', (gameId, answer) => {
             const { player } = socket.data;
 
             if (player === null) {
@@ -21,7 +21,7 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
                 return;
             }
 
-            answer(await this.hostedGameRepository.playerJoinGame(player, gameId));
+            answer(this.hostedGameRepository.playerJoinGame(player, gameId));
         });
     }
 

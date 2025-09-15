@@ -9,6 +9,7 @@ import Rooms from '../../../../shared/app/Rooms.js';
 import logger from '../../../services/logger.js';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 import ChatMessage from '../../../../shared/app/models/ChatMessage.js';
+import { errorToLogger } from '../../../../shared/app/utils.js';
 
 @JsonController()
 @Service()
@@ -60,17 +61,7 @@ export default class GameAnalyzeController
         this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 
         (async () => {
-            try {
-                gameAnalyze.analyze = await this.hexAiApiClient.analyzeGame(analyzeGameRequest);
-            } catch (e) {
-                if (!(e instanceof Error)) {
-                    throw e;
-                }
-
-                logger.error('Error in game analyze', { reason: e.message, stack: e.stack });
-                gameAnalyze.analyze = null;
-            }
-
+            gameAnalyze.analyze = await this.hexAiApiClient.analyzeGame(analyzeGameRequest);
             gameAnalyze.endedAt = new Date();
 
             await this.gameAnalyzePersister.persist(publicId, gameAnalyze);
@@ -78,7 +69,10 @@ export default class GameAnalyzeController
             this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 
             await this.hostedGameRepository.postChatMessage(publicId, this.createGameAnalyzeAvailableChatMessage(gameAnalyze));
-        })();
+        })().catch(e => {
+            logger.error('Error in game analyze', errorToLogger(e));
+            gameAnalyze.analyze = null;
+        });
 
         return gameAnalyze;
     }

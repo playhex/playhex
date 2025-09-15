@@ -11,7 +11,7 @@ const create = (tree: ConditionalMovesTree, unplayedLines: ConditionalMovesLine[
 
 describe('Conditional Moves', () => {
     describe('conditionalMovesShift', () => {
-        it('returns only conditional move if matched', async () => {
+        it('returns only conditional move if matched', () => {
             const conditionalMoves = create([['a1', 'a2']]);
 
             const result = conditionalMovesShift(conditionalMoves, 'a1');
@@ -21,7 +21,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [], 'no reason to add items in unplayed lines');
         });
 
-        it('disable unplayed lines', async () => {
+        it('disable unplayed lines', () => {
             const conditionalMoves = create([
                 ['a1', 'a2'],
                 ['b1', 'b2'],
@@ -34,7 +34,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [['b1', 'b2']], 'unplayed lines have been moved');
         });
 
-        it('played line is shifted', async () => {
+        it('played line is shifted', () => {
             const conditionalMoves = create([
                 ['a1', 'a2', [['a3', 'a4', [['e5', 'e6']]], ['b3', 'b4']]],
                 ['b1', 'b2'],
@@ -47,7 +47,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [['b1', 'b2']], 'unplayed lines have been moved');
         });
 
-        it('unplayed lines are added at the beginning of unplayed lines', async () => {
+        it('unplayed lines are added at the beginning of unplayed lines', () => {
             const conditionalMoves = create([
                 ['a1', 'a2'],
                 ['b1', 'b2'],
@@ -62,7 +62,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [['a1', 'a2'], ['c1', 'c2']]);
         });
 
-        it('removes lines having conflit with one of played moves', async () => {
+        it('removes lines having conflit with one of played moves', () => {
             const conditionalMoves = create([
                 ['a1', 'a2'],
                 ['b1', 'a2'],
@@ -75,7 +75,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [], 'unplayed line is not kept because a2 now has a stone');
         });
 
-        it('removes lines having conflit with one of played moves, even inactive ones', async () => {
+        it('removes lines having conflit with one of played moves, even inactive ones', () => {
             const conditionalMoves = create([
                 ['a1', 'a2'],
                 ['b1', 'b2'],
@@ -91,7 +91,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [['b1', 'b2'], ['a3', 'a4']], 'a3 a2 is removed because a2 now has a stone');
         });
 
-        it('do not add unplayed line if duplicated', async () => {
+        it('do not add unplayed line if duplicated', () => {
             const conditionalMoves = create([
                 ['a1', 'a2'],
                 ['b1', 'b2'],
@@ -106,7 +106,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [['b1', 'b2']]);
         });
 
-        it('do not add unplayed line if duplicated, even when no conditional move matched', async () => {
+        it('do not add unplayed line if duplicated, even when no conditional move matched', () => {
             const conditionalMoves = create([
                 ['a1', 'a2'],
                 ['b1', 'b2'],
@@ -121,7 +121,7 @@ describe('Conditional Moves', () => {
             assert.deepStrictEqual(conditionalMoves.unplayedLines, [['a1', 'a2'], ['b1', 'b2']]);
         });
 
-        it('do not add unplayed line if duplicated, even when conditional move matched but no answer defined', async () => {
+        it('do not add unplayed line if duplicated, even when conditional move matched but no answer defined', () => {
             const conditionalMoves = create([
                 ['a1'],
                 ['b1', 'b2'],

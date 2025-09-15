@@ -275,7 +275,7 @@ export default class Hex extends Container
     {
         this.clearAnimationLoop();
 
-        return new Promise(resolve => {
+        return await new Promise(resolve => {
             let i = 0;
 
             this.animationLoop = (): void => {

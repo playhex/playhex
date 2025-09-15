@@ -84,7 +84,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         if (this.tournament.state !== 'running') {
-            throw new Error(`Unexpected tournament state: "${this.tournament.state}".`);
+            throw new Error(`Unexpected tournament state: "${this.tournament.state as string}".`);
         }
 
         for (const tournamentMatch of this.tournament.matches) {
@@ -176,6 +176,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      *
      * @returns TournamentSubscription that has been removed, or null if subscription not in list.
      */
+    // eslint-disable-next-line @typescript-eslint/require-await, require-await
     async removeSubscription(playerPublicId: string): Promise<null | TournamentSubscription>
     {
         const tournamentSubscription = this.tournament.subscriptions
@@ -246,7 +247,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         // Tournament date past, start now
         if (startsInMs <= 0) {
-            this.iterateTournament();
+            void this.iterateTournament();
             return;
         }
 
@@ -298,7 +299,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     {
         this.logger.info('Tournament started now, with startNow()');
 
-        await this.doStartTournament();
+        this.doStartTournament();
         await this.createNextGames();
     }
 
@@ -342,7 +343,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.logger.info('Tournament auto start date is past, start it');
 
             try {
-                await this.doStartTournament();
+                this.doStartTournament();
             } catch (e) {
                 if (e instanceof TournamentError) {
                     this.logger.error('Could not start tournament', { reason: e.message });
@@ -378,7 +379,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             }
         }
 
-        const activeTournamentMatches = await this.tournamentEngine.getActiveMatches(this.tournament);
+        const activeTournamentMatches = this.tournamentEngine.getActiveMatches(this.tournament);
 
         // Check that we have not missed to report winner to tournament engine
         for (const tournamentMatch of activeTournamentMatches) {
@@ -389,7 +390,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                     matchKey: tournamentMatchKey(tournamentMatch),
                 });
 
-                await this.doMarkGameAsEnded(tournamentMatch);
+                this.doMarkGameAsEnded(tournamentMatch);
             }
         }
     }
@@ -402,7 +403,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     {
         this.logger.debug('Add/update tournament matches');
 
-        await this.tournamentEngine.updateTournamentMatches(this.tournament);
+        this.tournamentEngine.updateTournamentMatches(this.tournament);
 
         this.logger.debug('Check if created games can be started');
 
@@ -475,7 +476,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      * Either automatically when start date is now,
      * or manually by host.
      */
-    private async doStartTournament(): Promise<void>
+    private doStartTournament(): void
     {
         if (this.tournament.state !== 'created') {
             throw new Error('Cannot start, already started');
@@ -495,7 +496,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         try {
-            await this.tournamentEngine.start(this.tournament);
+            this.tournamentEngine.start(this.tournament);
             this.tournament.state = 'running';
             this.tournament.startedAt = new Date();
 
@@ -572,10 +573,10 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        await this.doMarkGameAsEnded(tournamentMatch);
+        this.doMarkGameAsEnded(tournamentMatch);
     }
 
-    private async doMarkGameAsEnded(tournamentMatch: TournamentMatch): Promise<void>
+    private doMarkGameAsEnded(tournamentMatch: TournamentMatch): void
     {
         const { hostedGame } = tournamentMatch;
         const matchKey = tournamentMatchKey(tournamentMatch);
@@ -594,7 +595,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         this.logger.info('Tournament game has ended, report winner', { matchKey, winnerIndex });
 
-        await this.tournamentEngine.reportWinner(this.tournament, tournamentMatch, winnerIndex);
+        this.tournamentEngine.reportWinner(this.tournament, tournamentMatch, winnerIndex);
         tournamentMatch.state = 'done';
         let endedAt = hostedGame.gameData?.endedAt;
 
@@ -644,7 +645,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     private listenHostedGameServer(tournamentMatch: TournamentMatch, hostedGameServer: HostedGameServer): void
     {
         hostedGameServer.on('ended', async () => {
-            await this.doMarkGameAsEnded(tournamentMatch);
+            this.doMarkGameAsEnded(tournamentMatch);
             await this.createNextGames();
             this.endTournamentIfEnded();
         });
@@ -786,7 +787,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         tournamentMatch.state = 'waiting';
 
-        await this.tournamentEngine.updateTournamentMatches(this.tournament);
+        this.tournamentEngine.updateTournamentMatches(this.tournament);
         await this.doStartTournamentMatch(tournamentMatch);
     }
 

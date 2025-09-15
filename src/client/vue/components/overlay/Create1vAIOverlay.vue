@@ -36,7 +36,7 @@ const { aiConfigs } = storeToRefs(useAiConfigsStore());
 const selectedAiConfig = ref<AIConfig | null>(null);
 const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
 
-(async () => {
+void (async () => {
     aiConfigsStatus.value = await apiGetAiConfigsStatus();
 })();
 
