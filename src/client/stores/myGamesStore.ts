@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
+import { useHead } from '@unhead/vue';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { HostedGame, Move } from '../../shared/app/models/index.js';
@@ -209,6 +210,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         },
         { immediate: true },
     );
+
+    // Show "(1) ..." in page title when I need to play
+    useHead({
+        titleTemplate: computed(() => myTurnCount.value > 0
+            ? `(${myTurnCount.value}) %s`
+            : '%s',
+        ),
+    });
 
     return {
         myGames,
