@@ -29,7 +29,7 @@
             }
         ],
         "timeControl": {
-            "type": "fischer",
+            "family": "fischer",
             "state": "running",
             "players": [
                 {
@@ -42,11 +42,9 @@
         },
         "boardsize": 11,
         "firstPlayer": null,
-        "opponent": {
-            "type": "ai"
-        },
+        "opponentType": "ai",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 900000,
                 "timeIncrement": 900000,
@@ -159,7 +157,7 @@
             }
         ],
         "timeControl": {
-            "type": "fischer",
+            "family": "fischer",
             "state": "ready",
             "players": [
                 {
@@ -172,11 +170,9 @@
         },
         "boardsize": 11,
         "firstPlayer": null,
-        "opponent": {
-            "type": "player"
-        },
+        "opponentType": "player",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 900000,
                 "timeIncrement": 900000,

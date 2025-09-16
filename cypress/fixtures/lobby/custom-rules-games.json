@@ -36,11 +36,9 @@
         "boardsize": 11,
         "firstPlayer": null,
         "swapRule": true,
-        "opponent": {
-            "type": "player"
-        },
+        "opponentType": "player",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 600000,
                 "timeIncrement": 5000,
@@ -89,11 +87,9 @@
         "boardsize": 12,
         "firstPlayer": null,
         "swapRule": false,
-        "opponent": {
-            "type": "player"
-        },
+        "opponentType": "player",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 600000,
                 "timeIncrement": 5000,
@@ -142,11 +138,9 @@
         "boardsize": 13,
         "firstPlayer": 0,
         "swapRule": false,
-        "opponent": {
-            "type": "player"
-        },
+        "opponentType": "player",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 600000,
                 "timeIncrement": 5000,
@@ -195,11 +189,9 @@
         "boardsize": 25,
         "firstPlayer": null,
         "swapRule": true,
-        "opponent": {
-            "type": "player"
-        },
+        "opponentType": "player",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 600000,
                 "timeIncrement": 5000,

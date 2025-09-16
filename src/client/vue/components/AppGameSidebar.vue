@@ -57,12 +57,8 @@ const emits = defineEmits([
     'toggleCoords',
 ]);
 
-const { loggedInPlayer } = useAuthStore();
+const { loggedInPlayer } = storeToRefs(useAuthStore());
 const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
-
-if (loggedInPlayer === null) {
-    throw new Error('Unexpected null logged in player');
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rtf = new (Intl as any).RelativeTimeFormat(autoLocale(), { numeric: 'auto' });
@@ -214,7 +210,11 @@ const downloadSGF = (): void => {
     const game = hostedGameClient.value.getGame();
     const players = hostedGameClient.value.getPlayers();
 
-    if (!canUseHexWorldOrDownloadSGF(hostedGameClient.value.getHostedGame(), loggedInPlayer)) {
+    if (!loggedInPlayer.value) {
+        return;
+    }
+
+    if (!canUseHexWorldOrDownloadSGF(hostedGameClient.value.getHostedGame(), loggedInPlayer.value)) {
         return;
     }
 
@@ -913,10 +913,10 @@ watchEffect(() => {
                     </div>
                 </div>
 
-                <form class="chat-input" v-if="true === canPlayerChatInGame(loggedInPlayer as Player, hostedGameClient.getHostedGame())">
+                <form class="chat-input" v-if="loggedInPlayer && canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGame()) === true">
                     <div class="input-group">
                         <input v-model="chatInput" ref="chatInputElement" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />
-                        <button class="btn btn-success" type="submit" @click="e => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
+                        <button class="btn btn-success" type="submit" @click="(e: PointerEvent) => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
                     </div>
                     <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / {{ $t('n_characters', { count: 250 }) }}</div>
                 </form>

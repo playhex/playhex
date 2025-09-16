@@ -45,11 +45,9 @@
     "boardsize": 11,
     "firstPlayer": null,
     "swapRule": true,
-    "opponent": {
-        "type": "ai"
-    },
+    "opponentType": "ai",
     "timeControlType": {
-        "type": "fischer",
+        "family": "fischer",
         "options": {
             "initialTime": 600000,
             "timeIncrement": 5000,

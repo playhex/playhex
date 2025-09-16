@@ -45,7 +45,7 @@
         "opponentType": "player",
         "opponentPublicId": null,
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 600000,
                 "timeIncrement": 5000,
@@ -133,7 +133,7 @@
         "opponentType": "ai",
         "opponentPublicId": "9c226258-d78b-4083-bd5e-4c4efdf66cec",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 600000,
                 "timeIncrement": 5000,

@@ -76,7 +76,7 @@ describe('My turn notification', () => {
         });
     });
 
-    it('displays 1 and my color, empty hexagon, when I have a running game, but not my turn', () => {
+    it('displays 0 and my color, empty hexagon, when I have a running game, but not my turn', () => {
         cy.mockSocketIO();
         cy.intercept('/api/auth/me-or-guest', {
             fixture: 'myturn-notification/not-my-turn-guest.json',

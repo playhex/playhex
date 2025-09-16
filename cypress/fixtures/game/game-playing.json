@@ -59,12 +59,10 @@
     "boardsize": 11,
     "firstPlayer": null,
     "swapRule": true,
-    "opponent": {
-        "type": "ai",
-        "publicId": "53ccc84c-c73b-40b2-9ee2-21ca2182ac85"
-    },
+    "opponentType": "ai",
+    "opponentPublicId": "53ccc84c-c73b-40b2-9ee2-21ca2182ac85",
     "timeControlType": {
-        "type": "fischer",
+        "family": "fischer",
         "options": {
             "initialTime": 600000,
             "timeIncrement": 5000,

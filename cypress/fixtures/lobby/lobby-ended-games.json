@@ -29,7 +29,7 @@
             }
         ],
         "timeControl": {
-            "type": "fischer",
+            "family": "fischer",
             "state": "over",
             "players": [
                 {
@@ -42,11 +42,9 @@
         },
         "boardsize": 9,
         "firstPlayer": 0,
-        "opponent": {
-            "type": "ai"
-        },
+        "opponentType": "ai",
         "timeControlType": {
-            "type": "fischer",
+            "family": "fischer",
             "options": {
                 "initialTime": 900000,
                 "timeIncrement": 900000,

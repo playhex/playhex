@@ -40,7 +40,7 @@
     "opponentType": "player",
     "opponentPublicId": null,
     "timeControlType": {
-        "type": "fischer",
+        "family": "fischer",
         "options": {
             "initialTime": 600000,
             "timeIncrement": 5000,
