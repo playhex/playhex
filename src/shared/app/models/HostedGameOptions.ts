@@ -75,7 +75,7 @@ export default class HostedGameOptions implements TimeControlBoardsize
     @ValidateNested()
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
-        switch ((type?.object as HostedGameOptions).timeControlType.family) {
+        switch ((type?.object as HostedGameOptions).timeControlType?.family) {
             case 'fischer': return HostedGameOptionsTimeControlFischer;
             case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
             default: return HostedGameOptionsTimeControl;
