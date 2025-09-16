@@ -23,6 +23,13 @@ export function pwaRouter(): Router {
             prefer_related_applications: false,
             categories: ['games', 'entertainment'],
             iarc_rating_id: 'e56758c4-bc03-4479-931d-07147af2c4d7', // Related to google play. Automatically created when android app went live on google play
+            related_applications: [
+                {
+                    platform: 'play',
+                    id: 'org.playhex.twa',
+                    url: 'https://play.google.com/store/apps/details?id=org.playhex.twa',
+                },
+            ],
             dir: 'auto',
             launch_handler: {
                 client_mode: ['navigate-existing', 'auto'],
