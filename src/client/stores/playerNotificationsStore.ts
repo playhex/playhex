@@ -24,27 +24,17 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
         return groupPlayerNotificationByGame(playerNotifications.value);
     });
 
-    const reloadPlayerNotifications = async (): Promise<PlayerNotification[]> => {
-        const promise = apiGetPlayerNotifications();
-
-        void promise.then(notifications => playerNotifications.value = notifications);
-
-        return await promise;
-    };
-
-    if (loggedInPlayer.value !== null) {
-        void reloadPlayerNotifications();
-    }
-
     // Update player notifications when logged in player change
-    watch(loggedInPlayer, player => {
+    watch(loggedInPlayer, async player => {
         playerNotifications.value = null;
 
         if (player === null) {
             return;
         }
 
-        void reloadPlayerNotifications();
+        playerNotifications.value = await apiGetPlayerNotifications();
+    }, {
+        immediate: true,
     });
 
     socket.on('playerNotification', playerNotification => {

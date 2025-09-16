@@ -809,11 +809,15 @@ export const apiPutTournamentAdmins = async (tournamentSlug: string, players: Pl
 };
 
 export const apiGetPlayerNotifications = async (): Promise<PlayerNotification[]> => {
-    const response = await fetch('/api/player-notifications');
+    const response = await fetch('/api/player-notifications', {
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
 
     if (!response.ok) {
         if (response.status >= 500) {
-            throw new Error('Server error');
+            throw new Error('Server error from apiGetPlayerNotifications');
         }
 
         return [];
