@@ -21,19 +21,9 @@ export default class ServerInfoController
     @Get('/api/contributors')
     async getContributors(): Promise<PlayHexContributors>
     {
-        const contributors: PlayHexContributors = {
-            github: [],
-            weblate: {},
+        return {
+            github: await fetchGithubContributors(),
+            weblate: fetchWeblateContributors(),
         };
-
-        const results = await Promise.all([
-            fetchGithubContributors().catch(() => []),
-            fetchWeblateContributors(),
-        ]);
-
-        contributors.github = results[0];
-        contributors.weblate = results[1];
-
-        return contributors;
     }
 }

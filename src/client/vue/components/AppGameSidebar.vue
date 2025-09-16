@@ -464,7 +464,7 @@ watchEffect(() => {
         <nav class="nav nav-game-sidebar nav-pills nav-fill">
             <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><IconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
 
-            <a class="nav-link" v-if="shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
+            <a class="nav-link" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
                 <IconSignpostSplit />
                 {{ ' ' }}
                 <span class="d-none d-md-inline">
@@ -607,7 +607,7 @@ watchEffect(() => {
 
                 <!-- Download SGF -->
                 <button
-                    v-if="canUseHexWorldOrDownloadSGF(hostedGameClient.getHostedGame(), loggedInPlayer)"
+                    v-if="loggedInPlayer && canUseHexWorldOrDownloadSGF(hostedGameClient.getHostedGame(), loggedInPlayer)"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"

@@ -645,10 +645,13 @@ export const listenGameUpdates = (
     /**
      * socket listeners to unregister
      */
-    const socketEventListeners: { name: string, listener: CallableFunction }[] = [];
+    const socketEventListeners: {
+        name: Parameters<typeof socket.on>[0];
+        listener: Parameters<typeof socket.on>[1];
+    }[] = [];
 
     // Listen, but also add listener to list of listeners to unregister
-    const on: typeof socket.on = (name, listener) => {
+    const on: typeof socket.on = (name: Parameters<typeof socket.on>[0], listener: Parameters<typeof socket.on>[1]) => {
         socket.on(name, listener);
         socketEventListeners.push({ name, listener });
 
