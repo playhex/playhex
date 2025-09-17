@@ -122,10 +122,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     socket.on('gameStarted', (hostedGame: HostedGame) => {
-        const { gameData, publicId } = hostedGame;
+        const { currentPlayerIndex, publicId } = hostedGame;
         const me = authStore.loggedInPlayer;
 
-        if (me === null || gameData === null) {
+        if (me === null) {
             return;
         }
 
@@ -144,7 +144,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         const myColor = hostedGame.hostedGameToPlayers[0].player.publicId === authStore.loggedInPlayer?.publicId ? 0 : 1;
         myGames.value[publicId].myColor = myColor;
-        myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === authStore.loggedInPlayer?.publicId;
+        myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === authStore.loggedInPlayer?.publicId;
         myGames.value[publicId].hostedGame = hostedGame;
     });
 
@@ -173,7 +173,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         myGames.value = {};
 
         for (const hostedGame of initialGames) {
-            const { publicId: id, gameData } = hostedGame;
+            const { publicId: id, currentPlayerIndex } = hostedGame;
 
             // I'm not in the game
             if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
@@ -188,10 +188,8 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             let isMyTurn = false;
             let myColor: null | PlayerIndex = null;
 
-            if (gameData !== null) {
-                myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
-                isMyTurn = hostedGame.hostedGameToPlayers[gameData.currentPlayerIndex].player.publicId === me.publicId;
-            }
+            myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
+            isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === me.publicId;
 
             myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: hostedGame };
         }

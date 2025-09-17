@@ -204,6 +204,31 @@ So when upgrading dependencies, bundled and CDN versions should match, so we mus
 - with yarn
 - version in `views/partials/cdn.ejs`
 
+## Migrating schema
+
+When doing a schema migration that is also a breaking change in api:
+
+On development:
+
+- Develop on blank database
+- Then, import production database, create migration, check `yarn db:diff`
+- Update Cypress fixtures, see `src/server/commands/migrateCypressFixtures.ts`
+- Check breaking changes are acceptable for client that have not yet updated:
+    - go to next version, `yarn build-server`, `node index.js`
+    - go to current production version, `yarn dev-server`
+    - then test application have no big error
+    - else, add retrocompat temporary fix (like `get gameData() { return { ... }; } set gameData(x) {}` to keep returning legacy property through api)
+
+On release:
+
+- check feature with the migration is merged into master
+- backup database just before migration
+- stop no restart server: update source, rebuild and stop only
+- run `migration.sql`
+- check `yarn db:diff`
+- eventually run `yarn db:sync` if there are only safe migrations (indexes, new columns...)
+- restart server
+
 ## License
 
 This project is under [AGPL-3.0 license](LICENSE).

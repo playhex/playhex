@@ -54,29 +54,25 @@
             "maxTime": 600000
         }
     },
-    "gameData": {
-        "size": 11,
-        "movesHistory": [
-            {
-                "row": 7,
-                "col": 5,
-                "playedAt": "2024-01-25T10:23:08.030Z"
-            },
-            {
-                "row": 2,
-                "col": 0,
-                "playedAt": "2024-01-25T10:23:08.033Z"
-            }
-        ],
-        "allowSwap": true,
-        "currentPlayerIndex": 0,
-        "winner": 1,
-        "outcome": "resign",
-        "startedAt": "2024-01-25T10:22:38.422Z",
-        "lastMoveAt": "2024-01-25T10:23:08.033Z",
-        "endedAt": "2024-01-25T10:25:44.028Z"
-    },
     "chatMessages": [],
     "state": "ended",
-    "createdAt": "2024-01-25T10:22:38.422Z"
+    "createdAt": "2024-01-25T10:22:38.422Z",
+    "movesHistory": [
+        {
+            "row": 7,
+            "col": 5,
+            "playedAt": "2024-01-25T10:23:08.030Z"
+        },
+        {
+            "row": 2,
+            "col": 0,
+            "playedAt": "2024-01-25T10:23:08.033Z"
+        }
+    ],
+    "currentPlayerIndex": 0,
+    "winner": 1,
+    "outcome": "resign",
+    "startedAt": "2024-01-25T10:22:38.422Z",
+    "lastMoveAt": "2024-01-25T10:23:08.033Z",
+    "endedAt": "2024-01-25T10:25:44.028Z"
 }

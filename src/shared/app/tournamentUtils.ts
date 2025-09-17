@@ -258,7 +258,7 @@ export const getTopPlayers = (tournament: Tournament, top = 3): TournamentPartic
 };
 
 export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player => {
-    const winner = tournamentMatch.hostedGame?.gameData?.winner;
+    const winner = tournamentMatch.hostedGame?.winner;
 
     if (winner !== 0 && winner !== 1) {
         throw new Error('getMatchWinnerStrict called but no winner');
@@ -277,7 +277,7 @@ export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player =
 };
 
 export const getMatchLoserStrict = (tournamentMatch: TournamentMatch): Player => {
-    const winner = tournamentMatch.hostedGame?.gameData?.winner;
+    const winner = tournamentMatch.hostedGame?.winner;
 
     if (winner !== 0 && winner !== 1) {
         throw new Error('getMatchLoserStrict called but no winner');

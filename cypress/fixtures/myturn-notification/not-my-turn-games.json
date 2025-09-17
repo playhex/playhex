@@ -53,25 +53,21 @@
                 "maxTime": 600000
             }
         },
-        "gameData": {
-            "size": 11,
-            "movesHistory": [
-                {
-                    "row": 3,
-                    "col": 7,
-                    "playedAt": "2024-01-19T21:38:23.541Z"
-                }
-            ],
-            "allowSwap": true,
-            "currentPlayerIndex": 1,
-            "winner": null,
-            "outcome": null,
-            "startedAt": "2024-01-19T21:38:06.312Z",
-            "lastMoveAt": "2024-01-19T21:38:23.542Z",
-            "endedAt": null
-        },
         "chatMessages": [],
         "state": "playing",
-        "createdAt": "2024-01-19T21:38:06.310Z"
+        "createdAt": "2024-01-19T21:38:06.310Z",
+        "movesHistory": [
+            {
+                "row": 3,
+                "col": 7,
+                "playedAt": "2024-01-19T21:38:23.541Z"
+            }
+        ],
+        "currentPlayerIndex": 1,
+        "winner": null,
+        "outcome": null,
+        "startedAt": "2024-01-19T21:38:06.312Z",
+        "lastMoveAt": "2024-01-19T21:38:23.542Z",
+        "endedAt": null
     }
 ]

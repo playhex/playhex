@@ -597,7 +597,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         this.tournamentEngine.reportWinner(this.tournament, tournamentMatch, winnerIndex);
         tournamentMatch.state = 'done';
-        let endedAt = hostedGame.gameData?.endedAt;
+        let endedAt = hostedGame.endedAt;
 
         if (!endedAt) {
             this.logger.warning('No game endedAt date for an ended tournament match. Assume match just ended now.', {

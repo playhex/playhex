@@ -51,90 +51,87 @@
                 "maxTime": 900000
             }
         },
-        "gameData": {
-            "size": 11,
-            "movesHistory": [
-                {
-                    "row": 3,
-                    "col": 5,
-                    "playedAt": "2023-12-20T21:02:45.548Z"
-                },
-                {
-                    "row": 3,
-                    "col": 7,
-                    "playedAt": "2023-12-20T21:02:45.550Z"
-                },
-                {
-                    "row": 6,
-                    "col": 7,
-                    "playedAt": "2023-12-20T21:02:45.832Z"
-                },
-                {
-                    "row": 3,
-                    "col": 8,
-                    "playedAt": "2023-12-20T21:02:45.833Z"
-                },
-                {
-                    "row": 7,
-                    "col": 4,
-                    "playedAt": "2023-12-20T21:02:46.053Z"
-                },
-                {
-                    "row": 8,
-                    "col": 3,
-                    "playedAt": "2023-12-20T21:02:46.054Z"
-                },
-                {
-                    "row": 5,
-                    "col": 0,
-                    "playedAt": "2023-12-20T21:02:46.251Z"
-                },
-                {
-                    "row": 4,
-                    "col": 1,
-                    "playedAt": "2023-12-20T21:02:46.252Z"
-                },
-                {
-                    "row": 7,
-                    "col": 5,
-                    "playedAt": "2023-12-20T21:02:46.521Z"
-                },
-                {
-                    "row": 4,
-                    "col": 4,
-                    "playedAt": "2023-12-20T21:02:46.522Z"
-                },
-                {
-                    "row": 5,
-                    "col": 6,
-                    "playedAt": "2023-12-20T21:02:46.773Z"
-                },
-                {
-                    "row": 4,
-                    "col": 10,
-                    "playedAt": "2023-12-20T21:02:46.774Z"
-                },
-                {
-                    "row": 6,
-                    "col": 3,
-                    "playedAt": "2023-12-20T21:02:46.997Z"
-                },
-                {
-                    "row": 7,
-                    "col": 1,
-                    "playedAt": "2023-12-20T21:02:46.998Z"
-                }
-            ],
-            "currentPlayerIndex": 0,
-            "winner": null,
-            "outcome": null,
-            "startedAt": "2023-12-20T21:02:44.748Z",
-            "lastMoveAt": "2023-12-20T21:02:46.999Z",
-            "endedAt": null
-        },
         "createdAt": "2023-12-20T21:02:44.748Z",
         "chatMessages": [],
-        "state": "playing"
+        "state": "playing",
+        "movesHistory": [
+            {
+                "row": 3,
+                "col": 5,
+                "playedAt": "2023-12-20T21:02:45.548Z"
+            },
+            {
+                "row": 3,
+                "col": 7,
+                "playedAt": "2023-12-20T21:02:45.550Z"
+            },
+            {
+                "row": 6,
+                "col": 7,
+                "playedAt": "2023-12-20T21:02:45.832Z"
+            },
+            {
+                "row": 3,
+                "col": 8,
+                "playedAt": "2023-12-20T21:02:45.833Z"
+            },
+            {
+                "row": 7,
+                "col": 4,
+                "playedAt": "2023-12-20T21:02:46.053Z"
+            },
+            {
+                "row": 8,
+                "col": 3,
+                "playedAt": "2023-12-20T21:02:46.054Z"
+            },
+            {
+                "row": 5,
+                "col": 0,
+                "playedAt": "2023-12-20T21:02:46.251Z"
+            },
+            {
+                "row": 4,
+                "col": 1,
+                "playedAt": "2023-12-20T21:02:46.252Z"
+            },
+            {
+                "row": 7,
+                "col": 5,
+                "playedAt": "2023-12-20T21:02:46.521Z"
+            },
+            {
+                "row": 4,
+                "col": 4,
+                "playedAt": "2023-12-20T21:02:46.522Z"
+            },
+            {
+                "row": 5,
+                "col": 6,
+                "playedAt": "2023-12-20T21:02:46.773Z"
+            },
+            {
+                "row": 4,
+                "col": 10,
+                "playedAt": "2023-12-20T21:02:46.774Z"
+            },
+            {
+                "row": 6,
+                "col": 3,
+                "playedAt": "2023-12-20T21:02:46.997Z"
+            },
+            {
+                "row": 7,
+                "col": 1,
+                "playedAt": "2023-12-20T21:02:46.998Z"
+            }
+        ],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": "2023-12-20T21:02:44.748Z",
+        "lastMoveAt": "2023-12-20T21:02:46.999Z",
+        "endedAt": null
     },
     {
         "publicId": "969653f0-b874-404f-9b1b-6d3e66b52880",
@@ -179,9 +176,15 @@
                 "maxTime": 900000
             }
         },
-        "gameData": null,
         "chatMessages": [],
         "createdAt": "2023-12-20T21:05:58.591Z",
-        "state": "created"
+        "state": "created",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": null,
+        "lastMoveAt": null,
+        "endedAt": null
     }
 ]

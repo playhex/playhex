@@ -186,8 +186,8 @@ const gameComparator = (a: HostedGame, b: HostedGame): number => {
     if (timeA === 'correspondence' && timeB !== 'correspondence')
         return 1;
 
-    const startedAtA = a.gameData?.startedAt;
-    const startedAtB = b.gameData?.startedAt;
+    const startedAtA = a.startedAt;
+    const startedAtB = b.startedAt;
 
     if (startedAtA != null && startedAtB != null)
         return startedAtB.getTime() - startedAtA.getTime();
@@ -199,14 +199,11 @@ const gameComparator = (a: HostedGame, b: HostedGame): number => {
  * Finished games
  */
 const byEndedAt = (a: HostedGame, b: HostedGame): number => {
-    const gameDataA = a.gameData;
-    const gameDataB = b.gameData;
-
-    if (!gameDataA?.endedAt || !gameDataB?.endedAt) {
+    if (!a?.endedAt || !b?.endedAt) {
         return 0;
     }
 
-    return gameDataB.endedAt.getTime() - gameDataA.endedAt.getTime();
+    return b.endedAt.getTime() - a.endedAt.getTime();
 };
 
 /*
@@ -382,7 +379,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                 <td>{{ hostedGame.boardsize }}</td>
                                 <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGame.gameData?.startedAt ?? 0, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGame.startedAt ?? 0, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>
@@ -420,7 +417,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
 
                                     <span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                                 </td>
-                                <template v-if="hostedGame?.gameData?.winner != null">
+                                <template v-if="hostedGame.winner != null">
                                     <td><AppPseudo rating onlineStatus :player="getStrictWinnerPlayer(hostedGame)" is="strong" /></td>
                                     <td><AppPseudo rating onlineStatus :player="getStrictLoserPlayer(hostedGame)" classes="text-body-secondary" /></td>
                                 </template>
@@ -431,7 +428,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                                 <td>{{ hostedGame.boardsize }}</td>
                                 <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
                                 <td>{{
-                                    formatDistanceToNowStrict(hostedGame.gameData?.endedAt ?? 0, { addSuffix: true })
+                                    formatDistanceToNowStrict(hostedGame.endedAt ?? 0, { addSuffix: true })
                                 }}</td>
                             </tr>
                         </tbody>

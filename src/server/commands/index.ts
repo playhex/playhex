@@ -10,5 +10,6 @@ import './checkDbInconsistencies.js';
 import './calculateRatings.js';
 import './exportGamesCommand.js';
 import './checkTestsRequirements.js';
+import './migrateCypressFixtures.js';
 
 hexProgram.parse();

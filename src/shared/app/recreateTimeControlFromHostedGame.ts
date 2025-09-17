@@ -16,14 +16,9 @@ import { HostedGame } from './models/index.js';
  * @param now "Now" date to use to check if last move is not elapsing
  */
 export const recreateTimeControlAfterUndo = (hostedGame: HostedGame, ignoreLastMoves: number, now: Date): null | AbstractTimeControl => {
-    const { gameData, timeControlType } = hostedGame;
-
-    if (!gameData) {
-        throw new Error('Cannot recreate time control, no gameData on hostedGame');
-    }
+    const { timeControlType, movesHistory } = hostedGame;
 
     try {
-        const { movesHistory } = gameData;
         const timeControl = createTimeControl(timeControlType);
         const totalMovesCount = movesHistory.length - ignoreLastMoves;
 

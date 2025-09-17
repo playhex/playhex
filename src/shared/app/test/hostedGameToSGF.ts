@@ -6,44 +6,40 @@ import { hostedGameToSGF } from '../hostedGameToSGF.js';
 describe('hostedGameToSGF', () => {
     it('generates SGF from an HostedGame instance', () => {
         const hostedGame: HostedGame = plainToInstance(HostedGame, {
-            gameData: {
-                movesHistory: [
-                    {
-                        row: 1,
-                        col: 0,
-                        playedAt: '2024-08-27T20:00:00.000Z',
-                    },
-                    {
-                        row: -1,
-                        col: -1,
-                        specialMoveType: 'swap-pieces',
-                        playedAt: '2024-08-27T20:00:10.000Z',
-                    },
-                    {
-                        row: 4,
-                        col: 10,
-                        playedAt: '2024-08-27T20:00:20.000Z',
-                    },
-                    {
-                        row: 5,
-                        col: 5,
-                        playedAt: '2024-08-27T20:00:30.000Z',
-                    },
-                    {
-                        row: 2,
-                        col: 4,
-                        playedAt: '2024-08-27T20:00:50.000Z',
-                    },
-                ],
-                winner: 0,
-                outcome: 'resign',
-                startedAt: '2024-08-27T20:00:00.000Z',
-                lastMoveAt: '2024-08-27T20:00:50.000Z',
-                endedAt: '2024-08-27T20:01:00.000Z',
-                size: 11,
-                allowSwap: true,
-                currentPlayerIndex: 1,
-            },
+            movesHistory: [
+                {
+                    row: 1,
+                    col: 0,
+                    playedAt: '2024-08-27T20:00:00.000Z',
+                },
+                {
+                    row: -1,
+                    col: -1,
+                    specialMoveType: 'swap-pieces',
+                    playedAt: '2024-08-27T20:00:10.000Z',
+                },
+                {
+                    row: 4,
+                    col: 10,
+                    playedAt: '2024-08-27T20:00:20.000Z',
+                },
+                {
+                    row: 5,
+                    col: 5,
+                    playedAt: '2024-08-27T20:00:30.000Z',
+                },
+                {
+                    row: 2,
+                    col: 4,
+                    playedAt: '2024-08-27T20:00:50.000Z',
+                },
+            ],
+            winner: 0,
+            outcome: 'resign',
+            startedAt: '2024-08-27T20:00:00.000Z',
+            lastMoveAt: '2024-08-27T20:00:50.000Z',
+            endedAt: '2024-08-27T20:01:00.000Z',
+            currentPlayerIndex: 1,
             undoRequest: null,
             rematch: null,
             rematchedFrom: null,
@@ -194,73 +190,69 @@ describe('hostedGameToSGF', () => {
                 ],
             },
             chatMessages: [],
-            gameData: {
-                size: 11,
-                movesHistory: [
-                    {
-                        row: 1,
-                        col: 9,
-                        playedAt: '2025-08-21T09:53:30.525Z',
-                    },
-                    {
-                        row: 6,
-                        col: 7,
-                        playedAt: '2025-08-21T09:53:35.024Z',
-                    },
-                    {
-                        row: 7,
-                        col: 5,
-                        playedAt: '2025-08-21T09:53:38.029Z',
-                    },
-                    {
-                        row: 3,
-                        col: 4,
-                        playedAt: '2025-08-21T09:53:42.418Z',
-                    },
-                    {
-                        row: 5,
-                        col: 6,
-                        playedAt: '2025-08-21T09:53:45.433Z',
-                    },
-                    {
-                        row: 6,
-                        col: 3,
-                        playedAt: '2025-08-21T09:53:54.479Z',
-                    },
-                    {
-                        row: 4,
-                        col: 6,
-                        playedAt: '2025-08-21T09:53:57.488Z',
-                    },
-                    {
-                        row: 2,
-                        col: 8,
-                        playedAt: '2025-08-21T09:54:00.897Z',
-                    },
-                    {
-                        row: 2,
-                        col: 7,
-                        playedAt: '2025-08-21T09:54:03.904Z',
-                    },
-                    {
-                        row: 3,
-                        col: 8,
-                        playedAt: '2025-08-21T09:54:08.401Z',
-                    },
-                    {
-                        row: 9,
-                        col: 4,
-                        playedAt: '2025-08-21T09:54:11.407Z',
-                    },
-                ],
-                allowSwap: true,
-                currentPlayerIndex: 1,
-                winner: 0,
-                outcome: 'resign',
-                startedAt: '2025-08-21T09:53:27.513Z',
-                lastMoveAt: '2025-08-21T09:54:11.407Z',
-                endedAt: '2025-08-21T09:54:14.639Z',
-            },
+            movesHistory: [
+                {
+                    row: 1,
+                    col: 9,
+                    playedAt: '2025-08-21T09:53:30.525Z',
+                },
+                {
+                    row: 6,
+                    col: 7,
+                    playedAt: '2025-08-21T09:53:35.024Z',
+                },
+                {
+                    row: 7,
+                    col: 5,
+                    playedAt: '2025-08-21T09:53:38.029Z',
+                },
+                {
+                    row: 3,
+                    col: 4,
+                    playedAt: '2025-08-21T09:53:42.418Z',
+                },
+                {
+                    row: 5,
+                    col: 6,
+                    playedAt: '2025-08-21T09:53:45.433Z',
+                },
+                {
+                    row: 6,
+                    col: 3,
+                    playedAt: '2025-08-21T09:53:54.479Z',
+                },
+                {
+                    row: 4,
+                    col: 6,
+                    playedAt: '2025-08-21T09:53:57.488Z',
+                },
+                {
+                    row: 2,
+                    col: 8,
+                    playedAt: '2025-08-21T09:54:00.897Z',
+                },
+                {
+                    row: 2,
+                    col: 7,
+                    playedAt: '2025-08-21T09:54:03.904Z',
+                },
+                {
+                    row: 3,
+                    col: 8,
+                    playedAt: '2025-08-21T09:54:08.401Z',
+                },
+                {
+                    row: 9,
+                    col: 4,
+                    playedAt: '2025-08-21T09:54:11.407Z',
+                },
+            ],
+            currentPlayerIndex: 1,
+            winner: 0,
+            outcome: 'resign',
+            startedAt: '2025-08-21T09:53:27.513Z',
+            lastMoveAt: '2025-08-21T09:54:11.407Z',
+            endedAt: '2025-08-21T09:54:14.639Z',
             tournamentMatch: null,
             undoRequest: null,
             rematch: null,
@@ -321,7 +313,6 @@ describe('hostedGameToSGF', () => {
                         periodsCount: 3,
                     },
                 },
-                gameData: null,
                 tournamentMatch: null,
                 undoRequest: null,
                 rematch: null,

@@ -2,7 +2,6 @@ import { Get, HttpError, JsonController, OnUndefined, Param, Put } from 'routing
 import { Service } from 'typedi';
 import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister.js';
 import HexAiApiClient from '../../../services/HexAiApiClient.js';
-import GamePersister from '../../../persistance/GamePersister.js';
 import GameAnalyze, { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
 import { HexServer } from '../../../server.js';
 import Rooms from '../../../../shared/app/Rooms.js';
@@ -10,6 +9,7 @@ import logger from '../../../services/logger.js';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 import ChatMessage from '../../../../shared/app/models/ChatMessage.js';
 import { errorToLogger } from '../../../../shared/app/utils.js';
+import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
 
 @JsonController()
 @Service()
@@ -17,7 +17,7 @@ export default class GameAnalyzeController
 {
     constructor(
         private gameAnalyzePersister: GameAnalyzePersister,
-        private gamePersister: GamePersister,
+        private hostedGamePersister: HostedGamePersister,
         private hexAiApiClient: HexAiApiClient,
         private hostedGameRepository: HostedGameRepository,
         private io: HexServer,
@@ -47,7 +47,7 @@ export default class GameAnalyzeController
             return gameAnalyze;
         }
 
-        const analyzeGameRequest = await this.gamePersister.getAnalyzeGameRequest(publicId);
+        const analyzeGameRequest = await this.hostedGamePersister.getAnalyzeGameRequest(publicId);
 
         if (analyzeGameRequest === null) {
             throw new HttpError(404, 'Game not found or not finished');

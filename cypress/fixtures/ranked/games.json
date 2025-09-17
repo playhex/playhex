@@ -65,9 +65,15 @@
             ]
         },
         "chatMessages": [],
-        "gameData": null,
         "rematch": null,
-        "createdAt": "2024-06-11T19:58:00.087Z"
+        "createdAt": "2024-06-11T19:58:00.087Z",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": null,
+        "lastMoveAt": null,
+        "endedAt": null
     },
     {
         "publicId": "d67d5947-f74c-47fb-ab1f-87ba318c9899",
@@ -153,24 +159,20 @@
             ]
         },
         "chatMessages": [],
-        "gameData": {
-            "size": 11,
-            "movesHistory": [
-                {
-                    "row": 2,
-                    "col": 6,
-                    "playedAt": "2024-06-11T19:58:57.145Z"
-                }
-            ],
-            "allowSwap": true,
-            "currentPlayerIndex": 1,
-            "winner": null,
-            "outcome": null,
-            "startedAt": "2024-06-11T19:58:57.104Z",
-            "lastMoveAt": "2024-06-11T19:58:57.145Z",
-            "endedAt": null
-        },
         "rematch": null,
-        "createdAt": "2024-06-11T19:58:57.096Z"
+        "createdAt": "2024-06-11T19:58:57.096Z",
+        "movesHistory": [
+            {
+                "row": 2,
+                "col": 6,
+                "playedAt": "2024-06-11T19:58:57.145Z"
+            }
+        ],
+        "currentPlayerIndex": 1,
+        "winner": null,
+        "outcome": null,
+        "startedAt": "2024-06-11T19:58:57.104Z",
+        "lastMoveAt": "2024-06-11T19:58:57.145Z",
+        "endedAt": null
     }
 ]

@@ -1,18 +1,18 @@
 import assert from 'assert';
-import { ChatMessage, Game, HostedGame, Player } from '../models/index.js';
+import { ChatMessage, Player } from '../models/index.js';
 import { RichChat } from '../rich-chat.js';
+import { createHostedGame } from '../models/HostedGame.js';
 
 describe('Rich Chat', () => {
     it('yield date headers', () => {
-        const hostedGame = new HostedGame();
+        const hostedGame = createHostedGame();
         const red = new Player();
         const blue = new Player();
 
         red.pseudo = 'red';
         blue.pseudo = 'blue';
 
-        const game = new Game();
-        game.startedAt = new Date('2024-08-24T12:00:00Z');
+        hostedGame.startedAt = new Date('2024-08-24T12:00:00Z');
 
         const message0 = new ChatMessage();
         message0.content = 'Hi';
@@ -29,7 +29,6 @@ describe('Rich Chat', () => {
         message2.createdAt = new Date('2024-08-25T10:00:00Z');
         message2.player = blue;
 
-        hostedGame.gameData = game;
         hostedGame.chatMessages = [
             message0,
             message1,
@@ -50,16 +49,15 @@ describe('Rich Chat', () => {
     });
 
     it('yield move number headers', () => {
-        const hostedGame = new HostedGame();
+        const hostedGame = createHostedGame();
         const red = new Player();
         const blue = new Player();
 
         red.pseudo = 'red';
         blue.pseudo = 'blue';
 
-        const game = new Game();
-        game.startedAt = new Date('2024-08-24T12:00:00Z');
-        game.movesHistory = [
+        hostedGame.startedAt = new Date('2024-08-24T12:00:00Z');
+        hostedGame.movesHistory = [
             { row: 0, col: 0, playedAt: new Date('2024-08-24T12:01:00Z') },
             { row: 0, col: 1, playedAt: new Date('2024-08-24T12:01:01Z') },
             { row: 0, col: 2, playedAt: new Date('2024-08-24T12:01:02Z') },
@@ -85,7 +83,6 @@ describe('Rich Chat', () => {
         message2.createdAt = new Date('2024-08-24T12:05:01Z');
         message2.player = blue;
 
-        hostedGame.gameData = game;
         hostedGame.chatMessages = [
             message0,
             message1,

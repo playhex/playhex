@@ -6,7 +6,8 @@
         "isGuest": false,
         "isBot": false,
         "slug": "aa",
-        "createdAt": "2024-01-24T16:33:29.586Z"
+        "createdAt": "2024-01-24T16:33:29.586Z",
+        "currentRating": null
     },
     "hostedGameToPlayers": [
         {
@@ -16,12 +17,13 @@
                 "isGuest": false,
                 "isBot": false,
                 "slug": "aa",
-                "createdAt": "2024-01-24T16:33:29.586Z"
+                "createdAt": "2024-01-24T16:33:29.586Z",
+                "currentRating": null
             }
         }
     ],
     "timeControl": {
-        "state": "over",
+        "state": "ready",
         "currentPlayer": 0,
         "players": [
             {
@@ -44,8 +46,20 @@
             "maxTime": 600000
         }
     },
-    "gameData": null,
     "chatMessages": [],
     "state": "canceled",
-    "createdAt": "2024-01-24T20:20:48.826Z"
+    "createdAt": "2024-01-24T20:20:48.826Z",
+    "movesHistory": [],
+    "currentPlayerIndex": 0,
+    "winner": null,
+    "outcome": null,
+    "tournamentMatch": null,
+    "undoRequest": null,
+    "rematch": null,
+    "rematchedFrom": null,
+    "startedAt": null,
+    "lastMoveAt": null,
+    "opponentPublicId": null,
+    "ranked": true,
+    "endedAt": "2025-09-17T17:16:11.943Z"
 }

@@ -6,10 +6,9 @@ import type { HostedGameState } from '../Types.js';
 import HostedGameOptions, { cloneGameOptions } from './HostedGameOptions.js';
 import type { GameTimeData } from '../../time-control/TimeControl.js';
 import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
-import Game from './Game.js';
 import ChatMessage from './ChatMessage.js';
 import HostedGameToPlayer from './HostedGameToPlayer.js';
-import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
@@ -17,10 +16,16 @@ import type TimeControlType from '../../time-control/TimeControlType.js';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
+import Move from './Move.js';
+import { type Outcome } from '../../game-engine/Types.js';
 
 @Entity()
 @Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
 @Index(keysOf<HostedGame>()('state', 'boardsize')) // For stats on boardsizes
+@Index(keysOf<HostedGame>()('state', 'endedAt')) // For archive page
+@Index('state_endedAt_desc', keysOf<HostedGame>()('state', 'endedAt')) // For archive page (set index order manually: endedAt desc)
+@Index(keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt')) // For archive page
+@Index('state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt')) // For archive page (set order index manually: endedAt desc)
 export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
 {
     @PrimaryGeneratedColumn()
@@ -114,13 +119,22 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Type(() => ChatMessage)
     chatMessages: ChatMessage[];
 
-    /**
-     * gameData is null on server when game is not yet started.
-     */
-    @OneToOne(() => Game, game => game.hostedGame, { cascade: true })
+    @Column({ type: 'json', transformer: { from: (value: unknown) => deserializeMovesHistory(value), to: value => value } })
     @Expose()
-    @Type(() => Game)
-    gameData: null | Game = null;
+    @Type(() => Move)
+    movesHistory: Move[];
+
+    @Column({ type: 'smallint', default: 0 })
+    @Expose()
+    currentPlayerIndex: 0 | 1;
+
+    @Column({ type: 'smallint', nullable: true })
+    @Expose()
+    winner: null | 0 | 1 = null;
+
+    @Column({ type: String, length: 15, nullable: true })
+    @Expose()
+    outcome: Outcome;
 
     /**
      * When this game is played in a tournament, else null.
@@ -159,7 +173,22 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
     @Type(() => Date)
-    createdAt: Date = new Date();
+    createdAt: Date;
+
+    @Column({ type: Date, precision: 3, nullable: true })
+    @Expose()
+    @Type(() => Date)
+    startedAt: null | Date;
+
+    @Column({ type: Date, precision: 3, nullable: true })
+    @Expose()
+    @Type(() => Date)
+    lastMoveAt: null | Date;
+
+    @Column({ type: Date, precision: 3, nullable: true })
+    @Expose()
+    @Type(() => Date)
+    endedAt: null | Date;
 
     /**
      * Which new ratings have been issued from this game.
@@ -183,6 +212,28 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      */
     @Column({ type: 'text', nullable: true })
     adminComments: null | string;
+
+    // TODO remove this method later: temporary retrocompat (Game entity merged into HostedGame)
+    @Expose()
+    get gameData()
+    {
+        return {
+            size: this.boardsize,
+            movesHistory: this.movesHistory ?? [],
+            allowSwap: this.swapRule,
+            currentPlayerIndex: this.currentPlayerIndex,
+            winner: this.winner,
+            outcome: this.outcome,
+            startedAt: this.startedAt,
+            lastMoveAt: this.lastMoveAt,
+            endedAt: this.endedAt,
+        };
+    }
+
+    // TODO remove this method later: temporary retrocompat (Game entity merged into HostedGame)
+    set gameData(ignore: unknown)
+    {
+    }
 
     @AfterLoad()
     sortPlayersPosition()
@@ -220,9 +271,17 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
     hostedGame.timeControl = null;
     hostedGame.host = params.host ?? null;
     hostedGame.chatMessages = [];
+    hostedGame.movesHistory = [];
+    hostedGame.currentPlayerIndex = 0;
+    hostedGame.winner = null;
+    hostedGame.outcome = null;
     hostedGame.hostedGameToPlayers = [];
     hostedGame.rematchedFrom = params.rematchedFrom ?? null;
     hostedGame.tournamentMatch = params.tournamentMatch ?? null;
+    hostedGame.createdAt = new Date();
+    hostedGame.startedAt = null;
+    hostedGame.lastMoveAt = null;
+    hostedGame.endedAt = null;
 
     if (params.host) {
         const hostedGameToPlayer = new HostedGameToPlayer();
@@ -253,4 +312,16 @@ const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): nul
     });
 
     return timeControlValue;
+};
+
+const deserializeMovesHistory = (value: unknown): Move[] => {
+    if (!value) {
+        return [];
+    }
+
+    if (!(value instanceof Array)) {
+        throw new Error('Expected an array here');
+    }
+
+    return value.map(v => plainToInstance(Move, v));
 };

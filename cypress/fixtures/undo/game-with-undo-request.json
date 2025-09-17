@@ -60,34 +60,30 @@
         ]
     },
     "chatMessages": [],
-    "gameData": {
-        "size": 11,
-        "movesHistory": [
-            {
-                "row": 4,
-                "col": 6,
-                "playedAt": "2024-07-17T17:07:39.439Z"
-            },
-            {
-                "row": 5,
-                "col": 7,
-                "playedAt": "2024-07-17T17:07:47.708Z"
-            },
-            {
-                "row": 5,
-                "col": 4,
-                "playedAt": "2024-07-17T17:07:49.359Z"
-            }
-        ],
-        "allowSwap": true,
-        "currentPlayerIndex": 1,
-        "winner": null,
-        "outcome": null,
-        "startedAt": "2024-07-17T17:07:26.279Z",
-        "lastMoveAt": "2024-07-17T17:07:49.359Z",
-        "endedAt": null
-    },
     "undoRequest": 0,
     "rematch": null,
-    "createdAt": "2024-07-17T17:07:23.418Z"
+    "createdAt": "2024-07-17T17:07:23.418Z",
+    "movesHistory": [
+        {
+            "row": 4,
+            "col": 6,
+            "playedAt": "2024-07-17T17:07:39.439Z"
+        },
+        {
+            "row": 5,
+            "col": 7,
+            "playedAt": "2024-07-17T17:07:47.708Z"
+        },
+        {
+            "row": 5,
+            "col": 4,
+            "playedAt": "2024-07-17T17:07:49.359Z"
+        }
+    ],
+    "currentPlayerIndex": 1,
+    "winner": null,
+    "outcome": null,
+    "startedAt": "2024-07-17T17:07:26.279Z",
+    "lastMoveAt": "2024-07-17T17:07:49.359Z",
+    "endedAt": null
 }

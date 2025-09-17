@@ -44,8 +44,14 @@
             "maxTime": 600000
         }
     },
-    "gameData": null,
     "chatMessages": [],
     "state": "created",
-    "createdAt": "2024-01-25T10:38:24.523Z"
+    "createdAt": "2024-01-25T10:38:24.523Z",
+    "movesHistory": [],
+    "currentPlayerIndex": 0,
+    "winner": null,
+    "outcome": null,
+    "startedAt": null,
+    "lastMoveAt": null,
+    "endedAt": null
 }

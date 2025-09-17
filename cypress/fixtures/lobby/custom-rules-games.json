@@ -45,10 +45,16 @@
                 "maxTime": 600000
             }
         },
-        "gameData": null,
         "chatMessages": [],
         "state": "created",
-        "createdAt": "2024-02-20T20:06:21.075Z"
+        "createdAt": "2024-02-20T20:06:21.075Z",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": null,
+        "lastMoveAt": null,
+        "endedAt": null
     },
     {
         "publicId": "02a9d462-afe2-46d9-9ab4-723f86b5b8be",
@@ -96,10 +102,16 @@
                 "maxTime": 600000
             }
         },
-        "gameData": null,
         "chatMessages": [],
         "state": "created",
-        "createdAt": "2024-02-20T20:06:28.192Z"
+        "createdAt": "2024-02-20T20:06:28.192Z",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": null,
+        "lastMoveAt": null,
+        "endedAt": null
     },
     {
         "publicId": "6cbc0c65-d20d-40d8-bcb0-8d93f8b08f05",
@@ -147,10 +159,16 @@
                 "maxTime": 600000
             }
         },
-        "gameData": null,
         "chatMessages": [],
         "state": "created",
-        "createdAt": "2024-02-20T20:06:33.517Z"
+        "createdAt": "2024-02-20T20:06:33.517Z",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": null,
+        "lastMoveAt": null,
+        "endedAt": null
     },
     {
         "publicId": "56c8982b-3979-4368-b4f8-80f2e2771d34",
@@ -198,9 +216,15 @@
                 "maxTime": 600000
             }
         },
-        "gameData": null,
         "chatMessages": [],
         "state": "created",
-        "createdAt": "2024-02-20T20:06:41.429Z"
+        "createdAt": "2024-02-20T20:06:41.429Z",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": null,
+        "outcome": null,
+        "startedAt": null,
+        "lastMoveAt": null,
+        "endedAt": null
     }
 ]

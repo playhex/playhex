@@ -54,79 +54,75 @@
             "maxTime": 600000
         }
     },
-    "gameData": {
-        "size": 11,
-        "movesHistory": [
-            {
-                "row": 2,
-                "col": 7,
-                "playedAt": "2024-01-24T21:03:52.289Z"
-            },
-            {
-                "row": 2,
-                "col": 3,
-                "playedAt": "2024-01-24T21:03:52.289Z"
-            },
-            {
-                "row": 4,
-                "col": 6,
-                "playedAt": "2024-01-24T21:03:53.821Z"
-            },
-            {
-                "row": 4,
-                "col": 10,
-                "playedAt": "2024-01-24T21:03:53.822Z"
-            },
-            {
-                "row": 7,
-                "col": 2,
-                "playedAt": "2024-01-24T21:03:55.026Z"
-            },
-            {
-                "row": 5,
-                "col": 10,
-                "playedAt": "2024-01-24T21:03:55.027Z"
-            },
-            {
-                "row": 8,
-                "col": 8,
-                "playedAt": "2024-01-24T21:03:55.877Z"
-            },
-            {
-                "row": 3,
-                "col": 2,
-                "playedAt": "2024-01-24T21:03:55.879Z"
-            },
-            {
-                "row": 7,
-                "col": 5,
-                "playedAt": "2024-01-24T21:03:57.254Z"
-            },
-            {
-                "row": 9,
-                "col": 0,
-                "playedAt": "2024-01-24T21:03:57.254Z"
-            },
-            {
-                "row": 8,
-                "col": 4,
-                "playedAt": "2024-01-24T21:03:58.611Z"
-            },
-            {
-                "row": 4,
-                "col": 4,
-                "playedAt": "2024-01-24T21:03:58.611Z"
-            }
-        ],
-        "allowSwap": true,
-        "currentPlayerIndex": 0,
-        "winner": null,
-        "outcome": null,
-        "startedAt": "2024-01-24T21:03:42.980Z",
-        "lastMoveAt": "2024-01-24T21:03:58.612Z",
-        "endedAt": null
-    },
     "chatMessages": [],
     "state": "playing",
-    "createdAt": "2024-01-24T21:03:42.979Z"
+    "createdAt": "2024-01-24T21:03:42.979Z",
+    "movesHistory": [
+        {
+            "row": 2,
+            "col": 7,
+            "playedAt": "2024-01-24T21:03:52.289Z"
+        },
+        {
+            "row": 2,
+            "col": 3,
+            "playedAt": "2024-01-24T21:03:52.289Z"
+        },
+        {
+            "row": 4,
+            "col": 6,
+            "playedAt": "2024-01-24T21:03:53.821Z"
+        },
+        {
+            "row": 4,
+            "col": 10,
+            "playedAt": "2024-01-24T21:03:53.822Z"
+        },
+        {
+            "row": 7,
+            "col": 2,
+            "playedAt": "2024-01-24T21:03:55.026Z"
+        },
+        {
+            "row": 5,
+            "col": 10,
+            "playedAt": "2024-01-24T21:03:55.027Z"
+        },
+        {
+            "row": 8,
+            "col": 8,
+            "playedAt": "2024-01-24T21:03:55.877Z"
+        },
+        {
+            "row": 3,
+            "col": 2,
+            "playedAt": "2024-01-24T21:03:55.879Z"
+        },
+        {
+            "row": 7,
+            "col": 5,
+            "playedAt": "2024-01-24T21:03:57.254Z"
+        },
+        {
+            "row": 9,
+            "col": 0,
+            "playedAt": "2024-01-24T21:03:57.254Z"
+        },
+        {
+            "row": 8,
+            "col": 4,
+            "playedAt": "2024-01-24T21:03:58.611Z"
+        },
+        {
+            "row": 4,
+            "col": 4,
+            "playedAt": "2024-01-24T21:03:58.611Z"
+        }
+    ],
+    "currentPlayerIndex": 0,
+    "winner": null,
+    "outcome": null,
+    "startedAt": "2024-01-24T21:03:42.980Z",
+    "lastMoveAt": "2024-01-24T21:03:58.612Z",
+    "endedAt": null
 }
