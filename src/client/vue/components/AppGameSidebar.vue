@@ -915,10 +915,10 @@ watchEffect(() => {
 
                 <form class="chat-input" v-if="loggedInPlayer && canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGame()) === true">
                     <div class="input-group">
-                        <input v-model="chatInput" ref="chatInputElement" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="250" />
+                        <input v-model="chatInput" ref="chatInputElement" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="1000" />
                         <button class="btn btn-success" type="submit" @click="(e: PointerEvent) => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
                     </div>
-                    <div class="form-text text-warning" v-if="chatInput.length > 200">{{ chatInput.length }} / {{ $t('n_characters', { count: 250 }) }}</div>
+                    <div class="form-text text-warning" v-if="chatInput.length > 980">{{ chatInput.length }} / {{ $t('n_characters', { count: 1000 }) }}</div>
                 </form>
             </template>
         </div>

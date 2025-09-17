@@ -32,8 +32,8 @@ export default class ChatMessage
     player: null | Player;
 
     @IsString({ groups: ['playerInput', 'post'] })
-    @Length(1, 255, { groups: ['playerInput', 'post'] })
-    @Column()
+    @Length(1, 1000, { groups: ['playerInput', 'post'] })
+    @Column({ length: 1000 })
     @Expose()
     content: string;
 
