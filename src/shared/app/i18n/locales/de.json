@@ -274,8 +274,7 @@
         "canceled": "Abgebrochen",
         "created": "Erstellt",
         "ended": "Beendet",
-        "playing": "Spiel im Gang",
-        "forfeited": "Forfaitiert"
+        "playing": "Spiel im Gang"
     },
     "force_board_orientation_mode": "Anzeigen des Spielbretts im Querformat oder Hochformat für diesen Bildschirm erzwingen",
     "move_number": "Zug {{n}}",
