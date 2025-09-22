@@ -53,7 +53,9 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
                 }
             }
 
-            unordereds.push({ game, moves });
+            if (moves.length > 0) {
+                unordereds.push({ game, moves });
+            }
         }
 
         return unordereds.map(unordered => {

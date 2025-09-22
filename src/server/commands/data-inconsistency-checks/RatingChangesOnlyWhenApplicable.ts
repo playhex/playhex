@@ -41,10 +41,9 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
 
         const missingRating: Result[] = await this.hostedGameRepository.query(`
             select hg.publicId as hostedGame_publicId, hg.createdAt as hostedGame_createdAt
-            from hosted_game_options hgo
-            inner join hosted_game hg on hg.id = hgo.hostedgameid
-            left join rating_games_hosted_game r on hgo.hostedgameid = r.hostedgameid
-            where ranked
+            from hosted_game hg
+            left join rating_games_hosted_game r on hg.id = r.hostedgameid
+            where hg.ranked
             and r.hostedgameid is null
             and hg.state in ('ended', 'forfeited')
         `);
