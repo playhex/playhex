@@ -13,7 +13,7 @@ import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import Move from '../../../shared/game-engine/Move.js';
-import { canPlayerChatInGame, makesCoordsInteractive } from '../../../shared/app/chatUtils.js';
+import { canPlayerChatInGame, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
@@ -309,49 +309,13 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
     }, 30000);
 };
 
-// Add absolute coordinates along side relative coordinates when the relative coordinates
-// are sourrounded in brackets []
-const relCoordsTranslate = (str: string): string => {
-    const size = hostedGameClient.value.getGame().getBoard().getSize();
-
-    return str.replace(/\[(\d+'?)([-,]?)(\d+'?)]/g, (input, row: string, sep: string, col: string) => {
-        const rowNumber = row.endsWith("'")
-            ? parseInt(row)
-            : size - parseInt(row) + 1;
-
-        if (!Number.isInteger(rowNumber) || rowNumber < 1 || rowNumber > size)
-            return input;
-
-        const colNumber = col.endsWith("'")
-            ? size - parseInt(col) + 1
-            : parseInt(col);
-
-        if (!Number.isInteger(colNumber) || colNumber < 1 || colNumber > size)
-            return input;
-
-        const colLetter = Move.colToLetter(colNumber - 1);
-
-        return `${row}${sep || ''}${col}(${colLetter}${rowNumber})`;
-    });
-};
-
 const renderMessage = (str: string): string => {
-    str = str.replace(/[<>&]/g, matched => {
-        switch (matched) {
-            case '<': return '&lt;';
-            case '>': return '&gt;';
-            case '&': return '&amp;';
-            default: return '';
-        }
-    });
-    str = str.replace(/https?:\/\/[\S]+[^\s?.,]/g, link => {
-        const escapedLink = link.replace(/"/g, '&quot;');
-        return `<a target="_blank" href="${escapedLink}">${link}</a>`;
-    });
-    if (str.includes('['))
-        str = relCoordsTranslate(str);
+    const { boardsize } = hostedGameClient.value.getHostedGame();
 
-    str = makesCoordsInteractive(str);
+    str = sanitizeMessage(str);
+    str = makeLinksClickable(str);
+    str = relCoordsTranslate(str, boardsize);
+    str = makesCoordsInteractive(str, boardsize);
 
     return str;
 };

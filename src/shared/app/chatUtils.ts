@@ -1,3 +1,4 @@
+import Move from '../game-engine/Move.js';
 import { HostedGame, Player, ChatMessage } from './models/index.js';
 
 export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
@@ -40,22 +41,89 @@ export const checkShadowDeleted = (chatMessage: ChatMessage, shouldShowToPlayer:
     return chatMessage.player.publicId === shouldShowToPlayer.publicId;
 };
 
+export const sanitizeMessage = (str: string): string => {
+    return str.replace(/[<>&]/g, matched => {
+        switch (matched) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            default: return '';
+        }
+    });
+};
+
+export const makeLinksClickable = (str: string): string => {
+    return str.replace(/https?:\/\/[\S]+[^\s?.,]/g, link => {
+        const escapedLink = link.replace(/"/g, '&quot;');
+        return `<a target="_blank" href="${escapedLink}">${link}</a>`;
+    });
+};
+
+/**
+ * Add absolute coordinates along side relative coordinates when the relative coordinates
+ * are sourrounded in brackets []
+ *
+ * Example:
+ *      - "you should play [4'4]"
+ *  =>  - "you should play 4'4(d4)"
+ */
+export const relCoordsTranslate = (str: string, boardsize: number): string => {
+    if (!str.includes('[')) {
+        return str;
+    }
+
+    return str.replace(/\[(\d+'?)([-,]?)(\d+'?)]/g, (input, row: string, sep: string, col: string) => {
+        const rowNumber = row.endsWith("'")
+            ? parseInt(row)
+            : boardsize - parseInt(row) + 1;
+
+        if (!Number.isInteger(rowNumber) || rowNumber < 1 || rowNumber > boardsize)
+            return input;
+
+        const colNumber = col.endsWith("'")
+            ? boardsize - parseInt(col) + 1
+            : parseInt(col);
+
+        if (!Number.isInteger(colNumber) || colNumber < 1 || colNumber > boardsize)
+            return input;
+
+        const colLetter = Move.colToLetter(colNumber - 1);
+
+        return `${row}${sep || ''}${col}(${colLetter}${rowNumber})`;
+    });
+};
+
 /**
  * Parse coords in chat to wrap them in <span class="coords">
  * and allow to highlight them and make them interactive.
  * Do not match coords inside url (to not break hexworld links for example).
- * See unit tests for examples.
  *
- * Matches up to 99x99 coords.
+ * Example:
+ *      "I would play d4 first"
+ *  =>  "I would play <span class="coords">d4</span> first"
+ *
+ * See unit tests for more examples.
  *
  * Should take boardsize a input to make sure not to match outside hexes.
  */
-export const makesCoordsInteractive = (str: string): string => {
+export const makesCoordsInteractive = (str: string, boardsize: number): string => {
+    const regex = boardsize > 26
+        ? /(https?:\/\/\S+)|\b([a-z]{2}\d{1,3})\b/gi
+        : /(https?:\/\/\S+)|\b([a-z][1-2]?\d)\b/gi
+    ;
+
     return str.replace(
-        /(https?:\/\/\S+)|\b([a-c]?[a-z]\d{1,2})\b/gi,
-        (_, url, coords) => {
+        regex,
+        (_, url: string, coords: string) => {
             if (url) {
                 return url;
+            }
+
+            const move = Move.fromString(coords.toLowerCase());
+
+            // do not match coords outside board (and do not match u2 in "hi, u2")
+            if (move.row >= boardsize || move.col >= boardsize) {
+                return coords;
             }
 
             return '<span class="coords">' + coords + '</span>';
