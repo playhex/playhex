@@ -16,11 +16,11 @@ export const useSearchGamesPagination = (
     defaultPageSize: number,
 ) => {
     const totalPages = computed(() => {
-        if (totalResults.value === null || totalResults.value === 0) {
-            return 0;
+        if (!totalResults.value) {
+            return 1;
         }
 
-        return 1 + Math.floor(totalResults.value / (searchGamesParameters.value.paginationPageSize ?? defaultPageSize));
+        return Math.ceil(totalResults.value / (searchGamesParameters.value.paginationPageSize ?? defaultPageSize));
     });
 
     const capPage = (page: number): number => {
