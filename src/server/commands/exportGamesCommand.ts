@@ -93,8 +93,6 @@ hexProgram
             select
                 *
             from hosted_game hg
-            inner join game g on hg.id = g.hostedGameId
-            inner join hosted_game_options hgo on hg.id = hgo.hostedGameId
             where hg.state = 'ended'
         `);
 
@@ -143,17 +141,13 @@ hexProgram
                 throw new Error('winner is not 0 or 1');
             }
 
-            const moves = JSON.parse(gameResult.movesHistory);
-
-            const timeControl = JSON.parse(gameResult.timeControl);
-
             exportedGames.push({
                 id: gameResult.publicId,
                 url: gameUrlPrefix + gameResult.publicId,
                 boardsize: gameResult.boardsize,
-                timeControl,
-                movesCount: moves.length,
-                moves: moves
+                timeControl: gameResult.timeControlType,
+                movesCount: gameResult.movesHistory.length,
+                moves: gameResult.movesHistory
                     .map((m: MoveData) => EngineMove.fromData(m).toString())
                     .join(' ')
                 ,
@@ -162,13 +156,13 @@ hexProgram
                 playerRedType: gamePlayers[gameResult.id][0]!.type,
                 playerBlueType: gamePlayers[gameResult.id][1]!.type,
                 winner: ['red', 'blue'][gameResult.winner] as 'red' | 'blue',
-                outcome: gameResult.outcome ?? 'path',
-                allowSwap: gameResult.allowSwap === 1,
+                outcome: gameResult.outcome,
+                allowSwap: gameResult.swapRule === 1,
                 rated: gameResult.ranked === 1,
                 handicap: guessDemerHandicap(
                     gameResult.swapRule === 1,
                     gameResult.firstPlayer !== null,
-                    moves,
+                    gameResult.movesHistory,
                 ),
                 startedAt: gameResult.startedAt,
                 endedAt: gameResult.endedAt,
