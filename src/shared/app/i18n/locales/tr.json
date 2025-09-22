@@ -42,7 +42,6 @@
     "game_state": {
         "created": "Oluşturuldu",
         "canceled": "İptal edildi",
-        "forfeited": "Pes edildi",
         "playing": "Oynanıyor",
         "ended": "Bitti"
     },
@@ -442,12 +441,14 @@
     },
     "player_wins_by": {
         "default": "{player} kazandı!",
+        "path": "{player} kazandı!",
         "time": "{player} süreyle kazandı!",
         "resign": "{player} kazandı!",
         "forfeit": "{player} hükmen kazandı!"
     },
     "player_loses_reason": {
         "default": "{player} kaybetti.",
+        "path": "{player} kaybetti.",
         "time": "{player} süresi doldu.",
         "resign": "{player} oyunu terk etti.",
         "forfeit": "{player} hükmen kaybetti."

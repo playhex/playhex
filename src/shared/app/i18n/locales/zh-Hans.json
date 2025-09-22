@@ -353,6 +353,7 @@
     },
     "player_wins_by": {
         "default": "{player}获胜！",
+        "path": "{player}获胜！",
         "time": "{player}因时间获胜！",
         "resign": "{player}获胜！",
         "forfeit": "{player}因弃权获胜！"

@@ -42,7 +42,7 @@ export class InconsistentWinnerStateOutcome implements DataInconsistenciesChecke
             .orWhere('(hostedGame.state = "created" and (outcome is not null or winner is not null))')
             .orWhere('(hostedGame.state = "playing" and (outcome is not null or winner is not null))')
             .orWhere('(hostedGame.state = "canceled" and (outcome is not null or winner is not null))')
-            .orWhere('(hostedGame.state = "ended" and winner is null)')
+            .orWhere('(hostedGame.state = "ended" and (outcome is null or winner is null))')
             .select('hostedGame.publicId')
             .addSelect('hostedGame.state')
             .addSelect('hostedGame.outcome')

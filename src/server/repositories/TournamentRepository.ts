@@ -15,7 +15,6 @@ import type { HostedGameAccessorInterface } from '../tournaments/hosted-game-acc
 import { HostedGameAccessor } from '../tournaments/hosted-game-accessor/HostedGameAccessor.js';
 import { TournamentBanManager } from '../tournaments/services/TournamentBanManager.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
-import { isStateEnded } from '../../shared/app/hostedGameUtils.js';
 
 /**
  * Relations to load for active tournament.
@@ -138,7 +137,7 @@ export default class TournamentRepository
             const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(hostedGame.publicId);
 
             if (hostedGameServer === null) {
-                if (!isStateEnded(hostedGame)) {
+                if (hostedGame.state !== 'ended') {
                     logger.warning('Could not find tournament active game', {
                         tournamentPublicId: hostedGame.publicId,
                         hostedGameState: hostedGame.state,

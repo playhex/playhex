@@ -167,11 +167,6 @@ export const addMove = (hostedGame: HostedGame, move: Move, moveIndex: number, b
 
 export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Outcome, endedAt: Date): void => {
     hostedGame.state = 'ended';
-
-    if (outcome === 'forfeit') {
-        hostedGame.state = 'forfeited';
-    }
-
     hostedGame.winner = winner;
     hostedGame.outcome = outcome;
     hostedGame.endedAt = endedAt;
@@ -180,12 +175,6 @@ export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Ou
 export const cancelGame = (hostedGame: HostedGame, canceledAt: Date): void => {
     hostedGame.state = 'canceled';
     hostedGame.endedAt = canceledAt;
-};
-
-export const isStateEnded = (hostedGame: HostedGame): boolean => {
-    return hostedGame.state === 'ended'
-        || hostedGame.state === 'forfeited'
-    ;
 };
 
 export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters: SearchGamesParameters): boolean => {

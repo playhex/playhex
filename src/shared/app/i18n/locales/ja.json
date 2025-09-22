@@ -355,6 +355,7 @@
     },
     "player_wins_by": {
         "default": "{player} の勝利！",
+        "path": "{player} の勝利！",
         "time": "{player} が時間切れで勝利！",
         "resign": "{player} の勝利！",
         "forfeit": "{player} が没収勝ち！"

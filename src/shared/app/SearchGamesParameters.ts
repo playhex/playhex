@@ -1,10 +1,10 @@
 import { Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsIn, IsNumber, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
+import { HostedGameState } from './Types.js';
 
-export const gameStates = [
+export const gameStates: HostedGameState[] = [
     'ended',
     'canceled',
-    'forfeited',
 ] as const;
 
 export type GameStates = typeof gameStates[number];

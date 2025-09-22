@@ -360,6 +360,7 @@
     },
     "player_wins_by": {
         "default": "{player} vence!",
+        "path": "{player} vence!",
         "time": "{player} vence por tempo!",
         "resign": "{player} vence!",
         "forfeit": "{player} vence por desclassificação!"

@@ -2,7 +2,7 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import { areSamePlayers, deduplicatePlayers } from '../../shared/app/playerUtils.js';
 import { Player, Tournament, TournamentAdmin, TournamentMatch, TournamentParticipant, TournamentSubscription } from '../../shared/app/models/index.js';
 import baseLogger from '../services/logger.js';
-import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer, isStateEnded } from '../../shared/app/hostedGameUtils.js';
+import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer } from '../../shared/app/hostedGameUtils.js';
 import { CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
 import { TournamentEngineInterface } from './organizers/TournamentEngineInterface.js';
 import { createGameOptionsForTournament, tournamentStartsAutomatically, sortAndRankParticipants, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, slugifyTournamentName, getCheckInOpensDate } from '../../shared/app/tournamentUtils.js';
@@ -568,7 +568,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        if (!isStateEnded(hostedGame)) {
+        if (hostedGame.state !== 'ended') {
             this.logger.error('Unexpected tournament match state', { hostedGamePublicId: hostedGame.publicId, state: hostedGame.state });
             return;
         }
@@ -586,7 +586,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        if (!isStateEnded(hostedGame)) {
+        if (hostedGame.state !== 'ended') {
             this.logger.error('doMarkGameAsEnded must be used on "ended" game', { matchKey, hostedGamePublicId: hostedGame.publicId, state: hostedGame.state });
             return;
         }

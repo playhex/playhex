@@ -361,6 +361,7 @@
     },
     "player_wins_by": {
         "default": "{player} vince!",
+        "path": "{player} vince!",
         "time": "{player} vince per tempo!",
         "resign": "{player} vince!",
         "forfeit": "{player} vince per abbandono!"

@@ -396,6 +396,7 @@
     "tournament_not_enough_participants_to_start": "Turnier konnte nicht gestartet werden. Zu wenig eingecheckte Teilnehmer für dieses Format.",
     "player_loses_reason": {
         "default": "{player} verliert.",
+        "path": "{player} verliert.",
         "time": "{player} überschreitet die Zeit.",
         "resign": "{player} gibt auf.",
         "forfeit": "{player} verliert durch Forfait."

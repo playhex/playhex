@@ -261,6 +261,7 @@
     },
     "player_wins_by": {
         "default": "{player} vinder!",
+        "path": "{player} vinder!",
         "time": "{player} vinder på tid!",
         "resign": "{player} vinder!",
         "forfeit": "{player} vinder ved forfald!"

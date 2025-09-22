@@ -466,10 +466,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private doEnd(winner: PlayerIndex, outcome: Outcome, date: Date): void
     {
         this.hostedGame.state = 'ended';
-
-        if (outcome === 'forfeit') {
-            this.hostedGame.state = 'forfeited';
-        }
+        this.hostedGame.outcome = outcome;
 
         this.io.to(this.gameRooms(true)).emit('ended', this.getPublicId(), winner, outcome, { date });
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());

@@ -378,6 +378,7 @@
     },
     "player_wins_by": {
         "default": "{player} wygrywa!",
+        "path": "{player} wygrywa!",
         "time": "{player} wygrywa na czas!",
         "resign": "{player} wygrywa!",
         "forfeit": "{player} wygrywa przez walkower!"
@@ -392,6 +393,7 @@
     "player_loses_reason": {
         "time": "{player} przekroczył limit czasu..",
         "default": "{player} przegrywa.",
+        "path": "{player} przegrywa.",
         "resign": "{player} rezygnuje.",
         "forfeit": "{player} przegrywa walkowerem."
     },

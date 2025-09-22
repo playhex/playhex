@@ -264,6 +264,7 @@
     },
     "player_wins_by": {
         "default": "{player} побеждает!",
+        "path": "{player} побеждает!",
         "time": "{player} побеждает по времени!",
         "resign": "{player} побеждает!",
         "forfeit": "{player} побеждает по техническому поражению!"
@@ -281,6 +282,7 @@
     "player_loses_reason": {
         "forfeit": "{player} проигрывает.",
         "default": "{player} проиграл.",
+        "path": "{player} проиграл.",
         "time": "{player} истекло время ожидания.",
         "resign": "{player} уходит."
     },

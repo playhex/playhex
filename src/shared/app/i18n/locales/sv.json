@@ -407,12 +407,14 @@
     },
     "player_wins_by": {
         "default": "{player} vinner!",
+        "path": "{player} vinner!",
         "time": "{player} vinner på tid!",
         "resign": "{player} vinner!",
         "forfeit": "{player} vinner genom förverkande!"
     },
     "player_loses_reason": {
         "default": "{player} förlorar.",
+        "path": "{player} förlorar.",
         "time": "{player} överskrider tiden.",
         "resign": "{player} ger upp.",
         "forfeit": "{player} förverkar."

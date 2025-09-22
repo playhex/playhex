@@ -19,10 +19,14 @@ export type PathItem = {
  */
 export type Outcome =
     /**
-     * No outcome precision, game should have been won by regular victory,
-     * or game is still playing, or has been canceled.
+     * No outcome precision, game is still playing, or has been canceled.
      */
     null
+
+    /**
+     * Player who won connected his sides.
+     */
+    | 'path'
 
     /**
      * Player who lost manually resigned the game, before or while playing.

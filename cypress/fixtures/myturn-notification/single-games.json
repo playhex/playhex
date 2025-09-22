@@ -125,7 +125,7 @@
         ],
         "currentPlayerIndex": 1,
         "winner": 1,
-        "outcome": null,
+        "outcome": "path",
         "startedAt": "2023-12-22T15:14:36.967Z",
         "lastMoveAt": "2023-12-22T15:14:40.711Z",
         "endedAt": "2023-12-22T15:14:40.711Z"

@@ -19,31 +19,13 @@ const migrate = (before: any): any => {
             return;
         }
 
-        if (typeof object.winner !== 'undefined') {
-            // already migrated
-            return;
+        if (object.state === 'forfeited') {
+            object.state = 'ended';
         }
 
-        if (object.gameData) {
-            object.movesHistory = object.gameData.movesHistory ?? [];
-            object.currentPlayerIndex = object.gameData.currentPlayerIndex;
-            object.winner = object.gameData.winner;
-            object.outcome = object.gameData.outcome;
-            object.startedAt = object.gameData.startedAt;
-            object.lastMoveAt = object.gameData.lastMoveAt;
-            object.endedAt = object.gameData.endedAt;
-        } else {
-            object.movesHistory = [];
-            object.currentPlayerIndex = 0;
-            object.winner = null;
-            object.outcome = null;
-            object.startedAt = null;
-            object.lastMoveAt = null;
-            object.endedAt = null;
+        if (object.outcome === null && object.state === 'ended') {
+            object.outcome = 'path';
         }
-
-        // always delete, even when gameData is null
-        delete object.gameData;
     };
 
     if (Array.isArray(before)) {

@@ -105,7 +105,7 @@ describe('Page Game finished', () => {
 
         cy.get('Accept').should('not.exist');
 
-        cy.title().should('include', 'Forfeited');
+        cy.title().should('include', 'Ended');
 
         // Game sidebar
         cy.contains('aa loses by forfeit.');

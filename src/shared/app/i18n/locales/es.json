@@ -227,6 +227,7 @@
     },
     "player_wins_by": {
         "default": "¡{player} gana!",
+        "path": "¡{player} gana!",
         "time": "¡{jugador} gana por tiempo!",
         "resign": "¡{player} gana!",
         "forfeit": "¡{player} gana por abandono!"
@@ -279,6 +280,7 @@
     "player_loses_reason": {
         "resign": "{player} renunció.",
         "default": "{player} pierde(n).",
+        "path": "{player} pierde(n).",
         "time": "{player} se quedó sin tiempo.",
         "forfeit": "{player} pierde."
     },

@@ -17,10 +17,12 @@
         "resign": "{player} வெற்றி!",
         "forfeit": "{player} பறிமுதல் மூலம் வெற்றி!",
         "default": "{player} வெற்றி!",
+        "path": "{player} வெற்றி!",
         "time": "{player} சரியான நேரத்தில் வெற்றி!"
     },
     "player_loses_reason": {
         "default": "{player} இழக்கிறது.",
+        "path": "{player} இழக்கிறது.",
         "time": "{player} மடங்கு.",
         "resign": "{player} ராசினாமா செய்கிறார்.",
         "forfeit": "{player} ஒரு பறிமுதல் என்று அறிவிக்கப்படுகிறது."

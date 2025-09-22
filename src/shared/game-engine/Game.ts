@@ -220,7 +220,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
         // Naively check connection on every move played
         if (this.board.hasPlayerConnection(byPlayerIndex)) {
-            this.setWinner(byPlayerIndex, null, move.getPlayedAt());
+            this.setWinner(byPlayerIndex, 'path', move.getPlayedAt());
         } else {
             this.changeCurrentPlayer();
         }
@@ -452,7 +452,7 @@ export default class Game extends TypedEmitter<GameEvents>
      * Just update properties, do not emit "ended" event.
      * Should be emitted manually.
      */
-    private setWinner(playerIndex: PlayerIndex, outcome: Outcome = null, date: Date): void
+    private setWinner(playerIndex: PlayerIndex, outcome: NonNullable<Outcome>, date: Date): void
     {
         this.winner = playerIndex;
         this.outcome = outcome;
@@ -462,7 +462,7 @@ export default class Game extends TypedEmitter<GameEvents>
     /**
      * Change game state by setting a winner and emitting "ended" event.
      */
-    declareWinner(playerIndex: PlayerIndex, outcome: Outcome, date: Date): void
+    declareWinner(playerIndex: PlayerIndex, outcome: NonNullable<Outcome>, date: Date): void
     {
         if (this.winner !== null) {
             throw new Error('Cannot set a winner again, there is already a winner');
@@ -599,6 +599,10 @@ export default class Game extends TypedEmitter<GameEvents>
         this.lastMoveAt = gameData.lastMoveAt;
 
         if (this.endedAt == null && this.winner == null && gameData.endedAt != null && gameData.winner != null) {
+            if (gameData.outcome === null) {
+                throw new Error('Game ended, but gameData.outcome is null');
+            }
+
             this.declareWinner(gameData.winner, gameData.outcome, gameData.endedAt);
         } else {
             this.winner = gameData.winner;

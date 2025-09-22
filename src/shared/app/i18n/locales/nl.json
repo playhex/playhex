@@ -361,6 +361,7 @@
     },
     "player_wins_by": {
         "default": "{player} wint!",
+        "path": "{player} wint!",
         "time": "{player} wint op tijd!",
         "resign": "{player} wint!",
         "forfeit": "{player} wint door verbeuren!"

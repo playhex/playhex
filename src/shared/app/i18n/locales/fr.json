@@ -230,10 +230,12 @@
         "time": "{player} gagne au temps !",
         "resign": "{player} gagne !",
         "default": "{player} gagne !",
+        "path": "{player} gagne !",
         "forfeit": "{player} gagne par forfait !"
     },
     "player_loses_reason": {
         "default": "{player} perd.",
+        "path": "{player} perd.",
         "time": "{player} n'a plus de temps.",
         "resign": "{player} abandonne.",
         "forfeit": "{player} est déclaré forfait."
@@ -460,7 +462,6 @@
         "canceled": "Annulée",
         "ended": "Terminée",
         "created": "Créée",
-        "forfeited": "Forfait",
         "playing": "En cours"
     },
     "discard": "Annuler",
