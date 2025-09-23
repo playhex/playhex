@@ -354,6 +354,7 @@
     },
     "outcome": {
         "win": "winst",
+        "path": "winst",
         "loss": "verlies",
         "resign": "opgeven",
         "forfeit": "verbeuren",

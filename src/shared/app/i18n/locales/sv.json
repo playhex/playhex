@@ -400,6 +400,7 @@
     },
     "outcome": {
         "win": "vinst",
+        "path": "vinst",
         "loss": "förlust",
         "resign": "avbryt",
         "forfeit": "förverkande",

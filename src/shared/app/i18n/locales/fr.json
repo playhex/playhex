@@ -221,6 +221,7 @@
     "n_characters_other": "{{count}} caractères",
     "outcome": {
         "win": "victoire",
+        "path": "victoire",
         "loss": "défaite",
         "resign": "abandon",
         "time": "temps",

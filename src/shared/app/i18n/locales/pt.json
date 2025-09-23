@@ -353,6 +353,7 @@
     },
     "outcome": {
         "win": "vitória",
+        "path": "vitória",
         "loss": "derrota",
         "resign": "desistência",
         "forfeit": "desclassificação",

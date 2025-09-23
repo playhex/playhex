@@ -371,6 +371,7 @@
     },
     "outcome": {
         "win": "wygrana",
+        "path": "wygrana",
         "loss": "przegrana",
         "resign": "poddanie",
         "forfeit": "walkower",

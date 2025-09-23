@@ -191,6 +191,7 @@
     },
     "outcome": {
         "win": "Sieg",
+        "path": "Sieg",
         "loss": "Niederlage",
         "resign": "aufgegeben",
         "forfeit": "Forfait",

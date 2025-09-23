@@ -348,6 +348,7 @@
     },
     "outcome": {
         "win": "승리",
+        "path": "승리",
         "loss": "패배",
         "resign": "기권",
         "forfeit": "몰수",

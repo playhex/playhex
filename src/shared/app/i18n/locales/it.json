@@ -354,6 +354,7 @@
     },
     "outcome": {
         "win": "vittoria",
+        "path": "vittoria",
         "loss": "sconfitta",
         "resign": "ritiro",
         "forfeit": "abbandono",

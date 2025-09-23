@@ -434,6 +434,7 @@
     },
     "outcome": {
         "win": "galibiyet",
+        "path": "galibiyet",
         "loss": "mağlubiyet",
         "resign": "terk",
         "forfeit": "hükmen",

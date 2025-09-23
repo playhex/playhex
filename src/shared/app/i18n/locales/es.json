@@ -222,6 +222,7 @@
         "resign": "abandonar",
         "time": "tiempo agotado",
         "win": "victoria",
+        "path": "victoria",
         "loss": "derrota",
         "forfeit": "renunciar"
     },

@@ -346,6 +346,7 @@
     },
     "outcome": {
         "win": "胜",
+        "path": "胜",
         "loss": "负",
         "resign": "认输",
         "forfeit": "弃权",

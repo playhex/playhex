@@ -475,6 +475,7 @@
     },
     "outcome": {
         "win": "win",
+        "path": "win",
         "loss": "loss",
         "resign": "resign",
         "forfeit": "forfeit",

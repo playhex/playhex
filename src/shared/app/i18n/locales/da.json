@@ -254,6 +254,7 @@
     },
     "outcome": {
         "win": "sejr",
+        "path": "sejr",
         "loss": "tab",
         "resign": "giv op",
         "forfeit": "tabt",

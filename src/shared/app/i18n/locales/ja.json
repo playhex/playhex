@@ -348,6 +348,7 @@
     },
     "outcome": {
         "win": "勝ち",
+        "path": "勝ち",
         "loss": "負け",
         "resign": "投了",
         "forfeit": "没収",
