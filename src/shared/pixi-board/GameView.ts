@@ -773,6 +773,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         return;
                     }
 
+                    // ctrl + click: emits hexClickedSecondary instead
+                    if (e.ctrlKey) {
+                        this.emit('hexClickedSecondary', { row, col });
+                        return;
+                    }
+
                     // Disable play in rewind mode. May change when simulation mode is implemented.
                     if (this.movesHistoryCursor !== null) {
                         if (this.movesHistoryCursor !== this.game.getMovesHistory().length - 1) {
@@ -783,9 +789,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         this.disableRewindMode();
                     }
 
-                    if (e.ctrlKey) {
-                        this.emit('hexClickedSecondary', { row, col });
-                    } else if (!this.simulationMode) {
+                    if (!this.simulationMode) {
                         this.emit('hexClicked', { row, col });
                     } else {
                         const move = new Move(row, col);
