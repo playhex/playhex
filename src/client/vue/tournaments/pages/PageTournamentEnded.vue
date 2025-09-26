@@ -13,6 +13,7 @@ import { Tournament, TournamentParticipant } from '../../../../shared/app/models
 import { t } from 'i18next';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
+import AppSeedingInfo from '../components/AppSeedingInfo.vue';
 
 const {
     tournament,
@@ -106,6 +107,12 @@ const colClasses = [
         </div>
 
         <AppTournamentBracket :tournament />
+
+        <div class="container-fluid my-3">
+            <p>
+                <AppSeedingInfo :tournament />
+            </p>
+        </div>
 
         <div class="container-fluid my-3">
             <h2>{{ $t('n_participants', { count: tournament.participants.length }) }}</h2>

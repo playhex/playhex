@@ -9,6 +9,7 @@ import { IconRecordFill } from '../../icons.js';
 import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
+import AppSeedingInfo from '../components/AppSeedingInfo.vue';
 
 const {
     tournament,
@@ -45,13 +46,19 @@ useHead({
 
             <AppTournamentFormat :tournament />
 
-            <p class="card-text lead">
+            <p class="lead">
                 <IconRecordFill class="text-danger" />
                 {{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}
             </p>
         </div>
 
         <AppTournamentBracket :tournament />
+
+        <div class="container-fluid my-3">
+            <p>
+                <AppSeedingInfo :tournament />
+            </p>
+        </div>
 
         <div class="container-fluid my-3">
             <h2>{{ $t('n_participants', { count: tournament.participants.length }) }}</h2>

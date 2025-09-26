@@ -9,6 +9,8 @@ import { Tournament, TournamentMatch } from '../../../shared/app/models/index.js
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import logger from '../../services/logger.js';
+import { glicko2Settings } from '../../../shared/app/ratingUtils.js';
+import { gaussianRandom } from '../../../shared/app/utils.js';
 
 const tournamentOrganizer = new TournamentOrganizer();
 
@@ -38,6 +40,34 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             delete toTournaments[tournament.publicId];
         }
 
+        const players: TOPlayer[] = tournament.participants.map(participant => {
+            const toPlayer = new TOPlayer(participant.player.publicId, participant.player.pseudo);
+
+            if (tournament.seedingMethod === 'random') {
+                toPlayer.value = Math.random();
+            } else if (tournament.seedingMethod === 'rating') {
+                toPlayer.value = participant.player.currentRating?.rating ?? glicko2Settings.rating;
+            } else if (tournament.seedingMethod === 'rating_random') {
+                toPlayer.value = gaussianRandom(
+                    participant.player.currentRating?.rating ?? glicko2Settings.rating,
+                    participant.player.currentRating?.deviation ?? glicko2Settings.rd,
+                );
+            } else {
+                logger.warning('Unknown tournament seeding method', {
+                    tournamentSlug: tournament.slug,
+                    tournamentSeedingMethod: tournament.seedingMethod,
+                });
+            }
+
+            return toPlayer;
+        });
+
+        logger.info('Tournament players have been seeded', {
+            tournamentId: tournament.id,
+            tournamentSeedingMethod: tournament.seedingMethod,
+            playerSeeds: players.map(p => `${p.name} (${p.value})`).join(', '),
+        });
+
         const toTournament = tournamentOrganizer.createTournament(tournament.title, {
             stageOne: {
                 format: tournament.stage1Format ?? undefined,
@@ -51,9 +81,9 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 format: tournament.stage2Format ?? undefined,
                 consolation: tournament.consolation ?? undefined,
             } : undefined,
-            players: tournament.participants.map(participant => {
-                return new TOPlayer(participant.player.publicId, participant.player.pseudo);
-            }),
+            players,
+            seating: true, // Seat players depending on their ratings (always rely on toPlayer.value)
+            sorting: 'descending', // descending to give bye to stronger players (assume toPlayer.value is a rating: higher value is first)
         }, tournament.publicId);
 
         toTournaments[tournament.publicId] = toTournament;

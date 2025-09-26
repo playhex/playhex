@@ -147,6 +147,15 @@
         "never": "Jamais",
         "never_help": "Le tournoi ne commencera pas automatiquement. L’organisateur devra le démarrer manuellement. Le tournoi sera affiché comme « début imminent » en attendant son démarrage."
     },
+    "tournament_seeding_methods": {
+        "title": "Placement initial",
+        "random": "Aléatoire",
+        "random_help": "Les joueurs sont placés au hasard pour la première manche.",
+        "rating": "Par classement",
+        "rating_help": "Les joueurs sont placés selon leur classement pour la première manche. S’il y a des exemptions au premier tour, ce sont les joueurs les mieux classés qui en bénéficient.",
+        "rating_random": "Par classement avec part d'aléatoire",
+        "rating_random_help": "Les joueurs sont placés selon leur classement, mais avec une part d’aléatoire dépendant de leur écart-type Glicko-2. S’il y a des exemptions au premier tour, ce sont les joueurs les mieux classés qui en bénéficient."
+    },
     "tournament_history": {
         "created": "{{organizerPseudo}} a créé le tournoi",
         "edited": "L’organisateur a modifié « {{ field }} » du tournoi : nouvelle valeur « {{ value }} ». (Ancienne valeur : « {{ oldValue }} »)",

@@ -47,6 +47,20 @@ export const availableStage1Formats: TournamentFormatStage1[] = [
     'round-robin',
 ];
 
+/**
+ * Available seeding methods.
+ * - `random`: players are seeded randomly
+ * - `rating`: players are seeded by their rating. Stronger players get the bye if any
+ * - `rating_random`: players are seeded by their rating, with a part of random depending on their glicko2 rating deviation
+ */
+export const seedingMethods = [
+    'random',
+    'rating',
+    'rating_random',
+] as const;
+
+export type SeedingMethod = (typeof seedingMethods)[number];
+
 export const slugifyTournamentName = (tournamentName: string): string => slugify(tournamentName);
 
 export const createGameOptionsForTournament = (tournament: Tournament): HostedGameOptions => {

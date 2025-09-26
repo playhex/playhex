@@ -19,6 +19,7 @@ import AppMySubscriptionStatus from '../components/AppMySubscriptionStatus.vue';
 import AppTournamentStartsAt from '../components/AppTournamentStartsAt.vue';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
+import AppSeedingInfo from '../components/AppSeedingInfo.vue';
 
 const {
     tournament,
@@ -129,6 +130,8 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                         <AppTimeControlLabel :timeControlBoardsize="tournament" />
                                         <br>
                                         <span class="lead">{{ tournament.boardsize }}×{{ tournament.boardsize }}</span>
+                                        <br>
+                                        <small><AppSeedingInfo :tournament /></small>
                                     </p>
                                 </div>
                             </div>

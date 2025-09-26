@@ -82,3 +82,15 @@ export const errorToLogger = (e: unknown): { message: string, stacktrace: string
         stacktrace: 'No stack trace because not an Error instance',
     };
 };
+
+/**
+ * Get a random number around mean given a standard deviation.
+ */
+export const gaussianRandom = (mean = 0, deviation = 1): number => {
+    const u = 1 - Math.random(); // Converting [0,1) to (0,1]
+    const v = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+
+    // Transform to the desired mean and standard deviation:
+    return z * deviation + mean;
+};

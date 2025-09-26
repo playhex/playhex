@@ -11,7 +11,7 @@ import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, Host
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import TournamentParticipant from './TournamentParticipant.js';
 import TournamentMatch from './TournamentMatch.js';
-import { slugifyTournamentName, tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2 } from '../tournamentUtils.js';
+import { type SeedingMethod, slugifyTournamentName, tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2, seedingMethods } from '../tournamentUtils.js';
 import TournamentSubscription from './TournamentSubscription.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import TournamentHistory from './TournamentHistory.js';
@@ -136,6 +136,16 @@ export default class Tournament implements TimeControlBoardsize
     @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @IsBoolean({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     consolation: boolean;
+
+    /**
+     * How players are seated in the beginning of a tournament.
+     * Defaults to `random`.
+     */
+    @Column({ default: 'random', length: 16 })
+    @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    @IsIn(seedingMethods)
+    @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    seedingMethod: SeedingMethod;
 
     @Column({ default: true })
     @IsBoolean({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
@@ -313,6 +323,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.stage1Rounds = null;
     tournament.stage2Format = null;
     tournament.consolation = true;
+    tournament.seedingMethod = 'random';
     tournament.accountRequired = false;
     tournament.ranked = true;
     tournament.boardsize = 11;
@@ -341,6 +352,7 @@ export const createTournamentDefaultsCreate = (): Tournament => {
     tournament.stage1Rounds = null;
     tournament.stage2Format = null;
     tournament.consolation = true;
+    tournament.seedingMethod = 'random';
     tournament.accountRequired = false;
     tournament.ranked = true;
     tournament.boardsize = 11;
@@ -368,6 +380,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.stage1Rounds = input.stage1Rounds;
     tournament.stage2Format = input.stage2Format;
     tournament.consolation = input.consolation;
+    tournament.seedingMethod = input.seedingMethod;
     tournament.accountRequired = input.accountRequired;
     tournament.ranked = input.ranked;
     tournament.boardsize = input.boardsize;

@@ -3,7 +3,7 @@ import { computed, onMounted, ref, toRefs, watchEffect } from 'vue';
 import { validate, ValidationError } from 'class-validator';
 import { Tournament } from '../../../../shared/app/models';
 import { FailedProperties, toFailedProperties } from '../../../../shared/app/ValidationError';
-import { availableStage1Formats } from '../../../../shared/app/tournamentUtils';
+import { availableStage1Formats, seedingMethods } from '../../../../shared/app/tournamentUtils';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
 import AppTimeControl from '../../components/AppTimeControl.vue';
 import { apiGetTournament } from '../../../apiClient';
@@ -317,7 +317,26 @@ defineExpose({
         rows="8"
     ></textarea>
 
-    <p class="text-danger" v-if="globalError">{{ globalError }}</p>
+    <h3>Tournament options</h3>
+
+    <h4>Players seeding</h4>
+
+    <p>
+        How players are placed in their first round.
+        You can choose whether their rating should be taken into account,
+        or place them randomly.
+    </p>
+
+    <ul class="list-group seeding-methods mb-4">
+        <li v-for="seedingMethod in seedingMethods" :key="seedingMethod" class="list-group-item">
+            <input class="form-check-input me-2" type="radio" v-model="tournament.seedingMethod" :value="seedingMethod" :id="'input-' + seedingMethod">
+            <label class="form-check-label stretched-link" :for="'input-' + seedingMethod">
+                {{ $t('tournament_seeding_methods.' + seedingMethod) }}
+                <br>
+                <small class="text-body-secondary">{{ $t('tournament_seeding_methods.' + seedingMethod + '_help') }}</small>
+            </label>
+        </li>
+    </ul>
 
     <h3>{{ $t('tournament_admins') }}</h3>
 
@@ -333,6 +352,10 @@ defineExpose({
         <!-- Yeah, this easier like that. -->
         <!-- Having a single controller that handle add/remove players instead adding a one to many in PATCH tournament. -->
     </p>
+
+    <!-- Global errors on form. -->
+    <!-- Should be display near submit button to make sure we see the error before submit. -->
+    <p class="text-danger" v-if="globalError">{{ globalError }}</p>
 </template>
 
 <style lang="stylus" scoped>
@@ -351,4 +374,10 @@ defineExpose({
 .input-group > label:first-of-type
     border-top-left-radius var(--bs-btn-border-radius) !important
     border-bottom-left-radius var(--bs-btn-border-radius) !important
+
+.seeding-methods
+    label
+        width 80%
+    label, label::after
+        cursor pointer
 </style>

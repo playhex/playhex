@@ -24,7 +24,7 @@ const formatHistoryLogDate = (date: Date): string => {
 </script>
 
 <template>
-    <h3>{{ $t('tournament_history_logs') }}</h3>
+    <h2>{{ $t('tournament_history_logs') }}</h2>
 
     <ul v-if="tournament.history.length > 0" class="list-group list-group-flush">
         <li

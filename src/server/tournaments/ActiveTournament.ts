@@ -928,6 +928,16 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             this.tournament.startDelayInSeconds = edited.startDelayInSeconds;
         }
 
+        if (edited.seedingMethod !== undefined && edited.seedingMethod !== this.tournament.seedingMethod) {
+            addTournamentHistory(this.tournament, 'edited', {
+                field: 'seedingMethod',
+                value: edited.seedingMethod,
+                oldValue: this.tournament.seedingMethod,
+            }, now);
+
+            this.tournament.seedingMethod = edited.seedingMethod;
+        }
+
         await this.autoSave.save();
 
         // In case start date, check in or delay time have been updated, recalculate timeout.

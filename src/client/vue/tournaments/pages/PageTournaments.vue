@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../icons.js';
 import { ref } from 'vue';
+import { useHead } from '@unhead/vue';
 import { Tournament } from '../../../../shared/app/models';
 import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
@@ -10,6 +11,11 @@ import AppCountdown from '../../components/AppCountdown.vue';
 import AppMySubscriptionStatus from '../components/AppMySubscriptionStatus.vue';
 import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
 import { getCurrentTournamentSubscriptionStatus, iAmParticipant } from '../composables/tournamentCurrentSubscription';
+import { t } from 'i18next';
+
+useHead({
+    title: t('tournaments'),
+});
 
 const activeTournaments = ref<null | Tournament[]>(null);
 const endedTournaments = ref<null | Tournament[]>(null);
