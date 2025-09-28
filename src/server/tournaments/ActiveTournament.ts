@@ -359,6 +359,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         // First mark games as ended
         await this.endPlayingMatchesIfEnded();
+        this.checkEndedGamesAreReported();
 
         // Then create new games from updated bracket
         await this.createNextGames();
@@ -368,31 +369,56 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         this.logger.debug('Workflow end');
     }
 
+    /**
+     * Double check games.
+     *
+     * Matches in playing state:
+     * check whether their game has ended
+     */
     private async endPlayingMatchesIfEnded(): Promise<void>
     {
         this.logger.debug('Check if playing matches have ended');
 
-        // Check playing games has ended
         for (const tournamentMatch of this.tournament.matches) {
             if (tournamentMatch.state === 'playing') {
                 await this.checkPlayingGameHasEnded(tournamentMatch);
             }
         }
+    }
 
-        const activeTournamentMatches = this.tournamentEngine.getActiveMatches(this.tournament);
+    /**
+     * Double check games.
+     *
+     * Active matches from engine:
+     * check whether they have ended, if yes, we need to report winner to tournament engine
+     */
+    private checkEndedGamesAreReported(): void
+    {
+        let hasUpdates = false;
+        let i = 0;
 
-        // Check that we have not missed to report winner to tournament engine
-        for (const tournamentMatch of activeTournamentMatches) {
-            if (tournamentMatch.state === 'done') {
-                this.logger.warning('A game was done, but still active in tournament engine. Reporting winner.', {
-                    tournamentMatchId: tournamentMatch.id,
-                    hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
-                    matchKey: tournamentMatchKey(tournamentMatch),
-                });
+        do {
+            hasUpdates = false;
+            const activeTournamentMatches = this.tournamentEngine.getActiveMatches(this.tournament);
 
-                this.doMarkGameAsEnded(tournamentMatch);
+            for (const tournamentMatch of activeTournamentMatches) {
+                if (tournamentMatch.state === 'done') {
+                    this.logger.warning('A game was done, but still active in tournament engine. Reporting winner.', {
+                        tournamentMatchId: tournamentMatch.id,
+                        hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
+                        matchKey: tournamentMatchKey(tournamentMatch),
+                    });
+
+                    this.doMarkGameAsEnded(tournamentMatch);
+                    hasUpdates = true;
+                }
             }
-        }
+
+            if (++i > 10) {
+                this.logger.warning('Still founding ended games that have not been reported, abort');
+                break;
+            }
+        } while (hasUpdates);
     }
 
     /**
@@ -646,6 +672,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     {
         hostedGameServer.on('ended', async () => {
             this.doMarkGameAsEnded(tournamentMatch);
+            this.checkEndedGamesAreReported(); // For round robin, report wins from next rounds if any, because it may not be supported by tournament library
             await this.createNextGames();
             this.endTournamentIfEnded();
         });
