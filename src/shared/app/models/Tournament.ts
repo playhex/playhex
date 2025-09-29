@@ -141,7 +141,7 @@ export default class Tournament implements TimeControlBoardsize
      * How players are seated in the beginning of a tournament.
      * Defaults to `random`.
      */
-    @Column({ default: 'random', length: 16 })
+    @Column({ type: String, default: 'random', length: 16 })
     @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @IsIn(seedingMethods)
     @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
