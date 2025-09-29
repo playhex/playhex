@@ -11,7 +11,7 @@ import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, Host
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import TournamentParticipant from './TournamentParticipant.js';
 import TournamentMatch from './TournamentMatch.js';
-import { type SeedingMethod, slugifyTournamentName, tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2, seedingMethods } from '../tournamentUtils.js';
+import { type SeedingMethod, slugifyTournamentName, tournamentFormatStage1Values, tournamentFormatStage2Values, type TournamentFormatStage1, type TournamentFormatStage2, seedingMethods, SEEDING_METHOD_DEFAULT } from '../tournamentUtils.js';
 import TournamentSubscription from './TournamentSubscription.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import TournamentHistory from './TournamentHistory.js';
@@ -139,9 +139,9 @@ export default class Tournament implements TimeControlBoardsize
 
     /**
      * How players are seated in the beginning of a tournament.
-     * Defaults to `random`.
+     * Defaults to `SEEDING_METHOD_DEFAULT` (`'rating_random'`).
      */
-    @Column({ type: String, default: 'random', length: 16 })
+    @Column({ type: String, default: SEEDING_METHOD_DEFAULT, length: 16 })
     @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @IsIn(seedingMethods)
     @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
@@ -323,7 +323,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.stage1Rounds = null;
     tournament.stage2Format = null;
     tournament.consolation = true;
-    tournament.seedingMethod = 'random';
+    tournament.seedingMethod = SEEDING_METHOD_DEFAULT;
     tournament.accountRequired = false;
     tournament.ranked = true;
     tournament.boardsize = 11;
@@ -352,7 +352,7 @@ export const createTournamentDefaultsCreate = (): Tournament => {
     tournament.stage1Rounds = null;
     tournament.stage2Format = null;
     tournament.consolation = true;
-    tournament.seedingMethod = 'random';
+    tournament.seedingMethod = SEEDING_METHOD_DEFAULT;
     tournament.accountRequired = false;
     tournament.ranked = true;
     tournament.boardsize = 11;

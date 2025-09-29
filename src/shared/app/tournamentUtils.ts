@@ -54,12 +54,14 @@ export const availableStage1Formats: TournamentFormatStage1[] = [
  * - `rating_random`: players are seeded by their rating, with a part of random depending on their glicko2 rating deviation
  */
 export const seedingMethods = [
-    'random',
     'rating',
     'rating_random',
+    'random',
 ] as const;
 
 export type SeedingMethod = (typeof seedingMethods)[number];
+
+export const SEEDING_METHOD_DEFAULT: SeedingMethod = 'rating_random';
 
 export const slugifyTournamentName = (tournamentName: string): string => slugify(tournamentName);
 
