@@ -26,6 +26,7 @@ hexProgram
             Container.get(GamesWithAIMustHaveOpponentId),
             Container.get(InconsistentWinnerStateOutcome),
             Container.get(MoveTimestampsAreOrdered),
+            Container.get(NoRankedVsAI),
         ];
 
         for (const checker of checkers) {
