@@ -8,11 +8,13 @@ import { RatingChangesOnlyWhenApplicable } from './data-inconsistency-checks/Rat
 import { TimeoutGamesWithLessThan2MovesMustBeCanceled } from './data-inconsistency-checks/TimeoutGamesWithLessThan2MovesMustBeCanceled.js';
 import { GamesWithAIMustHaveOpponentId } from './data-inconsistency-checks/GamesWithAIMustHaveOpponentId.js';
 import { InconsistentWinnerStateOutcome } from './data-inconsistency-checks/InconsistentWinnerStateOutcome.js';
+import { NoRankedVsAI } from './data-inconsistency-checks/NoRankedVsAI.js';
 
 hexProgram
     .command('check-inconsistencies')
     .description('Check inconsistencies in database')
-    .action(async () => {
+    .option('--name <name>', 'Only perform this check')
+    .action(async ({ name }) => {
         if (!AppDataSource.isInitialized) {
             await AppDataSource.initialize();
         }
@@ -27,10 +29,15 @@ hexProgram
         ];
 
         for (const checker of checkers) {
+            if (name && checker.constructor.name !== name) {
+                continue;
+            }
+
             const inconsistencies = await checker.run();
 
             console.log(
                 inconsistencies.length === 0 ? ' OK ' : `FAIL (${inconsistencies.length})`,
+                '[' + checker.constructor.name + ']',
                 checker.getDescription(),
             );
 
