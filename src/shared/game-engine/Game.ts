@@ -41,7 +41,7 @@ export default class Game extends TypedEmitter<GameEvents>
     private allowSwap = true;
 
     private winner: null | PlayerIndex = null;
-    private outcome: Outcome = null;
+    private outcome: null | Outcome = null;
 
     private startedAt: Date = new Date();
     private lastMoveAt: null | Date = null;
@@ -233,7 +233,7 @@ export default class Game extends TypedEmitter<GameEvents>
                 throw new Error('Ended at expected to be set');
             }
 
-            this.emit('ended', this.getStrictWinner(), null, this.endedAt);
+            this.emit('ended', this.getStrictWinner(), 'path', this.endedAt);
         }
     }
 
@@ -452,7 +452,7 @@ export default class Game extends TypedEmitter<GameEvents>
      * Just update properties, do not emit "ended" event.
      * Should be emitted manually.
      */
-    private setWinner(playerIndex: PlayerIndex, outcome: NonNullable<Outcome>, date: Date): void
+    private setWinner(playerIndex: PlayerIndex, outcome: Outcome, date: Date): void
     {
         this.winner = playerIndex;
         this.outcome = outcome;
@@ -462,7 +462,7 @@ export default class Game extends TypedEmitter<GameEvents>
     /**
      * Change game state by setting a winner and emitting "ended" event.
      */
-    declareWinner(playerIndex: PlayerIndex, outcome: NonNullable<Outcome>, date: Date): void
+    declareWinner(playerIndex: PlayerIndex, outcome: Outcome, date: Date): void
     {
         if (this.winner !== null) {
             throw new Error('Cannot set a winner again, there is already a winner');
@@ -498,7 +498,7 @@ export default class Game extends TypedEmitter<GameEvents>
         return this.isEnded() && this.winner === null;
     }
 
-    getOutcome(): Outcome
+    getOutcome(): null | Outcome
     {
         return this.outcome;
     }

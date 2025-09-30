@@ -1,7 +1,7 @@
 import { Game } from '../game-engine/index.js';
 import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
 
-const outcomeToHexworld = (outcome: Outcome, winner: PlayerIndex | null) => {
+const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) => {
     if (winner == null)
         return '';
     const lost = winner === 0 ? 'w' : 'b';

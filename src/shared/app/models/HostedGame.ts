@@ -134,7 +134,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
 
     @Column({ type: String, length: 15, nullable: true })
     @Expose()
-    outcome: Outcome;
+    outcome: null | Outcome;
 
     /**
      * When this game is played in a tournament, else null.
