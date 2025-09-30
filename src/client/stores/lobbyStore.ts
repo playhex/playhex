@@ -6,7 +6,7 @@ import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
 import { ref, watchEffect } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
-import { addMove, addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { notifier } from '../services/notifications/index.js';
 import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
