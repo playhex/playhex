@@ -628,7 +628,7 @@ const pass = async () => {
     }
 };
 
-const shouldShowPass = (): boolean => {
+const shouldShowPass = computed((): boolean => {
     if (hostedGameClient.value === null) {
         return false;
     }
@@ -636,9 +636,9 @@ const shouldShowPass = (): boolean => {
     return hostedGameClient.value.getState() === 'playing'
         && getLocalPlayerIndex() !== -1
     ;
-};
+});
 
-const shouldEnablePass = (): boolean => {
+const shouldEnablePass = computed((): boolean => {
     if (hostedGameClient.value === null) {
         return false;
     }
@@ -647,7 +647,7 @@ const shouldEnablePass = (): boolean => {
         && isMyTurn(hostedGameClient.value.getHostedGame())
         && canPassAgain(hostedGameClient.value.getGame())
     ;
-};
+});
 
 /*
  * Warning when guest joining correspondence game
@@ -817,11 +817,11 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 
                             <!-- Pass -->
                             <button
-                                v-if="shouldShowPass()"
+                                v-if="shouldShowPass"
                                 type="button"
                                 class="dropdown-item"
-                                :class="shouldEnablePass() ? 'text-warning' : 'text-secondary disabled'"
-                                :disabled="!shouldEnablePass()"
+                                :class="shouldEnablePass ? 'text-warning' : 'text-secondary disabled'"
+                                :disabled="!shouldEnablePass"
                                 @click="pass()"
                             >
                                 <IconArrowDownUp />
