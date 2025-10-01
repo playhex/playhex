@@ -110,6 +110,12 @@ export function pwaRouter(): Router {
                     purpose: 'any',
                 },
                 {
+                    src: '/images/logo-monochrome.png',
+                    type: 'image/png',
+                    sizes: '96x96',
+                    purpose: 'monochrome',
+                },
+                {
                     src: '/images/logo.png',
                     type: 'image/png',
                     sizes: '512x512',
