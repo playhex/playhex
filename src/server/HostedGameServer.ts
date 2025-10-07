@@ -512,11 +512,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.affectPlayersColors();
 
+        this.hostedGame.state = 'playing';
+        this.hostedGame.startedAt = new Date();
+
         this.game = Game.fromData(toEngineGameData(this.hostedGame));
 
         this.listenGame(this.game);
-
-        this.hostedGame.state = 'playing';
 
         this.saveState();
 
