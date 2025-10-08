@@ -375,6 +375,7 @@ export default class TournamentRepository
         const tournament = activeTournament.getTournament();
 
         tournament.softDeleted = true;
+        (tournament.slug as null | string) = null; // Only case where slug is set to null
 
         await activeTournament.save();
 

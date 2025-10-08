@@ -77,7 +77,12 @@ export default class Tournament implements TimeControlBoardsize
     @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     description: null | string;
 
-    @Column({ length: 64, unique: true })
+    /**
+     * Slug, generated from title, used for url.
+     * Can be null when tournament is soft deleted,
+     * to prevent unique constraint when delete/recreate tournament with same name.
+     */
+    @Column({ length: 64, unique: true, nullable: true })
     @Expose()
     @IsString()
     slug: string;
