@@ -22,10 +22,16 @@ import { type Outcome } from '../../game-engine/Types.js';
 @Entity()
 @Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
 @Index(keysOf<HostedGame>()('state', 'boardsize')) // For stats on boardsizes
-@Index(keysOf<HostedGame>()('state', 'endedAt')) // For archive page
-@Index('state_endedAt_desc', keysOf<HostedGame>()('state', 'endedAt')) // For archive page (set index order manually: endedAt desc)
-@Index(keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt')) // For archive page
-@Index('state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt')) // For archive page (set order index manually: endedAt desc)
+// For archive page
+// The ones ending with "_desc": set index order desc manually on endedAt column
+@Index('index_endedAt', keysOf<HostedGame>()('endedAt'))
+@Index('index_endedAt_desc', keysOf<HostedGame>()('endedAt'))
+@Index('index_state_endedAt', keysOf<HostedGame>()('state', 'endedAt'))
+@Index('index_state_endedAt_desc', keysOf<HostedGame>()('state', 'endedAt'))
+@Index('index_state_opponentType_endedAt', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
+@Index('index_state_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
+@Index('index_state_ranked_opponentType_endedAt', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
+@Index('index_state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
 export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
 {
     @PrimaryGeneratedColumn()
