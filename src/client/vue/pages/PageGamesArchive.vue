@@ -205,7 +205,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                             <span v-if="null !== game.winner">
                                 <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="0 === game.winner ? 'text-danger' : 'text-primary'" />
                                 {{ ' ' }}
-                                <small>+ {{ $t('outcome.' + (game.outcome ?? 'win')) }}</small>
+                                <small>+ {{ game.outcome ? $t('outcome.' + game.outcome) : '??' }}</small>
                             </span>
                             <span v-else>-</span>
                         </td>

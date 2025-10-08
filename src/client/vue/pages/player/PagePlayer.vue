@@ -516,7 +516,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
                         <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
                         <td v-else-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
-                        <td v-else style="width: 7em" class="text-danger">{{ $t('outcome.' + (game.outcome ?? 'loss')) }}</td>
+                        <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
 
                         <td v-if="game.hostedGameToPlayers.length < 2">-</td>
                         <td v-else><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
