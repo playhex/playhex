@@ -23,6 +23,8 @@ export class NoRankedVsAI implements DataInconsistenciesCheckerInterface
     async run(): Promise<string[]>
     {
         if (this.allowRankedBotGames) {
+            // eslint-disable-next-line no-console
+            console.log('     (test skipped) ranked bot games are allowed (ALLOW_RANKED_BOT_GAMES=true)');
             return [];
         }
 
