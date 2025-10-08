@@ -32,6 +32,10 @@ import { type Outcome } from '../../game-engine/Types.js';
 @Index('index_state_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
 @Index('index_state_ranked_opponentType_endedAt', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
 @Index('index_state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
+@Index('index_ranked_opponentType_endedAt', keysOf<HostedGame>()('ranked', 'opponentType', 'endedAt'))
+@Index('index_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('ranked', 'opponentType', 'endedAt'))
+@Index('index_opponentType_endedAt', keysOf<HostedGame>()('opponentType', 'endedAt'))
+@Index('index_opponentType_endedAt_desc', keysOf<HostedGame>()('opponentType', 'endedAt'))
 export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
 {
     @PrimaryGeneratedColumn()
