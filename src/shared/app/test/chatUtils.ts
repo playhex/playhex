@@ -88,6 +88,12 @@ describe('chatMessageUtils', () => {
                 `Best move is <span class="coords">u2</span>`,
                 `should match "u2" if boardsize is big enough`,
             );
+
+            assert.strictEqual(
+                makesCoordsInteractive(`x32`, 41),
+                `<span class="coords">x32</span>`,
+                `should match "x32" in 41x41`,
+            );
         });
     });
 

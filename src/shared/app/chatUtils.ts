@@ -108,7 +108,7 @@ export const relCoordsTranslate = (str: string, boardsize: number): string => {
  */
 export const makesCoordsInteractive = (str: string, boardsize: number): string => {
     const regex = boardsize > 26
-        ? /(https?:\/\/\S+)|\b([a-z]{2}\d{1,3})\b/gi
+        ? /(https?:\/\/\S+)|\b([a-z]{1,2}\d{1,3})\b/gi
         : /(https?:\/\/\S+)|\b([a-z][1-2]?\d)\b/gi
     ;
 
