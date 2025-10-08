@@ -526,7 +526,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.io.to(this.gameRooms(true)).emit('gameStarted', instanceToPlain(this.getHostedGame()));
         this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
-        this.logger.info('Game Started.');
+        this.logger.info('Game Started.', { startedAt: this.hostedGame.startedAt });
 
         notifier.emit('gameStart', this.hostedGame);
 
