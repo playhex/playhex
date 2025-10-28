@@ -159,7 +159,7 @@
         "confirmLabel": "Yes, pass",
         "cancelLabel": "Oops no, let me play"
     },
-    "player_passed_his_turn": "{{player}} passed his turn",
+    "player_passed_his_turn": "{{player}} passed",
     "go_to_the_game": "Go to the game",
     "explore": "Explore",
     "close": "Close",
