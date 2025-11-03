@@ -201,7 +201,8 @@
         "time": "{player} gewinnt auf Zeit!",
         "resign": "{player} gewinnt!",
         "forfeit": "{player} gewinnt durch Forfait!",
-        "default": "{player} gewinnt!"
+        "default": "{player} gewinnt!",
+        "path": "{player} gewinnt!"
     },
     "i_play": {
         "title": "Ich spiele",
@@ -492,5 +493,14 @@
     "notification": {
         "you_won": "Du hast das Spiel gewonnen!",
         "you_lost": "Du hast das Spiel verloren :("
+    },
+    "tournament_seeding_methods": {
+        "title": "Setzliste",
+        "random": "Zufällig",
+        "random_help": "Zufällige Auswahl, unabhängig der Rangfolge der Spieler.",
+        "rating": "Rang",
+        "rating_help": "Auswahl nach Rang. Wenn es in der ersten Runde Freilose gibt, bekommen stärkere Spieler das Freilos.",
+        "rating_random_help": "Auswahl nach Rang, aber mit Zufallselement nach Varianz des Glicko2-Rangs. Wenn es in der ersten Runde Freilose gibt, bekommen stärkere Spieler das Freilos.",
+        "rating_random": "Rang mit Zufallselement"
     }
 }
