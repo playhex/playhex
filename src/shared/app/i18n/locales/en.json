@@ -313,8 +313,8 @@
         "random_help": "Players are seated randomly, no matter their rating.",
         "rating": "Rating",
         "rating_help": "Players are seated by their rating. If there are bye matches on first round, stronger players get the bye.",
-        "rating_random": "Rating with part of random",
-        "rating_random_help": "Players are seated by their rating, but with a part of random depending on their glicko2 rating deviation. If there are bye matches on first round, stronger players get the bye."
+        "rating_random": "Rating with partial randomness",
+        "rating_random_help": "Players are seated by their rating, but with a random component depending on their glicko2 rating deviation. If there are bye matches on first round, stronger players get the bye."
     },
     "tournament_history": {
         "created": "{{organizerPseudo}} created the tournament",
