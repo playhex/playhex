@@ -39,6 +39,12 @@ export type TournamentState =
      * Last game has ended, and ranking is available.
      */
     | 'ended'
+
+    /**
+     * Tournament has been canceled, by admin.
+     * Playing games have been canceled.
+     */
+    | 'canceled'
 ;
 
 @Entity()
@@ -306,13 +312,6 @@ export default class Tournament implements TimeControlBoardsize
     @Transform(({ value }) => JSON.parse(JSON.stringify(value))) // Force expose all fields when value is an instance of Tournament, and not a pojo
     @IsOptional()
     engineData: null | LoadableTournamentValues;
-
-    /**
-     * Allow to delete a tournament.
-     * Only soft deleted to keep relations, history, and restore it in case of error.
-     */
-    @Column({ default: false })
-    softDeleted: boolean;
 }
 
 /**
@@ -340,7 +339,6 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.endedAt = null;
     tournament.featuredFromInSeconds = 0;
     tournament.engineData = null;
-    tournament.softDeleted = false;
 
     return tournament;
 };
@@ -400,7 +398,6 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.startedAt = null;
     tournament.featuredFromInSeconds = 0;
     tournament.history = [];
-    tournament.softDeleted = false;
 
     return tournament;
 };

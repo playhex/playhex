@@ -1040,4 +1040,35 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             });
         }
     }
+
+    cancelGamesAndCancelTournament(): void
+    {
+        if (this.tournament.state === 'ended') {
+            throw new TournamentError('Cannot cancel, tournament is already ended');
+        }
+
+        if (this.tournament.state === 'running') {
+            for (const match of this.tournament.matches) {
+                if (!match.hostedGame) {
+                    continue;
+                }
+
+                match.hostedGame.tournamentMatch = null;
+
+                const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(match.hostedGame.publicId);
+
+                if (!hostedGameServer) {
+                    this.logger.warning('Trying to cancel game in tournament, but hostedGameServer not found', {
+                        hostedGamePublicId: match.hostedGame.publicId,
+                    });
+
+                    continue;
+                }
+
+                hostedGameServer.systemCancel();
+            }
+        }
+
+        this.tournament.state = 'canceled';
+    }
 }

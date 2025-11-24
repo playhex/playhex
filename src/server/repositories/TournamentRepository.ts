@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { FindOptionsRelations, In, Repository } from 'typeorm';
+import { FindOptionsRelations, In, Not, Repository } from 'typeorm';
 import { Player, Tournament, TournamentSubscription } from '../../shared/app/models/index.js';
 import { by, errorToLogger } from '../../shared/app/utils.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
@@ -88,7 +88,6 @@ export default class TournamentRepository
             relations,
             where: {
                 state: In(['created', 'running']),
-                softDeleted: false,
             },
             relationLoadStrategy: 'query',
         });
@@ -222,7 +221,6 @@ export default class TournamentRepository
             },
             where: {
                 state: 'ended',
-                softDeleted: false,
             },
             order: {
                 endedAt: 'desc',
@@ -249,7 +247,7 @@ export default class TournamentRepository
 
         return await this.tournamentRepository.findOne({
             relations,
-            where: { slug, softDeleted: false },
+            where: { slug, state: Not('canceled') },
             relationLoadStrategy: 'query',
         });
     }
@@ -269,7 +267,7 @@ export default class TournamentRepository
         }
 
         return await this.tournamentRepository.findOne({
-            where: { slug, softDeleted: false },
+            where: { slug },
             relations: {
                 organizer: true,
             },
@@ -370,12 +368,13 @@ export default class TournamentRepository
         return tournamentSubscription;
     }
 
-    async deleteActiveTournament(activeTournament: ActiveTournament): Promise<void>
+    async cancelActiveTournament(activeTournament: ActiveTournament): Promise<void>
     {
         const tournament = activeTournament.getTournament();
 
-        tournament.softDeleted = true;
         (tournament.slug as null | string) = null; // Only case where slug is set to null
+
+        activeTournament.cancelGamesAndCancelTournament();
 
         await activeTournament.save();
 
