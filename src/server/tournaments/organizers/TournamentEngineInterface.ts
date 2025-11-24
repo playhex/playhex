@@ -76,7 +76,7 @@ export interface TournamentEngineInterface
     reportWinner(tournament: Tournament, tournamentMatch: TournamentMatch, winnerIndex: PlayerIndex): void;
 
     /**
-     * Update participant scores and tiebreaks values.
+     * Update participants ranks, scores and tiebreaks values.
      */
     updateParticipantsScore(tournament: Tournament): void;
 

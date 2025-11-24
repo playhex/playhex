@@ -5,7 +5,7 @@ import baseLogger from '../services/logger.js';
 import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer } from '../../shared/app/hostedGameUtils.js';
 import { CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
 import { TournamentEngineInterface } from './organizers/TournamentEngineInterface.js';
-import { createGameOptionsForTournament, tournamentStartsAutomatically, sortAndRankParticipants, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, slugifyTournamentName, getCheckInOpensDate } from '../../shared/app/tournamentUtils.js';
+import { createGameOptionsForTournament, tournamentStartsAutomatically, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, slugifyTournamentName, getCheckInOpensDate } from '../../shared/app/tournamentUtils.js';
 import HostedGameServer from '../HostedGameServer.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
@@ -706,8 +706,6 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     private updateRanking(): void
     {
         this.tournamentEngine.updateParticipantsScore(this.tournament);
-
-        sortAndRankParticipants(this.tournament.participants);
     }
 
     /**

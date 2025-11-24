@@ -1,7 +1,7 @@
 import TournamentOrganizer from 'tournament-organizer';
 import { StandingsValues } from 'tournament-organizer/interfaces';
 import { Tournament as TOTournament, Player as TOPlayer, Match } from 'tournament-organizer/components';
-import { findParticipantByPublicIdStrict, findTournamentMatchByRoundAndNumber, getMatchLoserStrict, getMatchWinnerStrict, getSwissTotalRounds, groupAndSortTournamentMatches, tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
+import { findTournamentPlayerByPublicIdStrict, findTournamentMatchByRoundAndNumber, getMatchLoserStrict, getMatchWinnerStrict, getSwissTotalRounds, groupAndSortTournamentMatches, tournamentMatchKey, rankParticipantsDoubleElimination, sortAndRankParticipants } from '../../../shared/app/tournamentUtils.js';
 import { TournamentEngineInterface } from './TournamentEngineInterface.js';
 import { CannotStartTournamentMatchError, NotEnoughParticipantsToStartTournamentError, TooDeepResetError, TournamentEngineError } from '../TournamentError.js';
 import { Service } from 'typedi';
@@ -381,11 +381,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     private doUpdateTournamentMatch(tournament: Tournament, tournamentMatch: TournamentMatch, match: Match): void
     {
         if (!tournamentMatch.player1 && match.player1.id) {
-            tournamentMatch.player1 = findParticipantByPublicIdStrict(tournament, match.player1.id);
+            tournamentMatch.player1 = findTournamentPlayerByPublicIdStrict(tournament, match.player1.id);
         }
 
         if (!tournamentMatch.player2 && match.player2.id) {
-            tournamentMatch.player2 = findParticipantByPublicIdStrict(tournament, match.player2.id);
+            tournamentMatch.player2 = findTournamentPlayerByPublicIdStrict(tournament, match.player2.id);
         }
     }
 
@@ -401,11 +401,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         tournamentMatch.bye = match.bye;
 
         if (match.player1.id) {
-            tournamentMatch.player1 = findParticipantByPublicIdStrict(tournament, match.player1.id);
+            tournamentMatch.player1 = findTournamentPlayerByPublicIdStrict(tournament, match.player1.id);
         }
 
         if (match.player2.id) {
-            tournamentMatch.player2 = findParticipantByPublicIdStrict(tournament, match.player2.id);
+            tournamentMatch.player2 = findTournamentPlayerByPublicIdStrict(tournament, match.player2.id);
         }
 
         tournament.matches.push(tournamentMatch);
@@ -549,6 +549,13 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
     {
         const toTournament = this.getTournament(tournament);
 
+        // For double elimination tournaments, do not rely on scores provided by library: it makes ranks not always correct.
+        // Because just counting number of wins is not valid: when a player have a bye match in the beginning, he will have one less win.
+        if (toTournament.stageOne.format === 'double-elimination') {
+            rankParticipantsDoubleElimination(tournament);
+            return;
+        }
+
         const standings = toTournament.standings(false);
         const playerStanding: { [playerPublicId: string]: StandingsValues } = {};
 
@@ -594,6 +601,9 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 increaseScore(consolation, rounds.length + 10, 'loser');
             }
         }
+
+        // and finaly, recompute rankings from scores
+        sortAndRankParticipants(tournament.participants);
     }
 
     /**

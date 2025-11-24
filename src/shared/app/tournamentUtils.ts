@@ -156,11 +156,11 @@ export const parseTournamentMatchKey = (matchKey: string): { group: number, roun
 };
 
 /**
- * Find a participant in given tournament.
+ * Find a player in given tournament.
  *
- * @throws {Error} If no participant found with this public id
+ * @throws {Error} If no player in this tournament found with this public id
  */
-export const findParticipantByPublicIdStrict = (tournament: Tournament, publicId: string): Player => {
+export const findTournamentPlayerByPublicIdStrict = (tournament: Tournament, publicId: string): Player => {
     for (const participant of tournament.participants) {
         if (participant.player.publicId === publicId) {
             return participant.player;
@@ -171,8 +171,25 @@ export const findParticipantByPublicIdStrict = (tournament: Tournament, publicId
 };
 
 /**
+ * Find a participant in given tournament.
+ *
+ * @throws {Error} If no participant found with this public id
+ */
+export const findParticipantByPlayerStrict = (tournament: Tournament, player: Player): TournamentParticipant => {
+    for (const participant of tournament.participants) {
+        if (participant.player.publicId === player.publicId) {
+            return participant;
+        }
+    }
+
+    throw new Error(`Player "${player.publicId}" not in tournament participants`);
+};
+
+/**
  * Sort participants from their score/tiebreak,
  * and set them a rank.
+ *
+ * Will reset their ranks to set the calculated one from scores.
  */
 export const sortAndRankParticipants = (participants: TournamentParticipant[]): void => {
     if (participants.length === 0) {
@@ -198,6 +215,143 @@ export const sortAndRankParticipants = (participants: TournamentParticipant[]): 
         } else {
             participant.rank = i + 1;
         }
+    }
+};
+
+/**
+ * Get player rank if he gets eliminated at a given round in loser bracket:
+ *
+ * ```
+ * loser brackets:
+ * ... 9 7 5 4 3rd
+ * ... 9 7 5
+ * ... 9
+ * ... 9
+ * ```
+ *
+ * @param loserBracket Loser bracket returned by groupAndSortTournamentMatches()[1]
+ *
+ * @returns An array of ranks, indexed by round number, example: [9, 7, 5, 4, 3]
+ * => if player is eliminated at round 2, she is 7th
+ */
+export const calculateRanksOfLosersBracketRounds = (loserBracket: TournamentMatch[][]): number[] => {
+    const roundsRank = [];
+    let currentRank = 3;
+
+    for (let i = loserBracket.length - 1; i >= 0; --i) {
+        roundsRank.unshift(currentRank);
+        currentRank += loserBracket[i].length;
+    }
+
+    return roundsRank;
+};
+
+/**
+ * For double elimination, first is the grand winner,
+ * second is loser of grand final, and third is winner of petite final,
+ * next ones are losers for all previous loser brackets losers, from last to first.
+ *
+ * ```
+ * winner brackets:
+ *         ... 1st
+ *         ... 2nd
+ *
+ * loser brackets:
+ * ... 9 7 5 4 3rd
+ * ... 9 7 5
+ * ... 9
+ * ... 9
+ * ```
+ *
+ * Should also works for non finished tournaments, players are initialized with lowest rank,
+ * then their rank is updated as long as they win matches and progess in bracket.
+ */
+export const rankParticipantsDoubleElimination = (tournament: Tournament): void => {
+    if (tournament.stage1Format !== 'double-elimination') {
+        throw new Error('forceDoubleEliminationPodium() called on non double elimination tournament');
+    }
+
+    for (const participant of tournament.participants) {
+        participant.rank = undefined;
+        participant.score = 0;
+        participant.tiebreak = 0;
+    }
+
+    const [winnerBracket, loserBracket] = groupAndSortTournamentMatches(tournament.matches);
+    const grandFinal = winnerBracket[winnerBracket.length - 1][0];
+
+    // Set 1st and 2nd ranks to grand final players
+    if (grandFinal.state === 'done') {
+        if (!grandFinal.hostedGame) {
+            throw new Error('match done but no hostedGame');
+        }
+
+        if (grandFinal.hostedGame.winner === null) {
+            throw new Error('match done but no winner');
+        }
+
+        const winner = getMatchWinnerStrict(grandFinal);
+        const loser = getMatchLoserStrict(grandFinal);
+
+        findParticipantByPlayerStrict(tournament, winner).rank = 1;
+        findParticipantByPlayerStrict(tournament, loser).rank = 2;
+    }
+
+    const eliminatedPlayersRanks = calculateRanksOfLosersBracketRounds(loserBracket);
+
+    // Set definitive ranks to players who have been eliminated
+    for (let roundIndex = loserBracket.length - 1; roundIndex >= 0; --roundIndex) {
+        for (const match of loserBracket[roundIndex]) {
+            const loser = getMatchLoser(match);
+
+            if (loser === null) {
+                continue;
+            }
+
+            const participant = findParticipantByPlayerStrict(tournament, loser);
+
+            if (participant.rank === undefined) {
+                participant.rank = eliminatedPlayersRanks[roundIndex];
+            }
+        }
+    }
+
+    /**
+     * Set best rank so far to player the first time we meet them in brackets
+     */
+    const updateTemporaryRank = (player: null | Player, currentRank: number): void => {
+        if (!player) {
+            return;
+        }
+
+        const participant = findParticipantByPlayerStrict(tournament, player);
+
+        if (participant.rank === undefined) {
+            participant.rank = currentRank;
+        }
+    };
+
+    // For still playing tournaments, set temporary ranks to players: minimum rank they can achieve from their position in brackets.
+    for (let roundIndex = Math.min(eliminatedPlayersRanks.length, loserBracket.length, winnerBracket.length) - 1; roundIndex >= 0; --roundIndex) {
+        for (const match of winnerBracket[roundIndex] ?? []) {
+            updateTemporaryRank(match.player1, eliminatedPlayersRanks[roundIndex]);
+            updateTemporaryRank(match.player2, eliminatedPlayersRanks[roundIndex]);
+        }
+
+        for (const match of loserBracket[roundIndex] ?? []) {
+            updateTemporaryRank(match.player1, eliminatedPlayersRanks[roundIndex]);
+            updateTemporaryRank(match.player2, eliminatedPlayersRanks[roundIndex]);
+        }
+    }
+
+    // Set scores relative to rank to keep their ranks in case we reorder them from scores
+    for (const participant of tournament.participants) {
+        if (participant.rank === undefined) {
+            participant.rank = eliminatedPlayersRanks[0];
+        }
+
+        participant.score = eliminatedPlayersRanks[0] - participant.rank + 1;
+        participant.tiebreak = 0;
     }
 };
 
@@ -290,6 +444,14 @@ export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player =
         ? player1
         : player2
     ;
+};
+
+export const getMatchLoser = (tournamentMatch: TournamentMatch): null | Player => {
+    if (tournamentMatch.state !== 'done') {
+        return null;
+    }
+
+    return getMatchLoserStrict(tournamentMatch);
 };
 
 export const getMatchLoserStrict = (tournamentMatch: TournamentMatch): Player => {
