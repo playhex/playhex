@@ -290,7 +290,7 @@
         "losers_final": "Losers Final"
     },
     "tournament_create": "Create a tournament",
-    "tournament_title_duplicate": "A tournament with the same title already exists",
+    "tournament_slug_duplicate": "A tournament with the same url name already exists",
     "tournament_format": {
         "single-elimination": "Single elimination",
         "double-elimination": "Double elimination",

@@ -283,7 +283,6 @@
         "losers_final": "Verliezersfinale"
     },
     "tournament_create": "Toernooi aanmaken",
-    "tournament_title_duplicate": "Er bestaat al een toernooi met deze titel",
     "tournament_format": {
         "single-elimination": "Single elimination",
         "double-elimination": "Double elimination",

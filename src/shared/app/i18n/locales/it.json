@@ -283,7 +283,6 @@
         "losers_final": "Finale dei perdenti"
     },
     "tournament_create": "Crea un torneo",
-    "tournament_title_duplicate": "Esiste già un torneo con lo stesso titolo",
     "tournament_format": {
         "single-elimination": "Eliminazione diretta",
         "double-elimination": "Doppia eliminazione",

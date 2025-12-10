@@ -5,7 +5,7 @@ import baseLogger from '../services/logger.js';
 import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer } from '../../shared/app/hostedGameUtils.js';
 import { CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
 import { TournamentEngineInterface } from './organizers/TournamentEngineInterface.js';
-import { createGameOptionsForTournament, tournamentStartsAutomatically, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, slugifyTournamentName, getCheckInOpensDate } from '../../shared/app/tournamentUtils.js';
+import { createGameOptionsForTournament, tournamentStartsAutomatically, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, getCheckInOpensDate, slugifyTournamentName } from '../../shared/app/tournamentUtils.js';
 import HostedGameServer from '../HostedGameServer.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
@@ -830,142 +830,243 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             throw new TournamentError('Cannot edit, tournament has already started');
         }
 
+        edited.slug = slugifyTournamentName(edited.slug);
+
         const now = new Date();
 
-        if (edited.title !== this.tournament.title) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'title',
-                value: edited.title,
-                oldValue: this.tournament.title,
-            }, now);
+        // In case tournament persist in database make an error,
+        // we have to revert fields changes, and not add history changes.
+        const onUpdated: (() => void)[] = [];
+        const onFailed: (() => void)[] = [];
 
+        if (edited.title !== this.tournament.title) {
+            const oldValue = this.tournament.title;
             this.tournament.title = edited.title;
-            this.tournament.slug = slugifyTournamentName(edited.title);
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'title',
+                    value: edited.title,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.title = oldValue);
+        }
+
+        if (edited.slug !== this.tournament.slug) {
+            const oldValue = this.tournament.slug;
+            this.tournament.slug = edited.slug;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'slug',
+                    value: edited.slug,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.slug = oldValue);
         }
 
         if (edited.description !== this.tournament.description) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'description',
-                value: edited.description?.substring(0, 12) ?? '',
-                oldValue: this.tournament.description?.substring(0, 12) ?? '',
-            }, now);
-
+            const oldValue = this.tournament.description;
             this.tournament.description = edited.description;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'description',
+                    value: edited.description?.substring(0, 12) ?? '',
+                    oldValue: oldValue?.substring(0, 12) ?? '',
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.description = oldValue);
         }
 
         if (edited.stage1Format !== this.tournament.stage1Format) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'stage1Format',
-                value: edited.stage1Format,
-                oldValue: this.tournament.stage1Format,
-            }, now);
-
+            const oldValue = this.tournament.stage1Format;
             this.tournament.stage1Format = edited.stage1Format;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'stage1Format',
+                    value: edited.stage1Format,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.stage1Format = oldValue);
         }
 
         if (edited.stage1Rounds !== this.tournament.stage1Rounds) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'stage1Rounds',
-                value: edited.stage1Rounds,
-                oldValue: this.tournament.stage1Rounds,
-            }, now);
-
+            const oldValue = this.tournament.stage1Rounds;
             this.tournament.stage1Rounds = edited.stage1Rounds;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'stage1Rounds',
+                    value: edited.stage1Rounds,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.stage1Rounds = oldValue);
         }
 
         if (edited.consolation !== this.tournament.consolation) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'consolation',
-                value: edited.consolation,
-                oldValue: this.tournament.consolation,
-            }, now);
-
+            const oldValue = this.tournament.consolation;
             this.tournament.consolation = edited.consolation;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'consolation',
+                    value: edited.consolation,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.consolation = oldValue);
         }
 
         if (edited.ranked !== this.tournament.ranked) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'ranked',
-                value: edited.ranked,
-                oldValue: this.tournament.ranked,
-            }, now);
-
+            const oldValue = this.tournament.ranked;
             this.tournament.ranked = edited.ranked;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'ranked',
+                    value: edited.ranked,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.ranked = oldValue);
         }
 
         if (edited.boardsize !== this.tournament.boardsize) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'boardsize',
-                value: edited.boardsize,
-                oldValue: this.tournament.boardsize,
-            }, now);
-
+            const oldValue = this.tournament.boardsize;
             this.tournament.boardsize = edited.boardsize;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'boardsize',
+                    value: edited.boardsize,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.boardsize = oldValue);
         }
 
         if (!isSameTimeControlType(edited.timeControlType, this.tournament.timeControlType)) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'timeControl',
-                value: timeControlToString(edited.timeControlType),
-                oldValue: timeControlToString(this.tournament.timeControlType),
-            }, now);
-
+            const oldValue = this.tournament.timeControlType;
             this.tournament.timeControlType = edited.timeControlType;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'timeControl',
+                    value: timeControlToString(edited.timeControlType),
+                    oldValue: timeControlToString(oldValue),
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.timeControlType = oldValue);
         }
 
         if (edited.accountRequired !== this.tournament.accountRequired) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'accountRequired',
-                value: edited.accountRequired,
-                oldValue: this.tournament.accountRequired,
-            }, now);
-
+            const oldValue = this.tournament.accountRequired;
             this.tournament.accountRequired = edited.accountRequired;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'accountRequired',
+                    value: edited.accountRequired,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.accountRequired = oldValue);
         }
 
         if (edited.startOfficialAt.getTime() !== this.tournament.startOfficialAt.getTime()) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'officiallyStartsAt',
-                value: edited.startOfficialAt,
-                oldValue: this.tournament.startOfficialAt,
-            }, now);
-
+            const oldValue = this.tournament.startOfficialAt;
             this.tournament.startOfficialAt = edited.startOfficialAt;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'officiallyStartsAt',
+                    value: edited.startOfficialAt,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.startOfficialAt = oldValue);
         }
 
         if (edited.checkInOpenOffsetSeconds !== this.tournament.checkInOpenOffsetSeconds) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'checkInOpenOffsetSeconds',
-                value: edited.checkInOpenOffsetSeconds,
-                oldValue: this.tournament.checkInOpenOffsetSeconds,
-            }, now);
-
+            const oldValue = this.tournament.checkInOpenOffsetSeconds;
             this.tournament.checkInOpenOffsetSeconds = edited.checkInOpenOffsetSeconds;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'checkInOpenOffsetSeconds',
+                    value: edited.checkInOpenOffsetSeconds,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.checkInOpenOffsetSeconds = oldValue);
         }
 
         if (edited.startDelayInSeconds !== this.tournament.startDelayInSeconds) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'startDelayInSeconds',
-                value: edited.startDelayInSeconds,
-                oldValue: this.tournament.startDelayInSeconds,
-            }, now);
-
+            const oldValue = this.tournament.startDelayInSeconds;
             this.tournament.startDelayInSeconds = edited.startDelayInSeconds;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'startDelayInSeconds',
+                    value: edited.startDelayInSeconds,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.startDelayInSeconds = oldValue);
         }
 
         if (edited.seedingMethod !== undefined && edited.seedingMethod !== this.tournament.seedingMethod) {
-            addTournamentHistory(this.tournament, 'edited', {
-                field: 'seedingMethod',
-                value: edited.seedingMethod,
-                oldValue: this.tournament.seedingMethod,
-            }, now);
-
+            const oldValue = this.tournament.seedingMethod;
             this.tournament.seedingMethod = edited.seedingMethod;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'seedingMethod',
+                    value: edited.seedingMethod,
+                    oldValue,
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.seedingMethod = oldValue);
         }
 
-        await this.autoSave.save();
+        try {
+            await this.autoSave.save();
+        } catch (e) {
+            // probable tournament slug duplicate, in this case, revert changes
+            for (const callback of onFailed) {
+                callback();
+            }
 
-        // In case start date, check in or delay time have been updated, recalculate timeout.
+            throw e;
+        }
+
+        for (const callback of onUpdated) {
+            callback();
+        }
+
+        await this.autoSave.save(); // save history changes
+
+        // Recalculate timeout in case one of these field changed: start date, check in or delay time.
         // Will maybe start tournament, so should persist tournament first, then maybe start tournament.
         this.autoNotifyCheckInPeriodOpens();
         this.autoStartOnDate();
@@ -1039,5 +1140,52 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                 e,
             });
         }
+    }
+
+    cancelGamesAndCancelTournament(): void
+    {
+        if (this.tournament.state === 'canceled') {
+            throw new TournamentError('Cannot cancel, tournament is already canceled');
+        }
+
+        if (this.tournament.state === 'ended') {
+            throw new TournamentError('Cannot cancel, tournament is already ended');
+        }
+
+        if (this.tournament.state === 'running') {
+            for (const match of this.tournament.matches) {
+                if (!match.hostedGame) {
+                    continue;
+                }
+
+                const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(match.hostedGame.publicId);
+
+                if (!hostedGameServer) {
+                    this.logger.warning('Trying to cancel game in tournament, but hostedGameServer not found', {
+                        hostedGamePublicId: match.hostedGame.publicId,
+                    });
+
+                    continue;
+                }
+
+                hostedGameServer.systemCancel();
+            }
+
+            this.doCancelTournament();
+            return;
+        }
+
+        if (this.tournament.state === 'created') {
+            this.doCancelTournament();
+            return;
+        }
+
+        throw new TournamentError(`Unexpected tournament state: "${String(this.tournament.state)}"`);
+    }
+
+    private doCancelTournament(): void
+    {
+        this.tournament.state = 'canceled';
+        this.tournament.canceledAt = new Date();
     }
 }

@@ -293,7 +293,6 @@
         "losers_final": "Finał przegranych"
     },
     "tournament_create": "Utwórz turniej",
-    "tournament_title_duplicate": "Turniej o takiej nazwie już istnieje",
     "tournament_format": {
         "single-elimination": "Pojedyncza eliminacja",
         "double-elimination": "Podwójna eliminacja",

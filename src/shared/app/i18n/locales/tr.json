@@ -324,7 +324,6 @@
         "losers_final": "Kaybedenler Finali"
     },
     "tournament_create": "Bir turnuva oluştur",
-    "tournament_title_duplicate": "Bu başlıkta bir turnuva zaten mevcut",
     "tournament_format": {
         "single-elimination": "Tekli eleme",
         "double-elimination": "Çiftli eleme",

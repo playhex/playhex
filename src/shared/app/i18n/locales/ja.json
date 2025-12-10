@@ -275,7 +275,6 @@
         "losers_final": "敗者側決勝"
     },
     "tournament_create": "トーナメントを作成する",
-    "tournament_title_duplicate": "同じタイトルのトーナメントがすでに存在します",
     "tournament_format": {
         "single-elimination": "シングル・エリミネーション",
         "double-elimination": "ダブル・エリミネーション",

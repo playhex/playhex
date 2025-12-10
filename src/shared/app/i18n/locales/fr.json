@@ -130,7 +130,7 @@
         "losers_final": "Finale des perdants"
     },
     "tournament_create": "Créer un tournoi",
-    "tournament_title_duplicate": "Un tournoi avec le même titre existe déjà",
+    "tournament_slug_duplicate": "Un tournoi avec le même nom d'url existe déjà",
     "tournament_format": {
         "single-elimination": "Élimination directe",
         "double-elimination": "Double élimination",

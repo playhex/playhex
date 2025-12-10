@@ -17,9 +17,18 @@ useHead({
 
 <template>
     <template v-if="tournament">
-        <PageTournamentUpcoming v-if="'created' === tournament.state" />
-        <PageTournamentRunning v-else-if="'running' === tournament.state" />
-        <PageTournamentEnded v-else="'ended' === tournament.state" />
+        <PageTournamentUpcoming v-if="tournament.state === 'created'" />
+        <PageTournamentRunning v-else-if="tournament.state === 'running'" />
+        <PageTournamentEnded v-else-if="tournament.state === 'ended'" />
+
+        <template v-else-if="tournament.state === 'canceled'">
+            <div class="container my-3">
+                <p class="display-4 text-warning">Canceled tournament</p>
+            </div>
+
+            <PageTournamentUpcoming v-if="tournament.startedAt === null" />
+            <PageTournamentRunning v-else />
+        </template>
     </template>
 
     <div v-else-if="null === tournament" class="container-fluid my-3">

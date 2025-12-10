@@ -1,7 +1,7 @@
 import diacritics from 'diacritics';
 
 export const slugify = (s: string): string => {
-    return diacritics.remove(s)
+    return diacritics.remove(s ?? '')
 
         // allow only alphanum chars, from any language
         // keeps alnums, Japanese chars, but removes _#~...

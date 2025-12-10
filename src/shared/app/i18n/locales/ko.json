@@ -277,7 +277,6 @@
         "losers_final": "패자조 결승"
     },
     "tournament_create": "토너먼트 만들기",
-    "tournament_title_duplicate": "같은 이름의 토너먼트가 이미 존재합니다",
     "tournament_format": {
         "single-elimination": "싱글 엘리미네이션",
         "double-elimination": "더블 엘리미네이션",

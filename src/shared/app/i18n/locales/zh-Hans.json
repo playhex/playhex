@@ -273,7 +273,6 @@
         "losers_final": "败者组决赛"
     },
     "tournament_create": "创建锦标赛",
-    "tournament_title_duplicate": "已存在同名锦标赛",
     "tournament_format": {
         "single-elimination": "单败淘汰制",
         "double-elimination": "双败淘汰制",

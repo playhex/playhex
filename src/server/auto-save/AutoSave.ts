@@ -70,12 +70,19 @@ export class AutoSave<T> implements AutoSaveInterface<T>
         }
 
         this.nextPromise = (async () => {
-            await this.currentPromise;
+            try {
+                await this.currentPromise;
 
-            this.currentPromise = this.nextPromise;
-            this.nextPromise = null;
+                this.currentPromise = this.nextPromise;
+                this.nextPromise = null;
 
-            return this.doRunCallback();
+                return this.doRunCallback();
+            } catch (e) {
+                this.currentPromise = this.nextPromise;
+                this.nextPromise = null;
+
+                throw e;
+            }
         })();
 
         return this.nextPromise;
@@ -89,10 +96,24 @@ export class AutoSave<T> implements AutoSaveInterface<T>
 
         this.isCallbackRunning = true;
 
-        const result = await this.callback();
+        try {
+            const result = await this.callback();
 
-        this.isCallbackRunning = false;
+            this.isCallbackRunning = false;
 
-        return result;
+            if (this.nextPromise === null) {
+                this.currentPromise = null;
+            }
+
+            return result;
+        } catch (e) {
+            this.isCallbackRunning = false;
+
+            if (this.nextPromise === null) {
+                this.currentPromise = null;
+            }
+
+            throw e;
+        }
     }
 }

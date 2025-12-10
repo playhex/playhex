@@ -1,0 +1,14 @@
+@host=http://localhost:3000
+
+# Admin password from .env
+@adminPassword=PASS
+
+###
+
+# Cancels a tournament. If tournament is currently playing,
+# all games are canceled first.
+
+@touramentSlug=ヘックス総当たり戦-日本大会
+
+DELETE /api/admin/tournaments/{{ touramentSlug }}
+Authorization: Bearer {{ adminPassword }}

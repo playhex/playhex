@@ -198,6 +198,21 @@ export default class AdminController
         });
     }
 
+    @Delete('/api/admin/tournaments/:slug')
+    async cancelTournament(
+        @Param('slug') slug: string,
+    ) {
+        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+
+        if (activeTournament === null) {
+            throw new NotFoundError(`No active tournament "${slug}"`);
+        }
+
+        await this.tournamentRepository.cancelActiveTournament(activeTournament);
+
+        return instanceToPlain(activeTournament.getTournament());
+    }
+
     @Post('/api/admin/tournaments/:slug/iterate')
     async iterateTournament(
         @Param('slug') slug: string,

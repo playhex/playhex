@@ -67,26 +67,29 @@ export default class TournamentController
             return await this.tournamentRepository.createTournament(tournament, organizer);
         } catch (e) {
             if (isDuplicateError(e)) {
-                throw new DomainHttpError(409, 'tournament_title_duplicate', 'A tournament already exists with same title');
+                throw new DomainHttpError(409, 'tournament_slug_duplicate', 'A tournament already exists with same slug');
             }
 
             throw e;
         }
     }
 
-    @Patch('/api/tournaments/:slug')
+    /**
+     * Patch endpoint uses publicId as identifier because slug can be edited
+     */
+    @Patch('/api/tournaments/:publicId')
     async patchTournament(
         @AuthenticatedPlayer() player: Player,
-        @Param('slug') slug: string,
+        @Param('publicId') publicId: string,
         @Body({
             validate: { groups: ['tournament:edit'] },
             transform: { groups: ['tournament:edit'] },
         }) edited: Tournament,
     ) {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentRepository.getActiveTournament(publicId);
 
         if (activeTournament === null) {
-            throw new NotFoundError(`No active tournament "${slug}"`);
+            throw new NotFoundError(`No active tournament with public id "${publicId}"`);
         }
 
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
@@ -95,7 +98,7 @@ export default class TournamentController
             return await activeTournament.editTournament(edited);
         } catch (e) {
             if (isDuplicateError(e)) {
-                throw new DomainHttpError(409, 'tournament_title_duplicate', 'A tournament already exists with same title');
+                throw new DomainHttpError(409, 'tournament_slug_duplicate', 'A tournament already exists with same url name');
             }
 
             throw e;
@@ -278,7 +281,7 @@ export default class TournamentController
     }
 
     @Delete('/api/tournaments/:slug')
-    async deleteTournament(
+    async cancelTournament(
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
     ): Promise<void> {
@@ -290,7 +293,7 @@ export default class TournamentController
 
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
-        await this.tournamentRepository.deleteActiveTournament(activeTournament);
+        await this.tournamentRepository.cancelActiveTournament(activeTournament);
     }
 
     @Put('/api/tournaments/:slug/admins')

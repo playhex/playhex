@@ -360,7 +360,6 @@
         "losers_final": "Verlierer-Finale"
     },
     "tournament_create": "Turnier erstellen",
-    "tournament_title_duplicate": "Ein Turnier mit demselben Titel existiert bereits",
     "tournament_format": {
         "single-elimination": "Einzelausscheidung",
         "double-elimination": "Doppelausscheidung",

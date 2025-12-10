@@ -3,7 +3,7 @@ import { computed, onMounted, ref, toRefs, watchEffect } from 'vue';
 import { validate, ValidationError } from 'class-validator';
 import { Tournament } from '../../../../shared/app/models';
 import { FailedProperties, toFailedProperties } from '../../../../shared/app/ValidationError';
-import { availableStage1Formats, seedingMethods } from '../../../../shared/app/tournamentUtils';
+import { availableStage1Formats, seedingMethods, slugifyTournamentName } from '../../../../shared/app/tournamentUtils';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
 import AppTimeControl from '../../components/AppTimeControl.vue';
 import { apiGetTournament } from '../../../apiClient';
@@ -13,6 +13,7 @@ import { cloneTournament } from '../../../../shared/app/models/Tournament';
 import AppTournamentFormatImage from './AppTournamentFormatImage.vue';
 import AppDurationInput from '../../components/AppDurationInput.vue';
 import { instanceToPlain, plainToInstance } from '../../../../shared/app/class-transformer-custom';
+import { IconPencilSquare } from '../../icons';
 
 const props = defineProps({
     tournament: {
@@ -22,6 +23,15 @@ const props = defineProps({
 });
 
 const { tournament } = toRefs(props);
+
+// Tournament slug auto/manual
+const manualSlug = ref((tournament.value.slug ?? '') !== slugifyTournamentName(tournament.value.title));
+
+watchEffect(() => {
+    if (!manualSlug.value) {
+        tournament.value.slug = slugifyTournamentName(tournament.value.title);
+    }
+});
 
 /**
  * Convert startAt Date to "datetime-local" input format (e.g "2025-04-01T22:00")
@@ -81,15 +91,11 @@ const globalError = ref<null | string>(null);
 const showFormErrors = (validationErrors: ValidationError[]): void => {
     failedProperties.value = toFailedProperties(validationErrors);
 
-    // If there is an error on an input that has no dedicated error placeholder, display if globally.
+    // If there is an error on an input that has no dedicated error placeholder, display it globally.
     // Should not happen: should be displayed next to input.
     const otherErrors: string[] = [];
 
     for (const failedProperty in failedProperties.value) {
-        if (['title'].includes(failedProperty)) {
-            continue;
-        }
-
         otherErrors.push(...failedProperties.value[failedProperty].map(e => failedProperty + ': ' + e));
     }
 
@@ -170,10 +176,37 @@ defineExpose({
             :class="{ 'is-invalid': failedProperties.title }"
             id="name"
         >
+        <div class="form-text mb-3">
+            Tournament title, as it will be displayed to players.
+            Url will be <code>/tournaments/{{ slugifyTournamentName(tournament.slug) }}</code>,
+            but you can
+            <a v-if="!manualSlug" href="#" @click.prevent="manualSlug = true"><IconPencilSquare /> change it</a>
+            <a v-else href="#" @click.prevent="manualSlug = false">let it as default</a>.
+        </div>
         <div v-if="failedProperties.title" class="invalid-feedback">
             {{ failedProperties.title.join(', ') }}
         </div>
     </div>
+
+    <div class="mb-3" v-if="manualSlug">
+        <label for="name" class="form-label">Tournament url name</label>
+        <input
+            v-model="tournament.slug"
+            type="text"
+            class="form-control form-control-sm"
+            :class="{ 'is-invalid': failedProperties.slug }"
+        >
+        <div class="form-text mb-3">
+            You can change the URL for this tournament here.
+            Please note that the previous URL will no longer work,
+            which may cause issues if you’ve already shared it with others.
+        </div>
+        <div v-if="failedProperties.slug" class="invalid-feedback">
+            {{ failedProperties.slug.join(', ') }}
+        </div>
+    </div>
+
+    <h3>Tournament format</h3>
 
     <div class="mb-3">
         <div class="row">

@@ -82,4 +82,44 @@ describe('AutoSave', () => {
         assert.strictEqual(r3, r4, 'same results');
         assert.strictEqual(resolved, 3);
     });
+
+    it('persist twice if called sychronously', async () => {
+        let callCount = 0;
+
+        const autoSave = new AutoSave<number>(async () => {
+            await wait(100);
+            return ++callCount;
+        });
+
+        assert.strictEqual(callCount, 0);
+        assert.strictEqual(await autoSave.save(), 1);
+        assert.strictEqual(callCount, 1);
+        assert.strictEqual(await autoSave.save(), 2);
+        assert.strictEqual(callCount, 2);
+    });
+
+    it('tries to persist again after last save threw an error', async () => {
+        let callCount = 0;
+
+        const autoSave = new AutoSave<number>(async () => {
+            await wait(100);
+            ++callCount;
+
+            if (callCount < 2) {
+                throw new Error('First save throws an error');
+            }
+
+            return callCount;
+        });
+
+        try {
+            await autoSave.save();
+            assert.fail('First save should throw error');
+        } catch {
+        }
+
+        assert.strictEqual(callCount, 1, 'First call, error thrown');
+        assert.strictEqual(await autoSave.save(), 2);
+        assert.strictEqual(callCount, 2, 'Second save should call again');
+    });
 });

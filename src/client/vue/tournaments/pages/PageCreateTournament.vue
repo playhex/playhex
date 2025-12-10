@@ -52,9 +52,9 @@ const createTournament = async (): Promise<void> => {
         ));
     } catch (e) {
         if (e instanceof DomainHttpError) {
-            if (e.type === 'tournament_title_duplicate') {
+            if (e.type === 'tournament_slug_duplicate') {
                 useToastsStore().addToast(new Toast(
-                    t('tournament_title_duplicate'),
+                    t('tournament_slug_duplicate'),
                     {
                         level: 'danger',
                     },

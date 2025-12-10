@@ -280,7 +280,6 @@
         "losers_final": "Final dos perdedores"
     },
     "tournament_create": "Criar um torneio",
-    "tournament_title_duplicate": "Já existe um torneio com esse nome",
     "tournament_format": {
         "single-elimination": "Eliminação simples",
         "double-elimination": "Eliminação dupla",

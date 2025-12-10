@@ -400,7 +400,6 @@
         "losers_final": "Финал проигравших"
     },
     "tournament_create": "Создать турнир",
-    "tournament_title_duplicate": "Турнир с таким названием уже существует",
     "tournament_format": {
         "single-elimination": "Одинарное выбивание",
         "double-elimination": "Двойное выбивание",

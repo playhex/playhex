@@ -665,7 +665,7 @@ export const apiPostTournament = async (tournament: Tournament): Promise<null | 
 };
 
 export const apiPatchTournament = async (tournament: Tournament): Promise<null | Tournament> => {
-    const response = await fetch(`/api/tournaments/${tournament.slug}`, {
+    const response = await fetch(`/api/tournaments/${tournament.publicId}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -787,7 +787,7 @@ export const apiPostResetAndRecreateGame = async (tournamentSlug: string, hosted
     await checkResponse(response);
 };
 
-export const apiDeleteTournament = async (tournamentSlug: string): Promise<void> => {
+export const apiCancelTournament = async (tournamentSlug: string): Promise<void> => {
     const response = await fetch(`/api/tournaments/${tournamentSlug}`, {
         method: 'delete',
     });

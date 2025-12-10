@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue';
 import { t } from 'i18next';
-import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiDeleteTournament, apiPutTournamentAdmins } from '../../../apiClient.js';
+import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiCancelTournament, apiPutTournamentAdmins } from '../../../apiClient.js';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
 import TournamentBannedPlayer from '../../../../shared/app/models/TournamentBannedPlayer.js';
 import Player from '../../../../shared/app/models/Player.js';
@@ -65,9 +65,9 @@ const editTournament = async () => {
         ));
     } catch (e) {
         if (e instanceof DomainHttpError) {
-            if (e.type === 'tournament_title_duplicate') {
+            if (e.type === 'tournament_slug_duplicate') {
                 useToastsStore().addToast(new Toast(
-                    t('tournament_title_duplicate'),
+                    t('tournament_slug_duplicate'),
                     {
                         level: 'danger',
                     },
@@ -168,13 +168,13 @@ const unbanPlayer = async (player: Player): Promise<void> => {
 };
 
 /**
- * Delete tournament
+ * Cancel tournament
  */
-const deleteTournament = async () => {
-    await apiDeleteTournament(slug);
+const cancelTournament = async () => {
+    await apiCancelTournament(slug);
 
     useToastsStore().addToast(new Toast(
-        `Tournament ${slug} has been deleted.`,
+        `Tournament ${slug} has been canceled.`,
         {
             level: 'warning',
         },
@@ -294,8 +294,8 @@ const updateAdmins = async () => {
         <br>
 
         <template v-if="tournament && 'ended' !== tournament.state">
-            <button @click="deleteTournament" class="btn btn-danger">Delete</button>
-            <p><small>Just delete all the tournament. It won't appear again in tournaments list, and won't be accessible anymore.</small></p>
+            <button @click="cancelTournament" class="btn btn-danger">Cancel</button>
+            <p><small>Cancels the tournament. It won't appear again in tournaments list. If tournament was started, active games will be canceled.</small></p>
         </template>
     </div>
 </template>

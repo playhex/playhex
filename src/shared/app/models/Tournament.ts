@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { type LoadableTournamentValues } from 'tournament-organizer/interfaces';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, type Relation } from 'typeorm';
-import { IsArray, IsBoolean, IsDate, IsIn, IsInt, IsObject, IsOptional, IsString, IsUUID, Length, Max, Min, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsIn, IsInt, IsObject, IsOptional, IsString, IsUUID, Length, Max, Min, Validate, ValidateNested } from 'class-validator';
+import { IsTournamentSlug } from '../validator/IsTournamentSlug.js';
 import { Transform, Type } from 'class-transformer';
 import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom.js';
 import { ColumnUUID } from '../custom-typeorm.js';
@@ -39,6 +40,12 @@ export type TournamentState =
      * Last game has ended, and ranking is available.
      */
     | 'ended'
+
+    /**
+     * Tournament has been canceled, by admin.
+     * Playing games have been canceled.
+     */
+    | 'canceled'
 ;
 
 @Entity()
@@ -58,7 +65,7 @@ export default class Tournament implements TimeControlBoardsize
     publicId: string;
 
     /**
-     * Name of this tournament
+     * Name of this tournament, as displayed in title.
      *
      * e.g "Hex Monthly 21"
      */
@@ -79,12 +86,16 @@ export default class Tournament implements TimeControlBoardsize
 
     /**
      * Slug, generated from title, used for url.
-     * Can be null when tournament is soft deleted,
-     * to prevent unique constraint when delete/recreate tournament with same name.
+     *
+     * Should not be null, even for tournaments canceled after they have started,
+     * because slug is used to generate tournament links to show in game page.
      */
-    @Column({ length: 64, unique: true, nullable: true })
-    @Expose()
-    @IsString()
+    @Column({ length: 64, unique: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    @IsString({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    @IsOptional({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    @Length(2, 64, { groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    @Validate(IsTournamentSlug)
     slug: string;
 
     /**
@@ -282,6 +293,26 @@ export default class Tournament implements TimeControlBoardsize
     @Type(() => Date)
     endedAt: null | Date;
 
+    /**
+     * When tournament has been canceled
+     */
+    @Column({ type: Date, nullable: true })
+    @Expose()
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    canceledAt: null | Date;
+
+    /**
+     * Free field to display a cancel reason to players,
+     * when this tournament is in canceled state.
+     */
+    @Column({ type: String, nullable: true })
+    @Expose()
+    @IsOptional()
+    @Type(() => String)
+    cancelReason: null | string;
+
     @OneToMany(() => TournamentHistory, tournamentHistory => tournamentHistory.tournament, { cascade: true })
     @Expose()
     history: TournamentHistory[];
@@ -306,13 +337,6 @@ export default class Tournament implements TimeControlBoardsize
     @Transform(({ value }) => JSON.parse(JSON.stringify(value))) // Force expose all fields when value is an instance of Tournament, and not a pojo
     @IsOptional()
     engineData: null | LoadableTournamentValues;
-
-    /**
-     * Allow to delete a tournament.
-     * Only soft deleted to keep relations, history, and restore it in case of error.
-     */
-    @Column({ default: false })
-    softDeleted: boolean;
 }
 
 /**
@@ -338,9 +362,10 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.createdAt = new Date();
     tournament.startedAt = null;
     tournament.endedAt = null;
+    tournament.canceledAt = null;
+    tournament.cancelReason = null;
     tournament.featuredFromInSeconds = 0;
     tournament.engineData = null;
-    tournament.softDeleted = false;
 
     return tournament;
 };
@@ -379,7 +404,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.publicId = uuidv4();
     tournament.title = input.title;
     tournament.description = input.description;
-    tournament.slug = slugifyTournamentName(input.title);
+    tournament.slug = input.slug ? slugifyTournamentName(input.slug) : slugifyTournamentName(input.title);
     tournament.admins = [];
     tournament.stage1Format = input.stage1Format;
     tournament.stage1Rounds = input.stage1Rounds;
@@ -398,9 +423,10 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.checkInOpenOffsetSeconds = input.checkInOpenOffsetSeconds;
     tournament.startDelayInSeconds = input.startDelayInSeconds;
     tournament.startedAt = null;
+    tournament.canceledAt = null;
+    tournament.cancelReason = null;
     tournament.featuredFromInSeconds = 0;
     tournament.history = [];
-    tournament.softDeleted = false;
 
     return tournament;
 };
@@ -410,6 +436,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
  */
 export const cloneTournament = (target: Tournament, source: Tournament): void => {
     target.title = source.title + ' (clone)';
+    target.slug = slugifyTournamentName(target.title);
     target.description = source.description;
     target.admins = [];
     target.stage1Format = source.stage1Format;

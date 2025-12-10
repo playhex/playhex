@@ -94,3 +94,16 @@ export const gaussianRandom = (mean = 0, deviation = 1): number => {
     // Transform to the desired mean and standard deviation:
     return z * deviation + mean;
 };
+
+/**
+ * Generates a random string that can go in url
+ */
+export const randomSlug = (length = 6): string => {
+    let randomString = '';
+
+    while (randomString.length < length) {
+        randomString += (1E24 * Math.random()).toString(36).substring(0, length);
+    }
+
+    return randomString.substring(0, length);
+};

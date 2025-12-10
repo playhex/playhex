@@ -362,7 +362,6 @@
         "losers_final": "Taberfinale"
     },
     "tournament_create": "Opret en turnering",
-    "tournament_title_duplicate": "En turnering med samme navn findes allerede",
     "tournament_format": {
         "single-elimination": "Single elimination",
         "double-elimination": "Double elimination",

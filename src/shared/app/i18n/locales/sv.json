@@ -309,7 +309,6 @@
         "losers_final": "Förlorarnas final"
     },
     "tournament_create": "Skapa en turnering",
-    "tournament_title_duplicate": "En turnering med samma titel finns redan",
     "tournament_format": {
         "single-elimination": "Enkel eliminering",
         "double-elimination": "Dubbel eliminering",

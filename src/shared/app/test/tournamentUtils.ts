@@ -212,7 +212,7 @@ describe('tournamentUtils', () => {
         });
     });
 
-    describe.only('rankParticipantsDoubleElimination', () => {
+    describe('rankParticipantsDoubleElimination', () => {
         it('sets all ranks to the lowest one when no game played yet', () => {
             const tournament = createTestTournament([
                 // hex monthly 28, 8 participants, beginning. https://playhex.org/tournaments/hex-monthly-28
