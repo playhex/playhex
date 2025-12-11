@@ -122,13 +122,13 @@
         "see_how_to_spawn_a_worker": "Zobacz, jak obliczać ruchy AI dla PlayHex z mojego komputera"
     },
     "game_analysis": {
-        "game_analysis": "Analiza gry przez AI",
-        "requested": "Oczekiwanie na analizę AI…",
+        "game_analysis": "Analiza partii przez SI",
+        "requested": "Oczekiwanie na analizę SI…",
         "errored": "Błąd analizy!",
         "best_move": "najlepszy ruch",
         "best": "najlepszy:",
         "how_it_works": "Jak to działa",
-        "request_analysis": "Zarządaj analizy AI"
+        "request_analysis": "Zażądaj analizy SI"
     },
     "try_again": "Spróbuj ponownie",
     "yes": "Tak",
