@@ -3,13 +3,13 @@ import { formatRelative } from 'date-fns';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
-import { IconMailbox, IconMailboxFlag } from '../icons';
+import { IconMailbox, IconMailboxFlag } from '../icons.js';
 import { apiPostPlayerNotificationsAcknowledge } from '../../apiClient.js';
 import AppNotification from './AppNotification.vue';
 import AppUnreadNotificationsBadge from './AppUnreadNotificationsBadge.vue';
-import { getOpponent } from '../../services/notifications/context-utils';
-import { pseudoStringOptional } from '../../../shared/app/pseudoUtils';
-import usePlayerNotificationsStore from '../../stores/playerNotificationsStore';
+import { getOpponent } from '../../services/notifications/context-utils.js';
+import { pseudoStringOptional } from '../../../shared/app/pseudoUtils.js';
+import usePlayerNotificationsStore from '../../stores/playerNotificationsStore.js';
 
 /**
  * null: not yet loaded

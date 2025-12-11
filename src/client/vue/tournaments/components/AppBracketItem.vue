@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, toRefs } from 'vue';
-import { Player, Tournament, TournamentMatch } from '../../../../shared/app/models';
+import { Player, Tournament, TournamentMatch } from '../../../../shared/app/models/index.js';
 import AppBracketManageGame from './AppBracketManageGame.vue';
 import { IconCheck, IconPlayFill, IconThreeDots, IconTrophyFill } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';

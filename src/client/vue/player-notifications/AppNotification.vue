@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PlayerNotification } from '../../../shared/app/models';
+import { PlayerNotification } from '../../../shared/app/models/index.js';
 import AppNotificationChatMessage from './notification-types/AppNotificationChatMessage.vue';
 import AppNotificationCustom from './notification-types/AppNotificationCustom.vue';
 import AppNotificationFallback from './notification-types/AppNotificationFallback.vue';

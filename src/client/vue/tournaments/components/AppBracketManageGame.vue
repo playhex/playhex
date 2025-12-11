@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, toRefs } from 'vue';
-import { Tournament, TournamentMatch } from '../../../../shared/app/models';
+import { Tournament, TournamentMatch } from '../../../../shared/app/models/index.js';
 import { IconCaretDownFill, IconCaretRight } from '../../icons.js';
-import { apiPostForfeitTournamentMatchPlayer, apiPostResetAndRecreateGame } from '../../../apiClient';
+import { apiPostForfeitTournamentMatchPlayer, apiPostResetAndRecreateGame } from '../../../apiClient.js';
 
 const props = defineProps({
     tournamentMatch: {

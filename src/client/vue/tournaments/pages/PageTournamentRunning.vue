@@ -6,7 +6,7 @@ import AppTournamentHistorySection from '../components/AppTournamentHistorySecti
 import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
 import { IconRecordFill } from '../../icons.js';
-import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
+import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils.js';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';

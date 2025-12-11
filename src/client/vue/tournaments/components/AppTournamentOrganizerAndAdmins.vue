@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppPseudo from '../../components/AppPseudo.vue';
-import { Tournament } from '../../../../shared/app/models';
+import { Tournament } from '../../../../shared/app/models/index.js';
 
 defineProps({
     tournament: {

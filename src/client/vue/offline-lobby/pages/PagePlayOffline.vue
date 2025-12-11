@@ -6,13 +6,13 @@ import AppBoard from '../../components/AppBoard.vue';
 import { Game, IllegalMove, Move, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
-import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions';
-import { findLocalAIByName, instanciateAi } from '../localAi';
+import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
+import { findLocalAIByName, instanciateAi } from '../localAi.js';
 import { defineOverlay } from '@overlastic/vue';
 import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vue';
-import GameView from '../../../../shared/pixi-board/GameView';
-import { OfflineGame } from '../models/OfflineGame';
-import { offlineGamesStorage } from '../services/OfflineGamesStorage';
+import GameView from '../../../../shared/pixi-board/GameView.js';
+import { OfflineGame } from '../models/OfflineGame.js';
+import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 
 let gameView: null | CustomizedGameView = null;
 let lastGameOptions: OfflineAIGameOptions;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { intlFormat } from 'date-fns';
-import { Tournament } from '../../../../shared/app/models';
-import { autoLocale } from '../../../../shared/app/i18n';
+import { Tournament } from '../../../../shared/app/models/index.js';
+import { autoLocale } from '../../../../shared/app/i18n/index.js';
 
 defineProps({
     tournament: {

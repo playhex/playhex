@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Tournament } from '../../../../shared/app/models';
+import { Tournament } from '../../../../shared/app/models/index.js';
 import AppStandingsDefault from './standings/AppStandingsDefault.vue';
 import AppStandingsSingleElimination from './standings/AppStandingsSingleElimination.vue';
 import AppStandingsDoubleElimination from './standings/AppStandingsDoubleElimination.vue';

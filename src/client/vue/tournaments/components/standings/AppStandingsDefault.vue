@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Tournament } from '../../../../../shared/app/models';
-import { byRank } from '../../../../../shared/app/tournamentUtils';
+import { Tournament } from '../../../../../shared/app/models/index.js';
+import { byRank } from '../../../../../shared/app/tournamentUtils.js';
 
 defineProps({
     tournament: {

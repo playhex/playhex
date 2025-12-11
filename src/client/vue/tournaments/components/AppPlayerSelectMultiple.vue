@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import 'vue-multiselect/dist/vue-multiselect.css';
 import Multiselect from 'vue-multiselect';
-import { Player } from '../../../../shared/app/models';
+import { Player } from '../../../../shared/app/models/index.js';
 import { ref } from 'vue';
-import { getSearchPlayers } from '../../../apiClient';
+import { getSearchPlayers } from '../../../apiClient.js';
 import { t } from 'i18next';
 
 defineModel<Player[]>({

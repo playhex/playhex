@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Tournament } from '../../../../shared/app/models';
+import { Tournament } from '../../../../shared/app/models/index.js';
 import AppBracketDefault from './brackets/AppBracketDefault.vue';
 import AppBracketDoubleElimination from './brackets/AppBracketDoubleElimination.vue';
 import AppBracketSingleElimination from './brackets/AppBracketSingleElimination.vue';

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Tournament } from '../../../../../shared/app/models';
-import { getSwissTotalRounds, tournamentMatchKey } from '../../../../../shared/app/tournamentUtils';
+import { Tournament } from '../../../../../shared/app/models/index.js';
+import { getSwissTotalRounds, tournamentMatchKey } from '../../../../../shared/app/tournamentUtils.js';
 import AppBracketItem from '../AppBracketItem.vue';
-import { useTournamentBracketsHelpers } from '../../composables/tournamentBracketsHelpers';
+import { useTournamentBracketsHelpers } from '../../composables/tournamentBracketsHelpers.js';
 import AppBracketItemEmpty from '../AppBracketItemEmpty.vue';
 
 const props = defineProps({

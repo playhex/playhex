@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { Player, Tournament } from '../../../../../shared/app/models';
-import { byRank } from '../../../../../shared/app/tournamentUtils';
-import { getWinnerPlayer } from '../../../../../shared/app/hostedGameUtils';
+import { Player, Tournament } from '../../../../../shared/app/models/index.js';
+import { byRank } from '../../../../../shared/app/tournamentUtils.js';
+import { getWinnerPlayer } from '../../../../../shared/app/hostedGameUtils.js';
 
 const props = defineProps({
     tournament: {

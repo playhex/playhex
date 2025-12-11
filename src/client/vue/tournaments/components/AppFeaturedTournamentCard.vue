@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
 import { IconBell, IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons.js';
-import { Tournament } from '../../../../shared/app/models';
+import { Tournament } from '../../../../shared/app/models/index.js';
 import AppMySubscriptionStatus from './AppMySubscriptionStatus.vue';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentStartsAt from './AppTournamentStartsAt.vue';
-import { getActiveTournamentMatches, isCheckInOpen } from '../../../../shared/app/tournamentUtils';
-import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
+import { getActiveTournamentMatches, isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
+import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription.js';
 
 const props = defineProps({
     tournament: {

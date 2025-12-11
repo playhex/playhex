@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { formatDistanceToNowStrict } from 'date-fns';
-import { PlayerNotification } from '../../../../shared/app/models';
+import { PlayerNotification } from '../../../../shared/app/models/index.js';
 
 defineProps({
     playerNotification: {

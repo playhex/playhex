@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, toRefs, watchEffect } from 'vue';
 import { validate, ValidationError } from 'class-validator';
-import { Tournament } from '../../../../shared/app/models';
-import { FailedProperties, toFailedProperties } from '../../../../shared/app/ValidationError';
-import { availableStage1Formats, seedingMethods, slugifyTournamentName } from '../../../../shared/app/tournamentUtils';
-import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils';
+import { Tournament } from '../../../../shared/app/models/index.js';
+import { FailedProperties, toFailedProperties } from '../../../../shared/app/ValidationError.js';
+import { availableStage1Formats, seedingMethods, slugifyTournamentName } from '../../../../shared/app/tournamentUtils.js';
+import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
 import AppTimeControl from '../../components/AppTimeControl.vue';
-import { apiGetTournament } from '../../../apiClient';
-import useToastsStore from '../../../stores/toastsStore';
-import { Toast } from '../../../../shared/app/Toast';
-import { cloneTournament } from '../../../../shared/app/models/Tournament';
+import { apiGetTournament } from '../../../apiClient.js';
+import useToastsStore from '../../../stores/toastsStore.js';
+import { Toast } from '../../../../shared/app/Toast.js';
+import { cloneTournament } from '../../../../shared/app/models/Tournament.js';
 import AppTournamentFormatImage from './AppTournamentFormatImage.vue';
 import AppDurationInput from '../../components/AppDurationInput.vue';
-import { instanceToPlain, plainToInstance } from '../../../../shared/app/class-transformer-custom';
-import { IconPencilSquare } from '../../icons';
+import { instanceToPlain, plainToInstance } from '../../../../shared/app/class-transformer-custom.js';
+import { IconPencilSquare } from '../../icons.js';
 
 const props = defineProps({
     tournament: {

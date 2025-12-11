@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
-import { useLandingPages } from '../../../composables/landingPages';
+import { useLandingPages } from '../../../composables/landingPages.js';
 
 useSeoMeta({
     title: 'オンラインでヘックスをプレイ',

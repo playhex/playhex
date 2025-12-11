@@ -6,10 +6,10 @@ import { IconRobot } from '../../icons.js';
 import Create1vOfflineAIOverlay from '../overlay/Create1vOfflineAIOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import { useRouter } from 'vue-router';
-import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions';
-import { offlineGamesStorage } from '../services/OfflineGamesStorage';
-import { Game } from '../../../../shared/game-engine';
-import { CustomizedGameView } from '../../../services/CustomizedGameView';
+import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
+import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
+import { Game } from '../../../../shared/game-engine/index.js';
+import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { onMounted, ref } from 'vue';
 
 useHead({

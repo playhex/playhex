@@ -10,7 +10,7 @@ import { AIConfigStatusData } from '../../../../shared/app/Types.js';
 import { apiGetAiConfigsStatus } from '../../../apiClient.js';
 import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
-import TimeControlType from '../../../../shared/time-control/TimeControlType';
+import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 
 const { min, max } = Math;
 

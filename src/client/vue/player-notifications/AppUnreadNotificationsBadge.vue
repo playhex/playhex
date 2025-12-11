@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { PlayerNotification } from '../../../shared/app/models';
+import { PlayerNotification } from '../../../shared/app/models/index.js';
 
 defineProps({
     playerNotifications: {

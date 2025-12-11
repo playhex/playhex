@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia';
 import { AIConfigStatusData } from '../../../../shared/app/Types.js';
 import { apiGetAiConfigsStatus } from '../../../apiClient.js';
 import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
-import TimeControlType from '../../../../shared/time-control/TimeControlType';
+import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 
 const { visible, resolve, reject } = useExtendOverlay();
 

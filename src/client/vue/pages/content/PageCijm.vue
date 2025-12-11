@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue';
 import { IconYoutube } from '../../icons.js';
-import { autoLocale } from '../../../../shared/app/i18n';
+import { autoLocale } from '../../../../shared/app/i18n/index.js';
 
 useHead({
     title: 'Tournoi de Hex à Paris 2025',

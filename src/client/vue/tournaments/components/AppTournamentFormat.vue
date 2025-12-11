@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
-import { Tournament } from '../../../../shared/app/models';
-import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils';
+import { Tournament } from '../../../../shared/app/models/index.js';
+import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils.js';
 
 defineProps({
     tournament: {

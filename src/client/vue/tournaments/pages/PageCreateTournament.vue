@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
-import { apiPostTournament } from '../../../apiClient';
+import { apiPostTournament } from '../../../apiClient.js';
 import { useRouter } from 'vue-router';
-import { DomainHttpError } from '../../../../shared/app/DomainHttpError';
+import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { t } from 'i18next';
-import { createTournamentDefaultsCreate } from '../../../../shared/app/models/Tournament';
+import { createTournamentDefaultsCreate } from '../../../../shared/app/models/Tournament.js';
 import { useHead } from '@unhead/vue';
 import AppTournamentForm from '../components/AppTournamentForm.vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
-import useToastsStore from '../../../stores/toastsStore';
-import { Toast } from '../../../../shared/app/Toast';
+import useToastsStore from '../../../stores/toastsStore.js';
+import { Toast } from '../../../../shared/app/Toast.js';
 
 const tournament = ref(createTournamentDefaultsCreate());
 

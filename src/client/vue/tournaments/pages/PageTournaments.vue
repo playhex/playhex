@@ -2,15 +2,15 @@
 import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../icons.js';
 import { ref } from 'vue';
 import { useHead } from '@unhead/vue';
-import { Tournament } from '../../../../shared/app/models';
-import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient';
+import { Tournament } from '../../../../shared/app/models/index.js';
+import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient.js';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
-import { autoLocale } from '../../../../shared/app/i18n';
+import { autoLocale } from '../../../../shared/app/i18n/index.js';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
 import AppCountdown from '../../components/AppCountdown.vue';
 import AppMySubscriptionStatus from '../components/AppMySubscriptionStatus.vue';
-import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils';
-import { getCurrentTournamentSubscriptionStatus, iAmParticipant } from '../composables/tournamentCurrentSubscription';
+import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils.js';
+import { getCurrentTournamentSubscriptionStatus, iAmParticipant } from '../composables/tournamentCurrentSubscription.js';
 import { t } from 'i18next';
 
 useHead({

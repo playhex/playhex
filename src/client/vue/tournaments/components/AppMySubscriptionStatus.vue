@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { Tournament } from '../../../../shared/app/models';
-import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription';
-import { isCheckInOpen } from '../../../../shared/app/tournamentUtils';
+import { Tournament } from '../../../../shared/app/models/index.js';
+import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription.js';
+import { isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import { IconBellCheckFill, IconCheck, IconExclamationTriangleFill } from '../../icons.js';
 
 /*

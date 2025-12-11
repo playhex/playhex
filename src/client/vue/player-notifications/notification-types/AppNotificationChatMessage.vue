@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { IconChatDots } from '../../icons';
-import { PlayerNotification } from '../../../../shared/app/models';
+import { IconChatDots } from '../../icons.js';
+import { PlayerNotification } from '../../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 
 defineProps({
