@@ -15,7 +15,7 @@
                     "pseudo": "Determinist random bot",
                     "slug": "slug",
                     "isGuest": false,
-                    "isBot": true
+                    "isBot": false
                 }
             },
             {
@@ -146,7 +146,7 @@
                     "pseudo": "Determinist random bot",
                     "slug": "slug",
                     "isGuest": false,
-                    "isBot": true
+                    "isBot": false
                 }
             },
             {

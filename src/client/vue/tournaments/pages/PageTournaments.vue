@@ -12,6 +12,8 @@ import AppMySubscriptionStatus from '../components/AppMySubscriptionStatus.vue';
 import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUtils.js';
 import { getCurrentTournamentSubscriptionStatus, iAmParticipant } from '../composables/tournamentCurrentSubscription.js';
 import { t } from 'i18next';
+import useToastsStore from '../../../stores/toastsStore.js';
+import { Toast } from '../../../../shared/app/Toast.js';
 
 useHead({
     title: t('tournaments'),
@@ -21,8 +23,27 @@ const activeTournaments = ref<null | Tournament[]>(null);
 const endedTournaments = ref<null | Tournament[]>(null);
 
 void (async () => {
-    activeTournaments.value = await apiGetActiveTournaments();
-    endedTournaments.value = await apiGetEndedTournaments();
+    try {
+        activeTournaments.value = await apiGetActiveTournaments();
+    } catch (e) {
+        useToastsStore().addToast(new Toast(
+            'Could not load active tournaments',
+            {
+                level: 'danger',
+            },
+        ));
+    }
+
+    try {
+        endedTournaments.value = await apiGetEndedTournaments();
+    } catch (e) {
+        useToastsStore().addToast(new Toast(
+            'Could not load ended tournaments',
+            {
+                level: 'danger',
+            },
+        ));
+    }
 })();
 
 const isUpcoming = (tournament: Tournament): boolean => tournament.state === 'created';

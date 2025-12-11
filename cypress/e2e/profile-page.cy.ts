@@ -3,6 +3,9 @@ describe('Profile page', () => {
         cy.intercept('/api/auth/me-or-guest', {
             fixture: 'profile-page/player-test.json',
         });
+        cy.intercept('/api/players?slug=player-test', {
+            fixture: 'profile-page/player-test.json',
+        });
         cy.intercept('/api/games?*d63e9d50-0afd-48ff-88f4-706fbee620b2*', {
             fixture: 'profile-page/games.json',
         });
@@ -11,6 +14,7 @@ describe('Profile page', () => {
         });
 
         cy.visit('/@player-test');
+        cy.get('header').contains('Player Test');
 
         cy.contains('h2', 'Player Test');
         cy.contains('Account created on 19 January 2024');

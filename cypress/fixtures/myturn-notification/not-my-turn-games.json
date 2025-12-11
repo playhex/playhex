@@ -24,7 +24,7 @@
                 "player": {
                     "publicId": "determinist-random-bot|3e0a8160-914a-4d74-9886-397f2134a061",
                     "pseudo": "Determinist random bot",
-                    "isBot": true,
+                    "isBot": false,
                     "isGuest": false
                 }
             }

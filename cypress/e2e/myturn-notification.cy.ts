@@ -23,6 +23,7 @@ describe('My turn notification', () => {
         });
 
         cy.visit('/');
+        cy.get('header').contains('Guest 1817');
 
         cy.receivePlayerGamesUpdate('myturn-notification/single-games.json');
         cy.wait(50); // Needs to wait before myTurn count updates, not sure why
@@ -83,6 +84,7 @@ describe('My turn notification', () => {
         });
 
         cy.visit('/');
+        cy.get('header').contains('Guest 3248');
 
         cy.receivePlayerGamesUpdate('myturn-notification/not-my-turn-games.json');
         cy.wait(50); // Needs to wait before myTurn count updates, not sure why

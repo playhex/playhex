@@ -17,16 +17,24 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
 
     const playerSettings: Ref<null | PlayerSettings> = ref(null);
 
+    const handleFetchError = (e: unknown) => {
+        // eslint-disable-next-line no-console
+        console.error('Error while loading player settings', e);
+    };
+
     const reloadPlayerSettings = async (): Promise<PlayerSettings> => {
         const promise = apiGetPlayerSettings();
 
-        void promise.then(settings => playerSettings.value = settings);
+        promise
+            .then(settings => playerSettings.value = settings)
+            .catch(handleFetchError)
+        ;
 
         return await promise;
     };
 
     if (loggedInPlayer.value !== null) {
-        void reloadPlayerSettings();
+        reloadPlayerSettings().catch(handleFetchError);
     }
 
     // Update player settings when logged in player change
@@ -37,7 +45,7 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
             return;
         }
 
-        void reloadPlayerSettings();
+        reloadPlayerSettings().catch(handleFetchError);
     });
 
     const updatePlayerSettings = async (): Promise<void> => {

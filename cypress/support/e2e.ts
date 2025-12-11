@@ -16,3 +16,13 @@
 // Import commands.js using ES2015 syntax:
 import 'reflect-metadata';
 import './commands.js';
+
+// Ignore errors when a request fails because we .reload() or a test ends and request is aborted
+Cypress.on('uncaught:exception', (e): false | void => {
+    if (
+        Cypress.browser.name === 'firefox' &&
+        (e.message.includes('AbortError') || e.message.includes('NetworkError'))
+    ) {
+        return false;
+    }
+});

@@ -8,6 +8,8 @@ import { apiGetActiveTournaments } from '../../../apiClient.js';
 import AppFeaturedTournamentCard from '../../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppConnectionLostPlayOffline from '../AppConnectionLostPlayOffline.vue';
 import { useConnectionLostPlayOfflineStore } from '../../offline-lobby/stores/connectionLostPlayOfflineStore.js';
+import { Toast } from '../../../../shared/app/Toast.js';
+import useToastsStore from '../../../stores/toastsStore.js';
 
 const {
     players,
@@ -28,9 +30,18 @@ const orderedPlayers = computed<OnlinePlayer[]>(() => {
 const featuredTournaments = ref<Tournament[]>([]);
 
 void (async () => {
-    featuredTournaments.value = await apiGetActiveTournaments({
-        featured: true,
-    });
+    try {
+        featuredTournaments.value = await apiGetActiveTournaments({
+            featured: true,
+        });
+    } catch (e) {
+        useToastsStore().addToast(new Toast(
+            'Could not load active tournaments',
+            {
+                level: 'danger',
+            },
+        ));
+    }
 })();
 
 // Display link "Play offline" when lose connection
