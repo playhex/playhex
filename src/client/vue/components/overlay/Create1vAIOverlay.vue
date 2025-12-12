@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useExtendOverlay } from '@overlastic/vue';
+import { useDisclosure } from '@overlastic/vue';
 import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
 import { IconCaretDownFill, IconCaretRight, IconExclamationTriangle, IconRobot } from '../../icons.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
@@ -13,7 +13,7 @@ import { apiGetAiConfigsStatus } from '../../../apiClient.js';
 import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 
-const { visible, resolve, reject } = useExtendOverlay();
+const { visible, confirm, cancel } = useDisclosure();
 
 const props = defineProps({
     gameOptions: {
@@ -103,10 +103,10 @@ watch(aiConfigs, () => {
     <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit.prevent="resolve(gameOptions)">
+                <form class="modal-content" @submit.prevent="confirm(gameOptions)">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $t('1vAI_friendly.title') }}</h5>
-                        <button type="button" class="btn-close" @click="reject()"></button>
+                        <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
@@ -117,7 +117,7 @@ watch(aiConfigs, () => {
                                 <small>
                                     <router-link
                                         :to="{ name: 'spawn-worker' }"
-                                        @click="reject()"
+                                        @click="cancel()"
                                     >{{ $t('workers.see_how_to_spawn_a_worker') }}</router-link>
                                 </small>
                             </p>
@@ -179,7 +179,7 @@ watch(aiConfigs, () => {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" @click="reject()">{{ $t('cancel') }}</button>
+                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
                         <button type="submit" class="btn btn-success">{{ $t('1vAI_friendly.create') }}</button>
                     </div>
                 </form>
