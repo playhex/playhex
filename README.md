@@ -204,6 +204,19 @@ So when upgrading dependencies, bundled and CDN versions should match, so we mus
 - with yarn
 - version in `views/partials/cdn.ejs`
 
+## Libraries upgrades
+
+``` bash
+# upgrade some deps
+yarn upgrade-interactive --latest
+
+# check new versions
+yarn outdated check outdated
+
+# sometimes, this works better
+rm -fr yarn.lock node_modules/ && yarn install
+```
+
 ## Migrating schema
 
 When doing a schema migration that is also a breaking change in api:
