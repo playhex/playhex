@@ -1933,21 +1933,21 @@
   dependencies:
     "@opentelemetry/core" "^2.0.0"
 
-"@overlastic/core@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@overlastic/core/-/core-0.8.1.tgz#aeaa91e23962df88152922024fe1d7ed062d4f2d"
-  integrity sha512-79aL2OQF0MQzxR/eCJtq/Gx6TaV0gfU+N4slO7NdUf//o7xYa24/Y6WtN3AbgeaOI2GzZ5DPXawgbfKoNVqq1Q==
+"@overlastic/core@^0.8.3":
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/@overlastic/core/-/core-0.8.3.tgz#9b62e6435609ec9e4a838af2995d30d574db4d8b"
+  integrity sha512-lRlHhuRpTg2Tj4gyDTdKCyIIWDcDhbpeB9q8PdBJv9R25aCZj+6N+jz22ENvAjKYOTYvzFKNjsyQwv6NPuHoJg==
 
-"@overlastic/vue@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@overlastic/vue/-/vue-0.8.1.tgz#d1745757d3f4bc0763d8fd859ececbe85796121c"
-  integrity sha512-A4vU/pFnT6R5Sv66ylMr+RRPmbFg9U52pjLpltiqn7MLLITkwao7yQiwo8KkqPFQFU3UMoxnvcD62nNE60Nh+Q==
+"@overlastic/vue@^0.8.3":
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/@overlastic/vue/-/vue-0.8.3.tgz#419beb0b651f67f648a62defd1383d8f8016012a"
+  integrity sha512-9T2pNg6QxFDai6GNNzJHFJZRO6VeFkd8/AlPGVQ6K1CJyqakjlgsVDcGMR9MwiYkvSUVK+NbGvchGEJmkt4QeA==
   dependencies:
-    "@overlastic/core" "^0.8.1"
-    "@vueuse/core" "^10.9.0"
+    "@overlastic/core" "^0.8.3"
+    "@vueuse/core" "^10.11.1"
     pascal-case "3.1.2"
     vue "^3.3.2"
-    vue-demi ">=0.14.7"
+    vue-demi ">=0.14.10"
 
 "@parcel/watcher-android-arm64@2.5.1":
   version "2.5.1"
@@ -3091,7 +3091,7 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.5.21.tgz#505edb122629d1979f70a2a65ca0bd4050dc2e54"
   integrity sha512-+2k1EQpnYuVuu3N7atWyG3/xoFWIVJZq4Mz8XNOdScFI0etES75fbny/oU4lKWk/577P1zmg0ioYvpGEDZ3DLw==
 
-"@vueuse/core@^10.9.0":
+"@vueuse/core@^10.11.1":
   version "10.11.1"
   resolved "https://registry.yarnpkg.com/@vueuse/core/-/core-10.11.1.tgz#15d2c0b6448d2212235b23a7ba29c27173e0c2c6"
   integrity sha512-guoy26JQktXPcz+0n3GukWIy/JDNKti9v6VEMu6kV2sYBsWuGiTU8OWdg+ADfUbHg3/3DlqySDe7JmdHrktiww==
@@ -9198,7 +9198,7 @@ vue-component-type-helpers@^3.0.5:
   resolved "https://registry.yarnpkg.com/vue-component-type-helpers/-/vue-component-type-helpers-3.0.7.tgz#84eda79954014016c95ab3d33d245ca1e2091096"
   integrity sha512-TvyUcFXmjZcXUvU+r1MOyn4/vv4iF+tPwg5Ig33l/FJ3myZkxeQpzzQMLMFWcQAjr6Xs7BRwVy/TwbmNZUA/4w==
 
-vue-demi@>=0.14.7, vue-demi@>=0.14.8:
+vue-demi@>=0.14.10, vue-demi@>=0.14.8:
   version "0.14.10"
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.10.tgz#afc78de3d6f9e11bf78c55e8510ee12814522f04"
   integrity sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==
