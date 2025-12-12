@@ -213,9 +213,15 @@ yarn upgrade-interactive --latest
 # check new versions
 yarn outdated check outdated
 
-# sometimes, this works better
+# sometimes, this works better and fixes weird bugs
+# related to incompatibilies when upgrading a deps
 rm -fr yarn.lock node_modules/ && yarn install
 ```
+
+Upgrade warnings:
+
+- `routing-controllers-openapi <5`: v5 makes an error
+- `tournament-organizer <4`: needs many api rewrite and test everything
 
 ## Migrating schema
 
