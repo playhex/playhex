@@ -88,7 +88,7 @@
     "tiny-typed-emitter": "^2.1.0",
     "tournament-organizer": "^3.9.1",
     "typedi": "^0.10.0",
-    "typeorm": "^0.3.21",
+    "typeorm": "^0.3.28",
     "typeorm-in-memory-cache": "^1.0.2",
     "uuid": "^13.0.0",
     "vue": "^3.5.18",
