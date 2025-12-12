@@ -220,7 +220,7 @@ rm -fr yarn.lock node_modules/ && yarn install
 
 Upgrade warnings:
 
-- `routing-controllers-openapi <5`: v5 makes an error
+- `routing-controllers-openapi <5`: v5 throw this error: https://github.com/epiphone/routing-controllers-openapi/issues/155
 - `tournament-organizer <4`: needs many api rewrite and test everything
 
 ## Migrating schema
