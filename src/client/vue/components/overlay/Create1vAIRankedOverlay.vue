@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useExtendOverlay } from '@overlastic/vue';
+import { useDisclosure } from '@overlastic/vue';
 import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
 import { IconExclamationTriangle, IconRobot, IconTrophy } from '../../icons.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
@@ -14,7 +14,7 @@ import TimeControlType from '../../../../shared/time-control/TimeControlType.js'
 
 const { min, max } = Math;
 
-const { visible, resolve, reject } = useExtendOverlay();
+const { visible, confirm, cancel } = useDisclosure();
 
 const props = defineProps({
     gameOptions: {
@@ -102,10 +102,10 @@ watch(aiConfigs, () => {
     <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit.prevent="resolve(gameOptions)">
+                <form class="modal-content" @submit.prevent="confirm(gameOptions)">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $t('1vAI_ranked.title') }}</h5>
-                        <button type="button" class="btn-close" @click="reject()"></button>
+                        <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
                         <template v-if="null !== aiConfigsStatus">
@@ -116,7 +116,7 @@ watch(aiConfigs, () => {
                                 <small>
                                     <router-link
                                         :to="{ name: 'spawn-worker' }"
-                                        @click="reject()"
+                                        @click="cancel()"
                                     >{{ $t('workers.see_how_to_spawn_a_worker') }}</router-link>
                                 </small>
                             </p>
@@ -158,7 +158,7 @@ watch(aiConfigs, () => {
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" @click="reject()">{{ $t('cancel') }}</button>
+                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
                         <button type="submit" class="btn btn-warning"><IconTrophy /> {{ $t('1vAI_ranked.create') }}</button>
                     </div>
                 </form>

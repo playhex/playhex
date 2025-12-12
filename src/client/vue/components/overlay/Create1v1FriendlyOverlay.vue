@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useExtendOverlay } from '@overlastic/vue';
+import { useDisclosure } from '@overlastic/vue';
 import { PropType, reactive, ref, toRef, watch } from 'vue';
 import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
 import { IconCaretDownFill, IconCaretRight } from '../../icons.js';
@@ -9,7 +9,7 @@ import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 
-const { visible, resolve, reject } = useExtendOverlay();
+const { visible, confirm, cancel } = useDisclosure();
 
 const props = defineProps({
     gameOptions: {
@@ -30,10 +30,10 @@ const showSecondaryOptions = ref(false);
     <div v-if="visible">
         <div class="modal d-block">
             <div class="modal-dialog">
-                <form class="modal-content" @submit.prevent="resolve(gameOptions)">
+                <form class="modal-content" @submit.prevent="confirm(gameOptions)">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $t('1v1_friendly.title') }}</h5>
-                        <button type="button" class="btn-close" @click="reject()"></button>
+                        <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -67,7 +67,7 @@ const showSecondaryOptions = ref(false);
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" @click="reject()">{{ $t('cancel') }}</button>
+                        <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>
                         <button type="submit" class="btn btn-success">{{ $t('1v1_friendly.create') }}</button>
                     </div>
                 </form>

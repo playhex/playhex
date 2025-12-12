@@ -168,7 +168,7 @@ const config: webpack.Configuration = {
                                 loader: 'sass-loader',
                                 options: {
                                     sassOptions: {
-                                        silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
+                                        silenceDeprecations: ['color-functions', 'global-builtin', 'import', 'if-function'],
                                     },
                                 },
                             },
