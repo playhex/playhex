@@ -3,7 +3,9 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board.js';
 import { Coords, Outcome } from './Types.js';
 import { GameData } from './normalization.js';
-import IllegalUndo from './IllegalUndo.js';
+import IllegalUndo from './errors/IllegalUndo.js';
+import NotYourTurnError from './errors/NotYourTurnError.js';
+import CellAlreadyOccupiedError from './errors/CellAlreadyOccupiedError.js';
 
 type GameEvents = {
     /**
@@ -31,6 +33,12 @@ type GameEvents = {
      *                    So A, B, C, undone 2 moves will make: [C, B]
      */
     undo: (undoneMoves: Move[]) => void;
+
+    /**
+     * Board has been updated in a non-usually way,
+     * like board has been empty, or set manually.
+     */
+    updated: () => void;
 };
 
 export default class Game extends TypedEmitter<GameEvents>
@@ -109,6 +117,21 @@ export default class Game extends TypedEmitter<GameEvents>
         return this;
     }
 
+    resetGame(): void
+    {
+        for (const move of this.movesHistory) {
+            this.board.setCell(move.row, move.col, null);
+        }
+
+        this.movesHistory = [];
+        this.winner = null;
+        this.outcome = null;
+        this.lastMoveAt = null;
+        this.endedAt = null;
+
+        this.emit('updated');
+    }
+
     getFirstMove(): null | Move
     {
         return this.movesHistory[0] ?? null;
@@ -151,7 +174,7 @@ export default class Game extends TypedEmitter<GameEvents>
         }
 
         if (this.currentPlayerIndex !== byPlayerIndex) {
-            throw new IllegalMove(move, 'Not your turn');
+            throw new NotYourTurnError(move);
         }
 
         switch (move.getSpecialMoveType()) {
@@ -161,7 +184,7 @@ export default class Game extends TypedEmitter<GameEvents>
                 }
 
                 if (!this.board.isEmpty(move.row, move.col)) {
-                    throw new IllegalMove(move, 'This cell is already occupied');
+                    throw new CellAlreadyOccupiedError(move);
                 }
 
                 break;
@@ -230,7 +253,7 @@ export default class Game extends TypedEmitter<GameEvents>
         // Emit "ended" event after "played" event to keep order between events.
         if (this.hasWinner()) {
             if (this.endedAt === null) {
-                throw new Error('Ended at expected to be set');
+                throw new Error('endedAt expected to be not null');
             }
 
             this.emit('ended', this.getStrictWinner(), 'path', this.endedAt);

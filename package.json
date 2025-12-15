@@ -56,7 +56,7 @@
     "copy-to-clipboard": "^3.3.3",
     "cypress": "^15.7.1",
     "date-fns": "^4.1.0",
-    "davies-hex-ai": "^1.2.5",
+    "davies-hex-ai": "^1.2.7",
     "diacritics": "^1.3.0",
     "ejs": "^3.1.10",
     "eslint-plugin-vue": "^10.6.2",

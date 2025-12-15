@@ -17,6 +17,7 @@ export { default as IconBell } from '~icons/mdi/bell-outline';
 export { default as IconBellCheckFill } from '~icons/mdi/bell-check';
 export { default as IconBookmarks } from '~icons/bi/bookmarks';
 export { default as IconBoxArrowRight } from '~icons/bi/box-arrow-right';
+export { default as IconBoxArrowUpRight } from '~icons/bi/box-arrow-up-right';
 export { default as IconBrightnessHighFill } from '~icons/bi/brightness-high-fill';
 export { default as IconCalendar } from '~icons/bi/calendar';
 export { default as IconCalendarEvent } from '~icons/bi/calendar-event';
