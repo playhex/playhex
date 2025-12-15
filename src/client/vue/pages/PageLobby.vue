@@ -14,7 +14,7 @@ import AppSidebar from '../components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
-import { IconEye, IconTrophy, IconPeople, IconRobot, IconTrophyFill, IconSearch, IconWifiOff } from '../icons.js';
+import { IconEye, IconTrophy, IconPeople, IconRobot, IconTrophyFill, IconSearch, IconWifiOff, IconRocketTakeOff } from '../icons.js';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
@@ -24,6 +24,7 @@ import { apiPostGame } from '../../apiClient.js';
 import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import { useConnectionLostPlayOfflineStore } from '../offline-lobby/stores/connectionLostPlayOfflineStore.js';
+import { useTutorialControls } from '../composables/tutorialControls.js';
 
 useHead({
     title: t('lobby_title'),
@@ -251,12 +252,44 @@ const btnClassUnlessOffline = (btnClass: string): string => {
         : btnClass
     ;
 };
+
+/*
+ * Tutorial
+ */
+const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
 </script>
 
 <template>
     <div class="container-fluid my-3">
         <div class="row">
             <div class="col-sm-8 col-md-9">
+
+                <!-- Tutorial -->
+                <div v-if="shouldDisplayLink" class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card mb-3 border-info">
+                            <div class="card-body">
+                                <button
+                                    class="btn btn-sm btn-outline-secondary float-end"
+                                    @click="dismissTutorial"
+                                    type="button"
+                                >✕ {{ $t('dismiss') }}</button>
+
+                                <h5 class="card-title">
+                                    {{ $t('tutorial.are_you_new_to_hex') }}
+                                </h5>
+
+                                <p>{{ $t('tutorial.learn_hex_in_1_minute') }}</p>
+
+                                <router-link
+                                    to="tutorial"
+                                    class="btn btn-info"
+                                ><IconRocketTakeOff /> {{ $t('tutorial.label') }}</router-link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex align-items-start">
                     <h3>{{ $t('new_game') }}</h3>
 

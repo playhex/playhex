@@ -688,6 +688,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.game.on('ended', () => this.endedCallback());
         this.game.on('canceled', () => this.endedCallback());
+
+        this.game.on('updated', () => {
+            this.redraw();
+        });
     }
 
     /**

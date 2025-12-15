@@ -202,6 +202,11 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        name: 'tutorial',
+        path: '/tutorial',
+        component: () => import('./pages/PageTutorial.vue'),
+    },
+    {
         name: 'offline-lobby',
         path: '/offline-lobby',
         component: () => import('./offline-lobby/pages/PageOfflineLobby.vue'),
@@ -239,24 +244,31 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
-    scrollBehavior: async to => {
-        let elementExists = false;
-
-        try {
-            elementExists = document.querySelector(to.hash) !== null;
-        } catch {
-            // Ignore error when hash is "invalid", because of e.g a dot, example:
-            // Document.querySelector: '#match-1.6' is not a valid selector
-            return;
+    scrollBehavior: async (to, from, savedPosition) => {
+        // In case of browser go back, scroll to last position
+        if (savedPosition) {
+            return {
+                ...savedPosition,
+                behavior: 'instant',
+            };
         }
 
-        if (to.hash && elementExists) {
+        // Scroll to element targeted by hash in url
+        // ex: "/url#settings" will scroll to element with id = "settings"
+        // Check element exists before to prevent a warning
+        if (to.hash && document.querySelector(to.hash)) {
             await new Promise(r => setTimeout(r, 100));
-            return { el: to.hash };
+
+            return {
+                el: to.hash,
+            };
         }
 
-        // Yes, eslint, I return nothing here.
-        return;
+        // Else, always scroll to top when changing page
+        return {
+            top: 0,
+            behavior: 'instant',
+        };
     },
 });
 
