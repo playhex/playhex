@@ -502,5 +502,6 @@
         "rating_help": "Auswahl nach Rang. Wenn es in der ersten Runde Freilose gibt, bekommen stärkere Spieler das Freilos.",
         "rating_random_help": "Auswahl nach Rang, aber mit Zufallselement nach Varianz des Glicko2-Rangs. Wenn es in der ersten Runde Freilose gibt, bekommen stärkere Spieler das Freilos.",
         "rating_random": "Rang mit Zufallselement"
-    }
+    },
+    "tournament_slug_duplicate": "Es gibt bereits ein Turnier mit dieser URL"
 }
