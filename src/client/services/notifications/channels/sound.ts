@@ -2,10 +2,10 @@ import { iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils.js';
 import { notifier } from '../notifier.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
 import { getLoserPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 
 function playAudioIfNotMuted(filename: string): void {
-    // TODO: THIS IS STILL BAD
-    if (JSON.parse(localStorage?.getItem('hex-local-settings') || '').muteAudio){return};
+    if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
     playAudio(filename);
 }
 
