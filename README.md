@@ -90,10 +90,14 @@ thanks to [Weblate](https://weblate.org).
 
 ## Icons
 
-- https://icones.js.org/
+We use Unplugin Icons, which allow to use any icon from any set of icons,
+and only bundle icons we actually use. To add a new icon:
+
+- Choose an icon from https://icones.js.org/
 - Then copy "Components > Unplugin Icons"
 - Add it to `src/client/vue/icons.ts`
 - Then use it in templates
+- Also do `yarn add -D ...` if this set of icons is not yet installed
 
 ## Admin endpoints
 

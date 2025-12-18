@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DOMPurify from 'dompurify';
 import { calcRandomMove, Game, Move, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -8,7 +9,14 @@ import { calcDaviesMoveFor9x9Board } from '../../../shared/app/daviesBot.js';
 import { apiPostGame } from '../../apiClient.js';
 import { useRouter } from 'vue-router';
 import useAiConfigsStore from '../../stores/aiConfigsStore.js';
-import { IconArrowRight, IconBoxArrowUpRight, IconCheck, IconInfoCircle } from '../icons.js';
+import { IconArrowRight, IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople, IconTablerSwords } from '../icons.js';
+import { useHead } from '@unhead/vue';
+import { t } from 'i18next';
+import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
+
+useHead({
+    title: t('how_to_play_hex'),
+});
 
 // Demo 0: show full path and play random bot
 const game0 = new Game(6);
@@ -97,6 +105,15 @@ gameView1.on('hexClicked', async coords => {
     }
 });
 
+// Swap map
+const gameSwapMap = new Game(11);
+const container2 = ref<HTMLElement>();
+const gameView2 = new CustomizedGameView(gameSwapMap);
+
+const mark = new TriangleMark(0xff0000);
+mark.setCoords({ row: 3, col: 3 });
+gameView2.addMark(mark, 'swap_map');
+
 onMounted(async () => {
     if (!container0.value) {
         throw new Error('no container0');
@@ -106,8 +123,13 @@ onMounted(async () => {
         throw new Error('no container1');
     }
 
+    if (!container2.value) {
+        throw new Error('no container2');
+    }
+
     await gameView0.mount(container0.value);
     await gameView1.mount(container1.value);
+    await gameView2.mount(container2.value);
 });
 
 const router = useRouter();
@@ -123,7 +145,28 @@ const playVsAI = async () => {
         timeControlType: {
             family: 'fischer',
             options: {
-                initialTime: 30000,
+                initialTime: 1800000,
+                timeIncrement: 10000,
+            },
+        },
+    });
+
+    await router.push({
+        name: 'online-game',
+        params: {
+            gameId: hostedGame.publicId,
+        },
+    });
+};
+
+const playVsPlayer = async () => {
+    const hostedGame = await apiPostGame({
+        boardsize: 11,
+        opponentType: 'player',
+        timeControlType: {
+            family: 'fischer',
+            options: {
+                initialTime: 600000,
                 timeIncrement: 5000,
             },
         },
@@ -136,13 +179,15 @@ const playVsAI = async () => {
         },
     });
 };
+
+const sanitizedT = ()
 </script>
 
 <template>
     <div class="container my-3">
         <h1>{{ $t('how_to_play_hex') }}</h1>
 
-        <p>Hex is a simple game but hard to master. It has <strong>only 2 rules</strong>.</p>
+        <p v-html="DOMPurify.sanitize($t('tutorial.hex_is_simple_and_has_two_rules'), { ALLOWED_TAGS: ['strong'] })"></p>
 
         <h2>Rule 1: Connect your sides</h2>
 
@@ -204,9 +249,11 @@ const playVsAI = async () => {
         <p><strong>What is a fair opening move?</strong></p>
 
         <p>
-            A good, balanced opening move is usually near <span class="text-danger">Red</span>'s sides.
-            If <span class="text-danger">Red</span> opens in the center, corners or near <span class="text-primary">Blue</span> sides, <span class="text-primary">Blue</span> should swap.
+            Playing first move in center is too strong, as well as near <span class="text-primary">Blue</span> sides.
+            So try opening near your <span class="text-danger">Red</span> side, or far from center.
         </p>
+
+        <div ref="container2" class="board"></div>
 
         <p class="lead text-center congrats"><IconCheck /> Congrats! You know how to play Hex!</p>
 
@@ -214,10 +261,14 @@ const playVsAI = async () => {
         <h2>What to do next</h2>
 
         <div class="row what-next">
-            <div class="col mt-3">
+            <div class="col-sm-6 mt-3">
                 <div class="card h-100">
                     <div class="card-body">
-                        <p class="card-text">Play a complete game against an easy AI opponent</p>
+                        <p class="card-text">
+                            <IconTablerSwords class="display-4" />
+                            <br>
+                            Play a complete game against an easy AI opponent
+                        </p>
 
                         <button
                             @click="playVsAI"
@@ -229,14 +280,25 @@ const playVsAI = async () => {
                     </div>
                 </div>
             </div>
-            <div class="col mt-3">
+            <div class="col-sm-6 mt-3">
                 <div class="card h-100">
                     <div class="card-body">
-                        <p class="card-text">
-                            Learn tactical and strategic fundamentals by solving some Hex puzzles
-                            <br>
-                            <small class="text-body-secondary">by Matthew Seymour</small>
-                        </p>
+                        <div class="row g-0">
+                            <div class="col-md-3 d-none d-md-block">
+                                <img
+                                    src="/images/links/500-puzzles.png"
+                                    alt="500 Hex puzzles by Matthew Seymour"
+                                    class="img-fluid mb-2"
+                                />
+                            </div>
+                            <div class="col-md-9 gx-3">
+                                <p>
+                                    Learn tactical and strategic fundamentals by solving some Hex puzzles
+                                    <br>
+                                    <small class="text-body-secondary">by Matthew Seymour</small>
+                                </p>
+                            </div>
+                        </div>
 
                         <a
                             class="btn btn-lg btn-success stretched-link"
@@ -250,28 +312,33 @@ const playVsAI = async () => {
 
         <p class="mt-4">or you can also</p>
 
-        <ul class="list-unstyled">
-            <li>
-                <a
-                    href="https://discord.gg/59SJ9KwvVq"
-                    target="_blank"
-                >Join Hex Discord <IconBoxArrowUpRight /></a>
-            </li>
+        <div class="what-next-also">
+            <button
+                @click="playVsPlayer"
+                class="btn btn-success"
+                type="button"
+                style="margin-bottom: 0"
+                :disabled="aiConfigs.length === 0"
+            ><IconPeople class="fs-3" /><br>Play 1v1</button>
 
-            <li>
-                <a
-                    href="https://www.hexwiki.net/index.php/Strategy_roadmap"
-                    target="_blank"
-                >Read the strategy roadmap on the HexWiki <IconBoxArrowUpRight /></a>
-            </li>
+            <a
+                href="https://discord.gg/59SJ9KwvVq"
+                target="_blank"
+                class="btn btn-outline-primary align-middle"
+            ><IconDiscord class="fs-3" /><br>Join Hex Discord</a>
 
-            <li>
-                <a
-                    href="http://www.mseymour.ca/hex_book/hexstrat.html"
-                    target="_blank"
-                >Read a deeper strategy guide <IconBoxArrowUpRight /></a>
-            </li>
-        </ul>
+            <a
+                href="https://www.hexwiki.net/index.php/Strategy_roadmap"
+                target="_blank"
+                class="btn btn-outline-primary"
+            >Read the strategy roadmap on the HexWiki <IconBoxArrowUpRight /></a>
+
+            <a
+                href="http://www.mseymour.ca/hex_book/hexstrat.html"
+                target="_blank"
+                class="btn btn-outline-primary"
+            >Read a deeper strategy guide <IconBoxArrowUpRight /></a>
+        </div>
     </div>
 </template>
 
@@ -282,6 +349,27 @@ const playVsAI = async () => {
         display flex
         flex-direction column
         justify-content space-between
+
+.what-next-also
+    display flex
+    justify-content space-between
+    gap 1em
+
+    flex-direction column
+
+    @media (min-width: 576px)
+        flex-direction row
+
+    > *
+        min-width 20%
+        min-height 6em
+
+    a
+        display flex
+        flex-direction column
+        text-align center
+        justify-content center
+        align-items center
 
 .congrats
     margin-top 2em

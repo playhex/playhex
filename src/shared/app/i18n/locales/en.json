@@ -466,6 +466,9 @@
         "view": "View rematch"
     },
     "how_to_play_hex": "How to play Hex",
+    "tutorial": {
+        "hex_is_simple_and_has_two_rules": "Hex is a simple game, but hard to master. It has <strong>only 2 rules</strong> <h1>Hey</h1>."
+    },
     "notifications": "Notifications",
     "mark_all_as_read": "Mark as read",
     "no_notifications": "No notifications.",

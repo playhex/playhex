@@ -77,6 +77,7 @@ export { default as IconSendFill } from '~icons/bi/send-fill';
 export { default as IconShareFill } from '~icons/bi/share-fill';
 export { default as IconSignpostSplit } from '~icons/bi/signpost-split';
 export { default as IconSignTurnLeft } from '~icons/bi/sign-turn-left';
+export { default as IconTablerSwords } from '~icons/tabler/swords';
 export { default as IconThreeDots } from '~icons/bi/three-dots';
 export { default as IconTrash } from '~icons/bi/trash';
 export { default as IconTrophy } from '~icons/bi/trophy';

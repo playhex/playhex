@@ -112,6 +112,7 @@
     "@iconify-json/bi": "^1.2.7",
     "@iconify-json/fa": "^1.2.2",
     "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/tabler": "^1.2.24",
     "@sentry/node": "^10.30.0",
     "@stylistic/eslint-plugin": "^5.6.1",
     "@types/debounce": "^1.2.1",
