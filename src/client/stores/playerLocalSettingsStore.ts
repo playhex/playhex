@@ -36,6 +36,14 @@ export class LocalSettings
      */
     @Expose()
     openSidebar?: boolean;
+
+    /**
+     * Mute the gameplay audio.
+     *
+     * undefined defaults to false (audio on).
+     */
+    @Expose()
+    muteAudio?: boolean;
 }
 
 const loadLocalSettings = (): LocalSettings => {

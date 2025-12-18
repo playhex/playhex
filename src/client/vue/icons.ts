@@ -85,3 +85,6 @@ export { default as IconWifiOff } from '~icons/bi/wifi-off';
 export { default as IconXLg } from '~icons/bi/x-lg';
 export { default as IconYoutube } from '~icons/bi/youtube';
 export { default as IconZoomOut } from '~icons/bi/zoom-out';
+export { default as IconMuteOn } from '~icons/bi/volume-mute-fill';
+export { default as IconMuteOff } from '~icons/bi/volume-up-fill';
+

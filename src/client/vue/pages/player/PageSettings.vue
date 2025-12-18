@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill } from '../../icons.js';
+import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill, IconMuteOn, IconMuteOff } from '../../icons.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
@@ -425,6 +425,25 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     :gameView="gameView"
                     :players="players"
                 />
+            </div>
+        </div>
+    </section>
+
+    <section id="audio">
+        <div class="container">
+            <h3>Audio</h3>
+            <div class="btn-group" role="group" aria-label="Mute audio switcher">
+                <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="true" id="btn-mute-on"
+                    autocomplete="off">
+                <label class="btn btn-outline-primary" for="btn-mute-on">
+                    <IconMuteOn /> {{ 'mute' }}
+                </label>
+
+                <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="false" id="btn-mute-off"
+                    autocomplete="off">
+                <label class="btn btn-outline-primary" for="btn-mute-off">
+                    <IconMuteOff /> {{ 'play' }}
+                </label>
             </div>
         </div>
     </section>
