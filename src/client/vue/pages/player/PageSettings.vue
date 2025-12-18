@@ -436,13 +436,13 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                 <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="true" id="btn-mute-on"
                     autocomplete="off">
                 <label class="btn btn-outline-primary" for="btn-mute-on">
-                    <IconMuteOn /> {{ 'mute' }}
+                    <IconMuteOn /> {{ $t('muted.on') }}
                 </label>
 
                 <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="false" id="btn-mute-off"
                     autocomplete="off">
                 <label class="btn btn-outline-primary" for="btn-mute-off">
-                    <IconMuteOff /> {{ 'play' }}
+                    <IconMuteOff /> {{ $t('muted.off') }}
                 </label>
             </div>
         </div>
