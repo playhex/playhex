@@ -243,6 +243,25 @@ const isNotificationSupported = typeof Notification !== 'undefined';
         </div>
     </section>
 
+    <section id="audio">
+        <div class="container">
+            <h3>Audio</h3>
+            <div class="btn-group" role="group" aria-label="Mute audio switcher">
+                <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="true" id="btn-mute-on"
+                    autocomplete="off">
+                <label class="btn btn-outline-primary" for="btn-mute-on">
+                    <IconMuteOn /> {{ $t('muted.on') }}
+                </label>
+
+                <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="false" id="btn-mute-off"
+                    autocomplete="off">
+                <label class="btn btn-outline-primary" for="btn-mute-off">
+                    <IconMuteOff /> {{ $t('muted.off') }}
+                </label>
+            </div>
+        </div>
+    </section>
+
     <section id="move-settings">
         <div class="container">
             <h3>{{ $t('move_settings.title') }}</h3>
@@ -425,25 +444,6 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     :gameView="gameView"
                     :players="players"
                 />
-            </div>
-        </div>
-    </section>
-
-    <section id="audio">
-        <div class="container">
-            <h3>Audio</h3>
-            <div class="btn-group" role="group" aria-label="Mute audio switcher">
-                <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="true" id="btn-mute-on"
-                    autocomplete="off">
-                <label class="btn btn-outline-primary" for="btn-mute-on">
-                    <IconMuteOn /> {{ $t('muted.on') }}
-                </label>
-
-                <input type="radio" class="btn-check" v-model="localSettings.muteAudio" :value="false" id="btn-mute-off"
-                    autocomplete="off">
-                <label class="btn btn-outline-primary" for="btn-mute-off">
-                    <IconMuteOff /> {{ $t('muted.off') }}
-                </label>
             </div>
         </div>
     </section>
