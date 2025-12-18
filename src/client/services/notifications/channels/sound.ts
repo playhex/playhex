@@ -3,6 +3,12 @@ import { notifier } from '../notifier.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
 import { getLoserPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 
+function playAudioIfNotMuted(filename: string): void {
+    // TODO: THIS IS STILL BAD
+    if (JSON.parse(localStorage?.getItem('hex-local-settings') || '').muteAudio){return};
+    playAudio(filename);
+}
+
 notifier.on('gameStart', (hostedGame) => {
     if (!(
         iAmInGame(hostedGame)
@@ -10,7 +16,7 @@ notifier.on('gameStart', (hostedGame) => {
         return;
     }
 
-    playAudio('/sounds/lisp/GenericNotify.ogg');
+    playAudioIfNotMuted('/sounds/lisp/GenericNotify.ogg');
 });
 
 notifier.on('gameEnd', (hostedGame) => {
@@ -23,14 +29,14 @@ notifier.on('gameEnd', (hostedGame) => {
     const loser = getLoserPlayer(hostedGame);
 
     if (loser === null) {
-        playAudio('/sounds/lisp/GenericNotify.ogg');
+        playAudioIfNotMuted('/sounds/lisp/GenericNotify.ogg');
         return;
     }
 
     if (isMe(loser)) {
-        playAudio('/sounds/lisp/Defeat.ogg');
+        playAudioIfNotMuted('/sounds/lisp/Defeat.ogg');
     } else {
-        playAudio('/sounds/lisp/Victory.ogg');
+        playAudioIfNotMuted('/sounds/lisp/Victory.ogg');
     }
 });
 
@@ -47,7 +53,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         return;
     }
 
-    playAudio('/sounds/lisp/NewPM.ogg');
+    playAudioIfNotMuted('/sounds/lisp/NewPM.ogg');
 });
 
 notifier.on('gameTimeControlWarning', (hostedGame) => {
@@ -55,7 +61,7 @@ notifier.on('gameTimeControlWarning', (hostedGame) => {
         return;
     }
 
-    playAudio('/sounds/lisp/LowTime.ogg');
+    playAudioIfNotMuted('/sounds/lisp/LowTime.ogg');
 });
 
 notifier.on('rematchOffer', hostedGame => {
@@ -69,5 +75,5 @@ notifier.on('rematchOffer', hostedGame => {
         return;
     }
 
-    playAudio('/sounds/lisp/NewChallenge.ogg');
+    playAudioIfNotMuted('/sounds/lisp/NewChallenge.ogg');
 });

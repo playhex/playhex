@@ -218,6 +218,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private playSoundForMove(move: Move): void
     {
+        if (JSON.parse(localStorage?.getItem('hex-local-settings') || '').muteAudio){return};
         playAudio(move.specialMoveType === 'pass'
             ? '/sounds/lisp/Check.ogg'
             : '/sounds/lisp/Move.ogg',
