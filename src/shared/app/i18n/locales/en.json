@@ -58,6 +58,10 @@
         "dark": "Dark",
         "light": "Light"
     },
+    "muted": {
+        "on": "Mute",
+        "off": "Play"
+    },
     "time_control": {
         "custom": "Custom",
         "use": "Use {{type}}",

@@ -17,6 +17,7 @@ import { RichChat, RichChatMessage } from '../shared/app/rich-chat.js';
 import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, toEngineGameData, updateHostedGame } from '../shared/app/hostedGameUtils.js';
 import useLobbyStore from './stores/lobbyStore.js';
 import useAuthStore from './stores/authStore.js';
+import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore.js';
 import { checkShadowDeleted } from '../shared/app/chatUtils.js';
 import { playAudio } from '../shared/app/audioPlayer.js';
 
@@ -218,6 +219,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     private playSoundForMove(move: Move): void
     {
+        if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
         playAudio(move.specialMoveType === 'pass'
             ? '/sounds/lisp/Check.ogg'
             : '/sounds/lisp/Move.ogg',
