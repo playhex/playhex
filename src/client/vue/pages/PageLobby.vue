@@ -130,12 +130,12 @@ const isWaiting = (hostedGame: HostedGame) =>
     hostedGame.state === 'created'
 ;
 
-const isPlaying = (hostedGame: HostedGame) =>
-    hostedGame.state === 'playing'
+const isPlayingHuman = (hostedGame: HostedGame) =>
+    hostedGame.state === 'playing' && hostedGame.opponentType === 'player'
 ;
 
-const isFinished = (hostedGame: HostedGame) =>
-    hostedGame.state === 'ended'
+const isFinishedHuman = (hostedGame: HostedGame) =>
+    hostedGame.state === 'ended' && hostedGame.opponentType === 'player'
 ;
 
 const joinGame = async (hostedGame: HostedGame) => {
@@ -343,7 +343,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                 <!--
                     Currently playing games
                 -->
-                <div v-if="Object.values(lobbyStore.hostedGames).some(isPlaying)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.hostedGames).some(isPlayingHuman)" class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
@@ -358,7 +358,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isPlaying).sort(gameComparator)"
+                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isPlayingHuman).sort(gameComparator)"
                                 :key="hostedGame.publicId"
                             >
                                 <td class="ps-0">
@@ -392,7 +392,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                 <!--
                     Finished games
                 -->
-                <div v-if="Object.values(lobbyStore.endedHostedGames).some(isFinished)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.endedHostedGames).some(isFinishedHuman)" class="table-responsive">
                     <table class="table" style="margin-bottom: 0">
                         <thead>
                             <tr>
@@ -406,7 +406,7 @@ const btnClassUnlessOffline = (btnClass: string): string => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGame in Object.values(lobbyStore.endedHostedGames).filter(isFinished).sort(byEndedAt)"
+                                v-for="hostedGame in Object.values(lobbyStore.endedHostedGames).filter(isFinishedHuman).sort(byEndedAt)"
                                 :key="hostedGame.publicId"
                             >
                                 <td class="ps-0">
