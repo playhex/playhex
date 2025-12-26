@@ -1,4 +1,4 @@
-import Move from './Move.js';
+import Move from '../Move.js';
 
 export default class IllegalMove extends Error
 {

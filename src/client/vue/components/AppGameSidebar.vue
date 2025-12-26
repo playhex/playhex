@@ -7,7 +7,7 @@ import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import AppPseudo from './AppPseudo.vue';
-import HostedGameClient from 'HostedGameClient';
+import HostedGameClient from '../../HostedGameClient.js';
 import { ChatMessage, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';

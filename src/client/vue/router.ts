@@ -202,6 +202,11 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        name: 'tutorial',
+        path: '/tutorial',
+        component: () => import('./pages/PageTutorial.vue'),
+    },
+    {
         name: 'offline-lobby',
         path: '/offline-lobby',
         component: () => import('./offline-lobby/pages/PageOfflineLobby.vue'),
