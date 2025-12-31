@@ -36,11 +36,11 @@ animation.push([pause, 2000]);
 for (let i = 0; i < movesDemo0.length; ++i) {
     animation.push([
         () => game0.move(movesDemo0[i], i % 2 as PlayerIndex),
-        200,
+        350,
     ]);
 }
 
-animation.push([() => game0.resetGame(), 2000]);
+animation.push([() => game0.resetGame(), 2500]);
 animation.push([() => {
     demo0Step.value = 1;
 
@@ -408,7 +408,7 @@ const sanitizedT = (key: string, allowedTags: string[] = ['strong']): string => 
 
         <h2>{{ $t('tutorial.what_to_do_next') }}</h2>
 
-        <div class="row what-next">
+        <div class="row what-next g-3">
             <div class="col-sm-6 mt-3">
                 <div class="card h-100">
                     <div class="card-body">
@@ -502,15 +502,15 @@ const sanitizedT = (key: string, allowedTags: string[] = ['strong']): string => 
     display flex
     justify-content space-between
     gap 1em
-
-    flex-direction column
-
-    @media (min-width: 576px)
-        flex-direction row
+    flex-direction row
+    flex-wrap wrap
 
     > *
-        min-width 20%
         min-height 6em
+        flex 1 0 40%
+
+        @media (min-width: 576px)
+            flex 1 0 20%
 
     a
         display flex
