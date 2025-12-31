@@ -3,10 +3,11 @@ import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { IconPersonFill, IconHexagonFill, IconHexagon } from '../../icons.js';
+import { IconPersonFill, IconHexagonFill, IconHexagon, IconRocketTakeOff } from '../../icons.js';
 import AppPseudo from '../AppPseudo.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
+import { useTutorialControls } from '../../composables/tutorialControls.js';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -79,6 +80,11 @@ const routeName = computed<null | string>(() => {
 
     return name;
 });
+
+/*
+ * Tutorial
+ */
+const { shouldDisplayLink } = useTutorialControls();
 </script>
 
 <template>
@@ -132,6 +138,16 @@ const routeName = computed<null | string>(() => {
             </div>
 
             <div class="d-flex">
+                <!-- Tutorial -->
+                <router-link
+                    v-if="shouldDisplayLink"
+                    to="tutorial"
+                    class="btn btn-sm btn-info"
+                >
+                    <IconRocketTakeOff />
+                    <span class="d-none d-sm-inline">&nbsp;{{ $t('tutorial.label') }}</span>
+                </router-link>
+
                 <!-- My turn notif -->
                 <span class="my-turn-notif">
                     <component

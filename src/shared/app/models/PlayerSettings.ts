@@ -107,4 +107,16 @@ export default class PlayerSettings
     @Max(1)
     @Column({ type: 'float', default: 0.5 })
     boardShadingPatternIntensity: number = 0.5;
+
+    /**
+     * Whether we should show/promote a link to the tutorial.
+     * Should be true for new players,
+     * and false for players who have finished the tutorial, dismissed it,
+     * or may not need the tutorial.
+     */
+    @Expose()
+    @IsOptional()
+    @IsBoolean()
+    @Column({ default: true })
+    showTutorial: boolean = true;
 }

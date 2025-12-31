@@ -46,6 +46,7 @@ i18n.on('languageChanged', () => {
         <p class="infos">
             <span>{{ $t('project_under_development') }}</span>
             <span v-if="date">{{ $t('last_change', { date }) }}</span>
+            <router-link :to="{ name: 'tutorial' }">{{ $t('tutorial.label') }}</router-link>
             <router-link :to="{ name: 'offline-lobby' }">{{ $t('play_offline') }}</router-link>
             <router-link :to="{ name: 'guide' }">PlayHex guide</router-link>
             <router-link :to="{ name: 'contribute' }">{{ $t('contribute') }}</router-link>
