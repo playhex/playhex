@@ -515,12 +515,12 @@
         "are_you_new_to_hex": "Êtes-vous nouveau sur le jeu de Hex ?",
         "learn_hex_in_1_minute": "Apprenez les règles en 1 minute",
         "hex_is_simple_and_has_two_rules": "Hex est un jeu simple, mais difficile à maîtriser. Il n'y a <strong>que 2 règles</strong>.",
-        "rule_1_connect_your_sides": "Règle 1 : Reliez vos côtés",
+        "rule_1_connect_your_sides": "Règle 1 : Reliez vos côtés",
         "to_win_you_must_connect_with_path": "Pour gagner, vous devez <strong>relier vos côtés</strong> avec un chemin complet.",
         "demo_0_step_example": "Voici un exemple de partie. {red} relie les côtés {red}.",
         "demo_0_step_lets_play": "À vous de jouer ! Vous êtes {red}, essayez de relier les côtés {red}.",
         "demo_0_step_congrats": "Félicitations ! Vous avez gagné la partie !",
-        "stones_are_played_this_way": "Les pierres sont placées de cette façon :",
+        "stones_are_played_this_way": "Les pierres sont placées de cette façon :",
         "each_player_place_a_stone": "chaque joueur ou joueuse place <strong>une pierre à tour de rôle</strong>",
         "stones_are_never_removed": "une fois placée, <strong>une pierre n'est jamais retirée ou déplacée</strong>",
         "rule_2_swap": "Règle 2 : Règle du swap (échange)",
@@ -541,7 +541,7 @@
         "show_swap_map": "Voir précisément où se trouvent les premiers coups équitables sur un plateau 11×11.",
         "swap_map_explain": "Voici une « carte de swap » pour les plateaux 11×11. Si le premier coup de {red} est joué dans une case rouge, cela donne un avantage à {red}, et {blue} devrait swapper. Donc {red} devrait jouer son premier coup près de la frontière entre les cases rouges et bleues, là où elles sont moins opaques.",
         "swap_map_credits": "Auteur : hzy, source : zhihu.com",
-        "congrats_you_know_play_hex": "Bravo ! Vous savez jouer au Hex !",
+        "congrats_you_know_play_hex": "Bravo ! Vous savez jouer au Hex !",
         "what_to_do_next": "Que faire ensuite",
         "play_vs_ai_desc": "Jouez une partie complète contre un adversaire IA facile",
         "play_vs_ai_button": "Jouer contre l’IA",
@@ -557,5 +557,9 @@
     "notification": {
         "you_won": "Vous avez gagné la partie !",
         "you_lost": "Vous avez perdu la partie :("
+    },
+    "muted": {
+        "on": "Muet",
+        "off": "Sons activés"
     }
 }
