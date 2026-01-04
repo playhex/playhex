@@ -1,7 +1,7 @@
 import { Ref } from 'vue';
 import { Game, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { Player, ChatMessage, Move, Rating, HostedGame } from '../shared/app/models/index.js';
+import { Player, ChatMessage, Move, Rating, HostedGame, Premove } from '../shared/app/models/index.js';
 import { Outcome } from '../shared/game-engine/Types.js';
 import { GameTimeData } from '../shared/time-control/TimeControl.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -251,15 +251,17 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     async sendPremove(move: Move): Promise<void>
     {
-        // No need to send client playedAt date, server won't trust it
-        const moveWithoutDate = new Move();
+        if (!this.game) {
+            throw new Error('Cannot premove next move, needs game to know which is next move index');
+        }
 
-        moveWithoutDate.row = move.row;
-        moveWithoutDate.col = move.col;
-        moveWithoutDate.specialMoveType = move.specialMoveType;
+        const premove = new Premove();
+
+        premove.move = toEngineMove(move).toString();
+        premove.moveIndex = this.game.getLastMoveIndex() + 2;
 
         return await new Promise((resolve, reject) => {
-            this.socket.emit('premove', this.getId(), moveWithoutDate, answer => {
+            this.socket.emit('premove', this.getId(), premove, answer => {
                 if (answer === true) {
                     resolve();
                     return;

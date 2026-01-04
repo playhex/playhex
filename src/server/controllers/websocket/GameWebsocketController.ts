@@ -23,7 +23,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
             answer(this.hostedGameRepository.playerMove(player, gameId, move));
         });
 
-        socket.on('premove', (gameId, move, answer) => {
+        socket.on('premove', (gameId, premove, answer) => {
             const { player } = socket.data;
 
             if (player === null) {
@@ -31,7 +31,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(this.hostedGameRepository.playerPremove(player, gameId, move));
+            answer(this.hostedGameRepository.playerPremove(player, gameId, premove));
         });
 
         socket.on('cancelPremove', (gameId, answer) => {

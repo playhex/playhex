@@ -1,6 +1,6 @@
 import { Container, Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
-import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating } from '../../shared/app/models/index.js';
+import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
 import HostedGamePersister from '../persistance/HostedGamePersister.js';
 import logger from '../services/logger.js';
@@ -434,7 +434,7 @@ export default class HostedGameRepository
         return result;
     }
 
-    playerPremove(player: Player, gameId: string, move: Move): string | true
+    playerPremove(player: Player, gameId: string, premove: Premove): string | true
     {
         const hostedGame = this.activeGames[gameId];
 
@@ -444,7 +444,7 @@ export default class HostedGameRepository
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerPremove(player, move);
+        const result = hostedGame.playerPremove(player, premove);
 
         return result;
     }

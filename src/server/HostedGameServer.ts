@@ -1,6 +1,6 @@
 import { Game as EngineGame, Game, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { ChatMessage, Player, HostedGameToPlayer, Move, HostedGame } from '../shared/app/models/index.js';
+import { ChatMessage, Player, HostedGameToPlayer, Move, HostedGame, Premove } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
 import baseLogger from './services/logger.js';
@@ -67,7 +67,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     /**
      * Players premoves, for live games.
      */
-    private premoves: [null | string, null | string] = [null, null];
+    private premoves: [null | Premove, null | Premove] = [null, null];
 
     private io: HexServer = Container.get(HexServer);
 
@@ -234,12 +234,19 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
+        // Ignore premove if it was for a previous move
+        if (premove.moveIndex !== this.game.getLastMoveIndex() + 1) {
+            this.logger.notice('Premove ignored because not for current index', { premove, lastMoveIndex: this.game.getLastMoveIndex() });
+            this.premoves[this.game.getCurrentPlayerIndex()] = null;
+            return;
+        }
+
         this.logger.info('Play premove', { premove });
 
         this.premoves[this.game.getCurrentPlayerIndex()] = null; // Must reset premove before playerMove(), else getCurrentPlayerIndex() will point to other player
 
         const player = this.players[this.game.getCurrentPlayerIndex()];
-        const result = this.playerMove(player, moveFromString(premove));
+        const result = this.playerMove(player, moveFromString(premove.move));
 
         if (result !== true) {
             this.logger.error('Could not play premove', { result });
@@ -721,7 +728,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
     }
 
-    playerPremove(player: Player, move: Move): true | string
+    playerPremove(player: Player, premove: Premove): true | string
     {
         if (this.hostedGame.state !== 'playing') {
             this.logger.notice('Player tried to register a premove but hosted game is not playing', { player: player.pseudo });
@@ -738,7 +745,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
-        this.premoves[this.getPlayerIndex(player) as PlayerIndex] = toEngineMove(move).toString();
+        if (premove.moveIndex <= this.game.getLastMoveIndex()) {
+            this.logger.notice('Premove received too late, a move has already been played for this index', { player: player.pseudo, premove, lastMoveIndex: this.game.getLastMoveIndex() });
+            return 'a move is already played at this index';
+        }
+
+        this.premoves[this.getPlayerIndex(player) as PlayerIndex] = premove;
 
         return true;
     }

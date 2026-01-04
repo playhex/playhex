@@ -19,6 +19,7 @@ import PlayerNotification from './PlayerNotification.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
+import Premove from './Premove.js';
 import Rating from './Rating.js';
 import Tournament from './Tournament.js';
 import TournamentAdmin from './TournamentAdmin.js';
@@ -50,6 +51,7 @@ export {
     PlayerSettings,
     PlayerStats,
     PlayerPushSubscription,
+    Premove,
     Rating,
     Tournament,
     TournamentAdmin,

@@ -3,7 +3,7 @@ import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models/index.js';
-import type { OnlinePlayers, PlayerNotification } from './models/index.js';
+import type { OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 
 export type HexClientToServerEvents = {
     /**
@@ -33,7 +33,7 @@ export type HexClientToServerEvents = {
      * Answer contains either true on success premove register,
      * or a string containing an error message.
      */
-    premove: (gameId: string, move: Move, answer: (result: true | string) => void) => void;
+    premove: (gameId: string, premove: Premove, answer: (result: true | string) => void) => void;
 
     /**
      * A player cancel its registered premove.
