@@ -1,4 +1,4 @@
-import { Game, Move, PlayerIndex, Coords } from '../game-engine/index.js';
+import { Game, PlayerIndex } from '../game-engine/index.js';
 import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pixi.js';
 import Hex from './Hex.js';
 import { Theme, themes } from './BoardTheme.js';
@@ -9,6 +9,7 @@ import { createShadingPattern, ShadingPatternType } from './shading-patterns.js'
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { Mark } from './Mark.js';
 import TextMark from './marks/TextMark.js';
+import { colToLetter, Coords, coordsToMove, mirrorMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -32,13 +33,13 @@ type GameViewEvents = {
     /**
      * A hex has been clicked on the view.
      */
-    hexClicked: (coords: Coords) => void;
+    hexClicked: (move: Move) => void;
 
     /**
      * A hex has been clicked on the view, as secondary action: long pressed or ctrl clicked.
      * Can be used to make some secondary actions.
      */
-    hexClickedSecondary: (coords: Coords) => void;
+    hexClickedSecondary: (move: Move) => void;
 
     /**
      * A hex has been clicked in simulation mode on the view.
@@ -179,7 +180,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     /**
      * Simulation moves played so far.
      */
-    private simulatedMoves: { move: string, byPlayerIndex: PlayerIndex }[] = [];
+    private simulatedMoves: { move: Move, byPlayerIndex: PlayerIndex }[] = [];
 
     /**
      * From which color play simulation moves.
@@ -265,6 +266,28 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.listenModel();
 
         element.appendChild(this.getView());
+    }
+
+    getHex(move: Move): Hex
+    {
+        if (move === 'swap-pieces' || move === 'pass') {
+            throw new Error('Cannot getHex with swap or pass');
+        }
+
+        const { row, col } = moveToCoords(move);
+
+        return this.hexes[row][col];
+    }
+
+    setHex(move: Move, hex: Hex): void
+    {
+        if (move === 'swap-pieces' || move === 'pass') {
+            throw new Error('Cannot getHex with swap or pass');
+        }
+
+        const { row, col } = moveToCoords(move);
+
+        this.hexes[row][col] = hex;
     }
 
     /**
@@ -615,7 +638,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * because at this time, game has already undone moves, and has no first move.
      * So we assume next move of undoneMoves was first move.
      */
-    private getSwapCoordsFromGameOrUndoneMoves(undoneMoves: null | Move[] = null): { swapped: Coords, mirror: Coords }
+    private getSwapCoordsFromGameOrUndoneMoves(undoneMoves: null | Move[] = null): { swapped: Move, mirror: Move }
     {
         const swapCoords = this.game.getSwapCoords(false);
 
@@ -630,7 +653,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         let firstMove: null | Move = null;
 
         for (let i = 0; i < undoneMoves.length; ++i) {
-            if (undoneMoves[i].getSpecialMoveType() === 'swap-pieces') {
+            if (undoneMoves[i] === 'swap-pieces') {
                 firstMove = undoneMoves[i + 1] ?? null;
             }
         }
@@ -640,7 +663,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         return {
-            mirror: firstMove.cloneMirror(),
+            mirror: mirrorMove(firstMove),
             swapped: firstMove,
         };
     }
@@ -650,12 +673,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightSidesFromGame();
 
         this.game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.addMove(move, byPlayerIndex);
+            this.addMove(move.move, byPlayerIndex);
             this.removePreviewedMove();
             this.highlightSidesFromGame();
         });
 
-        this.game.on('undo', async undoneMoves => {
+        this.game.on('undo', async undoneMovesTimestamped => {
+            const undoneMoves = undoneMovesTimestamped.map(timestampedMove => timestampedMove.move);
+
             this.removePreviewedMove(undoneMoves);
 
             for (let i = 0; i < undoneMoves.length; ++i) {
@@ -666,18 +691,21 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                     await new Promise(r => setTimeout(r, 150));
                 }
 
-                switch (move.getSpecialMoveType()) {
-                    case undefined:
-                        this.hexes[move.row][move.col].setPlayer(null);
+                switch (move) {
+                    case 'pass':
                         break;
 
                     case 'swap-pieces': {
                         const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
 
-                        this.hexes[mirror.row][mirror.col].setPlayer(null);
-                        this.hexes[swapped.row][swapped.col].setPlayer(0);
+                        this.getHex(mirror).setPlayer(null);
+                        this.getHex(swapped).setPlayer(0);
+
                         break;
                     }
+
+                    default:
+                        this.getHex(move).setPlayer(null);
                 }
 
                 this.highlightLastMove(undoneMoves[i + 1] ?? null);
@@ -762,7 +790,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
                 hex.on('touchstart', () => {
                     this.longPressTimeout = setTimeout(() => {
-                        this.emit('hexClickedSecondary', { row, col });
+                        this.emit('hexClickedSecondary', coordsToMove({ row, col }));
                         this.longPressed = true;
                         this.clearLongPressTimeout();
                     }, this.longPressDelay);
@@ -779,7 +807,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
                     // ctrl + click: emits hexClickedSecondary instead
                     if (e.ctrlKey) {
-                        this.emit('hexClickedSecondary', { row, col });
+                        this.emit('hexClickedSecondary', coordsToMove({ row, col }));
                         return;
                     }
 
@@ -794,12 +822,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                     }
 
                     if (!this.simulationMode) {
-                        this.emit('hexClicked', { row, col });
+                        this.emit('hexClicked', coordsToMove({ row, col }));
                     } else {
-                        const move = new Move(row, col);
+                        const move = coordsToMove({ row, col });
 
-                        if (this.game.getBoard().isEmpty(move.row, move.col)) {
-                            const simulationMoveColor = this.getSimulationMoveColorAt(move);
+                        if (this.game.getBoard().isEmpty(move)) {
+                            const simulationMoveColor = this.getSimulationMoveColorAt(moveToCoords(move));
                             let played = false;
 
                             if (simulationMoveColor === null) {
@@ -846,29 +874,29 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         this.unhighlightLastMove();
 
-        const lastMove = move ?? this.game.getLastMove();
+        const lastMove: null | Move = move ?? this.game.getLastMove()?.move ?? null;
 
         if (lastMove === null) {
             return;
         }
 
-        if (this.game.canSwapNow()) {
+        if (lastMove === 'pass') {
+            return;
+        }
+
+        if (this.game.canSwapNow() && lastMove !== 'swap-pieces') {
             this.showSwappable(lastMove);
             return;
         }
 
-        if (lastMove.getSpecialMoveType() === 'pass') {
-            return;
-        }
-
-        if (lastMove.getSpecialMoveType() === 'swap-pieces') {
+        if (lastMove === 'swap-pieces') {
             const { mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
             this.showSwapped(mirror);
             return;
         }
 
-        this.lastSimpleMoveHighlighted = lastMove;
-        this.hexes[lastMove.row][lastMove.col].setHighlighted();
+        this.lastSimpleMoveHighlighted = moveToCoords(lastMove);
+        this.getHex(lastMove).setHighlighted();
     }
 
     private createColoredSides(): Container
@@ -1001,11 +1029,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         };
 
         for (let i = 0; i < this.game.getSize(); ++i) {
-            const number = Move.rowToNumber(i);
+            const number = rowToNumber(i);
             container.addChild(createText(number, i, -1));
             container.addChild(createText(number, i, this.game.getSize()));
 
-            const letter = Move.colToLetter(i);
+            const letter = colToLetter(i);
             container.addChild(createText(letter, -1, i));
             container.addChild(createText(letter, this.game.getSize(), i));
         }
@@ -1042,7 +1070,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
     }
 
-    showSwappable(swappable: Coords | false): this
+    showSwappable(swappable: Move | null): this
     {
         this.removeMarks(GameView.MARKS_GROUP_SWAP);
 
@@ -1050,12 +1078,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return this;
         }
 
-        this.addMark(new SwappableMark().setCoords(swappable), GameView.MARKS_GROUP_SWAP);
+        this.addMark(new SwappableMark().setCoords(moveToCoords(swappable)), GameView.MARKS_GROUP_SWAP);
 
         return this;
     }
 
-    showSwapped(swapped: Coords | false): this
+    showSwapped(swapped: Move | null): this
     {
         this.removeMarks(GameView.MARKS_GROUP_SWAP);
 
@@ -1063,7 +1091,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return this;
         }
 
-        this.addMark(new SwappedMark().setCoords(swapped), GameView.MARKS_GROUP_SWAP);
+        this.addMark(new SwappedMark().setCoords(moveToCoords(swapped)), GameView.MARKS_GROUP_SWAP);
 
         return this;
     }
@@ -1081,7 +1109,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     setPreviewedMove(move: Move, playerIndex: PlayerIndex): this
     {
         if (this.previewedMove !== null) {
-            if (this.previewedMove.move.sameAs(move) && playerIndex === this.previewedMove.playerIndex) {
+            if (this.previewedMove.move === move && playerIndex === this.previewedMove.playerIndex) {
                 return this;
             }
 
@@ -1107,17 +1135,21 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const { move } = this.previewedMove;
         this.previewedMove = null;
 
-        switch (move.getSpecialMoveType()) {
-            case undefined:
-                this.hexes[move.row][move.col].removePreviewMove();
-                break;
-
+        switch (move) {
             case 'swap-pieces': {
                 const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
 
-                this.hexes[swapped.row][swapped.col].removePreviewMove();
-                this.hexes[mirror.row][mirror.col].removePreviewMove();
+                this.getHex(swapped).removePreviewMove();
+                this.getHex(mirror).removePreviewMove();
+
+                break;
             }
+
+            case 'pass':
+                break;
+
+            default:
+                this.getHex(move).removePreviewMove();
         }
 
         return this;
@@ -1134,9 +1166,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         const { move, playerIndex } = this.previewedMove;
 
-        switch (move.getSpecialMoveType()) {
-            case undefined:
-                this.hexes[move.row][move.col].previewMove(playerIndex);
+        switch (move) {
+            case 'pass':
                 break;
 
             case 'swap-pieces': {
@@ -1148,9 +1179,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
                 const { mirror, swapped } = swapCoords;
 
-                this.hexes[swapped.row][swapped.col].previewMove(1 - playerIndex as PlayerIndex);
-                this.hexes[mirror.row][mirror.col].previewMove(playerIndex);
+                this.getHex(swapped).previewMove(1 - playerIndex as PlayerIndex);
+                this.getHex(mirror).previewMove(playerIndex);
+
+                break;
             }
+
+            default:
+                this.getHex(move).previewMove(playerIndex);
         }
     }
 
@@ -1210,18 +1246,21 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     addMove(move: Move, byPlayerIndex: PlayerIndex): void
     {
-        switch (move.getSpecialMoveType()) {
-            case undefined:
-                this.hexes[move.row][move.col].setPlayer(byPlayerIndex);
+        switch (move) {
+            case 'pass':
                 break;
 
             case 'swap-pieces': {
                 const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
 
-                this.hexes[swapped.row][swapped.col].setPlayer(null);
-                this.hexes[mirror.row][mirror.col].setPlayer(byPlayerIndex);
+                this.getHex(swapped).setPlayer(null);
+                this.getHex(mirror).setPlayer(byPlayerIndex);
+
                 break;
             }
+
+            default:
+                this.getHex(move).setPlayer(byPlayerIndex);
         }
 
         this.highlightLastMove(this.simulationMode
@@ -1241,7 +1280,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                 break;
             }
 
-            this.addMove(movesHistory[i], i % 2 as PlayerIndex);
+            this.addMove(movesHistory[i].move, i % 2 as PlayerIndex);
         }
     }
 
@@ -1279,12 +1318,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.emit('simulationModeChanged', this.simulationMode);
     }
 
-    getSimulationMoves(): { move: string, byPlayerIndex: PlayerIndex }[]
+    getSimulationMoves(): { move: Move, byPlayerIndex: PlayerIndex }[]
     {
         return this.simulatedMoves;
     }
 
-    setSimulationMoves(moves: { move: string, byPlayerIndex: PlayerIndex }[]): void
+    setSimulationMoves(moves: { move: Move, byPlayerIndex: PlayerIndex }[]): void
     {
         this.simulatedMoves = moves;
         this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
@@ -1295,23 +1334,21 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Set simulation moves from a list of moves,
      * color are automatically defined.
      */
-    setSimulationMovesAuto(moves: string[]): void
+    setSimulationMovesAuto(moves: Move[]): void
     {
         this.simulatedMoves = [];
         this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
-        moves.forEach(move => this.playSimulatedMove(Move.fromString(move)));
+        moves.forEach(move => this.playSimulatedMove(move));
         this.redraw();
     }
 
     /**
      * @param index Number of the simulation move from last played move. Starts from 0.
      */
-    private addSimulatedMove(move: string, byPlayerIndex: PlayerIndex, index: number): void
+    private addSimulatedMove(move: Move, byPlayerIndex: PlayerIndex, index: number): void
     {
-        const moveInstance = Move.fromString(move);
-
-        this.addMove(moveInstance, byPlayerIndex);
-        this.addMark(new TextMark('' + (index + 1)).setCoords(moveInstance), GameView.MARKS_GROUP_SIMULATION);
+        this.addMove(move, byPlayerIndex);
+        this.addMark(new TextMark('' + (index + 1)).setCoords(moveToCoords(move)), GameView.MARKS_GROUP_SIMULATION);
     }
 
     private addAllSimulatedMoves(): void
@@ -1352,14 +1389,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             byPlayerIndex = this.getNextAutoSimulationColor();
         }
 
-        this.simulatedMoves.push({ move: move.toString(), byPlayerIndex });
-        this.addSimulatedMove(move.toString(), byPlayerIndex, this.simulatedMoves.length - 1);
+        this.simulatedMoves.push({ move, byPlayerIndex });
+        this.addSimulatedMove(move, byPlayerIndex, this.simulatedMoves.length - 1);
     }
 
     getSimulationMoveColorAt(coords: Coords): null | PlayerIndex
     {
         for (const { move, byPlayerIndex } of this.simulatedMoves) {
-            const { row, col } = Move.fromString(move);
+            const { row, col } = moveToCoords(move);
 
             if (coords.row === row && coords.col === col) {
                 return byPlayerIndex;

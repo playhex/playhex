@@ -1,6 +1,7 @@
 import { getBestMove, getBestMoveCustomPosition, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
-import { Game, Move } from '../game-engine/index.js';
+import { Game } from '../game-engine/index.js';
 import { PlayerIndex } from 'time-control/TimeControl.js';
+import { coordsToMove, Move, moveToCoords } from '../move-notation/move-notation.js';
 
 /**
  * Uses Davies AI to compute a move from a Game.
@@ -19,11 +20,11 @@ export const calcDaviesMove = async (game: Game, daviesLevel = 7, waitBeforePlay
 
     const move = getBestMove(
         game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
-        game.getMovesHistory().map(move => move.toString()),
+        game.getMovesHistory().map(timestampedMove => timestampedMove.move),
         daviesLevel,
-    );
+    ) as Move;
 
-    return Move.fromString(move);
+    return move;
 };
 
 export const calcDaviesMoveCustomPosition = async (playerTurn: PlayerIndex, position: [string[], string[]], daviesLevel = 7, waitBeforePlay = 0): Promise<Move> => {
@@ -37,9 +38,9 @@ export const calcDaviesMoveCustomPosition = async (playerTurn: PlayerIndex, posi
         playerTurn === 0 ? WHO_RED : WHO_BLUE,
         position,
         daviesLevel,
-    );
+    ) as Move;
 
-    return Move.fromString(move);
+    return move;
 };
 
 /**
@@ -60,24 +61,24 @@ export const calcDaviesMoveFor9x9Board = async (game: Game, daviesLevel = 7, wai
     const position: [string[], string[]] = [[], []];
 
     for (let i = 0; i < 11; ++i) {
-        position[0].push(new Move(0, i).toString());
-        position[0].push(new Move(10, i).toString());
+        position[0].push(coordsToMove({ row: 0, col: i }));
+        position[0].push(coordsToMove({ row: 10, col: i }));
     }
 
     for (let i = 1; i < 10; ++i) {
-        position[1].push(new Move(i, 0).toString());
-        position[1].push(new Move(i, 10).toString());
+        position[1].push(coordsToMove({ row: i, col: 0 }));
+        position[1].push(coordsToMove({ row: i, col: 10 }));
     }
 
     for (let i = 0; i < 9; ++i) {
         for (let j = 0; j < 9; ++j) {
-            const color = game.getBoard().getCell(i, j);
+            const color = game.getBoard().getCell(coordsToMove({ row: i, col: j }));
 
             if (color === null) {
                 continue;
             }
 
-            position[color].push(new Move(i + 1, j + 1).toString());
+            position[color].push(coordsToMove({ row: i + 1, col: j + 1 }));
         }
     }
 
@@ -85,12 +86,12 @@ export const calcDaviesMoveFor9x9Board = async (game: Game, daviesLevel = 7, wai
         game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
         position,
         daviesLevel,
-    );
+    ) as Move;
 
-    const move = Move.fromString(output);
+    const coords = moveToCoords(output);
 
-    --move.row;
-    --move.col;
+    --coords.row;
+    --coords.col;
 
-    return move;
+    return coordsToMove(coords);
 };

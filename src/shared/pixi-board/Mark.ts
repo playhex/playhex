@@ -1,6 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
-import { Coords } from '../game-engine/index.js';
 import Hex from './Hex.js';
+import { Coords } from '../move-notation/move-notation.js';
 
 const PI_6 = Math.PI / 6;
 const PI_3 = Math.PI / 3;

@@ -1,4 +1,5 @@
-import { HostedGame, Move } from './models/index.js';
+import { Move } from '../move-notation/move-notation.js';
+import { HostedGame } from './models/index.js';
 
 /**
  * Guess Demer handicap from game options and pass moves.
@@ -12,9 +13,9 @@ import { HostedGame, Move } from './models/index.js';
  *
  * @param swapRule Whether swap is enabled
  * @param firstPlayerPredefined Whether first player is pre-defined, false if first player is random
- * @param movesHistory Played moves. If not provided, assume the game is empty, and returns a provisional handicap based on game settings
+ * @param moves Played moves. If not provided, assume the game is empty, and returns a provisional handicap based on game settings
  */
-export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boolean, movesHistory?: Move[]): number | 'N/S' => {
+export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boolean, moves?: Move[]): number | 'N/S' => {
     if (!swapRule) {
         if (!firstPlayerPredefined) {
             return 'N/S';
@@ -22,19 +23,19 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
 
         let handicap = 0.5;
 
-        if (!movesHistory) {
+        if (!moves) {
             return handicap;
         }
 
         // Counting white pass moves
-        for (let i = 1; i < movesHistory.length && movesHistory[i].specialMoveType === 'pass'; i += 2) {
+        for (let i = 1; i < moves.length && moves[i] === 'pass'; i += 2) {
             ++handicap;
         }
 
         return handicap;
     }
 
-    if (!movesHistory) {
+    if (!moves) {
         return 0;
     }
 
@@ -42,14 +43,8 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
     let consecutiveMoves = 0;
 
     // Counting pass moves in first moves
-    for (let i = 1; i < movesHistory.length && consecutiveMoves < 2; ++i) {
-        const { specialMoveType } = movesHistory[i];
-
-        if (undefined === specialMoveType) {
-            ++consecutiveMoves;
-        }
-
-        if (specialMoveType === 'pass') {
+    for (let i = 1; i < moves.length && consecutiveMoves < 2; ++i) {
+        if (moves[i] === 'pass') {
             consecutiveMoves = 0;
 
             if ((i % 2) === 0) {
@@ -57,7 +52,15 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
             } else {
                 ++handicap;
             }
+
+            continue;
         }
+
+        if (moves[i] === 'swap-pieces') {
+            continue;
+        }
+
+        ++consecutiveMoves;
     }
 
     return handicap;
@@ -67,6 +70,6 @@ export const guessDemerHandicapFromHostedGame = (hostedGame: HostedGame): number
     return guessDemerHandicap(
         hostedGame.swapRule,
         hostedGame.firstPlayer !== null,
-        hostedGame.movesHistory,
+        hostedGame.moves,
     );
 };

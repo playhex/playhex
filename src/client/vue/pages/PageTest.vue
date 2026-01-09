@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Game, Move } from '../../../shared/game-engine/index.js';
+import { Game } from '../../../shared/game-engine/index.js';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
@@ -8,12 +8,12 @@ import { themes } from '../../../shared/pixi-board/BoardTheme.js';
 const game = new Game();
 const container = ref<HTMLElement>();
 
-game.getBoard().setCell(1, 1, 1);
-game.getBoard().setCell(1, 2, 1);
-game.getBoard().setCell(1, 3, 1);
+game.getBoard().setCell('b2', 1);
+game.getBoard().setCell('c2', 1);
+game.getBoard().setCell('d2', 1);
 
-game.move(new Move(0, 0), 0);
-game.move(Move.swapPieces(), 1);
+game.move('a1', 0);
+game.move('swap-pieces', 1);
 
 const gameView = new CustomizedGameView(game);
 

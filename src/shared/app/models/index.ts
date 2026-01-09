@@ -12,7 +12,6 @@ import {
     HostedGameOptionsTimeControlByoYomi,
 } from './HostedGameOptionsTimeControl.js';
 import HostedGameToPlayer from './HostedGameToPlayer.js';
-import Move from './Move.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
 import PlayerNotification from './PlayerNotification.js';
@@ -42,7 +41,6 @@ export {
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
     HostedGameToPlayer,
-    Move,
     MoveSettings,
     OnlinePlayers,
     OnlinePlayer,
@@ -75,7 +73,6 @@ export const entities = {
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
     HostedGameToPlayer,
-    Move,
     OnlinePlayers,
     Player,
     PlayerNotification,

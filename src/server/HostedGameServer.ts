@@ -1,6 +1,6 @@
 import { Game as EngineGame, Game, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { ChatMessage, Player, HostedGameToPlayer, Move, HostedGame, Premove } from '../shared/app/models/index.js';
+import { ChatMessage, Player, HostedGameToPlayer, HostedGame, Premove } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
 import baseLogger from './services/logger.js';
@@ -11,17 +11,17 @@ import { canPassAgain } from '../shared/app/passUtils.js';
 import { Container } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager.js';
-import { fromEngineMove, moveFromString, toEngineMove } from '../shared/app/models/Move.js';
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame.js';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository.js';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
 import { notifier } from './services/notifications/index.js';
 import { AutoSaveInterface } from 'auto-save/AutoSaveInterface.js';
 import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
-import { Outcome } from '../shared/game-engine/Types.js';
+import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
 import { assignEngineGameData, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
+import { Move } from '../shared/move-notation/move-notation.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -246,7 +246,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.premoves[this.game.getCurrentPlayerIndex()] = null; // Must reset premove before playerMove(), else getCurrentPlayerIndex() will point to other player
 
         const player = this.players[this.game.getCurrentPlayerIndex()];
-        const result = this.playerMove(player, moveFromString(premove.move));
+        const result = this.playerMove(player, premove.move);
 
         if (result !== true) {
             this.logger.error('Could not play premove', { result });
@@ -289,7 +289,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 return;
             }
 
-            const result = this.playerMove(player, fromEngineMove(move));
+            const result = this.playerMove(player, move);
 
             if (result !== true) {
                 this.logger.error('Bot tried to move but get an error', { result });
@@ -332,7 +332,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             const player = this.players[this.game.getCurrentPlayerIndex()];
             const conditionalMovesRepository = Container.get(ConditionalMovesRepository);
 
-            const move = await conditionalMovesRepository.shift(player, this.hostedGame, lastMove);
+            const move = await conditionalMovesRepository.shift(player, this.hostedGame, lastMove.move);
 
             if (move === null) {
                 this.logger.info('Conditional moves: no conditional move.', { lastMove });
@@ -346,7 +346,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 return;
             }
 
-            const result = this.playerMove(player, fromEngineMove(move));
+            const result = this.playerMove(player, move);
 
             if (result !== true) {
                 this.logger.error('Could not play conditional move', { result });
@@ -360,7 +360,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      * In player vs bot game, returns last player move.
      * Returns null if player has not yet played, or if this is bot vs bot.
      */
-    private getLastPlayerMove(): null | Move
+    private getLastPlayerMove(): null | TimestampedMove
     {
         if (this.game === null) {
             return null;
@@ -377,7 +377,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             }
         }
 
-        return fromEngineMove(this.game.getMovesHistory()[i]);
+        return this.game.getMovesHistory()[i];
     }
 
     /**
@@ -428,10 +428,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         /**
          * Listen on played event, move can come from AI
          */
-        game.on('played', (move, moveIndex, byPlayerIndex) => {
+        game.on('played', (timestampedMove, moveIndex, byPlayerIndex) => {
             this.saveState();
 
-            this.io.to(this.gameRooms()).emit('moved', this.getPublicId(), fromEngineMove(move), moveIndex, byPlayerIndex);
+            this.io.to(this.gameRooms()).emit('moved', this.getPublicId(), timestampedMove, moveIndex, byPlayerIndex);
             this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
             if (!game.isEnded()) {
@@ -444,7 +444,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.emit('played');
 
             if (!game.isEnded()) {
-                notifier.emit('move', this.hostedGame, fromEngineMove(move));
+                notifier.emit('move', this.hostedGame, timestampedMove);
             }
         });
 
@@ -689,9 +689,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return true;
     }
 
-    playerMove(player: Player, move: Move, moveDate: Date = new Date()): true | string
+    playerMove(player: Player, move: Move, playedAt: Date = new Date()): true | string
     {
-        move.playedAt = moveDate;
         this.logger.info('Move played', { move, player: player.pseudo });
 
         if (this.hostedGame.state !== 'playing') {
@@ -709,13 +708,13 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
-        if (move.specialMoveType === 'pass' && !canPassAgain(this.game)) {
+        if (move === 'pass' && !canPassAgain(this.game)) {
             this.logger.notice('Tried to pass again', { player: player.pseudo });
             return 'cannot pass infinitely. Now, play';
         }
 
         try {
-            this.game.move(toEngineMove(move), this.getPlayerIndex(player) as PlayerIndex);
+            this.game.move(move, this.getPlayerIndex(player) as PlayerIndex, playedAt);
 
             return true;
         } catch (e) {

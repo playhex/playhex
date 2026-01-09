@@ -1,5 +1,5 @@
 import { HostedGameOptions, Player } from '../../shared/app/models/index.js';
-import { Move, calcRandomMove } from '../../shared/game-engine/index.js';
+import { calcRandomMove } from '../../shared/game-engine/index.js';
 import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { Container } from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer.js';
@@ -7,6 +7,7 @@ import logger from './logger.js';
 import HostedGameServer from '../HostedGameServer.js';
 import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
+import { Move } from '../../shared/move-notation/move-notation.js';
 
 export class FindAIError extends Error {}
 
@@ -149,13 +150,11 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
                 throw new Error('Invalid config for aiConfig');
             }
 
-            return Move.fromString(
-                getBestMove(
-                    game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
-                    game.getMovesHistory().map(move => move.toString()),
-                    aiConfig.config.level,
-                ),
-            );
+            return getBestMove(
+                game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
+                game.getMovesHistory().map(timestampedMove => timestampedMove.move),
+                aiConfig.config.level,
+            ) as Move;
     }
 
     logger.error(`No local AI play for bot with slug = "${player.slug}"`);

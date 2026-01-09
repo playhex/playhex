@@ -1,5 +1,6 @@
 import { isSameDay } from 'date-fns';
 import { ChatMessage, HostedGame } from './models/index.js';
+import { getTimestampedMoves } from './hostedGameUtils.js';
 
 /*
  * Take a game chat messages, and adds between chat messages:
@@ -116,13 +117,13 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        const { movesHistory } = this.hostedGame;
+        const timestampedMoves = getTimestampedMoves(this.hostedGame);
 
         let currentMoveNumber = this.lastMoveNumber;
 
         while (
-            movesHistory.length > currentMoveNumber
-            && chatMessage.createdAt >= movesHistory[currentMoveNumber].playedAt
+            timestampedMoves.length > currentMoveNumber
+            && chatMessage.createdAt >= timestampedMoves[currentMoveNumber].playedAt
         ) {
             ++currentMoveNumber;
         }

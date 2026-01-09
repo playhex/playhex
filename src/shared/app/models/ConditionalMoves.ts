@@ -4,17 +4,18 @@ import HostedGame from './HostedGame.js';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 import { IsValidConditionalMovesTree } from '../validator/IsValidConditionalMovesTree.js';
+import { Move } from '../../move-notation/move-notation.js';
 
 export type ConditionalMovesLine = [
     // move
-    string,
+    Move,
 
     // answer
-    string?,
+    Move?,
 
     // next conditional moves
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [string, string?, [string, string?, any[]?][]?][]?, // ConditionalMovesTree?, // Not using recursive type because makes IDE constantly uses 100% cpu.
+    [Move, Move?, [Move, Move?, any[]?][]?][]?, // ConditionalMovesTree?, // Not using recursive type because makes IDE constantly uses 100% cpu.
 ];
 
 /**

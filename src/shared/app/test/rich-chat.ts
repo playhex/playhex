@@ -2,6 +2,7 @@ import assert from 'assert';
 import { ChatMessage, Player } from '../models/index.js';
 import { RichChat } from '../rich-chat.js';
 import { createHostedGame } from '../models/HostedGame.js';
+import { coordsToMove } from '../../move-notation/move-notation.js';
 
 describe('Rich Chat', () => {
     it('yield date headers', () => {
@@ -57,13 +58,21 @@ describe('Rich Chat', () => {
         blue.pseudo = 'blue';
 
         hostedGame.startedAt = new Date('2024-08-24T12:00:00Z');
-        hostedGame.movesHistory = [
-            { row: 0, col: 0, playedAt: new Date('2024-08-24T12:01:00Z') },
-            { row: 0, col: 1, playedAt: new Date('2024-08-24T12:01:01Z') },
-            { row: 0, col: 2, playedAt: new Date('2024-08-24T12:01:02Z') },
-            { row: 0, col: 3, playedAt: new Date('2024-08-24T12:05:00Z') },
-            { row: 0, col: 4, playedAt: new Date('2024-08-24T12:06:00Z') },
-            { row: 0, col: 5, playedAt: new Date('2024-08-24T12:07:00Z') },
+        hostedGame.moves = [
+            coordsToMove({ row: 0, col: 0 }),
+            coordsToMove({ row: 0, col: 1 }),
+            coordsToMove({ row: 0, col: 2 }),
+            coordsToMove({ row: 0, col: 3 }),
+            coordsToMove({ row: 0, col: 4 }),
+            coordsToMove({ row: 0, col: 5 }),
+        ];
+        hostedGame.moveTimestamps = [
+            new Date('2024-08-24T12:01:00Z'),
+            new Date('2024-08-24T12:01:01Z'),
+            new Date('2024-08-24T12:01:02Z'),
+            new Date('2024-08-24T12:05:00Z'),
+            new Date('2024-08-24T12:06:00Z'),
+            new Date('2024-08-24T12:07:00Z'),
         ];
 
         hostedGame.chatMessages = [];

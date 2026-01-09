@@ -10,10 +10,10 @@ export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeContr
     game.prependListener('played', (move, moveIndex, byPlayerIndex) => {
         // Start time control on first move
         if (timeControl.getState() === 'ready') {
-            timeControl.start(move.getPlayedAt());
+            timeControl.start(move.playedAt);
         }
 
-        timeControl.push(byPlayerIndex, move.getPlayedAt());
+        timeControl.push(byPlayerIndex, move.playedAt);
     });
 
     game.prependListener('ended', (winner, outcome, date) => {

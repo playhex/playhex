@@ -1,4 +1,4 @@
-import Move from '../game-engine/Move.js';
+import { colToLetter, Move, moveToCoords } from '../move-notation/move-notation.js';
 import { HostedGame, Player, ChatMessage } from './models/index.js';
 
 export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
@@ -87,7 +87,7 @@ export const relCoordsTranslate = (str: string, boardsize: number): string => {
         if (!Number.isInteger(colNumber) || colNumber < 1 || colNumber > boardsize)
             return input;
 
-        const colLetter = Move.colToLetter(colNumber - 1);
+        const colLetter = colToLetter(colNumber - 1);
 
         return `${row}${sep || ''}${col}(${colLetter}${rowNumber})`;
     });
@@ -119,7 +119,7 @@ export const makesCoordsInteractive = (str: string, boardsize: number): string =
                 return url;
             }
 
-            const move = Move.fromString(coords.toLowerCase());
+            const move = moveToCoords(coords.toLowerCase() as Move);
 
             // do not match coords outside board (and do not match u2 in "hi, u2")
             if (move.row >= boardsize || move.col >= boardsize) {

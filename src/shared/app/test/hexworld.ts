@@ -1,5 +1,5 @@
 import { gameToHexworldLink } from '../hexworld.js';
-import { Game, Move } from '../../game-engine/index.js';
+import { Game } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
 
@@ -7,11 +7,11 @@ describe('hexworld', () => {
     it('generates review link from game', () => {
         const game = new Game(9);
 
-        game.move(Move.fromString('e5'), 0);
-        game.move(Move.fromString('g6'), 1);
-        game.move(Move.fromString('c6'), 0);
-        game.move(Move.fromString('i9'), 1);
-        game.move(Move.fromString('b3'), 0);
+        game.move('e5', 0);
+        game.move('g6', 1);
+        game.move('c6', 0);
+        game.move('i9', 1);
+        game.move('b3', 0);
 
         const link = gameToHexworldLink(game);
 
@@ -21,11 +21,11 @@ describe('hexworld', () => {
     it('generates review link from game having a swap pieces move', () => {
         const game = new Game(9);
 
-        game.move(Move.fromString('b3'), 0);
-        game.move(Move.fromString('swap-pieces'), 1);
-        game.move(Move.fromString('c6'), 0);
-        game.move(Move.fromString('i9'), 1);
-        game.move(Move.fromString('c4'), 0);
+        game.move('b3', 0);
+        game.move('swap-pieces', 1);
+        game.move('c6', 0);
+        game.move('i9', 1);
+        game.move('c4', 0);
 
         const link = gameToHexworldLink(game);
 
@@ -35,11 +35,11 @@ describe('hexworld', () => {
     it('generates review link from game having a pass move', () => {
         const game = new Game(9);
 
-        game.move(Move.fromString('b3'), 0);
-        game.move(Move.fromString('swap-pieces'), 1);
-        game.move(Move.fromString('c6'), 0);
-        game.move(Move.fromString('i9'), 1);
-        game.move(Move.fromString('pass'), 0);
+        game.move('b3', 0);
+        game.move('swap-pieces', 1);
+        game.move('c6', 0);
+        game.move('i9', 1);
+        game.move('pass', 0);
 
         const link = gameToHexworldLink(game);
 
@@ -49,9 +49,9 @@ describe('hexworld', () => {
     it('generates review link from a resigned game', () => {
         const game = new Game(9);
 
-        game.move(Move.fromString('b3'), 0);
-        game.move(Move.fromString('swap-pieces'), 1);
-        game.move(Move.fromString('c6'), 0);
+        game.move('b3', 0);
+        game.move('swap-pieces', 1);
+        game.move('c6', 0);
         game.resign(1, new Date());
 
         const link = gameToHexworldLink(game);
@@ -62,8 +62,8 @@ describe('hexworld', () => {
     it('generates review link from a timed out game', () => {
         const game = new Game(11);
 
-        game.move(Move.fromString('b3'), 0);
-        game.move(Move.fromString('c11'), 1);
+        game.move('b3', 0);
+        game.move('c11', 1);
         game.loseByTime(new Date());
 
         const link = gameToHexworldLink(game);
@@ -73,9 +73,9 @@ describe('hexworld', () => {
 
     it('generates a review link for the "Flat" board rotation', () => {
         const game = new Game(11);
-        game.move(Move.fromString('c2'), 0);
-        game.move(Move.fromString('d4'), 1);
-        game.move(Move.fromString('c6'), 0);
+        game.move('c2', 0);
+        game.move('d4', 1);
+        game.move('c6', 0);
         game.resign(1, new Date());
 
         const link = gameToHexworldLink(game, 0);

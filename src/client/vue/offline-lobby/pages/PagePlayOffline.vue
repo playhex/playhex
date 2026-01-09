@@ -3,7 +3,7 @@
 import { t } from 'i18next';
 import { onUnmounted, Ref, ref } from 'vue';
 import AppBoard from '../../components/AppBoard.vue';
-import { Game, IllegalMove, Move, PlayerIndex } from '../../../../shared/game-engine/index.js';
+import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
@@ -13,6 +13,7 @@ import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vu
 import GameView from '../../../../shared/pixi-board/GameView.js';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
+import { Move } from '../../../../shared/move-notation/move-notation.js';
 
 let gameView: null | CustomizedGameView = null;
 let lastGameOptions: OfflineAIGameOptions;
@@ -95,8 +96,8 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
 
     gameView = new CustomizedGameView(game);
 
-    gameView.on('hexClicked', coords => {
-        const move = game.createMoveOrSwapMove(coords);
+    gameView.on('hexClicked', move => {
+        move = game.moveOrSwapPieces(move);
 
         try {
             game.move(move, playerIndex as PlayerIndex);
@@ -142,8 +143,8 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
 
     gameView = new CustomizedGameView(game);
 
-    gameView.on('hexClicked', coords => {
-        const move = game.createMoveOrSwapMove(coords);
+    gameView.on('hexClicked', move => {
+        game.moveOrSwapPieces(move);
 
         try {
             game.move(move, playerIndex as PlayerIndex);

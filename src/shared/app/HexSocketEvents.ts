@@ -1,8 +1,9 @@
-import { Outcome } from '../game-engine/Types.js';
+import { Move } from '../move-notation/move-notation.js';
+import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
-import { ChatMessage, GameAnalyze, HostedGame, Move, Player, Rating } from './models/index.js';
+import { ChatMessage, GameAnalyze, HostedGame, Player, Rating } from './models/index.js';
 import type { OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 
 export type HexClientToServerEvents = {
@@ -89,7 +90,7 @@ export type HexServerToClientEvents = {
     /**
      * A move has been played by a player.
      */
-    moved: (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => void;
+    moved: (gameId: string, timestampedMove: TimestampedMove, moveIndex: number, byPlayerIndex: PlayerIndex) => void;
 
     /**
      * Players remaining time should be updated.

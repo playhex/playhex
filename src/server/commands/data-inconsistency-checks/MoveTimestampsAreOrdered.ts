@@ -47,8 +47,8 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
         for (const game of games) {
             const moves: number[] = [];
 
-            for (let i = 1; i < game.movesHistory.length; ++i) {
-                if (game.movesHistory[i].playedAt < game.movesHistory[i - 1].playedAt) {
+            for (let i = 1; i < game.moveTimestamps.length; ++i) {
+                if (game.moveTimestamps[i] < game.moveTimestamps[i - 1]) {
                     moves.push(i);
                 }
             }
@@ -61,7 +61,7 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
         return unordereds.map(unordered => {
             const { game, moves } = unordered;
 
-            return `publicId ${game.publicId} hostedGameId ${game.id} ; moves ${moves.join(', ')} (length = ${game.movesHistory.length}, opponentType = ${game.opponentType})`;
+            return `publicId ${game.publicId} hostedGameId ${game.id} ; moves ${moves.join(', ')} (length = ${game.moveTimestamps.length}, opponentType = ${game.opponentType})`;
         });
     }
 }

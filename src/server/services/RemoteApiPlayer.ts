@@ -1,9 +1,10 @@
 import logger from './logger.js';
-import { Game, IllegalMove, Move } from '../../shared/game-engine/index.js';
+import { Game, IllegalMove } from '../../shared/game-engine/index.js';
 import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
 import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
+import { isMoveValid, Move } from '../../shared/move-notation/move-notation.js';
 
 @Service()
 export default class RemoteApiPlayer
@@ -32,15 +33,15 @@ export default class RemoteApiPlayer
         try {
             moveString = await this.hexRemotePlayerApi.calculateMove(payload);
 
-            if (moveString === 'swap-pieces') {
-                return Move.swapPieces();
-            }
-
             if (moveString === 'resign') {
                 throw new Error('ok, remote player expressely resigned.');
             }
 
-            return Move.fromString(moveString);
+            if (!isMoveValid(moveString)) {
+                throw new Error('Invalid move: ' + moveString);
+            }
+
+            return moveString;
         } catch (e) {
             logger.error(`Unexpected remote player move: "${moveString ?? '(api error)'}"`, { error: e.message });
             throw new Error(e);

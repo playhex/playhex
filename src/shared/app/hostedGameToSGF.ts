@@ -2,13 +2,13 @@ import { isSameDay } from 'date-fns';
 import { SGF, SGFColor, sgfToString } from '../sgf/index.js';
 import { HostedGame, ChatMessage } from './models/index.js';
 import { pseudoString } from './pseudoUtils.js';
-import { Move } from '../game-engine/index.js';
 import { guessDemerHandicapFromHostedGame } from './demerHandicap.js';
 import { isRatingConfident } from './ratingUtils.js';
 import { SGFMove } from 'sgf/types.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
 import { PlayerIndex } from '../time-control/TimeControl.js';
 import { ByoYomiTimeControl } from '../time-control/time-controls/ByoYomiTimeControl.js';
+import { getTimestampedMoves } from './hostedGameUtils.js';
 
 const baseSGF: SGF = {
     FF: 4,
@@ -30,20 +30,20 @@ const getMovesChatMessages = (hostedGame: HostedGame): ChatMessage[][] => {
         return [];
     }
 
-    const { movesHistory } = hostedGame;
+    const { moveTimestamps } = hostedGame;
 
-    if (movesHistory.length === 0) {
+    if (moveTimestamps.length === 0) {
         // If there is no move, there is no move node in sgf to contain chat messages.
         // So returns empty.
         return [];
     }
 
     const { chatMessages } = hostedGame;
-    const movesChatMessages: ChatMessage[][] = Array(movesHistory.length).fill(null).map(() => []);
+    const movesChatMessages: ChatMessage[][] = Array(moveTimestamps.length).fill(null).map(() => []);
     let i = 0;
 
     for (const chatMessage of chatMessages) {
-        while (i + 1 < movesHistory.length && chatMessage.createdAt > movesHistory[i + 1].playedAt) {
+        while (i + 1 < moveTimestamps.length && chatMessage.createdAt > moveTimestamps[i + 1]) {
             ++i;
         }
 
@@ -62,20 +62,20 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     };
 
     // Moves
-    const movesHistory = hostedGame.movesHistory;
+    const timestampedMoves = getTimestampedMoves(hostedGame);
 
-    if (movesHistory && movesHistory.length > 0) {
+    if (timestampedMoves && timestampedMoves.length > 0) {
         const timeControl = createTimeControl(hostedGame.timeControlType);
-        timeControl.start(movesHistory[0].playedAt, movesHistory[0].playedAt);
+        timeControl.start(timestampedMoves[0].playedAt, timestampedMoves[0].playedAt);
 
         const colors: SGFColor[] = ['B', 'W'];
         const movesChatMessages = getMovesChatMessages(hostedGame);
 
-        sgf.moves = movesHistory.map((move, index) => {
+        sgf.moves = timestampedMoves.map((timestampedMove, index) => {
             const sgfMove: SGFMove = {};
 
             // Move
-            sgfMove[colors[index % 2]] = Move.fromData(move).toString();
+            sgfMove[colors[index % 2]] = timestampedMove.move;
 
             // Chat messages as comment
             if (movesChatMessages[index].length > 0) {
@@ -83,7 +83,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
             }
 
             // Remaining time
-            timeControl.push(index % 2 as PlayerIndex, move.playedAt, move.playedAt);
+            timeControl.push(index % 2 as PlayerIndex, timestampedMove.playedAt, timestampedMove.playedAt);
 
             if (timeControl instanceof ByoYomiTimeControl) {
                 const { remainingMainTime, remainingPeriods } = timeControl.getValues().players[index % 2];

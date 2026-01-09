@@ -1,4 +1,5 @@
-import { Coords, PathItem, PlayerIndex } from './Types.js';
+import { Coords, Move, moveToCoords } from '../move-notation/move-notation.js';
+import { PathItem, PlayerIndex } from './Types.js';
 
 export const BOARD_DEFAULT_SIZE = 11;
 
@@ -53,13 +54,17 @@ export default class Board
         return this.hexes.map(row => row.slice());
     }
 
-    getCell(row: number, col: number): null | PlayerIndex
+    getCell(move: Move): null | PlayerIndex
     {
+        const { row, col } = moveToCoords(move);
+
         return this.hexes[row][col];
     }
 
-    isEmpty(row: number, col: number): boolean
+    isEmpty(move: Move): boolean
     {
+        const { row, col } = moveToCoords(move);
+
         return this.hexes[row][col] === null;
     }
 
@@ -68,12 +73,21 @@ export default class Board
         return row >= 0 && row < this.size && col >= 0 && col < this.size;
     }
 
+    containsMove(move: Move): boolean
+    {
+        const { row, col } = moveToCoords(move);
+
+        return row >= 0 && row < this.size && col >= 0 && col < this.size;
+    }
+
     /**
      * Set a cell to a value.
      * Should call move() instead to play the game.
      */
-    setCell(row: number, col: number, value: null | PlayerIndex): void
+    setCell(move: Move, value: null | PlayerIndex): void
     {
+        const { row, col } = moveToCoords(move);
+
         this.hexes[row][col] = value;
     }
 

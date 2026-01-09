@@ -1,6 +1,5 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
 import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced.js';
-import { Move } from '../../shared/game-engine/index.js';
 import { themes } from '../../shared/pixi-board/BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
@@ -8,6 +7,7 @@ import GameView from '../../shared/pixi-board/GameView.js';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { defer } from '../../shared/app/defer.js';
+import { Move, moveToCoords } from '../../shared/move-notation/move-notation.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -27,7 +27,7 @@ const rectWithNegative = (g: Graphics, x: number, y: number, width: number, heig
 };
 
 export type MoveAndValue = {
-    move: string;
+    move: Move;
     value: number;
     whiteWin?: number;
 };
@@ -248,11 +248,11 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             gameView.setMovesHistoryCursor(move.moveIndex);
 
             // Place best move
-            this.bestMoveMark.setCoords(Move.fromString(move.bestMoves[0].move));
+            this.bestMoveMark.setCoords(moveToCoords(move.bestMoves[0].move));
             this.bestMoveMark.show();
 
             // Place played move and eval color
-            this.playedMoveMark.setCoords(Move.fromString(move.move.move));
+            this.playedMoveMark.setCoords(moveToCoords(move.move.move));
 
             const playedWhiteWin = move.move.whiteWin;
             const bestWhiteWin = move.bestMoves[0].whiteWin;

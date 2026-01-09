@@ -1,7 +1,8 @@
 /* eslint-disable indent */
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Board, Move } from '../index.js';
+import { Board } from '../index.js';
+import { coordsToMove } from '../../move-notation/move-notation.js';
 
 const _ = null;
 
@@ -12,7 +13,7 @@ describe('Board', () => {
 
             const neighboors = board
                 .getNeighboors({ row: 1, col: 1 })
-                .map(c => new Move(c.row, c.col).toString())
+                .map(c => coordsToMove(c))
             ;
 
             assert.strictEqual(neighboors.length, 6);
@@ -32,8 +33,8 @@ describe('Board', () => {
             const topCells = board.getSideCells(0, 0);
             const bottomCells = board.getSideCells(0, 1);
 
-            assert.deepStrictEqual(topCells.map(c => new Move(c.row, c.col).toString()), ['a1', 'b1', 'c1']);
-            assert.deepStrictEqual(bottomCells.map(c => new Move(c.row, c.col).toString()), ['a3', 'b3', 'c3']);
+            assert.deepStrictEqual(topCells.map(c => coordsToMove(c)), ['a1', 'b1', 'c1']);
+            assert.deepStrictEqual(bottomCells.map(c => coordsToMove(c)), ['a3', 'b3', 'c3']);
         });
 
         it('returns side cells of blue player', () => {
@@ -42,8 +43,8 @@ describe('Board', () => {
             const topCells = board.getSideCells(1, 0);
             const bottomCells = board.getSideCells(1, 1);
 
-            assert.deepStrictEqual(topCells.map(c => new Move(c.row, c.col).toString()), ['a1', 'a2', 'a3']);
-            assert.deepStrictEqual(bottomCells.map(c => new Move(c.row, c.col).toString()), ['c1', 'c2', 'c3']);
+            assert.deepStrictEqual(topCells.map(c => coordsToMove(c)), ['a1', 'a2', 'a3']);
+            assert.deepStrictEqual(bottomCells.map(c => coordsToMove(c)), ['c1', 'c2', 'c3']);
         });
     });
 
@@ -51,11 +52,11 @@ describe('Board', () => {
         it('No connection, missing one', () => {
             const board = new Board(5);
 
-            board.setCell(0, 0, 1);
-            board.setCell(0, 1, 1);
-            //board.setCell(0, 2, 1);
-            board.setCell(0, 3, 1);
-            board.setCell(0, 4, 1);
+            board.setCell(coordsToMove({ row: 0, col: 0 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 1 }), 1);
+            //board.setCell(coordsToMove({ row: 0, col: 2 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 3 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 4 }), 1);
 
             assert.strictEqual(board.calculateWinner(), null);
         });
@@ -63,11 +64,11 @@ describe('Board', () => {
         it('Connection, straight line', () => {
             const board = new Board(5);
 
-            board.setCell(0, 0, 1);
-            board.setCell(0, 1, 1);
-            board.setCell(0, 2, 1);
-            board.setCell(0, 3, 1);
-            board.setCell(0, 4, 1);
+            board.setCell(coordsToMove({ row: 0, col: 0 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 1 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 2 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 3 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 4 }), 1);
 
             assert.strictEqual(board.calculateWinner(), 1);
         });
@@ -75,11 +76,11 @@ describe('Board', () => {
         it('No connection, blocked by opponent', () => {
             const board = new Board(5);
 
-            board.setCell(0, 0, 1);
-            board.setCell(0, 1, 0);
-            board.setCell(0, 2, 1);
-            board.setCell(0, 3, 1);
-            board.setCell(0, 4, 1);
+            board.setCell(coordsToMove({ row: 0, col: 0 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 1 }), 0);
+            board.setCell(coordsToMove({ row: 0, col: 2 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 3 }), 1);
+            board.setCell(coordsToMove({ row: 0, col: 4 }), 1);
 
             assert.strictEqual(board.calculateWinner(), null);
         });
