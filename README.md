@@ -238,7 +238,7 @@ On development:
 - Update Cypress fixtures, see `src/server/commands/migrateCypressFixtures.ts`
 - Check breaking changes are acceptable for client that have not yet updated:
     - go to next version, `yarn build-server`, `node index.js`
-    - go to current production version, `yarn dev-server`
+    - go to current production version, `yarn dev-client`
     - then test application have no big error
     - else, add retrocompat temporary fix (like `get gameData() { return { ... }; } set gameData(x) {}` to keep returning legacy property through api)
 
