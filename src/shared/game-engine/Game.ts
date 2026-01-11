@@ -1,11 +1,12 @@
-import { IllegalMove, PlayerIndex, Move, BOARD_DEFAULT_SIZE } from './index.js';
+import { IllegalMove, PlayerIndex, BOARD_DEFAULT_SIZE } from './index.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import Board from './Board.js';
-import { Coords, Outcome } from './Types.js';
+import { TimestampedMove, Outcome } from './Types.js';
 import { GameData } from './normalization.js';
 import IllegalUndo from './errors/IllegalUndo.js';
 import NotYourTurnError from './errors/NotYourTurnError.js';
 import CellAlreadyOccupiedError from './errors/CellAlreadyOccupiedError.js';
+import { mirrorMove, Move } from '../move-notation/move-notation.js';
 
 type GameEvents = {
     /**
@@ -13,7 +14,7 @@ type GameEvents = {
      * At this time, game.getCurrentPlayer() is the current player after move have been played.
      * If the move is winning, "winner" contains the actual winner. Otherwise contains null.
      */
-    played: (move: Move, moveIndex: number, byPlayerIndex: PlayerIndex, winner: null | PlayerIndex) => void;
+    played: (move: TimestampedMove, moveIndex: number, byPlayerIndex: PlayerIndex, winner: null | PlayerIndex) => void;
 
     /**
      * Game have been finished.
@@ -32,7 +33,7 @@ type GameEvents = {
      *                    First one is the first undone, so the latest played one.
      *                    So A, B, C, undone 2 moves will make: [C, B]
      */
-    undo: (undoneMoves: Move[]) => void;
+    undo: (undoneMoves: TimestampedMove[]) => void;
 
     /**
      * Board has been updated in a non-usually way,
@@ -45,7 +46,7 @@ export default class Game extends TypedEmitter<GameEvents>
 {
     private board: Board;
     private currentPlayerIndex: PlayerIndex = 0;
-    private movesHistory: Move[] = [];
+    private movesHistory: TimestampedMove[] = [];
     private allowSwap = true;
 
     private winner: null | PlayerIndex = null;
@@ -105,12 +106,12 @@ export default class Game extends TypedEmitter<GameEvents>
         this.currentPlayerIndex = this.otherPlayerIndex();
     }
 
-    getMovesHistory(): Move[]
+    getMovesHistory(): TimestampedMove[]
     {
         return this.movesHistory;
     }
 
-    setMovesHistory(movesHistory: Move[]): Game
+    setMovesHistory(movesHistory: TimestampedMove[]): Game
     {
         this.movesHistory = movesHistory;
 
@@ -120,7 +121,7 @@ export default class Game extends TypedEmitter<GameEvents>
     resetGame(): void
     {
         for (const move of this.movesHistory) {
-            this.board.setCell(move.row, move.col, null);
+            this.board.setCell(move.move, null);
         }
 
         this.movesHistory = [];
@@ -132,17 +133,17 @@ export default class Game extends TypedEmitter<GameEvents>
         this.emit('updated');
     }
 
-    getFirstMove(): null | Move
+    getFirstMove(): null | TimestampedMove
     {
         return this.movesHistory[0] ?? null;
     }
 
-    getSecondMove(): null | Move
+    getSecondMove(): null | TimestampedMove
     {
         return this.movesHistory[1] ?? null;
     }
 
-    getLastMove(): null | Move
+    getLastMove(): null | TimestampedMove
     {
         if (this.movesHistory.length === 0) {
             return null;
@@ -161,7 +162,7 @@ export default class Game extends TypedEmitter<GameEvents>
      */
     getMovesHistoryAsString(): string
     {
-        return Move.movesAsString(this.movesHistory);
+        return this.movesHistory.map(move => move.move).join(' ');
     }
 
     /**
@@ -177,18 +178,7 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new NotYourTurnError(move);
         }
 
-        switch (move.getSpecialMoveType()) {
-            case undefined:
-                if (!this.board.containsCoords(move.row, move.col)) {
-                    throw new IllegalMove(move, 'Cell outside board');
-                }
-
-                if (!this.board.isEmpty(move.row, move.col)) {
-                    throw new CellAlreadyOccupiedError(move);
-                }
-
-                break;
-
+        switch (move) {
             case 'swap-pieces':
                 if (!this.allowSwap) {
                     throw new IllegalMove(move, 'Cannot swap, swap rule is disabled');
@@ -204,7 +194,15 @@ export default class Game extends TypedEmitter<GameEvents>
                 break;
 
             default:
-                throw new IllegalMove(move, `Unknown move special type: "${move.getSpecialMoveType()}"`);
+                if (!this.board.containsMove(move)) {
+                    throw new IllegalMove(move, 'Cell outside board');
+                }
+
+                if (!this.board.isEmpty(move)) {
+                    throw new CellAlreadyOccupiedError(move);
+                }
+
+                break;
         }
     }
 
@@ -213,42 +211,43 @@ export default class Game extends TypedEmitter<GameEvents>
      *
      * @throws IllegalMove on invalid move.
      */
-    move(move: Move, byPlayerIndex: PlayerIndex): void
+    move(move: Move, byPlayerIndex: PlayerIndex, playedAt = new Date()): void
     {
         this.checkMove(move, byPlayerIndex);
 
-        switch (move.getSpecialMoveType()) {
+        switch (move) {
             case 'swap-pieces': {
-                const swapCoords = this.getSwapCoords(false)!;
-                const { swapped, mirror } = swapCoords;
+                const { swapped, mirror } = this.getSwapCoords(false)!;
 
-                this.board.setCell(swapped.row, swapped.col, null);
-                this.board.setCell(mirror.row, mirror.col, byPlayerIndex);
+                this.board.setCell(swapped, null);
+                this.board.setCell(mirror, byPlayerIndex);
                 break;
             }
-
-            case undefined:
-                this.board.setCell(move.row, move.col, byPlayerIndex);
-                break;
 
             case 'pass':
                 break;
 
             default:
-                throw new IllegalMove(move, `Unknown move special type: "${move.getSpecialMoveType()}"`);
+                this.board.setCell(move, byPlayerIndex);
+                break;
         }
 
-        this.movesHistory.push(move);
-        this.lastMoveAt = move.getPlayedAt();
+        const timestampedMove: TimestampedMove = {
+            move,
+            playedAt,
+        };
+
+        this.movesHistory.push(timestampedMove);
+        this.lastMoveAt = timestampedMove.playedAt;
 
         // Naively check connection on every move played
         if (this.board.hasPlayerConnection(byPlayerIndex)) {
-            this.setWinner(byPlayerIndex, 'path', move.getPlayedAt());
+            this.setWinner(byPlayerIndex, 'path', timestampedMove.playedAt);
         } else {
             this.changeCurrentPlayer();
         }
 
-        this.emit('played', move, this.movesHistory.length - 1, byPlayerIndex, this.getWinner());
+        this.emit('played', timestampedMove, this.movesHistory.length - 1, byPlayerIndex, this.getWinner());
 
         // Emit "ended" event after "played" event to keep order between events.
         if (this.hasWinner()) {
@@ -274,7 +273,7 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         return this.allowSwap
             && this.movesHistory.length === 1
-            && this.movesHistory[0].getSpecialMoveType() !== 'pass'
+            && this.movesHistory[0].move !== 'pass'
         ;
     }
 
@@ -287,24 +286,34 @@ export default class Game extends TypedEmitter<GameEvents>
             return false;
         }
 
-        return this.movesHistory[1].getSpecialMoveType() === 'swap-pieces';
+        return this.movesHistory[1].move === 'swap-pieces';
     }
 
-    createMoveOrSwapMove(coords: Coords): Move
+    /**
+     * Returns swap-pieces instead of move
+     * if trying to play over red's first move.
+     */
+    moveOrSwapPieces(move: Move): Move
     {
-        if (this.canSwapNow() && this.board.getCell(coords.row, coords.col) === 0) {
-            return Move.swapPieces();
+        if (this.canSwapNow() && this.board.getCell(move) === 0) {
+            return 'swap-pieces';
         }
 
-        return new Move(coords.row, coords.col);
+        return move;
     }
 
     /**
      * Returns previous move and new move coords.
      */
-    getSwapCoords(checkIsSwap = true): null | { swapped: Coords, mirror: Coords }
+    getSwapCoords(checkIsSwap = true): null | { swapped: Move, mirror: Move }
     {
-        if (checkIsSwap && (this.getLastMove()?.getSpecialMoveType() !== 'swap-pieces')) {
+        const lastMove = this.getLastMove();
+
+        if (lastMove === null) {
+            return null;
+        }
+
+        if (checkIsSwap && (lastMove.move !== 'swap-pieces')) {
             return null;
         }
 
@@ -315,8 +324,8 @@ export default class Game extends TypedEmitter<GameEvents>
         }
 
         return {
-            swapped: firstMove,
-            mirror: firstMove.cloneMirror(),
+            swapped: firstMove.move,
+            mirror: mirrorMove(firstMove.move),
         };
     }
 
@@ -355,7 +364,7 @@ export default class Game extends TypedEmitter<GameEvents>
         }
     }
 
-    private doUndoMove(): Move
+    private doUndoMove(): TimestampedMove
     {
         const lastMove = this.getLastMove();
 
@@ -363,11 +372,7 @@ export default class Game extends TypedEmitter<GameEvents>
             throw new Error('Cannot undo, board is empty');
         }
 
-        switch (lastMove.getSpecialMoveType()) {
-            case undefined:
-                this.board.setCell(lastMove.row, lastMove.col, null);
-                break;
-
+        switch (lastMove.move) {
             case 'swap-pieces': {
                 const firstMove = this.getFirstMove();
 
@@ -375,10 +380,16 @@ export default class Game extends TypedEmitter<GameEvents>
                     throw new Error('Unexpected null first move');
                 }
 
-                this.board.setCell(firstMove.col, firstMove.row, null);
-                this.board.setCell(firstMove.row, firstMove.col, 0);
+                this.board.setCell(mirrorMove(firstMove.move), null);
+                this.board.setCell(firstMove.move, 0);
                 break;
             }
+
+            case 'pass':
+                break;
+
+            default:
+                this.board.setCell(lastMove.move, null);
         }
 
         this.changeCurrentPlayer();
@@ -386,7 +397,7 @@ export default class Game extends TypedEmitter<GameEvents>
         return this.movesHistory.pop()!;
     }
 
-    undoMove(): Move
+    undoMove(): TimestampedMove
     {
         const undoneMove = this.doUndoMove();
 
@@ -399,7 +410,7 @@ export default class Game extends TypedEmitter<GameEvents>
      * player undo, moves are undone until it is player's turn again.
      * So 1 move is undone, or 2 if opponent played, his last move is also undone.
      */
-    playerUndo(playerIndex: PlayerIndex): Move[]
+    playerUndo(playerIndex: PlayerIndex): TimestampedMove[]
     {
         const undoneMoves = [];
 
@@ -421,9 +432,9 @@ export default class Game extends TypedEmitter<GameEvents>
     /**
      * Returns moves that will be undone if we call playerUndo()
      */
-    playerUndoDryRun(playerIndex: PlayerIndex): Move[]
+    playerUndoDryRun(playerIndex: PlayerIndex): TimestampedMove[]
     {
-        const undoneMoves: Move[] = [];
+        const undoneMoves: TimestampedMove[] = [];
 
         if (this.movesHistory.length < 2 && playerIndex === 1) {
             return undoneMoves;
@@ -438,13 +449,9 @@ export default class Game extends TypedEmitter<GameEvents>
         return undoneMoves;
     }
 
-    pass(byPlayerIndex: PlayerIndex): Move
+    pass(byPlayerIndex: PlayerIndex): void
     {
-        const passMove = Move.pass();
-
-        this.move(passMove, byPlayerIndex);
-
-        return passMove;
+        this.move('pass', byPlayerIndex);
     }
 
     hasWinner(): boolean
@@ -590,7 +597,7 @@ export default class Game extends TypedEmitter<GameEvents>
     {
         return {
             size: this.getSize(),
-            movesHistory: this.movesHistory.map(move => move.toData()),
+            movesHistory: this.movesHistory,
             allowSwap: this.allowSwap,
             currentPlayerIndex: this.currentPlayerIndex,
             winner: this.winner,
@@ -609,11 +616,11 @@ export default class Game extends TypedEmitter<GameEvents>
         let i = this.movesHistory.length;
         for (const moveData of gameData.movesHistory) {
             if (!found) {
-                if (moveData.col === lastMove!.col && moveData.row === lastMove!.row)
+                if (moveData.move === lastMove!.move)
                     found = true;
                 continue;
             }
-            this.move(Move.fromData(moveData), i % 2 as PlayerIndex);
+            this.move(moveData.move, i % 2 as PlayerIndex, moveData.playedAt);
             i++;
         }
 
@@ -641,7 +648,7 @@ export default class Game extends TypedEmitter<GameEvents>
         game.allowSwap = gameData.allowSwap;
 
         gameData.movesHistory.forEach((moveData, index) => {
-            game.move(Move.fromData(moveData), index % 2 as PlayerIndex);
+            game.move(moveData.move, index % 2 as PlayerIndex, moveData.playedAt);
         });
 
         game.currentPlayerIndex = gameData.currentPlayerIndex;

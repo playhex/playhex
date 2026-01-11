@@ -4,7 +4,6 @@ import logger from '../services/logger.js';
 import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { AnalyzeGameRequest } from 'services/HexAiApiClient.js';
-import Move from '../../shared/game-engine/Move.js';
 
 /**
  * Relations to load in order to recreate an HostedGame in memory.
@@ -127,10 +126,10 @@ export default class HostedGamePersister
      */
     async getAnalyzeGameRequest(publicId: string): Promise<null | AnalyzeGameRequest>
     {
-        const data = await this.hostedGameRepository.findOne({
+        const hostedGame = await this.hostedGameRepository.findOne({
             select: {
                 boardsize: true,
-                movesHistory: true,
+                moves: true,
             },
             where: {
                 publicId,
@@ -138,21 +137,19 @@ export default class HostedGamePersister
             },
         });
 
-        if (data === null) {
+        if (hostedGame === null) {
             return null;
         }
 
-        const { movesHistory, boardsize } = data;
+        const { moves, boardsize } = hostedGame;
 
-        if (!Array.isArray(movesHistory)) {
+        if (!Array.isArray(moves)) {
             throw new Error('Unexpected data in game.movesHistory');
         }
 
         return {
             size: boardsize,
-            movesHistory: Move.movesAsString(movesHistory
-                .map(moveData => Move.fromData(moveData)),
-            ),
+            movesHistory: moves.join(' '),
         };
     }
 

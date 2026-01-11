@@ -1,8 +1,10 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { Move, PlayerIndex } from '../game-engine/index.js';
+import { PlayerIndex } from '../game-engine/index.js';
 import GameView from '../pixi-board/GameView.js';
 import TextMark from '../pixi-board/marks/TextMark.js';
 import { clearDuplicatedUnplayedLines, conditionalMovesCut, conditionalMovesMergeMoves, conditionalMovesShift, ConditionalMovesStruct, getNextMovesAfterLine } from './conditionalMovesUtils.js';
+import { Move, moveToCoords } from '../move-notation/move-notation.js';
+import { TimestampedMove } from '../game-engine/Types.js';
 
 type ConditionalMovesEditorEvents = {
 
@@ -33,7 +35,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      * Currently selected line in the tree.
      * Should be highlihted, and actions like cutting will be done on this line, or last move in this line.
      */
-    private selectedLine: string[] = [];
+    private selectedLine: Move[] = [];
 
     /**
      * Whether player is currently adding/removing conditional moves.
@@ -74,8 +76,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     onHexSimulated(move: Move)
     {
-        const moveStr = move.toString();
-        const index = this.selectedLine.indexOf(moveStr);
+        const index = this.selectedLine.indexOf(move);
 
         if (index >= 0) {
             this.selectedLine.splice(index + 1);
@@ -84,7 +85,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
             return;
         }
 
-        this.selectedLine.push(moveStr);
+        this.selectedLine.push(move);
         this.markNextConditionalMoves();
         conditionalMovesMergeMoves(this.conditionalMovesDirty.tree, this.selectedLine);
         this.hasChanges = true;
@@ -99,7 +100,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
             return;
         }
 
-        conditionalMovesShift(this.conditionalMoves, move.toString());
+        conditionalMovesShift(this.conditionalMoves, move);
 
         this.discardSimulationMoves();
     }
@@ -135,7 +136,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         return this.hasChanges;
     }
 
-    getSelectedLine(): string[]
+    getSelectedLine(): Move[]
     {
         return this.selectedLine;
     }
@@ -160,7 +161,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         const nextNumberString = '' + (this.selectedLine.length + 1);
 
         for (const move of next) {
-            const mark = new TextMark(nextNumberString).setCoords(Move.fromString(move));
+            const mark = new TextMark(nextNumberString).setCoords(moveToCoords(move));
             this.gameView.addMark(mark, 'nextConditionalMoves');
         }
     }
@@ -213,13 +214,13 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     /**
      * Keeps previous line, merge new line to tree and make it selected.
      */
-    setSelectedLine(line: string[]): void
+    setSelectedLine(line: Move[]): void
     {
         this.enableSimulationMode();
         this.selectedLine = [...line];
 
         if (line.length > 0) {
-            conditionalMovesMergeMoves(this.conditionalMovesDirty.tree, this.selectedLine.map(move => move.toString()));
+            conditionalMovesMergeMoves(this.conditionalMovesDirty.tree, [...this.selectedLine]);
             this.hasChanges = true;
         }
 
@@ -297,7 +298,7 @@ export const listenGameViewEvents = (conditionalMovesEditor: ConditionalMovesEdi
     gameView.on('hexSimulated', onHexSimulated);
     onClose.push(() => gameView.off('hexSimulated', onHexSimulated));
 
-    const onPlayed = (move: Move, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move, _, byPlayerIndex);
+    const onPlayed = (move: TimestampedMove, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move.move, _, byPlayerIndex);
     gameView.getGame().on('played', onPlayed);
     onClose.push(() => gameView.getGame().off('played', onPlayed));
 

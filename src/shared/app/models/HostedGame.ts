@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad, type Relation } from 'typeorm';
-import { ColumnUUID } from '../custom-typeorm.js';
+import { ColumnUUID, longText } from '../custom-typeorm.js';
 import Player from './Player.js';
 import type { HostedGameState } from '../Types.js';
 import HostedGameOptions from './HostedGameOptions.js';
@@ -8,7 +8,7 @@ import type { GameTimeData } from '../../time-control/TimeControl.js';
 import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 import ChatMessage from './ChatMessage.js';
 import HostedGameToPlayer from './HostedGameToPlayer.js';
-import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
@@ -16,8 +16,8 @@ import type TimeControlType from '../../time-control/TimeControlType.js';
 import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
-import Move from './Move.js';
 import { type Outcome } from '../../game-engine/Types.js';
+import { Move } from '../../move-notation/move-notation.js';
 
 @Entity()
 @Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
@@ -129,10 +129,21 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Type(() => ChatMessage)
     chatMessages: ChatMessage[];
 
-    @Column({ type: 'json', transformer: { from: (value: unknown) => deserializeMovesHistory(value), to: value => value } })
+    @Column({ type: 'text', transformer: {
+        from: value => deserializeMoves(value),
+        to: moves => serializeMoves(moves),
+    } })
     @Expose()
-    @Type(() => Move)
-    movesHistory: Move[];
+    @Type(() => String)
+    moves: Move[];
+
+    @Column({ type: longText, transformer: {
+        from: value => deserializeMoveTimestamps(value),
+        to: moveTimestamps => serializeMoveTimestamps(moveTimestamps),
+    } })
+    @Expose()
+    @Type(() => Date)
+    moveTimestamps: Date[];
 
     @Column({ type: 'smallint', default: 0 })
     @Expose()
@@ -252,7 +263,8 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
     hostedGame.timeControl = null;
     hostedGame.host = params.host ?? null;
     hostedGame.chatMessages = [];
-    hostedGame.movesHistory = [];
+    hostedGame.moves = [];
+    hostedGame.moveTimestamps = [];
     hostedGame.currentPlayerIndex = 0;
     hostedGame.winner = null;
     hostedGame.outcome = null;
@@ -295,14 +307,24 @@ const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): nul
     return timeControlValue;
 };
 
-const deserializeMovesHistory = (value: unknown): Move[] => {
-    if (!value) {
-        return [];
-    }
+const serializeMoves = (moves: Move[]): string => {
+    return moves.join(' ');
+};
 
-    if (!(value instanceof Array)) {
-        throw new Error('Expected an array here');
-    }
+const deserializeMoves = (value: unknown): Move[] => {
+    return typeof value === 'string' && value.length > 0
+        ? value.split(' ') as Move[]
+        : []
+    ;
+};
 
-    return value.map(v => plainToInstance(Move, v));
+const serializeMoveTimestamps = (moveTimestamp: Date[]): string => {
+    return moveTimestamp.map(date => date.toISOString()).join(' ');
+};
+
+const deserializeMoveTimestamps = (value: unknown): Date[] => {
+    return typeof value === 'string' && value.length > 0
+        ? value.split(' ').map(s => new Date(s))
+        : []
+    ;
 };

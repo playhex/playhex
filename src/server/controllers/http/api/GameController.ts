@@ -3,12 +3,13 @@ import { format } from 'content-range';
 import HostedGameRepository, { GameError } from '../../../repositories/HostedGameRepository.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, HttpError, JsonController, Param, Post, QueryParams, Res } from 'routing-controllers';
-import { Player, Move, HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { Player, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { Service } from 'typedi';
 import { Expose } from '../../../../shared/app/class-transformer-custom.js';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
 import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
+import { type Move } from '../../../../shared/move-notation/move-notation.js';
 
 class AnswerUndoBody
 {

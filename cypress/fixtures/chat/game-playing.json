@@ -94,23 +94,15 @@
     ],
     "state": "playing",
     "createdAt": "2024-03-05T12:47:43.314Z",
-    "movesHistory": [
-        {
-            "row": 5,
-            "col": 6,
-            "playedAt": "2024-03-05T12:50:16.014Z"
-        },
-        {
-            "row": -1,
-            "col": -1,
-            "specialMoveType": "swap-pieces",
-            "playedAt": "2024-03-05T12:50:20.018Z"
-        },
-        {
-            "row": 3,
-            "col": 7,
-            "playedAt": "2024-03-05T12:50:23.188Z"
-        }
+    "moves": [
+        "g6",
+        "swap-pieces",
+        "h4"
+    ],
+    "moveTimestamps": [
+        "2024-03-05T12:50:16.014Z",
+        "2024-03-05T12:50:20.018Z",
+        "2024-03-05T12:50:23.188Z"
     ],
     "currentPlayerIndex": 1,
     "winner": null,

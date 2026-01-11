@@ -1,5 +1,5 @@
-import { HostedGame, HostedGameToPlayer, Move, Player } from './models/index.js';
-import { Outcome } from '../game-engine/Types.js';
+import { HostedGame, HostedGameToPlayer, Player } from './models/index.js';
+import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
 import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
@@ -155,14 +155,15 @@ export const addPlayer = (hostedGame: HostedGame, player: Player): void => {
     hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
 };
 
-export const addMove = (hostedGame: HostedGame, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void => {
-    if (moveIndex < hostedGame.movesHistory.length) {
+export const addMove = (hostedGame: HostedGame, timestampedMove: TimestampedMove, moveIndex: number, byPlayerIndex: PlayerIndex): void => {
+    if (moveIndex < hostedGame.moves.length) {
         return;
     }
 
-    hostedGame.movesHistory.push(move);
+    hostedGame.moves.push(timestampedMove.move);
+    hostedGame.moveTimestamps.push(timestampedMove.playedAt);
     hostedGame.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
-    hostedGame.lastMoveAt = move.playedAt;
+    hostedGame.lastMoveAt = timestampedMove.playedAt;
 };
 
 export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Outcome, endedAt: Date): void => {
@@ -269,12 +270,30 @@ export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Play
 };
 
 /**
+ * Returns an array of TimestampedMove from a hostedGame
+ */
+export const getTimestampedMoves = (hostedGame: HostedGame): TimestampedMove[] => {
+    return hostedGame.moves.map((move, index): TimestampedMove => ({
+        move,
+        playedAt: hostedGame.moveTimestamps[index],
+    }));
+};
+
+/**
+ * Update hostedGame moves and timestamps from an array of TimestampedMove
+ */
+export const assignTimestampedMoves = (hostedGame: HostedGame, timestampedMoves: TimestampedMove[]): void => {
+    hostedGame.moves = timestampedMoves.map(timestampedMove => timestampedMove.move);
+    hostedGame.moveTimestamps = timestampedMoves.map(timestampedMove => timestampedMove.playedAt);
+};
+
+/**
  * Convert a HostedGame to GameData.
  * GameData can be used to create a engine Game instance.
  */
 export const toEngineGameData = (hostedGame: HostedGame): GameData => ({
     size: hostedGame.boardsize,
-    movesHistory: hostedGame.movesHistory,
+    movesHistory: getTimestampedMoves(hostedGame),
     allowSwap: hostedGame.swapRule,
     currentPlayerIndex: hostedGame.currentPlayerIndex,
     winner: hostedGame.winner,
@@ -284,9 +303,9 @@ export const toEngineGameData = (hostedGame: HostedGame): GameData => ({
     endedAt: hostedGame.endedAt,
 });
 
-export const assignEngineGameData = (hostedGame: HostedGame, gameData: GameData) => {
+export const assignEngineGameData = (hostedGame: HostedGame, gameData: GameData): void => {
     hostedGame.boardsize = gameData.size;
-    hostedGame.movesHistory = gameData.movesHistory;
+    assignTimestampedMoves(hostedGame, gameData.movesHistory);
     hostedGame.swapRule = gameData.allowSwap;
     hostedGame.currentPlayerIndex = gameData.currentPlayerIndex;
     hostedGame.winner = gameData.winner;

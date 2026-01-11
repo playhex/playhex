@@ -18,12 +18,11 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
-import { Game, Move, PlayerIndex } from '../../../shared/game-engine/index.js';
+import { Game, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
-import { fromEngineMove } from '../../../shared/app/models/Move.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { isMyTurn } from '../../services/notifications/context-utils.js';
@@ -169,13 +168,13 @@ const listenHexClick = () => {
         throw new Error('no game view');
     }
 
-    gameView.on('hexClicked', async coords => {
+    gameView.on('hexClicked', async move => {
         if (hostedGameClient.value === null) {
             throw new Error('hex clicked but hosted game is null');
         }
 
         const game = hostedGameClient.value.getGame();
-        const move = game.createMoveOrSwapMove(coords);
+        move = game.moveOrSwapPieces(move);
 
         try {
             // Must get local player again in case player joined after (click "Watch", then "Join")
@@ -196,16 +195,16 @@ const listenHexClick = () => {
                 }
 
                 // cancel premove when click on it
-                if (gameView?.hasPreviewedMove() && move.sameAs(gameView.getPreviewedMove()!.move)) {
+                if (gameView?.hasPreviewedMove() && move === gameView.getPreviewedMove()!.move) {
                     await hostedGameClient.value.cancelPremove();
                     gameView?.removePreviewedMove();
 
                     return;
                 }
 
-                if (game.getBoard().isEmpty(move.row, move.col)) {
+                if (game.getBoard().isEmpty(move)) {
                     // set or replace premove
-                    void hostedGameClient.value.sendPremove(fromEngineMove(move));
+                    void hostedGameClient.value.sendPremove(move);
                     gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
                 } else if (gameView?.hasPreviewedMove()) {
                     // cancel premove when click on occupied cell
@@ -221,14 +220,14 @@ const listenHexClick = () => {
             // Send move if move preview is not enabled
             if (!shouldDisplayConfirmMove()) {
                 game.move(move, localPlayerIndex as PlayerIndex);
-                await hostedGameClient.value.sendMove(fromEngineMove(move));
+                await hostedGameClient.value.sendMove(move);
                 return;
             }
 
             // Cancel move preview if I click on it
             const previewedMove = gameView?.getPreviewedMove();
 
-            if (previewedMove && previewedMove.move.sameAs(move)) {
+            if (previewedMove && previewedMove.move === move) {
                 gameView?.removePreviewedMove();
                 confirmMove.value = null;
                 return;
@@ -243,7 +242,7 @@ const listenHexClick = () => {
                     return;
                 }
 
-                void hostedGameClient.value.sendMove(fromEngineMove(move));
+                void hostedGameClient.value.sendMove(move);
             };
 
             gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
@@ -262,7 +261,7 @@ const listenHexSecondaryClick = () => {
         throw new Error('no game view');
     }
 
-    gameView.on('hexClickedSecondary', coords => {
+    gameView.on('hexClickedSecondary', move => {
         if (!hostedGameClient.value) {
             return;
         }
@@ -273,7 +272,7 @@ const listenHexSecondaryClick = () => {
             chatInput.value += ' ';
         }
 
-        chatInput.value += new Move(coords.row, coords.col).toString() + ' ';
+        chatInput.value += move + ' ';
     });
 };
 
@@ -620,9 +619,8 @@ const pass = async () => {
             cancelClass: 'btn-outline-primary',
         });
 
-        const passMove = Move.pass();
-        hostedGameClient.value.getGame().move(passMove, getLocalPlayerIndex() as PlayerIndex);
-        void hostedGameClient.value.sendMove(fromEngineMove(passMove));
+        hostedGameClient.value.getGame().move('pass', getLocalPlayerIndex() as PlayerIndex);
+        void hostedGameClient.value.sendMove('pass');
     } catch (e) {
         // noop, player said no
     }

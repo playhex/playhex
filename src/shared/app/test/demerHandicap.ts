@@ -1,25 +1,13 @@
 import assert from 'assert';
-import { SpecialMoveType } from '../../game-engine/index.js';
-import { Move } from '../models/index.js';
 import { guessDemerHandicap } from '../demerHandicap.js';
+import { Move } from '../../move-notation/move-notation.js';
 
-const createMove = (specialMoveType?: SpecialMoveType): Move => {
-    const move = new Move();
-
-    move.row = 0;
-    move.col = 0;
-    move.playedAt = new Date();
-    move.specialMoveType = specialMoveType;
-
-    return move;
-};
-
-const move = createMove();
-const red = move;
-const blue = move;
-const blueSwaps = createMove('swap-pieces');
-const pass = createMove('pass');
-const etc = [move, move, move];
+const move: Move = 'a1';
+const red: Move = move;
+const blue: Move = move;
+const blueSwaps: Move = 'swap-pieces';
+const pass: Move = 'pass';
+const etc: Move[] = [move, move, move];
 
 describe('Demer Handicap', () => {
     it('guesses Demer handicap from a game', () => {

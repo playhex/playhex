@@ -57,12 +57,11 @@
     "chatMessages": [],
     "state": "canceled",
     "createdAt": "2024-01-24T20:22:40.783Z",
-    "movesHistory": [
-        {
-            "row": 2,
-            "col": 6,
-            "playedAt": "2024-01-24T20:22:40.787Z"
-        }
+    "moves": [
+        "g3"
+    ],
+    "moveTimestamps": [
+        "2024-01-24T20:22:40.787Z"
     ],
     "currentPlayerIndex": 1,
     "winner": null,

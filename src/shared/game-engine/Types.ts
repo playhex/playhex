@@ -1,17 +1,15 @@
-export type PlayerIndex = 0 | 1;
+import { Coords, Move } from '../move-notation/move-notation.js';
 
-/**
- * Row is number
- * Col is letter
- */
-export type Coords = {
-    row: number;
-    col: number;
-};
+export type PlayerIndex = 0 | 1;
 
 export type PathItem = {
     parent: null | PathItem;
     cell: Coords;
+};
+
+export type TimestampedMove = {
+    move: Move;
+    playedAt: Date;
 };
 
 /**

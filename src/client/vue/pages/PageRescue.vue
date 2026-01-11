@@ -2,7 +2,7 @@
 import { onBeforeMount, onUnmounted, ref, Ref } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
 import GameView from '../../../shared/pixi-board/GameView.js';
-import { Game, Move } from '../../../shared/game-engine/index.js';
+import { Game } from '../../../shared/game-engine/index.js';
 import { Player } from '../../../shared/app/models/index.js';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { shallowRef } from 'vue';
@@ -94,7 +94,7 @@ const clearCache = async () => {
  */
 const game = new Game(3);
 const gameView = shallowRef<null | GameView>(new CustomizedGameView(game));
-game.move(new Move(1, 1), 0);
+game.move('b2', 0);
 
 const players = ['A', 'B'].map(pseudo => {
     const player = new Player();

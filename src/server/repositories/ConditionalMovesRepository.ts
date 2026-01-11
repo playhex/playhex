@@ -1,9 +1,9 @@
 import { Inject, Service } from 'typedi';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { ConditionalMoves, HostedGame, Player } from '../../shared/app/models/index.js';
-import { Move } from '../../shared/game-engine/index.js';
 import { conditionalMovesShift, getNextMovesAfterLine } from '../../shared/app/conditionalMovesUtils.js';
 import logger from '../services/logger.js';
+import { Move } from '../../shared/move-notation/move-notation.js';
 
 @Service()
 export default class ConditionalMovesRepository
@@ -43,18 +43,15 @@ export default class ConditionalMovesRepository
         logger.info('Conditional moves candidates', {
             hostedGamePublicId: hostedGame.publicId,
             player: player.slug,
-            lastMove: lastMove.toString(),
+            lastMove,
             nextMoves: getNextMovesAfterLine(conditionalMoves.tree, []),
         });
 
-        const result = conditionalMovesShift(conditionalMoves, lastMove.toString());
+        const result = conditionalMovesShift(conditionalMoves, lastMove);
 
         // save() should be awaited to make sure we get up-to-date conditional moves if we recall shift() right after
         await this.conditionalMovesRepository.save(conditionalMoves);
 
-        return result === null
-            ? null
-            : Move.fromString(result)
-        ;
+        return result;
     }
 }
