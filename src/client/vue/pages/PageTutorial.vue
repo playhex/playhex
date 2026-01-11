@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DOMPurify from 'dompurify';
-import { calcRandomMove, Game, Move, PlayerIndex } from '../../../shared/game-engine/index.js';
+import { calcRandomMove, Game, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
@@ -13,6 +13,7 @@ import { IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import HexagonMark from '../../../shared/pixi-board/marks/HexagonMark.js';
+import { Move } from '../../../shared/move-notation/move-notation.js';
 
 useHead({
     title: t('how_to_play_hex'),
@@ -24,7 +25,7 @@ game0.setAllowSwap(false);
 const container0 = ref<HTMLElement>();
 const demo0Step = ref(0);
 
-const movesDemo0: Move[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ').map(s => Move.fromString(s));
+const movesDemo0: Move[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ') as Move[];
 
 const gameView0 = new CustomizedGameView(game0);
 
@@ -60,7 +61,7 @@ animation.push([() => {
         }
 
         try {
-            const move = game0.createMoveOrSwapMove(coords);
+            const move = game0.moveOrSwapPieces(coords);
             game0.move(move, game0.getCurrentPlayerIndex());
 
             if (game0.isEnded()) {
@@ -92,7 +93,7 @@ const container1 = ref<HTMLElement>();
 const gameView1 = new CustomizedGameView(gameSwap);
 const swapTextStep = ref<'init' | 'swapped' | 'not_swapped' | 'won' | 'lost'>('init');
 
-gameSwap.move(Move.fromString('d6'), 0);
+gameSwap.move('d6', 0);
 
 gameSwap.on('ended', winner => {
     swapTextStep.value = winner === 1
@@ -101,9 +102,9 @@ gameSwap.on('ended', winner => {
     ;
 });
 
-gameSwap.on('played', (move, moveIndex) => {
+gameSwap.on('played', (timestampedMove, moveIndex) => {
     if (moveIndex === 1) {
-        swapTextStep.value = move.getSpecialMoveType() === 'swap-pieces'
+        swapTextStep.value = timestampedMove.move === 'swap-pieces'
             ? 'swapped'
             : 'not_swapped'
         ;
@@ -116,7 +117,7 @@ gameView1.on('hexClicked', async coords => {
     }
 
     try {
-        const move = gameSwap.createMoveOrSwapMove(coords);
+        const move = gameSwap.moveOrSwapPieces(coords);
         gameSwap.move(move, gameSwap.getCurrentPlayerIndex());
 
         if (gameSwap.isEnded()) {

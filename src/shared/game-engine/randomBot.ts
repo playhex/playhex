@@ -1,5 +1,6 @@
 import seedrandom from 'seedrandom';
-import { Game, Move } from '../game-engine/index.js';
+import { Game } from '../game-engine/index.js';
+import { coordsToMove, Move } from '../move-notation/move-notation.js';
 
 /**
  * Returns a random number in [0;1[
@@ -9,7 +10,7 @@ const rand = (game: Game, determinist: boolean): number => {
     const rng = determinist
         ? seedrandom(game
             .getMovesHistory()
-            .map(m => m.toString())
+            .map(timestampedMove => timestampedMove.move)
             .join(' '),
         )
         : seedrandom()
@@ -34,15 +35,15 @@ export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist
 
     // Swaps 30% times
     if (game.canSwapNow() && rand(game, determinist) < 0.3) {
-        return Move.swapPieces();
+        return 'swap-pieces';
     }
 
     const possibleMoves: Move[] = [];
 
     for (let row = 0; row < game.getSize(); ++row) {
         for (let col = 0; col < game.getSize(); ++col) {
-            if (game.getBoard().getCell(row, col) === null) {
-                possibleMoves.push(new Move(row, col));
+            if (game.getBoard().isEmpty(coordsToMove({ row, col }))) {
+                possibleMoves.push(coordsToMove({ row, col }));
             }
         }
     }

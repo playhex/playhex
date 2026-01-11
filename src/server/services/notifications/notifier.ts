@@ -1,5 +1,6 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, HostedGame, Move, Tournament } from '../../../shared/app/models/index.js';
+import { ChatMessage, HostedGame, Tournament } from '../../../shared/app/models/index.js';
+import { TimestampedMove } from '../../../shared/game-engine/Types.js';
 
 type NotifiableEvents = {
     gameStart: (hostedGame: HostedGame) => void;
@@ -9,9 +10,9 @@ type NotifiableEvents = {
      * Can be either me, as soon as I click on a cell,
      * or a move from another player on another game.
      *
-     * move is not yet stacked in hostedGame.movesHistory
+     * move is not yet stacked in hostedGame.moves
      */
-    move: (hostedGame: HostedGame, move: Move) => void;
+    move: (hostedGame: HostedGame, timestampedMove: TimestampedMove) => void;
 
     /**
      * A game ended. Only ended: not canceled.

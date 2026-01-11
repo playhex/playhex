@@ -1,7 +1,5 @@
 import fs from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { Move as EngineMove } from '../../shared/game-engine/index.js';
-import { MoveData } from '../../shared/game-engine/normalization.js';
 import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { guessDemerHandicap } from '../../shared/app/demerHandicap.js';
@@ -141,16 +139,15 @@ hexProgram
                 throw new Error('winner is not 0 or 1');
             }
 
+            const moves = gameResult.moves.split(' ');
+
             exportedGames.push({
                 id: gameResult.publicId,
                 url: gameUrlPrefix + gameResult.publicId,
                 boardsize: gameResult.boardsize,
                 timeControl: gameResult.timeControlType,
-                movesCount: gameResult.movesHistory.length,
-                moves: gameResult.movesHistory
-                    .map((m: MoveData) => EngineMove.fromData(m).toString())
-                    .join(' ')
-                ,
+                movesCount: moves.length,
+                moves,
                 playerRed: gamePlayers[gameResult.id][0]!.pseudo,
                 playerBlue: gamePlayers[gameResult.id][1]!.pseudo,
                 playerRedType: gamePlayers[gameResult.id][0]!.type,
@@ -162,7 +159,7 @@ hexProgram
                 handicap: guessDemerHandicap(
                     gameResult.swapRule === 1,
                     gameResult.firstPlayer !== null,
-                    gameResult.movesHistory,
+                    moves,
                 ),
                 startedAt: gameResult.startedAt,
                 endedAt: gameResult.endedAt,

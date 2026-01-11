@@ -49,8 +49,8 @@ notifier.on('gameStart', hostedGame => {
 });
 
 // Toast when my opponent passed, or, if I'm watching, any player passed
-notifier.on('move', (hostedGame, move) => {
-    if (move.specialMoveType !== 'pass') {
+notifier.on('move', (hostedGame, timestampedMove) => {
+    if (timestampedMove.move !== 'pass') {
         return;
     }
 

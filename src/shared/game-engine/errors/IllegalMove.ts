@@ -1,9 +1,9 @@
-import Move from '../Move.js';
+import { Move } from '../../move-notation/move-notation.js';
 
 export default class IllegalMove extends Error
 {
     constructor(move: Move, message: string)
     {
-        super(`Move ${move.toString()}: ${message}`);
+        super(`Move ${move}: ${message}`);
     }
 }

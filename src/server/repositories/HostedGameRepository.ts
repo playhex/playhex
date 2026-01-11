@@ -1,6 +1,6 @@
 import { Container, Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
-import { Player, ChatMessage, HostedGame, HostedGameOptions, Move, Rating, Premove } from '../../shared/app/models/index.js';
+import { Player, ChatMessage, HostedGame, HostedGameOptions, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
 import HostedGamePersister from '../persistance/HostedGamePersister.js';
 import logger from '../services/logger.js';
@@ -19,6 +19,7 @@ import { createHostedGame, CreateHostedGameParams } from '../../shared/app/model
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
+import { Move } from '../../shared/move-notation/move-notation.js';
 
 export class GameError extends Error {}
 
@@ -324,7 +325,8 @@ export default class HostedGameRepository
         } catch (e) {
             logger.error('Could not persist game after creation', {
                 hostedGamePublicId: hostedGameServer.getPublicId(),
-                e,
+                message: e.message,
+                stack: e.stack,
             });
         }
 

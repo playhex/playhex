@@ -112,9 +112,9 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             notifier.emit('gameStart', hostedGame);
         });
 
-        socket.on('moved', (gameId, move) => {
+        socket.on('moved', (gameId, timestampedMove) => {
             if (hostedGames.value[gameId]) {
-                notifier.emit('move', hostedGames.value[gameId], move);
+                notifier.emit('move', hostedGames.value[gameId], timestampedMove);
             }
         });
 

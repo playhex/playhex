@@ -12,7 +12,6 @@ import { ChatMessage, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
-import Move from '../../../shared/game-engine/Move.js';
 import { canPlayerChatInGame, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
@@ -37,6 +36,7 @@ import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
 import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
+import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
 
 const props = defineProps({
     hostedGameClient: {
@@ -173,10 +173,10 @@ const chatClick = (e: PointerEvent) => {
         return;
     }
 
-    const coords = target.innerText.toLowerCase();
+    const coords = target.innerText.toLowerCase() as Move;
 
     const mark = new TriangleMark(0x0dcaf0);
-    mark.setCoords(Move.fromString(coords));
+    mark.setCoords(moveToCoords(coords));
 
     // ctrl click to show multiple marks when click on multiple coords in chat
     if (!e.ctrlKey) {
@@ -656,7 +656,7 @@ watchEffect(() => {
                     <dd class="col-md-7">{{ formatGameDuration(hostedGameClient) }}</dd>
 
                     <dt class="col-md-5">{{ $t('moves') }}</dt>
-                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().movesHistory.length ?? 0 }}</dd>
+                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().moves.length ?? 0 }}</dd>
 
                     <dt class="col-md-5">{{ $t('handicap.title') }}</dt>
                     <dd class="col-md-7" v-if="(0 === handicap)">{{ $t('handicap.none') }}</dd>

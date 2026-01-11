@@ -28,7 +28,7 @@ notifier.on('gameStart', hostedGame => {
     pushNotificationsPool.poolNotification(host, pushPayload);
 });
 
-notifier.on('move', (hostedGame, move) => {
+notifier.on('move', (hostedGame, timestampedMove) => {
     if (isBotGame(hostedGame)) {
         return;
     }
@@ -39,7 +39,7 @@ notifier.on('move', (hostedGame, move) => {
         return;
     }
 
-    const pushPayload = PushNotificationFactory.createTurnToPlayNotification(player, hostedGame, move.playedAt);
+    const pushPayload = PushNotificationFactory.createTurnToPlayNotification(player, hostedGame, timestampedMove.playedAt);
 
     pushNotificationsPool.poolNotification(player, pushPayload);
 });

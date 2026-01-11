@@ -1,4 +1,4 @@
-import Move from '../Move.js';
+import { Move } from '../../move-notation/move-notation.js';
 import IllegalMove from './IllegalMove.js';
 
 export default class NotYourTurnError extends IllegalMove

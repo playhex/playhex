@@ -3,6 +3,7 @@ import { PropType } from 'vue';
 import { ConditionalMovesLine, ConditionalMovesTree } from '../../../shared/app/models/ConditionalMoves.js';
 import { toRefs } from 'vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
+import { Move } from '../../../shared/move-notation/move-notation.js';
 
 const props = defineProps({
     tree: {
@@ -10,7 +11,7 @@ const props = defineProps({
         required: true,
     },
     selectedLine: {
-        type: Array as PropType<string[]>,
+        type: Array as PropType<Move[]>,
         required: false,
         default: null,
     },
@@ -48,7 +49,7 @@ const isSelectedAnswer = (currentLine: ConditionalMovesLine): boolean => {
     return selectedLine.value[1] === currentLine[1];
 };
 
-const subLine = (currentLine: ConditionalMovesLine): null | string[] => {
+const subLine = (currentLine: ConditionalMovesLine): null | Move[] => {
     if (!isSelectedAnswer(currentLine)) {
         return null;
     }
@@ -56,8 +57,8 @@ const subLine = (currentLine: ConditionalMovesLine): null | string[] => {
     return selectedLine.value.slice(2) ?? null;
 };
 
-const buildLine = (move: string, answer?: string, next?: string[]): string[] => {
-    const line = [move];
+const buildLine = (move: Move, answer?: Move, next?: Move[]): Move[] => {
+    const line: Move[] = [move];
 
     if (undefined !== answer) {
         line.push(answer);
@@ -71,7 +72,7 @@ const buildLine = (move: string, answer?: string, next?: string[]): string[] => 
 };
 
 const emit = defineEmits<{
-    (e: 'lineClicked', lineClicked: string[]): void;
+    (e: 'lineClicked', lineClicked: Move[]): void;
 }>();
 </script>
 

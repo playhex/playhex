@@ -1,3 +1,4 @@
+import { Move } from '../move-notation/move-notation.js';
 import { ConditionalMovesLine, ConditionalMovesTree } from './models/ConditionalMoves.js';
 
 export type ConditionalMovesStruct = {
@@ -14,7 +15,7 @@ export type ConditionalMovesStruct = {
  * @param conditionalMoves Instance of ConditionalMoves to update. Will update tree, and move other lines to unplayed lines.
  * @param lastMove Last move by opponent, will return an answer to this move. Then, both move and answer will be shifted from tree.
  */
-export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, lastMove: string): null | string => {
+export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, lastMove: Move): null | Move => {
     const { tree } = conditionalMoves;
 
     const playedLine = tree.find(line => line[0] === lastMove);
@@ -52,7 +53,7 @@ export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, 
  * Merge it with an existing line, extend it if new move,
  * replace answer if different answer, or add a new line.
  */
-export const conditionalMovesMergeMoves = (tree: ConditionalMovesTree, moves: string[]): void => {
+export const conditionalMovesMergeMoves = (tree: ConditionalMovesTree, moves: Move[]): void => {
     if (moves.length === 0) {
         return;
     }
@@ -133,7 +134,7 @@ export const clearDuplicatedUnplayedLines = (lines: ConditionalMovesLine[]): Con
 /**
  * Whether move appears at least once in whole line and its sublines.
  */
-export const lineContainsMove = (line: ConditionalMovesLine, ...moves: string[]): boolean => {
+export const lineContainsMove = (line: ConditionalMovesLine, ...moves: Move[]): boolean => {
     if (moves.includes(line[0])) {
         return true;
     }
@@ -190,9 +191,9 @@ export const isSameLines = (a: ConditionalMovesLine, b: ConditionalMovesLine): b
  * passing ['a1'] will return answer of a1,
  * passing ['a1', 'a2'] will return all next conditional moves after a2.
  */
-export const getNextMovesAfterLine = (tree: ConditionalMovesTree, moves: string[]): string[] => {
+export const getNextMovesAfterLine = (tree: ConditionalMovesTree, moves: Move[]): Move[] => {
 
-    const recursive = (currentTree: ConditionalMovesTree, currentMoves: string[]): string[] => {
+    const recursive = (currentTree: ConditionalMovesTree, currentMoves: Move[]): Move[] => {
         currentMoves = [...currentMoves];
         const move = currentMoves.shift();
 
@@ -230,7 +231,7 @@ export const getNextMovesAfterLine = (tree: ConditionalMovesTree, moves: string[
     return recursive(tree, moves);
 };
 
-const flatMovesToTree = (moves: string[]): undefined | ConditionalMovesLine => {
+const flatMovesToTree = (moves: Move[]): undefined | ConditionalMovesLine => {
     const move = moves.shift();
 
     if (undefined === move) {
@@ -261,13 +262,13 @@ const flatMovesToTree = (moves: string[]): undefined | ConditionalMovesLine => {
  *
  * @param moves Line to remove: will cut last move from this line, and all children.
  */
-export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: string[]): void => {
+export const conditionalMovesCut = (tree: ConditionalMovesTree, moves: Move[]): void => {
     if (moves.length === 0) {
         tree.splice(0);
         return;
     }
 
-    const cutRecursive = (currentTree: ConditionalMovesTree, currentMoves: string[]): void => {
+    const cutRecursive = (currentTree: ConditionalMovesTree, currentMoves: Move[]): void => {
         const move = currentMoves.shift();
 
         if (undefined === move) {

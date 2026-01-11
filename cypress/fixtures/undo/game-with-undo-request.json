@@ -63,22 +63,15 @@
     "undoRequest": 0,
     "rematch": null,
     "createdAt": "2024-07-17T17:07:23.418Z",
-    "movesHistory": [
-        {
-            "row": 4,
-            "col": 6,
-            "playedAt": "2024-07-17T17:07:39.439Z"
-        },
-        {
-            "row": 5,
-            "col": 7,
-            "playedAt": "2024-07-17T17:07:47.708Z"
-        },
-        {
-            "row": 5,
-            "col": 4,
-            "playedAt": "2024-07-17T17:07:49.359Z"
-        }
+    "moves": [
+        "g5",
+        "h6",
+        "e6"
+    ],
+    "moveTimestamps": [
+        "2024-07-17T17:07:39.439Z",
+        "2024-07-17T17:07:47.708Z",
+        "2024-07-17T17:07:49.359Z"
     ],
     "currentPlayerIndex": 1,
     "winner": null,

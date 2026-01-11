@@ -1,23 +1,8 @@
-import { SpecialMoveType } from './Move.js';
-import { Outcome, PlayerIndex } from './Types.js';
-
-/*
- * Used to transform a game instance to a plain object
- * that can be send as json, and transformed back to a game instance.
- *
- * See Game.toData() and Game.fromData()
- */
-
-export type MoveData = {
-    row: number;
-    col: number;
-    specialMoveType?: SpecialMoveType;
-    playedAt: Date;
-};
+import { TimestampedMove, Outcome, PlayerIndex } from './Types.js';
 
 export type GameData = {
     size: number;
-    movesHistory: MoveData[];
+    movesHistory: TimestampedMove[];
     allowSwap: boolean;
     currentPlayerIndex: PlayerIndex;
     winner: null | PlayerIndex;

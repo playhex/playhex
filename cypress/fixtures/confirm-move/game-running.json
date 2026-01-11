@@ -57,27 +57,17 @@
     "chatMessages": [],
     "state": "playing",
     "createdAt": "2024-01-25T10:32:11.323Z",
-    "movesHistory": [
-        {
-            "row": 7,
-            "col": 4,
-            "playedAt": "2024-01-25T10:32:13.386Z"
-        },
-        {
-            "row": 3,
-            "col": 1,
-            "playedAt": "2024-01-25T10:32:13.386Z"
-        },
-        {
-            "row": 4,
-            "col": 5,
-            "playedAt": "2024-01-25T10:32:14.487Z"
-        },
-        {
-            "row": 6,
-            "col": 4,
-            "playedAt": "2024-01-25T10:32:14.487Z"
-        }
+    "moves": [
+        "e8",
+        "b4",
+        "f5",
+        "e7"
+    ],
+    "moveTimestamps": [
+        "2024-01-25T10:32:13.386Z",
+        "2024-01-25T10:32:13.386Z",
+        "2024-01-25T10:32:14.487Z",
+        "2024-01-25T10:32:14.487Z"
     ],
     "currentPlayerIndex": 0,
     "winner": null,

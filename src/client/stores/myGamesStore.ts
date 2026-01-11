@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useHead } from '@unhead/vue';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
-import { HostedGame, Move } from '../../shared/app/models/index.js';
+import { HostedGame } from '../../shared/app/models/index.js';
 import Rooms from '../../shared/app/Rooms.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
@@ -148,7 +148,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         myGames.value[publicId].hostedGame = hostedGame;
     });
 
-    socket.on('moved', (gameId: string, move: Move, moveIndex: number, byPlayerIndex: PlayerIndex) => {
+    socket.on('moved', (gameId, timestampedMove, moveIndex, byPlayerIndex) => {
         if (!myGames.value[gameId] || myGames.value[gameId].myColor === null) {
             return;
         }

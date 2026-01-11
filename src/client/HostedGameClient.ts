@@ -1,8 +1,8 @@
 import { Ref } from 'vue';
 import { Game, PlayerIndex } from '../shared/game-engine/index.js';
 import { HostedGameState } from '../shared/app/Types.js';
-import { Player, ChatMessage, Move, Rating, HostedGame, Premove } from '../shared/app/models/index.js';
-import { Outcome } from '../shared/game-engine/Types.js';
+import { Player, ChatMessage, Rating, HostedGame, Premove } from '../shared/app/models/index.js';
+import type { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { GameTimeData } from '../shared/time-control/TimeControl.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { Socket } from 'socket.io-client';
@@ -12,7 +12,6 @@ import TimeControlType from '../shared/time-control/TimeControlType.js';
 import { notifier } from './services/notifications/index.js';
 import useServerDateStore from './stores/serverDateStore.js';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue.js';
-import { fromEngineMove, toEngineMove } from '../shared/app/models/Move.js';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat.js';
 import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, toEngineGameData, updateHostedGame } from '../shared/app/hostedGameUtils.js';
 import useLobbyStore from './stores/lobbyStore.js';
@@ -20,6 +19,7 @@ import useAuthStore from './stores/authStore.js';
 import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore.js';
 import { checkShadowDeleted } from '../shared/app/chatUtils.js';
 import { playAudio } from '../shared/app/audioPlayer.js';
+import { Move } from '../shared/move-notation/move-notation.js';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -220,7 +220,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
     private playSoundForMove(move: Move): void
     {
         if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
-        playAudio(move.specialMoveType === 'pass'
+        playAudio(move === 'pass'
             ? '/sounds/lisp/Check.ogg'
             : '/sounds/lisp/Move.ogg',
         );
@@ -228,15 +228,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
     async sendMove(move: Move): Promise<void>
     {
-        // No need to send client playedAt date, server won't trust it
-        const moveWithoutDate = new Move();
-
-        moveWithoutDate.row = move.row;
-        moveWithoutDate.col = move.col;
-        moveWithoutDate.specialMoveType = move.specialMoveType;
-
         return await new Promise((resolve, reject) => {
-            this.socket.emit('move', this.getId(), moveWithoutDate, answer => {
+            this.socket.emit('move', this.getId(), move, answer => {
                 if (answer === true) {
                     resolve();
                     return;
@@ -257,7 +250,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         const premove = new Premove();
 
-        premove.move = toEngineMove(move).toString();
+        premove.move = move;
         premove.moveIndex = this.game.getLastMoveIndex() + 2;
 
         return await new Promise((resolve, reject) => {
@@ -389,9 +382,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         notifier.emit('rematchOffer', this.hostedGame);
     }
 
-    onServerGameMoved(move: Move, moveIndex: number, byPlayerIndex: PlayerIndex): void
+    onServerGameMoved(timestampedMove: TimestampedMove, moveIndex: number, byPlayerIndex: PlayerIndex): void
     {
-        addMove(this.hostedGame, move, moveIndex, byPlayerIndex);
+        addMove(this.hostedGame, timestampedMove, moveIndex, byPlayerIndex);
 
         // Do nothing if game not loaded
         if (this.game === null) {
@@ -403,9 +396,9 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return;
         }
 
-        this.game.move(toEngineMove(move), byPlayerIndex);
+        this.game.move(timestampedMove.move, byPlayerIndex, timestampedMove.playedAt);
 
-        this.playSoundForMove(move);
+        this.playSoundForMove(timestampedMove.move);
     }
 
     onServerAskUndo(byPlayerIndex: PlayerIndex): void
@@ -437,7 +430,8 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
 
         if (this.game) {
             this.hostedGame.currentPlayerIndex = this.game.getCurrentPlayerIndex();
-            this.hostedGame.movesHistory = this.game.getMovesHistory().map(move => fromEngineMove(move));
+            this.hostedGame.moves = this.game.getMovesHistory().map(move => move.move);
+            this.hostedGame.moveTimestamps = this.game.getMovesHistory().map(move => move.playedAt);
         }
 
         if (undoRequest === null) {
@@ -625,12 +619,12 @@ export const listenGameUpdates = (
         hostedGameClient.value.onServerGameStarted(hostedGame);
     });
 
-    on('moved', (gameId, move, moveIndex, byPlayerIndex) => {
+    on('moved', (gameId, timestampedMove, moveIndex, byPlayerIndex) => {
         if (gameId !== currentPublicId) {
             return;
         }
 
-        hostedGameClient.value.onServerGameMoved(move, moveIndex, byPlayerIndex);
+        hostedGameClient.value.onServerGameMoved(timestampedMove, moveIndex, byPlayerIndex);
     });
 
     on('timeControlUpdate', (gameId, gameTimeData) => {

@@ -1,6 +1,7 @@
 import { PlayerIndex } from '../game-engine/index.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
 import { AbstractTimeControl, TimeControlError } from '../time-control/TimeControl.js';
+import { getTimestampedMoves } from './hostedGameUtils.js';
 import { HostedGame } from './models/index.js';
 
 /**
@@ -16,20 +17,21 @@ import { HostedGame } from './models/index.js';
  * @param now "Now" date to use to check if last move is not elapsing
  */
 export const recreateTimeControlAfterUndo = (hostedGame: HostedGame, ignoreLastMoves: number, now: Date): null | AbstractTimeControl => {
-    const { timeControlType, movesHistory } = hostedGame;
+    const { timeControlType } = hostedGame;
+    const timestampedMoves = getTimestampedMoves(hostedGame);
 
     try {
         const timeControl = createTimeControl(timeControlType);
-        const totalMovesCount = movesHistory.length - ignoreLastMoves;
+        const totalMovesCount = timestampedMoves.length - ignoreLastMoves;
 
         if (totalMovesCount === 0) {
             return timeControl;
         }
 
-        timeControl.start(movesHistory[0].playedAt, null);
+        timeControl.start(timestampedMoves[0].playedAt, null);
 
         for (let i = 0; i < totalMovesCount; ++i) {
-            const move = movesHistory[i];
+            const move = timestampedMoves[i];
 
             timeControl.push(
                 i % 2 as PlayerIndex,
