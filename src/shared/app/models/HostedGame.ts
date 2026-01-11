@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn,
 import { ColumnUUID } from '../custom-typeorm.js';
 import Player from './Player.js';
 import type { HostedGameState } from '../Types.js';
-import HostedGameOptions, { cloneGameOptions } from './HostedGameOptions.js';
+import HostedGameOptions from './HostedGameOptions.js';
 import type { GameTimeData } from '../../time-control/TimeControl.js';
 import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 import ChatMessage from './ChatMessage.js';
@@ -209,41 +209,12 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Expose()
     ratings: Rating[];
 
-    // TODO remove, tmp to fix backward retrocompat with older client that not yet updated
-    @Expose({ name: 'gameOptions' })
-    getGameOptions()
-    {
-        return cloneGameOptions(this);
-    }
-
     /**
      * Notes from admin relative to this game.
      * Only used by admin for now.
      */
     @Column({ type: 'text', nullable: true })
     adminComments: null | string;
-
-    // TODO remove this method later: temporary retrocompat (Game entity merged into HostedGame)
-    @Expose()
-    get gameData()
-    {
-        return {
-            size: this.boardsize,
-            movesHistory: this.movesHistory ?? [],
-            allowSwap: this.swapRule,
-            currentPlayerIndex: this.currentPlayerIndex,
-            winner: this.winner,
-            outcome: this.outcome,
-            startedAt: this.startedAt,
-            lastMoveAt: this.lastMoveAt,
-            endedAt: this.endedAt,
-        };
-    }
-
-    // TODO remove this method later: temporary retrocompat (Game entity merged into HostedGame)
-    set gameData(ignore: unknown)
-    {
-    }
 
     @AfterLoad()
     sortPlayersPosition()
