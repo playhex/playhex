@@ -1,0 +1,14 @@
+# Updates a tournament to change featuredFromInSeconds
+# 86400 means it will be displayed 1 days before tournament official startsAt date
+# 432000 = 5 days
+
+@touramentSlug=hex-monthly-37
+
+PATCH /api/admin/tournaments/{{ touramentSlug }}
+Authorization: Bearer {{ adminPassword }}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "featuredFromInSeconds": 864000
+}

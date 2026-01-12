@@ -1,10 +1,3 @@
-@host=http://localhost:3000
-
-# Admin password from .env
-@adminPassword=PASS
-
-###
-
 # Cancels a tournament. If tournament is currently playing,
 # all games are canceled first.
 
