@@ -4,10 +4,10 @@ import AppBoard from '../components/AppBoard.vue';
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { Game } from '../../../shared/game-engine/index.js';
 import { Player } from '../../../shared/app/models/index.js';
-import { apiGetServerInfo } from '../../apiClient.js';
 import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { shallowRef } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
+import { useServerVersionChecker } from '../composables/useServerVersionChecker.js';
 
 useSeoMeta({
     robots: 'noindex',
@@ -50,16 +50,12 @@ onUnmounted(() => {
 /*
  * Check version diff between server and client
  */
-
-/* global VERSION */
-// @ts-ignore: VERSION replaced at build time by webpack.
-const clientVersion: string = VERSION;
-
-const serverVersion = ref<null | string>(null);
-
-void (async () => {
-    serverVersion.value = (await apiGetServerInfo()).version;
-})();
+const {
+    clientVersion,
+    serverVersion,
+    clientUpToDate,
+    tryUpdateClient,
+} = useServerVersionChecker();
 
 /*
  * Empty all service worker cached resources
@@ -122,8 +118,11 @@ const players = ['A', 'B'].map(pseudo => {
         <p>Client version: {{ clientVersion }}</p>
         <p>Server version: {{ serverVersion }}</p>
 
-        <p v-if="null !== serverVersion && clientVersion !== serverVersion" class="text-warning">Client seems not up to date, try clearing the cache.</p>
-        <p v-else class="text-success">Client seems up to date.</p>
+        <p v-if="clientUpToDate" class="text-success">Client seems up to date.</p>
+        <template v-else>
+            <p class="text-warning">Client seems not up to date, try clearing the cache.</p>
+            <button class="btn btn-warning mb-4" @click="tryUpdateClient">Try to update now</button>
+        </template>
 
         <h2>Cache</h2>
 

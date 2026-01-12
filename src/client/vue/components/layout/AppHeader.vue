@@ -3,11 +3,12 @@ import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { IconPersonFill, IconHexagonFill, IconHexagon, IconRocketTakeOff } from '../../icons.js';
+import { IconPersonFill, IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload } from '../../icons.js';
 import AppPseudo from '../AppPseudo.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
+import { useServerVersionChecker } from '../../composables/useServerVersionChecker.js';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -85,6 +86,14 @@ const routeName = computed<null | string>(() => {
  * Tutorial
  */
 const { shouldDisplayLink } = useTutorialControls();
+
+/*
+ * server and client versions check
+ */
+const {
+    clientUpToDate,
+    tryUpdateClient,
+} = useServerVersionChecker();
 </script>
 
 <template>
@@ -147,6 +156,16 @@ const { shouldDisplayLink } = useTutorialControls();
                     <IconRocketTakeOff />
                     <span class="d-none d-sm-inline">&nbsp;{{ $t('tutorial.label') }}</span>
                 </router-link>
+
+                <!-- update app if versions mismatch -->
+                <button
+                    v-if="!clientUpToDate"
+                    @click="tryUpdateClient"
+                    class="btn btn-sm btn-success ms-2"
+                    title="New version available! Refresh to update"
+                >
+                    <IconDownload />
+                </button>
 
                 <!-- My turn notif -->
                 <span class="my-turn-notif">
