@@ -15,7 +15,7 @@ export const useGuestJoiningCorrespondenceWarning = () => {
     */
     const { loggedInPlayer } = storeToRefs(useAuthStore());
 
-    const createGuestJoiningCorrepondenceWarningOverlay: () => void = defineOverlay(GuestJoiningCorrepondenceWarningOverlay);
+    const createGuestJoiningCorrepondenceWarningOverlay: () => Promise<void> = defineOverlay(GuestJoiningCorrepondenceWarningOverlay);
 
     const isGuestJoiningCorrepondence = (hostedGame: HostedGame): boolean => {
         if (loggedInPlayer.value === null) {

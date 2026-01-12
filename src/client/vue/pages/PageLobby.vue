@@ -142,7 +142,7 @@ const isFinishedHuman = (hostedGame: HostedGame) =>
 const joinGame = async (hostedGame: HostedGame) => {
     if (isGuestJoiningCorrepondence(hostedGame)) {
         try {
-            createGuestJoiningCorrepondenceWarningOverlay();
+            await createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
             return;
         }
