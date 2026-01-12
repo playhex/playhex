@@ -21,7 +21,7 @@ import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
 import { Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
-import { assignEngineGameData, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
+import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -312,7 +312,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private async makeConditionalMovesIfApplicable(): Promise<void>
     {
         // Do not lose time querying database for conditional moves if game is not correspondence
-        if (timeControlToCadencyName(this.hostedGame) !== 'correspondence') {
+        if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(this.hostedGame))) {
             return;
         }
 

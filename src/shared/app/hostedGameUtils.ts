@@ -2,7 +2,7 @@ import { HostedGame, HostedGameToPlayer, Move, Player } from './models/index.js'
 import { Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
-import { timeControlToCadencyName } from './timeControlUtils.js';
+import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 import { GameData } from 'game-engine/normalization.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
@@ -212,10 +212,18 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
 };
 
 /**
+ * Time control cadencies where conditional moves are enabled.
+ */
+export const conditionalMovesEnabledForCadencies: TimeControlCadencyName[] = [
+    'correspondence',
+    'normal',
+];
+
+/**
  * Whether given player should be able to view/edit conditional moves on a given game.
  */
 export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Player): boolean => {
-    if (timeControlToCadencyName(hostedGame) !== 'correspondence') {
+    if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(hostedGame))) {
         return false;
     }
 
