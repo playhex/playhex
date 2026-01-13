@@ -411,14 +411,14 @@ onUnmounted(() => {
 /*
  * Join game
  */
-const join = () => {
+const join = async () => {
     if (hostedGameClient.value === null) {
         return;
     }
 
     if (isGuestJoiningCorrepondence(hostedGameClient.value.getHostedGame())) {
         try {
-            createGuestJoiningCorrepondenceWarningOverlay();
+            await createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
             return;
         }
