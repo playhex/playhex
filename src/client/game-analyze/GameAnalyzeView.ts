@@ -7,7 +7,7 @@ import GameView from '../../shared/pixi-board/GameView.js';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { defer } from '../../shared/app/defer.js';
-import { Move, moveToCoords } from '../../shared/move-notation/move-notation.js';
+import { isMoveNormal, Move, moveToCoords } from '../../shared/move-notation/move-notation.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -248,10 +248,16 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             gameView.setMovesHistoryCursor(move.moveIndex);
 
             // Place best move
-            this.bestMoveMark.setCoords(moveToCoords(move.bestMoves[0].move));
-            this.bestMoveMark.show();
+            if (isMoveNormal(move.bestMoves[0].move)) {
+                this.bestMoveMark.setCoords(moveToCoords(move.bestMoves[0].move));
+                this.bestMoveMark.show();
+            }
 
             // Place played move and eval color
+            if (!isMoveNormal(move.move.move)) {
+                return;
+            }
+
             this.playedMoveMark.setCoords(moveToCoords(move.move.move));
 
             const playedWhiteWin = move.move.whiteWin;

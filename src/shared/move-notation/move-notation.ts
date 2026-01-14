@@ -16,10 +16,25 @@ export type Move =
     | 'pass'
 ;
 
-export const isMoveValid = (move: string): move is Move => {
-    return move.match(/^"?([a-z]{1,2})(\d{1,2})"?$/) !== null
-        || move === 'swap-pieces'
+/**
+ * Whether move is a normal move like "d4", "e12", ...
+ */
+export const isMoveNormal = (move: string): move is Move => {
+    return move.match(/^"?([a-z]{1,2})(\d{1,2})"?$/) !== null;
+};
+
+/**
+ * Whether move is a special move like swap-pieces or pass
+ */
+export const isMoveSpecial = (move: string): move is 'pass' | 'swap-pieces' => {
+    return move === 'swap-pieces'
         || move === 'pass'
+    ;
+};
+
+export const isMoveValid = (move: string): move is Move => {
+    return isMoveNormal(move)
+        || isMoveSpecial(move)
     ;
 };
 
@@ -27,6 +42,8 @@ export const isMoveValid = (move: string): move is Move => {
  * Parse a move like "a2" to { row: 0, col: 1 }
  *
  * Ex: `const { row, col } = moveToCoords(move);`
+ *
+ * @throws {Error} If providing a special move, or invalid normal move
  */
 export const moveToCoords = (move: Move): Coords => {
     const match = move.match(/^"?([a-z]{1,2})(\d{1,2})"?$/);
