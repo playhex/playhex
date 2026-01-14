@@ -303,7 +303,7 @@
         "desc": "Недавний первый"
     },
     "game_created_by_system_time_ago": "Игра создана системой, {timeAgo}.",
-    "player_passed_his_turn": "{{player}} пропустил свой ход",
+    "player_passed_his_turn": "{{player}} пропустил ход",
     "go_to_the_game": "Перейти к игре",
     "explore": "Исследовать",
     "1v1": "уровень",
@@ -504,5 +504,23 @@
         "title": "Помеха",
         "none": "нет",
         "handicap_for_player": "{{n}} для {{player}}"
+    },
+    "muted": {
+        "on": "Без звука",
+        "off": "Со звуком"
+    },
+    "pass_confirm_overlay": {
+        "title": "Пропустить ход?",
+        "message": "Вы уверены, что хотите пропустить свой ход?",
+        "confirmLabel": "Пропустить"
+    },
+    "new_game_vs_ai": "Новая игра с ИИ",
+    "continue_game_vs_x": "Продолжить игру с {{ playerNickname }}",
+    "back_to_menu": "Назад в меню",
+    "tournament_admins": "Администраторы турнира",
+    "tournament_seeding_methods": {
+        "random_help": "Игроки распределяются случайно, независимо от их рейтинга",
+        "rating": "По рейтингу",
+        "rating_help": "Игроки распределяются с учётом их рейтинга. Если есть места с авто пропуском во второй раунд, их получают более сильные игроки"
     }
 }
