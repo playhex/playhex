@@ -124,7 +124,6 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
         const timestampedMoves = getTimestampedMoves(this.hostedGame);
-
         let currentMoveNumber = this.lastMoveNumber;
 
         while (

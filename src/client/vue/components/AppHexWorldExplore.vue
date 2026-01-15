@@ -1,19 +1,25 @@
 <script setup lang="ts">
-import { PropType, ref, toRefs, watchEffect } from 'vue';
+import { computed, PropType, toRefs } from 'vue';
 import { gameToHexworldLink } from '../../../shared/app/hexworld.js';
-import HostedGameClient from '../../HostedGameClient.js';
 import useAuthStore from '../../stores/authStore.js';
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { canUseHexWorldOrDownloadSGF } from '../../../shared/app/hostedGameUtils.js';
+import HostedGame from '../../../shared/app/models/HostedGame.js';
+import Game from '../../../shared/game-engine/Game.js';
 
 const props = defineProps({
-    hostedGameClient: {
-        type: Object as PropType<HostedGameClient>,
+    hostedGame: {
+        type: Object as PropType<HostedGame>,
         required: true,
     },
-    gameView: {
-        type: Object as PropType<GameView>,
+    game: {
+        type: Object as PropType<Game>,
         required: true,
+    },
+    orientation: {
+        type: [null, Number] as PropType<null | number>,
+        required: false,
+        default: null,
     },
     label: {
         type: String,
@@ -22,30 +28,21 @@ const props = defineProps({
     },
 });
 
-const { hostedGameClient } = toRefs(props);
-const { gameView, label } = props;
+const { hostedGame, label, orientation } = toRefs(props);
 const { loggedInPlayer } = toRefs(useAuthStore());
 
 const shouldDisplayHexworldLink = (): boolean => {
-    if (hostedGameClient.value === null || loggedInPlayer.value === null) {
-        return true;
+    if (!loggedInPlayer.value) {
+        return false;
     }
 
-    return canUseHexWorldOrDownloadSGF(hostedGameClient.value.getHostedGame(), loggedInPlayer.value);
+    return canUseHexWorldOrDownloadSGF(hostedGame.value, loggedInPlayer.value);
 };
 
-const generateHexworldLink = () => gameToHexworldLink(
-    hostedGameClient.value.getGame(),
-    gameView.getComputedBoardOrientation(),
-);
-
-const hexworldLink = ref(generateHexworldLink());
-
-watchEffect(() => {
-    hexworldLink.value = generateHexworldLink();
-});
-
-gameView.on('orientationChanged', () => hexworldLink.value = generateHexworldLink());
+const hexworldLink = computed(() => gameToHexworldLink(
+    hostedGame.value,
+    orientation.value ?? GameView.ORIENTATION_DIAMOND,
+));
 </script>
 
 <template>

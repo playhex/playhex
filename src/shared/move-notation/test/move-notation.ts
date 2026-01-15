@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { coordsToMove, mirrorMove, moveToCoords } from '../move-notation.js';
+import { coordsToMove, mirrorMove, parseMove } from '../move-notation.js';
 
 describe('move-notation', () => {
     it('associates well row/col to coords like c2...', () => {
@@ -8,9 +8,9 @@ describe('move-notation', () => {
     });
 
     it('create a Move instance from coords like "c2"', () => {
-        assert.strictEqual(coordsToMove(moveToCoords('c2')), 'c2');
-        assert.strictEqual(moveToCoords('c2').row, 1);
-        assert.strictEqual(moveToCoords('c2').col, 2);
+        assert.strictEqual(coordsToMove(parseMove('c2')), 'c2');
+        assert.strictEqual(parseMove('c2').row, 1);
+        assert.strictEqual(parseMove('c2').col, 2);
     });
 
     it('works up to 42', () => {

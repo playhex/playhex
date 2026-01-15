@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { ConditionalMovesLine, ConditionalMovesTree } from '../../../shared/app/models/ConditionalMoves.js';
+import { ConditionalMovesLine, ConditionalMovesTree } from '../../../shared/pixi-board/conditional-moves/types.js';
 import { toRefs } from 'vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
 import { Move } from '../../../shared/move-notation/move-notation.js';

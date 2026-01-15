@@ -1,4 +1,4 @@
-import { Move } from '../move-notation/move-notation.js';
+import { HexMove } from '../move-notation/hex-move-notation.js';
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
@@ -27,7 +27,7 @@ export type HexClientToServerEvents = {
      * A player wants to play a move.
      * Answer contains either true on success move, either a string containing an error message.
      */
-    move: (gameId: string, move: Move, answer: (result: true | string) => void) => void;
+    move: (gameId: string, move: HexMove, answer: (result: true | string) => void) => void;
 
     /**
      * A player registers a premove.

@@ -17,7 +17,7 @@ import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, Host
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
 import { type Outcome } from '../../game-engine/Types.js';
-import { Move } from '../../move-notation/move-notation.js';
+import { HexMove } from '../../move-notation/hex-move-notation.js';
 
 @Entity()
 @Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
@@ -135,7 +135,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     } })
     @Expose()
     @Type(() => String)
-    moves: Move[];
+    moves: HexMove[];
 
     @Column({ type: longText, transformer: {
         from: value => deserializeMoveTimestamps(value),
@@ -307,13 +307,13 @@ const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): nul
     return timeControlValue;
 };
 
-const serializeMoves = (moves: Move[]): string => {
+const serializeMoves = (moves: HexMove[]): string => {
     return moves.join(' ');
 };
 
-const deserializeMoves = (value: unknown): Move[] => {
+const deserializeMoves = (value: unknown): HexMove[] => {
     return typeof value === 'string' && value.length > 0
-        ? value.split(' ') as Move[]
+        ? value.split(' ') as HexMove[]
         : []
     ;
 };

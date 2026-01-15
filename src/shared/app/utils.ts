@@ -1,5 +1,7 @@
 // Global utils functions
 
+import { ListenerSignature, TypedEmitter } from 'tiny-typed-emitter';
+
 /**
  * For .sort() function, sort by a given field only.
  * Ex:
@@ -106,4 +108,19 @@ export const randomSlug = (length = 6): string => {
     }
 
     return randomString.substring(0, length);
+};
+
+/**
+ * Calls emitter.on(event, listener), and returns a callback to dispose the listener.
+ */
+export const on = <
+  L extends ListenerSignature<L>,
+  K extends keyof L
+>(
+        emitter: TypedEmitter<L>,
+        event: K,
+        listener: L[K],
+    ) => {
+    emitter.on(event, listener);
+    return () => emitter.off(event, listener);
 };

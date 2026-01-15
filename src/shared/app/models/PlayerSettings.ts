@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } fr
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
-import { allShadingPatterns, type ShadingPatternType } from '../../pixi-board/shading-patterns.js';
+import { allShadingPatterns, type ShadingPatternType } from '../../pixi-board/shading-patterns/shading-patterns.js';
 
 export enum MoveSettings {
     /**

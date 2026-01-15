@@ -7,6 +7,7 @@ import IllegalUndo from './errors/IllegalUndo.js';
 import NotYourTurnError from './errors/NotYourTurnError.js';
 import CellAlreadyOccupiedError from './errors/CellAlreadyOccupiedError.js';
 import { mirrorMove, Move } from '../move-notation/move-notation.js';
+import { HexMove, isSpecialHexMove } from '../move-notation/hex-move-notation.js';
 
 type GameEvents = {
     /**
@@ -120,8 +121,18 @@ export default class Game extends TypedEmitter<GameEvents>
 
     resetGame(): void
     {
-        for (const move of this.movesHistory) {
-            this.board.setCell(move.move, null);
+        for (const { move } of this.movesHistory) {
+            if (move === 'pass') {
+                continue;
+            }
+
+            if (move === 'swap-pieces') {
+                const { mirror } = this.getSwapCoords();
+                this.board.setCell(mirror, null);
+                continue;
+            }
+
+            this.board.setCell(move, null);
         }
 
         this.movesHistory = [];
@@ -168,7 +179,7 @@ export default class Game extends TypedEmitter<GameEvents>
     /**
      * @throws IllegalMove on invalid move.
      */
-    checkMove(move: Move, byPlayerIndex: PlayerIndex): void
+    checkMove(move: HexMove, byPlayerIndex: PlayerIndex): void
     {
         if (this.isEnded()) {
             throw new IllegalMove(move, 'Game is finished');
@@ -211,13 +222,13 @@ export default class Game extends TypedEmitter<GameEvents>
      *
      * @throws IllegalMove on invalid move.
      */
-    move(move: Move, byPlayerIndex: PlayerIndex, playedAt = new Date()): void
+    move(move: HexMove, byPlayerIndex: PlayerIndex, playedAt = new Date()): void
     {
         this.checkMove(move, byPlayerIndex);
 
         switch (move) {
             case 'swap-pieces': {
-                const { swapped, mirror } = this.getSwapCoords(false)!;
+                const { swapped, mirror } = this.getSwapCoords();
 
                 this.board.setCell(swapped, null);
                 this.board.setCell(mirror, byPlayerIndex);
@@ -293,8 +304,12 @@ export default class Game extends TypedEmitter<GameEvents>
      * Returns swap-pieces instead of move
      * if trying to play over red's first move.
      */
-    moveOrSwapPieces(move: Move): Move
+    moveOrSwapPieces(move: HexMove): HexMove
     {
+        if (isSpecialHexMove(move)) {
+            return move;
+        }
+
         if (this.canSwapNow() && this.board.getCell(move) === 0) {
             return 'swap-pieces';
         }
@@ -303,24 +318,21 @@ export default class Game extends TypedEmitter<GameEvents>
     }
 
     /**
-     * Returns previous move and new move coords.
+     * Returns swapped and mirror moves from first move.
+     * Won't check whether 2nd move is actual swap move.
+     *
+     * @throws {Error} Requires first move to be played to get swapped and mirror coords.
      */
-    getSwapCoords(checkIsSwap = true): null | { swapped: Move, mirror: Move }
+    getSwapCoords(): { swapped: Move, mirror: Move }
     {
-        const lastMove = this.getLastMove();
-
-        if (lastMove === null) {
-            return null;
-        }
-
-        if (checkIsSwap && (lastMove.move !== 'swap-pieces')) {
-            return null;
-        }
-
         const firstMove = this.getFirstMove();
 
         if (!firstMove) {
-            return null;
+            throw new Error('Cannot call getSwapCoords(), board is empty');
+        }
+
+        if (isSpecialHexMove(firstMove.move)) {
+            throw new Error('Unexpected special move as first move');
         }
 
         return {
@@ -374,14 +386,10 @@ export default class Game extends TypedEmitter<GameEvents>
 
         switch (lastMove.move) {
             case 'swap-pieces': {
-                const firstMove = this.getFirstMove();
+                const { swapped, mirror } = this.getSwapCoords();
 
-                if (firstMove === null) {
-                    throw new Error('Unexpected null first move');
-                }
-
-                this.board.setCell(mirrorMove(firstMove.move), null);
-                this.board.setCell(firstMove.move, 0);
+                this.board.setCell(mirror, null);
+                this.board.setCell(swapped, 0);
                 break;
             }
 

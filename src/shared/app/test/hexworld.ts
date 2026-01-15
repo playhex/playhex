@@ -2,6 +2,8 @@ import { gameToHexworldLink } from '../hexworld.js';
 import { Game } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
+import { assignEngineGameData } from '../hostedGameUtils.js';
+import { HostedGame } from '../models/index.js';
 
 describe('hexworld', () => {
     it('generates review link from game', () => {
@@ -13,7 +15,10 @@ describe('hexworld', () => {
         game.move('i9', 1);
         game.move('b3', 0);
 
-        const link = gameToHexworldLink(game);
+        const hostedGame = new HostedGame();
+        assignEngineGameData(hostedGame, game.toData());
+
+        const link = gameToHexworldLink(hostedGame);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,e5g6c6i9b3');
     });
@@ -27,7 +32,10 @@ describe('hexworld', () => {
         game.move('i9', 1);
         game.move('c4', 0);
 
-        const link = gameToHexworldLink(game);
+        const hostedGame = new HostedGame();
+        assignEngineGameData(hostedGame, game.toData());
+
+        const link = gameToHexworldLink(hostedGame);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6i9c4');
     });
@@ -41,7 +49,10 @@ describe('hexworld', () => {
         game.move('i9', 1);
         game.move('pass', 0);
 
-        const link = gameToHexworldLink(game);
+        const hostedGame = new HostedGame();
+        assignEngineGameData(hostedGame, game.toData());
+
+        const link = gameToHexworldLink(hostedGame);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6i9:p');
     });
@@ -54,7 +65,10 @@ describe('hexworld', () => {
         game.move('c6', 0);
         game.resign(1, new Date());
 
-        const link = gameToHexworldLink(game);
+        const hostedGame = new HostedGame();
+        assignEngineGameData(hostedGame, game.toData());
+
+        const link = gameToHexworldLink(hostedGame);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6:rw');
     });
@@ -66,7 +80,10 @@ describe('hexworld', () => {
         game.move('c11', 1);
         game.loseByTime(new Date());
 
-        const link = gameToHexworldLink(game);
+        const hostedGame = new HostedGame();
+        assignEngineGameData(hostedGame, game.toData());
+
+        const link = gameToHexworldLink(hostedGame);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#11r9c1,b3c11:fb');
     });
@@ -78,7 +95,10 @@ describe('hexworld', () => {
         game.move('c6', 0);
         game.resign(1, new Date());
 
-        const link = gameToHexworldLink(game, 0);
+        const hostedGame = new HostedGame();
+        assignEngineGameData(hostedGame, game.toData());
+
+        const link = gameToHexworldLink(hostedGame, 0);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#11c1,c2d4c6:rw');
     });

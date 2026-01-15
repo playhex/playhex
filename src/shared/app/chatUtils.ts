@@ -1,4 +1,4 @@
-import { colToLetter, Move, moveToCoords } from '../move-notation/move-notation.js';
+import { colToLetter, Move, parseMove } from '../move-notation/move-notation.js';
 import { HostedGame, Player, ChatMessage } from './models/index.js';
 
 export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
@@ -114,19 +114,19 @@ export const makesCoordsInteractive = (str: string, boardsize: number): string =
 
     return str.replace(
         regex,
-        (_, url: string, coords: string) => {
+        (_, url: string, move: Move) => {
             if (url) {
                 return url;
             }
 
-            const move = moveToCoords(coords.toLowerCase() as Move);
+            const { row, col } = parseMove(move.toLowerCase() as Move);
 
             // do not match coords outside board (and do not match u2 in "hi, u2")
-            if (move.row >= boardsize || move.col >= boardsize) {
-                return coords;
+            if (row >= boardsize || col >= boardsize) {
+                return move;
             }
 
-            return '<span class="coords">' + coords + '</span>';
+            return '<span class="coords">' + move + '</span>';
         },
     );
 };

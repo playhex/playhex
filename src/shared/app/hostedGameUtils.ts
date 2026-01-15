@@ -1,4 +1,4 @@
-import { HostedGame, HostedGameToPlayer, Player } from './models/index.js';
+import { HostedGame, HostedGameToPlayer, Player, Rating } from './models/index.js';
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
@@ -45,6 +45,10 @@ export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean 
 
 export const getPlayer = (hostedGame: HostedGame, position: number): null | Player => {
     return hostedGame.hostedGameToPlayers[position].player ?? null;
+};
+
+export const getPlayers = (hostedGame: HostedGame): Player[] => {
+    return hostedGame.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.player);
 };
 
 /**
@@ -178,6 +182,13 @@ export const cancelGame = (hostedGame: HostedGame, canceledAt: Date): void => {
     hostedGame.endedAt = canceledAt;
 };
 
+export const getRating = (hostedGame: HostedGame, player: Player): null | Rating => {
+    return hostedGame.ratings
+        ?.find(r => r.player.publicId === player.publicId)
+        ?? null
+    ;
+};
+
 export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters: SearchGamesParameters): boolean => {
     if (undefined !== searchGamesParameters.states) {
         if (!searchGamesParameters.states.some(state => state === hostedGame.state)) {
@@ -232,6 +243,31 @@ export const shouldShowConditionalMoves = (hostedGame: HostedGame, player: Playe
     }
 
     if (!hasPlayer(hostedGame, player)) {
+        return false;
+    }
+
+    return true;
+};
+
+/**
+ * Whether a player can undo a move.
+ * Same as the method in Game engine,
+ * but this one uses a hostedGame, to trigger reactivity when needed
+ * (using Game.canPlayerUndo won't react when currentPlayerIndex changed)
+ */
+export const canPlayerUndo = (hostedGame: HostedGame, playerIndex: 0 | 1): boolean => {
+    // Game not playing
+    if (hostedGame.state !== 'playing') {
+        return false;
+    }
+
+    // Cannot undo, no move to undo yet
+    if (hostedGame.moves.length < 1) {
+        return false;
+    }
+
+    // Second player cannot undo his move because he has not played any move yet
+    if (hostedGame.moves.length < 2 && playerIndex === 1) {
         return false;
     }
 
