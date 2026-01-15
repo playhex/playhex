@@ -25,7 +25,7 @@ export class CustomizedGameView extends GameView
 
     constructor(game: Game)
     {
-        super(game);
+        super(game.getSize());
 
         this.init();
     }

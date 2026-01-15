@@ -1,4 +1,3 @@
-import { Game, PlayerIndex } from '../game-engine/index.js';
 import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pixi.js';
 import Hex from './Hex.js';
 import { Theme, themes } from './BoardTheme.js';
@@ -15,6 +14,8 @@ const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 const PI_6 = PI / 6;
+
+type PlayerIndex = 0 | 1;
 
 export type OrientationMode = 'landscape' | 'portrait';
 
@@ -228,7 +229,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private marks: { [group: string]: Mark[] } = {};
 
     constructor(
-        private game: Game,
+        private boardsize: number,
         options: Partial<GameViewOptions> = {},
     ) {
         super();
@@ -405,8 +406,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.updateMarksRotation();
 
         this.gameContainer.pivot = Hex.coords(
-            this.game.getSize() / 2 - 0.5,
-            this.game.getSize() / 2 - 0.5,
+            this.boardsize / 2 - 0.5,
+            this.boardsize / 2 - 0.5,
         );
 
         this.gameContainer.position = {
@@ -500,11 +501,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         ;
     }
 
-    getGame()
-    {
-        return this.game;
-    }
-
     getView(): HTMLCanvasElement
     {
         return this.pixi.canvas;
@@ -559,8 +555,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         const { rotation } = this.gameContainer;
 
-        const boardHeight = Hex.RADIUS * this.game.getSize() * 1.5 - 0.5;
-        const boardWidth = Hex.RADIUS * this.game.getSize() * SQRT_3_2;
+        const boardHeight = Hex.RADIUS * this.boardsize * 1.5 - 0.5;
+        const boardWidth = Hex.RADIUS * this.boardsize * SQRT_3_2;
         const wrapperSize = this.getWrapperSize();
 
         if (wrapperSize === null) {
@@ -768,7 +764,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         const hexesContainer = new Container();
-        const size = this.game.getSize();
+        const size = this.boardsize;
         const { show44dots, shadingPatternType, shadingPatternIntensity, shadingPatternOption } = this.options;
         const shadingPattern = createShadingPattern(shadingPatternType, size, shadingPatternOption);
 
@@ -913,7 +909,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const sideWidth = Hex.RADIUS * sideRelativeWidth;
         const sideDist = Hex.RADIUS * (sideRelativeWidth + 1);
         const { colorA, colorB } = this.options.theme;
-        const lastI = this.game.getSize() - 1;
+        const lastI = this.boardsize - 1;
         const boardMiddle: PointData = middle(Hex.coords(0, 0), Hex.coords(lastI, lastI));
 
         // Set sides colors
@@ -1028,14 +1024,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return text;
         };
 
-        for (let i = 0; i < this.game.getSize(); ++i) {
+        for (let i = 0; i < this.boardsize; ++i) {
             const number = rowToNumber(i);
             container.addChild(createText(number, i, -1));
-            container.addChild(createText(number, i, this.game.getSize()));
+            container.addChild(createText(number, i, this.boardsize));
 
             const letter = colToLetter(i);
             container.addChild(createText(letter, -1, i));
-            container.addChild(createText(letter, this.game.getSize(), i));
+            container.addChild(createText(letter, this.boardsize, i));
         }
 
         return container;
