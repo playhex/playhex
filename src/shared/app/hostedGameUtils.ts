@@ -217,7 +217,6 @@ export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters:
  */
 export const conditionalMovesEnabledForCadencies: TimeControlCadencyName[] = [
     'correspondence',
-    'normal',
 ];
 
 /**
