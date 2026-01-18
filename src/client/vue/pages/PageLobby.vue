@@ -282,7 +282,7 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
                                 <p>{{ $t('tutorial.learn_hex_in_1_minute') }}</p>
 
                                 <router-link
-                                    to="tutorial"
+                                    :to="{ name: 'tutorial' }"
                                     class="btn btn-info"
                                 ><IconRocketTakeOff /> {{ $t('tutorial.label') }}</router-link>
                             </div>

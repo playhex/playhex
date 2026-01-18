@@ -101,7 +101,7 @@ const {
         <div class="container-fluid">
 
             <!-- PlayHex -->
-            <router-link to="/" class="navbar-brand" aria-label="Go to PlayHex lobby">
+            <router-link :to="{ name: 'home' }" class="navbar-brand" aria-label="Go to PlayHex lobby">
                 Play<span class="text-danger">Hex</span>
                 <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
             </router-link>
@@ -118,7 +118,7 @@ const {
                 <div class="offcanvas-header py-0">
 
                     <!-- PlayHex in offcanvas -->
-                    <router-link to="/" @click="closeOffcanvas" class="navbar-brand" aria-label="Go to PlayHex lobby">
+                    <router-link :to="{ name: 'home' }" @click="closeOffcanvas" class="navbar-brand" aria-label="Go to PlayHex lobby">
                         Play<span class="text-danger">Hex</span>
                         <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
                     </router-link>
@@ -150,7 +150,7 @@ const {
                 <!-- Tutorial -->
                 <router-link
                     v-if="shouldDisplayLink"
-                    to="tutorial"
+                    :to="{ name: 'tutorial' }"
                     class="btn btn-sm btn-info"
                 >
                     <IconRocketTakeOff />
