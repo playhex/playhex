@@ -3,6 +3,9 @@ import Game from '../../../shared/game-engine/Game.js';
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { AnimatorFacade } from '../../../shared/pixi-board/facades/AnimatorFacade.js';
 import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
+import { PreviewMoveFacade } from '../../../shared/pixi-board/facades/PreviewMoveFacade.js';
+import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
+import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
 
 type WinningPathAnimatorFacadeEvents = {
     /**
@@ -21,6 +24,14 @@ type WinningPathAnimatorFacadeEvents = {
 export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents>
 {
     private playingGameFacade: PlayingGameFacade;
+    private previewMoveFacade: PreviewMoveFacade;
+
+    /**
+     * Keeps track of which move is currently previewed.
+     * Not same as in previewMoveFace, here we keep "swap-pieces"
+     * in case of swap move.
+     */
+    private previewedMove: null | Move = null;
 
     constructor(
         private gameView: GameView,
@@ -28,11 +39,15 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     ) {
         super();
 
+        new PlayerSettingsFacade(gameView);
+
         this.playingGameFacade = new PlayingGameFacade(
             gameView,
             game.getAllowSwap(),
             game.getMovesHistory().map(moveTimestamped => moveTimestamped.move),
         );
+
+        this.previewMoveFacade = new PreviewMoveFacade(gameView);
 
         this.listenModel();
     }
@@ -117,5 +132,39 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
 
 
         this.emit('endedAndWinAnimationOver');
+    }
+
+    hasPreviewedMove(): boolean
+    {
+        return this.previewedMove !== null;
+    }
+
+    getPreviewedMove(): null | Move
+    {
+        return this.previewedMove;
+    }
+
+    setPreviewedMove(move: Move, byPlayerIndex: 0 | 1): void
+    {
+        this.previewedMove = move;
+
+        if (move === 'swap-pieces') {
+            const firstMove = this.game.getFirstMove()?.move;
+
+            if (!firstMove) {
+                throw new Error('Cannot preview swap piece move, no first move');
+            }
+
+            this.previewMoveFacade.preview(mirrorMove(firstMove), 0, firstMove);
+            return;
+        }
+
+        this.previewMoveFacade.preview(move, byPlayerIndex);
+    }
+
+    removePreviewedMove(): void
+    {
+        this.previewedMove = null;
+        this.previewMoveFacade.cancelPreview();
     }
 }

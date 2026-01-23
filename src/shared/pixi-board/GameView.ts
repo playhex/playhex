@@ -624,14 +624,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         const hexesContainer = new Container();
-        const size = this.boardsize;
         const { show44dots, shadingPatternType, shadingPatternIntensity, shadingPatternOption } = this.options;
-        const shadingPattern = createShadingPattern(shadingPatternType, size, shadingPatternOption);
+        const shadingPattern = createShadingPattern(shadingPatternType, this.boardsize, shadingPatternOption);
 
-        this.hexes = Array(size).fill(null).map(() => Array(size));
+        this.hexes = Array(this.boardsize).fill(null).map(() => Array(this.boardsize));
 
-        for (let row = 0; row < size; ++row) {
-            for (let col = 0; col < size; ++col) {
+        for (let row = 0; row < this.boardsize; ++row) {
+            for (let col = 0; col < this.boardsize; ++col) {
                 const hex = new Hex(
                     this.options.theme,
                     null,
@@ -672,11 +671,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             }
         }
 
-        if (show44dots && size > 9) {
+        if (show44dots && this.boardsize > 9) {
             this.hexes[3][3].showDot();
-            this.hexes[3][size - 4].showDot();
-            this.hexes[size - 4][3].showDot();
-            this.hexes[size - 4][size - 4].showDot();
+            this.hexes[3][this.boardsize - 4].showDot();
+            this.hexes[this.boardsize - 4][3].showDot();
+            this.hexes[this.boardsize - 4][this.boardsize - 4].showDot();
         }
 
         this.gameContainer.addChild(hexesContainer);

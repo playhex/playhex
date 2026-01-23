@@ -96,7 +96,7 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
 
     game.setAllowSwap(gameOptions.swapRule);
 
-    gameViewFacade = useGameViewFacade(game).gameViewFacade;
+    gameViewFacade = useGameViewFacade(game);
     gameView = gameViewFacade.getGameView();
 
     gameView.on('hexClicked', move => {
@@ -144,7 +144,7 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
 
     const game = Game.fromData(currentGame.gameData);
 
-    gameViewFacade = useGameViewFacade(game).gameViewFacade;
+    gameViewFacade = useGameViewFacade(game);
     gameView = gameViewFacade.getGameView();
 
     gameView.on('hexClicked', move => {

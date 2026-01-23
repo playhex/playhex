@@ -20,7 +20,7 @@ import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF.js';
-import GameView, { OrientationMode } from '../../../shared/pixi-board/GameView.js';
+import { OrientationMode } from '../../../shared/pixi-board/GameView.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 import AppGameAnalyzeSummary from './AppGameAnalyzeSummary.vue';
 import { guessDemerHandicapFromHostedGame } from '../../../shared/app/demerHandicap.js';
@@ -37,20 +37,23 @@ import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
 import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
 import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
+import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 
 const props = defineProps({
     hostedGameClient: {
         type: Object as PropType<HostedGameClient>,
         required: true,
     },
-    gameView: {
-        type: Object as PropType<GameView>,
+    gameViewFacade: {
+        type: Object as PropType<GameViewFacade>,
         required: true,
     },
 });
 
-const { gameView } = props;
+const { gameViewFacade } = props;
 const { hostedGameClient } = toRefs(props);
+
+const gameView = gameViewFacade.getGameView();
 
 const emits = defineEmits([
     'close',
@@ -866,7 +869,7 @@ watchEffect(() => {
 
                             <template v-else-if="message.type === 'move'">
                                 <span class="line"></span>
-                                <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="gameView?.setMovesHistoryCursor(message.moveNumber - 1)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
+                                <!-- <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="gameView?.setMovesHistoryCursor(message.moveNumber - 1)">{{ $t('move_number', { n: message.moveNumber }) }}</button> -->
                                 <span class="line"></span>
                             </template>
                             <template v-else-if="message.type === 'date'">

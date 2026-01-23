@@ -16,10 +16,10 @@ import i18n, { t } from 'i18next';
 import { Game } from '../../../../shared/game-engine/index.js';
 import { Player, MoveSettings } from '../../../../shared/app/models/index.js';
 import AppBoard from '../../components/AppBoard.vue';
-import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import { useGameViewFacade } from '../../composables/useGameViewFacade.js';
 
 const head = injectHead();
 
@@ -114,7 +114,7 @@ const submitPasswordChange = async () => {
  * Board preview
  */
 const game = new Game(14);
-const gameView = new CustomizedGameView(game);
+const gameViewFacade = useGameViewFacade(game);
 
 const players = ['A', 'B'].map(pseudo => {
     const player = new Player();
@@ -438,8 +438,8 @@ const isNotificationSupported = typeof Notification !== 'undefined';
 
             <div class="board-container">
                 <AppBoard
-                    v-if="gameView"
-                    :gameView="gameView"
+                    v-if="gameViewFacade"
+                    :gameViewFacade
                     :players="players"
                 />
             </div>

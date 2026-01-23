@@ -51,13 +51,13 @@ onMounted(() => {
     }
 
     const game = Game.fromData(currentGame.gameData);
-    const { gameView } = useGameViewFacade(game);
+    const gameViewFacade = useGameViewFacade(game);
 
     if (!pixiApp.value) {
         throw new Error('No ref="pixiApp" element');
     }
 
-    void gameView.mount(pixiApp.value);
+    void gameViewFacade.getGameView().mount(pixiApp.value);
 });
 </script>
 

@@ -7,7 +7,7 @@ import LastMoveMark from '../../pixi-board/marks/LastMoveMark.js';
 const MARKS_GROUP = '_game_marks';
 
 /**
- * Set of marks useful for a game.
+ * Set of marks useful for a game:
  * - last move
  * - swap/swapped
  *

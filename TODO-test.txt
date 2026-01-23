@@ -1,0 +1,11 @@
+test game view:
+- flat and diamond orientation
+- premove, move confirm
+- coords
+- swap, swapped
+- win animation
+- resize view should keep preview
+- conditionals
+- arrows keys
+- can cancel preview/premove
+- can cancel preview/premove if this is a swap-piece
