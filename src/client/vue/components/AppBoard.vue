@@ -1,6 +1,5 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';
 import AppChrono from './AppChrono.vue';
@@ -10,6 +9,7 @@ import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { storeToRefs } from 'pinia';
+import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -28,19 +28,20 @@ const props = defineProps({
         required: false,
         default: null,
     },
-    gameView: {
-        type: GameView,
+    gameViewFacade: {
+        type: GameViewFacade,
         required: true,
     },
 });
 
-const { gameView } = props;
+const { gameViewFacade } = props;
 const { players, timeControlOptions, timeControlValues } = toRefs(props);
 
 /*
  * Add piwi view
  */
-const game = gameView.getGame();
+const game = gameViewFacade.getGame();
+const gameView = gameViewFacade.getGameView();
 
 onMounted(() => {
     if (!pixiApp.value) {
@@ -70,7 +71,7 @@ onUnmounted(() => {
 /*
  * Rewind
  */
-gameView.listenArrowKeys();
+// gameView.listenArrowKeys();
 
 const hasRewindControls = ref(false);
 
@@ -84,13 +85,11 @@ const blinkButton = (button: Ref<HTMLElement | undefined>) => {
 
 gameView.on('movesHistoryCursorChanged', cursor => hasRewindControls.value = cursor !== null);
 
-const rewindZero = () => gameView.setMovesHistoryCursor(-1);
-const backward = () => gameView.changeMovesHistoryCursor(-1);
-const forward = () => gameView.changeMovesHistoryCursor(+1);
-const rewindCurrent = () => gameView.setMovesHistoryCursor(Infinity);
-const rewindClose = () => {
-    gameView.disableRewindMode();
-};
+const rewindZero = () => null; //gameView.setMovesHistoryCursor(-1);
+const backward = () => null; //gameView.changeMovesHistoryCursor(-1);
+const forward = () => null; //gameView.changeMovesHistoryCursor(+1);
+const rewindCurrent = () => null; //gameView.setMovesHistoryCursor(Infinity);
+const rewindClose = () => null; //gameView.disableRewindMode();
 
 const keyboardEventListener = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement | null)?.nodeName === 'INPUT')
@@ -212,9 +211,9 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
 
             <!-- Close conditional moves edition -->
-            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-warning">
+            <!-- <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-warning">
                 <IconX />
-            </button>
+            </button> -->
         </div>
     </div>
 </template>

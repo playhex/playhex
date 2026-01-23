@@ -1,5 +1,4 @@
 import { Container, DestroyOptions, Graphics, PointData, Ticker } from 'pixi.js';
-import { PlayerIndex } from '../game-engine/index.js';
 import { colorAverage } from './colorUtils.js';
 import { Theme } from './BoardTheme.js';
 
@@ -36,9 +35,13 @@ export default class Hex extends Container
     static readonly OUTER_RADIUS = Hex.RADIUS * (1 + Hex.PADDING);
 
     private hexColor: Graphics;
-    private highlight: Graphics;
     private dotContainer: Container = new Container();
     private animationLoop: null | (() => void) = null;
+
+    /**
+     * Whether this hex should be semi-transparent.
+     */
+    private faded = false;
 
     constructor(
         private theme: Theme,
@@ -47,10 +50,10 @@ export default class Hex extends Container
          * null: empty cell
          * 0 or 1: red or blue
          */
-        private playerIndex: null | PlayerIndex = null,
+        private playerIndex: null | 0 | 1 = null,
 
         /**
-         * Shading to apply, between 0 and 1.
+         * Shading to apply to background, between 0 and 1.
          * 0 = not shaded, 1 = shaded,
          * 0.5 = half-shaded (i.e for tri color shading patterns)...
          */
@@ -79,7 +82,6 @@ export default class Hex extends Container
             this.createEmptyColor(),
             this.dotContainer,
             this.hexColor = this.createHexColor(),
-            this.highlight = this.createHighlight(),
         );
     }
 
@@ -145,26 +147,6 @@ export default class Hex extends Container
     }
 
     /**
-     * Shape inside the hex displayed on hex to show last move
-     */
-    private createHighlight(): Graphics
-    {
-        const g = new Graphics();
-        const path: PointData[] = [];
-
-        for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.3));
-        }
-
-        g.poly(path);
-        g.fill({ color: 0xffffff, alpha: 0.4 });
-
-        g.visible = false;
-
-        return g;
-    }
-
-    /**
      * Show dot for starting anchors
      */
     showDot(): void
@@ -211,7 +193,7 @@ export default class Hex extends Container
     private updateColor(): void
     {
         this.hexColor.visible = this.playerIndex !== null;
-        this.hexColor.alpha = 1;
+        this.hexColor.alpha = this.faded ? 0.5 : 1;
 
         if (this.playerIndex !== null) {
             this.hexColor.tint = [
@@ -221,37 +203,11 @@ export default class Hex extends Container
         }
     }
 
-    setPlayer(playerIndex: null | PlayerIndex): this
+    setPlayer(playerIndex: null | 0 | 1, faded = false): this
     {
         this.playerIndex = playerIndex;
+        this.faded = faded;
         this.updateColor();
-
-        return this;
-    }
-
-    previewMove(playerIndex: PlayerIndex): this
-    {
-        this.hexColor.visible = true;
-        this.hexColor.alpha = 0.5;
-
-        this.hexColor.tint = [
-            this.theme.colorA,
-            this.theme.colorB,
-        ][playerIndex];
-
-        return this;
-    }
-
-    removePreviewMove(): this
-    {
-        this.updateColor();
-
-        return this;
-    }
-
-    setHighlighted(highlighted = true): this
-    {
-        this.highlight.visible = highlighted;
 
         return this;
     }

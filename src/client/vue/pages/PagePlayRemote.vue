@@ -24,7 +24,6 @@ import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { isMyTurn } from '../../services/notifications/context-utils.js';
 import { canPassAgain } from '../../../shared/app/passUtils.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
@@ -44,7 +43,7 @@ const { gameId } = useRoute().params;
 
 const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
 
-let gameView: null | CustomizedGameView = null; // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
+let gameView: null | GameView = null; // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
 
 /**
  * When game is loaded, gameView instanciated

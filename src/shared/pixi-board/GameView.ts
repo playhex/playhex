@@ -2,20 +2,15 @@ import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pi
 import Hex from './Hex.js';
 import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import SwappableMark from './marks/SwappableMark.js';
-import SwappedMark from './marks/SwappedMark.js';
 import { createShadingPattern, ShadingPatternType } from './shading-patterns.js';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { Mark } from './Mark.js';
-import TextMark from './marks/TextMark.js';
-import { colToLetter, Coords, coordsToMove, mirrorMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
+import { colToLetter, Coords, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 const PI_6 = PI / 6;
-
-type PlayerIndex = 0 | 1;
 
 export type OrientationMode = 'landscape' | 'portrait';
 
@@ -51,12 +46,6 @@ type GameViewEvents = {
      */
     hexSimulated: (move: Move, played: boolean) => void;
 
-    /**
-     * Game has ended, and win animation is over.
-     * Used to display win message after animation, and not at same time.
-     */
-    endedAndWinAnimationOver: () => void;
-
     orientationChanged: () => void;
 
     movesHistoryCursorChanged: (cursor: null | number) => void;
@@ -65,6 +54,16 @@ type GameViewEvents = {
      * Simulation mode has been enabled or disabled.
      */
     simulationModeChanged: (enabled: boolean) => void;
+
+    /**
+     * This view will be destroyed.
+     */
+    detroyBefore: () => void;
+
+    /**
+     * This view has been destroyed.
+     */
+    detroyAfter: () => void;
 };
 
 const defer = () => {
@@ -127,10 +126,17 @@ const defaultOptions: GameViewOptions = {
 };
 
 /**
- * Generates a pixi application to show a Hex board and position from a game.
+ * Generates a pixi application to show a Hex board.
+ * Responsible for:
+ * - showing a hex board
+ * - set any position of red/blue stones
+ * - display marks on hex cells (swap/swapped, triangle/circle/square mark, ...)
+ * - board shadding patterns
+ * - semi-transparent stones
+ * - themes
  *
  * GameView should not be a vue ref, it caused performance issues, more especially when calling .mount() on gameView.value
- * Also experienced crashes when toggling coords.
+ * Also experienced crashes when toggling coords. A shallowRef is ok.
  *
  * Memory leaks: to check for memory leak,
  * put `redraw()` in a loop (i.e `setInterval(() => this.redraw(), 20)`),
@@ -150,11 +156,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     static MARKS_GROUP_SIMULATION = '_simulation';
 
-    /**
-     * Name of marks group used for swappable and swapped
-     */
-    static MARKS_GROUP_SWAP = '_swap';
-
     private options: GameViewOptions;
 
     private containerElement: null | HTMLElement = null;
@@ -167,41 +168,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private currentOrientation: number;
 
     private sidesGraphics: [Graphics, Graphics];
-
-    private lastSimpleMoveHighlighted: null | Coords = null;
-
-    private previewedMove: null | { move: Move, playerIndex: PlayerIndex } = null;
-
-    /**
-     * When enabled, moves are no longer played, but instead stacked in simulatedMoves.
-     * They will be displayed temporarily only, until simulation mode is disabled.
-     */
-    private simulationMode = false;
-
-    /**
-     * Simulation moves played so far.
-     */
-    private simulatedMoves: { move: Move, byPlayerIndex: PlayerIndex }[] = [];
-
-    /**
-     * From which color play simulation moves.
-     * null: default, play next color after last played move
-     * 0 or 1: first simulated move is red or blue.
-     */
-    private simulationMoveFromPlayerIndex: null | PlayerIndex = null;
-
-    /**
-     * Show an earlier position on the board.
-     * - `null`: show current position
-     * - `0`: show first move
-     * - `-1`: show empty board
-     */
-    private movesHistoryCursor: null | number = null;
-
-    /**
-     * Listener for keyboard event to control moves history cursor
-     */
-    private keyboardEventListener: null | ((event: KeyboardEvent) => void) = null;
 
     private resizeObserver: null | ResizeObserver = null;
 
@@ -264,7 +230,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.pixi.stage.addChild(this.gameContainer);
 
         this.redraw();
-        this.listenModel();
 
         element.appendChild(this.getView());
     }
@@ -383,7 +348,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    protected redraw(): void
+    redraw(): void
     {
         const wrapperSize = this.getWrapperSize();
 
@@ -426,10 +391,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         this.createAndAddHexes();
-        this.addAllMoves();
-        this.addAllSimulatedMoves();
-        this.highlightSidesFromGame();
-        this.showPreviewedMove();
 
         this.gameContainer.addChild(
             this.marksContainer,
@@ -618,127 +579,26 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.gameContainer.scale = { x: scale, y: scale };
     }
 
-    private async endedCallback(): Promise<void>
-    {
-        this.highlightSidesFromGame();
-
-        await this.animateWinningPath();
-
-        this.emit('endedAndWinAnimationOver');
-    }
-
     /**
-     * Returns swap coords from a game, and optionnal undone moves, assuming player swapped.
+     * Animate a cell.
+     * Animate the stone if any.
      *
-     * While undoing swap move, we cannot get swap coords
-     * because at this time, game has already undone moves, and has no first move.
-     * So we assume next move of undoneMoves was first move.
+     * @param move Which cell to animate (ex: "d4")
+     * @param delay In milliseconds, wait before animate
      */
-    private getSwapCoordsFromGameOrUndoneMoves(undoneMoves: null | Move[] = null): { swapped: Move, mirror: Move }
+    async animateCell(coords: Move | Coords, delay = 0): Promise<void>
     {
-        const swapCoords = this.game.getSwapCoords(false);
-
-        if (swapCoords) {
-            return swapCoords;
+        if (typeof coords === 'string') {
+            coords = moveToCoords(coords);
         }
 
-        if (undoneMoves === null) {
-            throw new Error('Cannot get swap coords from game: no swap move, or has been undone but no undoneMoves provided.');
+        const { row, col } = coords;
+
+        if (delay > 0) {
+            await new Promise(resolve => setTimeout(resolve, delay));
         }
 
-        let firstMove: null | Move = null;
-
-        for (let i = 0; i < undoneMoves.length; ++i) {
-            if (undoneMoves[i] === 'swap-pieces') {
-                firstMove = undoneMoves[i + 1] ?? null;
-            }
-        }
-
-        if (!firstMove) {
-            throw new Error('Expected to have at least swap coords from game, or first move before swap move in undoneMoves');
-        }
-
-        return {
-            mirror: mirrorMove(firstMove),
-            swapped: firstMove,
-        };
-    }
-
-    private listenModel(): void
-    {
-        this.highlightSidesFromGame();
-
-        this.game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.addMove(move.move, byPlayerIndex);
-            this.removePreviewedMove();
-            this.highlightSidesFromGame();
-        });
-
-        this.game.on('undo', async undoneMovesTimestamped => {
-            const undoneMoves = undoneMovesTimestamped.map(timestampedMove => timestampedMove.move);
-
-            this.removePreviewedMove(undoneMoves);
-
-            for (let i = 0; i < undoneMoves.length; ++i) {
-                const move = undoneMoves[i];
-
-                if (i > 0) {
-                    // If two moves are undone, slightly wait between these two moves removal
-                    await new Promise(r => setTimeout(r, 150));
-                }
-
-                switch (move) {
-                    case 'pass':
-                        break;
-
-                    case 'swap-pieces': {
-                        const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
-
-                        this.getHex(mirror).setPlayer(null);
-                        this.getHex(swapped).setPlayer(0);
-
-                        break;
-                    }
-
-                    default:
-                        this.getHex(move).setPlayer(null);
-                }
-
-                this.highlightLastMove(undoneMoves[i + 1] ?? null);
-            }
-
-            this.highlightSidesFromGame();
-        });
-
-        this.game.on('ended', () => this.endedCallback());
-        this.game.on('canceled', () => this.endedCallback());
-
-        this.game.on('updated', () => {
-            this.redraw();
-        });
-    }
-
-    /**
-     * Animate winning path if there is one.
-     * To be called once all is loaded and board won't redraw anymore
-     * (redrawing while animation is running will make the animation incomplete).
-     */
-    async animateWinningPath(): Promise<void>
-    {
-        const winningPath = this.game.getBoard().getShortestWinningPath();
-
-        if (winningPath === null) {
-            // No winning path, winner has won by another outcome (opponent resigned, time out, ...)
-            return;
-        }
-
-        const promises = winningPath.map(async ({ row, col }, i): Promise<void> => {
-            await new Promise(resolve => setTimeout(resolve, i * 80));
-            await this.hexes[row][col].animate();
-            this.hexes[row][col].setHighlighted();
-        });
-
-        await Promise.all(promises);
+        await this.hexes[row][col].animate();
     }
 
     private clearLongPressTimeout(): void
@@ -807,33 +667,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                         return;
                     }
 
-                    // Disable play in rewind mode. May change when simulation mode is implemented.
-                    if (this.movesHistoryCursor !== null) {
-                        if (this.movesHistoryCursor !== this.game.getMovesHistory().length - 1) {
-                            return;
-                        }
-
-                        // In case rewind was already on last move, just disable rewind mode.
-                        this.disableRewindMode();
-                    }
-
-                    if (!this.simulationMode) {
-                        this.emit('hexClicked', coordsToMove({ row, col }));
-                    } else {
-                        const move = coordsToMove({ row, col });
-
-                        if (this.game.getBoard().isEmpty(move)) {
-                            const simulationMoveColor = this.getSimulationMoveColorAt(moveToCoords(move));
-                            let played = false;
-
-                            if (simulationMoveColor === null) {
-                                this.playSimulatedMove(move);
-                                played = true;
-                            }
-
-                            this.emit('hexSimulated', move, played);
-                        }
-                    }
+                    this.emit('hexClicked', coordsToMove({ row, col }));
                 });
             }
         }
@@ -846,53 +680,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         this.gameContainer.addChild(hexesContainer);
-    }
-
-    private unhighlightLastMove(): void
-    {
-        if (this.lastSimpleMoveHighlighted !== null) {
-            const { row, col } = this.lastSimpleMoveHighlighted;
-            this.hexes[row][col].setHighlighted(false);
-            this.lastSimpleMoveHighlighted = null;
-        }
-
-        this.removeMarks(GameView.MARKS_GROUP_SWAP);
-    }
-
-    /**
-     * Shows a dot on game current last played move.
-     * For swap move, shows arrows if possible to swap opponent move,
-     * or show a "S" to show that last move was swapped.
-     *
-     * @param move Override last move to highlight this move instead.
-     */
-    private highlightLastMove(move: null | Move = null): void
-    {
-        this.unhighlightLastMove();
-
-        const lastMove: null | Move = move ?? this.game.getLastMove()?.move ?? null;
-
-        if (lastMove === null) {
-            return;
-        }
-
-        if (lastMove === 'pass') {
-            return;
-        }
-
-        if (this.game.canSwapNow() && lastMove !== 'swap-pieces') {
-            this.showSwappable(lastMove);
-            return;
-        }
-
-        if (lastMove === 'swap-pieces') {
-            const { mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
-            this.showSwapped(mirror);
-            return;
-        }
-
-        this.lastSimpleMoveHighlighted = moveToCoords(lastMove);
-        this.getHex(lastMove).setHighlighted();
     }
 
     private createColoredSides(): Container
@@ -1043,7 +830,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.sidesGraphics[1].alpha = blue ? 1 : 0.25;
     }
 
-    highlightSideForPlayer(playerIndex: PlayerIndex): void
+    highlightSideForPlayer(playerIndex: 0 | 1): void
     {
         this.highlightSides(
             playerIndex === 0,
@@ -1051,399 +838,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         );
     }
 
-    highlightSidesFromGame(): void
+    setStone(move: Move, byPlayerIndex: null | 0 | 1, faded = false): void
     {
-        if (this.game.isCanceled()) {
-            this.highlightSides(true, true);
+        if (move === 'pass' || move === 'swap-pieces') {
             return;
         }
 
-        if (this.game.isEnded()) {
-            this.highlightSideForPlayer(this.game.getStrictWinner());
-            return;
-        }
-
-        this.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
-    }
-
-    showSwappable(swappable: Move | null): this
-    {
-        this.removeMarks(GameView.MARKS_GROUP_SWAP);
-
-        if (!swappable) {
-            return this;
-        }
-
-        this.addMark(new SwappableMark().setCoords(moveToCoords(swappable)), GameView.MARKS_GROUP_SWAP);
-
-        return this;
-    }
-
-    showSwapped(swapped: Move | null): this
-    {
-        this.removeMarks(GameView.MARKS_GROUP_SWAP);
-
-        if (!swapped) {
-            return this;
-        }
-
-        this.addMark(new SwappedMark().setCoords(moveToCoords(swapped)), GameView.MARKS_GROUP_SWAP);
-
-        return this;
-    }
-
-    hasPreviewedMove(): boolean
-    {
-        return this.previewedMove !== null;
-    }
-
-    getPreviewedMove(): null | { move: Move, playerIndex: PlayerIndex }
-    {
-        return this.previewedMove;
-    }
-
-    setPreviewedMove(move: Move, playerIndex: PlayerIndex): this
-    {
-        if (this.previewedMove !== null) {
-            if (this.previewedMove.move === move && playerIndex === this.previewedMove.playerIndex) {
-                return this;
-            }
-
-            this.removePreviewedMove();
-        }
-
-        this.previewedMove = { move, playerIndex };
-
-        this.showPreviewedMove();
-
-        return this;
-    }
-
-    /**
-     * @param undoneMoves In case of a move undo, pass them here so we can which was coords of undone moves to remove preview
-     */
-    removePreviewedMove(undoneMoves: null | Move[] = null): this
-    {
-        if (this.previewedMove === null) {
-            return this;
-        }
-
-        const { move } = this.previewedMove;
-        this.previewedMove = null;
-
-        switch (move) {
-            case 'swap-pieces': {
-                const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
-
-                this.getHex(swapped).removePreviewMove();
-                this.getHex(mirror).removePreviewMove();
-
-                break;
-            }
-
-            case 'pass':
-                break;
-
-            default:
-                this.getHex(move).removePreviewMove();
-        }
-
-        return this;
-    }
-
-    /**
-     * Show previewed move from what is set in this.previewedMove
-     */
-    private showPreviewedMove(): void
-    {
-        if (this.previewedMove === null) {
-            return;
-        }
-
-        const { move, playerIndex } = this.previewedMove;
-
-        switch (move) {
-            case 'pass':
-                break;
-
-            case 'swap-pieces': {
-                const swapCoords = this.game.getSwapCoords(false);
-
-                if (swapCoords === null) {
-                    throw new Error('Unexpected null swapCoords');
-                }
-
-                const { mirror, swapped } = swapCoords;
-
-                this.getHex(swapped).previewMove(1 - playerIndex as PlayerIndex);
-                this.getHex(mirror).previewMove(playerIndex);
-
-                break;
-            }
-
-            default:
-                this.getHex(move).previewMove(playerIndex);
-        }
-    }
-
-    getMovesHistoryCursor(): null | number
-    {
-        return this.movesHistoryCursor;
-    }
-
-    setMovesHistoryCursor(cursor: null | number): void
-    {
-        if (cursor === this.movesHistoryCursor) {
-            return;
-        }
-
-        this.movesHistoryCursor = cursor;
-        this.boundMovesHistoryCursor();
-        this.redrawIfInitialized();
-        this.emit('movesHistoryCursorChanged', this.movesHistoryCursor);
-    }
-
-    private boundMovesHistoryCursor(): void
-    {
-        if (this.movesHistoryCursor === null) {
-            return;
-        }
-
-        if (this.movesHistoryCursor < -1) {
-            this.movesHistoryCursor = -1;
-            return;
-        }
-
-        const { length } = this.getGame().getMovesHistory();
-
-        if (this.movesHistoryCursor >= length) {
-            this.movesHistoryCursor = length - 1;
-        }
-    }
-
-    enableRewindMode(): void
-    {
-        if (this.movesHistoryCursor === null) {
-            this.setMovesHistoryCursor(Infinity);
-        }
-    }
-
-    disableRewindMode(): void
-    {
-        if (this.movesHistoryCursor !== null) {
-            this.setMovesHistoryCursor(null);
-        }
-    }
-
-    changeMovesHistoryCursor(delta: number): void
-    {
-        this.setMovesHistoryCursor((this.movesHistoryCursor ?? this.getGame().getMovesHistory().length - 1) + delta);
-    }
-
-    addMove(move: Move, byPlayerIndex: PlayerIndex): void
-    {
-        switch (move) {
-            case 'pass':
-                break;
-
-            case 'swap-pieces': {
-                const { swapped, mirror } = this.getSwapCoordsFromGameOrUndoneMoves();
-
-                this.getHex(swapped).setPlayer(null);
-                this.getHex(mirror).setPlayer(byPlayerIndex);
-
-                break;
-            }
-
-            default:
-                this.getHex(move).setPlayer(byPlayerIndex);
-        }
-
-        this.highlightLastMove(this.simulationMode
-            ? null // do not pass move to highlight last played and not simulated move when simulating
-            : move,
-        );
-    }
-
-    private addAllMoves(): void
-    {
-        this.unhighlightLastMove();
-
-        const movesHistory = this.game.getMovesHistory();
-
-        for (let i = 0; i < movesHistory.length; ++i) {
-            if (this.movesHistoryCursor !== null && i > this.movesHistoryCursor) {
-                break;
-            }
-
-            this.addMove(movesHistory[i].move, i % 2 as PlayerIndex);
-        }
-    }
-
-    isSimulationMode(): boolean
-    {
-        return this.simulationMode;
-    }
-
-    /**
-     * Will play next moves temporarily.
-     * Moves will be erased when simulation mode disabled.
-     */
-    enableSimulationMode(fromPlayerIndex: null | PlayerIndex = null): void
-    {
-        if (this.simulationMode) {
-            return;
-        }
-
-        this.disableRewindMode();
-        this.simulationMode = true;
-        this.simulationMoveFromPlayerIndex = fromPlayerIndex;
-        this.emit('simulationModeChanged', this.simulationMode);
-    }
-
-    disableSimulationMode(): void
-    {
-        if (!this.simulationMode) {
-            return;
-        }
-
-        this.simulationMode = false;
-        this.simulatedMoves = [];
-        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
-        this.redraw();
-        this.emit('simulationModeChanged', this.simulationMode);
-    }
-
-    getSimulationMoves(): { move: Move, byPlayerIndex: PlayerIndex }[]
-    {
-        return this.simulatedMoves;
-    }
-
-    setSimulationMoves(moves: { move: Move, byPlayerIndex: PlayerIndex }[]): void
-    {
-        this.simulatedMoves = moves;
-        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
-        this.redraw();
-    }
-
-    /**
-     * Set simulation moves from a list of moves,
-     * color are automatically defined.
-     */
-    setSimulationMovesAuto(moves: Move[]): void
-    {
-        this.simulatedMoves = [];
-        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
-        moves.forEach(move => this.playSimulatedMove(move));
-        this.redraw();
-    }
-
-    /**
-     * @param index Number of the simulation move from last played move. Starts from 0.
-     */
-    private addSimulatedMove(move: Move, byPlayerIndex: PlayerIndex, index: number): void
-    {
-        this.addMove(move, byPlayerIndex);
-        this.addMark(new TextMark('' + (index + 1)).setCoords(moveToCoords(move)), GameView.MARKS_GROUP_SIMULATION);
-    }
-
-    private addAllSimulatedMoves(): void
-    {
-        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
-        this.simulatedMoves.forEach(({ move, byPlayerIndex }, index) => this.addSimulatedMove(move, byPlayerIndex, index));
-    }
-
-    /**
-     * Returns color of next simulation move,
-     * automatically guessed by last move.
-     */
-    private getNextAutoSimulationColor(): PlayerIndex
-    {
-        // returns next color than last simulated move color
-        if (this.simulatedMoves.length > 0) {
-            return 1 - this.simulatedMoves[this.simulatedMoves.length - 1].byPlayerIndex as PlayerIndex;
-        }
-
-        // if no simulation moves yet, returns simulationMoveFromPlayerIndex if defined
-        if (this.simulationMoveFromPlayerIndex !== null) {
-            return this.simulationMoveFromPlayerIndex;
-        }
-
-        // else return next player index from game
-        return 1 - this.game.getCurrentPlayerIndex() as PlayerIndex;
-    }
-
-    /**
-     * Play a simulation move.
-     *
-     * @param byPlayerIndex Which color. Let null for auto: will play colors alternately,
-     *                      depending on how much move are played already.
-     */
-    playSimulatedMove(move: Move, byPlayerIndex: null | PlayerIndex = null): void
-    {
-        if (byPlayerIndex === null) {
-            byPlayerIndex = this.getNextAutoSimulationColor();
-        }
-
-        this.simulatedMoves.push({ move, byPlayerIndex });
-        this.addSimulatedMove(move, byPlayerIndex, this.simulatedMoves.length - 1);
-    }
-
-    getSimulationMoveColorAt(coords: Coords): null | PlayerIndex
-    {
-        for (const { move, byPlayerIndex } of this.simulatedMoves) {
-            const { row, col } = moveToCoords(move);
-
-            if (coords.row === row && coords.col === col) {
-                return byPlayerIndex;
-            }
-        }
-
-        return null;
-    }
-
-    clearSimulationMoves(): void
-    {
-        this.simulatedMoves = [];
-        this.removeMarks(GameView.MARKS_GROUP_SIMULATION);
-        this.redraw();
-    }
-
-    listenArrowKeys(): void
-    {
-        if (this.keyboardEventListener !== null) {
-            return;
-        }
-
-        this.keyboardEventListener = event => {
-            if ((event.target as HTMLElement | null)?.nodeName === 'INPUT')
-                return;
-            switch (event.key) {
-                case 'ArrowLeft':
-                    if (!this.simulationMode) {
-                        this.changeMovesHistoryCursor(-1);
-                    }
-                    break;
-
-                case 'ArrowRight':
-                    if (!this.simulationMode) {
-                        this.changeMovesHistoryCursor(+1);
-                    }
-                    break;
-            }
-        };
-
-        window.addEventListener('keydown', this.keyboardEventListener);
-    }
-
-    unlistenArrowKeys(): void
-    {
-        if (this.keyboardEventListener === null) {
-            return;
-        }
-
-        window.removeEventListener('keydown', this.keyboardEventListener);
-        this.keyboardEventListener = null;
+        this.getHex(move).setPlayer(byPlayerIndex, faded);
     }
 
     addMark(mark: Mark, group: string = GameView.MARKS_GROUP_DEFAULT): void
@@ -1489,9 +890,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     destroy(): void
     {
+        this.emit('detroyBefore');
+
         this.pixi.destroy(true);
 
         this.destroyResizeObserver();
-        this.unlistenArrowKeys();
+
+        this.emit('detroyAfter');
     }
 }

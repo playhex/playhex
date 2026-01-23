@@ -1,17 +1,25 @@
-import { Game } from '../../shared/game-engine/index.js';
-import GameView from '../../shared/pixi-board/GameView.js';
-import usePlayerSettingsStore from '../../client/stores/playerSettingsStore.js';
-import usePlayerLocalSettingsStore, { LocalSettings } from '../../client/stores/playerLocalSettingsStore.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
+import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerLocalSettingsStore.js';
 import { watch, WatchStopHandle } from 'vue';
-import { themes } from '../../shared/pixi-board/BoardTheme.js';
-import { PlayerSettings } from '../../shared/app/models/index.js';
+import { themes } from '../../../shared/pixi-board/BoardTheme.js';
+import { PlayerSettings } from '../../../shared/app/models/index.js';
 
 /**
- * Create a GameView customized with player current settings
+ * Customizes game view with player current settings
  * (theme, preferred orientation, show coords by default, ...)
  */
-export class CustomizedGameView extends GameView
+export class PlayerSettingsFacade
 {
+    private unwatchSettingsChangedListener: WatchStopHandle;
+    private unwatchLocalSettingsChangedListener: WatchStopHandle;
+
+    constructor(
+        private gameView: GameView,
+    ) {
+        this.init();
+    }
+
     private playerSettingsChangedListener = (playerSettings: PlayerSettings) => {
         this.updateOptionsFromPlayerSettings(playerSettings);
     };
@@ -19,16 +27,6 @@ export class CustomizedGameView extends GameView
     private localSettingsChangedListener = (localSettings: LocalSettings) => {
         this.updateOptionsFromPlayerLocalSettings(localSettings);
     };
-
-    private unwatchSettingsChangedListener: WatchStopHandle;
-    private unwatchLocalSettingsChangedListener: WatchStopHandle;
-
-    constructor(game: Game)
-    {
-        super(game.getSize());
-
-        this.init();
-    }
 
     private init(): void
     {
@@ -49,11 +47,15 @@ export class CustomizedGameView extends GameView
          */
         this.updateOptionsFromPlayerLocalSettings(usePlayerLocalSettingsStore().localSettings);
         this.unwatchLocalSettingsChangedListener = watch(() => usePlayerLocalSettingsStore().localSettings, this.localSettingsChangedListener, { deep: true });
+
+        this.gameView.on('detroyBefore', () => {
+            this.destroy();
+        });
     }
 
     updateOptionsFromPlayerSettings(playerSettings: PlayerSettings): void
     {
-        this.updateOptions({
+        this.gameView.updateOptions({
             displayCoords: playerSettings.showCoords,
             preferredOrientations: {
                 landscape: playerSettings.orientationLandscape,
@@ -68,16 +70,14 @@ export class CustomizedGameView extends GameView
 
     updateOptionsFromPlayerLocalSettings(localSettings: LocalSettings): void
     {
-        this.updateOptions({
+        this.gameView.updateOptions({
             selectedBoardOrientationMode: localSettings.selectedBoardOrientation,
             theme: themes[usePlayerLocalSettingsStore().displayedTheme()],
         });
     }
 
-    override destroy(): void
+    destroy(): void
     {
-        super.destroy();
-
         this.unwatchSettingsChangedListener();
         this.unwatchLocalSettingsChangedListener();
     }

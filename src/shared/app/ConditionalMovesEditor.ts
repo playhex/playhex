@@ -60,7 +60,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         this.conditionalMovesDirty = { tree: [], unplayedLines: [] };
         copyConditionalMovesStruct(this.conditionalMovesDirty, this.conditionalMoves);
 
-        this.isSimulationMode = gameView.isSimulationMode();
+        // this.isSimulationMode = gameView.isSimulationMode();
     }
 
     onSimulationModeChanged(enabled: boolean)
@@ -80,7 +80,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
 
         if (index >= 0) {
             this.selectedLine.splice(index + 1);
-            this.gameView.setSimulationMovesAuto(this.selectedLine);
+            // this.gameView.setSimulationMovesAuto(this.selectedLine);
             this.markNextConditionalMoves();
             return;
         }
@@ -178,7 +178,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         this.conditionalMovesDirty.unplayedLines = clearDuplicatedUnplayedLines(this.conditionalMovesDirty.unplayedLines);
         copyConditionalMovesStruct(this.conditionalMoves, this.conditionalMovesDirty);
 
-        this.gameView.clearSimulationMoves();
+        // this.gameView.clearSimulationMoves();
         this.selectedLine = [];
         this.markNextConditionalMoves();
 
@@ -192,7 +192,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     discardSimulationMoves(): void
     {
-        this.gameView.clearSimulationMoves();
+        // this.gameView.clearSimulationMoves();
         this.gameView.removeMarks('nextConditionalMoves');
         this.selectedLine = [];
 
@@ -224,7 +224,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
             this.hasChanges = true;
         }
 
-        this.gameView.setSimulationMovesAuto(line);
+        // this.gameView.setSimulationMovesAuto(line);
         this.markNextConditionalMoves();
     }
 
@@ -234,7 +234,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     back(): void
     {
         this.selectedLine.pop();
-        this.gameView.setSimulationMovesAuto(this.selectedLine);
+        // this.gameView.setSimulationMovesAuto(this.selectedLine);
         this.markNextConditionalMoves();
     }
 
@@ -250,7 +250,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         conditionalMovesCut(this.conditionalMovesDirty.tree, this.selectedLine);
         this.hasChanges = true;
         this.selectedLine.pop();
-        this.gameView.setSimulationMovesAuto(this.selectedLine);
+        // this.gameView.setSimulationMovesAuto(this.selectedLine);
         this.markNextConditionalMoves();
     }
 
@@ -259,7 +259,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     enableSimulationMode(): void
     {
-        this.gameView.enableSimulationMode(this.getOpponentIndex());
+        // this.gameView.enableSimulationMode(this.getOpponentIndex());
     }
 
     /**
@@ -268,7 +268,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     disableSimulationMode(): void
     {
         this.gameView.removeMarks('nextConditionalMoves');
-        this.gameView.disableSimulationMode();
+        // this.gameView.disableSimulationMode();
     }
 
     /**
@@ -298,9 +298,9 @@ export const listenGameViewEvents = (conditionalMovesEditor: ConditionalMovesEdi
     gameView.on('hexSimulated', onHexSimulated);
     onClose.push(() => gameView.off('hexSimulated', onHexSimulated));
 
-    const onPlayed = (move: TimestampedMove, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move.move, _, byPlayerIndex);
-    gameView.getGame().on('played', onPlayed);
-    onClose.push(() => gameView.getGame().off('played', onPlayed));
+    // const onPlayed = (move: TimestampedMove, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move.move, _, byPlayerIndex);
+    // gameView.getGame().on('played', onPlayed);
+    // onClose.push(() => gameView.getGame().off('played', onPlayed));
 
     return () => onClose.forEach(callback => callback());
 };
