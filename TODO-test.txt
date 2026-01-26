@@ -9,3 +9,7 @@ test game view:
 - arrows keys
 - can cancel preview/premove
 - can cancel preview/premove if this is a swap-piece
+
+Custom themes:
+Create abstract Cell and Board, that can update theme, shading pattern, stones, ...
+depending on theme, can be only colors, or images...

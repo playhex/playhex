@@ -31,8 +31,36 @@ export class PlayingGameFacade
 
     addMove(move: Move): void
     {
-        this.moves.push(move);
+        if (this.moves.length === 1 && this.swapAllowed && move === this.moves[0]) {
+            move = 'swap-pieces';
+        }
+
+        if (move === 'swap-pieces') {
+            if (this.moves.length !== 1) {
+                throw new Error('Cannot swap-pieces now, can only swap on move 2');
+            }
+
+            if (this.moves[0] === 'pass') {
+                throw new Error('Cannot swap a pass move');
+            }
+
+            const mirror = mirrorMove(this.moves[0]);
+
+            this.moves.push(move);
+            this.gameView.setStone(this.moves[0], null);
+            this.gameView.setStone(mirror, 1);
+            this.markLastMove();
+            return;
+        }
+
+        if (move === 'pass') {
+            this.moves.push(move);
+            this.gameMarksFacade.hideMarks();
+            return;
+        }
+
         this.gameView.setStone(move, this.moves.length % 2 as 0 | 1);
+        this.moves.push(move);
         this.markLastMove();
     }
 

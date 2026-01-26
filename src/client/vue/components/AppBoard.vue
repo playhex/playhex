@@ -58,9 +58,9 @@ onUnmounted(() => {
 /*
  * Orientation auto update on screen size change
  */
-let orientation = ref<number>(gameView.getCurrentOrientation());
+let orientation = ref<number>(gameView.getOrientation());
 
-const updateOrientation = () => orientation.value = gameView.getCurrentOrientation();
+const updateOrientation = () => orientation.value = gameView.getOrientation();
 
 gameView.on('orientationChanged', updateOrientation);
 

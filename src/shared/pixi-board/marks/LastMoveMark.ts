@@ -1,4 +1,4 @@
-import { Container, Graphics, PointData } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { Mark } from '../Mark.js';
 import Hex from '../Hex.js';
 
@@ -12,22 +12,17 @@ export default class LastMoveMark extends Mark
     {
         super();
 
-        this.alwaysTop = true;
+        this.alwaysFlatTop = true;
     }
 
     protected override draw(): Container
     {
         const g = new Graphics();
-        const path: PointData[] = [];
 
-        for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.RADIUS * 0.3));
-        }
-
-        g.poly(path);
+        g.regularPoly(0, 0, Hex.RADIUS * 0.3, 6);
         g.fill({ color: 0xffffff, alpha: 0.4 });
 
-        g.visible = false;
+        g.rotation = Math.PI / 6;
 
         return g;
     }

@@ -20,7 +20,6 @@ import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF.js';
-import { OrientationMode } from '../../../shared/pixi-board/GameView.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 import AppGameAnalyzeSummary from './AppGameAnalyzeSummary.vue';
 import { guessDemerHandicapFromHostedGame } from '../../../shared/app/demerHandicap.js';
@@ -391,8 +390,8 @@ watch(
     { deep: true },
 );
 
-const currentOrientation = ref<OrientationMode>(gameView.getComputedBoardOrientationMode());
-gameView.on('orientationChanged', () => currentOrientation.value = gameView.getComputedBoardOrientationMode());
+const currentOrientation = ref<number>(gameView.getOrientation());
+gameView.on('orientationChanged', () => currentOrientation.value = gameView.getOrientation());
 
 const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
     return [

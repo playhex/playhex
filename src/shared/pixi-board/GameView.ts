@@ -12,14 +12,6 @@ const SQRT_3_2 = sqrt(3) / 2;
 const PI_3 = PI / 3;
 const PI_6 = PI / 6;
 
-export type OrientationMode = 'landscape' | 'portrait';
-
-/**
- * Integer, every PI/6.
- * Or an orientation depending on screen orientation.
- */
-type PreferredOrientations = { landscape: number, portrait: number };
-
 export type GameViewSize = {
     width: number;
     height: number;
@@ -90,15 +82,10 @@ type GameViewOptions = {
     displayCoords: boolean;
 
     /**
-     * Preferred orientations when game view is sized in landscape or portrait
+     * Integer, every PI/6.
+     * 0 means positive flat, 11 means diamond (or -1).
      */
-    preferredOrientations: PreferredOrientations;
-
-    /**
-     * Let "auto" to adapt board orientation depending on container ratio.
-     * Or set "landscape" or "portrait" to force displaying in this mode.
-     */
-    selectedBoardOrientationMode: 'auto' | OrientationMode;
+    orientation: number;
 
     /**
      * Whether to show "anchors" on 4-4 cells.
@@ -114,11 +101,7 @@ type GameViewOptions = {
 const defaultOptions: GameViewOptions = {
     theme: themes.dark,
     displayCoords: false,
-    preferredOrientations: {
-        landscape: 11, // Diamond
-        portrait: 9, // Vertical flat
-    },
-    selectedBoardOrientationMode: 'auto',
+    orientation: 11,
     show44dots: false,
     shadingPatternType: null,
     shadingPatternIntensity: 0.5,
@@ -162,10 +145,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private initialized = false;
 
     private hexes: Hex[][] = [];
+
     private pixi: Application;
     private gameContainer: Container = new Container();
 
-    private currentOrientation: number;
+    private coordsContainer: Container;
+    private coordsTexts: Text[] = [];
 
     private sidesGraphics: [Graphics, Graphics];
 
@@ -191,7 +176,26 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private longPressed = false;
 
-    private marksContainer = new Container();
+    /**
+     * Marks displayed on top of stone, so always visible.
+     * Used to show both a stone or an empty cell.
+     * Default.
+     */
+    private marksForegroundContainer: Container;
+
+    /**
+     * Marks displayed behind stone, on the board.
+     * Will be hidden, or overriden when a stone is played on the cell.
+     * Used for board pattern (e.g 4-4 dots),
+     * or may be used for UI purpose,
+     * or when a mark is no longer relevant once a stone is played.
+     */
+    private marksBackgroundContainer: Container;
+
+    /**
+     * Marks grouped by groups.
+     * Use groups to remove only marks added to a given group.
+     */
     private marks: { [group: string]: Mark[] } = {};
 
     constructor(
@@ -204,6 +208,19 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             ...defaultOptions,
             ...options,
         };
+
+        this.init();
+    }
+
+    private init(): void
+    {
+        this.gameContainer.addChild(
+            this.createColoredSides(),
+            this.marksBackgroundContainer = new Container(),
+            this.createHexesContainer(),
+            this.coordsContainer = this.createCoords(),
+            this.marksForegroundContainer = new Container(),
+        );
     }
 
     private async doMount(element: HTMLElement): Promise<void>
@@ -300,74 +317,22 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     }
 
     /**
-     * Returns which board orientation should be used
-     * from game view wrapper ratio, and user preferred orientations for landscape and portrait.
+     * Update after options changed, container resized or rotated...
      */
-    getComputedBoardOrientationMode(): OrientationMode
-    {
-        const { selectedBoardOrientationMode: selectedBoardOrientation } = this.options;
-
-        // If "portrait" or "landscape" explicitely selected, returns it
-        if (selectedBoardOrientation !== 'auto') {
-            return selectedBoardOrientation;
-        }
-
-        // If set to auto, returns depending on wrapper ratio
-        return this.getWrapperOrientationMode();
-    }
-
-    /**
-     * Returns which board orientation should be used
-     * from game view wrapper ratio, and user preferred orientations for landscape and portrait.
-     */
-    getComputedBoardOrientation(): number
-    {
-        const { preferredOrientations } = this.options;
-
-        return preferredOrientations[this.getComputedBoardOrientationMode()];
-    }
-
-    /**
-     * Re-check screen ratio to change board orientation if needed
-     */
-    private updateOrientation(): void
-    {
-        const previousCurrentOrientation = this.currentOrientation;
-
-        this.currentOrientation = this.getComputedBoardOrientation();
-
-        if (previousCurrentOrientation !== this.currentOrientation) {
-            this.emit('orientationChanged');
-        }
-    }
-
-    protected redrawIfInitialized(): void
-    {
-        if (this.initialized) {
-            this.redraw();
-        }
-    }
-
     redraw(): void
     {
+        if (!this.initialized) {
+            return;
+        }
+
         const wrapperSize = this.getWrapperSize();
 
         if (wrapperSize === null) {
             throw new Error('Cannot redraw, no wrapper size, seems not yet mounted');
         }
 
-        // Prevent destroying marks recursively
-        this.gameContainer.removeChild(this.marksContainer);
-
-        for (const child of this.gameContainer.children) {
-            child.destroy(true);
-        }
-
-        this.gameContainer.removeChildren();
-
-        this.updateOrientation();
-
-        this.gameContainer.rotation = this.currentOrientation * PI_6;
+        this.gameContainer.rotation = this.options.orientation * PI_6;
+        this.updateCoordsTextsOrientation();
         this.updateMarksRotation();
 
         this.gameContainer.pivot = Hex.coords(
@@ -382,19 +347,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.autoResize();
 
-        this.gameContainer.addChild(
-            this.createColoredSides(),
-        );
-
-        if (this.options.displayCoords) {
-            this.gameContainer.addChild(this.createCoords());
+        for (let row = 0; row < this.boardsize; ++row) {
+            for (let col = 0; col < this.boardsize; ++col) {
+                this.hexes[row][col].updateTheme(this.options.theme);
+            }
         }
 
-        this.createAndAddHexes();
-
-        this.gameContainer.addChild(
-            this.marksContainer,
-        );
+        this.coordsContainer.visible = this.options.displayCoords;
     }
 
     private resizeRendererAndRedraw(): void
@@ -448,43 +407,24 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return { width, height };
     }
 
-    private getWrapperOrientationMode(): OrientationMode
-    {
-        const wrapperSize = this.getWrapperSize();
-
-        if (wrapperSize === null) {
-            return 'landscape';
-        }
-
-        return wrapperSize.width > wrapperSize.height
-            ? 'landscape'
-            : 'portrait'
-        ;
-    }
-
     getView(): HTMLCanvasElement
     {
         return this.pixi.canvas;
     }
 
-    getPreferredOrientations(): PreferredOrientations
+    private modOrientation(orientation: number): number
     {
-        return this.options.preferredOrientations;
+        return ((orientation % 12) + 12) % 12;
     }
 
-    setPreferredOrientations(preferredOrientations: PreferredOrientations): void
+    getOrientation(): number
     {
-        this.options.preferredOrientations = preferredOrientations;
-        this.redrawIfInitialized();
+        return this.modOrientation(this.options.orientation);
     }
 
-    /**
-     * Returns current orientation used to display board,
-     * in landscape or portrait if configured.
-     */
-    getCurrentOrientation(): number
+    setOrientation(orientation: number): void
     {
-        return (this.currentOrientation + 12) % 12;
+        this.updateOptions({ orientation });
     }
 
     getTheme(): Theme
@@ -494,8 +434,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     setTheme(theme: Theme): void
     {
-        this.options.theme = theme;
-        this.redrawIfInitialized();
+        this.updateOptions({ theme });
     }
 
     updateOptions(options: Partial<GameViewOptions>): void
@@ -505,7 +444,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             ...options,
         };
 
-        this.redrawIfInitialized();
+        this.redraw();
     }
 
     /**
@@ -559,7 +498,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         // Add margin to prevent cells to be slightly cropped.
         // Depending on orientation, either width or height margin is needed.
-        if ([1, 2, 3].includes(this.getCurrentOrientation() % 6)) {
+        if ([1, 2, 3].includes(this.getOrientation() % 6)) {
             boxWidth += 30;
         } else {
             boxHeight += 30;
@@ -611,18 +550,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.longPressTimeout = null;
     }
 
-    private createAndAddHexes(): void
+    private createHexesContainer(): Container
     {
-        if (this.hexes.length > 0) {
-            for (const hexRow of this.hexes) {
-                for (const hex of hexRow) {
-                    hex.destroy(true);
-                }
-            }
-
-            this.hexes = [];
-        }
-
         const hexesContainer = new Container();
         const { show44dots, shadingPatternType, shadingPatternIntensity, shadingPatternOption } = this.options;
         const shadingPattern = createShadingPattern(shadingPatternType, this.boardsize, shadingPatternOption);
@@ -672,13 +601,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         if (show44dots && this.boardsize > 9) {
-            this.hexes[3][3].showDot();
-            this.hexes[3][this.boardsize - 4].showDot();
-            this.hexes[this.boardsize - 4][3].showDot();
-            this.hexes[this.boardsize - 4][this.boardsize - 4].showDot();
+            // this.hexes[3][3].showDot();
+            // this.hexes[3][this.boardsize - 4].showDot();
+            // this.hexes[this.boardsize - 4][3].showDot();
+            // this.hexes[this.boardsize - 4][this.boardsize - 4].showDot();
         }
 
-        this.gameContainer.addChild(hexesContainer);
+        return hexesContainer;
     }
 
     private createColoredSides(): Container
@@ -779,7 +708,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     setDisplayCoords(visible = true): void
     {
         this.options.displayCoords = visible;
-        this.redrawIfInitialized();
+        this.redraw();
     }
 
     toggleDisplayCoords(): void
@@ -789,6 +718,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private createCoords(): Container
     {
+        if (this.coordsTexts.length > 0) {
+            throw new Error('Coords Texts already created');
+        }
+
         const container = new Container();
 
         const coordsTextStyle = new TextStyle({
@@ -801,11 +734,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             const text = new Text({ text: string, style: coordsTextStyle });
 
             text.resolution = window.devicePixelRatio * 2;
-            text.rotation = -this.gameContainer.rotation;
             text.anchor.set(0.5, 0.5);
 
             const hexCoords = Hex.coords(x, y);
             text.position.set(hexCoords.x, hexCoords.y);
+
+            this.coordsTexts.push(text);
 
             return text;
         };
@@ -820,7 +754,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             container.addChild(createText(letter, this.boardsize, i));
         }
 
+        this.updateCoordsTextsOrientation();
+
         return container;
+    }
+
+    private updateCoordsTextsOrientation(): void
+    {
+        for (const text of this.coordsTexts) {
+            text.rotation = -this.gameContainer.rotation;
+        }
     }
 
     highlightSides(red: boolean, blue: boolean): void
@@ -839,14 +782,18 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     setStone(move: Move, byPlayerIndex: null | 0 | 1, faded = false): void
     {
-        if (move === 'pass' || move === 'swap-pieces') {
+        if (move === 'pass') {
             return;
         }
 
-        this.getHex(move).setPlayer(byPlayerIndex, faded);
+        if (move === 'swap-pieces') {
+            throw new Error('Cannot setStone with move "swap-pieces"');
+        }
+
+        this.getHex(move).setStone(byPlayerIndex, faded);
     }
 
-    addMark(mark: Mark, group: string = GameView.MARKS_GROUP_DEFAULT): void
+    addMark(mark: Mark, group: string = GameView.MARKS_GROUP_DEFAULT, position: 'foreground' | 'background' = 'foreground'): void
     {
         if (undefined === this.marks[group]) {
             this.marks[group] = [];
@@ -856,12 +803,18 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         mark.updateRotation(this.gameContainer.rotation);
 
         this.marks[group].push(mark);
-        this.marksContainer.addChild(mark);
+
+        if (position === 'background') {
+            this.marksBackgroundContainer.addChild(mark);
+        } else {
+            this.marksForegroundContainer.addChild(mark);
+        }
     }
 
     removeMark(mark: Mark): void
     {
-        this.marksContainer.removeChild(mark);
+        this.marksForegroundContainer.removeChild(mark);
+        this.marksBackgroundContainer.removeChild(mark);
 
         for (const group in this.marks) {
             this.marks[group] = this.marks[group].filter(m => m !== mark);
@@ -874,10 +827,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return;
         }
 
-        this.marksContainer.removeChild(...this.marks[group]);
+        this.marksForegroundContainer.removeChild(...this.marks[group]);
+        this.marksBackgroundContainer.removeChild(...this.marks[group]);
         this.marks[group] = [];
     }
 
+    /**
+     * For marks that need to be kept upside (like letters),
+     * or needs to change between hex flat-top/pointy-top,
+     * we need to update their rotation after board rotation changed.
+     */
     private updateMarksRotation(): void
     {
         for (const group in this.marks) {

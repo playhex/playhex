@@ -1,5 +1,4 @@
 import { Container, DestroyOptions, Graphics, PointData, Ticker } from 'pixi.js';
-import { colorAverage } from './colorUtils.js';
 import { Theme } from './BoardTheme.js';
 
 const { PI, cos, sin, sqrt } = Math;
@@ -12,6 +11,16 @@ const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
     return 1 - (2 * (x - 1) ** 2 - 1) ** 2;
 });
 
+/**
+ * A cell.
+ *
+ * Default PlayHex theme, only themed by colors, stones are full hexagons.
+ *
+ * Contains layers:
+ * - background, always shown, covers hex board
+ * - fading, for shading patterns
+ * - stone, may be faded for preview moves
+ */
 export default class Hex extends Container
 {
     /**
@@ -34,14 +43,20 @@ export default class Hex extends Container
      */
     static readonly OUTER_RADIUS = Hex.RADIUS * (1 + Hex.PADDING);
 
-    private hexColor: Graphics;
-    private dotContainer: Container = new Container();
+    /**
+     * Stroke color, cell color
+     */
+    private cellBackgroundGraphics: Graphics;
+
+    private cellShading: Container;
+    private stone: Container;
+
     private animationLoop: null | (() => void) = null;
 
     /**
-     * Whether this hex should be semi-transparent.
+     * Whether this stone should be semi-transparent.
      */
-    private faded = false;
+    private stoneFaded = false;
 
     constructor(
         private theme: Theme,
@@ -67,62 +82,89 @@ export default class Hex extends Container
             shading = 1;
         }
 
-        this.redrawHex();
-        this.setPlayer(playerIndex);
+        this.init();
+        this.setStone(playerIndex);
 
         this.eventMode = 'static';
     }
 
+    private init(): void
+    {
+        this.addChild(
+            this.createCell(),
+            this.cellShading = this.createCellShading(),
+            this.stone = this.createStone(),
+        );
+
+        this.redrawHex();
+    }
+
+    private createCell(): Container
+    {
+        const container = new Container();
+        this.cellBackgroundGraphics = new Graphics();
+
+        container.addChild(this.cellBackgroundGraphics);
+
+        return container;
+    }
+
+    private createCellShading(): Container
+    {
+        const container = new Container();
+        const g = new Graphics();
+
+        const innerPath: PointData[] = [];
+
+        for (let i = 0; i < 6; ++i) {
+            innerPath.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
+        }
+
+        g.poly(innerPath);
+        g.fill({ color: this.theme.colorEmptyShade });
+
+        container.addChild(g);
+
+        return container;
+    }
+
+    /**
+     * Redraw cell, fading and stone when theme changed
+     */
     private redrawHex(): void
     {
-        this.removeChildren();
+        // Redraw cell background with theme colors
+        this.cellBackgroundGraphics.clear();
 
-        this.addChild(
-            this.createBackground(),
-            this.createEmptyColor(),
-            this.dotContainer,
-            this.hexColor = this.createHexColor(),
-        );
-    }
-
-    /**
-     * Border of hex
-     */
-    private createBackground(): Graphics
-    {
-        const g = new Graphics();
-        const path: PointData[] = [];
+        // background, stroke color
+        const outperPath: PointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.OUTER_RADIUS));
+            outperPath.push(Hex.cornerCoords(i, Hex.OUTER_RADIUS));
         }
 
-        g.poly(path);
-        g.fill({ color: this.theme.strokeColor, alpha: 1 });
+        this.cellBackgroundGraphics.poly(outperPath);
+        this.cellBackgroundGraphics.fill({ color: this.theme.strokeColor });
 
-        return g;
-    }
-
-    /**
-     * Hex background
-     */
-    private createEmptyColor(): Graphics
-    {
-        const g = new Graphics();
-        const path: PointData[] = [];
+        // cell, empty cell color
+        const innerPath: PointData[] = [];
 
         for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
+            innerPath.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
         }
 
-        g.poly(path);
-        g.fill({ color: colorAverage(
-            this.theme.colorEmpty,
-            this.theme.colorEmptyShade,
-            this.shading,
-        ) });
+        this.cellBackgroundGraphics.poly(innerPath);
+        this.cellBackgroundGraphics.fill({ color: this.theme.colorEmpty });
 
-        return g;
+        // Update fading
+        this.cellShading.alpha = this.shading;
+    }
+
+    updateTheme(theme: Theme): void
+    {
+        this.theme = theme;
+
+        this.redrawHex();
     }
 
     /**
@@ -130,7 +172,7 @@ export default class Hex extends Container
      * White, then change tint to set color.
      * Hidden if not played yet.
      */
-    private createHexColor(): Graphics
+    private createStone(): Graphics
     {
         const g = new Graphics();
         const path: PointData[] = [];
@@ -144,21 +186,6 @@ export default class Hex extends Container
         g.visible = false;
 
         return g;
-    }
-
-    /**
-     * Show dot for starting anchors
-     */
-    showDot(): void
-    {
-        this.dotContainer.removeChildren();
-
-        const g = new Graphics();
-
-        g.circle(0, 0, Hex.RADIUS * 0.2);
-        g.fill({ color: this.theme.textColor, alpha: 0.2 });
-
-        this.dotContainer.addChild(g);
     }
 
     static coords(row: number, col: number): PointData
@@ -192,21 +219,21 @@ export default class Hex extends Container
 
     private updateColor(): void
     {
-        this.hexColor.visible = this.playerIndex !== null;
-        this.hexColor.alpha = this.faded ? 0.5 : 1;
+        this.stone.visible = this.playerIndex !== null;
+        this.stone.alpha = this.stoneFaded ? 0.5 : 1;
 
         if (this.playerIndex !== null) {
-            this.hexColor.tint = [
+            this.stone.tint = [
                 this.theme.colorA,
                 this.theme.colorB,
             ][this.playerIndex];
         }
     }
 
-    setPlayer(playerIndex: null | 0 | 1, faded = false): this
+    setStone(playerIndex: null | 0 | 1, faded = false): this
     {
         this.playerIndex = playerIndex;
-        this.faded = faded;
+        this.stoneFaded = faded;
         this.updateColor();
 
         return this;
@@ -219,7 +246,7 @@ export default class Hex extends Container
                 // Call animationLoop to resolve promise if destroyed and prevent let it unresolved
                 this.animationLoop();
             } else {
-                this.hexColor.scale = { x: 1, y: 1 };
+                this.stone.scale = { x: 1, y: 1 };
             }
 
             Ticker.shared.remove(this.animationLoop);
@@ -247,7 +274,7 @@ export default class Hex extends Container
                 }
 
                 const coef = 1 - 0.75 * animationCurve[i];
-                this.hexColor.scale = { x: coef, y: coef };
+                this.stone.scale = { x: coef, y: coef };
                 ++i;
             };
 
