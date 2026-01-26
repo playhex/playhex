@@ -6,6 +6,7 @@ import { createShadingPattern, ShadingPatternType } from './shading-patterns.js'
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { Mark } from './Mark.js';
 import { colToLetter, Coords, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
+import Anchor44Mark from './marks/Anchor44Mark.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -214,12 +215,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private init(): void
     {
+        this.marksBackgroundContainer = new Container();
+        this.marksForegroundContainer = new Container();
+
         this.gameContainer.addChild(
             this.createColoredSides(),
-            this.marksBackgroundContainer = new Container(),
             this.createHexesContainer(),
+            this.marksBackgroundContainer,
             this.coordsContainer = this.createCoords(),
-            this.marksForegroundContainer = new Container(),
+            this.marksForegroundContainer,
         );
     }
 
@@ -601,10 +605,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         if (show44dots && this.boardsize > 9) {
-            // this.hexes[3][3].showDot();
-            // this.hexes[3][this.boardsize - 4].showDot();
-            // this.hexes[this.boardsize - 4][3].showDot();
-            // this.hexes[this.boardsize - 4][this.boardsize - 4].showDot();
+            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: 3, col: 3 }), '_group44', 'background');
+            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: 3, col: this.boardsize - 4 }), '_group44', 'background');
+            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: this.boardsize - 4, col: this.boardsize - 4 }), '_group44', 'background');
+            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: this.boardsize - 4, col: 3 }), '_group44', 'background');
         }
 
         return hexesContainer;

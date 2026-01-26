@@ -55,7 +55,6 @@ export class Mark extends Container
     private updatePosition(): void
     {
         this.position = Hex.coords(this.coords.row, this.coords.col);
-        console.log(this.position, this.visible, this.alpha);
     }
 
     show(): Mark

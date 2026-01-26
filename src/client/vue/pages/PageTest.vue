@@ -7,7 +7,9 @@ import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGam
 
 const container = ref<HTMLElement>();
 
-const gameView = new GameView(9);
+const gameView = new GameView(11, {
+    show44dots: true,
+});
 const playingGameFacade = new PlayingGameFacade(gameView, true);
 
 playingGameFacade.addMove('b3');
@@ -34,6 +36,7 @@ onMounted(async () => {
     <button class="btn btn-primary" @click.prevent="gameView.updateOptions({ show44dots: false })">Hide 44 dots</button>
     <button class="btn btn-primary" @click.prevent="gameView.setOrientation(gameView.getOrientation() + 1)">Rotate</button>
     <button class="btn btn-primary" @click.prevent="playingGameFacade.addMove('pass')">Pass</button>
+    <button class="btn btn-primary" @click.prevent="playingGameFacade.undoLastMove()">Undo</button>
 </template>
 
 <style lang="stylus" scoped>
