@@ -2,11 +2,10 @@ import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pi
 import Hex from './Hex.js';
 import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { createShadingPattern, ShadingPatternType } from './shading-patterns.js';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
-import { Mark } from './Mark.js';
+import { BoardEntity } from './BoardEntity.js';
 import { colToLetter, Coords, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
-import Anchor44Mark from './marks/Anchor44Mark.js';
+import Stone from './entities/Stone.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -87,26 +86,12 @@ type GameViewOptions = {
      * 0 means positive flat, 11 means diamond (or -1).
      */
     orientation: number;
-
-    /**
-     * Whether to show "anchors" on 4-4 cells.
-     * Only for size > 9.
-     */
-    show44dots: boolean;
-
-    shadingPatternType: ShadingPatternType;
-    shadingPatternOption: unknown;
-    shadingPatternIntensity: number;
 };
 
 const defaultOptions: GameViewOptions = {
     theme: themes.dark,
     displayCoords: false,
     orientation: 11,
-    show44dots: false,
-    shadingPatternType: null,
-    shadingPatternIntensity: 0.5,
-    shadingPatternOption: null,
 };
 
 /**
@@ -131,23 +116,47 @@ const defaultOptions: GameViewOptions = {
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
     /**
-     * Name of marks group used when no group passed
+     * Name of entity group used when no group passed
      */
-    static MARKS_GROUP_DEFAULT = '_default';
+    static DEFAULT_ENTITY_GROUP = '_default';
 
     /**
-     * Name of marks group used for simulation moves
+     * Name of entity group used to place stones
      */
-    static MARKS_GROUP_SIMULATION = '_simulation';
+    static STONE_ENTITY_GROUP = '_stone';
 
-    private options: GameViewOptions;
+    /**
+     * Theme/colors used to display board
+     */
+    private theme: Theme;
+
+    /**
+     * Whether to show cell coords around the board
+     */
+    private displayCoords: boolean;
+
+    /**
+     * Integer, every PI/6.
+     * 0 means positive flat, 11 means diamond (or -1).
+     */
+    private orientation: number;
 
     private containerElement: null | HTMLElement = null;
+
+    /**
+     * Mounted, pixi app initialized, resize listener added...
+     */
     private initialized = false;
 
     private hexes: Hex[][] = [];
 
     private pixi: Application;
+
+    /**
+     * Root container.
+     * Contains board sides, cells, stones, coords.
+     * Can be rotated.
+     */
     private gameContainer: Container = new Container();
 
     private coordsContainer: Container;
@@ -158,6 +167,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private resizeObserver: null | ResizeObserver = null;
 
     private initPromise = defer();
+
+    /**
+     * Stones indexed by their move.
+     */
+    private stones: { [move: string]: Stone } = {};
 
     /**
      * Long press handling, to make secondary action available on mobile.
@@ -178,26 +192,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private longPressed = false;
 
     /**
-     * Marks displayed on top of stone, so always visible.
-     * Used to show both a stone or an empty cell.
-     * Default.
+     * Objects displayed on the board.
+     * Contains layers with label, correspondong to a group of entities.
+     * Layers are sorted by zIndex, and can be empty from all entities.
      */
-    private marksForegroundContainer: Container;
-
-    /**
-     * Marks displayed behind stone, on the board.
-     * Will be hidden, or overriden when a stone is played on the cell.
-     * Used for board pattern (e.g 4-4 dots),
-     * or may be used for UI purpose,
-     * or when a mark is no longer relevant once a stone is played.
-     */
-    private marksBackgroundContainer: Container;
-
-    /**
-     * Marks grouped by groups.
-     * Use groups to remove only marks added to a given group.
-     */
-    private marks: { [group: string]: Mark[] } = {};
+    private entityLayersContainer: Container<Container<BoardEntity>>;
 
     constructor(
         private boardsize: number,
@@ -205,31 +204,42 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     ) {
         super();
 
-        this.options = {
+        const opts = {
             ...defaultOptions,
             ...options,
         };
 
+        this.theme = opts.theme;
+        this.displayCoords = opts.displayCoords;
+        this.orientation = opts.orientation;
+
         this.init();
+    }
+
+    getBoardsize(): number
+    {
+        return this.boardsize;
     }
 
     private init(): void
     {
-        this.marksBackgroundContainer = new Container();
-        this.marksForegroundContainer = new Container();
+        this.entityLayersContainer = new Container({
+            sortableChildren: true,
+        });
+
+        this.setGroupZIndex(GameView.STONE_ENTITY_GROUP, -10);
 
         this.gameContainer.addChild(
             this.createColoredSides(),
             this.createHexesContainer(),
-            this.marksBackgroundContainer,
+            this.entityLayersContainer,
             this.coordsContainer = this.createCoords(),
-            this.marksForegroundContainer,
         );
     }
 
     private async doMount(element: HTMLElement): Promise<void>
     {
-        if (this.containerElement !== null) {
+        if (this.containerElement) {
             throw new Error('GameView already mounted.');
         }
 
@@ -250,7 +260,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.pixi.stage.addChild(this.gameContainer);
 
-        this.redraw();
+        this.redrawAfterOrientationOrWrapperSizeChanged();
 
         element.appendChild(this.getView());
     }
@@ -320,24 +330,28 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return this.initPromise.promise;
     }
 
-    /**
-     * Update after options changed, container resized or rotated...
-     */
-    redraw(): void
+    private redrawAfterThemeChanged(): void
     {
-        if (!this.initialized) {
-            return;
+        for (let row = 0; row < this.boardsize; ++row) {
+            for (let col = 0; col < this.boardsize; ++col) {
+                this.hexes[row][col].updateTheme(this.theme);
+            }
         }
 
+        this.updateEntitiesTheme();
+    }
+
+    private redrawAfterOrientationOrWrapperSizeChanged(): void
+    {
         const wrapperSize = this.getWrapperSize();
 
         if (wrapperSize === null) {
             throw new Error('Cannot redraw, no wrapper size, seems not yet mounted');
         }
 
-        this.gameContainer.rotation = this.options.orientation * PI_6;
+        this.gameContainer.rotation = this.orientation * PI_6;
         this.updateCoordsTextsOrientation();
-        this.updateMarksRotation();
+        this.updateEntitiesRotation();
 
         this.gameContainer.pivot = Hex.coords(
             this.boardsize / 2 - 0.5,
@@ -350,14 +364,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         };
 
         this.autoResize();
-
-        for (let row = 0; row < this.boardsize; ++row) {
-            for (let col = 0; col < this.boardsize; ++col) {
-                this.hexes[row][col].updateTheme(this.options.theme);
-            }
-        }
-
-        this.coordsContainer.visible = this.options.displayCoords;
     }
 
     private resizeRendererAndRedraw(): void
@@ -373,7 +379,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
-        this.redraw();
+        this.redrawAfterOrientationOrWrapperSizeChanged();
     }
 
     private destroyResizeObserver(): void
@@ -387,7 +393,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private listenContainerElementResize(element: HTMLElement): void
     {
         // Resize renderer first when starting listening to element resize
-        //this.resizeRendererAndRedraw();
+        this.resizeRendererAndRedraw();
 
         this.destroyResizeObserver();
 
@@ -423,32 +429,26 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     getOrientation(): number
     {
-        return this.modOrientation(this.options.orientation);
+        return this.modOrientation(this.orientation);
     }
 
     setOrientation(orientation: number): void
     {
-        this.updateOptions({ orientation });
+        this.orientation = orientation;
+
+        this.redrawAfterOrientationOrWrapperSizeChanged();
     }
 
     getTheme(): Theme
     {
-        return this.options.theme;
+        return this.theme;
     }
 
     setTheme(theme: Theme): void
     {
-        this.updateOptions({ theme });
-    }
+        this.theme = theme;
 
-    updateOptions(options: Partial<GameViewOptions>): void
-    {
-        this.options = {
-            ...this.options,
-            ...options,
-        };
-
-        this.redraw();
+        this.redrawAfterThemeChanged();
     }
 
     /**
@@ -509,7 +509,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         // Add margin to display coords around the board
-        if (this.options.displayCoords) {
+        if (this.displayCoords) {
             boxWidth += Hex.RADIUS * 1.8;
             boxHeight += Hex.RADIUS * 1.8;
         }
@@ -529,19 +529,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * @param move Which cell to animate (ex: "d4")
      * @param delay In milliseconds, wait before animate
      */
-    async animateCell(coords: Move | Coords, delay = 0): Promise<void>
+    async animateStone(coords: Move | Coords, delay = 0): Promise<void>
     {
-        if (typeof coords === 'string') {
-            coords = moveToCoords(coords);
+        if (typeof coords !== 'string') {
+            coords = coordsToMove(coords);
         }
-
-        const { row, col } = coords;
 
         if (delay > 0) {
             await new Promise(resolve => setTimeout(resolve, delay));
         }
 
-        await this.hexes[row][col].animate();
+        await this.stones[coords].animate();
     }
 
     private clearLongPressTimeout(): void
@@ -557,18 +555,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private createHexesContainer(): Container
     {
         const hexesContainer = new Container();
-        const { show44dots, shadingPatternType, shadingPatternIntensity, shadingPatternOption } = this.options;
-        const shadingPattern = createShadingPattern(shadingPatternType, this.boardsize, shadingPatternOption);
-
         this.hexes = Array(this.boardsize).fill(null).map(() => Array(this.boardsize));
 
         for (let row = 0; row < this.boardsize; ++row) {
             for (let col = 0; col < this.boardsize; ++col) {
-                const hex = new Hex(
-                    this.options.theme,
-                    null,
-                    shadingPattern.calc(row, col) * shadingPatternIntensity,
-                );
+                const hex = new Hex(this.theme);
 
                 hex.position = Hex.coords(row, col);
 
@@ -604,13 +595,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             }
         }
 
-        if (show44dots && this.boardsize > 9) {
-            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: 3, col: 3 }), '_group44', 'background');
-            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: 3, col: this.boardsize - 4 }), '_group44', 'background');
-            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: this.boardsize - 4, col: this.boardsize - 4 }), '_group44', 'background');
-            this.addMark(new Anchor44Mark(this.options.theme.textColor).setCoords({ row: this.boardsize - 4, col: 3 }), '_group44', 'background');
-        }
-
         return hexesContainer;
     }
 
@@ -627,7 +611,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const sideRelativeWidth = 0.35;
         const sideWidth = Hex.RADIUS * sideRelativeWidth;
         const sideDist = Hex.RADIUS * (sideRelativeWidth + 1);
-        const { colorA, colorB } = this.options.theme;
+        const { colorA, colorB } = this.theme;
         const lastI = this.boardsize - 1;
         const boardMiddle: PointData = middle(Hex.coords(0, 0), Hex.coords(lastI, lastI));
 
@@ -706,18 +690,19 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     getDisplayCoords(): boolean
     {
-        return this.options.displayCoords;
+        return this.displayCoords;
     }
 
     setDisplayCoords(visible = true): void
     {
-        this.options.displayCoords = visible;
-        this.redraw();
+        this.displayCoords = visible;
+        this.coordsContainer.visible = visible;
+        this.redrawAfterOrientationOrWrapperSizeChanged();
     }
 
     toggleDisplayCoords(): void
     {
-        this.setDisplayCoords(!this.options.displayCoords);
+        this.setDisplayCoords(!this.displayCoords);
     }
 
     private createCoords(): Container
@@ -726,12 +711,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             throw new Error('Coords Texts already created');
         }
 
-        const container = new Container();
+        const container = new Container({ visible: this.displayCoords });
 
         const coordsTextStyle = new TextStyle({
             fontFamily: 'Arial',
             fontSize: Hex.RADIUS * 0.6,
-            fill: this.options.theme.textColor,
+            fill: this.theme.textColor,
         });
 
         const createText = (string: string, x: number, y: number): Text => {
@@ -784,68 +769,105 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         );
     }
 
+    getStone(move: Move): null | Stone
+    {
+        if (move === 'pass' || move === 'swap-pieces') {
+            throw new Error('Cannot setStone with move "swap-pieces" or "pass"');
+        }
+
+        return this.stones[move] ?? null;
+    }
+
     setStone(move: Move, byPlayerIndex: null | 0 | 1, faded = false): void
     {
-        if (move === 'pass') {
-            return;
+        if (move === 'pass' || move === 'swap-pieces') {
+            throw new Error('Cannot setStone with move "swap-pieces" or "pass"');
         }
 
-        if (move === 'swap-pieces') {
-            throw new Error('Cannot setStone with move "swap-pieces"');
+        if (this.stones[move]) {
+            this.removeEntity(this.stones[move]);
+            delete this.stones[move];
         }
 
-        this.getHex(move).setStone(byPlayerIndex, faded);
-    }
-
-    addMark(mark: Mark, group: string = GameView.MARKS_GROUP_DEFAULT, position: 'foreground' | 'background' = 'foreground'): void
-    {
-        if (undefined === this.marks[group]) {
-            this.marks[group] = [];
-        }
-
-        mark.initOnce();
-        mark.updateRotation(this.gameContainer.rotation);
-
-        this.marks[group].push(mark);
-
-        if (position === 'background') {
-            this.marksBackgroundContainer.addChild(mark);
-        } else {
-            this.marksForegroundContainer.addChild(mark);
+        if (byPlayerIndex !== null) {
+            this.stones[move] = new Stone(byPlayerIndex, faded);
+            this.stones[move].setCoords(moveToCoords(move));
+            this.addEntity(this.stones[move], GameView.STONE_ENTITY_GROUP);
         }
     }
 
-    removeMark(mark: Mark): void
+    getGroup(group: string): Container<BoardEntity>
     {
-        this.marksForegroundContainer.removeChild(mark);
-        this.marksBackgroundContainer.removeChild(mark);
+        let layer = this.entityLayersContainer.getChildByLabel(group) as Container<BoardEntity>;
 
-        for (const group in this.marks) {
-            this.marks[group] = this.marks[group].filter(m => m !== mark);
+        if (!layer) {
+            layer = new Container<BoardEntity>({ label: group });
+            this.entityLayersContainer.addChild(layer);
         }
+
+        return layer;
     }
 
-    removeMarks(group: string = GameView.MARKS_GROUP_DEFAULT): void
+    setGroupZIndex(group: string, zIndex: number): void
     {
-        if (undefined === this.marks[group]) {
-            return;
-        }
+        this.getGroup(group).zIndex = zIndex;
+    }
 
-        this.marksForegroundContainer.removeChild(...this.marks[group]);
-        this.marksBackgroundContainer.removeChild(...this.marks[group]);
-        this.marks[group] = [];
+    setGroupZIndexBehindStones(group: string): void
+    {
+        this.setGroupZIndex(group, -20);
+    }
+
+    addEntity(entity: BoardEntity, group: string = GameView.DEFAULT_ENTITY_GROUP): void
+    {
+        entity.initOnce(this.theme);
+        entity.updateRotation(this.gameContainer.rotation);
+
+        this.getGroup(group).addChild(entity);
     }
 
     /**
-     * For marks that need to be kept upside (like letters),
+     * Removes an entity.
+     */
+    removeEntity(entity: BoardEntity): void
+    {
+        entity.removeFromParent();
+    }
+
+    clearEntitiesGroup(group: string = GameView.DEFAULT_ENTITY_GROUP): void
+    {
+        const layer = this.entityLayersContainer.getChildByLabel(group);
+
+        if (!layer) {
+            return;
+        }
+
+        layer.removeChildren();
+    }
+
+    /**
+     * For entities that need to be kept upside (like letters),
      * or needs to change between hex flat-top/pointy-top,
      * we need to update their rotation after board rotation changed.
      */
-    private updateMarksRotation(): void
+    private updateEntitiesRotation(): void
     {
-        for (const group in this.marks) {
-            for (const mark of this.marks[group]) {
-                mark.updateRotation(this.gameContainer.rotation);
+        for (const layer of this.entityLayersContainer.children) {
+            for (const entity of layer.children) {
+                entity.updateRotation(this.gameContainer.rotation);
+            }
+        }
+    }
+
+    /**
+     * Trigger onThemeUpdated() on each entity on this board.
+     * Will redraw for them that needs to.
+     */
+    private updateEntitiesTheme(): void
+    {
+        for (const layer of this.entityLayersContainer.children) {
+            for (const entity of layer.children) {
+                entity.onThemeUpdated(this.theme);
             }
         }
     }

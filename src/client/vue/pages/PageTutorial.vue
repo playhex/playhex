@@ -11,7 +11,7 @@ import useAiConfigsStore from '../../stores/aiConfigsStore.js';
 import { IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople, IconTablerSwords, IconTrophy } from '../icons.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import HexagonMark from '../../../shared/pixi-board/marks/HexagonMark.js';
+import HexagonMark from '../../../shared/pixi-board/entities/HexagonMark.js';
 import { Move } from '../../../shared/move-notation/move-notation.js';
 import { useGameViewFacade } from '../composables/useGameViewFacade.js';
 
@@ -169,7 +169,7 @@ for (let row = 0; row < 11; ++row) {
         mark.setCoords({ row, col });
         mark.alpha = alpha;
         mark.alpha **= 4; // Adds more contrast
-        gameView2.getGameView().addMark(mark, 'swap_map');
+        gameView2.getGameView().addEntity(mark, 'swap_map');
     }
 }
 

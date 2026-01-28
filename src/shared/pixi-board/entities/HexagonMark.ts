@@ -1,24 +1,22 @@
 import { Container, Graphics } from 'pixi.js';
-import { Mark } from '../Mark.js';
+import { BoardEntity } from '../BoardEntity.js';
 import Hex from '../Hex.js';
 
-export default class TriangleMark extends Mark
+export default class HexagonMark extends BoardEntity
 {
     constructor(
         private color: number = 0xffffff,
+        private radius: number = 1,
     ) {
         super();
-
-        this.alwaysTop = true;
     }
 
     protected override draw(): Container
     {
         const g = new Graphics();
-        g.regularPoly(0, 0, Hex.RADIUS * 0.55, 3);
-        g.stroke({
+        g.regularPoly(0, 0, Hex.RADIUS * this.radius, 6);
+        g.fill({
             color: this.color,
-            width: Hex.RADIUS * 0.15,
         });
 
         return g;

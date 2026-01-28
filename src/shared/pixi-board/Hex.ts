@@ -1,15 +1,8 @@
-import { Container, DestroyOptions, Graphics, PointData, Ticker } from 'pixi.js';
+import { Container, DestroyOptions, Graphics, PointData } from 'pixi.js';
 import { Theme } from './BoardTheme.js';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
-
-const animationDuration = 50;
-const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
-    const x = i / animationDuration;
-
-    return 1 - (2 * (x - 1) ** 2 - 1) ** 2;
-});
 
 /**
  * A cell.
@@ -44,28 +37,17 @@ export default class Hex extends Container
     static readonly OUTER_RADIUS = Hex.RADIUS * (1 + Hex.PADDING);
 
     /**
-     * Stroke color, cell color
+     * Stroke color and empty cell color
      */
     private cellBackgroundGraphics: Graphics;
 
-    private cellShading: Container;
-    private stone: Container;
-
-    private animationLoop: null | (() => void) = null;
-
     /**
-     * Whether this stone should be semi-transparent.
+     * Layer, variable alpha depending on shading pattern
      */
-    private stoneFaded = false;
+    private cellShading: Container;
 
     constructor(
         private theme: Theme,
-
-        /**
-         * null: empty cell
-         * 0 or 1: red or blue
-         */
-        private playerIndex: null | 0 | 1 = null,
 
         /**
          * Shading to apply to background, between 0 and 1.
@@ -83,7 +65,6 @@ export default class Hex extends Container
         }
 
         this.init();
-        this.setStone(playerIndex);
 
         this.eventMode = 'static';
     }
@@ -93,7 +74,6 @@ export default class Hex extends Container
         this.addChild(
             this.createCell(),
             this.cellShading = this.createCellShading(),
-            this.stone = this.createStone(),
         );
 
         this.redrawHex();
@@ -167,27 +147,6 @@ export default class Hex extends Container
         this.redrawHex();
     }
 
-    /**
-     * Hex color when played.
-     * White, then change tint to set color.
-     * Hidden if not played yet.
-     */
-    private createStone(): Graphics
-    {
-        const g = new Graphics();
-        const path: PointData[] = [];
-
-        for (let i = 0; i < 6; ++i) {
-            path.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
-        }
-
-        g.poly(path);
-        g.fill({ color: 0xffffff });
-        g.visible = false;
-
-        return g;
-    }
-
     static coords(row: number, col: number): PointData
     {
         return {
@@ -217,76 +176,8 @@ export default class Hex extends Container
         };
     }
 
-    private updateColor(): void
-    {
-        this.stone.visible = this.playerIndex !== null;
-        this.stone.alpha = this.stoneFaded ? 0.5 : 1;
-
-        if (this.playerIndex !== null) {
-            this.stone.tint = [
-                this.theme.colorA,
-                this.theme.colorB,
-            ][this.playerIndex];
-        }
-    }
-
-    setStone(playerIndex: null | 0 | 1, faded = false): this
-    {
-        this.playerIndex = playerIndex;
-        this.stoneFaded = faded;
-        this.updateColor();
-
-        return this;
-    }
-
-    private clearAnimationLoop(): void
-    {
-        if (this.animationLoop !== null) {
-            if (this.destroyed) {
-                // Call animationLoop to resolve promise if destroyed and prevent let it unresolved
-                this.animationLoop();
-            } else {
-                this.stone.scale = { x: 1, y: 1 };
-            }
-
-            Ticker.shared.remove(this.animationLoop);
-            this.animationLoop = null;
-        }
-    }
-
-    async animate(): Promise<void>
-    {
-        this.clearAnimationLoop();
-
-        return await new Promise(resolve => {
-            let i = 0;
-
-            this.animationLoop = (): void => {
-                if (this.destroyed) {
-                    resolve();
-                    return;
-                }
-
-                if (i >= animationDuration) {
-                    this.clearAnimationLoop();
-                    resolve();
-                    return;
-                }
-
-                const coef = 1 - 0.75 * animationCurve[i];
-                this.stone.scale = { x: coef, y: coef };
-                ++i;
-            };
-
-            Ticker.shared.add(this.animationLoop);
-        });
-    }
-
     override destroy(options?: DestroyOptions): void
     {
         super.destroy(options);
-
-        // Must be after destroy, so animation knows it's destroyed and can resolve
-        this.clearAnimationLoop();
     }
 }

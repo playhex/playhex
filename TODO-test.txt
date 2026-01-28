@@ -11,6 +11,21 @@ test game view:
 - can cancel preview/premove if this is a swap-piece
 - undo move, 1 move, 2 move, SWAP move (marks), pass move
 
+Optim:
+Try using ParticleContainer for stones and cells
+
+Move -> CoordsNotation (d4, ...) / Move (d4, swap-pieces, pass, ...)
+
+Stone Animation -> move all from StoneMark to AnimatorFacade
+
+Conditional move light theme:
+    - TextMark should adapt from theme
+    - Sidebar coords should always be white
+
+Move 44 anchor to a facade
+
+Move shading patterns to a facade
+
 Custom themes:
 Create abstract Cell and Board, that can update theme, shading pattern, stones, ...
 depending on theme, can be only colors, or images...

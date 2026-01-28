@@ -1,8 +1,8 @@
 import { Move, moveToCoords } from '../../move-notation/move-notation.js';
 import GameView from '../GameView.js';
-import SwappableMark from '../../pixi-board/marks/SwappableMark.js';
-import SwappedMark from '../../pixi-board/marks/SwappedMark.js';
-import LastMoveMark from '../../pixi-board/marks/LastMoveMark.js';
+import SwappableMark from '../entities/SwappableMark.js';
+import SwappedMark from '../entities/SwappedMark.js';
+import LastMoveMark from '../entities/LastMoveMark.js';
 
 const MARKS_GROUP = '_game_marks';
 
@@ -24,9 +24,9 @@ export class GameMarksFacade
     ) {
         this.hideMarks();
 
-        this.gameView.addMark(this.lastMoveMark, MARKS_GROUP);
-        this.gameView.addMark(this.swappableMark, MARKS_GROUP);
-        this.gameView.addMark(this.swappedMark, MARKS_GROUP);
+        this.gameView.addEntity(this.lastMoveMark, MARKS_GROUP);
+        this.gameView.addEntity(this.swappableMark, MARKS_GROUP);
+        this.gameView.addEntity(this.swappedMark, MARKS_GROUP);
     }
 
     /**

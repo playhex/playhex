@@ -1,7 +1,7 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { PlayerIndex } from '../game-engine/index.js';
 import GameView from '../pixi-board/GameView.js';
-import TextMark from '../pixi-board/marks/TextMark.js';
+import TextMark from '../pixi-board/entities/TextMark.js';
 import { clearDuplicatedUnplayedLines, conditionalMovesCut, conditionalMovesMergeMoves, conditionalMovesShift, ConditionalMovesStruct, getNextMovesAfterLine } from './conditionalMovesUtils.js';
 import { Move, moveToCoords } from '../move-notation/move-notation.js';
 import { TimestampedMove } from '../game-engine/Types.js';
@@ -155,14 +155,14 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     private markNextConditionalMoves(): void
     {
-        this.gameView.removeMarks('nextConditionalMoves');
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
 
         const next = getNextMovesAfterLine(this.conditionalMovesDirty.tree, this.selectedLine);
         const nextNumberString = '' + (this.selectedLine.length + 1);
 
         for (const move of next) {
             const mark = new TextMark(nextNumberString).setCoords(moveToCoords(move));
-            this.gameView.addMark(mark, 'nextConditionalMoves');
+            this.gameView.addEntity(mark, 'nextConditionalMoves');
         }
     }
 
@@ -173,7 +173,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     submitConditionalMoves(): void
     {
-        this.gameView.removeMarks('nextConditionalMoves');
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
 
         this.conditionalMovesDirty.unplayedLines = clearDuplicatedUnplayedLines(this.conditionalMovesDirty.unplayedLines);
         copyConditionalMovesStruct(this.conditionalMoves, this.conditionalMovesDirty);
@@ -193,7 +193,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     discardSimulationMoves(): void
     {
         // this.gameView.clearSimulationMoves();
-        this.gameView.removeMarks('nextConditionalMoves');
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
         this.selectedLine = [];
 
         copyConditionalMovesStruct(this.conditionalMovesDirty, this.conditionalMoves);
@@ -267,7 +267,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     disableSimulationMode(): void
     {
-        this.gameView.removeMarks('nextConditionalMoves');
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
         // this.gameView.disableSimulationMode();
     }
 

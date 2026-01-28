@@ -1,12 +1,12 @@
 import { Container, Graphics } from 'pixi.js';
-import { Mark } from '../Mark.js';
+import { BoardEntity } from '../BoardEntity.js';
 import Hex from '../Hex.js';
 
 /**
  * Show a little white hexagon on a stone to show last move.
  * Should not be used on an empty cell because won't be visible on light theme.
  */
-export default class LastMoveMark extends Mark
+export default class LastMoveMark extends BoardEntity
 {
     constructor()
     {

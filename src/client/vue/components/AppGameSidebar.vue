@@ -34,7 +34,7 @@ import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.j
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
-import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
+import TriangleMark from '../../../shared/pixi-board/entities/TriangleMark.js';
 import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 
@@ -159,7 +159,7 @@ const removeMarksLater = () => {
     clearMarksTimeout();
 
     marksTimeout = setTimeout(() => {
-        gameView.removeMarks('coords-show');
+        gameView.clearEntitiesGroup('coords-show');
         clearMarksTimeout();
     }, 3000);
 };
@@ -182,10 +182,10 @@ const chatClick = (e: PointerEvent) => {
 
     // ctrl click to show multiple marks when click on multiple coords in chat
     if (!e.ctrlKey) {
-        gameView.removeMarks('coords-show');
+        gameView.clearEntitiesGroup('coords-show');
     }
 
-    gameView.addMark(mark, 'coords-show');
+    gameView.addEntity(mark, 'coords-show');
 
     removeMarksLater();
 

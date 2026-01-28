@@ -20,7 +20,7 @@ export class AnimatorFacade
     async animatePath(moves: (Move | Coords)[]): Promise<void>
     {
         const promises = moves.map(async (move, i): Promise<void> => {
-            await this.gameView.animateCell(move, i * 80);
+            await this.gameView.animateStone(move, i * 80);
         });
 
         await Promise.all(promises);
