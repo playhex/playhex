@@ -28,25 +28,39 @@ onMounted(async () => {
 
     await gameView.mount(container.value);
 });
+
+// Change bg theme when changing board theme
+const bgTheme = ref<'bg-light' | 'bg-dark'>('bg-dark');
+
+// Display last events
+const lastHexClicked = ref('-');
+gameView.on('hexClicked', move => lastHexClicked.value = move);
+
+const lastHexSecondaryClicked = ref('-');
+gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move);
 </script>
 
 <template>
-    <div ref="container" class="game-view-container"></div>
+    <div ref="container" class="game-view-container" :class="bgTheme"></div>
     <button class="btn btn-primary" @click.prevent="gameView.toggleDisplayCoords()">Toggle coords</button>
-    <button class="btn btn-primary" @click.prevent="gameView.setTheme(themes.dark)">Dark</button>
-    <button class="btn btn-primary" @click.prevent="gameView.setTheme(themes.light)">Light</button>
+    <button class="btn btn-primary" @click.prevent="gameView.setTheme(themes.dark); bgTheme = 'bg-dark'">Dark</button>
+    <button class="btn btn-primary" @click.prevent="gameView.setTheme(themes.light); bgTheme = 'bg-light'">Light</button>
     <button class="btn btn-primary" @click.prevent="anchor44Facade.show44Anchors()">Show 44 dots</button>
     <button class="btn btn-primary" @click.prevent="anchor44Facade.hide44Anchors()">Hide 44 dots</button>
     <button class="btn btn-primary" @click.prevent="gameView.setOrientation(gameView.getOrientation() + 1)">Rotate</button>
     <button class="btn btn-primary" @click.prevent="playingGameFacade.addMove('pass')">Pass</button>
     <button class="btn btn-primary" @click.prevent="playingGameFacade.undoLastMove()">Undo</button>
+
+    <p>Last hex clicked: <code>{{ lastHexClicked }}</code></p>
+    <p>Last hex secondary clicked: <code>{{ lastHexSecondaryClicked }}</code></p>
 </template>
 
 <style lang="stylus" scoped>
 .game-view-container
-    width 400px
+    width 80%
     height 400px
     resize both
-    overflow auto
-    margin auto
+    overflow hidden
+    margin 1em auto
+    border 1px solid #888
 </style>

@@ -10,6 +10,12 @@ export class PlayingGameFacade
 {
     private gameMarksFacade: GameMarksFacade;
 
+    /**
+     * Already occupied cells.
+     * Used to quickly check if a cell is empty.
+     */
+    private placedStones: { [move: string]: 0 | 1 } = {};
+
     constructor(
         private gameView: GameView,
         private swapAllowed: boolean,
@@ -29,7 +35,14 @@ export class PlayingGameFacade
         return this.moves[this.moves.length - 1];
     }
 
-    addMove(move: Move): void
+    /**
+     * Play a move.
+     *
+     * @returns Whether move has been played, false if cell was already occupied.
+     *
+     * @throws When provided move is a bad value
+     */
+    addMove(move: Move): boolean
     {
         if (this.moves.length === 1 && this.swapAllowed && move === this.moves[0]) {
             move = 'swap-pieces';
@@ -50,18 +63,29 @@ export class PlayingGameFacade
             this.gameView.setStone(this.moves[0], null);
             this.gameView.setStone(mirror, 1);
             this.markLastMove();
-            return;
+            this.placedStones = {};
+            this.placedStones[mirror] = 1;
+
+            return true;
         }
 
         if (move === 'pass') {
             this.moves.push(move);
             this.gameMarksFacade.hideMarks();
-            return;
+
+            return true;
+        }
+
+        if (this.placedStones[move] !== undefined) {
+            return false;
         }
 
         this.gameView.setStone(move, this.moves.length % 2 as 0 | 1);
+        this.placedStones[move] = this.moves.length % 2 as 0 | 1;
         this.moves.push(move);
         this.markLastMove();
+
+        return true;
     }
 
     /**
@@ -84,11 +108,14 @@ export class PlayingGameFacade
                 const swapped = this.moves[0];
                 const mirror = mirrorMove(this.moves[0]);
 
-                this.gameView.setStone(swapped, null);
-                this.gameView.setStone(mirror, 0);
+                delete this.placedStones[mirror];
+                this.placedStones[swapped] = 0;
+                this.gameView.setStone(mirror, null);
+                this.gameView.setStone(swapped, 0);
                 break;
 
             default:
+                delete this.placedStones[undoneMove];
                 this.gameView.setStone(undoneMove, null);
         }
 

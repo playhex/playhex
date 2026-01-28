@@ -11,7 +11,7 @@ const MARKS_GROUP = '_game_marks';
  * - last move
  * - swap/swapped
  *
- * Swap marks do not appear simultaneously with the last move mark.
+ * Do not duplicate marks, nor make last move mark overlaps swap marks.
  */
 export class GameMarksFacade
 {

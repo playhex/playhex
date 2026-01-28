@@ -10,8 +10,8 @@ const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
 });
 
 /**
- * Show a little white hexagon on a stone to show last move.
- * Should not be used on an empty cell because won't be visible on light theme.
+ * The standard theme Hex stone.
+ * A hexagon filling the cell.
  */
 export default class Stone extends BoardEntity
 {

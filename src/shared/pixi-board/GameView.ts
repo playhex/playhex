@@ -4,7 +4,7 @@ import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { BoardEntity } from './BoardEntity.js';
-import { colToLetter, Coords, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
+import { colToLetter, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
 import Stone from './entities/Stone.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
@@ -30,22 +30,9 @@ type GameViewEvents = {
     hexClickedSecondary: (move: Move) => void;
 
     /**
-     * A hex has been clicked in simulation mode on the view.
-     *
-     * @param played Whether the move has been simulated and added to simulated moves stack,
-     *               or just clicked because cell is already occupied by another simulation move.
-     *               Event is not emitted when clicking on an already played cell.
+     * Board orientation changed.
      */
-    hexSimulated: (move: Move, played: boolean) => void;
-
     orientationChanged: () => void;
-
-    movesHistoryCursorChanged: (cursor: null | number) => void;
-
-    /**
-     * Simulation mode has been enabled or disabled.
-     */
-    simulationModeChanged: (enabled: boolean) => void;
 
     /**
      * This view will be destroyed.
@@ -159,7 +146,21 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private gameContainer: Container = new Container();
 
+    /**
+     * Container that contains coords.
+     *
+     * Hierarchy:
+     *
+     * coordsContainer (visible is switched)
+     * |- Container (destroyed recursively when redrawn)
+     *    |- letters (kept upside)
+     */
     private coordsContainer: Container;
+
+    /**
+     * All coords letters.
+     * Each of them need to be kept upside when board rotates.
+     */
     private coordsTexts: Text[] = [];
 
     private sidesGraphics: [Graphics, Graphics];
@@ -211,7 +212,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.theme = opts.theme;
         this.displayCoords = opts.displayCoords;
-        this.orientation = opts.orientation;
+        this.orientation = this.modOrientation(opts.orientation);
 
         this.init();
     }
@@ -233,8 +234,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             this.createColoredSides(),
             this.createHexesContainer(),
             this.entityLayersContainer,
-            this.coordsContainer = this.createCoords(),
+            this.coordsContainer = new Container(),
         );
+
+        this.redrawCoords();
     }
 
     private async doMount(element: HTMLElement): Promise<void>
@@ -339,6 +342,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         this.updateEntitiesTheme();
+        this.redrawCoords();
     }
 
     private redrawAfterOrientationOrWrapperSizeChanged(): void
@@ -429,14 +433,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     getOrientation(): number
     {
-        return this.modOrientation(this.orientation);
+        return this.orientation;
     }
 
     setOrientation(orientation: number): void
     {
-        this.orientation = orientation;
+        this.orientation = this.modOrientation(orientation);
 
         this.redrawAfterOrientationOrWrapperSizeChanged();
+
+        this.emit('orientationChanged');
     }
 
     getTheme(): Theme
@@ -520,26 +526,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         );
 
         this.gameContainer.scale = { x: scale, y: scale };
-    }
-
-    /**
-     * Animate a cell.
-     * Animate the stone if any.
-     *
-     * @param move Which cell to animate (ex: "d4")
-     * @param delay In milliseconds, wait before animate
-     */
-    async animateStone(coords: Move | Coords, delay = 0): Promise<void>
-    {
-        if (typeof coords !== 'string') {
-            coords = coordsToMove(coords);
-        }
-
-        if (delay > 0) {
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-
-        await this.stones[coords].animate();
     }
 
     private clearLongPressTimeout(): void
@@ -705,13 +691,22 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.setDisplayCoords(!this.displayCoords);
     }
 
-    private createCoords(): Container
+    /**
+     * Draw or redraw coords.
+     * Redrawn only when we need to change Text font color,
+     * when theme changes.
+     */
+    private redrawCoords(): void
     {
-        if (this.coordsTexts.length > 0) {
-            throw new Error('Coords Texts already created');
+        this.coordsTexts = [];
+
+        for (const child of this.coordsContainer.removeChildren()) {
+            child.destroy();
         }
 
-        const container = new Container({ visible: this.displayCoords });
+        this.coordsContainer.visible = this.displayCoords;
+
+        const container = new Container();
 
         const coordsTextStyle = new TextStyle({
             fontFamily: 'Arial',
@@ -745,7 +740,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.updateCoordsTextsOrientation();
 
-        return container;
+        this.coordsContainer.addChild(container);
     }
 
     private updateCoordsTextsOrientation(): void
