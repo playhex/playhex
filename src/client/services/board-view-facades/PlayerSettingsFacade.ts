@@ -4,6 +4,7 @@ import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerL
 import { watch, WatchStopHandle } from 'vue';
 import { themes } from '../../../shared/pixi-board/BoardTheme.js';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
+import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facade.js';
 
 /**
  * Customizes game view with player current settings
@@ -13,6 +14,8 @@ export class PlayerSettingsFacade
 {
     private unwatchSettingsChangedListener: WatchStopHandle;
     private unwatchLocalSettingsChangedListener: WatchStopHandle;
+
+    private anchor44Facade: Anchor44Facade;
 
     constructor(
         private gameView: GameView,
@@ -36,8 +39,11 @@ export class PlayerSettingsFacade
          */
         const { playerSettings } = usePlayerSettingsStore();
 
+        this.anchor44Facade = new Anchor44Facade(this.gameView, false);
+
         if (playerSettings !== null) {
             this.updateOptionsFromPlayerSettings(playerSettings);
+            this.anchor44Facade.show44Anchors(playerSettings.show44dots);
         }
 
         this.unwatchSettingsChangedListener = watch(() => usePlayerSettingsStore().playerSettings, this.playerSettingsChangedListener, { deep: true });
@@ -55,25 +61,16 @@ export class PlayerSettingsFacade
 
     updateOptionsFromPlayerSettings(playerSettings: PlayerSettings): void
     {
-        this.gameView.updateOptions({
-            displayCoords: playerSettings.showCoords,
-            preferredOrientations: {
-                landscape: playerSettings.orientationLandscape,
-                portrait: playerSettings.orientationPortrait,
-            },
-            shadingPatternType: playerSettings.boardShadingPattern,
-            shadingPatternIntensity: playerSettings.boardShadingPatternIntensity,
-            shadingPatternOption: playerSettings.boardShadingPatternOption,
-            show44dots: playerSettings.show44dots,
-        });
+        this.gameView.setDisplayCoords(playerSettings.showCoords);
+        this.gameView.setOrientation(playerSettings.orientationLandscape); // TODO move into facade
+        this.anchor44Facade.show44Anchors(playerSettings.show44dots);
+        // TODO shading pattern
     }
 
     updateOptionsFromPlayerLocalSettings(localSettings: LocalSettings): void
     {
-        this.gameView.updateOptions({
-            selectedBoardOrientationMode: localSettings.selectedBoardOrientation,
-            theme: themes[usePlayerLocalSettingsStore().displayedTheme()],
-        });
+        this.gameView.setTheme(themes[usePlayerLocalSettingsStore().displayedTheme()]);
+        // TODO selectedBoardOrientationMode
     }
 
     destroy(): void

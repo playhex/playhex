@@ -96,7 +96,7 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         this.game.on('canceled', () => this.endedCallback());
 
         this.game.on('updated', () => {
-            this.gameView.redraw();
+            // this.gameView.redraw(); // TODO
         });
     }
 

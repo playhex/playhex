@@ -347,6 +347,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private redrawAfterOrientationOrWrapperSizeChanged(): void
     {
+        if (!this.initialized) {
+            return;
+        }
+
         const wrapperSize = this.getWrapperSize();
 
         if (wrapperSize === null) {

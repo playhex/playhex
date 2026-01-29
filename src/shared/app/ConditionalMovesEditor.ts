@@ -291,12 +291,12 @@ export const listenGameViewEvents = (conditionalMovesEditor: ConditionalMovesEdi
     const onClose: (() => void)[] = [];
 
     const onSimulationModeChanged = (enabled: boolean) => conditionalMovesEditor.onSimulationModeChanged(enabled);
-    gameView.on('simulationModeChanged', onSimulationModeChanged);
-    onClose.push(() => gameView.off('simulationModeChanged', onSimulationModeChanged));
+    // gameView.on('simulationModeChanged', onSimulationModeChanged);
+    // onClose.push(() => gameView.off('simulationModeChanged', onSimulationModeChanged));
 
     const onHexSimulated = (move: Move) => conditionalMovesEditor.onHexSimulated(move);
-    gameView.on('hexSimulated', onHexSimulated);
-    onClose.push(() => gameView.off('hexSimulated', onHexSimulated));
+    // gameView.on('hexSimulated', onHexSimulated);
+    // onClose.push(() => gameView.off('hexSimulated', onHexSimulated));
 
     // const onPlayed = (move: TimestampedMove, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move.move, _, byPlayerIndex);
     // gameView.getGame().on('played', onPlayed);

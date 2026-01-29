@@ -140,6 +140,16 @@ export default class Hex extends Container
         this.cellShading.alpha = this.shading;
     }
 
+    getCellShading(): number
+    {
+        return this.cellShading.alpha;
+    }
+
+    setCellShading(shading: number): void
+    {
+        this.cellShading.alpha = shading;
+    }
+
     updateTheme(theme: Theme): void
     {
         this.theme = theme;

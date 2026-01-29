@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import { onMounted } from 'vue';
 import { themes } from '../../../shared/pixi-board/BoardTheme.js';
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
+import { ShadingPatternFacade } from '../../../shared/pixi-board/facades/ShadingPatternFacade.js';
 import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facade.js';
 import TextMark from '../../../shared/pixi-board/entities/TextMark.js';
+import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 
 const container = ref<HTMLElement>();
 
 const gameView = new GameView(11);
 const playingGameFacade = new PlayingGameFacade(gameView, true);
 const anchor44Facade = new Anchor44Facade(gameView);
+const playerSettingsFacade = shallowRef<null | PlayerSettingsFacade>(null);
+new ShadingPatternFacade(gameView);
 
 playingGameFacade.addMove('b3');
 
@@ -53,6 +57,8 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
 
     <p>Last hex clicked: <code>{{ lastHexClicked }}</code></p>
     <p>Last hex secondary clicked: <code>{{ lastHexSecondaryClicked }}</code></p>
+
+    <button v-if="!playerSettingsFacade" class="btn btn-success" @click.prevent="playerSettingsFacade = new PlayerSettingsFacade(gameView)">new PlayerSettingsFacade()</button>
 </template>
 
 <style lang="stylus" scoped>

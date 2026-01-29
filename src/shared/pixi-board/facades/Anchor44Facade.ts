@@ -37,10 +37,14 @@ export class Anchor44Facade
         this.gameView.addEntity(new Anchor44Mark().setCoords({ row: size - 4, col: 3 }), ANCHORS_44_ENTITY_GROUP);
     }
 
-    show44Anchors(): void
+    show44Anchors(show = true): void
     {
-        this.init();
-        this.gameView.getGroup(ANCHORS_44_ENTITY_GROUP).visible = true;
+        if (show) {
+            this.init();
+            this.gameView.getGroup(ANCHORS_44_ENTITY_GROUP).visible = true;
+        } else {
+            this.hide44Anchors();
+        }
     }
 
     hide44Anchors(): void
