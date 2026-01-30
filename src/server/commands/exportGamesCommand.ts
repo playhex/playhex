@@ -70,6 +70,26 @@ type ExportedGame = {
      */
     playerBlueType: 'player' | 'bot';
 
+    /**
+     * Rating of player Red when the game was played, Glicko2
+     */
+    playerRedRating?: number;
+
+    /**
+     * Rating deviation of player Red when the game was played, Glicko2
+     */
+    playerRedRatingDeviation?: number;
+
+    /**
+     * Rating of player Blue when the game was played, Glicko2
+     */
+    playerBlueRating?: number;
+
+    /**
+     * Rating deviation of player Blue when the game was played, Glicko2
+     */
+    playerBlueRatingDeviation?: number;
+
     startedAt: Date;
 
     endedAt: Date;
@@ -100,17 +120,27 @@ hexProgram
                 hgp.order,
                 p.isBot,
                 p.isGuest,
-                p.pseudo
+                p.pseudo,
+                r.rating,
+                r.deviation
             from hosted_game hg
             left join hosted_game_to_player hgp on hgp.hostedGameId = hg.id
             left join player p on hgp.playerId = p.id
+            left join rating_games_hosted_game rghg on rghg.hostedGameId = hg.id
+            left join rating r on r.id = rghg.ratingId
             where hg.state = 'ended'
+            and r.id is null or (
+                r.playerId = p.id
+                and r.category = 'overall'
+            )
             order by hg.id, hgp.order
         `);
 
         type Player = {
             pseudo: string;
             type: 'player' | 'bot';
+            rating?: number;
+            deviation?: number;
         };
 
         const gamePlayers: { [hostedGameId: number]: [null | Player, null | Player] } = [];
@@ -123,6 +153,8 @@ hexProgram
             gamePlayers[playerResult.id][playerResult.order] = {
                 pseudo: pseudoString(playerResult),
                 type: playerResult.isBot ? 'bot' : 'player',
+                rating: playerResult.rating ?? undefined,
+                deviation: playerResult.deviation ?? undefined,
             };
         }
 
@@ -147,11 +179,15 @@ hexProgram
                 boardsize: gameResult.boardsize,
                 timeControl: gameResult.timeControlType,
                 movesCount: moves.length,
-                moves,
+                moves: moves.join(' '),
                 playerRed: gamePlayers[gameResult.id][0]!.pseudo,
                 playerBlue: gamePlayers[gameResult.id][1]!.pseudo,
                 playerRedType: gamePlayers[gameResult.id][0]!.type,
                 playerBlueType: gamePlayers[gameResult.id][1]!.type,
+                playerRedRating: gamePlayers[gameResult.id][0]!.rating,
+                playerBlueRating: gamePlayers[gameResult.id][1]!.rating,
+                playerRedRatingDeviation: gamePlayers[gameResult.id][0]!.deviation,
+                playerBlueRatingDeviation: gamePlayers[gameResult.id][1]!.deviation,
                 winner: ['red', 'blue'][gameResult.winner] as 'red' | 'blue',
                 outcome: gameResult.outcome,
                 allowSwap: gameResult.swapRule === 1,

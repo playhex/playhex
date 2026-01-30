@@ -120,51 +120,70 @@ const getFilesize = (size: number): string => {
 
     <p>This is a json file structured like this:</p>
 
-    <!-- syntax highlighted here: https://highlight.hohli.com/?theme=github-dark&language=json -->
+    <!--
+        syntax highlighted here: https://highlight.hohli.com/?theme=github-dark&language=json
+
+        To update:
+            - copy current json example from /export-games-data
+            - paste it to the highlighter
+            - update, highlight and paste it down here.
+    -->
     <pre style="font-family:monospace;color: rgb(201, 209, 217); background-color: rgb(13, 17, 23); font-weight: 400; "><span style="color: rgb(201, 209, 217); font-weight: 400;">[</span>
     <span style="color: rgb(201, 209, 217); font-weight: 400;">{</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"id"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"3c93274a-31ef-4fd8-9803-1edd71ba35cf"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"url"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"https://playhex.org/games/3c93274a-31ef-4fd8-9803-1edd71ba35cf"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"boardsize"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">11</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"movesCount"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">34</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"id"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"ed6c004f-0307-4677-afc4-d9a93dd0106e"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"url"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"https://playhex.org/games/ed6c004f-0307-4677-afc4-d9a93dd0106e"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"boardsize"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">17</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"movesCount"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">119</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// Moves can be "a1", "swap-pieces", "pass"</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"moves"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"j2 swap-pieces f6 c8 h8 e7 g7 f7 ..."</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"moves"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"a10 swap-pieces n4 k2 d5 d4 e4 d14 n13 n14 m14 ..."</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// Time control, here is an example for Capped Fischer 10min + 5s increment, capped at 10min.</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// For byo yomi 10min + 5 x 5s, it would be: "family": "byoyomi", "options": { "initialTime": 600000, "periodsCount": 5, "periodTime": 5000 }</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"timeControl"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(201, 209, 217); font-weight: 400;">{</span>
             <span style="color: rgb(121, 192, 255); font-weight: 400;">"family"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"fischer"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
             <span style="color: rgb(121, 192, 255); font-weight: 400;">"options"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(201, 209, 217); font-weight: 400;">{</span>
-                <span style="color: rgb(121, 192, 255); font-weight: 400;">"initialTime"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">600000</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-                <span style="color: rgb(121, 192, 255); font-weight: 400;">"timeIncrement"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">5000</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-                <span style="color: rgb(121, 192, 255); font-weight: 400;">"maxTime"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">600000</span>
+                <span style="color: rgb(121, 192, 255); font-weight: 400;">"initialTime"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">300000</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+                <span style="color: rgb(121, 192, 255); font-weight: 400;">"timeIncrement"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">2000</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+                <span style="color: rgb(121, 192, 255); font-weight: 400;">"maxTime"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">300000</span>
             <span style="color: rgb(201, 209, 217); font-weight: 400;">}</span>
         <span style="color: rgb(201, 209, 217); font-weight: 400;">}</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// Nicknames of players</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerRed"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"JRM"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlue"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"Mohex 1.5"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerRed"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"yqxud"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlue"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"sya11"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// Whether players are "player" or "bot"</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerRedType"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"player"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlueType"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"bot"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlueType"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"player"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Ratings of players at the time the game were played. Glicko2</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Ratings are initialized with 1500, deviation 350 and volatility 0.06.</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Only for rated games: for friendly games, this info is not present</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerRedRating"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">1717.14</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlueRating"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">1993.47</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Ratings deviation of players at the time the game were played. Glicko2</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Lower value (&lt;100) means confident value, higher one means not sure (&gt; 200).</span>
+        <span style="color: rgb(139, 148, 158); font-weight: 400;">// Only for rated games: for friendly games, this info is not present</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerRedRatingDeviation"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">63.9047</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"playerBlueRatingDeviation"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">64.8934</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// "red" or "blue"</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"winner"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"blue"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"winner"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"red"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// How the game ended:</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "time": loser player ran out of time</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "resign": loser player resigned</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "path": winner player won by connecting his sides</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// - "forfeit": loser may have not been here in time and has been forfeited manually, e.g in a tournament</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"outcome"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"resign"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"outcome"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"path"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// whether swap has been allowed</span>
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"allowSwap"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;"><span style="color: rgb(255, 123, 114); font-weight: 400;">true</span></span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// whether it is a "ranked" game (true), or friendly (false)</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"rated"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;"><span style="color: rgb(255, 123, 114); font-weight: 400;">false</span></span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"rated"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;"><span style="color: rgb(255, 123, 114); font-weight: 400;">true</span></span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// guessed handicap from moves and game settings.</span>
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// See https://www.hexwiki.net/index.php/Handicap</span>
@@ -175,9 +194,9 @@ const getFilesize = (size: number): string => {
         <span style="color: rgb(121, 192, 255); font-weight: 400;">"handicap"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(121, 192, 255); font-weight: 400;">0</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
 
         <span style="color: rgb(139, 148, 158); font-weight: 400;">// when game started and ended</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"startedAt"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"2025-01-13T14:13:55.582Z"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
-        <span style="color: rgb(121, 192, 255); font-weight: 400;">"endedAt"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"2025-01-13T14:21:50.415Z"</span>
-    <span style="color: rgb(201, 209, 217); font-weight: 400;">}</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"startedAt"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"2025-12-27T19:12:10.070Z"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
+        <span style="color: rgb(121, 192, 255); font-weight: 400;">"endedAt"</span><span style="color: rgb(201, 209, 217); font-weight: 400;">:</span> <span style="color: rgb(165, 214, 255); font-weight: 400;">"2025-12-27T19:26:04.251Z"</span>
+    <span style="color: rgb(201, 209, 217); font-weight: 400;">}</span><span style="color: rgb(201, 209, 217); font-weight: 400;">,</span>
     ...
 <span style="color: rgb(201, 209, 217); font-weight: 400;">]</span></pre>
 </template>
