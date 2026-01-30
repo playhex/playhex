@@ -36,11 +36,11 @@ export class AutoOrientationFacade
         private preferredOrientations = defaultPreferredOrientations,
 
         /**
-         * Force orientation to landscape or portrait. Let 'auto' to display automatically.
+         * Force orientation to landscape or portrait. Let null to display automatically.
          *
-         * @default 'auto' Whill change automatically when gameView is resized and ratio changed.
+         * @default null Not forced: will change automatically when gameView is resized and ratio changed.
          */
-        private selectedOrientationMode: 'auto' | OrientationMode = 'auto',
+        private forcedOrientationMode: null | OrientationMode = null,
     ) {
         this.updateOrientation();
 
@@ -66,37 +66,39 @@ export class AutoOrientationFacade
         this.updateOrientation();
     }
 
-    getSelectedOrientationMode(): 'auto' | OrientationMode
+    getForcedOrientationMode(): null | OrientationMode
     {
-        return this.selectedOrientationMode;
+        return this.forcedOrientationMode;
     }
 
-    setSelectedOrientationMode(orientationMode: 'auto' | OrientationMode): void
+    setForcedOrientationMode(orientationMode: null | OrientationMode): void
     {
-        this.selectedOrientationMode = orientationMode;
+        this.forcedOrientationMode = orientationMode;
 
         this.updateOrientation();
     }
 
     updateOrientation(): void
     {
+        this.gameView.setOrientation(this.preferredOrientations[this.getCurrentOrientationMode()]);
+    }
+
+    getCurrentOrientationMode(): OrientationMode
+    {
         const wrapperSize = this.gameView.getWrapperSize();
 
         if (!wrapperSize) {
-            return;
+            return 'landscape';
         }
 
-        if (this.selectedOrientationMode !== 'auto') {
-            this.gameView.setOrientation(this.preferredOrientations[this.selectedOrientationMode]);
-            return;
+        if (this.forcedOrientationMode) {
+            return this.forcedOrientationMode;
         }
 
-        const screenOrientation: OrientationMode = wrapperSize.width > wrapperSize.height
+        return wrapperSize.width > wrapperSize.height
             ? 'landscape'
             : 'portrait'
         ;
-
-        this.gameView.setOrientation(this.preferredOrientations[screenOrientation]);
     }
 
     destroy(): void

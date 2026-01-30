@@ -1,10 +1,12 @@
 import GameView from '../../../shared/pixi-board/GameView.js';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerLocalSettingsStore.js';
-import { watch, WatchStopHandle } from 'vue';
+import { watch } from 'vue';
 import { themes } from '../../../shared/pixi-board/BoardTheme.js';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
 import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facade.js';
+import { ShadingPatternFacade } from '../../../shared/pixi-board/facades/ShadingPatternFacade.js';
+import { AutoOrientationFacade, OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
 /**
  * Customizes game view with player current settings
@@ -12,10 +14,11 @@ import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facad
  */
 export class PlayerSettingsFacade
 {
-    private unwatchSettingsChangedListener: WatchStopHandle;
-    private unwatchLocalSettingsChangedListener: WatchStopHandle;
+    private onDestroy: (() => void)[] = [];
 
     private anchor44Facade: Anchor44Facade;
+    private shadingPatternFacade: ShadingPatternFacade;
+    private autoOrientationFacade: AutoOrientationFacade;
 
     constructor(
         private gameView: GameView,
@@ -23,38 +26,50 @@ export class PlayerSettingsFacade
         this.init();
     }
 
-    private playerSettingsChangedListener = (playerSettings: PlayerSettings) => {
-        this.updateOptionsFromPlayerSettings(playerSettings);
-    };
-
-    private localSettingsChangedListener = (localSettings: LocalSettings) => {
-        this.updateOptionsFromPlayerLocalSettings(localSettings);
-    };
-
     private init(): void
     {
+        this.anchor44Facade = new Anchor44Facade(this.gameView, false);
+        this.shadingPatternFacade = new ShadingPatternFacade(this.gameView);
+        this.autoOrientationFacade = new AutoOrientationFacade(this.gameView);
+
         /*
          * Set settings if loaded,
          * then update when it changes.
          */
         const { playerSettings } = usePlayerSettingsStore();
 
-        this.anchor44Facade = new Anchor44Facade(this.gameView, false);
-
-        if (playerSettings !== null) {
+        if (playerSettings) {
             this.updateOptionsFromPlayerSettings(playerSettings);
-            this.anchor44Facade.show44Anchors(playerSettings.show44dots);
         }
 
-        this.unwatchSettingsChangedListener = watch(() => usePlayerSettingsStore().playerSettings, this.playerSettingsChangedListener, { deep: true });
+        this.onDestroy.push(watch(
+            () => usePlayerSettingsStore().playerSettings,
+            playerSettings => {
+                if (!playerSettings) {
+                    return;
+                }
+
+                this.updateOptionsFromPlayerSettings(playerSettings);
+            },
+            { deep: true },
+        ));
 
         /*
          * Set local settings and update when it changes.
          */
         this.updateOptionsFromPlayerLocalSettings(usePlayerLocalSettingsStore().localSettings);
-        this.unwatchLocalSettingsChangedListener = watch(() => usePlayerLocalSettingsStore().localSettings, this.localSettingsChangedListener, { deep: true });
+        this.onDestroy.push(watch(
+            () => usePlayerLocalSettingsStore().localSettings,
+            localSettings => {
+                this.updateOptionsFromPlayerLocalSettings(localSettings);
+            },
+            { deep: true },
+        ));
 
-        this.gameView.on('detroyBefore', () => {
+        /**
+         * Remove listeners when game view is destroyed
+         */
+        this.gameView.on('destroyBefore', () => {
             this.destroy();
         });
     }
@@ -64,18 +79,28 @@ export class PlayerSettingsFacade
         this.gameView.setDisplayCoords(playerSettings.showCoords);
         this.gameView.setOrientation(playerSettings.orientationLandscape); // TODO move into facade
         this.anchor44Facade.show44Anchors(playerSettings.show44dots);
-        // TODO shading pattern
+        this.shadingPatternFacade.setShadingPattern(playerSettings.boardShadingPattern, playerSettings.boardShadingPatternIntensity, playerSettings.boardShadingPatternOption);
+        this.autoOrientationFacade.setPreferredOrientations({
+            landscape: playerSettings.orientationLandscape,
+            portrait: playerSettings.orientationPortrait,
+        });
     }
 
     updateOptionsFromPlayerLocalSettings(localSettings: LocalSettings): void
     {
         this.gameView.setTheme(themes[usePlayerLocalSettingsStore().displayedTheme()]);
-        // TODO selectedBoardOrientationMode
+        this.autoOrientationFacade.setForcedOrientationMode(localSettings.forcedBoardOrientation);
+    }
+
+    getCurrentOrientationMode(): OrientationMode
+    {
+        return this.autoOrientationFacade.getCurrentOrientationMode();
     }
 
     destroy(): void
     {
-        this.unwatchSettingsChangedListener();
-        this.unwatchLocalSettingsChangedListener();
+        for (const callback of this.onDestroy) {
+            callback();
+        }
     }
 }

@@ -48,12 +48,12 @@ type GameViewEvents = {
     /**
      * This view will be destroyed.
      */
-    detroyBefore: () => void;
+    destroyBefore: () => void;
 
     /**
      * This view has been destroyed.
      */
-    detroyAfter: () => void;
+    destroyAfter: () => void;
 };
 
 const defer = () => {
@@ -903,12 +903,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     destroy(): void
     {
-        this.emit('detroyBefore');
+        this.emit('destroyBefore');
 
         this.pixi.destroy(true);
 
         this.destroyResizeObserver();
 
-        this.emit('detroyAfter');
+        this.emit('destroyAfter');
     }
 }

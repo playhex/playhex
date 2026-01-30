@@ -17,7 +17,7 @@ export const allShadingPatterns = [
 
 export type ShadingPatternType = typeof allShadingPatterns[number];
 
-export const createShadingPattern = (name: ShadingPatternType, options: unknown): ShadingPatternInterface => {
+export const createShadingPattern = (name: ShadingPatternType, options: unknown = null): ShadingPatternInterface => {
     if (!allShadingPatterns.includes(name)) {
         return new NullShadingPattern();
     }
@@ -27,7 +27,7 @@ export const createShadingPattern = (name: ShadingPatternType, options: unknown)
         case 'concentrical_rings': return new ConcentricalRings();
         case 'height_5_lines': return new Height5Lines();
         case 'single_ring': return new SingleRing();
-        case 'custom': return new CustomShadingPattern(options as string);
+        case 'custom': return new CustomShadingPattern(typeof options === 'string' ? options : '');
         case null: return new NullShadingPattern();
     }
 };

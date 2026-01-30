@@ -37,6 +37,7 @@ import { useChatInputStore } from '../../stores/chatInputStore.js';
 import TriangleMark from '../../../shared/pixi-board/entities/TriangleMark.js';
 import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
+import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
 const props = defineProps({
     hostedGameClient: {
@@ -347,9 +348,10 @@ const doAnalyzeGame = () => {
 
 const appGameAnalyzeComponent = ref<typeof AppGameAnalyze>();
 
-gameView.on('movesHistoryCursorChanged', cursor => {
-    appGameAnalyzeComponent.value?.selectMove(cursor);
-});
+// TODO
+// gameView.on('movesHistoryCursorChanged', cursor => {
+//     appGameAnalyzeComponent.value?.selectMove(cursor);
+// });
 
 /*
  * Tabs
@@ -390,8 +392,8 @@ watch(
     { deep: true },
 );
 
-const currentOrientation = ref<number>(gameView.getOrientation());
-gameView.on('orientationChanged', () => currentOrientation.value = gameView.getOrientation());
+const currentOrientationMode = ref<OrientationMode>(gameViewFacade.getCurrentOrientationMode());
+gameView.on('orientationChanged', () => currentOrientationMode.value = gameViewFacade.getCurrentOrientationMode());
 
 const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
     return [
@@ -732,9 +734,9 @@ watchEffect(() => {
                 ><IconAlphabet /> {{ $t('toggle_coords_short') }}</button>
 
                 <div class="row mt-2" v-if="playerSettings">
-                    <div class="col-12" v-if="'landscape' === currentOrientation">
+                    <div class="col-12" v-if="currentOrientationMode === 'landscape'">
                         <div class="btn-group" role="group">
-                            <template v-for="orientation in [0, 10, 11]" :key="orientation">
+                            <template v-for="orientation in [0, 11, 10]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation">
                                     <AppRhombus :orientation="orientation" />
@@ -742,7 +744,7 @@ watchEffect(() => {
                             </template>
                         </div>
                     </div>
-                    <div class="col-12" v-if="'portrait' === currentOrientation">
+                    <div class="col-12" v-if="currentOrientationMode === 'portrait'">
                         <div class="btn-group" role="group">
                             <template v-for="orientation in [1, 9, 2]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
@@ -757,13 +759,13 @@ watchEffect(() => {
                 <!-- force board orientation -->
                 <div class="form-text mt-4">{{ $t('force_board_orientation_mode') }}</div>
                 <div class="btn-group btn-group-sm" role="group" aria-label="Change board orientation">
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="auto" id="btn-orientation-auto" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" :value="null" id="btn-orientation-auto" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-auto">{{ $t('auto') }}</label>
 
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-landscape">{{ $t('landscape') }}</label>
 
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
                 </div>
 

@@ -5,7 +5,7 @@ test game view:
 - swap, swapped
 - win animation
 - resize view should keep preview
-- conditionals
+- conditionals, light/dark theme
 - arrows keys
 - can cancel preview/premove
 - can cancel preview/premove if this is a swap-piece
@@ -17,7 +17,6 @@ Try using ParticleContainer for stones and cells
 Move -> CoordsNotation (d4, ...) / Move (d4, swap-pieces, pass, ...)
 
 Conditional move light theme:
-    - TextMark should adapt from theme
     - Sidebar coords should always be white
 
 Custom themes:

@@ -10,7 +10,7 @@ export class ShadingPatternFacade
         private gameView: GameView,
     ) {}
 
-    setShadingPattern(name: ShadingPatternType, intensity = 0.5, options: unknown = {}): void
+    setShadingPattern(name: ShadingPatternType, intensity = 0.5, options: unknown = null): void
     {
         const shadingPattern = createShadingPattern(name, options);
         const size = this.gameView.getBoardsize();

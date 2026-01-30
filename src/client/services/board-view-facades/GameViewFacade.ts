@@ -6,6 +6,7 @@ import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGam
 import { PreviewMoveFacade } from '../../../shared/pixi-board/facades/PreviewMoveFacade.js';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
 import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
+import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
 type WinningPathAnimatorFacadeEvents = {
     /**
@@ -25,6 +26,7 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
 {
     private playingGameFacade: PlayingGameFacade;
     private previewMoveFacade: PreviewMoveFacade;
+    private playerSettingsFacade: PlayerSettingsFacade;
 
     /**
      * Keeps track of which move is currently previewed.
@@ -39,7 +41,7 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     ) {
         super();
 
-        new PlayerSettingsFacade(gameView);
+        this.playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
         this.playingGameFacade = new PlayingGameFacade(
             gameView,
@@ -166,5 +168,10 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     {
         this.previewedMove = null;
         this.previewMoveFacade.cancelPreview();
+    }
+
+    getCurrentOrientationMode(): OrientationMode
+    {
+        return this.playerSettingsFacade.getCurrentOrientationMode();
     }
 }

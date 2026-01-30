@@ -56,8 +56,8 @@ watch(
  */
 const landscapeOrientations = [
     { value: 0, labelTransKey: 'board_orientation.flat' },
-    { value: 10, labelTransKey: 'board_orientation.flat_2' },
     { value: 11, labelTransKey: 'board_orientation.diamond' },
+    { value: 10, labelTransKey: 'board_orientation.flat_2' },
 ];
 const portraitOrientations = [
     { value: 1, labelTransKey: 'board_orientation.flat' },
