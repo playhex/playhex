@@ -16,12 +16,21 @@ export class PlayingGameFacade
      */
     private placedStones: { [move: string]: 0 | 1 } = {};
 
+    /**
+     * Moves history
+     */
+    private moves: Move[] = [];
+
     constructor(
         private gameView: GameView,
         private swapAllowed: boolean,
-        private moves: Move[] = [],
+        initialMoves: Move[] = [],
     ) {
         this.gameMarksFacade = new GameMarksFacade(gameView);
+
+        for (const move of initialMoves) {
+            this.addMove(move);
+        }
 
         this.markLastMove();
     }
@@ -66,9 +75,9 @@ export class PlayingGameFacade
             this.moves.push(move);
             this.gameView.setStone(this.moves[0], null);
             this.gameView.setStone(mirror, 1);
-            this.markLastMove();
             this.placedStones = {};
             this.placedStones[mirror] = 1;
+            this.markLastMove();
 
             return true;
         }
