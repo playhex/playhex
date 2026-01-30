@@ -35,6 +35,17 @@ type GameViewEvents = {
     orientationChanged: () => void;
 
     /**
+     * Board has been resized and redrawn.
+     */
+    resized: () => void;
+
+    /**
+     * GameView has been mounted.
+     * Now we know its wrapper size, parent element...
+     */
+    mounted: () => void;
+
+    /**
      * This view will be destroyed.
      */
     detroyBefore: () => void;
@@ -102,6 +113,10 @@ const defaultOptions: GameViewOptions = {
  */
 export default class GameView extends TypedEmitter<GameViewEvents>
 {
+    static ORIENTATION_DIAMOND = 11;
+    static ORIENTATION_FLAT = 0;
+    static ORIENTATION_PORTRAIT_FLAT = 9;
+
     /**
      * Name of entity group used when no group passed
      */
@@ -125,6 +140,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     /**
      * Integer, every PI/6.
      * 0 means positive flat, 11 means diamond (or -1).
+     * See GameView.ORIENTATION_* constants for most used values.
      */
     private orientation: number;
 
@@ -242,10 +258,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private async doMount(element: HTMLElement): Promise<void>
     {
-        if (this.containerElement) {
-            throw new Error('GameView already mounted.');
-        }
-
         this.containerElement = element;
 
         this.pixi = new Application();
@@ -321,10 +333,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     async mount(element: HTMLElement): Promise<void>
     {
+        if (this.containerElement) {
+            throw new Error('GameView already mounted.');
+        }
+
         try {
             await this.doMount(element);
             this.initPromise.resolve();
             this.initialized = true;
+            this.emit('mounted');
         } catch (e) {
             this.initPromise.reject(e);
         }
@@ -395,6 +412,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
         this.redrawAfterOrientationOrWrapperSizeChanged();
+
+        this.emit('resized');
     }
 
     private destroyResizeObserver(): void
@@ -421,7 +440,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Get current size of the dom element that is containing the pixi application.
      * Can be null if not yet mounted.
      */
-    private getWrapperSize(): null | GameViewSize
+    getWrapperSize(): null | GameViewSize
     {
         if (this.containerElement === null) {
             return null;
@@ -449,6 +468,10 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     setOrientation(orientation: number): void
     {
+        if (orientation === this.orientation) {
+            return;
+        }
+
         this.orientation = this.modOrientation(orientation);
 
         this.redrawAfterOrientationOrWrapperSizeChanged();
@@ -472,7 +495,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Rescale the game board to fit in the container,
      * depending on board orientation.
      */
-    autoResize(): void
+    private autoResize(): void
     {
         const { rotation } = this.gameContainer;
 

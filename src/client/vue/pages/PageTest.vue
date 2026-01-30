@@ -9,6 +9,7 @@ import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facad
 import TextMark from '../../../shared/pixi-board/entities/TextMark.js';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { AnimatorFacade } from '../../../shared/pixi-board/facades/AnimatorFacade.js';
+import { AutoOrientationFacade } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
 const container = ref<HTMLElement>();
 
@@ -18,6 +19,7 @@ const anchor44Facade = new Anchor44Facade(gameView);
 const playerSettingsFacade = shallowRef<null | PlayerSettingsFacade>(null);
 const animatorFacade = new AnimatorFacade(gameView);
 const shadingPatternFacade = new ShadingPatternFacade(gameView);
+const autoOrientationFacade = shallowRef<null | AutoOrientationFacade>(null);
 
 playingGameFacade.addMove('b3');
 
@@ -70,6 +72,9 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
     <p>Last hex secondary clicked: <code>{{ lastHexSecondaryClicked }}</code></p>
 
     <button v-if="!playerSettingsFacade" class="btn btn-success" @click.prevent="playerSettingsFacade = new PlayerSettingsFacade(gameView)">new PlayerSettingsFacade()</button>
+
+    <button v-if="!autoOrientationFacade" class="btn btn-success" @click.prevent="autoOrientationFacade = new AutoOrientationFacade(gameView)">new AutoOrientationFacade()</button>
+    <button v-else class="btn btn-success" @click.prevent="autoOrientationFacade.destroy(); autoOrientationFacade = null">destroy AutoOrientationFacade</button>
 </template>
 
 <style lang="stylus" scoped>
