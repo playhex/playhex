@@ -11,7 +11,7 @@ import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { authChangePassword } from '../../../apiClient.js';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
-import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns.js';
+import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns/shading-patterns.js';
 import i18n, { t } from 'i18next';
 import { MoveSettings } from '../../../../shared/app/models/index.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';

@@ -4,7 +4,7 @@ import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { BoardEntity } from './BoardEntity.js';
-import { colToLetter, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
+import { colToLetter, Coords, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
 import Stone from './entities/Stone.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
@@ -275,6 +275,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         const { row, col } = moveToCoords(move);
+
+        return this.hexes[row][col];
+    }
+
+    getHexByCoords(coords: Coords): Hex
+    {
+        const { row, col } = coords;
 
         return this.hexes[row][col];
     }

@@ -44,7 +44,7 @@ export default class Hex extends Container
     /**
      * Layer, variable alpha depending on shading pattern
      */
-    private cellShading: Container;
+    private cellShading: Graphics;
 
     constructor(
         private theme: Theme,
@@ -73,9 +73,10 @@ export default class Hex extends Container
     {
         this.addChild(
             this.createCell(),
-            this.cellShading = this.createCellShading(),
+            this.cellShading = new Graphics(),
         );
 
+        this.redrawCellShading();
         this.redrawHex();
     }
 
@@ -89,23 +90,13 @@ export default class Hex extends Container
         return container;
     }
 
-    private createCellShading(): Container
+    private redrawCellShading(): void
     {
-        const container = new Container();
-        const g = new Graphics();
+        this.cellShading.clear();
 
-        const innerPath: PointData[] = [];
-
-        for (let i = 0; i < 6; ++i) {
-            innerPath.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
-        }
-
-        g.poly(innerPath);
-        g.fill({ color: this.theme.colorEmptyShade });
-
-        container.addChild(g);
-
-        return container;
+        this.cellShading.regularPoly(0, 0, Hex.INNER_RADIUS, 6);
+        this.cellShading.fill({ color: this.theme.colorEmptyShade });
+        this.cellShading.alpha = this.shading;
     }
 
     /**
@@ -136,17 +127,17 @@ export default class Hex extends Container
         this.cellBackgroundGraphics.poly(innerPath);
         this.cellBackgroundGraphics.fill({ color: this.theme.colorEmpty });
 
-        // Update fading
-        this.cellShading.alpha = this.shading;
+        this.redrawCellShading();
     }
 
     getCellShading(): number
     {
-        return this.cellShading.alpha;
+        return this.shading;
     }
 
     setCellShading(shading: number): void
     {
+        this.shading = shading;
         this.cellShading.alpha = shading;
     }
 

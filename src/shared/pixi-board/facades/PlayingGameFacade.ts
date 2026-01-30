@@ -44,7 +44,11 @@ export class PlayingGameFacade
      */
     addMove(move: Move): boolean
     {
-        if (this.moves.length === 1 && this.swapAllowed && move === this.moves[0]) {
+        if (this.moves.length === 1
+            && this.swapAllowed
+            && move === this.moves[0]
+            && move !== 'pass'
+        ) {
             move = 'swap-pieces';
         }
 
@@ -92,12 +96,12 @@ export class PlayingGameFacade
      * Undo last move, remove stone, and show update last move mark.
      * In case of swap-piece undone, mirrors move back.
      */
-    undoLastMove(): Move
+    undoLastMove(): null | Move
     {
         const undoneMove = this.moves.pop();
 
         if (!undoneMove) {
-            throw new Error('Cannot undo move, move are empty');
+            return null;
         }
 
         switch (undoneMove) {
