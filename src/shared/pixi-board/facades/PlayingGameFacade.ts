@@ -5,6 +5,7 @@ import { GameMarksFacade } from './GameMarksFacade.js';
 /**
  * Facade for a full playing game.
  * Add move, undo, show last move, swappable and swapped marks.
+ * Allows history rewinding.
  */
 export class PlayingGameFacade
 {
