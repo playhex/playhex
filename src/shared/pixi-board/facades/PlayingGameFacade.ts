@@ -5,7 +5,6 @@ import { GameMarksFacade } from './GameMarksFacade.js';
 /**
  * Facade for a full playing game.
  * Add move, undo, show last move, swappable and swapped marks.
- * Allows history rewinding.
  */
 export class PlayingGameFacade
 {
@@ -34,6 +33,11 @@ export class PlayingGameFacade
         }
 
         this.markLastMove();
+    }
+
+    getMoves(): Move[]
+    {
+        return this.moves;
     }
 
     getLastMove(): null | Move
@@ -142,12 +146,9 @@ export class PlayingGameFacade
     {
         this.gameMarksFacade.hideMarks();
 
-        const lastMove = this.moves.length > 0
-            ? this.moves[this.moves.length - 1]
-            : null
-        ;
+        const lastMove = this.moves[this.moves.length - 1];
 
-        if (lastMove === null) {
+        if (!lastMove) {
             return;
         }
 
