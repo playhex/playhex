@@ -1,7 +1,7 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { PlayerIndex } from '../game-engine/index.js';
 import GameView from '../pixi-board/GameView.js';
-import TextMark from '../pixi-board/marks/TextMark.js';
+import TextMark from '../pixi-board/entities/TextMark.js';
 import { clearDuplicatedUnplayedLines, conditionalMovesCut, conditionalMovesMergeMoves, conditionalMovesShift, ConditionalMovesStruct, getNextMovesAfterLine } from './conditionalMovesUtils.js';
 import { Move, moveToCoords } from '../move-notation/move-notation.js';
 import { TimestampedMove } from '../game-engine/Types.js';
@@ -60,7 +60,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         this.conditionalMovesDirty = { tree: [], unplayedLines: [] };
         copyConditionalMovesStruct(this.conditionalMovesDirty, this.conditionalMoves);
 
-        this.isSimulationMode = gameView.isSimulationMode();
+        // this.isSimulationMode = gameView.isSimulationMode();
     }
 
     onSimulationModeChanged(enabled: boolean)
@@ -80,7 +80,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
 
         if (index >= 0) {
             this.selectedLine.splice(index + 1);
-            this.gameView.setSimulationMovesAuto(this.selectedLine);
+            // this.gameView.setSimulationMovesAuto(this.selectedLine);
             this.markNextConditionalMoves();
             return;
         }
@@ -155,14 +155,14 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     private markNextConditionalMoves(): void
     {
-        this.gameView.removeMarks('nextConditionalMoves');
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
 
         const next = getNextMovesAfterLine(this.conditionalMovesDirty.tree, this.selectedLine);
         const nextNumberString = '' + (this.selectedLine.length + 1);
 
         for (const move of next) {
             const mark = new TextMark(nextNumberString).setCoords(moveToCoords(move));
-            this.gameView.addMark(mark, 'nextConditionalMoves');
+            this.gameView.addEntity(mark, 'nextConditionalMoves');
         }
     }
 
@@ -173,12 +173,12 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     submitConditionalMoves(): void
     {
-        this.gameView.removeMarks('nextConditionalMoves');
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
 
         this.conditionalMovesDirty.unplayedLines = clearDuplicatedUnplayedLines(this.conditionalMovesDirty.unplayedLines);
         copyConditionalMovesStruct(this.conditionalMoves, this.conditionalMovesDirty);
 
-        this.gameView.clearSimulationMoves();
+        // this.gameView.clearSimulationMoves();
         this.selectedLine = [];
         this.markNextConditionalMoves();
 
@@ -192,8 +192,8 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     discardSimulationMoves(): void
     {
-        this.gameView.clearSimulationMoves();
-        this.gameView.removeMarks('nextConditionalMoves');
+        // this.gameView.clearSimulationMoves();
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
         this.selectedLine = [];
 
         copyConditionalMovesStruct(this.conditionalMovesDirty, this.conditionalMoves);
@@ -224,7 +224,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
             this.hasChanges = true;
         }
 
-        this.gameView.setSimulationMovesAuto(line);
+        // this.gameView.setSimulationMovesAuto(line);
         this.markNextConditionalMoves();
     }
 
@@ -234,7 +234,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
     back(): void
     {
         this.selectedLine.pop();
-        this.gameView.setSimulationMovesAuto(this.selectedLine);
+        // this.gameView.setSimulationMovesAuto(this.selectedLine);
         this.markNextConditionalMoves();
     }
 
@@ -250,7 +250,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         conditionalMovesCut(this.conditionalMovesDirty.tree, this.selectedLine);
         this.hasChanges = true;
         this.selectedLine.pop();
-        this.gameView.setSimulationMovesAuto(this.selectedLine);
+        // this.gameView.setSimulationMovesAuto(this.selectedLine);
         this.markNextConditionalMoves();
     }
 
@@ -259,7 +259,7 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     enableSimulationMode(): void
     {
-        this.gameView.enableSimulationMode(this.getOpponentIndex());
+        // this.gameView.enableSimulationMode(this.getOpponentIndex());
     }
 
     /**
@@ -267,8 +267,8 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     disableSimulationMode(): void
     {
-        this.gameView.removeMarks('nextConditionalMoves');
-        this.gameView.disableSimulationMode();
+        this.gameView.clearEntitiesGroup('nextConditionalMoves');
+        // this.gameView.disableSimulationMode();
     }
 
     /**
@@ -291,16 +291,16 @@ export const listenGameViewEvents = (conditionalMovesEditor: ConditionalMovesEdi
     const onClose: (() => void)[] = [];
 
     const onSimulationModeChanged = (enabled: boolean) => conditionalMovesEditor.onSimulationModeChanged(enabled);
-    gameView.on('simulationModeChanged', onSimulationModeChanged);
-    onClose.push(() => gameView.off('simulationModeChanged', onSimulationModeChanged));
+    // gameView.on('simulationModeChanged', onSimulationModeChanged);
+    // onClose.push(() => gameView.off('simulationModeChanged', onSimulationModeChanged));
 
     const onHexSimulated = (move: Move) => conditionalMovesEditor.onHexSimulated(move);
-    gameView.on('hexSimulated', onHexSimulated);
-    onClose.push(() => gameView.off('hexSimulated', onHexSimulated));
+    // gameView.on('hexSimulated', onHexSimulated);
+    // onClose.push(() => gameView.off('hexSimulated', onHexSimulated));
 
-    const onPlayed = (move: TimestampedMove, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move.move, _, byPlayerIndex);
-    gameView.getGame().on('played', onPlayed);
-    onClose.push(() => gameView.getGame().off('played', onPlayed));
+    // const onPlayed = (move: TimestampedMove, _: number, byPlayerIndex: PlayerIndex) => conditionalMovesEditor.onPlayed(move.move, _, byPlayerIndex);
+    // gameView.getGame().on('played', onPlayed);
+    // onClose.push(() => gameView.getGame().off('played', onPlayed));
 
     return () => onClose.forEach(callback => callback());
 };

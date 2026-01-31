@@ -1,5 +1,5 @@
 import { Container, Graphics, PointData } from 'pixi.js';
-import { Mark } from '../../shared/pixi-board/Mark.js';
+import { BoardEntity } from '../../shared/pixi-board/BoardEntity.js';
 import Hex from '../../shared/pixi-board/Hex.js';
 import { colorAverage } from '../../shared/pixi-board/colorUtils.js';
 
@@ -8,7 +8,7 @@ import { colorAverage } from '../../shared/pixi-board/colorUtils.js';
  * Shows if played move is good or bad, relative to best move.
  * Note that it's always over a played cell.
  */
-export class PlayedMoveMark extends Mark
+export class PlayedMoveMark extends BoardEntity
 {
     private whiteWinIndicator: Graphics;
 

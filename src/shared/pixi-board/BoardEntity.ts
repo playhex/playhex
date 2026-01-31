@@ -1,11 +1,23 @@
 import { Container, Graphics } from 'pixi.js';
 import Hex from './Hex.js';
 import { Coords } from '../move-notation/move-notation.js';
+import { Theme } from './BoardTheme.js';
 
 const PI_6 = Math.PI / 6;
 const PI_3 = Math.PI / 3;
 
-export class Mark extends Container
+/**
+ * Entity placed on the board.
+ *
+ * Rotation can be updated automatically when the board rotate,
+ * depending on how it needs to be:
+ * - `none`: entity rotate with the board
+ * - `alwaysTop`: entity always looks at top, useful for letters
+ * - `alwaysFlatTop`: entity is rotated between 0 and PI/6 to keep flat top, useful for hexagon-like entities
+ *
+ * Both `alwaysTop` and `alwaysFlatTop` can be used to keep top, but add PI/6 to stay inside the hexagon.
+ */
+export class BoardEntity extends Container
 {
     private initialized = false;
 
@@ -26,17 +38,45 @@ export class Mark extends Container
      */
     protected alwaysFlatTop = false;
 
-    initOnce(): void
+    /**
+     * Whether this entity needs to redraw when GameView theme changed.
+     */
+    protected listenThemeChange = false;
+
+    /**
+     * Current theme of the GameView.
+     */
+    protected theme: Theme;
+
+    initOnce(theme: Theme): void
     {
         if (this.initialized) {
+            this.updatePosition();
+            this.onThemeUpdated(theme);
             return;
         }
 
         this.initialized = true;
+        this.theme = theme;
 
         this.updatePosition();
         this.rotationFixedContainer.addChild(this.draw());
         this.addChild(this.rotationFixedContainer);
+    }
+
+    onThemeUpdated(theme: Theme): void
+    {
+        if (!this.listenThemeChange) {
+            return;
+        }
+
+        this.theme = theme;
+
+        for (const child of this.rotationFixedContainer.removeChildren()) {
+            child.destroy();
+        }
+
+        this.rotationFixedContainer.addChild(this.draw());
     }
 
     getCoords()
@@ -44,7 +84,7 @@ export class Mark extends Container
         return this.coords;
     }
 
-    setCoords(coords: Coords): Mark
+    setCoords(coords: Coords): BoardEntity
     {
         this.coords = coords;
         this.updatePosition();
@@ -57,14 +97,14 @@ export class Mark extends Container
         this.position = Hex.coords(this.coords.row, this.coords.col);
     }
 
-    show(): Mark
+    show(): BoardEntity
     {
         this.visible = true;
 
         return this;
     }
 
-    hide(): Mark
+    hide(): BoardEntity
     {
         this.visible = false;
 
@@ -75,6 +115,7 @@ export class Mark extends Container
      * Called once, just before adding to gameView.
      * Must returns its graphics.
      * Rotation will be fixed.
+     * `this.theme` is available.
      */
     protected draw(): Container
     {
@@ -87,7 +128,7 @@ export class Mark extends Container
     }
 
     /**
-     * Rotate mark graphics to make it always upside.
+     * Rotate BoardEntity graphics to make it always upside.
      * Can also make it always flat-topped or point-topped.
      */
     updateRotation(containerRotation: number): void

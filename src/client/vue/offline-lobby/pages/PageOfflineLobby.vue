@@ -9,8 +9,8 @@ import { useRouter } from 'vue-router';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 import { Game } from '../../../../shared/game-engine/index.js';
-import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { onMounted, ref } from 'vue';
+import { useGameViewFacade } from '../../composables/useGameViewFacade.js';
 
 useHead({
     title: t('lobby_title'),
@@ -51,13 +51,13 @@ onMounted(() => {
     }
 
     const game = Game.fromData(currentGame.gameData);
-    const gameView = new CustomizedGameView(game);
+    const gameViewFacade = useGameViewFacade(game);
 
     if (!pixiApp.value) {
         throw new Error('No ref="pixiApp" element');
     }
 
-    void gameView.mount(pixiApp.value);
+    void gameViewFacade.getGameView().mount(pixiApp.value);
 });
 </script>
 
