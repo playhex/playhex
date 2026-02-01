@@ -21,6 +21,14 @@ export class PlayingGameFacade
      */
     private moves: Move[] = [];
 
+    /**
+     * List of callbacks to call when view is resumed
+     * to re-sync view with state.
+     *
+     * If null, view is not paused.
+     */
+    private actionsWhilePaused: null | (() => void)[] = null;
+
     constructor(
         private gameView: GameView,
         private swapAllowed: boolean,
@@ -35,6 +43,16 @@ export class PlayingGameFacade
         this.markLastMove();
     }
 
+    getGameView(): GameView
+    {
+        return this.gameView;
+    }
+
+    getSwapAllowed(): boolean
+    {
+        return this.swapAllowed;
+    }
+
     getMoves(): Move[]
     {
         return this.moves;
@@ -47,6 +65,11 @@ export class PlayingGameFacade
         }
 
         return this.moves[this.moves.length - 1];
+    }
+
+    setLastMoveMarksVisible(visible = true): void
+    {
+        this.gameMarksFacade.setVisible(visible);
     }
 
     /**
@@ -75,21 +98,28 @@ export class PlayingGameFacade
                 throw new Error('Cannot swap a pass move');
             }
 
-            const mirror = mirrorMove(this.moves[0]);
+            const firstMove = this.moves[0];
+            const mirror = mirrorMove(firstMove);
 
             this.moves.push(move);
-            this.gameView.setStone(this.moves[0], null);
-            this.gameView.setStone(mirror, 1);
             this.placedStones = {};
             this.placedStones[mirror] = 1;
-            this.markLastMove();
+
+            this.doOrDeferViewUpdate(() => {
+                this.gameView.setStone(firstMove, null);
+                this.gameView.setStone(mirror, 1);
+                this.markLastMove();
+            });
 
             return true;
         }
 
         if (move === 'pass') {
             this.moves.push(move);
-            this.gameMarksFacade.hideMarks();
+
+            this.doOrDeferViewUpdate(() => {
+                this.gameMarksFacade.hideMarks();
+            });
 
             return true;
         }
@@ -98,10 +128,14 @@ export class PlayingGameFacade
             return false;
         }
 
-        this.gameView.setStone(move, this.moves.length % 2 as 0 | 1);
-        this.placedStones[move] = this.moves.length % 2 as 0 | 1;
+        const playerIndex: 0 | 1 = this.moves.length % 2 as 0 | 1;
+        this.placedStones[move] = playerIndex;
         this.moves.push(move);
-        this.markLastMove();
+
+        this.doOrDeferViewUpdate(() => {
+            this.gameView.setStone(move, playerIndex);
+            this.markLastMove();
+        });
 
         return true;
     }
@@ -128,20 +162,33 @@ export class PlayingGameFacade
 
                 delete this.placedStones[mirror];
                 this.placedStones[swapped] = 0;
-                this.gameView.setStone(mirror, null);
-                this.gameView.setStone(swapped, 0);
+
+                this.doOrDeferViewUpdate(() => {
+                    this.gameView.setStone(mirror, null);
+                    this.gameView.setStone(swapped, 0);
+                });
+
                 break;
 
             default:
                 delete this.placedStones[undoneMove];
-                this.gameView.setStone(undoneMove, null);
+
+                this.doOrDeferViewUpdate(() => {
+                    this.gameView.setStone(undoneMove, null);
+                });
         }
 
-        this.markLastMove();
+        this.doOrDeferViewUpdate(() => {
+            this.markLastMove();
+        });
 
         return undoneMove;
     }
 
+    /**
+     * Mark last move (and remove other mark if any)
+     * given current moves history.
+     */
     private markLastMove(): void
     {
         this.gameMarksFacade.hideMarks();
@@ -169,5 +216,55 @@ export class PlayingGameFacade
         }
 
         this.gameMarksFacade.markLastMove(lastMove);
+    }
+
+    isViewPaused(): boolean
+    {
+        return this.actionsWhilePaused !== null;
+    }
+
+    /**
+     * Pauses the view so addMove won't be added until we resume the view.
+     *
+     * Used to do simulation.
+     */
+    pauseView(): void
+    {
+        if (this.actionsWhilePaused !== null) {
+            throw new Error('Cannot freeze, already frozen.');
+        }
+
+        this.actionsWhilePaused = [];
+    }
+
+    resumeView(): void
+    {
+        if (this.actionsWhilePaused === null) {
+            return;
+        }
+
+        for (const action of this.actionsWhilePaused) {
+            action();
+        }
+
+        this.actionsWhilePaused = null;
+    }
+
+    /**
+     * Just call the callback,
+     * or if view is paused, call it when we resume.
+     */
+    private doOrDeferViewUpdate(viewUpdate: () => void): void
+    {
+        if (this.actionsWhilePaused === null) {
+            viewUpdate();
+        } else {
+            this.actionsWhilePaused.push(viewUpdate);
+        }
+    }
+
+    destroy(): void
+    {
+        this.gameMarksFacade.hideMarks();
     }
 }

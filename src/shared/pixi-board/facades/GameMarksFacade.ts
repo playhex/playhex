@@ -81,4 +81,13 @@ export class GameMarksFacade
         this.swappableMark.hide();
         this.swappedMark.hide();
     }
+
+    /**
+     * Hide or show last move marks,
+     * but keep updating them when using mark*() methods.
+     */
+    setVisible(visible = true): void
+    {
+        this.gameView.getGroup(MARKS_GROUP).visible = visible;
+    }
 }
