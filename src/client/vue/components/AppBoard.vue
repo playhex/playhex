@@ -83,32 +83,59 @@ const blinkButton = (button: Ref<HTMLElement | undefined>) => {
     setTimeout(() => button.value?.classList.remove('active'), 80);
 };
 
-gameView.on('movesHistoryCursorChanged', cursor => hasRewindControls.value = cursor !== null);
+gameViewFacade.on('simulationModeChanged', enabled => hasRewindControls.value = enabled);
 
-const rewindZero = () => null; //gameView.setMovesHistoryCursor(-1);
-const backward = () => null; //gameView.changeMovesHistoryCursor(-1);
-const forward = () => null; //gameView.changeMovesHistoryCursor(+1);
-const rewindCurrent = () => null; //gameView.setMovesHistoryCursor(Infinity);
-const rewindClose = () => null; //gameView.disableRewindMode();
+const rewindZero = () => gameViewFacade.getSimulatePlayingGameFacade()?.rewindToFirstMove();
+const backward = () => gameViewFacade.getSimulatePlayingGameFacade()?.rewind(1);
+const forward = () => gameViewFacade.getSimulatePlayingGameFacade()?.forward(1);
+const rewindCurrent = () => gameViewFacade.getSimulatePlayingGameFacade()?.resetSimulationAndRewind();
+const rewindClose = () => gameViewFacade.disableSimulationMode();
 
-const keyboardEventListener = (event: KeyboardEvent) => {
-    if ((event.target as HTMLElement | null)?.nodeName === 'INPUT')
-        return;
-    switch (event.key) {
-        case 'ArrowLeft':
-            blinkButton(btnRewindBack);
-            break;
+const onKeyPress = (eventKey: string, callback: () => void): () => void => {
+    const cb = (event: KeyboardEvent) => {
 
-        case 'ArrowRight':
-            blinkButton(btnRewindForward);
-            break;
-    }
+        // Ignore when I am writing in an input or textarea
+        // to prevent indesirable trigger
+        if ((event.target as HTMLElement | null)?.nodeName === 'INPUT') {
+            return;
+        }
+
+        if (event.key === eventKey) {
+            callback();
+        }
+    };
+
+    window.addEventListener('keydown', cb);
+
+    return () => {
+        window.removeEventListener('keydown', cb);
+    };
 };
 
-window.addEventListener('keydown', keyboardEventListener);
+const unlisten: (() => void)[] = [
+    onKeyPress('ArrowLeft', () => {
+        if (!gameViewFacade.isSimulationMode()) {
+            gameViewFacade.enableSimulationMode();
+        }
+
+        backward();
+        blinkButton(btnRewindBack);
+    }),
+
+    onKeyPress('ArrowRight', () => {
+        if (!gameViewFacade.isSimulationMode()) {
+            gameViewFacade.enableSimulationMode();
+        }
+
+        forward();
+        blinkButton(btnRewindForward);
+    }),
+];
 
 onUnmounted(() => {
-    window.removeEventListener('keydown', keyboardEventListener);
+    for (const cb of unlisten) {
+        cb();
+    }
 });
 
 /*
@@ -118,7 +145,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls || conditionalMovesEditor?.getIsSimulationMode() }">
+    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls || conditionalMovesEditor?.isEnabled() }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
@@ -188,7 +215,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
         </div>
 
-        <div class="rewind-controls" v-else-if="conditionalMovesEditor?.getIsSimulationMode()">
+        <div class="rewind-controls" v-else-if="conditionalMovesEditor?.isEnabled()">
 
             <!-- Back to original position -->
             <button type="button" @click="conditionalMovesEditor.startNewLine()" class="btn btn-outline-primary">
@@ -211,9 +238,9 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
 
             <!-- Close conditional moves edition -->
-            <!-- <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-warning">
+            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameViewFacade?.disableSimulationMode()" class="btn btn-outline-warning">
                 <IconX />
-            </button> -->
+            </button>
         </div>
     </div>
 </template>

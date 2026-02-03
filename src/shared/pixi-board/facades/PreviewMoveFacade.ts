@@ -1,4 +1,5 @@
 import { Move } from '../../move-notation/move-notation.js';
+import { HexMove } from '../../move-notation/hex-move-notation.js';
 import GameView from '../GameView.js';
 
 /**
@@ -25,8 +26,12 @@ export class PreviewMoveFacade
      *
      * Only preview one move. Previewing another move will can current preview.
      */
-    preview(move: Move, byPlayerIndex: 0 | 1, swapped: null | Move = null): void
+    preview(move: HexMove, byPlayerIndex: 0 | 1, swapped: null | Move = null): void
     {
+        if (move === 'swap-pieces') {
+            throw new Error('Cannot preview "swap-pieces". Provide move and swapped move instead');
+        }
+
         this.cancelPreview();
 
         if (move === 'pass') {

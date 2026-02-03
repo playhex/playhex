@@ -77,7 +77,6 @@ export class PlayerSettingsFacade
     updateOptionsFromPlayerSettings(playerSettings: PlayerSettings): void
     {
         this.gameView.setDisplayCoords(playerSettings.showCoords);
-        this.gameView.setOrientation(playerSettings.orientationLandscape); // TODO move into facade
         this.anchor44Facade.show44Anchors(playerSettings.show44dots);
         this.shadingPatternFacade.setShadingPattern(playerSettings.boardShadingPattern, playerSettings.boardShadingPatternIntensity, playerSettings.boardShadingPatternOption);
         this.autoOrientationFacade.setPreferredOrientations({

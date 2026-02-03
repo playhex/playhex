@@ -1,6 +1,7 @@
 import seedrandom from 'seedrandom';
 import { Game } from '../game-engine/index.js';
-import { coordsToMove, Move } from '../move-notation/move-notation.js';
+import { coordsToMove } from '../move-notation/move-notation.js';
+import { HexMove } from '../move-notation/hex-move-notation.js';
 
 /**
  * Returns a random number in [0;1[
@@ -25,7 +26,7 @@ const rand = (game: Game, determinist: boolean): number => {
  * @param waitBeforePlay Time to wait in millisecond before return move. 0 to test concurrence, higher value to see coming.
  * @param determinist If random moves should be determinist. Bot will respond same as long as you play same moves.
  */
-export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist = false): Promise<Move> => {
+export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist = false): Promise<HexMove> => {
 
     if (waitBeforePlay > 0) {
         await new Promise(resolve => {
@@ -38,7 +39,7 @@ export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist
         return 'swap-pieces';
     }
 
-    const possibleMoves: Move[] = [];
+    const possibleMoves: HexMove[] = [];
 
     for (let row = 0; row < game.getSize(); ++row) {
         for (let col = 0; col < game.getSize(); ++col) {

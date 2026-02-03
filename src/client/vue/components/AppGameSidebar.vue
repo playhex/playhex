@@ -30,12 +30,12 @@ import AppHexWorldExplore from './AppHexWorldExplore.vue';
 import { canUseHexWorldOrDownloadSGF, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
-import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
+import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
 import TriangleMark from '../../../shared/pixi-board/entities/TriangleMark.js';
-import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
+import { parseMove, validateMove } from '../../../shared/move-notation/move-notation.js';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
@@ -176,10 +176,14 @@ const chatClick = (e: PointerEvent) => {
         return;
     }
 
-    const coords = target.innerText.toLowerCase() as Move;
+    const move = target.innerText.toLowerCase();
+
+    if (!validateMove(move)) {
+        throw new Error(`Highlighted move is invalid: "${move}"`);
+    }
 
     const mark = new TriangleMark(0x0dcaf0);
-    mark.setCoords(moveToCoords(coords));
+    mark.setCoords(parseMove(move));
 
     // ctrl click to show multiple marks when click on multiple coords in chat
     if (!e.ctrlKey) {

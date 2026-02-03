@@ -1,4 +1,5 @@
-import { Move, moveToCoords } from '../../move-notation/move-notation.js';
+import { Move, parseMove } from '../../move-notation/move-notation.js';
+import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
 import GameView from '../GameView.js';
 import SwappableMark from '../entities/SwappableMark.js';
 import SwappedMark from '../entities/SwappedMark.js';
@@ -32,16 +33,16 @@ export class GameMarksFacade
     /**
      * This stone is the lastly played
      */
-    markLastMove(move: Move): void
+    markLastMove(move: HexMove): void
     {
         this.hideMarks();
 
-        if (move === 'pass') {
+        if (isSpecialHexMove(move)) {
             return;
         }
 
         this.lastMoveMark
-            .setCoords(moveToCoords(move))
+            .setCoords(parseMove(move))
             .show()
         ;
     }
@@ -54,7 +55,7 @@ export class GameMarksFacade
         this.hideMarks();
 
         this.swappableMark
-            .setCoords(moveToCoords(move))
+            .setCoords(parseMove(move))
             .show()
         ;
     }
@@ -67,7 +68,7 @@ export class GameMarksFacade
         this.hideMarks();
 
         this.swappedMark
-            .setCoords(moveToCoords(move))
+            .setCoords(parseMove(move))
             .show()
         ;
     }

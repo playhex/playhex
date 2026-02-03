@@ -1,5 +1,4 @@
-import { Move } from '../../move-notation/move-notation.js';
-import GameView from '../GameView.js';
+import { HexMove } from '../../move-notation/hex-move-notation.js';
 import { PlayingGameFacade } from './PlayingGameFacade.js';
 
 /**
@@ -11,7 +10,7 @@ export class SimulatePlayingGameFacade
     /**
      * Board position when simulation was started.
      */
-    private mainLine: Move[];
+    private mainLine: HexMove[];
 
     /**
      * Rewind in moves history.
@@ -26,7 +25,7 @@ export class SimulatePlayingGameFacade
     /**
      * Moves played from a current or earlier board position.
      */
-    private simulationLine: Move[] = [];
+    private simulationLine: HexMove[] = [];
 
     /**
      * Rewind in moves history.
@@ -44,8 +43,6 @@ export class SimulatePlayingGameFacade
     private simulatedPlayingFacade: PlayingGameFacade;
 
     constructor(
-        gameView: GameView,
-
         /**
          * The PlayingGameFacade to rewind from.
          * Will take current position as a snapshot,
@@ -63,17 +60,12 @@ export class SimulatePlayingGameFacade
         this.mainCursor = this.mainLine.length;
 
         this.simulatedPlayingFacade = new PlayingGameFacade(
-            gameView,
+            initialPlayingGameFacade.getGameView(),
             initialPlayingGameFacade.getSwapAllowed(),
             this.mainLine,
         );
 
         this.initialPlayingGameFacade.pauseView();
-    }
-
-    setHistoryCursor(historyCursor: number): void
-    {
-        this.mainCursor = historyCursor;
     }
 
     /**
@@ -98,6 +90,14 @@ export class SimulatePlayingGameFacade
                 --this.mainCursor;
             }
         }
+    }
+
+    /**
+     * Rewind until having an empty board.
+     */
+    rewindToFirstMove(): void
+    {
+        this.rewind(Infinity);
     }
 
     /**
@@ -129,7 +129,12 @@ export class SimulatePlayingGameFacade
         }
     }
 
-    addSimulationMove(move: Move): boolean
+    /**
+     * Add a move in simulation line.
+     * If no simulation line yet, start a new one from the board position we are currently rewinded.
+     * swap-pieces move is handled. If playing over first move, it will be replaced by swap-pieces.
+     */
+    addSimulationMove(move: HexMove): boolean
     {
         if (!this.simulatedPlayingFacade.addMove(move)) {
             return false;
@@ -147,6 +152,10 @@ export class SimulatePlayingGameFacade
         return true;
     }
 
+    /**
+     * Restore initial board state.
+     * Reset any rewind or simulation.
+     */
     resetSimulationAndRewind(): void
     {
         if (this.simulationCursor) {
@@ -154,7 +163,7 @@ export class SimulatePlayingGameFacade
         }
 
         if (this.mainCursor < this.mainLine.length) {
-            this.forward(this.mainLine.length);
+            this.forward(this.mainLine.length - this.mainCursor);
         }
     }
 

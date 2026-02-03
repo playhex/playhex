@@ -12,14 +12,14 @@ import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vu
 import GameView from '../../../../shared/pixi-board/GameView.js';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
-import { Move } from '../../../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { useGameViewFacade } from '../../composables/useGameViewFacade.js';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 
 let gameView: null | GameView = null;
 let gameViewFacade: null | GameViewFacade = null;
 let lastGameOptions: OfflineAIGameOptions;
-let calculateMove: (game: Game) => Promise<Move>;
+let calculateMove: (game: Game) => Promise<HexMove>;
 
 const init = (): void => {
     // Player started a new game
@@ -100,10 +100,10 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
     gameView = gameViewFacade.getGameView();
 
     gameView.on('hexClicked', move => {
-        move = game.moveOrSwapPieces(move);
+        const hexMove = game.moveOrSwapPieces(move);
 
         try {
-            game.move(move, playerIndex as PlayerIndex);
+            game.move(hexMove, playerIndex as PlayerIndex);
         } catch (e) {
             if (!(e instanceof IllegalMove)) {
                 throw e;
@@ -148,10 +148,10 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
     gameView = gameViewFacade.getGameView();
 
     gameView.on('hexClicked', move => {
-        game.moveOrSwapPieces(move);
+        const hexMove = game.moveOrSwapPieces(move);
 
         try {
-            game.move(move, playerIndex as PlayerIndex);
+            game.move(hexMove, playerIndex as PlayerIndex);
         } catch (e) {
             if (!(e instanceof IllegalMove)) {
                 throw e;

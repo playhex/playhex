@@ -4,7 +4,8 @@ import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
 import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
-import { isMoveValid, Move } from '../../shared/move-notation/move-notation.js';
+import { validateMove } from '../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 @Service()
 export default class RemoteApiPlayer
@@ -13,7 +14,7 @@ export default class RemoteApiPlayer
         private hexRemotePlayerApi: HexAiApiClient,
     ) {}
 
-    private async fetchMove(engine: string, game: Game, config: { [key: string]: unknown }): Promise<Move>
+    private async fetchMove(engine: string, game: Game, config: { [key: string]: unknown }): Promise<HexMove>
     {
         const payload: CalculateMoveRequest = {
             game: {
@@ -37,7 +38,7 @@ export default class RemoteApiPlayer
                 throw new Error('ok, remote player expressely resigned.');
             }
 
-            if (!isMoveValid(moveString)) {
+            if (!validateMove(moveString)) {
                 throw new Error('Invalid move: ' + moveString);
             }
 
@@ -48,7 +49,7 @@ export default class RemoteApiPlayer
         }
     }
 
-    async makeMove(engine: string, hostedGameServer: HostedGameServer, config: { maxGames?: number, treeSearch?: boolean }): Promise<null | Move>
+    async makeMove(engine: string, hostedGameServer: HostedGameServer, config: { maxGames?: number, treeSearch?: boolean }): Promise<null | HexMove>
     {
         const game = hostedGameServer.getGame();
 

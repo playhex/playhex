@@ -1,7 +1,7 @@
 import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import Game from '../../../shared/game-engine/Game.js';
 import { calcRandomMove } from '../../../shared/game-engine/randomBot.js';
-import { Move } from '../../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
 
 export type LocalAI = {
     name: string;
@@ -30,7 +30,7 @@ export const findLocalAIByName = (name: string): LocalAI => {
     return localAI;
 };
 
-export const instanciateAi = (localAI: LocalAI): (game: Game) => Promise<Move> => {
+export const instanciateAi = (localAI: LocalAI): (game: Game) => Promise<HexMove> => {
     const [engine, level] = localAI.name.split('-');
 
     if (engine === 'davies') {
@@ -41,7 +41,7 @@ export const instanciateAi = (localAI: LocalAI): (game: Game) => Promise<Move> =
                 game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
                 game.getMovesHistory().map(timestampedMove => timestampedMove.move),
                 parseInt(level, 10),
-            ) as Move;
+            ) as HexMove;
 
             return move;
         };

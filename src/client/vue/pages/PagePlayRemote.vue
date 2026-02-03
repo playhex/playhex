@@ -176,8 +176,12 @@ const listenHexClick = () => {
             throw new Error('hex clicked but hosted game is null');
         }
 
-        const game = hostedGameClient.value.getGame();
-        move = game.moveOrSwapPieces(move);
+        if (gameViewFacade.value.isSimulationMode()) {
+            return;
+        }
+
+        const game = gameViewFacade.value.getGame();
+        const hexMove = game.moveOrSwapPieces(move);
 
         try {
             // Must get local player again in case player joined after (click "Watch", then "Join")
@@ -189,6 +193,8 @@ const listenHexClick = () => {
 
             /*
              * Premove
+             *
+             * Cannot premove swap-piece or pass, so use move instead of hexMove
              */
             const premovesEnabled = MoveSettings.PREMOVE === getMoveSettings();
 
@@ -218,19 +224,19 @@ const listenHexClick = () => {
                 return;
             }
 
-            game.checkMove(move, localPlayerIndex as PlayerIndex);
+            game.checkMove(hexMove, localPlayerIndex as PlayerIndex);
 
             // Send move if move preview is not enabled
             if (!shouldDisplayConfirmMove()) {
-                game.move(move, localPlayerIndex as PlayerIndex);
-                await hostedGameClient.value.sendMove(move);
+                game.move(hexMove, localPlayerIndex as PlayerIndex);
+                await hostedGameClient.value.sendMove(hexMove);
                 return;
             }
 
             // Cancel move preview if I click on it
             const previewedMove = gameViewFacade.value.getPreviewedMove();
 
-            if (previewedMove === move) {
+            if (previewedMove === hexMove) {
                 gameViewFacade.value.removePreviewedMove();
                 confirmMove.value = null;
                 return;
@@ -238,17 +244,17 @@ const listenHexClick = () => {
 
             // What happens when I validate move
             confirmMove.value = () => {
-                game.move(move, localPlayerIndex as PlayerIndex);
+                game.move(hexMove, localPlayerIndex as PlayerIndex);
                 confirmMove.value = null;
 
                 if (!hostedGameClient.value) {
                     return;
                 }
 
-                void hostedGameClient.value.sendMove(move);
+                void hostedGameClient.value.sendMove(hexMove);
             };
 
-            gameViewFacade.value.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
+            gameViewFacade.value.setPreviewedMove(hexMove, localPlayerIndex as PlayerIndex);
         } catch (e) {
             // noop
         }
@@ -582,7 +588,7 @@ const unreadMessages = (): number => {
  * Rewind mode
  */
 const enableRewindMode = () => {
-    // gameView?.enableRewindMode();
+    gameViewFacade.value?.enableSimulationMode();
 };
 
 /*
@@ -656,7 +662,7 @@ watch([hostedGameClient, loggedInPlayer], () => {
 
     void initConditionalMoves(
         hostedGameClient.value.getHostedGame(),
-        gameViewFacade.value.getGameView(),
+        gameViewFacade.value.getPlayingGameFacade(),
         getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value) as PlayerIndex,
     );
 });
@@ -726,7 +732,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                     </button>
 
                     <!-- Conditional moves -->
-                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="conditionalMovesEditor?.enableSimulationMode()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
+                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="() => { /* TODO */ }" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
                         <IconSignpostSplit />
                     </button>
 

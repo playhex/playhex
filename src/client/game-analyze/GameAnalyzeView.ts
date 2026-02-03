@@ -7,7 +7,8 @@ import GameView from '../../shared/pixi-board/GameView.js';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { defer } from '../../shared/app/defer.js';
-import { isMoveNormal, Move, moveToCoords } from '../../shared/move-notation/move-notation.js';
+import { validateMove, parseMove } from '../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -27,7 +28,7 @@ const rectWithNegative = (g: Graphics, x: number, y: number, width: number, heig
 };
 
 export type MoveAndValue = {
-    move: Move;
+    move: HexMove;
     value: number;
     whiteWin?: number;
 };
@@ -229,6 +230,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         gameView.addEntity(this.playedMoveMark, 'analyze');
         gameView.addEntity(this.bestMoveMark, 'analyze');
 
+        // TODO
         gameView.on('movesHistoryCursorChanged', cursor => {
             if (cursor === null) {
                 return;
@@ -248,17 +250,17 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             gameView.setMovesHistoryCursor(move.moveIndex);
 
             // Place best move
-            if (isMoveNormal(move.bestMoves[0].move)) {
-                this.bestMoveMark.setCoords(moveToCoords(move.bestMoves[0].move));
+            if (validateMove(move.bestMoves[0].move)) {
+                this.bestMoveMark.setCoords(parseMove(move.bestMoves[0].move));
                 this.bestMoveMark.show();
             }
 
             // Place played move and eval color
-            if (!isMoveNormal(move.move.move)) {
+            if (!validateMove(move.move.move)) {
                 return;
             }
 
-            this.playedMoveMark.setCoords(moveToCoords(move.move.move));
+            this.playedMoveMark.setCoords(parseMove(move.move.move));
 
             const playedWhiteWin = move.move.whiteWin;
             const bestWhiteWin = move.bestMoves[0].whiteWin;

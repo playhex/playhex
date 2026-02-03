@@ -1,9 +1,10 @@
-import { mirrorMove, Move } from '../../move-notation/move-notation.js';
+import { mirrorMove } from '../../move-notation/move-notation.js';
+import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
 import GameView from '../GameView.js';
 import { GameMarksFacade } from './GameMarksFacade.js';
 
 /**
- * Facade for a full playing game.
+ * Facade for adding moves alternately.
  * Add move, undo, show last move, swappable and swapped marks.
  */
 export class PlayingGameFacade
@@ -19,7 +20,7 @@ export class PlayingGameFacade
     /**
      * Moves history
      */
-    private moves: Move[] = [];
+    private moves: HexMove[] = [];
 
     /**
      * List of callbacks to call when view is resumed
@@ -32,7 +33,7 @@ export class PlayingGameFacade
     constructor(
         private gameView: GameView,
         private swapAllowed: boolean,
-        initialMoves: Move[] = [],
+        initialMoves: HexMove[] = [],
     ) {
         this.gameMarksFacade = new GameMarksFacade(gameView);
 
@@ -53,12 +54,12 @@ export class PlayingGameFacade
         return this.swapAllowed;
     }
 
-    getMoves(): Move[]
+    getMoves(): HexMove[]
     {
         return this.moves;
     }
 
-    getLastMove(): null | Move
+    getLastMove(): null | HexMove
     {
         if (this.moves.length === 0) {
             return null;
@@ -79,7 +80,7 @@ export class PlayingGameFacade
      *
      * @throws When provided move is a bad value
      */
-    addMove(move: Move): boolean
+    addMove(move: HexMove): boolean
     {
         if (this.moves.length === 1
             && this.swapAllowed
@@ -94,13 +95,13 @@ export class PlayingGameFacade
                 throw new Error('Cannot swap-pieces now, can only swap on move 2');
             }
 
-            if (this.moves[0] === 'pass') {
-                throw new Error('Cannot swap a pass move');
+            const firstMove = this.moves[0];
+
+            if (isSpecialHexMove(firstMove)) {
+                throw new Error('Cannot swap a special move');
             }
 
-            const firstMove = this.moves[0];
             const mirror = mirrorMove(firstMove);
-
             this.moves.push(move);
             this.placedStones = {};
             this.placedStones[mirror] = 1;
@@ -144,7 +145,7 @@ export class PlayingGameFacade
      * Undo last move, remove stone, and show update last move mark.
      * In case of swap-piece undone, mirrors move back.
      */
-    undoLastMove(): null | Move
+    undoLastMove(): null | HexMove
     {
         const undoneMove = this.moves.pop();
 
@@ -158,7 +159,12 @@ export class PlayingGameFacade
 
             case 'swap-pieces':
                 const swapped = this.moves[0];
-                const mirror = mirrorMove(this.moves[0]);
+
+                if (isSpecialHexMove(swapped)) {
+                    throw new Error('Unexpected special move as first move');
+                }
+
+                const mirror = mirrorMove(swapped);
 
                 delete this.placedStones[mirror];
                 this.placedStones[swapped] = 0;
@@ -185,6 +191,13 @@ export class PlayingGameFacade
         return undoneMove;
     }
 
+    undoAllMoves(): void
+    {
+        while (this.moves.length) {
+            this.undoLastMove();
+        }
+    }
+
     /**
      * Mark last move (and remove other mark if any)
      * given current moves history.
@@ -203,8 +216,14 @@ export class PlayingGameFacade
             return;
         }
 
+        const firstMove = this.moves[0];
+
+        if (isSpecialHexMove(firstMove)) {
+            throw new Error('Unexpected special move as first move');
+        }
+
         if (lastMove === 'swap-pieces') {
-            const swappedCoords = mirrorMove(this.moves[0]);
+            const swappedCoords = mirrorMove(firstMove);
 
             this.gameMarksFacade.markSwapped(swappedCoords);
             return;

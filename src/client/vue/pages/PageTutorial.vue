@@ -12,8 +12,10 @@ import { IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import HexagonMark from '../../../shared/pixi-board/entities/HexagonMark.js';
-import { Move } from '../../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
 import { useGameViewFacade } from '../composables/useGameViewFacade.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 
 useHead({
     title: t('how_to_play_hex'),
@@ -25,7 +27,7 @@ game0.setAllowSwap(false);
 const container0 = ref<HTMLElement>();
 const demo0Step = ref(0);
 
-const movesDemo0: Move[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ') as Move[];
+const movesDemo0: HexMove[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ') as HexMove[];
 
 const gameView0 = useGameViewFacade(game0);
 
@@ -136,9 +138,9 @@ gameView1.getGameView().on('hexClicked', async coords => {
 });
 
 // Swap map
-const gameSwapMap = new Game(11);
 const container2 = ref<HTMLElement>();
-const gameView2 = useGameViewFacade(gameSwapMap);
+const gameView2 = new GameView(11);
+new PlayerSettingsFacade(gameView2);
 const showSwapMap = ref(false);
 
 /**
@@ -169,7 +171,7 @@ for (let row = 0; row < 11; ++row) {
         mark.setCoords({ row, col });
         mark.alpha = alpha;
         mark.alpha **= 4; // Adds more contrast
-        gameView2.getGameView().addEntity(mark, 'swap_map');
+        gameView2.addEntity(mark, 'swap_map');
     }
 }
 
@@ -188,7 +190,7 @@ onMounted(async () => {
 
     await gameView0.getGameView().mount(container0.value);
     await gameView1.getGameView().mount(container1.value);
-    await gameView2.getGameView().mount(container2.value);
+    await gameView2.mount(container2.value);
 });
 
 const router = useRouter();

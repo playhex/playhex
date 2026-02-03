@@ -9,7 +9,7 @@ import { Expose } from '../../../../shared/app/class-transformer-custom.js';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
 import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
-import { type Move } from '../../../../shared/move-notation/move-notation.js';
+import { type HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 
 class AnswerUndoBody
 {
@@ -130,7 +130,7 @@ export default class GameController
     move(
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
-        @Body() move: Move,
+        @Body() move: HexMove,
     ) {
         const result = this.hostedGameRepository.playerMove(player, publicId, move);
 

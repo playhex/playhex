@@ -1,8 +1,8 @@
-import { Move } from '../../move-notation/move-notation.js';
+import { HexMove } from '../../move-notation/hex-move-notation.js';
 
 export default class IllegalMove extends Error
 {
-    constructor(move: Move, message: string)
+    constructor(move: HexMove, message: string)
     {
         super(`Move ${move}: ${message}`);
     }

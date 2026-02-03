@@ -4,7 +4,7 @@ import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { BoardEntity } from './BoardEntity.js';
-import { colToLetter, Coords, coordsToMove, Move, moveToCoords, rowToNumber } from '../move-notation/move-notation.js';
+import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '../move-notation/move-notation.js';
 import Stone from './entities/Stone.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
@@ -282,11 +282,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     getHex(move: Move): Hex
     {
-        if (move === 'swap-pieces' || move === 'pass') {
-            throw new Error('Cannot getHex with swap or pass');
-        }
-
-        const { row, col } = moveToCoords(move);
+        const { row, col } = parseMove(move);
 
         return this.hexes[row][col];
     }
@@ -300,11 +296,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     setHex(move: Move, hex: Hex): void
     {
-        if (move === 'swap-pieces' || move === 'pass') {
-            throw new Error('Cannot getHex with swap or pass');
-        }
-
-        const { row, col } = moveToCoords(move);
+        const { row, col } = parseMove(move);
 
         this.hexes[row][col] = hex;
     }
@@ -800,19 +792,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     getStone(move: Move): null | Stone
     {
-        if (move === 'pass' || move === 'swap-pieces') {
-            throw new Error('Cannot setStone with move "swap-pieces" or "pass"');
-        }
-
         return this.stones[move] ?? null;
     }
 
     setStone(move: Move, byPlayerIndex: null | 0 | 1, faded = false): void
     {
-        if (move === 'pass' || move === 'swap-pieces') {
-            throw new Error('Cannot setStone with move "swap-pieces" or "pass"');
-        }
-
         if (this.stones[move]) {
             this.removeEntity(this.stones[move]);
             delete this.stones[move];
@@ -820,7 +804,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         if (byPlayerIndex !== null) {
             this.stones[move] = new Stone(byPlayerIndex, faded);
-            this.stones[move].setCoords(moveToCoords(move));
+            this.stones[move].setCoords(parseMove(move));
             this.addEntity(this.stones[move], GameView.STONE_ENTITY_GROUP);
         }
     }

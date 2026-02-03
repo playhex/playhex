@@ -2,7 +2,7 @@
 import { IconCheck, IconScissors, IconTrash } from '../icons.js';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
-import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
+import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 
 defineProps({
     conditionalMovesEditor: {
@@ -30,14 +30,14 @@ defineProps({
     />
 
     <button
-        v-if="conditionalMovesEditor.getIsSimulationMode()"
+        v-if="conditionalMovesEditor.isEnabled()"
         @click="conditionalMovesEditor.submitConditionalMoves()"
         class="btn me-2"
         :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'"
     ><IconCheck /> {{ $t('save') }}</button>
 
     <button
-        v-if="conditionalMovesEditor.getIsSimulationMode()"
+        v-if="conditionalMovesEditor.isEnabled()"
         @click="conditionalMovesEditor.discardSimulationMoves(); conditionalMovesEditor.disableSimulationMode()"
         class="btn"
         :class="conditionalMovesEditor.getHasChanges() ? 'btn-warning' : 'btn-outline-warning'"

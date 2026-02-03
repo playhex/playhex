@@ -1,10 +1,5 @@
-import { Move } from '../move-notation/move-notation.js';
-import { ConditionalMovesLine, ConditionalMovesTree } from './models/ConditionalMoves.js';
-
-export type ConditionalMovesStruct = {
-    tree: ConditionalMovesTree;
-    unplayedLines: ConditionalMovesLine[];
-};
+import { Move } from 'move-notation/move-notation.js';
+import { ConditionalMovesLine, ConditionalMovesTree, ConditionalMovesStruct } from './types.js';
 
 /**
  * Get answer from conditional moves and move played by opponent.

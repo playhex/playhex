@@ -5,8 +5,10 @@ import { AnimatorFacade } from '../../../shared/pixi-board/facades/AnimatorFacad
 import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
 import { PreviewMoveFacade } from '../../../shared/pixi-board/facades/PreviewMoveFacade.js';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
-import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
+import { mirrorMove } from '../../../shared/move-notation/move-notation.js';
 import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
+import { HexMove, isSpecialHexMove } from '../../../shared/move-notation/hex-move-notation.js';
+import { SimulatePlayingGameFacade } from '../../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
 
 type WinningPathAnimatorFacadeEvents = {
     /**
@@ -14,6 +16,11 @@ type WinningPathAnimatorFacadeEvents = {
      * Used to display win message after animation, and not at same time.
      */
     endedAndWinAnimationOver: () => void;
+
+    /**
+     * When simulation mode has been enabled or disabled.
+     */
+    simulationModeChanged: (enabled: boolean) => void;
 };
 
 /**
@@ -27,13 +34,14 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     private playingGameFacade: PlayingGameFacade;
     private previewMoveFacade: PreviewMoveFacade;
     private playerSettingsFacade: PlayerSettingsFacade;
+    private simulatePlayingGameFacade: null | SimulatePlayingGameFacade = null;
 
     /**
      * Keeps track of which move is currently previewed.
-     * Not same as in previewMoveFace, here we keep "swap-pieces"
+     * Not same as in previewMoveFacade, here we keep "swap-pieces"
      * in case of swap move.
      */
-    private previewedMove: null | Move = null;
+    private previewedMove: null | HexMove = null;
 
     constructor(
         private gameView: GameView,
@@ -44,14 +52,18 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         this.playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
         this.playingGameFacade = new PlayingGameFacade(
-            gameView,
-            game.getAllowSwap(),
-            game.getMovesHistory().map(moveTimestamped => moveTimestamped.move),
+            this.gameView,
+            this.game.getAllowSwap(),
+            this.game.getMovesHistory().map(moveTimestamped => moveTimestamped.move),
         );
 
         this.previewMoveFacade = new PreviewMoveFacade(gameView);
 
         this.listenModel();
+
+        this.gameView.on('hexClicked', move => {
+            this.simulatePlayingGameFacade?.addSimulationMove(move);
+        });
     }
 
     getGameView(): GameView
@@ -62,6 +74,11 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     getGame(): Game
     {
         return this.game;
+    }
+
+    getPlayingGameFacade(): PlayingGameFacade
+    {
+        return this.playingGameFacade;
     }
 
     /**
@@ -98,7 +115,11 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         this.game.on('canceled', () => this.endedCallback());
 
         this.game.on('updated', () => {
-            // this.gameView.redraw(); // TODO
+            this.playingGameFacade.undoAllMoves();
+
+            for (const timestampedMove of this.game.getMovesHistory()) {
+                this.playingGameFacade.addMove(timestampedMove.move);
+            }
         });
     }
 
@@ -141,12 +162,12 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         return this.previewedMove !== null;
     }
 
-    getPreviewedMove(): null | Move
+    getPreviewedMove(): null | HexMove
     {
         return this.previewedMove;
     }
 
-    setPreviewedMove(move: Move, byPlayerIndex: 0 | 1): void
+    setPreviewedMove(move: HexMove, byPlayerIndex: 0 | 1): void
     {
         this.previewedMove = move;
 
@@ -155,6 +176,10 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
 
             if (!firstMove) {
                 throw new Error('Cannot preview swap piece move, no first move');
+            }
+
+            if (isSpecialHexMove(firstMove)) {
+                throw new Error('Unexpected special move as first move');
             }
 
             this.previewMoveFacade.preview(mirrorMove(firstMove), 0, firstMove);
@@ -173,5 +198,38 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     getCurrentOrientationMode(): OrientationMode
     {
         return this.playerSettingsFacade.getCurrentOrientationMode();
+    }
+
+    isSimulationMode(): boolean
+    {
+        return this.simulatePlayingGameFacade !== null;
+    }
+
+    enableSimulationMode(): void
+    {
+        if (this.simulatePlayingGameFacade) {
+            return;
+        }
+
+        this.simulatePlayingGameFacade = new SimulatePlayingGameFacade(this.playingGameFacade);
+
+        this.emit('simulationModeChanged', true);
+    }
+
+    disableSimulationMode(): void
+    {
+        if (!this.simulatePlayingGameFacade) {
+            return;
+        }
+
+        this.simulatePlayingGameFacade.destroy();
+        this.simulatePlayingGameFacade = null;
+
+        this.emit('simulationModeChanged', false);
+    }
+
+    getSimulatePlayingGameFacade(): null | SimulatePlayingGameFacade
+    {
+        return this.simulatePlayingGameFacade;
     }
 }

@@ -19,7 +19,7 @@ import useAuthStore from './stores/authStore.js';
 import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore.js';
 import { checkShadowDeleted } from '../shared/app/chatUtils.js';
 import { playAudio } from '../shared/app/audioPlayer.js';
-import { Move } from '../shared/move-notation/move-notation.js';
+import { HexMove } from '../shared/move-notation/hex-move-notation.js';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -217,7 +217,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return canJoin(this.hostedGame, player);
     }
 
-    private playSoundForMove(move: Move): void
+    private playSoundForMove(move: HexMove): void
     {
         if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
         playAudio(move === 'pass'
@@ -226,7 +226,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         );
     }
 
-    async sendMove(move: Move): Promise<void>
+    async sendMove(move: HexMove): Promise<void>
     {
         return await new Promise((resolve, reject) => {
             this.socket.emit('move', this.getId(), move, answer => {
@@ -242,7 +242,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         });
     }
 
-    async sendPremove(move: Move): Promise<void>
+    async sendPremove(move: HexMove): Promise<void>
     {
         if (!this.game) {
             throw new Error('Cannot premove next move, needs game to know which is next move index');

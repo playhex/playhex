@@ -4,9 +4,9 @@ import { HostedGame } from '../../shared/app/models/index.js';
 import useAuthStore from './authStore.js';
 import { shouldShowConditionalMoves } from '../../shared/app/hostedGameUtils.js';
 import { apiGetConditionalMoves, apiPatchConditionalMoves } from '../apiClient.js';
-import GameView from '../../shared/pixi-board/GameView.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
-import ConditionalMovesEditor, { listenGameViewEvents } from '../../shared/app/ConditionalMovesEditor.js';
+import ConditionalMovesEditor from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
+import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
 
 /**
  * Context for conditional moves of current game.
@@ -43,7 +43,7 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
     /**
      * Init conditional moves context for a given game.
      */
-    const initConditionalMoves = async (hostedGame: HostedGame, gameView: GameView, myIndex: PlayerIndex): Promise<void> => {
+    const initConditionalMoves = async (hostedGame: HostedGame, playingGameFacade: PlayingGameFacade, myIndex: PlayerIndex): Promise<void> => {
         resetConditionalMoves();
 
         currentHostedGame = hostedGame;
@@ -55,9 +55,10 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
 
         const conditionalMoves = await apiGetConditionalMoves(hostedGame.publicId);
 
-        conditionalMovesEditor.value = new ConditionalMovesEditor(gameView, myIndex, conditionalMoves);
+        conditionalMovesEditor.value = new ConditionalMovesEditor(playingGameFacade, myIndex, conditionalMoves);
 
-        unlistenGameView = listenGameViewEvents(conditionalMovesEditor.value as ConditionalMovesEditor, gameView);
+        // TODO
+        // unlistenGameView = listenGameViewEvents(conditionalMovesEditor.value as ConditionalMovesEditor, gameView);
         conditionalMovesEditor.value.on('conditionalMovesUpdated', () => apiPatchConditionalMoves(hostedGame.publicId, conditionalMoves));
     };
 

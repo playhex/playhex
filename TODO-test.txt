@@ -2,6 +2,7 @@ test game view:
 - flat and diamond orientation
 - premove, move confirm
 - coords, coords on light theme
+- coords clickable in chat
 - swap, swapped
 - win animation
 - resize view should keep preview
@@ -10,11 +11,10 @@ test game view:
 - can cancel preview/premove
 - can cancel preview/premove if this is a swap-piece
 - undo move, 1 move, 2 move, SWAP move (marks), pass move
+- game analyze click should update board position at clicked move
 
 Optim:
 Try using ParticleContainer for stones and cells
-
-Move -> CoordsNotation (d4, ...) / Move (d4, swap-pieces, pass, ...)
 
 Conditional move light theme:
     - Sidebar coords should always be white

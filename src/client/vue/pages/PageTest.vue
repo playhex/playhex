@@ -46,7 +46,7 @@ const bgTheme = ref<'bg-light' | 'bg-dark'>('bg-dark');
 const simulatePlayingGameFacade = shallowRef<null | SimulatePlayingGameFacade>(null);
 
 const startSimulate = () => {
-    simulatePlayingGameFacade.value = new SimulatePlayingGameFacade(gameView, playingGameFacade);
+    simulatePlayingGameFacade.value = new SimulatePlayingGameFacade(playingGameFacade);
 };
 
 const stopSimulate = () => {
