@@ -410,19 +410,18 @@ const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesEditorState, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
 
 watchEffect(() => {
-    if (conditionalMovesEditor.value === null) {
+    if (!conditionalMovesEditor.value || !conditionalMovesEditorState.value) {
         return;
     }
 
+    // enable or disable conditional moves when entering in the sidebar tab or leaving it
     if (currentTab.value === 'conditional_moves') {
-        conditionalMovesEditor.value.enableSimulationMode();
-    } else {
-        if (!conditionalMovesEditor.value.getHasChanges()) {
-            conditionalMovesEditor.value.disableSimulationMode();
-        }
+        conditionalMovesEnabled.value = true;
+    } else if (!conditionalMovesEditorState.value.hasChanges) {
+        conditionalMovesEnabled.value = false;
     }
 });
 </script>
@@ -838,12 +837,7 @@ watchEffect(() => {
             <div class="container-fluid">
                 <h3>{{ $t('conditional_moves.title') }}</h3>
 
-                <AppConditionalMoves
-                    v-if="null !== conditionalMovesEditor"
-                    :conditionalMovesEditor="(conditionalMovesEditor as ConditionalMovesEditor)"
-                />
-
-                <p v-else>{{ $t('loading') }}</p>
+                <AppConditionalMoves v-if="conditionalMovesEditor && conditionalMovesEditorState" />
             </div>
         </div>
 

@@ -141,6 +141,19 @@ export class PlayingGameFacade
         return true;
     }
 
+    addMoves(moves: HexMove[]): boolean
+    {
+        for (const move of moves) {
+            const added = this.addMove(move);
+
+            if (!added) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Undo last move, remove stone, and show update last move mark.
      * In case of swap-piece undone, mirrors move back.
@@ -243,7 +256,7 @@ export class PlayingGameFacade
     }
 
     /**
-     * Pauses the view so addMove won't be added until we resume the view.
+     * Pauses the view so addMove won't add the stone visually until we resume the view.
      *
      * Used to do simulation.
      */

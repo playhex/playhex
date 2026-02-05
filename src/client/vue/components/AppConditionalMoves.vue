@@ -2,68 +2,72 @@
 import { IconCheck, IconScissors, IconTrash } from '../icons.js';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
-import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
+import { storeToRefs } from 'pinia';
+import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 
-defineProps({
-    conditionalMovesEditor: {
-        type: ConditionalMovesEditor,
-        required: true,
-    },
-});
+const {
+    conditionalMovesEditor,
+    conditionalMovesEditorState,
+    conditionalMovesEnabled,
+} = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>
-    <div v-if="conditionalMovesEditor.getConditionalMovesDirty().tree.length > 0" class="conditional-move-tree-container">
-        <AppConditionalMoveTree
-            :tree="conditionalMovesEditor.getConditionalMovesDirty().tree"
-            :selectedLine="conditionalMovesEditor.getSelectedLine()"
-            :playerIndex="conditionalMovesEditor.getMyIndex()"
-            @lineClicked="lineClicked => conditionalMovesEditor.setSelectedLine(lineClicked)"
+    <template v-if="conditionalMovesEditor && conditionalMovesEditorState">
+        <div v-if="conditionalMovesEditorState.conditionalMovesDirty.tree.length > 0" class="conditional-move-tree-container">
+            <AppConditionalMoveTree
+                :tree="conditionalMovesEditorState.conditionalMovesDirty.tree"
+                :selectedLine="conditionalMovesEditorState.selectedLine"
+                :playerIndex="conditionalMovesEditorState.myIndex"
+                @lineClicked="lineClicked => conditionalMovesEditor?.setSelectedLine(lineClicked)"
+            />
+        </div>
+
+        <AppConditionalMoveButton
+            label="+"
+            :playerIndex="1 - conditionalMovesEditorState.myIndex"
+            @click="conditionalMovesEditor.startNewLine()"
+            aria-label="Add new conditional move"
         />
-    </div>
-
-    <AppConditionalMoveButton
-        label="+"
-        :playerIndex="conditionalMovesEditor.getOpponentIndex()"
-        @click="conditionalMovesEditor.startNewLine()"
-        aria-label="Add new conditional move"
-    />
-
-    <button
-        v-if="conditionalMovesEditor.isEnabled()"
-        @click="conditionalMovesEditor.submitConditionalMoves()"
-        class="btn me-2"
-        :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'"
-    ><IconCheck /> {{ $t('save') }}</button>
-
-    <button
-        v-if="conditionalMovesEditor.isEnabled()"
-        @click="conditionalMovesEditor.discardSimulationMoves(); conditionalMovesEditor.disableSimulationMode()"
-        class="btn"
-        :class="conditionalMovesEditor.getHasChanges() ? 'btn-warning' : 'btn-outline-warning'"
-    >{{ conditionalMovesEditor.getHasChanges() ? $t('discard') : $t('close') }}</button>
-
-    <button
-        v-if="conditionalMovesEditor.getSelectedLine().length > 0"
-        @click="conditionalMovesEditor.cutMove()"
-        class="btn btn-sm btn-outline-danger ms-2"
-    ><IconScissors /> {{ $t('conditional_moves.cut_move') }}</button>
-
-    <div v-if="conditionalMovesEditor.getConditionalMovesDirty().unplayedLines.length > 0" class="conditional-move-tree-container">
-        <h4>{{ $t('conditional_moves.inactive_lines') }}</h4>
 
         <button
-            @click="conditionalMovesEditor.deleteAllInactives()"
-            class="btn btn-sm btn-outline-danger ms-2"
-        ><IconTrash /> {{ $t('conditional_moves.clear_inactive_lines') }}</button>
+            v-if="conditionalMovesEnabled"
+            @click="conditionalMovesEditor.submitConditionalMoves()"
+            class="btn me-2"
+            :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'"
+        ><IconCheck /> {{ $t('save') }}</button>
 
-        <AppConditionalMoveTree
-            theme="inactive"
-            :tree="conditionalMovesEditor.getConditionalMovesDirty().unplayedLines"
-            :playerIndex="conditionalMovesEditor.getMyIndex()"
-            @lineClicked="lineClicked => conditionalMovesEditor.setSelectedLine(lineClicked)"
-        />
-    </div>
+        <button
+            v-if="conditionalMovesEnabled"
+            @click="conditionalMovesEditor.discardSimulationMoves(); conditionalMovesEnabled = false"
+            class="btn"
+            :class="conditionalMovesEditor.getHasChanges() ? 'btn-warning' : 'btn-outline-warning'"
+        >{{ conditionalMovesEditor.getHasChanges() ? $t('discard') : $t('close') }}</button>
+
+        <button
+            v-if="conditionalMovesEditorState.selectedLine.length > 0"
+            @click="conditionalMovesEditor.cutMove()"
+            class="btn btn-sm btn-outline-danger ms-2"
+        ><IconScissors /> {{ $t('conditional_moves.cut_move') }}</button>
+
+        <div v-if="conditionalMovesEditorState.conditionalMovesDirty.unplayedLines.length > 0" class="conditional-move-tree-container">
+            <h4>{{ $t('conditional_moves.inactive_lines') }}</h4>
+
+            <button
+                @click="conditionalMovesEditor.deleteAllInactives()"
+                class="btn btn-sm btn-outline-danger ms-2"
+            ><IconTrash /> {{ $t('conditional_moves.clear_inactive_lines') }}</button>
+
+            <AppConditionalMoveTree
+                theme="inactive"
+                :tree="conditionalMovesEditorState.conditionalMovesDirty.unplayedLines"
+                :playerIndex="conditionalMovesEditorState.myIndex"
+                @lineClicked="lineClicked => conditionalMovesEditor?.setSelectedLine(lineClicked)"
+            />
+        </div>
+    </template>
+
+    <p v-else>{{ $t('loading') }}</p>
 </template>
 
 <style lang="stylus" scoped>

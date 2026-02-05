@@ -40,7 +40,7 @@ export class SimulatePlayingGameFacade
     /**
      * Another playing game facade used for simulation, not paused.
      */
-    private simulatedPlayingFacade: PlayingGameFacade;
+    private playingGameFacade: PlayingGameFacade;
 
     constructor(
         /**
@@ -59,7 +59,7 @@ export class SimulatePlayingGameFacade
         this.mainLine = [...this.initialPlayingGameFacade.getMoves()];
         this.mainCursor = this.mainLine.length;
 
-        this.simulatedPlayingFacade = new PlayingGameFacade(
+        this.playingGameFacade = new PlayingGameFacade(
             initialPlayingGameFacade.getGameView(),
             initialPlayingGameFacade.getSwapAllowed(),
             this.mainLine,
@@ -76,7 +76,7 @@ export class SimulatePlayingGameFacade
     rewind(n = 1): void
     {
         for (let i = 0; i < n && this.mainCursor > 0; ++i) {
-            this.simulatedPlayingFacade.undoLastMove();
+            this.playingGameFacade.undoLastMove();
 
             if (this.simulationCursor) {
                 --this.simulationCursor;
@@ -115,7 +115,7 @@ export class SimulatePlayingGameFacade
                 || this.simulationLine.length && this.mainCursor >= this.mainLine.length
             ) {
                 if (this.simulationCursor < this.simulationLine.length) {
-                    this.simulatedPlayingFacade.addMove(this.simulationLine[this.simulationCursor]);
+                    this.playingGameFacade.addMove(this.simulationLine[this.simulationCursor]);
                     ++this.simulationCursor;
                 }
 
@@ -123,7 +123,7 @@ export class SimulatePlayingGameFacade
             }
 
             if (this.mainCursor < this.mainLine.length) {
-                this.simulatedPlayingFacade.addMove(this.mainLine[this.mainCursor]);
+                this.playingGameFacade.addMove(this.mainLine[this.mainCursor]);
                 ++this.mainCursor;
             }
         }
@@ -136,7 +136,7 @@ export class SimulatePlayingGameFacade
      */
     addSimulationMove(move: HexMove): boolean
     {
-        if (!this.simulatedPlayingFacade.addMove(move)) {
+        if (!this.playingGameFacade.addMove(move)) {
             return false;
         }
 
@@ -148,6 +148,19 @@ export class SimulatePlayingGameFacade
 
         this.simulationLine.push(move);
         this.simulationCursor++;
+
+        return true;
+    }
+
+    addSimulationMoves(moves: HexMove[]): boolean
+    {
+        for (const move of moves) {
+            const added = this.addSimulationMove(move);
+
+            if (!added) {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -171,6 +184,6 @@ export class SimulatePlayingGameFacade
     {
         this.resetSimulationAndRewind();
         this.initialPlayingGameFacade.resumeView();
-        this.simulatedPlayingFacade.destroy();
+        this.playingGameFacade.destroy();
     }
 }

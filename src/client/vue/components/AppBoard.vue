@@ -141,11 +141,11 @@ onUnmounted(() => {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls || conditionalMovesEditor?.isEnabled() }">
+    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls || conditionalMovesEnabled }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
@@ -215,7 +215,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
         </div>
 
-        <div class="rewind-controls" v-else-if="conditionalMovesEditor?.isEnabled()">
+        <div class="rewind-controls" v-else-if="conditionalMovesEditor && conditionalMovesEnabled">
 
             <!-- Back to original position -->
             <button type="button" @click="conditionalMovesEditor.startNewLine()" class="btn btn-outline-primary">
@@ -238,7 +238,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
 
             <!-- Close conditional moves edition -->
-            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameViewFacade?.disableSimulationMode()" class="btn btn-outline-warning">
+            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); conditionalMovesEnabled = false" class="btn btn-outline-warning">
                 <IconX />
             </button>
         </div>

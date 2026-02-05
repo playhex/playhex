@@ -176,7 +176,14 @@ const listenHexClick = () => {
             throw new Error('hex clicked but hosted game is null');
         }
 
+        // Do nothing here when in simulation mode, let gameViewFacade handle it
         if (gameViewFacade.value.isSimulationMode()) {
+            return;
+        }
+
+        // When conditional move editor is enabled, send move to it instead
+        if (conditionalMovesEnabled && conditionalMovesEditor.value) {
+            conditionalMovesEditor.value.autoAction(move);
             return;
         }
 
@@ -648,7 +655,7 @@ const {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
 const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
 
 watch([hostedGameClient, loggedInPlayer], () => {
@@ -660,6 +667,7 @@ watch([hostedGameClient, loggedInPlayer], () => {
         return;
     }
 
+    // TODO try replacing void by async await
     void initConditionalMoves(
         hostedGameClient.value.getHostedGame(),
         gameViewFacade.value.getPlayingGameFacade(),

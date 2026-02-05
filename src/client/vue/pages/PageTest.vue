@@ -11,6 +11,9 @@ import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSe
 import { AnimatorFacade } from '../../../shared/pixi-board/facades/AnimatorFacade.js';
 import { AutoOrientationFacade } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 import { SimulatePlayingGameFacade } from '../../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
+import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
+import { ConditionalMovesFacade } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesFacade.js';
+import { ConditionalMovesEditorState, createConditionalMovesEditorState } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditorState.js';
 
 const container = ref<HTMLElement>();
 
@@ -64,6 +67,8 @@ const stopSimulate = () => {
 gameView.on('hexClicked', move => {
     if (simulatePlayingGameFacade.value) {
         simulatePlayingGameFacade.value.addSimulationMove(move);
+    } else if (conditionalMovesFacade.value) {
+        conditionalMovesFacade.value.clickCell(move);
     } else {
         playingGameFacade.addMove(move);
     }
@@ -76,6 +81,30 @@ gameView.on('hexClickedSecondary', async move => {
         await animatorFacade.animateStone(move);
     }
 });
+
+/*
+ * Conditional moves
+ */
+const conditionalMovesEditorState = ref<ConditionalMovesEditorState>(createConditionalMovesEditorState(0));
+const conditionalMovesEditor = new ConditionalMovesEditor(conditionalMovesEditorState.value);
+const conditionalMovesFacade = shallowRef<null | ConditionalMovesFacade>(null);
+
+const enableConditionalMoves = () => {
+    if (conditionalMovesFacade.value) {
+        return;
+    }
+
+    conditionalMovesFacade.value = new ConditionalMovesFacade(playingGameFacade, conditionalMovesEditor);
+};
+
+const disableConditionalMoves = () => {
+    if (!conditionalMovesFacade.value) {
+        return;
+    }
+
+    conditionalMovesFacade.value.destroy();
+    conditionalMovesFacade.value = null;
+};
 
 /*
  * Debug game view events
@@ -152,13 +181,35 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
                         <h3>Simulate</h3>
                         <button v-if="!simulatePlayingGameFacade" class="btn btn-success" @click.prevent="startSimulate">Start simulate</button>
                         <div v-else>
-                            <button class="btn btn-success mb-3" @click.prevent="stopSimulate">Stop simulate</button>
+                            <button class="btn btn-success" @click.prevent="stopSimulate">Stop simulate</button>
 
                             <p>Enable simulation mode. <kbd>Click</kbd> to simulate a line. <kbd>Ctrl + click</kbd> to add move not simulated, on the main line instead.</p>
 
                             <button class="btn btn-success" @click.prevent="simulatePlayingGameFacade.rewind()">Rewind</button>
                             <button class="btn btn-success" @click.prevent="simulatePlayingGameFacade.forward()">Forward</button>
                             <button class="btn btn-success" @click.prevent="simulatePlayingGameFacade.resetSimulationAndRewind()">Reset simulation and rewind</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Conditional moves editor</h3>
+                        <button v-if="!conditionalMovesFacade" class="btn btn-success" @click.prevent="enableConditionalMoves">Enable</button>
+                        <div v-else>
+                            <p>
+                                Has changes: {{ conditionalMovesEditorState.hasChanges ? 'yes' : 'no' }}
+                                <br>
+                                Selected line: {{ conditionalMovesEditorState.selectedLine.join(' ') }}
+                                <br>
+                                Submitted lines count: {{ conditionalMovesEditorState.conditionalMoves.tree.length }}
+                            </p>
+
+                            <button class="btn btn-success" @click.prevent="disableConditionalMoves">Disable</button>
+                            <button class="btn btn-success" @click.prevent="conditionalMovesEditor.submitConditionalMoves()">Submit</button>
+
+                            <code><pre>{{ JSON.stringify(conditionalMovesEditorState.conditionalMovesDirty.tree, undefined, 2) }}</pre></code>
                         </div>
                     </div>
                 </div>

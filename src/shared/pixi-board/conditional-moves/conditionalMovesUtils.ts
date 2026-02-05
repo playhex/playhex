@@ -44,6 +44,16 @@ export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, 
 };
 
 /**
+ * Clone array in a way it works also when there is proxy arrays inside
+ */
+const cloneArray = <T>(array: T): T => JSON.parse(JSON.stringify(array));
+
+export const copyConditionalMovesStruct = (target: ConditionalMovesStruct, source: ConditionalMovesStruct): void => {
+    target.tree = cloneArray(source.tree);
+    target.unplayedLines = cloneArray(source.unplayedLines);
+};
+
+/**
  * Adds a line to a conditional moves tree.
  * Merge it with an existing line, extend it if new move,
  * replace answer if different answer, or add a new line.
