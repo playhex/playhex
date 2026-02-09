@@ -8,34 +8,15 @@ export type Coords = {
 };
 
 /**
- * 'a2', 'd4', or 'swap-pieces', 'pass'
+ * 'a2', 'd4'
  */
-export type Move =
-    `${Lowercase<string>}${number}` | `${Lowercase<string>}${Lowercase<string>}${number}`
-    | 'swap-pieces'
-    | 'pass'
-;
+export type Move = `${Lowercase<string>}${number}` | `${Lowercase<string>}${Lowercase<string>}${number}`;
 
 /**
  * Whether move is a normal move like "d4", "e12", ...
  */
-export const isMoveNormal = (move: string): move is Move => {
+export const validateMove = (move: string): move is Move => {
     return move.match(/^"?([a-z]{1,2})(\d{1,2})"?$/) !== null;
-};
-
-/**
- * Whether move is a special move like swap-pieces or pass
- */
-export const isMoveSpecial = (move: string): move is 'pass' | 'swap-pieces' => {
-    return move === 'swap-pieces'
-        || move === 'pass'
-    ;
-};
-
-export const isMoveValid = (move: string): move is Move => {
-    return isMoveNormal(move)
-        || isMoveSpecial(move)
-    ;
 };
 
 /**
@@ -45,7 +26,7 @@ export const isMoveValid = (move: string): move is Move => {
  *
  * @throws {Error} If providing a special move, or invalid normal move
  */
-export const moveToCoords = (move: Move): Coords => {
+export const parseMove = (move: Move): Coords => {
     const match = move.match(/^"?([a-z]{1,2})(\d{1,2})"?$/);
 
     if (match === null) {
@@ -82,7 +63,7 @@ export const mirrorCoords = (coords: Coords): Coords => ({
  * Mirror a move (for swap), "a2" => "b1"
  */
 export const mirrorMove = (move: Move): Move => {
-    return coordsToMove(mirrorCoords(moveToCoords(move)));
+    return coordsToMove(mirrorCoords(parseMove(move)));
 };
 
 /**

@@ -1,12 +1,14 @@
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
 import { HostedGame } from '../../shared/app/models/index.js';
 import useAuthStore from './authStore.js';
 import { shouldShowConditionalMoves } from '../../shared/app/hostedGameUtils.js';
 import { apiGetConditionalMoves, apiPatchConditionalMoves } from '../apiClient.js';
-import GameView from '../../shared/pixi-board/GameView.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
-import ConditionalMovesEditor, { listenGameViewEvents } from '../../shared/app/ConditionalMovesEditor.js';
+import ConditionalMovesEditor from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
+import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
+import { ConditionalMovesEditorState, createConditionalMovesEditorState } from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditorState.js';
+import { ConditionalMovesFacade } from '../../shared/pixi-board/conditional-moves/ConditionalMovesFacade.js';
 
 /**
  * Context for conditional moves of current game.
@@ -23,7 +25,16 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
 
     let currentHostedGame: null | HostedGame = null;
 
-    const conditionalMovesEditor = ref<null | ConditionalMovesEditor>(null);
+    let conditionalMovesFacade: null | ConditionalMovesFacade = null;
+
+    const conditionalMovesEditor = shallowRef<null | ConditionalMovesEditor>(null);
+
+    const conditionalMovesEditorState = ref<null | ConditionalMovesEditorState>(null);
+
+    /**
+     * Whether we show conditional move editor UI
+     */
+    const conditionalMovesEnabled = ref(false);
 
     let unlistenGameView: null | (() => void) = null;
 
@@ -36,14 +47,20 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
             unlistenGameView = null;
         }
 
+        if (conditionalMovesFacade) {
+            conditionalMovesFacade.destroy();
+            conditionalMovesFacade = null;
+        }
+
         currentHostedGame = null;
         conditionalMovesEditor.value = null;
+        conditionalMovesEditorState.value = null;
     };
 
     /**
      * Init conditional moves context for a given game.
      */
-    const initConditionalMoves = async (hostedGame: HostedGame, gameView: GameView, myIndex: PlayerIndex): Promise<void> => {
+    const initConditionalMoves = async (hostedGame: HostedGame, playingGameFacade: PlayingGameFacade, myIndex: PlayerIndex): Promise<void> => {
         resetConditionalMoves();
 
         currentHostedGame = hostedGame;
@@ -55,14 +72,19 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
 
         const conditionalMoves = await apiGetConditionalMoves(hostedGame.publicId);
 
-        conditionalMovesEditor.value = new ConditionalMovesEditor(gameView, myIndex, conditionalMoves);
+        conditionalMovesEditorState.value = createConditionalMovesEditorState(myIndex, conditionalMoves);
+        conditionalMovesEditor.value = new ConditionalMovesEditor(conditionalMovesEditorState.value);
+        conditionalMovesFacade = new ConditionalMovesFacade(playingGameFacade, conditionalMovesEditor.value);
 
-        unlistenGameView = listenGameViewEvents(conditionalMovesEditor.value as ConditionalMovesEditor, gameView);
-        conditionalMovesEditor.value.on('conditionalMovesUpdated', () => apiPatchConditionalMoves(hostedGame.publicId, conditionalMoves));
+        // TODO
+        // unlistenGameView = listenGameViewEvents(conditionalMovesEditor.value as ConditionalMovesEditor, gameView);
+        conditionalMovesEditor.value.on('conditionalMovesSubmitted', () => apiPatchConditionalMoves(hostedGame.publicId, conditionalMoves));
     };
 
     return {
         conditionalMovesEditor,
+        conditionalMovesEditorState,
+        conditionalMovesEnabled,
         resetConditionalMoves,
         initConditionalMoves,
     };

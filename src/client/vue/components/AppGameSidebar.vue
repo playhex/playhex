@@ -20,7 +20,6 @@ import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF.js';
-import GameView, { OrientationMode } from '../../../shared/pixi-board/GameView.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 import AppGameAnalyzeSummary from './AppGameAnalyzeSummary.vue';
 import { guessDemerHandicapFromHostedGame } from '../../../shared/app/demerHandicap.js';
@@ -31,26 +30,30 @@ import AppHexWorldExplore from './AppHexWorldExplore.vue';
 import { canUseHexWorldOrDownloadSGF, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
-import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
+import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
-import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
-import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
+import TriangleMark from '../../../shared/pixi-board/entities/TriangleMark.js';
+import { parseMove, validateMove } from '../../../shared/move-notation/move-notation.js';
+import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
+import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
 const props = defineProps({
     hostedGameClient: {
         type: Object as PropType<HostedGameClient>,
         required: true,
     },
-    gameView: {
-        type: Object as PropType<GameView>,
+    gameViewFacade: {
+        type: Object as PropType<GameViewFacade>,
         required: true,
     },
 });
 
-const { gameView } = props;
+const { gameViewFacade } = props;
 const { hostedGameClient } = toRefs(props);
+
+const gameView = gameViewFacade.getGameView();
 
 const emits = defineEmits([
     'close',
@@ -157,7 +160,7 @@ const removeMarksLater = () => {
     clearMarksTimeout();
 
     marksTimeout = setTimeout(() => {
-        gameView.removeMarks('coords-show');
+        gameView.removeEntitiesGroup('coords-show');
         clearMarksTimeout();
     }, 3000);
 };
@@ -173,17 +176,21 @@ const chatClick = (e: PointerEvent) => {
         return;
     }
 
-    const coords = target.innerText.toLowerCase() as Move;
+    const move = target.innerText.toLowerCase();
+
+    if (!validateMove(move)) {
+        throw new Error(`Highlighted move is invalid: "${move}"`);
+    }
 
     const mark = new TriangleMark(0x0dcaf0);
-    mark.setCoords(moveToCoords(coords));
+    mark.setCoords(parseMove(move));
 
     // ctrl click to show multiple marks when click on multiple coords in chat
     if (!e.ctrlKey) {
-        gameView.removeMarks('coords-show');
+        gameView.removeEntitiesGroup('coords-show');
     }
 
-    gameView.addMark(mark, 'coords-show');
+    gameView.addEntity(mark, 'coords-show');
 
     removeMarksLater();
 
@@ -345,9 +352,10 @@ const doAnalyzeGame = () => {
 
 const appGameAnalyzeComponent = ref<typeof AppGameAnalyze>();
 
-gameView.on('movesHistoryCursorChanged', cursor => {
-    appGameAnalyzeComponent.value?.selectMove(cursor);
-});
+// TODO
+// gameView.on('movesHistoryCursorChanged', cursor => {
+//     appGameAnalyzeComponent.value?.selectMove(cursor);
+// });
 
 /*
  * Tabs
@@ -388,8 +396,8 @@ watch(
     { deep: true },
 );
 
-const currentOrientation = ref<OrientationMode>(gameView.getComputedBoardOrientationMode());
-gameView.on('orientationChanged', () => currentOrientation.value = gameView.getComputedBoardOrientationMode());
+const currentOrientationMode = ref<OrientationMode>(gameViewFacade.getCurrentOrientationMode());
+gameView.on('orientationChanged', () => currentOrientationMode.value = gameViewFacade.getCurrentOrientationMode());
 
 const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
     return [
@@ -402,19 +410,18 @@ const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesEditorState, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
 
 watchEffect(() => {
-    if (conditionalMovesEditor.value === null) {
+    if (!conditionalMovesEditor.value || !conditionalMovesEditorState.value) {
         return;
     }
 
+    // enable or disable conditional moves when entering in the sidebar tab or leaving it
     if (currentTab.value === 'conditional_moves') {
-        conditionalMovesEditor.value.enableSimulationMode();
-    } else {
-        if (!conditionalMovesEditor.value.getHasChanges()) {
-            conditionalMovesEditor.value.disableSimulationMode();
-        }
+        conditionalMovesEnabled.value = true;
+    } else if (!conditionalMovesEditorState.value.hasChanges) {
+        conditionalMovesEnabled.value = false;
     }
 });
 </script>
@@ -730,9 +737,9 @@ watchEffect(() => {
                 ><IconAlphabet /> {{ $t('toggle_coords_short') }}</button>
 
                 <div class="row mt-2" v-if="playerSettings">
-                    <div class="col-12" v-if="'landscape' === currentOrientation">
+                    <div class="col-12" v-if="currentOrientationMode === 'landscape'">
                         <div class="btn-group" role="group">
-                            <template v-for="orientation in [0, 10, 11]" :key="orientation">
+                            <template v-for="orientation in [0, 11, 10]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation">
                                     <AppRhombus :orientation="orientation" />
@@ -740,7 +747,7 @@ watchEffect(() => {
                             </template>
                         </div>
                     </div>
-                    <div class="col-12" v-if="'portrait' === currentOrientation">
+                    <div class="col-12" v-if="currentOrientationMode === 'portrait'">
                         <div class="btn-group" role="group">
                             <template v-for="orientation in [1, 9, 2]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
@@ -755,13 +762,13 @@ watchEffect(() => {
                 <!-- force board orientation -->
                 <div class="form-text mt-4">{{ $t('force_board_orientation_mode') }}</div>
                 <div class="btn-group btn-group-sm" role="group" aria-label="Change board orientation">
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="auto" id="btn-orientation-auto" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" :value="null" id="btn-orientation-auto" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-auto">{{ $t('auto') }}</label>
 
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-landscape">{{ $t('landscape') }}</label>
 
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
                 </div>
 
@@ -830,12 +837,7 @@ watchEffect(() => {
             <div class="container-fluid">
                 <h3>{{ $t('conditional_moves.title') }}</h3>
 
-                <AppConditionalMoves
-                    v-if="null !== conditionalMovesEditor"
-                    :conditionalMovesEditor="(conditionalMovesEditor as ConditionalMovesEditor)"
-                />
-
-                <p v-else>{{ $t('loading') }}</p>
+                <AppConditionalMoves v-if="conditionalMovesEditor && conditionalMovesEditorState" />
             </div>
         </div>
 
@@ -866,7 +868,7 @@ watchEffect(() => {
 
                             <template v-else-if="message.type === 'move'">
                                 <span class="line"></span>
-                                <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="gameView?.setMovesHistoryCursor(message.moveNumber - 1)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
+                                <!-- <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="gameView?.setMovesHistoryCursor(message.moveNumber - 1)">{{ $t('move_number', { n: message.moveNumber }) }}</button> -->
                                 <span class="line"></span>
                             </template>
                             <template v-else-if="message.type === 'date'">

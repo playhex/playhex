@@ -1,11 +1,11 @@
 import { Container, Graphics } from 'pixi.js';
-import { Mark } from '../Mark.js';
+import { BoardEntity } from '../BoardEntity.js';
 import Hex from '../Hex.js';
 
 /**
  * Shows that first stone can be swapped if applicable.
  */
-export default class SwappableMark extends Mark
+export default class SwappableMark extends BoardEntity
 {
     constructor()
     {

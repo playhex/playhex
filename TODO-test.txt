@@ -1,0 +1,27 @@
+test game view:
+- flat and diamond orientation
+- premove, move confirm
+- coords, coords on light theme
+- coords clickable in chat
+- swap, swapped
+- win animation
+- resize view should keep preview
+- conditionals, light/dark theme
+- conditionals always start by opponent move, both on board and on sidebar tree
+- arrows keys
+- can cancel preview/premove
+- can cancel preview/premove if this is a swap-piece
+- undo move, 1 move, 2 move, SWAP move (marks), pass move
+- game analyze click should update board position at clicked move
+
+Optim:
+Try using ParticleContainer for stones and cells
+
+Conditional move light theme:
+    - Sidebar coords should always be white
+
+Entity groups: prevent sharing same GROUP_MARKS_FACADE by multiple instance and having multiple last move marks
+
+Custom themes:
+Create abstract Cell and Board, that can update theme, shading pattern, stones, ...
+depending on theme, can be only colors, or images...

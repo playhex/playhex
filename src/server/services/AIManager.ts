@@ -7,7 +7,7 @@ import logger from './logger.js';
 import HostedGameServer from '../HostedGameServer.js';
 import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
-import { Move } from '../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 export class FindAIError extends Error {}
 
@@ -106,7 +106,7 @@ const waitTimeBeforeRandomMove = (aiConfig: { wait?: number }): number => {
     return 0;
 };
 
-export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedGameServer): Promise<null | Move> => {
+export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedGameServer): Promise<null | HexMove> => {
     const { isBot } = player;
     let { aiConfig } = player;
 
@@ -154,7 +154,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
                 game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
                 game.getMovesHistory().map(timestampedMove => timestampedMove.move),
                 aiConfig.config.level,
-            ) as Move;
+            ) as HexMove;
     }
 
     logger.error(`No local AI play for bot with slug = "${player.slug}"`);

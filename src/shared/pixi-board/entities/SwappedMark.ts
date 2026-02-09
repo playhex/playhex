@@ -1,11 +1,11 @@
 import { Container, Text, TextStyle } from 'pixi.js';
-import { Mark } from '../Mark.js';
+import { BoardEntity } from '../BoardEntity.js';
 import Hex from '../Hex.js';
 
 /**
  * Show a 'S' on second player stone if she swapped.
  */
-export default class SwappedMark extends Mark
+export default class SwappedMark extends BoardEntity
 {
     constructor()
     {

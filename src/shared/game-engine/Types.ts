@@ -1,4 +1,5 @@
-import { Coords, Move } from '../move-notation/move-notation.js';
+import { Coords } from '../move-notation/move-notation.js';
+import { HexMove } from '../move-notation/hex-move-notation.js';
 
 export type PlayerIndex = 0 | 1;
 
@@ -8,7 +9,7 @@ export type PathItem = {
 };
 
 export type TimestampedMove = {
-    move: Move;
+    move: HexMove;
     playedAt: Date;
 };
 

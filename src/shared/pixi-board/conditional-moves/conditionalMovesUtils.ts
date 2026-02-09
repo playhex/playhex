@@ -1,10 +1,5 @@
-import { Move } from '../move-notation/move-notation.js';
-import { ConditionalMovesLine, ConditionalMovesTree } from './models/ConditionalMoves.js';
-
-export type ConditionalMovesStruct = {
-    tree: ConditionalMovesTree;
-    unplayedLines: ConditionalMovesLine[];
-};
+import { Move } from 'move-notation/move-notation.js';
+import { ConditionalMovesLine, ConditionalMovesTree, ConditionalMovesStruct } from './types.js';
 
 /**
  * Get answer from conditional moves and move played by opponent.
@@ -46,6 +41,16 @@ export const conditionalMovesShift = (conditionalMoves: ConditionalMovesStruct, 
     conditionalMoves.unplayedLines = clearDuplicatedUnplayedLines(conditionalMoves.unplayedLines);
 
     return answer;
+};
+
+/**
+ * Clone array in a way it works also when there is proxy arrays inside
+ */
+const cloneArray = <T>(array: T): T => JSON.parse(JSON.stringify(array));
+
+export const copyConditionalMovesStruct = (target: ConditionalMovesStruct, source: ConditionalMovesStruct): void => {
+    target.tree = cloneArray(source.tree);
+    target.unplayedLines = cloneArray(source.unplayedLines);
 };
 
 /**

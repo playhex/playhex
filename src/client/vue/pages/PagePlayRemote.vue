@@ -2,7 +2,7 @@
 /* eslint-env browser */
 import 'bootstrap/js/dist/dropdown';
 import useLobbyStore from '../../stores/lobbyStore.js';
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount, shallowRef } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
 import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient.js';
@@ -24,7 +24,6 @@ import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { isMyTurn } from '../../services/notifications/context-utils.js';
 import { canPassAgain } from '../../../shared/app/passUtils.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
@@ -32,11 +31,11 @@ import { apiPostRematch } from '../../apiClient.js';
 import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
-import { markRaw } from 'vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
-import GameView from '../../../shared/pixi-board/GameView.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
+import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
+import { useGameViewFacade } from '../composables/useGameViewFacade.js';
 
 const head = injectHead();
 
@@ -44,7 +43,7 @@ const { gameId } = useRoute().params;
 
 const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
 
-let gameView: null | CustomizedGameView = null; // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
+let gameViewFacade = shallowRef<null | GameViewFacade>(null); // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
 
 /**
  * When game is loaded, gameView instanciated
@@ -164,17 +163,32 @@ const getLocalPlayerIndex = (): number => {
 };
 
 const listenHexClick = () => {
-    if (gameView === null) {
-        throw new Error('no game view');
+    if (gameViewFacade.value === null) {
+        throw new Error('no game view facade');
     }
 
-    gameView.on('hexClicked', async move => {
+    gameViewFacade.value.getGameView().on('hexClicked', async move => {
+        if (gameViewFacade.value === null) {
+            throw new Error('no game view facade');
+        }
+
         if (hostedGameClient.value === null) {
             throw new Error('hex clicked but hosted game is null');
         }
 
-        const game = hostedGameClient.value.getGame();
-        move = game.moveOrSwapPieces(move);
+        // Do nothing here when in simulation mode, let gameViewFacade handle it
+        if (gameViewFacade.value.isSimulationMode()) {
+            return;
+        }
+
+        // When conditional move editor is enabled, send move to it instead
+        if (conditionalMovesEnabled && conditionalMovesEditor.value) {
+            conditionalMovesEditor.value.autoAction(move);
+            return;
+        }
+
+        const game = gameViewFacade.value.getGame();
+        const hexMove = game.moveOrSwapPieces(move);
 
         try {
             // Must get local player again in case player joined after (click "Watch", then "Join")
@@ -186,6 +200,8 @@ const listenHexClick = () => {
 
             /*
              * Premove
+             *
+             * Cannot premove swap-piece or pass, so use move instead of hexMove
              */
             const premovesEnabled = MoveSettings.PREMOVE === getMoveSettings();
 
@@ -195,9 +211,9 @@ const listenHexClick = () => {
                 }
 
                 // cancel premove when click on it
-                if (gameView?.hasPreviewedMove() && move === gameView.getPreviewedMove()!.move) {
+                if (move === gameViewFacade.value.getPreviewedMove()) {
                     await hostedGameClient.value.cancelPremove();
-                    gameView?.removePreviewedMove();
+                    gameViewFacade.value.removePreviewedMove();
 
                     return;
                 }
@@ -205,47 +221,47 @@ const listenHexClick = () => {
                 if (game.getBoard().isEmpty(move)) {
                     // set or replace premove
                     void hostedGameClient.value.sendPremove(move);
-                    gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
-                } else if (gameView?.hasPreviewedMove()) {
+                    gameViewFacade.value.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
+                } else if (gameViewFacade.value.hasPreviewedMove()) {
                     // cancel premove when click on occupied cell
                     await hostedGameClient.value.cancelPremove();
-                    gameView?.removePreviewedMove();
+                    gameViewFacade.value.removePreviewedMove();
                 }
 
                 return;
             }
 
-            game.checkMove(move, localPlayerIndex as PlayerIndex);
+            game.checkMove(hexMove, localPlayerIndex as PlayerIndex);
 
             // Send move if move preview is not enabled
             if (!shouldDisplayConfirmMove()) {
-                game.move(move, localPlayerIndex as PlayerIndex);
-                await hostedGameClient.value.sendMove(move);
+                game.move(hexMove, localPlayerIndex as PlayerIndex);
+                await hostedGameClient.value.sendMove(hexMove);
                 return;
             }
 
             // Cancel move preview if I click on it
-            const previewedMove = gameView?.getPreviewedMove();
+            const previewedMove = gameViewFacade.value.getPreviewedMove();
 
-            if (previewedMove && previewedMove.move === move) {
-                gameView?.removePreviewedMove();
+            if (previewedMove === hexMove) {
+                gameViewFacade.value.removePreviewedMove();
                 confirmMove.value = null;
                 return;
             }
 
             // What happens when I validate move
             confirmMove.value = () => {
-                game.move(move, localPlayerIndex as PlayerIndex);
+                game.move(hexMove, localPlayerIndex as PlayerIndex);
                 confirmMove.value = null;
 
                 if (!hostedGameClient.value) {
                     return;
                 }
 
-                void hostedGameClient.value.sendMove(move);
+                void hostedGameClient.value.sendMove(hexMove);
             };
 
-            gameView?.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
+            gameViewFacade.value.setPreviewedMove(hexMove, localPlayerIndex as PlayerIndex);
         } catch (e) {
             // noop
         }
@@ -257,11 +273,11 @@ const listenHexClick = () => {
  * (long press on mobile)
  */
 const listenHexSecondaryClick = () => {
-    if (gameView === null) {
+    if (gameViewFacade.value === null) {
         throw new Error('no game view');
     }
 
-    gameView.on('hexClickedSecondary', move => {
+    gameViewFacade.value.getGameView().on('hexClickedSecondary', move => {
         if (!hostedGameClient.value) {
             return;
         }
@@ -283,32 +299,13 @@ const initGameView = async () => {
 
     const game = hostedGameClient.value.loadGame();
 
-    gameView = markRaw(new CustomizedGameView(game));
+    gameViewFacade.value = useGameViewFacade(game);
 
     gameViewInitialized.value = true;
 
-    if (playerSettings.value !== null) {
-        gameView.updateOptionsFromPlayerSettings(playerSettings.value);
-    }
+    initWinOverlay(gameViewFacade.value, game);
 
-    initWinOverlay(gameView, game);
-
-    await gameView.ready();
-
-    // Should be after setDisplayCoords and setPreferredOrientations to start after redraws
-    void gameView.animateWinningPath();
-
-    watch(playerSettings, settings => {
-        if (gameView === null || settings === null) {
-            return;
-        }
-
-        gameView.setDisplayCoords(settings.showCoords);
-        gameView.setPreferredOrientations({
-            landscape: settings.orientationLandscape,
-            portrait: settings.orientationPortrait,
-        });
-    });
+    await gameViewFacade.value.getGameView().ready();
 
     if (hostedGameClient.value.getState() === 'playing') {
         listenHexClick();
@@ -493,8 +490,8 @@ const cancel = async (): Promise<void> => {
 };
 
 const toggleCoords = () => {
-    if (gameView !== null) {
-        gameView.toggleDisplayCoords();
+    if (gameViewFacade.value !== null) {
+        gameViewFacade.value.getGameView().toggleDisplayCoords();
     }
 };
 
@@ -598,7 +595,7 @@ const unreadMessages = (): number => {
  * Rewind mode
  */
 const enableRewindMode = () => {
-    gameView?.enableRewindMode();
+    gameViewFacade.value?.enableSimulationMode();
 };
 
 /*
@@ -658,11 +655,11 @@ const {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
 const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
 
 watch([hostedGameClient, loggedInPlayer], () => {
-    if (hostedGameClient.value === null || loggedInPlayer.value === null || gameView === null) {
+    if (hostedGameClient.value === null || loggedInPlayer.value === null || gameViewFacade.value === null) {
         return;
     }
 
@@ -670,9 +667,10 @@ watch([hostedGameClient, loggedInPlayer], () => {
         return;
     }
 
+    // TODO try replacing void by async await
     void initConditionalMoves(
         hostedGameClient.value.getHostedGame(),
-        gameView,
+        gameViewFacade.value.getPlayingGameFacade(),
         getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value) as PlayerIndex,
     );
 });
@@ -685,7 +683,7 @@ onUnmounted(() => resetConditionalMoves());
 const unlisteners: (() => void)[] = [];
 const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 
-const initWinOverlay = (gameView: GameView, game: Game) => {
+const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
     const listener = () => {
         const players = hostedGameClient.value?.getPlayers();
 
@@ -699,9 +697,9 @@ const initWinOverlay = (gameView: GameView, game: Game) => {
         });
     };
 
-    gameView.on('endedAndWinAnimationOver', listener);
+    gameViewFacade.on('endedAndWinAnimationOver', listener);
 
-    unlisteners.push(() => gameView.off('endedAndWinAnimationOver', listener));
+    unlisteners.push(() => gameViewFacade.off('endedAndWinAnimationOver', listener));
 };
 
 onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
@@ -714,11 +712,11 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
             <!-- Game board, "Accept" button -->
             <div class="board-container">
                 <AppBoard
-                    v-if="null !== hostedGameClient && null !== gameView"
+                    v-if="null !== hostedGameClient && null !== gameViewFacade"
                     :players="hostedGameClient.getPlayers()"
                     :timeControlOptions="hostedGameClient.getTimeControlOptions()"
                     :timeControlValues="hostedGameClient.getTimeControlValues()"
-                    :gameView="gameView"
+                    :gameViewFacade
                 />
 
                 <div v-if="hostedGameClient && hostedGameClient.canJoin(loggedInPlayer)" class="join-button-container">
@@ -737,12 +735,12 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                 <div class="buttons container-fluid">
 
                     <!-- rewind mode -->
-                    <button type="button" v-if="null !== gameView" @click="() => enableRewindMode()" class="btn btn-outline-primary">
+                    <button type="button" v-if="gameViewFacade" @click="() => enableRewindMode()" class="btn btn-outline-primary">
                         <IconRewind />
                     </button>
 
                     <!-- Conditional moves -->
-                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="conditionalMovesEditor?.enableSimulationMode()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
+                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="() => { /* TODO */ }" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
                         <IconSignpostSplit />
                     </button>
 
@@ -842,7 +840,7 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
                             <div><hr class="dropdown-divider"></div>
 
                             <!-- Explore -->
-                            <AppHexWorldExplore v-if="gameViewInitialized && gameView" :hostedGameClient :gameView :label="$t('explore')" class="dropdown-item" />
+                            <AppHexWorldExplore v-if="gameViewInitialized && gameViewFacade" :hostedGameClient :gameView="gameViewFacade.getGameView()" :label="$t('explore')" class="dropdown-item" />
                         </div>
                     </div>
 
@@ -851,17 +849,17 @@ onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
         </div>
 
         <!-- Game sidebar -->
-        <div class="sidebar bg-body" v-if="hostedGameClient && gameView">
+        <div class="sidebar bg-body" v-if="hostedGameClient && gameViewFacade">
             <AppGameSidebar
                 :hostedGameClient
-                :gameView
+                :gameViewFacade
                 @close="showSidebar(false)"
                 @toggleCoords="toggleCoords()"
             />
         </div>
     </div>
 
-    <div v-if="null === hostedGameClient || null === gameView" class="container-fluid my-3">
+    <div v-if="null === hostedGameClient || null === gameViewFacade" class="container-fluid my-3">
         <p class="lead text-center">{{ $t('loading_game') }}</p>
     </div>
 
