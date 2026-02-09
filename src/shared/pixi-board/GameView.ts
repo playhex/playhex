@@ -847,7 +847,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         entity.removeFromParent();
     }
 
-    clearEntitiesGroup(group: string = GameView.DEFAULT_ENTITY_GROUP): void
+    removeEntitiesGroup(group: string = GameView.DEFAULT_ENTITY_GROUP): void
     {
         const layer = this.entityLayersContainer.getChildByLabel(group);
 

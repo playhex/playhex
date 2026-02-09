@@ -160,7 +160,7 @@ const removeMarksLater = () => {
     clearMarksTimeout();
 
     marksTimeout = setTimeout(() => {
-        gameView.clearEntitiesGroup('coords-show');
+        gameView.removeEntitiesGroup('coords-show');
         clearMarksTimeout();
     }, 3000);
 };
@@ -187,7 +187,7 @@ const chatClick = (e: PointerEvent) => {
 
     // ctrl click to show multiple marks when click on multiple coords in chat
     if (!e.ctrlKey) {
-        gameView.clearEntitiesGroup('coords-show');
+        gameView.removeEntitiesGroup('coords-show');
     }
 
     gameView.addEntity(mark, 'coords-show');

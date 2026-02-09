@@ -231,11 +231,11 @@ export class PlayingGameFacade
 
         const firstMove = this.moves[0];
 
-        if (isSpecialHexMove(firstMove)) {
-            throw new Error('Unexpected special move as first move');
-        }
-
         if (lastMove === 'swap-pieces') {
+            if (isSpecialHexMove(firstMove)) {
+                throw new Error('Unexpected special move as first move');
+            }
+
             const swappedCoords = mirrorMove(firstMove);
 
             this.gameMarksFacade.markSwapped(swappedCoords);
@@ -263,7 +263,7 @@ export class PlayingGameFacade
     pauseView(): void
     {
         if (this.actionsWhilePaused !== null) {
-            throw new Error('Cannot freeze, already frozen.');
+            throw new Error('Cannot pause view, already paused.');
         }
 
         this.actionsWhilePaused = [];

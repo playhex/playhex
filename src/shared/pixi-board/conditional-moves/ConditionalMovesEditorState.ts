@@ -10,6 +10,7 @@ export type ConditionalMovesEditorState = {
 
     /**
      * Point of view of conditional moves.
+     * First conditional move in lines will be of color `1 - myIndex`
      */
     myIndex: 0 | 1;
 
@@ -37,8 +38,14 @@ export type ConditionalMovesEditorState = {
     selectedLine: Move[];
 };
 
-export const createConditionalMovesEditorState = (myIndex: 0 | 1, conditionalMoves: ConditionalMovesStruct = { tree: [], unplayedLines: [] }): ConditionalMovesEditorState => {
-    const state = {
+/**
+ * Creates a state that can be passed to editor.
+ */
+export const createConditionalMovesEditorState = (
+    myIndex: 0 | 1,
+    conditionalMoves: ConditionalMovesStruct = { tree: [], unplayedLines: [] },
+): ConditionalMovesEditorState => {
+    const state: ConditionalMovesEditorState = {
         myIndex,
         conditionalMoves,
         conditionalMovesDirty: { tree: [], unplayedLines: [] },

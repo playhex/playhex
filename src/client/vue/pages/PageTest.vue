@@ -85,16 +85,25 @@ gameView.on('hexClickedSecondary', async move => {
 /*
  * Conditional moves
  */
-const conditionalMovesEditorState = ref<ConditionalMovesEditorState>(createConditionalMovesEditorState(0));
-const conditionalMovesEditor = new ConditionalMovesEditor(conditionalMovesEditorState.value);
+const conditionalMovesEditorStateRed = ref<ConditionalMovesEditorState>(createConditionalMovesEditorState(0));
+const conditionalMovesEditorStateBlue = ref<ConditionalMovesEditorState>(createConditionalMovesEditorState(1));
+const conditionalMovesEditorState = ref<null | ConditionalMovesEditorState>(null);
+const editor = shallowRef<null | ConditionalMovesEditor>(null);
 const conditionalMovesFacade = shallowRef<null | ConditionalMovesFacade>(null);
 
-const enableConditionalMoves = () => {
+const enableConditionalMoves = (myIndex: 0 | 1) => {
     if (conditionalMovesFacade.value) {
         return;
     }
 
-    conditionalMovesFacade.value = new ConditionalMovesFacade(playingGameFacade, conditionalMovesEditor);
+    conditionalMovesEditorState.value = myIndex === 0
+        ? conditionalMovesEditorStateRed.value
+        : conditionalMovesEditorStateBlue.value
+    ;
+
+    editor.value = new ConditionalMovesEditor(conditionalMovesEditorState.value);
+
+    conditionalMovesFacade.value = new ConditionalMovesFacade(playingGameFacade, editor.value);
 };
 
 const disableConditionalMoves = () => {
@@ -196,8 +205,13 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
                 <div class="card">
                     <div class="card-body">
                         <h3>Conditional moves editor</h3>
-                        <button v-if="!conditionalMovesFacade" class="btn btn-success" @click.prevent="enableConditionalMoves">Enable</button>
-                        <div v-else>
+                        <template v-if="!conditionalMovesFacade">
+                            <button class="btn btn-success" @click.prevent="enableConditionalMoves(0)">Enable for Red</button>
+                            <button class="btn btn-success" @click.prevent="enableConditionalMoves(1)">Enable for Blue</button>
+                        </template>
+                        <div v-else-if="conditionalMovesEditorState && editor">
+                            <button class="btn btn-success" @click.prevent="disableConditionalMoves">Disable</button>
+
                             <p>
                                 Has changes: {{ conditionalMovesEditorState.hasChanges ? 'yes' : 'no' }}
                                 <br>
@@ -206,8 +220,10 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
                                 Submitted lines count: {{ conditionalMovesEditorState.conditionalMoves.tree.length }}
                             </p>
 
-                            <button class="btn btn-success" @click.prevent="disableConditionalMoves">Disable</button>
-                            <button class="btn btn-success" @click.prevent="conditionalMovesEditor.submitConditionalMoves()">Submit</button>
+                            <button class="btn btn-success" @click.prevent="editor.back()">Back</button>
+                            <button class="btn btn-success" @click.prevent="editor.startNewLine()">Start new line</button>
+                            <button class="btn btn-success" @click.prevent="editor.cutMove()">Cut move</button>
+                            <button class="btn btn-success" @click.prevent="editor.submitConditionalMoves()">Submit</button>
 
                             <code><pre>{{ JSON.stringify(conditionalMovesEditorState.conditionalMovesDirty.tree, undefined, 2) }}</pre></code>
                         </div>

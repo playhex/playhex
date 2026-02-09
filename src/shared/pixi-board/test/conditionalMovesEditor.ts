@@ -2,7 +2,7 @@ import assert from 'assert';
 import { createConditionalMovesEditorState } from '../conditional-moves/ConditionalMovesEditorState.js';
 import ConditionalMovesEditor from '../conditional-moves/ConditionalMovesEditor.js';
 
-describe.only('ConditionalMovesEditor', () => {
+describe('ConditionalMovesEditor', () => {
     it('can add move, then submit', () => {
         const state = createConditionalMovesEditorState(0);
         const editor = new ConditionalMovesEditor(state);

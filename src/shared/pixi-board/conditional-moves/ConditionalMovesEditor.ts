@@ -174,7 +174,13 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
      */
     back(): void
     {
-        this.state.selectedLine.pop();
+        const removedMove = this.state.selectedLine.pop();
+
+        if (!removedMove) {
+            return;
+        }
+
+        this.emit('selectedLineRewinded', [removedMove]);
     }
 
     /**
@@ -189,6 +195,8 @@ export default class ConditionalMovesEditor extends TypedEmitter<ConditionalMove
         conditionalMovesCut(this.state.conditionalMovesDirty.tree, this.state.selectedLine);
         this.state.hasChanges = true;
         this.state.selectedLine.pop();
+
+        this.emit('selectedLineReplaced', this.state.selectedLine);
     }
 
     /**
