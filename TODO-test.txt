@@ -1,3 +1,5 @@
+- move GameViewFacade into useGameView, rm GameViewFacade class
+
 test game view:
 - flat and diamond orientation
 - premove, move confirm

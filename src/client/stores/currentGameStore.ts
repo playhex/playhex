@@ -1,34 +1,35 @@
-import { ref, shallowRef } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
-import { HostedGame } from '../../shared/app/models/index.js';
-import useAuthStore from './authStore.js';
-import { shouldShowConditionalMoves } from '../../shared/app/hostedGameUtils.js';
-import { apiGetConditionalMoves, apiPatchConditionalMoves } from '../apiClient.js';
-import { PlayerIndex } from '../../shared/game-engine/index.js';
-import ConditionalMovesEditor from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
+import HostedGame from '../../shared/app/models/HostedGame.js';
 import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
+import { shouldShowConditionalMoves } from '../../shared/app/hostedGameUtils.js';
+import { apiGetConditionalMoves, apiPatchConditionalMoves } from 'apiClient.js';
 import { ConditionalMovesEditorState, createConditionalMovesEditorState } from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditorState.js';
+import ConditionalMovesEditor from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 import { ConditionalMovesFacade } from '../../shared/pixi-board/conditional-moves/ConditionalMovesFacade.js';
+import useAuthStore from './authStore.js';
+import { ref, shallowRef } from 'vue';
 
 /**
- * Context for conditional moves of current game.
- * Store is shared between many parts of the UI that interact with conditional moves:
- * - game sidebar (edit conditional moves tree)
- * - bottom game menu (navigate through moves, cut)
+ * Current remote game I am focused on.
  *
- * Allow to load and init conditional moves for a game,
- * and to reset it when leaving game page.
+ * Store is shared between many parts of the UI that interact with conditional moves:
+ * - game sidebar
+ * - bottom game menu
+ *
+ * When switching to another game, game is unloaded and new game is loaded.
+ * Reloading a game is best way to keep it synchronised and not miss updates.
  */
-const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
+const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     const { loggedInPlayer } = storeToRefs(useAuthStore());
 
-    let currentHostedGame: null | HostedGame = null;
+    const hostedGame = ref<null | HostedGame>(null);
 
-    let conditionalMovesFacade: null | ConditionalMovesFacade = null;
-
+    /*
+     * Conditional moves
+     */
+    const conditionalMovesFacade = shallowRef<null | ConditionalMovesFacade>(null);
     const conditionalMovesEditor = shallowRef<null | ConditionalMovesEditor>(null);
-
     const conditionalMovesEditorState = ref<null | ConditionalMovesEditorState>(null);
 
     /**
@@ -47,9 +48,9 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
             unlistenGameView = null;
         }
 
-        if (conditionalMovesFacade) {
-            conditionalMovesFacade.destroy();
-            conditionalMovesFacade = null;
+        if (conditionalMovesFacade.value) {
+            conditionalMovesFacade.value.destroy();
+            conditionalMovesFacade.value = null;
         }
 
         currentHostedGame = null;
@@ -60,7 +61,7 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
     /**
      * Init conditional moves context for a given game.
      */
-    const initConditionalMoves = async (hostedGame: HostedGame, playingGameFacade: PlayingGameFacade, myIndex: PlayerIndex): Promise<void> => {
+    const initConditionalMoves = async (hostedGame: HostedGame, playingGameFacade: PlayingGameFacade, myIndex: 0 | 1): Promise<void> => {
         resetConditionalMoves();
 
         currentHostedGame = hostedGame;
@@ -74,7 +75,7 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
 
         conditionalMovesEditorState.value = createConditionalMovesEditorState(myIndex, conditionalMoves);
         conditionalMovesEditor.value = new ConditionalMovesEditor(conditionalMovesEditorState.value);
-        conditionalMovesFacade = new ConditionalMovesFacade(playingGameFacade, conditionalMovesEditor.value);
+        conditionalMovesFacade.value = new ConditionalMovesFacade(playingGameFacade, conditionalMovesEditor.value);
 
         // TODO
         // unlistenGameView = listenGameViewEvents(conditionalMovesEditor.value as ConditionalMovesEditor, gameView);
@@ -82,6 +83,7 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
     };
 
     return {
+        conditionalMovesFacade,
         conditionalMovesEditor,
         conditionalMovesEditorState,
         conditionalMovesEnabled,
@@ -90,4 +92,4 @@ const useConditionalMovesStore = defineStore('conditionalMovesStore', () => {
     };
 });
 
-export default useConditionalMovesStore;
+export default useCurrentGameStore;

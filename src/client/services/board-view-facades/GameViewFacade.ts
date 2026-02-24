@@ -9,6 +9,9 @@ import { mirrorMove } from '../../../shared/move-notation/move-notation.js';
 import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 import { HexMove, isSpecialHexMove } from '../../../shared/move-notation/hex-move-notation.js';
 import { SimulatePlayingGameFacade } from '../../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
+import { ConditionalMovesFacade } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesFacade.js';
+import { createConditionalMovesEditorState } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditorState.js';
+import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 
 type WinningPathAnimatorFacadeEvents = {
     /**
@@ -24,10 +27,14 @@ type WinningPathAnimatorFacadeEvents = {
 };
 
 /**
+ * TODO maybe this should be a pinia store? should return ref with isSimulationMode, isConditionalMoves, ...
+ *
  * Keeps GameView updated with Game.
  * Shows stones from position, updates when move is played,
  * when move is undone, show swap/swapped,
  * highlight sides, animate winning path.
+ *
+ * Can switch to simulation mode, or conditional moves mode.
  */
 export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents>
 {
@@ -35,6 +42,7 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     private previewMoveFacade: PreviewMoveFacade;
     private playerSettingsFacade: PlayerSettingsFacade;
     private simulatePlayingGameFacade: null | SimulatePlayingGameFacade = null;
+    private conditionalMovesFacade: null | ConditionalMovesFacade = null;
 
     /**
      * Keeps track of which move is currently previewed.
@@ -205,15 +213,21 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         return this.simulatePlayingGameFacade !== null;
     }
 
-    enableSimulationMode(): void
+    /**
+     * Enable simulation mode if not yet enabled,
+     * and returns SimulatePlayingGameFacade to control it.
+     */
+    enableSimulationMode(): SimulatePlayingGameFacade
     {
         if (this.simulatePlayingGameFacade) {
-            return;
+            return this.simulatePlayingGameFacade;
         }
 
         this.simulatePlayingGameFacade = new SimulatePlayingGameFacade(this.playingGameFacade);
 
         this.emit('simulationModeChanged', true);
+
+        return this.simulatePlayingGameFacade;
     }
 
     disableSimulationMode(): void
@@ -231,5 +245,25 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
     getSimulatePlayingGameFacade(): null | SimulatePlayingGameFacade
     {
         return this.simulatePlayingGameFacade;
+    }
+
+    enableConditionalMoves(): ConditionalMovesFacade
+    {
+        if (this.conditionalMovesFacade) {
+            return this.conditionalMovesFacade;
+        }
+
+        this.disableSimulationMode();
+
+        const editor = new ConditionalMovesEditor(createConditionalMovesEditorState(0));
+
+        this.conditionalMovesFacade = new ConditionalMovesFacade(this.playingGameFacade, editor);
+
+        return this.conditionalMovesFacade;
+    }
+
+    disableConditionalMoves(): void
+    {
+
     }
 }

@@ -7,7 +7,7 @@ import AppPseudo from './AppPseudo.vue';
 import { Player } from '../../../shared/app/models/index.js';
 import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
+import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { storeToRefs } from 'pinia';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 
@@ -28,17 +28,13 @@ const props = defineProps({
         required: false,
         default: null,
     },
-    gameViewFacade: {
-        type: GameViewFacade,
-        required: true,
-    },
 });
 
-const { gameViewFacade } = props;
+const { gameViewFacade } = storeToRefs(useCurrentGameStore());
 const { players, timeControlOptions, timeControlValues } = toRefs(props);
 
 /*
- * Add piwi view
+ * Add pixi view
  */
 const game = gameViewFacade.getGame();
 const gameView = gameViewFacade.getGameView();
@@ -85,10 +81,10 @@ const blinkButton = (button: Ref<HTMLElement | undefined>) => {
 
 gameViewFacade.on('simulationModeChanged', enabled => hasRewindControls.value = enabled);
 
-const rewindZero = () => gameViewFacade.getSimulatePlayingGameFacade()?.rewindToFirstMove();
-const backward = () => gameViewFacade.getSimulatePlayingGameFacade()?.rewind(1);
-const forward = () => gameViewFacade.getSimulatePlayingGameFacade()?.forward(1);
-const rewindCurrent = () => gameViewFacade.getSimulatePlayingGameFacade()?.resetSimulationAndRewind();
+const rewindZero = () => gameViewFacade.enableSimulationMode().rewindToFirstMove();
+const backward = () => gameViewFacade.enableSimulationMode().rewind(1);
+const forward = () => gameViewFacade.enableSimulationMode().forward(1);
+const rewindCurrent = () => gameViewFacade.enableSimulationMode().resetSimulationAndRewind();
 const rewindClose = () => gameViewFacade.disableSimulationMode();
 
 const onKeyPress = (eventKey: string, callback: () => void): () => void => {
@@ -114,19 +110,11 @@ const onKeyPress = (eventKey: string, callback: () => void): () => void => {
 
 const unlisten: (() => void)[] = [
     onKeyPress('ArrowLeft', () => {
-        if (!gameViewFacade.isSimulationMode()) {
-            gameViewFacade.enableSimulationMode();
-        }
-
         backward();
         blinkButton(btnRewindBack);
     }),
 
     onKeyPress('ArrowRight', () => {
-        if (!gameViewFacade.isSimulationMode()) {
-            gameViewFacade.enableSimulationMode();
-        }
-
         forward();
         blinkButton(btnRewindForward);
     }),
@@ -141,7 +129,7 @@ onUnmounted(() => {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesEnabled } = storeToRefs(useCurrentGameStore());
 </script>
 
 <template>

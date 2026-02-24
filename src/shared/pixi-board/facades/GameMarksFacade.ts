@@ -5,8 +5,6 @@ import SwappableMark from '../entities/SwappableMark.js';
 import SwappedMark from '../entities/SwappedMark.js';
 import LastMoveMark from '../entities/LastMoveMark.js';
 
-const MARKS_GROUP = '_game_marks';
-
 /**
  * Set of marks useful for a game:
  * - last move
@@ -20,14 +18,20 @@ export class GameMarksFacade
     private swappableMark = new SwappableMark();
     private swappedMark = new SwappedMark();
 
+    /**
+     * Name of the entities group used for this instance.
+     * Must be random to not override entities of others instances of this same facade.
+     */
+    private marksGroup = `_game_marks_${(Math.random() + 1).toString(36).substring(7)}`;
+
     constructor(
         private gameView: GameView,
     ) {
         this.hideMarks();
 
-        this.gameView.addEntity(this.lastMoveMark, MARKS_GROUP);
-        this.gameView.addEntity(this.swappableMark, MARKS_GROUP);
-        this.gameView.addEntity(this.swappedMark, MARKS_GROUP);
+        this.gameView.addEntity(this.lastMoveMark, this.marksGroup);
+        this.gameView.addEntity(this.swappableMark, this.marksGroup);
+        this.gameView.addEntity(this.swappedMark, this.marksGroup);
     }
 
     /**
@@ -89,6 +93,6 @@ export class GameMarksFacade
      */
     setVisible(visible = true): void
     {
-        this.gameView.getGroup(MARKS_GROUP).visible = visible;
+        this.gameView.getGroup(this.marksGroup).visible = visible;
     }
 }

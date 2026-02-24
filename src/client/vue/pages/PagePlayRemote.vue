@@ -30,7 +30,6 @@ import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { apiPostRematch } from '../../apiClient.js';
 import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
@@ -182,8 +181,8 @@ const listenHexClick = () => {
         }
 
         // When conditional move editor is enabled, send move to it instead
-        if (conditionalMovesEnabled && conditionalMovesEditor.value) {
-            conditionalMovesEditor.value.autoAction(move);
+        if (conditionalMovesEnabled.value && conditionalMovesFacade.value) {
+            conditionalMovesFacade.value.clickCell(move);
             return;
         }
 
@@ -655,7 +654,7 @@ const {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor, conditionalMovesFacade, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
 const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
 
 watch([hostedGameClient, loggedInPlayer], () => {

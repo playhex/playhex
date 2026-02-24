@@ -1,4 +1,4 @@
-import { mirrorMove } from '../../move-notation/move-notation.js';
+import { mirrorMove, Move } from '../../move-notation/move-notation.js';
 import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
 import GameView from '../GameView.js';
 import { GameMarksFacade } from './GameMarksFacade.js';
@@ -34,8 +34,10 @@ export class PlayingGameFacade
         private gameView: GameView,
         private swapAllowed: boolean,
         initialMoves: HexMove[] = [],
+        showLastMovesMarks = true,
     ) {
         this.gameMarksFacade = new GameMarksFacade(gameView);
+        this.gameMarksFacade.setVisible(showLastMovesMarks);
 
         for (const move of initialMoves) {
             this.addMove(move);
@@ -59,6 +61,11 @@ export class PlayingGameFacade
         return this.moves;
     }
 
+    getStoneAt(move: Move): null | 0 | 1
+    {
+        return this.placedStones[move] ?? null;
+    }
+
     getLastMove(): null | HexMove
     {
         if (this.moves.length === 0) {
@@ -71,6 +78,14 @@ export class PlayingGameFacade
     setLastMoveMarksVisible(visible = true): void
     {
         this.gameMarksFacade.setVisible(visible);
+    }
+
+    /**
+     * Player index / color of the next stone that will be placed.
+     */
+    getCurrentPlayerIndex(): 0 | 1
+    {
+        return this.moves.length % 2 as 0 | 1;
     }
 
     /**
@@ -129,7 +144,7 @@ export class PlayingGameFacade
             return false;
         }
 
-        const playerIndex: 0 | 1 = this.moves.length % 2 as 0 | 1;
+        const playerIndex = this.getCurrentPlayerIndex();
         this.placedStones[move] = playerIndex;
         this.moves.push(move);
 

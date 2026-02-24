@@ -34,17 +34,25 @@ export class ConditionalMovesFacade
             this.gameView,
             initialPlayingGameFacade.getSwapAllowed(),
             this.mainLine,
+            false,
         );
+
+        // Make next conditional move always opponent move
+        if (this.editor.getMyIndex() === this.playingGameFacade.getCurrentPlayerIndex()) {
+            this.playingGameFacade.addMove('pass');
+            this.mainLine.push('pass');
+        }
 
         this.initialPlayingGameFacade.pauseView();
         this.markNextConditionalMoves();
 
         editor
             .on('conditionalMovesSubmitted', (conditionalMoves) => {
+                // eslint-disable-next-line no-console
                 console.log('SUBMITTED', conditionalMoves);
                 this.markNextConditionalMoves();
             })
-            .on('selectedLineMoveAdded', (move, byPlayerIndex) => {
+            .on('selectedLineMoveAdded', move => {
                 this.playingGameFacade.addMove(move);
                 this.markNextConditionalMoves();
             })
@@ -91,8 +99,17 @@ export class ConditionalMovesFacade
     {
         this.unmarksNextConditionalMoves();
 
-        const next = getNextMovesAfterLine(this.editor.getConditionalMovesDirty().tree, this.editor.getSelectedLine());
-        const nextNumberString = '' + (this.editor.getSelectedLine().length + 1);
+        const selectedLine = this.editor.getSelectedLine();
+
+        // add 1 2 3 4... on current line
+        for (let i = 0; i < selectedLine.length; ++i) {
+            const mark = new TextMark('' + (i + 1)).setCoords(parseMove(selectedLine[i]));
+            this.gameView.addEntity(mark, ENTITIES_GROUP_CONDITIONAL_MOVES);
+        }
+
+        // add 5 5 5... on every next moves that are already planned
+        const next = getNextMovesAfterLine(this.editor.getConditionalMovesDirty().tree, selectedLine);
+        const nextNumberString = '' + (selectedLine.length + 1);
 
         for (const move of next) {
             const mark = new TextMark(nextNumberString).setCoords(parseMove(move));
@@ -102,7 +119,7 @@ export class ConditionalMovesFacade
 
     clickCell(move: Move): void
     {
-        if (this.gameView.getStone(move)) {
+        if (this.initialPlayingGameFacade.getStoneAt(move) !== null) {
             return;
         }
 
