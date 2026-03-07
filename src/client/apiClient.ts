@@ -54,6 +54,8 @@ export const authGetMe = async (): Promise<Player> => {
         },
     });
 
+    await checkResponse(response);
+
     return plainToInstance(Player, await response.json());
 };
 

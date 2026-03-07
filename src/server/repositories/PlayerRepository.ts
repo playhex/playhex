@@ -173,7 +173,10 @@ export default class PlayerRepository
     {
         checkPseudo(pseudo);
 
-        const player = await this.getPlayer(publicId);
+        // Bypass cache for this critical operation
+        const player = await this.playerRepository.findOne({
+            where: { publicId },
+        });
 
         if (player === null) {
             // Should not happen: a session linked to a non-existing player
@@ -184,25 +187,25 @@ export default class PlayerRepository
             throw new MustBeGuestError();
         }
 
-        const upgradedPlayer = new Player();
-        Object.assign(upgradedPlayer, player);
-
-        upgradedPlayer.isGuest = false;
-        upgradedPlayer.pseudo = pseudo;
-        upgradedPlayer.slug = pseudoSlug(pseudo);
-        upgradedPlayer.password = await hashPassword(password);
-        upgradedPlayer.registeredAt = new Date();
+        // Mutate the existing managed entity directly instead of creating a new one
+        player.isGuest = false;
+        player.pseudo = pseudo;
+        player.slug = pseudoSlug(pseudo);
+        player.password = await hashPassword(password);
+        player.registeredAt = new Date();
 
         try {
-            await this.playerRepository.save(upgradedPlayer);
+            await this.playerRepository.save(player);
+
+            // Clear query cache so subsequent getPlayer() calls return fresh data
+            await this.playerRepository.manager.connection.queryResultCache?.clear();
 
             logger.info('Player created an account from guest', {
-                oldPlayer: player,
                 pseudo,
-                upgradedPlayer: instanceToPlain(upgradedPlayer), // do not log password hash
+                upgradedPlayer: instanceToPlain(player), // do not log password hash
             });
 
-            return upgradedPlayer;
+            return player;
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();

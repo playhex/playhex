@@ -1,5 +1,5 @@
 import { Player } from '../../shared/app/models/index.js';
-import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '../../client/apiClient.js';
+import { authGetMe, authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '../../client/apiClient.js';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import useSocketStore from './socketStore.js';
@@ -17,10 +17,15 @@ const useAuthStore = defineStore('authStore', () => {
 
     void (async () => {
         try {
-            const player = await authMeOrSignupGuest();
+            const player = await authGetMe();
             loggedInPlayer.value = playerRef(player, true);
         } catch (e) {
-            // seems offline
+            try {
+                const guest = await authMeOrSignupGuest();
+                loggedInPlayer.value = playerRef(guest, true);
+            } catch (e) {
+                // seems offline
+            }
         }
     })();
 
