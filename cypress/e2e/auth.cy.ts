@@ -313,6 +313,23 @@ describe('Authentication', () => {
         cy.get('.menu-top').contains(pseudo);
     });
 
+    it('sign up, and my nickname is displayed on top menu, even after refresh', () => {
+        const pseudo = 'test-' + randomString();
+        const password = 'test';
+
+        cy.visit('/signup');
+
+        const signupForm = () => cy.contains('h2', 'Create an account').closest('form');
+        signupForm().contains('Username').click().type(pseudo);
+        signupForm().contains('Password').click().type(password);
+        signupForm().contains('button', 'Sign up').click();
+
+        cy.get('.menu-top').contains(pseudo);
+
+        cy.reload();
+        cy.get('.menu-top').contains(pseudo);
+    });
+
     it('should not return password nor player id in api results', () => {
         cy.visit('/');
 
