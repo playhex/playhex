@@ -26,7 +26,6 @@ export default class PlayerRepository
             where: {
                 publicId,
             },
-            cache: 30000,
         });
     }
 
@@ -178,6 +177,8 @@ export default class PlayerRepository
             where: { publicId },
         });
 
+        const oldPlayer = instanceToPlain(player);
+
         if (player === null) {
             // Should not happen: a session linked to a non-existing player
             throw new Error('Player not found');
@@ -197,10 +198,8 @@ export default class PlayerRepository
         try {
             await this.playerRepository.save(player);
 
-            // Clear query cache so subsequent getPlayer() calls return fresh data
-            await this.playerRepository.manager.connection.queryResultCache?.clear();
-
             logger.info('Player created an account from guest', {
+                oldPlayer,
                 pseudo,
                 upgradedPlayer: instanceToPlain(player), // do not log password hash
             });
