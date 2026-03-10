@@ -1,13 +1,13 @@
 import assert from 'assert';
 import { guessDemerHandicap } from '../demerHandicap.js';
-import { Move } from '../../move-notation/move-notation.js';
+import { HexMove } from '../../move-notation/hex-move-notation.js';
 
-const move: Move = 'a1';
-const red: Move = move;
-const blue: Move = move;
-const blueSwaps: Move = 'swap-pieces';
-const pass: Move = 'pass';
-const etc: Move[] = [move, move, move];
+const move: HexMove = 'a1';
+const red: HexMove = move;
+const blue: HexMove = move;
+const blueSwaps: HexMove = 'swap-pieces';
+const pass: HexMove = 'pass';
+const etc: HexMove[] = [move, move, move];
 
 describe('Demer Handicap', () => {
     it('guesses Demer handicap from a game', () => {

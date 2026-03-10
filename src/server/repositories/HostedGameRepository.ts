@@ -19,7 +19,7 @@ import { createHostedGame, CreateHostedGameParams } from '../../shared/app/model
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
-import { Move } from '../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 export class GameError extends Error {}
 
@@ -421,7 +421,7 @@ export default class HostedGameRepository
         return true;
     }
 
-    playerMove(player: Player, gameId: string, move: Move): string | true
+    playerMove(player: Player, gameId: string, move: HexMove): string | true
     {
         const hostedGame = this.activeGames[gameId];
 

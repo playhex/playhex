@@ -3,7 +3,6 @@ import DOMPurify from 'dompurify';
 import { calcRandomMove, Game, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import CellAlreadyOccupiedError from '../../../shared/game-engine/errors/CellAlreadyOccupiedError.js';
 import { calcDaviesMoveFor9x9Board } from '../../../shared/app/daviesBot.js';
 import { apiPostGame } from '../../apiClient.js';
@@ -12,8 +11,11 @@ import useAiConfigsStore from '../../stores/aiConfigsStore.js';
 import { IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople, IconTablerSwords, IconTrophy } from '../icons.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import HexagonMark from '../../../shared/pixi-board/marks/HexagonMark.js';
-import { Move } from '../../../shared/move-notation/move-notation.js';
+import HexagonMark from '../../../shared/pixi-board/entities/HexagonMark.js';
+import { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
+import { useGameViewFacade } from '../composables/useGameViewFacade.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 
 useHead({
     title: t('how_to_play_hex'),
@@ -25,9 +27,9 @@ game0.setAllowSwap(false);
 const container0 = ref<HTMLElement>();
 const demo0Step = ref(0);
 
-const movesDemo0: Move[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ') as Move[];
+const movesDemo0: HexMove[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ') as HexMove[];
 
-const gameView0 = new CustomizedGameView(game0);
+const gameView0 = useGameViewFacade(game0);
 
 const animation: [() => void, number][] = [];
 const pause = () => {};
@@ -55,7 +57,7 @@ animation.push([() => {
 }, 0]);
 
 animation.push([() => {
-    gameView0.on('hexClicked', async coords => {
+    gameView0.getGameView().on('hexClicked', async coords => {
         if (game0.getCurrentPlayerIndex() === 1 || game0.isEnded()) {
             return;
         }
@@ -90,7 +92,7 @@ for (const [action, wait] of animation) {
 // Demo 1: swap and play davies 1
 const gameSwap = new Game(9);
 const container1 = ref<HTMLElement>();
-const gameView1 = new CustomizedGameView(gameSwap);
+const gameView1 = useGameViewFacade(gameSwap);
 const swapTextStep = ref<'init' | 'swapped' | 'not_swapped' | 'won' | 'lost'>('init');
 
 gameSwap.move('d6', 0);
@@ -111,7 +113,7 @@ gameSwap.on('played', (timestampedMove, moveIndex) => {
     }
 });
 
-gameView1.on('hexClicked', async coords => {
+gameView1.getGameView().on('hexClicked', async coords => {
     if (gameSwap.getCurrentPlayerIndex() === 0 || gameSwap.isEnded()) {
         return;
     }
@@ -136,9 +138,9 @@ gameView1.on('hexClicked', async coords => {
 });
 
 // Swap map
-const gameSwapMap = new Game(11);
 const container2 = ref<HTMLElement>();
-const gameView2 = new CustomizedGameView(gameSwapMap);
+const gameView2 = new GameView(11);
+new PlayerSettingsFacade(gameView2);
 const showSwapMap = ref(false);
 
 /**
@@ -169,7 +171,7 @@ for (let row = 0; row < 11; ++row) {
         mark.setCoords({ row, col });
         mark.alpha = alpha;
         mark.alpha **= 4; // Adds more contrast
-        gameView2.addMark(mark, 'swap_map');
+        gameView2.addEntity(mark, 'swap_map');
     }
 }
 
@@ -186,8 +188,8 @@ onMounted(async () => {
         throw new Error('no container2');
     }
 
-    await gameView0.mount(container0.value);
-    await gameView1.mount(container1.value);
+    await gameView0.getGameView().mount(container0.value);
+    await gameView1.getGameView().mount(container1.value);
     await gameView2.mount(container2.value);
 });
 

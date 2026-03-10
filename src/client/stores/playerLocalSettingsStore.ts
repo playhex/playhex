@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class-transformer-custom.js';
+import { OrientationMode } from '../../shared/pixi-board/facades/AutoOrientationFacade.js';
 
 const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 
@@ -17,16 +18,16 @@ export class LocalSettings
     selectedTheme: SelectedTheme = 'auto';
 
     /**
-     * Selected board orientation.
+     * Forced board orientation.
      *
-     * 'auto' by default, which means board uses player's preferred orientation,
+     * null by default, which means board uses player's preferred orientation,
      * depending of screen ratio, and rotate with screen,
      *
      * or player can force to use his preferred landscape or portrait orientation
      * no matter current screen orientation.
      */
     @Expose()
-    selectedBoardOrientation: 'auto' | 'landscape' | 'portrait' = 'auto';
+    forcedBoardOrientation: null | OrientationMode = null;
 
     /**
      * Whether to open sidebar on game page open.

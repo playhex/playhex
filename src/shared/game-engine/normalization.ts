@@ -11,5 +11,3 @@ export type GameData = {
     lastMoveAt: null | Date;
     endedAt: null | Date;
 };
-
-

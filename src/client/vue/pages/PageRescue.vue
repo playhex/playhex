@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onBeforeMount, onUnmounted, ref, Ref } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
-import GameView from '../../../shared/pixi-board/GameView.js';
 import { Game } from '../../../shared/game-engine/index.js';
 import { Player } from '../../../shared/app/models/index.js';
-import { CustomizedGameView } from '../../services/CustomizedGameView.js';
 import { shallowRef } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { useServerVersionChecker } from '../composables/useServerVersionChecker.js';
+import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
+import { useGameViewFacade } from '../composables/useGameViewFacade.js';
 
 useSeoMeta({
     robots: 'noindex',
@@ -93,7 +93,7 @@ const clearCache = async () => {
  * Test board rendering
  */
 const game = new Game(3);
-const gameView = shallowRef<null | GameView>(new CustomizedGameView(game));
+const gameViewFacade = shallowRef<GameViewFacade>(useGameViewFacade(game));
 game.move('b2', 0);
 
 const players = ['A', 'B'].map(pseudo => {
@@ -140,8 +140,8 @@ const players = ['A', 'B'].map(pseudo => {
 
         <div class="board-container">
             <AppBoard
-                v-if="gameView"
-                :gameView="(gameView as GameView)"
+                v-if="gameViewFacade"
+                :gameViewFacade
                 :players="players"
             />
         </div>

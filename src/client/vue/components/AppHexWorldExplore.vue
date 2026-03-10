@@ -36,7 +36,7 @@ const shouldDisplayHexworldLink = (): boolean => {
 
 const generateHexworldLink = () => gameToHexworldLink(
     hostedGameClient.value.getGame(),
-    gameView.getComputedBoardOrientation(),
+    gameView.getOrientation(),
 );
 
 const hexworldLink = ref(generateHexworldLink());

@@ -13,13 +13,13 @@ import { notifier } from './services/notifications/index.js';
 import useServerDateStore from './stores/serverDateStore.js';
 import { timeValueToMilliseconds } from '../shared/time-control/TimeValue.js';
 import { RichChat, RichChatMessage } from '../shared/app/rich-chat.js';
-import { addMove, canJoin, getLoserPlayer, getOtherPlayer, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, getWinnerPlayer, hasPlayer, toEngineGameData, updateHostedGame } from '../shared/app/hostedGameUtils.js';
+import { addMove, canJoin, getPlayer, getStrictLoserPlayer, getStrictWinnerPlayer, toEngineGameData, updateHostedGame } from '../shared/app/hostedGameUtils.js';
 import useLobbyStore from './stores/lobbyStore.js';
 import useAuthStore from './stores/authStore.js';
 import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore.js';
 import { checkShadowDeleted } from '../shared/app/chatUtils.js';
 import { playAudio } from '../shared/app/audioPlayer.js';
-import { Move } from '../shared/move-notation/move-notation.js';
+import { HexMove } from '../shared/move-notation/hex-move-notation.js';
 
 type HostedGameClientEvents = {
     started: () => void;
@@ -29,6 +29,9 @@ type HostedGameClientEvents = {
 /**
  * Contains info to display in the games list on lobby (HostedGame).
  * If needed, can also download full game data and start listening to game events (Game).
+ *
+ * Actually no: no longer used on lobby, only on page play remote, sidebar, menu...
+ * TODO Should be a store instead.
  */
 export default class HostedGameClient extends TypedEmitter<HostedGameClientEvents>
 {
@@ -97,38 +100,14 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return getPlayer(this.hostedGame, position);
     }
 
-    getWinnerPlayer(): null | Player
-    {
-        return getWinnerPlayer(this.hostedGame);
-    }
-
     getStrictWinnerPlayer(): Player
     {
         return getStrictWinnerPlayer(this.hostedGame);
     }
 
-    getLoserPlayer(): null | Player
-    {
-        return getLoserPlayer(this.hostedGame);
-    }
-
     getStrictLoserPlayer(): Player
     {
         return getStrictLoserPlayer(this.hostedGame);
-    }
-
-    hasPlayer(player: Player): boolean
-    {
-        return hasPlayer(this.hostedGame, player);
-    }
-
-    /**
-     * Returns player in this game who is playing against player.
-     * Or null if player is not in the game, or game has not yet 2 players.
-     */
-    getOtherPlayer(player: Player): null | Player
-    {
-        return getOtherPlayer(this.hostedGame, player);
     }
 
     getHostedGame(): HostedGame
@@ -151,11 +130,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return this.hostedGame.ranked;
     }
 
-    getRatings(): Rating[]
-    {
-        return this.hostedGame.ratings ?? [];
-    }
-
     getRating(player: Player): null | Rating
     {
         return this.hostedGame.ratings
@@ -170,11 +144,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
             return this.loadGame();
         }
 
-        return this.game;
-    }
-
-    getGameIfExists(): Game | null
-    {
         return this.game;
     }
 
@@ -217,7 +186,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         return canJoin(this.hostedGame, player);
     }
 
-    private playSoundForMove(move: Move): void
+    private playSoundForMove(move: HexMove): void
     {
         if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
         playAudio(move === 'pass'
@@ -226,7 +195,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         );
     }
 
-    async sendMove(move: Move): Promise<void>
+    async sendMove(move: HexMove): Promise<void>
     {
         return await new Promise((resolve, reject) => {
             this.socket.emit('move', this.getId(), move, answer => {
@@ -242,7 +211,7 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         });
     }
 
-    async sendPremove(move: Move): Promise<void>
+    async sendPremove(move: HexMove): Promise<void>
     {
         if (!this.game) {
             throw new Error('Cannot premove next move, needs game to know which is next move index');
@@ -549,11 +518,6 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.hostedGame.chatMessages.push(chatMessage);
         this.richChat.postChatMessage(chatMessage);
         this.emit('chatMessagePosted');
-    }
-
-    getUnreadMessages(): number
-    {
-        return this.readMessages - this.hostedGame.chatMessages.length;
     }
 
     getReadMessages(): number

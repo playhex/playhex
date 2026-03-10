@@ -11,15 +11,14 @@ import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { authChangePassword } from '../../../apiClient.js';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
-import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns.js';
+import { allShadingPatterns } from '../../../../shared/pixi-board/shading-patterns/shading-patterns.js';
 import i18n, { t } from 'i18next';
-import { Game } from '../../../../shared/game-engine/index.js';
-import { Player, MoveSettings } from '../../../../shared/app/models/index.js';
-import AppBoard from '../../components/AppBoard.vue';
-import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
+import { MoveSettings } from '../../../../shared/app/models/index.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import GameView from '../../../../shared/pixi-board/GameView.js';
+import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 
 const head = injectHead();
 
@@ -57,8 +56,8 @@ watch(
  */
 const landscapeOrientations = [
     { value: 0, labelTransKey: 'board_orientation.flat' },
-    { value: 10, labelTransKey: 'board_orientation.flat_2' },
     { value: 11, labelTransKey: 'board_orientation.diamond' },
+    { value: 10, labelTransKey: 'board_orientation.flat_2' },
 ];
 const portraitOrientations = [
     { value: 1, labelTransKey: 'board_orientation.flat' },
@@ -113,19 +112,17 @@ const submitPasswordChange = async () => {
 /*
  * Board preview
  */
-const game = new Game(14);
-const gameView = new CustomizedGameView(game);
+const gameView = new GameView(14);
+const shadingPatternPreview = ref<HTMLElement>();
 
-const players = ['A', 'B'].map(pseudo => {
-    const player = new Player();
+new PlayerSettingsFacade(gameView);
 
-    player.pseudo = pseudo;
-    player.createdAt = new Date();
-    player.isBot = false;
-    player.isGuest = false;
-    player.publicId = 'nope';
+onMounted(async () => {
+    if (!shadingPatternPreview.value) {
+        throw new Error('Missing element with ref="shadingPatternPreview"');
+    }
 
-    return player;
+    await gameView.mount(shadingPatternPreview.value);
 });
 
 /*
@@ -436,12 +433,7 @@ const isNotificationSupported = typeof Notification !== 'undefined';
 
             <h5>{{ $t('preview') }}</h5>
 
-            <div class="board-container">
-                <AppBoard
-                    v-if="gameView"
-                    :gameView="gameView"
-                    :players="players"
-                />
+            <div ref="shadingPatternPreview" class="board-container">
             </div>
         </div>
     </section>
@@ -512,7 +504,8 @@ h3, h4
     margin 0 0 0.5em 0
 
 .board-container
-    width 300px
+    width 400px
+    max-width 100%
     height 300px
 
 @css {

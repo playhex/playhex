@@ -1,12 +1,12 @@
 import { Graphics, PointData } from 'pixi.js';
-import { Mark } from '../../shared/pixi-board/Mark.js';
+import { BoardEntity } from '../../shared/pixi-board/BoardEntity.js';
 import Hex from '../../shared/pixi-board/Hex.js';
 
 /**
  * Computer best move.
  * Note that it can be either over empty cell, or a played cell.
  */
-export class BestMoveMark extends Mark
+export class BestMoveMark extends BoardEntity
 {
     override draw()
     {
