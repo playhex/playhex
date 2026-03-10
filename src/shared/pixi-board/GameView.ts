@@ -672,46 +672,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         this.highlightSidesFromGame();
 
-        this.game.on('played', (move, moveIndex, byPlayerIndex) => {
-            this.addMove(move.move, byPlayerIndex);
+        this.game.on('played', () => {
             this.removePreviewedMove();
-            this.highlightSidesFromGame();
+            this.redrawIfInitialized();
         });
 
-        this.game.on('undo', async undoneMovesTimestamped => {
+        this.game.on('undo', (undoneMovesTimestamped) => {
             const undoneMoves = undoneMovesTimestamped.map(timestampedMove => timestampedMove.move);
-
             this.removePreviewedMove(undoneMoves);
-
-            for (let i = 0; i < undoneMoves.length; ++i) {
-                const move = undoneMoves[i];
-
-                if (i > 0) {
-                    // If two moves are undone, slightly wait between these two moves removal
-                    await new Promise(r => setTimeout(r, 150));
-                }
-
-                switch (move) {
-                    case 'pass':
-                        break;
-
-                    case 'swap-pieces': {
-                        const { mirror, swapped } = this.getSwapCoordsFromGameOrUndoneMoves(undoneMoves);
-
-                        this.getHex(mirror).setPlayer(null);
-                        this.getHex(swapped).setPlayer(0);
-
-                        break;
-                    }
-
-                    default:
-                        this.getHex(move).setPlayer(null);
-                }
-
-                this.highlightLastMove(undoneMoves[i + 1] ?? null);
-            }
-
-            this.highlightSidesFromGame();
+            this.redrawIfInitialized();
         });
 
         this.game.on('ended', () => this.endedCallback());
