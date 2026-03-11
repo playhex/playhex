@@ -349,6 +349,8 @@
     "chat_message_placeholder": "Message…",
     "unread_messages": "unread messages",
     "send_chat_message": "Send",
+    "spectator_joined": "{{ player }} started watching",
+    "spectator_left": "{{ player }} stopped watching",
     "n_characters_one": "{{count}} character",
     "n_characters_other": "{{count}} characters",
     "landscape": "Landscape",

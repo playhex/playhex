@@ -12,6 +12,7 @@ export interface WebsocketControllerInterface
 {
     onConnection(socket: HexSocket): void;
     onJoinRoom?(socket: HexSocket, room: string): void;
+    onLeaveRoom?(socket: HexSocket, room: string): void;
 }
 
 export function registerWebsocketControllers() {
@@ -38,6 +39,14 @@ export function registerWebsocketControllers() {
         if (socket == null) return;
         websocketControllers.forEach(websocketController => {
             websocketController.onJoinRoom?.(socket, room);
+        });
+    });
+
+    io.of('/').adapter.on('leave-room', (room: string, id) => {
+        const socket = io.sockets.sockets.get(id);
+        if (socket == null) return;
+        websocketControllers.forEach(websocketController => {
+            websocketController.onLeaveRoom?.(socket, room);
         });
     });
 }

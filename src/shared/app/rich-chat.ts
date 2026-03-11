@@ -1,5 +1,5 @@
 import { isSameDay } from 'date-fns';
-import { ChatMessage, HostedGame } from './models/index.js';
+import { ChatMessage, HostedGame, Player } from './models/index.js';
 import { getTimestampedMoves } from './hostedGameUtils.js';
 
 /*
@@ -29,6 +29,7 @@ import { getTimestampedMoves } from './hostedGameUtils.js';
 export type ChatHeader =
     { type: 'date', date: Date }
     | { type: 'move', moveNumber: number }
+    | { type: 'spectator', player: Player, action: 'joined' | 'left' }
 ;
 
 export type RichChatMessage = ChatMessage | ChatHeader;
@@ -64,6 +65,11 @@ export class RichChat
         }
 
         this.richChatMessages.push(chatMessage);
+    }
+
+    pushSpectatorEvent(player: Player, action: 'joined' | 'left'): void
+    {
+        this.richChatMessages.push({ type: 'spectator', player, action });
     }
 }
 
