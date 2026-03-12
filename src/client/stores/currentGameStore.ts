@@ -7,6 +7,7 @@ import { ConditionalMovesEditorState, createConditionalMovesEditorState } from '
 import ConditionalMovesEditor from '../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 import { ConditionalMovesFacade } from '../../shared/pixi-board/conditional-moves/ConditionalMovesFacade.js';
 import useAuthStore from './authStore.js';
+import useSocketStore from './socketStore.js';
 import { ref, shallowRef } from 'vue';
 
 /**
@@ -22,8 +23,13 @@ import { ref, shallowRef } from 'vue';
 const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     const { loggedInPlayer } = storeToRefs(useAuthStore());
+    const socketStore = useSocketStore();
 
     const hostedGame = ref<null | HostedGame>(null);
+
+    const loadGame = (gamePublicId: string): void => {
+
+    };
 
     /*
      * Conditional moves
@@ -33,7 +39,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const conditionalMovesEditorState = ref<null | ConditionalMovesEditorState>(null);
 
     /**
-     * Whether we show conditional move editor UI
+     * Whether we show conditional move editor controls
      */
     const conditionalMovesEnabled = ref(false);
 

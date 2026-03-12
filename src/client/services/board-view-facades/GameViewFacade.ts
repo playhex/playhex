@@ -1,7 +1,5 @@
-import { TypedEmitter } from 'tiny-typed-emitter';
 import Game from '../../../shared/game-engine/Game.js';
 import GameView from '../../../shared/pixi-board/GameView.js';
-import { AnimatorFacade } from '../../../shared/pixi-board/facades/AnimatorFacade.js';
 import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
 import { PreviewMoveFacade } from '../../../shared/pixi-board/facades/PreviewMoveFacade.js';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
@@ -13,19 +11,6 @@ import { ConditionalMovesFacade } from '../../../shared/pixi-board/conditional-m
 import { createConditionalMovesEditorState } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditorState.js';
 import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
 
-type WinningPathAnimatorFacadeEvents = {
-    /**
-     * Game has ended, and win animation is over.
-     * Used to display win message after animation, and not at same time.
-     */
-    endedAndWinAnimationOver: () => void;
-
-    /**
-     * When simulation mode has been enabled or disabled.
-     */
-    simulationModeChanged: (enabled: boolean) => void;
-};
-
 /**
  * TODO maybe this should be a pinia store? should return ref with isSimulationMode, isConditionalMoves, ...
  *
@@ -36,7 +21,7 @@ type WinningPathAnimatorFacadeEvents = {
  *
  * Can switch to simulation mode, or conditional moves mode.
  */
-export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents>
+export class GameViewFacade
 {
     private playingGameFacade: PlayingGameFacade;
     private previewMoveFacade: PreviewMoveFacade;
@@ -55,8 +40,6 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         private gameView: GameView,
         private game: Game,
     ) {
-        super();
-
         this.playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
         this.playingGameFacade = new PlayingGameFacade(
@@ -119,8 +102,8 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
             }
         });
 
-        this.game.on('ended', () => this.endedCallback());
-        this.game.on('canceled', () => this.endedCallback());
+        this.game.on('ended', () => this.highlightSidesFromGame());
+        this.game.on('canceled', () => this.highlightSidesFromGame());
 
         this.game.on('updated', () => {
             this.playingGameFacade.undoAllMoves();
@@ -147,22 +130,6 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
         }
 
         this.gameView.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
-    }
-
-    private async endedCallback(): Promise<void>
-    {
-        this.highlightSidesFromGame();
-
-        const winningPath = this.game.getBoard().getShortestWinningPath();
-
-        if (winningPath) {
-            const animatorFacade = new AnimatorFacade(this.gameView);
-
-            await animatorFacade.animatePath(winningPath);
-        }
-
-
-        this.emit('endedAndWinAnimationOver');
     }
 
     hasPreviewedMove(): boolean
@@ -225,8 +192,6 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
 
         this.simulatePlayingGameFacade = new SimulatePlayingGameFacade(this.playingGameFacade);
 
-        this.emit('simulationModeChanged', true);
-
         return this.simulatePlayingGameFacade;
     }
 
@@ -238,8 +203,6 @@ export class GameViewFacade extends TypedEmitter<WinningPathAnimatorFacadeEvents
 
         this.simulatePlayingGameFacade.destroy();
         this.simulatePlayingGameFacade = null;
-
-        this.emit('simulationModeChanged', false);
     }
 
     getSimulatePlayingGameFacade(): null | SimulatePlayingGameFacade

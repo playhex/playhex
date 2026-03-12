@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { t } from 'i18next';
-import { onUnmounted, Ref, ref } from 'vue';
+import { Ref, ref } from 'vue';
 import AppBoard from '../../components/AppBoard.vue';
 import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
@@ -15,6 +15,7 @@ import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { useGameViewFacade } from '../../composables/useGameViewFacade.js';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
+import { useWinOverlay } from '../../composables/useWinOverlay.js';
 
 let gameView: null | GameView = null;
 let gameViewFacade: null | GameViewFacade = null;
@@ -181,21 +182,16 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
 /*
  * Game end: win popin
  */
-const unlisteners: (() => void)[] = [];
 const gameFinishedOverlay = defineOverlay(OfflineGameFinishedOverlay);
 
 const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game, players: Player[]) => {
-    gameViewFacade.on('endedAndWinAnimationOver', () => {
-        void gameFinishedOverlay({
+    useWinOverlay(gameViewFacade.getGameView(), gameViewFacade.getGame(), async () => {
+        await gameFinishedOverlay({
             game,
             players,
         });
     });
-
-    unlisteners.push(() => gameViewFacade.removeAllListeners('endedAndWinAnimationOver'));
 };
-
-onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 
 init();
 

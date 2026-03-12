@@ -35,14 +35,14 @@ import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 import { useGameViewFacade } from '../composables/useGameViewFacade.js';
+import { useWinOverlay } from '../composables/useWinOverlay.js';
+import { useGameRemote } from 'vue/composables/useGameRemote.js';
 
 const head = injectHead();
 
 const { gameId } = useRoute().params;
 
 const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
-
-let gameViewFacade = shallowRef<null | GameViewFacade>(null); // Cannot be a ref() because crash when toggle coords and hover board. Also, using .mount() on a ref is very laggy.
 
 /**
  * When game is loaded, gameView instanciated
@@ -52,6 +52,8 @@ const gameViewInitialized = ref(false);
 if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
 }
+
+const gameRemote = useGameRemote(gameId);
 
 const socketStore = useSocketStore();
 const lobbyStore = useLobbyStore();
@@ -64,18 +66,6 @@ const router = useRouter();
 const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 const { localSettings } = usePlayerLocalSettingsStore();
 const confirmMove: Ref<null | (() => void)> = ref(null);
-
-const getMoveSettings = (): null | MoveSettings => {
-    if (hostedGameClient.value === null || playerSettings.value === null) {
-        return null;
-    }
-
-    return {
-        blitz: playerSettings.value.moveSettingsBlitz,
-        normal: playerSettings.value.moveSettingsNormal,
-        correspondence: playerSettings.value.moveSettingsCorrespondence,
-    }[timeControlToCadencyName(hostedGameClient.value.getHostedGame())];
-};
 
 const shouldDisplayConfirmMove = (): boolean => {
     if (hostedGameClient.value === null) {
@@ -160,164 +150,6 @@ const getLocalPlayerIndex = (): number => {
 
     return getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value);
 };
-
-const listenHexClick = () => {
-    if (gameViewFacade.value === null) {
-        throw new Error('no game view facade');
-    }
-
-    gameViewFacade.value.getGameView().on('hexClicked', async move => {
-        if (gameViewFacade.value === null) {
-            throw new Error('no game view facade');
-        }
-
-        if (hostedGameClient.value === null) {
-            throw new Error('hex clicked but hosted game is null');
-        }
-
-        // Do nothing here when in simulation mode, let gameViewFacade handle it
-        if (gameViewFacade.value.isSimulationMode()) {
-            return;
-        }
-
-        // When conditional move editor is enabled, send move to it instead
-        if (conditionalMovesEnabled.value && conditionalMovesFacade.value) {
-            conditionalMovesFacade.value.clickCell(move);
-            return;
-        }
-
-        const game = gameViewFacade.value.getGame();
-        const hexMove = game.moveOrSwapPieces(move);
-
-        try {
-            // Must get local player again in case player joined after (click "Watch", then "Join")
-            const localPlayerIndex = getLocalPlayerIndex();
-
-            if (localPlayerIndex === -1) {
-                return;
-            }
-
-            /*
-             * Premove
-             *
-             * Cannot premove swap-piece or pass, so use move instead of hexMove
-             */
-            const premovesEnabled = MoveSettings.PREMOVE === getMoveSettings();
-
-            if (premovesEnabled && !isMyTurn(hostedGameClient.value.getHostedGame())) {
-                if (game.isEnded()) {
-                    return;
-                }
-
-                // cancel premove when click on it
-                if (move === gameViewFacade.value.getPreviewedMove()) {
-                    await hostedGameClient.value.cancelPremove();
-                    gameViewFacade.value.removePreviewedMove();
-
-                    return;
-                }
-
-                if (game.getBoard().isEmpty(move)) {
-                    // set or replace premove
-                    void hostedGameClient.value.sendPremove(move);
-                    gameViewFacade.value.setPreviewedMove(move, localPlayerIndex as PlayerIndex);
-                } else if (gameViewFacade.value.hasPreviewedMove()) {
-                    // cancel premove when click on occupied cell
-                    await hostedGameClient.value.cancelPremove();
-                    gameViewFacade.value.removePreviewedMove();
-                }
-
-                return;
-            }
-
-            game.checkMove(hexMove, localPlayerIndex as PlayerIndex);
-
-            // Send move if move preview is not enabled
-            if (!shouldDisplayConfirmMove()) {
-                game.move(hexMove, localPlayerIndex as PlayerIndex);
-                await hostedGameClient.value.sendMove(hexMove);
-                return;
-            }
-
-            // Cancel move preview if I click on it
-            const previewedMove = gameViewFacade.value.getPreviewedMove();
-
-            if (previewedMove === hexMove) {
-                gameViewFacade.value.removePreviewedMove();
-                confirmMove.value = null;
-                return;
-            }
-
-            // What happens when I validate move
-            confirmMove.value = () => {
-                game.move(hexMove, localPlayerIndex as PlayerIndex);
-                confirmMove.value = null;
-
-                if (!hostedGameClient.value) {
-                    return;
-                }
-
-                void hostedGameClient.value.sendMove(hexMove);
-            };
-
-            gameViewFacade.value.setPreviewedMove(hexMove, localPlayerIndex as PlayerIndex);
-        } catch (e) {
-            // noop
-        }
-    });
-};
-
-/**
- * Ctrl+hex click to paste coords in chat
- * (long press on mobile)
- */
-const listenHexSecondaryClick = () => {
-    if (gameViewFacade.value === null) {
-        throw new Error('no game view');
-    }
-
-    gameViewFacade.value.getGameView().on('hexClickedSecondary', move => {
-        if (!hostedGameClient.value) {
-            return;
-        }
-
-        const chatInput = useChatInputStore().getChatInput(hostedGameClient.value.getId());
-
-        if (chatInput.value.length > 0 && !chatInput.value.match(/\s$/)) {
-            chatInput.value += ' ';
-        }
-
-        chatInput.value += move + ' ';
-    });
-};
-
-const initGameView = async () => {
-    if (!hostedGameClient.value) {
-        throw new Error('Cannot init game view now, no hostedGameClient');
-    }
-
-    const game = hostedGameClient.value.loadGame();
-
-    gameViewFacade.value = useGameViewFacade(game);
-
-    gameViewInitialized.value = true;
-
-    initWinOverlay(gameViewFacade.value, game);
-
-    await gameViewFacade.value.getGameView().ready();
-
-    if (hostedGameClient.value.getState() === 'playing') {
-        listenHexClick();
-    } else {
-        hostedGameClient.value.on('started', () => listenHexClick());
-    }
-
-    listenHexSecondaryClick();
-};
-
-onBeforeUnmount(() => {
-    hostedGameClient.value?.destroy();
-});
 
 const makeTitle = (hostedGame: HostedGame) => {
     const players = hostedGame.hostedGameToPlayers.map(h => h.player);
@@ -679,29 +511,22 @@ onUnmounted(() => resetConditionalMoves());
 /*
  * Game end: win popin
  */
-const unlisteners: (() => void)[] = [];
 const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 
 const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
-    const listener = () => {
-        const players = hostedGameClient.value?.getPlayers();
+    const players = hostedGameClient.value?.getPlayers();
 
-        if (!players) {
-            throw new Error('Unexpected no players, but needed to show the winner');
-        }
+    if (!players) {
+        throw new Error('Unexpected no players, but needed to show the winner');
+    }
 
-        void gameFinishedOverlay({
+    useWinOverlay(gameViewFacade.getGameView(), gameViewFacade.getGame(), async () => {
+        await gameFinishedOverlay({
             game,
             players,
         });
-    };
-
-    gameViewFacade.on('endedAndWinAnimationOver', listener);
-
-    unlisteners.push(() => gameViewFacade.off('endedAndWinAnimationOver', listener));
+    });
 };
-
-onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 </script>
 
 <template>

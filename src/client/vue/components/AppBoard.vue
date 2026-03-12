@@ -79,8 +79,6 @@ const blinkButton = (button: Ref<HTMLElement | undefined>) => {
     setTimeout(() => button.value?.classList.remove('active'), 80);
 };
 
-gameViewFacade.on('simulationModeChanged', enabled => hasRewindControls.value = enabled);
-
 const rewindZero = () => gameViewFacade.enableSimulationMode().rewindToFirstMove();
 const backward = () => gameViewFacade.enableSimulationMode().rewind(1);
 const forward = () => gameViewFacade.enableSimulationMode().forward(1);
