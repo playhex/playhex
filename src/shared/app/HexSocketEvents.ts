@@ -187,6 +187,16 @@ export type HexServerToClientEvents = {
      */
     playerNotification: (playerNotification: PlayerNotification) => void;
 
+    /**
+     * A spectator (non-player) started watching a game.
+     */
+    spectatorJoined: (gameId: string, player: Player) => void;
+
+    /**
+     * A spectator (non-player) stopped watching a game.
+     */
+    spectatorLeft: (gameId: string, player: Player) => void;
+
     // Room updates
 
     /** State for the `Rooms.lobby` room. */

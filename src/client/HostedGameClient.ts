@@ -551,6 +551,18 @@ export default class HostedGameClient extends TypedEmitter<HostedGameClientEvent
         this.emit('chatMessagePosted');
     }
 
+    onSpectatorJoined(player: Player): void
+    {
+        this.richChat.pushSpectatorEvent(player, 'joined');
+        this.emit('chatMessagePosted');
+    }
+
+    onSpectatorLeft(player: Player): void
+    {
+        this.richChat.pushSpectatorEvent(player, 'left');
+        this.emit('chatMessagePosted');
+    }
+
     getUnreadMessages(): number
     {
         return this.readMessages - this.hostedGame.chatMessages.length;
@@ -701,6 +713,22 @@ export const listenGameUpdates = (
         }
 
         hostedGameClient.value.onChatMessage(chatMessage);
+    });
+
+    on('spectatorJoined', (gameId: string, player: Player) => {
+        if (gameId !== currentPublicId) {
+            return;
+        }
+
+        hostedGameClient.value.onSpectatorJoined(player);
+    });
+
+    on('spectatorLeft', (gameId: string, player: Player) => {
+        if (gameId !== currentPublicId) {
+            return;
+        }
+
+        hostedGameClient.value.onSpectatorLeft(player);
     });
 
     return (): void => {

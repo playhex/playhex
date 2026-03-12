@@ -109,4 +109,26 @@ describe('Rich Chat', () => {
         assert.deepStrictEqual(richChat[2], { type: 'move', moveNumber: 4 });
         assert.strictEqual(richChat[3], message2);
     });
+
+    it('push spectator events', () => {
+        const hostedGame = createHostedGame();
+        hostedGame.chatMessages = [];
+
+        const spectator = new Player();
+        spectator.pseudo = 'Watcher';
+
+        const richChat = new RichChat(hostedGame);
+
+        richChat.pushSpectatorEvent(spectator, 'joined');
+
+        const messages = richChat.getRichChatMessages();
+
+        assert.strictEqual(messages.length, 1);
+        assert.deepStrictEqual(messages[0], { type: 'spectator', player: spectator, action: 'joined' });
+
+        richChat.pushSpectatorEvent(spectator, 'left');
+
+        assert.strictEqual(messages.length, 2);
+        assert.deepStrictEqual(messages[1], { type: 'spectator', player: spectator, action: 'left' });
+    });
 });
