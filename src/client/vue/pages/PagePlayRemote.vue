@@ -15,20 +15,19 @@ import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCo
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
-import { Game, PlayerIndex } from '../../../shared/game-engine/index.js';
+import { Game } from '../../../shared/game-engine/index.js';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import { canPassAgain } from '../../../shared/app/passUtils.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { apiPostRematch } from '../../apiClient.js';
 import { canJoin, getPlayers, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
 import GameView from '../../../shared/pixi-board/GameView.js';
-import useCurrentGameStore from 'stores/currentGameStore.js';
+import useCurrentGameStore from '../../stores/currentGameStore.js';
 
 const head = injectHead();
 

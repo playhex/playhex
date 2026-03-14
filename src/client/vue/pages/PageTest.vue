@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue';
-import { onMounted } from 'vue';
+import { ref, onMounted, shallowRef } from 'vue';
 import { themes } from '../../../shared/pixi-board/BoardTheme.js';
 import GameView from '../../../shared/pixi-board/GameView.js';
 import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';

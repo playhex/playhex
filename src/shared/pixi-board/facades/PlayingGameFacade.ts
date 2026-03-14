@@ -42,12 +42,14 @@ export class PlayingGameFacade
 
     constructor(
         private gameView: GameView,
-        private swapAllowed: boolean,
+        private swapAllowed = true,
         initialMoves: HexMove[] = [],
         showLastMovesMarks = true,
     ) {
         this.gameMarksFacade = new GameMarksFacade(gameView);
         this.gameMarksFacade.setVisible(showLastMovesMarks);
+
+        this.previewMoveFacade = new PreviewMoveFacade(gameView);
 
         for (const move of initialMoves) {
             this.addMove(move);
@@ -309,7 +311,7 @@ export class PlayingGameFacade
                 throw new Error('Unexpected special move as first move');
             }
 
-            this.previewMoveFacade.preview(mirrorMove(firstMove), 0, firstMove);
+            this.previewMoveFacade.preview(mirrorMove(firstMove), 1, firstMove);
             return;
         }
 

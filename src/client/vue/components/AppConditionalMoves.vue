@@ -3,13 +3,12 @@ import { IconCheck, IconScissors, IconTrash } from '../icons.js';
 import AppConditionalMoveTree from './AppConditionalMoveTree.vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
 import { storeToRefs } from 'pinia';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
 
-const {
-    conditionalMovesEditor,
-    conditionalMovesEditorState,
-    conditionalMovesEnabled,
-} = storeToRefs(useConditionalMovesStore());
+// const {
+//     conditionalMovesEditor,
+//     conditionalMovesEditorState,
+//     conditionalMovesEnabled,
+// } = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>

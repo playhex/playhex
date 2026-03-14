@@ -20,6 +20,7 @@ import usePlayerLocalSettingsStore from './playerLocalSettingsStore.js';
 import { playAudio } from '../../shared/app/audioPlayer.js';
 import Premove from '../../shared/app/models/Premove.js';
 import { SimulatePlayingGameFacade } from '../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
+import { canPassAgain } from '../../shared/app/passUtils.js';
 
 /**
  * Current remote game I am focused on.
@@ -331,23 +332,23 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     };
 
     const shouldShowPass = computed((): boolean => {
-        if (hostedGameClient.value === null) {
+        if (!hostedGame.value) {
             return false;
         }
 
-        return hostedGameClient.value.getState() === 'playing'
-            && getLocalPlayerIndex() !== -1
+        return hostedGame.value.state === 'playing'
+            && localPlayerIndex.value !== null
         ;
     });
 
     const shouldEnablePass = computed((): boolean => {
-        if (hostedGameClient.value === null) {
+        if (!hostedGame.value || !game.value) {
             return false;
         }
 
-        return hostedGameClient.value.getState() === 'playing'
-            && isMyTurn(hostedGameClient.value.getHostedGame())
-            && canPassAgain(hostedGameClient.value.getGame())
+        return hostedGame.value.state === 'playing'
+            && isMyTurn.value
+            && canPassAgain(game.value)
         ;
     });
 
@@ -533,6 +534,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         gameUIMode.value = 'simulation';
         simulatePlayingGameFacade.value = new SimulatePlayingGameFacade(playingGameFacade.value);
     };
+
+    /*
+     * Conditional moves
+     */
+    
 
     return {
         hostedGame,
