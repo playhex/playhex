@@ -3,7 +3,7 @@ import GameView from '../../../shared/pixi-board/GameView.js';
 import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
 import { PreviewMoveFacade } from '../../../shared/pixi-board/facades/PreviewMoveFacade.js';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
-import { mirrorMove } from '../../../shared/move-notation/move-notation.js';
+import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
 import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
 import { HexMove, isSpecialHexMove } from '../../../shared/move-notation/hex-move-notation.js';
 import { SimulatePlayingGameFacade } from '../../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
@@ -161,7 +161,7 @@ export class GameViewFacade
             return;
         }
 
-        this.previewMoveFacade.preview(move, byPlayerIndex);
+        this.previewMoveFacade.preview(move as Move, byPlayerIndex);
     }
 
     removePreviewedMove(): void

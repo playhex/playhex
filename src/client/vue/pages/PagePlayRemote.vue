@@ -2,19 +2,16 @@
 /* eslint-env browser */
 import 'bootstrap/js/dist/dropdown';
 import useLobbyStore from '../../stores/lobbyStore.js';
-import { ref, computed, onBeforeUnmount, shallowRef } from 'vue';
+import { ref, computed } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
-import HostedGameClient, { listenGameUpdates } from '../../HostedGameClient.js';
 import { defineOverlay } from '@overlastic/vue';
 import { Ref, onUnmounted, watch, watchEffect } from 'vue';
 import useSocketStore from '../../stores/socketStore.js';
 import useAuthStore from '../../stores/authStore.js';
 import Rooms from '../../../shared/app/Rooms.js';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { useRoute, useRouter } from 'vue-router';
 import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
-import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
@@ -24,36 +21,53 @@ import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import { isMyTurn } from '../../services/notifications/context-utils.js';
 import { canPassAgain } from '../../../shared/app/passUtils.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { apiPostRematch } from '../../apiClient.js';
-import { canJoin, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
+import { canJoin, getPlayers, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
-import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
-import { useChatInputStore } from '../../stores/chatInputStore.js';
-import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
-import { useGameViewFacade } from '../composables/useGameViewFacade.js';
-import { useWinOverlay } from '../composables/useWinOverlay.js';
-import { useGameRemote } from 'vue/composables/useGameRemote.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import useCurrentGameStore from 'stores/currentGameStore.js';
 
 const head = injectHead();
 
 const { gameId } = useRoute().params;
 
-const hostedGameClient: Ref<HostedGameClient | null> = ref(null);
-
-/**
- * When game is loaded, gameView instanciated
- */
-const gameViewInitialized = ref(false);
-
 if (Array.isArray(gameId)) {
     throw new Error('unexpected array param in gameId');
 }
 
-const gameRemote = useGameRemote(gameId);
+const {
+    hostedGame,
+    gameView,
+
+    isMyTurn,
+    players,
+    localPlayerIndex,
+    shouldDisplayConfirmMove,
+    canCancel,
+    shouldDisplayAnswerUndoMove,
+    shouldDisplayUndoMove,
+    shouldDisableUndoMove,
+    canRematch,
+    shouldShowPass,
+    shouldEnablePass,
+} = storeToRefs(useCurrentGameStore());
+
+const {
+    loadGame,
+
+    askUndo,
+    answerUndo,
+    sendMove,
+    sendPremove,
+    cancelPremove,
+    sendPass,
+    sendResign,
+    sendCancel,
+    enableSimulationMode,
+} = useCurrentGameStore();
 
 const socketStore = useSocketStore();
 const lobbyStore = useLobbyStore();
@@ -63,93 +77,10 @@ const router = useRouter();
 /*
  * Confirm move
  */
-const { playerSettings } = storeToRefs(usePlayerSettingsStore());
 const { localSettings } = usePlayerLocalSettingsStore();
 const confirmMove: Ref<null | (() => void)> = ref(null);
 
-const shouldDisplayConfirmMove = (): boolean => {
-    if (hostedGameClient.value === null) {
-        return false;
-    }
-
-    // I am watcher
-    if (getLocalPlayerIndex() === -1) {
-        return false;
-    }
-
-    // Game has ended. Still display button when game is not yet started to make sure it works
-    if (hostedGameClient.value.isStateEnded()) {
-        return false;
-    }
-
-    return getMoveSettings() === MoveSettings.MUST_CONFIRM;
-};
-
-/*
- * Undo move
- */
-const shouldDisplayUndoMove = (): boolean => {
-    if (hostedGameClient.value === null || playerSettings.value === null) {
-        return false;
-    }
-
-    // I am watcher
-    if (getLocalPlayerIndex() === -1) {
-        return false;
-    }
-
-    if (hostedGameClient.value.getState() !== 'playing') {
-        return false;
-    }
-
-    // Show a disabled button if I sent an undo request,
-    // but hide it if opponent sent an undo request.
-    if (hostedGameClient.value?.getUndoRequest() === 1 - getLocalPlayerIndex()) {
-        return false;
-    }
-
-    return true;
-};
-
-const shouldDisableUndoMove = (): boolean => {
-    if (!hostedGameClient.value) {
-        return true;
-    }
-
-    const game = hostedGameClient.value.getGame();
-
-    return hostedGameClient.value.getUndoRequest() === getLocalPlayerIndex()
-        || game.canPlayerUndo(getLocalPlayerIndex() as PlayerIndex) !== true
-    ;
-};
-
-const shouldDisplayAnswerUndoMove = (): boolean => {
-    if (!hostedGameClient.value) {
-        return false;
-    }
-
-    if (hostedGameClient.value.getState() !== 'playing') {
-        return false;
-    }
-
-    return hostedGameClient.value?.getUndoRequest() === 1 - getLocalPlayerIndex();
-};
-
-const askUndo = (): void => {
-    void hostedGameClient.value?.sendAskUndo();
-};
-
-const answerUndo = (accept: boolean): void => {
-    void hostedGameClient.value?.sendAnswerUndo(accept);
-};
-
-const getLocalPlayerIndex = (): number => {
-    if (loggedInPlayer.value === null || !hostedGameClient.value) {
-        return -1;
-    }
-
-    return getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value);
-};
+loadGame(gameId);
 
 const makeTitle = (hostedGame: HostedGame) => {
     const players = hostedGame.hostedGameToPlayers.map(h => h.player);
@@ -174,9 +105,10 @@ const makeTitle = (hostedGame: HostedGame) => {
  */
 let unlistenGameUpdates: null | (() => void) = null;
 
-socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
+// TODO
+socketStore.socket.on('gameUpdate', (publicId, hostedGame) => {
     // ignore if not my game, or already initialized
-    if (publicId !== gameId || hostedGameClient.value !== null) {
+    if (publicId !== gameId) {
         return;
     }
 
@@ -186,21 +118,8 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
         return;
     }
 
-    // @ts-ignore
-    hostedGameClient.value = new HostedGameClient(hostedGame, socketStore.socket);
-
-    // I think `listenGameUpdates()` must be called synchronously here (i.e do not put await before this call)
-    // to prevent losing updates between game initialization and next socket event.
-    unlistenGameUpdates = listenGameUpdates(
-        hostedGameClient as Ref<HostedGameClient>,
-        // @ts-ignore
-        socketStore.socket,
-    );
-
-    await initGameView();
-
-    const playerPseudos = hostedGameClient.value.getPlayers().map(p => p.pseudo);
-    const { state, host } = hostedGameClient.value.getHostedGame();
+    const playerPseudos = getPlayers(hostedGame).map(p => p.pseudo);
+    const { state, host } = hostedGame;
     const description = state === 'created'
         ? `Hex game, hosted by ${host?.pseudo ?? 'system'}, waiting for an opponent.`
         : `Hex game, ${playerPseudos.join(' versus ')}.`
@@ -208,8 +127,8 @@ socketStore.socket.on('gameUpdate', async (publicId, hostedGame) => {
 
     useSeoMeta({
         title: computed(() => {
-            if (hostedGameClient.value == null) return '';
-            return makeTitle(hostedGameClient.value.getHostedGame());
+            if (hostedGame == null) return '';
+            return makeTitle(hostedGame);
         }),
         description,
         ogDescription: description,
@@ -240,11 +159,11 @@ onUnmounted(() => {
  * Join game
  */
 const join = async () => {
-    if (hostedGameClient.value === null) {
+    if (hostedGame.value === null) {
         return;
     }
 
-    if (isGuestJoiningCorrepondence(hostedGameClient.value.getHostedGame())) {
+    if (isGuestJoiningCorrepondence(hostedGame.value)) {
         try {
             await createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
@@ -252,7 +171,7 @@ const join = async () => {
         }
     }
 
-    return lobbyStore.joinGame(hostedGameClient.value.getId());
+    return lobbyStore.joinGame(hostedGame.value.publicId);
 };
 
 const confirmationOverlay = defineOverlay(ConfirmationOverlay);
@@ -261,17 +180,15 @@ const confirmationOverlay = defineOverlay(ConfirmationOverlay);
  * Resign
  */
 const canResign = (): boolean => {
-    if (getLocalPlayerIndex() === -1 || hostedGameClient.value === null) {
+    if (localPlayerIndex.value === null || hostedGame.value === null) {
         return false;
     }
 
-    return hostedGameClient.value.canResign();
+    return hostedGame.value.state === 'playing';
 };
 
 const resign = async (): Promise<void> => {
-    const localPlayerIndex = getLocalPlayerIndex();
-
-    if (localPlayerIndex === -1) {
+    if (localPlayerIndex.value === null) {
         return;
     }
 
@@ -285,7 +202,7 @@ const resign = async (): Promise<void> => {
             cancelClass: 'btn-outline-primary',
         });
 
-        await hostedGameClient.value?.sendResign();
+        await sendResign();
     } catch (e) {
         // resignation canceled
     }
@@ -294,14 +211,6 @@ const resign = async (): Promise<void> => {
 /*
  * Cancel
  */
-const canCancel = (): boolean => {
-    if (getLocalPlayerIndex() === -1 || hostedGameClient.value === null) {
-        return false;
-    }
-
-    return hostedGameClient.value.canCancel();
-};
-
 const cancel = async (): Promise<void> => {
     try {
         await confirmationOverlay({
@@ -317,13 +226,11 @@ const cancel = async (): Promise<void> => {
         return;
     }
 
-    await hostedGameClient.value?.sendCancel();
+    await sendCancel();
 };
 
 const toggleCoords = () => {
-    if (gameViewFacade.value !== null) {
-        gameViewFacade.value.getGameView().toggleDisplayCoords();
-    }
+    gameView.value?.toggleDisplayCoords();
 };
 
 /*
@@ -332,27 +239,20 @@ const toggleCoords = () => {
 const canAcceptRematch: Ref<boolean> = ref(false);
 
 watchEffect(() => {
-    if (hostedGameClient.value == null) return;
-    const rematch = hostedGameClient.value.getRematch();
+    if (!hostedGame.value) return;
+    const rematch = hostedGame.value.rematch ?? null;
     if (rematch == null) return;
     if (loggedInPlayer.value == null) return;
-    if (getLocalPlayerIndex() === -1) return;
+    if (localPlayerIndex.value === null) return;
     canAcceptRematch.value = canJoin(rematch, loggedInPlayer.value);
 });
 
-const canRematch = (): boolean => {
-    if (getLocalPlayerIndex() === -1 || hostedGameClient.value === null) {
-        return false;
-    }
-    return hostedGameClient.value.canRematch();
-};
-
 const createOrAcceptRematch = async (): Promise<void> => {
-    if (!hostedGameClient.value) {
+    if (!hostedGame.value) {
         throw new Error('Error while trying to rematch, no current game');
     }
 
-    const rematchId = hostedGameClient.value.getRematchGameId();
+    const rematchId = hostedGame.value.rematch?.publicId ?? null;
     let hostedGameRematch: null | HostedGame = null;
 
     if (rematchId != null) {
@@ -361,7 +261,7 @@ const createOrAcceptRematch = async (): Promise<void> => {
             throw new Error('A rematch game does not exist');
         }
     } else {
-        hostedGameRematch = await apiPostRematch(hostedGameClient.value.getId());
+        hostedGameRematch = await apiPostRematch(hostedGame.value.publicId);
     }
 
     if (loggedInPlayer && canJoin(hostedGameRematch, loggedInPlayer.value)) {
@@ -394,49 +294,40 @@ const isSidebarCurrentlyOpen = (): boolean => {
 /*
  * Chat
  */
-watch(hostedGameClient, game => {
+watch(hostedGame, game => {
     if (game === null) {
         return;
     }
 
-    game.on('chatMessagePosted', () => {
-        if (isSidebarCurrentlyOpen()) {
-            game.markAllMessagesRead();
-        }
-    });
+    // TODO
+    // game.on('chatMessagePosted', () => {
+    //     if (isSidebarCurrentlyOpen()) {
+    //         game.markAllMessagesRead();
+    //     }
+    // });
 
-    watch(localSettings, () => {
-        if (isSidebarCurrentlyOpen()) {
-            game.markAllMessagesRead();
-        }
-    });
+    // watch(localSettings, () => {
+    //     if (isSidebarCurrentlyOpen()) {
+    //         game.markAllMessagesRead();
+    //     }
+    // });
 });
 
 const unreadMessages = (): number => {
-    if (hostedGameClient.value === null) {
-        return 0;
-    }
+    return 0; // TODO
+    // if (hostedGameClient.value === null) {
+    //     return 0;
+    // }
 
-    return hostedGameClient.value.getChatMessages().length
-        - hostedGameClient.value.getReadMessages()
-    ;
-};
-
-/*
- * Rewind mode
- */
-const enableRewindMode = () => {
-    gameViewFacade.value?.enableSimulationMode();
+    // return hostedGameClient.value.getChatMessages().length
+    //     - hostedGameClient.value.getReadMessages()
+    // ;
 };
 
 /*
  * Pass
  */
 const pass = async () => {
-    if (hostedGameClient.value === null) {
-        return;
-    }
-
     try {
         await confirmationOverlay({
             title: t('pass_confirm_overlay.title'),
@@ -447,33 +338,11 @@ const pass = async () => {
             cancelClass: 'btn-outline-primary',
         });
 
-        hostedGameClient.value.getGame().move('pass', getLocalPlayerIndex() as PlayerIndex);
-        void hostedGameClient.value.sendMove('pass');
+        await sendPass();
     } catch (e) {
         // noop, player said no
     }
 };
-
-const shouldShowPass = computed((): boolean => {
-    if (hostedGameClient.value === null) {
-        return false;
-    }
-
-    return hostedGameClient.value.getState() === 'playing'
-        && getLocalPlayerIndex() !== -1
-    ;
-});
-
-const shouldEnablePass = computed((): boolean => {
-    if (hostedGameClient.value === null) {
-        return false;
-    }
-
-    return hostedGameClient.value.getState() === 'playing'
-        && isMyTurn(hostedGameClient.value.getHostedGame())
-        && canPassAgain(hostedGameClient.value.getGame())
-    ;
-});
 
 /*
  * Warning when guest joining correspondence game
@@ -486,23 +355,22 @@ const {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor, conditionalMovesFacade, conditionalMovesEnabled } = storeToRefs(useConditionalMovesStore());
+const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 const { initConditionalMoves, resetConditionalMoves } = useConditionalMovesStore();
 
-watch([hostedGameClient, loggedInPlayer], () => {
-    if (hostedGameClient.value === null || loggedInPlayer.value === null || gameViewFacade.value === null) {
+watch([hostedGame, loggedInPlayer], () => {
+    if (hostedGame.value === null || loggedInPlayer.value === null || gameView === null) {
         return;
     }
 
-    if (!shouldShowConditionalMoves(hostedGameClient.value.getHostedGame(), loggedInPlayer.value)) {
+    if (!shouldShowConditionalMoves(hostedGame.value, loggedInPlayer.value)) {
         return;
     }
 
-    // TODO try replacing void by async await
     void initConditionalMoves(
-        hostedGameClient.value.getHostedGame(),
-        gameViewFacade.value.getPlayingGameFacade(),
-        getPlayerIndex(hostedGameClient.value.getHostedGame(), loggedInPlayer.value) as PlayerIndex,
+        hostedGame.value,
+        gameView,
+        localPlayerIndex.value,
     );
 });
 
@@ -511,43 +379,50 @@ onUnmounted(() => resetConditionalMoves());
 /*
  * Game end: win popin
  */
+const unlisteners: (() => void)[] = [];
 const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 
-const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
-    const players = hostedGameClient.value?.getPlayers();
+const initWinOverlay = (gameView: GameView, game: Game) => {
+    const listener = () => {
+        const players = hostedGameClient.value?.getPlayers();
 
-    if (!players) {
-        throw new Error('Unexpected no players, but needed to show the winner');
-    }
+        if (!players) {
+            throw new Error('Unexpected no players, but needed to show the winner');
+        }
 
-    useWinOverlay(gameViewFacade.getGameView(), gameViewFacade.getGame(), async () => {
-        await gameFinishedOverlay({
+        void gameFinishedOverlay({
             game,
             players,
         });
-    });
+    };
+
+    gameView.on('endedAndWinAnimationOver', listener);
+
+    unlisteners.push(() => gameView.off('endedAndWinAnimationOver', listener));
 };
+
+onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 </script>
 
 <template>
-    <div v-show="gameViewInitialized && null !== hostedGameClient" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : 'sidebar-closed')">
+    <div v-show="hostedGame" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : 'sidebar-closed')">
         <div class="game">
 
             <!-- Game board, "Accept" button -->
             <div class="board-container">
                 <AppBoard
-                    v-if="null !== hostedGameClient && null !== gameViewFacade"
-                    :players="hostedGameClient.getPlayers()"
-                    :timeControlOptions="hostedGameClient.getTimeControlOptions()"
-                    :timeControlValues="hostedGameClient.getTimeControlValues()"
-                    :gameViewFacade
+                    v-if="hostedGame"
+                    :players
+                    :timeControlOptions="hostedGame.timeControlType"
+                    :timeControlValues="hostedGame.timeControl!"
+                    :gameView="gameView"
                 />
 
-                <div v-if="hostedGameClient && hostedGameClient.canJoin(loggedInPlayer)" class="join-button-container">
+                <div v-if="hostedGame && canJoin(hostedGame, loggedInPlayer)" class="join-button-container">
                     <div class="d-flex justify-content-center">
                         <button
                             class="btn btn-lg"
-                            :class="isGuestJoiningCorrepondence(hostedGameClient.getHostedGame()) ? 'btn-outline-warning' : 'btn-success'"
+                            :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
                             @click="join()"
                         >Accept</button>
                     </div>
@@ -555,62 +430,62 @@ const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
             </div>
 
             <!-- Control buttons at bottom of game board (resign, undo, confirm move, ...) -->
-            <nav class="menu-game navbar" v-if="null !== hostedGameClient">
+            <nav class="menu-game navbar" v-if="hostedGame">
                 <div class="buttons container-fluid">
 
                     <!-- rewind mode -->
-                    <button type="button" v-if="gameViewFacade" @click="() => enableRewindMode()" class="btn btn-outline-primary">
+                    <button type="button" v-if="null !== gameView" @click="() => enableSimulationMode()" class="btn btn-outline-primary">
                         <IconRewind />
                     </button>
 
                     <!-- Conditional moves -->
-                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" @click="() => { /* TODO */ }" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
+                    <button type="button" v-if="null !== loggedInPlayer && shouldShowConditionalMoves(hostedGame, loggedInPlayer)" @click="conditionalMovesEditor?.enableSimulationMode()" class="btn btn-outline-primary" :disabled="null === conditionalMovesEditor">
                         <IconSignpostSplit />
                     </button>
 
                     <!-- Resign -->
-                    <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel()" @click="resign()">
+                    <button type="button" class="btn btn-outline-danger" v-if="canResign() && !canCancel" @click="resign()">
                         <IconFlag />
                         <span class="hide-sm">{{ ' ' + $t('resign') }}</span>
                     </button>
 
                     <!-- Cancel -->
-                    <button type="button" class="btn btn-outline-warning" v-if="canCancel()" @click="cancel()">
+                    <button type="button" class="btn btn-outline-warning" v-if="canCancel" @click="cancel()">
                         <IconXLg />
                         <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
                     </button>
 
                     <!-- Confirm move -->
-                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove()" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()">
+                    <button type="button" class="btn" v-if="shouldDisplayConfirmMove" :class="null === confirmMove ? 'btn-outline-secondary' : 'btn-success'" :disabled="null === confirmMove" @click="null !== confirmMove && confirmMove()">
                         <IconCheck />
                         <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
                         <span class="hide-sm">{{ ' ' + $t('confirm_move.button_label') }}</span>
                     </button>
 
                     <!-- Undo accept -->
-                    <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(true)">
+                    <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(true)">
                         <IconCheck />
                         <span class="hide-sm">{{ $t('undo.accept') }}</span>
                     </button>
 
                     <!-- Undo reject -->
-                    <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove()" @click="answerUndo(false)">
+                    <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(false)">
                         <IconX />
                         <span class="hide-sm">{{ $t('undo.reject') }}</span>
                     </button>
 
                     <!-- Rematch -->
-                    <button type="button" class="btn btn-outline-primary" v-if="canRematch()" @click="createOrAcceptRematch()">
+                    <button type="button" class="btn btn-outline-primary" v-if="canRematch" @click="createOrAcceptRematch()">
                         <IconRepeat />
                         <span class="hide-sm">{{ ' ' + $t('rematch.label') }}</span>
                     </button>
 
                     <!-- Accept / View rematch -->
-                    <template v-else-if="hostedGameClient.getRematchGameId() != null">
+                    <template v-else-if="hostedGame.rematch?.publicId">
                         <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()">
                             {{ ' ' + $t('rematch.accept') }}
                         </button>
-                        <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGameClient.getRematchGameId() } }" class="btn btn-outline-primary">
+                        <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGame.rematch.publicId } }" class="btn btn-outline-primary">
                             {{ ' ' + $t('rematch.view') }}
                         </router-link>
                     </template>
@@ -650,11 +525,11 @@ const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
 
                             <!-- Undo -->
                             <button
-                                v-if="shouldDisplayUndoMove()"
+                                v-if="shouldDisplayUndoMove"
                                 type="button"
                                 class="dropdown-item"
-                                :class="!shouldDisableUndoMove() ? 'text-primary' : 'disabled'"
-                                :disabled="shouldDisableUndoMove()"
+                                :class="!shouldDisableUndoMove ? 'text-primary' : 'disabled'"
+                                :disabled="shouldDisableUndoMove"
                                 @click="askUndo()"
                             >
                                 <IconArrowCounterclockwise />
@@ -664,7 +539,14 @@ const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
                             <div><hr class="dropdown-divider"></div>
 
                             <!-- Explore -->
-                            <AppHexWorldExplore v-if="gameViewInitialized && gameViewFacade" :hostedGameClient :gameView="gameViewFacade.getGameView()" :label="$t('explore')" class="dropdown-item" />
+                            <!-- TODO -->
+                            <!-- <AppHexWorldExplore
+                                v-if="gameView"
+                                :hostedGameClient
+                                :gameView
+                                :label="$t('explore')"
+                                class="dropdown-item"
+                            /> -->
                         </div>
                     </div>
 
@@ -673,17 +555,16 @@ const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game) => {
         </div>
 
         <!-- Game sidebar -->
-        <div class="sidebar bg-body" v-if="hostedGameClient && gameViewFacade">
+        <div class="sidebar bg-body" v-if="hostedGame">
             <AppGameSidebar
-                :hostedGameClient
-                :gameViewFacade
+                :hostedGame
                 @close="showSidebar(false)"
                 @toggleCoords="toggleCoords()"
             />
         </div>
     </div>
 
-    <div v-if="null === hostedGameClient || null === gameViewFacade" class="container-fluid my-3">
+    <div v-if="!hostedGame" class="container-fluid my-3">
         <p class="lead text-center">{{ $t('loading_game') }}</p>
     </div>
 

@@ -2,6 +2,7 @@ import { mirrorMove, Move } from '../../move-notation/move-notation.js';
 import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
 import GameView from '../GameView.js';
 import { GameMarksFacade } from './GameMarksFacade.js';
+import { PreviewMoveFacade } from './PreviewMoveFacade.js';
 
 /**
  * Facade for adding moves alternately.
@@ -29,6 +30,15 @@ export class PlayingGameFacade
      * If null, view is not paused.
      */
     private actionsWhilePaused: null | (() => void)[] = null;
+
+    private previewMoveFacade: PreviewMoveFacade;
+
+    /**
+     * Keeps track of which move is currently previewed.
+     * Not same as in previewMoveFacade, here we keep "swap-pieces"
+     * in case of swap move.
+     */
+    private previewedMove: null | HexMove = null;
 
     constructor(
         private gameView: GameView,
@@ -268,6 +278,48 @@ export class PlayingGameFacade
     isViewPaused(): boolean
     {
         return this.actionsWhilePaused !== null;
+    }
+
+    hasPreviewedMove(): boolean
+    {
+        return this.previewedMove !== null;
+    }
+
+    getPreviewedMove(): null | HexMove
+    {
+        return this.previewedMove;
+    }
+
+    setPreviewedMove(move: HexMove, byPlayerIndex: 0 | 1): void
+    {
+        this.previewedMove = move;
+
+        if (move === 'pass') {
+            return;
+        }
+
+        if (move === 'swap-pieces') {
+            const firstMove = this.moves[0];
+
+            if (!firstMove) {
+                throw new Error('Cannot preview swap piece move, no first move');
+            }
+
+            if (isSpecialHexMove(firstMove)) {
+                throw new Error('Unexpected special move as first move');
+            }
+
+            this.previewMoveFacade.preview(mirrorMove(firstMove), 0, firstMove);
+            return;
+        }
+
+        this.previewMoveFacade.preview(move, byPlayerIndex);
+    }
+
+    removePreviewedMove(): void
+    {
+        this.previewedMove = null;
+        this.previewMoveFacade.cancelPreview();
     }
 
     /**

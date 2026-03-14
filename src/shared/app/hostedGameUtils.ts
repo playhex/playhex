@@ -1,4 +1,4 @@
-import { HostedGame, HostedGameToPlayer, Player } from './models/index.js';
+import { HostedGame, HostedGameToPlayer, Player, Rating } from './models/index.js';
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
@@ -45,6 +45,10 @@ export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean 
 
 export const getPlayer = (hostedGame: HostedGame, position: number): null | Player => {
     return hostedGame.hostedGameToPlayers[position].player ?? null;
+};
+
+export const getPlayers = (hostedGame: HostedGame): Player[] => {
+    return hostedGame.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.player);
 };
 
 /**
@@ -176,6 +180,13 @@ export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Ou
 export const cancelGame = (hostedGame: HostedGame, canceledAt: Date): void => {
     hostedGame.state = 'canceled';
     hostedGame.endedAt = canceledAt;
+};
+
+export const getRating = (hostedGame: HostedGame, player: Player): null | Rating => {
+    return hostedGame.ratings
+        ?.find(r => r.player.publicId === player.publicId)
+        ?? null
+    ;
 };
 
 export const matchSearchParams = (hostedGame: HostedGame, searchGamesParameters: SearchGamesParameters): boolean => {
