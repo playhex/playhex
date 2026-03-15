@@ -561,5 +561,7 @@
     "muted": {
         "on": "Muet",
         "off": "Sons activés"
-    }
+    },
+    "spectator_joined": "{{ player }} a rejoint les spectateurs",
+    "spectator_left": "{{ player }} a quitté les spectateurs"
 }

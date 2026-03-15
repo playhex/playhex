@@ -26,10 +26,14 @@
         "outcome": "Uitkomst",
         "lost": "Verloren",
         "playing": "Aan het spelen",
-        "watch": "Kijken"
+        "watch": "Kijken",
+        "title": "Spel",
+        "info": "Info",
+        "duration": "Lengte",
+        "title_your_turn": "Jou beurt!"
     },
     "game_rules": {
-        "normal": "normaal",
+        "normal": "standaard",
         "host_plays_first": "gastheer speelt eerst",
         "host_plays_second": "gastheer speelt als tweede",
         "no_swap": "geen ruil"
@@ -251,7 +255,7 @@
     "tournament_player_games_win_history": "Geschiedenis",
     "tournament_organized_by": "Georganiseerd door { player }",
     "checkin_opens_time_before": "Inchecken opent {{ time }} van tevoren.",
-    "tournament_subscribe": "Abonneren",
+    "tournament_subscribe": "Ik ben geïnteresseerd!",
     "tournament_checkin": "Inchecken",
     "tournament_checkedin": "Ingecheckt",
     "no_player_checked_in_yet": "Nog geen speler ingecheckt.",
@@ -365,5 +369,15 @@
         "time": "{player} wint op tijd!",
         "resign": "{player} wint!",
         "forfeit": "{player} wint door verbeuren!"
+    },
+    "game_state": {
+        "created": "Gemaakt",
+        "canceled": "Geannuleerd",
+        "playing": "Aan het spelen",
+        "ended": "Beëindigd"
+    },
+    "muted": {
+        "on": "Dempen",
+        "off": "Spelen"
     }
 }
