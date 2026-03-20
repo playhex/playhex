@@ -1,15 +1,15 @@
 <script setup lang="ts">
 /* eslint-env browser */
-import GameView from '../../../shared/pixi-board/GameView.js';
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
+import { storeToRefs } from 'pinia';
 import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
 import { Player } from '../../../shared/app/models/index.js';
 import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
-import { storeToRefs } from 'pinia';
+import useCurrentGameStore from '../../stores/currentGameStore.js';
+import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -28,51 +28,51 @@ const props = defineProps({
         required: false,
         default: null,
     },
-    gameView: {
-        type: GameView,
-        required: true,
-    },
 });
 
-const { gameView } = props;
-const { players, timeControlOptions, timeControlValues } = toRefs(props);
+const {
+    players,
+    timeControlOptions,
+    timeControlValues,
+} = toRefs(props);
+
+const {
+    game,
+    gameView,
+    conditionalMovesEditor,
+    gameUIMode,
+} = storeToRefs(useCurrentGameStore());
+
+const {
+    stopConditionalMoves,
+    enableSimulationMode,
+    disableSimulationMode,
+} = useCurrentGameStore();
 
 /*
- * Add piwi view
+ * Add pixi view
  */
-const game = gameView.getGame();
-
 onMounted(() => {
     if (!pixiApp.value) {
         throw new Error('No element with ref="pixiApp"');
     }
 
-    void gameView.mount(pixiApp.value);
+    if (!gameView.value) {
+        throw new Error('no game view');
+    }
+
+    void gameView.value.mount(pixiApp.value);
 });
 
 onUnmounted(() => {
-    gameView.destroy();
+    gameView.value?.destroy();
 });
 
-/*
- * Orientation auto update on screen size change
- */
-let orientation = ref<number>(gameView.getCurrentOrientation());
-
-const updateOrientation = () => orientation.value = gameView.getCurrentOrientation();
-
-gameView.on('orientationChanged', updateOrientation);
-
-onUnmounted(() => {
-    gameView.off('orientationChanged', updateOrientation);
-});
+const orientation = useGameViewOrientation(gameView);
 
 /*
- * Rewind
+ * Simulation mode
  */
-gameView.listenArrowKeys();
-
-const hasRewindControls = ref(false);
 
 const btnRewindBack = ref<HTMLElement>();
 const btnRewindForward = ref<HTMLElement>();
@@ -82,44 +82,59 @@ const blinkButton = (button: Ref<HTMLElement | undefined>) => {
     setTimeout(() => button.value?.classList.remove('active'), 80);
 };
 
-gameView.on('movesHistoryCursorChanged', cursor => hasRewindControls.value = cursor !== null);
+const rewindZero = () => enableSimulationMode().rewindToFirstMove();
+const backward = () => enableSimulationMode().rewind(1);
+const forward = () => enableSimulationMode().forward(1);
+const rewindCurrent = () => enableSimulationMode().resetSimulationAndRewind();
+const rewindClose = () => disableSimulationMode();
 
-const rewindZero = () => gameView.setMovesHistoryCursor(-1);
-const backward = () => gameView.changeMovesHistoryCursor(-1);
-const forward = () => gameView.changeMovesHistoryCursor(+1);
-const rewindCurrent = () => gameView.setMovesHistoryCursor(Infinity);
-const rewindClose = () => {
-    gameView.disableRewindMode();
+const onKeyPress = (eventKey: string, callback: () => void): () => void => {
+    const cb = (event: KeyboardEvent) => {
+        // Ignore when in another mode,
+        // to prevent switching to simulation mode when I was in conditional moves mode
+        if (gameUIMode.value !== 'play' && gameUIMode.value !== 'simulation') {
+            return;
+        }
+
+        // Ignore when I am writing in an input or textarea
+        // to prevent indesirable trigger
+        if ((event.target as HTMLElement | null)?.nodeName === 'INPUT') {
+            return;
+        }
+
+        if (event.key === eventKey) {
+            callback();
+        }
+    };
+
+    window.addEventListener('keydown', cb);
+
+    return () => {
+        window.removeEventListener('keydown', cb);
+    };
 };
 
-const keyboardEventListener = (event: KeyboardEvent) => {
-    if ((event.target as HTMLElement | null)?.nodeName === 'INPUT')
-        return;
-    switch (event.key) {
-        case 'ArrowLeft':
-            blinkButton(btnRewindBack);
-            break;
+const unlisten: (() => void)[] = [
+    onKeyPress('ArrowLeft', () => {
+        backward();
+        blinkButton(btnRewindBack);
+    }),
 
-        case 'ArrowRight':
-            blinkButton(btnRewindForward);
-            break;
-    }
-};
-
-window.addEventListener('keydown', keyboardEventListener);
+    onKeyPress('ArrowRight', () => {
+        forward();
+        blinkButton(btnRewindForward);
+    }),
+];
 
 onUnmounted(() => {
-    window.removeEventListener('keydown', keyboardEventListener);
+    for (const cb of unlisten) {
+        cb();
+    }
 });
-
-/*
- * Conditional moves
- */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': hasRewindControls || conditionalMovesEditor?.getIsSimulationMode() }">
+    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
@@ -162,7 +177,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
         </div>
         <p v-else>{{ $t('initializing_game') }}</p>
 
-        <div class="rewind-controls" v-if="hasRewindControls">
+        <div class="rewind-controls" v-if="gameUIMode === 'simulation'">
             <!-- backward initial -->
             <button type="button" @click="rewindZero()" class="btn btn-outline-primary">
                 <IconChevronBarLeft />
@@ -189,7 +204,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
         </div>
 
-        <div class="rewind-controls" v-else-if="conditionalMovesEditor?.getIsSimulationMode()">
+        <div class="rewind-controls" v-else-if="conditionalMovesEditor && gameUIMode === 'conditional_moves'">
 
             <!-- Back to original position -->
             <button type="button" @click="conditionalMovesEditor.startNewLine()" class="btn btn-outline-primary">
@@ -212,7 +227,7 @@ const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
             </button>
 
             <!-- Close conditional moves edition -->
-            <button type="button" @click="conditionalMovesEditor.discardSimulationMoves(); gameView!.disableSimulationMode()" class="btn btn-outline-warning">
+            <button type="button" @click="stopConditionalMoves()" class="btn btn-outline-warning">
                 <IconX />
             </button>
         </div>

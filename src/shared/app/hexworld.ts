@@ -1,5 +1,5 @@
-import { Game } from '../game-engine/index.js';
 import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
+import HostedGame from './models/HostedGame.js';
 
 const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) => {
     if (winner == null)
@@ -19,11 +19,11 @@ const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) 
  * @param game
  * @param orientation Board rotation from 0 to 11, where 0 is the "Flat" one.
  */
-export const gameToHexworldLink = (game: Game, orientation: number = 11): string => {
+export const gameToHexworldLink = (hostedGame: HostedGame, orientation: number = 11): string => {
     if (orientation < 0 || orientation > 11)
         throw new Error('Invalid board orientation');
-    const moves = game.getMovesHistory()
-        .map(({ move }) => {
+    const moves = hostedGame.moves
+        .map(move => {
             if (move === 'swap-pieces') {
                 return ':s';
             }
@@ -33,8 +33,8 @@ export const gameToHexworldLink = (game: Game, orientation: number = 11): string
             return move;
         })
         .join('');
-    const size = game.getSize();
-    const outcome = outcomeToHexworld(game.getOutcome(), game.getWinner());
+    const size = hostedGame.boardsize;
+    const outcome = outcomeToHexworld(hostedGame.outcome, hostedGame.winner);
     // from 1 to 12 (closed), shifted by -2
     const hexworldRotation = (((orientation - 2) % 12) + 11) % 12 + 1;
     const rotationConfig = hexworldRotation === 10 ? '' : 'r' + hexworldRotation;

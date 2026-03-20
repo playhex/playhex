@@ -241,6 +241,16 @@ const routes: RouteRecordRaw[] = [
     },
 ];
 
+const querySelectorSilent = (selector: string) => {
+    try {
+        return document.querySelector(selector);
+    } catch (e) {
+        // Ignore error when hash is "invalid", because of e.g a dot, example:
+        // Document.querySelector: '#match-1.6' is not a valid selector
+        return;
+    }
+};
+
 const router = createRouter({
     history: createWebHistory(),
     routes,
@@ -256,7 +266,7 @@ const router = createRouter({
         // Scroll to element targeted by hash in url
         // ex: "/url#settings" will scroll to element with id = "settings"
         // Check element exists before to prevent a warning
-        if (to.hash && document.querySelector(to.hash)) {
+        if (to.hash && querySelectorSilent(to.hash)) {
             await new Promise(r => setTimeout(r, 100));
 
             return {

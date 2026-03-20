@@ -21,7 +21,7 @@ import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
 import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
-import { Move } from '../shared/move-notation/move-notation.js';
+import { HexMove } from '../shared/move-notation/hex-move-notation.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -689,7 +689,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return true;
     }
 
-    playerMove(player: Player, move: Move, playedAt: Date = new Date()): true | string
+    playerMove(player: Player, move: HexMove, playedAt: Date = new Date()): true | string
     {
         this.logger.info('Move played', { move, player: player.pseudo });
 

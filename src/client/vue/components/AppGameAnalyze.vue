@@ -1,25 +1,30 @@
 <script lang="ts" setup>
 /* eslint-env browser */
+import { PropType, onMounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
 import GameAnalyzeView, { AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeView.js';
-import { PropType, onMounted, ref } from 'vue';
-import GameView from '../../../shared/pixi-board/GameView.js';
+import useCurrentGameStore from '../../stores/currentGameStore.js';
 
 const props = defineProps({
     analyze: {
         type: Object as PropType<GameAnalyzeData>,
         required: true,
     },
-    gameView: {
-        type: Object as PropType<null | GameView>,
-        required: false,
-        default: null,
-    },
 });
 
-const { analyze, gameView } = props;
+const { analyze } = props;
 const gameAnalyzeContainer = ref<HTMLElement>();
 const moveAnalyze = ref<null | AnalyzeMoveOutput>(null);
+
+const {
+    gameView,
+    simulatePlayingGameFacade,
+} = storeToRefs(useCurrentGameStore());
+
+const {
+    enableSimulationMode,
+} = useCurrentGameStore();
 
 onMounted(() => {
     if (!gameAnalyzeContainer.value) {
@@ -28,9 +33,23 @@ onMounted(() => {
 
     const gameAnalyzeView = new GameAnalyzeView(analyze);
 
-    if (gameView !== null) {
-        gameAnalyzeView.linkGameViewCursor(gameView);
+    if (gameView.value) {
+        // update game view position when clicking on a move on analyze view
+        gameAnalyzeView.linkGameViewCursor(
+            gameView.value,
+            showPositionAt => enableSimulationMode().goToMainPosition(showPositionAt),
+        );
     }
+
+    const onMainCursorChanged = (index: number) => {
+        gameAnalyzeView.selectMove(index);
+    };
+
+    // update game analyze cursor when rewind/forward position with arrows or buttons
+    watch(simulatePlayingGameFacade, (facade, oldFacade) => {
+        oldFacade?.off('mainCursorChanged', onMainCursorChanged);
+        facade?.on('mainCursorChanged', onMainCursorChanged);
+    });
 
     void gameAnalyzeView.mount(gameAnalyzeContainer.value);
 

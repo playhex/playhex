@@ -7,7 +7,8 @@ import GameView from '../../shared/pixi-board/GameView.js';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { defer } from '../../shared/app/defer.js';
-import { isMoveNormal, Move, moveToCoords } from '../../shared/move-notation/move-notation.js';
+import { validateMove, parseMove, Move } from '../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -27,7 +28,7 @@ const rectWithNegative = (g: Graphics, x: number, y: number, width: number, heig
 };
 
 export type MoveAndValue = {
-    move: Move;
+    move: HexMove;
     value: number;
     whiteWin?: number;
 };
@@ -50,6 +51,7 @@ type GameAnalyzeViewEvents = {
     /**
      * Move have been selected, i.e clicked by user.
      * Should show detailled info of the move.
+     * Can be null if for some reason, missing analyze for this given move.
      */
     selectedMoveChanged: (move: null | AnalyzeMoveOutput) => void;
 };
@@ -222,20 +224,23 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
      * Update game view cursor when selected an analyzed move,
      * and update selected move when game view cursor changed.
      */
-    linkGameViewCursor(gameView: GameView): void
+    linkGameViewCursor(gameView: GameView, showPositionAt: (showPositionAt: number) => void): void
     {
-        this.playedMoveMark.hide();
-        this.bestMoveMark.hide();
-        gameView.addMark(this.playedMoveMark, 'analyze');
-        gameView.addMark(this.bestMoveMark, 'analyze');
+        let currentlyFaded: null | Move = null;
 
-        gameView.on('movesHistoryCursorChanged', cursor => {
-            if (cursor === null) {
-                return;
+        const fadePlayedMove = (move: Move, byPlayerIndex: 0 | 1): void => {
+            if (currentlyFaded && gameView.getStone(currentlyFaded)?.isFaded()) {
+                gameView.setStone(currentlyFaded, null);
             }
 
-            this.selectMove(cursor);
-        });
+            currentlyFaded = move;
+            gameView.setStone(currentlyFaded, byPlayerIndex, true);
+        };
+
+        this.playedMoveMark.hide();
+        this.bestMoveMark.hide();
+        gameView.addEntity(this.playedMoveMark, 'analyze');
+        gameView.addEntity(this.bestMoveMark, 'analyze');
 
         this.on('selectedMoveChanged', move => {
             this.bestMoveMark.hide();
@@ -245,20 +250,21 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
                 return;
             }
 
-            gameView.setMovesHistoryCursor(move.moveIndex);
+            showPositionAt(move.moveIndex);
 
             // Place best move
-            if (isMoveNormal(move.bestMoves[0].move)) {
-                this.bestMoveMark.setCoords(moveToCoords(move.bestMoves[0].move));
+            if (validateMove(move.bestMoves[0].move)) {
+                this.bestMoveMark.setCoords(parseMove(move.bestMoves[0].move));
                 this.bestMoveMark.show();
             }
 
             // Place played move and eval color
-            if (!isMoveNormal(move.move.move)) {
+            if (!validateMove(move.move.move)) {
                 return;
             }
 
-            this.playedMoveMark.setCoords(moveToCoords(move.move.move));
+            fadePlayedMove(move.move.move, move.color === 'black' ? 0 : 1);
+            this.playedMoveMark.setCoords(parseMove(move.move.move));
 
             const playedWhiteWin = move.move.whiteWin;
             const bestWhiteWin = move.bestMoves[0].whiteWin;

@@ -7,8 +7,7 @@ import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import AppPseudo from './AppPseudo.vue';
-import HostedGameClient from '../../HostedGameClient.js';
-import { ChatMessage, Player } from '../../../shared/app/models/index.js';
+import { ChatMessage, HostedGame, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
@@ -20,7 +19,6 @@ import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF.js';
-import GameView, { OrientationMode } from '../../../shared/pixi-board/GameView.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 import AppGameAnalyzeSummary from './AppGameAnalyzeSummary.vue';
 import { guessDemerHandicapFromHostedGame } from '../../../shared/app/demerHandicap.js';
@@ -28,33 +26,48 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
-import { canUseHexWorldOrDownloadSGF, getPlayerIndex, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
+import { canUseHexWorldOrDownloadSGF, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
-import useConditionalMovesStore from '../../stores/conditionalMovesStore.js';
-import ConditionalMovesEditor from '../../../shared/app/ConditionalMovesEditor.js';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
-import TriangleMark from '../../../shared/pixi-board/marks/TriangleMark.js';
-import { Move, moveToCoords } from '../../../shared/move-notation/move-notation.js';
+import TriangleMark from '../../../shared/pixi-board/entities/TriangleMark.js';
+import { parseMove, validateMove } from '../../../shared/move-notation/move-notation.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import useCurrentGameStore from '../../stores/currentGameStore.js';
+import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 
 const props = defineProps({
-    hostedGameClient: {
-        type: Object as PropType<HostedGameClient>,
+    hostedGame: {
+        type: Object as PropType<HostedGame>,
         required: true,
     },
     gameView: {
-        type: Object as PropType<GameView>,
+        type: GameView,
         required: true,
     },
 });
 
-const { gameView } = props;
-const { hostedGameClient } = toRefs(props);
+const { hostedGame, gameView } = toRefs(props);
+
+const {
+    game,
+    gameUIMode,
+    conditionalMovesEditor,
+    conditionalMovesState,
+    playerSettingsFacade,
+    richChat,
+} = storeToRefs(useCurrentGameStore());
+
+const {
+    sendChatMessage,
+    enableSimulationMode,
+    startConditionalMoves,
+    stopConditionalMoves,
+} = useCurrentGameStore();
 
 const emits = defineEmits([
     'close',
-    'toggleCoords',
 ]);
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
@@ -79,8 +92,8 @@ const formatChatDateHeader = (date: Date): string => {
 };
 const formatDateInfo = (date: null | Date): string => date === null ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
 const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
-    const { startedAt, endedAt } = hostedGameClient.getHostedGame();
+const formatGameDuration = (hostedGame: HostedGame): string => {
+    const { startedAt, endedAt } = hostedGame;
 
     if (!startedAt) {
         return '-';
@@ -98,7 +111,7 @@ const formatGameDuration = (hostedGameClient: HostedGameClient): string => {
 };
 
 const playerColor = (player: Player): string => {
-    const index = getPlayerIndex(hostedGameClient.value.getHostedGame(), player);
+    const index = getPlayerIndex(hostedGame.value, player);
 
     if (index === 0) {
         return 'text-danger';
@@ -111,7 +124,7 @@ const playerColor = (player: Player): string => {
     return '';
 };
 
-const chatInput = useChatInputStore().getChatInput(hostedGameClient.value.getId());
+const chatInput = useChatInputStore().getChatInput(hostedGame.value.publicId);
 const chatMessagesElement = ref<HTMLElement>();
 const chatInputElement = ref<HTMLElement>();
 
@@ -121,14 +134,14 @@ const scrollChatToBottom = () => nextTick(() => {
     }
 });
 
-watch(hostedGameClient.value.getChatMessages(), () => scrollChatToBottom());
+watch(hostedGame.value.chatMessages, () => scrollChatToBottom());
 
 const sendChat = () => {
     if (chatInput.value === '') {
         return;
     }
 
-    void hostedGameClient.value.sendChatMessage(chatInput.value);
+    void sendChatMessage(chatInput.value);
 
     chatInput.value = '';
 };
@@ -157,7 +170,7 @@ const removeMarksLater = () => {
     clearMarksTimeout();
 
     marksTimeout = setTimeout(() => {
-        gameView.removeMarks('coords-show');
+        gameView.value.removeEntitiesGroup('coords-show');
         clearMarksTimeout();
     }, 3000);
 };
@@ -173,17 +186,21 @@ const chatClick = (e: PointerEvent) => {
         return;
     }
 
-    const coords = target.innerText.toLowerCase() as Move;
+    const move = target.innerText.toLowerCase();
+
+    if (!validateMove(move)) {
+        throw new Error(`Highlighted move is invalid: "${move}"`);
+    }
 
     const mark = new TriangleMark(0x0dcaf0);
-    mark.setCoords(moveToCoords(coords));
+    mark.setCoords(parseMove(move));
 
     // ctrl click to show multiple marks when click on multiple coords in chat
     if (!e.ctrlKey) {
-        gameView.removeMarks('coords-show');
+        gameView.value.removeEntitiesGroup('coords-show');
     }
 
-    gameView.addMark(mark, 'coords-show');
+    gameView.value.addEntity(mark, 'coords-show');
 
     removeMarksLater();
 
@@ -207,23 +224,20 @@ const isChatMessage = (object: unknown): object is ChatMessage => {
  * SGF download
  */
 const downloadSGF = (): void => {
-    const game = hostedGameClient.value.getGame();
-    const players = hostedGameClient.value.getPlayers();
-
-    if (!loggedInPlayer.value) {
+    if (!loggedInPlayer.value || !hostedGame.value) {
         return;
     }
 
-    if (!canUseHexWorldOrDownloadSGF(hostedGameClient.value.getHostedGame(), loggedInPlayer.value)) {
+    if (!canUseHexWorldOrDownloadSGF(hostedGame.value, loggedInPlayer.value)) {
         return;
     }
 
-    let filename = 'playhex-' + game.getStartedAt().toISOString().substring(0, 10) + '-';
+    let filename = 'playhex-' + (hostedGame.value.startedAt ?? hostedGame.value.createdAt).toISOString().substring(0, 10) + '-';
 
-    filename += players.map(player => pseudoString(player, 'slug')).join('-vs-');
+    filename += getPlayers(hostedGame.value).map(player => pseudoString(player, 'slug')).join('-vs-');
     filename += '.sgf';
 
-    downloadString(hostedGameToSGF(hostedGameClient.value.getHostedGame()), filename);
+    downloadString(hostedGameToSGF(hostedGame.value), filename);
 };
 
 const ctrlSListener = (e: KeyboardEvent) => {
@@ -310,7 +324,7 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
 };
 
 const renderMessage = (str: string): string => {
-    const { boardsize } = hostedGameClient.value.getHostedGame();
+    const { boardsize } = hostedGame.value;
 
     str = sanitizeMessage(str);
     str = makeLinksClickable(str);
@@ -324,30 +338,27 @@ const renderMessage = (str: string): string => {
  * Game analyze
  */
 const analyzeStore = useAnalyzeStore();
-const gameId = hostedGameClient.value.getId();
+const gameId = hostedGame.value.publicId;
 const gameAnalyze = analyzeStore.getAnalyze(gameId);
 const analyzeSummarized = ref(false);
 
 const shouldShowAnalyzeBlock = (): boolean => {
-    return hostedGameClient.value.getGame().isEnded()
-        && !hostedGameClient.value.getGame().isCanceled()
-        && hostedGameClient.value.getGame().getMovesHistory().length >= 2
+    if (!hostedGame.value) {
+        return false;
+    }
+
+    return hostedGame.value.state === 'ended'
+        && hostedGame.value.moves.length >= 2
     ;
 };
 
-if (hostedGameClient.value.getGame().isEnded()) {
+if (hostedGame.value.state === 'ended') {
     analyzeStore.loadAnalyze(gameId);
 }
 
 const doAnalyzeGame = () => {
     analyzeStore.loadAnalyze(gameId, true);
 };
-
-const appGameAnalyzeComponent = ref<typeof AppGameAnalyze>();
-
-gameView.on('movesHistoryCursorChanged', cursor => {
-    appGameAnalyzeComponent.value?.selectMove(cursor);
-});
 
 /*
  * Tabs
@@ -365,7 +376,7 @@ const isTab = (...tabs: Tab[]): boolean => tabs.includes(currentTab.value);
 const handicap = ref<'N/S' | number>();
 
 watchEffect(() => {
-    handicap.value = guessDemerHandicapFromHostedGame(hostedGameClient.value.getHostedGame());
+    handicap.value = guessDemerHandicapFromHostedGame(hostedGame.value);
 });
 
 /*
@@ -388,8 +399,7 @@ watch(
     { deep: true },
 );
 
-const currentOrientation = ref<OrientationMode>(gameView.getComputedBoardOrientationMode());
-gameView.on('orientationChanged', () => currentOrientation.value = gameView.getComputedBoardOrientationMode());
+const orientation = useGameViewOrientation(gameView);
 
 const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
     return [
@@ -402,19 +412,27 @@ const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
 /*
  * Conditional moves
  */
-const { conditionalMovesEditor } = storeToRefs(useConditionalMovesStore());
 
-watchEffect(() => {
-    if (conditionalMovesEditor.value === null) {
-        return;
-    }
-
+// enable or disable conditional moves when entering in the sidebar tab or leaving it
+watch(currentTab, () => {
     if (currentTab.value === 'conditional_moves') {
-        conditionalMovesEditor.value.enableSimulationMode();
-    } else {
-        if (!conditionalMovesEditor.value.getHasChanges()) {
-            conditionalMovesEditor.value.disableSimulationMode();
+        if (gameUIMode.value !== 'conditional_moves') {
+            startConditionalMoves();
         }
+    } else {
+        if (gameUIMode.value === 'conditional_moves') {
+            // quit conditional moves only if no unsaved changes
+            if (conditionalMovesState.value && !conditionalMovesState.value.hasChanges) {
+                stopConditionalMoves();
+            }
+        }
+    }
+});
+
+// open conditional moves tab when start conditional moves mode (click on icon in bottom menu)
+watch(gameUIMode, () => {
+    if (gameUIMode.value === 'conditional_moves') {
+        currentTab.value = 'conditional_moves';
     }
 });
 </script>
@@ -428,7 +446,7 @@ watchEffect(() => {
         <nav class="nav nav-game-sidebar nav-pills nav-fill">
             <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><IconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
 
-            <a class="nav-link" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGameClient.getHostedGame(), loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
+            <a class="nav-link" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGame, loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
                 <IconSignpostSplit />
                 {{ ' ' }}
                 <span class="d-none d-md-inline">
@@ -446,24 +464,24 @@ watchEffect(() => {
         -->
         <div class="sidebar-block block-game-title" v-if="isTab('main', 'info')">
             <div class="container-fluid">
-                <h3 v-if="'created' === hostedGameClient.getState()">{{ $t('waiting_for_an_opponent') }}</h3>
-                <h3 v-if="'canceled' === hostedGameClient.getState()">{{ $t('game_has_been_canceled') }}</h3>
-                <h3 v-if="'playing' === hostedGameClient.getState()">{{ $t('game.playing') }}</h3>
-                <h3 v-if="hostedGameClient.isStateEnded()">
+                <h3 v-if="hostedGame.state === 'created'">{{ $t('waiting_for_an_opponent') }}</h3>
+                <h3 v-if="hostedGame.state === 'canceled'">{{ $t('game_has_been_canceled') }}</h3>
+                <h3 v-if="hostedGame.state === 'playing'">{{ $t('game.playing') }}</h3>
+                <h3 v-if="hostedGame.state === 'ended'">
                     <i18next :translation="$t('player_wins_by.default')">
                         <template #player>
-                            <AppPseudo :player="hostedGameClient.getStrictWinnerPlayer()" :classes="playerColor(hostedGameClient.getStrictWinnerPlayer())" />
+                            <AppPseudo :player="getStrictWinnerPlayer(hostedGame)" :classes="playerColor(getStrictWinnerPlayer(hostedGame))" />
                         </template>
                     </i18next>
-                    <AppRatingChange v-if="hostedGameClient.isRanked()" :ratingChange="hostedGameClient.getRating(hostedGameClient.getStrictWinnerPlayer())?.ratingChange ?? 0" class="smaller ms-2" />
+                    <AppRatingChange v-if="hostedGame.ranked" :ratingChange="getRating(hostedGame, getStrictWinnerPlayer(hostedGame))?.ratingChange ?? 0" class="smaller ms-2" />
                 </h3>
-                <p v-if="hostedGameClient.isStateEnded()" class="mb-0">
-                    <i18next :translation="$t('player_loses_reason.' + (hostedGameClient.getHostedGame().outcome ?? 'default'))">
+                <p v-if="hostedGame.state === 'ended'" class="mb-0">
+                    <i18next :translation="$t('player_loses_reason.' + (hostedGame.outcome ?? 'default'))">
                         <template #player>
-                            <AppPseudo :player="hostedGameClient.getStrictLoserPlayer()" :classes="playerColor(hostedGameClient.getStrictLoserPlayer())" />
+                            <AppPseudo :player="getStrictLoserPlayer(hostedGame)" :classes="playerColor(getStrictLoserPlayer(hostedGame))" />
                         </template>
                     </i18next>
-                    <AppRatingChange v-if="hostedGameClient.isRanked()" :ratingChange="hostedGameClient.getRating(hostedGameClient.getStrictLoserPlayer())?.ratingChange ?? 0" class="ms-2" />
+                    <AppRatingChange v-if="hostedGame.ranked" :ratingChange="getRating(hostedGame, getStrictLoserPlayer(hostedGame))?.ratingChange ?? 0" class="ms-2" />
                 </p>
             </div>
         </div>
@@ -475,85 +493,85 @@ watchEffect(() => {
             <div class="container-fluid">
 
                 <!-- created -->
-                <template v-if="'created' === hostedGameClient.getState()">
-                    <p v-if="null !== hostedGameClient.getHostedGame().host">
+                <template v-if="'created' === hostedGame.state">
+                    <p v-if="null !== hostedGame.host">
                         <i18next :translation="$t('game_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host!" />
+                                <AppPseudo onlineStatus :player="hostedGame.host!" />
                             </template>
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                     <p v-else>
                         <i18next :translation="$t('game_created_by_system_time_ago')">
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                 </template>
 
                 <!-- canceled -->
-                <template v-if="'canceled' === hostedGameClient.getState()">
-                    <p v-if="null !== hostedGameClient.getHostedGame().host">
+                <template v-if="'canceled' === hostedGame.state">
+                    <p v-if="null !== hostedGame.host">
                         <i18next :translation="$t('game_was_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudo onlineStatus :player="hostedGameClient.getHostedGame().host!" />
+                                <AppPseudo onlineStatus :player="hostedGame.host!" />
                             </template>
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                     <p v-else>
                         <i18next :translation="$t('game_created_by_system_time_ago')">
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGameClient.getHostedGame().createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                 </template>
 
                 <!-- playing -->
-                <template v-if="'playing' === hostedGameClient.getState()">
+                <template v-if="'playing' === hostedGame.state">
                     <p>
-                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM yyyy p') }}</small>
+                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGame.startedAt!, 'd MMMM yyyy p') }}</small>
                         <br>
                         <small>
                             {{ $t('2dots', { s: $t('last_move') }) }}
-                            <template v-if="hostedGameClient.getHostedGame().lastMoveAt">{{ formatRelative(hostedGameClient.getHostedGame().lastMoveAt!, useServerDateStore().newDate()) }}</template>
+                            <template v-if="hostedGame.lastMoveAt">{{ formatRelative(hostedGame.lastMoveAt!, useServerDateStore().newDate()) }}</template>
                             <template v-else>-</template>
                         </small>
                     </p>
                 </template>
 
                 <!-- ended -->
-                <template v-if="hostedGameClient.isStateEnded()">
+                <template v-if="hostedGame.state === 'ended'">
                     <p>
-                        <small v-if="hostedGameClient.getHostedGame().startedAt && hostedGameClient.getHostedGame().endedAt">
+                        <small v-if="hostedGame.startedAt && hostedGame.endedAt">
 
                             <!-- Game played is same day, show short form: "Played date/hour -> hour" -->
-                            <template v-if="isSameDay(hostedGameClient.getHostedGame().startedAt!, hostedGameClient.getHostedGame().endedAt!)">
-                                {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM yyyy p') }}
+                            <template v-if="isSameDay(hostedGame.startedAt!, hostedGame.endedAt!)">
+                                {{ format(hostedGame.startedAt!, 'd MMMM yyyy p') }}
                                 →
-                                {{ format(hostedGameClient.getHostedGame().endedAt!, 'p') }}
+                                {{ format(hostedGame.endedAt!, 'p') }}
                             </template>
 
                             <!-- Game played on multiple days, show dates, no times, and no need to repeat year -->
                             <template v-else>
-                                {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM') }}
+                                {{ format(hostedGame.startedAt!, 'd MMMM') }}
                                 →
-                                {{ format(hostedGameClient.getHostedGame().endedAt!, 'd MMMM yyyy') }}
+                                {{ format(hostedGame.endedAt!, 'd MMMM yyyy') }}
                             </template>
                         </small>
 
                         <!-- Fallback to naive form if missing a date, should not be used -->
                         <template v-else>
-                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGameClient.getHostedGame().startedAt!, 'd MMMM yyyy p') }}</small>
+                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGame.startedAt!, 'd MMMM yyyy p') }}</small>
                             <br>
-                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGameClient.getHostedGame().endedAt!, 'd MMMM p') }}</small>
+                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGame.endedAt!, 'd MMMM p') }}</small>
                         </template>
                     </p>
                 </template>
@@ -567,11 +585,17 @@ watchEffect(() => {
             <div class="container-fluid">
 
                 <!-- HexWorld link -->
-                <AppHexWorldExplore :hostedGameClient :gameView class="btn btn-sm btn-outline-primary me-2 mb-2" />
+                <AppHexWorldExplore
+                    v-if="game"
+                    :hostedGame
+                    :game
+                    :orientation
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                />
 
                 <!-- Download SGF -->
                 <button
-                    v-if="loggedInPlayer && canUseHexWorldOrDownloadSGF(hostedGameClient.getHostedGame(), loggedInPlayer)"
+                    v-if="loggedInPlayer && canUseHexWorldOrDownloadSGF(hostedGame, loggedInPlayer)"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"
@@ -596,7 +620,7 @@ watchEffect(() => {
         -->
         <div class="sidebar-block block-game-options" v-if="isTab('main', 'info')">
             <router-link
-                v-for="tournamentMatch in hostedGameClient.getHostedGame().tournamentMatch ? [hostedGameClient.getHostedGame().tournamentMatch!] : []"
+                v-for="tournamentMatch in hostedGame.tournamentMatch ? [hostedGame.tournamentMatch!] : []"
                 :to="{ name: 'tournament', params: { slug: tournamentMatch.tournament.slug }, hash: '#match-' + tournamentMatchKey(tournamentMatch) }"
                 class="btn btn-warning btn-block btn-tournament"
             >
@@ -612,12 +636,12 @@ watchEffect(() => {
             </router-link>
 
             <div class="container-fluid">
-                <p v-if="hostedGameClient.isRanked()" class="text-warning">
+                <p v-if="hostedGame.ranked" class="text-warning">
                     <IconTrophyFill /> {{ $t('ranked') }}
                 </p>
                 <p v-else>
                     <span class="text-success"><IconPeopleFill /> {{ $t('friendly') }}</span>
-                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="hostedGameClient.getHostedGame()" /></small>
+                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="hostedGame" /></small>
                 </p>
             </div>
         </div>
@@ -630,33 +654,33 @@ watchEffect(() => {
                 <dl class="row">
                     <dt class="col-md-5">{{ $t('game.host') }}</dt>
                     <dd class="col-md-7">
-                        <AppPseudo v-if="hostedGameClient.getHostedGame().host" :player="hostedGameClient.getHostedGame().host!" :classes="playerColor(hostedGameClient.getHostedGame().host!)" />
+                        <AppPseudo v-if="hostedGame.host" :player="hostedGame.host!" :classes="playerColor(hostedGame.host!)" />
                         <i v-else>System</i>
                     </dd>
 
                     <dt class="col-md-5">{{ $t('game.time_control') }}</dt>
-                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="hostedGameClient.getHostedGame()" /></dd>
+                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></dd>
 
                     <dt class="col-md-5">{{ $t('game.board_size') }}</dt>
-                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().boardsize }}</dd>
+                    <dd class="col-md-7">{{ hostedGame.boardsize }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.created') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().createdAt) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.createdAt) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.started') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().startedAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.startedAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('last_move') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().lastMoveAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.lastMoveAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.finished') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGameClient.getHostedGame().endedAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.endedAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.duration') }}</dt>
-                    <dd class="col-md-7">{{ formatGameDuration(hostedGameClient) }}</dd>
+                    <dd class="col-md-7">{{ formatGameDuration(hostedGame) }}</dd>
 
                     <dt class="col-md-5">{{ $t('moves') }}</dt>
-                    <dd class="col-md-7">{{ hostedGameClient.getHostedGame().moves.length ?? 0 }}</dd>
+                    <dd class="col-md-7">{{ hostedGame.moves.length ?? 0 }}</dd>
 
                     <dt class="col-md-5">{{ $t('handicap.title') }}</dt>
                     <dd class="col-md-7" v-if="(0 === handicap)">{{ $t('handicap.none') }}</dd>
@@ -674,7 +698,7 @@ watchEffect(() => {
             <div class="container-fluid">
 
                 <div class="mb-2" v-if="playerSettings">
-                    <template v-if="'blitz' === timeControlToCadencyName(hostedGameClient.getHostedGame())">
+                    <template v-if="'blitz' === timeControlToCadencyName(hostedGame)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -688,7 +712,7 @@ watchEffect(() => {
                         </div>
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsBlitz)) }}</div>
                     </template>
-                    <template v-if="'normal' === timeControlToCadencyName(hostedGameClient.getHostedGame())">
+                    <template v-if="'normal' === timeControlToCadencyName(hostedGame)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -702,7 +726,7 @@ watchEffect(() => {
                         </div>
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsNormal)) }}</div>
                     </template>
-                    <template v-if="'correspondence' === timeControlToCadencyName(hostedGameClient.getHostedGame())">
+                    <template v-if="'correspondence' === timeControlToCadencyName(hostedGame)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -724,28 +748,28 @@ watchEffect(() => {
                 <button
                     type="button"
                     class="btn btn-outline-primary me-2 mb-2"
-                    @click.prevent="emits('toggleCoords')"
+                    @click.prevent="gameView.toggleDisplayCoords()"
                     :aria-label="$t('toggle_coords')"
                     :title="$t('toggle_coords')"
                 ><IconAlphabet /> {{ $t('toggle_coords_short') }}</button>
 
-                <div class="row mt-2" v-if="playerSettings">
-                    <div class="col-12" v-if="'landscape' === currentOrientation">
+                <div class="row mt-2" v-if="playerSettingsFacade && playerSettings">
+                    <div class="col-12" v-if="playerSettingsFacade.getCurrentOrientationMode() === 'landscape'">
                         <div class="btn-group" role="group">
-                            <template v-for="orientation in [0, 10, 11]" :key="orientation">
+                            <template v-for="orientation in [0, 11, 10]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation">
-                                    <AppRhombus :orientation="orientation" />
+                                    <AppRhombus :orientation />
                                 </label>
                             </template>
                         </div>
                     </div>
-                    <div class="col-12" v-if="'portrait' === currentOrientation">
+                    <div class="col-12" v-if="playerSettingsFacade.getCurrentOrientationMode() === 'portrait'">
                         <div class="btn-group" role="group">
                             <template v-for="orientation in [1, 9, 2]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation">
-                                    <AppRhombus :orientation="orientation" />
+                                    <AppRhombus :orientation />
                                 </label>
                             </template>
                         </div>
@@ -755,13 +779,13 @@ watchEffect(() => {
                 <!-- force board orientation -->
                 <div class="form-text mt-4">{{ $t('force_board_orientation_mode') }}</div>
                 <div class="btn-group btn-group-sm" role="group" aria-label="Change board orientation">
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="auto" id="btn-orientation-auto" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" :value="null" id="btn-orientation-auto" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-auto">{{ $t('auto') }}</label>
 
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" value="landscape" id="btn-orientation-landscape" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-landscape">{{ $t('landscape') }}</label>
 
-                    <input type="radio" class="btn-check" v-model="localSettings.selectedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
+                    <input type="radio" class="btn-check" v-model="localSettings.forcedBoardOrientation" value="portrait" id="btn-orientation-portrait" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-orientation-portrait">{{ $t('portrait') }}</label>
                 </div>
 
@@ -811,7 +835,7 @@ watchEffect(() => {
                         </small>
 
                         <!-- Anayze graph -->
-                        <AppGameAnalyze :analyze="gameAnalyze.analyze" :gameView />
+                        <AppGameAnalyze :analyze="gameAnalyze.analyze" />
                     </div>
 
                     <div v-else>
@@ -830,12 +854,7 @@ watchEffect(() => {
             <div class="container-fluid">
                 <h3>{{ $t('conditional_moves.title') }}</h3>
 
-                <AppConditionalMoves
-                    v-if="null !== conditionalMovesEditor"
-                    :conditionalMovesEditor="(conditionalMovesEditor as ConditionalMovesEditor)"
-                />
-
-                <p v-else>{{ $t('loading') }}</p>
+                <AppConditionalMoves v-if="conditionalMovesEditor && conditionalMovesState" />
             </div>
         </div>
 
@@ -848,7 +867,7 @@ watchEffect(() => {
                 <div class="chat-messages" ref="chatMessagesElement" @click="chatClick">
                     <div class="container-fluid">
                         <div
-                            v-for="message, key in hostedGameClient.getRichChatMessages()"
+                            v-for="message, key in richChat?.getRichChatMessages()"
                             :key
                             class="chat-message"
                             :class="isChatMessage(message) ? '' : `chat-header chat-header-${message.type}`"
@@ -866,7 +885,7 @@ watchEffect(() => {
 
                             <template v-else-if="message.type === 'move'">
                                 <span class="line"></span>
-                                <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="gameView?.setMovesHistoryCursor(message.moveNumber - 1)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
+                                <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="enableSimulationMode().goToMainPosition(message.moveNumber)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
                                 <span class="line"></span>
                             </template>
                             <template v-else-if="message.type === 'date'">
@@ -876,11 +895,11 @@ watchEffect(() => {
                                 <small class="text-body-secondary fst-italic">{{ $t('spectator_' + message.action, { player: pseudoString(message.player) }) }}</small>
                             </template>
                         </div>
-                        <p v-if="0 === hostedGameClient.getRichChatMessages().length" class="text-secondary">{{ $t('chat') }}</p>
+                        <p v-if="!richChat?.getRichChatMessages().length" class="text-secondary">{{ $t('chat') }}</p>
                     </div>
                 </div>
 
-                <form class="chat-input" v-if="loggedInPlayer && canPlayerChatInGame(loggedInPlayer, hostedGameClient.getHostedGame()) === true">
+                <form class="chat-input" v-if="loggedInPlayer && canPlayerChatInGame(loggedInPlayer, hostedGame) === true">
                     <div class="input-group">
                         <input v-model="chatInput" ref="chatInputElement" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="1000" />
                         <button class="btn btn-success" type="submit" @click="(e: PointerEvent) => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>

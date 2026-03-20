@@ -1,11 +1,9 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { t } from 'i18next';
-import { onUnmounted, Ref, ref } from 'vue';
-import AppBoard from '../../components/AppBoard.vue';
+import { Ref, ref } from 'vue';
 import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
-import { CustomizedGameView } from '../../../services/CustomizedGameView.js';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
 import { findLocalAIByName, instanciateAi } from '../localAi.js';
 import { defineOverlay } from '@overlastic/vue';
@@ -13,11 +11,15 @@ import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vu
 import GameView from '../../../../shared/pixi-board/GameView.js';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
-import { Move } from '../../../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
+import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
+import { useWinOverlay } from '../../composables/useWinOverlay.js';
+import AppGameView from '../../components/AppGameView.vue';
 
-let gameView: null | CustomizedGameView = null;
+let gameView: null | GameView = null;
+let gameViewFacade: null | GameViewFacade = null;
 let lastGameOptions: OfflineAIGameOptions;
-let calculateMove: (game: Game) => Promise<Move>;
+let calculateMove: (game: Game) => Promise<HexMove>;
 
 const init = (): void => {
     // Player started a new game
@@ -94,13 +96,14 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
 
     game.setAllowSwap(gameOptions.swapRule);
 
-    gameView = new CustomizedGameView(game);
+    gameView = new GameView(game.getSize());
+    gameViewFacade = new GameViewFacade(gameView, game);
 
     gameView.on('hexClicked', move => {
-        move = game.moveOrSwapPieces(move);
+        const hexMove = game.moveOrSwapPieces(move);
 
         try {
-            game.move(move, playerIndex as PlayerIndex);
+            game.move(hexMove, playerIndex as PlayerIndex);
         } catch (e) {
             if (!(e instanceof IllegalMove)) {
                 throw e;
@@ -128,7 +131,7 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
 
     saveGame();
 
-    initWinOverlay(gameView, game, players.value);
+    initWinOverlay(gameViewFacade, game, players.value);
 };
 
 const reloadCurrentGame = (currentGame: OfflineGame) => {
@@ -141,13 +144,14 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
 
     const game = Game.fromData(currentGame.gameData);
 
-    gameView = new CustomizedGameView(game);
+    gameView = new GameView(game.getSize());
+    gameViewFacade = new GameViewFacade(gameView, game);
 
     gameView.on('hexClicked', move => {
-        game.moveOrSwapPieces(move);
+        const hexMove = game.moveOrSwapPieces(move);
 
         try {
-            game.move(move, playerIndex as PlayerIndex);
+            game.move(hexMove, playerIndex as PlayerIndex);
         } catch (e) {
             if (!(e instanceof IllegalMove)) {
                 throw e;
@@ -171,27 +175,22 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
     });
     game.on('ended', () => offlineGamesStorage.clearCurrentGame());
 
-    initWinOverlay(gameView, game, players.value);
+    initWinOverlay(gameViewFacade, game, players.value);
 };
 
 /*
  * Game end: win popin
  */
-const unlisteners: (() => void)[] = [];
 const gameFinishedOverlay = defineOverlay(OfflineGameFinishedOverlay);
 
-const initWinOverlay = (gameView: GameView, game: Game, players: Player[]) => {
-    gameView.on('endedAndWinAnimationOver', () => {
-        void gameFinishedOverlay({
+const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game, players: Player[]) => {
+    useWinOverlay(gameViewFacade.getGameView(), gameViewFacade.getGame(), async () => {
+        await gameFinishedOverlay({
             game,
             players,
         });
     });
-
-    unlisteners.push(() => gameView.removeAllListeners('endedAndWinAnimationOver'));
 };
-
-onUnmounted(() => unlisteners.forEach(unlistener => unlistener()));
 
 init();
 
@@ -207,14 +206,12 @@ const rematch = () => {
 </script>
 
 <template>
-    <div class="offline-board-container">
-        <AppBoard
-            :key="reload"
-            v-if="null !== gameView"
-            :gameView
-            :players
-        />
-    </div>
+    <AppGameView
+        v-if="gameView"
+        :key="reload"
+        :gameView
+        class="offline-board-container"
+    />
 
     <div class="game-menu">
         <router-link class="btn btn-outline-primary" :to="{ name: 'offline-lobby' }">{{ $t('back_to_menu') }}</router-link>

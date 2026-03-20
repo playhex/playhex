@@ -1,4 +1,4 @@
-import { Coords, Move, moveToCoords } from '../move-notation/move-notation.js';
+import { Coords, Move, parseMove } from '../move-notation/move-notation.js';
 import { PathItem, PlayerIndex } from './Types.js';
 
 export const BOARD_DEFAULT_SIZE = 11;
@@ -56,14 +56,14 @@ export default class Board
 
     getCell(move: Move): null | PlayerIndex
     {
-        const { row, col } = moveToCoords(move);
+        const { row, col } = parseMove(move);
 
         return this.hexes[row][col];
     }
 
     isEmpty(move: Move): boolean
     {
-        const { row, col } = moveToCoords(move);
+        const { row, col } = parseMove(move);
 
         return this.hexes[row][col] === null;
     }
@@ -75,7 +75,7 @@ export default class Board
 
     containsMove(move: Move): boolean
     {
-        const { row, col } = moveToCoords(move);
+        const { row, col } = parseMove(move);
 
         return row >= 0 && row < this.size && col >= 0 && col < this.size;
     }
@@ -86,7 +86,7 @@ export default class Board
      */
     setCell(move: Move, value: null | PlayerIndex): void
     {
-        const { row, col } = moveToCoords(move);
+        const { row, col } = parseMove(move);
 
         this.hexes[row][col] = value;
     }

@@ -1,4 +1,4 @@
-import { Move } from '../move-notation/move-notation.js';
+import { HexMove } from '../move-notation/hex-move-notation.js';
 import { HostedGame } from './models/index.js';
 
 /**
@@ -15,7 +15,7 @@ import { HostedGame } from './models/index.js';
  * @param firstPlayerPredefined Whether first player is pre-defined, false if first player is random
  * @param moves Played moves. If not provided, assume the game is empty, and returns a provisional handicap based on game settings
  */
-export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boolean, moves?: Move[]): number | 'N/S' => {
+export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boolean, moves?: HexMove[]): number | 'N/S' => {
     if (!swapRule) {
         if (!firstPlayerPredefined) {
             return 'N/S';

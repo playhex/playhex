@@ -9,6 +9,7 @@ import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 import { ActiveTournamentsFilters } from '../shared/app/tournamentUtils.js';
+import { ConditionalMovesStruct } from '../shared/pixi-board/conditional-moves/types.js';
 
 /**
  * @throws {DomainHttpError}
@@ -555,7 +556,7 @@ export const apiGetConditionalMoves = async (hostedGamePublicId: string): Promis
     return plainToInstance(ConditionalMoves, await response.json());
 };
 
-export const apiPatchConditionalMoves = async (hostedGamePublicId: string, conditionalMoves: ConditionalMoves): Promise<ConditionalMoves> => {
+export const apiPatchConditionalMoves = async (hostedGamePublicId: string, conditionalMoves: ConditionalMovesStruct): Promise<ConditionalMoves> => {
     const response = await fetch(`/api/games/${hostedGamePublicId}/conditional-moves`, {
         method: 'PATCH',
         headers: {

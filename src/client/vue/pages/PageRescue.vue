@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { onBeforeMount, onUnmounted, ref, Ref } from 'vue';
-import AppBoard from '../components/AppBoard.vue';
-import GameView from '../../../shared/pixi-board/GameView.js';
-import { Game } from '../../../shared/game-engine/index.js';
-import { Player } from '../../../shared/app/models/index.js';
-import { CustomizedGameView } from '../../services/CustomizedGameView.js';
-import { shallowRef } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { useServerVersionChecker } from '../composables/useServerVersionChecker.js';
+import GameView from '../../../shared/pixi-board/GameView.js';
+import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
+import AppGameView from '../components/AppGameView.vue';
 
 useSeoMeta({
     robots: 'noindex',
@@ -92,21 +89,10 @@ const clearCache = async () => {
 /*
  * Test board rendering
  */
-const game = new Game(3);
-const gameView = shallowRef<null | GameView>(new CustomizedGameView(game));
-game.move('b2', 0);
+const gameView = new GameView(3);
+const playingGameFacade = new PlayingGameFacade(gameView);
 
-const players = ['A', 'B'].map(pseudo => {
-    const player = new Player();
-
-    player.pseudo = pseudo;
-    player.createdAt = new Date();
-    player.isBot = false;
-    player.isGuest = false;
-    player.publicId = 'nope';
-
-    return player;
-});
+playingGameFacade.addMove('b2');
 </script>
 
 <template>
@@ -138,13 +124,7 @@ const players = ['A', 'B'].map(pseudo => {
 
         <p>Displaying Hex board:</p>
 
-        <div class="board-container">
-            <AppBoard
-                v-if="gameView"
-                :gameView="(gameView as GameView)"
-                :players="players"
-            />
-        </div>
+        <AppGameView :gameView class="board-container" />
 
         <p>You should see a 3x3 board above.</p>
 
