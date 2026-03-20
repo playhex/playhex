@@ -86,6 +86,9 @@ export const availableLocales: AvailableLocales = {
     nl: {
         label: '🇳🇱 Nederlands (Dutch)',
         loader: () => import(/* webpackChunkName: "locale-nl" */ 'date-fns/locale/nl') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'Ebbe Steenhoudt', link: 'https://ebbdrop.com/' },
+        ],
     },
     pl: {
         label: '🇵🇱 Polski (Polish)',
