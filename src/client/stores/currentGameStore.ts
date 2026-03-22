@@ -645,6 +645,20 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }[timeControlToCadencyName(hostedGame.value)];
     });
 
+    // Remove premove or move confirmation when changing player settings
+    watch(moveSettings, async (_, oldSettings) => {
+        if (oldSettings === MoveSettings.MUST_CONFIRM) {
+            removeConfirmMove();
+        }
+
+        if (oldSettings === MoveSettings.PREMOVE) {
+            if (playingGameFacade.value?.hasPreviewedMove()) {
+                await cancelPremove();
+                removeConfirmMove();
+            }
+        }
+    });
+
     /**
      * Whether we should show the "Confirm move" button.
      * The button then should be disabled or enabled depending
