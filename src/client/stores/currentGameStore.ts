@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import HostedGame from '../../shared/app/models/HostedGame.js';
 import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
-import { addMove, canPlayerUndo, getCurrentPlayer, getPlayer, getPlayerIndex, getPlayers, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, canExplore, canPlayerUndo, getCurrentPlayer, getPlayer, getPlayerIndex, getPlayers, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -455,11 +455,14 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                  * Simulation
                  */
                 if (simulatePlayingGameFacade.value) {
-                    const simulationEnabled = hostedGame.value.state !== 'playing'; // TODO allow simulation on playing game if allowed in game config
+                    if (!loggedInPlayer.value) {
+                        return;
+                    }
 
-                    if (simulationEnabled) {
+                    if (canExplore(hostedGame.value, loggedInPlayer.value)) {
                         simulatePlayingGameFacade.value.addSimulationMoveOrForward(move);
                     }
+
                     return;
                 }
 

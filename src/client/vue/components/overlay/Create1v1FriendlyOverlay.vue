@@ -8,6 +8,7 @@ import AppTimeControl from '../AppTimeControl.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
+import AppAllowExploration from './create-game/AppAllowExploration.vue';
 
 const { visible, confirm, cancel } = useDisclosure();
 
@@ -65,6 +66,8 @@ const showSecondaryOptions = ref(false);
                         <div class="mb-3">
                             <AppSwapRule v-model="gameOptions.swapRule" />
                         </div>
+
+                        <AppAllowExploration v-model="gameOptions.explorationAllowed" />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>

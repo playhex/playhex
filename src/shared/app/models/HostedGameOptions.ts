@@ -82,6 +82,15 @@ export default class HostedGameOptions implements TimeControlBoardsize
         }
     })
     timeControlType: TimeControlType = structuredClone(defaultTimeControlTypes.normal);
+
+    /**
+     * Whether players are allowed to explore lines while playing.
+     * If disabled, this won't be possible: exploration, conditional moves, Hexworld link.
+     */
+    @IsBoolean()
+    @IsOptional()
+    @Expose()
+    explorationAllowed = true;
 }
 
 /**
@@ -98,6 +107,7 @@ export const cloneGameOptions = (gameOptions: HostedGameOptions): HostedGameOpti
     clone.opponentType = gameOptions.opponentType;
     clone.opponentPublicId = gameOptions.opponentPublicId;
     clone.timeControlType = gameOptions.timeControlType;
+    clone.explorationAllowed = gameOptions.explorationAllowed;
 
     return clone;
 };

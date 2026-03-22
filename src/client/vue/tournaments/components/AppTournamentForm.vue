@@ -339,6 +339,19 @@ defineExpose({
         </div>
     </div>
 
+    <div class="mb-3">
+        <div class="form-check">
+            <input
+                v-model="tournament.explorationAllowed"
+                type="checkbox"
+                class="form-check-input"
+                id="tournament-exploration"
+            >
+            <label class="form-check-label" for="tournament-exploration">{{ $t('allow_exploration') }}</label>
+            <div class="form-text">{{ $t('allow_exploration_help') }}</div>
+        </div>
+    </div>
+
     <h3>Description, rules</h3>
 
     <p class="text-body-secondary mb-1"><small>Markdown format is supported.</small></p>

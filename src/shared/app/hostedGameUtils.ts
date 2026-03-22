@@ -275,17 +275,20 @@ export const canPlayerUndo = (hostedGame: HostedGame, playerIndex: 0 | 1): boole
 };
 
 /**
- * Whether player can use tools that allow explore, simulate or export game.
- * Used to know e.g when to display HexWorld link, or download SGF file.
+ * Whether player can use tools that allows to easily export moves.
+ * This should be disabled where needed to prevent copying game moves to cheat.
+ *
+ * This should disable Hexworld link, SGF export.
+ * Should be disabled in playing games, though watchers may want to use Hexworld.
  */
-export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Player): boolean => {
-    // Friendly games are allowed
-    if (!hostedGame.ranked) {
-        return true;
+export const canExportGame = (hostedGame: HostedGame, player: Player): boolean => {
+    // Cannot export if I cannot explore in-game
+    if (!canExplore(hostedGame, player)) {
+        return false;
     }
 
     // Any ended games are allowed
-    if (['ended', 'canceled', 'forfeited'].includes(hostedGame.state)) {
+    if (['ended', 'canceled'].includes(hostedGame.state)) {
         return true;
     }
 
@@ -301,6 +304,31 @@ export const canUseHexWorldOrDownloadSGF = (hostedGame: HostedGame, player: Play
     }
 
     // In other cases, disable by default
+    return false;
+};
+
+/**
+ * Whether player can use in-game exploration tool.
+ * Different than canExportGame() because in-game exploration does not allow moves export.
+ */
+export const canExplore = (hostedGame: HostedGame, player: Player): boolean => {
+    // Always possible if enabled
+    if (hostedGame.explorationAllowed) {
+        return true;
+    }
+
+    // If disabled, can explore when game not playing.
+    // Not yet started games should also disable to make sure exploration will be disabled in this game
+    if (['ended', 'canceled'].includes(hostedGame.state)) {
+        return true;
+    }
+
+    // Allow exploration for watchers
+    // but not guests because it's too easy to open a tab as incognito
+    if (hostedGame.state === 'playing') {
+        return !hasPlayer(hostedGame, player) && !player.isGuest;
+    }
+
     return false;
 };
 

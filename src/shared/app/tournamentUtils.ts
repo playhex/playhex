@@ -71,6 +71,7 @@ export const createGameOptionsForTournament = (tournament: Tournament): HostedGa
     gameOptions.boardsize = tournament.boardsize;
     gameOptions.timeControlType = tournament.timeControlType;
     gameOptions.ranked = tournament.ranked;
+    gameOptions.explorationAllowed = tournament.explorationAllowed;
 
     return gameOptions;
 };

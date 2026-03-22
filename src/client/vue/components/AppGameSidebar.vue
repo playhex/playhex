@@ -26,7 +26,7 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
-import { canUseHexWorldOrDownloadSGF, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
+import { canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
@@ -228,7 +228,7 @@ const downloadSGF = (): void => {
         return;
     }
 
-    if (!canUseHexWorldOrDownloadSGF(hostedGame.value, loggedInPlayer.value)) {
+    if (!canExportGame(hostedGame.value, loggedInPlayer.value)) {
         return;
     }
 
@@ -595,7 +595,7 @@ watch(gameUIMode, () => {
 
                 <!-- Download SGF -->
                 <button
-                    v-if="loggedInPlayer && canUseHexWorldOrDownloadSGF(hostedGame, loggedInPlayer)"
+                    v-if="loggedInPlayer && canExportGame(hostedGame, loggedInPlayer)"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"
@@ -687,6 +687,10 @@ watch(gameUIMode, () => {
                     <dd class="col-md-7" v-else-if="('number' === typeof handicap)">{{ $t('handicap.handicap_for_player', { n: Math.abs(handicap), player: handicap > 0 ? $t('game.red') : $t('game.blue') }) }}</dd>
                     <dd class="col-md-7" v-else-if="handicap === 'N/S'">{{ $t('handicap.none') }} ({{ $t('game_rules.no_swap') }})</dd>
                     <dd class="col-md-7" v-else>-</dd>
+
+                    <dt class="col-md-5">{{ $t('allow_exploration') }}</dt>
+                    <dd class="col-md-7" v-if="hostedGame.explorationAllowed">{{ $t('yes') }}</dd>
+                    <dd class="col-md-7" v-else>{{ $t('no') }}</dd>
                 </dl>
             </div>
         </div>

@@ -959,6 +959,21 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             onFailed.push(() => this.tournament.boardsize = oldValue);
         }
 
+        if (edited.explorationAllowed !== this.tournament.explorationAllowed) {
+            const oldValue = this.tournament.explorationAllowed;
+            this.tournament.explorationAllowed = edited.explorationAllowed;
+
+            onUpdated.push(() => {
+                addTournamentHistory(this.tournament, 'edited', {
+                    field: 'explorationAllowed',
+                    value: edited.explorationAllowed ? 'yes' : 'no',
+                    oldValue: oldValue ? 'yes' : 'no',
+                }, now);
+            });
+
+            onFailed.push(() => this.tournament.explorationAllowed = oldValue);
+        }
+
         if (!isSameTimeControlType(edited.timeControlType, this.tournament.timeControlType)) {
             const oldValue = this.tournament.timeControlType;
             this.tournament.timeControlType = edited.timeControlType;

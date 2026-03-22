@@ -65,6 +65,7 @@ export const createGameOptionsFromUrlHash = (hash: string = document.location.ha
             case 'hexmonthly':
                 gameOptions.boardsize = 14;
                 gameOptions.ranked = true;
+                gameOptions.explorationAllowed = false;
                 gameOptions.timeControlType = {
                     family: 'fischer',
                     options: {
@@ -85,6 +86,10 @@ export const createGameOptionsFromUrlHash = (hash: string = document.location.ha
 
             case 'hostsecond':
                 gameOptions.firstPlayer = 1;
+                break;
+
+            case 'noexplo':
+                gameOptions.explorationAllowed = false;
                 break;
 
             default:

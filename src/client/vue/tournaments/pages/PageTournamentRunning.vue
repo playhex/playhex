@@ -10,6 +10,7 @@ import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUti
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';
+import AppTournamentExplorationAllowedInfo from '../components/AppTournamentExplorationAllowedInfo.vue';
 
 const {
     tournament,
@@ -45,6 +46,8 @@ useHead({
             <AppTournamentOrganizerAndAdmins :tournament />
 
             <AppTournamentFormat :tournament />
+
+            <AppTournamentExplorationAllowedInfo :tournament />
 
             <p class="lead">
                 <IconRecordFill class="text-danger" />

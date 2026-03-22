@@ -85,6 +85,8 @@
     },
     "swap_rule": "Swap rule",
     "enable_swap_rule": "Enable swap rule",
+    "allow_exploration": "Allow exploration",
+    "allow_exploration_help": "Allows to try lines by playing both colors before submit a move. If disabled, conditional moves are also disabled.",
     "toggle_coords": "Toggle the display of coordinates",
     "toggle_coords_short": "Toggle coordinates",
     "share_game": "Share game",

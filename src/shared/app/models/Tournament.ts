@@ -197,6 +197,15 @@ export default class Tournament implements TimeControlBoardsize
     timeControlType: TimeControlType;
 
     /**
+     * Whether players are allowed to explore lines while playing.
+     * If disabled, this won't be possible: exploration, conditional moves, Hexworld link.
+     */
+    @Column({ default: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    @IsBoolean({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
+    explorationAllowed: boolean;
+
+    /**
      * Whether player needs an account to join tournament,
      * i.e disallow guests.
      */
@@ -357,6 +366,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.ranked = true;
     tournament.boardsize = 11;
     tournament.timeControlType = structuredClone(defaultTimeControlTypes.normal);
+    tournament.explorationAllowed = true;
     tournament.checkInOpenOffsetSeconds = 15 * 60;
     tournament.startDelayInSeconds = 0;
     tournament.createdAt = new Date();
@@ -389,6 +399,7 @@ export const createTournamentDefaultsCreate = (): Tournament => {
     tournament.startDelayInSeconds = 0;
     tournament.checkInOpenOffsetSeconds = 15 * 60;
     tournament.timeControlType = structuredClone(defaultTimeControlTypes.normal);
+    tournament.explorationAllowed = true;
 
     return tournament;
 };
@@ -415,6 +426,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.ranked = input.ranked;
     tournament.boardsize = input.boardsize;
     tournament.timeControlType = input.timeControlType;
+    tournament.explorationAllowed = input.explorationAllowed;
     tournament.subscriptions = [];
     tournament.participants = [];
     tournament.matches = [];
@@ -447,6 +459,7 @@ export const cloneTournament = (target: Tournament, source: Tournament): void =>
     target.ranked = source.ranked;
     target.boardsize = source.boardsize;
     target.timeControlType = structuredClone(source.timeControlType);
+    target.explorationAllowed = source.explorationAllowed;
 
     // Prevents "maxTime must not be greater than [2 weeks]" error when cloning a tournament and submit it
     if (target.timeControlType.family === 'fischer' && undefined !== target.timeControlType.options.maxTime && target.timeControlType.options.maxTime > maxTimeControlInputTime) {

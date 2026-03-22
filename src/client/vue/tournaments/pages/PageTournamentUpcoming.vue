@@ -131,6 +131,11 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                         <br>
                                         <span class="lead">{{ tournament.boardsize }}×{{ tournament.boardsize }}</span>
                                         <br>
+                                        <span>{{ $t('allow_exploration') }}
+                                            <strong v-if="tournament.explorationAllowed">{{ $t('yes') }}</strong>
+                                            <strong v-else>{{ $t('no') }}</strong>
+                                        </span>
+                                        <br>
                                         <small><AppSeedingInfo :tournament /></small>
                                     </p>
                                 </div>

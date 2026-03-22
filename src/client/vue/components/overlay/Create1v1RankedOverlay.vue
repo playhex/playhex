@@ -7,6 +7,7 @@ import AppTimeControl from '../AppTimeControl.vue';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
 import { IconTrophy } from '../../icons.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
+import AppAllowExploration from './create-game/AppAllowExploration.vue';
 
 const { visible, confirm, cancel } = useDisclosure();
 
@@ -40,6 +41,9 @@ watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
                         <div class="mb-3">
                             <AppTimeControl v-model="timeControl" />
                         </div>
+                    </div>
+                    <div class="modal-body border-top">
+                        <AppAllowExploration v-model="gameOptions.explorationAllowed" />
                     </div>
 
                     <div class="modal-footer">

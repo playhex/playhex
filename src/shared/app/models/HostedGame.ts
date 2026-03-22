@@ -124,6 +124,14 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Transform(({ value }: { value: GameTimeData }) => deserializeTimeControlValue(value), { toClassOnly: true })
     timeControl: null | GameTimeData; // TODO create model for transform
 
+    /**
+     * Whether players are allowed to explore lines while playing.
+     * If disabled, this won't be possible: exploration, conditional moves, Hexworld link.
+     */
+    @Column({ default: true })
+    @Expose()
+    explorationAllowed: boolean;
+
     @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
     @Expose()
     @Type(() => ChatMessage)
@@ -244,7 +252,8 @@ export type CreateHostedGameParams = {
 };
 
 /**
- * Create a new HostedGame.
+ * Create a new HostedGame
+ * from parameters provided while creating a new game.
  */
 export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGame => {
     const hostedGame = new HostedGame();
@@ -261,6 +270,7 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
     hostedGame.opponentPublicId = gameOptions.opponentPublicId;
     hostedGame.timeControlType = structuredClone(gameOptions.timeControlType);
     hostedGame.timeControl = null;
+    hostedGame.explorationAllowed = params.gameOptions?.explorationAllowed ?? true;
     hostedGame.host = params.host ?? null;
     hostedGame.chatMessages = [];
     hostedGame.moves = [];

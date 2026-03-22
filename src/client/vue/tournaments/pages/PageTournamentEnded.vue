@@ -14,6 +14,7 @@ import { t } from 'i18next';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';
+import AppTournamentExplorationAllowedInfo from '../components/AppTournamentExplorationAllowedInfo.vue';
 
 const {
     tournament,
@@ -100,6 +101,8 @@ const colClasses = [
             </div>
 
             <AppTournamentFormat :tournament />
+
+            <AppTournamentExplorationAllowedInfo :tournament />
 
             <p>{{ $t('tournament_started_at', { date: tournament.startedAt ? format(tournament.startedAt, 'd MMMM yyyy p') : '-' }) }}</p>
             <p>{{ $t('tournament_duration', { duration: formatTournamentDuration(tournament) }) }}</p>
