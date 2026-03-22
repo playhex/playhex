@@ -89,6 +89,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
         );
 
         this.initialPlayingGameFacade.pauseView();
+        this.initialPlayingGameFacade.setLastMoveMarksVisible(false);
     }
 
     /**
@@ -274,6 +275,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
     {
         this.resetSimulationAndRewind();
         this.initialPlayingGameFacade.resumeView();
+        this.initialPlayingGameFacade.setLastMoveMarksVisible();
         this.playingGameFacade.destroy();
     }
 }
