@@ -471,6 +471,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                     return;
                 }
 
+                // Next actions only available when game is playing
+                if (hostedGame.value.state !== 'playing') {
+                    return;
+                }
+
                 /*
                  * Conditional moves
                  */
