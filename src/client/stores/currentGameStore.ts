@@ -590,7 +590,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return null;
         }
 
-        return getPlayerIndex(hostedGame.value, loggedInPlayer.value) as 0 | 1;
+        const playerIndex = getPlayerIndex(hostedGame.value, loggedInPlayer.value);
+
+        if (playerIndex === -1) {
+            return null;
+        }
+
+        return playerIndex as 0 | 1;
     });
 
     const players = computed<Player[]>(() => {

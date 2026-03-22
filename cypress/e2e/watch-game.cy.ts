@@ -12,6 +12,19 @@ describe('Watch game', () => {
         cy.contains('Player B');
     });
 
+    it('does not display buttons like "Resign"', () => {
+        cy.mockSocketIO();
+
+        cy.visit('/games/280fa373-affd-46bd-b2cd-b2cb4578bc94');
+
+        cy.contains('Loading game…');
+        cy.receiveGameUpdate('watch-game/game-running.json');
+        cy.contains('Loading game…').should('not.exist');
+        cy.contains('Offline').should('not.exist');
+
+        cy.contains('.menu-game button', 'Resign', { timeout: 100 }).should('not.exist');
+    });
+
     it('shows spectator joined and left messages in chat', () => {
         cy.mockSocketIO();
 
