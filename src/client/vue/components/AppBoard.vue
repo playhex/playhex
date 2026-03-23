@@ -223,7 +223,7 @@ onUnmounted(() => {
 
             <!-- Save -->
             <button type="button" @click="conditionalMovesEditor.submitConditionalMoves()" class="btn" :class="conditionalMovesEditor.getHasChanges() ? 'btn-success' : 'btn-outline-success'">
-                <IconCheck /> Save
+                <IconCheck /> {{ $t('save') }}
             </button>
 
             <!-- Close conditional moves edition -->
