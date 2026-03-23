@@ -12,8 +12,11 @@ const {
 } = storeToRefs(useCurrentGameStore());
 
 const {
+    startConditionalMoves,
     stopConditionalMoves,
 } = useCurrentGameStore();
+
+const start = () => startConditionalMoves().getEditor();
 </script>
 
 <template>
@@ -23,14 +26,14 @@ const {
                 :tree="conditionalMovesState.conditionalMovesDirty.tree"
                 :selectedLine="conditionalMovesState.selectedLine"
                 :playerIndex="conditionalMovesState.myIndex"
-                @lineClicked="lineClicked => conditionalMovesEditor?.setSelectedLine(lineClicked)"
+                @lineClicked="lineClicked => start().setSelectedLine(lineClicked)"
             />
         </div>
 
         <AppConditionalMoveButton
             label="+"
             :playerIndex="1 - conditionalMovesState.myIndex"
-            @click="conditionalMovesEditor.startNewLine()"
+            @click="start().startNewLine()"
             aria-label="Add new conditional move"
         />
 
@@ -58,7 +61,7 @@ const {
             <h4>{{ $t('conditional_moves.inactive_lines') }}</h4>
 
             <button
-                @click="conditionalMovesEditor.deleteAllInactives()"
+                @click="start().deleteAllInactives()"
                 class="btn btn-sm btn-outline-danger ms-2"
             ><IconTrash /> {{ $t('conditional_moves.clear_inactive_lines') }}</button>
 
@@ -66,7 +69,7 @@ const {
                 theme="inactive"
                 :tree="conditionalMovesState.conditionalMovesDirty.unplayedLines"
                 :playerIndex="conditionalMovesState.myIndex"
-                @lineClicked="lineClicked => conditionalMovesEditor?.setSelectedLine(lineClicked)"
+                @lineClicked="lineClicked => start().setSelectedLine(lineClicked)"
             />
         </div>
     </template>

@@ -69,6 +69,11 @@ export class ConditionalMovesFacade
         );
     }
 
+    getEditor()
+    {
+        return this.editor;
+    }
+
     /**
      * Rewind simulated moves.
      * Cannot rewind more, in main line.

@@ -1104,9 +1104,9 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
     });
 
-    const startConditionalMoves = () => {
+    const startConditionalMoves = (): ConditionalMovesFacade => {
         if (conditionalMovesFacade.value) {
-            return;
+            return conditionalMovesFacade.value;
         }
 
         disableCurrentUIMode();
@@ -1125,6 +1125,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         removeConfirmMove();
         conditionalMovesFacade.value = new ConditionalMovesFacade(playingGameFacade.value, conditionalMovesEditor.value);
+
+        return conditionalMovesFacade.value;
     };
 
     const stopConditionalMoves = () => {
