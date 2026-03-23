@@ -198,6 +198,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             game.value.move(timestampedMove.move, byPlayerIndex, timestampedMove.playedAt);
 
             playSoundForMove(timestampedMove.move);
+
+            if (!isSpecialHexMove(timestampedMove.move)) {
+                conditionalMovesEditor.value?.realMovePlayed(timestampedMove.move, byPlayerIndex);
+            }
         });
 
         on('timeControlUpdate', (gameId, gameTimeData) => {
