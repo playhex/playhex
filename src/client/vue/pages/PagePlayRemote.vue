@@ -9,7 +9,7 @@ import { defineOverlay } from '@overlastic/vue';
 import { Ref, watch, watchEffect } from 'vue';
 import useAuthStore from '../../stores/authStore.js';
 import { useRoute, useRouter } from 'vue-router';
-import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
+import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit, IconEye } from '../icons.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
@@ -26,6 +26,7 @@ import { useGameViewOrientation } from '../composables/useGameViewOrientation.js
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import { useWinOverlay } from '../composables/useWinOverlay.js';
 import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
+import { onClickOutside } from '@vueuse/core';
 
 const head = injectHead();
 
@@ -54,6 +55,7 @@ const {
     shouldEnablePass,
     unreadMessages,
     isReadingChatMessages,
+    spectators,
 } = storeToRefs(useCurrentGameStore());
 
 const {
@@ -70,6 +72,13 @@ const {
 
 const lobbyStore = useLobbyStore();
 const { loggedInPlayer } = storeToRefs(useAuthStore());
+
+const spectatorPopupOpen = ref(false);
+const spectatorCountEl = ref<HTMLElement>();
+const toggleSpectatorPopup = () => { spectatorPopupOpen.value = !spectatorPopupOpen.value; };
+onClickOutside(spectatorCountEl, () => { spectatorPopupOpen.value = false; });
+watch(spectators, (s) => { if (s.length === 0) spectatorPopupOpen.value = false; });
+
 const router = useRouter();
 const orientation = useGameViewOrientation(gameView);
 
@@ -409,55 +418,73 @@ const {
                         </span>
                     </button>
 
-                    <!-- Secondary actions dropup -->
-                    <div class="dropup-center dropup">
+                    <!-- Secondary actions dropup + spectator count -->
+                    <div class="dropup-wrap">
+                        <div class="dropup-center dropup">
 
-                        <!-- Dropup button -->
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Secondary actions" aria-expanded="false" data-bs-auto-close="true">
-                            <IconList />
-                        </button>
-
-                        <!-- Secondary actions -->
-                        <div class="dropdown-menu">
-
-                            <!-- Pass -->
-                            <button
-                                v-if="shouldShowPass"
-                                type="button"
-                                class="dropdown-item"
-                                :class="shouldEnablePass ? 'text-warning' : 'text-secondary disabled'"
-                                :disabled="!shouldEnablePass"
-                                @click="pass()"
-                            >
-                                <IconArrowDownUp />
-                                {{ $t('pass') }}
+                            <!-- Dropup button -->
+                            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Secondary actions" aria-expanded="false" data-bs-auto-close="true">
+                                <IconList />
                             </button>
 
-                            <!-- Undo -->
-                            <button
-                                v-if="shouldDisplayUndoMove"
-                                type="button"
-                                class="dropdown-item"
-                                :class="shouldEnableUndoMove ? 'text-primary' : 'disabled'"
-                                :disabled="!shouldEnableUndoMove"
-                                @click="askUndo()"
-                            >
-                                <IconArrowCounterclockwise />
-                                {{ $t('undo.undo_move') }}
-                            </button>
+                            <!-- Secondary actions -->
+                            <div class="dropdown-menu">
 
-                            <div><hr class="dropdown-divider"></div>
+                                <!-- Pass -->
+                                <button
+                                    v-if="shouldShowPass"
+                                    type="button"
+                                    class="dropdown-item"
+                                    :class="shouldEnablePass ? 'text-warning' : 'text-secondary disabled'"
+                                    :disabled="!shouldEnablePass"
+                                    @click="pass()"
+                                >
+                                    <IconArrowDownUp />
+                                    {{ $t('pass') }}
+                                </button>
 
-                            <!-- Explore -->
-                            <AppHexWorldExplore
-                                v-if="game"
-                                :hostedGame
-                                :game
-                                :orientation
-                                :label="$t('explore')"
-                                class="dropdown-item"
-                            />
+                                <!-- Undo -->
+                                <button
+                                    v-if="shouldDisplayUndoMove"
+                                    type="button"
+                                    class="dropdown-item"
+                                    :class="shouldEnableUndoMove ? 'text-primary' : 'disabled'"
+                                    :disabled="!shouldEnableUndoMove"
+                                    @click="askUndo()"
+                                >
+                                    <IconArrowCounterclockwise />
+                                    {{ $t('undo.undo_move') }}
+                                </button>
+
+                                <div><hr class="dropdown-divider"></div>
+
+                                <!-- Explore -->
+                                <AppHexWorldExplore
+                                    v-if="game"
+                                    :hostedGame
+                                    :game
+                                    :orientation
+                                    :label="$t('explore')"
+                                    class="dropdown-item"
+                                />
+                            </div>
                         </div>
+
+                        <!-- Spectator count -->
+                        <span
+                            ref="spectatorCountEl"
+                            class="spectator-count"
+                            :class="{ 'spectator-count-visible': spectators.length > 0, 'spectator-popup-open': spectatorPopupOpen }"
+                            @click="toggleSpectatorPopup"
+                        >
+                            <IconEye /> {{ spectators.length || '' }}
+                            <div v-if="spectators.length > 0" class="spectator-popup" @click.stop>
+                                <div class="spectator-popup-title">{{ $t('spectators') }}</div>
+                                <TransitionGroup name="spectator-item" tag="ul" class="spectator-popup-list">
+                                    <li v-for="s in spectators" :key="s.publicId">{{ pseudoString(s, 'pseudo') }}</li>
+                                </TransitionGroup>
+                            </div>
+                        </span>
                     </div>
 
                 </div>
@@ -516,6 +543,84 @@ const {
         display none
         height calc(100vh - 3rem) // (fallback if dvh is not supported)
         height calc(100dvh - 3rem) // 3rem = header height
+
+    .dropup-wrap
+        position relative
+
+    .spectator-count
+        position absolute
+        left 100%
+        top 50%
+        transform translateY(-50%)
+        margin-left 0.5em
+        display flex
+        align-items center
+        gap 0.4em
+        color var(--bs-primary)
+        cursor pointer
+        font-size 1.2em
+        padding 0.2em 0.35em
+        opacity 0
+        transition opacity 0.3s ease
+        white-space nowrap
+
+
+    .spectator-count-visible
+        opacity 1
+
+    .spectator-popup
+        display none
+        position absolute
+        bottom 100%
+        right 0
+        margin-bottom 0.5em
+        background var(--bs-body-bg)
+        border 1px solid var(--bs-border-color)
+        border-radius 0.5em
+        padding 0.5em 0.75em
+        min-width 10em
+        max-height 50vh
+        overflow-y auto
+        box-shadow 0 2px 8px rgba(0, 0, 0, 0.2)
+        z-index 10
+
+    .spectator-count-visible:hover .spectator-popup,
+    .spectator-popup-open .spectator-popup
+        display block
+
+    .spectator-popup-title
+        font-size 0.85em
+        font-weight bold
+        color var(--bs-body-color)
+        margin-bottom 0.3em
+
+    .spectator-popup-list
+        list-style disc
+        margin 0
+        padding-left 1.2em
+        font-size 0.85em
+        color var(--bs-body-color)
+
+        li
+            padding 0.1em 0
+
+    .spectator-item-enter-active
+        transition all 0.3s ease
+
+    .spectator-item-leave-active
+        transition all 0.3s ease
+
+    .spectator-item-enter-from
+        opacity 0
+        transform translateX(-10px)
+
+    .spectator-item-leave-to
+        opacity 0
+        transform translateX(10px)
+
+    .spectator-item-move
+        transition transform 0.3s ease
+
 
     .open-sidebar-btn
         position absolute
@@ -589,4 +694,5 @@ sidebarOpen()
 
             @media (min-width: 992px)
                 display unset
+
 </style>

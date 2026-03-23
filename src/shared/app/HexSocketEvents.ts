@@ -197,6 +197,12 @@ export type HexServerToClientEvents = {
      */
     spectatorLeft: (gameId: string, player: Player) => void;
 
+    /**
+     * Current list of spectators watching a game.
+     * Sent to a client when they join a game room.
+     */
+    spectatorList: (gameId: string, players: Player[]) => void;
+
     // Room updates
 
     /** State for the `Rooms.lobby` room. */
