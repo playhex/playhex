@@ -5,6 +5,8 @@ import { storeToRefs } from 'pinia';
 import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
 import GameAnalyzeView, { AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeView.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
+import { themes } from '../../../shared/pixi-board/BoardTheme.js';
+import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 
 const props = defineProps({
     analyze: {
@@ -31,7 +33,10 @@ onMounted(() => {
         throw new Error('element with ref="gameAnalyzeContainer" not found');
     }
 
-    const gameAnalyzeView = new GameAnalyzeView(analyze);
+    const gameAnalyzeView = new GameAnalyzeView(
+        analyze,
+        themes[usePlayerLocalSettingsStore().displayedTheme()],
+    );
 
     if (gameView.value) {
         // update game view position when clicking on a move on analyze view

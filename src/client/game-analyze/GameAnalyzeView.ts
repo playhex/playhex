@@ -1,6 +1,6 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
 import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced.js';
-import { themes } from '../../shared/pixi-board/BoardTheme.js';
+import { Theme, themes } from '../../shared/pixi-board/BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import GameView from '../../shared/pixi-board/GameView.js';
@@ -78,6 +78,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
     constructor(
         private analyze: GameAnalyzeData,
+        private theme: Theme = themes.dark,
     ) {
         super();
     }
@@ -162,7 +163,6 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
             }
 
             const movePower = moveAnalyze.move.whiteWin;
-            const bestMovePower = moveAnalyze.bestMoves[0].whiteWin as number;
 
             if (movePower !== undefined) {
                 // Draw bar
@@ -174,7 +174,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
                     (movePower - 0.5) * height,
                 );
 
-                graphics.fill({ color: movePower < 0.5 ? themes.dark.colorA : themes.dark.colorB });
+                graphics.fill({ color: movePower < 0.5 ? this.theme.colorA : this.theme.colorB });
             }
         }
 
@@ -186,7 +186,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         this.highlight.visible = false;
         this.highlight.rect(0, 0, barWidth, height);
         this.highlight.stroke({
-            color: 'white',
+            color: this.theme.textColor,
             width: 1,
         });
 

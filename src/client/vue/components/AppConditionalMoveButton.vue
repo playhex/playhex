@@ -44,14 +44,22 @@ div.hexagons
     width 2.5rem
 
     &::before
-            font-size 2.5rem
-            content '\2B22'
+        font-size 2.5rem
+        content '\2B22'
 
-        &.player-0::before
+    &.player-0
+        &::before
             color var(--bs-danger)
 
-        &.player-1::before
+        color var(--bs-white)
+
+
+    &.player-1
+        &::before
             color var(--bs-primary)
+
+        color var(--bs-white)
+
 
 div.inactive
     height 2rem
