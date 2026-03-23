@@ -452,6 +452,7 @@ watch(gameUIMode, () => {
                 <span class="d-none d-md-inline">
                     {{ $t('conditional_moves.title_short') }}
                 </span>
+                <span v-if="conditionalMovesEditor?.getHasChanges()">*</span>
                 <span v-if="null !== conditionalMovesEditor && conditionalMovesEditor.getConditionalMoves().tree.length > 0"> ({{ conditionalMovesEditor.getConditionalMoves().tree.length }})</span>
             </a>
 
