@@ -84,7 +84,7 @@ export class BoardEntity extends Container
         return this.coords;
     }
 
-    setCoords(coords: Coords | Move): BoardEntity
+    setCoords(coords: Coords | Move): this
     {
         if (typeof coords === 'string') {
             coords = parseMove(coords);

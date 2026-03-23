@@ -1181,6 +1181,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         game,
         gameView,
         gameUIMode,
+        playingGameFacade,
         playerSettingsFacade,
 
         players,

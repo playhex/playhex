@@ -5,6 +5,7 @@
  */
 
 export { default as Icon0CircleFill } from '~icons/bi/0-circle-fill';
+export { default as Icon123 } from '~icons/bi/123';
 export { default as IconAlarmFill } from '~icons/bi/alarm-fill';
 export { default as IconAlphabet } from '~icons/bi/alphabet';
 export { default as IconArrowBarLeft } from '~icons/bi/arrow-bar-left';

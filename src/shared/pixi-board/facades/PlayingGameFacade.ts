@@ -3,6 +3,9 @@ import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation
 import GameView from '../GameView.js';
 import { GameMarksFacade } from './GameMarksFacade.js';
 import { PreviewMoveFacade } from './PreviewMoveFacade.js';
+import TextMark from '../entities/TextMark.js';
+
+const GROUP_MOVE_NUMBERS = 'playing_game_facade_move_numbers';
 
 /**
  * Facade for adding moves alternately.
@@ -39,6 +42,8 @@ export class PlayingGameFacade
      * in case of swap move.
      */
     private previewedMove: null | HexMove = null;
+
+    private moveNumbersVisible = false;
 
     constructor(
         private gameView: GameView,
@@ -370,6 +375,81 @@ export class PlayingGameFacade
         } else {
             this.actionsWhilePaused.push(viewUpdate);
         }
+    }
+
+    /**
+     * Add number of move on all played move in order.
+     * Shows "S" on blue move if blue swapped.
+     */
+    showMoveNumbers(): void
+    {
+        if (this.moveNumbersVisible) {
+            return;
+        }
+
+        this.doAddMoveNumbers();
+        this.moveNumbersVisible = true;
+    }
+
+    hideMoveNumbers(): void
+    {
+        if (!this.moveNumbersVisible) {
+            return;
+        }
+
+        this.gameView.removeEntitiesGroup(GROUP_MOVE_NUMBERS);
+        this.moveNumbersVisible = false;
+    }
+
+    toggleMoveNumbers(): void
+    {
+        if (this.moveNumbersVisible) {
+            this.hideMoveNumbers();
+        } else {
+            this.showMoveNumbers();
+        }
+    }
+
+    private doAddMoveNumbers(): void
+    {
+        const [first, second] = this.moves;
+
+        if (second === 'swap-pieces') {
+            if (isSpecialHexMove(first)) {
+                throw new Error('Unexpected special move as first move');
+            }
+
+            const swappedCoords = mirrorMove(first);
+
+            this.addText('S', swappedCoords);
+        } else {
+            if (first && !isSpecialHexMove(first)) {
+                this.addText('1', first);
+            }
+
+            if (second && !isSpecialHexMove(second)) {
+                this.addText('2', second);
+            }
+        }
+
+        for (let i = 2; i < this.moves.length; ++i) {
+            const move = this.moves[i];
+
+            if (!isSpecialHexMove(move)) {
+                this.addText(String(i + 1), move);
+            }
+        }
+    }
+
+    private addText(text: string, move: Move): void
+    {
+        const mark = new TextMark(text)
+            .setCoords(move)
+            .setColor(0xffffff)
+            .setSizeCoef(0.9)
+        ;
+
+        this.gameView.addEntity(mark, GROUP_MOVE_NUMBERS);
     }
 
     destroy(): void

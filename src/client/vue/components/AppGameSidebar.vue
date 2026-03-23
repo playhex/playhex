@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-env browser */
 import { PropType, nextTick, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit } from '../icons.js';
+import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123 } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
@@ -55,6 +55,7 @@ const {
     gameUIMode,
     conditionalMovesEditor,
     conditionalMovesState,
+    playingGameFacade,
     playerSettingsFacade,
     richChat,
 } = storeToRefs(useCurrentGameStore());
@@ -593,6 +594,13 @@ watch(gameUIMode, () => {
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                 />
+
+                <button
+                    v-if="playingGameFacade"
+                    @click="playingGameFacade.toggleMoveNumbers()"
+                    type="button"
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                ><Icon123 /> {{ $t('moves') }}</button>
 
                 <!-- Download SGF -->
                 <button
