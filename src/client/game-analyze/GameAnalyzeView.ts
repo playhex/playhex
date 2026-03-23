@@ -176,15 +176,6 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
                 graphics.fill({ color: movePower < 0.5 ? themes.dark.colorA : themes.dark.colorB });
             }
-
-            // Draw best move
-            graphics.circle(
-                (i + 0.5) * barWidth,
-                bestMovePower * height,
-                2,
-            );
-
-            graphics.fill({ color: '0x00ff00' });
         }
 
         this.container.addChild(graphics);
