@@ -599,7 +599,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                     }
 
                     // ctrl + click: emits hexClickedSecondary instead
-                    if (e.ctrlKey) {
+                    if ((e.ctrlKey || e.metaKey)) {
                         this.emit('hexClickedSecondary', coordsToMove({ row, col }));
                         return;
                     }

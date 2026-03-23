@@ -196,7 +196,7 @@ const chatClick = (e: PointerEvent) => {
     mark.setCoords(parseMove(move));
 
     // ctrl click to show multiple marks when click on multiple coords in chat
-    if (!e.ctrlKey) {
+    if (!(e.ctrlKey || e.metaKey)) {
         gameView.value.removeEntitiesGroup('coords-show');
     }
 
@@ -241,7 +241,7 @@ const downloadSGF = (): void => {
 };
 
 const ctrlSListener = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 's') {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         downloadSGF();
     }
