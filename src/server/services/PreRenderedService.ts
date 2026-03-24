@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { readFile } from 'node:fs/promises';
 import { join } from 'path';
-import { renderFile } from 'ejs';
+import ejs from 'ejs';
 import { getManifest } from '../controllers/http/misc/manifest-manager.js';
 import { seo } from '../../shared/app/seo.js';
 
@@ -121,7 +121,7 @@ export class PreRenderedService
             body: await this.readTemplatePart(templateParts.body),
         };
 
-        return await renderFile(
+        return await ejs.renderFile(
             join(process.cwd(), 'views', 'page-pre-rendered.ejs'),
             pageVariables,
         );
