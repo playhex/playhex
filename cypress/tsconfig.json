@@ -1,6 +1,8 @@
 {
     "extends": "../src/client/tsconfig.json",
     "compilerOptions": {
+      "rootDir": "..",
+      "ignoreDeprecations": "6.0", // TODO temporary while cypress does not support TS6: https://github.com/cypress-io/cypress/issues/33385
       "types": ["cypress", "node"]
     },
     "include": ["**/*.ts"]

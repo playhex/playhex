@@ -90,8 +90,10 @@ Cypress.Commands.add('closeGameSidebar', () => {
     ;
 });
 
+let socketIoMocked = false;
+
 beforeEach(() => {
-    Cypress.env('socketIoMocked', false);
+    socketIoMocked = false;
 });
 
 Cypress.Commands.add('mockSocketIO', () => {
@@ -100,11 +102,11 @@ Cypress.Commands.add('mockSocketIO', () => {
         (window as any).io = () => socketIoMock;
     });
 
-    Cypress.env('socketIoMocked', true);
+    socketIoMocked = true;
 });
 
 Cypress.Commands.add('receiveSocketIoMessage', (type, ...args) => {
-    if (!Cypress.env('socketIoMocked')) {
+    if (!socketIoMocked) {
         throw new Error('Cannot emit mocked socket message, must call "cy.mockSocketIO()" at the beginning of the test');
     }
 
