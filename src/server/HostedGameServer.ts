@@ -15,7 +15,7 @@ import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlF
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository.js';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
 import { notifier } from './services/notifications/index.js';
-import { AutoSaveInterface } from 'auto-save/AutoSaveInterface.js';
+import { AutoSaveInterface } from './auto-save/AutoSaveInterface.js';
 import { instanceToPlain } from '../shared/app/class-transformer-custom.js';
 import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';

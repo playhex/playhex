@@ -1,4 +1,4 @@
-import type { SGF, SGFMove, SGFProperty } from './types.js';
+import type { SGF, SGFMove } from './types.js';
 
 /*
  * SGF docs:
@@ -32,12 +32,12 @@ const escapeSgfValue = (value: unknown): unknown => {
  */
 const write = <T extends (SGF & SGFMove)>(sgf: T, properties: (keyof T)[]): string => {
     return properties
-        .map((property: SGFProperty) => {
+        .map((property) => {
             if (undefined === sgf[property] || sgf[property] === null) {
                 return '';
             }
 
-            return property + '[' + String(escapeSgfValue(sgf[property])) + ']';
+            return String(property) + '[' + String(escapeSgfValue(sgf[property])) + ']';
         })
         .join('')
     ;

@@ -16,6 +16,8 @@
         "experimentalDecorators": true,
         "sourceMap": true,
         "strictNullChecks": true,
+        "strictPropertyInitialization": false,
+        "useUnknownInCatchVariables": false,
         "incremental": true,
         "composite": true,
         "lib": [

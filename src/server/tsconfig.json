@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "target": "ESNext",
-        "baseUrl": "./",
+        "rootDir": ".",
         "outDir": "../../dist/server",
         "types": [
             "node"

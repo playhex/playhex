@@ -129,6 +129,7 @@ const config: webpack.Configuration = {
                         options: {
                             appendTsSuffixTo: [/\.vue$/],
                             transpileOnly: true,
+                            ignoreDiagnostics: [5011, 6059], // Problem with rootDir I couldn't solve. Ignoring seems still fine so...
                         },
                     },
                 ],

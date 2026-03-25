@@ -84,7 +84,6 @@ export default tseslint.config([
             parserOptions: {
                 parser: tseslint.parser,
                 projectService: true,
-                tsconfigRootDir: import.meta.dirname,
                 extraFileExtensions: ['.vue'],
             },
         },

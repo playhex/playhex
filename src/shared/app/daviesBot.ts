@@ -1,6 +1,6 @@
 import { getBestMove, getBestMoveCustomPosition, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { Game } from '../game-engine/index.js';
-import { PlayerIndex } from 'time-control/TimeControl.js';
+import { PlayerIndex } from '../time-control/TimeControl.js';
 import { coordsToMove, parseMove } from '../move-notation/move-notation.js';
 import { HexMove, isSpecialHexMove } from '../../shared/move-notation/hex-move-notation.js';
 

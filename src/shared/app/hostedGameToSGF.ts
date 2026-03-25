@@ -4,7 +4,7 @@ import { HostedGame, ChatMessage } from './models/index.js';
 import { pseudoString } from './pseudoUtils.js';
 import { guessDemerHandicapFromHostedGame } from './demerHandicap.js';
 import { isRatingConfident } from './ratingUtils.js';
-import { SGFMove } from 'sgf/types.js';
+import { SGFMove } from '../sgf/types.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
 import { PlayerIndex } from '../time-control/TimeControl.js';
 import { ByoYomiTimeControl } from '../time-control/time-controls/ByoYomiTimeControl.js';

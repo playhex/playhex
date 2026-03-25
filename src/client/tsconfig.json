@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "target": "ESNext",
-        "baseUrl": "./",
+        "rootDir": ".",
         "outDir": "../../dist/client",
         "types": [
             "unplugin-icons/types/vue",

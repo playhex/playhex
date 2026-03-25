@@ -3,7 +3,7 @@ import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
 import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
-import { GameData } from 'game-engine/normalization.js';
+import { GameData } from '../game-engine/normalization.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     if (hostedGame.host !== null && hostedGame.host.publicId === player.publicId) {

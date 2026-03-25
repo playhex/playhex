@@ -1,4 +1,4 @@
-import { Move } from 'move-notation/move-notation.js';
+import { Move } from '../../move-notation/move-notation.js';
 import { ConditionalMovesLine, ConditionalMovesTree, ConditionalMovesStruct } from './types.js';
 
 /**

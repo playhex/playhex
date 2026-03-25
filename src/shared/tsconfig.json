@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "target": "ES2019",
-        "baseUrl": "./",
+        "rootDir": ".",
         "outDir": "../../dist/shared"
     },
     "include": [
