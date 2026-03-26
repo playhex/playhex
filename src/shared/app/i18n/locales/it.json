@@ -26,7 +26,12 @@
         "outcome": "Risultato",
         "lost": "Perso",
         "playing": "In gioco",
-        "watch": "Guarda"
+        "watch": "Guarda",
+        "info": "",
+        "title_your_turn": "",
+        "title": "",
+        "title_waiting": "",
+        "duration": ""
     },
     "game_rules": {
         "normal": "normale",
@@ -59,7 +64,8 @@
         "periods_time": "Tempo dei periodi",
         "fast": "Veloce",
         "normal": "Normale",
-        "long": "Lungo"
+        "long": "Lungo",
+        "capped_abbreviation": ""
     },
     "i_play": {
         "title": "Gioco",
@@ -121,7 +127,9 @@
         "errored": "Errore nell'analisi!",
         "best_move": "mossa migliore",
         "best": "migliore:",
-        "how_it_works": "Come funziona"
+        "how_it_works": "Come funziona",
+        "available": "",
+        "request_analysis": ""
     },
     "try_again": "Riprova",
     "yes": "Sì",
@@ -316,7 +324,8 @@
         "started": "Il torneo è iniziato!",
         "match_ended": "Partita {{ round }}.{{ number }} terminata: {{ winnerPseudo }} ha vinto contro {{ loserPseudo }}.",
         "match_canceled_recreated": "La partita {{ round }}.{{ number }} è stata ricreata dopo l'annullamento.",
-        "ended": "Il torneo è terminato."
+        "ended": "Il torneo è terminato.",
+        "changed_admins": ""
     },
     "tournament_player_is_banned": "Escluso da questo torneo",
     "tournament_account_required": "Questo torneo richiede un account. Gli ospiti non sono ammessi. Effettua il login o crea un account.",
@@ -372,7 +381,9 @@
     "undo": {
         "undo_move": "Annulla",
         "accept": "Accetta annullamento",
-        "reject": "Rifiuta"
+        "reject": "Rifiuta",
+        "takeback_request_denied": "",
+        "player_takeback_his_move": ""
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -389,7 +400,8 @@
         "button_label_short": "Conferma",
         "send_immediately": "Invia immediatamente",
         "ask_confirmation": "Richiedi conferma",
-        "description": "Per evitare clic errati, puoi richiedere una conferma prima di inviare una mossa."
+        "description": "Per evitare clic errati, puoi richiedere una conferma prima di inviare una mossa.",
+        "send_immediately_description": ""
     },
     "rematch": {
         "label": "Rivincita",
@@ -416,5 +428,137 @@
         "time": "{player} vince per tempo!",
         "resign": "{player} vince!",
         "forfeit": "{player} vince per abbandono!"
-    }
+    },
+    "bot_games": "",
+    "resign_confirm_overlay": {
+        "cancelLabel": "",
+        "title": "",
+        "message": "",
+        "confirmLabel": ""
+    },
+    "tournament_admins": "",
+    "moves": "",
+    "dismiss": "",
+    "tournament_seeding_methods": {
+        "rating": "",
+        "random": "",
+        "rating_help": "",
+        "title": "",
+        "random_help": ""
+    },
+    "1v1": "",
+    "save": "",
+    "hex_tournament_paris": {
+        "title": "",
+        "read_more": ""
+    },
+    "any": "",
+    "notification": {
+        "you_won": "",
+        "you_lost": ""
+    },
+    "preferred_board_sizes": "",
+    "losers_bracket": "",
+    "no_notifications": "",
+    "allow_exploration_help": "",
+    "friendly_games": "",
+    "move_settings": {
+        "title": ""
+    },
+    "allow_exploration": "",
+    "boardsize": {
+        "medium": "",
+        "small": "",
+        "large": ""
+    },
+    "game_state": {
+        "ended": "",
+        "canceled": "",
+        "created": "",
+        "playing": ""
+    },
+    "player_loses_reason": {
+        "time": "",
+        "resign": "",
+        "default": "",
+        "path": ""
+    },
+    "new_game_vs_ai": "",
+    "pass_confirm_overlay": {
+        "title": "",
+        "message": "",
+        "confirmLabel": "",
+        "cancelLabel": ""
+    },
+    "next": "",
+    "pseudo_not_existing": "",
+    "explore": "",
+    "n_total_games_one": "",
+    "n_total_games_many": "",
+    "n_total_games_other": "",
+    "conditional_moves": {
+        "title_short": "",
+        "cut_move": "",
+        "clear_inactive_lines": "",
+        "title": "",
+        "inactive_lines": ""
+    },
+    "game_created_short": "",
+    "player_sent_you_rematch_offer": "",
+    "continue_game_vs_x": "",
+    "handicap": {
+        "none": "",
+        "handicap_for_player": "",
+        "title": ""
+    },
+    "invalid_password": "",
+    "premove": {
+        "title": "",
+        "description": ""
+    },
+    "muted": {
+        "off": "",
+        "on": ""
+    },
+    "go_to_the_game": "",
+    "connection_lost": "",
+    "pseudo_too_long": "",
+    "notifications_misc": "",
+    "tournament_slug_duplicate": "",
+    "ranked_games": "",
+    "admins_one": "",
+    "admins_many": "",
+    "admins_other": "",
+    "browse_all_ended_games": "",
+    "discard": "",
+    "invalid_pseudo": "",
+    "overall": "",
+    "game_against_player": "",
+    "notifications": "",
+    "sort_date": {
+        "asc": "",
+        "desc": ""
+    },
+    "previous": "",
+    "pseudo_already_taken": "",
+    "restart": "",
+    "offline": "",
+    "game_created_by_system_time_ago": "",
+    "no_yet_data": "",
+    "total_played_games": "",
+    "mark_all_as_read": "",
+    "friendly": "",
+    "force_board_orientation_mode": "",
+    "player_sent_rematch_offer": "",
+    "play_offline": "",
+    "spectator_joined": "",
+    "page_page_of_max": "",
+    "back_to_menu": "",
+    "loading": "",
+    "must_be_logged_in_as_guest": "",
+    "password_changed_success": "",
+    "tournament_unsubscribe": "",
+    "username_not_an_email_warning": "",
+    "spectator_left": "",
+    "pseudo_too_short": ""
 }
