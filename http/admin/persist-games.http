@@ -1,0 +1,5 @@
+# Persist all games from memory to database.
+# To do before restarting server, or regularly, to prevent games data loss.
+
+POST /api/admin/persist-games
+Authorization: Bearer {{ adminPassword }}
