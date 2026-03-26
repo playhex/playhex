@@ -188,7 +188,8 @@
         "accept": "Aceptar deshacer",
         "reject": "Rechazar",
         "takeback_request_denied": "",
-        "player_takeback_his_move": ""
+        "player_takeback_his_move": "",
+        "player_wants_to_takeback": ""
     },
     "ping": {
         "date_shift_ms": "Ajustes temporales: {{ms}}ms",
@@ -502,7 +503,8 @@
         "random": "",
         "rating_help": "",
         "rating_random_help": "",
-        "random_help": ""
+        "random_help": "",
+        "rating_random": ""
     },
     "player_sent_you_rematch_offer": "",
     "invalid_password": "",
