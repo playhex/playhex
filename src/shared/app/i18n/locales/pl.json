@@ -337,7 +337,8 @@
         "accept": "Zaakceptuj cofnięcie",
         "reject": "Odrzuć",
         "takeback_request_denied": "",
-        "player_takeback_his_move": ""
+        "player_takeback_his_move": "",
+        "player_wants_to_takeback": ""
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -522,7 +523,9 @@
         "random": "",
         "rating_help": "",
         "title": "",
-        "random_help": ""
+        "random_help": "",
+        "rating_random_help": "",
+        "rating_random": ""
     },
     "notification": {
         "you_won": "",
