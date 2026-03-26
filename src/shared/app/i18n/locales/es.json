@@ -63,7 +63,8 @@
         "custom": "Personalizado",
         "periods_time": "Periodo de tiempo",
         "initial_time": "Tiempo inicial",
-        "time_increment": "Incremento de tiempo"
+        "time_increment": "Incremento de tiempo",
+        "capped_abbreviation": "Limitar"
     },
     "i_play": {
         "title": "Yo juego",
@@ -106,7 +107,8 @@
         "best_move": "mejor jugada",
         "best": "mejor:",
         "how_it_works": "Cómo funciona",
-        "request_analysis": "Solicitar análisis de IA"
+        "request_analysis": "Solicitar análisis de IA",
+        "available": "El análisis del juego está disponible."
     },
     "close": "Cerrar",
     "ranked": "Clasificatoria",
@@ -121,7 +123,7 @@
         "create": "Crear 1vs1 clasificatoria"
     },
     "1v1_friendly": {
-        "title": "Amistosa ^^",
+        "title": "Amistosa",
         "create": "Crear partida 1vs1 amistosa"
     },
     "1vAI_ranked": {
@@ -179,7 +181,7 @@
     "contribute": "Colaborar",
     "contributors": "Colaboradores",
     "player_made_a_move": "{{player}} hizo una jugada",
-    "game_with_player_has_started": "La partida con {{player}} ha comenzado",
+    "game_with_player_has_started": "{{player}} se ha unido a la partida y la partida ha comenzado",
     "last_move": "Última jugada",
     "undo": {
         "undo_move": "Recuperación",
@@ -296,7 +298,8 @@
     "force_board_orientation_mode": "Forzar la visualización del tablero en horizontal o vertical para esta pantalla",
     "1v1": "1vs1",
     "sort_date": {
-        "desc": "Los más recientes"
+        "desc": "Los más recientes",
+        "asc": "Cronológico"
     },
     "loading_tournaments": "Cargando torneos…",
     "loading_tournament": "Cargando torneo…",
@@ -329,7 +332,7 @@
     "n_matches_played_many": "{{ count }} partidas jugadas",
     "n_matches_played_other": "{{ count }} partidas jugadas",
     "tournament_subscription": {
-        "subscribed": "Estás suscrito",
+        "subscribed": "Estás interesado",
         "checked_in": "¡Tu participación está confirmada!",
         "must_check_in": "¡Debes hacer check-in!",
         "can_subscribe": "Aún no puedes hacer check-in, pero puedes suscribirte para recibir una notificación cuando se habilite.",
@@ -343,12 +346,12 @@
     "tournament_player_games_win_history": "Historial",
     "tournament_organized_by": "Organizado por { player }",
     "checkin_opens_time_before": "El check-in se abre {{ time }} antes.",
-    "tournament_subscribe": "Suscribirse",
+    "tournament_subscribe": "Estoy interesado!",
     "tournament_checkin": "Check-in",
     "tournament_checkedin": "Check-in realizado",
     "no_player_checked_in_yet": "Ningún jugador ha hecho check-in todavía.",
     "not_yet_checked_in": "Aún no ha hecho check-in",
-    "every_subscribers_checked_in": "Todos los suscritos han hecho check-in.",
+    "every_subscribers_checked_in": "Todos los interesados han hecho check-in.",
     "tournament_description": "Descripción",
     "tournament_requires_account": "Este torneo requiere una cuenta para participar.",
     "tournament_ordinal": {
@@ -395,19 +398,20 @@
     "tournament_history": {
         "created": "{{organizerPseudo}} creó el torneo",
         "edited": "El organizador cambió '{{ field }}' del torneo: el nuevo valor es '{{ value }}' (el anterior era '{{ oldValue }}')",
-        "player_subscribed": "{{ playerPseudo }} se suscribió",
-        "player_unsubscribed": "{{ playerPseudo }} canceló su suscripción",
+        "player_subscribed": "{{ playerPseudo }} esta interesado",
+        "player_unsubscribed": "A {{ playerPseudo }} ya no le interesa",
         "player_kicked": "{{ playerPseudo }} fue expulsado",
         "player_checked_in": "{{ playerPseudo }} hizo check-in",
         "player_banned": "{{ playerPseudo }} fue expulsado de este torneo",
         "started": "¡El torneo ha comenzado!",
         "match_ended": "Partida {{ round }}.{{ number }} finalizada: {{ winnerPseudo }} ganó contra {{ loserPseudo }}.",
         "match_canceled_recreated": "La partida {{ round }}.{{ number }} fue recreada debido a una cancelación.",
-        "ended": "El torneo ha terminado."
+        "ended": "El torneo ha terminado.",
+        "changed_admins": "Organizador asignado por administradores: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Expulsado de este torneo",
     "tournament_account_required": "Este torneo requiere una cuenta, no se permiten invitados. Inicia sesión o crea una cuenta primero.",
-    "tournament_not_enough_participants_to_start": "No se pudo iniciar el torneo. Actualmente no hay suficientes jugadores con check-in para este formato.",
+    "tournament_not_enough_participants_to_start": "No se pudo iniciar el torneo. No hay suficientes jugadores con check-in para este formato.",
     "how_to_play_hex": "Cómo jugar Hex",
     "tutorial": {
         "label": "Tutorial",
@@ -458,6 +462,52 @@
     "discard": "Desechado",
     "loading": "Cargando…",
     "game_created_by_system_time_ago": "Juego creado por el sistema hace, {timeAgo}.",
-    "player_passed_his_turn": "{{player}} ha pasado",
-    "go_to_the_game": "Ir a la partida"
+    "player_passed_his_turn": "{{player}} ha saltado",
+    "go_to_the_game": "Ir a la partida",
+    "muted": {
+        "on": "Silenciar",
+        "off": "Activar sonido"
+    },
+    "allow_exploration": "Permitir exploracion",
+    "allow_exploration_help": "Permite probar líneas jugando de ambos colores antes de confirmar un movimiento. Si deshabilitado, los movimientos condicionales también serán deshabilitados.",
+    "game_created_short": "creado {{date}}",
+    "pass_confirm_overlay": {
+        "title": "¿Saltar mi turno?",
+        "message": "Estas a punto de saltar tu turno. ¿Estás seguro?",
+        "confirmLabel": "Si, saltar turno",
+        "cancelLabel": "Oops, no saltar turno"
+    },
+    "dismiss": "Ignorar",
+    "any": "Cualquiera",
+    "offline": "Sin conexión",
+    "connection_lost": "Conexión perdida",
+    "play_offline": "Jugar sin conexión",
+    "new_game_vs_ai": "Nueva partida vs IA",
+    "continue_game_vs_x": "Continuar partida vs {{playerNickname}}",
+    "restart": "Reiniciar",
+    "back_to_menu": "Regresar al menu",
+    "tournament_admins": "Administradores del torneo",
+    "admins_one": "Administrador: { players }",
+    "admins_many": "",
+    "admins_other": "Administradores: { players }",
+    "tournament_unsubscribe": "Ya no estoy interesado.",
+    "tournament_slug_duplicate": "Un torneo con la misma url ya existe",
+    "tournament_seeding_methods": {
+        "random": "Al azar",
+        "random_help": "Los jugadores obtienen su lugar al azar, no importa su nivel.",
+        "rating": "Clasificación",
+        "rating_help": "Los jugadores obtienen su lugar en base a su clasificación.",
+        "rating_random_help": "Los jugadores obtienen su lugar en base a su clasificacion, pero con un componente de azar dependiendo en la desviacion de la calsificacion en su glicko2."
+    },
+    "resign_confirm_overlay": {
+        "title": "Rendirse",
+        "message": "Estas seguro que quieres rendirte?",
+        "confirmLabel": "Si, me rindo",
+        "cancelLabel": "No, seguir jugando"
+    },
+    "conditional_moves": {
+        "title": "Movimientos condicionales"
+    },
+    "password_changed_success": "La contraseña ha cambiado.",
+    "total_played_games": "Partidas totales jugadas"
 }
