@@ -59,6 +59,7 @@ export const availableLocales: AvailableLocales = {
             { fullName: 'Guille', link: 'https://hosted.weblate.org/user/guillevg/' },
             { fullName: '2swap', link: 'http://localhost:3000/@2swap' },
             { fullName: 'Marco', link: 'https://hosted.weblate.org/user/60825138Mmm./' },
+            { fullName: 'pipebits', link: 'https://github.com/pipebits' },
         ],
     },
     fr: {
