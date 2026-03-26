@@ -184,7 +184,9 @@
     "undo": {
         "undo_move": "Recuperación",
         "accept": "Aceptar deshacer",
-        "reject": "Rechazar"
+        "reject": "Rechazar",
+        "takeback_request_denied": "",
+        "player_takeback_his_move": ""
     },
     "ping": {
         "date_shift_ms": "Ajustes temporales: {{ms}}ms",
@@ -201,7 +203,8 @@
         "ask_confirmation": "Pedir confirmación",
         "description": "Para evitar errores, puedes pedir confirmación antes de enviar un movimiento insano.",
         "button_label_short": "Confirmar",
-        "send_immediately": "Enviar inmediatamente"
+        "send_immediately": "Enviar inmediatamente",
+        "send_immediately_description": ""
     },
     "hex_tournament_paris": {
         "title": "Torneo de Hex en París",
@@ -459,5 +462,60 @@
     "loading": "Cargando…",
     "game_created_by_system_time_ago": "Juego creado por el sistema hace, {timeAgo}.",
     "player_passed_his_turn": "{{player}} ha pasado",
-    "go_to_the_game": "Ir a la partida"
+    "go_to_the_game": "Ir a la partida",
+    "bot_games": "",
+    "notification": {
+        "you_won": "",
+        "you_lost": ""
+    },
+    "preferred_board_sizes": "",
+    "losers_bracket": "",
+    "no_notifications": "",
+    "friendly_games": "",
+    "move_settings": {
+        "title": ""
+    },
+    "boardsize": {
+        "medium": "",
+        "small": "",
+        "large": ""
+    },
+    "next": "",
+    "pseudo_not_existing": "",
+    "n_total_games_one": "",
+    "n_total_games_many": "",
+    "n_total_games_other": "",
+    "conditional_moves": {
+        "title_short": "",
+        "cut_move": "",
+        "clear_inactive_lines": "",
+        "inactive_lines": ""
+    },
+    "tournament_seeding_methods": {
+        "title": ""
+    },
+    "player_sent_you_rematch_offer": "",
+    "invalid_password": "",
+    "premove": {
+        "title": "",
+        "description": ""
+    },
+    "pseudo_too_long": "",
+    "notifications_misc": "",
+    "ranked_games": "",
+    "browse_all_ended_games": "",
+    "invalid_pseudo": "",
+    "overall": "",
+    "game_against_player": "",
+    "notifications": "",
+    "previous": "",
+    "pseudo_already_taken": "",
+    "no_yet_data": "",
+    "mark_all_as_read": "",
+    "player_sent_rematch_offer": "",
+    "spectator_joined": "",
+    "page_page_of_max": "",
+    "must_be_logged_in_as_guest": "",
+    "spectator_left": "",
+    "pseudo_too_short": ""
 }
