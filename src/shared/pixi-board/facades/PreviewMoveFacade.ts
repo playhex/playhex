@@ -35,11 +35,12 @@ export class PreviewMoveFacade
         this.previewedMove = move;
         this.swapped = swapped;
 
-        this.gameView.setStone(move, byPlayerIndex, true);
-
+        // To do before move, in case move and swapped are on same cell (when played on long diagonal)
         if (swapped) {
             this.gameView.setStone(swapped, null);
         }
+
+        this.gameView.setStone(move, byPlayerIndex, true);
     }
 
     hasPreview(): boolean
