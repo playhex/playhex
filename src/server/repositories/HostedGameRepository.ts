@@ -285,11 +285,46 @@ export default class HostedGameRepository
         );
     }
 
+    async makeAIJoinGameIfApplicable(hostedGameServer: HostedGameServer, params: CreateHostedGameParams & { gameOptions: HostedGameOptions })
+    {
+        if (params.gameOptions.opponentType !== 'ai') {
+            return;
+        }
+
+        try {
+            const opponent = await findAIOpponent(params.gameOptions);
+            if (opponent == null) throw new GameError('No matching AI found');
+            hostedGameServer.playerJoin(opponent);
+        } catch (e) {
+            if (e instanceof FindAIError) {
+                throw new GameError(e.message);
+            }
+            throw e;
+        }
+    }
+
     /**
      * Officially creates a new hosted game, emit event to clients.
      */
-    async createGame(params: CreateHostedGameParams & { gameOptions: HostedGameOptions }): Promise<HostedGameServer>
-    {
+    async createGame(
+        params: CreateHostedGameParams & { gameOptions: HostedGameOptions },
+        createOptions: {
+            /**
+             * Defaults to true: game are persisted before returned.
+             * Set false when it's safe: no risk of game fail to persist, and make it faster (no db call).
+             * May be true when there is a risk of unique constrait, like in the rematch workflow:
+             * we need to persist rematched and rematch at same time in a transaction.
+             */
+            persist?: boolean;
+
+            /**
+             * Defaults to true: AI join as opponent if this is a bot game.
+             * May be disabled to prevent race condition:
+             * when AI join, game starts, and persist: we may want to wait before persist.
+             */
+            aiJoinAuto?: boolean;
+        } = { persist: true, aiJoinAuto: true },
+    ): Promise<HostedGameServer> {
         if (params.host) {
             this.onlinePlayerService.notifyPlayerActivity(params.host);
         }
@@ -299,26 +334,21 @@ export default class HostedGameRepository
 
         hostedGameServer.saveState();
 
-        logger.info('Hosted game created.', { host: params.host?.pseudo ?? null });
+        logger.info('Hosted game created.', { host: params.host?.pseudo ?? null, publicId: hostedGame.publicId });
 
         Container.get(HexServer).to(Rooms.lobby).emit('gameCreated', hostedGame);
 
-        if (params.gameOptions.opponentType === 'ai') {
-            try {
-                const opponent = await findAIOpponent(params.gameOptions);
-                if (opponent == null) throw new GameError('No matching AI found');
-                hostedGameServer.playerJoin(opponent);
-            } catch (e) {
-                if (e instanceof FindAIError) {
-                    throw new GameError(e.message);
-                }
-                throw e;
-            }
+        if (createOptions.aiJoinAuto ?? true) {
+            await this.makeAIJoinGameIfApplicable(hostedGameServer, params);
         }
 
         this.activeGames[hostedGameServer.getPublicId()] = hostedGameServer;
 
         this.listenHostedGameServer(hostedGameServer);
+
+        if (!(createOptions.persist ?? true)) {
+            return hostedGameServer;
+        }
 
         try {
             await hostedGameServer.persist();
@@ -328,47 +358,75 @@ export default class HostedGameRepository
                 message: e.message,
                 stack: e.stack,
             });
+
+            throw e;
         }
 
         return hostedGameServer;
     }
 
-    async rematchGame(host: Player, gameId: string): Promise<HostedGame>
+    async rematchGame(host: Player, publicId: string): Promise<HostedGame>
     {
-        const game = await this.getActiveOrArchivedGame(gameId);
+        logger.info('rematch game', { hostPublicId: host.publicId, publicId });
+
+        const game = await this.getActiveOrArchivedGame(publicId);
 
         if (game === null) {
-            throw new GameError(`no game ${gameId}`);
+            throw new GameError(`no game ${publicId}`);
         }
         if (!game.hostedGameToPlayers.some(p => p.player.publicId === host.publicId)) {
             throw new GameError('Player not in the game');
         }
         if (game.rematch != null && this.activeGames[game.rematch.publicId]) {
+            logger.info('rematch game: already has rematch, return', { publicId, rematchPublicId: game.rematch.publicId });
             return this.activeGames[game.rematch.publicId].getHostedGame();
         }
         if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
         }
-        if (this.activeGames[gameId]) {
+        if (this.activeGames[publicId]) {
             throw new GameError('Cannot rematch an active game');
         }
 
-        const rematch = await this.createGame({ gameOptions: cloneGameOptions(game), host, rematchedFrom: game });
+        const params = { gameOptions: cloneGameOptions(game), host, rematchedFrom: game };
+
+        const rematch = await this.createGame(params, { persist: false, aiJoinAuto: false });
         game.rematch = rematch.getHostedGame();
 
         try {
-            await this.hostedGamePersister.persist(game);
+            logger.info('persist rematch game, and rematched game', {
+                game: game.publicId,
+                rematch: game.rematch.publicId,
+                rematchRematchedFrom: game.rematch.rematchedFrom?.publicId,
+            });
+
+            await this.hostedGamePersister.persistMultiple([game, game.rematch]);
+
+            await this.makeAIJoinGameIfApplicable(rematch, params);
         } catch (e) {
             if (isDuplicateError(e)) {
+                logger.info('Rematch duplicate, fix', {
+                    game: game.publicId,
+                    rematch: game.rematch.publicId,
+                    errorMessage: e.message,
+                });
+
                 // In case both players rematch at same time, 2 games are created in memory but with same rematchedFromId, so one game won't persist thanks to unicity constraint.
                 // So here we try to fetch the actual rematch, returns it, and remove the duplicated rematch from memory.
-                delete this.activeGames[game.rematch.publicId];
+                if (game.rematch) {
+                    delete this.activeGames[game.rematch.publicId];
+                }
 
                 if (!game.id) {
                     throw new Error('Unexpected empty game.id');
                 }
 
                 game.rematch = await this.hostedGamePersister.findRematch(game.id);
+
+                logger.info('First rematch found:', {
+                    game: game.publicId,
+                    rematch: game.rematch?.publicId,
+                });
 
                 if (game.rematch === null) {
                     throw new Error('Game has already rematched, but could not find rematch game');
@@ -377,7 +435,7 @@ export default class HostedGameRepository
                 logger.error(`Failed to persist: ${e?.message}`, e);
 
                 // Throw to prevent returning a rematch game that failed to persist
-                throw new Error('Error while persisting rematch game');
+                throw e;
             }
         }
 

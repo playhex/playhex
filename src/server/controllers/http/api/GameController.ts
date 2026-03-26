@@ -89,7 +89,7 @@ export default class GameController
         @Body() gameOptions: HostedGameOptions,
     ) {
         try {
-            const hostedGame = await this.hostedGameRepository.createGame({ gameOptions, host });
+            const hostedGame = await this.hostedGameRepository.createGame({ gameOptions, host }, { persist: false });
             return hostedGame.getHostedGame();
         } catch (e) {
             if (e instanceof GameError) {

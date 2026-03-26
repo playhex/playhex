@@ -74,6 +74,17 @@ export default class HostedGamePersister
         return result;
     }
 
+    /**
+     * Persist multiple hostedGame in a transaction.
+     * Used to persist game and its rematch, with rematch from and to.
+     */
+    async persistMultiple(hostedGames: HostedGame[]): Promise<HostedGame[]>
+    {
+        return await this.hostedGameRepository.save(hostedGames, {
+            transaction: true,
+        });
+    }
+
     async deleteIfExists(hostedGame: HostedGame): Promise<void>
     {
         logger.info('Delete a game if exists...', { publicId: hostedGame.publicId });

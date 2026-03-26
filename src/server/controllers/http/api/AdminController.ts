@@ -113,7 +113,7 @@ export default class AdminController
             },
         };
 
-        const hostedGameServer = await this.hostedGameRepository.createGame({ gameOptions });
+        const hostedGameServer = await this.hostedGameRepository.createGame({ gameOptions }, { persist: false, aiJoinAuto: false });
 
         hostedGameServer.playerJoin(ai0, true);
         hostedGameServer.playerJoin(ai1, true);
