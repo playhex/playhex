@@ -2,7 +2,7 @@ import assert from 'assert';
 import { it } from 'mocha';
 import { TimeControlError } from '../TimeControl.js';
 import { FischerTimeControl } from '../time-controls/FischerTimeControl.js';
-import TimeValue, { timeValueToMilliseconds } from '../TimeValue.js';
+import { type TimeValue, timeValueToMilliseconds } from '../TimeValue.js';
 import { ByoYomiTimeControl } from '../time-controls/ByoYomiTimeControl.js';
 import parallel from 'mocha.parallel';
 

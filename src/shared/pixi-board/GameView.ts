@@ -443,6 +443,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return { width, height };
     }
 
+    getPixiApp()
+    {
+        return this.pixi;
+    }
+
     getView(): HTMLCanvasElement
     {
         return this.pixi.canvas;

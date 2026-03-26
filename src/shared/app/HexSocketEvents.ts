@@ -1,4 +1,4 @@
-import { HexMove } from '../move-notation/hex-move-notation.js';
+import type { HexMove } from '../move-notation/hex-move-notation.js';
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';

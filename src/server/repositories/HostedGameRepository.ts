@@ -19,7 +19,7 @@ import { createHostedGame, CreateHostedGameParams } from '../../shared/app/model
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
-import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 export class GameError extends Error {}
 

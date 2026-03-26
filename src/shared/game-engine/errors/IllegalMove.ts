@@ -1,4 +1,4 @@
-import { HexMove } from '../../move-notation/hex-move-notation.js';
+import type { HexMove } from '../../move-notation/hex-move-notation.js';
 
 export default class IllegalMove extends Error
 {

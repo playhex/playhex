@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import TimeValue from './TimeValue.js';
+import { type TimeValue } from './TimeValue.js';
 import TimeControlType from './TimeControlType.js';
 
 export type PlayerIndex = 0 | 1;

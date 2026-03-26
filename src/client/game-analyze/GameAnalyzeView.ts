@@ -8,7 +8,7 @@ import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { defer } from '../../shared/app/defer.js';
 import { validateMove, parseMove, Move } from '../../shared/move-notation/move-notation.js';
-import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.

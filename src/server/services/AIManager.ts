@@ -7,7 +7,7 @@ import logger from './logger.js';
 import HostedGameServer from '../HostedGameServer.js';
 import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
-import { HexMove } from '../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 export class FindAIError extends Error {}
 

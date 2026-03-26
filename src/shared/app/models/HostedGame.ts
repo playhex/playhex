@@ -17,7 +17,7 @@ import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, Host
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
 import { type Outcome } from '../../game-engine/Types.js';
-import { HexMove } from '../../move-notation/hex-move-notation.js';
+import type { HexMove } from '../../move-notation/hex-move-notation.js';
 
 @Entity()
 @Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page

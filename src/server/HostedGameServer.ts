@@ -21,7 +21,7 @@ import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
 import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
-import { HexMove } from '../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../shared/move-notation/hex-move-notation.js';
 
 type HostedGameEvents = {
     played: () => void;

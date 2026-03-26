@@ -9,9 +9,7 @@
  * - positive number/future date: countdown timer.
  * - negative number/past date: time is incrementing.
  */
-type TimeValue = Date | number;
-
-export default TimeValue;
+export type TimeValue = Date | number;
 
 /**
  * Convert a elasping or not time value to milliseconds, from a given date.

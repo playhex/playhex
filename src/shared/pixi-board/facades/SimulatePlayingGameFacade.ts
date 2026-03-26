@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { HexMove } from '../../move-notation/hex-move-notation.js';
+import type { HexMove } from '../../move-notation/hex-move-notation.js';
 import { PlayingGameFacade } from './PlayingGameFacade.js';
 
 type SimulatePlayingGameFacadeEvents = {

@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { Player, Tournament, TournamentSubscription } from '../../../shared/app/models/index.js';
 import { createTournamentDefaultsCreate, createTournamentFromCreateInput } from '../../../shared/app/models/Tournament.js';
 import { ActiveTournament } from '../../tournaments/ActiveTournament.js';
-import { TournamentEngineInterface } from '../../tournaments/organizers/TournamentEngineInterface.js';
+import type { TournamentEngineInterface } from '../../tournaments/organizers/TournamentEngineInterface.js';
 import { NoopHostedGameAccessor } from '../../tournaments/hosted-game-accessor/NoopHostedGameAccessor.js';
 import { NoopAutoSave } from '../../auto-save/NoopAutoSave.js';
 import { getTournamentEngine } from '../../tournaments/organizers/getTournamentEngine.js';

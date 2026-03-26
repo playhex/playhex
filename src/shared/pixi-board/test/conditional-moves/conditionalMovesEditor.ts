@@ -1,6 +1,6 @@
 import assert from 'assert';
-import { createConditionalMovesState } from '../conditional-moves/ConditionalMovesState.js';
-import ConditionalMovesEditor from '../conditional-moves/ConditionalMovesEditor.js';
+import { createConditionalMovesState } from '../../conditional-moves/ConditionalMovesState.js';
+import ConditionalMovesEditor from '../../conditional-moves/ConditionalMovesEditor.js';
 
 describe('ConditionalMovesEditor', () => {
     it('can add move, then submit', () => {

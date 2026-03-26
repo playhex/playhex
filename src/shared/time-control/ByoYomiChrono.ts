@@ -1,6 +1,6 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { Chrono } from './Chrono.js';
-import TimeValue, { timeValueToMilliseconds } from './TimeValue.js';
+import { type TimeValue, timeValueToMilliseconds } from './TimeValue.js';
 
 type ChronoEvents = {
     /**

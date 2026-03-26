@@ -11,7 +11,7 @@ import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vu
 import GameView from '../../../../shared/pixi-board/GameView.js';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
-import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 import { useWinOverlay } from '../../composables/useWinOverlay.js';
 import AppGameView from '../../components/AppGameView.vue';

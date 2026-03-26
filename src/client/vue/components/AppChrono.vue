@@ -1,7 +1,6 @@
 <script setup lang="ts">
-/* eslint-env browser */
-import TimeValue, { timeValueToMilliseconds } from '../../../shared/time-control/TimeValue.js';
-import { PropType, onUnmounted, ref, toRefs, watch } from 'vue';
+import { type TimeValue, timeValueToMilliseconds } from '../../../shared/time-control/TimeValue.js';
+import { PropType, Ref, onUnmounted, ref, toRefs, watch } from 'vue';
 import { PlayerTimeData } from '../../../shared/time-control/TimeControl.js';
 import { ByoYomiPlayerTimeData } from '../../../shared/time-control/time-controls/ByoYomiTimeControl.js';
 import TimeControlType from '../../../shared/time-control/TimeControlType.js';
@@ -65,7 +64,7 @@ if (timeControlOptions.value.family === 'byoyomi') {
     byoYomiChrono.setMainValue(remainingMainTime);
     byoYomiChrono.setRemainingPeriods(remainingPeriods);
 
-    watch(playerTimeData, (newValue: ByoYomiPlayerTimeData) => {
+    watch(playerTimeData as Ref<ByoYomiPlayerTimeData>, newValue => {
         if (byoYomiChrono === null) {
             return;
         }

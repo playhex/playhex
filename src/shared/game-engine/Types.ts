@@ -1,5 +1,5 @@
 import { Coords } from '../move-notation/move-notation.js';
-import { HexMove } from '../move-notation/hex-move-notation.js';
+import type { HexMove } from '../move-notation/hex-move-notation.js';
 
 export type PlayerIndex = 0 | 1;
 
