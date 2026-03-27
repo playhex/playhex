@@ -188,7 +188,8 @@
         "accept": "Aceptar deshacer",
         "reject": "Rechazar",
         "takeback_request_denied": "",
-        "player_takeback_his_move": ""
+        "player_takeback_his_move": "",
+        "player_wants_to_takeback": ""
     },
     "ping": {
         "date_shift_ms": "Ajustes temporales: {{ms}}ms",
@@ -501,7 +502,8 @@
         "rating": "Clasificación",
         "rating_help": "Los jugadores obtienen su lugar en base a su clasificación.",
         "rating_random_help": "Los jugadores obtienen su lugar en base a su clasificacion, pero con un componente de azar dependiendo en la desviacion de la calsificacion en su glicko2.",
-        "title": ""
+        "title": "",
+        "rating_random": ""
     },
     "resign_confirm_overlay": {
         "title": "Rendirse",
