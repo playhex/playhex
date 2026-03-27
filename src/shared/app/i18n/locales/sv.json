@@ -139,8 +139,7 @@
         "errored": "AI-analysen misslyckades!",
         "best_move": "bästa draget",
         "best": "bästa:",
-        "how_it_works": "Så här fungerar det",
-        "available": ""
+        "how_it_works": "Så här fungerar det"
     },
     "try_again": "Försök igen",
     "yes": "Ja",
@@ -337,8 +336,7 @@
         "started": "Turneringen har startat!",
         "match_ended": "Match {{ round }}.{{ number }} avslutades: {{ winnerPseudo }} vann mot {{ loserPseudo }}.",
         "match_canceled_recreated": "Match {{ round }}.{{ number }} har återskapats efter avbokning.",
-        "ended": "Turneringen är avslutad.",
-        "changed_admins": ""
+        "ended": "Turneringen är avslutad."
     },
     "tournament_player_is_banned": "Avstängd från denna turnering",
     "tournament_account_required": "Denna turnering kräver ett konto. Gäster är inte tillåtna. Logga in eller skapa ett konto först.",
@@ -408,10 +406,7 @@
     "undo": {
         "undo_move": "Ta tillbaka",
         "accept": "Acceptera återgång",
-        "reject": "Avvisa",
-        "takeback_request_denied": "",
-        "player_takeback_his_move": "",
-        "player_wants_to_takeback": ""
+        "reject": "Avvisa"
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -434,8 +429,7 @@
         "button_label_short": "Bekräfta",
         "send_immediately": "Skicka omedelbart",
         "ask_confirmation": "Begär bekräftelse",
-        "description": "För att förhindra felklick kan du kräva bekräftelse innan du skickar ett drag.",
-        "send_immediately_description": ""
+        "description": "För att förhindra felklick kan du kräva bekräftelse innan du skickar ett drag."
     },
     "rematch": {
         "label": "Omgång",
@@ -469,93 +463,5 @@
         "time": "{player} överskrider tiden.",
         "resign": "{player} ger upp.",
         "forfeit": "{player} förverkar."
-    },
-    "resign_confirm_overlay": {
-        "cancelLabel": "",
-        "title": "",
-        "message": "",
-        "confirmLabel": ""
-    },
-    "tournament_admins": "",
-    "dismiss": "",
-    "tournament_seeding_methods": {
-        "rating": "",
-        "random": "",
-        "rating_help": "",
-        "title": "",
-        "random_help": "",
-        "rating_random_help": "",
-        "rating_random": ""
-    },
-    "save": "",
-    "hex_tournament_paris": {
-        "title": "",
-        "read_more": ""
-    },
-    "notification": {
-        "you_won": "",
-        "you_lost": ""
-    },
-    "losers_bracket": "",
-    "no_notifications": "",
-    "allow_exploration_help": "",
-    "move_settings": {
-        "title": ""
-    },
-    "allow_exploration": "",
-    "new_game_vs_ai": "",
-    "pass_confirm_overlay": {
-        "title": "",
-        "message": "",
-        "confirmLabel": "",
-        "cancelLabel": ""
-    },
-    "pseudo_not_existing": "",
-    "conditional_moves": {
-        "title_short": "",
-        "cut_move": "",
-        "clear_inactive_lines": "",
-        "title": "",
-        "inactive_lines": ""
-    },
-    "game_created_short": "",
-    "player_sent_you_rematch_offer": "",
-    "continue_game_vs_x": "",
-    "invalid_password": "",
-    "premove": {
-        "title": "",
-        "description": ""
-    },
-    "muted": {
-        "off": "",
-        "on": ""
-    },
-    "go_to_the_game": "",
-    "connection_lost": "",
-    "pseudo_too_long": "",
-    "notifications_misc": "",
-    "tournament_slug_duplicate": "",
-    "admins_one": "",
-    "admins_other": "",
-    "discard": "",
-    "invalid_pseudo": "",
-    "game_against_player": "",
-    "notifications": "",
-    "pseudo_already_taken": "",
-    "restart": "",
-    "offline": "",
-    "game_created_by_system_time_ago": "",
-    "mark_all_as_read": "",
-    "player_sent_rematch_offer": "",
-    "play_offline": "",
-    "spectator_joined": "",
-    "back_to_menu": "",
-    "loading": "",
-    "must_be_logged_in_as_guest": "",
-    "password_changed_success": "",
-    "tournament_unsubscribe": "",
-    "username_not_an_email_warning": "",
-    "spectator_left": "",
-    "pseudo_too_short": "",
-    "player_passed_his_turn": ""
+    }
 }
