@@ -141,7 +141,8 @@
         "errored": "AI analizi başarısız oldu!",
         "best_move": "en iyi hamle",
         "best": "en iyi:",
-        "how_it_works": "Nasıl çalışır"
+        "how_it_works": "Nasıl çalışır",
+        "available": ""
     },
     "try_again": "Tekrar dene",
     "yes": "Evet",
@@ -351,7 +352,8 @@
         "started": "Turnuva başladı!",
         "match_ended": "{{ round }}.{{ number }} maçı sona erdi: {{ winnerPseudo }}, {{ loserPseudo }} karşısında kazandı.",
         "match_canceled_recreated": "{{ round }}.{{ number }} maçı iptal edildiği için yeniden oluşturuldu.",
-        "ended": "Turnuva sona erdi."
+        "ended": "Turnuva sona erdi.",
+        "changed_admins": ""
     },
     "tournament_player_is_banned": "Bu turnuvadan yasaklandınız",
     "tournament_account_required": "Bu turnuva bir hesap gerektiriyor. Misafirler kabul edilmez. Lütfen giriş yapın veya hesap oluşturun.",
@@ -428,7 +430,9 @@
     "undo": {
         "undo_move": "Hamleyi geri al",
         "accept": "Geri almayı kabul et",
-        "reject": "Reddet"
+        "reject": "Reddet",
+        "takeback_request_denied": "",
+        "player_takeback_his_move": ""
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -497,5 +501,58 @@
         "time": "{player} süresi doldu.",
         "resign": "{player} oyunu terk etti.",
         "forfeit": "{player} hükmen kaybetti."
-    }
+    },
+    "resign_confirm_overlay": {
+        "cancelLabel": "",
+        "title": "",
+        "message": "",
+        "confirmLabel": ""
+    },
+    "tournament_admins": "",
+    "dismiss": "",
+    "tournament_seeding_methods": {
+        "rating": "",
+        "random": "",
+        "rating_help": "",
+        "title": "",
+        "random_help": ""
+    },
+    "notification": {
+        "you_won": "",
+        "you_lost": ""
+    },
+    "losers_bracket": "",
+    "no_notifications": "",
+    "allow_exploration_help": "",
+    "allow_exploration": "",
+    "new_game_vs_ai": "",
+    "pass_confirm_overlay": {
+        "title": "",
+        "message": "",
+        "confirmLabel": "",
+        "cancelLabel": ""
+    },
+    "game_created_short": "",
+    "player_sent_you_rematch_offer": "",
+    "continue_game_vs_x": "",
+    "muted": {
+        "off": "",
+        "on": ""
+    },
+    "connection_lost": "",
+    "notifications_misc": "",
+    "tournament_slug_duplicate": "",
+    "admins_one": "",
+    "admins_other": "",
+    "game_against_player": "",
+    "notifications": "",
+    "restart": "",
+    "offline": "",
+    "mark_all_as_read": "",
+    "player_sent_rematch_offer": "",
+    "play_offline": "",
+    "spectator_joined": "",
+    "back_to_menu": "",
+    "tournament_unsubscribe": "",
+    "spectator_left": ""
 }
