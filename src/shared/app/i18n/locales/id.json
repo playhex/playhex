@@ -186,14 +186,17 @@
         "random": "",
         "rating_help": "",
         "title": "",
-        "random_help": ""
+        "random_help": "",
+        "rating_random_help": "",
+        "rating_random": ""
     },
     "undo": {
         "accept": "",
         "reject": "",
         "takeback_request_denied": "",
         "undo_move": "",
-        "player_takeback_his_move": ""
+        "player_takeback_his_move": "",
+        "player_wants_to_takeback": ""
     },
     "tournament_subscription": {
         "subscribed": "",
