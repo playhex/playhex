@@ -556,5 +556,6 @@
     "tournament_unsubscribe": "",
     "username_not_an_email_warning": "",
     "spectator_left": "",
-    "pseudo_too_short": ""
+    "pseudo_too_short": "",
+    "player_passed_his_turn": ""
 }
