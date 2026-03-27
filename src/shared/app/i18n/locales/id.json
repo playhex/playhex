@@ -365,7 +365,8 @@
         "time": "",
         "resign": "",
         "default": "",
-        "path": ""
+        "path": "",
+        "forfeit": ""
     },
     "new_game_vs_ai": "",
     "change_password": "",
@@ -547,5 +548,6 @@
     "tournament_started_ago": "",
     "tournament_not_found": "",
     "contribute": "",
-    "view_tournament": ""
+    "view_tournament": "",
+    "player_passed_his_turn": ""
 }
