@@ -497,7 +497,8 @@
         "time": "",
         "resign": "",
         "default": "",
-        "path": ""
+        "path": "",
+        "forfeit": ""
     },
     "new_game_vs_ai": "",
     "pass_confirm_overlay": {
@@ -555,5 +556,6 @@
     "password_changed_success": "",
     "tournament_unsubscribe": "",
     "spectator_left": "",
-    "pseudo_too_short": ""
+    "pseudo_too_short": "",
+    "player_passed_his_turn": ""
 }
