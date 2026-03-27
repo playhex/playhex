@@ -128,7 +128,8 @@
         "best_move": "лучший ход",
         "best": "лучший:",
         "how_it_works": "Как это работает",
-        "request_analysis": "Запросить анализ искусственного интеллекта"
+        "request_analysis": "Запросить анализ искусственного интеллекта",
+        "available": ""
     },
     "try_again": "Попробовать снова",
     "yes": "Да",
@@ -224,7 +225,9 @@
     "undo": {
         "undo_move": "Отмена хода",
         "accept": "Принять отмену",
-        "reject": "Отклонить"
+        "reject": "Отклонить",
+        "takeback_request_denied": "",
+        "player_takeback_his_move": ""
     },
     "ping": {
         "ping_ms": "Пинг: {{ms}}мс",
@@ -427,7 +430,8 @@
         "started": "Турнир начался!",
         "match_ended": "Матч {{ round }}.{{ number }} завершён: {{ winnerPseudo }} победил {{ loserPseudo }}.",
         "match_canceled_recreated": "Матч {{ round }}.{{ number }} был пересоздан после отмены.",
-        "ended": "Турнир завершён."
+        "ended": "Турнир завершён.",
+        "changed_admins": ""
     },
     "tournament_player_is_banned": "Забанен в этом турнире",
     "tournament_account_required": "Для участия необходим аккаунт. Гостевой доступ запрещён. Пожалуйста, войдите или зарегистрируйтесь.",
@@ -512,7 +516,8 @@
     "pass_confirm_overlay": {
         "title": "Пропустить ход?",
         "message": "Вы уверены, что хотите пропустить свой ход?",
-        "confirmLabel": "Пропустить"
+        "confirmLabel": "Пропустить",
+        "cancelLabel": ""
     },
     "new_game_vs_ai": "Новая игра с ИИ",
     "continue_game_vs_x": "Продолжить игру с {{ playerNickname }}",
@@ -521,6 +526,41 @@
     "tournament_seeding_methods": {
         "random_help": "Игроки распределяются случайно, независимо от их рейтинга",
         "rating": "По рейтингу",
-        "rating_help": "Игроки распределяются с учётом их рейтинга. Если есть места с авто пропуском во второй раунд, их получают более сильные игроки"
-    }
+        "rating_help": "Игроки распределяются с учётом их рейтинга. Если есть места с авто пропуском во второй раунд, их получают более сильные игроки",
+        "random": "",
+        "title": ""
+    },
+    "resign_confirm_overlay": {
+        "cancelLabel": "",
+        "title": "",
+        "message": "",
+        "confirmLabel": ""
+    },
+    "dismiss": "",
+    "notification": {
+        "you_won": "",
+        "you_lost": ""
+    },
+    "losers_bracket": "",
+    "no_notifications": "",
+    "allow_exploration_help": "",
+    "allow_exploration": "",
+    "game_created_short": "",
+    "player_sent_you_rematch_offer": "",
+    "connection_lost": "",
+    "notifications_misc": "",
+    "tournament_slug_duplicate": "",
+    "admins_one": "",
+    "admins_few": "",
+    "admins_many": "",
+    "game_against_player": "",
+    "notifications": "",
+    "restart": "",
+    "offline": "",
+    "mark_all_as_read": "",
+    "player_sent_rematch_offer": "",
+    "play_offline": "",
+    "spectator_joined": "",
+    "tournament_unsubscribe": "",
+    "spectator_left": ""
 }
