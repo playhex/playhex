@@ -820,9 +820,8 @@ watch(gameUIMode, () => {
                 </div>
 
                 <!-- Waiting results -->
-                <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height">
-                    {{ $t('game_analysis.requested') }}
-                    <br>
+                <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height d-flex flex-column justify-content-center">
+                    <span>{{ $t('game_analysis.requested') }}</span>
                     <small class="text-body-secondary">{{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }}</small>
                 </p>
 
