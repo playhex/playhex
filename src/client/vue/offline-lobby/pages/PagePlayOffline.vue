@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import { t } from 'i18next';
 import { Ref, ref } from 'vue';
 import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';

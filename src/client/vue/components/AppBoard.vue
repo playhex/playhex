@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { storeToRefs } from 'pinia';
 import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';

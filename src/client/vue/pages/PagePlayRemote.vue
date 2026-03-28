@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import 'bootstrap/js/dist/dropdown';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { ref, computed } from 'vue';

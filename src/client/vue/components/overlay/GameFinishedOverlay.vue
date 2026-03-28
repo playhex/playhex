@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import { PropType } from 'vue';
 import { useDisclosure } from '@overlastic/vue';
 import AppPseudo from '../AppPseudo.vue';

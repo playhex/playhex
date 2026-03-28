@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-/* eslint-env browser */
 import { PropType, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';

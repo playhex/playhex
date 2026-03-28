@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-/* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill } from '../../icons.js';

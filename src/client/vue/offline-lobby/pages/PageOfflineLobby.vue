@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import { IconRobot } from '../../icons.js';

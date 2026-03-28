@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import { onUnmounted, ref } from 'vue';
 import { IconTrophy, IconCircleFill } from '../icons.js';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-/* eslint-env browser */
 import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
 import { PropType } from 'vue';
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-env browser */
 import { storeToRefs } from 'pinia';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { useRouter } from 'vue-router';
