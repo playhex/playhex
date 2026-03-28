@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import 'bootstrap/js/dist/dropdown';
+import 'bootstrap/js/dist/dropdown.js';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { ref, computed } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
