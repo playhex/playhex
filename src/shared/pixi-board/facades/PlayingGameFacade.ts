@@ -331,7 +331,7 @@ export class PlayingGameFacade
         const clearedMoves = this.previewMoveFacade.cancelPreview();
 
         for (const clearedMove of clearedMoves) {
-            if (this.placedStones[clearedMove]) {
+            if (this.placedStones[clearedMove] !== undefined) {
                 this.gameView.setStone(clearedMove, this.placedStones[clearedMove]);
             }
         }
