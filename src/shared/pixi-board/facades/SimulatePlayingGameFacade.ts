@@ -11,6 +11,13 @@ type SimulatePlayingGameFacadeEvents = {
      * event will be emitted once at the end.
      */
     mainCursorChanged: (index: number) => void;
+
+    /**
+     * Simulation move added or removed.
+     * index is the position of simulation cursor now:
+     * 0 means we are at the beginning of the simulation line, no simulation show (or simulation just started or stopped).
+     */
+    simulationCursorChanged: (index: number) => void;
 };
 
 /**
@@ -92,6 +99,21 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
         this.initialPlayingGameFacade.setLastMoveMarksVisible(false);
     }
 
+    getPlayingGameFacade()
+    {
+        return this.playingGameFacade;
+    }
+
+    getMainCursor(): number
+    {
+        return this.mainCursor;
+    }
+
+    getSimulationCursor(): number
+    {
+        return this.simulationCursor;
+    }
+
     /**
      * Go to position at given move index, in the main line.
      * goToPosition(1) will go to the position after first move is played.
@@ -99,6 +121,8 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
      */
     goToMainPosition(toMoveIndex: number): void
     {
+        const emitEventsIfCursorChanged = this.willEmitEventsIfCursorChanged();
+
         this.resetSimulationLine();
 
         if (toMoveIndex < this.mainCursor) {
@@ -109,7 +133,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
             this.doForward(toMoveIndex - this.mainCursor);
         }
 
-        this.emit('mainCursorChanged', this.mainCursor);
+        emitEventsIfCursorChanged();
     }
 
     private doRewind(n = 1): void
@@ -138,9 +162,11 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
      */
     rewind(n = 1): void
     {
+        const emitEventsIfCursorChanged = this.willEmitEventsIfCursorChanged();
+
         this.doRewind(n);
 
-        this.emit('mainCursorChanged', this.mainCursor);
+        emitEventsIfCursorChanged();
     }
 
     /**
@@ -182,9 +208,11 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
      */
     forward(n = 1): void
     {
+        const emitEventsIfCursorChanged = this.willEmitEventsIfCursorChanged();
+
         this.doForward(n);
 
-        this.emit('mainCursorChanged', this.mainCursor);
+        emitEventsIfCursorChanged();
     }
 
     /**
@@ -206,6 +234,8 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
 
         this.simulationLine.push(move);
         this.simulationCursor++;
+
+        this.emit('simulationCursorChanged', this.simulationCursor);
 
         return true;
     }
@@ -262,13 +292,31 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
      */
     resetSimulationAndRewind(): void
     {
+        const emitEventsIfCursorChanged = this.willEmitEventsIfCursorChanged();
+
         this.resetSimulationLine();
 
         if (this.mainCursor < this.mainLine.length) {
             this.doForward(this.mainLine.length - this.mainCursor);
         }
 
-        this.emit('mainCursorChanged', this.mainCursor);
+        emitEventsIfCursorChanged();
+    }
+
+    private willEmitEventsIfCursorChanged(): () => void
+    {
+        const mainCursorBefore = this.mainCursor;
+        const simulationCursorBefore = this.simulationCursor;
+
+        return () => {
+            if (mainCursorBefore !== this.mainCursor) {
+                this.emit('mainCursorChanged', this.mainCursor);
+            }
+
+            if (simulationCursorBefore !== this.simulationCursor) {
+                this.emit('simulationCursorChanged', this.simulationCursor);
+            }
+        };
     }
 
     destroy(): void
