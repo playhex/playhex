@@ -47,13 +47,6 @@ type GameAnalyzeViewEvents = {
      * Should show summary info of the move.
      */
     highlightedMoveChanged: (move: null | AnalyzeMoveOutput) => void;
-
-    /**
-     * Move have been selected, i.e clicked by user.
-     * Should show detailled info of the move.
-     * Can be null if for some reason, missing analyze for this given move.
-     */
-    selectedMoveChanged: (move: null | AnalyzeMoveOutput) => void;
 };
 
 export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
@@ -66,6 +59,9 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     private selectedMove: null | number = null;
     private bestMoveMark = new BestMoveMark();
     private playedMoveMark = new PlayedMoveMark();
+    private gameView: null | GameView = null;
+    private showPositionAt: null | ((showPositionAt: number) => void) = null;
+    private currentlyFaded: null | Move = null;
 
     private initPromise = defer<void>();
 
@@ -211,81 +207,90 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         return this.containerElement.getBoundingClientRect();
     }
 
+    fadePlayedMove(move: Move, byPlayerIndex: 0 | 1): void
+    {
+        if (!this.gameView) {
+            return;
+        }
+
+        if (this.currentlyFaded && this.gameView.getStone(this.currentlyFaded)?.isFaded()) {
+            this.gameView.setStone(this.currentlyFaded, null);
+        }
+
+        this.currentlyFaded = move;
+        this.gameView.setStone(this.currentlyFaded, byPlayerIndex, true);
+    }
+
+    showAnalysisMarks(move: null | AnalyzeMoveOutput): void
+    {
+        this.bestMoveMark.hide();
+        this.playedMoveMark.hide();
+
+        if (move === null) {
+            return;
+        }
+
+        if (this.showPositionAt) {
+            this.showPositionAt(move.moveIndex);
+        }
+
+        // Place best move
+        if (validateMove(move.bestMoves[0].move)) {
+            this.bestMoveMark.setCoords(parseMove(move.bestMoves[0].move));
+            this.bestMoveMark.show();
+        }
+
+        // Place played move and eval color
+        if (!validateMove(move.move.move)) {
+            return;
+        }
+
+        this.fadePlayedMove(move.move.move, move.color === 'black' ? 0 : 1);
+        this.playedMoveMark.setCoords(parseMove(move.move.move));
+
+        const playedWhiteWin = move.move.whiteWin;
+        const bestWhiteWin = move.bestMoves[0].whiteWin;
+
+        if (undefined !== playedWhiteWin && undefined !== bestWhiteWin) {
+            let diff = playedWhiteWin - bestWhiteWin;
+            diff *= 2; // drop 50% means full red
+
+            // Oppose value every two move, as it is whiteWin
+            if (move.moveIndex % 2) {
+                diff = -diff;
+            }
+
+            // Can be negative when player found a better move than cpu best move
+            if (diff < 0) {
+                diff = 0;
+            }
+
+            // Can be >1 when big mistake, because we multiply the diff
+            if (diff > 1) {
+                diff = 1;
+            }
+
+            this.playedMoveMark.setWhiteWinDiff(diff);
+        } else {
+            this.playedMoveMark.setWhiteWinDiff(0);
+        }
+
+        this.playedMoveMark.show();
+    }
+
     /**
      * Update game view cursor when selected an analyzed move,
      * and update selected move when game view cursor changed.
      */
     linkGameViewCursor(gameView: GameView, showPositionAt: (showPositionAt: number) => void): void
     {
-        let currentlyFaded: null | Move = null;
-
-        const fadePlayedMove = (move: Move, byPlayerIndex: 0 | 1): void => {
-            if (currentlyFaded && gameView.getStone(currentlyFaded)?.isFaded()) {
-                gameView.setStone(currentlyFaded, null);
-            }
-
-            currentlyFaded = move;
-            gameView.setStone(currentlyFaded, byPlayerIndex, true);
-        };
+        this.gameView = gameView;
+        this.showPositionAt = showPositionAt;
 
         this.playedMoveMark.hide();
         this.bestMoveMark.hide();
         gameView.addEntity(this.playedMoveMark, 'analyze');
         gameView.addEntity(this.bestMoveMark, 'analyze');
-
-        this.on('selectedMoveChanged', move => {
-            this.bestMoveMark.hide();
-            this.playedMoveMark.hide();
-
-            if (move === null) {
-                return;
-            }
-
-            showPositionAt(move.moveIndex);
-
-            // Place best move
-            if (validateMove(move.bestMoves[0].move)) {
-                this.bestMoveMark.setCoords(parseMove(move.bestMoves[0].move));
-                this.bestMoveMark.show();
-            }
-
-            // Place played move and eval color
-            if (!validateMove(move.move.move)) {
-                return;
-            }
-
-            fadePlayedMove(move.move.move, move.color === 'black' ? 0 : 1);
-            this.playedMoveMark.setCoords(parseMove(move.move.move));
-
-            const playedWhiteWin = move.move.whiteWin;
-            const bestWhiteWin = move.bestMoves[0].whiteWin;
-
-            if (undefined !== playedWhiteWin && undefined !== bestWhiteWin) {
-                let diff = playedWhiteWin - bestWhiteWin;
-                diff *= 2; // drop 50% means full red
-
-                // Oppose value every two move, as it is whiteWin
-                if (move.moveIndex % 2) {
-                    diff = -diff;
-                }
-
-                // Can be negative when player found a better move than cpu best move
-                if (diff < 0) {
-                    diff = 0;
-                }
-
-                // Can be >1 when big mistake, because we multiply the diff
-                if (diff > 1) {
-                    diff = 1;
-                }
-
-                this.playedMoveMark.setWhiteWinDiff(diff);
-            } else {
-                this.playedMoveMark.setWhiteWinDiff(0);
-            }
-
-            this.playedMoveMark.show();
-        });
     }
 
     selectMove(moveIndex: number): void
@@ -298,7 +303,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
 
         this.selectedMove = moveIndex;
 
-        this.emit('selectedMoveChanged', this.analyze[moveIndex] ?? null);
+        this.showAnalysisMarks(this.analyze[moveIndex] ?? null);
     }
 
     private highlightMove(moveIndex: number, force = false): void
