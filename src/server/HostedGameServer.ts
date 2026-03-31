@@ -896,7 +896,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     playerResign(player: Player): true | string
     {
         if (this.hostedGame.state !== 'playing') {
-            this.logger.notice('Player tried to move but hosted game is not playing', { joiner: player.pseudo });
+            this.logger.notice('Player tried to resign but hosted game is not playing', { joiner: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -906,7 +906,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         if (!this.isPlayerInGame(player)) {
-            this.logger.notice('A player not in the game tried to make a move', { player: player.pseudo });
+            this.logger.notice('A player not in the game tried to resign', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
@@ -930,7 +930,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         if (this.hostedGame.state !== 'playing' && this.hostedGame.state !== 'created') {
-            this.logger.notice('Player tried to move but hosted game is not playing nor created', { joiner: player.pseudo });
+            this.logger.notice('Player tried to cancel but hosted game is not playing nor created', { joiner: player.pseudo });
             return 'Game is not playing nor created';
         }
 
