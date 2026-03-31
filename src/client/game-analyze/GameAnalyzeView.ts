@@ -207,7 +207,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         return this.containerElement.getBoundingClientRect();
     }
 
-    fadePlayedMove(move: Move, byPlayerIndex: 0 | 1): void
+    private fadePlayedMove(move: Move, byPlayerIndex: 0 | 1): void
     {
         if (!this.gameView) {
             return;
