@@ -22,6 +22,10 @@ export class PlayerNotificationsService
             }))
         ;
 
+        if (playerNotification.hostedGame && typeof playerNotification.hostedGame.id === 'undefined') {
+            throw new Error('Cannot add a notification for this hostedGame, hostedGame is not yet persisted');
+        }
+
         await this.playerNotificationRepository.save(playerNotification);
     }
 }

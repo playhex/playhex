@@ -10,6 +10,7 @@ import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.
 import { IsBoolean } from 'class-validator';
 import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
 import { type HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
+import logger from '../../../services/logger.js';
 
 class AnswerUndoBody
 {
@@ -89,8 +90,21 @@ export default class GameController
         @Body() gameOptions: HostedGameOptions,
     ) {
         try {
-            const hostedGame = await this.hostedGameRepository.createGame({ gameOptions, host }, { persist: false });
-            return hostedGame.getHostedGame();
+            const hostedGameServer = await this.hostedGameRepository.createGame({ gameOptions, host }, { persist: false });
+
+            // Persist game:
+            // asynchronously to return it faster,
+            // but soon because we need to have a persisted entity to add relations from other entities (PlayerNotification, ChatMessage, ...)
+            hostedGameServer.persist()
+                .catch(e => {
+                    logger.warning('Could not persist game asynchronously after created it', {
+                        hostedGamePublicId: hostedGameServer.getPublicId(),
+                        errorMessage: e.message ?? e,
+                    });
+                })
+            ;
+
+            return hostedGameServer.getHostedGame();
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);

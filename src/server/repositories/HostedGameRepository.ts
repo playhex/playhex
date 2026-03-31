@@ -390,7 +390,7 @@ export default class HostedGameRepository
 
         const params = { gameOptions: cloneGameOptions(game), host, rematchedFrom: game };
 
-        const rematch = await this.createGame(params, { persist: false, aiJoinAuto: false });
+        const rematch = await this.createGame(params, { persist: false, aiJoinAuto: false }); // do not persist because will persist later in the transaction, at same time as rematchId
         game.rematch = rematch.getHostedGame();
 
         try {
