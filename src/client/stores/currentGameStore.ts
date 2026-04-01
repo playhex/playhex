@@ -701,7 +701,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const sendMove = async (move: HexMove): Promise<void> => {
         return await new Promise((resolve, reject) => {
             if (!hostedGame.value) {
-                return;
+                throw new Error('no hostedGame');
             }
 
             socket.emit('move', hostedGame.value.publicId, move, answer => {
@@ -787,7 +787,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         return await new Promise((resolve, reject) => {
             if (!hostedGame.value) {
-                return;
+                throw new Error('no hostedGame');
             }
 
             socket.emit('premove', hostedGame.value.publicId, premove, answer => {
@@ -804,7 +804,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const cancelPremove = async (): Promise<void> => {
         return await new Promise((resolve, reject) => {
             if (!hostedGame.value) {
-                return;
+                throw new Error('no hostedGame');
             }
 
             socket.emit('cancelPremove', hostedGame.value.publicId, answer => {
