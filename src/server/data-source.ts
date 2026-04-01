@@ -5,8 +5,14 @@ import { Container } from 'typedi';
 import { entities } from '../shared/app/models/index.js';
 import logger from './services/logger.js';
 import { errorToString } from '../shared/app/utils.js';
+import { TypeOrmLogger } from './services/TypeORMLogger.js';
 
-const { DATABASE_URL, DATABASE_SHOW_SQL, DATABASE_SHOW_SLOW_QUERIES } = process.env;
+const { DATABASE_URL, DATABASE_LOG_QUERIES_SLOWER_THAN } = process.env;
+
+const logQueriesSlowerThan = typeof DATABASE_LOG_QUERIES_SLOWER_THAN !== 'undefined'
+    ? parseInt(DATABASE_LOG_QUERIES_SLOWER_THAN, 10)
+    : undefined
+;
 
 if (!DATABASE_URL) {
     throw new Error('DATABASE_URL must be defined in .env');
@@ -22,11 +28,12 @@ if (type !== 'mysql' && type !== 'postgres') {
 export const AppDataSource = new DataSource({
     type,
     url: DATABASE_URL,
-    logging: DATABASE_SHOW_SQL === 'true',
     timezone: 'Z',
     entities: Object.values(entities),
     migrations: [],
-    maxQueryExecutionTime: (undefined !== DATABASE_SHOW_SLOW_QUERIES && DATABASE_SHOW_SLOW_QUERIES.match(/^\d+$/)) ? parseInt(DATABASE_SHOW_SLOW_QUERIES, 10) : undefined,
+    logging: typeof logQueriesSlowerThan === 'number',
+    maxQueryExecutionTime: logQueriesSlowerThan ?? undefined,
+    logger: typeof logQueriesSlowerThan === 'number' ? new TypeOrmLogger() : undefined,
     cache: {
         provider: () => new InMemoryCacheProvider.default(),
     },
