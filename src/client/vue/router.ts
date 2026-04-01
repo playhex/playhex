@@ -225,6 +225,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./pages/content/PageCijm.vue'),
     },
     {
+        name: 'cijm2026',
+        path: '/tournoi-hex-paris-2026',
+        component: () => import('./pages/content/PageCijm2026.vue'),
+    },
+    {
         name: 'rescue',
         path: '/rescue',
         component: () => import('./pages/PageRescue.vue'),

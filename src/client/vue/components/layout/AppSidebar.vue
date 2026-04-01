@@ -6,6 +6,7 @@ import AppPseudo from '../AppPseudo.vue';
 import { Tournament, type OnlinePlayer } from '../../../../shared/app/models/index.js';
 import { apiGetActiveTournaments } from '../../../apiClient.js';
 import AppFeaturedTournamentCard from '../../tournaments/components/AppFeaturedTournamentCard.vue';
+import AppCijmTournamentCard2026 from '../AppCijmTournamentCard2026.vue';
 import AppConnectionLostPlayOffline from '../AppConnectionLostPlayOffline.vue';
 import { useConnectionLostPlayOfflineStore } from '../../offline-lobby/stores/connectionLostPlayOfflineStore.js';
 import { Toast } from '../../../../shared/app/Toast.js';
@@ -51,6 +52,8 @@ const { shouldDisplayPlayOffline } = storeToRefs(useConnectionLostPlayOfflineSto
 <template>
     <div>
         <AppConnectionLostPlayOffline v-if="shouldDisplayPlayOffline" />
+
+        <AppCijmTournamentCard2026 />
 
         <AppFeaturedTournamentCard
             v-for="tournament in featuredTournaments"
