@@ -20,7 +20,12 @@ export const registerHttpControllers = (app: Express): void => {
     app.use(pagesRouter());
 
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-        logger.notice('API error: ' + req.method + ' ' + req.originalUrl + ' ' + err.message, { classname: err.constructor.name, errorMessage: err.message, err, stack: err.stack });
+        logger.notice(`API error: ${req.method} ${req.route?.path ?? req.originalUrl}`, {
+            classname: err.constructor.name,
+            errorMessage: err.message,
+            stack: err.stack,
+            err,
+        });
 
         if (err instanceof DomainHttpError) {
             res
