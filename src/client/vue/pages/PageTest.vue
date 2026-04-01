@@ -195,6 +195,7 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
 
                             <button class="btn btn-success" @click.prevent="simulatePlayingGameFacade.rewind()">Rewind</button>
                             <button class="btn btn-success" @click.prevent="simulatePlayingGameFacade.forward()">Forward</button>
+                            <button class="btn btn-primary" @click.prevent="simulatePlayingGameFacade.forward(3)">Forward 3</button>
                             <button class="btn btn-success" @click.prevent="simulatePlayingGameFacade.resetSimulationAndRewind()">Reset simulation and rewind</button>
                         </div>
                     </div>

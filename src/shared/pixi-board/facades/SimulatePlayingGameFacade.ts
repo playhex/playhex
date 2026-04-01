@@ -180,10 +180,12 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
     private doForward(n = 1): void
     {
         for (let i = 0; i < n; ++i) {
-            if (this.simulationCursor
+            if (
+                // We are in a simulation line
+                this.simulationCursor
 
-                // If we have a simulation line starting from the end of main line,
-                // go forward on it.
+                // If are at not in silulation line but on the end of the main line,
+                // and there is an existing simulation line: forward on simulation line
                 || this.simulationLine.length && this.mainCursor >= this.mainLine.length
             ) {
                 if (this.simulationCursor < this.simulationLine.length) {
@@ -191,7 +193,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
                     ++this.simulationCursor;
                 }
 
-                break;
+                continue;
             }
 
             if (this.mainCursor < this.mainLine.length) {
