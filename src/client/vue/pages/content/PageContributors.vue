@@ -9,6 +9,7 @@ useSeoMeta({
 });
 
 const contributors = ref<null | PlayHexContributors>(null);
+const liberapayDefaultAvatar = 'https://liberapay.com/assets/avatar-default.png';
 
 void (async () => {
     contributors.value = await apiGetContributors();
@@ -49,6 +50,34 @@ void (async () => {
         which is still testing PlayHex and giving feedback.
     </p>
 
+    <!--
+        Donors
+    -->
+
+    <h2>Donors</h2>
+
+    <p>
+        <a href="https://liberapay.com/PlayHex/" target="_blank" rel="noopener noreferrer">
+            <img src="https://img.shields.io/liberapay/patrons/PlayHex.svg?logo=liberapay" alt="Number of Liberapay donators" height="20" />
+        </a>
+    </p>
+
+    <p>People who donated to PlayHex via <a href="https://liberapay.com/PlayHex/" target="_blank" rel="noopener noreferrer">Liberapay</a>.</p>
+
+    <ul v-if="contributors?.liberapay && contributors.liberapay.length > 0" class="list-inline">
+        <li v-for="{ username, avatar, publicName} in contributors.liberapay" :key="username" class="list-inline-item me-4 mb-3">
+            <a :href="`https://liberapay.com/${username}/`" target="_blank" class="text-decoration-none lead">
+                <img :src="avatar ?? liberapayDefaultAvatar" class="rounded" width="42" :alt="`${publicName ?? username}'s avatar'`" />
+                {{ publicName ?? username }}
+            </a>
+        </li>
+    </ul>
+    <p v-else-if="contributors?.liberapay?.length === 0"><em>No public donors yet.</em></p>
+
+    <!--
+        Code contributors
+    -->
+
     <h2>Code contributors</h2>
 
     <ul v-if="contributors?.github && contributors.github.length > 0" class="list-inline">
@@ -61,6 +90,10 @@ void (async () => {
     </ul>
 
     <p>See <a href="https://github.com/playhex/playhex" target="_blank">PlayHex on Github</a>.</p>
+
+    <!--
+        Translators
+    -->
 
     <h2>Translators</h2>
 

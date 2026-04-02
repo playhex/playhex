@@ -32,9 +32,24 @@ export type WeblateContributors = {
     [lang: string]: Translator[];
 };
 
+export type LiberapayPatron = {
+    /**
+     * Used to create url to patron's profile page
+     */
+    username: string;
+
+    publicName?: string;
+
+    /**
+     * Should fallback to https://liberapay.com/assets/avatar-default.png
+     */
+    avatar?: string;
+};
+
 export type PlayHexContributors = {
     github: GithubContributor[];
     weblate: WeblateContributors;
+    liberapay: LiberapayPatron[];
 };
 
 export type AIConfigStatusData = {

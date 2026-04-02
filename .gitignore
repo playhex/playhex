@@ -1,7 +1,7 @@
 dist
 .env
 node_modules
-yarn-error.log
+*.log
 cypress/screenshots/
 size-stats-*.json
 var/

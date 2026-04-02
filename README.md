@@ -1,6 +1,8 @@
 # Hex
 
-Play Hex online.
+[![Number of Liberapay donators](https://img.shields.io/liberapay/patrons/PlayHex.svg?logo=liberapay)](https://liberapay.com/PlayHex/)
+
+Play Hex board game online, against players or bots.
 
 Currently hosted here: <https://playhex.org>
 
@@ -263,3 +265,9 @@ Files under these folders are under another license:
 | Folder | License | Author |
 | ------ | ------- | ------ |
 | `assets/sounds/lisp/` | `CC BY-NC-SA 4.0` | [EdinburghCollective](http://lichess.org/@/EdinburghCollective) |
+
+## Donate
+
+PlayHex has a [LiberaPay donation page](https://liberapay.com/PlayHex/) where you can explore its funding goals and upcoming projects.
+
+[![Number of Liberapay donators](https://img.shields.io/liberapay/patrons/PlayHex.svg?logo=liberapay)](https://liberapay.com/PlayHex/)

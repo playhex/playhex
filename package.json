@@ -54,6 +54,7 @@
     "connect-redis": "^9.0.0",
     "content-range": "^2.0.2",
     "copy-to-clipboard": "^3.3.3",
+    "csv-parse": "^6.2.1",
     "cypress": "^15.7.1",
     "date-fns": "^4.1.0",
     "davies-hex-ai": "^1.2.7",

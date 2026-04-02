@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
 import { ref } from 'vue';
+import AppLiberapayLink from '../../components/AppLiberapayLink.vue';
 
 useSeoMeta({
     title: 'How to contribute',
@@ -101,6 +102,15 @@ const playerIsFair = ref(0);
     </p>
 
     <a href="https://github.com/playhex/playhex" class="btn btn-success" target="_blank">PlayHex on Github</a>
+
+    <h2>Donate</h2>
+
+    <p>
+        PlayHex has a LiberaPay donation page
+        where you can explore its funding goals and upcoming projects.
+    </p>
+
+    <AppLiberapayLink />
 
     <h2>Be a fair player</h2>
 

@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';
 import i18n from 'i18next';
+import AppLiberapayLink from '../AppLiberapayLink.vue';
 
 /* global LAST_COMMIT_DATE */
 // @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
@@ -42,6 +43,9 @@ i18n.on('languageChanged', () => {
                 <br>
                 {{ $t('hex_links') }}
             </router-link>
+        </div>
+        <div class="d-flex justify-content-center">
+            <AppLiberapayLink class="mt-4" />
         </div>
         <p class="infos">
             <span>{{ $t('project_under_development') }}</span>
