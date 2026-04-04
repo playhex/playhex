@@ -289,6 +289,7 @@
     "chat_message_placeholder": "Message…",
     "unread_messages": "messages non lus",
     "send_chat_message": "Envoyer",
+    "spectators": "Spectateurs",
     "landscape": "Paysage",
     "portrait": "Portrait",
     "force_board_orientation_mode": "Forcer l'affichage en paysage ou portrait pour cet écran",
@@ -562,7 +563,5 @@
     "muted": {
         "on": "Muet",
         "off": "Sons activés"
-    },
-    "spectator_joined": "{{ player }} a rejoint les spectateurs",
-    "spectator_left": "{{ player }} a quitté les spectateurs"
+    }
 }
