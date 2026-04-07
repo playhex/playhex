@@ -1,5 +1,12 @@
 import { HostedGameOptions } from '../../shared/app/models/index.js';
 
+/**
+ * Creates an instance of HostedGameOptions from options in url hash.
+ *
+ * Example:
+ * createGameOptionsFromUrlHash('#create-1v1-friendly'); // => returns options with opponentType = 'player' and ranked is false
+ * createGameOptionsFromUrlHash(); // => reads from window location hash and returns a HostedGameOptions
+ */
 export const createGameOptionsFromUrlHash = (hash: string = document.location.hash): null | HostedGameOptions => {
     if (!hash || !hash.startsWith('#create-')) {
         return null;

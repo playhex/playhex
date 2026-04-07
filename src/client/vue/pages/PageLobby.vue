@@ -2,28 +2,23 @@
 import { storeToRefs } from 'pinia';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { useRouter } from 'vue-router';
-import { defineOverlay } from '@overlastic/vue';
-import Create1v1RankedOverlay from '../components/overlay/Create1v1RankedOverlay.vue';
-import Create1v1FriendlyOverlay from '../components/overlay/Create1v1FriendlyOverlay.vue';
-import Create1vAIOverlay from '../components/overlay/Create1vAIOverlay.vue';
-import Create1vAIRankedOverlay from '../components/overlay/Create1vAIRankedOverlay.vue';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
-import { HostedGame, HostedGameOptions } from '../../../shared/app/models/index.js';
+import { HostedGame } from '../../../shared/app/models/index.js';
 import AppSidebar from '../components/layout/AppSidebar.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import useAuthStore from '../../stores/authStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
-import { IconEye, IconTrophy, IconPeople, IconRobot, IconTrophyFill, IconSearch, IconWifiOff, IconRocketTakeOff } from '../icons.js';
+import { IconEye, IconTrophy, IconTrophyFill, IconSearch, IconWifiOff, IconRocketTakeOff } from '../icons.js';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { useHead } from '@unhead/vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { t } from 'i18next';
-import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash.js';
-import { apiPostGame } from '../../apiClient.js';
 import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import { useConnectionLostPlayOfflineStore } from '../offline-lobby/stores/connectionLostPlayOfflineStore.js';
 import { useTutorialControls } from '../composables/tutorialControls.js';
+import AppCreateGameButtons from '../components/AppCreateGameButtons.vue';
+import { useCreateGameOverlay } from '../composables/useCreateGameOverlay.js';
 
 useHead({
     title: t('lobby_title'),
@@ -31,97 +26,6 @@ useHead({
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
-
-const goToGame = (gameId: string) => {
-    void router.push({
-        name: 'online-game',
-        params: {
-            gameId,
-        },
-    });
-};
-
-/*
- * 1 vs 1 - ranked
- */
-const create1v1RankedOverlay = defineOverlay(Create1v1RankedOverlay);
-
-const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
-    gameOptions.opponentType = 'player';
-    gameOptions.ranked = true;
-
-    try {
-        gameOptions = await create1v1RankedOverlay({ gameOptions });
-
-        const hostedGame = await apiPostGame(gameOptions);
-        goToGame(hostedGame.publicId);
-    } catch (e) {
-        // noop, player just closed popin
-    }
-};
-
-/*
- * 1 vs 1 - friendly
- */
-const create1v1FriendlyOverlay = defineOverlay(Create1v1FriendlyOverlay);
-
-const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
-    gameOptions.opponentType = 'player';
-    gameOptions.ranked = false;
-
-    try {
-        gameOptions = await create1v1FriendlyOverlay({ gameOptions });
-
-        const hostedGame = await apiPostGame(gameOptions);
-        goToGame(hostedGame.publicId);
-    } catch (e) {
-        // noop, player just closed popin
-    }
-};
-
-
-
-/*
-* 1 vs AI ranked
-*/
-const create1vAIRankedOverlay = defineOverlay(Create1vAIRankedOverlay);
-
-/* global ALLOW_RANKED_BOT_GAMES */
-// @ts-ignore: ALLOW_RANKED_BOT_GAMES replaced at build time by webpack.
-const allowRankedBotGames: boolean = ALLOW_RANKED_BOT_GAMES === 'true';
-
-const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
-    gameOptions.opponentType = 'ai';
-    gameOptions.ranked = true;
-
-    try {
-        gameOptions = await create1vAIRankedOverlay({ gameOptions });
-
-        const hostedGame = await apiPostGame(gameOptions);
-        goToGame(hostedGame.publicId);
-    } catch (e) {
-        // noop, player just closed popin
-    }
-};
-
-/*
- * 1 vs AI
- */
-const create1vAIOverlay = defineOverlay(Create1vAIOverlay);
-
-const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
-    gameOptions.opponentType = 'ai';
-    gameOptions.ranked = false;
-
-    try {
-        gameOptions = await create1vAIOverlay({ gameOptions });
-
-        const hostedGame = await apiPostGame(gameOptions);
-        goToGame(hostedGame.publicId);
-    } catch (e) {
-        // noop, player just closed popin
-    }
-};
 
 /*
  * Utils functions
@@ -153,7 +57,12 @@ const joinGame = async (hostedGame: HostedGame) => {
         throw new Error('Could not join game: ' + e.message);
     }
 
-    goToGame(hostedGame.publicId);
+    await router.push({
+        name: 'online-game',
+        params: {
+            gameId: hostedGame.publicId,
+        },
+    });
 };
 
 const isUncommonBoardsize = (hostedGame: HostedGame): boolean => {
@@ -206,30 +115,9 @@ const byEndedAt = (a: HostedGame, b: HostedGame): number => {
     return b.endedAt.getTime() - a.endedAt.getTime();
 };
 
-/*
- * Auto create game with options from url hash
- * I.e "/#create-1v1" -> open create 1v1 popin with predefined parameters
- */
-const createGameFromHash = () => {
-    const gameOptions = createGameOptionsFromUrlHash();
-
-    if (gameOptions === null) {
-        return;
-    }
-
-    // Remove hash to allow re-open create game overlay in case of clicking on a link again
-    document.location.hash = '';
-
-    if (gameOptions.opponentType === 'player') {
-        if (gameOptions.ranked) {
-            void create1v1RankedAndJoinGame(gameOptions);
-        } else {
-            void create1v1FriendlyAndJoinGame(gameOptions);
-        }
-    } else {
-        void create1vAIFriendlyAndJoinGame(gameOptions);
-    }
-};
+const {
+    createGameFromHash,
+} = useCreateGameOverlay();
 
 createGameFromHash();
 window.addEventListener('hashchange', () => createGameFromHash());
@@ -244,13 +132,6 @@ const {
 
 // Display link "Play offline" when lose connection
 const { shouldDisplayPlayOffline } = storeToRefs(useConnectionLostPlayOfflineStore());
-
-const btnClassUnlessOffline = (btnClass: string): string => {
-    return shouldDisplayPlayOffline.value
-        ? 'btn-secondary'
-        : btnClass
-    ;
-};
 
 /*
  * Tutorial
@@ -302,20 +183,7 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
                     </router-link>
                 </div>
 
-                <div class="play-buttons row mb-4 g-3">
-                    <div class="col">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1v1RankedAndJoinGame()"><IconTrophy class="fs-3" /><br>{{ $t('1v1_ranked.title') }}</button>
-                    </div>
-                    <div class="col" v-if="allowRankedBotGames">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-warning')" @click="() => create1vAIRankedAndJoinGame()"><IconRobot class="fs-3" /><br>{{ $t('1vAI_ranked.title') }}</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-success')" @click="() => create1v1FriendlyAndJoinGame()"><IconPeople class="fs-3" /><br>{{ $t('1v1_friendly.title') }}</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn w-100" :class="btnClassUnlessOffline('btn-primary')" @click="() => create1vAIFriendlyAndJoinGame()"><IconRobot class="fs-3" /><br>{{ $t('1vAI_friendly.title') }}</button>
-                    </div>
-                </div>
+                <AppCreateGameButtons />
 
                 <h3>{{ $t('lobby.join_a_game') }}</h3>
 
@@ -478,13 +346,6 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
 </template>
 
 <style lang="stylus" scoped>
-.play-buttons
-    .btn
-        min-height 6em
-
-        @media (min-width: 992px)
-            min-height 7em
-
 h4
     margin-top 1em
 
