@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DOMPurify from 'dompurify';
 import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../icons.js';
 import { ref } from 'vue';
 import { useHead } from '@unhead/vue';
@@ -69,6 +70,13 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
         default: return '';
     }
 };
+
+const sanitizedT = (key: string, allowedTags: string[] = ['br', 'strong']): string => {
+    return DOMPurify.sanitize(
+        t(key),
+        { ALLOWED_TAGS: allowedTags },
+    );
+};
 </script>
 
 <template>
@@ -76,7 +84,6 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
         <div class="d-flex justify-content-between">
             <div class="d-flex align-items-start">
                 <h1>{{ $t('tournaments') }}</h1>
-                <span class="badge text-bg-danger rounded-pill">beta</span>
             </div>
 
             <div>
@@ -87,13 +94,7 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
             </div>
         </div>
 
-        <div class="alert alert-warning" role="alert">
-            <p class="m-0">
-                Tournaments is a new feature, so you might encounter some bugs or unclear elements.
-                Feel free to <a href="https://feedback.alcalyn.app/" target="_blank">share your feedback here</a>,
-                or on the <a href="https://discord.gg/59SJ9KwvVq" target="_blank">Hex Discord</a> in the #playhex-org channel.
-            </p>
-        </div>
+        <p v-html="sanitizedT('tournaments_page_intro')"></p>
 
         <template v-if="null !== activeTournaments">
 
@@ -102,7 +103,7 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
             -->
             <h2>{{ $t('playing_tournaments') }}</h2>
 
-            <div class="row">
+            <div v-if="activeTournaments.some(isActive)" class="row">
                 <div
                     v-for="tournament in activeTournaments.filter(isActive)"
                     :key="tournament.publicId"
@@ -145,12 +146,14 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
                 </div>
             </div>
 
+            <p v-else><i>{{ $t('no_active_tournament') }}</i></p>
+
             <!--
                 Upcoming tournaments
             -->
             <h2>{{ $t('upcoming_tournaments') }}</h2>
 
-            <div class="list-group mb-3 text-body">
+            <div v-if="activeTournaments.some(isUpcoming)" class="list-group mb-3 text-body">
                 <router-link
                     v-for="tournament in activeTournaments.filter(isUpcoming)"
                     :key="tournament.publicId"
@@ -171,12 +174,14 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
                 </router-link>
             </div>
 
+            <p v-else><i>{{ $t('no_upcoming_tournament') }}</i></p>
+
             <!--
                 Past tournaments
             -->
             <h2>{{ $t('past_tournaments') }}</h2>
 
-            <div class="row">
+            <div v-if="endedTournaments" class="row">
                 <div
                     v-for="tournament in endedTournaments"
                     :key="tournament.publicId"
@@ -205,6 +210,9 @@ const mySubscriptionStatusClasses = (tournament: Tournament): string => {
                     </div>
                 </div>
             </div>
+
+            <p v-else-if="endedTournaments === null"><i>{{ $t('loading_tournaments') }}</i></p>
+            <p v-else><i>No tournament has been played yet.</i></p>
         </template>
 
         <p v-else>{{ $t('loading_tournaments') }}</p>
