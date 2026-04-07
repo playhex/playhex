@@ -1,5 +1,5 @@
 import { t } from 'i18next';
-import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../context-utils.js';
+import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import router from '../../../vue/router.js';

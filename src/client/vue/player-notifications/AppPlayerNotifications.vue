@@ -7,7 +7,7 @@ import { IconMailbox, IconMailboxFlag } from '../icons.js';
 import { apiPostPlayerNotificationsAcknowledge } from '../../apiClient.js';
 import AppNotification from './AppNotification.vue';
 import AppUnreadNotificationsBadge from './AppUnreadNotificationsBadge.vue';
-import { getOpponent } from '../../services/notifications/context-utils.js';
+import { getOpponent } from '../../services/context-utils.js';
 import { pseudoStringOptional } from '../../../shared/app/pseudoUtils.js';
 import usePlayerNotificationsStore from '../../stores/playerNotificationsStore.js';
 

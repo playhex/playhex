@@ -27,9 +27,10 @@ import { watchEffect } from 'vue';
 import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
-import { getOtherPlayer, getWinnerPlayer, hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { getOtherPlayerStrict, hasPlayer, hasWon } from '../../../../shared/app/hostedGameUtils.js';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import { isMe } from '../../../services/context-utils.js';
 
 const { slug } = useRoute().params;
 
@@ -71,9 +72,11 @@ const updateMeta = (player: Player): void => {
  * Player data
  */
 const { loggedInPlayer } = storeToRefs(useAuthStore());
-const isMe = (): boolean => loggedInPlayer.value !== null && loggedInPlayer.value.slug === slug;
 
-const player: Ref<null | Player> = isMe()
+/**
+ * Can be me, or another player (when seeing other player profile page)
+ */
+const player: Ref<null | Player> = loggedInPlayer.value?.slug === slug
     ? loggedInPlayer
     : ref(null)
 ;
@@ -195,37 +198,6 @@ watchEffect(async () => {
     totalResults.value = count;
 });
 
-const hasWon = (game: HostedGame): boolean => {
-    if (player.value === null) {
-        throw new Error('player must be set');
-    }
-
-    return getWinnerPlayer(game)?.publicId === player.value.publicId;
-};
-
-const getOpponent = (game: HostedGame): Player => {
-    if (player.value === null) {
-        throw new Error('player must be set');
-    }
-
-    let me: null | Player = null;
-    let opponent: null | Player = null;
-
-    for (const p of game.hostedGameToPlayers) {
-        if (p.player.publicId === player.value.publicId) {
-            me = p.player;
-        } else {
-            opponent = p.player;
-        }
-    }
-
-    if (me === null || opponent === null) {
-        throw new Error('Player not in the game, or no opponent');
-    }
-
-    return opponent;
-};
-
 const router = useRouter();
 
 const clickLogout = async () => {
@@ -339,7 +311,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                     : '…' })
                 }}</p>
 
-                <p v-if="isMe()" class="text-body-secondary">
+                <p v-if="player && isMe(player)" class="text-body-secondary">
                     <small>
                         {{ $t('ping.ping_ms', { ms: pingTime }) }}
                         –
@@ -347,7 +319,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                     </small>
                 </p>
 
-                <div v-if="isMe() && null !== player" class="player-btns mt-3">
+                <div v-if="player && isMe(player)" class="player-btns mt-3">
                     <template v-if="player.isGuest">
                         <router-link
                             :to="{ name: 'signup' }"
@@ -432,7 +404,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
         <h3 class="mt-4">{{ $t('player_current_games') }}</h3>
 
-        <div v-if="player" class="table-responsive">
+        <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
@@ -445,7 +417,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <th scope="col">{{ $t('game.started') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="player">
                     <tr
                         v-for="game in getCurrentGames()"
                         :key="game.publicId"
@@ -459,7 +431,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <td>
                             <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
                         </td>
-                        <td><AppPseudo rating onlineStatus :player="getOtherPlayer(game, player)!" /></td>
+                        <td><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
                         <td>{{ game.boardsize }}</td>
                         <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
                         <td><AppGameRulesSummary :gameOptions="game" /></td>
@@ -498,7 +470,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <th scope="col">{{ $t('game.finished') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="player">
                     <tr
                         v-for="game in gamesHistory"
                         :key="game.publicId"
@@ -514,11 +486,11 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         </td>
 
                         <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
-                        <td v-else-if="hasWon(game)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
+                        <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
                         <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
 
                         <td v-if="game.hostedGameToPlayers.length < 2">-</td>
-                        <td v-else><AppPseudo rating onlineStatus :player="getOpponent(game)" /></td>
+                        <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
 
                         <td>{{ game.boardsize }}</td>
                         <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>

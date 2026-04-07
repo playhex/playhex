@@ -8,7 +8,7 @@ import Rooms from '../../shared/app/Rooms.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
-import { iAmInGame } from '../services/notifications/context-utils.js';
+import { iAmInGame } from '../services/context-utils.js';
 
 export type CurrentGame = {
     publicId: string;

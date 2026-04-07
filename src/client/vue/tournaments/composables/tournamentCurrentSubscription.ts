@@ -1,20 +1,14 @@
 import { t } from 'i18next';
 import { computed, Ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import Tournament from '../../../../shared/app/models/Tournament.js';
 import TournamentSubscription from '../../../../shared/app/models/TournamentSubscription.js';
-import useAuthStore from '../../../stores/authStore.js';
-import Player from '../../../../shared/app/models/Player.js';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import { apiDeleteTournamentSubscription, apiPutTournamentSubscription } from '../../../apiClient.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { Toast } from '../../../../shared/app/Toast.js';
 import useToastsStore from '../../../stores/toastsStore.js';
-
-const { loggedInPlayer } = storeToRefs(useAuthStore());
-
-const isMe = (player: Player): boolean => loggedInPlayer.value !== null && loggedInPlayer.value.publicId === player.publicId;
+import { isMe } from '../../../services/context-utils.js';
 
 export const getCurrentTournamentSubscription = (tournament: Tournament): null | TournamentSubscription => {
     for (const subscription of tournament.subscriptions) {

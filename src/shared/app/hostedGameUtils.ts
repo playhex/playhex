@@ -68,6 +68,20 @@ export const getOtherPlayer = (hostedGame: HostedGame, player: Player): null | P
 };
 
 /**
+ * Returns player in this game who is playing against player.
+ * @throws {Error} If player is not in the game, or game has not yet 2 players.
+ */
+export const getOtherPlayerStrict = (hostedGame: HostedGame, player: Player): Player => {
+    const otherPlayer = getOtherPlayer(hostedGame, player);
+
+    if (!otherPlayer) {
+        throw new Error('getOtherPlayerStrict(): no other player than provided player');
+    }
+
+    return otherPlayer;
+};
+
+/**
  * Returns player which is current turn to play.
  *
  * @returns {null | Player} Null if game is not playing.
@@ -80,6 +94,20 @@ export const getCurrentPlayer = (hostedGame: HostedGame): null | Player => {
     }
 
     return hostedGame.hostedGameToPlayers[currentPlayerIndex].player;
+};
+
+/**
+ * Whether it's player's turn to play.
+ * Also returns false if game is not in game, or player is null.
+ */
+export const isPlayerTurn = (hostedGame: HostedGame, player: null | Player): boolean => {
+    const currentPlayer = getCurrentPlayer(hostedGame);
+
+    if (player === null || currentPlayer === null) {
+        return false;
+    }
+
+    return currentPlayer.publicId === player.publicId;
 };
 
 export const getWinnerPlayer = (hostedGame: HostedGame): null | Player => {
@@ -129,6 +157,10 @@ export const getStrictLoserPlayer = (hostedGame: HostedGame): Player => {
     }
 
     return hostedGame.hostedGameToPlayers[1 - hostedGame.winner].player;
+};
+
+export const hasWon = (hostedGame: HostedGame, player: Player): boolean => {
+    return getWinnerPlayer(hostedGame)?.publicId === player.publicId;
 };
 
 export const isBotGame = (hostedGame: HostedGame): boolean => {

@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import HostedGame from '../../shared/app/models/HostedGame.js';
 import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
-import { addMove, canExplore, canPlayerUndo, getCurrentPlayer, getPlayer, getPlayerIndex, getPlayers, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, canExplore, canPlayerUndo, getPlayer, getPlayerIndex, getPlayers, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -620,17 +620,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     });
 
     const isMyTurn = computed(() => {
-        if (hostedGame.value === null || loggedInPlayer.value === null) {
+        if (hostedGame.value === null) {
             return false;
         }
 
-        const currentPlayer = getCurrentPlayer(hostedGame.value);
-
-        if (currentPlayer === null) {
-            return false;
-        }
-
-        return currentPlayer.publicId === loggedInPlayer.value.publicId;
+        return isPlayerTurn(hostedGame.value, loggedInPlayer.value);
     });
 
     /**

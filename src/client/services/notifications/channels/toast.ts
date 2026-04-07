@@ -2,7 +2,7 @@ import useToastsStore from '../../../../client/stores/toastsStore.js';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { Toast } from '../../../../shared/app/Toast.js';
-import { getOpponent, iAmInGame, isMe, viewingGame } from '../context-utils.js';
+import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { t } from 'i18next';
 

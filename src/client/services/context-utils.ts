@@ -1,7 +1,7 @@
-import { HostedGame, Player } from '../../../shared/app/models/index.js';
-import { getCurrentPlayer, getOtherPlayer, hasPlayer } from '../../../shared/app/hostedGameUtils.js';
-import useAuthStore from '../../stores/authStore.js';
-import router from '../../vue/router.js';
+import { HostedGame, Player } from '../../shared/app/models/index.js';
+import { getOtherPlayer, hasPlayer, isPlayerTurn } from '../../shared/app/hostedGameUtils.js';
+import useAuthStore from '../stores/authStore.js';
+import router from '../vue/router.js';
 
 export const hasFocus = () => document.hasFocus();
 
@@ -17,13 +17,8 @@ export const iAmInGame = (hostedGame: HostedGame): boolean => {
 
 export const isMyTurn = (hostedGame: HostedGame): boolean => {
     const { loggedInPlayer } = useAuthStore();
-    const currentPlayer = getCurrentPlayer(hostedGame);
 
-    if (loggedInPlayer === null || currentPlayer === null) {
-        return false;
-    }
-
-    return currentPlayer.publicId === loggedInPlayer.publicId;
+    return isPlayerTurn(hostedGame, loggedInPlayer);
 };
 
 export const getOpponent = (hostedGame: HostedGame): null | Player => {

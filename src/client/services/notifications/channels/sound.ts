@@ -1,4 +1,4 @@
-import { iAmInGame, isMe, isMyTurn, viewingGame } from '../context-utils.js';
+import { iAmInGame, isMe, isMyTurn, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
 import { getLoserPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
