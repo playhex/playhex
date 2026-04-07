@@ -107,10 +107,10 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
             initialPlayingGameFacade.getGameView(),
             initialPlayingGameFacade.getSwapAllowed(),
             this.mainLine,
-            false,
         );
 
         this.initialPlayingGameFacade.pauseView();
+        this.initialPlayingGameFacade.setLastMoveMarksVisible(false);
     }
 
     getPlayingGameFacade()
@@ -378,6 +378,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
     destroy(): void
     {
         this.resetSimulationAndRewind();
+        this.initialPlayingGameFacade.setLastMoveMarksVisible(true);
         this.initialPlayingGameFacade.resumeView();
         this.playingGameFacade.destroy();
     }
