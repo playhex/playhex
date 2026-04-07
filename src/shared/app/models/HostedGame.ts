@@ -42,7 +42,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
     publicId: string;
 
     /**
@@ -53,24 +53,24 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      * Player cannot join system game by itself.
      */
     @ManyToOne(() => Player, { nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Type(() => Player)
     host: null | Relation<Player>;
 
     @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
     @Type(() => HostedGameToPlayer)
     hostedGameToPlayers: HostedGameToPlayer[];
 
     @Column({ type: String, length: 15 })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     state: HostedGameState;
 
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Column()
     ranked: boolean;
 
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Column({ type: 'smallint' })
     boardsize: number;
 
@@ -81,7 +81,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      * 1: Opponent or bot begins
      */
     @Column({ type: 'smallint', nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     firstPlayer: null | 0 | 1;
 
     /**
@@ -89,14 +89,14 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      * Should be true by default for 1v1 games.
      */
     @Column()
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     swapRule: boolean;
 
     /**
      * Which opponent type I want.
      */
     @Column({ length: 15 })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     opponentType: 'player' | 'ai';
 
     /**
@@ -104,11 +104,11 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      * If it is a bot player, it will automatically join.
      */
     @ColumnUUID({ nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     opponentPublicId: null | string;
 
     @Column({ type: 'json' })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
         switch ((type?.object as HostedGame).timeControlType?.family) {
@@ -129,7 +129,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      * If disabled, this won't be possible: exploration, conditional moves, Hexworld link.
      */
     @Column({ default: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     explorationAllowed: boolean;
 
     @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
@@ -200,7 +200,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     rematchedFrom: null | HostedGame = null;
 
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
     @Type(() => Date)
     createdAt: Date;
 

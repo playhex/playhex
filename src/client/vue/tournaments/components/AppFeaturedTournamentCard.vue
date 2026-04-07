@@ -24,7 +24,10 @@ const {
 </script>
 
 <template>
-    <div class="card card-bg-icon border-warning mb-4">
+    <router-link
+        :to="{ name: 'tournament', params: { slug: tournament.slug } }"
+        class="card card-bg-icon text-decoration-none border-warning mb-4"
+    >
         <IconTrophy class="bg-trophy text-warning" />
         <div class="card-body">
             <h6 class="card-subtitle text-body-secondary">{{ $t('tournament') }}</h6>
@@ -40,22 +43,24 @@ const {
                 <!-- subscribe / ckeck-in / unsubscribe -->
                 <button
                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
-                    @click="subscribeCheckIn"
-                    class="btn btn-outline-info"
+                    @click.prevent="subscribeCheckIn"
+                    class="btn btn-sm btn-outline-info"
                 ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                 <button
                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
-                    @click="subscribeCheckIn"
+                    @click.prevent="subscribeCheckIn"
                     class="btn btn-success me-3"
                 >{{ $t('tournament_checkin') }}</button>
 
-                <p v-if="tournament.subscriptions.length > 0" class="card-text">
-                    <small>{{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}</small>
+                <!-- Current player status on this tournament -->
+                <p class="card-text mb-3">
+                    <AppMySubscriptionStatus :tournament />
                 </p>
 
-                <!-- Current player status on this tournament -->
-                <p><AppMySubscriptionStatus :tournament /></p>
+                <p v-if="tournament.subscriptions.length > 0" class="card-text">
+                    <small><IconPeopleFill /> {{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}</small>
+                </p>
             </template>
 
             <!-- Running -->
@@ -76,14 +81,8 @@ const {
                 <p class="m-0"><small>{{ $t('tournament_ordinal.1') }}</small></p>
                 <p class="lead">{{ tournament.participants.find(p => 1 === p.rank)?.player.pseudo }}</p>
             </template>
-
-            <router-link
-                :to="{ name: 'tournament', params: { slug: tournament.slug } }"
-            >
-                {{ $t('view_tournament') }}
-            </router-link>
         </div>
-    </div>
+    </router-link>
 </template>
 
 <style lang="stylus" scoped>

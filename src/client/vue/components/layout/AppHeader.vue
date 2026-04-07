@@ -97,7 +97,7 @@ const {
 </script>
 
 <template>
-    <nav class="navbar navbar-expand-sm bg-body-tertiary menu-top">
+    <nav class="navbar navbar-expand-sm bg-body-secondary menu-top shadow-sm">
         <div class="container-fluid">
 
             <!-- PlayHex -->

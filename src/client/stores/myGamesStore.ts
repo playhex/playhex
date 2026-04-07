@@ -49,13 +49,22 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         ;
     });
 
-    const byRemainingTime = (now: Date) => (game0: CurrentGame, game1: CurrentGame): number => {
+    const byMostUrgentFirst = (game0: CurrentGame, game1: CurrentGame): number => {
         if (game0.myColor === null || game1.myColor === null) {
             return 0;
         }
 
+        if (isBotGame(game0.hostedGame) !== isBotGame(game1.hostedGame)) {
+            return isBotGame(game0.hostedGame) ? 1 : -1;
+        }
+
+        if (game0.isMyTurn !== game1.isMyTurn) {
+            return game0.isMyTurn ? -1 : 1;
+        }
+
         const time0 = game0.hostedGame.timeControl?.players[game0.myColor].totalRemainingTime ?? Infinity;
         const time1 = game1.hostedGame.timeControl?.players[game1.myColor].totalRemainingTime ?? Infinity;
+        const now = new Date();
 
         return timeValueToMilliseconds(time0, now) - timeValueToMilliseconds(time1, now);
     };
@@ -64,13 +73,14 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         return game.hostedGame.state === 'playing';
     };
 
-    const isEmpty = (): boolean => {
-        for (const _ in myGames.value) {
-            return false;
-        }
+    const mySortedGames = computed((): CurrentGame[] => {
+        const playingGames = Object.values(myGames.value)
+            .filter(game => isPlaying(game))
+            .sort(byMostUrgentFirst)
+        ;
 
-        return true;
-    };
+        return playingGames;
+    });
 
     /**
      * Returns game id to redirect on when click on notification.
@@ -81,30 +91,11 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      * Or null if I have 0 current game.
      */
     const mostUrgentGame = computed((): null | CurrentGame => {
-        if (isEmpty()) {
-            return null;
-        }
-
-        const playingGames = Object.values(myGames.value)
-            .filter(game =>
-                isPlaying(game)
-                && !isBotGame(game.hostedGame),
-            )
-            .sort(byRemainingTime(new Date()))
+        const playingGames = mySortedGames.value
+            .filter(game => !isBotGame(game.hostedGame))
         ;
 
-        if (playingGames.length === 0) {
-            return null;
-        }
-
-        return playingGames
-
-            // My turn, less remaining time
-            .find(game => game.isMyTurn)
-
-            // Not my turn, but game is playing and less remaining time
-            ?? playingGames[0]
-        ;
+        return playingGames[0] ?? null;
     });
 
 
@@ -203,7 +194,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 leaveRoom(Rooms.playerGames(oldMe.publicId));
             }
             if (me != null) {
-                joinRoom(Rooms.playerGames(me.publicId));
+                void joinRoom(Rooms.playerGames(me.publicId));
             }
         },
         { immediate: true },
@@ -222,6 +213,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         myGamesCount,
         myTurnCount,
         mostUrgentGame,
+        mySortedGames,
     };
 });
 

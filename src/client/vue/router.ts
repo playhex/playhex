@@ -9,6 +9,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./pages/PageLobby.vue'),
     },
     {
+        name: 'home-old',
+        path: '/lobby-old',
+        component: () => import('./pages/PageLobbyOld.vue'),
+    },
+    {
         path: '/',
         component: () => import('./ReloadOnRouteChange.vue'),
         children: [

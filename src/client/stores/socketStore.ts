@@ -21,7 +21,10 @@ const useSocketStore = defineStore('socketStore', () => {
         autoConnect: false, // connect once player is logged in at least as guest
     });
 
-    const joinRoom = (room: string) => socket.emit('joinRoom', room);
+    const joinRoom = (room: string) => new Promise<void>(resolve => {
+        socket.emit('joinRoom', room, () => resolve());
+    });
+
     const leaveRoom = (room: string) => socket.emit('leaveRoom', room);
 
     const connected = ref(false);
@@ -42,7 +45,7 @@ const useSocketStore = defineStore('socketStore', () => {
         }
 
         reconnectSocket();
-        joinRoom(Rooms.player(player.publicId));
+        void joinRoom(Rooms.player(player.publicId));
     });
 
     socket.on('connect', () => {

@@ -123,7 +123,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         watchEffect(() => {
             if (socketStore.connected) {
-                socketStore.joinRoom(Rooms.game(gamePublicId));
+                void socketStore.joinRoom(Rooms.game(gamePublicId));
             }
         });
 

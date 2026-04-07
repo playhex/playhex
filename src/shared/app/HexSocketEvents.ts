@@ -15,8 +15,9 @@ export type HexClientToServerEvents = {
 
     /**
      * A player wants to join a room.
+     * answer is called when room is joined.
      */
-    joinRoom: (room: string) => void;
+    joinRoom: (room: string, answer: () => void) => void;
 
     /**
      * A player wants to leave a room.
@@ -63,6 +64,13 @@ export type HexClientToServerEvents = {
      *      and prevent displaying a shifted chrono in games.
      */
     getServerStatus: (answer: (serverStatus: { serverDate: Date }) => void) => void;
+
+    /**
+     * Message sent when requested by a game thumbnail.
+     *
+     * // TODO explain why requested and not join room
+     */
+    thumbnailGameUpdateRequest: (gameId: string, answer: (hostedGame: HostedGame | null) => void) => void;
 };
 
 export type HexServerToClientEvents = {
@@ -72,15 +80,28 @@ export type HexServerToClientEvents = {
     gameCreated: (hostedGame: HostedGame) => void;
 
     /**
+     * A game has been created.
+     * Just the info needed to display game on lobby
+     */
+    lobbyGameCreated: (hostedGame: HostedGame) => void;
+
+    /**
      * A player joined gameId.
      */
     gameJoined: (gameId: string, player: Player) => void;
 
     /**
      * Game has started.
-     * All info are sent again, with GameData.
+     * All info are sent again.
      */
     gameStarted: (hostedGame: HostedGame) => void;
+
+    /**
+     * Game has started.
+     * All info are sent again.
+     * Just the info needed to display game on lobby
+     */
+    lobbyGameStarted: (hostedGame: HostedGame) => void;
 
     /**
      * Game has been canceled.
@@ -166,8 +187,9 @@ export type HexServerToClientEvents = {
      * Opponent accepted or rejected undo request,
      * game has been updated server side, or not.
      * Undo request is over.
+     * First move in the undoneMoves array is the last move played in the history.
      */
-    answerUndo: (gameId: string, accept: boolean) => void;
+    answerUndo: (gameId: string, accept: boolean, undoneMoves: HexMove[]) => void;
 
     /**
      * Undo request has been automatically canceled
@@ -222,4 +244,10 @@ export type HexServerToClientEvents = {
 
     /** State for the `Rooms.playerGames` room. */
     playerGamesUpdate: (myGames: HostedGame[]) => void;
+
+    /**
+     * Message sent when joining featured games room.
+     * List of few games interesting to display on lobby.
+     */
+    featuredGamesUpdate: (publicIds: string[]) => void;
 };

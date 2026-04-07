@@ -1,0 +1,354 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import useLobbyStore from '../../stores/lobbyStore.js';
+import { useRouter } from 'vue-router';
+import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import { HostedGame } from '../../../shared/app/models/index.js';
+import AppSidebar from '../components/layout/AppSidebar.vue';
+import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
+import useAuthStore from '../../stores/authStore.js';
+import AppPseudo from '../components/AppPseudo.vue';
+import { IconEye, IconTrophy, IconTrophyFill, IconSearch, IconWifiOff, IconRocketTakeOff } from '../icons.js';
+import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
+import { useHead } from '@unhead/vue';
+import { formatDistanceToNowStrict } from 'date-fns';
+import { t } from 'i18next';
+import { canJoin, getPlayer, getStrictWinnerPlayer, getStrictLoserPlayer } from '../../../shared/app/hostedGameUtils.js';
+import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
+import { useConnectionLostPlayOfflineStore } from '../offline-lobby/stores/connectionLostPlayOfflineStore.js';
+import { useTutorialControls } from '../composables/tutorialControls.js';
+import AppCreateGameButtons from '../components/AppCreateGameButtons.vue';
+import { useCreateGameOverlay } from '../composables/useCreateGameOverlay.js';
+
+useHead({
+    title: t('lobby_title'),
+});
+
+const router = useRouter();
+const lobbyStore = useLobbyStore();
+
+/*
+ * Utils functions
+ */
+const isWaiting = (hostedGame: HostedGame) =>
+    hostedGame.state === 'created'
+;
+
+const isPlaying = (hostedGame: HostedGame) =>
+    hostedGame.state === 'playing'
+;
+
+const joinGame = async (hostedGame: HostedGame) => {
+    if (isGuestJoiningCorrepondence(hostedGame)) {
+        try {
+            await createGuestJoiningCorrepondenceWarningOverlay();
+        } catch (e) {
+            return;
+        }
+    }
+
+    try {
+        await lobbyStore.joinGame(hostedGame.publicId);
+    } catch (e) {
+        throw new Error('Could not join game: ' + e.message);
+    }
+
+    await router.push({
+        name: 'online-game',
+        params: {
+            gameId: hostedGame.publicId,
+        },
+    });
+};
+
+const isUncommonBoardsize = (hostedGame: HostedGame): boolean => {
+    const { boardsize } = hostedGame;
+
+    return boardsize < 9 || boardsize > 19;
+};
+
+// Sort games in the "current games" and "join a game" sections
+const gameComparator = (a: HostedGame, b: HostedGame): number => {
+    // All bots games are placed at the end. Correspondence games are placed
+    // after real-time games. The third factor is start time (if not existent,
+    // then creation time).
+
+    const botA = a.hostedGameToPlayers.some(p => p.player.isBot);
+    const botB = b.hostedGameToPlayers.some(p => p.player.isBot);
+
+    if (!botA && botB)
+        return -1;
+
+    if (botA && !botB)
+        return 1;
+
+    const timeA = timeControlToCadencyName(a);
+    const timeB = timeControlToCadencyName(b);
+
+    if (timeA !== 'correspondence' && timeB === 'correspondence')
+        return -1;
+
+    if (timeA === 'correspondence' && timeB !== 'correspondence')
+        return 1;
+
+    const startedAtA = a.startedAt;
+    const startedAtB = b.startedAt;
+
+    if (startedAtA != null && startedAtB != null)
+        return startedAtB.getTime() - startedAtA.getTime();
+
+    return b.createdAt.getTime() - a.createdAt.getTime();
+};
+
+/**
+ * Finished games
+ */
+const byEndedAt = (a: HostedGame, b: HostedGame): number => {
+    if (!a?.endedAt || !b?.endedAt) {
+        return 0;
+    }
+
+    return b.endedAt.getTime() - a.endedAt.getTime();
+};
+
+const {
+    createGameFromHash,
+} = useCreateGameOverlay();
+
+createGameFromHash();
+window.addEventListener('hashchange', () => createGameFromHash());
+
+/*
+ * Warning when guest joining correspondence game
+ */
+const {
+    createGuestJoiningCorrepondenceWarningOverlay,
+    isGuestJoiningCorrepondence,
+} = useGuestJoiningCorrespondenceWarning();
+
+// Display link "Play offline" when lose connection
+const { shouldDisplayPlayOffline } = storeToRefs(useConnectionLostPlayOfflineStore());
+
+/*
+ * Tutorial
+ */
+const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
+</script>
+
+<template>
+    <div class="container-fluid my-3">
+        <div class="row">
+            <div class="col-sm-8 col-md-9">
+
+                <!-- Tutorial -->
+                <div v-if="shouldDisplayLink" class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card mb-3 border-info">
+                            <div class="card-body">
+                                <button
+                                    class="btn btn-sm btn-outline-secondary float-end"
+                                    @click="dismissTutorial"
+                                    type="button"
+                                >✕ {{ $t('dismiss') }}</button>
+
+                                <h5 class="card-title">
+                                    {{ $t('tutorial.are_you_new_to_hex') }}
+                                </h5>
+
+                                <p>{{ $t('tutorial.learn_hex_in_1_minute') }}</p>
+
+                                <router-link
+                                    :to="{ name: 'tutorial' }"
+                                    class="btn btn-info"
+                                ><IconRocketTakeOff /> {{ $t('tutorial.label') }}</router-link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start">
+                    <h3>{{ $t('new_game') }}</h3>
+
+                    <router-link
+                        v-if="shouldDisplayPlayOffline"
+                        :to="{ name: 'offline-lobby' }"
+                        class="btn btn-sm btn-warning ms-3 d-sm-none"
+                    >
+                        <IconWifiOff />
+                        {{ $t('play_offline') }}
+                    </router-link>
+                </div>
+
+                <AppCreateGameButtons />
+
+                <h3>{{ $t('lobby.join_a_game') }}</h3>
+
+                <!--
+                    Created games
+                -->
+                <div v-if="Object.values(lobbyStore.hostedGames).some(isWaiting)" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col">{{ $t('game.host') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.rules') }}</th>
+                                <th scope="col">{{ $t('game.created') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isWaiting).sort(gameComparator)"
+                                :key="hostedGame.publicId"
+                            >
+                                <td>
+                                    <button
+                                        v-if="canJoin(hostedGame, useAuthStore().loggedInPlayer)"
+                                        class="btn me-3 btn-sm"
+                                        :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
+                                        @click="joinGame(hostedGame)"
+                                    >{{ $t('game.accept') }}</button>
+
+                                    <router-link
+                                        class="btn me-3 btn-sm btn-link"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
+                                    >{{ $t('game.watch') }}</router-link>
+                                </td>
+                                <td><span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span></td>
+                                <td>
+                                    <AppPseudo v-if="hostedGame.host" onlineStatus rating :player="hostedGame.host" />
+                                    <i v-else>System</i>
+                                </td>
+                                <td :class="isUncommonBoardsize(hostedGame) ? 'text-warning' : ''">{{ hostedGame.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
+                                <td><AppGameRulesSummary :gameOptions="hostedGame" /></td>
+                                <td>{{
+                                    formatDistanceToNowStrict(hostedGame.createdAt, { addSuffix: true })
+                                }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p v-else>{{ $t('lobby.no_waiting_games') }}</p>
+
+                <h4><IconEye /> {{ $t('lobby.watch_current_games') }}</h4>
+
+                <!--
+                    Currently playing games
+                -->
+                <div v-if="Object.values(lobbyStore.hostedGames).some(isPlaying)" class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col" class="d-none d-sm-table-cell">{{ $t('game.red') }}</th>
+                                <th scope="col" class="d-none d-sm-table-cell">{{ $t('game.blue') }}</th>
+                                <th scope="col" class="d-table-cell d-sm-none">{{ $t('players') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.started') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isPlaying).sort(gameComparator)"
+                                :key="hostedGame.publicId"
+                            >
+                                <td class="ps-0">
+                                    <router-link
+                                        class="btn btn-sm btn-link"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
+                                    >{{ $t('game.watch') }}</router-link>
+
+                                    <span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                </td>
+                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 0)!" /></td>
+                                <td class="d-none d-sm-table-cell"><AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" /></td>
+                                <td class="d-table-cell d-sm-none">
+                                    <AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 0)!" />
+                                    <br>
+                                    <AppPseudo rating onlineStatus :player="getPlayer(hostedGame, 1)!" />
+                                </td>
+                                <td>{{ hostedGame.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
+                                <td>{{
+                                    formatDistanceToNowStrict(hostedGame.startedAt ?? 0, { addSuffix: true })
+                                }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p v-else>{{ $t('lobby.no_playing_games') }}</p>
+
+                <h4><IconTrophy /> {{ $t('finished_games') }}</h4>
+
+                <!--
+                    Finished games
+                -->
+                <div v-if="Object.values(lobbyStore.endedHostedGames).length > 0" class="table-responsive">
+                    <table class="table" style="margin-bottom: 0">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">{{ $t('game.won') }}</th>
+                                <th scope="col">{{ $t('game.lost') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.finished') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="hostedGame in Object.values(lobbyStore.endedHostedGames).sort(byEndedAt)"
+                                :key="hostedGame.publicId"
+                            >
+                                <td class="ps-0">
+                                    <router-link
+                                        class="btn btn-sm btn-link"
+                                        :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
+                                    >{{ $t('game.review') }}</router-link>
+
+                                    <span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                </td>
+                                <template v-if="hostedGame.winner != null">
+                                    <td><AppPseudo rating onlineStatus :player="getStrictWinnerPlayer(hostedGame)" is="strong" /></td>
+                                    <td><AppPseudo rating onlineStatus :player="getStrictLoserPlayer(hostedGame)" classes="text-body-secondary" /></td>
+                                </template>
+                                <template v-else>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </template>
+                                <td>{{ hostedGame.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
+                                <td>{{
+                                    formatDistanceToNowStrict(hostedGame.endedAt ?? 0, { addSuffix: true })
+                                }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <router-link class="btn btn-link text-decoration-none" :to="{ name: 'games-archive' }">
+                        <IconSearch /> {{ $t('browse_all_ended_games') }}
+                    </router-link>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-3">
+                <AppSidebar />
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="stylus" scoped>
+h4
+    margin-top 1em
+
+tr
+    td:first-child, th:first-child
+        padding-left 0
+
+    td:last-child, th:last-child
+        padding-right 0
+</style>

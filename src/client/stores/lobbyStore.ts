@@ -1,16 +1,13 @@
-import { PlayerIndex } from '../../shared/game-engine/index.js';
-import { Outcome } from '../../shared/game-engine/Types.js';
 import { defineStore } from 'pinia';
-import { HostedGame, Player, ChatMessage } from '../../shared/app/models/index.js';
+import { HostedGame } from '../../shared/app/models/index.js';
 import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
-import { addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { cancelGame, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { notifier } from '../services/notifications/index.js';
-import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
-import useAuthStore from './authStore.js';
+import { isCorrespondence, isLive } from '../../shared/app/timeControlUtils.js';
 
 /**
  * State synced with server, and methods to handle games and players.
@@ -21,7 +18,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const { socket, joinRoom } = socketStore;
 
     /**
-     * List of active games, show on lobby in created and playing sections,
+     * List of games waiting for opponent, show on lobby in created section,
      * and keep track of updates.
      */
     const hostedGames = ref<{ [key: string]: HostedGame }>({});
@@ -31,6 +28,16 @@ const useLobbyStore = defineStore('lobbyStore', () => {
      * updates when an active game ends.
      */
     const endedHostedGames = ref<HostedGame[]>([]);
+
+    const currentLobby = ref<'live' | 'correspondence'>('live');
+
+    const currentLobbyHostedGames = computed<HostedGame[]>(() => {
+        if (currentLobby.value === 'live') {
+            return Object.values(hostedGames.value).filter(hostedGame => isLive(hostedGame));
+        } else {
+            return Object.values(hostedGames.value).filter(hostedGame => isCorrespondence(hostedGame));
+        }
+    });
 
     const getOrFetchHostedGame = async (gameId: string): Promise<null | HostedGame> => {
         return hostedGames.value[gameId] ?? await getGame(gameId);
@@ -80,42 +87,16 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             void updateLastEndedGames();
         });
 
-        socket.on('gameUpdate', (gameId, hostedGame) => {
-            if (hostedGame === null) {
-                return;
-            }
-
-            if (hostedGames.value[hostedGame.publicId]) {
-                updateHostedGame(hostedGames.value[hostedGame.publicId], hostedGame);
-            } else {
-                hostedGames.value[hostedGame.publicId] = hostedGame;
-            }
-        });
-
-        socket.on('gameCreated', (hostedGame: HostedGame) => {
+        socket.on('lobbyGameCreated', (hostedGame: HostedGame) => {
             hostedGames.value[hostedGame.publicId] = hostedGame;
         });
 
-        socket.on('gameJoined', (gameId: string, player: Player) => {
-            if (hostedGames.value[gameId]) {
-                addPlayer(hostedGames.value[gameId], player);
-            }
-        });
-
-        socket.on('gameStarted', (hostedGame: HostedGame) => {
+        socket.on('lobbyGameStarted', (hostedGame: HostedGame) => {
             if (hostedGames.value[hostedGame.publicId]) {
-                updateHostedGame(hostedGames.value[hostedGame.publicId], hostedGame);
-            } else {
-                hostedGames.value[hostedGame.publicId] = hostedGame;
+                delete hostedGames.value[hostedGame.publicId];
             }
 
             notifier.emit('gameStart', hostedGame);
-        });
-
-        socket.on('moved', (gameId, timestampedMove) => {
-            if (hostedGames.value[gameId]) {
-                notifier.emit('move', hostedGames.value[gameId], timestampedMove);
-            }
         });
 
         socket.on('gameCanceled', (gameId, { date }) => {
@@ -127,31 +108,6 @@ const useLobbyStore = defineStore('lobbyStore', () => {
                 delete hostedGames.value[gameId];
             }
         });
-
-        socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome, { date }) => {
-            if (hostedGames.value[gameId]) {
-                endGame(hostedGames.value[gameId], winner, outcome, date);
-
-                if (matchSearchParams(hostedGames.value[gameId], lastEndedGamesParameters)) {
-                    endedHostedGames.value.unshift(hostedGames.value[gameId]);
-                    endedHostedGames.value.pop();
-                }
-
-                notifier.emit('gameEnd', hostedGames.value[gameId]);
-
-                delete hostedGames.value[gameId];
-            }
-        });
-
-        socket.on('chat', (gameId: string, chatMessage: ChatMessage) => {
-            if (hostedGames.value[gameId]) {
-                if (!checkShadowDeleted(chatMessage, useAuthStore().loggedInPlayer)) {
-                    return;
-                }
-
-                notifier.emit('chatMessage', hostedGames.value[gameId], chatMessage);
-            }
-        });
     };
 
     // Listen lobby event to update state on change
@@ -159,12 +115,18 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     // Get lobby updates
     watchEffect(() => {
-        if (socketStore.connected) joinRoom(Rooms.lobby);
+        if (!socketStore.connected) {
+            return;
+        }
+
+        void joinRoom(Rooms.lobby);
     });
 
     return {
         hostedGames,
         endedHostedGames,
+        currentLobby,
+        currentLobbyHostedGames,
         joinGame,
         getOrFetchHostedGame,
     };

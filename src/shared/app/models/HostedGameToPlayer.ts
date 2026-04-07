@@ -17,7 +17,7 @@ export default class HostedGameToPlayer
     playerId: number;
 
     @ManyToOne(() => Player)
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
     player: Relation<Player>;
 
     @PrimaryColumn('smallint')
