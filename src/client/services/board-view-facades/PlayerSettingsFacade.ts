@@ -22,6 +22,13 @@ export class PlayerSettingsFacade
 
     constructor(
         private gameView: GameView,
+
+        /**
+         * If a setting is defined here, it will be used instead,
+         * and ignore player setting.
+         * Used for example to nether show coords in a small gameView, despite player settings.
+         */
+        private overrideSettings: Partial<PlayerSettings & LocalSettings> = {},
     ) {
         this.init();
     }
@@ -76,19 +83,29 @@ export class PlayerSettingsFacade
 
     updateOptionsFromPlayerSettings(playerSettings: PlayerSettings): void
     {
-        this.gameView.setDisplayCoords(playerSettings.showCoords);
-        this.anchor44Facade.show44Anchors(playerSettings.show44dots);
-        this.shadingPatternFacade.setShadingPattern(playerSettings.boardShadingPattern, playerSettings.boardShadingPatternIntensity, playerSettings.boardShadingPatternOption);
+        const settings = {
+            ...playerSettings,
+            ...this.overrideSettings,
+        };
+
+        this.gameView.setDisplayCoords(settings.showCoords);
+        this.anchor44Facade.show44Anchors(settings.show44dots);
+        this.shadingPatternFacade.setShadingPattern(settings.boardShadingPattern, settings.boardShadingPatternIntensity, settings.boardShadingPatternOption);
         this.autoOrientationFacade.setPreferredOrientations({
-            landscape: playerSettings.orientationLandscape,
-            portrait: playerSettings.orientationPortrait,
+            landscape: settings.orientationLandscape,
+            portrait: settings.orientationPortrait,
         });
     }
 
     updateOptionsFromPlayerLocalSettings(localSettings: LocalSettings): void
     {
+        const settings = {
+            ...localSettings,
+            ...this.overrideSettings,
+        };
+
         this.gameView.setTheme(themes[usePlayerLocalSettingsStore().displayedTheme()]);
-        this.autoOrientationFacade.setForcedOrientationMode(localSettings.forcedBoardOrientation);
+        this.autoOrientationFacade.setForcedOrientationMode(settings.forcedBoardOrientation);
     }
 
     getCurrentOrientationMode(): OrientationMode
