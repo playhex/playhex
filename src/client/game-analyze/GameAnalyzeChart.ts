@@ -3,12 +3,7 @@ import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/
 import { Theme, themes } from '../../shared/pixi-board/BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
-import GameView from '../../shared/pixi-board/GameView.js';
-import { BestMoveMark } from './BestMoveMark.js';
-import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { defer } from '../../shared/app/defer.js';
-import { validateMove, parseMove, Move } from '../../shared/move-notation/move-notation.js';
-import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 
 /**
  * Rectangle, but allow using negative height for better readability.
@@ -27,47 +22,32 @@ const rectWithNegative = (g: Graphics, x: number, y: number, width: number, heig
     g.rect(x, y, width, height);
 };
 
-export type MoveAndValue = {
-    move: HexMove;
-    value: number;
-    whiteWin?: number;
-};
-
-export type AnalyzeMoveOutput = {
-    moveIndex: number;
-    color: 'black' | 'white';
-    move: MoveAndValue;
-    bestMoves: MoveAndValue[];
-    whiteWin: number;
-};
-
-type GameAnalyzeViewEvents = {
+type GameAnalyzeChartEvents = {
     /**
      * Move is hovered, and is currently highlighted in this view.
      * Should show summary info of the move.
      */
-    highlightedMoveChanged: (move: null | AnalyzeMoveOutput) => void;
+    highlightedMoveChanged: (moveIndex: number) => void;
+
+    /**
+     * Move is selected (clicked).
+     */
+    moveSelected: (moveIndex: number) => void;
 };
 
-export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
+export class GameAnalyzeChart extends TypedEmitter<GameAnalyzeChartEvents>
 {
     private pixi: Application;
     private resizeObserver: null | ResizeObserver = null;
     private container: Container = new Container();
     private highlight: null | Graphics = null;
     private highlightedMove: null | number = null;
-    private selectedMove: null | number = null;
-    private bestMoveMark = new BestMoveMark();
-    private playedMoveMark = new PlayedMoveMark();
-    private gameView: null | GameView = null;
-    private showPositionAt: null | ((showPositionAt: number) => void) = null;
-    private currentlyFaded: null | Move = null;
 
     private initPromise = defer<void>();
 
     /**
-     * Element in which this gameView should fit.
-     * View will then auto fit when element size changes.
+     * Element in which this chart should fit.
+     * Chart will then auto fit when element size changes.
      * Element should have fixed size.
      */
     private containerElement: null | HTMLElement = null;
@@ -116,7 +96,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
     async mount(element: HTMLElement): Promise<void>
     {
         if (this.containerElement !== null) {
-            throw new Error('Game analyze view already mounted');
+            throw new Error('Game analyze chart already mounted');
         }
 
         this.containerElement = element;
@@ -187,7 +167,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         });
 
         if (this.highlightedMove !== null) {
-            this.highlightMove(this.highlightedMove, true);
+            this.setHighlightedMove(this.highlightedMove, true);
         }
 
         this.container.addChild(this.highlight);
@@ -207,106 +187,7 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         return this.containerElement.getBoundingClientRect();
     }
 
-    private fadePlayedMove(move: Move, byPlayerIndex: 0 | 1): void
-    {
-        if (!this.gameView) {
-            return;
-        }
-
-        if (this.currentlyFaded && this.gameView.getStone(this.currentlyFaded)?.isFaded()) {
-            this.gameView.setStone(this.currentlyFaded, null);
-        }
-
-        this.currentlyFaded = move;
-        this.gameView.setStone(this.currentlyFaded, byPlayerIndex, true);
-    }
-
-    showAnalysisMarks(move: null | AnalyzeMoveOutput): void
-    {
-        this.bestMoveMark.hide();
-        this.playedMoveMark.hide();
-
-        if (move === null) {
-            return;
-        }
-
-        if (this.showPositionAt) {
-            this.showPositionAt(move.moveIndex);
-        }
-
-        // Place best move
-        if (validateMove(move.bestMoves[0].move)) {
-            this.bestMoveMark.setCoords(parseMove(move.bestMoves[0].move));
-            this.bestMoveMark.show();
-        }
-
-        // Place played move and eval color
-        if (!validateMove(move.move.move)) {
-            return;
-        }
-
-        this.fadePlayedMove(move.move.move, move.color === 'black' ? 0 : 1);
-        this.playedMoveMark.setCoords(parseMove(move.move.move));
-
-        const playedWhiteWin = move.move.whiteWin;
-        const bestWhiteWin = move.bestMoves[0].whiteWin;
-
-        if (undefined !== playedWhiteWin && undefined !== bestWhiteWin) {
-            let diff = playedWhiteWin - bestWhiteWin;
-            diff *= 2; // drop 50% means full red
-
-            // Oppose value every two move, as it is whiteWin
-            if (move.moveIndex % 2) {
-                diff = -diff;
-            }
-
-            // Can be negative when player found a better move than cpu best move
-            if (diff < 0) {
-                diff = 0;
-            }
-
-            // Can be >1 when big mistake, because we multiply the diff
-            if (diff > 1) {
-                diff = 1;
-            }
-
-            this.playedMoveMark.setWhiteWinDiff(diff);
-        } else {
-            this.playedMoveMark.setWhiteWinDiff(0);
-        }
-
-        this.playedMoveMark.show();
-    }
-
-    /**
-     * Update game view cursor when selected an analyzed move,
-     * and update selected move when game view cursor changed.
-     */
-    linkGameViewCursor(gameView: GameView, showPositionAt: (showPositionAt: number) => void): void
-    {
-        this.gameView = gameView;
-        this.showPositionAt = showPositionAt;
-
-        this.playedMoveMark.hide();
-        this.bestMoveMark.hide();
-        gameView.addEntity(this.playedMoveMark, 'analyze');
-        gameView.addEntity(this.bestMoveMark, 'analyze');
-    }
-
-    selectMove(moveIndex: number): void
-    {
-        if (this.selectedMove === moveIndex) {
-            return;
-        }
-
-        this.highlightMove(moveIndex);
-
-        this.selectedMove = moveIndex;
-
-        this.showAnalysisMarks(this.analyze[moveIndex] ?? null);
-    }
-
-    private highlightMove(moveIndex: number, force = false): void
+    setHighlightedMove(moveIndex: number, force = false): void
     {
         if (this.highlight === null) {
             return;
@@ -320,8 +201,18 @@ export default class GameAnalyzeView extends TypedEmitter<GameAnalyzeViewEvents>
         this.highlight.visible = true;
         this.highlight.x = width * (moveIndex / this.analyze.length);
         this.highlightedMove = moveIndex;
+    }
 
-        this.emit('highlightedMoveChanged', this.analyze[moveIndex] ?? null);
+    private highlightMove(moveIndex: number): void
+    {
+        this.setHighlightedMove(moveIndex);
+        this.emit('highlightedMoveChanged', moveIndex);
+    }
+
+    private selectMove(moveIndex: number): void
+    {
+        this.highlightMove(moveIndex);
+        this.emit('moveSelected', moveIndex);
     }
 
     private destroyResizeObserver(): void
