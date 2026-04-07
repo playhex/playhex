@@ -106,6 +106,22 @@ export class PlayingGameFacade
     }
 
     /**
+     * Convert to 'swap-pieces' when trying to play on first move.
+     */
+    guessMove(move: HexMove): HexMove
+    {
+        if (this.moves.length === 1
+            && this.swapAllowed
+            && move === this.moves[0]
+            && move !== 'pass'
+        ) {
+            return 'swap-pieces';
+        }
+
+        return move;
+    }
+
+    /**
      * Play a move.
      *
      * @returns Whether move has been played, false if cell was already occupied.
@@ -114,13 +130,7 @@ export class PlayingGameFacade
      */
     addMove(move: HexMove): boolean
     {
-        if (this.moves.length === 1
-            && this.swapAllowed
-            && move === this.moves[0]
-            && move !== 'pass'
-        ) {
-            move = 'swap-pieces';
-        }
+        move = this.guessMove(move);
 
         if (move === 'swap-pieces') {
             if (this.moves.length !== 1) {

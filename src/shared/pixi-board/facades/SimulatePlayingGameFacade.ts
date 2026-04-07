@@ -1,6 +1,10 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import type { HexMove } from '../../move-notation/hex-move-notation.js';
+import { isSpecialHexMove, type HexMove } from '../../move-notation/hex-move-notation.js';
 import { PlayingGameFacade } from './PlayingGameFacade.js';
+import TextMark from '../entities/TextMark.js';
+import { mirrorMove, parseMove } from '../../move-notation/move-notation.js';
+import { BoardEntity } from '../BoardEntity.js';
+import GameView from '../GameView.js';
 
 type SimulatePlayingGameFacadeEvents = {
     /**
@@ -20,6 +24,8 @@ type SimulatePlayingGameFacadeEvents = {
     simulationCursorChanged: (index: number) => void;
 };
 
+const SIMULATION_NUMBERS_GROUP = 'simulation_numbers_group';
+
 /**
  * Rewind through a game history,
  * shows the game position at an earlier state.
@@ -34,6 +40,8 @@ type SimulatePlayingGameFacadeEvents = {
  */
 export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameFacadeEvents>
 {
+    private gameView: GameView;
+
     /**
      * Board position when simulation was started.
      */
@@ -70,6 +78,11 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
      */
     private playingGameFacade: PlayingGameFacade;
 
+    /**
+     * Keep track of numbers added to remove when rewind.
+     */
+    private numberEntities: BoardEntity[] = [];
+
     constructor(
         /**
          * The PlayingGameFacade to rewind from.
@@ -86,6 +99,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
     ) {
         super();
 
+        this.gameView = initialPlayingGameFacade.getGameView();
         this.mainLine = [...this.initialPlayingGameFacade.getMoves()];
         this.mainCursor = this.mainLine.length;
 
@@ -93,10 +107,10 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
             initialPlayingGameFacade.getGameView(),
             initialPlayingGameFacade.getSwapAllowed(),
             this.mainLine,
+            false,
         );
 
         this.initialPlayingGameFacade.pauseView();
-        this.initialPlayingGameFacade.setLastMoveMarksVisible(false);
     }
 
     getPlayingGameFacade()
@@ -149,6 +163,8 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
                 if (this.simulationCursor === 0 && this.mainCursor < this.mainLine.length) {
                     this.simulationLine = [];
                 }
+
+                this.removeLastNumber();
             } else {
                 --this.mainCursor;
             }
@@ -190,6 +206,7 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
             ) {
                 if (this.simulationCursor < this.simulationLine.length) {
                     this.playingGameFacade.addMove(this.simulationLine[this.simulationCursor]);
+                    this.addNumber(this.simulationLine[this.simulationCursor], this.simulationCursor + 1);
                     ++this.simulationCursor;
                 }
 
@@ -217,6 +234,39 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
         emitEventsIfCursorChanged();
     }
 
+    private addNumber(move: HexMove, number: number): void
+    {
+        if (move === 'pass') {
+            return;
+        }
+
+        if (move === 'swap-pieces') {
+            const firstMove = this.playingGameFacade.getMoves()[0];
+
+            if (!firstMove || isSpecialHexMove(firstMove)) {
+                throw new Error('Unexpected first move not just coordinates');
+            }
+
+            move = mirrorMove(firstMove);
+        }
+
+        const mark = new TextMark(String(number)).setCoords(parseMove(move));
+
+        this.gameView.addEntity(mark, SIMULATION_NUMBERS_GROUP);
+        this.numberEntities.push(mark);
+    }
+
+    private removeLastNumber(): void
+    {
+        const lastNumber = this.numberEntities.pop();
+
+        if (!lastNumber) {
+            return;
+        }
+
+        this.gameView.removeEntity(lastNumber);
+    }
+
     /**
      * Add a move in simulation line.
      * If no simulation line yet, start a new one from the board position we are currently rewinded.
@@ -224,9 +274,13 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
      */
     addSimulationMove(move: HexMove): boolean
     {
+        move = this.playingGameFacade.guessMove(move);
+
         if (!this.playingGameFacade.addMove(move)) {
             return false;
         }
+
+        this.addNumber(move, this.simulationCursor + 1);
 
         // if rewinded in simulation and add another move,
         // delete next moves from previous simulation line first.
@@ -325,7 +379,6 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
     {
         this.resetSimulationAndRewind();
         this.initialPlayingGameFacade.resumeView();
-        this.initialPlayingGameFacade.setLastMoveMarksVisible();
         this.playingGameFacade.destroy();
     }
 }
