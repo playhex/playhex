@@ -86,10 +86,10 @@ const resources: Resource[] = [
         link: 'https://discord.gg/59SJ9KwvVq',
         link_show: 'discord.gg/59SJ9KwvVq',
         title: 'Hex Discord Server',
-        subTitle: 'Discord server with ~200 Hex players',
+        subTitle: 'A community for the game of Hex',
         illustration: { icon: IconDiscord },
         paragraph: [
-            'To talk to other Hex players, see tournaments or events related to Hex.',
+            'Talk to other Hex players, see tournaments or events related to Hex.',
         ],
     },
     {
