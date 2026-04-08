@@ -3,8 +3,8 @@ import HostedGameServer from '../HostedGameServer.js';
 import { Player, ChatMessage, HostedGame, HostedGameOptions, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
 import HostedGamePersister from '../persistance/HostedGamePersister.js';
+import { RoomsHostedGame } from '../../shared/app/RoomsHostedGame.js';
 import logger from '../services/logger.js';
-import Rooms from '../../shared/app/Rooms.js';
 import { HexServer } from '../server.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
@@ -20,6 +20,7 @@ import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
+import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 
 export class GameError extends Error {}
 
@@ -205,10 +206,7 @@ export default class HostedGameRepository
             const newRatings = await this.updateRatings(hostedGameServer);
 
             Container.get(HexServer)
-                .to([
-                    Rooms.game(hostedGameServer.getPublicId()),
-                    Rooms.lobby,
-                ])
+                .to(RoomsHostedGame.ratingsUpdated(hostedGameServer.getHostedGame()))
                 .emit(
                     'ratingsUpdated',
                     hostedGameServer.getPublicId(),
@@ -264,6 +262,14 @@ export default class HostedGameRepository
     getActiveGamesData(): HostedGame[]
     {
         return Object.values(this.activeGames)
+            .map(game => game.getHostedGame())
+        ;
+    }
+
+    getActive1v1GamesData(): HostedGame[]
+    {
+        return Object.values(this.activeGames)
+            .filter(game => !isBotGame(game.getHostedGame()))
             .map(game => game.getHostedGame())
         ;
     }
@@ -336,7 +342,7 @@ export default class HostedGameRepository
 
         logger.info('Hosted game created.', { host: params.host?.pseudo ?? null, publicId: hostedGame.publicId });
 
-        Container.get(HexServer).to(Rooms.lobby).emit('gameCreated', hostedGame);
+        Container.get(HexServer).to(RoomsHostedGame.gameCreated(hostedGame)).emit('gameCreated', hostedGame);
 
         if (createOptions.aiJoinAuto ?? true) {
             await this.makeAIJoinGameIfApplicable(hostedGameServer, params);
@@ -439,7 +445,7 @@ export default class HostedGameRepository
             }
         }
 
-        Container.get(HexServer).to(Rooms.game(game.publicId))
+        Container.get(HexServer).to(RoomsHostedGame.rematchAvailable(game))
             .emit('rematchAvailable', game.publicId, game.rematch.publicId);
 
         return game.rematch;
@@ -632,7 +638,7 @@ export default class HostedGameRepository
 
         notifier.emit('chatMessage', hostedGame, chatMessage);
 
-        Container.get(HexServer).to(Rooms.game(publicId)).emit('chat', publicId, chatMessage);
+        Container.get(HexServer).to(RoomsHostedGame.chat(hostedGame)).emit('chat', publicId, chatMessage);
 
         return true;
     }

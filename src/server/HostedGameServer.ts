@@ -4,7 +4,6 @@ import { ChatMessage, Player, HostedGameToPlayer, HostedGame, Premove } from '..
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
 import baseLogger from './services/logger.js';
-import Rooms from '../shared/app/Rooms.js';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl.js';
 import { createTimeControl } from '../shared/time-control/createTimeControl.js';
 import { canPassAgain } from '../shared/app/passUtils.js';
@@ -22,6 +21,7 @@ import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
 import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
 import type { HexMove } from '../shared/move-notation/hex-move-notation.js';
+import { RoomsHostedGame } from '../shared/app/RoomsHostedGame.js';
 
 type HostedGameEvents = {
     played: () => void;
@@ -181,26 +181,6 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     getState(): HostedGameState
     {
         return this.hostedGame.state;
-    }
-
-    /**
-     * Returns rooms where a message from this hosted game should be emitted.
-     */
-    private gameRooms(withLobby = false): string[]
-    {
-        const rooms = [
-            Rooms.game(this.getPublicId()),
-        ];
-
-        if (withLobby) {
-            rooms.push(Rooms.lobby);
-        }
-
-        this.players.forEach(player =>
-            rooms.push(Rooms.playerGames(player.publicId)),
-        );
-
-        return rooms;
     }
 
     /**
@@ -431,8 +411,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         game.on('played', (timestampedMove, moveIndex, byPlayerIndex) => {
             this.saveState();
 
-            this.io.to(this.gameRooms()).emit('moved', this.getPublicId(), timestampedMove, moveIndex, byPlayerIndex);
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
+            this.io.to(RoomsHostedGame.moved(this.hostedGame)).emit('moved', this.getPublicId(), timestampedMove, moveIndex, byPlayerIndex);
+            this.io.to(RoomsHostedGame.timeControlUpdate(this.hostedGame)).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
             if (!game.isEnded()) {
                 this.makeAutomatedMoves().catch(e => {
@@ -475,8 +455,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.hostedGame.state = 'ended';
         this.hostedGame.outcome = outcome;
 
-        this.io.to(this.gameRooms(true)).emit('ended', this.getPublicId(), winner, outcome, { date });
-        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
+        this.io.to(RoomsHostedGame.gameEnded(this.hostedGame)).emit('ended', this.getPublicId(), winner, outcome, { date });
+        this.io.to(RoomsHostedGame.timeControlUpdate(this.hostedGame)).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
         this.logger.info('Game ended.', { winner, outcome });
 
@@ -530,8 +510,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.bindTimeControl();
 
-        this.io.to(this.gameRooms(true)).emit('gameStarted', instanceToPlain(this.getHostedGame()));
-        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
+        this.io.to(RoomsHostedGame.gameStarted(this.hostedGame)).emit('gameStarted', instanceToPlain(this.getHostedGame()));
+        this.io.to(RoomsHostedGame.timeControlUpdate(this.hostedGame)).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
         this.logger.info('Game Started.', { startedAt: this.hostedGame.startedAt });
 
@@ -675,7 +655,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.players.push(player);
 
-        this.io.to(this.gameRooms(true)).emit('gameJoined', this.getPublicId(), player);
+        this.io.to(RoomsHostedGame.gameJoined(this.hostedGame)).emit('gameJoined', this.getPublicId(), player);
 
         this.logger.info('Player joined.', { joiner: player.pseudo });
 
@@ -801,7 +781,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         hostedGame.undoRequest = playerIndex;
-        this.io.to(this.gameRooms()).emit('askUndo', this.getPublicId(), playerIndex);
+        this.io.to(RoomsHostedGame.askUndo(this.hostedGame)).emit('askUndo', this.getPublicId(), playerIndex);
 
         this.makeAIAnswerUndoIfApplicable().catch(e => {
             this.logger.error('Error in makeAIAnswerUndoIfApplicable()', errorToLogger(e));
@@ -858,12 +838,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         const playerUndoing = this.players[hostedGame.undoRequest];
         this.saveGameState();
         hostedGame.undoRequest = null;
-        this.io.to(this.gameRooms()).emit('answerUndo', this.getPublicId(), accept);
+        this.io.to(RoomsHostedGame.answerUndo(this.hostedGame)).emit('answerUndo', this.getPublicId(), accept);
 
         if (accept) {
             this.timeControl.setValues(timeControlAfterUndo!.getValues(), now);
             hostedGame.timeControl = this.timeControl.getValues();
-            this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), hostedGame.timeControl);
+            this.io.to(RoomsHostedGame.timeControlUpdate(this.hostedGame)).emit('timeControlUpdate', this.getPublicId(), hostedGame.timeControl);
 
             if (!isBotGame(this.hostedGame)) {
                 this.postSystemChatMessage(
@@ -889,7 +869,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         if (playerIndex === this.hostedGame.undoRequest) {
             this.hostedGame.undoRequest = null;
-            this.io.to(this.gameRooms()).emit('cancelUndo', this.getPublicId());
+            this.io.to(RoomsHostedGame.cancelUndo(this.hostedGame)).emit('cancelUndo', this.getPublicId());
         }
     }
 
@@ -990,8 +970,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.hostedGame.state = 'canceled';
         this.hostedGame.endedAt = date;
 
-        this.io.to(this.gameRooms(true)).emit('gameCanceled', this.getPublicId(), { date });
-        this.io.to(this.gameRooms()).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
+        this.io.to(RoomsHostedGame.gameCanceled(this.hostedGame)).emit('gameCanceled', this.getPublicId(), { date });
+        this.io.to(RoomsHostedGame.timeControlUpdate(this.hostedGame)).emit('timeControlUpdate', this.getPublicId(), this.timeControl.getValues());
 
         this.logger.info('hosted game server canceled', { date });
 
@@ -1045,7 +1025,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.logger.info('Chat message posted', { gamePublicId: this.getPublicId(), author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
         this.hostedGame.chatMessages.push(chatMessage);
         notifier.emit('chatMessage', this.hostedGame, chatMessage);
-        this.io.to(this.gameRooms()).emit('chat', this.getPublicId(), chatMessage);
+        this.io.to(RoomsHostedGame.chat(this.hostedGame)).emit('chat', this.getPublicId(), chatMessage);
         this.emit('chat');
     }
 

@@ -34,12 +34,8 @@ const isWaiting = (hostedGame: HostedGame) =>
     hostedGame.state === 'created'
 ;
 
-const isPlayingHuman = (hostedGame: HostedGame) =>
-    hostedGame.state === 'playing' && hostedGame.opponentType === 'player'
-;
-
-const isFinishedHuman = (hostedGame: HostedGame) =>
-    hostedGame.state === 'ended' && hostedGame.opponentType === 'player'
+const isPlaying = (hostedGame: HostedGame) =>
+    hostedGame.state === 'playing'
 ;
 
 const joinGame = async (hostedGame: HostedGame) => {
@@ -243,7 +239,7 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
                 <!--
                     Currently playing games
                 -->
-                <div v-if="Object.values(lobbyStore.hostedGames).some(isPlayingHuman)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.hostedGames).some(isPlaying)" class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
@@ -258,7 +254,7 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isPlayingHuman).sort(gameComparator)"
+                                v-for="hostedGame in Object.values(lobbyStore.hostedGames).filter(isPlaying).sort(gameComparator)"
                                 :key="hostedGame.publicId"
                             >
                                 <td class="ps-0">
@@ -292,7 +288,7 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
                 <!--
                     Finished games
                 -->
-                <div v-if="Object.values(lobbyStore.endedHostedGames).some(isFinishedHuman)" class="table-responsive">
+                <div v-if="Object.values(lobbyStore.endedHostedGames).length > 0" class="table-responsive">
                     <table class="table" style="margin-bottom: 0">
                         <thead>
                             <tr>
@@ -306,7 +302,7 @@ const { shouldDisplayLink, dismissTutorial } = useTutorialControls();
                         </thead>
                         <tbody>
                             <tr
-                                v-for="hostedGame in Object.values(lobbyStore.endedHostedGames).filter(isFinishedHuman).sort(byEndedAt)"
+                                v-for="hostedGame in Object.values(lobbyStore.endedHostedGames).sort(byEndedAt)"
                                 :key="hostedGame.publicId"
                             >
                                 <td class="ps-0">
