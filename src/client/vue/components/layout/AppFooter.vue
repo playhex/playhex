@@ -18,7 +18,7 @@ i18n.on('languageChanged', () => {
 </script>
 
 <template>
-    <div class="container-fluid py-3 footer bg-dark-subtle">
+    <div class="container-fluid py-3 footer bg-body-tertiary">
         <div class="d-flex justify-content-center gap-4">
             <p>{{ seo.title }}</p>
         </div>
@@ -66,7 +66,6 @@ i18n.on('languageChanged', () => {
 
 <style lang="stylus" scoped>
 .footer
-    opacity 0.8
     font-size 0.9em
 
     a
