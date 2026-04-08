@@ -1,4 +1,4 @@
-import { Expression, Parser } from 'expr-eval';
+import { Expression, Parser } from 'expr-eval-fork';
 import { ShadingPatternInterface } from './ShadingPatternInterface.js';
 import { distToSide } from './utils.js';
 
