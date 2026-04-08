@@ -12,7 +12,6 @@ import logger from './services/logger.js';
 import { addSessionMiddlewares } from './services/security/middlewares.js';
 import monitorConnectedSockets from './services/monitorConnectedSockets.js';
 import { initTimeControl } from './services/initTimeControl.js';
-import { enableSwaggerStats } from './swagger-stats/enableSwaggerStats.js';
 import TournamentRepository from './repositories/TournamentRepository.js';
 import { initAutoCancelStaleGames } from './services/auto-cancel-stale-games/init.js';
 
@@ -36,7 +35,6 @@ const io = new HexServer(server, {
     },
 });
 
-enableSwaggerStats(app);
 addSessionMiddlewares(app, io);
 socketIoAdminUi(io);
 monitorConnectedSockets();
