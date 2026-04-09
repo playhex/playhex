@@ -227,7 +227,8 @@
         "accept": "Принять отмену",
         "reject": "Отклонить",
         "takeback_request_denied": "",
-        "player_takeback_his_move": ""
+        "player_takeback_his_move": "",
+        "player_wants_to_takeback": ""
     },
     "ping": {
         "ping_ms": "Пинг: {{ms}}мс",
@@ -528,7 +529,9 @@
         "rating": "По рейтингу",
         "rating_help": "Игроки распределяются с учётом их рейтинга. Если есть места с авто пропуском во второй раунд, их получают более сильные игроки",
         "random": "",
-        "title": ""
+        "title": "",
+        "rating_random_help": "",
+        "rating_random": ""
     },
     "resign_confirm_overlay": {
         "cancelLabel": "",
