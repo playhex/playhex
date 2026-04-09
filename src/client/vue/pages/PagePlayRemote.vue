@@ -193,6 +193,7 @@ const cancel = async (): Promise<void> => {
  * Rematch
  */
 const canAcceptRematch: Ref<boolean> = ref(false);
+const rematchRequestOngoing = ref(false);
 
 watchEffect(() => {
     if (!hostedGame.value) return;
@@ -211,20 +212,27 @@ const createOrAcceptRematch = async (): Promise<void> => {
     const rematchId = hostedGame.value.rematch?.publicId ?? null;
     let hostedGameRematch: null | HostedGame = null;
 
-    if (rematchId != null) {
-        hostedGameRematch = await lobbyStore.getOrFetchHostedGame(rematchId);
-        if (hostedGameRematch == null) {
-            throw new Error('A rematch game does not exist');
+    try {
+        rematchRequestOngoing.value = true;
+
+        if (rematchId != null) {
+            hostedGameRematch = await lobbyStore.getOrFetchHostedGame(rematchId);
+
+            if (hostedGameRematch == null) {
+                throw new Error('A rematch game does not exist');
+            }
+        } else {
+            hostedGameRematch = await apiPostRematch(hostedGame.value.publicId);
         }
-    } else {
-        hostedGameRematch = await apiPostRematch(hostedGame.value.publicId);
+    } finally {
+        rematchRequestOngoing.value = false;
     }
 
-    if (loggedInPlayer && canJoin(hostedGameRematch, loggedInPlayer.value)) {
+    if (canJoin(hostedGameRematch, loggedInPlayer.value)) {
         await lobbyStore.joinGame(hostedGameRematch.publicId);
     }
 
-    void router.push({
+    await router.push({
         name: 'online-game',
         params: {
             gameId: hostedGameRematch.publicId,
@@ -384,14 +392,14 @@ const {
                     </button>
 
                     <!-- Rematch -->
-                    <button type="button" class="btn btn-outline-primary" v-if="canRematch" @click="createOrAcceptRematch()">
+                    <button type="button" class="btn btn-outline-primary" v-if="canRematch" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
                         <IconRepeat />
                         <span class="hide-sm">{{ ' ' + $t('rematch.label') }}</span>
                     </button>
 
                     <!-- Accept / View rematch -->
                     <template v-else-if="hostedGame.rematch?.publicId">
-                        <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()">
+                        <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
                             {{ ' ' + $t('rematch.accept') }}
                         </button>
                         <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGame.rematch.publicId } }" class="btn btn-outline-primary">
