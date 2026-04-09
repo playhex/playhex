@@ -30,8 +30,7 @@
         "title_your_turn": "Din tur!",
         "duration": "Varighed",
         "title": "Spil",
-        "info": "Info",
-        "title_waiting": ""
+        "info": "Info"
     },
     "game_rules": {
         "normal": "normal",
@@ -64,8 +63,7 @@
         "periods_time": "Periodetid",
         "fast": "Hurtig",
         "normal": "Normal",
-        "long": "Lang",
-        "capped_abbreviation": ""
+        "long": "Lang"
     },
     "i_play": {
         "title": "Jeg spiller",
@@ -128,8 +126,7 @@
         "best_move": "bedste træk",
         "best": "bedste:",
         "how_it_works": "Sådan fungerer det",
-        "request_analysis": "Anmod om AI analyse",
-        "available": ""
+        "request_analysis": "Anmod om AI analyse"
     },
     "try_again": "Prøv igen",
     "yes": "Ja",
@@ -224,10 +221,7 @@
     "undo": {
         "undo_move": "Fortryd",
         "accept": "Accepter fortrydelse",
-        "reject": "Afvis",
-        "takeback_request_denied": "",
-        "player_takeback_his_move": "",
-        "player_wants_to_takeback": ""
+        "reject": "Afvis"
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -281,16 +275,11 @@
     },
     "game_state": {
         "created": "Oprettet",
-        "ended": "Afsluttet",
-        "canceled": "",
-        "playing": ""
+        "ended": "Afsluttet"
     },
     "conditional_moves": {
         "clear_inactive_lines": "Ryd inaktive linjer",
-        "inactive_lines": "Inaktive linjer",
-        "title_short": "",
-        "cut_move": "",
-        "title": ""
+        "inactive_lines": "Inaktive linjer"
     },
     "username_not_an_email_warning": "Hej, det ser ud til, at du indtaster din e-mail, men PlayHex behøver kun et brugernavn. Din e-mail ville være offentligt synlig…",
     "save": "Gem",
@@ -400,8 +389,7 @@
         "started": "Turneringen er startet!",
         "match_ended": "Kamp {{ round }}.{{ number }} er afsluttet: {{ winnerPseudo }} vandt over {{ loserPseudo }}.",
         "match_canceled_recreated": "Kamp {{ round }}.{{ number }} blev genskabt efter aflysning.",
-        "ended": "Turneringen er afsluttet.",
-        "changed_admins": ""
+        "ended": "Turneringen er afsluttet."
     },
     "tournament_player_is_banned": "Udelukket fra denne turnering",
     "tournament_account_required": "Denne turnering kræver en konto. Gæster er ikke tilladt. Log ind eller opret en konto.",
@@ -413,149 +401,5 @@
     "explore": "Udforsk",
     "friendly": "Venskabelig",
     "moves": "Træk",
-    "force_board_orientation_mode": "Tving brættet til at vises i landskab eller portræt for denne skærm",
-    "bot_games": "",
-    "resign_confirm_overlay": {
-        "cancelLabel": "",
-        "title": "",
-        "message": "",
-        "confirmLabel": ""
-    },
-    "tournament_admins": "",
-    "dismiss": "",
-    "tournament_seeding_methods": {
-        "rating": "",
-        "random": "",
-        "rating_help": "",
-        "title": "",
-        "random_help": "",
-        "rating_random_help": "",
-        "rating_random": ""
-    },
-    "hex_tournament_paris": {
-        "title": "",
-        "read_more": ""
-    },
-    "notification": {
-        "you_won": "",
-        "you_lost": ""
-    },
-    "preferred_board_sizes": "",
-    "tutorial": {
-        "center_too_strong_open_sides": "",
-        "red_has_strong_advantage": "",
-        "join_hex_discord": "",
-        "you_play_blue_swap_it": "",
-        "you_can_also": "",
-        "hex_is_simple_and_has_two_rules": "",
-        "rule_2_swap": "",
-        "not_swapped": "",
-        "red_weak_dont_get_swapped": "",
-        "are_you_new_to_hex": "",
-        "on_first_turn_blue_can_swap": "",
-        "do_some_puzzle_credits": "",
-        "stones_are_played_this_way": "",
-        "red_strong_get_swapped": "",
-        "do_some_puzzle_desc": "",
-        "swap_rule_keeps_games_balanced": "",
-        "swapped": "",
-        "what_should_i_learn_now": "",
-        "read_strategy_guide": "",
-        "demo_0_step_lets_play": "",
-        "label": "",
-        "play_vs_ai_desc": "",
-        "congrats_you_know_play_hex": "",
-        "so_red_should_open_fair_move": "",
-        "demo_0_step_example": "",
-        "learn_hex_in_1_minute": "",
-        "swap_lost": "",
-        "demo_0_step_congrats": "",
-        "play_1v1": "",
-        "do_some_puzzle_button": "",
-        "each_player_place_a_stone": "",
-        "what_is_a_fair_opening_move": "",
-        "swap_won": "",
-        "to_win_you_must_connect_with_path": "",
-        "show_swap_map": "",
-        "rule_1_connect_your_sides": "",
-        "stones_are_never_removed": "",
-        "play_vs_ai_button": "",
-        "what_to_do_next": "",
-        "swap_map_explain": "",
-        "we_use_swap_rule": "",
-        "swap_map_credits": ""
-    },
-    "losers_bracket": "",
-    "no_notifications": "",
-    "allow_exploration_help": "",
-    "friendly_games": "",
-    "move_settings": {
-        "title": ""
-    },
-    "allow_exploration": "",
-    "player_loses_reason": {
-        "time": "",
-        "resign": "",
-        "default": "",
-        "path": "",
-        "forfeit": ""
-    },
-    "new_game_vs_ai": "",
-    "pass_confirm_overlay": {
-        "title": "",
-        "message": "",
-        "confirmLabel": "",
-        "cancelLabel": ""
-    },
-    "pseudo_not_existing": "",
-    "n_total_games_one": "",
-    "n_total_games_other": "",
-    "game_created_short": "",
-    "player_sent_you_rematch_offer": "",
-    "continue_game_vs_x": "",
-    "handicap": {
-        "none": "",
-        "handicap_for_player": "",
-        "title": ""
-    },
-    "invalid_password": "",
-    "premove": {
-        "title": "",
-        "description": ""
-    },
-    "muted": {
-        "off": "",
-        "on": ""
-    },
-    "go_to_the_game": "",
-    "connection_lost": "",
-    "pseudo_too_long": "",
-    "notifications_misc": "",
-    "tournament_slug_duplicate": "",
-    "ranked_games": "",
-    "admins_one": "",
-    "admins_other": "",
-    "invalid_pseudo": "",
-    "overall": "",
-    "game_against_player": "",
-    "notifications": "",
-    "previous": "",
-    "pseudo_already_taken": "",
-    "restart": "",
-    "offline": "",
-    "game_created_by_system_time_ago": "",
-    "no_yet_data": "",
-    "total_played_games": "",
-    "mark_all_as_read": "",
-    "player_sent_rematch_offer": "",
-    "play_offline": "",
-    "spectator_joined": "",
-    "back_to_menu": "",
-    "how_to_play_hex": "",
-    "must_be_logged_in_as_guest": "",
-    "password_changed_success": "",
-    "tournament_unsubscribe": "",
-    "spectator_left": "",
-    "pseudo_too_short": "",
-    "player_passed_his_turn": ""
+    "force_board_orientation_mode": "Tving brættet til at vises i landskab eller portræt for denne skærm"
 }
