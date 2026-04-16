@@ -314,6 +314,10 @@ export const canPlayerUndo = (hostedGame: HostedGame, playerIndex: 0 | 1): boole
  * Should be disabled in playing games, though watchers may want to use Hexworld.
  */
 export const canExportGame = (hostedGame: HostedGame, player: Player): boolean => {
+    if (isBotGame(hostedGame)) {
+        return true;
+    }
+
     // Cannot export if I cannot explore in-game
     if (!canExplore(hostedGame, player)) {
         return false;
@@ -346,6 +350,10 @@ export const canExportGame = (hostedGame: HostedGame, player: Player): boolean =
 export const canExplore = (hostedGame: HostedGame, player: Player): boolean => {
     // Always possible if enabled
     if (hostedGame.explorationAllowed) {
+        return true;
+    }
+
+    if (isBotGame(hostedGame)) {
         return true;
     }
 
