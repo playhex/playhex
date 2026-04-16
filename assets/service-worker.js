@@ -157,7 +157,7 @@ self.addEventListener('fetch', event => {
 
         // console.log({ cachePolicy, hit: result.hit }, event.request.method, event.request.url);
 
-        return result.response;
+        return result.response ?? new Response(null, { status: 503, statusText: 'Service Unavailable' });
     })());
 });
 
