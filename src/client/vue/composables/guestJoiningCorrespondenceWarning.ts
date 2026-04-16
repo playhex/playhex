@@ -1,9 +1,9 @@
 import { defineOverlay } from '@overlastic/vue';
 import { storeToRefs } from 'pinia';
 import { HostedGame } from '../../../shared/app/models/index.js';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAuthStore from '../../stores/authStore.js';
 import GuestJoiningCorrepondenceWarningOverlay from '../components/overlay/GuestJoiningCorrepondenceWarningOverlay.vue';
+import { isCorrespondence } from '../../../shared/app/timeControlUtils.js';
 
 export const useGuestJoiningCorrespondenceWarning = () => {
     /*
@@ -22,7 +22,7 @@ export const useGuestJoiningCorrespondenceWarning = () => {
             return false;
         }
 
-        if (loggedInPlayer.value.isGuest && timeControlToCadencyName(hostedGame) === 'correspondence') {
+        if (loggedInPlayer.value.isGuest && isCorrespondence(hostedGame)) {
             return true;
         }
 

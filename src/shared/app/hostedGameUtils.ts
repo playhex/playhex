@@ -2,7 +2,7 @@ import { HostedGame, HostedGameToPlayer, Player, Rating } from './models/index.j
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
-import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
+import { isCorrespondence, TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 import { GameData } from '../game-engine/normalization.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
@@ -171,10 +171,6 @@ export const is1v1Game = (hostedGame: HostedGame): boolean => {
     return hostedGame.opponentType === 'player';
 };
 
-export const isCorrespondenceGame = (hostedGame: HostedGame): boolean => {
-    return timeControlToCadencyName(hostedGame) === 'correspondence';
-};
-
 /**
  * Update local hosted game data from HostedGame received data
  */
@@ -329,7 +325,7 @@ export const canExportGame = (hostedGame: HostedGame, player: Player): boolean =
     }
 
     // Correspondence games are allowed
-    if (timeControlToCadencyName(hostedGame) === 'correspondence') {
+    if (isCorrespondence(hostedGame)) {
         return true;
     }
 

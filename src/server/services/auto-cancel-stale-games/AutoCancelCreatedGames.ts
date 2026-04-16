@@ -4,9 +4,9 @@ import HostedGameRepository from '../../repositories/HostedGameRepository.js';
 import OnlinePlayersService from '../OnlinePlayersService.js';
 import Player from '../../../shared/app/models/Player.js';
 import { timings } from './timings.js';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import { isPlayingAndEmpty } from './utils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
+import { isLive } from '../../../shared/app/timeControlUtils.js';
 
 type AutoCancelCreatedGamesEvents = {
     playerDiconnectedForTooLong: (player: Player) => void;
@@ -62,7 +62,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
                 && hostedGame.host
                 && !this.onlinePlayersService.isOnline(hostedGame.host)
                 && !hostedGame.tournamentMatch
-                && timeControlToCadencyName(hostedGame) !== 'correspondence'
+                && isLive(hostedGame)
             ) {
                 this.onPlayerDisconnect(hostedGame.host);
             }
@@ -96,7 +96,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
                 && hostedGame.host
                 && hostedGame.host.publicId === player.publicId
                 && !hostedGame.tournamentMatch
-                && timeControlToCadencyName(hostedGame) !== 'correspondence'
+                && isLive(hostedGame)
             ) {
                 logger.info('Auto cancel created games: cancel waiting or empty game because host left', {
                     hostedGamePublicId: hostedGame.publicId,

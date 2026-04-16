@@ -1,9 +1,10 @@
 import HostedGameServer from '../../HostedGameServer.js';
-import { is1v1Game, isBotGame, isCorrespondenceGame } from '../../../shared/app/hostedGameUtils.js';
+import { is1v1Game, isBotGame } from '../../../shared/app/hostedGameUtils.js';
 import { no, StaleEvaluatorResult, yes } from './StaleEvaluatorResult.js';
 import { Service } from 'typedi';
 import { timings } from './timings.js';
 import { isPlayingAndEmpty, isTimingPast } from './utils.js';
+import { isCorrespondence } from '../../../shared/app/timeControlUtils.js';
 
 /**
  * Take a single game, and evaluates, from its state,
@@ -38,7 +39,7 @@ export class GameStaleEvaluator
         }
 
         // 1v1, correspondence, empty
-        if (is1v1Game(hostedGame) && isCorrespondenceGame(hostedGame) && isPlayingAndEmpty(hostedGameServer)) {
+        if (is1v1Game(hostedGame) && isCorrespondence(hostedGame) && isPlayingAndEmpty(hostedGameServer)) {
             const lastActivityAt = game?.getLastMoveAt()
                 ?? game?.getStartedAt()
                 ?? hostedGameServer.getHostedGame().createdAt
@@ -51,7 +52,7 @@ export class GameStaleEvaluator
             return no('1v1 correspondence empty, but timing still ok', { lastActivityAt });
         }
 
-        if (is1v1Game(hostedGame) && !isCorrespondenceGame(hostedGame)) {
+        if (is1v1Game(hostedGame) && !isCorrespondence(hostedGame)) {
 
             // 1v1, live, empty
             if (isPlayingAndEmpty(hostedGameServer)) {
@@ -72,7 +73,7 @@ export class GameStaleEvaluator
             is1v1: is1v1Game(hostedGame),
             isBot: isBotGame(hostedGame),
             isPlayingAndEmpty: isPlayingAndEmpty(hostedGameServer),
-            isCorrepondence: isCorrespondenceGame(hostedGame),
+            isCorrepondence: isCorrespondence(hostedGame),
         });
     }
 }

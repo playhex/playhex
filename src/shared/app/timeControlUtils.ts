@@ -59,6 +59,20 @@ export const timeControlToCadencyName = (timeControlBoardsize: TimeControlBoards
 };
 
 /**
+ * Whether a game is playing live (or blitz), not correspondence
+ */
+export const isLive = (timeControlBoardsize: TimeControlBoardsize): boolean => {
+    return timeControlToCadencyName(timeControlBoardsize) !== 'correspondence';
+};
+
+/**
+ * Whether a game is playing correspondence
+ */
+export const isCorrespondence = (timeControlBoardsize: TimeControlBoardsize): boolean => {
+    return timeControlToCadencyName(timeControlBoardsize) === 'correspondence';
+};
+
+/**
  * Show seconds like time. For in game elapsing time.
  * "5:02", "1h06", "1d 5h"
  *

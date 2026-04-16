@@ -7,7 +7,7 @@ import { CannotStartTournamentMatchError, NotEnoughParticipantsToStartTournament
 import { Service } from 'typedi';
 import { Tournament, TournamentMatch } from '../../../shared/app/models/index.js';
 import { PlayerIndex } from '../../../shared/game-engine/Types.js';
-import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
+import { isCorrespondence } from '../../../shared/app/timeControlUtils.js';
 import logger from '../../services/logger.js';
 import { glicko2Settings } from '../../../shared/app/ratingUtils.js';
 import { gaussianRandom } from '../../../shared/app/utils.js';
@@ -336,7 +336,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
 
         // Ignore correspondence tournaments
-        if (timeControlToCadencyName(tournament) === 'correspondence') {
+        if (isCorrespondence(tournament)) {
             return;
         }
 
