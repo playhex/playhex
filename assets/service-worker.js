@@ -1,5 +1,15 @@
+const CACHE_NAME = 'cache';
+
 self.addEventListener('install', () => {
-    // noop
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(keys =>
+            Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+        )
+    );
 });
 
 const CachePolicy = {
@@ -26,14 +36,6 @@ const CachePolicy = {
      * Used for bundled js (as they have unique filename), images
      */
     CACHE_FIRST: 'cache first',
-
-    /**
-     * First returns response from cache,
-     * then update if network available.
-     *
-     * Like CACHE_FIRST, but still update resource for next call.
-     */
-    CACHE_AND_UPDATE: 'cache and update',
 };
 
 /**
@@ -85,7 +87,7 @@ const cacheResponse = async (request, response) => {
         return;
     }
 
-    const cache = await caches.open('cache');
+    const cache = await caches.open(CACHE_NAME);
     cache.put(request, response);
 };
 
@@ -104,15 +106,14 @@ const retrieveResponse = async (request, cachePolicy) => {
             try {
                 return { response: await fetch(request), hit: false };
             } catch (e) {
+                return { response: new Response(null, { status: 503, statusText: 'Service Unavailable' }), hit: false };
             }
         }
-
-            break;
 
         case CachePolicy.NETWORK_FIRST: {
             try {
                 const response = await fetch(request);
-                cacheResponse(request, response.clone());
+                await cacheResponse(request, response.clone());
 
                 return { response, hit: false };
             } catch (e) {
@@ -122,9 +123,9 @@ const retrieveResponse = async (request, cachePolicy) => {
                     return { response: cachedResponse, hit: true };
                 }
             }
-        }
 
             break;
+        }
 
         case CachePolicy.CACHE_FIRST: {
             try {
@@ -135,37 +136,14 @@ const retrieveResponse = async (request, cachePolicy) => {
                 }
 
                 const response = await fetch(request);
-                cacheResponse(request, response.clone());
+                await cacheResponse(request, response.clone());
 
                 return { response, hit: false };
             } catch (e) {
             }
-        }
 
             break;
-
-        case CachePolicy.CACHE_AND_UPDATE: {
-            try {
-                const cachedResponse = await caches.match(request);
-
-                if (cachedResponse) {
-                    fetch(request)
-                        .then(response => cacheResponse(request, response.clone()))
-                        .catch(() => { /* noop, no problem */ })
-                    ;
-
-                    return { response: cachedResponse, hit: true };
-                }
-
-                const response = await fetch(request);
-                cacheResponse(request, response.clone());
-
-                return { response, hit: false };
-            } catch (e) {
-            }
         }
-
-            break;
     }
 
     return { response: undefined, hit: false };
@@ -209,9 +187,11 @@ self.addEventListener('push', (event) => {
 // Keep track url changes in clients, because client.url is the url when the tab was created.
 const clientUpdatedUrls = {};
 
-self.addEventListener('message', (event) => {
+self.addEventListener('message', async (event) => {
     if (event.data?.type === 'ROUTE_UPDATE') {
         clientUpdatedUrls[event.source.id] = event.data.url;
+        const windowClients = await clients.matchAll({ type: 'window' });
+        cleanClientUpdatedUrls(windowClients);
     }
 });
 
@@ -229,7 +209,6 @@ const cleanClientUpdatedUrls = windowClients => {
 
     for (const clientId in clientUpdatedUrls) {
         if (!stillOpenClientIds[clientId]) {
-            self.console.log('delete', clientId);
             delete clientUpdatedUrls[clientId];
         }
     }
@@ -274,7 +253,7 @@ self.addEventListener('notificationclick', event => {
                 const clientUrl = clientUpdatedUrls[client.id] ?? client.url;
 
                 // If so, just focus it.
-                if (goToPath !== null && clientUrl.includes(goToPath) && 'focus' in client) {
+                if (goToPath && clientUrl.includes(goToPath) && 'focus' in client) {
                     return client.focus();
                 }
 
@@ -290,7 +269,7 @@ self.addEventListener('notificationclick', event => {
             }
 
             // navigate to the url in the focused client
-            if (goToPath !== null) {
+            if (goToPath) {
                 focusedClient.postMessage({ type: 'NAVIGATE', goToPath });
             }
         }),
