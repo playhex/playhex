@@ -3,10 +3,10 @@ import Player from '../../../shared/app/models/Player.js';
 import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
-import { glicko2Settings, isRatingConfident } from '../../../shared/app/ratingUtils.js';
 import usePlayersStore from '../../stores/playersStore.js';
 import { ref } from 'vue';
 import { watchEffect } from 'vue';
+import AppPlayerRating from './AppPlayerRating.vue';
 
 const props = defineProps({
     player: {
@@ -42,7 +42,6 @@ const props = defineProps({
     },
 });
 
-const { round } = Math;
 const p = ref();
 watchEffect(() => {
     p.value = usePlayersStore().playerRef(props.player);
@@ -65,14 +64,7 @@ watchEffect(() => {
             <!-- adds an invisible space between username and rating to make copy/paste and functionnal tests more readable -->
             <span class="small">&nbsp;</span>
 
-            <small class="text-body-secondary ms-2 d-inline-block">
-                <template v-if="'full' === rating">
-                    {{ round(p.currentRating?.rating ?? glicko2Settings.rating) }} ±{{ round((p.currentRating?.deviation ?? glicko2Settings.rd) * 2) }}
-                </template>
-                <template v-else>
-                    <template v-if="p.currentRating ? !isRatingConfident(p.currentRating) : true">~</template>{{ round(p.currentRating?.rating ?? glicko2Settings.rating) }}
-                </template>
-            </small>
+            <AppPlayerRating :player="p" :full="rating === 'full'" class="ms-2" />
         </template>
     </RouterLink>
 </template>
