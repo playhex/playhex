@@ -76,7 +76,7 @@ export function pwaRouter(): Router {
                 {
                     src: '/images/screenshots/game-narrow.png',
                     type: 'image/png',
-                    sizes: '1080x2172',
+                    sizes: '1491x2436',
                     form_factor: 'narrow',
                     label: 'Play Hex',
                 },
@@ -112,7 +112,7 @@ export function pwaRouter(): Router {
                 {
                     src: '/images/logo-monochrome.png',
                     type: 'image/png',
-                    sizes: '96x96',
+                    sizes: '256x256',
                     purpose: 'monochrome',
                 },
                 {
