@@ -6,7 +6,7 @@ import { TimeControlBoardsize } from './models/TimeControlBoardsize.js';
  * Returns average seconds per move
  * for a given time control and a board size.
  */
-export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boardsize: number): number => {
+export const calcAverageSecondsPerMove = (timeControlBoardsize: TimeControlBoardsize): number => {
     /**
      * "A typical hex game fills about one-third of the board."
      *      -- from https://trmph.com/hexwiki/Basic_strategy_guide.html
@@ -14,9 +14,9 @@ export const calcAverageSecondsPerMove = (timeControlType: TimeControlType, boar
      * Another relevant thread:
      * https://littlegolem.net/jsp/forum/topic2.jsp?forum=50&topic=809
      */
-    const averageMoves = boardsize ** 2 / 6;
+    const averageMoves = timeControlBoardsize.boardsize ** 2 / 6;
 
-    const { family: type, options } = timeControlType;
+    const { family: type, options } = timeControlBoardsize.timeControlType;
 
     switch (type) {
         case 'fischer':
@@ -41,10 +41,7 @@ export type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
  * given its time control and board size.
  */
 export const timeControlToCadencyName = (timeControlBoardsize: TimeControlBoardsize): TimeControlCadencyName => {
-    const averageSecondsPerMove = calcAverageSecondsPerMove(
-        timeControlBoardsize.timeControlType,
-        timeControlBoardsize.boardsize,
-    );
+    const averageSecondsPerMove = calcAverageSecondsPerMove(timeControlBoardsize);
 
     if (averageSecondsPerMove < 10) {
         return 'blitz';

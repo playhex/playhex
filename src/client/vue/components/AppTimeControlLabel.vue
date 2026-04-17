@@ -50,7 +50,7 @@ const cadency = timeControlToCadencyName(props.timeControlBoardsize);
 
         <template v-if="showAverage">
             <span>&nbsp;</span>
-            <small class="text-body-secondary d-none d-sm-inline">(~{{ msToDuration(1000 * Math.round(calcAverageSecondsPerMove(timeControlBoardsize.timeControlType, timeControlBoardsize.boardsize)), 1) }}&nbsp;/&nbsp;{{ $t('move') }})</small>
+            <small class="text-body-secondary d-none d-sm-inline">(~{{ msToDuration(1000 * Math.round(calcAverageSecondsPerMove(timeControlBoardsize)), 1) }}&nbsp;/&nbsp;{{ $t('move') }})</small>
         </template>
     </span>
 </template>

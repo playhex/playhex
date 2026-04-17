@@ -10,44 +10,56 @@ describe('timeControlUtils', () => {
          */
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'fischer',
-                options: {
-                    initialTime: 300000,
-                    timeIncrement: 10000,
+                timeControlType: {
+                    family: 'fischer',
+                    options: {
+                        initialTime: 300000,
+                        timeIncrement: 10000,
+                    },
                 },
-            }, 6),
+                boardsize: 6,
+            }),
             60,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'fischer',
-                options: {
-                    initialTime: 300000,
-                    timeIncrement: 1000,
+                timeControlType: {
+                    family: 'fischer',
+                    options: {
+                        initialTime: 300000,
+                        timeIncrement: 1000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             13.5,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'fischer',
-                options: {
-                    initialTime: 0,
-                    timeIncrement: 1000,
+                timeControlType: {
+                    family: 'fischer',
+                    options: {
+                        initialTime: 0,
+                        timeIncrement: 1000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             1,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'fischer',
-                options: {
-                    initialTime: 240000,
+                timeControlType: {
+                    family: 'fischer',
+                    options: {
+                        initialTime: 240000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             10,
         );
 
@@ -56,61 +68,76 @@ describe('timeControlUtils', () => {
          */
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'byoyomi',
-                options: {
-                    initialTime: 100000,
-                    periodsCount: 2,
-                    periodTime: 20000,
+                timeControlType: {
+                    family: 'byoyomi',
+                    options: {
+                        initialTime: 100000,
+                        periodsCount: 2,
+                        periodTime: 20000,
+                    },
                 },
-            }, 6),
+                boardsize: 6,
+            }),
             40,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'byoyomi',
-                options: {
-                    initialTime: 300000,
-                    periodsCount: 4,
-                    periodTime: 10000,
+                timeControlType: {
+                    family: 'byoyomi',
+                    options: {
+                        initialTime: 300000,
+                        periodsCount: 4,
+                        periodTime: 10000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             23.75,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'byoyomi',
-                options: {
-                    initialTime: 0,
-                    periodsCount: 1,
-                    periodTime: 12000,
+                timeControlType: {
+                    family: 'byoyomi',
+                    options: {
+                        initialTime: 0,
+                        periodsCount: 1,
+                        periodTime: 12000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             12,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'byoyomi',
-                options: {
-                    initialTime: 0,
-                    periodsCount: 3,
-                    periodTime: 12000,
+                timeControlType: {
+                    family: 'byoyomi',
+                    options: {
+                        initialTime: 0,
+                        periodsCount: 3,
+                        periodTime: 12000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             13,
         );
 
         assert.strictEqual(
             calcAverageSecondsPerMove({
-                family: 'byoyomi',
-                options: {
-                    initialTime: 240000,
-                    periodsCount: 0,
-                    periodTime: 12000,
+                timeControlType: {
+                    family: 'byoyomi',
+                    options: {
+                        initialTime: 240000,
+                        periodsCount: 0,
+                        periodTime: 12000,
+                    },
                 },
-            }, 12),
+                boardsize: 12,
+            }),
             10,
         );
     });
