@@ -10,8 +10,22 @@ import ServerStatusWebsocketController from './ServerStatusWebsocketController.j
 
 export interface WebsocketControllerInterface
 {
-    onConnection(socket: HexSocket): void;
+    /**
+     * A client socket just connected.
+     * Can be used to listen this socket in case it emits event to server
+     * that this controller should handle (custom event, disconnect, ...)
+     */
+    onConnection?(socket: HexSocket): void;
+
+    /**
+     * Socket joined a given room.
+     * Can be used to emit a message with initial data.
+     */
     onJoinRoom?(socket: HexSocket, room: string): void;
+
+    /**
+     * Socket left a given room.
+     */
     onLeaveRoom?(socket: HexSocket, room: string): void;
 }
 
@@ -30,7 +44,7 @@ export function registerWebsocketControllers() {
 
     io.on('connection', socket => {
         websocketControllers.forEach(websocketController => {
-            websocketController.onConnection(socket);
+            websocketController.onConnection?.(socket);
         });
     });
 
