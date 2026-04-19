@@ -26,7 +26,7 @@ const removeUnwantedJs = (manifest: ManifestType): void => {
 
 const getManifestFromWebpack = async (): Promise<ManifestType> => {
     const response = await fetch(`http://localhost:${WEBPACK_PORT}/statics/manifest.json`);
-    const manifest: ManifestType = await response.json();
+    const manifest = await response.json() as ManifestType;
 
     removeUnwantedJs(manifest);
 

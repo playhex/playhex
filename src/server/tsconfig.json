@@ -7,6 +7,9 @@
         "types": [
             "node"
         ],
+        "lib": [
+            "ES2024"
+        ],
         "importHelpers": true,
         "noErrorTruncation": true
     },

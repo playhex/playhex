@@ -1,3 +1,4 @@
+import { type PushSubscription } from 'web-push';
 import { Service } from 'typedi';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, JsonController, Post, Put } from 'routing-controllers';
@@ -25,7 +26,7 @@ export default class PushController
     @Put('/api/push-subscriptions')
     postSubscription(
         @AuthenticatedPlayer() player: Player,
-        @Body() pushSubscriptionJSON: PushSubscriptionJSON,
+        @Body() pushSubscriptionJSON: PushSubscription,
     ) {
         const playerPushSubscription = new PlayerPushSubscription();
 

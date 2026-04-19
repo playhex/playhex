@@ -101,7 +101,7 @@ export default class HexAiApiClient
             body: JSON.stringify(payload),
         });
 
-        return await response.json();
+        return await response.json() as GameAnalyzeData;
     }
 
     async getPeersStatus(): Promise<PeerStatusData>
@@ -122,7 +122,7 @@ export default class HexAiApiClient
                 throw new Error(`HEX_AI_API returned status ${response.status}`);
             }
 
-            return await response.json();
+            return await response.json() as PeerStatusData;
         } catch (e) {
             throw new Error(`HEX_AI_API error: ${e.message}`);
         }
