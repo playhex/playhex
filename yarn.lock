@@ -3111,7 +3111,7 @@
   resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.69.tgz#6b849bf370a1f29c78bd3aeba8e84c1150b237f2"
   integrity sha512-RPmm6kgRbI8e98zSD3RVACvnuktIja5+yLgDAkTmxLr90BEwdTXRQWNLF3ETTTyH/8mKhznZuN5AveXYFEsMGQ==
 
-"@xmldom/xmldom@^0.8.11":
+"@xmldom/xmldom@^0.8.12":
   version "0.8.13"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.13.tgz#00d1dd940b218dff2e49309d410d8bb212159225"
   integrity sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==
@@ -6964,15 +6964,15 @@ pinia@^3.0.4:
   dependencies:
     "@vue/devtools-api" "^7.7.7"
 
-pixi.js@8.17.1:
-  version "8.17.1"
-  resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-8.17.1.tgz#57881d7e7015e523fc1bc12d8f62010ec82d4588"
-  integrity sha512-OB4TpZHrP5RYy+7FqmFrAc0IHRhfOoNIfF4sVeinvK3aG1r2pYrSMneJAKi9+WvGKC70Dj7GEpZ2OZGB6o/xdg==
+pixi.js@^8.18.1:
+  version "8.18.1"
+  resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-8.18.1.tgz#952a528d31a20355383f46e7aeb0653927a262e2"
+  integrity sha512-6LUPWYgulZhp/w4kam2XHXB0QedISZIqrJbRdHLLQ3csn5a38uzKxAp6B5j6s89QFYaIJbg95kvgTRcbgpO1ow==
   dependencies:
     "@pixi/colord" "^2.9.6"
     "@types/earcut" "^3.0.0"
     "@webgpu/types" "^0.1.69"
-    "@xmldom/xmldom" "^0.8.11"
+    "@xmldom/xmldom" "^0.8.12"
     earcut "^3.0.2"
     eventemitter3 "^5.0.1"
     gifuct-js "^2.1.2"
@@ -7527,10 +7527,10 @@ sass-loader@^16.0.6:
   dependencies:
     neo-async "^2.6.2"
 
-sass@1.98.0:
-  version "1.98.0"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.98.0.tgz#924ce85a3745ccaccd976262fdc1bc0c13aa8e57"
-  integrity sha512-+4N/u9dZ4PrgzGgPlKnaaRQx64RO0JBKs9sDhQ2pLgN6JQZ25uPQZKQYaBJU48Kd5BxgXoJ4e09Dq7nMcOUW3A==
+sass@^1.99.0:
+  version "1.99.0"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.99.0.tgz#ff9d1594da4886249dfaafabbeea2dea2dc74b26"
+  integrity sha512-kgW13M54DUB7IsIRM5LvJkNlpH+WhMpooUcaWGFARkF1Tc82v9mIWkCbCYf+MBvpIUBSeSOTilpZjEPr2VYE6Q==
   dependencies:
     chokidar "^4.0.0"
     immutable "^5.1.5"
