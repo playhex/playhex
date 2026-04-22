@@ -37,6 +37,67 @@ describe('Chat', () => {
         cy.contains('.chat-messages .text-body', 'Guest 7614').should('not.visible');
     });
 
+    describe('shadow deleted messages', () => {
+        it('hides shadow deleted messages from other players', () => {
+            cy.mockSocketIO();
+            // Logged in as "aaa", not the author of the shadow-deleted message (author is "6569")
+            cy.intercept('/api/auth/me-or-guest', {
+                fixture: 'game/me-or-guest.json',
+            });
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+            cy.contains('Loading game…');
+            cy.receiveGameUpdate('chat/game-playing-shadow-deleted.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-messages', 'Hello, I am a watcher');
+            cy.contains('.chat-messages', "Hello, ready. Let's play");
+            cy.contains('.chat-messages', 'This message was shadow deleted').should('not.exist');
+        });
+
+        it('shows shadow deleted messages to the message author', () => {
+            cy.mockSocketIO();
+            // Intercept as a guest player with publicId matching "6569" (author of the shadow-deleted message)
+            cy.intercept('/api/auth/me-or-guest', {
+                body: {
+                    pseudo: '6569',
+                    publicId: '77c251cb-16f6-4150-97ff-10f8814dcd8f',
+                    isGuest: true,
+                    isBot: false,
+                    slug: '6569',
+                    createdAt: '2024-03-05T12:48:22.885Z',
+                },
+            });
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+            cy.contains('Loading game…');
+            cy.receiveGameUpdate('chat/game-playing-shadow-deleted.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-messages', 'Hello, I am a watcher');
+            cy.contains('.chat-messages', "Hello, ready. Let's play");
+            cy.contains('.chat-messages', 'This message was shadow deleted');
+        });
+
+        it('shows normal messages to all players', () => {
+            cy.mockSocketIO();
+            cy.intercept('/api/auth/me-or-guest', {
+                fixture: 'game/me-or-guest.json',
+            });
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+            cy.contains('Loading game…');
+            cy.receiveGameUpdate('chat/game-playing-shadow-deleted.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-messages', 'Hello, I am a watcher');
+            cy.contains('.chat-messages', "Hello, ready. Let's play");
+        });
+    });
+
     it('shows chat message length limit when I am about to reach it, instead of crashing when sending a too long message', () => {
         cy.mockSocketIO();
         cy.intercept('/api/auth/me-or-guest', {

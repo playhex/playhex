@@ -1,0 +1,116 @@
+{
+    "publicId": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "pseudo": "aaa",
+        "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "aaa",
+        "createdAt": "2024-03-05T10:16:32.291Z"
+    },
+    "hostedGameToPlayers": [
+        {
+            "player": {
+                "pseudo": "aaa",
+                "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aaa",
+                "createdAt": "2024-03-05T10:16:32.291Z"
+            }
+        },
+        {
+            "player": {
+                "pseudo": "6569",
+                "publicId": "77c251cb-16f6-4150-97ff-10f8814dcd8f",
+                "isGuest": true,
+                "isBot": false,
+                "slug": "6569",
+                "createdAt": "2024-03-05T12:48:22.885Z"
+            }
+        }
+    ],
+    "timeControl": {
+        "state": "running",
+        "currentPlayer": 1,
+        "players": [
+            {
+                "totalRemainingTime": 600000
+            },
+            {
+                "totalRemainingTime": "2024-03-05T13:00:23.189Z"
+            }
+        ]
+    },
+    "boardsize": 11,
+    "firstPlayer": null,
+    "swapRule": true,
+    "opponentType": "player",
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
+        }
+    },
+    "chatMessages": [
+        {
+            "content": "Hello, I am a watcher",
+            "shadowDeleted": false,
+            "player": {
+                "pseudo": "7614",
+                "publicId": "926972b7-a222-45d1-8a77-5c75c2a29b27",
+                "isGuest": true,
+                "isBot": false,
+                "slug": "7614",
+                "createdAt": "2024-03-05T12:47:49.606Z"
+            },
+            "createdAt": "2024-03-05T12:48:06.651Z"
+        },
+        {
+            "content": "This message was shadow deleted",
+            "shadowDeleted": true,
+            "player": {
+                "pseudo": "6569",
+                "publicId": "77c251cb-16f6-4150-97ff-10f8814dcd8f",
+                "isGuest": true,
+                "isBot": false,
+                "slug": "6569",
+                "createdAt": "2024-03-05T12:48:22.885Z"
+            },
+            "createdAt": "2024-03-05T12:48:49.210Z"
+        },
+        {
+            "content": "Hello, ready. Let's play",
+            "shadowDeleted": false,
+            "player": {
+                "pseudo": "aaa",
+                "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aaa",
+                "createdAt": "2024-03-05T10:16:32.291Z"
+            },
+            "createdAt": "2024-03-05T12:49:03.517Z"
+        }
+    ],
+    "state": "playing",
+    "createdAt": "2024-03-05T12:47:43.314Z",
+    "moves": [
+        "g6",
+        "swap-pieces",
+        "h4"
+    ],
+    "moveTimestamps": [
+        "2024-03-05T12:50:16.014Z",
+        "2024-03-05T12:50:20.018Z",
+        "2024-03-05T12:50:23.188Z"
+    ],
+    "currentPlayerIndex": 1,
+    "winner": null,
+    "outcome": null,
+    "startedAt": "2024-03-05T12:48:39.623Z",
+    "lastMoveAt": "2024-03-05T12:50:23.189Z",
+    "endedAt": null
+}

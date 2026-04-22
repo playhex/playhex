@@ -1,0 +1,9 @@
+# Shadow ban a player.
+# All previously posted chat message will be shadow deleted,
+# this player will be marked as shadow banned,
+# and all next messages will be shadow deleted too.
+
+@playerPublicId=9b409c13-0350-4909-883e-bcad2cdbdc3d
+
+POST /api/admin/players/{{ playerPublicId }}/shadow-ban
+Authorization: Bearer {{ adminPassword }}

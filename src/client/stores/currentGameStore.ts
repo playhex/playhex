@@ -105,6 +105,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         const unlisten = listenSocketMessages(gamePublicId, hostedGameInitialData => {
             hostedGame.value = hostedGameInitialData;
+            removeShadowDeletedMessages(hostedGame.value);
             game.value = Game.fromData(toEngineGameData(hostedGame.value));
             gameView.value = new GameView(hostedGame.value.boardsize);
             playerSettingsFacade.value = new PlayerSettingsFacade(gameView.value);
@@ -959,6 +960,22 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         chatInput.value += move + ' ';
+    };
+
+    /**
+     * On init, remove shadow banned chat messages
+     */
+    const removeShadowDeletedMessages = (hostedGame: HostedGame): void => {
+        // Append '#unban' to the url and refresh to see shadow banned chat messages
+        if (window.location.hash === '#unban') {
+            return;
+        }
+
+        const { loggedInPlayer } = useAuthStore();
+
+        hostedGame.chatMessages = hostedGame.chatMessages
+            .filter(chatMessage => checkShadowDeleted(chatMessage, loggedInPlayer))
+        ;
     };
 
     /*
