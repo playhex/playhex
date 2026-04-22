@@ -287,7 +287,7 @@ const shareGameLink = async (): Promise<CopyResult> => {
         return result;
     }
 
-    return copy(href) ? 'copied' : 'unsupported';
+    return (await copy(href)) ? 'copied' : 'unsupported';
 };
 
 const shareGameLinkAndShowResult = async (): Promise<void> => {

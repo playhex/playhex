@@ -12,7 +12,7 @@ Currently hosted here: <https://playhex.org>
 
 Requires:
 
-- node >= 18.18.2
+- node >= 20
 - yarn
 - mysql or postgres
 
