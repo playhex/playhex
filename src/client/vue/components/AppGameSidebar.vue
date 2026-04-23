@@ -27,6 +27,7 @@ import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
 import { canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
+import AppSpectatorCount from './AppSpectatorCount.vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
@@ -907,10 +908,26 @@ watch(gameUIMode, () => {
                     </div>
                 </div>
 
-                <form class="chat-input" v-if="loggedInPlayer && canPlayerChatInGame(loggedInPlayer, hostedGame) === true">
+                <form class="chat-input">
                     <div class="input-group">
-                        <input v-model="chatInput" ref="chatInputElement" class="form-control bg-body-tertiary" aria-describedby="message-submit" :placeholder="$t('chat_message_placeholder')" maxlength="1000" />
-                        <button class="btn btn-success" type="submit" @click="(e: PointerEvent) => { e.preventDefault(); sendChat() }" id="message-submit"><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
+                        <input
+                            v-model="chatInput"
+                            ref="chatInputElement"
+                            class="form-control bg-body-tertiary"
+                            aria-describedby="message-submit"
+                            :placeholder="(canPlayerChatInGame(loggedInPlayer, hostedGame) === true) ? $t('chat_message_placeholder') : ''"
+                            maxlength="1000"
+                            :disabled="!(canPlayerChatInGame(loggedInPlayer, hostedGame) === true)"
+                        />
+                        <AppSpectatorCount />
+                        <button
+                            class="btn chat-message-submit"
+                            :class="(canPlayerChatInGame(loggedInPlayer, hostedGame) === true) ? 'btn-success' : 'btn-secondary'"
+                            type="submit"
+                            id="message-submit"
+                            :disabled="!(canPlayerChatInGame(loggedInPlayer, hostedGame) === true)"
+                            @click="(e: PointerEvent) => { e.preventDefault(); sendChat() }"
+                        ><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
                     </div>
                     <div class="form-text text-warning" v-if="chatInput.length > 980">{{ chatInput.length }} / {{ $t('n_characters', { count: 1000 }) }}</div>
                 </form>
@@ -974,6 +991,9 @@ watch(gameUIMode, () => {
         input, button
             border-radius 0
             border-width 0
+
+        .chat-message-submit
+            min-width 4em
 
 .nav-game-sidebar
     .nav-link

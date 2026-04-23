@@ -1,7 +1,11 @@
 import { colToLetter, Move, parseMove } from '../move-notation/move-notation.js';
 import { HostedGame, Player, ChatMessage } from './models/index.js';
 
-export const canPlayerChatInGame = (player: Player, hostedGame: HostedGame): true | string => {
+export const canPlayerChatInGame = (player: null | Player, hostedGame: HostedGame): true | string => {
+    if (player === null) {
+        return 'no player';
+    }
+
     if (
         hostedGame.state !== 'created'
         && player.isGuest

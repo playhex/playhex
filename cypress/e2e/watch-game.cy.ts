@@ -52,32 +52,32 @@ describe('Watch game', () => {
         };
 
         // No spectator count initially
-        cy.get('.spectator-count').should('not.have.class', 'spectator-count-visible');
+        cy.get('.spectator-count').should('not.exist');
 
         // Spectator list with one spectator
-        cy.receiveSocketIoMessage('spectatorList', '280fa373-affd-46bd-b2cd-b2cb4578bc94', [spectator1]);
-        cy.get('.spectator-count-visible').should('contain', '1');
+        cy.receiveSocketIoMessage('spectatorUpdate', '280fa373-affd-46bd-b2cd-b2cb4578bc94', [spectator1]);
+        cy.get('.spectator-count').should('contain', '1');
 
         // Click to open popup, verify list
-        cy.get('.spectator-count-visible').click();
-        cy.get('.spectator-popup-list li').should('have.length', 1).and('contain', 'Spectator1');
+        cy.get('.spectator-count').click();
+        cy.get('.spectator-popup li').should('have.length', 1).and('contain', 'Spectator1');
 
         // Second spectator joins
         cy.receiveSocketIoMessage('spectatorJoined', '280fa373-affd-46bd-b2cd-b2cb4578bc94', spectator2);
-        cy.get('.spectator-count-visible').should('contain', '2');
-        cy.get('.spectator-popup-list li').should('have.length', 2);
+        cy.get('.spectator-count').should('contain', '2');
+        cy.get('.spectator-popup li').should('have.length', 2);
 
         // Click to close popup
-        cy.get('.spectator-count-visible').click();
+        cy.get('.spectator-count').click();
         cy.get('.spectator-popup').should('not.be.visible');
 
         // One spectator leaves
         cy.receiveSocketIoMessage('spectatorLeft', '280fa373-affd-46bd-b2cd-b2cb4578bc94', spectator1);
         cy.get('.spectator-count').should('be.visible').and('contain', '1');
 
-        // Last spectator leaves — icon fades out, popup auto-closes
+        // Last spectator leaves — element removed from DOM
         cy.receiveSocketIoMessage('spectatorLeft', '280fa373-affd-46bd-b2cd-b2cb4578bc94', spectator2);
-        cy.get('.spectator-count').should('not.have.class', 'spectator-count-visible');
+        cy.get('.spectator-count').should('not.exist');
 
         // No spectator messages in chat
         cy.contains('.chat-messages', 'started watching').should('not.exist');

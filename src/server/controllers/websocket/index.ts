@@ -7,6 +7,7 @@ import OnlinePlayersWebsocketController from './OnlinePlayersWebsocketController
 import ChatWebsocketController from './ChatWebsocketController.js';
 import PlayerGamesWebsocketController from './PlayerGamesWebsocketController.js';
 import ServerStatusWebsocketController from './ServerStatusWebsocketController.js';
+import SpectatorWebsocketController from './SpectatorWebsocketController.js';
 
 export interface WebsocketControllerInterface
 {
@@ -38,6 +39,7 @@ export function registerWebsocketControllers() {
         Container.get(OnlinePlayersWebsocketController),
         Container.get(PlayerGamesWebsocketController),
         Container.get(ServerStatusWebsocketController),
+        Container.get(SpectatorWebsocketController),
     ];
 
     const io = Container.get(HexServer);

@@ -384,7 +384,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             }
         });
 
-        on('spectatorList', (gameId: string, players: Player[]) => {
+        on('spectatorUpdate', (gameId: string, players: Player[]) => {
             if (gameId !== gamePublicId) {
                 return;
             }
@@ -398,7 +398,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             }
 
             if (!spectators.value.some(s => s.publicId === player.publicId)) {
-                spectators.value.push(player);
+                spectators.value = [...spectators.value, player];
             }
         });
 
