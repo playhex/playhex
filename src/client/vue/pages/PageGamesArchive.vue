@@ -128,6 +128,19 @@ const gamesChartOptions: ChartOptions<'bar'> = {
     },
     maintainAspectRatio: false,
 };
+
+const chartBackgroundPlugin = {
+    id: 'chartBackground',
+    beforeDraw: (chart: InstanceType<typeof Chart>) => {
+        const ctx = chart.canvas.getContext('2d');
+        if (!ctx) return;
+        const { left, top, right, bottom } = chart.chartArea;
+        ctx.save();
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bs-body-bg').trim() || '#fff';
+        ctx.fillRect(left, top, right - left, bottom - top);
+        ctx.restore();
+    },
+};
 </script>
 
 <template>
@@ -139,6 +152,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                 v-if="null !== gamesChartData"
                 :data="(gamesChartData as unknown as ChartData<'bar'>)"
                 :options="gamesChartOptions"
+                :plugins="[chartBackgroundPlugin]"
                 ref="gameChart"
             />
         </div>
