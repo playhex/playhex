@@ -57,6 +57,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const hostedGamePublicId = ref<null | string>(null);
 
     const hostedGame = ref<null | HostedGame>(null);
+    const spectators = ref<Player[]>([]);
 
     const game = shallowRef<null | Game>(null);
     const gameView = shallowRef<GameView | null>(null);
@@ -144,6 +145,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             game.value = null;
             hostedGame.value = null;
             hostedGamePublicId.value = null;
+            spectators.value = [];
         });
     };
 
@@ -382,12 +384,22 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             }
         });
 
+        on('spectatorList', (gameId: string, players: Player[]) => {
+            if (gameId !== gamePublicId) {
+                return;
+            }
+
+            spectators.value = players;
+        });
+
         on('spectatorJoined', (gameId: string, player: Player) => {
             if (gameId !== gamePublicId) {
                 return;
             }
 
-            richChat.value?.pushSpectatorEvent(player, 'joined');
+            if (!spectators.value.some(s => s.publicId === player.publicId)) {
+                spectators.value.push(player);
+            }
         });
 
         on('spectatorLeft', (gameId: string, player: Player) => {
@@ -395,7 +407,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            richChat.value?.pushSpectatorEvent(player, 'left');
+            spectators.value = spectators.value.filter(s => s.publicId !== player.publicId);
         });
 
         return () => {
@@ -1212,6 +1224,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         isReadingChatMessages,
         canCancel,
         canRematch,
+        spectators,
         conditionalMovesEditor,
         conditionalMovesState,
         simulatePlayingGameFacade,

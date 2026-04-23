@@ -180,6 +180,7 @@
     "chat_message_placeholder": "Wiadomość…",
     "unread_messages": "nieprzeczytane wiadomości",
     "send_chat_message": "Wyślij",
+    "spectators": "Widzowie",
     "n_characters_one": "{{count}} znak",
     "n_characters_few": "{{count}} znaków",
     "n_characters_many": "{{count}} znaków",

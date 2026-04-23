@@ -201,6 +201,7 @@
     "chat_message_placeholder": "Meddelande…",
     "unread_messages": "olästa meddelanden",
     "send_chat_message": "Skicka",
+    "spectators": "Åskådare",
     "n_characters_one": "{{count}} tecken",
     "n_characters_other": "{{count}} tecken",
     "landscape": "Liggande",

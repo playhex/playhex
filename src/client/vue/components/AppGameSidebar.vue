@@ -902,9 +902,6 @@ watch(gameUIMode, () => {
                             <template v-else-if="message.type === 'date'">
                                 <small class="header-date text-secondary mt-1">{{ formatChatDateHeader(message.date) }}</small>
                             </template>
-                            <template v-else-if="message.type === 'spectator'">
-                                <small class="text-body-secondary fst-italic">{{ $t('spectator_' + message.action, { player: pseudoString(message.player) }) }}</small>
-                            </template>
                         </div>
                         <p v-if="!richChat?.getRichChatMessages().length" class="text-secondary">{{ $t('chat') }}</p>
                     </div>

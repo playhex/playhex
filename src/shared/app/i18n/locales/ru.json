@@ -181,6 +181,7 @@
     "chat_message_placeholder": "Сообщение…",
     "unread_messages": "непрочитанные сообщения",
     "send_chat_message": "Отправить",
+    "spectators": "Зрители",
     "n_characters_one": "{{count}} символ",
     "n_characters_few": "{{count}} символов",
     "n_characters_many": "{{count}} символов",
