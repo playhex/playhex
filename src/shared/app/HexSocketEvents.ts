@@ -130,6 +130,13 @@ export type HexServerToClientEvents = {
     ended: (gameId: string, winner: PlayerIndex, outcome: Outcome, endedAt: { date: Date }) => void;
 
     /**
+     * A game has ended and there is a winner.
+     *
+     * This event is for lobby, and contains
+     */
+    lobbyGameEnded: (hostedGame: HostedGame) => void;
+
+    /**
      * Some players ratings have been updated
      * due to a ranked game ended.
      *

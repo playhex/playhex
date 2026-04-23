@@ -7,6 +7,7 @@
 - correspondence section: maybe show count of games played last 24h, or count of active players in correpondence games
 - show spectators in live game thumbnails
 - check TODO
+- tournament brackets: fix match label background
 
 commit separation:
 - header sticky

@@ -108,6 +108,14 @@ const useLobbyStore = defineStore('lobbyStore', () => {
                 delete hostedGames.value[gameId];
             }
         });
+
+        socket.on('lobbyGameEnded', (hostedGame: HostedGame) => {
+            endedHostedGames.value.unshift(hostedGame);
+
+            while (endedHostedGames.value.length > 5) {
+                endedHostedGames.value.pop();
+            }
+        });
     };
 
     // Listen lobby event to update state on change

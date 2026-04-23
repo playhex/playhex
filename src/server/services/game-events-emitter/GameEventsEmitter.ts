@@ -132,10 +132,13 @@ export class GameEventsEmitter
     {
         io().to([
             Rooms.game(hostedGame.publicId),
-            lobbyRoom(hostedGame),
             ...gamePlayersRooms(hostedGame),
             Rooms.thumbnailGame(hostedGame.publicId),
         ]).emit('ended', hostedGame.publicId, winner, outcome, endedAt);
+
+        io().to([
+            lobbyRoom(hostedGame),
+        ]).emit('lobbyGameEnded', instanceToInstance(hostedGame));
     }
 
     emitGameCanceled(hostedGame: HostedGame, canceledAt: { date: Date }): void

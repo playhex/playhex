@@ -134,6 +134,15 @@ const {
 
                         <li class="nav-item">
                             <router-link
+                                :to="{ name: 'playing-games' }"
+                                :class="{ active: routeName === 'playing-games' }"
+                                class="nav-link"
+                                @click="closeOffcanvas"
+                            >Playing now</router-link>
+                        </li>
+
+                        <li class="nav-item">
+                            <router-link
                                 :to="{ name: 'tournaments' }"
                                 :class="{ active: routeName?.startsWith('tournament') }"
                                 class="nav-link"
