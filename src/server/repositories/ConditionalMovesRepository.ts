@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ConditionalMoves, HostedGame, Player } from '../../shared/app/models/index.js';
 import { conditionalMovesShift, getNextMovesAfterLine } from '../../shared/pixi-board/conditional-moves/conditionalMovesUtils.js';
 import logger from '../services/logger.js';
@@ -19,7 +19,7 @@ export default class ConditionalMovesRepository
         return this.conditionalMovesRepository.findOneBy({
             playerId: player.id,
             hostedGameId: hostedGame.id,
-        } as FindOptionsWhere<ConditionalMoves>);
+        });
     }
 
     save(conditionalMoves: ConditionalMoves): Promise<ConditionalMoves>

@@ -13,7 +13,7 @@ import router from './vue/router.js';
 import unoverlay from '@overlastic/vue';
 import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore.js';
 import I18NextVue from 'i18next-vue';
-import i18next, { type i18n } from 'i18next';
+import i18next from 'i18next';
 import useMatomo from './vue/useMatomo.js';
 import './services/registerServiceWorker.js';
 import './services/playerActivity.js';
@@ -24,7 +24,7 @@ const pinia = createPinia();
 const vueApp = createApp(App);
 vueApp.use(router);
 vueApp.use(pinia);
-vueApp.use(I18NextVue, { i18next: i18next as unknown as i18n });
+vueApp.use(I18NextVue, { i18next });
 vueApp.use(unoverlay);
 vueApp.use(createHead());
 
