@@ -16,7 +16,7 @@ const locale = autoLocale();
     -->
     <div v-if="'fr' === locale" class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2026/02/27_Salon_A32_page-0001-scaled.jpg"
                     alt="27e salon Culture et jeux mathématiques"
@@ -81,8 +81,8 @@ const locale = autoLocale();
         <ul>
             <li><strong>Entrée gratuite</strong> au salon</li>
             <li>Autres activités proposées sur place : jeux logiques, ateliers de maths, défis, animations pour enfants et adultes</li>
+            <li>Infos sur le CIJM : <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex">https://salon-math.fr/cijm/</a></li>
             <li>Infos générales sur le salon : <a href="https://salon-math.fr">https://salon-math.fr</a>  </li>
-            <li>Infos sur le CIJM : <a href="https://salon-math.fr/cijm/">https://salon-math.fr/cijm/</a></li>
         </ul>
     </div>
 
@@ -91,7 +91,7 @@ const locale = autoLocale();
     -->
     <div v-else-if="'pl' === locale" class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2026/02/27_Salon_A32_page-0001-scaled.jpg"
                     alt="27e salon Culture et jeux mathématiques"
@@ -156,8 +156,8 @@ const locale = autoLocale();
         <ul>
             <li><strong>Wstęp wolny</strong> na salon</li>
             <li>Inne atrakcje na miejscu: gry logiczne, warsztaty matematyczne, wyzwania, animacje dla dzieci i dorosłych</li>
+            <li>Informacje o CIJM: <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex">https://salon-math.fr/cijm/</a></li>
             <li>Informacje ogólne o salonie: <a href="https://salon-math.fr">https://salon-math.fr</a></li>
-            <li>Informacje o CIJM: <a href="https://salon-math.fr/cijm/">https://salon-math.fr/cijm/</a></li>
         </ul>
     </div>
 
@@ -166,7 +166,7 @@ const locale = autoLocale();
     -->
     <div v-else-if="'es' === locale" class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2026/02/27_Salon_A32_page-0001-scaled.jpg"
                     alt="27e salon Culture et jeux mathématiques"
@@ -231,8 +231,8 @@ const locale = autoLocale();
         <ul>
             <li><strong>Entrada gratuita</strong> al salón</li>
             <li>Otras actividades en el lugar: juegos de lógica, talleres de matemáticas, desafíos, animaciones para niños y adultos</li>
+            <li>Información sobre el CIJM: <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex">https://salon-math.fr/cijm/</a></li>
             <li>Información general sobre el salón: <a href="https://salon-math.fr">https://salon-math.fr</a></li>
-            <li>Información sobre el CIJM: <a href="https://salon-math.fr/cijm/">https://salon-math.fr/cijm/</a></li>
         </ul>
     </div>
 
@@ -241,7 +241,7 @@ const locale = autoLocale();
     -->
     <div v-else class="container my-3">
         <div class="text-center">
-            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi de Hex" target="_blank">
+            <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex" target="_blank">
                 <img
                     src="https://salon-math.fr/wp-content/uploads/2026/02/27_Salon_A32_page-0001-scaled.jpg"
                     alt="27th Culture and Mathematical Games Fair"
@@ -304,8 +304,8 @@ const locale = autoLocale();
         <ul>
             <li><strong>Free entry</strong> to the fair</li>
             <li>Other on-site activities: logic games, math workshops, challenges, entertainment for kids and adults</li>
+            <li>Info about CIJM: <a href="https://salon-math.fr/cijm/#:~:text=Tournoi géant de Hex">https://salon-math.fr/cijm/</a></li>
             <li>General info about the fair: <a href="https://salon-math.fr">https://salon-math.fr</a></li>
-            <li>Info about CIJM: <a href="https://salon-math.fr/cijm/">https://salon-math.fr/cijm/</a></li>
         </ul>
     </div>
 </template>
