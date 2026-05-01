@@ -18,6 +18,7 @@ import useMatomo from './vue/useMatomo.js';
 import './services/registerServiceWorker.js';
 import './services/playerActivity.js';
 import { preloadAssets } from './services/preload-assets.js';
+import './services/notifications/index.js';
 
 const pinia = createPinia();
 
