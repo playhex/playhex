@@ -1,0 +1,7 @@
+# Cancels a tournament. If tournament is currently playing,
+# all games are canceled first.
+
+@gamePublicId=7c2a668f-39ab-4640-8aae-43384face62a
+
+POST /api/admin/games/{{ gamePublicId }}/cancel
+Authorization: Bearer {{ adminPassword }}
