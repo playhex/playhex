@@ -10,7 +10,7 @@ const displayFooter = () => currentRoute.value.meta.displayFooter !== false;
 
 <template>
     <div class="app-layout">
-        <header>
+        <header class="sticky-top">
             <AppHeader />
         </header>
 
