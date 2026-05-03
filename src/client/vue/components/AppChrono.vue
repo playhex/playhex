@@ -96,4 +96,5 @@ onUnmounted(() => clearInterval(chronoThread));
 <style scoped lang="stylus">
 .chrono-time
     font-size 1.75em
+    font-family monospace
 </style>
