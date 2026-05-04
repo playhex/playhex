@@ -157,6 +157,21 @@ export const authChangePassword = async (oldPassword: string, newPassword: strin
     return plainToInstance(Player, await response.json());
 };
 
+export const apiGetActiveGames = async (): Promise<HostedGame[]> => {
+    const response = await fetch('/api/games/active', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as HostedGame[])
+        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    ;
+};
+
 /**
  * Won't return active games, but can return created and playing games if persisted.
  */
@@ -524,6 +539,21 @@ export const apiGetContributors = async (): Promise<PlayHexContributors> => {
     });
 
     return await response.json();
+};
+
+export const apiGetPlayerActiveGames = async (playerPublicId: string): Promise<HostedGame[]> => {
+    const response = await fetch(`/api/players/${playerPublicId}/active-games`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as HostedGame[])
+        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    ;
 };
 
 export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | PlayerStats> => {

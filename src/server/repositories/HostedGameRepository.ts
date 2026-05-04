@@ -1,16 +1,13 @@
-import { Container, Inject, Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
 import { Player, ChatMessage, HostedGame, HostedGameOptions, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
 import HostedGamePersister from '../persistance/HostedGamePersister.js';
-import { RoomsHostedGame } from '../../shared/app/RoomsHostedGame.js';
 import logger from '../services/logger.js';
-import { HexServer } from '../server.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
 import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
 import { AppDataSource } from '../data-source.js';
-import { instanceToInstance } from '../../shared/app/class-transformer-custom.js';
 import RatingRepository from './RatingRepository.js';
 import { isDuplicateError } from './typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
@@ -21,6 +18,7 @@ import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 
 export class GameError extends Error {}
 
@@ -43,10 +41,13 @@ export default class HostedGameRepository
      */
     private persistWhenNoActivity: { [publicId: string]: ReturnType<typeof setTimeout> } = {};
 
+    private gamesLoadedPromise = Promise.withResolvers<true>();
+
     constructor(
         private hostedGamePersister: HostedGamePersister,
         private ratingRepository: RatingRepository,
         private onlinePlayerService: OnlinePlayersService,
+        private gameEventEmitter: GameEventsEmitter,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
@@ -94,6 +95,13 @@ export default class HostedGameRepository
         }
 
         logger.info(`${games.length} games loaded.`);
+
+        this.gamesLoadedPromise.resolve(true);
+    }
+
+    isReady(): Promise<true>
+    {
+        return this.gamesLoadedPromise.promise;
     }
 
     /**
@@ -205,16 +213,7 @@ export default class HostedGameRepository
         if (hostedGameServer.getHostedGame().ranked) {
             const newRatings = await this.updateRatings(hostedGameServer);
 
-            Container.get(HexServer)
-                .to(RoomsHostedGame.ratingsUpdated(hostedGameServer.getHostedGame()))
-                .emit(
-                    'ratingsUpdated',
-                    hostedGameServer.getPublicId(),
-                    instanceToInstance(newRatings.filter(rating => rating.category === 'overall'), {
-                        groups: ['rating'],
-                    }),
-                )
-            ;
+            this.gameEventEmitter.emitRatingsUpdated(hostedGameServer.getHostedGame(), newRatings);
         }
     }
 
@@ -270,6 +269,14 @@ export default class HostedGameRepository
     {
         return Object.values(this.activeGames)
             .filter(game => !isBotGame(game.getHostedGame()))
+            .map(game => game.getHostedGame())
+        ;
+    }
+
+    getWaiting1v1GamesData(): HostedGame[]
+    {
+        return Object.values(this.activeGames)
+            .filter(game => game.getHostedGame().state === 'created' && !isBotGame(game.getHostedGame()))
             .map(game => game.getHostedGame())
         ;
     }
@@ -342,7 +349,7 @@ export default class HostedGameRepository
 
         logger.info('Hosted game created.', { host: params.host?.pseudo ?? null, publicId: hostedGame.publicId });
 
-        Container.get(HexServer).to(RoomsHostedGame.gameCreated(hostedGame)).emit('gameCreated', hostedGame);
+        this.gameEventEmitter.emitGameCreated(hostedGame);
 
         if (createOptions.aiJoinAuto ?? true) {
             await this.makeAIJoinGameIfApplicable(hostedGameServer, params);
@@ -445,8 +452,7 @@ export default class HostedGameRepository
             }
         }
 
-        Container.get(HexServer).to(RoomsHostedGame.rematchAvailable(game))
-            .emit('rematchAvailable', game.publicId, game.rematch.publicId);
+        this.gameEventEmitter.emitRematchAvailable(game, game.rematch.publicId);
 
         return game.rematch;
     }
@@ -638,7 +644,7 @@ export default class HostedGameRepository
 
         notifier.emit('chatMessage', hostedGame, chatMessage);
 
-        Container.get(HexServer).to(RoomsHostedGame.chat(hostedGame)).emit('chat', publicId, chatMessage);
+        this.gameEventEmitter.emitChat(hostedGame, chatMessage);
 
         return true;
     }

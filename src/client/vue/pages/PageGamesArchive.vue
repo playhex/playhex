@@ -128,6 +128,19 @@ const gamesChartOptions: ChartOptions<'bar'> = {
     },
     maintainAspectRatio: false,
 };
+
+const chartBackgroundPlugin = {
+    id: 'chartBackground',
+    beforeDraw: (chart: InstanceType<typeof Chart>) => {
+        const ctx = chart.canvas.getContext('2d');
+        if (!ctx) return;
+        const { left, top, right, bottom } = chart.chartArea;
+        ctx.save();
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bs-body-bg').trim() || '#fff';
+        ctx.fillRect(left, top, right - left, bottom - top);
+        ctx.restore();
+    },
+};
 </script>
 
 <template>
@@ -139,6 +152,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
                 v-if="null !== gamesChartData"
                 :data="(gamesChartData as unknown as ChartData<'bar'>)"
                 :options="gamesChartOptions"
+                :plugins="[chartBackgroundPlugin]"
                 ref="gameChart"
             />
         </div>
@@ -148,86 +162,88 @@ const gamesChartOptions: ChartOptions<'bar'> = {
         <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
         <p v-else>…</p>
 
-        <div class="mt-3">
-            <button @click="goPagePrevious" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-            <span class="mx-3">{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-            <button @click="goPageNext" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
-        </div>
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+            </div>
 
-        <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
-            <table class="table mb-0">
-                <thead>
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                        <th scope="col">{{ $t('game.red') }}</th>
-                        <th scope="col">{{ $t('game.blue') }}</th>
-                        <th scope="col">{{ $t('game.outcome') }}</th>
-                        <th scope="col">{{ $t('game.size') }}</th>
-                        <th scope="col">{{ $t('game.time_control') }}</th>
-                        <th scope="col">{{ $t('game.rules') }}</th>
-                        <th scope="col">{{ $t('game.finished') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="game in gamesHistory"
-                        :key="game.publicId"
-                    >
-                        <td class="ps-0">
-                            <router-link
-                                :to="{ name: 'online-game', params: { gameId: game.publicId } }"
-                                class="btn btn-sm btn-link"
-                            >Open</router-link>
-                        </td>
+            <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
+                <table class="table text-nowrap mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col">{{ $t('game.red') }}</th>
+                            <th scope="col">{{ $t('game.blue') }}</th>
+                            <th scope="col">{{ $t('game.outcome') }}</th>
+                            <th scope="col">{{ $t('game.size') }}</th>
+                            <th scope="col">{{ $t('game.time_control') }}</th>
+                            <th scope="col">{{ $t('game.rules') }}</th>
+                            <th scope="col">{{ $t('game.finished') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="game in gamesHistory"
+                            :key="game.publicId"
+                        >
+                            <td class="ps-0">
+                                <router-link
+                                    :to="{ name: 'online-game', params: { gameId: game.publicId } }"
+                                    class="btn btn-sm btn-link"
+                                >Open</router-link>
+                            </td>
 
-                        <td>
-                            <span v-if="game.ranked" class="text-warning">
-                                {{ $t('ranked') }}
-                            </span>
-                            <span v-else class="text-success">
-                                {{ $t('friendly') }}
-                            </span>
-                        </td>
+                            <td>
+                                <span v-if="game.ranked" class="text-warning">
+                                    {{ $t('ranked') }}
+                                </span>
+                                <span v-else class="text-success">
+                                    {{ $t('friendly') }}
+                                </span>
+                            </td>
 
-                        <td>
-                            <AppPseudo v-if="game.hostedGameToPlayers[0]" :player="game.hostedGameToPlayers[0].player" classes="text-danger" />
-                            <span v-else>-</span>
-                        </td>
+                            <td>
+                                <AppPseudo v-if="game.hostedGameToPlayers[0]" :player="game.hostedGameToPlayers[0].player" classes="text-danger" />
+                                <span v-else>-</span>
+                            </td>
 
-                        <td>
-                            <AppPseudo v-if="game.hostedGameToPlayers[1]" :player="game.hostedGameToPlayers[1].player" classes="text-primary" />
-                            <span v-else>-</span>
-                        </td>
+                            <td>
+                                <AppPseudo v-if="game.hostedGameToPlayers[1]" :player="game.hostedGameToPlayers[1].player" classes="text-primary" />
+                                <span v-else>-</span>
+                            </td>
 
-                        <td v-if="'canceled' === game.state">{{ $t('game_state.canceled') }}</td>
-                        <td v-else>
-                            <span v-if="null !== game.winner">
-                                <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="0 === game.winner ? 'text-danger' : 'text-primary'" />
-                                {{ ' ' }}
-                                <small>+ {{ game.outcome ? $t('outcome.' + game.outcome) : '??' }}</small>
-                            </span>
-                            <span v-else>-</span>
-                        </td>
+                            <td v-if="'canceled' === game.state">{{ $t('game_state.canceled') }}</td>
+                            <td v-else>
+                                <span v-if="null !== game.winner">
+                                    <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="0 === game.winner ? 'text-danger' : 'text-primary'" />
+                                    {{ ' ' }}
+                                    <small>+ {{ game.outcome ? $t('outcome.' + game.outcome) : '??' }}</small>
+                                </span>
+                                <span v-else>-</span>
+                            </td>
 
-                        <td>{{ game.boardsize }}</td>
+                            <td>{{ game.boardsize }}</td>
 
-                        <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                            <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
 
-                        <td><AppGameRulesSummary :gameOptions="game" /></td>
+                            <td><AppGameRulesSummary :gameOptions="game" /></td>
 
-                        <td>{{
-                            game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
-                        }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            <td>{{
+                                game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
+                            }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div v-if="gamesHistory && gamesHistory.length > 0" class="mt-3">
-            <button @click="goPagePrevious" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-            <span class="mx-3">{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-            <button @click="goPageNext" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+            <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
+                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+            </div>
         </div>
     </div>
 </template>

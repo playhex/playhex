@@ -45,6 +45,7 @@ export { default as IconFileEarmarkText } from '~icons/bi/file-earmark-text';
 export { default as IconFlag } from '~icons/bi/flag';
 export { default as IconGear } from '~icons/bi/gear';
 export { default as IconGithub } from '~icons/bi/github';
+export { default as IconGrid3x3GapFill } from '~icons/bi/grid-3x3-gap-fill';
 export { default as IconHexagon } from '~icons/bi/hexagon';
 export { default as IconHexagonFill } from '~icons/bi/hexagon-fill';
 export { default as IconHourglass } from '~icons/bi/hourglass';

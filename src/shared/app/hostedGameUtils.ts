@@ -4,6 +4,7 @@ import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
 import { isCorrespondence, TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 import { GameData } from '../game-engine/normalization.js';
+import { GameTimeData } from '../time-control/TimeControl.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     if (hostedGame.host !== null && hostedGame.host.publicId === player.publicId) {
@@ -196,6 +197,15 @@ export const addMove = (hostedGame: HostedGame, timestampedMove: TimestampedMove
     hostedGame.moveTimestamps.push(timestampedMove.playedAt);
     hostedGame.currentPlayerIndex = 1 - byPlayerIndex as PlayerIndex;
     hostedGame.lastMoveAt = timestampedMove.playedAt;
+};
+
+export const handleTimeControlUpdate = (hostedGame: HostedGame, gameTimeData: GameTimeData): void => {
+    if (hostedGame.timeControl === null) {
+        hostedGame.timeControl = gameTimeData;
+        return;
+    }
+
+    Object.assign(hostedGame.timeControl, gameTimeData);
 };
 
 export const endGame = (hostedGame: HostedGame, winner: PlayerIndex, outcome: Outcome, endedAt: Date): void => {

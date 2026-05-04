@@ -118,8 +118,6 @@ const colClasses = [
         </div>
 
         <div class="container-fluid my-3">
-            <h2>{{ $t('n_participants', { count: tournament.participants.length }) }}</h2>
-
             <AppTournamentStandings :tournament />
 
             <AppTournamentDescription :tournament />

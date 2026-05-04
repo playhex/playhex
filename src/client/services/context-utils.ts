@@ -1,5 +1,5 @@
 import { HostedGame, Player } from '../../shared/app/models/index.js';
-import { getOtherPlayer, hasPlayer, isPlayerTurn } from '../../shared/app/hostedGameUtils.js';
+import { getOtherPlayer, getPlayerIndex, hasPlayer, isPlayerTurn } from '../../shared/app/hostedGameUtils.js';
 import useAuthStore from '../stores/authStore.js';
 import router from '../vue/router.js';
 
@@ -29,6 +29,22 @@ export const getOpponent = (hostedGame: HostedGame): null | Player => {
     }
 
     return getOtherPlayer(hostedGame, loggedInPlayer);
+};
+
+export const getMyIndex = (hostedGame: HostedGame): null | 0 | 1 => {
+    const { loggedInPlayer } = useAuthStore();
+
+    if (loggedInPlayer === null) {
+        return null;
+    }
+
+    const index = getPlayerIndex(hostedGame, loggedInPlayer);
+
+    if (index === -1) {
+        return null;
+    }
+
+    return index as 0 | 1;
 };
 
 export const isMe = (player: Player): boolean => {

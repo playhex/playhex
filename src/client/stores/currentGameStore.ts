@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import HostedGame from '../../shared/app/models/HostedGame.js';
 import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
-import { addMove, canExplore, canPlayerUndo, getPlayer, getPlayerIndex, getPlayers, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, canExplore, canPlayerUndo, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -123,7 +123,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         watchEffect(() => {
             if (socketStore.connected) {
-                socketStore.joinRoom(Rooms.game(gamePublicId));
+                void socketStore.joinRoom(Rooms.game(gamePublicId));
             }
         });
 
@@ -212,12 +212,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            if (hostedGame.value.timeControl === null) {
-                hostedGame.value.timeControl = gameTimeData;
-                return;
-            }
-
-            Object.assign(hostedGame.value.timeControl, gameTimeData);
+            handleTimeControlUpdate(hostedGame.value, gameTimeData);
 
             notifyWhenLowTime(gameTimeData);
         });
@@ -287,11 +282,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            hostedGame.value.state = 'ended';
-
-            hostedGame.value.winner = winner;
-            hostedGame.value.outcome = outcome;
-            hostedGame.value.endedAt = date;
+            endGame(hostedGame.value, winner, outcome, date);
 
             // Do nothing if game not loaded
             if (game.value === null) {
@@ -307,12 +298,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
 
         on('gameCanceled', (gameId, { date }) => {
-            if (gameId !== gamePublicId || ! hostedGame.value) {
+            if (gameId !== gamePublicId || !hostedGame.value) {
                 return;
             }
 
-            hostedGame.value.state = 'canceled';
-            hostedGame.value.endedAt = date;
+            cancelGame(hostedGame.value, date);
 
             // Do nothing if game not loaded
             if (game.value === null) {

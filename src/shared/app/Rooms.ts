@@ -5,7 +5,7 @@ export default class Rooms
 {
     /**
      * Only for 1v1 games, no bot games events.
-     * All open games meta data updates, like game created, started, ended (no moves).
+     * All waiting games updates (created, started).
      * Used to refresh games in lobby.
      */
     static readonly lobby = 'lobby';
@@ -24,6 +24,11 @@ export default class Rooms
     static readonly onlinePlayers = 'online-players';
 
     /**
+     * Lightweight room for lobby: only sends active players count updates.
+     */
+    static readonly onlinePlayersCount = 'online-players-count';
+
+    /**
      * Full game info (moves).
      * Used on game page.
      */
@@ -39,4 +44,27 @@ export default class Rooms
      * Used to know when a player needs to play on one of his games.
      */
     static readonly playerGames = (playerId: string) => `players/${playerId}/games`;
+
+    /**
+     * Get currently featured live games list, and keep it updated.
+     */
+    static readonly featuredLiveGames = 'featured-live-games';
+
+    /**
+     * Get currently featured correspondence games list, and keep it updated.
+     */
+    static readonly featuredCorrespondenceGames = 'featured-correspondence-games';
+
+    /**
+     * Get game updates for thumbnail live game.
+     * Must be a separate room than game to have its own initial message (thumbnailGameUpdate)
+     * on room join.
+     */
+    static readonly thumbnailGame = (gameId: string) => `thumbnail-games/${gameId}`;
+
+    /**
+     * Count of human playing games, split by live and correspondence.
+     * Used to display counts next to lobby section titles.
+     */
+    static readonly playingGamesCount = 'playing-games-count';
 }

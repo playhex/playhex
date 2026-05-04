@@ -15,8 +15,9 @@ export type HexClientToServerEvents = {
 
     /**
      * A player wants to join a room.
+     * answer is called when room is joined.
      */
-    joinRoom: (room: string) => void;
+    joinRoom: (room: string, answer: () => void) => void;
 
     /**
      * A player wants to leave a room.
@@ -63,6 +64,15 @@ export type HexClientToServerEvents = {
      *      and prevent displaying a shifted chrono in games.
      */
     getServerStatus: (answer: (serverStatus: { serverDate: Date }) => void) => void;
+
+    /**
+     * Message sent when requested by a game thumbnail.
+     *
+     * Cannot use onRoomJoin event here because there can be 2 thumbnails for a same game,
+     * and only one thumbnail may receive the event.
+     * So we need that each thumbnail request independently a full update.
+     */
+    thumbnailGameUpdateRequest: (gameId: string, answer: (hostedGame: HostedGame | null, spectatorsCount: number) => void) => void;
 };
 
 export type HexServerToClientEvents = {
@@ -72,15 +82,28 @@ export type HexServerToClientEvents = {
     gameCreated: (hostedGame: HostedGame) => void;
 
     /**
+     * A game has been created.
+     * Just the info needed to display game on lobby
+     */
+    lobbyGameCreated: (hostedGame: HostedGame) => void;
+
+    /**
      * A player joined gameId.
      */
     gameJoined: (gameId: string, player: Player) => void;
 
     /**
      * Game has started.
-     * All info are sent again, with GameData.
+     * All info are sent again.
      */
     gameStarted: (hostedGame: HostedGame) => void;
+
+    /**
+     * Game has started.
+     * All info are sent again.
+     * Just the info needed to display game on lobby
+     */
+    lobbyGameStarted: (hostedGame: HostedGame) => void;
 
     /**
      * Game has been canceled.
@@ -107,6 +130,13 @@ export type HexServerToClientEvents = {
      * endedAt is in object to allow date normalization (or will denormalize date as string instead of Date).
      */
     ended: (gameId: string, winner: PlayerIndex, outcome: Outcome, endedAt: { date: Date }) => void;
+
+    /**
+     * A game has ended and there is a winner.
+     *
+     * This event is for lobby, and contains
+     */
+    lobbyGameEnded: (hostedGame: HostedGame) => void;
 
     /**
      * Some players ratings have been updated
@@ -166,8 +196,9 @@ export type HexServerToClientEvents = {
      * Opponent accepted or rejected undo request,
      * game has been updated server side, or not.
      * Undo request is over.
+     * First move in the undoneMoves array is the last move played in the history.
      */
-    answerUndo: (gameId: string, accept: boolean) => void;
+    answerUndo: (gameId: string, accept: boolean, undoneMoves: HexMove[]) => void;
 
     /**
      * Undo request has been automatically canceled
@@ -212,6 +243,11 @@ export type HexServerToClientEvents = {
     onlinePlayersUpdate: (onlinePlayers: OnlinePlayers) => void;
 
     /**
+     * State for the `Rooms.onlinePlayersCount` room. Active and inactive players count.
+     */
+    onlinePlayersCount: (counts: { active: number, inactive: number }) => void;
+
+    /**
      * State for the `Rooms.game` room.
      *
      * game can be null e.g when a player enters a room of a game that doesn't exists,
@@ -222,4 +258,22 @@ export type HexServerToClientEvents = {
 
     /** State for the `Rooms.playerGames` room. */
     playerGamesUpdate: (myGames: HostedGame[]) => void;
+
+    /**
+     * Message sent when joining featured games room.
+     * List of few games interesting to display on lobby.
+     */
+    featuredLiveGamesUpdate: (publicIds: string[]) => void;
+
+    /**
+     * Message sent when joining featured correspondence games room.
+     * List of few high-rated correspondence games with enough moves to display on lobby.
+     */
+    featuredCorrespondenceGamesUpdate: (publicIds: string[]) => void;
+
+    /**
+     * State for the `Rooms.playingGamesCount` room.
+     * Count of human playing games, split by live and correspondence.
+     */
+    playingGamesCountUpdate: (counts: { live: number, correspondence: number }) => void;
 };

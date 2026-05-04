@@ -82,7 +82,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
         ]"
     >
         <div class="card-body">
-            <small class="text-secondary match-number">
+            <small class="match-number">
                 {{ $t(`match_title.${tournamentMatch.label ?? 'default'}`, {
                     round: tournamentMatch.round,
                     number: tournamentMatch.number,
@@ -141,9 +141,12 @@ const playerHighlightClasses = (player: null | Player = null): string => {
 .match-number
     position absolute
     top -0.75em
-    left 0.5em
-    background var(--bs-body-bg)
+    left 1em
+    background var(--bs-success)
+    font-size 0.75em
+    border-radius 0.25em
     padding 0 0.5em
+    color white
 
 .card-highlighted
     box-shadow var(--bs-focus-ring-x, 0) var(--bs-focus-ring-y, 0) var(--bs-focus-ring-blur, 0) var(--bs-focus-ring-width) unquote('rgba(var(--bs-secondary-rgb), 0.5)')

@@ -14,6 +14,14 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
         this.listenOnlinePlayersServiceEvents();
     }
 
+    private emitActivePlayersCount(): void
+    {
+        this.hexServer.to(Rooms.onlinePlayersCount).emit(
+            'onlinePlayersCount',
+            this.onlinePlayersService.getActiveAndInactivePlayersCount(),
+        );
+    }
+
     private listenOnlinePlayersServiceEvents(): void
     {
         this.onlinePlayersService
@@ -32,6 +40,8 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                     player,
                     this.onlinePlayersService.getOnlinePlayersCount(),
                 );
+
+                this.emitActivePlayersCount();
             })
 
             .on('playerActive', (player, lastState) => {
@@ -44,6 +54,8 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                     'playerActive',
                     player,
                 );
+
+                this.emitActivePlayersCount();
             })
 
             .on('playerInactive', (player) => {
@@ -51,6 +63,8 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                     'playerInactive',
                     player,
                 );
+
+                this.emitActivePlayersCount();
             })
 
         ;
@@ -74,8 +88,13 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
 
     onJoinRoom(socket: HexSocket, room: string): void
     {
-        if (room !== Rooms.onlinePlayers) return;
-        const onlinePlayers = this.onlinePlayersService.getOnlinePlayers();
-        socket.emit('onlinePlayersUpdate', onlinePlayers);
+        if (room === Rooms.onlinePlayers) {
+            const onlinePlayers = this.onlinePlayersService.getOnlinePlayers();
+            socket.emit('onlinePlayersUpdate', onlinePlayers);
+        }
+
+        if (room === Rooms.onlinePlayersCount) {
+            socket.emit('onlinePlayersCount', this.onlinePlayersService.getActiveAndInactivePlayersCount());
+        }
     }
 }

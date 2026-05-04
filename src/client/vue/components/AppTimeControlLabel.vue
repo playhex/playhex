@@ -30,7 +30,7 @@ const props = defineProps({
     showAverage: {
         type: Boolean,
         required: false,
-        default: true,
+        default: false,
     },
 });
 
