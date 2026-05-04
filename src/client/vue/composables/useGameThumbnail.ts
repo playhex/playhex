@@ -110,7 +110,7 @@ export const useGameThumbnail = (gamePublicId: string) => {
 
             hostedGame.value = hostedGameData;
             spectatorsCount.value = spectatorsCountData;
-            gameView.value = new GameView(hostedGameData.boardsize);
+            gameView.value = new GameView(hostedGameData.boardsize, { interactive: false });
             playerSettingsFacade.value = new PlayerSettingsFacade(gameView.value, {
                 showCoords: false,
             });
