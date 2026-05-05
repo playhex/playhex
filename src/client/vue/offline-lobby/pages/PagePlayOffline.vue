@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { t } from 'i18next';
-import { Ref, ref } from 'vue';
+import { Ref, ref, shallowRef } from 'vue';
 import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
@@ -14,9 +14,15 @@ import type { HexMove } from '../../../../shared/move-notation/hex-move-notation
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 import { useWinOverlay } from '../../composables/useWinOverlay.js';
 import AppGameView from '../../components/AppGameView.vue';
+import { useHead } from '@unhead/vue';
 
-let gameView: null | GameView = null;
-let gameViewFacade: null | GameViewFacade = null;
+useHead({
+    title: t('play_offline'),
+});
+
+const game = shallowRef<Game | null>(null);
+const gameView = shallowRef<GameView | null>(null);
+let gameViewFacade = shallowRef<null | GameViewFacade>(null);
 let lastGameOptions: OfflineAIGameOptions;
 let calculateMove: (game: Game) => Promise<HexMove>;
 
@@ -91,18 +97,22 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
 
     const playerIndex = players.value.findIndex(p => !p.isBot);
 
-    const game = new Game(gameOptions.boardsize);
+    game.value = new Game(gameOptions.boardsize);
 
-    game.setAllowSwap(gameOptions.swapRule);
+    game.value.setAllowSwap(gameOptions.swapRule);
 
-    gameView = new GameView(game.getSize());
-    gameViewFacade = new GameViewFacade(gameView, game);
+    gameView.value = new GameView(game.value.getSize());
+    gameViewFacade.value = new GameViewFacade(gameView.value, game.value);
 
-    gameView.on('hexClicked', move => {
-        const hexMove = game.moveOrSwapPieces(move);
+    gameView.value.on('hexClicked', move => {
+        if (!game.value) {
+            return;
+        }
+
+        const hexMove = game.value.moveOrSwapPieces(move);
 
         try {
-            game.move(hexMove, playerIndex as PlayerIndex);
+            game.value.move(hexMove, playerIndex as PlayerIndex);
         } catch (e) {
             if (!(e instanceof IllegalMove)) {
                 throw e;
@@ -111,6 +121,10 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
     });
 
     const saveGame = () => {
+        if (!game.value) {
+            return;
+        }
+
         const currentGame = new OfflineGame();
 
         currentGame.gameOptions = gameOptions;
@@ -118,19 +132,17 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
             p.currentRating = undefined;
             return p;
         });
-        currentGame.gameData = game.toData();
+        currentGame.gameData = game.value.toData();
 
         offlineGamesStorage.setCurrentGame(currentGame);
     };
 
-    void makeAIMoveIfApplicable(game, players.value);
-    game.on('played', () => makeAIMoveIfApplicable(game, players.value));
-    game.on('played', () => saveGame());
-    game.on('ended', () => offlineGamesStorage.clearCurrentGame());
+    void makeAIMoveIfApplicable(game.value, players.value);
+    game.value.on('played', () => game.value && makeAIMoveIfApplicable(game.value, players.value));
+    game.value.on('played', () => saveGame());
+    game.value.on('ended', () => offlineGamesStorage.clearCurrentGame());
 
     saveGame();
-
-    initWinOverlay(gameViewFacade, game, players.value);
 };
 
 const reloadCurrentGame = (currentGame: OfflineGame) => {
@@ -141,16 +153,20 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
 
     const playerIndex = players.value.findIndex(p => !p.isBot);
 
-    const game = Game.fromData(currentGame.gameData);
+    game.value = Game.fromData(currentGame.gameData);
 
-    gameView = new GameView(game.getSize());
-    gameViewFacade = new GameViewFacade(gameView, game);
+    gameView.value = new GameView(game.value.getSize());
+    gameViewFacade.value = new GameViewFacade(gameView.value, game.value);
 
-    gameView.on('hexClicked', move => {
-        const hexMove = game.moveOrSwapPieces(move);
+    gameView.value.on('hexClicked', move => {
+        if (!game.value) {
+            return;
+        }
+
+        const hexMove = game.value.moveOrSwapPieces(move);
 
         try {
-            game.move(hexMove, playerIndex as PlayerIndex);
+            game.value.move(hexMove, playerIndex as PlayerIndex);
         } catch (e) {
             if (!(e instanceof IllegalMove)) {
                 throw e;
@@ -158,9 +174,13 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
         }
     });
 
-    void makeAIMoveIfApplicable(game, players.value);
-    game.on('played', () => makeAIMoveIfApplicable(game, players.value));
-    game.on('played', () => {
+    void makeAIMoveIfApplicable(game.value, players.value);
+    game.value.on('played', () => game.value && makeAIMoveIfApplicable(game.value, players.value));
+    game.value.on('played', () => {
+        if (!game.value) {
+            return;
+        }
+
         const nextCurrentGame = new OfflineGame();
 
         nextCurrentGame.gameOptions = currentGame.gameOptions;
@@ -168,13 +188,13 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
             p.currentRating = undefined;
             return p;
         });
-        nextCurrentGame.gameData = game.toData();
+
+        nextCurrentGame.gameData = game.value.toData();
 
         offlineGamesStorage.setCurrentGame(nextCurrentGame);
     });
-    game.on('ended', () => offlineGamesStorage.clearCurrentGame());
 
-    initWinOverlay(gameViewFacade, game, players.value);
+    game.value.on('ended', () => offlineGamesStorage.clearCurrentGame());
 };
 
 /*
@@ -182,14 +202,12 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
  */
 const gameFinishedOverlay = defineOverlay(OfflineGameFinishedOverlay);
 
-const initWinOverlay = (gameViewFacade: GameViewFacade, game: Game, players: Player[]) => {
-    useWinOverlay(gameViewFacade.getGameView(), gameViewFacade.getGame(), async () => {
-        await gameFinishedOverlay({
-            game,
-            players,
-        });
+useWinOverlay(gameView, game, async (gameView, game) => {
+    await gameFinishedOverlay({
+        game,
+        players: players.value,
     });
-};
+});
 
 init();
 
@@ -205,16 +223,18 @@ const rematch = () => {
 </script>
 
 <template>
-    <AppGameView
-        v-if="gameView"
-        :key="reload"
-        :gameView
-        class="offline-board-container"
-    />
+    <div class="bg-body">
+        <AppGameView
+            v-if="gameView"
+            :key="reload"
+            :gameView
+            class="offline-board-container"
+        />
 
-    <div class="game-menu">
-        <router-link class="btn btn-outline-primary" :to="{ name: 'offline-lobby' }">{{ $t('back_to_menu') }}</router-link>
-        <button class="btn btn-outline-warning" @click="rematch">{{ $t('restart') }}</button>
+        <div class="game-menu">
+            <router-link class="btn btn-outline-primary" :to="{ name: 'offline-lobby' }">{{ $t('back_to_menu') }}</router-link>
+            <button class="btn btn-outline-warning" @click="rematch">{{ $t('restart') }}</button>
+        </div>
     </div>
 </template>
 

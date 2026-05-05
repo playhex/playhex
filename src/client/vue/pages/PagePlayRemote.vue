@@ -287,24 +287,18 @@ const pass = async () => {
  */
 const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
 
-watch([gameView, game], () => {
-    if (!gameView.value || !game.value) {
+useWinOverlay(gameView, game, async (gameView, game) => {
+    if (!hostedGame.value) {
         return;
     }
 
-    useWinOverlay(gameView.value, game.value, async () => {
-        if (!hostedGame.value || !game.value) {
-            return;
-        }
-
-        await gameFinishedOverlay({
-            game: game.value,
-            players: hostedGame.value.hostedGameToPlayers
-                .map(hostedGameToPlayer => hostedGameToPlayer.player)
-            ,
-        });
+    await gameFinishedOverlay({
+        game,
+        players: hostedGame.value.hostedGameToPlayers
+            .map(hostedGameToPlayer => hostedGameToPlayer.player)
+        ,
     });
-}, { immediate: true });
+});
 
 /*
  * Warning when guest joining correspondence game
