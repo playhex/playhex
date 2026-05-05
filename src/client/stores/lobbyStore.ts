@@ -1,16 +1,34 @@
-import { PlayerIndex } from '../../shared/game-engine/index.js';
-import { Outcome } from '../../shared/game-engine/Types.js';
 import { defineStore } from 'pinia';
-import { HostedGame, Player, ChatMessage } from '../../shared/app/models/index.js';
+import { HostedGame } from '../../shared/app/models/index.js';
 import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
-import { addPlayer, cancelGame, endGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { cancelGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
-import { notifier } from '../services/notifications/index.js';
-import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
-import useAuthStore from './authStore.js';
+import { isCorrespondence, isLive } from '../../shared/app/timeControlUtils.js';
+
+/**
+ * Do not hide games directly from lobby when game started or canceled,
+ * first make it unavailable, and delete only when we are sure
+ * that it won't make player misclick (prevent CLS).
+ */
+type SoftRemovable = {
+
+    /**
+     * Whether game is no longer available to join.
+     * Should be displayed as greyed out on lobby.
+     * Will be deleted later, not before the Date, when misclick-safe.
+     */
+    softRemoved?: Date;
+};
+
+/**
+ * In milliseconds, keep the soft removed item for at least this time.
+ */
+const REMOVE_AFTER = 3000;
+
+const softRemoveDate = () => new Date(new Date().getTime() + REMOVE_AFTER);
 
 /**
  * State synced with server, and methods to handle games and players.
@@ -21,16 +39,52 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const { socket, joinRoom } = socketStore;
 
     /**
-     * List of active games, show on lobby in created and playing sections,
+     * List of games waiting for opponent, show on lobby in created section,
      * and keep track of updates.
      */
-    const hostedGames = ref<{ [key: string]: HostedGame }>({});
+    const hostedGames = ref<{ [key: string]: HostedGame & SoftRemovable }>({});
 
     /**
      * List of last ended games, show on lobby in ended games,
      * updates when an active game ends.
      */
     const endedHostedGames = ref<HostedGame[]>([]);
+
+    const currentLobby = ref<'live' | 'correspondence'>('live');
+
+    const currentLobbyHostedGames = computed<(HostedGame & SoftRemovable)[]>(() => {
+        if (currentLobby.value === 'live') {
+            return Object.values(hostedGames.value).filter(hostedGame => isLive(hostedGame));
+        } else {
+            return Object.values(hostedGames.value).filter(hostedGame => isCorrespondence(hostedGame));
+        }
+    });
+
+    /**
+     * Remove all softRemoved games now.
+     * Should be called when player is not hovering games list.
+     *
+     * @param immediate If true, will not wait REMOVE_AFTER delay. Used when we come back
+     */
+    const clearSoftRemovedGames = (immediate = false): void => {
+        const now = new Date();
+
+        for (const id in hostedGames.value) {
+            const game = hostedGames.value[id];
+
+            if (game.softRemoved && (now > game.softRemoved || immediate)) {
+                delete hostedGames.value[id];
+            }
+        }
+    };
+
+    const isSoftRemoved = (softRemovable: SoftRemovable): boolean => {
+        return !!softRemovable.softRemoved;
+    };
+
+    const excludeSoftRemoved = (softRemovable: SoftRemovable): boolean => {
+        return !softRemovable.softRemoved;
+    };
 
     const getOrFetchHostedGame = async (gameId: string): Promise<null | HostedGame> => {
         return hostedGames.value[gameId] ?? await getGame(gameId);
@@ -73,6 +127,10 @@ const useLobbyStore = defineStore('lobbyStore', () => {
                 } else {
                     hostedGames.value[hostedGame.publicId] = hostedGame;
                 }
+
+                if (hostedGames.value[hostedGame.publicId].state !== 'created') {
+                    hostedGames.value[hostedGame.publicId].softRemoved = softRemoveDate();
+                }
             }
 
             // Done after lobbyUpdate event received to make sure I don't miss an ended game
@@ -80,41 +138,13 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             void updateLastEndedGames();
         });
 
-        socket.on('gameUpdate', (gameId, hostedGame) => {
-            if (hostedGame === null) {
-                return;
-            }
-
-            if (hostedGames.value[hostedGame.publicId]) {
-                updateHostedGame(hostedGames.value[hostedGame.publicId], hostedGame);
-            } else {
-                hostedGames.value[hostedGame.publicId] = hostedGame;
-            }
-        });
-
-        socket.on('gameCreated', (hostedGame: HostedGame) => {
+        socket.on('lobbyGameCreated', (hostedGame: HostedGame) => {
             hostedGames.value[hostedGame.publicId] = hostedGame;
         });
 
-        socket.on('gameJoined', (gameId: string, player: Player) => {
-            if (hostedGames.value[gameId]) {
-                addPlayer(hostedGames.value[gameId], player);
-            }
-        });
-
-        socket.on('gameStarted', (hostedGame: HostedGame) => {
+        socket.on('lobbyGameStarted', (hostedGame: HostedGame) => {
             if (hostedGames.value[hostedGame.publicId]) {
-                updateHostedGame(hostedGames.value[hostedGame.publicId], hostedGame);
-            } else {
-                hostedGames.value[hostedGame.publicId] = hostedGame;
-            }
-
-            notifier.emit('gameStart', hostedGame);
-        });
-
-        socket.on('moved', (gameId, timestampedMove) => {
-            if (hostedGames.value[gameId]) {
-                notifier.emit('move', hostedGames.value[gameId], timestampedMove);
+                hostedGames.value[hostedGame.publicId].softRemoved = softRemoveDate();
             }
         });
 
@@ -122,34 +152,19 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             if (hostedGames.value[gameId]) {
                 cancelGame(hostedGames.value[gameId], date);
 
-                notifier.emit('gameEnd', hostedGames.value[gameId]);
-
-                delete hostedGames.value[gameId];
+                hostedGames.value[gameId].softRemoved = softRemoveDate();
             }
         });
 
-        socket.on('ended', (gameId: string, winner: PlayerIndex, outcome: Outcome, { date }) => {
-            if (hostedGames.value[gameId]) {
-                endGame(hostedGames.value[gameId], winner, outcome, date);
-
-                if (matchSearchParams(hostedGames.value[gameId], lastEndedGamesParameters)) {
-                    endedHostedGames.value.unshift(hostedGames.value[gameId]);
-                    endedHostedGames.value.pop();
-                }
-
-                notifier.emit('gameEnd', hostedGames.value[gameId]);
-
-                delete hostedGames.value[gameId];
+        socket.on('lobbyGameEnded', (hostedGame: HostedGame) => {
+            if (!matchSearchParams(hostedGame, lastEndedGamesParameters)) {
+                return;
             }
-        });
 
-        socket.on('chat', (gameId: string, chatMessage: ChatMessage) => {
-            if (hostedGames.value[gameId]) {
-                if (!checkShadowDeleted(chatMessage, useAuthStore().loggedInPlayer)) {
-                    return;
-                }
+            endedHostedGames.value.unshift(hostedGame);
 
-                notifier.emit('chatMessage', hostedGames.value[gameId], chatMessage);
+            while (endedHostedGames.value.length > 5) {
+                endedHostedGames.value.pop();
             }
         });
     };
@@ -159,14 +174,23 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     // Get lobby updates
     watchEffect(() => {
-        if (socketStore.connected) joinRoom(Rooms.lobby);
+        if (!socketStore.connected) {
+            return;
+        }
+
+        void joinRoom(Rooms.lobby);
     });
 
     return {
         hostedGames,
         endedHostedGames,
+        currentLobby,
+        currentLobbyHostedGames,
         joinGame,
         getOrFetchHostedGame,
+        clearSoftRemovedGames,
+        isSoftRemoved,
+        excludeSoftRemoved,
     };
 });
 

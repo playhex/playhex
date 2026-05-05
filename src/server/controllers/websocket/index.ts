@@ -8,6 +8,10 @@ import ChatWebsocketController from './ChatWebsocketController.js';
 import PlayerGamesWebsocketController from './PlayerGamesWebsocketController.js';
 import ServerStatusWebsocketController from './ServerStatusWebsocketController.js';
 import SpectatorWebsocketController from './SpectatorWebsocketController.js';
+import FeaturedLiveGamesWebsocketController from './FeaturedLiveGamesWebsocketController.js';
+import FeaturedCorrespondenceGamesWebsocketController from './FeaturedCorrespondenceGamesWebsocketController.js';
+import ThumbnailGameWebsocketController from './ThumbnailGameWebsocketController.js';
+import PlayingGamesCountWebsocketController from './PlayingGamesCountWebsocketController.js';
 
 export interface WebsocketControllerInterface
 {
@@ -35,6 +39,10 @@ export function registerWebsocketControllers() {
         Container.get(RoomWebsocketController),
         Container.get(ChatWebsocketController),
         Container.get(LobbyWebsocketController),
+        Container.get(FeaturedLiveGamesWebsocketController),
+        Container.get(FeaturedCorrespondenceGamesWebsocketController),
+        Container.get(ThumbnailGameWebsocketController),
+        Container.get(PlayingGamesCountWebsocketController),
         Container.get(GameWebsocketController),
         Container.get(OnlinePlayersWebsocketController),
         Container.get(PlayerGamesWebsocketController),

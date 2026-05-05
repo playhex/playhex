@@ -68,18 +68,8 @@ describe('Ranked games', () => {
         cy.receiveLobbyUpdate('ranked/games.json');
 
         cy
-            // Waiting games
-            .contains('Join a game')
-            .next('div')
-            .contains('Guest 2943')
-            .closest('tr')
-            .contains('Ranked')
-        ;
-
-        cy
-            // Current games
-            .contains('Watch current games')
-            .next('.table-responsive')
+            .contains('Join a live game')
+            .closest('.card')
             .contains('Guest 2943')
             .closest('tr')
             .contains('Ranked')
@@ -90,6 +80,8 @@ describe('Ranked games', () => {
         cy.mockSocketIO();
 
         cy.visit('/');
+
+        cy.contains('active players').click();
 
         cy.receiveOnlinePlayersUpdate('ranked/online-players.json');
 

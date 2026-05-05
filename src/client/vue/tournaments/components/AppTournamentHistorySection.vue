@@ -24,19 +24,23 @@ const formatHistoryLogDate = (date: Date): string => {
 </script>
 
 <template>
-    <h2>{{ $t('tournament_history_logs') }}</h2>
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title m-0">{{ $t('tournament_history_logs') }}</h2>
+        </div>
 
-    <ul v-if="tournament.history.length > 0" class="list-group list-group-flush">
-        <li
-            v-for="history, key in tournament.history"
-            :key
-            class="list-group-item"
-        >
-            <small class="text-secondary">{{ formatHistoryLogDate(history.date) }}</small>
-            -
-            {{ $t('tournament_history.' + history.type, history.parameters) }}
-        </li>
-    </ul>
+        <ul v-if="tournament.history.length > 0" class="list-group list-group-flush">
+            <li
+                v-for="history, key in tournament.history"
+                :key
+                class="list-group-item"
+            >
+                <small class="text-secondary">{{ formatHistoryLogDate(history.date) }}</small>
+                -
+                {{ $t('tournament_history.' + history.type, history.parameters) }}
+            </li>
+        </ul>
 
-    <p v-else><i>{{ $t('tournament_history_logs_empty') }}</i></p>
+        <p v-else class="m-3"><i>{{ $t('tournament_history_logs_empty') }}</i></p>
+    </div>
 </template>

@@ -3,11 +3,11 @@ import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill } from '../../icons.js';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
-import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames } from '../../../apiClient.js';
-import { Ref, ref, useTemplateRef, watch } from 'vue';
+import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
+import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import { format } from 'date-fns';
-import useLobbyStore from '../../../stores/lobbyStore.js';
+import useMyGamesStore from '../../../stores/myGamesStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
@@ -21,13 +21,12 @@ import { injectHead, useSeoMeta } from '@unhead/vue';
 import { definePerson, useSchemaOrg } from '@unhead/schema-org';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { timeControlToCadencyName } from '../../../../shared/app/timeControlUtils.js';
 import useServerDateStore from '../../../stores/serverDateStore.js';
 import { watchEffect } from 'vue';
 import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
-import { getOtherPlayerStrict, hasPlayer, hasWon } from '../../../../shared/app/hostedGameUtils.js';
+import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/hostedGameUtils.js';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
@@ -105,45 +104,27 @@ void (async () => {
 /*
  * Current games
  */
-const { hostedGames } = storeToRefs(useLobbyStore());
+const { mySortedGames } = storeToRefs(useMyGamesStore());
+const otherPlayerActiveGames = ref<HostedGame[]>([]);
 
-const currentGameComparator = (a: HostedGame, b: HostedGame): number => {
-    // Correspondence games go after real-time games, then sorted by "started at"
-    const timeA = timeControlToCadencyName(a);
-    const timeB = timeControlToCadencyName(b);
-
-    if (timeA !== 'correspondence' && timeB === 'correspondence')
-        return -1;
-
-    if (timeA === 'correspondence' && timeB !== 'correspondence')
-        return 1;
-
-    const startedAtA = a.startedAt;
-    const startedAtB = b.startedAt;
-
-    if (startedAtA != null && startedAtB != null)
-        return startedAtB.getTime() - startedAtA.getTime();
-
-    return 0;
-};
-
-const getCurrentGames = (): HostedGame[] => {
-    if (player.value === null) {
-        return [];
+watchEffect(async () => {
+    if (player.value === null || loggedInPlayer.value?.publicId === player.value.publicId) {
+        otherPlayerActiveGames.value = [];
+        return;
     }
 
-    const currentGames: HostedGame[] = [];
+    otherPlayerActiveGames.value = await apiGetPlayerActiveGames(player.value.publicId);
+});
 
-    for (const hostedGame of Object.values(hostedGames.value)) {
-        if (hostedGame.state !== 'playing' || !hasPlayer(hostedGame, player.value)) {
-            continue;
-        }
+const currentGames = computed((): HostedGame[] => {
+    if (player.value === null) return [];
 
-        currentGames.push(hostedGame);
+    if (loggedInPlayer.value?.publicId === player.value.publicId) {
+        return mySortedGames.value.map(g => g.hostedGame);
     }
 
-    return currentGames.sort(currentGameComparator);
-};
+    return otherPlayerActiveGames.value;
+});
 
 /*
  * Games history
@@ -419,7 +400,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                 </thead>
                 <tbody v-if="player">
                     <tr
-                        v-for="game in getCurrentGames()"
+                        v-for="game in currentGames"
                         :key="game.publicId"
                     >
                         <td class="ps-0">
@@ -450,63 +431,65 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
         <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
         <p v-else>…</p>
 
-        <div class="mt-3">
-            <button @click="goPagePrevious" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-            <span class="mx-3">{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-            <button @click="goPageNext" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
-        </div>
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+            </div>
 
-        <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
-            <table class="table mb-0">
-                <thead>
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                        <th scope="col">{{ $t('game.outcome') }}</th>
-                        <th scope="col">{{ $t('game.opponent') }}</th>
-                        <th scope="col">{{ $t('game.size') }}</th>
-                        <th scope="col">{{ $t('game.time_control') }}</th>
-                        <th scope="col">{{ $t('game.rules') }}</th>
-                        <th scope="col">{{ $t('game.finished') }}</th>
-                    </tr>
-                </thead>
-                <tbody v-if="player">
-                    <tr
-                        v-for="game in gamesHistory"
-                        :key="game.publicId"
-                    >
-                        <td class="ps-0">
-                            <router-link
-                                :to="{ name: 'online-game', params: { gameId: game.publicId } }"
-                                class="btn btn-sm btn-link"
-                            >{{ $t('game.review') }}</router-link>
-                        </td>
-                        <td>
-                            <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
-                        </td>
+            <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
+                <table class="table text-nowrap mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col">{{ $t('game.outcome') }}</th>
+                            <th scope="col">{{ $t('game.opponent') }}</th>
+                            <th scope="col">{{ $t('game.size') }}</th>
+                            <th scope="col">{{ $t('game.time_control') }}</th>
+                            <th scope="col">{{ $t('game.rules') }}</th>
+                            <th scope="col">{{ $t('game.finished') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody v-if="player">
+                        <tr
+                            v-for="game in gamesHistory"
+                            :key="game.publicId"
+                        >
+                            <td class="ps-0">
+                                <router-link
+                                    :to="{ name: 'online-game', params: { gameId: game.publicId } }"
+                                    class="btn btn-sm btn-link"
+                                >{{ $t('game.review') }}</router-link>
+                            </td>
+                            <td>
+                                <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                            </td>
 
-                        <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
-                        <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
-                        <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
+                            <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
+                            <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
+                            <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
 
-                        <td v-if="game.hostedGameToPlayers.length < 2">-</td>
-                        <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
+                            <td v-if="game.hostedGameToPlayers.length < 2">-</td>
+                            <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
 
-                        <td>{{ game.boardsize }}</td>
-                        <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
-                        <td><AppGameRulesSummary :gameOptions="game" /></td>
-                        <td>{{
-                            game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
-                        }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            <td>{{ game.boardsize }}</td>
+                            <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                            <td><AppGameRulesSummary :gameOptions="game" /></td>
+                            <td>{{
+                                game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
+                            }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div v-if="gamesHistory && gamesHistory.length > 0" class="mt-3">
-            <button @click="goPagePrevious" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-            <span class="mx-3">{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-            <button @click="goPageNext" class="btn btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+            <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
+                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+            </div>
         </div>
     </div>
 

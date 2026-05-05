@@ -317,7 +317,7 @@ const {
 
 <template>
     <div v-show="hostedGame" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : 'sidebar-closed')">
-        <div class="game">
+        <div class="game bg-body">
 
             <!-- Game board, "Accept" button -->
             <div class="board-container">

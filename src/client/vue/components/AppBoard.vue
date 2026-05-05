@@ -153,6 +153,7 @@ onUnmounted(() => {
                     v-if="timeControlOptions && timeControlValues"
                     :timeControlOptions="timeControlOptions"
                     :playerTimeData="timeControlValues.players[0]"
+                    class="my-1"
                 />
             </div>
             <div class="player player-b">
@@ -171,6 +172,7 @@ onUnmounted(() => {
                     v-if="timeControlOptions && timeControlValues"
                     :timeControlOptions="timeControlOptions"
                     :playerTimeData="timeControlValues.players[1]"
+                    class="my-1"
                 />
             </div>
         </div>

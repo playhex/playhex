@@ -26,12 +26,33 @@ describe('Profile page', () => {
         cy.contains('win');
     });
 
+    it('see playing games in current games section of someone else profile page', () => {
+        cy.intercept('/api/players?slug=player-test', {
+            fixture: 'profile-page/player-test.json',
+        });
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/active-games', {
+            fixture: 'profile-page/games-state-playing.json',
+        });
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/games?state=ended', {
+            fixture: 'profile-page/games-state-ended.json',
+        });
+
+        cy.visit('/@player-test');
+
+        cy.contains('h3', 'Current games');
+        cy.contains('Opponent Player');
+        cy.contains('Watch');
+    });
+
     it('see someone else profile page', () => {
         cy.intercept('/api/games?*d63e9d50-0afd-48ff-88f4-706fbee620b2*', {
             fixture: 'profile-page/games.json',
         });
         cy.intercept('/api/players?slug=player-test', {
             fixture: 'profile-page/player-test.json',
+        });
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/active-games', {
+            body: [],
         });
         cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/games?state=ended', {
             fixture: 'profile-page/games-state-ended.json',

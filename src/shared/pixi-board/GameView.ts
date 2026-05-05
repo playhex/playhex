@@ -84,12 +84,19 @@ type GameViewOptions = {
      * 0 means positive flat, 11 means diamond (or -1).
      */
     orientation: number;
+
+    /**
+     * Whether this view can be clicked and should emit click events.
+     * Defaults to true. Set to false when not needed and for better performances.
+     */
+    interactive: boolean;
 };
 
 const defaultOptions: GameViewOptions = {
     theme: themes.dark,
     displayCoords: false,
     orientation: 11,
+    interactive: true,
 };
 
 /**
@@ -215,20 +222,22 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private entityLayersContainer: Container<Container<BoardEntity>>;
 
+    private gameViewOptions: GameViewOptions;
+
     constructor(
         private boardsize: number,
         options: Partial<GameViewOptions> = {},
     ) {
         super();
 
-        const opts = {
+        this.gameViewOptions = {
             ...defaultOptions,
             ...options,
         };
 
-        this.theme = opts.theme;
-        this.displayCoords = opts.displayCoords;
-        this.orientation = this.modOrientation(opts.orientation);
+        this.theme = this.gameViewOptions.theme;
+        this.displayCoords = this.gameViewOptions.displayCoords;
+        this.orientation = this.modOrientation(this.gameViewOptions.orientation);
 
         this.init();
     }
@@ -268,6 +277,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             resolution: ceil(window.devicePixelRatio), // passing devicePixelRatio * 2 here, and no longer need to double resolution of PIXI.Text
             autoDensity: true,
             resizeTo: element,
+            eventMode: this.gameViewOptions.interactive ? 'passive' : 'none',
             ...this.getWrapperSize(),
         });
 

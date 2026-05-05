@@ -7,8 +7,9 @@ export default class RoomWebsocketController implements WebsocketControllerInter
 {
     onConnection(socket: HexSocket): void
     {
-        socket.on('joinRoom', async room => {
+        socket.on('joinRoom', async (room, answer) => {
             await socket.join(room);
+            answer();
         });
 
         socket.on('leaveRoom', async room => {

@@ -36,6 +36,13 @@ const goToMostUrgentGame = (): void => {
 };
 
 /**
+ * Leave focus of submenu item to not keep it open after clicking on it and page changed
+ */
+const leaveFocus = (): void => {
+    (document.activeElement as HTMLElement)?.blur();
+};
+
+/**
  * Just adding data-bs-toggle="offcanvas" on offcanvas links
  * does not work (close offcanvas but prevent navigation).
  */
@@ -97,7 +104,7 @@ const {
 </script>
 
 <template>
-    <nav class="navbar navbar-expand-sm bg-body-tertiary menu-top">
+    <nav class="navbar navbar-expand-sm bg-body-secondary menu-top shadow-sm">
         <div class="container-fluid">
 
             <!-- PlayHex -->
@@ -131,6 +138,42 @@ const {
 
                     <!-- Header menu items-->
                     <ul class="navbar-nav flex-grow-1 pe-3">
+
+                        <li class="nav-item has-submenu">
+                            <router-link
+                                :to="{ name: 'home' }"
+                                :class="{ active: routeName === 'home' || routeName === 'playing-games' || routeName === 'games-archive' }"
+                                class="nav-link"
+                                @click="closeOffcanvas(); leaveFocus()"
+                            >{{ $t('nav_games') }}</router-link>
+
+                            <ul class="nav-submenu">
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'home' }"
+                                        :class="{ active: routeName === 'home' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('nav_lobby') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'playing-games' }"
+                                        :class="{ active: routeName === 'playing-games' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('nav_observe') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'games-archive' }"
+                                        :class="{ active: routeName === 'games-archive' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('nav_archives') }}</router-link>
+                                </li>
+                            </ul>
+                        </li>
 
                         <li class="nav-item">
                             <router-link
@@ -206,6 +249,31 @@ nav
 
 .navbar-toggler
     font-size 1em
+
+.has-submenu
+    position relative
+
+    .nav-submenu
+        position static
+        box-shadow none
+        padding 0
+        padding-left 1em
+        white-space nowrap
+        list-style none
+
+        @media (min-width: 576px)
+            display none
+            position absolute
+            top 100%
+            left -1em
+            padding 0.5em 1em
+            margin 0
+            background var(--bs-secondary-bg)
+            box-shadow 0 4px 6px rgba(0, 0, 0, 0.1)
+
+    &:hover .nav-submenu,
+    &:focus-within .nav-submenu
+        display block
 
 .nav-player-item
     font-size 1.1em

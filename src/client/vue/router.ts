@@ -54,9 +54,19 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        name: 'online-players',
+        path: '/online-players',
+        component: () => import('./pages/PageOnlinePlayers.vue'),
+    },
+    {
         name: 'games-archive',
         path: '/games-archive',
         component: () => import('./pages/PageGamesArchive.vue'),
+    },
+    {
+        name: 'playing-games',
+        path: '/playing-games/:mode(live|correspondence)?',
+        component: () => import('./pages/PagePlayingGames.vue'),
     },
     {
         name: 'login',

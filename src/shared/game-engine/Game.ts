@@ -417,6 +417,7 @@ export default class Game extends TypedEmitter<GameEvents>
     /**
      * player undo, moves are undone until it is player's turn again.
      * So 1 move is undone, or 2 if opponent played, his last move is also undone.
+     * First move in the array is the last move played in the history.
      */
     playerUndo(playerIndex: PlayerIndex): TimestampedMove[]
     {

@@ -1,0 +1,76 @@
+[
+    {
+        "publicId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "host": {
+            "pseudo": "Player Test",
+            "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "player-test",
+            "createdAt": "2024-01-19T10:23:11.600Z"
+        },
+        "hostedGameToPlayers": [
+            {
+                "player": {
+                    "pseudo": "Player Test",
+                    "publicId": "d63e9d50-0afd-48ff-88f4-706fbee620b2",
+                    "isGuest": false,
+                    "isBot": false,
+                    "slug": "player-test",
+                    "createdAt": "2024-01-19T10:23:11.600Z"
+                }
+            },
+            {
+                "player": {
+                    "pseudo": "Opponent Player",
+                    "publicId": "b1c2d3e4-f5a6-7890-bcde-fa1234567890",
+                    "isGuest": false,
+                    "isBot": false,
+                    "slug": "opponent-player",
+                    "createdAt": "2024-01-20T08:00:00.000Z"
+                }
+            }
+        ],
+        "timeControl": {
+            "state": "running",
+            "currentPlayer": 0,
+            "players": [
+                {
+                    "totalRemainingTime": 580000
+                },
+                {
+                    "totalRemainingTime": 595000
+                }
+            ]
+        },
+        "boardsize": 11,
+        "firstPlayer": null,
+        "swapRule": true,
+        "opponentType": "player",
+        "ranked": false,
+        "timeControlType": {
+            "family": "fischer",
+            "options": {
+                "initialTime": 600000,
+                "timeIncrement": 5000,
+                "maxTime": 600000
+            }
+        },
+        "chatMessages": [],
+        "state": "playing",
+        "createdAt": "2024-01-20T09:00:00.000Z",
+        "movesHistory": [
+            {
+                "row": 5,
+                "col": 5,
+                "playedAt": "2024-01-20T09:00:01.000Z"
+            }
+        ],
+        "currentPlayerIndex": 1,
+        "winner": null,
+        "outcome": null,
+        "startedAt": "2024-01-20T09:00:00.500Z",
+        "lastMoveAt": "2024-01-20T09:00:01.000Z",
+        "endedAt": null
+    }
+]

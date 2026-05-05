@@ -3,6 +3,7 @@ import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
 import StatsRepository from '../../../repositories/StatsRepository.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 
 @JsonController()
 @Service()
@@ -11,6 +12,7 @@ export default class PlayerController
     constructor(
         private playerRepository: PlayerRepository,
         private statsRepository: StatsRepository,
+        private hostedGameRepository: HostedGameRepository,
     ) {}
 
     /**
@@ -41,6 +43,21 @@ export default class PlayerController
         }
 
         return player;
+    }
+
+    @Get('/api/players/:publicId/active-games')
+    async getActiveGames(
+        @Param('publicId') publicId: string,
+    ) {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (player === null) {
+            throw new DomainHttpError(404, 'player_not_found');
+        }
+
+        return this.hostedGameRepository.getPlayerActiveGames(player)
+            .map(g => g.getHostedGame())
+        ;
     }
 
     @Get('/api/players/:publicId/stats')

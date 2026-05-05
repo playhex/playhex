@@ -62,7 +62,7 @@ watchEffect(() => {
 
         <template v-if="rating">
             <!-- adds an invisible space between username and rating to make copy/paste and functionnal tests more readable -->
-            <span class="small">&nbsp;</span>
+            <span class="invisible">&nbsp;</span>
 
             <AppPlayerRating :player="p" :full="rating === 'full'" class="ms-2" />
         </template>
@@ -70,6 +70,6 @@ watchEffect(() => {
 </template>
 
 <style lang="stylus" scoped>
-.small
+.invisible
     font-size 0px
 </style>
