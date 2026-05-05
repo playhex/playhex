@@ -147,7 +147,7 @@ const sortedGames = computed(() => {
                     <div
                         v-for="game in sortedGames.slice(0, TOP_COUNT)"
                         :key="game.publicId"
-                        class="col col-sm-6 col-md-4 col-xl-3"
+                        class="col-12 col-sm-6 col-md-4 col-xl-3"
                     >
                         <AppGameThumbnailLobbyLiveCard :gamePublicId="game.publicId" />
                     </div>
