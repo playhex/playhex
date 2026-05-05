@@ -131,6 +131,10 @@ export const useGameThumbnail = (gamePublicId: string) => {
         socket.off('spectatorJoined', onSpectatorJoined);
         socket.off('spectatorLeft', onSpectatorLeft);
         leaveRoom(Rooms.thumbnailGame(gamePublicId));
+
+        gameView.value?.destroy();
+        playingGameFacade.value?.destroy();
+        playerSettingsFacade.value?.destroy();
     });
 
     return {
