@@ -9,6 +9,9 @@ export default class RoomWebsocketController implements WebsocketControllerInter
     {
         socket.on('joinRoom', async (room, answer) => {
             await socket.join(room);
+
+            if (!answer) return; // TODO temporary for retrocompat. Remove later
+
             answer();
         });
 
