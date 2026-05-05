@@ -23,8 +23,6 @@ import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoinin
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
-import { useWinOverlay } from '../composables/useWinOverlay.js';
-import GameFinishedOverlay from '../components/overlay/GameFinishedOverlay.vue';
 
 const head = injectHead();
 
@@ -281,24 +279,6 @@ const pass = async () => {
         // noop, player said no
     }
 };
-
-/*
- * Win animation and overlay
- */
-const gameFinishedOverlay = defineOverlay(GameFinishedOverlay);
-
-useWinOverlay(gameView, game, async (gameView, game) => {
-    if (!hostedGame.value) {
-        return;
-    }
-
-    await gameFinishedOverlay({
-        game,
-        players: hostedGame.value.hostedGameToPlayers
-            .map(hostedGameToPlayer => hostedGameToPlayer.player)
-        ,
-    });
-});
 
 /*
  * Warning when guest joining correspondence game

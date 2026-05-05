@@ -63,4 +63,14 @@ export class AnimatorFacade
     {
         this.gameView.removeEntitiesGroup(AnimatorFacade.GROUP_ANIMATE_PATH);
     }
+
+    hideAnimatePathMarks(): void
+    {
+        this.gameView.getGroup(AnimatorFacade.GROUP_ANIMATE_PATH).visible = false;
+    }
+
+    showAnimatePathMarks(): void
+    {
+        this.gameView.getGroup(AnimatorFacade.GROUP_ANIMATE_PATH).visible = true;
+    }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { t } from 'i18next';
-import { Ref, ref, shallowRef } from 'vue';
+import { Ref, ref, shallowRef, onUnmounted } from 'vue';
 import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
@@ -12,9 +12,9 @@ import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 import type { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
-import { useWinOverlay } from '../../composables/useWinOverlay.js';
 import AppGameView from '../../components/AppGameView.vue';
 import { useHead } from '@unhead/vue';
+import { AnimatorFacade } from '../../../../shared/pixi-board/facades/AnimatorFacade.js';
 
 useHead({
     title: t('play_offline'),
@@ -143,6 +143,8 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
     game.value.on('ended', () => offlineGamesStorage.clearCurrentGame());
 
     saveGame();
+
+    initWinOverlay(game.value, gameView.value);
 };
 
 const reloadCurrentGame = (currentGame: OfflineGame) => {
@@ -195,6 +197,8 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
     });
 
     game.value.on('ended', () => offlineGamesStorage.clearCurrentGame());
+
+    initWinOverlay(game.value, gameView.value);
 };
 
 /*
@@ -202,12 +206,42 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
  */
 const gameFinishedOverlay = defineOverlay(OfflineGameFinishedOverlay);
 
-useWinOverlay(gameView, game, async (gameView, game) => {
-    await gameFinishedOverlay({
-        game,
-        players: players.value,
-    });
-});
+let disposeWinOverlay: null | (() => void) = null;
+
+const initWinOverlay = (game: Game, gameView: GameView) => {
+    disposeWinOverlay?.();
+
+    let disposed = false;
+
+    const endedCallback = async () => {
+        if (disposed) return;
+
+        const winningPath = game.getBoard().getShortestWinningPath();
+
+        if (winningPath) {
+            const animatorFacade = new AnimatorFacade(gameView);
+            await animatorFacade.animatePath(winningPath);
+
+            if (disposed) return;
+        }
+
+        await gameFinishedOverlay({
+            game,
+            players: players.value,
+        });
+    };
+
+    game.on('ended', endedCallback);
+    game.on('canceled', endedCallback);
+
+    disposeWinOverlay = () => {
+        disposed = true;
+        game.off('ended', endedCallback);
+        game.off('canceled', endedCallback);
+    };
+};
+
+onUnmounted(() => disposeWinOverlay?.());
 
 init();
 

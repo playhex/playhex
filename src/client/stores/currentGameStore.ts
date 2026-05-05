@@ -34,6 +34,9 @@ import { notifier } from '../services/notifications/notifier.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
 import useLobbyStore from './lobbyStore.js';
 import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
+import { AnimatorFacade } from '../../shared/pixi-board/facades/AnimatorFacade.js';
+import { defineOverlay } from '@overlastic/vue';
+import GameFinishedOverlay from '../vue/components/overlay/GameFinishedOverlay.vue';
 
 /**
  * Current remote game I am focused on.
@@ -64,6 +67,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const playingGameFacade = shallowRef<null | PlayingGameFacade>(null);
     const playerSettingsFacade = shallowRef<null | PlayerSettingsFacade>(null);
     const simulatePlayingGameFacade = shallowRef<null | SimulatePlayingGameFacade>(null);
+    let animatorFacade: null | AnimatorFacade = null;
 
     /**
      * Whether we are in simulation or conditional moves mode.
@@ -119,6 +123,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             listenHexClick();
             listenHexSecondaryClick();
             listenModel(playingGameFacade.value, game.value);
+
+            initWinOverlay(game.value, gameView.value, hostedGame.value);
         });
 
         watchEffect(() => {
@@ -128,6 +134,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
 
         onBeforeUnmount(() => {
+            disposeWinOverlay?.();
             disableCurrentUIMode();
             socketStore.leaveRoom(Rooms.game(gamePublicId));
             unlisten();
@@ -1041,6 +1048,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         removeConfirmMove();
         simulatePlayingGameFacade.value = new SimulatePlayingGameFacade(playingGameFacade.value);
 
+        animatorFacade?.hideAnimatePathMarks();
+
         return simulatePlayingGameFacade.value;
     };
 
@@ -1051,6 +1060,56 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         simulatePlayingGameFacade.value.destroy();
         simulatePlayingGameFacade.value = null;
+
+        animatorFacade?.showAnimatePathMarks();
+    };
+
+    /**
+     * Win overlay and animation
+     */
+    let disposeWinOverlay: null | (() => void) = null;
+
+    const initWinOverlay = (game: Game, gameView: GameView, hostedGame: HostedGame) => {
+        if (disposeWinOverlay) {
+            disposeWinOverlay();
+            disposeWinOverlay = null;
+        }
+
+        let disposed = false;
+
+        const endedCallback = async () => {
+            if (disposed) {
+                return;
+            }
+
+            const winningPath = game.getBoard().getShortestWinningPath();
+
+            if (winningPath) {
+                animatorFacade = new AnimatorFacade(gameView);
+                await animatorFacade.animatePath(winningPath);
+
+                if (disposed) {
+                    return;
+                }
+            }
+
+            await defineOverlay(GameFinishedOverlay)({
+                game,
+                players: hostedGame.hostedGameToPlayers
+                    .map(hostedGameToPlayer => hostedGameToPlayer.player)
+                ,
+            });
+        };
+
+        game.on('ended', endedCallback);
+        game.on('canceled', endedCallback);
+
+        disposeWinOverlay = () => {
+            disposed = true;
+            game.off('ended', endedCallback);
+            game.off('canceled', endedCallback);
+            animatorFacade = null;
+        };
     };
 
     /*
