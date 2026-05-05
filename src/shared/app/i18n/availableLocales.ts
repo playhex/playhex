@@ -74,6 +74,7 @@ export const availableLocales: AvailableLocales = {
         loader: () => import(/* webpackChunkName: "locale-id" */ 'date-fns/locale/id') as unknown as DefaultExportLocale,
         translators: [
             { fullName: '2swap', link: 'http://localhost:3000/@2swap' },
+            { fullName: 'Arif Budiman', link: 'https://github.com/arifpedia' },
         ],
     },
     it: {
