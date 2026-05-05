@@ -287,7 +287,13 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.redrawAfterOrientationOrWrapperSizeChanged();
 
-        element.appendChild(this.getView());
+        const canvas = this.getView();
+        element.appendChild(canvas);
+
+        // Allow native page scrolling on mobile. Pixi sets touch-action:none by default.
+        canvas.style.touchAction = 'pan-y';
+        canvas.addEventListener('touchmove', () => this.clearLongPressTimeout(), { passive: true });
+        canvas.addEventListener('pointercancel', () => this.clearLongPressTimeout());
     }
 
     getHex(move: Move): Hex
