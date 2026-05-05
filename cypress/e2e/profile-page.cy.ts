@@ -44,6 +44,23 @@ describe('Profile page', () => {
         cy.contains('Watch');
     });
 
+    it('shows a profile page of a player having 2 active games: a waiting and a playing', () => {
+        cy.intercept('/api/players?slug=player-test', {
+            fixture: 'profile-page/player-test.json',
+        });
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/active-games', {
+            fixture: 'profile-page/games-state-playing-and-waiting.json',
+        });
+        cy.intercept('/api/players/d63e9d50-0afd-48ff-88f4-706fbee620b2/games?state=ended', {
+            fixture: 'profile-page/games-state-ended.json',
+        });
+
+        cy.visit('/@player-test');
+
+        cy.contains('h3', 'Current games');
+        cy.contains('Opponent Player');
+    });
+
     it('see someone else profile page', () => {
         cy.intercept('/api/games?*d63e9d50-0afd-48ff-88f4-706fbee620b2*', {
             fixture: 'profile-page/games.json',

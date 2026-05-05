@@ -120,10 +120,13 @@ const currentGames = computed((): HostedGame[] => {
     if (player.value === null) return [];
 
     if (loggedInPlayer.value?.publicId === player.value.publicId) {
-        return mySortedGames.value.map(g => g.hostedGame);
+        return mySortedGames.value
+            .map(g => g.hostedGame)
+            .filter(hostedGame => hostedGame.state === 'playing')
+        ;
     }
 
-    return otherPlayerActiveGames.value;
+    return otherPlayerActiveGames.value.filter(hostedGame => hostedGame.state === 'playing');
 });
 
 /*
