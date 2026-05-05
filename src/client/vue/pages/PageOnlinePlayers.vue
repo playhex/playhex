@@ -22,6 +22,11 @@ const sortMode = ref<SortMode>('rating');
 const sortedPlayers = computed<OnlinePlayer[]>(() => {
     return Object.values<OnlinePlayer>(players.value)
         .sort((a, b) => {
+            // inactive players at the end
+            if (a.active && !b.active) return -1;
+            if (!a.active && b.active) return 1;
+
+            // guest players at the end
             if (!a.player.isGuest && b.player.isGuest) return -1;
             if (a.player.isGuest && !b.player.isGuest) return 1;
 
