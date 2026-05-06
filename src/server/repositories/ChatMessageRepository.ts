@@ -26,4 +26,25 @@ export default class ChatMessageRepository
 
         return affected;
     }
+
+    async getLastChatMessages(limit: number = 100): Promise<ChatMessage[]>
+    {
+        return await this.chatMessageRepository.find({
+            relations: { player: true },
+            order: { createdAt: 'desc' },
+            take: limit,
+        });
+    }
+
+    async moderateDeleteChatMessage(publicId: string): Promise<boolean>
+    {
+        const { affected } = await this.chatMessageRepository.createQueryBuilder()
+            .update()
+            .where('publicId = :publicId', { publicId })
+            .set({ deletedByModeration: true })
+            .execute()
+        ;
+
+        return (affected ?? 0) > 0;
+    }
 }

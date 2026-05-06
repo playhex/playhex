@@ -1,0 +1,7 @@
+# Mark a chat message as deleted by moderation.
+# Sets deletedByModeration = true on the message, in memory and/or database.
+
+@chatMessagePublicId=00000000-0000-0000-0000-000000000000
+
+DELETE /api/admin/moderation/chat-messages/{{ chatMessagePublicId }}
+Authorization: Bearer {{ moderationPassword }}

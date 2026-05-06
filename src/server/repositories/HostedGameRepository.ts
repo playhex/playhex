@@ -649,6 +649,20 @@ export default class HostedGameRepository
         return true;
     }
 
+    moderateDeleteChatMessage(publicId: string): boolean
+    {
+        for (const key in this.activeGames) {
+            for (const chatMessage of this.activeGames[key].getHostedGame().chatMessages) {
+                if (chatMessage.publicId === publicId) {
+                    chatMessage.deletedByModeration = true;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Shadow delete player chat messages in active games
      */

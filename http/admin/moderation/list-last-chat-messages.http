@@ -1,0 +1,5 @@
+# Get last 100 chat messages (from database and active in-memory games).
+# Includes moderation fields: publicId and deletedByModeration.
+
+GET /api/admin/moderation/chat-messages
+Authorization: Bearer {{ moderationPassword }}

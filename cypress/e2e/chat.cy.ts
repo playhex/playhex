@@ -73,6 +73,7 @@ describe('Chat', () => {
             cy.visit('/games/00000000-0000-0000-0000-000000000000');
 
             cy.contains('Loading game…');
+            cy.contains('header .nav-player-item', 'Guest 6569');
             cy.receiveGameUpdate('chat/game-playing-shadow-deleted.json');
             cy.contains('Loading game…').should('not.exist');
 
@@ -95,6 +96,56 @@ describe('Chat', () => {
 
             cy.contains('.chat-messages', 'Hello, I am a watcher');
             cy.contains('.chat-messages', "Hello, ready. Let's play");
+        });
+    });
+
+    describe('moderated messages', () => {
+        it('shows moderated message as "Message deleted by moderation" to all players', () => {
+            cy.mockSocketIO();
+            cy.intercept('/api/auth/me-or-guest', {
+                fixture: 'game/me-or-guest.json',
+            });
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+            cy.contains('Loading game…');
+            cy.receiveGameUpdate('chat/game-playing-moderated.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-messages', 'Hello, I am a watcher');
+            cy.contains('.chat-messages', "Hello, ready. Let's play");
+            cy.contains('.chat-messages', 'Message deleted by moderation');
+
+            // does not show original content of a moderated message
+            cy.contains('.chat-messages', 'This message was moderated').should('not.exist');
+        });
+
+        it('shows moderated message as "Message deleted by moderation" even to the message author', () => {
+            cy.mockSocketIO();
+            // Logged in as "6569", author of the moderated message
+            cy.intercept('/api/auth/me-or-guest', {
+                body: {
+                    pseudo: '6569',
+                    publicId: '77c251cb-16f6-4150-97ff-10f8814dcd8f',
+                    isGuest: true,
+                    isBot: false,
+                    slug: '6569',
+                    createdAt: '2024-03-05T12:48:22.885Z',
+                },
+            });
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+
+            cy.contains('Loading game…');
+            cy.receiveGameUpdate('chat/game-playing-moderated.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-messages', 'Hello, I am a watcher');
+            cy.contains('.chat-messages', "Hello, ready. Let's play");
+            cy.contains('.chat-messages', 'Message deleted by moderation');
+
+            // does not show original content of a moderated message
+            cy.contains('.chat-messages', 'This message was moderated').should('not.exist');
         });
     });
 

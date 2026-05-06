@@ -13,6 +13,7 @@ import TournamentRepository from '../../../repositories/TournamentRepository.js'
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { GameStaleEvaluator } from '../../../services/auto-cancel-stale-games/GameStaleEvaluator.js';
 import { AutoCancelStaleGames } from '../../../services/auto-cancel-stale-games/AutoCancelStaleGames.js';
+import { ROLE_ADMIN } from '../../../services/roles.js';
 
 class CreateAiVsAiInput
 {
@@ -30,7 +31,7 @@ class CreateAiVsAiInput
 
 @JsonController()
 @Service()
-@Authorized('ADMIN')
+@Authorized(ROLE_ADMIN)
 export default class AdminController
 {
     constructor(

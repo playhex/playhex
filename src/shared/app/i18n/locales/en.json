@@ -399,6 +399,7 @@
     "chat": "Chat",
     "system": "System",
     "chat_message_placeholder": "Message…",
+    "chat_message_moderated": "Message deleted by moderation",
     "unread_messages": "unread messages",
     "send_chat_message": "Send",
     "spectators": "Spectators",

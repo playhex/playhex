@@ -98,6 +98,10 @@ export class GameEventsEmitter
 
     emitChat(hostedGame: HostedGame, chatMessage: ChatMessage): void
     {
+        if (chatMessage.deletedByModeration) {
+            return;
+        }
+
         io().to([
             Rooms.game(hostedGame.publicId),
             ...gamePlayersRooms(hostedGame),

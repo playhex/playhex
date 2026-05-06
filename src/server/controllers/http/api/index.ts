@@ -21,6 +21,8 @@ import GameConditionalMovesController from './GameConditionalMovesController.js'
 import PushController from './PushController.js';
 import TournamentController from './TournamentController.js';
 import TournamentBanController from './TournamentBanController.js';
+import ModerationController from './ModerationController.js';
+import { checkAuthorization } from '../../../services/roles.js';
 
 export const registerApi = (app: Express) => {
 
@@ -53,24 +55,7 @@ export const registerApi = (app: Express) => {
             return player;
         },
         authorizationChecker: (action, roles): boolean => {
-            if (roles.includes('ADMIN')) {
-                const authorization = (action.request as Request).get('Authorization');
-
-                if (undefined === authorization || !authorization.startsWith('Bearer ')) {
-                    throw new HttpError(403, 'Restricted admin area. Add header Authorization: Bearer xxx');
-                }
-
-                const { ADMIN_PASSWORD } = process.env;
-                const token = authorization.substring('Bearer '.length);
-
-                if (typeof ADMIN_PASSWORD !== 'string' || token !== ADMIN_PASSWORD) {
-                    throw new HttpError(403, 'Invalid admin token');
-                }
-
-                return true;
-            }
-
-            return false;
+            return checkAuthorization((action.request as Request).get('Authorization'), roles);
         },
         controllers: [
             OnlinePlayersController,
@@ -85,6 +70,7 @@ export const registerApi = (app: Express) => {
             AuthController,
             PlayerSettingsController,
             AdminController,
+            ModerationController,
             AIConfigController,
             PushController,
             RatingController,

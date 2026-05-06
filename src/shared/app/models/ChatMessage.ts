@@ -3,13 +3,19 @@ import Player from './Player.js';
 import { IsDate, IsNotEmpty, IsObject, IsString, Length } from 'class-validator';
 import HostedGame from './HostedGame.js';
 import { Expose } from '../class-transformer-custom.js';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { ColumnUUID } from '../custom-typeorm.js';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export default class ChatMessage
 {
     @PrimaryGeneratedColumn()
     id?: number;
+
+    @ColumnUUID({ unique: true })
+    @Expose({ groups: ['moderation'] })
+    publicId: string = uuidv4();
 
     @IsNotEmpty()
     @Column()
@@ -35,6 +41,7 @@ export default class ChatMessage
     @Length(1, 1000, { groups: ['playerInput', 'post'] })
     @Column({ length: 1000 })
     @Expose()
+    @Transform(({ value, obj, options }) => obj.deletedByModeration && !options?.groups?.includes('moderation') ? '' : value)
     content: string;
 
     /**
@@ -46,6 +53,7 @@ export default class ChatMessage
      */
     @Column({ type: String, length: 64, nullable: true })
     @Expose()
+    @Transform(({ value, obj, options }) => obj.deletedByModeration && !options?.groups?.includes('moderation') ? 'chat_message_moderated' : value)
     contentTranslationKey: null | string;
 
     /**
@@ -68,4 +76,8 @@ export default class ChatMessage
     @Expose()
     @Column({ default: false })
     shadowDeleted: boolean;
+
+    @Expose({ groups: ['moderation'] })
+    @Column({ default: false })
+    deletedByModeration: boolean;
 }
