@@ -42,7 +42,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'moderation_action_unacked'] })
     publicId: string;
 
     /**

@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification } from '../shared/app/models/index.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
@@ -857,6 +857,46 @@ export const apiGetPlayerNotifications = async (): Promise<PlayerNotification[]>
     return (await response.json() as PlayerNotification[])
         .map(playerNotification => plainToInstance(PlayerNotification, playerNotification))
     ;
+};
+
+export const apiGetPlayerIsCurrentlyChatRestricted = async (playerPublicId: string): Promise<boolean> => {
+    const response = await fetch(`/api/players/${playerPublicId}/has-moderation-actions`);
+
+    if (!response.ok) {
+        return false;
+    }
+
+    return response.json();
+};
+
+export const apiGetPlayerModerationActions = async (): Promise<PlayerModerationAction[]> => {
+    const response = await fetch('/api/player-moderation-actions', {
+        headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+        if (response.status >= 500) {
+            throw new Error('Server error from apiGetPlayerModerationActions');
+        }
+
+        return [];
+    }
+
+    if (response.status === 204) {
+        return [];
+    }
+
+    return (await response.json() as PlayerModerationAction[])
+        .map(action => plainToInstance(PlayerModerationAction, action))
+    ;
+};
+
+export const apiPatchPlayerModerationActionAcknowledge = async (publicId: string): Promise<void> => {
+    const response = await fetch(`/api/player-moderation-actions/${publicId}/acknowledge`, {
+        method: 'PATCH',
+    });
+
+    await checkResponse(response);
 };
 
 export const apiPostPlayerNotificationsAcknowledge = async (hostedGamePublicId?: string): Promise<void> => {

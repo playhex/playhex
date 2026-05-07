@@ -3,13 +3,15 @@ import { notifier } from '../notifier.js';
 import { truncateText } from '../../../../shared/app/utils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { createPlayerNotification } from '../../../../shared/app/models/PlayerNotification.js';
-import { getLoserPlayer, getOtherPlayer, getWinnerPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer } from '../../../../shared/app/hostedGameUtils.js';
 import logger from '../../../services/logger.js';
 import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
 import { PlayerNotificationsService } from '../../../services/PlayerNotificationsService.js';
+import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
 
 const onlinePlayerService = Container.get(OnlinePlayersService);
 const playerNotificationService = Container.get(PlayerNotificationsService);
+const hostedGamePersister = Container.get(HostedGamePersister);
 
 /*
  * Adds notifications in the player header, in the UI.
@@ -150,4 +152,40 @@ notifier.on('gameCanceled', async hostedGame => {
 
         await playerNotificationService.addNotification(playerNotification);
     }
+});
+
+notifier.on('moderationActionTaken', async action => {
+    if (action.relatedChatMessages.length === 0) {
+        return;
+    }
+
+    const hostedGame = await hostedGamePersister.findHostedGameFromChatMessage(action.relatedChatMessages[0].publicId);
+
+    if (!hostedGame) {
+        return;
+    }
+
+    for (const participant of getPlayers(hostedGame)) {
+        if (participant.publicId === action.player.publicId) {
+            continue;
+        }
+
+        if (participant.isBot) {
+            continue;
+        }
+
+        const playerNotification = createPlayerNotification(
+            'myOpponentHasBeenModerated',
+            {
+                player: pseudoString(action.player),
+                hostedGame: undefined,
+            },
+            participant,
+            hostedGame,
+            action.createdAt,
+        );
+
+        await playerNotificationService.addNotification(playerNotification);
+    }
+
 });

@@ -153,6 +153,11 @@ const routes: RouteRecordRaw[] = [
                 path: 'conditional-moves',
                 component: () => import('./pages/guide/PageConditionalMoves.vue'),
             },
+            {
+                name: 'guide-moderation',
+                path: 'moderation',
+                component: () => import('./pages/guide/PageModeration.vue'),
+            },
         ],
     },
     {

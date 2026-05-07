@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, type Rel
 import Player from './Player.js';
 import { IsDate, IsNotEmpty, IsObject, IsString, Length } from 'class-validator';
 import HostedGame from './HostedGame.js';
-import { Expose } from '../class-transformer-custom.js';
+import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import { ColumnUUID } from '../custom-typeorm.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +23,7 @@ export default class ChatMessage
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
     @JoinColumn()
+    @Expose({ groups: ['moderation_action_unacked'] })
     hostedGame: Relation<HostedGame>;
 
     @Column({ nullable: true })
@@ -34,14 +35,14 @@ export default class ChatMessage
      */
     @IsObject({ groups: ['post'] })
     @ManyToOne(() => Player)
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
     player: null | Player;
 
     @IsString({ groups: ['playerInput', 'post'] })
     @Length(1, 1000, { groups: ['playerInput', 'post'] })
     @Column({ length: 1000 })
-    @Expose()
-    @Transform(({ value, obj, options }) => obj.deletedByModeration && !options?.groups?.includes('moderation') ? '' : value)
+    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Transform(({ value, obj, options }) => serializationShouldHideContent(obj, options.groups) ? '' : value)
     content: string;
 
     /**
@@ -53,7 +54,7 @@ export default class ChatMessage
      */
     @Column({ type: String, length: 64, nullable: true })
     @Expose()
-    @Transform(({ value, obj, options }) => obj.deletedByModeration && !options?.groups?.includes('moderation') ? 'chat_message_moderated' : value)
+    @Transform(({ value, obj, options }) => serializationShouldHideContent(obj, options.groups) ? 'chat_message_moderated' : value)
     contentTranslationKey: null | string;
 
     /**
@@ -65,7 +66,7 @@ export default class ChatMessage
 
     @IsDate({ groups: ['post'] })
     @Column({ default: () => 'current_timestamp(3)', precision: 3 })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
     @Type(() => Date)
     createdAt: Date;
 
@@ -81,3 +82,18 @@ export default class ChatMessage
     @Column({ default: false })
     deletedByModeration: boolean;
 }
+
+const serializationShouldHideContent = (chatMessage: ChatMessage, groups?: string[]): boolean => {
+    // always show content to moderators
+    if (groups?.includes('moderation')) {
+        return false;
+    }
+
+    // show content to player when they get the warning
+    if (groups?.includes('moderation_action_unacked')) {
+        return false;
+    }
+
+    // else, show only if not deleted
+    return chatMessage.deletedByModeration;
+};

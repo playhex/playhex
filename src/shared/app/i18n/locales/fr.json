@@ -607,10 +607,25 @@
     },
     "notification": {
         "you_won": "Vous avez gagné la partie !",
-        "you_lost": "Vous avez perdu la partie :("
+        "you_lost": "Vous avez perdu la partie :(",
+        "opponent_moderated": "{{player}} a été modéré. Désolé pour les messages inappropriés que vous avez reçus."
     },
     "muted": {
         "on": "Muet",
         "off": "Sons activés"
+    },
+    "player_chat_restricted": "{player} ne peut pas répondre dans le chat (accès restreint).",
+    "moderation_action_overlay": {
+        "title": "Avis de modération",
+        "warning_only": "Ceci est un avertissement.",
+        "chat_block_until": "Votre accès au chat est restreint jusqu'au {{date}}.",
+        "reason": "Raison",
+        "details": "Détails",
+        "related_messages": "Messages concernés",
+        "acknowledge": "J'ai lu et compris",
+        "scroll_hint": "Lire et accepter en bas"
+    },
+    "moderation_reason": {
+        "chat_insults": "Insultes ou comportement inapproprié dans le chat"
     }
 }

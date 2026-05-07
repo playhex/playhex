@@ -578,7 +578,8 @@
     "notifications_misc": "Other notifications",
     "notification": {
         "you_won": "You have won the game!",
-        "you_lost": "You have lost the game :("
+        "you_lost": "You have lost the game :(",
+        "opponent_moderated": "{{player}} has been moderated. Sorry for the inappropriate messages you received."
     },
     "player_sent_you_rematch_offer": "{{ player }} challenged you to a rematch!",
     "player_sent_rematch_offer": "{{ player }} sent a rematch offer",
@@ -595,6 +596,20 @@
         "resign": "resign",
         "forfeit": "forfeit",
         "time": "timeout"
+    },
+    "player_chat_restricted": "{player} cannot reply in chat (chat restricted).",
+    "moderation_action_overlay": {
+        "title": "Moderation notice",
+        "warning_only": "This is a warning.",
+        "chat_block_until": "Your chat access has been restricted until {{date}}.",
+        "reason": "Reason",
+        "details": "Details",
+        "related_messages": "Related messages",
+        "acknowledge": "I have read and understood",
+        "scroll_hint": "Read and accept below"
+    },
+    "moderation_reason": {
+        "chat_insults": "Insults or inappropriate behavior in chat"
     },
     "player_wins_by": {
         "default": "{player} wins!",

@@ -2,6 +2,7 @@
 import AppHeader from './components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
 import AppToasts from './components/layout/AppToasts.vue';
+import AppPlayerModerationActionOverlayAll from './components/AppPlayerModerationActionOverlayAll.vue';
 import { useRouter } from 'vue-router';
 
 const { currentRoute } = useRouter();
@@ -23,6 +24,7 @@ const displayFooter = () => currentRoute.value.meta.displayFooter !== false;
         </footer>
 
         <AppToasts />
+        <AppPlayerModerationActionOverlayAll />
     </div>
 </template>
 

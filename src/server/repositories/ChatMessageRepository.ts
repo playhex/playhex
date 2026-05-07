@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ChatMessage, Player } from '../../shared/app/models/index.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 
@@ -36,15 +36,15 @@ export default class ChatMessageRepository
         });
     }
 
-    async moderateDeleteChatMessage(publicId: string): Promise<boolean>
+    async moderateDeleteChatMessages(publicIds: string[]): Promise<number>
     {
         const { affected } = await this.chatMessageRepository.createQueryBuilder()
             .update()
-            .where('publicId = :publicId', { publicId })
+            .where({ publicId: In(publicIds) })
             .set({ deletedByModeration: true })
             .execute()
         ;
 
-        return (affected ?? 0) > 0;
+        return affected ?? 0;
     }
 }

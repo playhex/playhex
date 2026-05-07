@@ -1,0 +1,4 @@
+# Get the authenticated player's current (latest unacknowledged) moderation action.
+# Returns 204 if the player has no pending moderation action.
+
+GET /api/player-moderation-actions

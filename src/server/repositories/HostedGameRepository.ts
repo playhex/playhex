@@ -19,6 +19,7 @@ import { errorToLogger } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
+import PlayerModerationActionRepository from './PlayerModerationActionRepository.js';
 
 export class GameError extends Error {}
 
@@ -48,6 +49,7 @@ export default class HostedGameRepository
         private ratingRepository: RatingRepository,
         private onlinePlayerService: OnlinePlayersService,
         private gameEventEmitter: GameEventsEmitter,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
@@ -604,6 +606,10 @@ export default class HostedGameRepository
     {
         if (chatMessage.player !== null) {
             this.onlinePlayerService.notifyPlayerActivity(chatMessage.player);
+
+            if (await this.playerModerationActionRepository.isCurrentlyChatRestricted(chatMessage.player.publicId)) {
+                return 'chat_restricted';
+            }
         }
 
         // shadow delete chat message if player is shadow banned for chat messages
@@ -649,18 +655,21 @@ export default class HostedGameRepository
         return true;
     }
 
-    moderateDeleteChatMessage(publicId: string): boolean
+    moderateDeleteChatMessages(publicIds: string[]): number
     {
+        const publicIdSet = new Set(publicIds);
+        let deleted = 0;
+
         for (const key in this.activeGames) {
             for (const chatMessage of this.activeGames[key].getHostedGame().chatMessages) {
-                if (chatMessage.publicId === publicId) {
+                if (publicIdSet.has(chatMessage.publicId)) {
                     chatMessage.deletedByModeration = true;
-                    return true;
+                    ++deleted;
                 }
             }
         }
 
-        return false;
+        return deleted;
     }
 
     /**
