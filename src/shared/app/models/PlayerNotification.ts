@@ -71,6 +71,9 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
     @Column()
     playerId: null | number;
 
+    /**
+     * Who should read this notification.
+     */
     @ManyToOne(() => Player)
     player: Relation<Player>;
 
@@ -123,7 +126,7 @@ export const createPlayerNotification = <T extends keyof PlayerNotificationTypes
     type: T,
     parameters: PlayerNotificationTypes[T],
     player: Player,
-    hostedGame: HostedGame,
+    hostedGame: null | HostedGame,
     createdAt = new Date(),
 ): PlayerNotification => {
     const playerNotification = new PlayerNotification<T>();
