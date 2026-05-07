@@ -41,12 +41,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
 
             const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
 
-            if (result !== true) {
-                answer(result);
-                return;
-            }
-
-            answer(true);
+            answer(result);
         });
     }
 }
