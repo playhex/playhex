@@ -1,0 +1,5 @@
+# Get a player by their public id.
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/players/{{ playerPublicId }}

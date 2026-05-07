@@ -1,0 +1,3 @@
+# Create a new guest session, regardless of current authentication state.
+
+POST /api/auth/guest

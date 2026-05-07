@@ -1,0 +1,9 @@
+# Create a new player account.
+
+POST /api/auth/signup
+Content-Type: application/json
+
+{
+  "pseudo": "MyPseudo",
+  "password": "my-password"
+}

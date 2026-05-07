@@ -1,0 +1,3 @@
+# Return the currently logged-in player, or create a guest session if not authenticated.
+
+POST /api/auth/me-or-guest
