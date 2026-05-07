@@ -149,6 +149,74 @@ describe('Chat', () => {
         });
     });
 
+    describe('chat restriction notice', () => {
+        // In the fixture, players are "aaa" (e3d5…) and "6569" (77c2…).
+        // "6569" is the chat-restricted player.
+
+        const restrictedPlayerPublicId = '77c251cb-16f6-4150-97ff-10f8814dcd8f';
+        const unrestrictedPlayerPublicId = 'e3d50579-6a8b-4ca3-a618-b2cc3e97ae30';
+
+        const interceptChatRestriction = (publicId: string, restricted: boolean) => {
+            cy.intercept(
+                `/api/players/${publicId}/has-moderation-actions`,
+                { body: restricted },
+            );
+        };
+
+        beforeEach(() => {
+            cy.mockSocketIO();
+            // Default: no player is restricted
+            cy.intercept('/api/players/*/has-moderation-actions', { body: false });
+        });
+
+        it('shows notice to others when a game player is chat-restricted', () => {
+            // Logged in as "aaa", not the restricted player
+            cy.intercept('/api/auth/me-or-guest', { fixture: 'game/me-or-guest.json' });
+            interceptChatRestriction(restrictedPlayerPublicId, true);
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+            cy.receiveGameUpdate('chat/game-playing.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-restriction-notice', /Guest 6569/);
+            cy.contains('.chat-restriction-notice', /cannot reply in chat/);
+        });
+
+        it('shows notice to the restricted player themselves', () => {
+            // Logged in as "6569", the restricted player
+            cy.intercept('/api/auth/me-or-guest', {
+                body: {
+                    pseudo: '6569',
+                    publicId: restrictedPlayerPublicId,
+                    isGuest: true,
+                    isBot: false,
+                    slug: '6569',
+                    createdAt: '2024-03-05T12:48:22.885Z',
+                },
+            });
+            interceptChatRestriction(restrictedPlayerPublicId, true);
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+            cy.receiveGameUpdate('chat/game-playing.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.contains('.chat-restriction-notice', /Guest 6569/);
+            cy.contains('.chat-restriction-notice', /cannot reply in chat/);
+        });
+
+        it('does not show notice when no player is chat-restricted', () => {
+            cy.intercept('/api/auth/me-or-guest', { fixture: 'game/me-or-guest.json' });
+            interceptChatRestriction(restrictedPlayerPublicId, false);
+            interceptChatRestriction(unrestrictedPlayerPublicId, false);
+
+            cy.visit('/games/00000000-0000-0000-0000-000000000000');
+            cy.receiveGameUpdate('chat/game-playing.json');
+            cy.contains('Loading game…').should('not.exist');
+
+            cy.get('.chat-restriction-notice').should('not.exist');
+        });
+    });
+
     it('shows chat message length limit when I am about to reach it, instead of crashing when sending a too long message', () => {
         cy.mockSocketIO();
         cy.intercept('/api/auth/me-or-guest', {

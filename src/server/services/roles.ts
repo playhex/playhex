@@ -6,7 +6,7 @@ import { HttpError } from 'routing-controllers';
 export const ROLE_ADMIN = 'ADMIN';
 
 /**
- * Can do moderation from ModerationController (moderate chat messages...)
+ * Can do moderation from AdminModerationController (moderate chat messages...)
  */
 export const ROLE_MODERATOR = 'MODERATOR';
 

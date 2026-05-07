@@ -1,0 +1,52 @@
+[
+    {
+        "publicId": "aaaaaaaa-0000-0000-0000-000000000002",
+        "player": {
+            "pseudo": "aaa",
+            "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+            "isGuest": false,
+            "isBot": false,
+            "slug": "aaa",
+            "createdAt": "2024-03-05T10:16:32.291Z"
+        },
+        "reason": "moderation_reason.chat_insults",
+        "reasonDetails": "You insulted your opponent during the game.",
+        "chatBlockedUntil": "2099-12-31T00:00:00.000Z",
+        "acknowledgedAt": null,
+        "createdAt": "2024-03-05T13:00:00.000Z",
+        "relatedChatMessages": [
+            {
+                "publicId": "bbbbbbbb-0000-0000-0000-000000000001",
+                "content": "u suck",
+                "createdAt": "2024-03-05T12:48:00.000Z",
+                "player": {
+                    "pseudo": "aaa",
+                    "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+                    "isGuest": false,
+                    "isBot": false,
+                    "slug": "aaa",
+                    "createdAt": "2024-03-05T10:16:32.291Z"
+                },
+                "hostedGame": {
+                    "publicId": "00000000-0000-0000-0000-000000000000"
+                }
+            },
+            {
+                "publicId": "bbbbbbbb-0000-0000-0000-000000000002",
+                "content": "get rekt",
+                "createdAt": "2024-03-05T12:49:00.000Z",
+                "player": {
+                    "pseudo": "aaa",
+                    "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+                    "isGuest": false,
+                    "isBot": false,
+                    "slug": "aaa",
+                    "createdAt": "2024-03-05T10:16:32.291Z"
+                },
+                "hostedGame": {
+                    "publicId": "00000000-0000-0000-0000-000000000000"
+                }
+            }
+        ]
+    }
+]

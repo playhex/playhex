@@ -1,0 +1,9 @@
+# Log in with an existing player account.
+
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "pseudo": "Alcalyn",
+  "password": "test"
+}

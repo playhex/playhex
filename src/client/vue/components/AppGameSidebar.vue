@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType, nextTick, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
+import { PropType, computed, nextTick, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123 } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
@@ -36,6 +36,9 @@ import { parseMove, validateMove } from '../../../shared/move-notation/move-nota
 import GameView from '../../../shared/pixi-board/GameView.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
+import useToastsStore from '../../stores/toastsStore.js';
+import { Toast } from '../../../shared/app/Toast.js';
+import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 
 const props = defineProps({
     hostedGame: {
@@ -137,14 +140,21 @@ const scrollChatToBottom = () => nextTick(() => {
 
 watch(hostedGame.value.chatMessages, () => scrollChatToBottom());
 
-const sendChat = () => {
+const sendChat = async () => {
     if (chatInput.value === '') {
         return;
     }
 
-    void sendChatMessage(chatInput.value);
-
+    const message = chatInput.value;
     chatInput.value = '';
+
+    try {
+        await sendChatMessage(message);
+    } catch (e) {
+        useToastsStore().addToast(new Toast(e.message ?? 'could not post message', {
+            level: 'danger',
+        }));
+    }
 };
 
 // Focus/Keep focus when pasting coords into chat
@@ -401,6 +411,37 @@ watch(
 );
 
 const orientation = useGameViewOrientation(gameView);
+
+/*
+ * Chat restriction status for game players
+ */
+const chatRestrictedPlayers = ref<Set<string>>(new Set());
+
+void (async () => {
+    const players = getPlayers(hostedGame.value);
+    const results = await Promise.all(
+        players.map(async player => ({
+            publicId: player.publicId,
+            restricted: await apiGetPlayerIsCurrentlyChatRestricted(player.publicId),
+        })),
+    );
+
+    chatRestrictedPlayers.value = new Set(
+        results.filter(r => r.restricted).map(r => r.publicId),
+    );
+})();
+
+const isChatInputEnabled = computed<boolean>(() => {
+    if (!loggedInPlayer.value) {
+        return false;
+    }
+
+    if (chatRestrictedPlayers.value.has(loggedInPlayer.value.publicId)) {
+        return false;
+    }
+
+    return canPlayerChatInGame(loggedInPlayer.value, hostedGame.value) === true;
+});
 
 const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
     return [
@@ -909,23 +950,35 @@ watch(gameUIMode, () => {
                 </div>
 
                 <form class="chat-input">
+                    <div
+                        v-for="player in getPlayers(hostedGame).filter(p => chatRestrictedPlayers.has(p.publicId))"
+                        :key="player.publicId"
+                        class="chat-restriction-notice"
+                    >
+                        <i18next :translation="$t('player_chat_restricted')">
+                            <template #player>
+                                <AppPseudo :player :classes="playerColor(player)" />
+                            </template>
+                        </i18next>
+                    </div>
+
                     <div class="input-group">
                         <input
                             v-model="chatInput"
                             ref="chatInputElement"
                             class="form-control bg-body-tertiary"
                             aria-describedby="message-submit"
-                            :placeholder="(canPlayerChatInGame(loggedInPlayer, hostedGame) === true) ? $t('chat_message_placeholder') : ''"
+                            :placeholder="isChatInputEnabled ? $t('chat_message_placeholder') : ''"
                             maxlength="1000"
-                            :disabled="!(canPlayerChatInGame(loggedInPlayer, hostedGame) === true)"
+                            :disabled="!isChatInputEnabled"
                         />
                         <AppSpectatorCount />
                         <button
                             class="btn chat-message-submit"
-                            :class="(canPlayerChatInGame(loggedInPlayer, hostedGame) === true) ? 'btn-success' : 'btn-secondary'"
+                            :class="isChatInputEnabled ? 'btn-success' : 'btn-secondary'"
                             type="submit"
                             id="message-submit"
-                            :disabled="!(canPlayerChatInGame(loggedInPlayer, hostedGame) === true)"
+                            :disabled="!isChatInputEnabled"
                             @click="(e: PointerEvent) => { e.preventDefault(); sendChat() }"
                         ><IconSendFill /> <span class="d-none d-md-inline">{{ $t('send_chat_message') }}</span></button>
                     </div>
@@ -983,6 +1036,12 @@ watch(gameUIMode, () => {
 
         .chat-message:last-child
             margin-bottom 1.5em
+
+    .chat-restriction-notice
+        font-size 0.85em
+        padding 0.25em 0.75em
+        color var(--bs-warning-text-emphasis)
+        background-color var(--bs-warning-bg-subtle)
 
     .chat-input
         flex 0 1 auto

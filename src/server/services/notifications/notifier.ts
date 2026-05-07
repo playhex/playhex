@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, HostedGame, Tournament } from '../../../shared/app/models/index.js';
+import { ChatMessage, HostedGame, PlayerModerationAction, Tournament } from '../../../shared/app/models/index.js';
 import { TimestampedMove } from '../../../shared/game-engine/Types.js';
 
 type NotifiableEvents = {
@@ -42,6 +42,15 @@ type NotifiableEvents = {
      * and subscribed players should check-in.
      */
     tournamentCheckInOpen: (tournament: Tournament) => void;
+
+    /**
+     * For communication, notification to players that may have been victim of hard words,
+     * to inform them that the player has been moderated.
+     *
+     * @param moderatedPlayer Player who have been moderated: chat message deleted, and player is now chat restricted or just warned
+     * @param hostedGame One of the game where related chat messages have been posted
+     */
+    moderationActionTaken: (action: PlayerModerationAction) => void;
 };
 
 export const notifier = new TypedEmitter<NotifiableEvents>();

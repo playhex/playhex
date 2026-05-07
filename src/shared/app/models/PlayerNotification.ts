@@ -42,6 +42,21 @@ type PlayerNotificationTypes = {
     gameCanceled: null;
 
     /**
+     * A moderation action has been taken against a player that I met
+     */
+    myOpponentHasBeenModerated: {
+        /**
+         * Who has been moderated
+         */
+        player: string;
+
+        /**
+         * One of the game with the relevant moderated chat messages
+         */
+        hostedGame?: HostedGame;
+    };
+
+    /**
      * Custom notification to display any text
      */
     custom: {
@@ -71,6 +86,9 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
     @Column()
     playerId: null | number;
 
+    /**
+     * Who should read this notification.
+     */
     @ManyToOne(() => Player)
     player: Relation<Player>;
 
@@ -123,7 +141,7 @@ export const createPlayerNotification = <T extends keyof PlayerNotificationTypes
     type: T,
     parameters: PlayerNotificationTypes[T],
     player: Player,
-    hostedGame: HostedGame,
+    hostedGame: null | HostedGame,
     createdAt = new Date(),
 ): PlayerNotification => {
     const playerNotification = new PlayerNotification<T>();

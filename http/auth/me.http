@@ -1,0 +1,3 @@
+# Get the currently authenticated player.
+
+GET /api/auth/me

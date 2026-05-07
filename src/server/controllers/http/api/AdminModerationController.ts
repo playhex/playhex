@@ -1,18 +1,22 @@
-import { Authorized, Delete, Get, JsonController, NotFoundError, Param } from 'routing-controllers';
+import { Authorized, BadRequestError, Body, Delete, Get, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
 import { Service } from 'typedi';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import PlayerModerationActionRepository, { CreateAndSaveError, PostPlayerModerationAction } from '../../../repositories/PlayerModerationActionRepository.js';
+import ModerationService from '../../../services/ModerationService.js';
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { ROLE_MODERATOR } from '../../../services/roles.js';
 
 @JsonController()
 @Service()
 @Authorized(ROLE_MODERATOR)
-export default class ModerationController
+export default class AdminModerationController
 {
     constructor(
         private chatMessageRepository: ChatMessageRepository,
         private hostedGameRepository: HostedGameRepository,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
+        private moderationService: ModerationService,
     ) {}
 
     @Get('/api/admin/moderation/chat-messages')
@@ -37,8 +41,7 @@ export default class ModerationController
     async deleteModerateChatMessage(
         @Param('publicId') publicId: string,
     ) {
-        const deletedInMemory = this.hostedGameRepository.moderateDeleteChatMessage(publicId);
-        const deletedInDb = await this.chatMessageRepository.moderateDeleteChatMessage(publicId);
+        const { deletedInDb, deletedInMemory } = await this.moderationService.moderateDeleteChatMessages([publicId]);
 
         if (!deletedInMemory && !deletedInDb) {
             throw new NotFoundError(`Chat message "${publicId}" not found`);
@@ -48,5 +51,24 @@ export default class ModerationController
             deletedInDb,
             deletedInMemory,
         };
+    }
+
+    @Post('/api/admin/moderation/action')
+    async postPlayerModerationAction(
+        @Body() postPlayerModerationAction: PostPlayerModerationAction,
+    ) {
+        try {
+            if (postPlayerModerationAction.relatedChatMessages && postPlayerModerationAction.relatedChatMessages.length > 0) {
+                await this.moderationService.moderateDeleteChatMessages(postPlayerModerationAction.relatedChatMessages);
+            }
+
+            return await this.playerModerationActionRepository.createAndSave(postPlayerModerationAction);
+        } catch (e) {
+            if (e instanceof CreateAndSaveError) {
+                throw new BadRequestError(e.message);
+            }
+
+            throw e;
+        }
     }
 }

@@ -21,7 +21,8 @@ import GameConditionalMovesController from './GameConditionalMovesController.js'
 import PushController from './PushController.js';
 import TournamentController from './TournamentController.js';
 import TournamentBanController from './TournamentBanController.js';
-import ModerationController from './ModerationController.js';
+import AdminModerationController from './AdminModerationController.js';
+import PlayerModerationController from './PlayerModerationController.js';
 import { checkAuthorization } from '../../../services/roles.js';
 
 export const registerApi = (app: Express) => {
@@ -70,7 +71,8 @@ export const registerApi = (app: Express) => {
             AuthController,
             PlayerSettingsController,
             AdminController,
-            ModerationController,
+            AdminModerationController,
+            PlayerModerationController,
             AIConfigController,
             PushController,
             RatingController,

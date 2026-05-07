@@ -5,6 +5,7 @@
                 <router-link class="nav-link" :to="{ name: 'guide' }">PlayHex guide</router-link>
                 <router-link class="nav-link" :to="{ name: 'guide-ai-analysis' }">{{ $t('game_analysis.game_analysis') }}</router-link>
                 <router-link class="nav-link" :to="{ name: 'guide-conditional-moves' }">{{ $t('conditional_moves.title') }}</router-link>
+                <router-link class="nav-link" :to="{ name: 'guide-moderation' }">Moderation</router-link>
             </nav>
         </div>
         <div class="col-12 col-sm-8 col-md-9 col-lg-6">

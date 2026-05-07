@@ -1,0 +1,3 @@
+# Log out and create a new guest session.
+
+DELETE /api/auth/logout

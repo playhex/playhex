@@ -1,0 +1,6 @@
+# Check whether a player currently has an active chat restriction (chatBlockedUntil > now).
+# Returns true or false.
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/players/{{ playerPublicId }}/has-moderation-actions

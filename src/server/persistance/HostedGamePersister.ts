@@ -311,4 +311,25 @@ export default class HostedGamePersister
             totalGames: +result.totalGames,
         }));
     }
+
+    /**
+     * Retrieve hostedGame in which a chatMessage has been posted.
+     */
+    async findHostedGameFromChatMessage(chatMessagePublicId: string): Promise<null | HostedGame>
+    {
+        const hostedGame = await this.hostedGameRepository.findOne({
+            relations: {
+                hostedGameToPlayers: {
+                    player: true,
+                },
+            },
+            where: {
+                chatMessages: {
+                    publicId: chatMessagePublicId,
+                },
+            },
+        });
+
+        return hostedGame;
+    };
 }

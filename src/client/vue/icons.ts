@@ -78,6 +78,7 @@ export { default as IconScissors } from '~icons/bi/scissors';
 export { default as IconSearch } from '~icons/bi/search';
 export { default as IconSendFill } from '~icons/bi/send-fill';
 export { default as IconShareFill } from '~icons/bi/share-fill';
+export { default as IconShieldCheck } from '~icons/bi/shield-check';
 export { default as IconSignpostSplit } from '~icons/bi/signpost-split';
 export { default as IconSignTurnLeft } from '~icons/bi/sign-turn-left';
 export { default as IconTablerSwords } from '~icons/tabler/swords';

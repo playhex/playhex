@@ -1,0 +1,9 @@
+# Upgrade the current guest session into a full player account.
+
+POST /api/auth/signup-from-guest
+Content-Type: application/json
+
+{
+  "pseudo": "MyPseudo",
+  "password": "my-password"
+}

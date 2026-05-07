@@ -1,0 +1,18 @@
+# Apply a moderation action to a player.
+# Creates a PlayerModerationAction: optionally blocks chat until a given date,
+# and links related chat messages as evidence shown to the player.
+
+POST /api/admin/moderation/action
+Authorization: Bearer {{ moderationPassword }}
+Content-Type: application/json
+
+{
+  "playerPublicId": "00000000-0000-0000-0000-000000000000",
+  "reason": "moderation_reason.chat_insults",
+  "reasonDetails": "This insult is not accepted here.",
+  "chatBlockedUntil": "2026-05-14T00:00:00Z",
+  "relatedChatMessages": [
+    "00000000-0000-0000-0000-000000000001",
+    "00000000-0000-0000-0000-000000000002"
+  ]
+}
