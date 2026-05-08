@@ -68,6 +68,8 @@ Cypress.Commands.add('submitAIGame', () => {
         .contains('button', 'Play vs AI')
         .click()
     ;
+
+    cy.contains('.sidebar', 'Playing');
 });
 
 Cypress.Commands.add('play', (x, y) => {

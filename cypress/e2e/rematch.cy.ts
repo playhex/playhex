@@ -36,6 +36,8 @@ describe('Rematch', () => {
             .click()
         ;
 
+        cy.contains('.sidebar', 'Playing');
+
         // Must play diagonal line to win both as red or blue because we can't choose our color on ranked games
         cy.play(217, 297);
         cy.play(247, 314);
@@ -134,6 +136,7 @@ describe('Rematch', () => {
         let previousFirstPlayer: string;
         let currentFirstPlayer: string;
 
+        // I am red
         cy
             .get('.game-info-overlay .player-a .text-danger')
             .invoke('text')
@@ -145,6 +148,7 @@ describe('Rematch', () => {
         cy.contains('Rematch').click();
         cy.contains('.sidebar', 'Playing');
 
+        // I am still red
         cy
             .get('.game-info-overlay .player-a .text-danger')
             .invoke('text')
