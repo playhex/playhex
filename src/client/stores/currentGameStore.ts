@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import HostedGame from '../../shared/app/models/HostedGame.js';
 import { PlayingGameFacade } from '../../shared/pixi-board/facades/PlayingGameFacade.js';
-import { addMove, cancelGame, canExplore, canPlayerUndo, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, canExplore, canPlayerUndo, cloneHostedGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -109,7 +109,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         hostedGamePublicId.value = gamePublicId;
 
         const unlisten = listenSocketMessages(gamePublicId, hostedGameInitialData => {
-            hostedGame.value = hostedGameInitialData;
+            hostedGame.value = cloneHostedGame(hostedGameInitialData);
             removeShadowDeletedMessages(hostedGame.value);
             game.value = Game.fromData(toEngineGameData(hostedGame.value));
             gameView.value = new GameView(hostedGame.value.boardsize);

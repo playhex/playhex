@@ -60,5 +60,15 @@ declare namespace Cypress {
          * Simulate a "onlinePlayersUpdate" message with a fixture file (will be denormalized).
          */
         receiveOnlinePlayersUpdate(fixtureFile: string): Chainable;
+
+        /**
+         * Simulate a "gameStarted" message with a fixture file (will be denormalized).
+         */
+        receiveGameStarted(fixtureFile: string): Chainable;
+
+        /**
+         * Simulate a "moved" message for a game.
+         */
+        receiveMoved(gameId: string, move: string, moveIndex: number, byPlayerIndex: number): Chainable;
     }
 }

@@ -177,6 +177,38 @@ export const is1v1Game = (hostedGame: HostedGame): boolean => {
  */
 export const updateHostedGame = (local: HostedGame, server: HostedGame): void => {
     Object.assign(local, server);
+
+    if (typeof server.hostedGameToPlayers !== 'undefined') {
+        local.hostedGameToPlayers = [...server.hostedGameToPlayers];
+    }
+
+    if (typeof server.timeControlType !== 'undefined') {
+        local.timeControlType = structuredClone(server.timeControlType);
+    }
+
+    if (typeof server.timeControl !== 'undefined') {
+        local.timeControl = server.timeControl !== null ? structuredClone(server.timeControl) : null;
+    }
+
+    if (typeof server.chatMessages !== 'undefined') {
+        local.chatMessages = [...server.chatMessages];
+    }
+
+    if (typeof server.moves !== 'undefined') {
+        local.moves = [...server.moves];
+    }
+
+    if (typeof server.moveTimestamps !== 'undefined') {
+        local.moveTimestamps = [...server.moveTimestamps];
+    }
+};
+
+export const cloneHostedGame = (hostedGame: HostedGame): HostedGame => {
+    const clone = new HostedGame();
+
+    updateHostedGame(clone, hostedGame);
+
+    return clone;
 };
 
 export const addPlayer = (hostedGame: HostedGame, player: Player): void => {

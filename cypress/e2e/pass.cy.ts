@@ -53,4 +53,33 @@ describe('Pass', () => {
         cy.contains('Pass').should('not.have.attr', 'disabled');
     });
 
+    it('allows to pass when I host a game, my opponent join later and after they play first move', () => {
+        cy.mockSocketIO();
+        cy.intercept('/api/auth/me-or-guest', { fixture: 'pass/me.json' });
+        cy.intercept('/api/player-settings', { fixture: 'confirm-move/player-settings.json' });
+
+        cy.visit('/games/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+
+        cy.receiveGameUpdate('pass/game-created.json');
+        cy.contains('Loading game…').should('not.exist');
+
+        // Pass not shown while waiting for opponent to join
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Pass', { timeout: 100 }).should('not.exist');
+
+        // Opponent joins — game starts, but it's their turn (they play first)
+        cy.contains('.sidebar', 'Waiting for an opponent…');
+        cy.wait(500); // must wait to reproduce the bug
+        cy.receiveGameStarted('pass/game-playing-opponent-joined.json');
+
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Pass').should('have.attr', 'disabled');
+
+        // Opponent plays their first move — now it's my turn
+        cy.receiveMoved('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'a1', 0, 0);
+
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Pass').should('not.have.attr', 'disabled');
+    });
+
 });

@@ -152,3 +152,13 @@ Cypress.Commands.add('receiveOnlinePlayersUpdate', fixtureFile => {
         cy.receiveSocketIoMessage('onlinePlayersUpdate', plainToInstance(OnlinePlayers, fixture));
     });
 });
+
+Cypress.Commands.add('receiveGameStarted', fixtureFile => {
+    cy.fixture(fixtureFile).then((fixture: unknown) => {
+        cy.receiveSocketIoMessage('gameStarted', plainToInstance(HostedGame, fixture));
+    });
+});
+
+Cypress.Commands.add('receiveMoved', (gameId, move, moveIndex, byPlayerIndex) => {
+    cy.receiveSocketIoMessage('moved', gameId, { move, playedAt: new Date() }, moveIndex, byPlayerIndex);
+});

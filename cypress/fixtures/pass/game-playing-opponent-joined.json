@@ -1,0 +1,65 @@
+{
+    "publicId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "host": {
+        "pseudo": "aa",
+        "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "aa",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "hostedGameToPlayers": [
+        {
+            "player": {
+                "pseudo": "bb",
+                "publicId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "bb",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
+        },
+        {
+            "player": {
+                "pseudo": "aa",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "aa",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
+        }
+    ],
+    "timeControl": {
+        "state": "running",
+        "currentPlayer": 0,
+        "players": [
+            { "totalRemainingTime": "2024-01-25T10:01:00.000Z" },
+            { "totalRemainingTime": 600000 }
+        ]
+    },
+    "boardsize": 11,
+    "firstPlayer": null,
+    "swapRule": true,
+    "opponentType": "player",
+    "opponentPublicId": null,
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
+        }
+    },
+    "chatMessages": [],
+    "state": "playing",
+    "createdAt": "2024-01-25T10:00:00.000Z",
+    "moves": [],
+    "moveTimestamps": [],
+    "currentPlayerIndex": 0,
+    "winner": null,
+    "outcome": null,
+    "startedAt": "2024-01-25T10:00:30.000Z",
+    "lastMoveAt": null,
+    "endedAt": null
+}

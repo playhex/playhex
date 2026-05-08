@@ -7,7 +7,7 @@ import { HostedGame } from '../../shared/app/models/index.js';
 import Rooms from '../../shared/app/Rooms.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
-import { addMove, cancelGame, endGame, handleTimeControlUpdate, isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, cloneHostedGame, endGame, handleTimeControlUpdate, isBotGame } from '../../shared/app/hostedGameUtils.js';
 import { iAmInGame } from '../services/context-utils.js';
 import { notifier } from '../services/notifications/notifier.js';
 
@@ -112,7 +112,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             publicId: hostedGame.publicId,
             isMyTurn: false,
             myColor: null,
-            hostedGame: hostedGame,
+            hostedGame: cloneHostedGame(hostedGame),
         };
     });
 
@@ -133,7 +133,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 publicId,
                 isMyTurn: false,
                 myColor: null,
-                hostedGame: hostedGame,
+                hostedGame: cloneHostedGame(hostedGame),
             };
         }
 
@@ -225,7 +225,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
             isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === me.publicId;
 
-            myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: hostedGame };
+            myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: cloneHostedGame(hostedGame) };
         }
     });
 
