@@ -162,4 +162,76 @@ describe('Rematch', () => {
             }
         });
     });
+
+    it('keeps same colors when "host plays second" and host rematch', () => {
+        cy.visit('/');
+        cy.get('.menu-top').contains(/Guest \d+/);
+
+        cy.createAIGameWithRandom(false);
+
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+            .contains('Custom')
+            .click()
+
+            .closest('.modal-content')
+            .get('input[type=number]')
+            .clear()
+            .type('4')
+
+            .closest('.modal-content')
+            .contains('More options')
+            .click()
+        ;
+
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+            .contains(/^Second$/)
+            .click()
+        ;
+
+        cy.submitAIGame();
+
+        cy.play(320, 355);
+        cy.play(239, 305);
+        cy.play(237, 210);
+        cy.play(404, 405);
+
+        cy.contains('Game finished');
+        cy.contains(/Guest \d+ wins!/);
+
+        cy.contains('Game finished').closest('.modal-content').contains('Close').click();
+
+        // Rematch should reverse players colors.
+        let previousFirstPlayer: string;
+        let currentFirstPlayer: string;
+
+        // I am blue
+        cy
+            .get('.game-info-overlay .player-b .text-primary')
+            .invoke('text')
+            .invoke('trim')
+            .then(p => previousFirstPlayer = p)
+        ;
+
+
+        cy.contains('Rematch').click();
+        cy.contains('.sidebar', 'Playing');
+
+        // I am still blue
+        cy
+            .get('.game-info-overlay .player-b .text-primary')
+            .invoke('text')
+            .invoke('trim')
+            .then(p => currentFirstPlayer = p)
+        ;
+
+        cy.then(() => {
+            if (previousFirstPlayer !== currentFirstPlayer) {
+                throw new Error('Players have switched color after rematch');
+            }
+        });
+    });
 });

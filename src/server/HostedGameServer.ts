@@ -550,24 +550,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.logger.info('Rematch alternate colors: should alternate?');
 
             if (this.shouldAlternateColorsFromRematchedGame()) {
-                const previousFirstPlayer = this.hostedGame.rematchedFrom.hostedGameToPlayers[0].playerId;
-                const currentFirstPlayer = this.players[0].id;
+                this.logger.info('Rematch alternate colors: yes, reversing player order');
 
-                if (typeof previousFirstPlayer !== 'number' || typeof currentFirstPlayer !== 'number') {
-                    this.logger.warning('Rematch alternate colors: missing previous or current first player id. Randomize.', { previousFirstPlayer, currentFirstPlayer });
-
-                    if (Math.random() < 0.5) {
-                        this.players.reverse();
-                    }
-
-                    return;
-                }
-
-                this.logger.info('Rematch alternate colors: yes', { previousFirstPlayer, currentFirstPlayer });
-
-                if (previousFirstPlayer === currentFirstPlayer) {
-                    this.players.reverse();
-                }
+                this.players.reverse();
             }
 
             return;
@@ -593,14 +578,17 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
     }
 
+    /**
+     * Whether the players order should be reversed before starting the game.
+     * Depends on:
+     * - game config: random colors, or host plays first, or host plays second,
+     * - previous players colors
+     * - whether they are same players
+     */
     private shouldAlternateColorsFromRematchedGame(): boolean
     {
+        // no a rematch, do nothing
         if (this.hostedGame.rematchedFrom === null) {
-            return false;
-        }
-
-        if (this.hostedGame.firstPlayer !== null) {
-            this.logger.info('Rematch alternate colors: no, colors are fixed', { state: this.hostedGame.rematchedFrom.state });
             return false;
         }
 
@@ -610,17 +598,35 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return false;
         }
 
-        // Alternate only if players are same. If another player joined rematch, just use random colors
         const previousPlayersIds = this.hostedGame.rematchedFrom.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
         const currentPlayersIds = this.players.map(player => player.id ?? 0);
 
         const samePlayers = currentPlayersIds.every(id => previousPlayersIds.includes(id));
+        const sameOrder = currentPlayersIds[0] === previousPlayersIds[0] && currentPlayersIds[1] === previousPlayersIds[1];
 
-        if (!samePlayers) {
-            this.logger.info('Rematch alternate colors: no, not same players', { previousPlayersIds, currentPlayersIds });
+        // If players have fixed positions (host plays first or second), keep same colors as before
+        if (this.hostedGame.firstPlayer !== null) {
+            if (sameOrder) {
+                this.logger.info('Rematch alternate colors: no, colors are fixed, and players have same order', { state: this.hostedGame.rematchedFrom.state });
+            } else {
+                this.logger.info('Rematch alternate colors: yes, colors are fixed, but players have not same order (the non-host rematched)', { state: this.hostedGame.rematchedFrom.state });
+            }
+
+            return !sameOrder;
         }
 
-        return samePlayers;
+        // Do not alternate if someone else joined the rematch, so players are not the same
+        if (!samePlayers) {
+            this.logger.info('Rematch alternate colors: no, not same players', { previousPlayersIds, currentPlayersIds });
+            return false;
+        }
+
+        // Should alternate players from previous game,
+        // so alternate only if players kept same order from previous game
+        // (depending on who clicked the rematch button)
+        this.logger.info('Rematch alternate colors: yes, so reverse if player kept same order', { sameOrder, previousPlayersIds, currentPlayersIds });
+
+        return sameOrder;
     }
 
     /**
