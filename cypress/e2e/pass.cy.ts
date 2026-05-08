@@ -23,11 +23,32 @@ describe('Pass', () => {
         cy.contains('Second').click();
         cy.submitAIGame();
 
+        // I can't pass while waiting for opponent's first move
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Pass').should('have.attr', 'disabled');
 
         cy.wait(1200); // Wait for random bot move
 
+        // Now I can pass
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Pass').should('not.have.attr', 'disabled');
+
+        // Try again after rematch
+        cy.play(236, 308);
+        cy.contains('Resign').click();
+        cy.contains('Yes, I resign').click();
+        cy.contains('Game finished');
+        cy.contains('.modal-content .modal-footer', 'Close').click();
+        cy.contains('Rematch').click();
+        cy.contains('.sidebar', 'Playing');
+
+        // I can't pass while waiting for opponent's first move
+        cy.get('[aria-label="Secondary actions"]').click();
+        cy.contains('Pass').should('have.attr', 'disabled');
+
+        cy.wait(1200); // Wait for random bot move
+
+        // Now I can pass
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Pass').should('not.have.attr', 'disabled');
     });
