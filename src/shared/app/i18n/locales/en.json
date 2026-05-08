@@ -272,6 +272,7 @@
     "nav_observe": "Observe",
     "nav_archives": "Archives",
     "logging_in": "logging in…",
+    "update": "Update",
     "tournaments": "Tournaments",
     "tournaments_page_intro": "Here are Hex tournaments, which can be <strong>organized by anyone</strong> in various formats such as Swiss or elimination.<br>You can watch games from ongoing tournaments or join an upcoming one.<br><strong>To participate</strong>, make sure to <strong>check in on time</strong>. You can subscribe to receive a notification when check-in opens.<br>Review the tournament description for details like check-in times, format, and participants.",
     "create_tournament": "Create tournament",

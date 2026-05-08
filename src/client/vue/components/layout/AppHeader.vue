@@ -202,12 +202,13 @@ const {
 
                 <!-- update app if versions mismatch -->
                 <button
-                    v-if="!clientUpToDate"
+                    v-if="clientUpToDate === false"
                     @click="tryUpdateClient"
                     class="btn btn-sm btn-success ms-2"
                     title="New version available! Refresh to update"
                 >
                     <IconDownload />
+                    {{ $t('update') }}
                 </button>
 
                 <!-- My turn notif -->
