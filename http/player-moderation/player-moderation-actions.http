@@ -1,4 +1,15 @@
 # Get the authenticated player's current (latest unacknowledged) moderation action.
 # Returns 204 if the player has no pending moderation action.
 
+# Those endpoints use the currently logged in player as context.
+# First, login with /api/login
+
+###
+# Retrieve moderation actions that player needs to acknowledge before continuing
+
 GET /api/player-moderation-actions
+
+###
+# Retrieve all player moderation actions, with acknowledged ones, to display an history
+
+GET /api/player-moderation-actions?withPastActions

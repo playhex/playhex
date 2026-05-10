@@ -16,7 +16,7 @@ export default class PlayerModerationAction
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     publicId: string;
 
     /**
@@ -32,7 +32,7 @@ export default class PlayerModerationAction
      */
     @Column({ type: String, length: 64, nullable: true })
     @Type(() => String)
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     reason: null | string;
 
     /**
@@ -41,7 +41,7 @@ export default class PlayerModerationAction
      */
     @Column({ type: String, length: 255, nullable: true })
     @Type(() => String)
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     reasonDetails: null | string;
 
     /**
@@ -50,7 +50,7 @@ export default class PlayerModerationAction
      */
     @Column({ type: Date, nullable: true })
     @Type(() => Date)
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     chatBlockedUntil: null | Date;
 
     /**
@@ -65,7 +65,7 @@ export default class PlayerModerationAction
      * Player has view this action and clicked "ok"
      */
     @Column()
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     createdAt: Date;
 
     /**
@@ -74,6 +74,6 @@ export default class PlayerModerationAction
      */
     @ManyToMany(() => ChatMessage)
     @JoinTable({ name: 'player_moderation_action_chat_message' })
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     relatedChatMessages: ChatMessage[];
 }

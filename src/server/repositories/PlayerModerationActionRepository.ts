@@ -57,13 +57,15 @@ export default class PlayerModerationActionRepository
 
     /**
      * Get unacknowledged moderation actions for a player.
+     *
+     * @withPastActions Defaults to false. If true, also include actions that player already acknowledged.
      */
-    async findNewActionsForPlayer(player: Player): Promise<PlayerModerationAction[]>
+    async findActionsForPlayer(player: Player, withPastActions?: boolean): Promise<PlayerModerationAction[]>
     {
         return await this.playerModerationActionRepository.find({
             where: {
                 player: { id: player.id },
-                acknowledgedAt: IsNull(),
+                acknowledgedAt: withPastActions ? undefined : IsNull(),
             },
             relations: {
                 relatedChatMessages: {

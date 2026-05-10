@@ -1,4 +1,4 @@
-import { Get, JsonController, Param, Patch } from 'routing-controllers';
+import { Get, JsonController, Param, Patch, QueryParam } from 'routing-controllers';
 import { Service } from 'typedi';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import Player from '../../../../shared/app/models/Player.js';
@@ -16,11 +16,12 @@ export default class PlayerModerationController
     @Get('/api/player-moderation-actions')
     async getCurrentModerationAction(
         @AuthenticatedPlayer() player: Player,
+        @QueryParam('withPastActions') withPastActions?: boolean,
     ) {
-        const moderationActions = await this.playerModerationActionRepository.findNewActionsForPlayer(player);
+        const moderationActions = await this.playerModerationActionRepository.findActionsForPlayer(player, withPastActions);
 
         return moderationActions.map(moderationAction => instanceToPlain(moderationAction, {
-            groups: ['moderation_action_unacked'],
+            groups: ['player_moderation_action'],
         }));
     }
 

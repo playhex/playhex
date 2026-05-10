@@ -23,7 +23,7 @@ export default class ChatMessage
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
     @JoinColumn()
-    @Expose({ groups: ['moderation_action_unacked'] })
+    @Expose({ groups: ['player_moderation_action'] })
     hostedGame: Relation<HostedGame>;
 
     @Column({ nullable: true })
@@ -35,13 +35,13 @@ export default class ChatMessage
      */
     @IsObject({ groups: ['post'] })
     @ManyToOne(() => Player)
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     player: null | Player;
 
     @IsString({ groups: ['playerInput', 'post'] })
     @Length(1, 1000, { groups: ['playerInput', 'post'] })
     @Column({ length: 1000 })
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     @Transform(({ value, obj, options }) => serializationShouldHideContent(obj, options.groups) ? '' : value)
     content: string;
 
@@ -66,7 +66,7 @@ export default class ChatMessage
 
     @IsDate({ groups: ['post'] })
     @Column({ default: () => 'current_timestamp(3)', precision: 3 })
-    @Expose({ groups: [GROUP_DEFAULT, 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     @Type(() => Date)
     createdAt: Date;
 
@@ -90,7 +90,7 @@ const serializationShouldHideContent = (chatMessage: ChatMessage, groups?: strin
     }
 
     // show content to player when they get the warning
-    if (groups?.includes('moderation_action_unacked')) {
+    if (groups?.includes('player_moderation_action')) {
         return false;
     }
 

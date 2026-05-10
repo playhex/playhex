@@ -869,8 +869,10 @@ export const apiGetPlayerIsCurrentlyChatRestricted = async (playerPublicId: stri
     return response.json();
 };
 
-export const apiGetPlayerModerationActions = async (): Promise<PlayerModerationAction[]> => {
-    const response = await fetch('/api/player-moderation-actions', {
+export const apiGetPlayerModerationActions = async (withPastActions?: boolean): Promise<PlayerModerationAction[]> => {
+    const parameters = withPastActions ? '?withPastActions' : '';
+
+    const response = await fetch('/api/player-moderation-actions' + parameters, {
         headers: { 'Accept': 'application/json' },
     });
 

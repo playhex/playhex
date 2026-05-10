@@ -17,21 +17,21 @@ export default class Player
      * Used for displays
      */
     @Column({ length: 34, unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action'] })
     pseudo: string;
 
     /**
      * Used to identify a player
      */
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'player_moderation_action'] })
     publicId: string;
 
     /**
      * Show an italized "Guest" before pseudo
      */
     @Column({ default: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'moderation_action_unacked'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action'] })
     isGuest: boolean;
 
     /**

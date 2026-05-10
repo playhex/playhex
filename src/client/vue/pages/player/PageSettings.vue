@@ -19,6 +19,7 @@ import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import GameView from '../../../../shared/pixi-board/GameView.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
+import AppPlayerModerationActionList from '../../components/AppPlayerModerationActionList.vue';
 
 const head = injectHead();
 
@@ -460,6 +461,14 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                 :disabled="!subscribed"
                 @click="apiPostPushTest"
             >Test push notification</button>
+        </div>
+    </section>
+
+    <section id="moderation">
+        <div class="container">
+            <h3>Moderation</h3>
+
+            <AppPlayerModerationActionList />
         </div>
     </section>
 

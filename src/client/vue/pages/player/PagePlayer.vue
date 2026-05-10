@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill } from '../../icons.js';
+import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX } from '../../icons.js';
 import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
@@ -30,6 +30,7 @@ import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/hostedGameU
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
+import { apiGetPlayerIsCurrentlyChatRestricted } from '../../../apiClient.js';
 
 const { slug } = useRoute().params;
 
@@ -247,6 +248,20 @@ const showRatingCategory = (category: RatingCategory): void => {
     ratingChart.value.showRatingCategory(category);
 };
 
+/*
+ * Moderation status for other players
+ */
+const isChatRestricted = ref<null | boolean>(null);
+
+watchEffect(async () => {
+    if (player.value === null || isMe(player.value)) {
+        isChatRestricted.value = null;
+        return;
+    }
+
+    isChatRestricted.value = await apiGetPlayerIsCurrentlyChatRestricted(player.value.publicId);
+});
+
 const vRating: Directive<HTMLElement, RatingCategory> = {
     mounted: (el, binding) => {
         el.classList.add('clickable-rating');
@@ -333,6 +348,10 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
         </div>
 
         <AppPlayerStats v-if="playerStats" :playerStats />
+
+        <p v-if="player && !isMe(player) && isChatRestricted" class="mt-3 text-danger">
+            <IconX /> This player's chat is currently restricted.
+        </p>
 
         <h3 class="mt-4">{{ $t('rating') }}</h3>
 
