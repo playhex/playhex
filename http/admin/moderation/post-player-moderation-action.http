@@ -3,7 +3,7 @@
 # and links related chat messages as evidence shown to the player.
 
 POST /api/admin/moderation/action
-Authorization: Bearer {{ moderationPassword }}
+Authorization: Bearer {{ adminPassword }}
 Content-Type: application/json
 
 {

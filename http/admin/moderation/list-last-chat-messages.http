@@ -2,4 +2,4 @@
 # Includes moderation fields: publicId and deletedByModeration.
 
 GET /api/admin/moderation/chat-messages
-Authorization: Bearer {{ moderationPassword }}
+Authorization: Bearer {{ adminPassword }}

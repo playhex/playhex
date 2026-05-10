@@ -4,4 +4,4 @@
 @chatMessagePublicId=00000000-0000-0000-0000-000000000000
 
 DELETE /api/admin/moderation/chat-messages/{{ chatMessagePublicId }}
-Authorization: Bearer {{ moderationPassword }}
+Authorization: Bearer {{ adminPassword }}
