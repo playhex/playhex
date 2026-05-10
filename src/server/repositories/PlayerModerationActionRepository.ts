@@ -1,13 +1,10 @@
 import { Inject, Service } from 'typedi';
-import { In, IsNull, MoreThan, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, Player, PlayerModerationAction } from '../../shared/app/models/index.js';
+import { IsNull, MoreThan, Repository } from 'typeorm';
+import { Player, PlayerModerationAction } from '../../shared/app/models/index.js';
 import { PostPlayerModerationAction } from '../../shared/app/playerModerationActionUtils.js';
-import { notifier } from '../services/notifications/notifier.js';
 
 export { PostPlayerModerationAction };
 
-export class CreateAndSaveError extends Error {}
 export class PlayerNotExistingError extends Error {}
 
 @Service()
@@ -19,41 +16,7 @@ export default class PlayerModerationActionRepository
 
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
-
-        @Inject('Repository<ChatMessage>')
-        private chatMessageRepository: Repository<ChatMessage>,
     ) {}
-
-    async createAndSave(post: PostPlayerModerationAction): Promise<PlayerModerationAction>
-    {
-        const player = await this.playerRepository.findOneBy({ publicId: post.playerPublicId });
-
-        if (player === null) {
-            throw new CreateAndSaveError(`Player "${post.playerPublicId}" not found`);
-        }
-
-        const relatedChatMessages = post.relatedChatMessages?.length
-            ? await this.chatMessageRepository.findBy({ publicId: In(post.relatedChatMessages) })
-            : []
-        ;
-
-        const action = new PlayerModerationAction();
-
-        action.publicId = uuidv4();
-        action.player = player;
-        action.reason = post.reason ?? null;
-        action.reasonDetails = post.reasonDetails ?? null;
-        action.chatBlockedUntil = post.chatBlockedUntil ?? null;
-        action.acknowledgedAt = null;
-        action.createdAt = new Date();
-        action.relatedChatMessages = relatedChatMessages;
-
-        await this.playerModerationActionRepository.save(action);
-
-        notifier.emit('moderationActionTaken', action);
-
-        return action;
-    }
 
     /**
      * Get unacknowledged moderation actions for a player.

@@ -2,8 +2,8 @@ import { Authorized, BadRequestError, Body, Delete, Get, JsonController, NotFoun
 import { Service } from 'typedi';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
-import PlayerModerationActionRepository, { CreateAndSaveError, PostPlayerModerationAction } from '../../../repositories/PlayerModerationActionRepository.js';
-import ModerationService from '../../../services/ModerationService.js';
+import PlayerModerationActionRepository, { PostPlayerModerationAction } from '../../../repositories/PlayerModerationActionRepository.js';
+import ModerationService, { CreateAndSaveError } from '../../../services/ModerationService.js';
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { ROLE_MODERATOR } from '../../../services/roles.js';
 
@@ -22,19 +22,15 @@ export default class AdminModerationController
     @Get('/api/admin/moderation/chat-messages')
     async getLastChatMessages()
     {
-        const persistedMessages = await this.chatMessageRepository.getLastChatMessages();
+        const LIMIT = 200;
 
-        const persistedPublicIds = new Set(persistedMessages.map(m => m.publicId));
+        const persistedMessages = await this.chatMessageRepository.getLastChatMessages(LIMIT);
+        const inMemoryMessages = this.hostedGameRepository.getUnpersistedChatMessages();
 
-        const activeMessages = this.hostedGameRepository.getActiveGamesData()
-            .flatMap(game => game.chatMessages)
-            .filter(m => !persistedPublicIds.has(m.publicId))
-        ;
-
-        const allMessages = [...persistedMessages, ...activeMessages];
+        const allMessages = [...inMemoryMessages, ...persistedMessages];
         allMessages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-        return instanceToPlain(allMessages.slice(0, 100), { groups: [GROUP_DEFAULT, 'moderation'] });
+        return instanceToPlain(allMessages.slice(0, LIMIT), { groups: [GROUP_DEFAULT, 'moderation'] });
     }
 
     @Delete('/api/admin/moderation/chat-messages/:publicId')
@@ -62,7 +58,7 @@ export default class AdminModerationController
                 await this.moderationService.moderateDeleteChatMessages(postPlayerModerationAction.relatedChatMessages);
             }
 
-            return await this.playerModerationActionRepository.createAndSave(postPlayerModerationAction);
+            return await this.moderationService.createAndSaveAction(postPlayerModerationAction);
         } catch (e) {
             if (e instanceof CreateAndSaveError) {
                 throw new BadRequestError(e.message);

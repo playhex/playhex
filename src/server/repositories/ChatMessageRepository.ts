@@ -11,6 +11,13 @@ export default class ChatMessageRepository
         private chatMessageRepository: Repository<ChatMessage>,
     ) {}
 
+    async findMultipleByPublicId(publicIds: string[]): Promise<ChatMessage[]>
+    {
+        return await this.chatMessageRepository.findBy({
+            publicId: In(publicIds),
+        });
+    }
+
     async shadowDeletePlayerMessages(player: Player)
     {
         const { affected } = await this.chatMessageRepository.createQueryBuilder()

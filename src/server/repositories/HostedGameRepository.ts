@@ -283,6 +283,25 @@ export default class HostedGameRepository
         ;
     }
 
+    getUnpersistedChatMessages(): ChatMessage[]
+    {
+        const chatMessages: ChatMessage[] = [];
+
+        for (const key in this.activeGames) {
+            const hostedGame = this.activeGames[key].getHostedGame();
+
+            for (const chatMessage of hostedGame.chatMessages) {
+                if (chatMessage.id) {
+                    continue;
+                }
+
+                chatMessages.push(chatMessage);
+            }
+        }
+
+        return chatMessages;
+    }
+
     async getActiveOrArchivedGame(publicId: string): Promise<HostedGame | null>
     {
         if (this.activeGames[publicId]) {
