@@ -4,7 +4,11 @@
         "no_waiting_games": "Brak dostępnych gier. Stwórz nową!",
         "watch_current_games": "Oglądaj aktualne gry",
         "join_a_game": "Dołącz do gry",
-        "no_playing_games": "Obecnie nie ma żadnych gier w toku."
+        "no_playing_games": "Obecnie nie ma żadnych gier w toku.",
+        "open_live_games": "Dołącz do gry na żywo",
+        "open_correspondence_games": "Dołącz do gry korespondencyjnej",
+        "no_open_live_games": "Obecnie brak otwartych gier na żywo",
+        "no_open_correspondence_games": "Obecnie brak otwartych gier korespondencyjnych"
     },
     "game": {
         "opponent": "Przeciwnik",
@@ -128,7 +132,8 @@
         "best_move": "najlepszy ruch",
         "best": "najlepszy:",
         "how_it_works": "Jak to działa",
-        "request_analysis": "Zażądaj analizy SI"
+        "request_analysis": "Zażądaj analizy SI",
+        "available": "Analiza gry jest już dostępna."
     },
     "try_again": "Spróbuj ponownie",
     "yes": "Tak",
@@ -321,7 +326,8 @@
         "started": "Turniej się rozpoczął!",
         "match_ended": "Mecz {{ round }}.{{ number }} zakończony: {{ winnerPseudo }} wygrał z {{ loserPseudo }}.",
         "match_canceled_recreated": "Mecz {{ round }}.{{ number }} został odtworzony po anulowaniu.",
-        "ended": "Turniej się zakończył."
+        "ended": "Turniej się zakończył.",
+        "changed_admins": "Organizator wyznaczył administratorów: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Zbanowany w tym turnieju",
     "tournament_account_required": "Ten turniej wymaga konta. Goście nie są dozwoleni. Zaloguj się lub utwórz konto.",
@@ -334,7 +340,10 @@
     "undo": {
         "undo_move": "Cofnij",
         "accept": "Zaakceptuj cofnięcie",
-        "reject": "Odrzuć"
+        "reject": "Odrzuć",
+        "player_wants_to_takeback": "{{ player }} chce cofnąć swój ruch",
+        "player_takeback_his_move": "{{ player }} cofnął swój ruch.",
+        "takeback_request_denied": "Prośba {{ player }} o cofnięcie ruchu została odrzucona."
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -440,7 +449,11 @@
     "loading": "Ładowanie…",
     "losers_bracket": "Drabinka przegranych",
     "conditional_moves": {
-        "title": "Ruchy warunkowe"
+        "title": "Ruchy warunkowe",
+        "title_short": "Ruchy warunkowe",
+        "cut_move": "Usuń ruch",
+        "inactive_lines": "Nieaktywne warianty",
+        "clear_inactive_lines": "Wyczyść nieaktywne warianty"
     },
     "how_to_play_hex": "Jak grać w Hex",
     "tutorial": {
@@ -501,5 +514,130 @@
     },
     "move_settings": {
         "title": "Ustawienia ruchu"
+    },
+    "muted": {
+        "on": "Wycisz",
+        "off": "Odtwórz"
+    },
+    "allow_exploration": "Zezwól na analizę",
+    "allow_exploration_help": "Pozwala testować warianty, grając obiema stronami przed zatwierdzeniem ruchu. Jeśli wyłączone, ruchy warunkowe również będą wyłączone.",
+    "game_created_short": "utworzono {{ date }}",
+    "game_created_by_system_time_ago": "Gra utworzona przez system, {timeAgo}.",
+    "pass_confirm_overlay": {
+        "title": "Pominąć swoją turę?",
+        "message": "Za chwilę pominiesz swoją obecną turę. Czy na pewno?",
+        "confirmLabel": "Tak, pomiń",
+        "cancelLabel": "Nie, chcę zagrać"
+    },
+    "dismiss": "Zamknij",
+    "offline": "Offline",
+    "connection_lost": "Połączenie utracone",
+    "play_offline": "Graj offline",
+    "new_game_vs_ai": "Nowa gra przeciw AI",
+    "continue_game_vs_x": "Kontynuuj grę przeciw {{ playerNickname }}",
+    "restart": "Uruchom ponownie",
+    "back_to_menu": "Powrót do menu",
+    "no_active_tournament": "Obecnie nie ma aktywnego turnieju.",
+    "no_upcoming_tournament": "Brak nadchodzących turniejów.",
+    "upcoming_events": "Nadchodzące wydarzenia",
+    "tournament_subscribed": "Subskrybowano",
+    "tournament_state": {
+        "running": "Na żywo"
+    },
+    "lobby_my_turn_to_play": "Mój ruch",
+    "lobby_my_current_games": "Moje bieżące gry",
+    "lobby_your_turn_badge": "Twój ruch",
+    "lobby_waiting_badge": "Oczekiwanie",
+    "lobby_join": "Dołącz",
+    "lobby_game_no_longer_available": "Gra nie jest już dostępna",
+    "lobby_active_players_one": "aktywny gracz",
+    "lobby_active_players_other": "aktywni gracze",
+    "lobby_playing_now": "Grają teraz",
+    "lobby_no_live_games_now": "Obecnie nie ma gier na żywo.",
+    "lobby_observe_correspondence": "Obserwuj gry korespondencyjne",
+    "lobby_mode": {
+        "live_description": "Graj w czasie rzeczywistym",
+        "correspondence_description": "Graj we własnym tempie",
+        "open": "otwarta",
+        "n_playing": "{{n}} gra"
+    },
+    "playing_games": {
+        "title": "Trwające gry",
+        "live_games": "Gry na żywo",
+        "correspondence_games": "Gry korespondencyjne",
+        "no_live_games": "Brak trwających gier na żywo",
+        "no_correspondence_games": "Brak trwających gier korespondencyjnych"
+    },
+    "sort_recently_started": "Niedawno rozpoczęte",
+    "sort_most_moves": "Najwięcej ruchów",
+    "sort_longest_game": "Najdłuższa gra",
+    "sort_player_rating": "Ranking gracza",
+    "all": "Wszystkie",
+    "online_players_title": "Gracze online",
+    "online_players_heading": "Gracze online ({{n}})",
+    "sort_by_rating": "Według rankingu",
+    "sort_alpha": "A–Z",
+    "no_players_online": "Brak graczy online",
+    "nav_games": "Gry",
+    "nav_lobby": "Lobby",
+    "nav_observe": "Obserwuj",
+    "nav_archives": "Archiwum",
+    "update": "Aktualizuj",
+    "tournaments_page_intro": "Oto turnieje Hex, które mogą być <strong>organizowane przez każdego</strong> w różnych formatach, takich jak system szwajcarski lub pucharowy.<br>Możesz oglądać gry z trwających turniejów albo dołączyć do nadchodzącego.<br><strong>Aby wziąć udział</strong>, pamiętaj, aby <strong>zameldować się na czas</strong>. Możesz zasubskrybować powiadomienie, gdy meldowanie zostanie otwarte.<br>Sprawdź opis turnieju, aby poznać szczegóły, takie jak godziny meldowania, format i uczestnicy.",
+    "n_people_are_interested_other": "{{count}} osób jest zainteresowanych",
+    "n_participants_other": "{{ count }} uczestników",
+    "n_playing_games_other": "{{ count }} trwających gier",
+    "n_matches_played_other": "{{ count }} rozegranych meczów",
+    "tournament_admins": "Administratorzy turnieju",
+    "admins_one": "Administrator: { players }",
+    "admins_other": "Administratorzy: { players }",
+    "tournament_unsubscribe": "Nie jestem już zainteresowany.",
+    "n_rounds_other": "{{ count }} rund",
+    "tournament_slug_duplicate": "Turniej o tej samej nazwie URL już istnieje",
+    "tournament_seeding_methods": {
+        "title": "Rozstawienie",
+        "random": "Losowe",
+        "random_help": "Gracze są rozstawiani losowo, niezależnie od rankingu.",
+        "rating": "Ranking",
+        "rating_help": "Gracze są rozstawiani według rankingu. Jeśli w pierwszej rundzie są wolne losy, silniejsi gracze je otrzymują.",
+        "rating_random": "Ranking z częściową losowością",
+        "rating_random_help": "Gracze są rozstawiani według rankingu, ale z losowym elementem zależnym od odchylenia rankingu glicko2. Jeśli w pierwszej rundzie są wolne losy, silniejsi gracze je otrzymują."
+    },
+    "chat_message_moderated": "Wiadomość usunięta przez moderację",
+    "n_characters_other": "{{count}} znaków",
+    "resign_confirm_overlay": {
+        "title": "Poddaj grę",
+        "message": "Czy na pewno chcesz poddać grę?",
+        "confirmLabel": "Tak, poddaję się",
+        "cancelLabel": "Nie, kontynuuj grę"
+    },
+    "bot": "Bot",
+    "n_total_games_other": "{{count}} gier łącznie.",
+    "donate": "Wesprzyj PlayHex",
+    "notifications": "Powiadomienia",
+    "mark_all_as_read": "Oznacz wszystko jako przeczytane",
+    "no_notifications": "Brak powiadomień.",
+    "game_against_player": "Gra przeciw {{ player }}",
+    "notifications_misc": "Inne powiadomienia",
+    "notification": {
+        "you_won": "Wygrałeś grę!",
+        "you_lost": "Przegrałeś grę :(",
+        "opponent_moderated": "{{player}} został objęty moderacją. Przepraszamy za niestosowne wiadomości, które otrzymałeś."
+    },
+    "player_sent_you_rematch_offer": "{{ player }} zaprosił cię do rewanżu!",
+    "player_sent_rematch_offer": "{{ player }} wysłał ofertę rewanżu",
+    "player_chat_restricted": "{player} nie może odpowiadać na czacie (czat ograniczony).",
+    "moderation_action_overlay": {
+        "title": "Powiadomienie moderacyjne",
+        "warning_only": "To jest ostrzeżenie.",
+        "chat_block_until": "Twój dostęp do czatu został ograniczony do {{date}}.",
+        "reason": "Powód",
+        "details": "Szczegóły",
+        "related_messages": "Powiązane wiadomości",
+        "acknowledge": "Przeczytałem i rozumiem",
+        "scroll_hint": "Przeczytaj i zaakceptuj poniżej"
+    },
+    "moderation_reason": {
+        "chat_insults": "Obelgi lub niestosowne zachowanie na czacie"
     }
 }

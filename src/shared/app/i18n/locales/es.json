@@ -3,7 +3,11 @@
         "join_a_game": "Únete a una partida",
         "no_playing_games": "En este momento no hay partidas en curso.",
         "no_waiting_games": "En este momento no hay partidas disponibles ¡Crea una!",
-        "watch_current_games": "Ver partidas en curso"
+        "watch_current_games": "Ver partidas en curso",
+        "open_live_games": "Unirse a una partida en vivo",
+        "open_correspondence_games": "Unirse a una partida por correspondencia",
+        "no_open_live_games": "No hay partidas en vivo abiertas por ahora",
+        "no_open_correspondence_games": "No hay partidas por correspondencia abiertas por ahora"
     },
     "game": {
         "opponent": "Contrincante",
@@ -187,7 +191,10 @@
     "undo": {
         "undo_move": "Recuperación",
         "accept": "Aceptar deshacer",
-        "reject": "Rechazar"
+        "reject": "Rechazar",
+        "player_wants_to_takeback": "{{ player }} quiere deshacer su movimiento",
+        "player_takeback_his_move": "{{ player }} deshizo su movimiento.",
+        "takeback_request_denied": "La solicitud de {{ player }} para deshacer su movimiento ha sido rechazada."
     },
     "ping": {
         "date_shift_ms": "Ajustes temporales: {{ms}}ms",
@@ -204,7 +211,8 @@
         "ask_confirmation": "Pedir confirmación",
         "description": "Para evitar errores, puedes pedir confirmación antes de enviar un movimiento insano.",
         "button_label_short": "Confirmar",
-        "send_immediately": "Enviar inmediatamente"
+        "send_immediately": "Enviar inmediatamente",
+        "send_immediately_description": "El movimiento se envía en cuanto haces clic en la celda."
     },
     "hex_tournament_paris": {
         "title": "Torneo de Hex en París",
@@ -498,7 +506,9 @@
         "random_help": "Los jugadores obtienen su lugar al azar, no importa su nivel.",
         "rating": "Clasificación",
         "rating_help": "Los jugadores obtienen su lugar en base a su clasificación.",
-        "rating_random_help": "Los jugadores obtienen su lugar en base a su clasificacion, pero con un componente de azar dependiendo en la desviacion de la calsificacion en su glicko2."
+        "rating_random_help": "Los jugadores obtienen su lugar en base a su clasificacion, pero con un componente de azar dependiendo en la desviacion de la calsificacion en su glicko2.",
+        "title": "Emparejamiento inicial",
+        "rating_random": "Puntuación con aleatoriedad parcial"
     },
     "resign_confirm_overlay": {
         "title": "Rendirse",
@@ -507,8 +517,120 @@
         "cancelLabel": "No, seguir jugando"
     },
     "conditional_moves": {
-        "title": "Movimientos condicionales"
+        "title": "Movimientos condicionales",
+        "title_short": "Movimientos condicionales",
+        "cut_move": "Eliminar movimiento",
+        "inactive_lines": "Líneas inactivas",
+        "clear_inactive_lines": "Borrar líneas inactivas"
     },
     "password_changed_success": "La contraseña ha cambiado.",
-    "total_played_games": "Partidas totales jugadas"
+    "total_played_games": "Partidas totales jugadas",
+    "no_active_tournament": "No hay ningún torneo activo en este momento.",
+    "no_upcoming_tournament": "Todavía no hay próximos torneos.",
+    "upcoming_events": "Próximos eventos",
+    "tournament_subscribed": "Suscrito",
+    "tournament_state": {
+        "running": "En vivo"
+    },
+    "lobby_my_turn_to_play": "Mi turno para jugar",
+    "lobby_my_current_games": "Mis partidas actuales",
+    "lobby_your_turn_badge": "Tu turno",
+    "lobby_waiting_badge": "Esperando",
+    "lobby_join": "Unirse",
+    "lobby_game_no_longer_available": "La partida ya no está disponible",
+    "lobby_active_players_one": "jugador activo",
+    "lobby_active_players_other": "jugadores activos",
+    "lobby_playing_now": "Jugando ahora",
+    "lobby_no_live_games_now": "No hay partidas en vivo en curso ahora mismo.",
+    "lobby_observe_correspondence": "Observar partidas por correspondencia",
+    "lobby_mode": {
+        "live_description": "Juega en tiempo real",
+        "correspondence_description": "Juega a tu propio ritmo",
+        "open": "abierta",
+        "n_playing": "{{n}} jugando"
+    },
+    "playing_games": {
+        "title": "Partidas en curso",
+        "live_games": "Partidas en vivo",
+        "correspondence_games": "Partidas por correspondencia",
+        "no_live_games": "No hay partidas en vivo en curso",
+        "no_correspondence_games": "No hay partidas por correspondencia en curso"
+    },
+    "sort_recently_started": "Comenzadas recientemente",
+    "sort_most_moves": "Más movimientos jugados",
+    "sort_longest_game": "Partida más larga",
+    "sort_player_rating": "Puntuación del jugador",
+    "all": "Todas",
+    "online_players_title": "Jugadores en línea",
+    "online_players_heading": "Jugadores en línea ({{n}})",
+    "sort_by_rating": "Por puntuación",
+    "sort_alpha": "A–Z",
+    "no_players_online": "No hay jugadores en línea",
+    "nav_games": "Partidas",
+    "nav_lobby": "Sala",
+    "nav_observe": "Observar",
+    "nav_archives": "Archivo",
+    "update": "Actualizar",
+    "tournaments_page_intro": "Aquí están los torneos de Hex, que pueden ser <strong>organizados por cualquiera</strong> en varios formatos como sistema suizo o eliminación.<br>Puedes ver partidas de torneos en curso o unirte a uno próximo.<br><strong>Para participar</strong>, asegúrate de <strong>registrarte a tiempo</strong>. Puedes suscribirte para recibir una notificación cuando se abra el registro.<br>Consulta la descripción del torneo para ver detalles como horarios de registro, formato y participantes.",
+    "losers_bracket": "Cuadro de perdedores",
+    "chat_message_moderated": "Mensaje eliminado por moderación",
+    "no_yet_data": "¡Quién sabe!",
+    "preferred_board_sizes": "Tamaños de tablero preferidos",
+    "ranked_games": "Clasificadas",
+    "friendly_games": "Amistosas",
+    "bot_games": "Partidas contra bots",
+    "bot": "Bot",
+    "browse_all_ended_games": "Ver todas las partidas terminadas",
+    "n_total_games_one": "1 partida en total.",
+    "n_total_games_other": "{{count}} partidas en total.",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "page_page_of_max": "Página {{page}} / {{max}}",
+    "must_be_logged_in_as_guest": "Debes haber iniciado sesión como invitado",
+    "pseudo_already_taken": "Este nombre de usuario ya está siendo usado por otro jugador",
+    "pseudo_not_existing": "No hay ningún jugador con ese nombre de usuario",
+    "invalid_password": "Contraseña no válida para esta cuenta",
+    "pseudo_too_short": "El nombre de usuario es demasiado corto",
+    "pseudo_too_long": "El nombre de usuario es demasiado largo",
+    "invalid_pseudo": "El nombre de usuario no es válido",
+    "overall": "General",
+    "boardsize": {
+        "small": "Pequeño",
+        "medium": "Mediano",
+        "large": "Grande"
+    },
+    "premove": {
+        "title": "Premovimiento",
+        "description": "Juega un movimiento durante el turno del rival: se ejecutará instantáneamente tras su jugada."
+    },
+    "move_settings": {
+        "title": "Configuración de movimientos"
+    },
+    "donate": "Donar a PlayHex",
+    "notifications": "Notificaciones",
+    "mark_all_as_read": "Marcar como leído",
+    "no_notifications": "No hay notificaciones.",
+    "game_against_player": "Partida contra {{ player }}",
+    "notifications_misc": "Otras notificaciones",
+    "notification": {
+        "you_won": "¡Has ganado la partida!",
+        "you_lost": "Has perdido la partida :(",
+        "opponent_moderated": "{{player}} ha sido moderado. Sentimos los mensajes inapropiados que recibiste."
+    },
+    "player_sent_you_rematch_offer": "¡{{ player }} te ha retado a una revancha!",
+    "player_sent_rematch_offer": "{{ player }} envió una oferta de revancha",
+    "player_chat_restricted": "{player} no puede responder en el chat (chat restringido).",
+    "moderation_action_overlay": {
+        "title": "Aviso de moderación",
+        "warning_only": "Esto es una advertencia.",
+        "chat_block_until": "Tu acceso al chat ha sido restringido hasta {{date}}.",
+        "reason": "Motivo",
+        "details": "Detalles",
+        "related_messages": "Mensajes relacionados",
+        "acknowledge": "He leído y entendido",
+        "scroll_hint": "Lee y acepta abajo"
+    },
+    "moderation_reason": {
+        "chat_insults": "Insultos o comportamiento inapropiado en el chat"
+    }
 }

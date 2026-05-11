@@ -4,7 +4,11 @@
         "no_waiting_games": "現在利用可能なゲームはありません。新しいゲームを作成しましょう！",
         "watch_current_games": "現在のゲームを観戦する",
         "join_a_game": "ゲームに参加",
-        "no_playing_games": "現在進行中のゲームはありません。"
+        "no_playing_games": "現在進行中のゲームはありません。",
+        "open_live_games": "ライブ対局に参加",
+        "open_correspondence_games": "通信対局に参加",
+        "no_open_live_games": "現在参加可能なライブ対局はありません",
+        "no_open_correspondence_games": "現在参加可能な通信対局はありません"
     },
     "game": {
         "opponent": "対戦相手",
@@ -26,7 +30,12 @@
         "outcome": "結果",
         "lost": "敗北",
         "playing": "プレイ中",
-        "watch": "観戦"
+        "watch": "観戦",
+        "title": "対局",
+        "info": "情報",
+        "duration": "時間",
+        "title_your_turn": "あなたの番です！",
+        "title_waiting": "対戦相手を待機中：作成者"
     },
     "game_rules": {
         "normal": "通常",
@@ -59,7 +68,8 @@
         "periods_time": "期間時間",
         "fast": "速い",
         "normal": "普通",
-        "long": "長い"
+        "long": "長い",
+        "capped_abbreviation": "上限"
     },
     "i_play": {
         "title": "プレイする",
@@ -121,7 +131,9 @@
         "errored": "分析エラー！",
         "best_move": "最善手",
         "best": "最善:",
-        "how_it_works": "動作の仕組み"
+        "how_it_works": "動作の仕組み",
+        "request_analysis": "AI解析を依頼",
+        "available": "対局解析が利用可能になりました。"
     },
     "try_again": "再試行",
     "yes": "はい",
@@ -303,7 +315,8 @@
         "started": "トーナメントが開始されました！",
         "match_ended": "試合 {{ round }}.{{ number }} が終了：{{ winnerPseudo }} が {{ loserPseudo }} に勝利しました。",
         "match_canceled_recreated": "試合 {{ round }}.{{ number }} はキャンセルされ、再作成されました。",
-        "ended": "トーナメントが終了しました。"
+        "ended": "トーナメントが終了しました。",
+        "changed_admins": "主催者が管理者を設定しました: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "このトーナメントへの参加は禁止されています",
     "tournament_account_required": "このトーナメントにはアカウントが必要です。ゲストとしての参加はできません。ログインまたはアカウントを作成してください。",
@@ -361,7 +374,10 @@
     "undo": {
         "undo_move": "手を戻す",
         "accept": "戻しを承認",
-        "reject": "却下"
+        "reject": "却下",
+        "player_wants_to_takeback": "{{ player }} が待ったを希望しています",
+        "player_takeback_his_move": "{{ player }} が着手を取り消しました。",
+        "takeback_request_denied": "{{ player }} の待った申請は拒否されました。"
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -378,7 +394,8 @@
         "button_label_short": "確認",
         "send_immediately": "すぐに送信",
         "ask_confirmation": "確認を求める",
-        "description": "誤クリックを防ぐため、手を送信する前に確認を求めることができます。"
+        "description": "誤クリックを防ぐため、手を送信する前に確認を求めることができます。",
+        "send_immediately_description": "マスをクリックするとすぐに着手が送信されます。"
     },
     "rematch": {
         "label": "再戦",
@@ -410,5 +427,203 @@
         "small": "小",
         "medium": "中",
         "large": "大"
+    },
+    "game_state": {
+        "created": "作成済み",
+        "canceled": "キャンセル済み",
+        "playing": "対局中",
+        "ended": "終了"
+    },
+    "muted": {
+        "on": "ミュート",
+        "off": "再生"
+    },
+    "allow_exploration": "検討を許可",
+    "allow_exploration_help": "着手を送信する前に、両色を打って変化を試せます。無効にすると、条件付き着手も無効になります。",
+    "handicap": {
+        "title": "ハンデ",
+        "none": "なし",
+        "handicap_for_player": "{{player}} に {{n}}"
+    },
+    "game_created_short": "{{ date }} に作成",
+    "game_created_by_system_time_ago": "システムにより {timeAgo} に作成された対局です。",
+    "username_not_an_email_warning": "メールアドレスを入力しているようですが、PlayHex に必要なのはユーザー名のみです。メールアドレスは公開表示されます…",
+    "save": "保存",
+    "discard": "破棄",
+    "pass_confirm_overlay": {
+        "title": "手番をパスしますか？",
+        "message": "現在の手番をスキップしようとしています。よろしいですか？",
+        "confirmLabel": "はい、パスする",
+        "cancelLabel": "いいえ、着手します"
+    },
+    "player_passed_his_turn": "{{player}} がパスしました",
+    "go_to_the_game": "対局へ移動",
+    "explore": "検討",
+    "dismiss": "閉じる",
+    "friendly": "親善",
+    "any": "任意",
+    "1v1": "1対1",
+    "sort_date": {
+        "asc": "古い順",
+        "desc": "新しい順"
+    },
+    "offline": "オフライン",
+    "connection_lost": "接続が失われました",
+    "play_offline": "オフラインでプレイ",
+    "new_game_vs_ai": "AIと新しい対局",
+    "continue_game_vs_x": "{{ playerNickname }} との対局を続ける",
+    "restart": "再開",
+    "back_to_menu": "メニューに戻る",
+    "loading": "読み込み中…",
+    "no_active_tournament": "現在開催中の大会はありません。",
+    "no_upcoming_tournament": "現在予定されている大会はありません。",
+    "upcoming_events": "今後のイベント",
+    "tournament_subscribed": "登録済み",
+    "tournament_state": {
+        "running": "開催中"
+    },
+    "lobby_my_turn_to_play": "自分の番の対局",
+    "lobby_my_current_games": "現在の対局",
+    "lobby_your_turn_badge": "あなたの番",
+    "lobby_waiting_badge": "待機中",
+    "lobby_join": "参加",
+    "lobby_game_no_longer_available": "この対局は利用できなくなりました",
+    "lobby_active_players_one": "アクティブプレイヤー",
+    "lobby_active_players_other": "アクティブプレイヤー",
+    "lobby_playing_now": "対局中",
+    "lobby_no_live_games_now": "現在進行中のライブ対局はありません。",
+    "lobby_observe_correspondence": "通信対局を観戦",
+    "lobby_mode": {
+        "live_description": "リアルタイムで対局",
+        "correspondence_description": "自分のペースで対局",
+        "open": "募集中",
+        "n_playing": "{{n}} 対局中"
+    },
+    "playing_games": {
+        "title": "進行中の対局",
+        "live_games": "ライブ対局",
+        "correspondence_games": "通信対局",
+        "no_live_games": "進行中のライブ対局はありません",
+        "no_correspondence_games": "進行中の通信対局はありません"
+    },
+    "sort_recently_started": "開始が新しい順",
+    "sort_most_moves": "着手数順",
+    "sort_longest_game": "最長対局",
+    "sort_player_rating": "レーティング",
+    "all": "すべて",
+    "online_players_title": "オンラインプレイヤー",
+    "online_players_heading": "オンラインプレイヤー（{{n}}）",
+    "sort_by_rating": "レーティング順",
+    "sort_alpha": "A–Z",
+    "no_players_online": "オンラインのプレイヤーはいません",
+    "nav_games": "対局",
+    "nav_lobby": "ロビー",
+    "nav_observe": "観戦",
+    "nav_archives": "アーカイブ",
+    "update": "更新",
+    "tournaments_page_intro": "こちらは Hex の大会一覧です。<strong>誰でも主催可能</strong>で、スイス式やトーナメント方式など様々な形式に対応しています。<br>開催中の大会の対局を観戦したり、今後開催される大会に参加できます。<br><strong>参加するには</strong>、<strong>時間内にチェックイン</strong>してください。チェックイン開始時に通知を受け取る登録も可能です。<br>チェックイン時間、形式、参加者などの詳細は大会説明をご確認ください。",
+    "n_people_are_interested_one": "{{count}} 人が興味あり",
+    "n_participants_one": "{{ count }} 人参加",
+    "n_playing_games_one": "{{ count }} 対局進行中",
+    "n_matches_played_one": "{{ count }} 試合実施済み",
+    "tournament_admins": "大会管理者",
+    "admins_one": "管理者: { players }",
+    "admins_other": "管理者: { players }",
+    "tournament_unsubscribe": "興味ありを解除しました。",
+    "n_rounds_one": "1ラウンド",
+    "losers_bracket": "敗者側トーナメント",
+    "tournament_slug_duplicate": "同じURL名の大会がすでに存在します",
+    "tournament_seeding_methods": {
+        "title": "シード方式",
+        "random": "ランダム",
+        "random_help": "レーティングに関係なくランダムに組み合わせます。",
+        "rating": "レーティング順",
+        "rating_help": "レーティング順に組み合わせます。初回戦に不戦勝がある場合、上位者が不戦勝になります。",
+        "rating_random": "レーティング＋一部ランダム",
+        "rating_random_help": "レーティング順を基本としつつ、glicko2 の偏差に応じたランダム要素を加えます。初回戦に不戦勝がある場合、上位者が不戦勝になります。"
+    },
+    "moves": "着手数",
+    "chat_message_moderated": "メッセージはモデレーションにより削除されました",
+    "n_characters_one": "{{count}} 文字",
+    "force_board_orientation_mode": "この画面で盤面表示を横向きまたは縦向きに固定する",
+    "resign_confirm_overlay": {
+        "title": "投了",
+        "message": "本当に投了しますか？",
+        "confirmLabel": "はい、投了します",
+        "cancelLabel": "いいえ、続けます"
+    },
+    "conditional_moves": {
+        "title": "条件付き着手",
+        "title_short": "条件手",
+        "cut_move": "この手を削除",
+        "inactive_lines": "無効な分岐",
+        "clear_inactive_lines": "無効な分岐を削除"
+    },
+    "password_changed_success": "パスワードが変更されました。",
+    "no_yet_data": "誰にもわかりません！",
+    "total_played_games": "総対局数",
+    "preferred_board_sizes": "好みの盤サイズ",
+    "ranked_games": "レート戦",
+    "friendly_games": "親善対局",
+    "bot_games": "Bot対局",
+    "bot": "Bot",
+    "browse_all_ended_games": "終了した全対局を見る",
+    "n_total_games_one": "合計1対局。",
+    "n_total_games_other": "合計{{count}}対局。",
+    "previous": "前へ",
+    "next": "次へ",
+    "page_page_of_max": "{{page}} / {{max}} ページ",
+    "must_be_logged_in_as_guest": "ゲストとしてログインする必要があります",
+    "pseudo_already_taken": "このユーザー名はすでに使用されています",
+    "pseudo_not_existing": "そのユーザー名のプレイヤーはいません",
+    "invalid_password": "このアカウントのパスワードが無効です",
+    "pseudo_too_short": "ユーザー名が短すぎます",
+    "pseudo_too_long": "ユーザー名が長すぎます",
+    "invalid_pseudo": "無効なユーザー名です",
+    "overall": "総合",
+    "hex_tournament_paris": {
+        "title": "パリ Hex 大会",
+        "read_more": "続きを読む"
+    },
+    "premove": {
+        "title": "先読み着手",
+        "description": "相手の手番中に着手予約します。相手の着手後すぐに実行されます。"
+    },
+    "move_settings": {
+        "title": "着手設定"
+    },
+    "donate": "PlayHex に寄付する",
+    "notifications": "通知",
+    "mark_all_as_read": "すべて既読にする",
+    "no_notifications": "通知はありません。",
+    "game_against_player": "{{ player }} との対局",
+    "notifications_misc": "その他の通知",
+    "notification": {
+        "you_won": "あなたの勝ちです！",
+        "you_lost": "あなたの負けです :(",
+        "opponent_moderated": "{{player}} はモデレーション対象となりました。不適切なメッセージについてお詫びします。"
+    },
+    "player_sent_you_rematch_offer": "{{ player }} が再戦を申し込みました！",
+    "player_sent_rematch_offer": "{{ player }} が再戦オファーを送りました",
+    "player_chat_restricted": "{player} はチャットに返信できません（制限中）。",
+    "moderation_action_overlay": {
+        "title": "モデレーション通知",
+        "warning_only": "これは警告です。",
+        "chat_block_until": "あなたのチャット利用は {{date}} まで制限されています。",
+        "reason": "理由",
+        "details": "詳細",
+        "related_messages": "関連メッセージ",
+        "acknowledge": "読み、理解しました",
+        "scroll_hint": "下まで読んで同意してください"
+    },
+    "moderation_reason": {
+        "chat_insults": "チャットでの侮辱または不適切な行為"
+    },
+    "player_loses_reason": {
+        "default": "{player} の負けです。",
+        "path": "{player} の負けです。",
+        "time": "{player} が時間切れです。",
+        "resign": "{player} が投了しました。",
+        "forfeit": "{player} の不戦敗です。"
     }
 }

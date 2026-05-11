@@ -4,7 +4,11 @@
         "no_waiting_games": "Derzeit sind keine Spiele verfügbar. Erstelle ein neues!",
         "watch_current_games": "Aktuelle Spiele ansehen",
         "join_a_game": "Einem Spiel beitreten",
-        "no_playing_games": "Derzeit sind keine Spiele im Gange."
+        "no_playing_games": "Derzeit sind keine Spiele im Gange.",
+        "open_live_games": "Einem Live-Spiel beitreten",
+        "open_correspondence_games": "Einem Fernspiel beitreten",
+        "no_open_live_games": "Derzeit keine offenen Live-Spiele",
+        "no_open_correspondence_games": "Derzeit keine offenen Fernspiele"
     },
     "game": {
         "opponent": "Gegner",
@@ -493,7 +497,8 @@
     "notifications_misc": "Sonstige Benachrichtigungen",
     "notification": {
         "you_won": "Du hast das Spiel gewonnen!",
-        "you_lost": "Du hast das Spiel verloren :("
+        "you_lost": "Du hast das Spiel verloren :(",
+        "opponent_moderated": "{{player}} wurde moderiert. Entschuldigung für die unangemessenen Nachrichten, die du erhalten hast."
     },
     "how_to_play_hex": "Wie man Hex spielt",
     "tutorial": {
@@ -549,5 +554,76 @@
         "rating_random_help": "Auswahl nach Rang, aber mit Zufallselement nach Varianz des Glicko2-Rangs. Wenn es in der ersten Runde Freilose gibt, bekommen stärkere Spieler das Freilos.",
         "rating_random": "Rang mit Zufallselement"
     },
-    "tournament_slug_duplicate": "Es gibt bereits ein Turnier mit dieser URL"
+    "tournament_slug_duplicate": "Es gibt bereits ein Turnier mit dieser URL",
+    "muted": {
+        "on": "Stumm",
+        "off": "Abspielen"
+    },
+    "allow_exploration": "Analyse erlauben",
+    "allow_exploration_help": "Erlaubt es, Varianten auszuprobieren, indem beide Farben gespielt werden, bevor ein Zug abgesendet wird. Wenn deaktiviert, werden auch bedingte Züge deaktiviert.",
+    "dismiss": "Schließen",
+    "no_active_tournament": "Derzeit gibt es kein aktives Turnier.",
+    "no_upcoming_tournament": "Derzeit gibt es noch keine kommenden Turniere.",
+    "upcoming_events": "Kommende Ereignisse",
+    "tournament_subscribed": "Abonniert",
+    "tournament_state": {
+        "running": "Live"
+    },
+    "lobby_my_turn_to_play": "Ich bin am Zug",
+    "lobby_my_current_games": "Meine aktuellen Spiele",
+    "lobby_your_turn_badge": "Du bist am Zug",
+    "lobby_waiting_badge": "Warten",
+    "lobby_join": "Beitreten",
+    "lobby_game_no_longer_available": "Spiel nicht mehr verfügbar",
+    "lobby_active_players_one": "aktiver Spieler",
+    "lobby_active_players_other": "aktive Spieler",
+    "lobby_playing_now": "Spielen gerade",
+    "lobby_no_live_games_now": "Derzeit läuft kein Live-Spiel.",
+    "lobby_observe_correspondence": "Fernspiele beobachten",
+    "lobby_mode": {
+        "live_description": "In Echtzeit spielen",
+        "correspondence_description": "Im eigenen Tempo spielen",
+        "open": "offen",
+        "n_playing": "{{n}} spielen"
+    },
+    "playing_games": {
+        "title": "Laufende Spiele",
+        "live_games": "Live-Spiele",
+        "correspondence_games": "Fernspiele",
+        "no_live_games": "Keine laufenden Live-Spiele",
+        "no_correspondence_games": "Keine laufenden Fernspiele"
+    },
+    "sort_recently_started": "Kürzlich gestartet",
+    "sort_most_moves": "Meiste Züge",
+    "sort_longest_game": "Längstes Spiel",
+    "sort_player_rating": "Spielerwertung",
+    "all": "Alle",
+    "online_players_title": "Online-Spieler",
+    "online_players_heading": "Online-Spieler ({{n}})",
+    "sort_by_rating": "Nach Wertung",
+    "sort_alpha": "A–Z",
+    "no_players_online": "Keine Spieler online",
+    "nav_games": "Spiele",
+    "nav_lobby": "Lobby",
+    "nav_observe": "Beobachten",
+    "nav_archives": "Archiv",
+    "update": "Aktualisieren",
+    "tournaments_page_intro": "Hier sind Hex-Turniere, die <strong>von jedem organisiert werden können</strong> in verschiedenen Formaten wie Schweizer System oder K.-o.-System.<br>Du kannst Spiele laufender Turniere ansehen oder einem kommenden Turnier beitreten.<br><strong>Um teilzunehmen</strong>, stelle sicher, dass du <strong>rechtzeitig eincheckst</strong>. Du kannst Benachrichtigungen abonnieren, wenn der Check-in beginnt.<br>Sieh dir die Turnierbeschreibung für Details wie Check-in-Zeiten, Format und Teilnehmer an.",
+    "chat_message_moderated": "Nachricht durch Moderation gelöscht",
+    "bot": "Bot",
+    "donate": "An PlayHex spenden",
+    "player_chat_restricted": "{player} kann im Chat nicht antworten (Chat eingeschränkt).",
+    "moderation_action_overlay": {
+        "title": "Moderationshinweis",
+        "warning_only": "Dies ist eine Warnung.",
+        "chat_block_until": "Dein Chat-Zugang wurde bis {{date}} eingeschränkt.",
+        "reason": "Grund",
+        "details": "Details",
+        "related_messages": "Zugehörige Nachrichten",
+        "acknowledge": "Ich habe gelesen und verstanden",
+        "scroll_hint": "Unten lesen und akzeptieren"
+    },
+    "moderation_reason": {
+        "chat_insults": "Beleidigungen oder unangemessenes Verhalten im Chat"
+    }
 }
