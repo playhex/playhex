@@ -4,7 +4,11 @@
         "no_waiting_games": "目前没有可用的游戏。创建一个新游戏吧！",
         "watch_current_games": "观看当前游戏",
         "join_a_game": "加入游戏",
-        "no_playing_games": "目前没有正在进行的游戏。"
+        "no_playing_games": "目前没有正在进行的游戏。",
+        "open_live_games": "加入实时对局",
+        "open_correspondence_games": "加入回合制对局",
+        "no_open_live_games": "当前没有可加入的实时对局",
+        "no_open_correspondence_games": "当前没有可加入的回合制对局"
     },
     "game": {
         "opponent": "对手",
@@ -26,7 +30,12 @@
         "outcome": "结果",
         "lost": "失败",
         "playing": "正在玩",
-        "watch": "观看"
+        "watch": "观看",
+        "title": "对局",
+        "info": "信息",
+        "duration": "时长",
+        "title_your_turn": "轮到你了！",
+        "title_waiting": "等待对手中：房主为"
     },
     "game_rules": {
         "normal": "普通",
@@ -59,7 +68,8 @@
         "periods_time": "每段时间",
         "fast": "快",
         "normal": "普通",
-        "long": "长"
+        "long": "长",
+        "capped_abbreviation": "上限"
     },
     "i_play": {
         "title": "我玩",
@@ -121,7 +131,9 @@
         "errored": "分析出错！",
         "best_move": "最佳走法",
         "best": "最佳：",
-        "how_it_works": "工作原理"
+        "how_it_works": "工作原理",
+        "request_analysis": "请求 AI 分析",
+        "available": "对局分析现已可用。"
     },
     "try_again": "重试",
     "yes": "是",
@@ -301,7 +313,8 @@
         "started": "锦标赛已开始！",
         "match_ended": "第 {{ round }}.{{ number }} 场比赛结束：{{ winnerPseudo }} 战胜了 {{ loserPseudo }}。",
         "match_canceled_recreated": "第 {{ round }}.{{ number }} 场比赛因取消而被重新创建。",
-        "ended": "锦标赛已结束。"
+        "ended": "锦标赛已结束。",
+        "changed_admins": "组织者已指定管理员：{{ newAdmins }}"
     },
     "tournament_player_is_banned": "已被禁止参加此锦标赛",
     "tournament_account_required": "此锦标赛需要账号，访客无法参与。请先登录或创建账号。",
@@ -359,7 +372,10 @@
     "undo": {
         "undo_move": "撤销",
         "accept": "接受撤销",
-        "reject": "拒绝"
+        "reject": "拒绝",
+        "player_wants_to_takeback": "{{ player }} 想悔棋",
+        "player_takeback_his_move": "{{ player }} 已悔棋。",
+        "takeback_request_denied": "{{ player }} 的悔棋请求已被拒绝。"
     },
     "ping": {
         "ping_ms": "延迟：{{ms}}毫秒",
@@ -376,7 +392,8 @@
         "button_label_short": "确认",
         "send_immediately": "立即发送",
         "ask_confirmation": "要求确认",
-        "description": "为了防止误点，你可以要求在提交走棋前确认。"
+        "description": "为了防止误点，你可以要求在提交走棋前确认。",
+        "send_immediately_description": "点击格子后立即提交该步。"
     },
     "rematch": {
         "label": "重赛",
@@ -403,5 +420,210 @@
         "time": "{player}因时间获胜！",
         "resign": "{player}获胜！",
         "forfeit": "{player}因弃权获胜！"
+    },
+    "game_state": {
+        "created": "已创建",
+        "canceled": "已取消",
+        "playing": "进行中",
+        "ended": "已结束"
+    },
+    "muted": {
+        "on": "静音",
+        "off": "播放"
+    },
+    "allow_exploration": "允许试走",
+    "allow_exploration_help": "允许在提交落子前模拟双方走法进行试走。如果禁用，条件走子也会被禁用。",
+    "handicap": {
+        "title": "让子",
+        "none": "无",
+        "handicap_for_player": "{{n}} 给 {{player}}"
+    },
+    "game_created_short": "创建于 {{ date }}",
+    "game_created_by_system_time_ago": "系统创建的对局，{timeAgo}。",
+    "username_not_an_email_warning": "嘿，看起来你输入的是邮箱地址，但 PlayHex 只需要用户名。你的邮箱将会公开显示……",
+    "save": "保存",
+    "discard": "放弃",
+    "pass_confirm_overlay": {
+        "title": "跳过此回合？",
+        "message": "你即将跳过当前回合。确定吗？",
+        "confirmLabel": "是的，跳过",
+        "cancelLabel": "不，我要继续下"
+    },
+    "player_passed_his_turn": "{{player}} 已跳过回合",
+    "go_to_the_game": "进入对局",
+    "explore": "探索",
+    "dismiss": "关闭",
+    "friendly": "友谊赛",
+    "any": "任意",
+    "rating_n": "等级分：{{rating}}",
+    "1v1": "1对1",
+    "sort_date": {
+        "asc": "按时间顺序",
+        "desc": "最近优先"
+    },
+    "offline": "离线",
+    "connection_lost": "连接已断开",
+    "play_offline": "离线游玩",
+    "new_game_vs_ai": "与 AI 开始新对局",
+    "continue_game_vs_x": "继续与 {{ playerNickname }} 的对局",
+    "restart": "重新开始",
+    "back_to_menu": "返回菜单",
+    "loading": "加载中…",
+    "no_active_tournament": "当前没有进行中的锦标赛。",
+    "no_upcoming_tournament": "当前暂无即将开始的锦标赛。",
+    "upcoming_events": "即将到来的活动",
+    "tournament_subscribed": "已订阅",
+    "tournament_state": {
+        "running": "进行中"
+    },
+    "lobby_my_turn_to_play": "轮到我走",
+    "lobby_my_current_games": "我的当前对局",
+    "lobby_your_turn_badge": "轮到你",
+    "lobby_waiting_badge": "等待中",
+    "lobby_join": "加入",
+    "lobby_game_no_longer_available": "该对局已不可用",
+    "lobby_active_players_one": "活跃玩家",
+    "lobby_active_players_other": "活跃玩家",
+    "lobby_playing_now": "正在进行",
+    "lobby_no_live_games_now": "当前没有实时对局进行中。",
+    "lobby_observe_correspondence": "观战回合制对局",
+    "lobby_mode": {
+        "live_description": "实时进行对局",
+        "correspondence_description": "按自己的节奏进行对局",
+        "open": "开放",
+        "n_playing": "{{n}} 正在游戏"
+    },
+    "playing_games": {
+        "title": "进行中的对局",
+        "live_games": "实时对局",
+        "correspondence_games": "回合制对局",
+        "no_live_games": "当前没有进行中的实时对局",
+        "no_correspondence_games": "当前没有进行中的回合制对局"
+    },
+    "sort_recently_started": "最近开始",
+    "sort_most_moves": "步数最多",
+    "sort_longest_game": "时长最长",
+    "sort_player_rating": "玩家等级分",
+    "all": "全部",
+    "online_players_title": "在线玩家",
+    "online_players_heading": "在线玩家（{{n}}）",
+    "sort_by_rating": "按等级分",
+    "sort_alpha": "按字母顺序",
+    "no_players_online": "当前没有玩家在线",
+    "nav_games": "对局",
+    "nav_lobby": "大厅",
+    "nav_observe": "观战",
+    "nav_archives": "存档",
+    "update": "更新",
+    "tournaments_page_intro": "这里是 Hex 锦标赛，<strong>任何人都可以组织</strong>，支持瑞士制、淘汰赛等多种赛制。<br>你可以观看正在进行的比赛，或加入即将开始的锦标赛。<br><strong>想要参加</strong>，请务必<strong>按时签到</strong>。你可以订阅通知，在签到开放时收到提醒。<br>请查看锦标赛说明，了解签到时间、赛制和参赛者等详情。",
+    "n_people_are_interested_one": "{{count}} 人感兴趣",
+    "n_participants_one": "{{ count }} 名参与者",
+    "n_playing_games_one": "{{ count }} 场进行中的对局",
+    "n_matches_played_one": "{{ count }} 场已完成比赛",
+    "tournament_admins": "锦标赛管理员",
+    "admins_one": "管理员：{ players }",
+    "admins_other": "管理员：{ players }",
+    "tournament_unsubscribe": "我不再感兴趣。",
+    "n_rounds_one": "一轮",
+    "losers_bracket": "败者组",
+    "tournament_slug_duplicate": "已有相同网址名称的锦标赛",
+    "tournament_seeding_methods": {
+        "title": "种子排序",
+        "random": "随机",
+        "random_help": "玩家将随机分配位置，与等级分无关。",
+        "rating": "按等级分",
+        "rating_help": "玩家按等级分排序。如首轮有轮空，高分玩家获得轮空。",
+        "rating_random": "等级分 + 部分随机",
+        "rating_random_help": "玩家按等级分排序，但会根据其 glicko2 波动值加入随机因素。如首轮有轮空，高分玩家获得轮空。"
+    },
+    "moves": "步数",
+    "move_number": "第 {{n}} 手",
+    "chat_message_moderated": "消息已被审核删除",
+    "n_characters_one": "{{count}} 个字符",
+    "force_board_orientation_mode": "强制此界面以横屏或竖屏显示棋盘",
+    "resign_confirm_overlay": {
+        "title": "认输",
+        "message": "确定要认输吗？",
+        "confirmLabel": "是的，我认输",
+        "cancelLabel": "不，继续游戏"
+    },
+    "conditional_moves": {
+        "title": "条件走子",
+        "title_short": "条件步",
+        "cut_move": "删除该步",
+        "inactive_lines": "未激活分支",
+        "clear_inactive_lines": "清除未激活分支"
+    },
+    "password_changed_success": "密码已更改。",
+    "no_yet_data": "谁知道呢！",
+    "total_played_games": "总对局数",
+    "preferred_board_sizes": "偏好棋盘大小",
+    "ranked_games": "排位赛",
+    "friendly_games": "友谊赛",
+    "bot_games": "机器人对局",
+    "bot": "机器人",
+    "browse_all_ended_games": "浏览所有已结束对局",
+    "n_total_games_one": "共 1 场对局。",
+    "n_total_games_other": "共 {{count}} 场对局。",
+    "previous": "上一页",
+    "next": "下一页",
+    "page_page_of_max": "第 {{page}} / {{max}} 页",
+    "must_be_logged_in_as_guest": "你必须以游客身份登录",
+    "pseudo_already_taken": "该用户名已被其他玩家使用",
+    "pseudo_not_existing": "没有使用此用户名的玩家",
+    "invalid_password": "此账号密码无效",
+    "pseudo_too_short": "用户名太短",
+    "pseudo_too_long": "用户名太长",
+    "invalid_pseudo": "用户名无效",
+    "overall": "总体",
+    "boardsize": {
+        "small": "小",
+        "medium": "中",
+        "large": "大"
+    },
+    "hex_tournament_paris": {
+        "title": "巴黎 Hex 锦标赛",
+        "read_more": "了解更多"
+    },
+    "premove": {
+        "title": "预走",
+        "description": "在对手回合提前落子：对手走完后将立即执行。"
+    },
+    "move_settings": {
+        "title": "走子设置"
+    },
+    "donate": "向 PlayHex 捐赠",
+    "notifications": "通知",
+    "mark_all_as_read": "全部标为已读",
+    "no_notifications": "暂无通知。",
+    "game_against_player": "对阵 {{ player }}",
+    "notifications_misc": "其他通知",
+    "notification": {
+        "you_won": "你赢得了这场对局！",
+        "you_lost": "你输了这场对局 :(",
+        "opponent_moderated": "{{player}} 已被处理。很抱歉你收到了不当消息。"
+    },
+    "player_sent_you_rematch_offer": "{{ player }} 向你发起再战邀请！",
+    "player_sent_rematch_offer": "{{ player }} 发送了再战邀请",
+    "player_chat_restricted": "{player} 无法在聊天中回复（聊天受限）。",
+    "moderation_action_overlay": {
+        "title": "管理通知",
+        "warning_only": "这是一次警告。",
+        "chat_block_until": "你的聊天权限已被限制至 {{date}}。",
+        "reason": "原因",
+        "details": "详情",
+        "related_messages": "相关消息",
+        "acknowledge": "我已阅读并理解",
+        "scroll_hint": "请阅读下方内容并确认"
+    },
+    "moderation_reason": {
+        "chat_insults": "聊天中的侮辱或不当行为"
+    },
+    "player_loses_reason": {
+        "default": "{player} 失败。",
+        "path": "{player} 失败。",
+        "time": "{player} 超时。",
+        "resign": "{player} 认输。",
+        "forfeit": "{player} 弃权落败。"
     }
 }
