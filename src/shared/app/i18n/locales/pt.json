@@ -4,7 +4,11 @@
         "no_waiting_games": "Nenhum jogo disponível agora. Crie um novo!",
         "watch_current_games": "Assista aos jogos atuais",
         "join_a_game": "Entrar em um jogo",
-        "no_playing_games": "Não há jogos em andamento agora."
+        "no_playing_games": "Não há jogos em andamento agora.",
+        "open_live_games": "Entrar em um jogo ao vivo",
+        "open_correspondence_games": "Entrar em um jogo por correspondência",
+        "no_open_live_games": "Nenhum jogo ao vivo aberto no momento",
+        "no_open_correspondence_games": "Nenhum jogo por correspondência aberto no momento"
     },
     "game": {
         "opponent": "Oponente",
@@ -26,7 +30,12 @@
         "outcome": "Resultado",
         "lost": "Perdeu",
         "playing": "Jogando",
-        "watch": "Assistir"
+        "watch": "Assistir",
+        "title": "Jogo",
+        "info": "Info",
+        "duration": "Duração",
+        "title_your_turn": "Sua vez!",
+        "title_waiting": "Aguardando um oponente: hospedado por"
     },
     "game_rules": {
         "normal": "normal",
@@ -59,7 +68,8 @@
         "periods_time": "Tempo dos períodos",
         "fast": "Rápido",
         "normal": "Normal",
-        "long": "Longo"
+        "long": "Longo",
+        "capped_abbreviation": "máx."
     },
     "i_play": {
         "title": "Eu jogo",
@@ -121,7 +131,9 @@
         "errored": "Erro na análise!",
         "best_move": "melhor movimento",
         "best": "melhor:",
-        "how_it_works": "Como funciona"
+        "how_it_works": "Como funciona",
+        "request_analysis": "Solicitar análise por IA",
+        "available": "A análise da partida já está disponível."
     },
     "try_again": "Tentar novamente",
     "yes": "Sim",
@@ -308,7 +320,8 @@
         "started": "O torneio começou!",
         "match_ended": "Partida {{ round }}.{{ number }} finalizada: {{ winnerPseudo }} venceu {{ loserPseudo }}.",
         "match_canceled_recreated": "Partida {{ round }}.{{ number }} foi recriada devido ao cancelamento.",
-        "ended": "O torneio terminou."
+        "ended": "O torneio terminou.",
+        "changed_admins": "O organizador designou admins: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Banido deste torneio",
     "tournament_account_required": "Este torneio requer uma conta. Convidados não são permitidos. Faça login ou crie uma conta.",
@@ -321,7 +334,10 @@
     "undo": {
         "undo_move": "Desfazer",
         "accept": "Aceitar desfazer",
-        "reject": "Rejeitar"
+        "reject": "Rejeitar",
+        "player_wants_to_takeback": "{{ player }} quer desfazer sua jogada",
+        "player_takeback_his_move": "{{ player }} desfez sua jogada.",
+        "takeback_request_denied": "O pedido de {{ player }} para desfazer a jogada foi negado."
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -338,7 +354,8 @@
         "button_label_short": "Confirmar",
         "send_immediately": "Enviar imediatamente",
         "ask_confirmation": "Solicitar confirmação",
-        "description": "Para evitar cliques errados, você pode exigir confirmação antes de enviar um movimento."
+        "description": "Para evitar cliques errados, você pode exigir confirmação antes de enviar um movimento.",
+        "send_immediately_description": "A jogada é enviada assim que você clicar na célula."
     },
     "rematch": {
         "label": "Revanche",
@@ -365,5 +382,254 @@
         "time": "{player} vence por tempo!",
         "resign": "{player} vence!",
         "forfeit": "{player} vence por desclassificação!"
+    },
+    "game_state": {
+        "created": "Criado",
+        "canceled": "Cancelado",
+        "playing": "Em andamento",
+        "ended": "Encerrado"
+    },
+    "muted": {
+        "on": "Silenciar",
+        "off": "Reproduzir"
+    },
+    "allow_exploration": "Permitir exploração",
+    "allow_exploration_help": "Permite testar variantes jogando com ambas as cores antes de enviar uma jogada. Se desativado, jogadas condicionais também serão desativadas.",
+    "handicap": {
+        "title": "Handicap",
+        "none": "nenhum",
+        "handicap_for_player": "{{n}} para {{player}}"
+    },
+    "game_created_short": "criado em {{ date }}",
+    "game_created_by_system_time_ago": "Jogo criado pelo sistema, {timeAgo}.",
+    "username_not_an_email_warning": "Ei, parece que você está digitando seu e-mail, mas o PlayHex só precisa de um nome de usuário. Seu e-mail ficaria visível publicamente…",
+    "save": "Salvar",
+    "discard": "Descartar",
+    "pass_confirm_overlay": {
+        "title": "Passar minha vez?",
+        "message": "Você está prestes a pular sua vez atual. Tem certeza?",
+        "confirmLabel": "Sim, passar",
+        "cancelLabel": "Ops, não, deixa eu jogar"
+    },
+    "player_passed_his_turn": "{{player}} passou",
+    "go_to_the_game": "Ir para o jogo",
+    "explore": "Explorar",
+    "dismiss": "Fechar",
+    "friendly": "Amistoso",
+    "any": "Qualquer",
+    "1v1": "1v1",
+    "sort_date": {
+        "asc": "Cronológico",
+        "desc": "Mais recentes primeiro"
+    },
+    "offline": "Offline",
+    "connection_lost": "Conexão perdida",
+    "play_offline": "Jogar offline",
+    "new_game_vs_ai": "Novo jogo contra IA",
+    "continue_game_vs_x": "Continuar jogo contra {{ playerNickname }}",
+    "restart": "Reiniciar",
+    "back_to_menu": "Voltar ao menu",
+    "loading": "Carregando…",
+    "no_active_tournament": "Nenhum torneio ativo no momento.",
+    "no_upcoming_tournament": "Nenhum próximo torneio ainda.",
+    "upcoming_events": "Próximos eventos",
+    "tournament_subscribed": "Inscrito",
+    "tournament_state": {
+        "running": "Ao vivo"
+    },
+    "lobby_my_turn_to_play": "Minha vez de jogar",
+    "lobby_my_current_games": "Meus jogos atuais",
+    "lobby_your_turn_badge": "Sua vez",
+    "lobby_waiting_badge": "Aguardando",
+    "lobby_join": "Entrar",
+    "lobby_game_no_longer_available": "Jogo não está mais disponível",
+    "lobby_active_players_one": "jogador ativo",
+    "lobby_active_players_other": "jogadores ativos",
+    "lobby_playing_now": "Jogando agora",
+    "lobby_no_live_games_now": "Nenhum jogo ao vivo em andamento agora.",
+    "lobby_observe_correspondence": "Observar jogos por correspondência",
+    "lobby_mode": {
+        "live_description": "Jogue em tempo real",
+        "correspondence_description": "Jogue no seu ritmo",
+        "open": "aberto",
+        "n_playing": "{{n}} jogando"
+    },
+    "playing_games": {
+        "title": "Jogos em andamento",
+        "live_games": "Jogos ao vivo",
+        "correspondence_games": "Jogos por correspondência",
+        "no_live_games": "Nenhum jogo ao vivo em andamento",
+        "no_correspondence_games": "Nenhum jogo por correspondência em andamento"
+    },
+    "sort_recently_started": "Iniciados recentemente",
+    "sort_most_moves": "Mais jogadas",
+    "sort_longest_game": "Jogo mais longo",
+    "sort_player_rating": "Rating do jogador",
+    "all": "Todos",
+    "online_players_title": "Jogadores online",
+    "online_players_heading": "Jogadores online ({{n}})",
+    "sort_by_rating": "Por rating",
+    "sort_alpha": "A–Z",
+    "no_players_online": "Nenhum jogador online",
+    "nav_games": "Jogos",
+    "nav_lobby": "Lobby",
+    "nav_observe": "Observar",
+    "nav_archives": "Arquivos",
+    "update": "Atualizar",
+    "tournaments_page_intro": "Aqui estão os torneios de Hex, que podem ser <strong>organizados por qualquer pessoa</strong> em vários formatos, como suíço ou eliminação.<br>Você pode assistir jogos de torneios em andamento ou entrar em um próximo torneio.<br><strong>Para participar</strong>, certifique-se de <strong>fazer check-in no horário</strong>. Você pode se inscrever para receber uma notificação quando o check-in abrir.<br>Veja a descrição do torneio para detalhes como horários de check-in, formato e participantes.",
+    "n_people_are_interested_other": "{{count}} pessoas estão interessadas",
+    "n_participants_other": "{{ count }} participantes",
+    "n_playing_games_other": "{{ count }} jogos em andamento",
+    "n_matches_played_other": "{{ count }} partidas jogadas",
+    "tournament_admins": "Administradores do torneio",
+    "admins_one": "Admin: { players }",
+    "admins_other": "Admins: { players }",
+    "tournament_unsubscribe": "Não estou mais interessado.",
+    "n_rounds_other": "{{ count }} rodadas",
+    "losers_bracket": "Chave dos perdedores",
+    "tournament_slug_duplicate": "Já existe um torneio com o mesmo nome de URL",
+    "tournament_seeding_methods": {
+        "title": "Emparceiramento",
+        "random": "Aleatório",
+        "random_help": "Os jogadores são posicionados aleatoriamente, independentemente do rating.",
+        "rating": "Rating",
+        "rating_help": "Os jogadores são posicionados pelo rating. Se houver byes na primeira rodada, os jogadores mais fortes recebem o bye.",
+        "rating_random": "Rating com aleatoriedade parcial",
+        "rating_random_help": "Os jogadores são posicionados pelo rating, mas com um componente aleatório dependendo do desvio do rating glicko2. Se houver byes na primeira rodada, os jogadores mais fortes recebem o bye."
+    },
+    "moves": "Jogadas",
+    "move_number": "jogada {{n}}",
+    "chat_message_moderated": "Mensagem excluída pela moderação",
+    "n_characters_other": "{{count}} caracteres",
+    "force_board_orientation_mode": "Forçar exibição do tabuleiro em paisagem ou retrato nesta tela",
+    "resign_confirm_overlay": {
+        "title": "Desistir da partida",
+        "message": "Tem certeza de que deseja desistir da partida?",
+        "confirmLabel": "Sim, desisto",
+        "cancelLabel": "Não, continuar jogando"
+    },
+    "conditional_moves": {
+        "title": "Jogadas condicionais",
+        "title_short": "Se-jogadas",
+        "cut_move": "Cortar jogada",
+        "inactive_lines": "Linhas inativas",
+        "clear_inactive_lines": "Limpar linhas inativas"
+    },
+    "password_changed_success": "A senha foi alterada.",
+    "no_yet_data": "Quem sabe!",
+    "total_played_games": "Total de jogos disputados",
+    "preferred_board_sizes": "Tamanhos de tabuleiro preferidos",
+    "ranked_games": "Ranqueados",
+    "friendly_games": "Amistosos",
+    "bot_games": "Jogos contra bot",
+    "bot": "Bot",
+    "browse_all_ended_games": "Ver todos os jogos encerrados",
+    "n_total_games_one": "1 jogo no total.",
+    "n_total_games_other": "{{count}} jogos no total.",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "page_page_of_max": "Página {{page}} / {{max}}",
+    "must_be_logged_in_as_guest": "Você deve estar logado como convidado",
+    "pseudo_already_taken": "Este nome de usuário já está sendo usado por outro jogador",
+    "pseudo_not_existing": "Nenhum jogador com este nome de usuário",
+    "invalid_password": "Senha inválida para esta conta",
+    "pseudo_too_short": "Nome de usuário muito curto",
+    "pseudo_too_long": "Nome de usuário muito longo",
+    "invalid_pseudo": "Nome de usuário inválido",
+    "overall": "Geral",
+    "boardsize": {
+        "small": "Pequeno",
+        "medium": "Médio",
+        "large": "Grande"
+    },
+    "hex_tournament_paris": {
+        "title": "Torneio de Hex em Paris",
+        "read_more": "ler mais"
+    },
+    "premove": {
+        "title": "Pré-jogada",
+        "description": "Faça uma jogada durante a vez do oponente: será executada instantaneamente após a jogada dele."
+    },
+    "move_settings": {
+        "title": "Configurações de jogada"
+    },
+    "how_to_play_hex": "Como jogar Hex",
+    "tutorial": {
+        "label": "Tutorial",
+        "are_you_new_to_hex": "Você é novo no Hex?",
+        "learn_hex_in_1_minute": "Aprenda a jogar Hex em 1 minuto",
+        "hex_is_simple_and_has_two_rules": "Hex é um jogo simples, mas difícil de dominar. Ele tem <strong>apenas 2 regras</strong>.",
+        "rule_1_connect_your_sides": "Regra 1: Conecte seus lados",
+        "to_win_you_must_connect_with_path": "Para vencer, você deve <strong>conectar seus lados</strong> com um caminho totalmente conectado.",
+        "demo_0_step_example": "Aqui está um exemplo de jogo. {red} está conectando os lados {red}.",
+        "demo_0_step_lets_play": "Vamos jogar! Você é {red}. Tente conectar os lados {red}.",
+        "demo_0_step_congrats": "Parabéns! Você venceu a partida!",
+        "stones_are_played_this_way": "As pedras são jogadas da seguinte forma:",
+        "each_player_place_a_stone": "os jogadores se revezam colocando <strong>uma pedra</strong>",
+        "stones_are_never_removed": "uma vez colocada, <strong>uma pedra nunca é removida nem movida</strong>",
+        "rule_2_swap": "Regra 2: Regra da troca",
+        "red_has_strong_advantage": "Como {red} sempre joga primeiro, {red} tem uma grande vantagem.",
+        "we_use_swap_rule": "Para garantir partidas equilibradas, <strong>apenas no primeiro turno</strong>, usamos a <strong>regra da troca</strong>:",
+        "on_first_turn_blue_can_swap": "No primeiro turno, o segundo jogador ({blue}) pode escolher “roubar” a jogada inicial de {red} em vez de colocar uma pedra.",
+        "you_play_blue_swap_it": "Você é {blue} e joga em segundo. A abertura de {red} é forte demais — clique nela para trocar!",
+        "swapped": "Boa! Agora você está na frente. Vamos ver se consegue vencer esta IA iniciante.",
+        "not_swapped": "Ah, você decidiu não trocar, deixando a vantagem para seu oponente — mas ainda pode vencer esta IA iniciante.",
+        "swap_won": "Boa! Você venceu o computador!",
+        "swap_lost": "Droga! Sem problemas — provavelmente só precisa jogar mais algumas partidas para descobrir como vencer esta IA.",
+        "swap_rule_keeps_games_balanced": "A regra da troca mantém os jogos equilibrados:",
+        "red_strong_get_swapped": "{red} abre com uma jogada forte → {blue} troca e fica com a vantagem.",
+        "red_weak_dont_get_swapped": "{red} abre com uma jogada fraca → {blue} não troca, mantém a vantagem e coloca uma pedra azul.",
+        "so_red_should_open_fair_move": "Então {red} deve abrir a partida com uma jogada inicial justa.",
+        "what_is_a_fair_opening_move": "O que é uma jogada inicial justa?",
+        "center_too_strong_open_sides": "Abrir com uma jogada no centro é muito poderoso. Como iniciante, basta lembrar de <strong>evitar começar no centro</strong> e, em vez disso, fazer sua primeira jogada perto das bordas.",
+        "show_swap_map": "Mostre exatamente onde ficam as jogadas iniciais justas no tabuleiro 11×11.",
+        "swap_map_explain": "Abaixo está um “mapa de troca” para tabuleiros 11×11. Se a primeira jogada de {red} cair em uma célula vermelha, ela dá vantagem a {red}, e {blue} deve trocar. Então {red} deve jogar perto da fronteira entre células vermelhas e azuis, onde as células são menos opacas.",
+        "swap_map_credits": "Autor: hzy, fonte: zhihu.com",
+        "congrats_you_know_play_hex": "Parabéns! Agora você sabe jogar Hex!",
+        "what_to_do_next": "O que fazer agora",
+        "play_vs_ai_desc": "Jogue uma partida completa contra uma IA fácil",
+        "play_vs_ai_button": "Jogar contra IA",
+        "do_some_puzzle_desc": "Aprenda fundamentos táticos e estratégicos resolvendo alguns puzzles de Hex",
+        "do_some_puzzle_credits": "por Matthew Seymour",
+        "do_some_puzzle_button": "Resolver puzzles de Hex",
+        "you_can_also": "você também pode…",
+        "play_1v1": "Jogar 1v1",
+        "join_hex_discord": "Entrar no Discord de Hex",
+        "what_should_i_learn_now": "O que devo aprender agora",
+        "read_strategy_guide": "Leia um guia estratégico mais aprofundado"
+    },
+    "donate": "Doe para o PlayHex",
+    "notifications": "Notificações",
+    "mark_all_as_read": "Marcar tudo como lido",
+    "no_notifications": "Nenhuma notificação.",
+    "game_against_player": "Jogo vs {{ player }}",
+    "notifications_misc": "Outras notificações",
+    "notification": {
+        "you_won": "Você venceu a partida!",
+        "you_lost": "Você perdeu a partida :(",
+        "opponent_moderated": "{{player}} foi moderado. Desculpe pelas mensagens inadequadas que você recebeu."
+    },
+    "player_sent_you_rematch_offer": "{{ player }} desafiou você para uma revanche!",
+    "player_sent_rematch_offer": "{{ player }} enviou uma oferta de revanche",
+    "player_chat_restricted": "{player} não pode responder no chat (chat restrito).",
+    "moderation_action_overlay": {
+        "title": "Aviso de moderação",
+        "warning_only": "Isto é um aviso.",
+        "chat_block_until": "Seu acesso ao chat foi restringido até {{date}}.",
+        "reason": "Motivo",
+        "details": "Detalhes",
+        "related_messages": "Mensagens relacionadas",
+        "acknowledge": "Li e entendi",
+        "scroll_hint": "Leia e aceite abaixo"
+    },
+    "moderation_reason": {
+        "chat_insults": "Insultos ou comportamento inadequado no chat"
+    },
+    "player_loses_reason": {
+        "default": "{player} perde.",
+        "path": "{player} perde.",
+        "time": "{player} estoura o tempo.",
+        "resign": "{player} desiste.",
+        "forfeit": "{player} perde por desistência."
     }
 }
