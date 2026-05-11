@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import hexProgram from './hexProgram.js';
+import { availableLocales } from '../../shared/app/i18n/availableLocales.js';
 
 const localesDir = 'src/shared/app/i18n/locales';
 
@@ -82,9 +83,12 @@ hexProgram
             process.exit(0);
         }
 
+        const label = availableLocales[locale]?.label ?? locale;
+        const localeName = label.match(/\(([^)]+)\)/)?.[1] ?? label;
+        const separator = '='.repeat(10);
+        process.stderr.write(`${separator}\nTranslate to ${localeName}:\n\n`);
         console.log(JSON.stringify(missing, null, 4));
-
-        process.stderr.write('\nPaste translated JSON and press Ctrl+D:\n');
+        process.stderr.write(`${separator}\n\nWaiting for ${localeName} translation... Paste translated JSON and press Ctrl+D...\n`);
 
         const input = await readStdin();
 
