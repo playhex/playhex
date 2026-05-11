@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { IsDate, IsNotEmpty, IsObject, IsString, Length } from 'class-validator';
 import HostedGame from './HostedGame.js';
@@ -6,8 +6,10 @@ import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import { ColumnUUID } from '../custom-typeorm.js';
 import { v4 as uuidv4 } from 'uuid';
+import { keysOf } from '../utils.js';
 
 @Entity()
+@Index('createdAt_desc', keysOf<ChatMessage>()('createdAt')) // TODO replace with: { field: 'createdAt', order: 'DESC' }, once this issue is solved: https://github.com/typeorm/typeorm/issues/3336
 export default class ChatMessage
 {
     @PrimaryGeneratedColumn()
