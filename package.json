@@ -54,6 +54,7 @@
     "connect-redis": "^9.0.0",
     "content-range": "^2.0.2",
     "copy-to-clipboard": "^4.0.0",
+    "cors": "^2.8.6",
     "csv-parse": "^6.2.1",
     "cypress": "^15.14.1",
     "date-fns": "^4.1.0",

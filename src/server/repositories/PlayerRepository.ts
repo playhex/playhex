@@ -210,6 +210,15 @@ export default class PlayerRepository
     /**
      * @returns Number of players shadow deleted (0 or 1)
      */
+    async getLastRegisteredPlayers(limit: number): Promise<Player[]>
+    {
+        return await this.playerRepository.find({
+            where: { isGuest: false, isBot: false },
+            order: { registeredAt: 'desc' },
+            take: limit,
+        });
+    }
+
     async shadowBan(publicId: string): Promise<number | undefined>
     {
         const { affected } = await this.playerRepository.createQueryBuilder('player')

@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { ChatMessage, Player } from '../../shared/app/models/index.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 
@@ -34,10 +34,14 @@ export default class ChatMessageRepository
         return affected;
     }
 
-    async getLastChatMessages(limit: number = 100): Promise<ChatMessage[]>
+    async getLastChatMessagesForModeration(limit: number = 100): Promise<ChatMessage[]>
     {
         return await this.chatMessageRepository.find({
-            relations: { player: true },
+            relations: { player: true, hostedGame: true },
+            where: {
+                contentTranslationKey: IsNull(),
+                deletedByModeration: false,
+            },
             order: { createdAt: 'desc' },
             take: limit,
         });

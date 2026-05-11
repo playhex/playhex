@@ -62,6 +62,7 @@ export default class Player
      * When player registered an account.
      */
     @Column({ type: Date, nullable: true })
+    @Expose({ groups: ['moderation'] })
     registeredAt?: null | Date;
 
     /**

@@ -23,7 +23,7 @@ export default class ChatMessage
 
     @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
     @JoinColumn()
-    @Expose({ groups: ['player_moderation_action'] })
+    @Expose({ groups: ['player_moderation_action', 'moderation'] })
     hostedGame: Relation<HostedGame>;
 
     @Column({ nullable: true })

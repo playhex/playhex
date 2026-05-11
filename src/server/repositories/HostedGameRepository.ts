@@ -283,7 +283,7 @@ export default class HostedGameRepository
         ;
     }
 
-    getUnpersistedChatMessages(): ChatMessage[]
+    getUnpersistedChatMessagesForModeration(): ChatMessage[]
     {
         const chatMessages: ChatMessage[] = [];
 
@@ -291,11 +291,22 @@ export default class HostedGameRepository
             const hostedGame = this.activeGames[key].getHostedGame();
 
             for (const chatMessage of hostedGame.chatMessages) {
+                // Already persisted
                 if (chatMessage.id) {
                     continue;
                 }
 
-                chatMessages.push(chatMessage);
+                // Special message (took back their move, ai analysis available, ...)
+                if (chatMessage.contentTranslationKey) {
+                    continue;
+                }
+
+                // Already deleted by moderation
+                if (chatMessage.deletedByModeration) {
+                    continue;
+                }
+
+                chatMessages.push({ ...chatMessage, hostedGame });
             }
         }
 

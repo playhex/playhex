@@ -14,6 +14,7 @@ import monitorConnectedSockets from './services/monitorConnectedSockets.js';
 import { initTimeControl } from './services/initTimeControl.js';
 import TournamentRepository from './repositories/TournamentRepository.js';
 import { initAutoCancelStaleGames } from './services/auto-cancel-stale-games/init.js';
+import { registerCors } from './controllers/http/misc/cors.js';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -21,6 +22,8 @@ logger.info(`*******************************************`);
 
 const app = express();
 app.disable('x-powered-by');
+
+registerCors(app);
 
 initTimeControl();
 Container.get(TournamentRepository);
