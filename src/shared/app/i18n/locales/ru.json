@@ -4,7 +4,11 @@
         "no_waiting_games": "Сейчас нет доступных игр. Создайте новую!",
         "watch_current_games": "Смотреть текущие игры",
         "join_a_game": "Присоединиться к игре",
-        "no_playing_games": "В данный момент нет активных игр."
+        "no_playing_games": "В данный момент нет активных игр.",
+        "open_live_games": "Присоединиться к игре в реальном времени",
+        "open_correspondence_games": "Присоединиться к заочной игре",
+        "no_open_live_games": "Сейчас нет открытых игр в реальном времени",
+        "no_open_correspondence_games": "Сейчас нет открытых заочных игр"
     },
     "game": {
         "opponent": "Противник",
@@ -128,7 +132,8 @@
         "best_move": "лучший ход",
         "best": "лучший:",
         "how_it_works": "Как это работает",
-        "request_analysis": "Запросить анализ искусственного интеллекта"
+        "request_analysis": "Запросить анализ искусственного интеллекта",
+        "available": "Анализ партии теперь доступен."
     },
     "try_again": "Попробовать снова",
     "yes": "Да",
@@ -225,7 +230,10 @@
     "undo": {
         "undo_move": "Отмена хода",
         "accept": "Принять отмену",
-        "reject": "Отклонить"
+        "reject": "Отклонить",
+        "player_wants_to_takeback": "{{ player }} хочет отменить свой ход",
+        "player_takeback_his_move": "{{ player }} отменил свой ход.",
+        "takeback_request_denied": "Запрос {{ player }} на отмену хода был отклонён."
     },
     "ping": {
         "ping_ms": "Пинг: {{ms}}мс",
@@ -428,7 +436,8 @@
         "started": "Турнир начался!",
         "match_ended": "Матч {{ round }}.{{ number }} завершён: {{ winnerPseudo }} победил {{ loserPseudo }}.",
         "match_canceled_recreated": "Матч {{ round }}.{{ number }} был пересоздан после отмены.",
-        "ended": "Турнир завершён."
+        "ended": "Турнир завершён.",
+        "changed_admins": "Организатор назначил администраторов: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Забанен в этом турнире",
     "tournament_account_required": "Для участия необходим аккаунт. Гостевой доступ запрещён. Пожалуйста, войдите или зарегистрируйтесь.",
@@ -513,7 +522,8 @@
     "pass_confirm_overlay": {
         "title": "Пропустить ход?",
         "message": "Вы уверены, что хотите пропустить свой ход?",
-        "confirmLabel": "Пропустить"
+        "confirmLabel": "Пропустить",
+        "cancelLabel": "Ой нет, я хочу сыграть"
     },
     "new_game_vs_ai": "Новая игра с ИИ",
     "continue_game_vs_x": "Продолжить игру с {{ playerNickname }}",
@@ -522,6 +532,112 @@
     "tournament_seeding_methods": {
         "random_help": "Игроки распределяются случайно, независимо от их рейтинга",
         "rating": "По рейтингу",
-        "rating_help": "Игроки распределяются с учётом их рейтинга. Если есть места с авто пропуском во второй раунд, их получают более сильные игроки"
+        "rating_help": "Игроки распределяются с учётом их рейтинга. Если есть места с авто пропуском во второй раунд, их получают более сильные игроки",
+        "title": "Посев",
+        "random": "Случайный",
+        "rating_random": "По рейтингу с частичной случайностью",
+        "rating_random_help": "Игроки распределяются по рейтингу, но со случайной составляющей, зависящей от отклонения рейтинга glicko2. Если в первом раунде есть пропуски, более сильные игроки получают пропуск."
+    },
+    "allow_exploration": "Разрешить исследование",
+    "allow_exploration_help": "Позволяет пробовать варианты, играя за обе стороны перед отправкой хода. Если отключено, условные ходы также отключаются.",
+    "game_created_short": "создано {{ date }}",
+    "dismiss": "Закрыть",
+    "offline": "Не в сети",
+    "connection_lost": "Соединение потеряно",
+    "play_offline": "Играть офлайн",
+    "restart": "Перезапустить",
+    "no_active_tournament": "Сейчас нет активных турниров.",
+    "no_upcoming_tournament": "Пока нет предстоящих турниров.",
+    "upcoming_events": "Предстоящие события",
+    "tournament_subscribed": "Подписка оформлена",
+    "tournament_state": {
+        "running": "В эфире"
+    },
+    "lobby_my_turn_to_play": "Мой ход",
+    "lobby_my_current_games": "Мои текущие игры",
+    "lobby_your_turn_badge": "Ваш ход",
+    "lobby_waiting_badge": "Ожидание",
+    "lobby_join": "Присоединиться",
+    "lobby_game_no_longer_available": "Игра больше недоступна",
+    "lobby_active_players_one": "активный игрок",
+    "lobby_active_players_other": "активных игроков",
+    "lobby_playing_now": "Играют сейчас",
+    "lobby_no_live_games_now": "Сейчас никто не играет в реальном времени.",
+    "lobby_observe_correspondence": "Наблюдать за заочными играми",
+    "lobby_mode": {
+        "live_description": "Играть в реальном времени",
+        "correspondence_description": "Играть в удобном темпе",
+        "open": "открыто",
+        "n_playing": "{{n}} играют"
+    },
+    "playing_games": {
+        "title": "Текущие игры",
+        "live_games": "Игры в реальном времени",
+        "correspondence_games": "Заочные игры",
+        "no_live_games": "Нет текущих игр в реальном времени",
+        "no_correspondence_games": "Нет текущих заочных игр"
+    },
+    "sort_recently_started": "Недавно начатые",
+    "sort_most_moves": "Больше всего ходов",
+    "sort_longest_game": "Самая длинная игра",
+    "sort_player_rating": "Рейтинг игрока",
+    "all": "Все",
+    "online_players_title": "Игроки онлайн",
+    "online_players_heading": "Игроки онлайн ({{n}})",
+    "sort_by_rating": "По рейтингу",
+    "sort_alpha": "A–Я",
+    "no_players_online": "Нет игроков онлайн",
+    "nav_games": "Игры",
+    "nav_lobby": "Лобби",
+    "nav_observe": "Наблюдать",
+    "nav_archives": "Архивы",
+    "update": "Обновить",
+    "tournaments_page_intro": "Здесь представлены турниры Hex, которые могут быть <strong>организованы кем угодно</strong> в различных форматах, таких как швейцарская система или выбывание.<br>Вы можете смотреть партии текущих турниров или присоединиться к предстоящему.<br><strong>Чтобы участвовать</strong>, обязательно <strong>отметьтесь вовремя</strong>.<br>Вы можете подписаться, чтобы получить уведомление, когда откроется регистрация.<br>Проверьте описание турнира для подробностей: время регистрации, формат и участники.",
+    "n_people_are_interested_other": "{{count}} человек заинтересованы",
+    "n_participants_other": "{{ count }} участников",
+    "n_playing_games_other": "{{ count }} активных игр",
+    "n_matches_played_other": "{{ count }} сыгранных матчей",
+    "admins_one": "Администратор: { players }",
+    "admins_other": "Администраторы: { players }",
+    "tournament_unsubscribe": "Мне это больше не интересно.",
+    "n_rounds_other": "{{ count }} раундов",
+    "losers_bracket": "Сетка проигравших",
+    "tournament_slug_duplicate": "Турнир с таким URL-именем уже существует",
+    "chat_message_moderated": "Сообщение удалено модерацией",
+    "n_characters_other": "{{count}} символов",
+    "resign_confirm_overlay": {
+        "title": "Сдаться",
+        "message": "Вы уверены, что хотите сдаться?",
+        "confirmLabel": "Да, сдаюсь",
+        "cancelLabel": "Нет, продолжить игру"
+    },
+    "bot": "Бот",
+    "n_total_games_other": "{{count}} всего игр.",
+    "donate": "Поддержать PlayHex",
+    "notifications": "Уведомления",
+    "mark_all_as_read": "Отметить всё как прочитанное",
+    "no_notifications": "Нет уведомлений.",
+    "game_against_player": "Игра против {{ player }}",
+    "notifications_misc": "Прочие уведомления",
+    "notification": {
+        "you_won": "Вы выиграли партию!",
+        "you_lost": "Вы проиграли партию :(",
+        "opponent_moderated": "{{player}} был подвергнут модерации. Извините за неподобающие сообщения, которые вы получили."
+    },
+    "player_sent_you_rematch_offer": "{{ player }} предложил вам матч-реванш!",
+    "player_sent_rematch_offer": "{{ player }} отправил предложение реванша",
+    "player_chat_restricted": "{player} не может отвечать в чате (чат ограничен).",
+    "moderation_action_overlay": {
+        "title": "Уведомление о модерации",
+        "warning_only": "Это предупреждение.",
+        "chat_block_until": "Ваш доступ к чату ограничен до {{date}}.",
+        "reason": "Причина",
+        "details": "Подробности",
+        "related_messages": "Связанные сообщения",
+        "acknowledge": "Я прочитал и понял",
+        "scroll_hint": "Прочитайте и подтвердите ниже"
+    },
+    "moderation_reason": {
+        "chat_insults": "Оскорбления или неподобающее поведение в чате"
     }
 }

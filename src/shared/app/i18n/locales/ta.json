@@ -32,7 +32,11 @@
         "no_waiting_games": "இப்போது எந்த விளையாட்டுகளும் கிடைக்கவில்லை. புதிய ஒன்றை உருவாக்கவும்!",
         "watch_current_games": "தற்போதைய விளையாட்டுகளைப் பாருங்கள்",
         "join_a_game": "ஒரு விளையாட்டில் சேரவும்",
-        "no_playing_games": "இப்போது எந்த விளையாட்டுகளும் முன்னேற்றத்தில் இல்லை."
+        "no_playing_games": "இப்போது எந்த விளையாட்டுகளும் முன்னேற்றத்தில் இல்லை.",
+        "open_live_games": "நேரலை விளையாட்டில் சேரவும்",
+        "open_correspondence_games": "கடிதப் பரிமாற்ற விளையாட்டில் சேரவும்",
+        "no_open_live_games": "இப்போது திறந்த நேரலை விளையாட்டுகள் இல்லை",
+        "no_open_correspondence_games": "இப்போது திறந்த கடிதப் பரிமாற்ற விளையாட்டுகள் இல்லை"
     },
     "game": {
         "title": "விளையாட்டு",
@@ -167,7 +171,8 @@
         "errored": "AI பகுப்பாய்வு தோல்வியடைந்தது!",
         "best_move": "சிறந்த நடவடிக்கை",
         "best": "சிறந்தது:",
-        "how_it_works": "இது எவ்வாறு இயங்குகிறது"
+        "how_it_works": "இது எவ்வாறு இயங்குகிறது",
+        "available": "விளையாட்டு பகுப்பாய்வு இப்போது கிடைக்கிறது."
     },
     "try_again": "மீண்டும் முயற்சிக்கவும்",
     "yes": "ஆம்",
@@ -348,5 +353,119 @@
     },
     "move_settings": {
         "title": "அமைப்புகளை நகர்த்தவும்"
+    },
+    "muted": {
+        "on": "ஒலி நிறுத்து",
+        "off": "இயக்கு"
+    },
+    "allow_exploration": "ஆராய அனுமதி",
+    "allow_exploration_help": "நகர்வை சமர்ப்பிப்பதற்கு முன் இரு நிறங்களிலும் விளையாடி வழிகளை முயற்சிக்க அனுமதிக்கிறது. இதை முடக்கியால் நிபந்தனை நகர்வுகளும் முடக்கப்படும்.",
+    "game_created_short": "{{ date }} அன்று உருவாக்கப்பட்டது",
+    "pass_confirm_overlay": {
+        "title": "என் முறையைத் தவிர்க்கவா?",
+        "message": "நீங்கள் உங்கள் தற்போதைய முறையைத் தவிர்க்க இருக்கிறீர்கள். உறுதியாக உள்ளீர்களா?",
+        "confirmLabel": "ஆம், தவிர்க்கவும்",
+        "cancelLabel": "இல்லை, நான் விளையாடுகிறேன்"
+    },
+    "dismiss": "மூடு",
+    "offline": "ஆஃப்லைன்",
+    "connection_lost": "இணைப்பு துண்டிக்கப்பட்டது",
+    "play_offline": "ஆஃப்லைனில் விளையாடு",
+    "new_game_vs_ai": "AI எதிராக புதிய விளையாட்டு",
+    "continue_game_vs_x": "{{ playerNickname }} எதிராக விளையாட்டைத் தொடரவும்",
+    "restart": "மீண்டும் தொடங்கு",
+    "back_to_menu": "மெனுவிற்கு திரும்பு",
+    "loading_tournaments": "போட்டிகள் ஏற்றப்படுகின்றன…",
+    "loading_tournament": "போட்டி ஏற்றப்படுகிறது…",
+    "tournament_not_found": "போட்டி கிடைக்கவில்லை",
+    "no_active_tournament": "இப்போது செயலில் போட்டிகள் இல்லை.",
+    "no_upcoming_tournament": "வரவிருக்கும் போட்டிகள் இன்னும் இல்லை.",
+    "upcoming_events": "வரவிருக்கும் நிகழ்வுகள்",
+    "tournament_subscribed": "சந்தா செய்யப்பட்டது",
+    "tournament_state": {
+        "running": "நேரலை"
+    },
+    "lobby_my_turn_to_play": "என் விளையாட்டு முறை",
+    "lobby_my_current_games": "என் தற்போதைய விளையாட்டுகள்",
+    "lobby_your_turn_badge": "உங்கள் முறை",
+    "lobby_waiting_badge": "காத்திருக்கிறது",
+    "lobby_join": "சேரவும்",
+    "lobby_game_no_longer_available": "விளையாட்டு இனி கிடைக்காது",
+    "lobby_active_players_one": "செயலில் உள்ள வீரர்",
+    "lobby_active_players_other": "செயலில் உள்ள வீரர்கள்",
+    "lobby_playing_now": "இப்போது விளையாடுகின்றனர்",
+    "lobby_no_live_games_now": "இப்போது நேரலை விளையாட்டுகள் இல்லை.",
+    "lobby_observe_correspondence": "கடிதப் பரிமாற்ற விளையாட்டுகளைப் பாருங்கள்",
+    "lobby_mode": {
+        "live_description": "நேரடியாக விளையாடு",
+        "correspondence_description": "உங்கள் வேகத்தில் விளையாடு",
+        "open": "திறந்தது",
+        "n_playing": "{{n}} பேர் விளையாடுகின்றனர்"
+    },
+    "playing_games": {
+        "title": "நடந்து கொண்டிருக்கும் விளையாட்டுகள்",
+        "live_games": "நேரலை விளையாட்டுகள்",
+        "correspondence_games": "கடிதப் பரிமாற்ற விளையாட்டுகள்",
+        "no_live_games": "நேரலை விளையாட்டுகள் நடைபெறவில்லை",
+        "no_correspondence_games": "கடிதப் பரிமாற்ற விளையாட்டுகள் நடைபெறவில்லை"
+    },
+    "sort_recently_started": "சமீபத்தில் தொடங்கியது",
+    "sort_most_moves": "அதிக நகர்வுகள்",
+    "sort_longest_game": "நீண்ட விளையாட்டு",
+    "sort_player_rating": "வீரர் மதிப்பீடு",
+    "all": "அனைத்தும்",
+    "online_players_title": "ஆன்லைன் வீரர்கள்",
+    "online_players_heading": "ஆன்லைன் வீரர்கள் ({{n}})",
+    "sort_by_rating": "மதிப்பீட்டின்படி",
+    "sort_alpha": "A–Z",
+    "no_players_online": "ஆன்லைனில் வீரர்கள் இல்லை",
+    "nav_games": "விளையாட்டுகள்",
+    "nav_lobby": "லாபி",
+    "nav_observe": "பார்க்க",
+    "nav_archives": "காப்பகங்கள்",
+    "logging_in": "உள்நுழைகிறது…",
+    "update": "புதுப்பிப்பு",
+    "tournaments": "போட்டிகள்",
+    "create_tournament": "போட்டியை உருவாக்கு",
+    "manage_tournament": "நிர்வகி",
+    "clone_tournament": "நகலெடு",
+    "playing_tournaments": "நடப்பு போட்டிகள்",
+    "upcoming_tournaments": "வரவிருக்கும் போட்டிகள்",
+    "past_tournaments": "கடந்த போட்டிகள்",
+    "participants": "பங்கேற்பாளர்கள்",
+    "tournament_start_imminent": "விரைவில் தொடங்கும்!",
+    "tournament_player_score": "மதிப்பெண்",
+    "tournament_player_tiebreak": "டைபிரேக்",
+    "tournament_player_games_win_history": "வரலாறு",
+    "tournament_checkin": "செக்-இன்",
+    "tournament_checkedin": "செக்-இன் செய்யப்பட்டது",
+    "tournament_description": "விளக்கம்",
+    "round_n": "சுற்று {{ n }}",
+    "losers_bracket": "தோல்வியாளர் பிரிவு",
+    "tournament_create": "ஒரு போட்டியை உருவாக்கு",
+    "chat_message_moderated": "செய்தி நிர்வாகத்தால் நீக்கப்பட்டது",
+    "bot": "பாட்",
+    "how_to_play_hex": "Hex எப்படி விளையாடுவது",
+    "donate": "PlayHex க்கு நன்கொடை அளிக்கவும்",
+    "notifications": "அறிவிப்புகள்",
+    "mark_all_as_read": "அனைத்தையும் படித்ததாக குறிக்கவும்",
+    "no_notifications": "அறிவிப்புகள் இல்லை.",
+    "notifications_misc": "பிற அறிவிப்புகள்",
+    "notification": {
+        "you_won": "நீங்கள் விளையாட்டில் வெற்றி பெற்றீர்கள்!",
+        "you_lost": "நீங்கள் விளையாட்டில் தோற்றுவிட்டீர்கள் :(",
+        "opponent_moderated": "{{player}} மீது நடவடிக்கை எடுக்கப்பட்டது. நீங்கள் பெற்ற பொருத்தமற்ற செய்திகளுக்கு மன்னிக்கவும்."
+    },
+    "moderation_action_overlay": {
+        "title": "நிர்வாக அறிவிப்பு",
+        "warning_only": "இது ஒரு எச்சரிக்கை.",
+        "reason": "காரணம்",
+        "details": "விவரங்கள்",
+        "related_messages": "தொடர்புடைய செய்திகள்",
+        "acknowledge": "நான் படித்து புரிந்துகொண்டேன்",
+        "scroll_hint": "கீழே படித்து ஏற்கவும்"
+    },
+    "moderation_reason": {
+        "chat_insults": "அரட்டைச் செய்தியில் அவமதிப்பு அல்லது பொருத்தமற்ற நடத்தை"
     }
 }

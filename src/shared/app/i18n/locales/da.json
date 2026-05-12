@@ -4,7 +4,11 @@
         "no_waiting_games": "Ingen spil tilgængelige lige nu. Opret et nyt!",
         "watch_current_games": "Se nuværende spil",
         "join_a_game": "Deltag i et spil",
-        "no_playing_games": "Der er ingen spil i gang lige nu."
+        "no_playing_games": "Der er ingen spil i gang lige nu.",
+        "open_live_games": "Deltag i et live-spil",
+        "open_correspondence_games": "Deltag i et korrespondancespil",
+        "no_open_live_games": "Ingen åbne live-spil lige nu",
+        "no_open_correspondence_games": "Ingen åbne korrespondancespil lige nu"
     },
     "game": {
         "opponent": "Modstander",
@@ -30,7 +34,8 @@
         "title_your_turn": "Din tur!",
         "duration": "Varighed",
         "title": "Spil",
-        "info": "Info"
+        "info": "Info",
+        "title_waiting": "Venter på en modstander: oprettet af"
     },
     "game_rules": {
         "normal": "normal",
@@ -63,7 +68,8 @@
         "periods_time": "Periodetid",
         "fast": "Hurtig",
         "normal": "Normal",
-        "long": "Lang"
+        "long": "Lang",
+        "capped_abbreviation": "maks."
     },
     "i_play": {
         "title": "Jeg spiller",
@@ -126,7 +132,8 @@
         "best_move": "bedste træk",
         "best": "bedste:",
         "how_it_works": "Sådan fungerer det",
-        "request_analysis": "Anmod om AI analyse"
+        "request_analysis": "Anmod om AI analyse",
+        "available": "Spilanalyse er nu tilgængelig."
     },
     "try_again": "Prøv igen",
     "yes": "Ja",
@@ -222,7 +229,10 @@
     "undo": {
         "undo_move": "Fortryd",
         "accept": "Accepter fortrydelse",
-        "reject": "Afvis"
+        "reject": "Afvis",
+        "player_wants_to_takeback": "{{ player }} vil tage sit træk tilbage",
+        "player_takeback_his_move": "{{ player }} tog sit træk tilbage.",
+        "takeback_request_denied": "{{ player }}s anmodning om at tage sit træk tilbage blev afvist."
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -276,11 +286,16 @@
     },
     "game_state": {
         "created": "Oprettet",
-        "ended": "Afsluttet"
+        "ended": "Afsluttet",
+        "canceled": "Annulleret",
+        "playing": "Spiller"
     },
     "conditional_moves": {
         "clear_inactive_lines": "Ryd inaktive linjer",
-        "inactive_lines": "Inaktive linjer"
+        "inactive_lines": "Inaktive linjer",
+        "title": "Betingede træk",
+        "title_short": "Hvis-træk",
+        "cut_move": "Afbryd træk"
     },
     "username_not_an_email_warning": "Hej, det ser ud til, at du indtaster din e-mail, men PlayHex behøver kun et brugernavn. Din e-mail ville være offentligt synlig…",
     "save": "Gem",
@@ -390,7 +405,8 @@
         "started": "Turneringen er startet!",
         "match_ended": "Kamp {{ round }}.{{ number }} er afsluttet: {{ winnerPseudo }} vandt over {{ loserPseudo }}.",
         "match_canceled_recreated": "Kamp {{ round }}.{{ number }} blev genskabt efter aflysning.",
-        "ended": "Turneringen er afsluttet."
+        "ended": "Turneringen er afsluttet.",
+        "changed_admins": "Arrangøren tildelte administratorer: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Udelukket fra denne turnering",
     "tournament_account_required": "Denne turnering kræver en konto. Gæster er ikke tilladt. Log ind eller opret en konto.",
@@ -402,5 +418,212 @@
     "explore": "Udforsk",
     "friendly": "Venskabelig",
     "moves": "Træk",
-    "force_board_orientation_mode": "Tving brættet til at vises i landskab eller portræt for denne skærm"
+    "force_board_orientation_mode": "Tving brættet til at vises i landskab eller portræt for denne skærm",
+    "muted": {
+        "on": "Lydløs",
+        "off": "Afspil"
+    },
+    "allow_exploration": "Tillad udforskning",
+    "allow_exploration_help": "Gør det muligt at prøve varianter ved at spille begge farver, før et træk indsendes. Hvis deaktiveret, er betingede træk også deaktiveret.",
+    "handicap": {
+        "title": "Handicap",
+        "none": "ingen",
+        "handicap_for_player": "{{n}} for {{player}}"
+    },
+    "game_created_short": "oprettet {{ date }}",
+    "game_created_by_system_time_ago": "Spil oprettet af systemet, {timeAgo}.",
+    "pass_confirm_overlay": {
+        "title": "Springe min tur over?",
+        "message": "Du er ved at springe din nuværende tur over. Er du sikker?",
+        "confirmLabel": "Ja, spring over",
+        "cancelLabel": "Ups nej, lad mig spille"
+    },
+    "player_passed_his_turn": "{{player}} sprang over",
+    "go_to_the_game": "Gå til spillet",
+    "dismiss": "Luk",
+    "offline": "Offline",
+    "connection_lost": "Forbindelsen mistet",
+    "play_offline": "Spil offline",
+    "new_game_vs_ai": "Nyt spil mod AI",
+    "continue_game_vs_x": "Fortsæt spil mod {{ playerNickname }}",
+    "restart": "Genstart",
+    "back_to_menu": "Tilbage til menuen",
+    "no_active_tournament": "Ingen aktiv turnering lige nu.",
+    "no_upcoming_tournament": "Ingen kommende turnering endnu.",
+    "upcoming_events": "Kommende begivenheder",
+    "tournament_subscribed": "Tilmeldt",
+    "tournament_state": {
+        "running": "Live"
+    },
+    "lobby_my_turn_to_play": "Min tur til at spille",
+    "lobby_my_current_games": "Mine nuværende spil",
+    "lobby_your_turn_badge": "Din tur",
+    "lobby_waiting_badge": "Venter",
+    "lobby_join": "Deltag",
+    "lobby_game_no_longer_available": "Spillet er ikke længere tilgængeligt",
+    "lobby_active_players_one": "aktiv spiller",
+    "lobby_active_players_other": "aktive spillere",
+    "lobby_playing_now": "Spiller nu",
+    "lobby_no_live_games_now": "Ingen live-spil i gang nu.",
+    "lobby_observe_correspondence": "Observer korrespondancespil",
+    "lobby_mode": {
+        "live_description": "Spil i realtid",
+        "correspondence_description": "Spil i dit eget tempo",
+        "open": "åben",
+        "n_playing": "{{n}} spiller"
+    },
+    "playing_games": {
+        "title": "Igangværende spil",
+        "live_games": "Live-spil",
+        "correspondence_games": "Korrespondancespil",
+        "no_live_games": "Ingen live-spil i gang",
+        "no_correspondence_games": "Ingen korrespondancespil i gang"
+    },
+    "sort_recently_started": "Senest startet",
+    "sort_most_moves": "Flest træk spillet",
+    "sort_longest_game": "Længste spil",
+    "sort_player_rating": "Spillervurdering",
+    "all": "Alle",
+    "online_players_title": "Online spillere",
+    "online_players_heading": "Online spillere ({{n}})",
+    "sort_by_rating": "Efter rating",
+    "sort_alpha": "A–Z",
+    "no_players_online": "Ingen spillere online",
+    "nav_games": "Spil",
+    "nav_lobby": "Lobby",
+    "nav_observe": "Observer",
+    "nav_archives": "Arkiver",
+    "update": "Opdater",
+    "tournaments_page_intro": "Her er Hex-turneringer, som kan <strong>organiseres af alle</strong> i forskellige formater såsom schweizer eller eliminering.<br>Du kan se spil fra igangværende turneringer eller deltage i en kommende.<br><strong>For at deltage</strong>, sørg for at <strong>tjekke ind til tiden</strong>. Du kan abonnere for at få en notifikation, når check-in åbner.<br>Læs turneringsbeskrivelsen for detaljer som check-in tider, format og deltagere.",
+    "tournament_admins": "Turneringsadministratorer",
+    "admins_one": "Administrator: { players }",
+    "admins_other": "Administratorer: { players }",
+    "tournament_unsubscribe": "Jeg er ikke længere interesseret.",
+    "losers_bracket": "Taberrunde",
+    "tournament_slug_duplicate": "En turnering med samme URL-navn findes allerede",
+    "tournament_seeding_methods": {
+        "title": "Seedning",
+        "random": "Tilfældig",
+        "random_help": "Spillere placeres tilfældigt, uanset rating.",
+        "rating": "Rating",
+        "rating_help": "Spillere placeres efter rating. Hvis der er bye-kampe i første runde, får stærkere spillere bye.",
+        "rating_random": "Rating med delvis tilfældighed",
+        "rating_random_help": "Spillere placeres efter rating, men med et tilfældigt element afhængigt af deres glicko2 ratingafvigelse. Hvis der er bye-kampe i første runde, får stærkere spillere bye."
+    },
+    "chat_message_moderated": "Besked slettet af moderation",
+    "resign_confirm_overlay": {
+        "title": "Opgiv spil",
+        "message": "Er du sikker på, at du vil opgive spillet?",
+        "confirmLabel": "Ja, jeg opgiver",
+        "cancelLabel": "Nej, fortsæt med at spille"
+    },
+    "password_changed_success": "Adgangskoden er blevet ændret.",
+    "no_yet_data": "Hvem ved!",
+    "total_played_games": "Samlet antal spillede spil",
+    "preferred_board_sizes": "Foretrukne brætstørrelser",
+    "ranked_games": "Rangerede",
+    "friendly_games": "Venskabsspil",
+    "bot_games": "Bot-spil",
+    "bot": "Bot",
+    "n_total_games_one": "1 spil i alt.",
+    "n_total_games_other": "{{count}} spil i alt.",
+    "previous": "Forrige",
+    "must_be_logged_in_as_guest": "Du skal være logget ind som gæst",
+    "pseudo_already_taken": "Dette brugernavn bruges allerede af en anden spiller",
+    "pseudo_not_existing": "Ingen spiller med dette brugernavn",
+    "invalid_password": "Ugyldig adgangskode til denne konto",
+    "pseudo_too_short": "Brugernavnet er for kort",
+    "pseudo_too_long": "Brugernavnet er for langt",
+    "invalid_pseudo": "Brugernavnet er ugyldigt",
+    "overall": "Samlet",
+    "hex_tournament_paris": {
+        "title": "Hex-turnering i Paris",
+        "read_more": "læs mere"
+    },
+    "premove": {
+        "title": "Forhåndstræk",
+        "description": "Spil et træk under modstanderens tur: bliver spillet straks efter modstanderens træk."
+    },
+    "move_settings": {
+        "title": "Trækindstillinger"
+    },
+    "how_to_play_hex": "Sådan spiller du Hex",
+    "tutorial": {
+        "label": "Tutorial",
+        "are_you_new_to_hex": "Er du ny i Hex?",
+        "learn_hex_in_1_minute": "Lær at spille Hex på 1 minut",
+        "hex_is_simple_and_has_two_rules": "Hex er et simpelt spil, men svært at mestre. Det har <strong>kun 2 regler</strong>.",
+        "rule_1_connect_your_sides": "Regel 1: Forbind dine sider",
+        "to_win_you_must_connect_with_path": "For at vinde skal du <strong>forbinde dine sider</strong> med en fuldt sammenhængende sti.",
+        "demo_0_step_example": "Her er et eksempel på et spil. {red} forbinder {red} sider.",
+        "demo_0_step_lets_play": "Lad os spille! Du er {red}. Prøv at forbinde {red} sider.",
+        "demo_0_step_congrats": "Tillykke! Du vandt spillet!",
+        "stones_are_played_this_way": "Brikker spilles sådan:",
+        "each_player_place_a_stone": "spillerne skiftes til at placere <strong>en brik</strong>",
+        "stones_are_never_removed": "når en brik er placeret, <strong>fjernes eller flyttes den aldrig</strong>",
+        "rule_2_swap": "Regel 2: Byttereglen",
+        "red_has_strong_advantage": "Fordi {red} altid spiller først, har {red} en stor fordel.",
+        "we_use_swap_rule": "For at sikre balancerede spil bruger vi <strong>kun på første tur</strong> <strong>byttereglen</strong>:",
+        "on_first_turn_blue_can_swap": "På første tur kan den anden spiller ({blue}) vælge at \"stjæle\" {red}s åbningstræk i stedet for at placere en brik.",
+        "you_play_blue_swap_it": "Du er {blue} og spiller som nummer to. {red}s åbningstræk er for stærkt — klik på det for at bytte!",
+        "swapped": "Flot! Du er foran nu. Lad os se, om du kan slå denne begynder-AI.",
+        "not_swapped": "Ah, du valgte ikke at bytte og gav dermed fordelen til modstanderen — men du kan stadig vinde mod denne begynder-AI.",
+        "swap_won": "Flot, du slog computeren!",
+        "swap_lost": "Øv! Bare rolig — du skal nok bare spille et par spil mere for at finde ud af, hvordan du slår denne AI.",
+        "swap_rule_keeps_games_balanced": "Byttereglen holder spil balancerede:",
+        "red_strong_get_swapped": "{red} åbner med et stærkt træk → {blue} bytter og får fordelen.",
+        "red_weak_dont_get_swapped": "{red} åbner med et svagt træk → {blue} bytter ikke, beholder fordelen og placerer en blå brik.",
+        "so_red_should_open_fair_move": "Så {red} bør åbne spillet med et fair åbningstræk.",
+        "what_is_a_fair_opening_move": "Hvad er et fair åbningstræk?",
+        "center_too_strong_open_sides": "Et åbningstræk i midten er meget stærkt. Som begynder kan du bare huske at <strong>undgå at starte i midten</strong> og i stedet placere dit første træk nær siderne.",
+        "show_swap_map": "Vis mig præcis hvor fair åbningstræk er på et 11×11-bræt.",
+        "swap_map_explain": "Nedenfor er et \"byttekort\" for 11×11-brætter. Hvis {red}s første træk er i en rød celle, giver det {red} en fordel, og {blue} bør bytte. Så {red} bør spille sit første træk nær grænsen mellem røde og blå celler, hvor cellerne er mindre uigennemsigtige.",
+        "swap_map_credits": "Forfatter: hzy, kilde: zhihu.com",
+        "congrats_you_know_play_hex": "Tillykke! Du ved nu, hvordan man spiller Hex!",
+        "what_to_do_next": "Hvad gør jeg nu",
+        "play_vs_ai_desc": "Spil et helt spil mod en let AI-modstander",
+        "play_vs_ai_button": "Spil mod AI",
+        "do_some_puzzle_desc": "Lær taktiske og strategiske grundprincipper ved at løse Hex-opgaver",
+        "do_some_puzzle_credits": "af Matthew Seymour",
+        "do_some_puzzle_button": "Løs nogle Hex-opgaver",
+        "you_can_also": "du kan også…",
+        "play_1v1": "Spil 1v1",
+        "join_hex_discord": "Deltag i Hex Discord",
+        "what_should_i_learn_now": "Hvad bør jeg lære nu",
+        "read_strategy_guide": "Læs en dybere strategiguide"
+    },
+    "donate": "Donér til PlayHex",
+    "notifications": "Notifikationer",
+    "mark_all_as_read": "Marker alle som læst",
+    "no_notifications": "Ingen notifikationer.",
+    "game_against_player": "Spil mod {{ player }}",
+    "notifications_misc": "Andre notifikationer",
+    "notification": {
+        "you_won": "Du har vundet spillet!",
+        "you_lost": "Du har tabt spillet :(",
+        "opponent_moderated": "{{player}} er blevet modereret. Beklager de upassende beskeder, du modtog."
+    },
+    "player_sent_you_rematch_offer": "{{ player }} udfordrede dig til revanche!",
+    "player_sent_rematch_offer": "{{ player }} sendte et revanchetilbud",
+    "player_chat_restricted": "{player} kan ikke svare i chatten (chat begrænset).",
+    "moderation_action_overlay": {
+        "title": "Moderationsmeddelelse",
+        "warning_only": "Dette er en advarsel.",
+        "chat_block_until": "Din chatadgang er begrænset indtil {{date}}.",
+        "reason": "Årsag",
+        "details": "Detaljer",
+        "related_messages": "Relaterede beskeder",
+        "acknowledge": "Jeg har læst og forstået",
+        "scroll_hint": "Læs og accepter nedenfor"
+    },
+    "moderation_reason": {
+        "chat_insults": "Fornærmelser eller upassende opførsel i chatten"
+    },
+    "player_loses_reason": {
+        "default": "{player} taber.",
+        "path": "{player} taber.",
+        "time": "{player} løber tør for tid.",
+        "resign": "{player} opgiver.",
+        "forfeit": "{player} taber på walkover."
+    }
 }

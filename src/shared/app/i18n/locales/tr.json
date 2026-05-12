@@ -4,7 +4,11 @@
         "no_waiting_games": "Şu anda açık oyun bulunmamaktadır. Yeni bir tane oluştur!",
         "watch_current_games": "Aktif oyunları izle",
         "join_a_game": "Bir oyuna katıl",
-        "no_playing_games": "Şu anda aktif oyun bulunmamaktadır."
+        "no_playing_games": "Şu anda aktif oyun bulunmamaktadır.",
+        "open_live_games": "Canlı bir oyuna katıl",
+        "open_correspondence_games": "Yazışmalı bir oyuna katıl",
+        "no_open_live_games": "Şu anda açık canlı oyun yok",
+        "no_open_correspondence_games": "Şu anda açık yazışmalı oyun yok"
     },
     "game": {
         "title": "Oyun",
@@ -141,7 +145,8 @@
         "errored": "AI analizi başarısız oldu!",
         "best_move": "en iyi hamle",
         "best": "en iyi:",
-        "how_it_works": "Nasıl çalışır"
+        "how_it_works": "Nasıl çalışır",
+        "available": "Oyun analizi artık mevcut."
     },
     "try_again": "Tekrar dene",
     "yes": "Evet",
@@ -352,7 +357,8 @@
         "started": "Turnuva başladı!",
         "match_ended": "{{ round }}.{{ number }} maçı sona erdi: {{ winnerPseudo }}, {{ loserPseudo }} karşısında kazandı.",
         "match_canceled_recreated": "{{ round }}.{{ number }} maçı iptal edildiği için yeniden oluşturuldu.",
-        "ended": "Turnuva sona erdi."
+        "ended": "Turnuva sona erdi.",
+        "changed_admins": "Organizatör yöneticileri atadı: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Bu turnuvadan yasaklandınız",
     "tournament_account_required": "Bu turnuva bir hesap gerektiriyor. Misafirler kabul edilmez. Lütfen giriş yapın veya hesap oluşturun.",
@@ -429,7 +435,10 @@
     "undo": {
         "undo_move": "Hamleyi geri al",
         "accept": "Geri almayı kabul et",
-        "reject": "Reddet"
+        "reject": "Reddet",
+        "player_wants_to_takeback": "{{ player }} hamlesini geri almak istiyor",
+        "player_takeback_his_move": "{{ player }} hamlesini geri aldı.",
+        "takeback_request_denied": "{{ player }} adlı oyuncunun hamlesini geri alma isteği reddedildi."
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -498,5 +507,123 @@
         "time": "{player} süresi doldu.",
         "resign": "{player} oyunu terk etti.",
         "forfeit": "{player} hükmen kaybetti."
+    },
+    "muted": {
+        "on": "Sessize al",
+        "off": "Oynat"
+    },
+    "allow_exploration": "Keşfe izin ver",
+    "allow_exploration_help": "Bir hamle göndermeden önce iki renkle de oynayarak varyantları denemeye izin verir. Devre dışıysa koşullu hamleler de devre dışı kalır.",
+    "game_created_short": "{{ date }} tarihinde oluşturuldu",
+    "pass_confirm_overlay": {
+        "title": "Sıramı pas geçeyim mi?",
+        "message": "Mevcut sıranızı atlamak üzeresiniz. Emin misiniz?",
+        "confirmLabel": "Evet, pas geç",
+        "cancelLabel": "Hayır, oynayayım"
+    },
+    "dismiss": "Kapat",
+    "offline": "Çevrimdışı",
+    "connection_lost": "Bağlantı kesildi",
+    "play_offline": "Çevrimdışı oyna",
+    "new_game_vs_ai": "YZ'ye karşı yeni oyun",
+    "continue_game_vs_x": "{{ playerNickname }} ile oyuna devam et",
+    "restart": "Yeniden başlat",
+    "back_to_menu": "Menüye dön",
+    "no_active_tournament": "Şu anda aktif turnuva yok.",
+    "no_upcoming_tournament": "Henüz yaklaşan turnuva yok.",
+    "upcoming_events": "Yaklaşan etkinlikler",
+    "tournament_subscribed": "Abone olundu",
+    "tournament_state": {
+        "running": "Canlı"
+    },
+    "lobby_my_turn_to_play": "Oynama sıram",
+    "lobby_my_current_games": "Mevcut oyunlarım",
+    "lobby_your_turn_badge": "Sıra sende",
+    "lobby_waiting_badge": "Bekleniyor",
+    "lobby_join": "Katıl",
+    "lobby_game_no_longer_available": "Oyun artık mevcut değil",
+    "lobby_active_players_one": "aktif oyuncu",
+    "lobby_active_players_other": "aktif oyuncu",
+    "lobby_playing_now": "Şimdi oynanıyor",
+    "lobby_no_live_games_now": "Şu anda oynanan canlı oyun yok.",
+    "lobby_observe_correspondence": "Yazışmalı oyunları izle",
+    "lobby_mode": {
+        "live_description": "Gerçek zamanlı oyna",
+        "correspondence_description": "Kendi hızında oyna",
+        "open": "açık",
+        "n_playing": "{{n}} oynuyor"
+    },
+    "playing_games": {
+        "title": "Oynanan oyunlar",
+        "live_games": "Canlı oyunlar",
+        "correspondence_games": "Yazışmalı oyunlar",
+        "no_live_games": "Devam eden canlı oyun yok",
+        "no_correspondence_games": "Devam eden yazışmalı oyun yok"
+    },
+    "sort_recently_started": "Yakın zamanda başlayanlar",
+    "sort_most_moves": "En çok hamle yapılan",
+    "sort_longest_game": "En uzun oyun",
+    "sort_player_rating": "Oyuncu puanı",
+    "all": "Tümü",
+    "online_players_title": "Çevrimiçi oyuncular",
+    "online_players_heading": "Çevrimiçi oyuncular ({{n}})",
+    "sort_by_rating": "Puana göre",
+    "sort_alpha": "A–Z",
+    "no_players_online": "Çevrimiçi oyuncu yok",
+    "nav_games": "Oyunlar",
+    "nav_lobby": "Lobi",
+    "nav_observe": "İzle",
+    "nav_archives": "Arşivler",
+    "update": "Güncelle",
+    "tournaments_page_intro": "Burada, İsviçre sistemi veya eleme gibi çeşitli formatlarda <strong>herkes tarafından düzenlenebilen</strong> Hex turnuvaları bulunur.<br>Devam eden turnuvalardaki oyunları izleyebilir veya yaklaşan bir turnuvaya katılabilirsiniz.<br><strong>Katılmak için</strong>, <strong>zamanında check-in yaptığınızdan emin olun</strong>. Check-in açıldığında bildirim almak için abone olabilirsiniz.<br>Check-in saatleri, format ve katılımcılar gibi ayrıntılar için turnuva açıklamasını inceleyin.",
+    "tournament_admins": "Turnuva yöneticileri",
+    "admins_one": "Yönetici: { players }",
+    "admins_other": "Yöneticiler: { players }",
+    "tournament_unsubscribe": "Artık ilgilenmiyorum.",
+    "losers_bracket": "Kaybedenler tablosu",
+    "tournament_slug_duplicate": "Aynı URL adına sahip bir turnuva zaten var",
+    "tournament_seeding_methods": {
+        "title": "Seribaşı yerleştirme",
+        "random": "Rastgele",
+        "random_help": "Oyuncular puanlarına bakılmaksızın rastgele yerleştirilir.",
+        "rating": "Puana göre",
+        "rating_help": "Oyuncular puanlarına göre yerleştirilir. İlk turda bay geçme varsa daha güçlü oyuncular bay geçer.",
+        "rating_random": "Kısmi rastgelelik ile puana göre",
+        "rating_random_help": "Oyuncular puanlarına göre yerleştirilir, ancak glicko2 puan sapmasına bağlı rastgele bir unsur da vardır. İlk turda bay geçme varsa daha güçlü oyuncular bay geçer."
+    },
+    "chat_message_moderated": "Mesaj moderasyon tarafından silindi",
+    "resign_confirm_overlay": {
+        "title": "Oyundan çekil",
+        "message": "Oyundan çekilmek istediğinize emin misiniz?",
+        "confirmLabel": "Evet, çekiliyorum",
+        "cancelLabel": "Hayır, oynamaya devam et"
+    },
+    "bot": "Bot",
+    "donate": "PlayHex'e bağış yap",
+    "notifications": "Bildirimler",
+    "mark_all_as_read": "Okundu olarak işaretle",
+    "no_notifications": "Bildirim yok.",
+    "game_against_player": "{{ player }} ile oyun",
+    "notifications_misc": "Diğer bildirimler",
+    "notification": {
+        "you_won": "Oyunu kazandınız!",
+        "you_lost": "Oyunu kaybettiniz :(",
+        "opponent_moderated": "{{player}} moderasyona alındı. Aldığınız uygunsuz mesajlar için üzgünüz."
+    },
+    "player_sent_you_rematch_offer": "{{ player }} size rövanş teklif etti!",
+    "player_sent_rematch_offer": "{{ player }} rövanş teklifi gönderdi",
+    "player_chat_restricted": "{player} sohbette yanıt veremez (sohbet kısıtlandı).",
+    "moderation_action_overlay": {
+        "title": "Moderasyon bildirimi",
+        "warning_only": "Bu bir uyarıdır.",
+        "chat_block_until": "Sohbet erişiminiz {{date}} tarihine kadar kısıtlandı.",
+        "reason": "Sebep",
+        "details": "Detaylar",
+        "related_messages": "İlgili mesajlar",
+        "acknowledge": "Okudum ve anladım",
+        "scroll_hint": "Aşağıyı okuyup kabul edin"
+    },
+    "moderation_reason": {
+        "chat_insults": "Sohbette hakaret veya uygunsuz davranış"
     }
 }

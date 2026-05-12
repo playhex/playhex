@@ -4,7 +4,11 @@
         "no_waiting_games": "Er zijn momenteel geen spellen beschikbaar. Maak een nieuw spel aan!",
         "watch_current_games": "Bekijk huidige spellen",
         "join_a_game": "Doe mee aan een spel",
-        "no_playing_games": "Er zijn momenteel geen spellen bezig."
+        "no_playing_games": "Er zijn momenteel geen spellen bezig.",
+        "open_live_games": "Doe mee aan een live spel",
+        "open_correspondence_games": "Doe mee aan een correspondentiespel",
+        "no_open_live_games": "Momenteel geen open live spellen",
+        "no_open_correspondence_games": "Momenteel geen open correspondentiespellen"
     },
     "game": {
         "opponent": "Tegenstander",
@@ -30,7 +34,8 @@
         "title": "Spel",
         "info": "Info",
         "duration": "Lengte",
-        "title_your_turn": "Jou beurt!"
+        "title_your_turn": "Jou beurt!",
+        "title_waiting": "Wachten op een tegenstander: gehost door"
     },
     "game_rules": {
         "normal": "standaard",
@@ -63,7 +68,8 @@
         "periods_time": "Periodes tijd",
         "fast": "Snel",
         "normal": "Normaal",
-        "long": "Lang"
+        "long": "Lang",
+        "capped_abbreviation": "max."
     },
     "i_play": {
         "title": "Ik speel",
@@ -125,7 +131,9 @@
         "errored": "Analyse mislukt!",
         "best_move": "beste zet",
         "best": "beste:",
-        "how_it_works": "Hoe het werkt"
+        "how_it_works": "Hoe het werkt",
+        "request_analysis": "AI-analyse aanvragen",
+        "available": "Spelanalyse is nu beschikbaar."
     },
     "try_again": "Probeer opnieuw",
     "yes": "Ja",
@@ -315,7 +323,8 @@
         "started": "Toernooi is gestart!",
         "match_ended": "Wedstrijd {{ round }}.{{ number }} geëindigd: {{ winnerPseudo }} won van {{ loserPseudo }}.",
         "match_canceled_recreated": "Wedstrijd {{ round }}.{{ number }} is opnieuw aangemaakt na annulering.",
-        "ended": "Toernooi is geëindigd."
+        "ended": "Toernooi is geëindigd.",
+        "changed_admins": "Organisator wees admins toe: {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Verbannen uit dit toernooi",
     "tournament_account_required": "Voor dit toernooi is een account vereist. Gasten zijn niet toegestaan. Log in of maak eerst een account aan.",
@@ -326,7 +335,10 @@
     "undo": {
         "undo_move": "Ongedaan maken",
         "accept": "Ongedaan maken accepteren",
-        "reject": "Afwijzen"
+        "reject": "Afwijzen",
+        "player_wants_to_takeback": "{{ player }} wil zijn/haar zet terugnemen",
+        "player_takeback_his_move": "{{ player }} heeft zijn/haar zet teruggenomen.",
+        "takeback_request_denied": "Verzoek van {{ player }} om de zet terug te nemen is geweigerd."
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",
@@ -343,7 +355,8 @@
         "button_label_short": "Bevestigen",
         "send_immediately": "Onmiddellijk verzenden",
         "ask_confirmation": "Vraag bevestiging",
-        "description": "Om verkeerde klikken te voorkomen, kun je bevestiging vereisen voordat je een zet verzendt."
+        "description": "Om verkeerde klikken te voorkomen, kun je bevestiging vereisen voordat je een zet verzendt.",
+        "send_immediately_description": "De zet wordt verzonden zodra je op het vakje klikt."
     },
     "rematch": {
         "label": "Rematch",
@@ -380,5 +393,237 @@
     "muted": {
         "on": "Dempen",
         "off": "Spelen"
+    },
+    "allow_exploration": "Verkenning toestaan",
+    "allow_exploration_help": "Laat toe om varianten uit te proberen door beide kleuren te spelen voordat je een zet indient. Indien uitgeschakeld, worden voorwaardelijke zetten ook uitgeschakeld.",
+    "handicap": {
+        "title": "Handicap",
+        "none": "geen",
+        "handicap_for_player": "{{n}} voor {{player}}"
+    },
+    "game_created_short": "gemaakt {{ date }}",
+    "game_created_by_system_time_ago": "Spel aangemaakt door systeem, {timeAgo}.",
+    "username_not_an_email_warning": "Hé, het lijkt erop dat je je e-mailadres invoert, maar PlayHex heeft alleen een gebruikersnaam nodig. Je e-mailadres zou openbaar zichtbaar zijn…",
+    "save": "Opslaan",
+    "discard": "Verwerpen",
+    "pass_confirm_overlay": {
+        "title": "Mijn beurt overslaan?",
+        "message": "Je staat op het punt je huidige beurt over te slaan. Weet je het zeker?",
+        "confirmLabel": "Ja, passen",
+        "cancelLabel": "Oeps nee, laat me spelen"
+    },
+    "player_passed_his_turn": "{{player}} heeft gepast",
+    "go_to_the_game": "Ga naar het spel",
+    "explore": "Verkennen",
+    "dismiss": "Sluiten",
+    "friendly": "Vriendschappelijk",
+    "any": "Elke",
+    "1v1": "1v1",
+    "sort_date": {
+        "asc": "Chronologisch",
+        "desc": "Recent eerst"
+    },
+    "offline": "Offline",
+    "connection_lost": "Verbinding verbroken",
+    "play_offline": "Offline spelen",
+    "new_game_vs_ai": "Nieuw spel tegen AI",
+    "continue_game_vs_x": "Ga verder met spel tegen {{ playerNickname }}",
+    "restart": "Opnieuw starten",
+    "back_to_menu": "Terug naar menu",
+    "loading": "Laden…",
+    "no_active_tournament": "Momenteel geen actief toernooi.",
+    "no_upcoming_tournament": "Nog geen aankomend toernooi.",
+    "upcoming_events": "Aankomende evenementen",
+    "tournament_subscribed": "Geabonneerd",
+    "tournament_state": {
+        "running": "Live"
+    },
+    "lobby_my_turn_to_play": "Mijn beurt",
+    "lobby_my_current_games": "Mijn huidige spellen",
+    "lobby_your_turn_badge": "Jouw beurt",
+    "lobby_waiting_badge": "Wachten",
+    "lobby_join": "Meedoen",
+    "lobby_game_no_longer_available": "Spel niet langer beschikbaar",
+    "lobby_active_players_one": "actieve speler",
+    "lobby_active_players_other": "actieve spelers",
+    "lobby_playing_now": "Nu aan het spelen",
+    "lobby_no_live_games_now": "Momenteel geen live spel bezig.",
+    "lobby_observe_correspondence": "Bekijk correspondentiespellen",
+    "lobby_mode": {
+        "live_description": "Speel in realtime",
+        "correspondence_description": "Speel op je eigen tempo",
+        "open": "open",
+        "n_playing": "{{n}} aan het spelen"
+    },
+    "playing_games": {
+        "title": "Lopende spellen",
+        "live_games": "Live spellen",
+        "correspondence_games": "Correspondentiespellen",
+        "no_live_games": "Geen live spellen bezig",
+        "no_correspondence_games": "Geen correspondentiespellen bezig"
+    },
+    "sort_recently_started": "Recent gestart",
+    "sort_most_moves": "Meeste zetten gespeeld",
+    "sort_longest_game": "Langste spel",
+    "sort_player_rating": "Spelersrating",
+    "all": "Alle",
+    "online_players_title": "Online spelers",
+    "online_players_heading": "Online spelers ({{n}})",
+    "sort_by_rating": "Op rating",
+    "sort_alpha": "A–Z",
+    "no_players_online": "Geen spelers online",
+    "nav_games": "Spellen",
+    "nav_lobby": "Lobby",
+    "nav_observe": "Bekijken",
+    "nav_archives": "Archieven",
+    "update": "Bijwerken",
+    "tournaments_page_intro": "Hier zijn Hex-toernooien, die <strong>door iedereen georganiseerd</strong> kunnen worden in verschillende formats zoals Zwitsers of eliminatie.<br>Je kunt spellen bekijken van lopende toernooien of deelnemen aan een aankomend toernooi.<br><strong>Om deel te nemen</strong>, zorg ervoor dat je <strong>op tijd incheckt</strong>. Je kunt je abonneren om een melding te ontvangen wanneer check-in opent.<br>Bekijk de toernooibeschrijving voor details zoals check-in tijden, format en deelnemers.",
+    "tournament_admins": "Toernooiadmins",
+    "admins_one": "Admin: { players }",
+    "admins_other": "Admins: { players }",
+    "tournament_unsubscribe": "Ik ben niet langer geïnteresseerd.",
+    "losers_bracket": "Verliezersronde",
+    "tournament_slug_duplicate": "Er bestaat al een toernooi met dezelfde url-naam",
+    "tournament_seeding_methods": {
+        "title": "Plaatsing",
+        "random": "Willekeurig",
+        "random_help": "Spelers worden willekeurig geplaatst, ongeacht hun rating.",
+        "rating": "Rating",
+        "rating_help": "Spelers worden geplaatst op basis van hun rating. Als er vrijstellingen zijn in ronde één, krijgen sterkere spelers die.",
+        "rating_random": "Rating met gedeeltelijke willekeur",
+        "rating_random_help": "Spelers worden geplaatst op basis van hun rating, maar met een willekeurige factor afhankelijk van hun glicko2 ratingafwijking. Als er vrijstellingen zijn in ronde één, krijgen sterkere spelers die."
+    },
+    "moves": "Zetten",
+    "chat_message_moderated": "Bericht verwijderd door moderatie",
+    "force_board_orientation_mode": "Forceer liggende of staande weergave voor dit scherm",
+    "resign_confirm_overlay": {
+        "title": "Spel opgeven",
+        "message": "Weet je zeker dat je het spel wilt opgeven?",
+        "confirmLabel": "Ja, ik geef op",
+        "cancelLabel": "Nee, verder spelen"
+    },
+    "conditional_moves": {
+        "title": "Voorwaardelijke zetten",
+        "title_short": "Als-zetten",
+        "cut_move": "Zet afsnijden",
+        "inactive_lines": "Inactieve lijnen",
+        "clear_inactive_lines": "Inactieve lijnen wissen"
+    },
+    "password_changed_success": "Het wachtwoord is gewijzigd.",
+    "no_yet_data": "Wie weet!",
+    "total_played_games": "Totaal gespeelde spellen",
+    "preferred_board_sizes": "Voorkeursbordgroottes",
+    "ranked_games": "Gerangschikt",
+    "friendly_games": "Vriendschappelijke spellen",
+    "bot_games": "Botspellen",
+    "bot": "Bot",
+    "browse_all_ended_games": "Bekijk alle beëindigde spellen",
+    "n_total_games_one": "1 spel totaal.",
+    "n_total_games_other": "{{count}} spellen totaal.",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "page_page_of_max": "Pagina {{page}} / {{max}}",
+    "must_be_logged_in_as_guest": "Je moet ingelogd zijn als gast",
+    "pseudo_already_taken": "Deze gebruikersnaam wordt al gebruikt door een andere speler",
+    "pseudo_not_existing": "Geen speler met deze gebruikersnaam",
+    "invalid_password": "Ongeldig wachtwoord voor dit account",
+    "pseudo_too_short": "Gebruikersnaam is te kort",
+    "pseudo_too_long": "Gebruikersnaam is te lang",
+    "invalid_pseudo": "Gebruikersnaam is ongeldig",
+    "overall": "Algemeen",
+    "boardsize": {
+        "small": "Klein",
+        "medium": "Middel",
+        "large": "Groot"
+    },
+    "hex_tournament_paris": {
+        "title": "Hex-toernooi in Parijs",
+        "read_more": "lees meer"
+    },
+    "premove": {
+        "title": "Voorzet",
+        "description": "Speel een zet tijdens de beurt van de tegenstander: wordt direct gespeeld na de zet van de tegenstander."
+    },
+    "move_settings": {
+        "title": "Zetinstellingen"
+    },
+    "how_to_play_hex": "Hoe speel je Hex",
+    "tutorial": {
+        "label": "Tutorial",
+        "are_you_new_to_hex": "Ben je nieuw bij Hex?",
+        "learn_hex_in_1_minute": "Leer Hex spelen in 1 minuut",
+        "hex_is_simple_and_has_two_rules": "Hex is een eenvoudig spel, maar moeilijk te beheersen. Het heeft <strong>slechts 2 regels</strong>.",
+        "rule_1_connect_your_sides": "Regel 1: Verbind je zijden",
+        "to_win_you_must_connect_with_path": "Om te winnen moet je <strong>je zijden verbinden</strong> met een volledig verbonden pad.",
+        "demo_0_step_example": "Hier is een voorbeeldspel. {red} verbindt de {red} zijden.",
+        "demo_0_step_lets_play": "Laten we spelen! Jij bent {red}. Probeer de {red} zijden te verbinden.",
+        "demo_0_step_congrats": "Gefeliciteerd! Je hebt het spel gewonnen!",
+        "stones_are_played_this_way": "Stenen worden als volgt gespeeld:",
+        "each_player_place_a_stone": "de spelers plaatsen om de beurt <strong>een steen</strong>",
+        "stones_are_never_removed": "eens geplaatst wordt <strong>een steen nooit verwijderd of verplaatst</strong>",
+        "rule_2_swap": "Regel 2: De wisselregel",
+        "red_has_strong_advantage": "Omdat {red} altijd begint, heeft {red} een groot voordeel.",
+        "we_use_swap_rule": "Om evenwichtige spellen te garanderen gebruiken we <strong>alleen bij de eerste beurt</strong> de <strong>wisselregel</strong>:",
+        "on_first_turn_blue_can_swap": "Bij de eerste beurt mag de tweede speler ({blue}) ervoor kiezen om de openingszet van {red} te \"stelen\" in plaats van een steen te plaatsen.",
+        "you_play_blue_swap_it": "Jij bent {blue} en speelt als tweede. De openingszet van {red} is te sterk — klik erop om te wisselen!",
+        "swapped": "Mooi! Jij staat nu voor. Laten we zien of je deze beginners-AI kunt verslaan.",
+        "not_swapped": "Ah, je koos ervoor niet te wisselen en liet het voordeel aan je tegenstander — maar je kunt nog steeds winnen van deze beginners-AI.",
+        "swap_won": "Mooi, je hebt de computer verslagen!",
+        "swap_lost": "Verdorie! Geen zorgen — je moet waarschijnlijk gewoon nog een paar spellen spelen om deze AI te leren verslaan.",
+        "swap_rule_keeps_games_balanced": "De wisselregel houdt spellen in balans:",
+        "red_strong_get_swapped": "{red} opent met een sterke zet → {blue} wisselt en krijgt het voordeel.",
+        "red_weak_dont_get_swapped": "{red} opent met een zwakke zet → {blue} wisselt niet, behoudt het voordeel en plaatst een blauwe steen.",
+        "so_red_should_open_fair_move": "Dus {red} moet openen met een eerlijke openingszet.",
+        "what_is_a_fair_opening_move": "Wat is een eerlijke openingszet?",
+        "center_too_strong_open_sides": "Openen in het midden is erg krachtig. Als beginner kun je gewoon onthouden dat je <strong>niet in het midden moet beginnen</strong> en je eerste zet liever dicht bij de randen plaatst.",
+        "show_swap_map": "Laat me precies zien waar eerlijke openingszetten zijn op een 11×11 bord.",
+        "swap_map_explain": "Hieronder staat een \"wisselkaart\" voor 11×11 borden. Als de eerste zet van {red} in een rood vak ligt, geeft dat {red} voordeel en moet {blue} wisselen. Dus {red} moet de eerste zet spelen dicht bij de grens tussen rode en blauwe vakken, waar de vakken minder ondoorzichtig zijn.",
+        "swap_map_credits": "Auteur: hzy, bron: zhihu.com",
+        "congrats_you_know_play_hex": "Gefeliciteerd! Je weet nu hoe je Hex speelt!",
+        "what_to_do_next": "Wat nu te doen",
+        "play_vs_ai_desc": "Speel een volledig spel tegen een makkelijke AI-tegenstander",
+        "play_vs_ai_button": "Speel tegen AI",
+        "do_some_puzzle_desc": "Leer tactische en strategische basisprincipes door enkele Hex-puzzels op te lossen",
+        "do_some_puzzle_credits": "door Matthew Seymour",
+        "do_some_puzzle_button": "Los Hex-puzzels op",
+        "you_can_also": "je kunt ook…",
+        "play_1v1": "Speel 1v1",
+        "join_hex_discord": "Word lid van Hex Discord",
+        "what_should_i_learn_now": "Wat moet ik nu leren",
+        "read_strategy_guide": "Lees een uitgebreidere strategiegids"
+    },
+    "donate": "Doneer aan PlayHex",
+    "notifications": "Meldingen",
+    "mark_all_as_read": "Markeer alles als gelezen",
+    "no_notifications": "Geen meldingen.",
+    "game_against_player": "Spel tegen {{ player }}",
+    "notifications_misc": "Overige meldingen",
+    "notification": {
+        "you_won": "Je hebt het spel gewonnen!",
+        "you_lost": "Je hebt het spel verloren :(",
+        "opponent_moderated": "{{player}} is gemodereerd. Sorry voor de ongepaste berichten die je hebt ontvangen."
+    },
+    "player_sent_you_rematch_offer": "{{ player }} heeft je uitgedaagd voor een revanche!",
+    "player_sent_rematch_offer": "{{ player }} stuurde een revanche-aanbod",
+    "player_chat_restricted": "{player} kan niet antwoorden in chat (chat beperkt).",
+    "moderation_action_overlay": {
+        "title": "Moderatiemelding",
+        "warning_only": "Dit is een waarschuwing.",
+        "chat_block_until": "Je chattoegang is beperkt tot {{date}}.",
+        "reason": "Reden",
+        "details": "Details",
+        "related_messages": "Gerelateerde berichten",
+        "acknowledge": "Ik heb dit gelezen en begrepen",
+        "scroll_hint": "Lees hieronder en accepteer"
+    },
+    "moderation_reason": {
+        "chat_insults": "Beledigingen of ongepast gedrag in chat"
+    },
+    "player_loses_reason": {
+        "default": "{player} verliest.",
+        "path": "{player} verliest.",
+        "time": "{player} verliest op tijd.",
+        "resign": "{player} geeft op.",
+        "forfeit": "{player} verliest door forfait."
     }
 }
