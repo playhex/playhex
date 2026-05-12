@@ -25,17 +25,17 @@ import type { HexMove } from '../../move-notation/hex-move-notation.js';
 // For archive page
 // The ones ending with "_desc": set index order desc manually on endedAt column
 @Index('index_endedAt', keysOf<HostedGame>()('endedAt'))
-@Index('index_endedAt_desc', keysOf<HostedGame>()('endedAt'))
+@Index('index_endedAt_desc', keysOf<HostedGame>()([{ field: 'endedAt', order: 'DESC' }]))
 @Index('index_state_endedAt', keysOf<HostedGame>()('state', 'endedAt'))
-@Index('index_state_endedAt_desc', keysOf<HostedGame>()('state', 'endedAt'))
+@Index('index_state_endedAt_desc', keysOf<HostedGame>()(['state', { field: 'endedAt', order: 'DESC' }]))
 @Index('index_state_opponentType_endedAt', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
-@Index('index_state_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
+@Index('index_state_opponentType_endedAt_desc', keysOf<HostedGame>()(['state', 'opponentType', { field: 'endedAt', order: 'DESC' }]))
 @Index('index_state_ranked_opponentType_endedAt', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
-@Index('index_state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
+@Index('index_state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()(['state', 'ranked', 'opponentType', { field: 'endedAt', order: 'DESC' }]))
 @Index('index_ranked_opponentType_endedAt', keysOf<HostedGame>()('ranked', 'opponentType', 'endedAt'))
-@Index('index_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('ranked', 'opponentType', 'endedAt'))
+@Index('index_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()(['ranked', 'opponentType', { field: 'endedAt', order: 'DESC' }]))
 @Index('index_opponentType_endedAt', keysOf<HostedGame>()('opponentType', 'endedAt'))
-@Index('index_opponentType_endedAt_desc', keysOf<HostedGame>()('opponentType', 'endedAt'))
+@Index('index_opponentType_endedAt_desc', keysOf<HostedGame>()(['opponentType', { field: 'endedAt', order: 'DESC' }]))
 export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
 {
     @PrimaryGeneratedColumn()

@@ -37,9 +37,27 @@ export const truncateText = (text: string, maxLength = 24): string => {
  * Usage:
  * ```
  *   @Index(keysOf<HostedGame>()('state', 'opponentType'))
+ *
+ *   @Index(keysOf<HostedGame>()([
+ *     'state',
+ *     { field: 'opponentType' },
+ *     { field: 'createdAt', order: 'DESC' },
+ *   ]))
  * ```
  */
-export const keysOf = <T>() => <K extends keyof T>(...keys: K[]) => keys;
+type IndexColumn<K> = K | { field: K, order?: 'ASC' | 'DESC' };
+
+export const keysOf = <T>() => {
+    function keys<K extends keyof T>(...spreadKeys: K[]): K[];
+    function keys<K extends keyof T>(arrayKeys: IndexColumn<K>[]): IndexColumn<K>[];
+    function keys(...args: unknown[]): unknown {
+        if (args.length === 1 && Array.isArray(args[0])) {
+            return args[0];
+        }
+        return args;
+    }
+    return keys;
+};
 
 /**
  * When catching, allow to log error as string, depending on its type (Error, string, ...).

@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { keysOf } from '../utils.js';
 
 @Entity()
-@Index('createdAt_desc', keysOf<ChatMessage>()('createdAt')) // TODO replace with: { field: 'createdAt', order: 'DESC' }, once this issue is solved: https://github.com/typeorm/typeorm/issues/3336
+@Index('createdAt_desc', keysOf<ChatMessage>()([{ field: 'createdAt', order: 'DESC' }]))
 export default class ChatMessage
 {
     @PrimaryGeneratedColumn()
