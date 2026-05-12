@@ -52,6 +52,17 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     const currentLobby = ref<'live' | 'correspondence'>('live');
 
+    const waitingGamesCount = computed<{ live: number, correspondence: number }>(() => {
+        const count = { live: 0, correspondence: 0 };
+        for (const publicId in hostedGames.value) {
+            const game = hostedGames.value[publicId];
+            if (isSoftRemoved(game)) continue;
+            if (isLive(game)) ++count.live;
+            else ++count.correspondence;
+        }
+        return count;
+    });
+
     const currentLobbyHostedGames = computed<(HostedGame & SoftRemovable)[]>(() => {
         if (currentLobby.value === 'live') {
             return Object.values(hostedGames.value).filter(hostedGame => isLive(hostedGame));
@@ -186,6 +197,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         endedHostedGames,
         currentLobby,
         currentLobbyHostedGames,
+        waitingGamesCount,
         joinGame,
         getOrFetchHostedGame,
         clearSoftRemovedGames,

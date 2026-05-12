@@ -23,10 +23,10 @@ import useToastsStore from '../../stores/toastsStore.js';
 import { Toast } from '../../../shared/app/Toast.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppCijmTournamentCard2026 from '../components/AppCijmTournamentCard2026.vue';
-import AppLobbyModeSwitcher from '../components/AppLobbyModeSwitcher.vue';
-import { IconCircleFill, IconSearch, IconTrophyFill } from '../icons.js';
+import { IconCalendar, IconCircleFill, IconLightningChargeFill, IconSearch, IconTrophyFill } from '../icons.js';
 import AppLobbyFeaturesLiveGames from '../components/AppLobbyFeaturesLiveGames.vue';
 import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesCorrespondenceGames.vue';
+import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
 import { useElementHover } from '@vueuse/core';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
@@ -41,8 +41,9 @@ const router = useRouter();
 const { mySortedGames, myTurnCount } = storeToRefs(useMyGamesStore());
 const { activePlayersCount } = storeToRefs(useOnlinePlayersStore());
 const lobbyStore = useLobbyStore();
-const { clearSoftRemovedGames, excludeSoftRemoved } = lobbyStore;
-const { currentLobby, currentLobbyHostedGames, endedHostedGames } = storeToRefs(lobbyStore);
+const { clearSoftRemovedGames } = lobbyStore;
+const { currentLobby, currentLobbyHostedGames, endedHostedGames, waitingGamesCount } = storeToRefs(lobbyStore);
+const { live: livePlayingCount, correspondence: correspondencePlayingCount } = storeToRefs(usePlayingGamesCountStore());
 const authStore = useAuthStore();
 
 const {
@@ -155,9 +156,6 @@ onBeforeUnmount(() => clearSoftRemovedGames(true));
                     </div>
                 </section>
 
-                <!-- switch live/correspondence -->
-                <AppLobbyModeSwitcher class="mb-4" />
-
                 <!-- Create game -->
                 <h2>{{ $t('new_game') }}</h2>
 
@@ -166,9 +164,20 @@ onBeforeUnmount(() => clearSoftRemovedGames(true));
                 <!-- Open games -->
                 <section class="mb-4">
                     <div class="card" ref="gamesList">
-                        <div class="card-header d-flex align-items-center justify-content-between">
-                            <span class="fw-bold">{{ $t(currentLobby === 'live' ? 'lobby.open_live_games' : 'lobby.open_correspondence_games') }}</span>
-                            <span class="badge text-bg-secondary">{{ currentLobbyHostedGames.filter(excludeSoftRemoved).length }}</span>
+                        <div class="card-header py-0 d-flex align-items-stretch justify-content-between">
+                            <span class="fw-bold py-2 d-flex align-items-center">{{ $t('lobby.join_a_game') }}</span>
+                            <div role="tablist" class="d-flex gap-3 align-items-stretch">
+                                <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
+                                    <IconLightningChargeFill class="me-1" />
+                                    {{ $t('time_cadency.normal') }}
+                                    <span class="badge text-bg-success ms-1">{{ waitingGamesCount.live }}</span>
+                                </button>
+                                <button type="button" role="tab" @click="currentLobby = 'correspondence'" :aria-selected="currentLobby === 'correspondence'" class="lobby-tab lobby-tab-correspondence" :class="{ active: currentLobby === 'correspondence' }">
+                                    <IconCalendar class="me-1" />
+                                    {{ $t('time_cadency.correspondence') }}
+                                    <span class="badge text-bg-warning ms-1">{{ waitingGamesCount.correspondence }}</span>
+                                </button>
+                            </div>
                         </div>
                         <div v-if="currentLobbyHostedGames.length > 0" class="table-responsive waiting-games-list">
                             <table class="table text-nowrap table-borderless table-hover mb-0">
@@ -219,9 +228,30 @@ onBeforeUnmount(() => clearSoftRemovedGames(true));
                     </div>
                 </section>
 
-                <!-- Featured playing games -->
-                <AppLobbyFeaturesLiveGames v-if="currentLobby === 'live'" />
-                <AppLobbyFeaturesCorrespondenceGames v-else-if="currentLobby === 'correspondence'" />
+                <!-- Playing now -->
+                <section v-if="(livePlayingCount ?? 0) > 0 || (correspondencePlayingCount ?? 0) > 0" class="mb-4">
+                    <div class="d-flex align-items-stretch justify-content-between mb-2">
+                        <h2 class="mb-0 d-flex align-items-center gap-2">
+                            <IconCircleFill v-if="(livePlayingCount ?? 0) > 0" class="live-indicator" />
+                            {{ $t('lobby_playing_now') }}
+                        </h2>
+                        <div role="tablist" class="d-flex gap-3">
+                            <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
+                                <IconLightningChargeFill class="me-1" />
+                                {{ $t('time_cadency.normal') }}
+                                <span class="badge text-bg-success ms-1">{{ livePlayingCount ?? '…' }}</span>
+                            </button>
+                            <button type="button" role="tab" @click="currentLobby = 'correspondence'" :aria-selected="currentLobby === 'correspondence'" class="lobby-tab lobby-tab-correspondence" :class="{ active: currentLobby === 'correspondence' }">
+                                <IconCalendar class="me-1" />
+                                {{ $t('time_cadency.correspondence') }}
+                                <span class="badge text-bg-warning ms-1">{{ correspondencePlayingCount ?? '…' }}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <AppLobbyFeaturesLiveGames v-if="currentLobby === 'live'" />
+                    <AppLobbyFeaturesCorrespondenceGames v-else />
+                </section>
 
                 <!-- Recent games -->
                 <section v-if="endedHostedGames.length > 0" class="mb-4">
@@ -366,4 +396,44 @@ onBeforeUnmount(() => clearSoftRemovedGames(true));
 
 tr.soft-removed, tr.soft-removed *
     color var(--bs-secondary-color) !important
+
+.live-indicator
+    font-size 0.55em
+    color var(--bs-danger)
+    animation live-pulse 1.5s ease-in-out infinite
+
+@css {
+    @keyframes live-pulse {
+        0%, 100% { opacity: 1; }
+        50%      { opacity: 0.25; }
+    }
+}
+
+.lobby-tab
+    background none
+    border none
+    border-bottom 2px solid transparent
+    padding 0 0.25rem
+    cursor pointer
+    color var(--bs-secondary-color)
+    font-weight 500
+    font-size 0.95rem
+    white-space nowrap
+    transition color 0.15s, border-color 0.15s
+    display flex
+    align-items center
+
+    &:hover
+        color var(--bs-body-color)
+
+    &.active
+        cursor default
+
+.lobby-tab-live.active
+    border-bottom-color var(--bs-success)
+    color var(--bs-success)
+
+.lobby-tab-correspondence.active
+    border-bottom-color var(--bs-warning)
+    color var(--bs-warning)
 </style>

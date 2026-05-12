@@ -36,7 +36,7 @@ describe('Lobby', () => {
         cy.receiveLobbyUpdate('lobby/lobby-active-games.json');
 
         // Waiting game is listed with Watch button in the open games card
-        cy.contains('Join a live game')
+        cy.contains('Join a game')
             .closest('.card')
             .contains('Player waiting')
             .closest('tr')
@@ -44,7 +44,7 @@ describe('Lobby', () => {
         ;
 
         // Playing game is soft-removed: shown greyed out with Watch button still visible
-        cy.contains('Join a live game')
+        cy.contains('Join a game')
             .closest('.card')
             .contains('tr.soft-removed', 'Watch')
         ;

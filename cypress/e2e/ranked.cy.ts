@@ -68,7 +68,7 @@ describe('Ranked games', () => {
         cy.receiveLobbyUpdate('ranked/games.json');
 
         cy
-            .contains('Join a live game')
+            .contains('Join a game')
             .closest('.card')
             .contains('Guest 2943')
             .closest('tr')
