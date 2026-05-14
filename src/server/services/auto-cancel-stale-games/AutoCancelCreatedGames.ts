@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import logger from '../logger.js';
 import HostedGameRepository from '../../repositories/HostedGameRepository.js';
 import OnlinePlayersService from '../OnlinePlayersService.js';
-import Player from '../../../shared/app/models/Player.js';
+import { Player } from '../../../shared/app/models/index.js';
 import { timings } from './timings.js';
 import { isPlayingAndEmpty } from './utils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';

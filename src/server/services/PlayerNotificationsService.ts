@@ -1,6 +1,6 @@
 import { Container, Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import PlayerNotification from '../../shared/app/models/PlayerNotification.js';
+import { PlayerNotification } from '../../shared/app/models/index.js';
 import { HexServer } from '../server.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 import Rooms from '../../shared/app/Rooms.js';

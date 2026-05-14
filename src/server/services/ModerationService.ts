@@ -3,9 +3,8 @@ import { Inject, Service } from 'typedi';
 import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
 import HostedGameRepository from '../repositories/HostedGameRepository.js';
 import { PostPlayerModerationAction } from '../repositories/PlayerModerationActionRepository.js';
-import PlayerModerationAction from '../../shared/app/models/PlayerModerationAction.js';
 import { Repository } from 'typeorm';
-import { ChatMessage, Player } from '../../shared/app/models/index.js';
+import { ChatMessage, Player, PlayerModerationAction } from '../../shared/app/models/index.js';
 import { notifier } from './notifications/notifier.js';
 
 export class CreateAndSaveError extends Error {}

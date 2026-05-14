@@ -1,14 +1,11 @@
 import { Container, Service } from 'typedi';
-import HostedGame from '../../../shared/app/models/HostedGame.js';
+import { HostedGame, Player, ChatMessage, Rating } from '../../../shared/app/models/index.js';
 import { HexServer } from '../../server.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { isBotGame } from '../../../shared/app/hostedGameUtils.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
 import { AbstractTimeControl } from '../../../shared/time-control/TimeControl.js';
-import Player from '../../../shared/app/models/Player.js';
-import ChatMessage from '../../../shared/app/models/ChatMessage.js';
-import Rating from '../../../shared/app/models/Rating.js';
 import { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
 
 /**

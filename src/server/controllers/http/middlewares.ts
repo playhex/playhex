@@ -1,6 +1,5 @@
 import { CurrentUser, HttpError } from 'routing-controllers';
-import Tournament from '../../../shared/app/models/Tournament.js';
-import Player from '../../../shared/app/models/Player.js';
+import { Tournament, Player } from '../../../shared/app/models/index.js';
 
 /**
  * Provide currently authenticated player.

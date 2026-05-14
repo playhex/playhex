@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import HostedGameRepository from '../repositories/HostedGameRepository.js';
-import HostedGame from '../../shared/app/models/HostedGame.js';
+import { HostedGame } from '../../shared/app/models/index.js';
 import { isCorrespondence } from '../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';

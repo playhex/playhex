@@ -1,6 +1,6 @@
 import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
-import Player from '../../shared/app/models/Player.js';
+import { Player } from '../../shared/app/models/index.js';
 
 hexProgram
     .command('check-tests-requirements')

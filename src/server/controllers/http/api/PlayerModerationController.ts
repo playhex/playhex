@@ -1,7 +1,7 @@
 import { Get, JsonController, Param, Patch, QueryParam } from 'routing-controllers';
 import { Service } from 'typedi';
 import { AuthenticatedPlayer } from '../middlewares.js';
-import Player from '../../../../shared/app/models/Player.js';
+import { Player } from '../../../../shared/app/models/index.js';
 import PlayerModerationActionRepository from '../../../repositories/PlayerModerationActionRepository.js';
 import { instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 

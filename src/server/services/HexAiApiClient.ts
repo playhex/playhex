@@ -1,5 +1,5 @@
-import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import { Service } from 'typedi';
+import { type GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 
 /*
  * Client from Hex remote player API.

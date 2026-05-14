@@ -2,14 +2,14 @@ import { Get, HttpError, JsonController, OnUndefined, Param, Put } from 'routing
 import { Service } from 'typedi';
 import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister.js';
 import HexAiApiClient from '../../../services/HexAiApiClient.js';
-import GameAnalyze, { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
+import { GameAnalyze, ChatMessage } from '../../../../shared/app/models/index.js';
 import { HexServer } from '../../../server.js';
 import Rooms from '../../../../shared/app/Rooms.js';
 import logger from '../../../services/logger.js';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
-import ChatMessage from '../../../../shared/app/models/ChatMessage.js';
 import { errorToLogger } from '../../../../shared/app/utils.js';
 import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
+import { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
 
 @JsonController()
 @Service()

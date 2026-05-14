@@ -2,9 +2,7 @@ import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { Get, JsonController, NotFoundError, Post, QueryParam } from 'routing-controllers';
 import { AuthenticatedPlayer } from '../middlewares.js';
-import Player from '../../../../shared/app/models/Player.js';
-import PlayerNotification from '../../../../shared/app/models/PlayerNotification.js';
-import HostedGame from '../../../../shared/app/models/HostedGame.js';
+import { Player, PlayerNotification, HostedGame } from '../../../../shared/app/models/index.js';
 
 @JsonController()
 @Service()
