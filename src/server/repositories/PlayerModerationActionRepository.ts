@@ -35,6 +35,10 @@ export default class PlayerModerationActionRepository
                     hostedGame: true,
                     player: true,
                 },
+                relatedChannelChatMessages: {
+                    channel: true,
+                    player: true,
+                },
             },
             order: { createdAt: 'desc' },
         });

@@ -42,7 +42,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'player_moderation_action', 'moderation'] })
     publicId: string;
 
     /**
@@ -96,7 +96,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      * Which opponent type I want.
      */
     @Column({ length: 15 })
-    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby', 'moderation'] })
     opponentType: 'player' | 'ai';
 
     /**
@@ -135,7 +135,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
     @Expose()
     @Type(() => ChatMessage)
-    chatMessages: ChatMessage[];
+    chatMessages: Relation<ChatMessage>[];
 
     @Column({ type: 'text', transformer: {
         from: value => deserializeMoves(value),
@@ -188,7 +188,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @JoinColumn()
     @Expose()
     @Type(() => HostedGame)
-    rematch: null | HostedGame = null;
+    rematch: null | Relation<HostedGame> = null;
 
     /**
      * Link to previous game if this game is a rematch.
@@ -197,7 +197,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @JoinColumn()
     @Expose()
     @Type(() => HostedGame)
-    rematchedFrom: null | HostedGame = null;
+    rematchedFrom: null | Relation<HostedGame> = null;
 
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })

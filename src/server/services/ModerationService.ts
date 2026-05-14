@@ -4,8 +4,9 @@ import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
 import HostedGameRepository from '../repositories/HostedGameRepository.js';
 import { PostPlayerModerationAction } from '../repositories/PlayerModerationActionRepository.js';
 import { Repository } from 'typeorm';
-import { ChatMessage, Player, PlayerModerationAction } from '../../shared/app/models/index.js';
+import { Player, PlayerModerationAction } from '../../shared/app/models/index.js';
 import { notifier } from './notifications/notifier.js';
+import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
 
 export class CreateAndSaveError extends Error {}
 
@@ -15,6 +16,7 @@ export default class ModerationService
     constructor(
         private chatMessageRepository: ChatMessageRepository,
         private hostedGameRepository: HostedGameRepository,
+        private channelChatMessageRepository: ChannelChatMessageRepository,
 
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
@@ -23,11 +25,12 @@ export default class ModerationService
         private playerModerationActionRepository: Repository<PlayerModerationAction>,
     ) {}
 
-    async moderateDeleteChatMessages(publicIds: string[]): Promise<{ deletedInDb: number, deletedInMemory: number }>
+    async moderateDeleteChatMessages(publicIds: string[]): Promise<{ deletedInDb: number, deletedInMemory: number, deletedInChannels: number }>
     {
         return {
             deletedInMemory: this.hostedGameRepository.moderateDeleteChatMessages(publicIds),
             deletedInDb: await this.chatMessageRepository.moderateDeleteChatMessages(publicIds),
+            deletedInChannels: await this.channelChatMessageRepository.moderateDeleteChatMessages(publicIds),
         };
     }
 
@@ -39,17 +42,6 @@ export default class ModerationService
             throw new CreateAndSaveError(`Player "${post.playerPublicId}" not found`);
         }
 
-        let relatedChatMessages: ChatMessage[] = [];
-
-        if (Array.isArray(post.relatedChatMessages) && post.relatedChatMessages.length > 0) {
-            // /!\ Chat messages must be persisted in database,
-            // i.e can't add a relation if message is only in memory because just posted.
-            // So we need to persist hosted games containing those chat messages first.
-            await this.persistGamesHavingChatMessages(post.relatedChatMessages);
-
-            relatedChatMessages = await this.chatMessageRepository.findMultipleByPublicId(post.relatedChatMessages);
-        }
-
         const action = new PlayerModerationAction();
 
         action.publicId = uuidv4();
@@ -59,7 +51,21 @@ export default class ModerationService
         action.chatBlockedUntil = post.chatBlockedUntil ?? null;
         action.acknowledgedAt = null;
         action.createdAt = new Date();
-        action.relatedChatMessages = relatedChatMessages;
+        action.relatedChatMessages = [];
+        action.relatedChannelChatMessages = [];
+
+        if (Array.isArray(post.relatedChatMessages) && post.relatedChatMessages.length > 0) {
+            // /!\ Chat messages must be persisted in database,
+            // i.e can't add a relation if message is only in memory because just posted.
+            // So we need to persist hosted games containing those chat messages first.
+            await this.persistGamesHavingChatMessages(post.relatedChatMessages);
+
+            // Chat messages
+            action.relatedChatMessages = await this.chatMessageRepository.findMultipleByPublicId(post.relatedChatMessages);
+
+            // Channel chat messages
+            action.relatedChannelChatMessages = await this.channelChatMessageRepository.findMultipleByPublicId(post.relatedChatMessages);
+        }
 
         await this.playerModerationActionRepository.save(action);
 

@@ -32,6 +32,8 @@ import { useElementHover } from '@vueuse/core';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
+import AppChannel from '../components/AppChannel.vue';
+import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
 useHead({
     title: t('lobby_title'),
@@ -96,6 +98,22 @@ watch(isHovered, hovered => {
 
 onBeforeMount(() => clearSoftRemovedGames(true));
 onBeforeUnmount(() => clearSoftRemovedGames(true));
+
+// Lobby locales
+const MAX_LOBBY_CHANNELS = 3;
+const channels = ['lobby-en']; // Suggest lobby-en to everyone
+
+for (const locale of getPlayerLocales()) {
+    if (channels.includes('lobby-' + locale)) {
+        continue;
+    }
+
+    channels.push('lobby-' + locale);
+
+    if (channels.length >= MAX_LOBBY_CHANNELS) {
+        break;
+    }
+}
 </script>
 
 <template>
@@ -331,6 +349,8 @@ onBeforeUnmount(() => clearSoftRemovedGames(true));
                     :key="tournament.publicId"
                     :tournament
                 />
+
+                <AppChannel :channels />
 
             </div>
         </div>

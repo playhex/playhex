@@ -1,4 +1,6 @@
 import AIConfig from './AIConfig.js';
+import Channel from './Channel.js';
+import ChannelChatMessage from './ChannelChatMessage.js';
 import ChatMessage from './ChatMessage.js';
 import ConditionalMoves from './ConditionalMoves.js';
 import GameAnalyze from './GameAnalyze.js';
@@ -32,6 +34,8 @@ import TournamentParticipant from './TournamentParticipant.js';
 export {
     HostedGame,
     AIConfig,
+    Channel,
+    ChannelChatMessage,
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
@@ -65,6 +69,8 @@ export {
 export const entities = {
     HostedGame,
     AIConfig,
+    Channel,
+    ChannelChatMessage,
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,

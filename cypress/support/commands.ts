@@ -147,6 +147,18 @@ Cypress.Commands.add('receivePlayerGamesUpdate', fixtureFile => {
     });
 });
 
+Cypress.Commands.add('mockSendChannelChat', (player) => {
+    socketIoMock.once('sendChannelChat', (channelName, content, callback) => {
+        callback(true);
+        socketIoMock.emit('channelChatMessagePosted', channelName, {
+            publicId: `test-${Date.now()}`,
+            content,
+            createdAt: new Date().toISOString(),
+            player,
+        });
+    });
+});
+
 Cypress.Commands.add('receiveOnlinePlayersUpdate', fixtureFile => {
     cy.fixture(fixtureFile).then((fixture: unknown[]) => {
         cy.receiveSocketIoMessage('onlinePlayersUpdate', plainToInstance(OnlinePlayers, fixture));

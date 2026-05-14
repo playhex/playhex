@@ -35,6 +35,26 @@ export const getQuickLocales = (): string[] => {
 };
 
 /**
+ *
+ * @returns Any locales used by player from its browser, supported or not by translations.
+ *      Ex: `['fr', 'en', 'sv']`. Exclude locales like "en-US"
+ */
+export const getPlayerLocales = (): string[] => {
+    const locales: string[] = [];
+
+    for (const navigatorLocale of navigator.languages) {
+        // Exclude sub locales like "fr-FR", "en-US", keep only "fr", "en"
+        if (navigatorLocale.match(/(-|_)/)) {
+            continue;
+        }
+
+        locales.push(navigatorLocale);
+    }
+
+    return locales;
+};
+
+/**
  * @returns Locale used by player but translation not exists yet
  */
 export const getPlayerMissingLocale = (): null | string => {

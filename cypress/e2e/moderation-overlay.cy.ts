@@ -22,12 +22,26 @@ describe('Moderation overlay', () => {
         cy.contains('.list-group-item', 'u suck');
         cy.contains('.list-group-item', 'get rekt');
         cy.contains('.list-group-item strong', 'aaa');
-
+        cy.contains('.list-group-item', 'reported channel message');
 
         cy.contains('.modal', 'Moderation notice');
         cy.contains('I have read and understood').click();
 
         cy.get('.modal').should('not.exist');
+    });
+
+    it('shows both in-game and channel related messages', () => {
+        cy.intercept('/api/player-moderation-actions', { fixture: 'moderation/chat-restricted.json' });
+
+        cy.visit('/');
+
+        cy.contains('.modal-body', 'Related messages');
+
+        cy.contains('.list-group-item', 'u suck')
+            .contains('small', '(Game)');
+
+        cy.contains('.list-group-item', 'reported channel message')
+            .contains('small', '(in #general)');
     });
 
     it('calls the acknowledge API when chat restriction action is acknowledged', () => {

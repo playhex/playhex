@@ -134,3 +134,5 @@ export const makesCoordsInteractive = (str: string, boardsize: number): string =
         },
     );
 };
+
+export const formatMessagePostedHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;

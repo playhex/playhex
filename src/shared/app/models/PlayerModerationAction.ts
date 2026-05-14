@@ -4,6 +4,7 @@ import { Expose, Type } from 'class-transformer';
 import Player from './Player.js';
 import ChatMessage from './ChatMessage.js';
 import { GROUP_DEFAULT } from '../class-transformer-custom.js';
+import ChannelChatMessage from './ChannelChatMessage.js';
 
 /**
  * This player received a moderation warning
@@ -76,4 +77,13 @@ export default class PlayerModerationAction
     @JoinTable({ name: 'player_moderation_action_chat_message' })
     @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
     relatedChatMessages: ChatMessage[];
+
+    /**
+     * Channel chat messages (posted in channels) that originated this action.
+     * Will be displayed to player as a proof.
+     */
+    @ManyToMany(() => ChannelChatMessage)
+    @JoinTable({ name: 'player_moderation_action_channel_chat_message' })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    relatedChannelChatMessages: ChannelChatMessage[];
 }

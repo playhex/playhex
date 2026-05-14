@@ -70,5 +70,12 @@ declare namespace Cypress {
          * Simulate a "moved" message for a game.
          */
         receiveMoved(gameId: string, move: string, moveIndex: number, byPlayerIndex: number): Chainable;
+
+        /**
+         * Set up a one-time handler that acks the next "sendChannelChat" socket emit with success,
+         * then broadcasts "channelChatMessagePosted" back so the message appears in the UI.
+         * Pass the player object to include in the broadcasted message.
+         */
+        mockSendChannelChat(player: object): Chainable;
     }
 }

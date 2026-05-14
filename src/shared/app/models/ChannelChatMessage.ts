@@ -1,21 +1,21 @@
 import { Column, Entity, JoinColumn, ManyToOne, type Relation } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
-import HostedGame from './HostedGame.js';
 import { Expose } from '../class-transformer-custom.js';
 import AbstractChatMessage from './AbstractChatMessage.js';
+import Channel from './Channel.js';
 
 /**
- * Chat message posted in a game.
+ * Chat message posted in a Channel.
  */
 @Entity()
-export default class ChatMessage extends AbstractChatMessage
+export default class ChannelChatMessage extends AbstractChatMessage
 {
     @IsNotEmpty()
     @Column()
-    hostedGameId: number;
+    channelId: number;
 
-    @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
+    @ManyToOne(() => Channel, channel => channel.messages)
     @JoinColumn()
     @Expose({ groups: ['player_moderation_action'] })
-    hostedGame: Relation<HostedGame>;
+    channel: Relation<Channel>;
 }

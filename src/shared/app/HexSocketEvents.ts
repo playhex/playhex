@@ -4,7 +4,7 @@ import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, HostedGame, Player, Rating } from './models/index.js';
-import type { OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
+import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 
 export type HexClientToServerEvents = {
     /**
@@ -73,6 +73,11 @@ export type HexClientToServerEvents = {
      * So we need that each thumbnail request independently a full update.
      */
     thumbnailGameUpdateRequest: (gameId: string, answer: (hostedGame: HostedGame | null, spectatorsCount: number) => void) => void;
+
+    /**
+     * A player send a chat message in a channel
+     */
+    sendChannelChat: (channel: string, content: string, answer: (result: true | string) => void) => void;
 };
 
 export type HexServerToClientEvents = {
@@ -276,4 +281,14 @@ export type HexServerToClientEvents = {
      * Count of human playing games, split by live and correspondence.
      */
     playingGamesCountUpdate: (counts: { live: number, correspondence: number }) => void;
+
+    /**
+     * I just subscribed to a channel, receive last chat messages
+     */
+    channelChatMessageUpdate: (channel: string, channelChatMessages: ChannelChatMessage[]) => void;
+
+    /**
+     * A message has been posted in a channel I subscribed for.
+     */
+    channelChatMessagePosted: (channel: string, channelChatMessage: ChannelChatMessage) => void;
 };

@@ -12,6 +12,7 @@ import FeaturedLiveGamesWebsocketController from './FeaturedLiveGamesWebsocketCo
 import FeaturedCorrespondenceGamesWebsocketController from './FeaturedCorrespondenceGamesWebsocketController.js';
 import ThumbnailGameWebsocketController from './ThumbnailGameWebsocketController.js';
 import PlayingGamesCountWebsocketController from './PlayingGamesCountWebsocketController.js';
+import ChannelWebsocketController from './ChannelWebsocketController.js';
 
 export interface WebsocketControllerInterface
 {
@@ -38,6 +39,7 @@ export function registerWebsocketControllers() {
     const websocketControllers: WebsocketControllerInterface[] = [
         Container.get(RoomWebsocketController),
         Container.get(ChatWebsocketController),
+        Container.get(ChannelWebsocketController),
         Container.get(LobbyWebsocketController),
         Container.get(FeaturedLiveGamesWebsocketController),
         Container.get(FeaturedCorrespondenceGamesWebsocketController),

@@ -10,7 +10,7 @@ import { ChatMessage, HostedGame, Player } from '../../../shared/app/models/inde
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
-import { canPlayerChatInGame, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
+import { canPlayerChatInGame, formatMessagePostedHour, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
@@ -95,7 +95,6 @@ const formatChatDateHeader = (date: Date): string => {
     return intlFormat(date, { day: 'numeric', month: 'long' }, { locale: autoLocale() });
 };
 const formatDateInfo = (date: null | Date): string => date === null ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
-const formatHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
 const formatGameDuration = (hostedGame: HostedGame): string => {
     const { startedAt, endedAt } = hostedGame;
 
@@ -926,7 +925,7 @@ watch(gameUIMode, () => {
                             :class="isChatMessage(message) ? '' : `chat-header chat-header-${message.type}`"
                         >
                             <template v-if="isChatMessage(message)">
-                                <small class="time text-secondary">{{ formatHour(message.createdAt) }}</small>
+                                <small class="time text-secondary">{{ formatMessagePostedHour(message.createdAt) }}</small>
                                 <span>&nbsp;</span>
                                 <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
                                 <span v-if="message.player">&nbsp;</span>

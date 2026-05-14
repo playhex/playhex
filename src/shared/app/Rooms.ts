@@ -45,6 +45,8 @@ export default class Rooms
      */
     static readonly playerGames = (playerId: string) => `players/${playerId}/games`;
 
+    static readonly channel = (channel: string) => `channels/${channel}`;
+
     /**
      * Get currently featured live games list, and keep it updated.
      */

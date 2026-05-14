@@ -47,6 +47,25 @@
                     "publicId": "00000000-0000-0000-0000-000000000000"
                 }
             }
+        ],
+        "relatedChannelChatMessages": [
+            {
+                "publicId": "cccccccc-0000-0000-0000-000000000001",
+                "content": "reported channel message",
+                "createdAt": "2024-03-05T12:50:00.000Z",
+                "player": {
+                    "pseudo": "aaa",
+                    "publicId": "e3d50579-6a8b-4ca3-a618-b2cc3e97ae30",
+                    "isGuest": false,
+                    "isBot": false,
+                    "slug": "aaa",
+                    "createdAt": "2024-03-05T10:16:32.291Z"
+                },
+                "channel": {
+                    "publicId": "dddddddd-0000-0000-0000-000000000001",
+                    "name": "general"
+                }
+            }
         ]
     }
 ]

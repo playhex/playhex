@@ -58,8 +58,9 @@ onMounted(() => updateHasMoreBelow());
                             <p>{{ action.reasonDetails }}</p>
                         </template>
 
-                        <template v-if="action.relatedChatMessages?.length > 0">
+                        <template v-if="action.relatedChatMessages?.length > 0 || action.relatedChannelChatMessages?.length > 0">
                             <h6>{{ $t('moderation_action_overlay.related_messages') }}</h6>
+
                             <ul class="list-group">
                                 <li
                                     v-for="message in action.relatedChatMessages"
@@ -67,7 +68,21 @@ onMounted(() => updateHasMoreBelow());
                                     class="list-group-item"
                                 >
                                     <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                        <small class="text-secondary">{{ format(message.createdAt, 'PPp') }}</small>
+                                        <small class="text-secondary">{{ format(message.createdAt, 'PPp') }} ({{ $t('game.title') }})</small>
+                                    </div>
+                                    <span>
+                                        <strong>{{ pseudoStringOptional(message.player) }}</strong>
+                                        <span>: {{ message.content }}</span>
+                                    </span>
+                                </li>
+
+                                <li
+                                    v-for="message in action.relatedChannelChatMessages"
+                                    :key="message.publicId"
+                                    class="list-group-item"
+                                >
+                                    <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                        <small class="text-secondary">{{ format(message.createdAt, 'PPp') }} (in #{{ message.channel.name }})</small>
                                     </div>
                                     <span>
                                         <strong>{{ pseudoStringOptional(message.player) }}</strong>

@@ -7,6 +7,14 @@ import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import ModerationService, { CreateAndSaveError } from '../../../services/ModerationService.js';
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { ROLE_MODERATOR } from '../../../services/roles.js';
+import { HostedGame } from '../../../../shared/app/models/index.js';
+import type AbstractChatMessage from '../../../../shared/app/models/AbstractChatMessage.js';
+import ChannelChatMessageRepository from '../../../repositories/ChannelChatMessageRepository.js';
+
+type MessageFromAnySource =
+    { message: AbstractChatMessage, source: 'game', data: HostedGame }
+    | { message: AbstractChatMessage, source: 'channel', data: string }
+;
 
 @JsonController()
 @Service()
@@ -19,6 +27,7 @@ export default class AdminModerationController
         private playerModerationActionRepository: PlayerModerationActionRepository,
         private playerRepository: PlayerRepository,
         private moderationService: ModerationService,
+        private channelChatMessageRepository: ChannelChatMessageRepository,
     ) {}
 
     @Get('/api/admin/moderation/players')
@@ -57,33 +66,68 @@ export default class AdminModerationController
         return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action'] });
     }
 
+    /**
+     * Get all recent chat messages from any source (game or channel).
+     *
+     * @returns Last messages, most recent first, like: [
+     *  { message: { ... }, source: 'game', sourceId: '123abc...' },
+     *  { message: { ... }, source: 'channel', sourceId: 'lobby-en...' },
+     * ]
+     */
     @Get('/api/admin/moderation/chat-messages')
-    async getLastChatMessages()
+    async getLastChatMessages(): Promise<MessageFromAnySource[]>
     {
-        const LIMIT = 200;
+        const SINCE = new Date(new Date().getTime() - 86400000 * 14); // 2 weeks of history
 
-        const persistedMessages = await this.chatMessageRepository.getLastChatMessagesForModeration(LIMIT);
+        const persistedMessages = await this.chatMessageRepository.getLastChatMessagesForModeration(SINCE);
         const inMemoryMessages = this.hostedGameRepository.getUnpersistedChatMessagesForModeration();
+        const channelMessages = await this.channelChatMessageRepository.getLastMessagesForModeration(SINCE);
 
-        const allMessages = [...inMemoryMessages, ...persistedMessages];
-        allMessages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        const allMessages: MessageFromAnySource[] = [];
 
-        return instanceToPlain(allMessages.slice(0, LIMIT), { groups: [GROUP_DEFAULT, 'moderation'] });
+        for (const message of persistedMessages) {
+            allMessages.push({
+                source: 'game',
+                message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
+                data: instanceToPlain(message.hostedGame, { groups: ['moderation'] }),
+            });
+        }
+
+        for (const message of inMemoryMessages) {
+            allMessages.push({
+                source: 'game',
+                message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
+                data: instanceToPlain(message.hostedGame, { groups: ['moderation'] }),
+            });
+        }
+
+        for (const message of channelMessages) {
+            allMessages.push({
+                source: 'channel',
+                message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
+                data: message.channel.name,
+            });
+        }
+
+        allMessages.sort((a, b) => b.message.createdAt.getTime() - a.message.createdAt.getTime());
+
+        return allMessages;
     }
 
     @Delete('/api/admin/moderation/chat-messages/:publicId')
     async deleteModerateChatMessage(
         @Param('publicId') publicId: string,
     ) {
-        const { deletedInDb, deletedInMemory } = await this.moderationService.moderateDeleteChatMessages([publicId]);
+        const { deletedInDb, deletedInMemory, deletedInChannels } = await this.moderationService.moderateDeleteChatMessages([publicId]);
 
-        if (!deletedInMemory && !deletedInDb) {
+        if (!deletedInMemory && !deletedInDb && !deletedInChannels) {
             throw new NotFoundError(`Chat message "${publicId}" not found`);
         }
 
         return {
             deletedInDb,
             deletedInMemory,
+            deletedInChannels,
         };
     }
 
