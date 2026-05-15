@@ -47,7 +47,7 @@ export class ChannelsService
             return channel;
         }
 
-        if (!this.allowedToAutoCreateChannel(channelName)) {
+        if (!await this.allowedToAutoCreateChannel(channelName)) {
             throw new ChannelNotFoundError(`No channel "${channelName}"`);
         }
 
