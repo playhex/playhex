@@ -63,4 +63,11 @@ export default class ChannelChatMessageRepository
             publicId: In(publicIds),
         });
     }
+
+    async countMessages(channelName: string): Promise<number>
+    {
+        return await this.channelChatMessageRepository.countBy({
+            channel: { name: channelName },
+        });
+    }
 }

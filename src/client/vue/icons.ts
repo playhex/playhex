@@ -26,6 +26,8 @@ export { default as IconCaretDownFill } from '~icons/bi/caret-down-fill';
 export { default as IconCaretRight } from '~icons/bi/caret-right';
 export { default as IconCaretUpFill } from '~icons/bi/caret-up-fill';
 export { default as IconChatDots } from '~icons/bi/chat-dots';
+export { default as IconChatRight } from '~icons/bi/chat-right';
+export { default as IconChatRightText } from '~icons/bi/chat-right-text';
 export { default as IconCheck } from '~icons/bi/check';
 export { default as IconChevronBarLeft } from '~icons/bi/chevron-bar-left';
 export { default as IconChevronBarRight } from '~icons/bi/chevron-bar-right';

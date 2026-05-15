@@ -24,6 +24,7 @@ import TournamentBanController from './TournamentBanController.js';
 import AdminModerationController from './AdminModerationController.js';
 import PlayerModerationController from './PlayerModerationController.js';
 import { checkAuthorization } from '../../../services/roles.js';
+import ChannelController from './ChannelController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -66,6 +67,7 @@ export const registerApi = (app: Express) => {
             TournamentController,
             TournamentBanController,
             ChatController,
+            ChannelController,
             PlayerController,
             PlayerNotificationController,
             AuthController,

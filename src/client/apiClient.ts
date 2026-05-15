@@ -914,3 +914,13 @@ export const apiPostPlayerNotificationsAcknowledge = async (hostedGamePublicId?:
 
     await checkResponse(response);
 };
+
+export const apiGetChannelMessagesCount = async (channelName: string): Promise<number> => {
+    const url = `/api/channels/${channelName}/messages/count`;
+
+    const response = await fetch(url);
+
+    await checkResponse(response);
+
+    return await response.json();
+};

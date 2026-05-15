@@ -1,0 +1,5 @@
+# Get the count of message in a channel
+
+@channelName=lobby-en
+
+GET /api/channels/{{ channelName }}/messages/count

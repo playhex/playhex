@@ -7,6 +7,7 @@ import AppCountdown from '../../components/AppCountdown.vue';
 import AppTournamentStartsAt from './AppTournamentStartsAt.vue';
 import { getActiveTournamentMatches, isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription.js';
+import AppChannelMessagesCount from '../../components/AppChannelMessagesCount.vue';
 
 const props = defineProps({
     tournament: {
@@ -60,6 +61,8 @@ const {
 
                 <p v-if="tournament.subscriptions.length > 0" class="card-text">
                     <small><IconPeopleFill /> {{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}</small>
+                    <span class="text-secondary mx-2">•</span>
+                    <small><AppChannelMessagesCount :channel="'tournament-' + tournament.slug" /></small>
                 </p>
             </template>
 
@@ -74,12 +77,16 @@ const {
                     <IconRecordFill class="text-danger" />
                     {{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}
                 </p>
+
+                <AppChannelMessagesCount :channel="'tournament-' + tournament.slug" />
             </template>
 
             <!-- Ended -->
             <template v-else-if="tournament.state === 'ended'">
                 <p class="m-0"><small>{{ $t('tournament_ordinal.1') }}</small></p>
                 <p class="lead">{{ tournament.participants.find(p => 1 === p.rank)?.player.pseudo }}</p>
+
+                <AppChannelMessagesCount :channel="'tournament-' + tournament.slug" />
             </template>
         </div>
     </router-link>
