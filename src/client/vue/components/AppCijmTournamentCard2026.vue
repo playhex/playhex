@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IconChevronRight, IconTrophy } from '../icons.js';
 import { formatDistanceStrict } from 'date-fns';
+import AppChannelMessagesCount from './AppChannelMessagesCount.vue';
 
 const sunday = new Date('2026-05-24T14:00:00+0200');
 const sundayEnd = new Date('2026-05-24T18:00:00+0200');
@@ -28,6 +29,8 @@ const now = new Date();
                     <router-link :to="{ name: 'cijm2026' }" class="stretched-link">
                         {{ $t('hex_tournament_paris.read_more') }}
                     </router-link>
+                    <span class="text-secondary mx-2">•</span>
+                    <AppChannelMessagesCount channel="cijm-paris-2026" />
                 </small>
             </p>
         </div>
