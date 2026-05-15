@@ -15,6 +15,7 @@ import AppTournamentDescription from '../components/AppTournamentDescription.vue
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';
 import AppTournamentExplorationAllowedInfo from '../components/AppTournamentExplorationAllowedInfo.vue';
+import AppChannel from '../../components/AppChannel.vue';
 
 const {
     tournament,
@@ -122,7 +123,14 @@ const colClasses = [
 
             <AppTournamentDescription :tournament />
 
-            <AppTournamentHistorySection :tournament />
+            <div class="row">
+                <div class="col-md-6">
+                    <AppChannel :channels="'tournament-' + tournament.slug" class="mb-3" />
+                </div>
+                <div class="col-md-6">
+                    <AppTournamentHistorySection :tournament />
+                </div>
+            </div>
         </div>
     </template>
 </template>

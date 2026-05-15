@@ -3,6 +3,7 @@ import { Channel, ChannelChatMessage } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
 import { languagesCodesISO6391 } from '../../shared/app/codes.js';
+import TournamentRepository from '../repositories/TournamentRepository.js';
 
 export class ChannelNotFoundError extends Error {}
 
@@ -13,6 +14,7 @@ export class ChannelsService
 {
     constructor(
         private channelChatMessageRepository: ChannelChatMessageRepository,
+        private tournamentRepository: TournamentRepository,
 
         @Inject('Repository<Channel>')
         private channelRepository: Repository<Channel>,
@@ -60,13 +62,22 @@ export class ChannelsService
      * Create channel in database if needed,
      * instead of being forced to do it manually when installing project.
      */
-    private allowedToAutoCreateChannel(channelName: string): boolean
+    private async allowedToAutoCreateChannel(channelName: string): Promise<boolean>
     {
         // Allow "lobby-en", "lobby-.." as soon as language code is valid
         const lobbyByLanguage = channelName.match(/^lobby-([a-z]{2})$/);
 
         if (lobbyByLanguage) {
             return languagesCodesISO6391.has(lobbyByLanguage[1]);
+        }
+
+        // Allow tournament channels "tourament-[slug]"
+        const tournament = channelName.match(/^tournament-(.*)$/);
+
+        if (tournament) {
+            const slug = tournament[1];
+
+            return await this.tournamentRepository.slugExists(slug);
         }
 
         return false;

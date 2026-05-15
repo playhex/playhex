@@ -274,6 +274,17 @@ export default class TournamentRepository
         });
     }
 
+    async slugExists(slug: string): Promise<boolean>
+    {
+        for (const publicId in this.activeTournaments) {
+            if (this.activeTournaments[publicId].getTournament().slug === slug) {
+                return true;
+            }
+        }
+
+        return await this.tournamentRepository.existsBy({ slug });
+    }
+
     /**
      * For active tournaments,
      * should call activeTournament.save() instead

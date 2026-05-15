@@ -20,6 +20,7 @@ import AppTournamentStartsAt from '../components/AppTournamentStartsAt.vue';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';
+import AppChannel from '../../components/AppChannel.vue';
 
 const {
     tournament,
@@ -236,7 +237,14 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
         <div class="container my-3">
             <AppTournamentDescription :tournament />
 
-            <AppTournamentHistorySection :tournament />
+            <div class="row">
+                <div class="col-md-6">
+                    <AppChannel :channels="'tournament-' + tournament.slug" class="mb-3" />
+                </div>
+                <div class="col-md-6">
+                    <AppTournamentHistorySection :tournament />
+                </div>
+            </div>
         </div>
     </template>
 </template>
