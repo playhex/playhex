@@ -20,6 +20,7 @@ export default class ChannelChatMessageRepository
         return await this.channelChatMessageRepository.find({
             where: {
                 channel: { name: channelName },
+                deletedByModeration: false, // do not display "message has been moderated" in channels because annoying in #lobby-en at least
             },
             relations: {
                 player: true,
