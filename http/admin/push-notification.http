@@ -1,0 +1,15 @@
+# Send a push notification to a player.
+
+@playerPublicId=9b409c13-0350-4909-883e-bcad2cdbdc3d
+
+POST /api/admin/players/{{ playerPublicId }}/push-notification
+Authorization: Bearer {{ adminPassword }}
+Content-Type: application/json
+
+{
+    "title": "PlayHex",
+    "body": "Test notification",
+    "tag": null,
+    "goToPath": null,
+    "lang": "en"
+}

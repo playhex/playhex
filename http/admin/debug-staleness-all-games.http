@@ -1,0 +1,4 @@
+# Check staleness status of all active games without canceling them.
+
+POST /api/admin/games/debug-staleness
+Authorization: Bearer {{ adminPassword }}

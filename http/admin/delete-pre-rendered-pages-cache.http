@@ -1,0 +1,5 @@
+# Reset pre-rendered pages cache.
+# Forces pages to be re-rendered on next request.
+
+DELETE /api/admin/pre-rendered-pages-cache
+Authorization: Bearer {{ adminPassword }}

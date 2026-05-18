@@ -1,0 +1,6 @@
+# Run one iteration of a tournament (advance to next round, pair players, etc.).
+
+@touramentSlug=hex-monthly-37
+
+POST /api/admin/tournaments/{{ touramentSlug }}/iterate
+Authorization: Bearer {{ adminPassword }}

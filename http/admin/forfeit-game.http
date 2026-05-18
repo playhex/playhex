@@ -1,0 +1,7 @@
+# Force-forfeit a player in an active game.
+
+@gamePublicId=7c2a668f-39ab-4640-8aae-43384face62a
+@playerPublicId=9b409c13-0350-4909-883e-bcad2cdbdc3d
+
+POST /api/admin/games/{{ gamePublicId }}/players/{{ playerPublicId }}/forfeit
+Authorization: Bearer {{ adminPassword }}

@@ -1,0 +1,4 @@
+# Persist all tournaments from memory to database.
+
+POST /api/admin/persist-tournaments
+Authorization: Bearer {{ adminPassword }}

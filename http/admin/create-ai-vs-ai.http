@@ -1,0 +1,11 @@
+# Create a ranked AI vs AI game.
+
+POST /api/admin/create-ai-vs-ai
+Authorization: Bearer {{ adminPassword }}
+Content-Type: application/json
+
+{
+    "ai0Slug": "mohex",
+    "ai1Slug": "katahex",
+    "boardsize": 11
+}
