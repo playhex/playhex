@@ -366,7 +366,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.ranked = true;
     tournament.boardsize = 11;
     tournament.timeControlType = structuredClone(defaultTimeControlTypes.normal);
-    tournament.explorationAllowed = true;
+    tournament.explorationAllowed = false;
     tournament.checkInOpenOffsetSeconds = 15 * 60;
     tournament.startDelayInSeconds = 0;
     tournament.createdAt = new Date();
@@ -399,7 +399,7 @@ export const createTournamentDefaultsCreate = (): Tournament => {
     tournament.startDelayInSeconds = 0;
     tournament.checkInOpenOffsetSeconds = 15 * 60;
     tournament.timeControlType = structuredClone(defaultTimeControlTypes.normal);
-    tournament.explorationAllowed = true;
+    tournament.explorationAllowed = false;
 
     return tournament;
 };
