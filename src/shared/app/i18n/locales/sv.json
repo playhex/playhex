@@ -173,12 +173,12 @@
         "desc": "Senaste först"
     },
     "1v1_ranked": {
-        "title": "1v1",
-        "create": "Skapa 1v1"
+        "title": "Rankat",
+        "create": "Skapa 1v1 rankat"
     },
     "1v1_friendly": {
-        "title": "Anpassad 1v1",
-        "create": "Skapa anpassad 1v1"
+        "title": "Vänskapligt",
+        "create": "Skapa 1v1-vänskapsmatch"
     },
     "1vAI_ranked": {
         "title": "Rankat mot AI",
@@ -269,7 +269,7 @@
     "n_matches_played_one": "{{ count }} match spelad",
     "n_matches_played_other": "{{ count }} matcher spelade",
     "tournament_subscription": {
-        "subscribed": "Du är prenumererad",
+        "subscribed": "Du är intresserad",
         "checked_in": "Din medverkan är bekräftad!",
         "must_check_in": "Du måste checka in!",
         "can_subscribe": "Du kan ännu inte checka in, men du kan prenumerera för att få en notis när incheckningen öppnar.",
@@ -283,7 +283,7 @@
     "tournament_player_games_win_history": "Historik",
     "tournament_organized_by": "Organiserad av { player }",
     "checkin_opens_time_before": "Incheckning öppnar {{ time }} innan.",
-    "tournament_subscribe": "Prenumerera",
+    "tournament_subscribe": "Jag är intresserad!",
     "tournament_checkin": "Checka in",
     "tournament_checkedin": "Incheckad",
     "no_player_checked_in_yet": "Ingen spelare har checkat in ännu.",
@@ -334,8 +334,8 @@
     "tournament_history": {
         "created": "{{organizerPseudo}} skapade turneringen",
         "edited": "Organisatören ändrade '{{ field }}': nytt värde är '{{ value }}'. (Tidigare värde var '{{ oldValue }}')",
-        "player_subscribed": "{{ playerPseudo }} prenumererade",
-        "player_unsubscribed": "{{ playerPseudo }} avslutade prenumerationen",
+        "player_subscribed": "{{ playerPseudo }} är intresserad",
+        "player_unsubscribed": "{{ playerPseudo }} är inte längre intresserad",
         "player_kicked": "{{ playerPseudo }} blev borttagen",
         "player_checked_in": "{{ playerPseudo }} checkade in",
         "player_banned": "{{ playerPseudo }} blev avstängd från turneringen",
@@ -352,7 +352,7 @@
     "contributors": "Bidragsgivare",
     "no_yet_data": "Vem vet!",
     "player_made_a_move": "{{player}} gjorde ett drag",
-    "game_with_player_has_started": "Spelet med {{player}} har börjat",
+    "game_with_player_has_started": "{{player}} har gått med i ditt spel och spelet har börjat",
     "last_move": "Senaste drag",
     "total_played_games": "Totalt antal spelade spel",
     "preferred_board_sizes": "Föredragna brädstorlekar",
