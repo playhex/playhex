@@ -182,7 +182,7 @@ for (const locale of getPlayerLocales()) {
                 <!-- Open games -->
                 <section class="mb-4">
                     <div class="card" ref="gamesList">
-                        <div class="card-header py-0 d-flex align-items-stretch justify-content-between">
+                        <div class="card-header py-0 pe-1 d-flex align-items-stretch justify-content-between">
                             <span class="fw-bold py-2 d-flex align-items-center"><span class="d-md-none">{{ $t('lobby_join') }}</span><span class="d-none d-md-inline">{{ $t('lobby.join_a_game') }}</span></span>
                             <div role="tablist" class="d-flex gap-3 align-items-stretch overflow-hidden">
                                 <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
@@ -433,7 +433,6 @@ tr.soft-removed, tr.soft-removed *
     background none
     border none
     border-bottom 2px solid transparent
-    padding 0 0.25rem
     cursor pointer
     color var(--bs-secondary-color)
     font-weight 500
