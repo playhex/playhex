@@ -115,6 +115,9 @@ export const availableLocales: AvailableLocales = {
     sv: {
         label: '🇸🇪 Svenska (Swedish)',
         loader: () => import(/* webpackChunkName: "locale-sv" */ 'date-fns/locale/sv') as unknown as DefaultExportLocale,
+        translators: [
+            { fullName: 'Luna Jernberg', link: 'https://github.com/bittin' },
+        ],
     },
     tr: {
         label: '🇹🇷 Türkçe (Turkish)',
