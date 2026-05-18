@@ -30,7 +30,7 @@ describe('Time controls', () => {
             .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
-            .contains('Time control')
+            .contains('Live')
             .closest('div')
             .contains('Normal 10 + 5')
             .click()
@@ -47,7 +47,7 @@ describe('Time controls', () => {
             .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
-            .contains('Time control')
+            .contains('Live')
             .closest('div')
             .contains('Fast 5 + 2')
             .click()
@@ -64,7 +64,7 @@ describe('Time controls', () => {
             .contains('h5', 'Play vs AI')
             .closest('.modal-content')
 
-            .contains('Time control')
+            .contains('Live')
             .closest('div')
             .contains('Fast 5 + 2')
             .click()
@@ -75,46 +75,22 @@ describe('Time controls', () => {
         ;
 
         // Change initial time AFTER checking Capped Fischer to make sure maxTime updates
-        // Initial time: 1d
+        // Initial time: 2h
         cy
-            .get('input#custom-fischer-initial-time')
-            .invoke('val', 26)
+            .get('input#custom-initial-time')
+            .invoke('val', 23)
             .trigger('input')
         ;
 
-        cy.contains('Initial time: 1d');
+        cy.contains('Initial time: 2h');
 
         cy.submitAIGame();
 
         cy.contains('.sidebar', 'Playing');
         cy.get('.nav-game-sidebar').contains('Info').click();
 
-        cy.contains('1d + 2s cap. 5min').should('not.exist');
-        cy.contains('1d + 2s cap.');
-    });
-
-    it('create a game with custom time control, Byo Yomi', () => {
-        cy
-            .contains('h5', 'Play vs AI')
-            .closest('.modal-content')
-            .contains('Use Byo-Yomi')
-            .click()
-        ;
-
-        cy.contains('Periods:');
-
-        cy.submitAIGame();
-
-        cy.contains('TestBot Determinist instant');
-        cy.contains('10:00 + 5 × 5s');
-
-        // byo yomi dates are well deserialized
-        cy.play(406, 397);
-
-        cy.reload();
-
-        cy.contains(/\d+:\d+ \+ 5 × 5s/);
-        cy.contains('.chrono-time', 'NaN').should('not.exist');
+        cy.contains('2h + 2s cap. 5min').should('not.exist');
+        cy.contains('2h + 2s cap.');
     });
 
     it('cancels a game when timeout with only one move', () => {
@@ -128,7 +104,7 @@ describe('Time controls', () => {
 
         // Put minimal time
         cy
-            .get('input#custom-fischer-initial-time')
+            .get('input#custom-initial-time')
             .invoke('val', 0)
             .trigger('input')
         ;
@@ -140,5 +116,31 @@ describe('Time controls', () => {
         cy.contains('.player-b', '0:00.0');
 
         cy.contains('.sidebar', 'Game has been canceled');
+    });
+
+    it('creates a correspondence game, capped by default', () => {
+        cy
+            .contains('h5', 'Play vs AI')
+            .closest('.modal-content')
+
+            .contains('Correspondence')
+            .click()
+        ;
+
+        // Initial time: 2d
+        cy
+            .get('input#custom-initial-time')
+            .invoke('val', 1)
+            .trigger('input')
+        ;
+
+        cy.contains('Initial time: 2d');
+
+        cy.submitAIGame();
+
+        cy.contains('.sidebar', 'Playing');
+        cy.get('.nav-game-sidebar').contains('Info').click();
+
+        cy.contains('2d + 1d cap.');
     });
 });

@@ -34,6 +34,7 @@ export const useCreateGameOverlay = () => {
     const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
         gameOptions.opponentType = 'player';
         gameOptions.ranked = true;
+        gameOptions.explorationAllowed = false;
 
         try {
             gameOptions = await create1v1RankedOverlay({ gameOptions });
@@ -51,6 +52,7 @@ export const useCreateGameOverlay = () => {
     const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
         gameOptions.opponentType = 'player';
         gameOptions.ranked = false;
+        gameOptions.explorationAllowed = true;
 
         try {
             gameOptions = await create1v1FriendlyOverlay({ gameOptions });
@@ -68,6 +70,7 @@ export const useCreateGameOverlay = () => {
     const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
         gameOptions.opponentType = 'ai';
         gameOptions.ranked = true;
+        gameOptions.explorationAllowed = true;
 
         try {
             gameOptions = await create1vAIRankedOverlay({ gameOptions });
@@ -85,6 +88,7 @@ export const useCreateGameOverlay = () => {
     const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
         gameOptions.opponentType = 'ai';
         gameOptions.ranked = false;
+        gameOptions.explorationAllowed = true;
 
         try {
             gameOptions = await create1vAIOverlay({ gameOptions });

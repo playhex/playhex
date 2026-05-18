@@ -149,7 +149,9 @@ export const msToDuration = (ms: number, precision = 2): string => {
     return tokens.slice(0, precision).join('');
 };
 
-const twoWeeks = 86400 * 14 * 1000;
+export const DAY_MS = 86400 * 1000;
+
+const twoWeeks = DAY_MS * 14;
 
 /**
  * Cannot be called server-side because of the need of unit translations.
@@ -218,10 +220,7 @@ export const assignTimeControlType = (target: TimeControlType, source: TimeContr
     return target;
 };
 
-/**
- * initial time for Fischer and ByoYomi
- */
-export const initialTimeSteps: number[] = [
+export const liveInitialTimeSteps: number[] = [
     5 * 1000,
     10 * 1000,
     15 * 1000,
@@ -248,16 +247,19 @@ export const initialTimeSteps: number[] = [
     60 * 120 * 1000,
     60 * 150 * 1000,
     60 * 180 * 1000,
+];
+
+export const correspondenceInitialTimeSteps: number[] = [
     86400 * 1 * 1000,
+    86400 * 2 * 1000,
     86400 * 3 * 1000,
+    86400 * 5 * 1000,
     86400 * 7 * 1000,
+    86400 * 10 * 1000,
     86400 * 14 * 1000,
 ];
 
-/**
- * time increment for Fischer and period time for ByoYomi
- */
-export const secondaryTimeSteps: number[] = [
+export const liveSecondaryTimeSteps: number[] = [
     0 * 1000,
     1 * 1000,
     2 * 1000,
@@ -282,9 +284,9 @@ export const secondaryTimeSteps: number[] = [
     120 * 1000,
     150 * 1000,
     180 * 1000,
-    3600 * 4 * 1000,
-    3600 * 8 * 1000,
-    3600 * 12 * 1000,
+];
+
+export const correspondenceSecondaryTimeSteps: number[] = [
     86400 * 1 * 1000,
     86400 * 2 * 1000,
     86400 * 3 * 1000,
@@ -314,6 +316,9 @@ export const defaultTimeControlTypes: {
     fast: TimeControlType;
     normal: TimeControlType;
     long: TimeControlType;
+    correspondenceFast: TimeControlType;
+    correspondenceNormal: TimeControlType;
+    correspondenceLong: TimeControlType;
 } = {
     fast: {
         family: 'fischer',
@@ -336,19 +341,43 @@ export const defaultTimeControlTypes: {
             timeIncrement: 15 * 1000,
         },
     },
+    correspondenceFast: {
+        family: 'fischer',
+        options: {
+            initialTime: DAY_MS,
+            timeIncrement: DAY_MS,
+            maxTime: DAY_MS,
+        },
+    },
+    correspondenceNormal: {
+        family: 'fischer',
+        options: {
+            initialTime: 3 * DAY_MS,
+            timeIncrement: DAY_MS,
+            maxTime: 3 * DAY_MS,
+        },
+    },
+    correspondenceLong: {
+        family: 'fischer',
+        options: {
+            initialTime: 7 * DAY_MS,
+            timeIncrement: DAY_MS,
+            maxTime: 7 * DAY_MS,
+        },
+    },
 };
 
 /**
- * Get step number from initialTime.
+ * Get step number from initialTime within the given steps array.
  * If not a predefined step, returns the nearest one.
  */
-export const getInitialTimeStep = (timeControlType: TimeControlType): number => {
+export const getInitialTimeStep = (timeControlType: TimeControlType, steps: number[]): number => {
     const { initialTime } = timeControlType.options;
 
-    let step = Object.values(initialTimeSteps).findIndex(t => t === initialTime);
+    let step = steps.findIndex(t => t === initialTime);
 
     if (step < 0) {
-        while (initialTimeSteps[step] < initialTime) {
+        while (steps[step] < initialTime) {
             ++step;
         }
     }
@@ -357,20 +386,20 @@ export const getInitialTimeStep = (timeControlType: TimeControlType): number => 
 };
 
 /**
- * Get step number from secondaryTime.
+ * Get step number from secondaryTime within the given steps array.
  * If not a predefined step, returns the nearest one.
  */
-export const getSecondaryTimeStep = (timeControlType: TimeControlType): number => {
+export const getSecondaryTimeStep = (timeControlType: TimeControlType, steps: number[]): number => {
     const { family, options } = timeControlType;
     const secondaryTime = family === 'fischer'
         ? (options.timeIncrement ?? 0)
         : options.periodTime
     ;
 
-    let step = Object.values(secondaryTimeSteps).findIndex(t => t === secondaryTime);
+    let step = steps.findIndex(t => t === secondaryTime);
 
     if (step < 0) {
-        while (secondaryTimeSteps[step] < secondaryTime) {
+        while (steps[step] < secondaryTime) {
             ++step;
         }
     }

@@ -7,6 +7,7 @@ import type TimeControlType from '../../time-control/TimeControlType.js';
 import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { defaultTimeControlTypes } from '../timeControlUtils.js';
+import { TimeControlIsLiveOrCorrespondence } from '../validator/TimeControlIsLiveOrCorrespondence.js';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export const MIN_BOARDSIZE = 1;
@@ -15,7 +16,7 @@ export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176
 /**
  * DTO for game options, must have default values
  * for when we POST a games through api with partial values:
- * clas-transformer will use default values.
+ * class-transformer will use default values.
  */
 export default class HostedGameOptions implements TimeControlBoardsize
 {
@@ -72,6 +73,7 @@ export default class HostedGameOptions implements TimeControlBoardsize
 
     @Expose()
     @IsObject()
+    @Validate(TimeControlIsLiveOrCorrespondence)
     @ValidateNested()
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
