@@ -25,6 +25,14 @@ export default class AIConfig
     @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     description: string | null;
 
+    /**
+     * From 0 to 6, relative level.
+     * 1: easy, 6: hard, 0: test (random...)
+     */
+    @Column({ type: 'smallint', nullable: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
+    relativeLevel?: number;
+
     @Column({ type: 'smallint', nullable: true })
     @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     boardsizeMin?: null | number;

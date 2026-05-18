@@ -35,6 +35,7 @@ export default class AIConfigController
                 requireMorePower: true,
                 isRemote: true,
                 config: true as unknown as undefined,
+                relativeLevel: true,
                 player: {
                     publicId: true,
                 },

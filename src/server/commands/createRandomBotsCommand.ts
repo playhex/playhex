@@ -4,7 +4,8 @@ import createAiConfigIfNotExists from './utils/createAiConfigIfNotExists.js';
 hexProgram
     .command('create-random-bots')
     .description('Create random bots config in database')
-    .action(async () => {
+    .option('--reuse-player', 'If AI player exists but not AI config, reuse player instance')
+    .action(async ({ reusePlayer }) => {
         let created: boolean;
 
         console.log('Creating bot "Random"...');
@@ -14,10 +15,11 @@ hexProgram
             engine: 'random',
             label: 'Random',
             description: 'plays randomly',
-            order: 30,
+            order: 40,
             pseudo: 'Random bot',
             slug: 'random-bot',
-        });
+            relativeLevel: 0,
+        }, reusePlayer);
 
         if (!created) {
             console.log('Bot "Random" already created');
@@ -30,10 +32,11 @@ hexProgram
             engine: 'random',
             label: 'Determinist',
             description: 'plays same responses',
-            order: 31,
+            order: 41,
             pseudo: 'Determinist random bot',
             slug: 'determinist-random-bot',
-        });
+            relativeLevel: 0,
+        }, reusePlayer);
 
         if (!created) {
             console.log('Bot "Determinist" already created');

@@ -133,6 +133,7 @@ watch(aiConfigs, () => {
                                     required
                                     :disabled="!isAIConfigAvailable(aiConfig)"
                                     class="form-check-input"
+                                    :class="'level-' + aiConfig.relativeLevel"
                                     type="radio"
                                     name="flexRadioDefault"
                                     :id="aiConfig.player.publicId"
@@ -193,4 +194,29 @@ watch(aiConfigs, () => {
 .ai-engine-choice
     .nav-link::first-letter
         text-transform capitalize
+
+.level-1
+    background-color #d1e7dd
+
+.level-2
+    background-color var(--bs-success)
+
+.level-3
+    background-color var(--bs-warning)
+
+.level-4
+    background-color var(--bs-danger)
+
+.level-5
+    background-color #520dc2
+
+.level-6
+    background-color #290661
+
+
+.level-0
+    background-color var(--bs-secondary)
+
+input[type="radio"]:checked + label
+    font-weight bold
 </style>
