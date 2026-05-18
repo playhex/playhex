@@ -1,0 +1,3 @@
+# Get the list of currently online players.
+
+GET /api/online-players

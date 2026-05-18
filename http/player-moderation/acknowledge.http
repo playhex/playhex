@@ -1,0 +1,5 @@
+# Acknowledge a moderation action (dismiss it). Requires authentication.
+
+@moderationActionPublicId=00000000-0000-0000-0000-000000000000
+
+PATCH /api/player-moderation-actions/{{ moderationActionPublicId }}/acknowledge

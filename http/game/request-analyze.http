@@ -1,0 +1,5 @@
+# Request an AI analysis for a finished game. Idempotent if analysis already exists.
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+PUT /api/games/{{ gamePublicId }}/analyze

@@ -1,0 +1,9 @@
+# Play a move in a game. Requires authentication.
+# Move is a cell notation like "a1", "b3", or "swap" for the swap rule.
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+POST /api/games/{{ gamePublicId }}/move
+Content-Type: application/json
+
+"a1"

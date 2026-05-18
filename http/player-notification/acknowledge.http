@@ -1,0 +1,11 @@
+# Mark all player notifications as read. Requires authentication.
+# Use optional query param hostedGamePublicId to only ack notifications from one game.
+
+POST /api/player-notifications/acknowledge
+
+###
+# Ack notifications from a specific game only
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+POST /api/player-notifications/acknowledge?hostedGamePublicId={{ gamePublicId }}

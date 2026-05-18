@@ -1,0 +1,5 @@
+# Start a tournament. Requires authentication (must be organizer).
+
+@tournamentSlug=hex-monthly-38
+
+POST /api/tournaments/{{ tournamentSlug }}/start

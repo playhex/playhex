@@ -1,0 +1,7 @@
+# Get the current rating of a player for a specific category.
+# Category example: "11x11", "13x13", "19x19"
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+@category=11x11
+
+GET /api/players/{{ playerPublicId }}/current-ratings/{{ category }}

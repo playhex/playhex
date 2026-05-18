@@ -1,0 +1,6 @@
+# Get all moderation actions for a player (including past ones).
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/admin/moderation/players/{{ playerPublicId }}/actions
+Authorization: Bearer {{ adminPassword }}

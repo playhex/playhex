@@ -1,0 +1,11 @@
+# Set the admin list for a tournament. Requires authentication (must be organizer).
+# Admins can help organizers manage the tournament.
+
+@tournamentSlug=hex-monthly-38
+
+PUT /api/tournaments/{{ tournamentSlug }}/admins
+Content-Type: application/json
+
+[
+    { "publicId": "00000000-0000-0000-0000-000000000000" }
+]

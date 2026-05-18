@@ -1,0 +1,29 @@
+# Create a new tournament. Requires authentication.
+# slug: optional, auto-generated from title if omitted
+# stage1Format: "single-elimination", "double-elimination", "swiss", "round-robin"
+# checkInOpenOffsetSeconds: seconds before startOfficialAt when check-in opens
+
+POST /api/tournaments
+Content-Type: application/json
+
+{
+    "title": "Hex Monthly 38",
+    "slug": "hex-monthly-38",
+    "description": null,
+    "stage1Format": "double-elimination",
+    "stage1Rounds": null,
+    "stage2Format": null,
+    "consolation": false,
+    "ranked": true,
+    "boardsize": 11,
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 300000,
+            "timeIncrement": 30000,
+            "maxTime": 300000
+        }
+    },
+    "startOfficialAt": "2025-06-01T18:00:00.000Z",
+    "checkInOpenOffsetSeconds": 86400
+}

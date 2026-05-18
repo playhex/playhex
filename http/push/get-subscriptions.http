@@ -1,0 +1,3 @@
+# Get all push subscriptions for the authenticated player. Requires authentication.
+
+GET /api/push-subscriptions

@@ -1,0 +1,13 @@
+# Register a web push subscription. Requires authentication.
+
+PUT /api/push-subscriptions
+Content-Type: application/json
+
+{
+    "endpoint": "https://updates.push.services.mozilla.com/wpush/v2/gAAAAA....",
+    "expirationTime": null,
+    "keys": {
+        "auth": "tDYQ2a....",
+        "p256dh": "BN5LgjIOAxw-L6ZDR_o1GB2iEf...."
+    }
+}

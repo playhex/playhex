@@ -1,0 +1,5 @@
+# Subscribe (check in) to a tournament. Requires authentication.
+
+@tournamentSlug=hex-monthly-38
+
+PUT /api/tournaments/{{ tournamentSlug }}/subscriptions

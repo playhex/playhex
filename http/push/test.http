@@ -1,0 +1,3 @@
+# Send a test push notification to the authenticated player. Requires authentication.
+
+POST /api/push/test

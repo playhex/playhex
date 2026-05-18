@@ -39,6 +39,31 @@ Wait javascript to be bundled, then the application is available at:
 
 <http://localhost:3000/>
 
+### API
+
+All HTTP endpoints are documented in `http/` folder, in `.http` files.
+
+Use [HttpYac](https://httpyac.github.io/) IDE plugin or cli tool to send api call from `.http` files easily.
+
+#### Admin endpoints
+
+Some API endpoints exists for admin tasks (i.e persist all memory games into database manually).
+
+To use them, you must add in your `.env`:
+
+``` .env
+ADMIN_PASSWORD=your-password
+```
+
+Then you can now call admin endpoints by setting this same password as bearer token, curl example:
+
+``` bash
+curl --location --request POST 'http://localhost:3000/api/admin/persist-games' \
+    --header 'Authorization: Bearer your-password'
+```
+
+See available admin endpoints in `http/admin/` folder.
+
 ### Play with AI
 
 For development you can use local AI:
@@ -100,25 +125,6 @@ and only bundle icons we actually use. To add a new icon:
 - Add it to `src/client/vue/icons.ts`
 - Then use it in templates
 - Also do `yarn add -D ...` if this set of icons is not yet installed
-
-## Admin endpoints
-
-Some API endpoints exists for admin tasks (i.e persist all memory games into database manually).
-
-To use them, you must add in your `.env`:
-
-``` .env
-ADMIN_PASSWORD=your-password
-```
-
-Then you can now call admin endpoints by setting this same password as bearer token, curl example:
-
-``` bash
-curl --location --request POST 'http://localhost:3000/api/admin/persist-games' \
-    --header 'Authorization: Bearer your-password'
-```
-
-See available admin endpoints in postman collection, in "Admin" folder.
 
 ## Push notifications
 

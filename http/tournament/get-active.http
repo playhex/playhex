@@ -1,0 +1,16 @@
+# Get active tournaments (created or running).
+# Optional: filter by player or featured status.
+
+GET /api/tournaments/active
+
+###
+# Get active tournaments a specific player is involved in
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/tournaments/active?playerPublicId={{ playerPublicId }}
+
+###
+# Get featured active tournaments
+
+GET /api/tournaments/active?featured=true

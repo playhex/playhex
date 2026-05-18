@@ -1,0 +1,5 @@
+# Get all current ratings for a player (across all categories).
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/players/{{ playerPublicId }}/current-ratings

@@ -1,0 +1,3 @@
+# Get all available AI configurations.
+
+GET /api/ai-configs

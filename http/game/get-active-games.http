@@ -1,0 +1,3 @@
+# Get all currently active games (in memory, not yet persisted).
+
+GET /api/games/active

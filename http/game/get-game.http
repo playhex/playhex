@@ -1,0 +1,5 @@
+# Get a game by its publicId (active or archived).
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/games/{{ gamePublicId }}

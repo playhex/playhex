@@ -1,0 +1,13 @@
+# Edit a tournament by its publicId. Requires authentication (must be organizer).
+# Uses publicId (not slug) because slug itself can be edited.
+
+@tournamentPublicId=00000000-0000-0000-0000-000000000000
+
+PATCH /api/tournaments/{{ tournamentPublicId }}
+Content-Type: application/json
+
+{
+    "name": "Hex Monthly 38 (edited)",
+    "slug": "hex-monthly-38",
+    "description": "Updated description"
+}

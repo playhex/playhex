@@ -1,0 +1,6 @@
+# Get the rating changes from a specific game for a category.
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+@category=11x11
+
+GET /api/games/{{ gamePublicId }}/ratings/{{ category }}

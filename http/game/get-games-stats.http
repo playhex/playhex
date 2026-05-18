@@ -1,0 +1,9 @@
+# Get game statistics grouped by day, with the same filters as GET /api/games.
+
+GET /api/games-stats
+    ?states[]=ended
+    &opponentType=player
+    &ranked=true
+    &endedAtSort=desc
+    &fromEndedAt=2024-01-01T00:00:00
+    &toEndedAt=2025-01-01T00:00:00

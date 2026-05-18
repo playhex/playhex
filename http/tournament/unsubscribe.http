@@ -1,0 +1,7 @@
+# Unsubscribe from a tournament, or kick a player (organizer only).
+# Requires authentication.
+
+@tournamentSlug=hex-monthly-38
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+DELETE /api/tournaments/{{ tournamentSlug }}/subscriptions/{{ playerPublicId }}

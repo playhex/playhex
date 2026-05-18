@@ -1,0 +1,11 @@
+# Get archived games (ended or canceled) with optional filters.
+
+GET /api/games
+    ?states[]=ended
+    &opponentType=player
+    &ranked=true
+    &players[0][publicId]=d1d15a0c-272f-413f-aa84-c480c69ac34f
+    &endedAtSort=desc
+    &fromEndedAt=2024-01-01T00:00:00
+    &paginationPageSize=20
+    &paginationPage=0

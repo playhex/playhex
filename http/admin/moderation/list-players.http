@@ -1,0 +1,4 @@
+# Get last 100 registered players (with moderation data).
+
+GET /api/admin/moderation/players
+Authorization: Bearer {{ adminPassword }}

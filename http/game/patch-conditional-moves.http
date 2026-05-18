@@ -1,0 +1,19 @@
+# Save the authenticated player's conditional moves tree for a game.
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+PATCH /api/games/{{ gamePublicId }}/conditional-moves
+Content-Type: application/json
+
+{
+    "tree": [
+        ["a1", "a2", [
+            ["a3", "a4"],
+            ["b3", "b4"]
+        ]],
+        ["d4", "d5"]
+    ],
+    "unplayedLines": [
+        ["g6", "g7"]
+    ]
+}

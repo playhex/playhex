@@ -1,0 +1,15 @@
+# Search players.
+
+GET /api/search/players
+    ?nicknameLike=al
+    &isGuest=false
+    &isBot=false
+    &limit=10
+
+
+###
+# Search bots
+
+GET /api/search/players
+    ?isBot=true
+    &limit=3

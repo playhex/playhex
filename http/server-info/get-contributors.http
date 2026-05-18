@@ -1,0 +1,3 @@
+# Get the list of project contributors.
+
+GET /api/contributors

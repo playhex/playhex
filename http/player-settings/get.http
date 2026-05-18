@@ -1,0 +1,3 @@
+# Get the authenticated player's settings. Requires authentication.
+
+GET /api/player-settings

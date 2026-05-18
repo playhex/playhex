@@ -1,0 +1,3 @@
+# Get ended tournaments.
+
+GET /api/tournaments

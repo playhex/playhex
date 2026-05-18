@@ -1,0 +1,6 @@
+# Reset and recreate a tournament game. Requires authentication (must be organizer).
+
+@tournamentSlug=hex-monthly-38
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+POST /api/tournaments/{{ tournamentSlug }}/games/{{ gamePublicId }}/reset-recreate

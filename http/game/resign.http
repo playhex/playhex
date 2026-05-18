@@ -1,0 +1,5 @@
+# Resign from a game. Requires authentication.
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+POST /api/games/{{ gamePublicId }}/resign

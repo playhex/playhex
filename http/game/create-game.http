@@ -1,0 +1,48 @@
+# Create a new game. Requires authentication (login first).
+# firstPlayer: null = random, 0 = host plays first, 1 = opponent plays first
+# opponentType: "player" or "ai"
+# opponentPublicId: optional, restrict to a specific opponent (or bot publicId for AI)
+# timeControlType.family: "fischer" or "byoyomi"
+
+POST /api/games
+Content-Type: application/json
+
+{
+    "boardsize": 11,
+    "ranked": true,
+    "swapRule": true,
+    "firstPlayer": null,
+    "opponentType": "player",
+    "opponentPublicId": null,
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
+        }
+    }
+}
+
+###
+# Byoyomi time control example
+
+POST /api/games
+Content-Type: application/json
+
+{
+    "boardsize": 11,
+    "ranked": false,
+    "swapRule": true,
+    "firstPlayer": null,
+    "opponentType": "player",
+    "opponentPublicId": null,
+    "timeControlType": {
+        "family": "byoyomi",
+        "options": {
+            "initialTime": 300000,
+            "periodTime": 10000,
+            "periodsCount": 5
+        }
+    }
+}

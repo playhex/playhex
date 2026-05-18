@@ -1,0 +1,6 @@
+# Get the rating history of a player for a specific category.
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+@category=11x11
+
+GET /api/players/{{ playerPublicId }}/ratings/{{ category }}

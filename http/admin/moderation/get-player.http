@@ -1,0 +1,6 @@
+# Get a player with their moderation data.
+
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+GET /api/admin/moderation/players/{{ playerPublicId }}
+Authorization: Bearer {{ adminPassword }}

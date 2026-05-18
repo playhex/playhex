@@ -1,0 +1,3 @@
+# Get general server information.
+
+GET /api/server-info

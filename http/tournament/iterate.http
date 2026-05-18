@@ -1,0 +1,5 @@
+# Advance a tournament to the next round. Requires authentication (must be organizer).
+
+@tournamentSlug=hex-monthly-38
+
+POST /api/tournaments/{{ tournamentSlug }}/iterate

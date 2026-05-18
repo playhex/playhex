@@ -1,0 +1,6 @@
+# Remove a player ban from a tournament. Requires authentication (must be organizer).
+
+@tournamentSlug=hex-monthly-38
+@playerPublicId=00000000-0000-0000-0000-000000000000
+
+DELETE /api/tournaments/{{ tournamentSlug }}/banned-players/{{ playerPublicId }}

@@ -1,0 +1,10 @@
+# Post a chat message in a game. Requires authentication.
+
+@gamePublicId=00000000-0000-0000-0000-000000000000
+
+POST /api/games/{{ gamePublicId }}/chat-messages
+Content-Type: application/json
+
+{
+    "content": "Good game!"
+}

@@ -1,0 +1,5 @@
+# Get the list of players banned from a tournament. Requires authentication (must be organizer).
+
+@tournamentSlug=hex-monthly-38
+
+GET /api/tournaments/{{ tournamentSlug }}/banned-players

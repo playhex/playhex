@@ -1,0 +1,3 @@
+# Get unread player notifications. Requires authentication.
+
+GET /api/player-notifications
