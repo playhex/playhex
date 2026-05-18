@@ -41,15 +41,15 @@ export type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
  * given its time control and board size.
  */
 export const timeControlToCadencyName = (timeControlBoardsize: TimeControlBoardsize): TimeControlCadencyName => {
-    const averageSecondsPerMove = calcAverageSecondsPerMove(timeControlBoardsize);
-
-    if (averageSecondsPerMove < 10) {
-        return 'blitz';
+    if (timeControlBoardsize.timeControlType.options.initialTime >= 86400000) {
+        return 'correspondence';
     }
 
+    const averageSecondsPerMove = calcAverageSecondsPerMove(timeControlBoardsize);
+
     // wet finger technique
-    if (averageSecondsPerMove > 3600) {
-        return 'correspondence';
+    if (averageSecondsPerMove < 10) {
+        return 'blitz';
     }
 
     return 'normal';
