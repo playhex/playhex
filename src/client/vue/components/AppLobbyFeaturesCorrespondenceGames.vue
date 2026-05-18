@@ -38,4 +38,12 @@ const visibleFeaturedGamesPublicIds = computed(() => {
             <AppGameThumbnailLobbyLiveCard :gamePublicId />
         </div>
     </div>
+    <div v-else>
+        <p>
+            {{ $t('lobby_no_correspondence_games_now') }}
+            <router-link
+                :to="{ name: 'playing-games', params: { mode: 'live' } }"
+            >{{ $t('lobby_observe_live') }}</router-link>.
+        </p>
+    </div>
 </template>

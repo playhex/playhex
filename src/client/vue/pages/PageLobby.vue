@@ -183,17 +183,17 @@ for (const locale of getPlayerLocales()) {
                 <section class="mb-4">
                     <div class="card" ref="gamesList">
                         <div class="card-header py-0 d-flex align-items-stretch justify-content-between">
-                            <span class="fw-bold py-2 d-flex align-items-center">{{ $t('lobby.join_a_game') }}</span>
-                            <div role="tablist" class="d-flex gap-3 align-items-stretch">
+                            <span class="fw-bold py-2 d-flex align-items-center"><span class="d-md-none">{{ $t('lobby_join') }}</span><span class="d-none d-md-inline">{{ $t('lobby.join_a_game') }}</span></span>
+                            <div role="tablist" class="d-flex gap-3 align-items-stretch overflow-hidden">
                                 <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
-                                    <IconLightningChargeFill class="me-1" />
-                                    {{ $t('time_cadency.normal') }}
-                                    <span class="badge text-bg-success ms-1">{{ waitingGamesCount.live }}</span>
+                                    <IconLightningChargeFill class="flex-shrink-0 me-1" />
+                                    <span class="tab-label">{{ $t('time_cadency.normal') }}</span>
+                                    <span class="badge text-bg-success flex-shrink-0 ms-1">{{ waitingGamesCount.live }}</span>
                                 </button>
                                 <button type="button" role="tab" @click="currentLobby = 'correspondence'" :aria-selected="currentLobby === 'correspondence'" class="lobby-tab lobby-tab-correspondence" :class="{ active: currentLobby === 'correspondence' }">
-                                    <IconCalendar class="me-1" />
-                                    {{ $t('time_cadency.correspondence') }}
-                                    <span class="badge text-bg-warning ms-1">{{ waitingGamesCount.correspondence }}</span>
+                                    <IconCalendar class="flex-shrink-0 me-1" />
+                                    <span class="tab-label">{{ $t('time_cadency.correspondence') }}</span>
+                                    <span class="badge text-bg-warning flex-shrink-0 ms-1">{{ waitingGamesCount.correspondence }}</span>
                                 </button>
                             </div>
                         </div>
@@ -247,22 +247,22 @@ for (const locale of getPlayerLocales()) {
                 </section>
 
                 <!-- Playing now -->
-                <section v-if="(livePlayingCount ?? 0) > 0 || (correspondencePlayingCount ?? 0) > 0" class="mb-4">
-                    <div class="d-flex align-items-stretch justify-content-between mb-2">
+                <section class="mb-4">
+                    <div class="playing-now-heading mb-2">
                         <h2 class="mb-0 d-flex align-items-center gap-2">
                             <IconCircleFill v-if="(livePlayingCount ?? 0) > 0" class="live-indicator" />
                             {{ $t('lobby_playing_now') }}
                         </h2>
-                        <div role="tablist" class="d-flex gap-3">
+                        <div role="tablist" class="d-flex gap-3 overflow-hidden">
                             <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
-                                <IconLightningChargeFill class="me-1" />
-                                {{ $t('time_cadency.normal') }}
-                                <span class="badge text-bg-success ms-1">{{ livePlayingCount ?? '…' }}</span>
+                                <IconLightningChargeFill class="flex-shrink-0 me-1" />
+                                <span class="tab-label">{{ $t('time_cadency.normal') }}</span>
+                                <span class="badge text-bg-success flex-shrink-0 ms-1">{{ livePlayingCount ?? '…' }}</span>
                             </button>
                             <button type="button" role="tab" @click="currentLobby = 'correspondence'" :aria-selected="currentLobby === 'correspondence'" class="lobby-tab lobby-tab-correspondence" :class="{ active: currentLobby === 'correspondence' }">
-                                <IconCalendar class="me-1" />
-                                {{ $t('time_cadency.correspondence') }}
-                                <span class="badge text-bg-warning ms-1">{{ correspondencePlayingCount ?? '…' }}</span>
+                                <IconCalendar class="flex-shrink-0 me-1" />
+                                <span class="tab-label">{{ $t('time_cadency.correspondence') }}</span>
+                                <span class="badge text-bg-warning flex-shrink-0 ms-1">{{ correspondencePlayingCount ?? '…' }}</span>
                             </button>
                         </div>
                     </div>
@@ -442,12 +442,35 @@ tr.soft-removed, tr.soft-removed *
     transition color 0.15s, border-color 0.15s
     display flex
     align-items center
+    min-width 0
+    min-height 2.5em
+    overflow hidden
+
+.tab-label
+    overflow hidden
+    text-overflow ellipsis
+    white-space nowrap
+    min-width 0
 
     &:hover
         color var(--bs-body-color)
 
     &.active
         cursor default
+
+.playing-now-heading
+    display flex
+    flex-direction column
+    gap 0.5em
+
+    & > div
+        align-self end
+
+    @media (min-width: 576px)
+        flex-direction row
+        justify-content space-between
+        gap 0
+
 
 .lobby-tab-live.active
     border-bottom-color var(--bs-success)

@@ -243,7 +243,9 @@
     "lobby_active_players_other": "active players",
     "lobby_playing_now": "Playing now",
     "lobby_no_live_games_now": "No live game playing now.",
+    "lobby_no_correspondence_games_now": "No correspondence game playing now.",
     "lobby_observe_correspondence": "Observe correspondence games",
+    "lobby_observe_live": "Observe live games",
     "lobby_mode": {
         "live_description": "Play in real time",
         "correspondence_description": "Play at your own pace",
