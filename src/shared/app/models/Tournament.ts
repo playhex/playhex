@@ -459,6 +459,7 @@ export const cloneTournament = (target: Tournament, source: Tournament): void =>
     target.ranked = source.ranked;
     target.boardsize = source.boardsize;
     target.timeControlType = structuredClone(source.timeControlType);
+    target.seedingMethod = source.seedingMethod;
     target.explorationAllowed = source.explorationAllowed;
 
     // Prevents "maxTime must not be greater than [2 weeks]" error when cloning a tournament and submit it
