@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
+import AppPlayerAvatar from './AppPlayerAvatar.vue';
 import { Player } from '../../../shared/app/models/index.js';
 import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
@@ -139,13 +140,15 @@ onUnmounted(() => {
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
                 <p class="h5" v-if="players">
-                    <AppPseudo
-                        v-if="players[0]"
-                        rating
-                        onlineStatus
-                        :player="players[0]"
-                        classes="text-danger"
-                    />
+                    <template v-if="players[0]">
+                        <AppPlayerAvatar v-if="players[0].avatarThumbnailPath ?? players[0].avatarPath" :player="players[0]" thumbnail onlineStatus class="board-avatar me-1" />
+                        <AppPseudo
+                            rating
+                            :onlineStatus="!(players[0].avatarThumbnailPath ?? players[0].avatarPath)"
+                            :player="players[0]"
+                            classes="text-danger"
+                        />
+                    </template>
                     <span v-else class="fst-italic">{{ $t('waiting') }}</span>
                     <span v-if="game.getWinner() === 0">&nbsp;<IconTrophyFill class="text-warning" /></span>
                 </p>
@@ -159,13 +162,15 @@ onUnmounted(() => {
             <div class="player player-b">
                 <p class="h5" v-if="players">
                     <span v-if="game.getWinner() === 1"><IconTrophyFill class="text-warning" />&nbsp;</span>
-                    <AppPseudo
-                        v-if="players[1]"
-                        rating
-                        onlineStatus
-                        :player="players[1]"
-                        classes="text-primary"
-                    />
+                    <template v-if="players[1]">
+                        <AppPlayerAvatar v-if="players[1].avatarThumbnailPath ?? players[1].avatarPath" :player="players[1]" thumbnail onlineStatus class="board-avatar me-1" />
+                        <AppPseudo
+                            rating
+                            :onlineStatus="!(players[1].avatarThumbnailPath ?? players[1].avatarPath)"
+                            :player="players[1]"
+                            classes="text-primary"
+                        />
+                    </template>
                     <span v-else class="fst-italic">{{ $t('waiting') }}</span>
                 </p>
                 <AppChrono
@@ -258,6 +263,13 @@ onUnmounted(() => {
 
     p
         margin 0
+        display flex
+        align-items center
+
+.board-avatar
+    width 1.4em
+    height 1.4em
+    flex-shrink 0
 
 // Default, top left, top right
 .player-a

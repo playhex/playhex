@@ -924,3 +924,21 @@ export const apiGetChannelMessagesCount = async (channelName: string): Promise<n
 
     return await response.json();
 };
+
+export const apiUploadPlayerAvatar = async (publicId: string, blob: Blob, mimeType: string): Promise<{ avatarPath: string, avatarThumbnailPath: string }> => {
+    const ext = mimeType.split('/')[1] ?? 'jpg';
+    const formData = new FormData();
+    formData.append('avatar', blob, `avatar.${ext}`);
+
+    const response = await fetch(`/api/players/${publicId}/avatar`, {
+        method: 'put',
+        headers: {
+            'Accept': 'application/json',
+        },
+        body: formData,
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};

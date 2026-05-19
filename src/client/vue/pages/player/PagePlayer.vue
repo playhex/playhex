@@ -30,7 +30,11 @@ import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/hostedGameU
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
-import { apiGetPlayerIsCurrentlyChatRestricted } from '../../../apiClient.js';
+import { apiGetPlayerIsCurrentlyChatRestricted, apiUploadPlayerAvatar } from '../../../apiClient.js';
+import useToastsStore from '../../../stores/toastsStore.js';
+import { Toast } from '../../../../shared/app/Toast.js';
+import { defineOverlay } from '@overlastic/vue';
+import AppAvatarCropOverlay from '../../components/overlay/AppAvatarCropOverlay.vue';
 
 const { slug } = useRoute().params;
 
@@ -271,6 +275,35 @@ const vRating: Directive<HTMLElement, RatingCategory> = {
     },
 };
 
+/*
+ * Avatar upload
+ */
+const avatarCropOverlay = defineOverlay(AppAvatarCropOverlay);
+
+const onAvatarFileSelected = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    if (!file || !player.value) return;
+
+    let blob: Blob;
+    try {
+        blob = await avatarCropOverlay({ file });
+    } catch {
+        return; // user cancelled
+    }
+
+    try {
+        const { avatarPath, avatarThumbnailPath } = await apiUploadPlayerAvatar(player.value.publicId, blob, file.type);
+
+        player.value.avatarPath = avatarPath;
+        player.value.avatarThumbnailPath = avatarThumbnailPath;
+    } catch {
+        useToastsStore().addToast(new Toast('Avatar upload failed', { level: 'danger' }));
+    }
+};
+
 const timeRangeUpdated = (from: null | Date, to: null | Date) => {
     let isZoomed = from || to;
 
@@ -299,7 +332,26 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
     <div v-if="!playerNotFound" class="container-fluid my-3">
         <div class="d-flex mb-4">
             <div class="avatar-wrapper">
-                <IconPerson class="icon img-thumbnail" />
+
+                <!-- me, not guest, no avatar yet, show "change avatar" -->
+                <label v-if="player && isMe(player) && !player.isGuest" class="avatar-upload-label">
+                    <img v-if="player.avatarPath" :src="player.avatarPath" class="avatar-img img-thumbnail" :alt="player.pseudo" />
+                    <IconPerson v-else class="icon img-thumbnail" />
+                    <span class="avatar-upload-hint">{{ $t('player_settings.change_avatar') }}</span>
+                    <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
+                        class="d-none"
+                        @change="onAvatarFileSelected"
+                    />
+                </label>
+
+                <!-- not me, but avatar, show avatar -->
+                <template v-else>
+                    <img v-if="player?.avatarPath" :src="player.avatarPath" class="avatar-img img-thumbnail" :alt="player?.pseudo" />
+                    <IconPerson v-else class="icon img-thumbnail" />
+                </template>
+
                 <AppOnlineStatus v-if="player" :player class="player-status" />
             </div>
             <div>
@@ -555,4 +607,34 @@ td:first-child, th:first-child
 
     &:hover
         text-decoration underline
+
+.avatar-upload-label
+    cursor pointer
+    position relative
+    display block
+
+    .avatar-upload-hint
+        position absolute
+        inset 0
+        display flex
+        align-items center
+        justify-content center
+        background rgba(0, 0, 0, 0.45)
+        color #fff
+        font-size 0.75em
+        text-align center
+        border-radius 100%
+        opacity 0
+        transition opacity 0.15s
+
+    &:hover .avatar-upload-hint
+        opacity 1
+
+.avatar-img
+    width 8em
+    height 8em
+    border-radius 100%
+    object-fit cover
+    // Override img-thumbnail padding so image fills the full circle
+    padding 0
 </style>

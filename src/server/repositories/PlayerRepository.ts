@@ -219,6 +219,16 @@ export default class PlayerRepository
         });
     }
 
+    async updateAvatar(publicId: string, avatarPath: string, avatarThumbnailPath: string): Promise<void>
+    {
+        await this.playerRepository.createQueryBuilder('player')
+            .update()
+            .where('publicId = :publicId', { publicId })
+            .set({ avatarPath, avatarThumbnailPath })
+            .execute()
+        ;
+    }
+
     async shadowBan(publicId: string): Promise<number | undefined>
     {
         const { affected } = await this.playerRepository.createQueryBuilder('player')

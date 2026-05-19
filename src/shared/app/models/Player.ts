@@ -96,4 +96,12 @@ export default class Player
      */
     @Column({ default: false })
     shadowBanned?: boolean;
+
+    @Column({ type: String, nullable: true, default: null })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    avatarPath?: null | string;
+
+    @Column({ type: String, nullable: true, default: null })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    avatarThumbnailPath?: null | string;
 }

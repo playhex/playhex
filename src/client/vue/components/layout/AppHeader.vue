@@ -3,7 +3,7 @@ import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { IconPersonFill, IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload } from '../../icons.js';
+import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload, IconPersonFill } from '../../icons.js';
 import AppPseudo from '../AppPseudo.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
@@ -232,8 +232,11 @@ const {
                 <p class="nav-player-item">
                     <template v-if="loggedInPlayer">
                         <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }" class="link-body-emphasis">
-                            <IconPersonFill style="font-size: 1.5em" />
-                            <AppPseudo :player="loggedInPlayer" classes="d-none d-sm-inline" />
+                            <img v-if="loggedInPlayer.avatarThumbnailPath ?? loggedInPlayer.avatarPath" :src="(loggedInPlayer.avatarThumbnailPath ?? loggedInPlayer.avatarPath)!" :alt="loggedInPlayer.pseudo" class="nav-avatar" />
+                            <template v-else>
+                                <IconPersonFill class="nav-avatar-icon" />
+                                <AppPseudo :player="loggedInPlayer" classes="d-none d-sm-inline" />
+                            </template>
                         </router-link>
                     </template>
                     <template v-else>{{ $t('logging_in') }}</template>
@@ -278,6 +281,17 @@ nav
 
 .nav-player-item
     font-size 1.1em
+
+.nav-avatar
+    width 1.75em
+    height 1.75em
+    border-radius 50%
+    object-fit cover
+    vertical-align middle
+
+.nav-avatar-icon
+    font-size 1.5em
+    vertical-align middle
 
 .my-turn-notif
     position relative

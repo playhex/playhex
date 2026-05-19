@@ -55,7 +55,9 @@
         "more_options": "More options"
     },
     "player_settings": {
-        "title": "Settings"
+        "title": "Settings",
+        "change_avatar": "Change avatar",
+        "crop_avatar": "Adjust avatar"
     },
     "background_theme": {
         "title": "Theme",

@@ -8,3 +8,4 @@ var/
 /assets/export-data/
 /views/pre-rendered/
 tsconfig.tsbuildinfo
+assets/avatars/

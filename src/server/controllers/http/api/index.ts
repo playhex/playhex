@@ -23,6 +23,7 @@ import TournamentController from './TournamentController.js';
 import TournamentBanController from './TournamentBanController.js';
 import AdminModerationController from './AdminModerationController.js';
 import PlayerModerationController from './PlayerModerationController.js';
+import PlayerAvatarController from './PlayerAvatarController.js';
 import { checkAuthorization } from '../../../services/roles.js';
 import ChannelController from './ChannelController.js';
 
@@ -75,6 +76,7 @@ export const registerApi = (app: Express) => {
             AdminController,
             AdminModerationController,
             PlayerModerationController,
+            PlayerAvatarController,
             AIConfigController,
             PushController,
             RatingController,

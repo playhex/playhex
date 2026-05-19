@@ -9,10 +9,12 @@ import logger from '../../services/logger.js';
 import { DomainHttpError, normalizeDomainHttpError } from '../../../shared/app/DomainHttpError.js';
 import { HttpError } from 'routing-controllers';
 import { preRenderedRouter } from './misc/pre-rendered-router.js';
+import { avatarsPath } from '../../services/PlayerAvatarService.js';
 
 export const registerHttpControllers = (app: Express): void => {
     app.use(preRenderedRouter());
     app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
+    app.use('/avatars', express.static(avatarsPath));
     registerApi(app);
     app.use(staticsRouter());
     app.use(pwaRouter());
