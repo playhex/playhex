@@ -14,7 +14,9 @@ Requires:
 
 - node >= 20
 - yarn
-- mysql or postgres
+- mysql or mariadb >=12.1 or postgres
+
+*mariadb 12.1 or more is required to have the unlimited json depth for conditional_moves.tree*
 
 Create an `.env` file with at least a database access. Example:
 
