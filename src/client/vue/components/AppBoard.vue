@@ -263,13 +263,14 @@ onUnmounted(() => {
 
     p
         margin 0
-        display flex
-        align-items center
+
+        &:has(.board-avatar)
+            display flex
+            align-items center
 
 .board-avatar
     width 1.4em
     height 1.212em
-    flex-shrink 0
 
 // Default, top left, top right
 .player-a
