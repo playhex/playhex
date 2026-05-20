@@ -335,8 +335,8 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
                 <!-- me, not guest, no avatar yet, show "change avatar" -->
                 <label v-if="player && isMe(player) && !player.isGuest" class="avatar-upload-label">
-                    <img v-if="player.avatarPath" :src="player.avatarPath" class="avatar-img img-thumbnail" :alt="player.pseudo" />
-                    <IconPerson v-else class="icon img-thumbnail" />
+                    <img v-if="player.avatarPath" :src="player.avatarPath" class="avatar-img bg-body" :alt="player.pseudo" />
+                    <IconPerson v-else class="icon bg-body" />
                     <span class="avatar-upload-hint">{{ $t('player_settings.change_avatar') }}</span>
                     <input
                         type="file"
@@ -348,8 +348,8 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
                 <!-- not me, but avatar, show avatar -->
                 <template v-else>
-                    <img v-if="player?.avatarPath" :src="player.avatarPath" class="avatar-img img-thumbnail" :alt="player?.pseudo" />
-                    <IconPerson v-else class="icon img-thumbnail" />
+                    <img v-if="player?.avatarPath" :src="player.avatarPath" class="avatar-img bg-body" :alt="player?.pseudo" />
+                    <IconPerson v-else class="icon bg-body" />
                 </template>
 
                 <AppOnlineStatus v-if="player" :player class="player-status" />
