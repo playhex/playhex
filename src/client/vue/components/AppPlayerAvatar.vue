@@ -45,19 +45,22 @@ defineProps({
 
 <style scoped lang="stylus">
 .player-avatar
-    border-radius 50%
+    clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     object-fit cover
     width 1em
-    height 1em
+    height 0.866em
 
 .player-avatar-icon
+    clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     font-size 1em
+    width 1em
+    height 0.866em
 
 .avatar-status-wrapper
     position relative
     display inline-flex
     width 1em
-    height 1em
+    height 0.866em
     flex-shrink 0
 
     .player-avatar
@@ -71,8 +74,8 @@ defineProps({
 
 .avatar-status-badge
     position absolute
-    top 72%
-    left 72%
+    top 65%
+    left 65%
     font-size 0.55em
     line-height 1
     margin 0

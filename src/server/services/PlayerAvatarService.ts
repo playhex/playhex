@@ -17,7 +17,8 @@ const ALLOWED_MIME_TYPES = new Set([
 ]);
 
 const AVATAR_MAX_SIZE = 512;
-const AVATAR_THUMB_SIZE = 128;
+const AVATAR_THUMB_WIDTH = 128;
+const AVATAR_THUMB_HEIGHT = Math.round(128 * Math.sqrt(3) / 2); // 111px: matches hexagon 2/√3 ratio
 const JPEG_QUALITY = 90;
 
 const { AVATARS_PATH } = process.env;
@@ -87,7 +88,7 @@ export default class PlayerAvatarService
                     .toBuffer()
                 ,
                 sharp(fileBuffer)
-                    .resize(AVATAR_THUMB_SIZE, AVATAR_THUMB_SIZE, { fit: 'cover' })
+                    .resize(AVATAR_THUMB_WIDTH, AVATAR_THUMB_HEIGHT, { fit: 'cover' })
                     .jpeg({ quality: JPEG_QUALITY })
                     .toBuffer()
                 ,

@@ -284,8 +284,8 @@ nav
 
 .nav-avatar
     width 1.75em
-    height 1.75em
-    border-radius 50%
+    height 1.516em
+    clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     object-fit cover
     vertical-align middle
 

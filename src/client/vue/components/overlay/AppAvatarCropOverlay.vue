@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useDisclosure } from '@overlastic/vue';
 import { PropType, ref, onMounted, onUnmounted } from 'vue';
-import { Cropper, CircleStencil } from 'vue-advanced-cropper';
+import { Cropper } from 'vue-advanced-cropper';
+import HexagonStencil from '../HexagonStencil.vue';
 import 'vue-advanced-cropper/dist/style.css';
 
 const { visible, confirm, cancel } = useDisclosure();
@@ -50,13 +51,19 @@ const confirmCrop = () => {
                             class="avatar-cropper"
                             :class="{ invisible: !ready }"
                             :src="imageUrl"
-                            :stencilComponent="CircleStencil"
-                            :stencilProps="{ aspectRatio: 1 }"
+                            :stencilComponent="HexagonStencil"
+                            :stencilProps="{ aspectRatio: 2 / Math.sqrt(3) }"
                             :defaultSize="({ imageSize }: { imageSize: { width: number; height: number } }) => {
-                                const size = Math.min(imageSize.width, imageSize.height);
-                                return { width: size, height: size };
+                                const ratio = 2 / Math.sqrt(3);
+                                if (imageSize.width / imageSize.height > ratio) {
+                                    const height = imageSize.height;
+                                    return { width: height * ratio, height };
+                                } else {
+                                    const width = imageSize.width;
+                                    return { width, height: width / ratio };
+                                }
                             }"
-                            :canvas="{ width: 512, height: 512 }"
+                            :canvas="{ width: 512, height: Math.round(512 * Math.sqrt(3) / 2) }"
                             @ready="ready = true"
                         />
                         <div v-if="!ready" class="cropper-loader">

@@ -268,7 +268,7 @@ onUnmounted(() => {
 
 .board-avatar
     width 1.4em
-    height 1.4em
+    height 1.212em
     flex-shrink 0
 
 // Default, top left, top right

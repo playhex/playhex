@@ -575,7 +575,9 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 <style lang="stylus" scoped>
 .icon
     font-size 8em
-    border-radius 100%
+    width 1em
+    height 0.866em
+    clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     padding 1.25rem
 
 .player-btns > *
@@ -589,8 +591,8 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
     .player-status
         position absolute
-        top 77%
-        left 77%
+        top 92%
+        left 68%
         font-size 1.25em
 
 td:first-child, th:first-child
@@ -623,7 +625,7 @@ td:first-child, th:first-child
         color #fff
         font-size 0.75em
         text-align center
-        border-radius 100%
+        clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
         opacity 0
         transition opacity 0.15s
 
@@ -632,9 +634,8 @@ td:first-child, th:first-child
 
 .avatar-img
     width 8em
-    height 8em
-    border-radius 100%
+    height 6.928em
+    clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     object-fit cover
-    // Override img-thumbnail padding so image fills the full circle
     padding 0
 </style>
