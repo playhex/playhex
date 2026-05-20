@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
-import { apiPostPushTest } from '../../../apiClient.js';
+import { apiPostPushTest, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
 import { watch, Ref, ref, onMounted, onUnmounted } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
@@ -20,6 +20,7 @@ import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import GameView from '../../../../shared/pixi-board/GameView.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import AppPlayerModerationActionList from '../../components/AppPlayerModerationActionList.vue';
+import AppFlagSelector from '../../components/AppFlagSelector.vue';
 
 const head = injectHead();
 
@@ -157,6 +158,19 @@ const getLocaleName = (locale: string): string => {
 };
 
 /*
+ * Country flag
+ */
+const updateCountryFlag = async (flag: string | null) => {
+    if (!loggedInPlayer.value) {
+        return;
+    }
+
+    await apiUpdatePlayerCountryFlag(loggedInPlayer.value.publicId, flag);
+
+    loggedInPlayer.value.countryFlag = flag;
+};
+
+/*
  * Push notification
  */
 const {
@@ -221,6 +235,19 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     <a href="https://hosted.weblate.org/engage/playhex/" target="_blank">Add it with Weblate</a>!
                 </small>
             </p>
+        </div>
+    </section>
+
+    <section id="country-flag" v-if="loggedInPlayer && !loggedInPlayer.isGuest">
+        <div class="container">
+            <h3>{{ $t('country_flag.title') }}</h3>
+
+            <p>{{ $t('country_flag.explain') }}</p>
+
+            <AppFlagSelector
+                :modelValue="loggedInPlayer.countryFlag ?? null"
+                @update:modelValue="updateCountryFlag"
+            />
         </div>
     </section>
 

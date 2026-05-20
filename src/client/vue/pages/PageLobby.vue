@@ -226,7 +226,7 @@ for (const locale of getPlayerLocales()) {
                                             <span v-if="hostedGame.ranked" class="text-warning ms-2"><IconTrophyFill /> {{ $t('ranked') }}</span>
                                         </td>
                                         <td>
-                                            <AppPseudo v-if="hostedGame.host" :player="hostedGame.host" onlineStatus rating />
+                                            <AppPseudo v-if="hostedGame.host" :player="hostedGame.host" flag onlineStatus rating />
                                             <i v-else>{{ $t('system') }}</i>
                                         </td>
                                         <template v-if="!hostedGame.softRemoved">
@@ -300,8 +300,8 @@ for (const locale of getPlayerLocales()) {
                                         </td>
                                         <td><span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-sm-inline">{{ $t('ranked') }}</span></span></td>
                                         <template v-if="hostedGame.winner !== null">
-                                            <td><AppPseudo :player="getStrictWinnerPlayer(hostedGame)" rating classes="fw-semibold" /></td>
-                                            <td><AppPseudo :player="getStrictLoserPlayer(hostedGame)" rating classes="text-body-secondary" /></td>
+                                            <td><AppPseudo :player="getStrictWinnerPlayer(hostedGame)" flag rating classes="fw-semibold" /></td>
+                                            <td><AppPseudo :player="getStrictLoserPlayer(hostedGame)" flag rating classes="text-body-secondary" /></td>
                                         </template>
                                         <template v-else>
                                             <td colspan="2" class="text-body-secondary">-</td>

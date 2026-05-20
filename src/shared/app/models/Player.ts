@@ -108,4 +108,8 @@ export default class Player
 
     @Column({ type: Date, nullable: true, default: null })
     avatarUpdatedAt?: null | Date;
+
+    @Column({ type: String, nullable: true, default: null, length: 8 })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    countryFlag?: null | string;
 }

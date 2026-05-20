@@ -229,6 +229,16 @@ export default class PlayerRepository
         ;
     }
 
+    async updateCountryFlag(publicId: string, countryFlag: string | null): Promise<void>
+    {
+        await this.playerRepository.createQueryBuilder('player')
+            .update()
+            .where('publicId = :publicId', { publicId })
+            .set({ countryFlag })
+            .execute()
+        ;
+    }
+
     async shadowBan(publicId: string): Promise<number | undefined>
     {
         const { affected } = await this.playerRepository.createQueryBuilder('player')

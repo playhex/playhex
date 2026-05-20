@@ -95,7 +95,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
                 @mouseleave="highlightPlayer(null)"
                 class="mb-2"
             >
-                <AppPseudo v-if="tournamentMatch.player1" :player="tournamentMatch.player1" />
+                <AppPseudo v-if="tournamentMatch.player1" :player="tournamentMatch.player1" flag />
                 <span v-else>-</span>
                 <IconTrophyFill
                     v-if="'done' === tournamentMatch.state && 0 === tournamentMatch.hostedGame?.winner"
@@ -109,7 +109,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
                 @mouseleave="highlightPlayer(null)"
                 class="my-0"
             >
-                <AppPseudo v-if="tournamentMatch.player2" :player="tournamentMatch.player2" />
+                <AppPseudo v-if="tournamentMatch.player2" :player="tournamentMatch.player2" flag />
                 <span v-else>-</span>
                 <IconTrophyFill
                     v-if="'done' === tournamentMatch.state && 1 === tournamentMatch.hostedGame?.winner"

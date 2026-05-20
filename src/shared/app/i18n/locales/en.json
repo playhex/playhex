@@ -629,5 +629,13 @@
         "time": "{player} times out.",
         "resign": "{player} resigns.",
         "forfeit": "{player} loses by forfeit."
+    },
+    "country_flag": {
+        "title": "Country flag",
+        "explain": "Display your country flag next to your nickname.",
+        "suggestions": "Suggested from your browser:",
+        "all_countries": "All countries:",
+        "search_placeholder": "Search country…",
+        "remove": "Remove flag"
     }
 }

@@ -925,6 +925,19 @@ export const apiGetChannelMessagesCount = async (channelName: string): Promise<n
     return await response.json();
 };
 
+export const apiUpdatePlayerCountryFlag = async (publicId: string, countryFlag: string | null): Promise<void> => {
+    const response = await fetch(`/api/players/${publicId}/country-flag`, {
+        method: 'PATCH',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ countryFlag }),
+    });
+
+    await checkResponse(response);
+};
+
 export const apiUploadPlayerAvatar = async (publicId: string, blob: Blob, mimeType: string): Promise<{ avatarPath: string, avatarThumbnailPath: string }> => {
     const ext = mimeType.split('/')[1] ?? 'jpg';
     const formData = new FormData();

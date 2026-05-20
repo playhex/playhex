@@ -31,6 +31,14 @@ const props = defineProps({
     },
 
     /**
+     * Whether to display the player's country flag emoji next to the nickname
+     */
+    flag: {
+        type: Boolean,
+        default: false,
+    },
+
+    /**
      * How to display rating:
      * - `<AppPseudo />` If not set, rating is not shown.
      * - `<AppPseudo rating />` rating is shown in minimalist form, like "1500" or "~1500" depending on confidence
@@ -58,6 +66,7 @@ watchEffect(() => {
         <component :is="is" :class="classes">
             <span v-if="p.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
             <span>{{ p.pseudo }}</span>
+            <small v-if="flag && p.countryFlag" aria-hidden="true">&nbsp;{{ p.countryFlag }}</small>
         </component>
 
         <template v-if="rating">

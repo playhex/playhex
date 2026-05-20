@@ -193,7 +193,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                         :key="subscription.player.publicId"
                                         class="list-inline-item me-4"
                                     >
-                                        <AppPseudo :player="subscription.player" onlineStatus rating />
+                                        <AppPseudo :player="subscription.player" onlineStatus flag rating />
                                     </li>
                                 </ul>
 
@@ -209,7 +209,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                             :key="subscription.player.publicId"
                                             class="list-inline-item me-4"
                                         >
-                                            <AppPseudo :player="subscription.player" onlineStatus rating classes="text-body-secondary" />
+                                            <AppPseudo :player="subscription.player" onlineStatus flag rating classes="text-body-secondary" />
                                         </li>
                                     </ul>
                                 </div>
@@ -224,7 +224,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                         :key="subscription.player.publicId"
                                         class="list-inline-item me-4"
                                     >
-                                        <AppPseudo :player="subscription.player" onlineStatus rating />
+                                        <AppPseudo :player="subscription.player" onlineStatus flag rating />
                                     </li>
                                 </ul>
                             </template>

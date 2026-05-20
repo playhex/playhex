@@ -355,7 +355,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                 <AppOnlineStatus v-if="player" :player class="player-status" />
             </div>
             <div>
-                <h2><AppPseudo v-if="player" :player /><template v-else>…</template></h2>
+                <h2><AppPseudo v-if="player" :player flag /><template v-else>…</template></h2>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM y')

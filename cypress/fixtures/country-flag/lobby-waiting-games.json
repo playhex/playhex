@@ -1,0 +1,48 @@
+[
+    {
+        "publicId": "549737f7-5a70-453a-b227-abb4f7906138",
+        "host": {
+            "publicId": "afb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "pseudo": "Player E",
+            "slug": "player-e",
+            "isGuest": false,
+            "isBot": false,
+            "countryFlag": "🇺🇸"
+        },
+        "hostedGameToPlayers": [
+            {
+                "player": {
+                    "publicId": "afb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "pseudo": "Player E",
+                    "slug": "player-e",
+                    "isGuest": false,
+                    "isBot": false,
+                    "countryFlag": "🇺🇸"
+                }
+            }
+        ],
+        "timeControl": {
+            "family": "fischer",
+            "state": "waiting",
+            "players": [
+                { "totalRemainingTime": 900000 }
+            ]
+        },
+        "boardsize": 11,
+        "firstPlayer": null,
+        "opponentType": "player",
+        "timeControlType": {
+            "family": "fischer",
+            "options": {
+                "initialTime": 900000,
+                "timeIncrement": 900000,
+                "maxTime": 900000
+            }
+        },
+        "createdAt": "2023-12-20T21:02:55.420Z",
+        "chatMessages": [],
+        "state": "created",
+        "movesHistory": [],
+        "ranked": false
+    }
+]

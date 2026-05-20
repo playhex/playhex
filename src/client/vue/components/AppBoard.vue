@@ -143,6 +143,7 @@ onUnmounted(() => {
                     <template v-if="players[0]">
                         <AppPlayerAvatar v-if="players[0].avatarThumbnailPath ?? players[0].avatarPath" :player="players[0]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo
+                            flag
                             rating
                             :onlineStatus="!(players[0].avatarThumbnailPath ?? players[0].avatarPath)"
                             :player="players[0]"
@@ -165,6 +166,7 @@ onUnmounted(() => {
                     <template v-if="players[1]">
                         <AppPlayerAvatar v-if="players[1].avatarThumbnailPath ?? players[1].avatarPath" :player="players[1]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo
+                            flag
                             rating
                             :onlineStatus="!(players[1].avatarThumbnailPath ?? players[1].avatarPath)"
                             :player="players[1]"

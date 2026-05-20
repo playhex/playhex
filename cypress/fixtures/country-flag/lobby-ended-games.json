@@ -1,0 +1,65 @@
+[
+    {
+        "publicId": "e212910d-9422-482d-97e1-b4d1c60516ed",
+        "host": {
+            "publicId": "cfb0bb91-60af-468b-b470-4fa10dfadfc4",
+            "pseudo": "Player C",
+            "slug": "player-c",
+            "isGuest": false,
+            "isBot": false,
+            "countryFlag": "🇫🇷"
+        },
+        "hostedGameToPlayers": [
+            {
+                "player": {
+                    "publicId": "cfb0bb91-60af-468b-b470-4fa10dfadfc4",
+                    "pseudo": "Player C",
+                    "slug": "player-c",
+                    "isGuest": false,
+                    "isBot": false,
+                    "countryFlag": "🇫🇷"
+                }
+            },
+            {
+                "player": {
+                    "publicId": "62509e2e-294c-4e21-a5a3-c308742d2bc4",
+                    "pseudo": "Player D",
+                    "slug": "player-d",
+                    "isGuest": false,
+                    "isBot": false,
+                    "countryFlag": "🇬🇧"
+                }
+            }
+        ],
+        "timeControl": {
+            "family": "fischer",
+            "state": "over",
+            "players": [
+                { "totalRemainingTime": 896506 },
+                { "totalRemainingTime": 899986 }
+            ]
+        },
+        "boardsize": 9,
+        "firstPlayer": 0,
+        "opponentType": "player",
+        "timeControlType": {
+            "family": "fischer",
+            "options": {
+                "initialTime": 900000,
+                "timeIncrement": 900000,
+                "maxTime": 900000
+            }
+        },
+        "createdAt": "2023-12-20T21:02:55.420Z",
+        "chatMessages": [],
+        "state": "ended",
+        "movesHistory": [],
+        "currentPlayerIndex": 0,
+        "winner": 0,
+        "outcome": "path",
+        "startedAt": "2023-12-20T21:02:55.420Z",
+        "lastMoveAt": "2023-12-20T21:02:58.926Z",
+        "endedAt": "2023-12-20T21:02:58.926Z",
+        "ranked": false
+    }
+]
