@@ -8,6 +8,7 @@ import { keysOf } from '../utils.js';
 
 @Entity()
 @Index(keysOf<Player>()('isGuest', 'isBot', 'pseudo'))
+@Index(keysOf<Player>()('avatarUpdatedAt'))
 export default class Player
 {
     @PrimaryGeneratedColumn()
@@ -104,4 +105,7 @@ export default class Player
     @Column({ type: String, nullable: true, default: null })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
     avatarThumbnailPath?: null | string;
+
+    @Column({ type: Date, nullable: true, default: null })
+    avatarUpdatedAt?: null | Date;
 }

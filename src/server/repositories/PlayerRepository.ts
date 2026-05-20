@@ -224,7 +224,7 @@ export default class PlayerRepository
         await this.playerRepository.createQueryBuilder('player')
             .update()
             .where('publicId = :publicId', { publicId })
-            .set({ avatarPath, avatarThumbnailPath })
+            .set({ avatarPath, avatarThumbnailPath, avatarUpdatedAt: new Date() })
             .execute()
         ;
     }
