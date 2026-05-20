@@ -8,6 +8,8 @@ import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/a
 import { IconTrophy } from '../../icons.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
+import useLobbyStore from '../../../stores/lobbyStore.js';
+import { storeToRefs } from 'pinia';
 
 const { visible, confirm, cancel } = useDisclosure();
 
@@ -19,9 +21,15 @@ const props = defineProps({
 });
 
 const gameOptions = reactive(props.gameOptions);
+const { currentLobby } = storeToRefs(useLobbyStore());
 
 const timeControl = toRef(gameOptions.timeControlType);
 watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
+
+// ranked: by default, exploration is enabled for correspondence (and can be changed by host)
+watch(currentLobby, () => {
+    gameOptions.explorationAllowed = currentLobby.value === 'correspondence';
+}, { immediate: true });
 </script>
 
 <template>
