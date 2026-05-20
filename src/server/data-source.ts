@@ -37,6 +37,10 @@ export const AppDataSource = new DataSource({
     cache: {
         provider: () => new InMemoryCacheProvider.default(),
     },
+    invalidWhereValuesBehavior: {
+        null: 'throw', // keep default, must use IsNull()
+        undefined: 'ignore', // to make this example not throw (since typeorm 1.0.0): where { deletedAt: onlyAlive ? IsNull() : undefined }
+    },
 });
 
 AppDataSource.initialize().catch(reason => {
