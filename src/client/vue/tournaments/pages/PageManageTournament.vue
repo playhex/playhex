@@ -7,7 +7,6 @@ import TournamentBannedPlayer from '../../../../shared/app/models/TournamentBann
 import Player from '../../../../shared/app/models/Player.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import useToastsStore from '../../../stores/toastsStore.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 import { useHead } from '@unhead/vue';
 import TournamentSubscription from '../../../../shared/app/models/TournamentSubscription.js';
 import AppTournamentForm from '../components/AppTournamentForm.vue';
@@ -57,33 +56,33 @@ const editTournament = async () => {
             },
         });
 
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             'Tournament updated successfully.',
             {
                 level: 'success',
             },
-        ));
+        );
     } catch (e) {
         if (e instanceof DomainHttpError) {
             if (e.type === 'tournament_slug_duplicate') {
-                useToastsStore().addToast(new Toast(
+                useToastsStore().addToast(
                     t('tournament_slug_duplicate'),
                     {
                         level: 'danger',
                     },
-                ));
+                );
 
                 window.scrollTo(0, 0);
                 return;
             }
         }
 
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             'Error while creating tournament',
             {
                 level: 'danger',
             },
-        ));
+        );
 
         throw e;
     }
@@ -99,13 +98,13 @@ const startTournament = async () => {
     } catch (e) {
         if (e instanceof DomainHttpError) {
             if (e.type === 'tournament_not_enough_participants_to_start') {
-                useToastsStore().addToast(new Toast(
+                useToastsStore().addToast(
                     t(e.type),
                     {
                         level: 'danger',
                         autoCloseAfter: 6000,
                     },
-                ));
+                );
 
                 return;
             }
@@ -173,12 +172,12 @@ const unbanPlayer = async (player: Player): Promise<void> => {
 const cancelTournament = async () => {
     await apiCancelTournament(slug);
 
-    useToastsStore().addToast(new Toast(
+    useToastsStore().addToast(
         `Tournament ${slug} has been canceled.`,
         {
             level: 'warning',
         },
-    ));
+    );
 };
 
 /**
@@ -196,12 +195,12 @@ const updateAdmins = async () => {
     const admins = selectedAdmins.value;
     await apiPutTournamentAdmins(slug, admins);
 
-    useToastsStore().addToast(new Toast(
+    useToastsStore().addToast(
         `Admins updated. Now they are: ${admins.length === 0 ? '- none -' : admins.map(admin => admin.pseudo).join(', ')}`,
         {
             level: 'success',
         },
-    ));
+    );
 };
 </script>
 

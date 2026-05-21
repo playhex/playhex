@@ -1,7 +1,6 @@
 import useToastsStore from '../../../../client/stores/toastsStore.js';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { t } from 'i18next';
@@ -33,7 +32,7 @@ notifier.on('gameStart', hostedGame => {
         return;
     }
 
-    useToastsStore().addToast(new Toast(
+    useToastsStore().addToast(
         t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
         {
             level: 'success',
@@ -45,7 +44,7 @@ notifier.on('gameStart', hostedGame => {
                 } },
             ],
         },
-    ));
+    );
 });
 
 // Toast when my opponent passed, or, if I'm watching, any player passed
@@ -66,12 +65,12 @@ notifier.on('move', (hostedGame, timestampedMove) => {
         return;
     }
 
-    useToastsStore().addToast(new Toast(
+    useToastsStore().addToast(
         t('player_passed_his_turn', { player: pseudoString(passingPlayer, 'pseudo') }),
         {
             level: 'warning',
         },
-    ));
+    );
 });
 
 notifier.on('takebackRequested', (hostedGame, byPlayer) => {
@@ -80,12 +79,12 @@ notifier.on('takebackRequested', (hostedGame, byPlayer) => {
         return;
     }
 
-    useToastsStore().addToast(new Toast(
+    useToastsStore().addToast(
         t('undo.player_wants_to_takeback', { player: pseudoString(byPlayer, 'pseudo') }),
         {
             level: 'warning',
         },
-    ));
+    );
 });
 
 notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
@@ -97,15 +96,15 @@ notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
     }
 
     if (accepted) {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             t('undo.player_takeback_his_move', { player: pseudoString(playerTakeback, 'pseudo') }),
             { level: 'success' },
-        ));
+        );
     } else {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             t('undo.takeback_request_denied', { player: pseudoString(playerTakeback, 'pseudo') }),
             { level: 'danger' },
-        ));
+        );
     }
 });
 
@@ -122,14 +121,14 @@ notifier.on('rematchOffer', hostedGame => {
     }
 
     if (iAmInGame(hostedGame)) {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             t('player_sent_you_rematch_offer', { player: pseudoString(rematchRequester, 'pseudo') }),
             { level: 'success' },
-        ));
+        );
     } else {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             t('player_sent_rematch_offer', { player: pseudoString(rematchRequester, 'pseudo') }),
             { level: 'info' },
-        ));
+        );
     }
 });

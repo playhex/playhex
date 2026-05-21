@@ -20,7 +20,6 @@ import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoinin
 import { onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { apiGetActiveTournaments } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
-import { Toast } from '../../../shared/app/Toast.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppCijmTournamentCard2026 from '../components/AppCijmTournamentCard2026.vue';
 import { IconCalendar, IconCircleFill, IconLightningChargeFill, IconSearch, IconTrophyFill } from '../icons.js';
@@ -65,7 +64,7 @@ const joinGame = async (hostedGame: HostedGame) => {
     try {
         await lobbyStore.joinGame(hostedGame.publicId);
     } catch (e) {
-        useToastsStore().addToast(new Toast('Could not join game', { level: 'danger' }));
+        useToastsStore().addToast('Could not join game', { level: 'danger' });
         return;
     }
 

@@ -6,7 +6,6 @@ import { IconSendFill } from '../icons.js';
 import { useChannel } from '../composables/useChannel.js';
 import useAuthStore from '../../stores/authStore.js';
 import useToastsStore from '../../stores/toastsStore.js';
-import { Toast } from '../../../shared/app/Toast.js';
 import { sanitizeMessage, makeLinksClickable } from '../../../shared/app/chatUtils.js';
 import AppPseudo from './AppPseudo.vue';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
@@ -103,9 +102,9 @@ const sendMessage = async () => {
     try {
         await postMessage(content);
     } catch (e) {
-        useToastsStore().addToast(new Toast(e.message ?? 'could not post message', {
+        useToastsStore().addToast(e.message ?? 'could not post message', {
             level: 'danger',
-        }));
+        });
     }
 };
 </script>

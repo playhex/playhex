@@ -9,7 +9,6 @@ import { useHead } from '@unhead/vue';
 import AppTournamentForm from '../components/AppTournamentForm.vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import useToastsStore from '../../../stores/toastsStore.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 
 const tournament = ref(createTournamentDefaultsCreate());
 
@@ -44,33 +43,33 @@ const createTournament = async (): Promise<void> => {
             },
         });
 
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             'Tournament created successfully.',
             {
                 level: 'success',
             },
-        ));
+        );
     } catch (e) {
         if (e instanceof DomainHttpError) {
             if (e.type === 'tournament_slug_duplicate') {
-                useToastsStore().addToast(new Toast(
+                useToastsStore().addToast(
                     t('tournament_slug_duplicate'),
                     {
                         level: 'danger',
                     },
-                ));
+                );
 
                 window.scrollTo(0, 0);
                 return;
             }
         }
 
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             'Error while creating tournament',
             {
                 level: 'danger',
             },
-        ));
+        );
 
         throw e;
     }

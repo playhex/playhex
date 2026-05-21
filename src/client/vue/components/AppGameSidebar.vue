@@ -37,7 +37,6 @@ import GameView from '../../../shared/pixi-board/GameView.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import useToastsStore from '../../stores/toastsStore.js';
-import { Toast } from '../../../shared/app/Toast.js';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 
 const props = defineProps({
@@ -150,9 +149,9 @@ const sendChat = async () => {
     try {
         await sendChatMessage(message);
     } catch (e) {
-        useToastsStore().addToast(new Toast(e.message ?? 'could not post message', {
+        useToastsStore().addToast(e.message ?? 'could not post message', {
             level: 'danger',
-        }));
+        });
     }
 };
 

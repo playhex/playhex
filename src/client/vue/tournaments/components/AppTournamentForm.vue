@@ -8,7 +8,6 @@ import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/a
 import AppTimeControl from '../../components/AppTimeControl.vue';
 import { apiGetTournament } from '../../../apiClient.js';
 import useToastsStore from '../../../stores/toastsStore.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 import { cloneTournament } from '../../../../shared/app/models/Tournament.js';
 import AppTournamentFormatImage from './AppTournamentFormatImage.vue';
 import AppDurationInput from '../../components/AppDurationInput.vue';
@@ -128,10 +127,10 @@ onMounted(async () => {
     const sourceTournament = await apiGetTournament(hash.substring(7));
 
     if (sourceTournament === null) {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             `No tournaments with slug "${hash.substring(7)}"`,
             { level: 'warning' },
-        ));
+        );
 
         timeControlReady.value = true;
         return;

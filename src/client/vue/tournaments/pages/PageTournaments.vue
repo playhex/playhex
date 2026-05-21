@@ -14,7 +14,6 @@ import { getActiveTournamentMatches } from '../../../../shared/app/tournamentUti
 import { getCurrentTournamentSubscriptionStatus, iAmParticipant } from '../composables/tournamentCurrentSubscription.js';
 import { t } from 'i18next';
 import useToastsStore from '../../../stores/toastsStore.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 
 useHead({
     title: t('tournaments'),
@@ -27,23 +26,23 @@ void (async () => {
     try {
         activeTournaments.value = await apiGetActiveTournaments();
     } catch (e) {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             'Could not load active tournaments',
             {
                 level: 'danger',
             },
-        ));
+        );
     }
 
     try {
         endedTournaments.value = await apiGetEndedTournaments();
     } catch (e) {
-        useToastsStore().addToast(new Toast(
+        useToastsStore().addToast(
             'Could not load ended tournaments',
             {
                 level: 'danger',
             },
-        ));
+        );
     }
 })();
 

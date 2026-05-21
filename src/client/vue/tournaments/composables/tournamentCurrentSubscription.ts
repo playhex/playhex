@@ -6,7 +6,6 @@ import TournamentSubscription from '../../../../shared/app/models/TournamentSubs
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import { apiDeleteTournamentSubscription, apiPutTournamentSubscription } from '../../../apiClient.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 import useToastsStore from '../../../stores/toastsStore.js';
 import { isMe } from '../../../services/context-utils.js';
 
@@ -82,18 +81,18 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
             } catch (e) {
                 if (e instanceof DomainHttpError) {
                     if (e.type === 'tournament_player_is_banned') {
-                        useToastsStore().addToast(new Toast(
+                        useToastsStore().addToast(
                             t(e.type),
                             {
                                 level: 'danger',
                             },
-                        ));
+                        );
 
                         return;
                     }
 
                     if (e.type === 'tournament_account_required') {
-                        useToastsStore().addToast(new Toast(
+                        useToastsStore().addToast(
                             t(e.type),
                             {
                                 level: 'danger',
@@ -105,7 +104,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
                                 ],
                                 autoCloseAfter: 8000,
                             },
-                        ));
+                        );
 
                         return;
                     }

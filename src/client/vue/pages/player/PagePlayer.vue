@@ -32,7 +32,6 @@ import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
 import { apiGetPlayerIsCurrentlyChatRestricted, apiUploadPlayerAvatar } from '../../../apiClient.js';
 import useToastsStore from '../../../stores/toastsStore.js';
-import { Toast } from '../../../../shared/app/Toast.js';
 import { defineOverlay } from '@overlastic/vue';
 import AppAvatarCropOverlay from '../../components/overlay/AppAvatarCropOverlay.vue';
 
@@ -300,7 +299,7 @@ const onAvatarFileSelected = async (event: Event) => {
         player.value.avatarPath = avatarPath;
         player.value.avatarThumbnailPath = avatarThumbnailPath;
     } catch {
-        useToastsStore().addToast(new Toast('Avatar upload failed', { level: 'danger' }));
+        useToastsStore().addToast('Avatar upload failed', { level: 'danger' });
     }
 };
 
