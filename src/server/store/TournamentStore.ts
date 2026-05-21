@@ -1,5 +1,4 @@
 import { Inject, Service } from 'typedi';
-import { FindOptionsRelations, In, Repository } from 'typeorm';
 import { Player, Tournament, TournamentSubscription } from '../../shared/app/models/index.js';
 import { by, errorToLogger } from '../../shared/app/utils.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
@@ -15,46 +14,7 @@ import type { HostedGameAccessorInterface } from '../tournaments/hosted-game-acc
 import { HostedGameAccessor } from '../tournaments/hosted-game-accessor/HostedGameAccessor.js';
 import { TournamentBanManager } from '../tournaments/services/TournamentBanManager.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
-
-/**
- * Relations to load for active tournament.
- *
- * With these relations, must add relationLoadStrategy: 'query'
- * as typeorm parameter (e.g in find(), findOne(), ...)
- * to prevent join all relation at once and fetch thousands of rows.
- */
-const relations: FindOptionsRelations<Tournament> = {
-    organizer: true,
-    subscriptions: {
-        player: {
-            currentRating: true,
-        },
-    },
-    participants: {
-        player: {
-            currentRating: true,
-        },
-    },
-    admins: {
-        player: true,
-    },
-    matches: {
-        player1: {
-            currentRating: true,
-        },
-        player2: {
-            currentRating: true,
-        },
-        hostedGame: {
-            hostedGameToPlayers: {
-                player: {
-                    currentRating: true,
-                },
-            },
-        },
-    },
-    history: true,
-};
+import TournamentRepository from '../repositories/TournamentRepository.js';
 
 @Service()
 export default class TournamentStore
@@ -65,9 +25,7 @@ export default class TournamentStore
     private activeTournaments: { [tournamentPublicId: string]: ActiveTournament } = {};
 
     constructor(
-        @Inject('Repository<Tournament>')
-        private tournamentRepository: Repository<Tournament>,
-
+        private tournamentRepository: TournamentRepository,
         private tournamentBanManager: TournamentBanManager,
 
         @Inject(() => HostedGameAccessor)
@@ -84,13 +42,7 @@ export default class TournamentStore
 
         await AppDataSource.initialize();
 
-        const tournaments = await this.tournamentRepository.find({
-            relations,
-            where: {
-                state: In(['created', 'running']),
-            },
-            relationLoadStrategy: 'query',
-        });
+        const tournaments = await this.tournamentRepository.findActiveTournaments();
 
         for (const tournament of tournaments) {
             try {
@@ -210,27 +162,6 @@ export default class TournamentStore
         return null;
     }
 
-    async getEndedTournaments(): Promise<Tournament[]>
-    {
-        return await this.tournamentRepository.find({
-            relations: {
-                organizer: true,
-                participants: {
-                    player: true,
-                },
-            },
-            where: {
-                state: 'ended',
-            },
-            order: {
-                endedAt: 'desc',
-                participants: {
-                    rank: 'desc',
-                },
-            },
-        });
-    }
-
     /**
      * Find tournament by slug, from memory or database.
      * Returns null if no tournament with this slug.
@@ -245,11 +176,7 @@ export default class TournamentStore
             }
         }
 
-        return await this.tournamentRepository.findOne({
-            relations,
-            where: { slug },
-            relationLoadStrategy: 'query',
-        });
+        return await this.tournamentRepository.findBySlugFull(slug);
     }
 
     /**
@@ -266,12 +193,7 @@ export default class TournamentStore
             }
         }
 
-        return await this.tournamentRepository.findOne({
-            where: { slug },
-            relations: {
-                organizer: true,
-            },
-        });
+        return await this.tournamentRepository.findBySlug(slug);
     }
 
     async slugExists(slug: string): Promise<boolean>
@@ -282,7 +204,7 @@ export default class TournamentStore
             }
         }
 
-        return await this.tournamentRepository.existsBy({ slug });
+        return await this.tournamentRepository.slugExists(slug);
     }
 
     /**

@@ -9,6 +9,7 @@ import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { AccountRequiredTournamentError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, PlayerIsBannedTournamentError, TooDeepResetError, TournamentError } from '../../../tournaments/TournamentError.js';
 import logger from '../../../services/logger.js';
+import TournamentRepository from '../../../repositories/TournamentRepository.js';
 
 @JsonController()
 @Service()
@@ -16,6 +17,7 @@ export default class TournamentController
 {
     constructor(
         private tournamentStore: TournamentStore,
+        private tournamentRepository: TournamentRepository,
         private playerRepository: PlayerRepository,
     ) {}
 
@@ -39,7 +41,7 @@ export default class TournamentController
     @Get('/api/tournaments')
     getTournaments()
     {
-        return this.tournamentStore.findEndedTournaments();
+        return this.tournamentRepository.findEndedTournaments();
     }
 
     @Get('/api/tournaments/:slug')
