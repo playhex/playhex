@@ -1,6 +1,6 @@
 import { Get, HttpError, JsonController, OnUndefined, Param, Put } from 'routing-controllers';
 import { Service } from 'typedi';
-import GameAnalyzePersister from '../../../persistance/GameAnalyzePersister.js';
+import GameAnalyzeRepository from '../../../repositories/GameAnalyzeRepository.js';
 import HexAiApiClient from '../../../services/HexAiApiClient.js';
 import { GameAnalyze, ChatMessage } from '../../../../shared/app/models/index.js';
 import { HexServer } from '../../../server.js';
@@ -8,7 +8,7 @@ import Rooms from '../../../../shared/app/Rooms.js';
 import logger from '../../../services/logger.js';
 import HostedGameStore from '../../../store/HostedGameStore.js';
 import { errorToLogger } from '../../../../shared/app/utils.js';
-import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 import { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
 
 @JsonController()
@@ -16,8 +16,8 @@ import { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze
 export default class GameAnalyzeController
 {
     constructor(
-        private gameAnalyzePersister: GameAnalyzePersister,
-        private hostedGamePersister: HostedGamePersister,
+        private gameAnalyzeRepository: GameAnalyzeRepository,
+        private hostedGameRepository: HostedGameRepository,
         private hexAiApiClient: HexAiApiClient,
         private hostedGameStore: HostedGameStore,
         private io: HexServer,
@@ -28,7 +28,7 @@ export default class GameAnalyzeController
     async getOne(
         @Param('publicId') publicId: string,
     ) {
-        const gameAnalyze = await this.gameAnalyzePersister.findByGamePublicId(publicId);
+        const gameAnalyze = await this.gameAnalyzeRepository.findByGamePublicId(publicId);
 
         if (gameAnalyze === null) {
             return;
@@ -41,13 +41,13 @@ export default class GameAnalyzeController
     async requestAnalyze(
         @Param('publicId') publicId: string,
     ) {
-        let gameAnalyze = await this.gameAnalyzePersister.findByGamePublicId(publicId);
+        let gameAnalyze = await this.gameAnalyzeRepository.findByGamePublicId(publicId);
 
         if (gameAnalyze !== null && !hasGameAnalyzeErrored(gameAnalyze)) {
             return gameAnalyze;
         }
 
-        const analyzeGameRequest = await this.hostedGamePersister.getAnalyzeGameRequest(publicId);
+        const analyzeGameRequest = await this.hostedGameRepository.getAnalyzeGameRequest(publicId);
 
         if (analyzeGameRequest === null) {
             throw new HttpError(404, 'Game not found or not finished');
@@ -56,7 +56,7 @@ export default class GameAnalyzeController
         gameAnalyze = new GameAnalyze();
         gameAnalyze.startedAt = new Date();
 
-        await this.gameAnalyzePersister.persist(publicId, gameAnalyze);
+        await this.gameAnalyzeRepository.persist(publicId, gameAnalyze);
 
         this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 
@@ -64,7 +64,7 @@ export default class GameAnalyzeController
             gameAnalyze.analyze = await this.hexAiApiClient.analyzeGame(analyzeGameRequest);
             gameAnalyze.endedAt = new Date();
 
-            await this.gameAnalyzePersister.persist(publicId, gameAnalyze);
+            await this.gameAnalyzeRepository.persist(publicId, gameAnalyze);
 
             this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 

@@ -7,11 +7,11 @@ import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer } from '../
 import logger from '../../../services/logger.js';
 import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
 import { PlayerNotificationsService } from '../../../services/PlayerNotificationsService.js';
-import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 
 const onlinePlayerService = Container.get(OnlinePlayersService);
 const playerNotificationService = Container.get(PlayerNotificationsService);
-const hostedGamePersister = Container.get(HostedGamePersister);
+const hostedGamePersister = Container.get(HostedGameRepository);
 
 /*
  * Adds notifications in the player header, in the UI.

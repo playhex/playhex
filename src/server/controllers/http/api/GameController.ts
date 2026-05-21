@@ -8,7 +8,7 @@ import { Service } from 'typedi';
 import { Expose } from '../../../../shared/app/class-transformer-custom.js';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
-import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
+import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 import { type HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import logger from '../../../services/logger.js';
 
@@ -24,8 +24,8 @@ class AnswerUndoBody
 export default class GameController
 {
     constructor(
-        private hostedGamePersister: HostedGamePersister,
         private hostedGameStore: HostedGameStore,
+        private hostedGameRepository: HostedGameRepository,
     ) {}
 
     /**
@@ -37,7 +37,7 @@ export default class GameController
         @QueryParams() searchParams: SearchGamesParameters,
         @Res() res: Response,
     ) {
-        const { results, count } = await this.hostedGamePersister.search(searchParams);
+        const { results, count } = await this.hostedGameRepository.search(searchParams);
 
         const contentRange = format({
             unit: 'games',
@@ -57,7 +57,7 @@ export default class GameController
     async getStatsAll(
         @QueryParams() searchParams: SearchGamesParameters,
     ) {
-        const results = await this.hostedGamePersister.searchStatsByDay(searchParams);
+        const results = await this.hostedGameRepository.searchStatsByDay(searchParams);
 
         return results;
     }

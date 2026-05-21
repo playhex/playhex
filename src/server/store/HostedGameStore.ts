@@ -2,7 +2,7 @@ import { Inject, Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
 import { Player, ChatMessage, HostedGame, HostedGameOptions, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
-import HostedGamePersister from '../persistance/HostedGamePersister.js';
+import HostedGameRepository from '../repositories/HostedGameRepository.js';
 import logger from '../services/logger.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
@@ -45,7 +45,7 @@ export default class HostedGameStore
     private gamesLoadedPromise = Promise.withResolvers<true>();
 
     constructor(
-        private hostedGamePersister: HostedGamePersister,
+        private hostedGameRepository: HostedGameRepository,
         private ratingRepository: RatingRepository,
         private onlinePlayerService: OnlinePlayersService,
         private gameEventEmitter: GameEventsEmitter,
@@ -68,7 +68,7 @@ export default class HostedGameStore
 
         await AppDataSource.initialize();
 
-        const games = await this.hostedGamePersister.findMany({
+        const games = await this.hostedGameRepository.findMany({
             where: [
                 { state: 'created' },
                 { state: 'playing' },
@@ -319,14 +319,14 @@ export default class HostedGameStore
             return this.activeGames[publicId].getHostedGame();
         }
 
-        return await this.hostedGamePersister.findUnique(publicId);
+        return await this.hostedGameRepository.findUnique(publicId);
     }
 
     private createHostedGameServerForHostedGame(hostedGame: HostedGame): HostedGameServer
     {
         return new HostedGameServer(
             hostedGame,
-            new AutoSave<HostedGame>(() => this.hostedGamePersister.persist(hostedGame)),
+            new AutoSave<HostedGame>(() => this.hostedGameRepository.persist(hostedGame)),
         );
     }
 
@@ -445,7 +445,7 @@ export default class HostedGameStore
                 rematchRematchedFrom: game.rematch.rematchedFrom?.publicId,
             });
 
-            await this.hostedGamePersister.persistMultiple([game, game.rematch]);
+            await this.hostedGameRepository.persistMultiple([game, game.rematch]);
 
             await this.makeAIJoinGameIfApplicable(rematch, params);
         } catch (e) {
@@ -466,7 +466,7 @@ export default class HostedGameStore
                     throw new Error('Unexpected empty game.id');
                 }
 
-                game.rematch = await this.hostedGamePersister.findRematch(game.id);
+                game.rematch = await this.hostedGameRepository.findRematch(game.id);
 
                 logger.info('First rematch found:', {
                     game: game.publicId,
@@ -661,7 +661,7 @@ export default class HostedGameStore
         }
 
         // Game is not in memory, store chat message directly in database, on persisted game
-        const hostedGame = await this.hostedGamePersister.findUnique(publicId);
+        const hostedGame = await this.hostedGameRepository.findUnique(publicId);
 
         if (hostedGame === null) {
             logger.notice('Tried to chat on a non-existant game', { chatMessage });

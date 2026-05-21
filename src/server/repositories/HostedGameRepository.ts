@@ -56,7 +56,7 @@ const order: FindOptionsOrder<HostedGame> = {
  * Layer between HostedGame and database.
  */
 @Service()
-export default class HostedGamePersister
+export default class HostedGameRepository
 {
     constructor(
         @Inject('Repository<HostedGame>')

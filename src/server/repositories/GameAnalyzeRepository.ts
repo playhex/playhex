@@ -3,7 +3,7 @@ import { GameAnalyze, HostedGame } from '../../shared/app/models/index.js';
 import { Repository } from 'typeorm';
 
 @Service()
-export default class GameAnalyzePersister
+export default class GameAnalyzeRepository
 {
     constructor(
         @Inject('Repository<GameAnalyze>')
