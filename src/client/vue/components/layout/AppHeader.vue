@@ -189,7 +189,7 @@ const {
                 </div>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex align-items-center">
                 <!-- Tutorial -->
                 <router-link
                     v-if="shouldDisplayLink"
@@ -284,10 +284,10 @@ nav
 
 .nav-avatar
     width 1.75em
-    height 1.516em
     clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     object-fit cover
     vertical-align middle
+    font-size 1.5em
 
 .nav-avatar-icon
     font-size 1.5em
