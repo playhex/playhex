@@ -16,7 +16,7 @@ const useToastsStore = defineStore('toastsStore', () => {
         toast.show = false;
 
         setTimeout(() => {
-            toasts.value = toasts.value.filter(t => toast !== t);
+            toasts.value = toasts.value.filter(t => toast.id !== t.id);
         }, 150);
     };
 
