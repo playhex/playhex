@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import HostedGameRepository from '../repositories/HostedGameRepository.js';
+import HostedGameStore from '../store/HostedGameStore.js';
 import { HostedGame } from '../../shared/app/models/index.js';
 import { calcAverageSecondsPerMove, isLive } from '../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
@@ -28,12 +28,12 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
     private featuredGames: HostedGame[] = [];
 
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {
         super();
 
         void (async () => {
-            await this.hostedGameRepository.isReady();
+            await this.hostedGameStore.isReady();
             this.featuredGames = this.calcInitialFeaturedGames();
         })();
 
@@ -93,7 +93,7 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
         let bestScore: null | number = null;
         let bestHostedGame: null | HostedGame = null;
 
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
 
         for (const publicId in activeGames) {
             const hostedGame = activeGames[publicId].getHostedGame();
@@ -135,7 +135,7 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
      */
     calcInitialFeaturedGames(): HostedGame[]
     {
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
 
         const featuredGames: HostedGame[] = [];
 

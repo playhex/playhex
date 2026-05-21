@@ -1,4 +1,4 @@
-import HostedGameRepository from '../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../store/HostedGameStore.js';
 import { Service } from 'typedi';
 import { GameStaleEvaluator } from './GameStaleEvaluator.js';
 import logger from '../logger.js';
@@ -21,7 +21,7 @@ export class AutoCancelStaleGames
     private intervalThread: null | NodeJS.Timeout = null;
 
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
         private gameStaleEvaluator: GameStaleEvaluator,
     ) {}
 
@@ -61,7 +61,7 @@ export class AutoCancelStaleGames
      */
     checkAllGames(cancelStaleGames = false): object[]
     {
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
         const reasons: object[] = [];
 
         logger.debug('Check all active games staleness', {

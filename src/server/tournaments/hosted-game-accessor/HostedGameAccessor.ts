@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import HostedGameRepository from '../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../store/HostedGameStore.js';
 import { HostedGameOptions, TournamentMatch } from '../../../shared/app/models/index.js';
 import HostedGameServer from '../../HostedGameServer.js';
 import { HostedGameAccessorInterface } from './HostedGameAccessorInterface.js';
@@ -8,12 +8,12 @@ import { HostedGameAccessorInterface } from './HostedGameAccessorInterface.js';
 export class HostedGameAccessor implements HostedGameAccessorInterface
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {}
 
     getHostedGameServer(publicId: string): null | HostedGameServer
     {
-        return this.hostedGameRepository.getActiveGame(publicId);
+        return this.hostedGameStore.getActiveGame(publicId);
     }
 
     async createHostedGameServer(gameOptions: HostedGameOptions, tournamentMatch: TournamentMatch): Promise<HostedGameServer>
@@ -22,7 +22,7 @@ export class HostedGameAccessor implements HostedGameAccessorInterface
             throw new Error('Cannot create game, a player is missing');
         }
 
-        const hostedGameServer = await this.hostedGameRepository.createGame({ gameOptions, tournamentMatch });
+        const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions, tournamentMatch });
 
         if (!tournamentMatch.player1 || !tournamentMatch.player2) {
             throw new Error('Unexpected: a player is now missing, after creating a game');

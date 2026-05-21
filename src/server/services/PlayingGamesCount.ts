@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import HostedGameRepository from '../repositories/HostedGameRepository.js';
+import HostedGameStore from '../store/HostedGameStore.js';
 import { isLive } from '../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -13,7 +13,7 @@ type PlayingGamesCountEvents = {
 export class PlayingGamesCount extends TypedEmitter<PlayingGamesCountEvents>
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {
         super();
 
@@ -26,7 +26,7 @@ export class PlayingGamesCount extends TypedEmitter<PlayingGamesCountEvents>
     {
         let live = 0;
         let correspondence = 0;
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
 
         for (const key in activeGames) {
             const game = activeGames[key].getHostedGame();

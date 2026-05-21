@@ -12,7 +12,7 @@ import logger from './services/logger.js';
 import { addSessionMiddlewares } from './services/security/middlewares.js';
 import monitorConnectedSockets from './services/monitorConnectedSockets.js';
 import { initTimeControl } from './services/initTimeControl.js';
-import TournamentRepository from './repositories/TournamentRepository.js';
+import TournamentStore from './store/TournamentStore.js';
 import { initAutoCancelStaleGames } from './services/auto-cancel-stale-games/init.js';
 import { registerCors } from './controllers/http/misc/cors.js';
 
@@ -26,7 +26,7 @@ app.disable('x-powered-by');
 registerCors(app);
 
 initTimeControl();
-Container.get(TournamentRepository);
+Container.get(TournamentStore);
 initAutoCancelStaleGames();
 
 const server = http.createServer(app);

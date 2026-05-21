@@ -1,7 +1,7 @@
 import { Authorized, BadRequestError, Body, Delete, Get, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
 import { Service } from 'typedi';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../../store/HostedGameStore.js';
 import PlayerModerationActionRepository, { PostPlayerModerationAction } from '../../../repositories/PlayerModerationActionRepository.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import ModerationService, { CreateAndSaveError } from '../../../services/ModerationService.js';
@@ -23,7 +23,7 @@ export default class AdminModerationController
 {
     constructor(
         private chatMessageRepository: ChatMessageRepository,
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
         private playerModerationActionRepository: PlayerModerationActionRepository,
         private playerRepository: PlayerRepository,
         private moderationService: ModerationService,
@@ -80,7 +80,7 @@ export default class AdminModerationController
         const SINCE = new Date(new Date().getTime() - 86400000 * 14); // 2 weeks of history
 
         const persistedMessages = await this.chatMessageRepository.getLastChatMessagesForModeration(SINCE);
-        const inMemoryMessages = this.hostedGameRepository.getUnpersistedChatMessagesForModeration();
+        const inMemoryMessages = this.hostedGameStore.getUnpersistedChatMessagesForModeration();
         const channelMessages = await this.channelChatMessageRepository.getLastMessagesForModeration(SINCE);
 
         const allMessages: MessageFromAnySource[] = [];

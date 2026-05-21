@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Inject, Service } from 'typedi';
 import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
-import HostedGameRepository from '../repositories/HostedGameRepository.js';
+import HostedGameStore from '../store/HostedGameStore.js';
 import { PostPlayerModerationAction } from '../repositories/PlayerModerationActionRepository.js';
 import { Repository } from 'typeorm';
 import { Player, PlayerModerationAction } from '../../shared/app/models/index.js';
@@ -15,7 +15,7 @@ export default class ModerationService
 {
     constructor(
         private chatMessageRepository: ChatMessageRepository,
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
         private channelChatMessageRepository: ChannelChatMessageRepository,
 
         @Inject('Repository<Player>')
@@ -28,7 +28,7 @@ export default class ModerationService
     async moderateDeleteChatMessages(publicIds: string[]): Promise<{ deletedInDb: number, deletedInMemory: number, deletedInChannels: number }>
     {
         return {
-            deletedInMemory: this.hostedGameRepository.moderateDeleteChatMessages(publicIds),
+            deletedInMemory: this.hostedGameStore.moderateDeleteChatMessages(publicIds),
             deletedInDb: await this.chatMessageRepository.moderateDeleteChatMessages(publicIds),
             deletedInChannels: await this.channelChatMessageRepository.moderateDeleteChatMessages(publicIds),
         };
@@ -80,7 +80,7 @@ export default class ModerationService
      */
     async persistGamesHavingChatMessages(chatMessagePublicIds: string[]): Promise<void>
     {
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
 
         for (const key in activeGames) {
             const activeGame = activeGames[key];

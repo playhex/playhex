@@ -2,7 +2,7 @@ import { Body, HttpError, JsonController, Param, Post } from 'routing-controller
 import { Service } from 'typedi';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { ChatMessage, Player } from '../../../../shared/app/models/index.js';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../../store/HostedGameStore.js';
 import { validateOrReject } from 'class-validator';
 import { plainToInstance } from '../../../../shared/app/class-transformer-custom.js';
 import logger from '../../../services/logger.js';
@@ -12,7 +12,7 @@ import logger from '../../../services/logger.js';
 export default class ChatController
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {}
 
     @Post('/api/games/:gameId/chat-messages')
@@ -33,7 +33,7 @@ export default class ChatController
             return e.message;
         }
 
-        const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
+        const result = await this.hostedGameStore.postChatMessage(gameId, chatMessage);
 
         if (result !== true) {
             throw new HttpError(400, result);

@@ -3,14 +3,14 @@ import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { AuthenticatedPlayer, mustBeTournamentOrganizer } from '../middlewares.js';
 import { Player, TournamentBannedPlayer } from '../../../../shared/app/models/index.js';
-import TournamentRepository from '../../../repositories/TournamentRepository.js';
+import TournamentStore from '../../../store/TournamentStore.js';
 import { TournamentBanManager } from '../../../tournaments/services/TournamentBanManager.js';
 
 @JsonController()
 @Service()
 export default class TournamentBanController {
     constructor(
-        private tournamentRepository: TournamentRepository,
+        private tournamentStore: TournamentStore,
         private tournamentBanManager: TournamentBanManager,
 
         @Inject('Repository<Player>')
@@ -22,7 +22,7 @@ export default class TournamentBanController {
         @AuthenticatedPlayer() authenticatedPlayer: Player,
         @Param('slug') slug: string,
     ): Promise<TournamentBannedPlayer[]> {
-        const tournament = await this.tournamentRepository.findBySlug(slug);
+        const tournament = await this.tournamentStore.findBySlug(slug);
 
         if (tournament === null) {
             throw new NotFoundError(`Tournament "${slug}" not found`);
@@ -39,7 +39,7 @@ export default class TournamentBanController {
         @Param('slug') slug: string,
         @Param('playerPublicId') playerPublicId: string,
     ): Promise<TournamentBannedPlayer> {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`Tournament "${slug}" not found`);
@@ -64,7 +64,7 @@ export default class TournamentBanController {
         @Param('slug') slug: string,
         @Param('playerPublicId') playerPublicId: string,
     ) {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`Tournament "${slug}" not found`);

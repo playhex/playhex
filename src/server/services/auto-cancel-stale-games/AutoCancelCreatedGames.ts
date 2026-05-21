@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import logger from '../logger.js';
-import HostedGameRepository from '../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../store/HostedGameStore.js';
 import OnlinePlayersService from '../OnlinePlayersService.js';
 import { Player } from '../../../shared/app/models/index.js';
 import { timings } from './timings.js';
@@ -25,7 +25,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
 
     constructor(
         private onlinePlayersService: OnlinePlayersService,
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {
         super();
 
@@ -51,7 +51,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
      */
     private checkAllCreatedGames(): void
     {
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
 
         for (const publicId in activeGames) {
             const activeGame = activeGames[publicId];
@@ -85,7 +85,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
 
     private cancelPlayerLiveWaitingGame(player: Player): void
     {
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
 
         for (const publicId in activeGames) {
             const activeGame = activeGames[publicId];

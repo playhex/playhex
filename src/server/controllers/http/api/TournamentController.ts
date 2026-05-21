@@ -3,7 +3,7 @@ import { Service } from 'typedi';
 import { AuthenticatedPlayer, mustBeTournamentOrganizer } from '../middlewares.js';
 import { Player, Tournament, TournamentSubscription } from '../../../../shared/app/models/index.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
-import TournamentRepository from '../../../repositories/TournamentRepository.js';
+import TournamentStore from '../../../store/TournamentStore.js';
 import { isDuplicateError } from '../../../repositories/typeormUtils.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
@@ -15,7 +15,7 @@ import logger from '../../../services/logger.js';
 export default class TournamentController
 {
     constructor(
-        private tournamentRepository: TournamentRepository,
+        private tournamentStore: TournamentStore,
         private playerRepository: PlayerRepository,
     ) {}
 
@@ -30,7 +30,7 @@ export default class TournamentController
         @QueryParam('playerPublicId') playerPublicId?: string,
         @QueryParam('featured') featured?: boolean,
     ) {
-        return this.tournamentRepository.getActiveTournaments({
+        return this.tournamentStore.getActiveTournaments({
             playerPublicId,
             featured,
         });
@@ -39,14 +39,14 @@ export default class TournamentController
     @Get('/api/tournaments')
     getTournaments()
     {
-        return this.tournamentRepository.getEndedTournaments();
+        return this.tournamentStore.findEndedTournaments();
     }
 
     @Get('/api/tournaments/:slug')
     async getTournament(
         @Param('slug') slug: string,
     ) {
-        const tournament = await this.tournamentRepository.findBySlugFull(slug);
+        const tournament = await this.tournamentStore.findBySlugFull(slug);
 
         if (tournament === null) {
             throw new HttpError(404, `No tournament with slug "${slug}"`);
@@ -64,7 +64,7 @@ export default class TournamentController
         }) tournament: Tournament,
     ) {
         try {
-            return await this.tournamentRepository.createTournament(tournament, organizer);
+            return await this.tournamentStore.createTournament(tournament, organizer);
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new DomainHttpError(409, 'tournament_slug_duplicate', 'A tournament already exists with same slug');
@@ -86,7 +86,7 @@ export default class TournamentController
             transform: { groups: ['tournament:edit'] },
         }) edited: Tournament,
     ) {
-        const activeTournament = this.tournamentRepository.getActiveTournament(publicId);
+        const activeTournament = this.tournamentStore.getActiveTournament(publicId);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament with public id "${publicId}"`);
@@ -110,14 +110,14 @@ export default class TournamentController
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
     ): Promise<TournamentSubscription> {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
         }
 
         try {
-            return await this.tournamentRepository.subscribeCheckIn(activeTournament.getTournament(), player);
+            return await this.tournamentStore.subscribeCheckIn(activeTournament.getTournament(), player);
         } catch (e) {
             if (e instanceof PlayerIsBannedTournamentError) {
                 throw new DomainHttpError(403, 'tournament_player_is_banned');
@@ -140,7 +140,7 @@ export default class TournamentController
         @Param('slug') slug: string,
         @Param('playerPublicId') playerPublicId: string,
     ): Promise<null | TournamentSubscription> {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
@@ -166,7 +166,7 @@ export default class TournamentController
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
     ): Promise<Tournament> {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
@@ -204,7 +204,7 @@ export default class TournamentController
         @Param('hostedGamePublicId') hostedGamePublicId: string,
         @Param('playerPublicId') playerPublicId: string,
     ) {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
@@ -233,7 +233,7 @@ export default class TournamentController
         @Param('slug') slug: string,
         @Param('hostedGamePublicId') hostedGamePublicId: string,
     ) {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
@@ -265,7 +265,7 @@ export default class TournamentController
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
     ): Promise<Tournament> {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
@@ -285,7 +285,7 @@ export default class TournamentController
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
     ): Promise<void> {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);
@@ -293,7 +293,7 @@ export default class TournamentController
 
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
-        await this.tournamentRepository.cancelActiveTournament(activeTournament);
+        await this.tournamentStore.cancelActiveTournament(activeTournament);
     }
 
     @Put('/api/tournaments/:slug/admins')
@@ -302,7 +302,7 @@ export default class TournamentController
         @Param('slug') slug: string,
         @Body() players: Player[],
     ) {
-        const activeTournament = this.tournamentRepository.getActiveTournamentBySlug(slug);
+        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
         if (activeTournament === null) {
             throw new NotFoundError(`No active tournament "${slug}"`);

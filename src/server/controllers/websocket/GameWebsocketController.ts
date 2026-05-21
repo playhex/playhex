@@ -1,4 +1,4 @@
-import HostedGameRepository from '../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../store/HostedGameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
@@ -7,7 +7,7 @@ import { HexSocket } from '../../server.js';
 export default class GameWebsocketController implements WebsocketControllerInterface
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {}
 
     onConnection(socket: HexSocket): void
@@ -20,7 +20,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(this.hostedGameRepository.playerMove(player, gameId, move));
+            answer(this.hostedGameStore.playerMove(player, gameId, move));
         });
 
         socket.on('premove', (gameId, premove, answer) => {
@@ -31,7 +31,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(this.hostedGameRepository.playerPremove(player, gameId, premove));
+            answer(this.hostedGameStore.playerPremove(player, gameId, premove));
         });
 
         socket.on('cancelPremove', (gameId, answer) => {
@@ -42,7 +42,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer(this.hostedGameRepository.playerCancelPremove(player, gameId));
+            answer(this.hostedGameStore.playerCancelPremove(player, gameId));
         });
     }
 
@@ -50,7 +50,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
     {
         const gameId = room.match(/games\/(.+)/)?.[1];
         if (gameId == null) return;
-        const game = await this.hostedGameRepository.getActiveOrArchivedGame(gameId);
+        const game = await this.hostedGameStore.getActiveOrArchivedGame(gameId);
         socket.emit('gameUpdate', gameId, game);
     }
 }

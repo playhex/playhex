@@ -8,8 +8,8 @@ import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
 import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
 import { AppDataSource } from '../data-source.js';
-import RatingRepository from './RatingRepository.js';
-import { isDuplicateError } from './typeormUtils.js';
+import RatingRepository from '../repositories/RatingRepository.js';
+import { isDuplicateError } from '../repositories/typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
 import { createHostedGame, CreateHostedGameParams } from '../../shared/app/models/HostedGame.js';
@@ -19,12 +19,12 @@ import { errorToLogger } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
-import PlayerModerationActionRepository from './PlayerModerationActionRepository.js';
+import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 
 export class GameError extends Error {}
 
 @Service()
-export default class HostedGameRepository
+export default class HostedGameStore
 {
     /**
      * All currently created and playing games, from creation to game ended (then archived into database).

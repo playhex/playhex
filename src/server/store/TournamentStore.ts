@@ -57,7 +57,7 @@ const relations: FindOptionsRelations<Tournament> = {
 };
 
 @Service()
-export default class TournamentRepository
+export default class TournamentStore
 {
     /**
      * Upcoming and active tournaments, then archived.

@@ -1,4 +1,4 @@
-import HostedGameRepository from '../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../store/HostedGameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
@@ -11,7 +11,7 @@ import logger from '../../services/logger.js';
 export default class ChatWebsocketController implements WebsocketControllerInterface
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {}
 
     onConnection(socket: HexSocket): void
@@ -39,7 +39,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
                 return e.message;
             }
 
-            const result = await this.hostedGameRepository.postChatMessage(gameId, chatMessage);
+            const result = await this.hostedGameStore.postChatMessage(gameId, chatMessage);
 
             answer(result);
         });

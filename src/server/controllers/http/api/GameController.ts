@@ -1,6 +1,6 @@
 import type { Response } from 'express';
 import { format } from 'content-range';
-import HostedGameRepository, { GameError } from '../../../repositories/HostedGameRepository.js';
+import HostedGameStore, { GameError } from '../../../store/HostedGameStore.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, HttpError, JsonController, Param, Post, QueryParams, Res } from 'routing-controllers';
 import { Player, HostedGameOptions } from '../../../../shared/app/models/index.js';
@@ -24,8 +24,8 @@ class AnswerUndoBody
 export default class GameController
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
         private hostedGamePersister: HostedGamePersister,
+        private hostedGameStore: HostedGameStore,
     ) {}
 
     /**
@@ -68,14 +68,14 @@ export default class GameController
     @Get('/api/games/active')
     getActiveGames(
     ) {
-        return this.hostedGameRepository.getActiveGamesData();
+        return this.hostedGameStore.getActiveGamesData();
     }
 
     @Get('/api/games/:publicId')
     async getOne(
         @Param('publicId') publicId: string,
     ) {
-        const game = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
+        const game = await this.hostedGameStore.getActiveOrArchivedGame(publicId);
 
         if (game === null) {
             throw new HttpError(404, 'Game not found');
@@ -90,7 +90,7 @@ export default class GameController
         @Body() gameOptions: HostedGameOptions,
     ) {
         try {
-            const hostedGameServer = await this.hostedGameRepository.createGame({ gameOptions, host }, { persist: false });
+            const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions, host }, { persist: false });
 
             // Persist game:
             // asynchronously to return it faster,
@@ -119,7 +119,7 @@ export default class GameController
         @AuthenticatedPlayer() host: Player,
     ) {
         try {
-            return await this.hostedGameRepository.rematchGame(host, publicId);
+            return await this.hostedGameStore.rematchGame(host, publicId);
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);
@@ -133,7 +133,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = this.hostedGameRepository.playerJoinGame(player, publicId);
+        const result = this.hostedGameStore.playerJoinGame(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -146,7 +146,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @Body() move: HexMove,
     ) {
-        const result = this.hostedGameRepository.playerMove(player, publicId, move);
+        const result = this.hostedGameStore.playerMove(player, publicId, move);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -158,7 +158,7 @@ export default class GameController
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
     ) {
-        const result = this.hostedGameRepository.playerAskUndo(player, publicId);
+        const result = this.hostedGameStore.playerAskUndo(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -171,7 +171,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @Body() answerUndoBody: AnswerUndoBody,
     ) {
-        const result = this.hostedGameRepository.playerAnswerUndo(player, publicId, answerUndoBody.accept);
+        const result = this.hostedGameStore.playerAnswerUndo(player, publicId, answerUndoBody.accept);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -183,7 +183,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = this.hostedGameRepository.playerResign(player, publicId);
+        const result = this.hostedGameStore.playerResign(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -195,7 +195,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = this.hostedGameRepository.playerCancel(player, publicId);
+        const result = this.hostedGameStore.playerCancel(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);

@@ -1,4 +1,4 @@
-import HostedGameRepository from '../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../store/HostedGameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
@@ -12,7 +12,7 @@ export default class SpectatorWebsocketController implements WebsocketController
 
     constructor(
         private gameSpectators: GameSpectators,
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
         private gameEventsEmitter: GameEventsEmitter,
     ) {}
 
@@ -38,7 +38,7 @@ export default class SpectatorWebsocketController implements WebsocketController
         const { player } = socket.data;
         if (player === null) return;
 
-        const activeGame = this.hostedGameRepository.getActiveGame(gameId);
+        const activeGame = this.hostedGameStore.getActiveGame(gameId);
         if (activeGame === null) return;
 
         if (hasPlayer(activeGame.getHostedGame(), player)) return;

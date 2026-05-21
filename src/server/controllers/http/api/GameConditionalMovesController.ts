@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { Body, ForbiddenError, Get, JsonController, NotFoundError, Param, Patch } from 'routing-controllers';
 import { ConditionalMoves, Player } from '../../../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../../store/HostedGameStore.js';
 import ConditionalMovesRepository from '../../../repositories/ConditionalMovesRepository.js';
 import { hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
 
@@ -12,7 +12,7 @@ export default class GameConditionalMovesController
 {
     constructor(
         private conditionalMovesRepository: ConditionalMovesRepository,
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {}
 
     @Get('/api/games/:publicId/conditional-moves')
@@ -20,7 +20,7 @@ export default class GameConditionalMovesController
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
     ): Promise<ConditionalMoves> {
-        const hostedGame = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
+        const hostedGame = await this.hostedGameStore.getActiveOrArchivedGame(publicId);
 
         if (hostedGame === null) {
             throw new NotFoundError(`No active game with id '${publicId}'.`);
@@ -46,7 +46,7 @@ export default class GameConditionalMovesController
         @Param('publicId') publicId: string,
         @Body() conditionalMoves: ConditionalMoves,
     ): Promise<ConditionalMoves> {
-        const hostedGame = await this.hostedGameRepository.getActiveOrArchivedGame(publicId);
+        const hostedGame = await this.hostedGameStore.getActiveOrArchivedGame(publicId);
 
         if (hostedGame === null) {
             throw new NotFoundError(`No active game with id '${publicId}'.`);

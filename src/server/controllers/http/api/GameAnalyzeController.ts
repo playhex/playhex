@@ -6,7 +6,7 @@ import { GameAnalyze, ChatMessage } from '../../../../shared/app/models/index.js
 import { HexServer } from '../../../server.js';
 import Rooms from '../../../../shared/app/Rooms.js';
 import logger from '../../../services/logger.js';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import HostedGameStore from '../../../store/HostedGameStore.js';
 import { errorToLogger } from '../../../../shared/app/utils.js';
 import HostedGamePersister from '../../../persistance/HostedGamePersister.js';
 import { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
@@ -19,7 +19,7 @@ export default class GameAnalyzeController
         private gameAnalyzePersister: GameAnalyzePersister,
         private hostedGamePersister: HostedGamePersister,
         private hexAiApiClient: HexAiApiClient,
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
         private io: HexServer,
     ) {}
 
@@ -68,7 +68,7 @@ export default class GameAnalyzeController
 
             this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 
-            await this.hostedGameRepository.postChatMessage(publicId, this.createGameAnalyzeAvailableChatMessage(gameAnalyze));
+            await this.hostedGameStore.postChatMessage(publicId, this.createGameAnalyzeAvailableChatMessage(gameAnalyze));
         })().catch(e => {
             logger.error('Error in game analyze', errorToLogger(e));
             gameAnalyze.analyze = null;

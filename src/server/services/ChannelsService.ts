@@ -3,7 +3,7 @@ import { Channel, ChannelChatMessage } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
 import { languagesCodesISO6391 } from '../../shared/app/codes.js';
-import TournamentRepository from '../repositories/TournamentRepository.js';
+import TournamentStore from '../store/TournamentStore.js';
 
 export class ChannelNotFoundError extends Error {}
 
@@ -14,7 +14,7 @@ export class ChannelsService
 {
     constructor(
         private channelChatMessageRepository: ChannelChatMessageRepository,
-        private tournamentRepository: TournamentRepository,
+        private tournamentStore: TournamentStore,
 
         @Inject('Repository<Channel>')
         private channelRepository: Repository<Channel>,
@@ -77,7 +77,7 @@ export class ChannelsService
         if (tournament) {
             const slug = tournament[1];
 
-            return await this.tournamentRepository.slugExists(slug);
+            return await this.tournamentStore.slugExists(slug);
         }
 
         return false;

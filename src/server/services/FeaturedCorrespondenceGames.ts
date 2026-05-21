@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import HostedGameRepository from '../repositories/HostedGameRepository.js';
+import HostedGameStore from '../store/HostedGameStore.js';
 import { HostedGame } from '../../shared/app/models/index.js';
 import { isCorrespondence } from '../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
@@ -31,7 +31,7 @@ const DECREASE_SCORE_FEW_MOVES = 10;
 export class FeaturedCorrespondenceGames extends TypedEmitter<FeaturedCorrespondenceGamesEvents>
 {
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private hostedGameStore: HostedGameStore,
     ) {
         super();
 
@@ -80,7 +80,7 @@ export class FeaturedCorrespondenceGames extends TypedEmitter<FeaturedCorrespond
 
     getFeaturedGames(): HostedGame[]
     {
-        const activeGames = this.hostedGameRepository.getActiveGames();
+        const activeGames = this.hostedGameStore.getActiveGames();
         const candidates: HostedGame[] = [];
 
         for (const publicId in activeGames) {
