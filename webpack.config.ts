@@ -87,6 +87,7 @@ const config: webpack.Configuration = {
         alias: {
             'typeorm': path.resolve(__dirname, 'node_modules/typeorm/typeorm-model-shim'), // To prevent typeorm decorators "not found" error on frontside
             'vue': path.resolve(__dirname, 'node_modules/vue/dist/vue.runtime.esm-bundler.js'), // Runtime-only build; compiler not needed since vue-loader compiles templates at build time
+            [path.resolve(__dirname, 'node_modules/class-validator/esm5/decorator/string/IsPhoneNumber.js')]: path.resolve(__dirname, 'src/client/shims/IsPhoneNumber.ts'), // Can be removed when https://github.com/typestack/class-validator/issues/2682 is fixed
         },
     },
     optimization: {
