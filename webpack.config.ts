@@ -86,6 +86,7 @@ const config: webpack.Configuration = {
         },
         alias: {
             'typeorm': path.resolve(__dirname, 'node_modules/typeorm/typeorm-model-shim'), // To prevent typeorm decorators "not found" error on frontside
+            'vue': path.resolve(__dirname, 'node_modules/vue/dist/vue.runtime.esm-bundler.js'), // Runtime-only build; compiler not needed since vue-loader compiles templates at build time
         },
     },
     optimization: {
