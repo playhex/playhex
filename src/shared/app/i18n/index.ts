@@ -101,9 +101,7 @@ const setI18nLanguage = (locale: string) => {
 };
 
 const loadLocaleMessages = async (locale: string) => {
-    const messages = await import(
-        /* webpackChunkName: "locale-[request]" */ `./locales/${locale}.json`
-    );
+    const messages = await import(`./locales/${locale}.json`);
 
     // set locale and locale message
     i18n.addResourceBundle(locale, 'translation', messages.default);

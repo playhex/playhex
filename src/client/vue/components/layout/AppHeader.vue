@@ -12,9 +12,7 @@ import { useServerVersionChecker } from '../../composables/useServerVersionCheck
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
-/* global SITE_TITLE_SUFFIX */
-// @ts-ignore: SITE_TITLE_SUFFIX replaced at build time by webpack.
-const siteTitleSuffix: undefined | string = SITE_TITLE_SUFFIX;
+const siteTitleSuffix = SITE_TITLE_SUFFIX;
 
 /*
  * My turn notification

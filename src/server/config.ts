@@ -13,6 +13,6 @@ if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'producti
 }
 
 const IS_DEV = process.env.NODE_ENV !== 'production';
-const WEBPACK_PORT = 8085; // For dev environment only
+const VITE_PORT = 5173;
 
-export { IS_DEV, WEBPACK_PORT };
+export { IS_DEV, VITE_PORT };

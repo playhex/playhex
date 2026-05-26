@@ -162,6 +162,13 @@ yarn test:e2e
 
 # Open Cypress browser
 yarn cypress open
+# then select "E2E testing" > your browser > Run all tests
+```
+
+For Cypress, make sure the app is running, and in production mode to make tests faster:
+
+``` bash
+yarn serve:prod
 ```
 
 **Warning**: For e2e/cypress tests, there is some configuration requirements:

@@ -47,9 +47,14 @@ Container.set(HexServer, io);
 app.set('view engine', 'ejs');
 app.set('query parser', 'extended'); // to allow parsing url with "?param[]=value". No the default since express v5
 
-registerHttpControllers(app);
+await registerHttpControllers(app, server);
 registerWebsocketControllers();
 
 server.listen(process.env.PORT || 3000, () => {
     logger.info(`App listening on port ${process.env.PORT || 3000}!`);
+});
+
+process.on('SIGINT', () => {
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 3000).unref();
 });

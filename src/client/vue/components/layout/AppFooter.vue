@@ -6,14 +6,10 @@ import { format } from 'date-fns';
 import i18n from 'i18next';
 import AppLiberapayLink from '../AppLiberapayLink.vue';
 
-/* global LAST_COMMIT_DATE */
-// @ts-ignore: LAST_COMMIT_DATE replaced at build time by webpack.
-const lastCommitDate: string = LAST_COMMIT_DATE;
-
-const date = ref<string>(lastCommitDate);
+const date = ref<string>(LAST_COMMIT_DATE);
 
 i18n.on('languageChanged', () => {
-    date.value = format(new Date(`${lastCommitDate} 12:00:00`), 'd MMM y');
+    date.value = format(new Date(`${LAST_COMMIT_DATE} 12:00:00`), 'd MMM y');
 });
 </script>
 

@@ -1,4 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
+import http from 'http';
 import path from 'path';
 import { registerApi } from './api/index.js';
 import { staticsRouter } from './misc/statics-router.js';
@@ -11,12 +12,12 @@ import { HttpError } from 'routing-controllers';
 import { preRenderedRouter } from './misc/pre-rendered-router.js';
 import { avatarsPath } from '../../services/PlayerAvatarService.js';
 
-export const registerHttpControllers = (app: Express): void => {
+export const registerHttpControllers = async (app: Express, httpServer: http.Server): Promise<void> => {
     app.use(preRenderedRouter());
     app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
     app.use('/avatars', express.static(avatarsPath));
     registerApi(app);
-    app.use(staticsRouter());
+    app.use(await staticsRouter(httpServer));
     app.use(pwaRouter());
     app.use(seoRouter());
     app.use(pagesRouter());

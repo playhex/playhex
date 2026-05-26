@@ -7,10 +7,8 @@ export const useServerVersionChecker = () => {
 
     /**
      * Current client javascript version.
-     * Defined statically at build time (see webpack config).
+     * Defined statically at build time (see Vite config define).
      */
-    /* global VERSION */
-    // @ts-ignore: VERSION replaced at build time by webpack.
     const clientVersion: string = VERSION;
 
     /**

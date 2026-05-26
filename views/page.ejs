@@ -14,6 +14,12 @@
     <% if (useCDN) { %>
         <%- include('partials/cdn.ejs') %>
     <% } %>
+
+    <% for(const assetUrl of Object.values(manifest)) { %>
+        <% if (assetUrl.endsWith('.css')) { %>
+        <link rel="stylesheet" href="<%- assetUrl %>">
+        <% } %>
+    <% } %>
 </head>
 
 <body>
@@ -25,8 +31,10 @@
 
     <%- include('partials/sentry.ejs') %>
 
-    <% for(var jsLocation of Object.values(manifest)) {%>
-        <script type="text/javascript" src="<%- jsLocation %>"></script>
+    <% for(const assetUrl of Object.values(manifest)) { %>
+        <% if (!assetUrl.endsWith('.css')) { %>
+        <script type="module" src="<%- assetUrl %>"></script>
+        <% } %>
     <% } %>
 </body>
 

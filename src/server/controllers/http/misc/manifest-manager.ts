@@ -1,58 +1,52 @@
 import fs from 'node:fs';
 import path from 'path';
-import { IS_DEV, WEBPACK_PORT } from '../../../config.js';
+import { IS_DEV } from '../../../config.js';
 
+type ViteEntry = { file: string, name?: string, isEntry?: boolean, css?: string[] };
+type ViteManifest = { [key: string]: ViteEntry };
 type ManifestType = { [key: string]: string };
 
-/**
- * Do not include source maps in manifest to not load them as javascripts
- */
-const removeUnwantedJs = (manifest: ManifestType): void => {
-    Object.keys(manifest)
-        .forEach(key => {
-            // Remove source maps
-            if (key.endsWith('.map')) {
-                delete manifest[key];
-            }
+const MANIFEST_PATH = path.join(process.cwd(), 'dist', 'statics', 'manifest.json');
+const PUBLIC = '/statics/';
 
-            // Remove lazy loaded vuejs routes
-            // Remove pixi bundle, load it only when required
-            if (!key.includes('main') && !key.includes('vendors')) {
-                delete manifest[key];
-            }
-        })
-    ;
-};
+const flattenViteManifest = (raw: ViteManifest): ManifestType => {
+    const result: ManifestType = {};
 
-const getManifestFromWebpack = async (): Promise<ManifestType> => {
-    const response = await fetch(`http://localhost:${WEBPACK_PORT}/statics/manifest.json`);
-    const manifest = await response.json() as ManifestType;
+    for (const entry of Object.values(raw)) {
+        if (!entry.isEntry && !entry.name?.includes('vendor')) {
+            continue;
+        }
 
-    removeUnwantedJs(manifest);
+        result[entry.name ?? entry.file] = PUBLIC + entry.file;
 
-    return manifest;
+        for (const css of entry.css ?? []) {
+            result[css] = PUBLIC + css;
+        }
+    }
+
+    return result;
 };
 
 let manifestCache: null | ManifestType = null;
 
-export async function getManifest(): Promise<ManifestType> {
+export function getManifest(): ManifestType {
     if (IS_DEV) {
-        // load from webpack dev server
-        return await getManifestFromWebpack();
+        return {
+            'vite-client': '/@vite/client',
+            'main': '/src/client/client.ts',
+        };
     }
 
     if (manifestCache !== null) {
         return manifestCache;
     }
 
-    // read from file system
-    manifestCache = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'dist', 'statics', 'manifest.json'), 'utf-8').toString());
+    const raw = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8')) as ViteManifest;
+    manifestCache = flattenViteManifest(raw);
 
-    if (!manifestCache) {
-        throw new Error('"manifest.json" file not found');
+    if (Object.keys(manifestCache).length === 0) {
+        throw new Error('manifest.json has no entry or vendor chunks');
     }
-
-    removeUnwantedJs(manifestCache);
 
     return manifestCache;
 }

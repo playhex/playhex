@@ -110,7 +110,7 @@ export class PreRenderedService
         const { templateParts } = preRenderedPage;
 
         const pageVariables = {
-            manifest: await getManifest(),
+            manifest: getManifest(),
             seo,
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,

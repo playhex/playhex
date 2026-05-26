@@ -8,7 +8,6 @@ import Create1vAIRankedOverlay from '../components/overlay/Create1vAIRankedOverl
 import Create1vAIOverlay from '../components/overlay/Create1vAIOverlay.vue';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash.js';
 
-// @ts-ignore: ALLOW_RANKED_BOT_GAMES replaced at build time by webpack.
 export const allowRankedBotGames: boolean = ALLOW_RANKED_BOT_GAMES === 'true';
 
 const create1v1RankedOverlay = defineOverlay(Create1v1RankedOverlay);

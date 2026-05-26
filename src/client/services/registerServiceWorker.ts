@@ -2,10 +2,6 @@
 import router from '../vue/router.js';
 import { apiPutPushSubscription } from '../apiClient.js';
 
-/* global PUSH_VAPID_PUBLIC_KEY */
-// @ts-ignore: PUSH_VAPID_PUBLIC_KEY replaced at build time by webpack.
-const pushValidPublicKey: undefined | string = PUSH_VAPID_PUBLIC_KEY as string;
-
 /**
  * Register service worker, and returns a ServiceWorkerRegistration,
  * used later to show notifications, subscribe to push notifications...
@@ -105,13 +101,13 @@ export const subscribeToPushNotifications = async (): Promise<null | PushSubscri
     if (pushSubscription === null) {
         const registration = await serviceWorkerRegistrationPromise;
 
-        if (!registration?.pushManager || typeof pushValidPublicKey !== 'string' || pushValidPublicKey.length === 0) {
+        if (!registration?.pushManager || typeof PUSH_VAPID_PUBLIC_KEY !== 'string' || PUSH_VAPID_PUBLIC_KEY.length === 0) {
             return null;
         }
 
         pushSubscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: pushValidPublicKey,
+            applicationServerKey: PUSH_VAPID_PUBLIC_KEY,
         });
     }
 

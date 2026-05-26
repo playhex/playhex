@@ -2,7 +2,8 @@
     "extends": "../src/client/tsconfig.json",
     "compilerOptions": {
       "rootDir": "..",
-      "types": ["cypress", "node"]
+      "types": ["cypress", "node"],
+      "moduleDetection": "force"
     },
     "include": ["**/*.ts"]
 }
