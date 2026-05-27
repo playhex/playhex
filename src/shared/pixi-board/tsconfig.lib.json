@@ -1,0 +1,28 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "./dist/types"
+    },
+    "include": [
+        "*.ts",
+        "entities/*.ts",
+        "facades/*.ts",
+        "conditional-moves/*.ts",
+        "shading-patterns/*.ts",
+        "move-notation/*.ts",
+        "resize-observer-debounced/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "cypress",
+        "vite.*.ts",
+        "cypress.config.ts"
+    ]
+}

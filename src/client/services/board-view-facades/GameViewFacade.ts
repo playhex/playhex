@@ -1,12 +1,12 @@
 import Game from '../../../shared/game-engine/Game.js';
-import GameView from '../../../shared/pixi-board/GameView.js';
-import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
-import { PreviewMoveFacade } from '../../../shared/pixi-board/facades/PreviewMoveFacade.js';
+import { GameView } from '@playhex/pixi-board';
+import { PlayingGameFacade } from '@playhex/pixi-board';
+import { PreviewMoveFacade } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
 import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
-import { OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
+import { OrientationMode } from '@playhex/pixi-board';
 import { HexMove, isSpecialHexMove } from '../../../shared/move-notation/hex-move-notation.js';
-import { SimulatePlayingGameFacade } from '../../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
+import { SimulatePlayingGameFacade } from '@playhex/pixi-board';
 
 /**
  * Keeps GameView updated with Game.

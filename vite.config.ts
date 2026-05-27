@@ -33,6 +33,7 @@ export default defineConfig(({ command }) => ({
             '.js': ['.ts', '.js'],
         },
         alias: {
+            '@playhex/pixi-board': path.resolve(__dirname, 'src/shared/pixi-board/index.ts'),
             // Polyfill Node.js built-ins that browser-targeted packages (e.g. tiny-typed-emitter) depend on
             'events': path.resolve(__dirname, 'node_modules/events/events.js'),
             'typeorm': path.resolve(__dirname, 'node_modules/typeorm/typeorm-model-shim.js'),

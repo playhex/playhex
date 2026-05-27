@@ -9,7 +9,7 @@ import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 import { ActiveTournamentsFilters } from '../shared/app/tournamentUtils.js';
-import { ConditionalMovesStruct } from '../shared/pixi-board/conditional-moves/types.js';
+import { ConditionalMovesStruct } from '@playhex/pixi-board';
 
 /**
  * @throws {DomainHttpError}

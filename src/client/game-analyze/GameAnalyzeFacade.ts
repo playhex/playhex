@@ -1,5 +1,5 @@
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
-import GameView from '../../shared/pixi-board/GameView.js';
+import { GameView } from '@playhex/pixi-board';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
 import { validateMove, parseMove, Move } from '../../shared/move-notation/move-notation.js';

@@ -5,7 +5,7 @@ import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
 import { GameAnalyzeChart } from '../../game-analyze/GameAnalyzeChart.js';
 import { GameAnalyzeFacade, AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeFacade.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
-import { themes } from '../../../shared/pixi-board/BoardTheme.js';
+import { themes } from '@playhex/pixi-board';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 
 const props = defineProps({

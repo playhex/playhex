@@ -1,12 +1,12 @@
-import GameView from '../../../shared/pixi-board/GameView.js';
+import { GameView } from '@playhex/pixi-board';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerLocalSettingsStore.js';
 import { watch } from 'vue';
-import { themes } from '../../../shared/pixi-board/BoardTheme.js';
+import { themes } from '@playhex/pixi-board';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
-import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facade.js';
-import { ShadingPatternFacade } from '../../../shared/pixi-board/facades/ShadingPatternFacade.js';
-import { AutoOrientationFacade, OrientationMode } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
+import { Anchor44Facade } from '@playhex/pixi-board';
+import { ShadingPatternFacade } from '@playhex/pixi-board';
+import { AutoOrientationFacade, OrientationMode } from '@playhex/pixi-board';
 
 /**
  * Customizes game view with player current settings

@@ -9,7 +9,7 @@ import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 import { Game } from '../../../../shared/game-engine/index.js';
 import { onMounted, ref } from 'vue';
-import GameView from '../../../../shared/pixi-board/GameView.js';
+import { GameView } from '@playhex/pixi-board';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 
 useHead({

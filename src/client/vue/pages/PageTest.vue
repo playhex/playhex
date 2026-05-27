@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted, shallowRef } from 'vue';
-import { themes } from '../../../shared/pixi-board/BoardTheme.js';
-import GameView from '../../../shared/pixi-board/GameView.js';
-import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
-import { ShadingPatternFacade } from '../../../shared/pixi-board/facades/ShadingPatternFacade.js';
-import { Anchor44Facade } from '../../../shared/pixi-board/facades/Anchor44Facade.js';
-import TextMark from '../../../shared/pixi-board/entities/TextMark.js';
+import { themes } from '@playhex/pixi-board';
+import { GameView } from '@playhex/pixi-board';
+import { PlayingGameFacade } from '@playhex/pixi-board';
+import { ShadingPatternFacade } from '@playhex/pixi-board';
+import { Anchor44Facade } from '@playhex/pixi-board';
+import { TextMark } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
-import { AnimatorFacade } from '../../../shared/pixi-board/facades/AnimatorFacade.js';
-import { AutoOrientationFacade } from '../../../shared/pixi-board/facades/AutoOrientationFacade.js';
-import { SimulatePlayingGameFacade } from '../../../shared/pixi-board/facades/SimulatePlayingGameFacade.js';
-import ConditionalMovesEditor from '../../../shared/pixi-board/conditional-moves/ConditionalMovesEditor.js';
-import { ConditionalMovesFacade } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesFacade.js';
-import { ConditionalMovesState, createConditionalMovesState } from '../../../shared/pixi-board/conditional-moves/ConditionalMovesState.js';
+import { AnimatorFacade } from '@playhex/pixi-board';
+import { AutoOrientationFacade } from '@playhex/pixi-board';
+import { SimulatePlayingGameFacade } from '@playhex/pixi-board';
+import { ConditionalMovesEditor } from '@playhex/pixi-board';
+import { ConditionalMovesFacade } from '@playhex/pixi-board';
+import { ConditionalMovesState, createConditionalMovesState } from '@playhex/pixi-board';
 
 const container = ref<HTMLElement>();
 

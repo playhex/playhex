@@ -1,7 +1,7 @@
 import { Container, Graphics, PointData } from 'pixi.js';
-import { BoardEntity } from '../../shared/pixi-board/BoardEntity.js';
-import Hex from '../../shared/pixi-board/Hex.js';
-import { colorAverage } from '../../shared/pixi-board/colorUtils.js';
+import { BoardEntity } from '@playhex/pixi-board';
+import { Hex } from '@playhex/pixi-board';
+import { colorAverage } from '@playhex/pixi-board';
 
 /**
  * Where player actually played.

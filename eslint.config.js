@@ -90,12 +90,12 @@ export default tseslint.config([
     },
     {
         ignores: [
-            'dist/',
+            '**/dist/',
             'cypress/',
             'eslint.config.js',
             'assets/service-worker.js',
             'index.js',
-            'register.js',
+            '**/register.js',
         ],
     },
 ]);

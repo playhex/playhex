@@ -3,8 +3,8 @@ import HostedGame from '../../../shared/app/models/HostedGame.js';
 import useSocketStore from '../../stores/socketStore.js';
 import { addMove, cancelGame, endGame } from '../../../shared/app/hostedGameUtils.js';
 import Rooms from '../../../shared/app/Rooms.js';
-import GameView from '../../../shared/pixi-board/GameView.js';
-import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
+import { GameView } from '@playhex/pixi-board';
+import { PlayingGameFacade } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { HexServerToClientEvents } from '../../../shared/app/HexSocketEvents.js';
 

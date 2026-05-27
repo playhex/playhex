@@ -5,7 +5,11 @@ import type { HexMove } from '../../move-notation/hex-move-notation.js';
 import { getNextMovesAfterLine } from './conditionalMovesUtils.js';
 import TextMark from '../entities/TextMark.js';
 import GameView from '../GameView.js';
-import { on } from '../../app/utils.js';
+import { ListenerSignature, TypedEmitter } from 'tiny-typed-emitter';
+
+const on = <L extends ListenerSignature<L>, K extends keyof L>(
+    emitter: TypedEmitter<L>, event: K, listener: L[K],
+): () => void => { emitter.on(event, listener); return () => emitter.off(event, listener); };
 
 const ENTITIES_GROUP_CONDITIONAL_MOVES = 'entities_group_conditional_moves';
 

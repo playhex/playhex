@@ -2,10 +2,10 @@ import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pi
 import Hex from './Hex.js';
 import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 import { BoardEntity } from './BoardEntity.js';
-import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '../move-notation/move-notation.js';
 import Stone from './entities/Stone.js';
+import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '../move-notation/move-notation.js';
+import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;
@@ -914,9 +914,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         this.emit('destroyBefore');
 
-        this.pixi.destroy(true);
+        this.destroyResizeObserver(); // Must disconnect resize observer before destroying pixi app, the observed element
 
-        this.destroyResizeObserver();
+        this.pixi.destroy(true);
 
         this.emit('destroyAfter');
     }

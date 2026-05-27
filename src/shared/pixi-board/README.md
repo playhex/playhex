@@ -1,8 +1,25 @@
-# Hex board
+# Hex board view
 
-Displays a game board for Hex.
+Hex board game renderer built on [PixiJS](https://pixijs.com/).
 
 Can show Red or Blue stones, can be rotated, last move played, mark swap move, show coords, add custom marks...
+
+## Installation
+
+```bash
+npm install @playhex/pixi-board pixi.js tiny-typed-emitter
+```
+
+`pixi.js` and `tiny-typed-emitter` are peer dependencies and must be installed alongside the package.
+
+## Quick start
+
+```ts
+import { GameView } from '@playhex/pixi-board';
+
+const gameView = new GameView(9);
+await gameView.mount(document.getElementById('board'));
+```
 
 ## Usage
 
@@ -248,4 +265,33 @@ editor.submitConditionalMoves();
  * Once done, disable conditional moves edition. Will resume the view.
  */
 conditionalMovesFacade.destroy();
+```
+
+## Testing
+
+### Unit tests
+
+``` bash
+npm run test:unit
+```
+
+### Visual tests
+
+Renders board snapshots in a headless browser and compares them against reference images.
+
+``` bash
+npm run test:visual
+```
+
+- `src/shared/pixi-board/cypress/screenshots-expected`: how board view should looks like
+- `src/shared/pixi-board/cypress/screenshots`: how board view appeared while being under test
+
+**Note**: If a new visual test is added,
+expected screenshots will be automatically added in folder on first run.
+
+If board appearance changed from expected screenshot, but it's not a regression,
+validate changes and update reference screenshots with:
+
+``` bash
+npm run test:visual:update
 ```

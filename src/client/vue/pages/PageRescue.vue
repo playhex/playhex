@@ -2,8 +2,8 @@
 import { onBeforeMount, onUnmounted, ref, Ref } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { useServerVersionChecker } from '../composables/useServerVersionChecker.js';
-import GameView from '../../../shared/pixi-board/GameView.js';
-import { PlayingGameFacade } from '../../../shared/pixi-board/facades/PlayingGameFacade.js';
+import { GameView } from '@playhex/pixi-board';
+import { PlayingGameFacade } from '@playhex/pixi-board';
 import AppGameView from '../components/AppGameView.vue';
 
 useSeoMeta({

@@ -1,6 +1,6 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
 import { ResizeObserverDebounced } from '../../shared/resize-observer-debounced/ResizeObserverDebounced.js';
-import { Theme, themes } from '../../shared/pixi-board/BoardTheme.js';
+import { Theme, themes } from '@playhex/pixi-board';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import { defer } from '../../shared/app/defer.js';

@@ -165,13 +165,20 @@ yarn cypress open
 # then select "E2E testing" > your browser > Run all tests
 ```
 
-For Cypress, make sure the app is running, and in production mode to make tests faster:
+All commands to run Cypress tests in command line:
 
 ``` bash
-yarn serve:prod
+yarn hex check-tests-requirements # check environment has no issue that may make tests failing
+yarn serve:prod # serve prod is faster for e2e tests
+yarn cypress run --browser firefox # or another browser, or leave empty
 ```
 
 **Warning**: For e2e/cypress tests, there is some configuration requirements:
+
+``` bash
+# you can run this command to check all missing requirements
+yarn hex check-tests-requirements
+```
 
 - Test bots must exists in database, if not, run:
 

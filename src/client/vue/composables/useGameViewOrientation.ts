@@ -1,5 +1,5 @@
 import { ref, Ref, ShallowRef, watch } from 'vue';
-import GameView from '../../../shared/pixi-board/GameView.js';
+import { GameView } from '@playhex/pixi-board';
 
 /**
  * Creates an orientation ref from a GameView shallowRef

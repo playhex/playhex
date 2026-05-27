@@ -7,14 +7,14 @@ import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
 import { findLocalAIByName, instanciateAi } from '../localAi.js';
 import { defineOverlay } from '@overlastic/vue';
 import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vue';
-import GameView from '../../../../shared/pixi-board/GameView.js';
+import { GameView } from '@playhex/pixi-board';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 import type { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 import AppGameView from '../../components/AppGameView.vue';
 import { useHead } from '@unhead/vue';
-import { AnimatorFacade } from '../../../../shared/pixi-board/facades/AnimatorFacade.js';
+import { AnimatorFacade } from '@playhex/pixi-board';
 
 useHead({
     title: t('play_offline'),

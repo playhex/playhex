@@ -3,10 +3,14 @@
   "description": "Play Hex board game online",
   "license": "AGPL-3.0-only",
   "author": "Julien Maulny",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/playhex/playhex.git"
   },
+  "workspaces": [
+    "src/shared/pixi-board"
+  ],
   "type": "module",
   "exports": "./index.js",
   "engines": {
@@ -28,8 +32,8 @@
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
     "db:diff": "yarn build-server && yarn typeorm schema:log -d dist/server/data-source.js",
     "db:sync": "yarn build-server && yarn typeorm schema:sync -d dist/server/data-source.js",
-    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/shared/tsconfig.json\" mocha 'src/**/**/**/test/**/**/**/*.ts' --extension ts --ignore 'src/**/node_modules/**'",
-    "test:e2e": "yarn hex check-tests-requirements && cypress run",
+    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/shared/tsconfig.json\" mocha 'src/**/**/**/test/**/**/**/*.ts' --extension ts --ignore 'src/**/node_modules/**' --ignore 'src/**/pixi-board/**'",
+    "test:e2e": "yarn hex check-tests-requirements && concurrently --kill-others --names SERVER,CYPRESS \"yarn serve:prod\" \"wait-on http://localhost:${PORT:-3000} && yarn cypress run --browser firefox\"",
     "test:all": "yarn test:unit && yarn test:e2e",
     "test": "yarn test:unit"
   },
@@ -80,6 +84,7 @@
     "parse-duration": "^2.1.4",
     "pg": "^8.14.1",
     "pinia": "^3.0.4",
+    "@playhex/pixi-board": "*",
     "pixi.js": "^8.18.1",
     "qs": "^6.14.0",
     "redis": "^5.10.0",

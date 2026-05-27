@@ -1,6 +1,6 @@
 import { Graphics, PointData } from 'pixi.js';
-import { BoardEntity } from '../../shared/pixi-board/BoardEntity.js';
-import Hex from '../../shared/pixi-board/Hex.js';
+import { BoardEntity } from '@playhex/pixi-board';
+import { Hex } from '@playhex/pixi-board';
 
 /**
  * Computer best move.

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class-transformer-custom.js';
-import { OrientationMode } from '../../shared/pixi-board/facades/AutoOrientationFacade.js';
+import { OrientationMode } from '@playhex/pixi-board';
 
 const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 

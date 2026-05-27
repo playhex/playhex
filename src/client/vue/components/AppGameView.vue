@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, toRefs } from 'vue';
-import GameView from '../../../shared/pixi-board/GameView.js';
+import { GameView } from '@playhex/pixi-board';
 
 const props = defineProps({
     gameView: {

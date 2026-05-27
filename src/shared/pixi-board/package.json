@@ -1,0 +1,54 @@
+{
+  "name": "@playhex/pixi-board",
+  "version": "1.0.0",
+  "description": "Hex board game renderer built on PixiJS",
+  "license": "AGPL-3.0-only",
+  "author": "Julien Maulny",
+  "homepage": "https://playhex.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/playhex/playhex.git",
+    "directory": "src/shared/pixi-board"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "types": "./dist/types/shared/pixi-board/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
+    "build:visual-test": "vite build --config vite.visual.config.ts",
+    "test:visual": "npm run build:visual-test && cypress run",
+    "test:visual:update": "npm run build:visual-test && cypress run --env UPDATE_SNAPSHOTS=true",
+    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT='../tsconfig.json' mocha 'test/**/*.ts' --extension ts --ignore 'test/visual/**'",
+    "test": "npm run test:unit && npm run test:visual",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "expr-eval-fork": "^3.0.3"
+  },
+  "peerDependencies": {
+    "pixi.js": ">=8",
+    "tiny-typed-emitter": ">=2"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "@types/pngjs": "*",
+    "cypress": "^15.15.0",
+    "mocha": "^11.0.0",
+    "pixelmatch": "*",
+    "pixi.js": "^8.18.1",
+    "pngjs": "*",
+    "tiny-typed-emitter": "^2.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2",
+    "vite": "^6.0.0"
+  }
+}
