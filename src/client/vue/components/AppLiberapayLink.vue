@@ -1,6 +1,6 @@
 <template>
     <a class="btn btn-liberapay" href="https://liberapay.com/PlayHex/" target="_blank" rel="noopener noreferrer">
-        <img src="/images/liberapay_logo_black.svg" alt="Logo Liberapay" height="20" />
+        <img src="/images/liberapay_logo_black.svg" alt="Logo Liberapay" width="20" height="20" />
         {{ $t('donate') }}
     </a>
 </template>
