@@ -26,7 +26,6 @@ import { IconCalendar, IconCircleFill, IconLightningChargeFill, IconSearch, Icon
 import AppLobbyFeaturesLiveGames from '../components/AppLobbyFeaturesLiveGames.vue';
 import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesCorrespondenceGames.vue';
 import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
-import AppTutorialCard from '../components/AppTutorialCard.vue';
 import { useElementHover } from '@vueuse/core';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.vue';
@@ -120,8 +119,6 @@ for (const locale of getPlayerLocales()) {
 
         <div class="row">
             <div class="col-md-8">
-
-                <AppTutorialCard />
 
                 <!-- My turn to play -->
                 <section v-if="mySortedGames && mySortedGames.length > 0" class="mb-4">
@@ -271,13 +268,13 @@ for (const locale of getPlayerLocales()) {
                 </section>
 
                 <!-- Recent games -->
-                <section v-if="endedHostedGames.length > 0" class="mb-4">
+                <section class="mb-4">
                     <div class="card">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <span class="fw-bold">{{ $t('finished_games') }}</span>
                         </div>
                         <div class="table-responsive">
-                            <table class="table text-nowrap table-borderless table-hover mb-0">
+                            <table style="min-height: 14em;" class="table text-nowrap table-borderless table-hover mb-0">
                                 <thead>
                                     <tr class="small text-secondary">
                                         <th></th>

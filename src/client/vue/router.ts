@@ -7,6 +7,9 @@ const routes: RouteRecordRaw[] = [
         name: 'home',
         path: '/',
         component: () => import('./pages/PageLobby.vue'),
+        meta: {
+            fixFooterCls: true,
+        },
     },
     {
         path: '/',

@@ -4,9 +4,11 @@ import AppFooter from './components/layout/AppFooter.vue';
 import AppToasts from './components/layout/AppToasts.vue';
 import AppPlayerModerationActionOverlayAll from './components/AppPlayerModerationActionOverlayAll.vue';
 import { useRouter } from 'vue-router';
+import { computed } from 'vue';
 
 const { currentRoute } = useRouter();
-const displayFooter = () => currentRoute.value.meta.displayFooter !== false;
+const displayFooter = computed(() => currentRoute.value.meta.displayFooter !== false);
+const fixFooterCls = computed(() => currentRoute.value.meta.fixFooterCls !== false);
 </script>
 
 <template>
@@ -15,11 +17,11 @@ const displayFooter = () => currentRoute.value.meta.displayFooter !== false;
             <AppHeader />
         </header>
 
-        <main>
+        <main :class="{ 'fix-footer-cls': fixFooterCls }">
             <router-view />
         </main>
 
-        <footer v-if="displayFooter()">
+        <footer v-if="displayFooter">
             <AppFooter />
         </footer>
 
@@ -37,4 +39,8 @@ const displayFooter = () => currentRoute.value.meta.displayFooter !== false;
 
     footer
         margin-top auto
+        min-height 18em
+
+main.fix-footer-cls
+    min-height 100vh
 </style>
