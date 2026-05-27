@@ -49,6 +49,9 @@ const ack = async (hostedGamePublicId?: string) => {
                 ? 'link-body-emphasis'
                 : 'link-secondary'
             "
+            role="button"
+            :aria-label="$t('Notifications')"
+            :title="$t('Notifications')"
         >
             <IconMailboxFlag v-if="playerNotifications && playerNotifications.length > 0" style="font-size: 1.5em" class="custom-svg-color" />
             <IconMailbox v-else style="font-size: 1.5em" />

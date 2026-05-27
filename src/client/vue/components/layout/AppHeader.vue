@@ -9,6 +9,7 @@ import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
 import { useServerVersionChecker } from '../../composables/useServerVersionChecker.js';
+import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -193,6 +194,8 @@ const {
                     v-if="shouldDisplayLink"
                     :to="{ name: 'tutorial' }"
                     class="btn btn-sm btn-info"
+                    :title="$t('tutorial.label')"
+                    :aria-label="$t('tutorial.label')"
                 >
                     <IconRocketTakeOff />
                     <span class="d-none d-sm-inline">&nbsp;{{ $t('tutorial.label') }}</span>
@@ -229,7 +232,12 @@ const {
                 <!-- Player nickname -->
                 <p class="nav-player-item">
                     <template v-if="loggedInPlayer">
-                        <router-link :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }" class="link-body-emphasis">
+                        <router-link
+                            :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }"
+                            class="link-body-emphasis"
+                            :title="pseudoString(loggedInPlayer)"
+                            :aria-label="pseudoString(loggedInPlayer)"
+                        >
                             <img v-if="loggedInPlayer.avatarThumbnailPath ?? loggedInPlayer.avatarPath" :src="(loggedInPlayer.avatarThumbnailPath ?? loggedInPlayer.avatarPath)!" :alt="loggedInPlayer.pseudo" class="nav-avatar" />
                             <template v-else>
                                 <IconPersonFill class="nav-avatar-icon" />

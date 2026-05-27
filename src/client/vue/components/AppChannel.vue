@@ -157,6 +157,8 @@ const sendMessage = async () => {
                     :class="loggedInPlayer && !isChatBlocked ? 'btn-success' : 'btn-secondary'"
                     type="submit"
                     :disabled="!loggedInPlayer || isChatBlocked"
+                    :title="$t('send_chat_message')"
+                    :aria-label="$t('send_chat_message')"
                 ><IconSendFill /></button>
             </form>
         </div>
