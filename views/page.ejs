@@ -17,7 +17,8 @@
 
     <% for(const assetUrl of Object.values(manifest)) { %>
         <% if (assetUrl.endsWith('.css')) { %>
-        <link rel="stylesheet" href="<%- assetUrl %>">
+        <link rel="preload" href="<%- assetUrl %>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="<%- assetUrl %>"></noscript>
         <% } %>
     <% } %>
 </head>
