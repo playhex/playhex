@@ -1,7 +1,8 @@
 import path from 'path';
 import http from 'http';
-import express, { Router } from 'express';
+import { Router } from 'express';
 import { IS_DEV } from '../../../config.js';
+import { memoryStatic } from './static-memory-cache.js';
 
 export async function staticsRouter(httpServer: http.Server): Promise<Router> {
     const router = Router();
@@ -16,9 +17,10 @@ export async function staticsRouter(httpServer: http.Server): Promise<Router> {
             appType: 'custom',
         });
         router.use(vite.middlewares);
-    } else {
-        router.use('/statics', express.static(path.join(process.cwd(), 'dist', 'statics')));
+        return router;
     }
+
+    router.use('/statics', memoryStatic(path.join(process.cwd(), 'dist', 'statics')));
 
     return router;
 }
