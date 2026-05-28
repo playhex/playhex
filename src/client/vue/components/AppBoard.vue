@@ -139,7 +139,7 @@ onUnmounted(() => {
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
-                <p class="h5" v-if="players">
+                <p v-if="players">
                     <template v-if="players[0]">
                         <AppPlayerAvatar v-if="players[0].avatarThumbnailPath ?? players[0].avatarPath" :player="players[0]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo
@@ -148,6 +148,7 @@ onUnmounted(() => {
                             :onlineStatus="!(players[0].avatarThumbnailPath ?? players[0].avatarPath)"
                             :player="players[0]"
                             classes="text-danger"
+                            class="nickname"
                         />
                     </template>
                     <span v-else class="fst-italic">{{ $t('waiting') }}</span>
@@ -161,16 +162,18 @@ onUnmounted(() => {
                 />
             </div>
             <div class="player player-b">
-                <p class="h5" v-if="players">
+                <p v-if="players">
                     <span v-if="game.getWinner() === 1"><IconTrophyFill class="text-warning" />&nbsp;</span>
                     <template v-if="players[1]">
                         <AppPlayerAvatar v-if="players[1].avatarThumbnailPath ?? players[1].avatarPath" :player="players[1]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo
                             flag
                             rating
+                            alignItems="right"
                             :onlineStatus="!(players[1].avatarThumbnailPath ?? players[1].avatarPath)"
                             :player="players[1]"
                             classes="text-primary"
+                            class="nickname"
                         />
                     </template>
                     <span v-else class="fst-italic">{{ $t('waiting') }}</span>
@@ -260,7 +263,7 @@ onUnmounted(() => {
     flex-direction column
     position absolute
     height auto
-    max-width 30%
+    max-width 32%
     margin 0.75rem // To align with bootstrap navbar/container
 
     p
@@ -270,9 +273,15 @@ onUnmounted(() => {
             display flex
             align-items center
 
+    .nickname
+        font-weight 500
+
+        @media (min-width 992px)
+            font-size 1.2em
+
 .board-avatar
-    width 1.4em
-    height 1.212em
+    width 2rem
+    height 1.732rem // width * cos(30)
 
 // Default, top left, top right
 .player-a

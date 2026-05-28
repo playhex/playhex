@@ -17,6 +17,10 @@ const props = defineProps({
         type: String,
         default: 'span',
     },
+
+    /**
+     * CSS classes to apply to nickname text (e.g red or blue color)
+     */
     classes: {
         type: [String, Array, Object] as PropType<null | string | { [className: string]: boolean } | string[]>,
         default: null,
@@ -48,6 +52,11 @@ const props = defineProps({
         type: [Boolean, String] as PropType<boolean | 'full'>,
         default: false,
     },
+
+    alignItems: {
+        type: String as PropType<'left' | 'right'>,
+        default: 'left',
+    },
 });
 
 const p = ref();
@@ -57,28 +66,67 @@ watchEffect(() => {
 </script>
 
 <template>
-    <AppOnlineStatus v-if="onlineStatus" :player="p" />
-
     <RouterLink
         :to="p.slug ? { name: 'player', params: { slug: p.slug } } : ''"
-        class="text-body text-decoration-none"
+        class="text-body text-decoration-none pseudo-link"
+        :style="{ justifyContent: alignItems === 'right' ? 'flex-end' : 'flex-start' }"
     >
-        <component :is="is" :class="classes">
-            <span v-if="p.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
-            <span>{{ p.pseudo }}</span>
-            <small v-if="flag && p.countryFlag" aria-hidden="true">&nbsp;{{ p.countryFlag }}</small>
-        </component>
+        <span class="nick-group">
+            <span v-if="onlineStatus" class="status-icon">
+                <AppOnlineStatus :player="p" />
+            </span>
 
-        <template v-if="rating">
-            <!-- adds an invisible space between username and rating to make copy/paste and functionnal tests more readable -->
-            <span class="invisible">&nbsp;</span>
+            <component :is="is" :class="classes" class="nick">
+                <span v-if="p.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
+                <span>{{ p.pseudo }}</span>
+            </component>
+        </span>
 
-            <AppPlayerRating :player="p" :full="rating === 'full'" class="ms-2" />
-        </template>
+        <span v-if="(flag && p.countryFlag) || rating" class="meta-group">
+            <small v-if="flag && p.countryFlag" aria-hidden="true">{{ p.countryFlag }}</small>
+
+            <template v-if="rating">
+                <!-- adds an invisible space between username and rating to make copy/paste and functionnal tests more readable -->
+                <span class="invisible">&nbsp;</span>
+
+                <AppPlayerRating :player="p" :full="rating === 'full'" />
+            </template>
+        </span>
     </RouterLink>
 </template>
 
 <style lang="stylus" scoped>
 .invisible
     font-size 0px
+
+.pseudo-link
+    display inline-flex
+    flex-wrap wrap
+    align-items center
+    justify-content flex-start
+    column-gap 0.4em
+    min-width 0
+    max-width 100%
+
+.nick-group
+    display inline-flex
+    align-items center
+    min-width 0
+    overflow hidden
+
+.status-icon
+    font-size 1rem
+    flex-shrink 0
+    line-height 1
+
+.nick
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    min-width 0
+
+.meta-group
+    display inline-flex
+    align-items center
+    gap 0.1em
 </style>
