@@ -4,11 +4,18 @@ import AppFooter from './components/layout/AppFooter.vue';
 import AppToasts from './components/layout/AppToasts.vue';
 import AppPlayerModerationActionOverlayAll from './components/AppPlayerModerationActionOverlayAll.vue';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
-const { currentRoute } = useRouter();
-const displayFooter = computed(() => currentRoute.value.meta.displayFooter !== false);
-const fixFooterCls = computed(() => currentRoute.value.meta.fixFooterCls !== false);
+const router = useRouter();
+const { currentRoute } = router;
+
+const displayFooter = computed(() => currentRoute.value.meta.displayFooter ?? true);
+
+// Fix CLS on footer
+const routeLoaded = ref(false);
+
+router.beforeEach(() => { routeLoaded.value = false; });
+router.afterEach(() => { routeLoaded.value = true; });
 </script>
 
 <template>
@@ -17,11 +24,11 @@ const fixFooterCls = computed(() => currentRoute.value.meta.fixFooterCls !== fal
             <AppHeader />
         </header>
 
-        <main :class="{ 'fix-footer-cls': fixFooterCls }">
+        <main>
             <router-view />
         </main>
 
-        <footer v-if="displayFooter">
+        <footer v-if="routeLoaded && displayFooter">
             <AppFooter />
         </footer>
 
@@ -40,7 +47,4 @@ const fixFooterCls = computed(() => currentRoute.value.meta.fixFooterCls !== fal
     footer
         margin-top auto
         min-height 18em
-
-main.fix-footer-cls
-    min-height 100vh
 </style>
