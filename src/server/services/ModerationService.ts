@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { Player, PlayerModerationAction } from '../../shared/app/models/index.js';
 import { notifier } from './notifications/notifier.js';
 import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
+import PlayerAvatarService from './PlayerAvatarService.js';
+import logger from './logger.js';
 
 export class CreateAndSaveError extends Error {}
 
@@ -17,6 +19,7 @@ export default class ModerationService
         private chatMessageRepository: ChatMessageRepository,
         private hostedGameStore: HostedGameStore,
         private channelChatMessageRepository: ChannelChatMessageRepository,
+        private playerAvatarService: PlayerAvatarService,
 
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
@@ -49,6 +52,7 @@ export default class ModerationService
         action.reason = post.reason ?? null;
         action.reasonDetails = post.reasonDetails ?? null;
         action.chatBlockedUntil = post.chatBlockedUntil ?? null;
+        action.avatarBlockedUntil = post.avatarBlockedUntil ?? null;
         action.acknowledgedAt = null;
         action.createdAt = new Date();
         action.relatedChatMessages = [];
@@ -68,6 +72,13 @@ export default class ModerationService
         }
 
         await this.playerModerationActionRepository.save(action);
+
+        if (action.avatarBlockedUntil) {
+            await this.playerAvatarService.deleteAvatar(player.avatarPath, player.avatarThumbnailPath).catch(reason => {
+                logger.notice('Error while deleting moderated avatar', { reason });
+            });
+            await this.playerRepository.update({ id: player.id }, { avatarPath: null, avatarThumbnailPath: null, avatarUpdatedAt: null });
+        }
 
         notifier.emit('moderationActionTaken', action);
 

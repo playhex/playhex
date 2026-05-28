@@ -298,8 +298,12 @@ const onAvatarFileSelected = async (event: Event) => {
 
         player.value.avatarPath = avatarPath;
         player.value.avatarThumbnailPath = avatarThumbnailPath;
-    } catch {
-        useToastsStore().addToast('Avatar upload failed', { level: 'danger' });
+    } catch (e) {
+        if (!(e instanceof Error)) {
+            throw e;
+        }
+
+        useToastsStore().addToast(e.message, { level: 'danger' });
     }
 };
 

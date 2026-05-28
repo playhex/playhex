@@ -65,6 +65,14 @@ export default class PlayerAvatarService
         }
     }
 
+    async deleteAvatar(avatarPath: null | string | undefined, avatarThumbnailPath: null | string | undefined): Promise<void>
+    {
+        await Promise.all([
+            avatarPath ? this.deleteIfExists(this.urlToFilename(avatarPath)) : Promise.resolve(),
+            avatarThumbnailPath ? this.deleteIfExists(this.urlToFilename(avatarThumbnailPath)) : Promise.resolve(),
+        ]);
+    }
+
     async saveAvatar(
         fileBuffer: Buffer,
         mimeType: string,

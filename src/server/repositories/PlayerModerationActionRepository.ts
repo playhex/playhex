@@ -74,4 +74,12 @@ export default class PlayerModerationActionRepository
             chatBlockedUntil: MoreThan(new Date()),
         });
     }
+
+    async isCurrentlyAvatarRestricted(playerPublicId: string): Promise<boolean>
+    {
+        return await this.playerModerationActionRepository.existsBy({
+            player: { publicId: playerPublicId },
+            avatarBlockedUntil: MoreThan(new Date()),
+        });
+    }
 }

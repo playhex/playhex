@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
 import logger from '../services/logger.js';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils.js';
-import { QueryFailedError, Repository } from 'typeorm';
+import { IsNull, Not, QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils.js';
 import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
@@ -215,6 +215,15 @@ export default class PlayerRepository
         return await this.playerRepository.find({
             where: { isGuest: false, isBot: false },
             order: { registeredAt: 'desc' },
+            take: limit,
+        });
+    }
+
+    async getLastAvatarUploads(limit: number): Promise<Player[]>
+    {
+        return await this.playerRepository.find({
+            where: { avatarUpdatedAt: Not(IsNull()) },
+            order: { avatarUpdatedAt: 'desc' },
             take: limit,
         });
     }

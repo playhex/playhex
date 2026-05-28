@@ -55,6 +55,15 @@ export default class PlayerModerationAction
     chatBlockedUntil: null | Date;
 
     /**
+     * If defined, player cannot upload a new avatar until this date.
+     * Their current avatar is also removed when this is set.
+     */
+    @Column({ type: Date, nullable: true })
+    @Type(() => Date)
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    avatarBlockedUntil: null | Date;
+
+    /**
      * Player has view this action and clicked "ok"
      */
     @Column({ type: Date, nullable: true })

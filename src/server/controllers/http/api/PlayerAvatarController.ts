@@ -6,6 +6,7 @@ import { Player } from '../../../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import PlayerAvatarService, { InvalidImageError } from '../../../services/PlayerAvatarService.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
+import PlayerModerationActionRepository from '../../../repositories/PlayerModerationActionRepository.js';
 import logger from '../../../services/logger.js';
 
 const upload = multer({
@@ -20,6 +21,7 @@ export default class PlayerAvatarController
     constructor(
         private playerAvatarService: PlayerAvatarService,
         private playerRepository: PlayerRepository,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
     ) {}
 
     @Put('/api/players/:publicId/avatar')
@@ -35,6 +37,10 @@ export default class PlayerAvatarController
 
         if (player.isGuest) {
             throw new HttpError(403, 'Guests cannot upload avatars');
+        }
+
+        if (await this.playerModerationActionRepository.isCurrentlyAvatarRestricted(publicId)) {
+            throw new HttpError(403, 'You are not allowed to upload an avatar at this time');
         }
 
         const file = req.file;

@@ -614,6 +614,7 @@
         "scroll_hint": "Read and accept below"
     },
     "moderation_reason": {
+        "avatar_inappropriate": "Inappropriate avatar",
         "chat_insults": "Insults or inappropriate behavior in chat"
     },
     "player_wins_by": {

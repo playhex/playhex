@@ -15,6 +15,10 @@ export class PostPlayerModerationAction
     @IsDate()
     chatBlockedUntil?: Date;
 
+    @IsOptional()
+    @IsDate()
+    avatarBlockedUntil?: Date;
+
     /**
      * publicIds of chat messages,
      * can be ids of ChatMessage (in games)

@@ -114,6 +114,14 @@ export default class AdminModerationController
         return allMessages;
     }
 
+    @Get('/api/admin/moderation/avatar-uploads')
+    async getLastAvatarUploads()
+    {
+        const players = await this.playerRepository.getLastAvatarUploads(100);
+
+        return instanceToPlain(players, { groups: [GROUP_DEFAULT, 'moderation'] });
+    }
+
     @Delete('/api/admin/moderation/chat-messages/:publicId')
     async deleteModerateChatMessage(
         @Param('publicId') publicId: string,

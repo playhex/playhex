@@ -107,6 +107,7 @@ export default class Player
     avatarThumbnailPath?: null | string;
 
     @Column({ type: Date, nullable: true, default: null })
+    @Expose({ groups: ['moderation'] })
     avatarUpdatedAt?: null | Date;
 
     @Column({ type: String, nullable: true, default: null, length: 8 })
