@@ -1,6 +1,7 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
 import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
+import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
@@ -658,14 +659,12 @@ export const apiGetActiveTournaments = async (activeTournamentsFilters?: ActiveT
     ;
 };
 
-export const apiGetEndedTournaments = async (): Promise<null | Tournament[]> => {
+export const apiGetEndedTournaments = async (): Promise<TournamentListItemDto[]> => {
     const response = await fetch(`/api/tournaments`);
 
     await checkResponse(response);
 
-    return (await response.json() as Tournament[])
-        .map(subscription => plainToInstance(Tournament, subscription))
-    ;
+    return await response.json();
 };
 
 export const apiGetTournament = async (slug: string): Promise<null | Tournament> => {

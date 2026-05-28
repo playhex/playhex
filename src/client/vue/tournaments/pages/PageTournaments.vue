@@ -4,6 +4,7 @@ import { IconPeopleFill, IconPlus, IconRecordFill, IconTrophyFill } from '../../
 import { ref } from 'vue';
 import { useHead } from '@unhead/vue';
 import { Tournament } from '../../../../shared/app/models/index.js';
+import { TournamentListItemDto } from '../../../../shared/app/models/TournamentListItemDto.js';
 import { apiGetActiveTournaments, apiGetEndedTournaments } from '../../../apiClient.js';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
 import { autoLocale } from '../../../../shared/app/i18n/index.js';
@@ -20,7 +21,7 @@ useHead({
 });
 
 const activeTournaments = ref<null | Tournament[]>(null);
-const endedTournaments = ref<null | Tournament[]>(null);
+const endedTournaments = ref<null | TournamentListItemDto[]>(null);
 
 void (async () => {
     try {
@@ -195,12 +196,12 @@ const sanitizedT = (key: string, allowedTags: string[] = ['br', 'strong']): stri
                                 >{{ tournament.title }}</router-link>
                             </h5>
                             <p class="card-text text-body-secondary nb-participants">
-                                <small>{{ $t('n_participants', { count: tournament.participants.length }) }}</small>
+                                <small>{{ $t('n_participants', { count: tournament.participantsCount }) }}</small>
                             </p>
 
                             <IconTrophyFill class="text-warning bg-icon" />
                             <p class="m-0"><small>{{ $t('tournament_ordinal.1') }}</small></p>
-                            <p class="lead">{{ tournament.participants.find(p => 1 === p.rank)?.player.pseudo }}</p>
+                            <p class="lead">{{ tournament.rank1Participant?.pseudo }}</p>
 
                             <p v-if="tournament.endedAt" class="card-text">
                                 <small class="text-body-secondary">{{ formatEndedAtDate(tournament.endedAt) }}</small>

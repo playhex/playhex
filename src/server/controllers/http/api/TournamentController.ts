@@ -10,6 +10,7 @@ import { instanceToPlain } from '../../../../shared/app/class-transformer-custom
 import { AccountRequiredTournamentError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, PlayerIsBannedTournamentError, TooDeepResetError, TournamentError } from '../../../tournaments/TournamentError.js';
 import logger from '../../../services/logger.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
+import { TournamentListItemDto } from '../../../../shared/app/models/TournamentListItemDto.js';
 
 @JsonController()
 @Service()
@@ -39,9 +40,11 @@ export default class TournamentController
     }
 
     @Get('/api/tournaments')
-    getTournaments()
+    async getTournaments()
     {
-        return this.tournamentRepository.findEndedTournaments();
+        const endedTournaments = await this.tournamentRepository.findEndedTournaments();
+
+        return endedTournaments.map(tournament => TournamentListItemDto.fromTournament(tournament));
     }
 
     @Get('/api/tournaments/:slug')
