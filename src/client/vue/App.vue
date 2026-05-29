@@ -46,5 +46,5 @@ router.afterEach(() => { routeLoaded.value = true; });
 
     footer
         margin-top auto
-        min-height 18em
+        min-height 16em
 </style>
