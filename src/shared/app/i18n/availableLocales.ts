@@ -69,6 +69,10 @@ export const availableLocales: AvailableLocales = {
             { fullName: 'Julien Maulny', link: 'https://playhex.org/@alcalyn' },
         ],
     },
+    fi: {
+        label: '🇫🇮 Suomi (Finnish)',
+        loader: () => import('date-fns/locale/fi') as unknown as DefaultExportLocale,
+    },
     id: {
         label: '🇮🇩 Indonesia (Indonesian)',
         loader: () => import('date-fns/locale/id') as unknown as DefaultExportLocale,
