@@ -1,6 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { Player, PlayerPushSubscription } from '../../shared/app/models/index.js';
+import { isDuplicateError } from './typeormUtils.js';
 
 @Service()
 export default class PlayerPushSubscriptionRepository
@@ -25,7 +26,15 @@ export default class PlayerPushSubscriptionRepository
             return alreadyInserted;
         }
 
-        return await this.playerPushSubscriptionRepository.save(playerPushSubscription);
+        try {
+            return await this.playerPushSubscriptionRepository.save(playerPushSubscription);
+        } catch (e) {
+            if (isDuplicateError(e)) {
+                return playerPushSubscription;
+            }
+
+            throw e;
+        }
     }
 
     async findForPlayer(player: Player, endpoint?: string): Promise<PlayerPushSubscription[]>

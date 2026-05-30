@@ -472,16 +472,24 @@ const isNotificationSupported = typeof Notification !== 'undefined';
 
             <p v-if="!isNotificationSupported"><IconExclamationTriangleFill class="text-warning" /> It seems that this browser does not support notifications.</p>
 
-            <p v-if="'granted' === permission"><IconCheck class="text-success" /> Notifications granted</p>
+            <!-- Notification browser permission -->
+            <p v-if="permission === 'default'" class="mb-0"><IconX class="text-danger" /> Notifications not yet granted.</p>
+            <p v-if="permission === 'granted'" class="mb-0"><IconCheck class="text-success" /> Notifications granted</p>
+            <p v-if="permission === 'denied'" class="mb-0"><IconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
+
+            <p class="text-secondary">To receive notifications, you need to grant permission on this device. If denied, you first need to cancel your deny, then grant.</p>
+
             <button
-                v-else-if="'default' === permission"
-                class="btn btn-outline-success"
+                v-if="'default' === permission"
+                class="btn btn-success mb-4"
                 @click="requestPermission"
             >Allow notifications</button>
-            <p v-else><IconX class="text-danger" /> Notifications denied. You need to allow them in your browser.</p>
 
-            <p v-if="subscribed"><IconCheck class="text-success" /> Subscribed to push notifications.</p>
-            <p v-else><IconX class="text-danger" /> Not subscribed to push notifications.</p>
+            <!-- Push subscription -->
+            <p v-if="subscribed" class="mb-0"><IconCheck class="text-success" /> Subscribed to push notifications.</p>
+            <p v-else class="mb-0"><IconX class="text-danger" /> Not subscribed to push notifications.</p>
+
+            <p class="text-secondary">Once notifications are granted, this device will automatically subscribe to offline notifications, to receive notifications while you are not on PlayHex.</p>
 
             <button
                 class="btn btn-sm btn-info"

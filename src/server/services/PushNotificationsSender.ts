@@ -37,13 +37,23 @@ export class PushNotificationSender
     async sendPush(player: Player, pushPayload: PushPayload)
     {
         if (!isPushNotificationEnabled) {
+            logger.notice('Cannot send push notification, config is not set (PUSH_VAPID_* env vars)');
             return [];
         }
 
         const subscriptions = await this.playerPushSubscriptionRepository.findForPlayer(player);
 
         if (subscriptions.length === 0) {
-            return;
+            logger.notice('Cannot send push notification, player has no subscription', {
+                playerPublicId: player.publicId,
+                playerSlug: player.slug,
+                notification: {
+                    title: pushPayload.title,
+                    body: pushPayload.body,
+                },
+            });
+
+            return [];
         }
 
         let sent = 0;

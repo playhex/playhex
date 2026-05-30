@@ -17,12 +17,17 @@ const useNotificationStore = defineStore('notificationStore', () => {
      */
     const subscribed = ref(false);
 
-    const requestPermission = async () => {
+    /**
+     * @returns State of permission after prompt. False if notifications not supported by browser.
+     */
+    const requestPermission = async (): Promise<false | NotificationPermission> => {
         if (typeof Notification === 'undefined') {
-            return;
+            return false;
         }
 
         permission.value = await Notification.requestPermission();
+
+        return permission.value;
     };
 
     // Listens notification permission change
