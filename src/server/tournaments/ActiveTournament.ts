@@ -3,9 +3,9 @@ import { areSamePlayers, deduplicatePlayers } from '../../shared/app/playerUtils
 import { Player, Tournament, TournamentAdmin, TournamentMatch, TournamentParticipant, TournamentSubscription } from '../../shared/app/models/index.js';
 import baseLogger from '../services/logger.js';
 import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer } from '../../shared/app/hostedGameUtils.js';
-import { CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
+import { AccountRequiredTournamentError, CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
 import { TournamentEngineInterface } from './organizers/TournamentEngineInterface.js';
-import { createGameOptionsForTournament, tournamentStartsAutomatically, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, getCheckInOpensDate, slugifyTournamentName } from '../../shared/app/tournamentUtils.js';
+import { createGameOptionsForTournament, tournamentStartsAutomatically, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, getCheckInOpensDate, slugifyTournamentName, isCheckInOpen } from '../../shared/app/tournamentUtils.js';
 import HostedGameServer from '../HostedGameServer.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
@@ -111,6 +111,59 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     async save(): Promise<Tournament>
     {
         return await this.autoSave.save();
+    }
+
+    /**
+     * Subscribe and/or check-in a player in a tournament.
+     * Check-in is effective only when in check-in period.
+     *
+     * @throws {PlayerIsBannedTournamentError}
+     */
+    async subscribeCheckIn(player: Player): Promise<TournamentSubscription>
+    {
+        if (this.tournament.state !== 'created') {
+            throw new Error('Cannot subscribe or checkIn, tournament already started');
+        }
+
+        if (this.tournament.accountRequired && player.isGuest) {
+            throw new AccountRequiredTournamentError();
+        }
+
+        const now = new Date();
+        let tournamentSubscription = this.tournament.subscriptions.find(subscription => subscription.player.publicId === player.publicId);
+
+        // subscribe
+        if (undefined === tournamentSubscription) {
+            tournamentSubscription = new TournamentSubscription();
+
+            tournamentSubscription.player = player;
+            tournamentSubscription.tournament = this.tournament;
+            tournamentSubscription.subscribedAt = now;
+            tournamentSubscription.checkedIn = null;
+
+            this.tournament.subscriptions.push(tournamentSubscription);
+
+            if (!isCheckInOpen(this.tournament, now)) {
+                addTournamentHistory(this.tournament, 'player_subscribed', {
+                    playerPublicId: player.publicId,
+                    playerPseudo: pseudoString(player),
+                }, now);
+            }
+        }
+
+        // check in
+        if (isCheckInOpen(this.tournament, now) && !tournamentSubscription.checkedIn) {
+            tournamentSubscription.checkedIn = now;
+
+            addTournamentHistory(this.tournament, 'player_checked_in', {
+                playerPublicId: player.publicId,
+                playerPseudo: pseudoString(player),
+            }, now);
+        }
+
+        await this.save();
+
+        return tournamentSubscription;
     }
 
     findSubscriptionByPlayerPublicId(publicId: string): null | TournamentSubscription

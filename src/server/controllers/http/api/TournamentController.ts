@@ -11,6 +11,7 @@ import { AccountRequiredTournamentError, GamePlayerNotFoundTournamentError, NotE
 import logger from '../../../services/logger.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
 import { TournamentListItemDto } from '../../../../shared/app/models/TournamentListItemDto.js';
+import { TournamentBanManager } from '../../../tournaments/services/TournamentBanManager.js';
 
 @JsonController()
 @Service()
@@ -20,6 +21,7 @@ export default class TournamentController
         private tournamentStore: TournamentStore,
         private tournamentRepository: TournamentRepository,
         private playerRepository: PlayerRepository,
+        private tournamentBanManager: TournamentBanManager,
     ) {}
 
     /**
@@ -122,7 +124,11 @@ export default class TournamentController
         }
 
         try {
-            return await this.tournamentStore.subscribeCheckIn(activeTournament.getTournament(), player);
+            if (await this.tournamentBanManager.isBanned(activeTournament.getTournament(), player)) {
+                throw new PlayerIsBannedTournamentError();
+            }
+
+            return await activeTournament.subscribeCheckIn(player);
         } catch (e) {
             if (e instanceof PlayerIsBannedTournamentError) {
                 throw new DomainHttpError(403, 'tournament_player_is_banned');

@@ -1,18 +1,16 @@
 import { Inject, Service } from 'typedi';
-import { Player, Tournament, TournamentSubscription } from '../../shared/app/models/index.js';
+import { Player, Tournament } from '../../shared/app/models/index.js';
 import { by, errorToLogger } from '../../shared/app/utils.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
 import logger from '../services/logger.js';
 import { AppDataSource } from '../data-source.js';
 import { createTournamentFromCreateInput } from '../../shared/app/models/Tournament.js';
 import { getTournamentEngine } from '../tournaments/organizers/getTournamentEngine.js';
-import { ActiveTournamentsFilters, isCheckInOpen, isFeaturedNow, isPlayerInvolved, tournamentMatchKey } from '../../shared/app/tournamentUtils.js';
+import { ActiveTournamentsFilters, isFeaturedNow, isPlayerInvolved, tournamentMatchKey } from '../../shared/app/tournamentUtils.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
-import { AccountRequiredTournamentError, PlayerIsBannedTournamentError } from '../tournaments/TournamentError.js';
 import type { HostedGameAccessorInterface } from '../tournaments/hosted-game-accessor/HostedGameAccessorInterface.js';
 import { HostedGameAccessor } from '../tournaments/hosted-game-accessor/HostedGameAccessor.js';
-import { TournamentBanManager } from '../tournaments/services/TournamentBanManager.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import TournamentRepository from '../repositories/TournamentRepository.js';
 
@@ -26,7 +24,6 @@ export default class TournamentStore
 
     constructor(
         private tournamentRepository: TournamentRepository,
-        private tournamentBanManager: TournamentBanManager,
 
         @Inject(() => HostedGameAccessor)
         private hostedGameAccessor: HostedGameAccessorInterface,
@@ -240,65 +237,6 @@ export default class TournamentStore
         this.activeTournaments[tournament.publicId] = await this.createActiveTournament(tournament);
 
         return tournament;
-    }
-
-    /**
-     * TODO move to ActiveTournament
-     *
-     * Subscribe and/or check-in a player in a tournament.
-     * Check-in is effective only when in check-in period.
-     *
-     * @throws {PlayerIsBannedTournamentError}
-     */
-    async subscribeCheckIn(tournament: Tournament, player: Player): Promise<TournamentSubscription>
-    {
-        if (tournament.state !== 'created') {
-            throw new Error('Cannot subscribe or checkIn, tournament already started');
-        }
-
-        if (await this.tournamentBanManager.isBanned(tournament, player)) {
-            throw new PlayerIsBannedTournamentError();
-        }
-
-        if (tournament.accountRequired && player.isGuest) {
-            throw new AccountRequiredTournamentError();
-        }
-
-        const now = new Date();
-        let tournamentSubscription = tournament.subscriptions.find(subscription => subscription.player.publicId === player.publicId);
-
-        // subscribe
-        if (undefined === tournamentSubscription) {
-            tournamentSubscription = new TournamentSubscription();
-
-            tournamentSubscription.player = player;
-            tournamentSubscription.tournament = tournament;
-            tournamentSubscription.subscribedAt = now;
-            tournamentSubscription.checkedIn = null;
-
-            tournament.subscriptions.push(tournamentSubscription);
-
-            if (!isCheckInOpen(tournament, now)) {
-                addTournamentHistory(tournament, 'player_subscribed', {
-                    playerPublicId: player.publicId,
-                    playerPseudo: pseudoString(player),
-                }, now);
-            }
-        }
-
-        // check in
-        if (isCheckInOpen(tournament, now) && !tournamentSubscription.checkedIn) {
-            tournamentSubscription.checkedIn = now;
-
-            addTournamentHistory(tournament, 'player_checked_in', {
-                playerPublicId: player.publicId,
-                playerPseudo: pseudoString(player),
-            }, now);
-        }
-
-        await this.tournamentRepository.save(tournament); // TODO replace by autosave
-
-        return tournamentSubscription;
     }
 
     async cancelActiveTournament(activeTournament: ActiveTournament): Promise<void>
