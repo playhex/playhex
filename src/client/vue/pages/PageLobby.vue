@@ -22,7 +22,7 @@ import { apiGetActiveTournaments } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppCijmTournamentCard2026 from '../components/AppCijmTournamentCard2026.vue';
-import { IconCalendar, IconCircleFill, IconLightningChargeFill, IconSearch, IconTrophyFill } from '../icons.js';
+import { IconCalendar, IconCircleFill, IconEye, IconLightningChargeFill, IconSearch, IconTrophyFill } from '../icons.js';
 import AppLobbyFeaturesLiveGames from '../components/AppLobbyFeaturesLiveGames.vue';
 import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesCorrespondenceGames.vue';
 import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
@@ -179,7 +179,10 @@ for (const locale of getPlayerLocales()) {
                 <section class="mb-4">
                     <div class="card" ref="gamesList">
                         <div class="card-header py-0 pe-1 d-flex align-items-stretch justify-content-between">
-                            <span class="fw-bold py-2 d-flex align-items-center"><span class="d-md-none">{{ $t('lobby_join') }}</span><span class="d-none d-md-inline">{{ $t('lobby.join_a_game') }}</span></span>
+                            <span class="fw-bold py-2 d-flex align-items-center text-nowrap">
+                                <span class="d-sm-none">{{ $t('lobby_join') }}</span>
+                                <span class="d-none d-sm-inline">{{ $t('lobby.join_a_game') }}</span>
+                            </span>
                             <div role="tablist" class="d-flex gap-3 align-items-stretch overflow-hidden">
                                 <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
                                     <IconLightningChargeFill class="flex-shrink-0 me-1" />
@@ -242,29 +245,40 @@ for (const locale of getPlayerLocales()) {
                     </div>
                 </section>
 
+                <h2>{{ $t('view_games') }}</h2>
+
                 <!-- Playing now -->
                 <section class="mb-4">
-                    <div class="playing-now-heading mb-2">
-                        <h2 class="mb-0 d-flex align-items-center gap-2">
-                            <IconCircleFill v-if="(livePlayingCount ?? 0) > 0" class="live-indicator" />
-                            {{ $t('lobby_playing_now') }}
-                        </h2>
-                        <div role="tablist" class="d-flex gap-3 overflow-hidden">
-                            <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
-                                <IconLightningChargeFill class="flex-shrink-0 me-1" />
-                                <span class="tab-label">{{ $t('time_cadency.normal') }}</span>
-                                <span class="badge text-bg-success flex-shrink-0 ms-1">{{ livePlayingCount ?? '…' }}</span>
-                            </button>
-                            <button type="button" role="tab" @click="currentLobby = 'correspondence'" :aria-selected="currentLobby === 'correspondence'" class="lobby-tab lobby-tab-correspondence" :class="{ active: currentLobby === 'correspondence' }">
-                                <IconCalendar class="flex-shrink-0 me-1" />
-                                <span class="tab-label">{{ $t('time_cadency.correspondence') }}</span>
-                                <span class="badge text-bg-warning flex-shrink-0 ms-1">{{ correspondencePlayingCount ?? '…' }}</span>
-                            </button>
+                    <div class="card">
+                        <div class="card-header py-0 pe-1 d-flex align-items-stretch justify-content-between">
+                            <span class="fw-bold py-2 d-flex align-items-center gap-2 text-nowrap">
+                                <IconCircleFill v-if="(livePlayingCount ?? 0) > 0" class="live-indicator" />
+                                <span class="d-sm-none">{{ $t('lobby_playing_now_short') }}</span>
+                                <span class="d-none d-sm-inline">{{ $t('lobby_playing_now') }}</span>
+                            </span>
+                            <div role="tablist" class="d-flex gap-3 align-items-stretch overflow-hidden">
+                                <button type="button" role="tab" @click="currentLobby = 'live'" :aria-selected="currentLobby === 'live'" class="lobby-tab lobby-tab-live" :class="{ active: currentLobby === 'live' }">
+                                    <IconLightningChargeFill class="flex-shrink-0 me-1" />
+                                    <span class="tab-label">{{ $t('time_cadency.normal') }}</span>
+                                    <span class="badge text-bg-success flex-shrink-0 ms-1">{{ livePlayingCount ?? '…' }}</span>
+                                </button>
+                                <button type="button" role="tab" @click="currentLobby = 'correspondence'" :aria-selected="currentLobby === 'correspondence'" class="lobby-tab lobby-tab-correspondence" :class="{ active: currentLobby === 'correspondence' }">
+                                    <IconCalendar class="flex-shrink-0 me-1" />
+                                    <span class="tab-label">{{ $t('time_cadency.correspondence') }}</span>
+                                    <span class="badge text-bg-warning flex-shrink-0 ms-1">{{ correspondencePlayingCount ?? '…' }}</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <AppLobbyFeaturesLiveGames v-if="currentLobby === 'live'" />
+                            <AppLobbyFeaturesCorrespondenceGames v-else />
+                        </div>
+                        <div class="card-footer">
+                            <router-link class="btn btn-link text-decoration-none p-0" :to="{ name: 'playing-games', params: { mode: currentLobby } }">
+                                <small><IconEye /> {{ $t('observe_all_playing_games') }}</small>
+                            </router-link>
                         </div>
                     </div>
-
-                    <AppLobbyFeaturesLiveGames v-if="currentLobby === 'live'" />
-                    <AppLobbyFeaturesCorrespondenceGames v-else />
                 </section>
 
                 <!-- Recent games -->
@@ -452,19 +466,6 @@ tr.soft-removed, tr.soft-removed *
 
     &.active
         cursor default
-
-.playing-now-heading
-    display flex
-    flex-direction column
-    gap 0.5em
-
-    & > div
-        align-self end
-
-    @media (min-width: 576px)
-        flex-direction row
-        justify-content space-between
-        gap 0
 
 
 .lobby-tab-live.active
