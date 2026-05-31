@@ -47,8 +47,6 @@ defineProps({
 .player-avatar
     clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
     object-fit cover
-    width 1em
-    height 0.866em
 
 .player-avatar-icon
     clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)

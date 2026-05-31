@@ -4,6 +4,7 @@ import { useDisclosure } from '@overlastic/vue';
 import AppPseudo from '../AppPseudo.vue';
 import Player from '../../../../shared/app/models/Player.js';
 import { Game } from '../../../../shared/game-engine/index.js';
+import AppPlayerAvatar from '../AppPlayerAvatar.vue';
 
 const { visible, confirm } = useDisclosure();
 
@@ -36,13 +37,18 @@ const winner: null | Player = game.isCanceled()
                         <h5 class="modal-title">{{ $t('game_finished_overlay.title') }}</h5>
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
-                    <div class="modal-body text-center lead">
-                        <p v-if="null !== winner">
+                    <div class="modal-body text-center">
+                        <AppPlayerAvatar
+                            v-if="winner?.avatarPath"
+                            :player="winner"
+                        />
+                        <p v-if="null !== winner" class="lead m-0">
                             <i18next :translation="$t('player_wins_by.' + (game.getOutcome() ?? 'default'))">
                                 <template #player>
                                     <AppPseudo
                                         :player="winner"
                                         is="strong"
+                                        flag
                                         :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
                                     />
                                 </template>
@@ -63,3 +69,9 @@ const winner: null | Player = game.isCanceled()
         <div class="modal-backdrop show d-fixed"></div>
     </div>
 </template>
+
+<style lang="stylus" scoped>
+:deep(.player-avatar)
+    width 8em
+    margin-bottom 0.5rem
+</style>
