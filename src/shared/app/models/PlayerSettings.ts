@@ -4,7 +4,10 @@ import { Expose } from '../class-transformer-custom.js';
 import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
 import { allShadingPatterns, type ShadingPatternType } from '../../pixi-board/shading-patterns/shading-patterns.js';
 
-export enum MoveSettings {
+/**
+ * TODO: tmp, remove later when most players saved move confirm settings locally
+ */
+enum MoveSettings {
     /**
      * Send immediately, and premove allowed
      */
@@ -31,18 +34,27 @@ export default class PlayerSettings
     @JoinColumn()
     player?: Relation<Player>;
 
+    /**
+     * TODO: tmp, remove later when most players saved move confirm settings locally
+     */
     @Expose()
     @IsOptional()
     @IsEnum(MoveSettings)
     @Column({ default: MoveSettings.SEND_IMMEDIATELY })
     moveSettingsBlitz: MoveSettings = MoveSettings.SEND_IMMEDIATELY;
 
+    /**
+     * TODO: tmp, remove later when most players saved move confirm settings locally
+     */
     @Expose()
     @IsOptional()
     @IsEnum(MoveSettings)
     @Column({ default: MoveSettings.SEND_IMMEDIATELY })
     moveSettingsNormal: MoveSettings = MoveSettings.SEND_IMMEDIATELY;
 
+    /**
+     * TODO: tmp, remove later when most players saved move confirm settings locally
+     */
     @Expose()
     @IsOptional()
     @IsEnum(MoveSettings)

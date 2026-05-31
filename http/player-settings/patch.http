@@ -1,14 +1,10 @@
 # Update the authenticated player's settings. Requires authentication.
 # All fields are optional; only send the ones you want to change.
-# moveSettings values: 0 = premove, 1 = send immediately, 2 = must confirm
 
 PATCH /api/player-settings
 Content-Type: application/json
 
 {
-    "moveSettingsBlitz": 1,
-    "moveSettingsNormal": 1,
-    "moveSettingsCorrespondence": 2,
     "orientationLandscape": 11,
     "orientationPortrait": 9,
     "showCoords": false,

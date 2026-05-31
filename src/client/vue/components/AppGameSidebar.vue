@@ -4,7 +4,7 @@ import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
-import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
+import usePlayerLocalSettingsStore, { MoveSettings } from '../../stores/playerLocalSettingsStore.js';
 import AppPseudo from './AppPseudo.vue';
 import { ChatMessage, HostedGame, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
@@ -28,7 +28,6 @@ import AppHexWorldExplore from './AppHexWorldExplore.vue';
 import { canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import AppSpectatorCount from './AppSpectatorCount.vue';
-import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
 import { TriangleMark } from '@playhex/pixi-board';
@@ -749,48 +748,48 @@ watch(gameUIMode, () => {
         <div class="sidebar-block block-settings overflow-y-auto" v-if="isTab('settings')">
             <div class="container-fluid">
 
-                <div class="mb-2" v-if="playerSettings">
+                <div class="mb-2" v-if="localSettings">
                     <template v-if="'blitz' === timeControlToCadencyName(hostedGame)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
-                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
 
-                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsBlitz" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-2">{{ $t('confirm_move.send_immediately') }}</label>
 
-                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsBlitz" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
-                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsBlitz)) }}</div>
+                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(localSettings.moveSettingsBlitz)) }}</div>
                     </template>
                     <template v-if="'normal' === timeControlToCadencyName(hostedGame)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
-                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
 
-                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsNormal" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-2">{{ $t('confirm_move.send_immediately') }}</label>
 
-                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsNormal" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
-                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsNormal)) }}</div>
+                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(localSettings.moveSettingsNormal)) }}</div>
                     </template>
                     <template v-if="'correspondence' === timeControlToCadencyName(hostedGame)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
-                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-1">{{ $t('premove.title') }}</label>
 
-                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsCorrespondence" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-2" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-2">{{ $t('confirm_move.send_immediately') }}</label>
 
-                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
+                            <input v-model="localSettings.moveSettingsCorrespondence" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-3" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
-                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsCorrespondence)) }}</div>
+                        <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(localSettings.moveSettingsCorrespondence)) }}</div>
                     </template>
                 </div>
 
