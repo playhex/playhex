@@ -33,7 +33,10 @@ export class TimeoutGamesWithLessThan2MovesMustBeCanceled implements DataInconsi
             .createQueryBuilder('hostedGame')
             .where('hostedGame.outcome = "time"')
             .andWhere('hostedGame.state = "ended"')
-            .andWhere('json_length(hostedGame.movesHistory) < 2')
+            .andWhere(`CASE
+                WHEN hostedGame.moves = '' OR hostedGame.moves IS NULL THEN 0
+                ELSE LENGTH(hostedGame.moves) - LENGTH(REPLACE(hostedGame.moves, ' ', '')) + 1
+            END < 2`)
             .groupBy('hostedGame.id')
             .execute()
         ;
