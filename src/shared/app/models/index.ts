@@ -16,6 +16,7 @@ import {
 import HostedGameToPlayer from './HostedGameToPlayer.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
+import PlayerAccountPassword from './PlayerAccountPassword.js';
 import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
@@ -49,6 +50,7 @@ export {
     OnlinePlayers,
     OnlinePlayer,
     Player,
+    PlayerAccountPassword,
     PlayerModerationAction,
     PlayerNotification,
     PlayerSettings,
@@ -82,6 +84,7 @@ export const entities = {
     HostedGameToPlayer,
     OnlinePlayers,
     Player,
+    PlayerAccountPassword,
     PlayerModerationAction,
     PlayerNotification,
     PlayerPushSubscription,

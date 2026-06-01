@@ -1,4 +1,4 @@
-import { Player } from '../../shared/app/models/index.js';
+import { Player, PlayerAccountPassword } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
@@ -18,6 +18,9 @@ export default class PlayerRepository
     constructor(
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
+
+        @Inject('Repository<PlayerAccountPassword>')
+        private playerAccountPasswordRepository: Repository<PlayerAccountPassword>,
     ) {}
 
     async getPlayer(publicId: string): Promise<null | Player>
@@ -120,10 +123,20 @@ export default class PlayerRepository
             player.publicId = uuidv4();
             player.pseudo = pseudo;
             player.slug = pseudoSlug(pseudo);
-            player.password = await hashPassword(password);
             player.registeredAt = new Date();
 
-            await this.playerRepository.save(player);
+            const playerAccountPassword = new PlayerAccountPassword();
+
+            playerAccountPassword.player = player;
+            playerAccountPassword.login = pseudo.trim();
+            playerAccountPassword.password = await hashPassword(password);
+            playerAccountPassword.createdAt = new Date();
+            playerAccountPassword.updatedAt = new Date();
+
+            await this.playerRepository.manager.transaction(async manager => {
+                await manager.save(player);
+                await manager.save(playerAccountPassword);
+            });
 
             logger.info('Player created an account from anonymous', {
                 oldPlayer: player,
@@ -141,8 +154,11 @@ export default class PlayerRepository
         }
     }
 
-    /** @throws {InvalidPasswordError} */
-    async changePassword(publicId: string, oldPassword: string, newPassword: string): Promise<Player> {
+    /**
+     * @throws {InvalidPasswordError}
+     */
+    async changePassword(publicId: string, oldPassword: string, newPassword: string): Promise<Player>
+    {
         const player = await this.playerRepository.findOne({
             where: {
                 publicId,
@@ -153,12 +169,27 @@ export default class PlayerRepository
             logger.error(`Player with id ${publicId} doesn't exist`);
             throw new Error('Cannot find player id');
         }
-        if (!checkPassword(player, oldPassword)) {
+
+        const playerAccountPassword = await this.playerAccountPasswordRepository.findOneBy({
+            playerId: player.id,
+        });
+
+        if (!playerAccountPassword) {
+            throw new Error('Unexpected null playerAccountPassword');
+        }
+
+        if (!checkPassword(playerAccountPassword, oldPassword)) {
             throw new InvalidPasswordError();
         }
-        player.password = await hashPassword(newPassword);
+
+        playerAccountPassword.password = await hashPassword(newPassword);
+        playerAccountPassword.updatedAt = new Date();
+
         logger.info('Player is changing password', { playerPublicId: publicId });
-        return await this.playerRepository.save(player);
+
+        await this.playerAccountPasswordRepository.save(playerAccountPassword);
+
+        return player;
     }
 
     /**
@@ -186,11 +217,21 @@ export default class PlayerRepository
         player.isGuest = false;
         player.pseudo = pseudo;
         player.slug = pseudoSlug(pseudo);
-        player.password = await hashPassword(password);
         player.registeredAt = new Date();
 
+        const playerAccountPassword = new PlayerAccountPassword();
+
+        playerAccountPassword.player = player;
+        playerAccountPassword.login = player.pseudo.trim();
+        playerAccountPassword.password = await hashPassword(password);
+        playerAccountPassword.createdAt = new Date();
+        playerAccountPassword.updatedAt = new Date();
+
         try {
-            await this.playerRepository.save(player);
+            await this.playerRepository.manager.transaction(async manager => {
+                await manager.save(player);
+                await manager.save(playerAccountPassword);
+            });
 
             logger.info('Player created an account from guest', {
                 pseudo,

@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
-import { IsNull, Like, Not, Repository } from 'typeorm';
-import { Player } from '../../../shared/app/models/index.js';
+import { Repository } from 'typeorm';
+import { Player, PlayerAccountPassword } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
@@ -22,12 +22,16 @@ export class AccountsMustHavePassword implements DataInconsistenciesCheckerInter
 
     async run(): Promise<string[]>
     {
-        const accountsWithoutPassword = await this.playerRepository.findBy({
-            isGuest: false,
-            isBot: false,
-            password: IsNull(),
-            slug: Not(Like('anonymous%')),
-        });
+        const accountsWithoutPassword = await this.playerRepository
+            .createQueryBuilder('p')
+            .select(['p.id', 'p.pseudo'])
+            .leftJoin(PlayerAccountPassword, 'pap', 'p.id = pap.playerId')
+            .where('p.isGuest = false')
+            .andWhere('p.isBot = false')
+            .andWhere('p.slug NOT LIKE :slug', { slug: 'anonymous%' })
+            .andWhere('pap.playerId IS NULL')
+            .getMany()
+        ;
 
         return accountsWithoutPassword.map(player => `${player.pseudo} (id = ${player.id})`);
     }

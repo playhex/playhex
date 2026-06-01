@@ -67,12 +67,6 @@ export default class Player
     registeredAt?: null | Date;
 
     /**
-     * BCrypt hashed password
-     */
-    @Column({ type: 'char', length: 60, nullable: true })
-    password?: null | string;
-
-    /**
      * For AI players, their config.
      * Should not be null for AI players: they must all have a AIConfig entry.
      */
