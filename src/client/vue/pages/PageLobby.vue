@@ -282,13 +282,13 @@ for (const locale of getPlayerLocales()) {
                 </section>
 
                 <!-- Recent games -->
-                <section class="mb-4">
+                <section class="mb-4 recent-games">
                     <div class="card">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <span class="fw-bold">{{ $t('finished_games') }}</span>
                         </div>
                         <div class="table-responsive">
-                            <table style="min-height: 14em;" class="table text-nowrap table-borderless table-hover mb-0">
+                            <table class="table text-nowrap table-borderless table-hover mb-0">
                                 <thead>
                                     <tr class="small text-secondary">
                                         <th></th>
@@ -475,4 +475,8 @@ tr.soft-removed, tr.soft-removed *
 .lobby-tab-correspondence.active
     border-bottom-color var(--bs-warning)
     color var(--bs-warning)
+
+.recent-games
+    .table-responsive
+        min-height 14em
 </style>
