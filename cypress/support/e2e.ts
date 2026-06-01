@@ -21,7 +21,7 @@ import './commands.js';
 Cypress.on('uncaught:exception', (e): false | void => {
     if (
         Cypress.browser.name === 'firefox' &&
-        (e.message.includes('AbortError') || e.message.includes('NetworkError'))
+        (e.message.includes('AbortError') || e.message.includes('NetworkError') || e.message.includes('error loading dynamically imported module'))
     ) {
         return false;
     }

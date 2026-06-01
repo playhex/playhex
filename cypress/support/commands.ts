@@ -148,9 +148,9 @@ Cypress.Commands.add('receivePlayerGamesUpdate', fixtureFile => {
 });
 
 Cypress.Commands.add('mockSendChannelChat', (player) => {
-    socketIoMock.once('sendChannelChat', (channelName, content, callback) => {
-        callback(true);
-        socketIoMock.emit('channelChatMessagePosted', channelName, {
+    socketIoMock.once('sendChannelChat', (channel: string, content: string, answer: (result: true | string) => void) => {
+        answer(true);
+        socketIoMock.emit('channelChatMessagePosted', channel, {
             publicId: `test-${Date.now()}`,
             content,
             createdAt: new Date().toISOString(),
