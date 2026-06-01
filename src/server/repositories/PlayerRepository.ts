@@ -215,14 +215,14 @@ export default class PlayerRepository
         }
 
         player.isGuest = false;
-        player.pseudo = pseudo;
+        player.pseudo = pseudo.trim();
         player.slug = pseudoSlug(pseudo);
         player.registeredAt = new Date();
 
         const playerAccountPassword = new PlayerAccountPassword();
 
         playerAccountPassword.player = player;
-        playerAccountPassword.login = player.pseudo.trim();
+        playerAccountPassword.login = player.pseudo;
         playerAccountPassword.password = await hashPassword(password);
         playerAccountPassword.createdAt = new Date();
         playerAccountPassword.updatedAt = new Date();

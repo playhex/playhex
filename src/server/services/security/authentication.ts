@@ -2,7 +2,7 @@ import { Player, PlayerAccountPassword } from '../../../shared/app/models/index.
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../../data-source.js';
 
-export class PseudoNotExistingError extends Error {}
+export class LoginNotExistingError extends Error {}
 export class InvalidPasswordError extends Error {}
 
 export const hashPassword = async (password: string): Promise<string> => {
@@ -20,30 +20,25 @@ export const checkPassword = (playerAccountPassword: PlayerAccountPassword | nul
 };
 
 /**
- * @throws {PseudoNotExistingError}
+ * @throws {LoginNotExistingError}
  * @throws {InvalidPasswordError}
  */
-export const authenticate = async (pseudo: string, password: string): Promise<Player> => {
-    const playerRepository = AppDataSource.getRepository(Player);
+export const authenticate = async (login: string, password: string): Promise<Player> => {
     const playerAccountPasswordRepository = AppDataSource.getRepository(PlayerAccountPassword);
 
-    const player = await playerRepository.findOne({
-        where: {
-            pseudo,
-        },
+    const playerAccountPassword = await playerAccountPasswordRepository.findOne({
+        where: { login },
+        relations: { player: true },
+        select: { player: true },
     });
 
-    if (player === null) {
-        throw new PseudoNotExistingError();
+    if (playerAccountPassword === null) {
+        throw new LoginNotExistingError();
     }
-
-    const playerAccountPassword = await playerAccountPasswordRepository.findOneBy({
-        playerId: player.id,
-    });
 
     if (!checkPassword(playerAccountPassword, password)) {
         throw new InvalidPasswordError();
     }
 
-    return player;
+    return playerAccountPassword.player;
 };

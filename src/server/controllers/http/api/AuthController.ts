@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { Body, CurrentUser, Delete, Get, JsonController, Post, Req, Session } from 'routing-controllers';
 import type { SessionData } from 'express-session';
 import PlayerRepository, { MustBeGuestError, PseudoAlreadyTakenError } from '../../../repositories/PlayerRepository.js';
-import { authenticate, InvalidPasswordError, PseudoNotExistingError } from '../../../services/security/authentication.js';
+import { authenticate, InvalidPasswordError, LoginNotExistingError } from '../../../services/security/authentication.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import type { Request } from 'express';
@@ -10,8 +10,12 @@ import { IsString } from 'class-validator';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { InvalidPseudoError, PseudoTooLongError, PseudoTooShortError } from '../../../../shared/app/pseudoUtils.js';
 
-class PseudoPasswordInput
+class LoginPasswordInput
 {
+    /**
+     * For login: must match PlayerAccountPassword.login, not Player.pseudo
+     * For account creation, will be used for both login and nickname
+     */
     @IsString()
     pseudo: string;
 
@@ -63,7 +67,7 @@ export default class AuthController
 
     @Post('/api/auth/signup')
     async signup(
-        @Body() body: PseudoPasswordInput,
+        @Body() body: LoginPasswordInput,
         @Session() session: SessionData,
     ) {
         try {
@@ -96,7 +100,7 @@ export default class AuthController
     @Post('/api/auth/signup-from-guest')
     async signupFromGuest(
         @AuthenticatedPlayer() player: Player,
-        @Body() body: PseudoPasswordInput,
+        @Body() body: LoginPasswordInput,
     ) {
         try {
             const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo.trim(), body.password);
@@ -129,7 +133,7 @@ export default class AuthController
 
     @Post('/api/auth/login')
     async login(
-        @Body() body: PseudoPasswordInput,
+        @Body() body: LoginPasswordInput,
         @Session() session: SessionData,
     ) {
         try {
@@ -139,7 +143,7 @@ export default class AuthController
 
             return player;
         } catch (e) {
-            if (e instanceof PseudoNotExistingError) {
+            if (e instanceof LoginNotExistingError) {
                 throw new DomainHttpError(403, 'pseudo_not_existing');
             }
 
