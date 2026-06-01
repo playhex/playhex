@@ -31,7 +31,7 @@ Then run these commands:
 yarn install
 
 # Create database schema
-yarn db:sync
+yarn typeorm schema:sync
 
 # Start application
 yarn serve
@@ -250,14 +250,31 @@ Upgrade warnings:
 
 - `tournament-organizer <4`: needs many api rewrite and test everything
 
-## Migrating schema
+## Migrations
+
+TypeORM migrations:
+
+``` bash
+# Create a blank migration
+yarn typeorm migration:create src/server/migrations/my-feature
+
+# Auto generate migration from schema diff
+yarn typeorm migration:generate src/server/migrations/my-feature
+
+# Run migrations
+yarn typeorm migration:run
+```
+
+Use `yarn typeorm` to see all other TypeORM commands.
+
+### Migrating schema that may break retrocompatibility
 
 When doing a schema migration that is also a breaking change in api:
 
 On development:
 
 - Develop on blank database
-- Then, import production database, create migration, check `yarn db:diff`
+- Then, import production database, create migration, check `yarn typeorm schema:log`
 - Update Cypress fixtures, see `src/server/commands/migrateCypressFixtures.ts`
 - Check breaking changes are acceptable for client that have not yet updated:
     - go to next version, `yarn build-server`, `node index.js`
@@ -271,8 +288,8 @@ On release:
 - backup database just before migration
 - stop no restart server: update source, rebuild and stop only
 - run `migration.sql`
-- check `yarn db:diff`
-- eventually run `yarn db:sync` if there are only safe migrations (indexes, new columns...)
+- check `yarn typeorm schema:log`
+- eventually run `yarn typeorm schema:sync` if there are only safe migrations (indexes, new columns...)
 - restart server
 
 ## License
