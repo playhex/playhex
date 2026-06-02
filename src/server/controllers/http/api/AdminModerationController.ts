@@ -114,6 +114,14 @@ export default class AdminModerationController
         return allMessages;
     }
 
+    @Get('/api/admin/moderation/actions')
+    async getLastModerationActions()
+    {
+        const actions = await this.playerModerationActionRepository.getLastActions(100);
+
+        return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action'] });
+    }
+
     @Get('/api/admin/moderation/avatar-uploads')
     async getLastAvatarUploads()
     {

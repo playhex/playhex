@@ -68,6 +68,25 @@ export default class PlayerModerationActionRepository
         });
     }
 
+    async getLastActions(limit = 100): Promise<PlayerModerationAction[]>
+    {
+        return await this.playerModerationActionRepository.find({
+            relations: {
+                player: true,
+                relatedChatMessages: {
+                    hostedGame: true,
+                    player: true,
+                },
+                relatedChannelChatMessages: {
+                    channel: true,
+                    player: true,
+                },
+            },
+            order: { createdAt: 'desc' },
+            take: limit,
+        });
+    }
+
     async isCurrentlyChatRestricted(playerPublicId: string): Promise<boolean>
     {
         return await this.playerModerationActionRepository.existsBy({
