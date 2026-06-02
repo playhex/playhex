@@ -614,11 +614,14 @@
         "details": "Details",
         "related_messages": "Related messages",
         "acknowledge": "I have read and understood",
-        "scroll_hint": "Read and accept below"
+        "scroll_hint": "Read and accept below",
+        "nickname_moderated_title": "Nickname moderated",
+        "nickname_moderated_body": "Your nickname \"{{former}}\" has been moderated to \"{{moderated}}\". You can still login with your actual login, but your player's nickname has changed."
     },
     "moderation_reason": {
         "avatar_inappropriate": "Inappropriate avatar",
-        "chat_insults": "Insults or inappropriate behavior in chat"
+        "chat_insults": "Insults or inappropriate behavior in chat",
+        "nickname_inappropriate": "Inappropriate nickname"
     },
     "player_wins_by": {
         "default": "{player} wins!",

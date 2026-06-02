@@ -53,6 +53,14 @@ onMounted(() => updateHasMoreBelow());
                             <p>{{ $t(action.reason) }}</p>
                         </template>
 
+                        <template v-if="action.nicknameModerated !== null">
+                            <h6>{{ $t('moderation_action_overlay.nickname_moderated_title') }}</h6>
+                            <p>{{ $t('moderation_action_overlay.nickname_moderated_body', {
+                                former: action.nicknameModerated,
+                                moderated: action.player.pseudo,
+                            }) }}</p>
+                        </template>
+
                         <template v-if="action.reasonDetails !== null">
                             <h6>{{ $t('moderation_action_overlay.details') }}</h6>
                             <p>{{ action.reasonDetails }}</p>

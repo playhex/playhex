@@ -148,6 +148,16 @@ export default class AdminModerationController
                 await this.moderationService.moderateDeleteChatMessages(postPlayerModerationAction.relatedChatMessages);
             }
 
+            if (postPlayerModerationAction.moderateNickname) {
+                const player = await this.playerRepository.getPlayer(postPlayerModerationAction.playerPublicId);
+
+                if (!player) {
+                    throw new NotFoundError(`Player "${postPlayerModerationAction.playerPublicId}" not found`);
+                }
+
+                await this.playerRepository.moderateNickname(player);
+            }
+
             return await this.moderationService.createAndSaveAction(postPlayerModerationAction);
         } catch (e) {
             if (e instanceof CreateAndSaveError) {

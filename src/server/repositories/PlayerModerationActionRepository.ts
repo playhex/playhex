@@ -31,6 +31,7 @@ export default class PlayerModerationActionRepository
                 acknowledgedAt: withPastActions ? undefined : IsNull(),
             },
             relations: {
+                player: true,
                 relatedChatMessages: {
                     hostedGame: true,
                     player: true,

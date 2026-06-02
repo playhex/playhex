@@ -27,4 +27,7 @@ export class PostPlayerModerationAction
     @IsOptional()
     @IsArray()
     relatedChatMessages?: string[];
+
+    @IsOptional()
+    moderateNickname?: string;
 }

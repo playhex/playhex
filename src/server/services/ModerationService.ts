@@ -53,6 +53,7 @@ export default class ModerationService
         action.reasonDetails = post.reasonDetails ?? null;
         action.chatBlockedUntil = post.chatBlockedUntil ?? null;
         action.avatarBlockedUntil = post.avatarBlockedUntil ?? null;
+        action.nicknameModerated = post.moderateNickname ?? null;
         action.acknowledgedAt = null;
         action.createdAt = new Date();
         action.relatedChatMessages = [];

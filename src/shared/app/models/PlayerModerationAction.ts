@@ -64,6 +64,16 @@ export default class PlayerModerationAction
     avatarBlockedUntil: null | Date;
 
     /**
+     * If set, the player's nickname has been moderated renamed as part of this action.
+     * Contains previous nickname that originated the moderation action.
+     * Player's nickname has been changed to "moderated XXX" (random number).
+     */
+    @Column({ type: String, length: 34, nullable: true })
+    @Type(() => String)
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    nicknameModerated: null | string;
+
+    /**
      * Player has view this action and clicked "ok"
      */
     @Column({ type: Date, nullable: true })

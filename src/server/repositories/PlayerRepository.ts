@@ -302,4 +302,29 @@ export default class PlayerRepository
 
         return affected;
     }
+
+    async moderateNickname(player: Player): Promise<void>
+    {
+        let exponent = 2;
+
+        while (exponent < 12) {
+            try {
+                const number = String(10 ** exponent + Math.floor(Math.random() * 9 * (10 ** exponent)));
+                player.pseudo = `moderated ${number}`;
+                player.slug = pseudoSlug(player.pseudo);
+                await this.playerRepository.save(player);
+                return;
+            } catch (e) {
+                if (e instanceof QueryFailedError && e.message.includes('Duplicate entry')) {
+                    ++exponent;
+                    continue;
+                }
+
+                throw e;
+            }
+        }
+
+        logger.error('Unable to moderate nickname');
+        throw new Error('Unable to moderate nickname');
+    }
 }
