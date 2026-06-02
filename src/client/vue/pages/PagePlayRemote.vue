@@ -23,6 +23,7 @@ import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoinin
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
+import AppHexplorerLink from '../components/AppHexplorerLink.vue';
 
 const head = injectHead();
 
@@ -437,6 +438,14 @@ const {
                                 :game
                                 :orientation
                                 :label="$t('explore')"
+                                class="dropdown-item"
+                            />
+
+                            <!-- Hexplorer -->
+                            <AppHexplorerLink
+                                v-if="game"
+                                :hostedGame
+                                :orientation
                                 class="dropdown-item"
                             />
                         </div>

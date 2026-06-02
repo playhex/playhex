@@ -183,6 +183,15 @@ const {
                             >{{ $t('tournaments') }}</router-link>
                         </li>
 
+                        <li class="nav-item">
+                            <router-link
+                                :to="{ name: 'hexplorer' }"
+                                :class="{ active: routeName?.startsWith('hexplorer') }"
+                                class="nav-link"
+                                @click="closeOffcanvas"
+                            >Hexplorer</router-link>
+                        </li>
+
                     </ul>
 
                 </div>

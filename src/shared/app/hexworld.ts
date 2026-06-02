@@ -20,6 +20,14 @@ const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) 
  * @param orientation Board rotation from 0 to 11, where 0 is the "Flat" one.
  */
 export const gameToHexworldLink = (hostedGame: HostedGame, orientation: number = 11): string => {
+    return `https://hexworld.org/board/#${createHexworldString(hostedGame, orientation)}`;
+};
+
+/**
+ * Generate Hexworld string from hostedGame, '15c1,e6:sf7i8g10j10'
+ * to pass as query hash.
+ */
+export const createHexworldString = (hostedGame: HostedGame, orientation: number = 11): string => {
     if (orientation < 0 || orientation > 11)
         throw new Error('Invalid board orientation');
     const moves = hostedGame.moves
@@ -38,5 +46,44 @@ export const gameToHexworldLink = (hostedGame: HostedGame, orientation: number =
     // from 1 to 12 (closed), shifted by -2
     const hexworldRotation = (((orientation - 2) % 12) + 11) % 12 + 1;
     const rotationConfig = hexworldRotation === 10 ? '' : 'r' + hexworldRotation;
-    return `https://hexworld.org/board/#${size}${rotationConfig}c1,${moves}${outcome}`;
+    return `${size}${rotationConfig}c1,${moves}${outcome}`;
+};
+
+/**
+ * Parses 14r1c1,d3:sa3... to { size: 14, moves: ["d3", "swap-pieces",  "a3", ...]' }
+ */
+export const parseHexworldString = (hexworldString: string): { size: number, moves: string[] } => {
+    const match = hexworldString.match(/^(\d+)[^,]+,(.*)$/);
+
+    if (!match) {
+        throw new Error('Invalid Hexworld string');
+    }
+
+    const [, sizeStr, movesStr] = match;
+    const moves = movesStr.match(/([a-z]+\d+)|(:s|:p|:r.|:f.)/g);
+
+    if (!moves) {
+        throw new Error('Error while parsing moves');
+    }
+
+    for (let i = 0; i < moves.length; ++i) {
+        if (!moves[i].startsWith(':')) {
+            continue;
+        }
+
+        if (moves[i] === ':s') {
+            moves[i] = 'swap-pieces';
+        } else if (moves[i] === ':p') {
+            moves[i] = 'pass';
+        } else if (moves[i].match(/^:(r|f).$/)) {
+            delete moves[i];
+        } else {
+            throw new Error('Unexpected special move "' + moves[i] + '"');
+        }
+    }
+
+    return {
+        size: parseInt(sizeStr),
+        moves: moves.filter(m => m),
+    };
 };
