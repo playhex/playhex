@@ -3,6 +3,13 @@
 
 <head>
     <%- head %>
+
+    <% for(const assetUrl of Object.values(manifest)) { %>
+        <% if (assetUrl.endsWith('.css')) { %>
+        <link rel="preload" href="<%- assetUrl %>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="<%- assetUrl %>"></noscript>
+        <% } %>
+    <% } %>
 </head>
 
 <body>
@@ -12,8 +19,10 @@
 
     <%- include('partials/sentry.ejs') %>
 
-    <% for(var jsLocation of Object.values(manifest)) {%>
-        <script type="text/javascript" src="<%- jsLocation %>"></script>
+    <% for(const assetUrl of Object.values(manifest)) { %>
+        <% if (!assetUrl.endsWith('.css')) { %>
+        <script type="module" src="<%- assetUrl %>"></script>
+        <% } %>
     <% } %>
 </body>
 
