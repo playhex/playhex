@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill, IconMuteOn, IconMuteOff } from '../../icons.js';
-import usePlayerLocalSettingsStore, { MoveSettings } from '../../../stores/playerLocalSettingsStore.js';
+import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
@@ -13,6 +13,7 @@ import { authChangePassword } from '../../../apiClient.js';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
 import { allShadingPatterns } from '@playhex/pixi-board';
 import i18n, { t } from 'i18next';
+import { MoveSettings } from '../../../../shared/app/models/index.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
@@ -288,18 +289,18 @@ const isNotificationSupported = typeof Notification !== 'undefined';
         <div class="container">
             <h3>{{ $t('move_settings.title') }}</h3>
 
-            <template v-if="localSettings">
+            <template v-if="playerSettings">
                 <div class="mb-3 row">
                     <label for="move-settings-blitz" class="col-md-3 col-xl-2 col-form-label"><IconLightningChargeFill /> {{ $t('time_cadency.blitz') }}</label>
                     <div class="col-md-9">
                         <div class="btn-group" role="group">
-                            <input v-model="localSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-blitz-1" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-blitz-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-blitz-1">{{ $t('premove.title') }}</label>
 
-                            <input v-model="localSettings.moveSettingsBlitz" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-blitz-2" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-blitz-2" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-blitz-2">{{ $t('confirm_move.send_immediately') }}</label>
 
-                            <input v-model="localSettings.moveSettingsBlitz" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-blitz-3" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-blitz-3" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-blitz-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
                     </div>
@@ -308,13 +309,13 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     <label for="move-settings-normal" class="col-md-3 col-xl-2 col-form-label"><IconAlarmFill /> {{ $t('time_cadency.normal') }}</label>
                     <div class="col-md-9">
                         <div class="btn-group" role="group">
-                            <input v-model="localSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-normal-1" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-normal-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-normal-1">{{ $t('premove.title') }}</label>
 
-                            <input v-model="localSettings.moveSettingsNormal" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-normal-2" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-normal-2" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-normal-2">{{ $t('confirm_move.send_immediately') }}</label>
 
-                            <input v-model="localSettings.moveSettingsNormal" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-normal-3" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-normal-3" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-normal-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
                     </div>
@@ -323,13 +324,13 @@ const isNotificationSupported = typeof Notification !== 'undefined';
                     <label for="move-settings-correspondace" class="col-md-3 col-xl-2 col-form-label"><IconCalendar /> {{ $t('time_cadency.correspondence') }}</label>
                     <div class="col-md-9">
                         <div class="btn-group" role="group">
-                            <input v-model="localSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-correspondence-1" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-correspondence-1" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-correspondence-1">{{ $t('premove.title') }}</label>
 
-                            <input v-model="localSettings.moveSettingsCorrespondence" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-correspondence-2" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.SEND_IMMEDIATELY" type="radio" class="btn-check" id="move-settings-correspondence-2" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-correspondence-2">{{ $t('confirm_move.send_immediately') }}</label>
 
-                            <input v-model="localSettings.moveSettingsCorrespondence" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-correspondence-3" autocomplete="off">
+                            <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.MUST_CONFIRM" type="radio" class="btn-check" id="move-settings-correspondence-3" autocomplete="off">
                             <label class="btn btn-outline-primary" for="move-settings-correspondence-3">{{ $t('confirm_move.ask_confirmation') }}</label>
                         </div>
                     </div>

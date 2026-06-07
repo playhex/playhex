@@ -2,29 +2,11 @@ import { defineStore } from 'pinia';
 import { ref, watch, watchEffect } from 'vue';
 import { Expose, instanceToPlain, plainToInstance } from '../../shared/app/class-transformer-custom.js';
 import { OrientationMode } from '@playhex/pixi-board';
-import { apiGetPlayerSettings } from '../apiClient.js';
 
 const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 
 export type DarkOrLight = 'dark' | 'light';
 export type SelectedTheme = DarkOrLight | 'auto';
-
-export enum MoveSettings {
-    /**
-     * Send immediately, and premove allowed
-     */
-    PREMOVE = 0,
-
-    /**
-     * Send immediately (no premove)
-     */
-    SEND_IMMEDIATELY = 1,
-
-    /**
-     * Must confirm moves before send
-     */
-    MUST_CONFIRM = 2,
-}
 
 export class LocalSettings
 {
@@ -63,57 +45,16 @@ export class LocalSettings
      */
     @Expose()
     muteAudio?: boolean;
-
-    // Move settings are local because we don't want to constantly switch between confirm/immediately when switch from mobile and desktop with same account.
-
-    /**
-     * Move settings for blitz.
-     */
-    @Expose()
-    moveSettingsBlitz: MoveSettings = MoveSettings.SEND_IMMEDIATELY;
-
-    /**
-     * Move settings for live games.
-     */
-    @Expose()
-    moveSettingsNormal: MoveSettings = MoveSettings.SEND_IMMEDIATELY;
-
-    /**
-     * Move settings for correspondence games.
-     */
-    @Expose()
-    moveSettingsCorrespondence: MoveSettings = MoveSettings.MUST_CONFIRM;
 }
-
-// TODO remove later
-const importMoveSettings = (localSettings: LocalSettings) => {
-    apiGetPlayerSettings().then(settings => {
-        localSettings.moveSettingsBlitz = settings.moveSettingsBlitz;
-        localSettings.moveSettingsNormal = settings.moveSettingsNormal;
-        localSettings.moveSettingsCorrespondence = settings.moveSettingsCorrespondence;
-        saveLocalSettings(localSettings);
-    }).catch(() => {});
-};
 
 const loadLocalSettings = (): LocalSettings => {
     const serialized = localStorage?.getItem(LOCAL_SETTINGS_KEY);
 
     if (!serialized) {
-        const localSettings = new LocalSettings();
-
-        importMoveSettings(localSettings);
-
-        return localSettings;
+        return new LocalSettings();
     }
 
-    const parsed = JSON.parse(serialized);
-    const localSettings = plainToInstance(LocalSettings, parsed);
-
-    if (typeof parsed.moveSettingsBlitz === 'undefined') {
-        importMoveSettings(localSettings);
-    }
-
-    return localSettings;
+    return plainToInstance(LocalSettings, JSON.parse(serialized));
 };
 
 const saveLocalSettings = (localSettings: LocalSettings): void => {

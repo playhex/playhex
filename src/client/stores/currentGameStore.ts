@@ -11,11 +11,12 @@ import { GameView } from '@playhex/pixi-board';
 import Rooms from '../../shared/app/Rooms.js';
 import { useRouter } from 'vue-router';
 import Player from '../../shared/app/models/Player.js';
+import { MoveSettings } from '../../shared/app/models/PlayerSettings.js';
 import { timeControlToCadencyName } from '../../shared/app/timeControlUtils.js';
 import { apiGetConditionalMoves, apiPatchConditionalMoves, apiPostAnswerUndo, apiPostAskUndo, apiPostCancel, apiPostResign } from '../apiClient.js';
 import { HexMove, isSpecialHexMove } from '../../shared/move-notation/hex-move-notation.js';
 import { useChatInputStore } from './chatInputStore.js';
-import usePlayerLocalSettingsStore, { MoveSettings } from './playerLocalSettingsStore.js';
+import usePlayerLocalSettingsStore from './playerLocalSettingsStore.js';
 import { playAudio } from '../../shared/app/audioPlayer.js';
 import Premove from '../../shared/app/models/Premove.js';
 import { SimulatePlayingGameFacade } from '@playhex/pixi-board';
@@ -646,9 +647,9 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         return {
-            blitz: localSettings.value.moveSettingsBlitz,
-            normal: localSettings.value.moveSettingsNormal,
-            correspondence: localSettings.value.moveSettingsCorrespondence,
+            blitz: playerSettings.value.moveSettingsBlitz,
+            normal: playerSettings.value.moveSettingsNormal,
+            correspondence: playerSettings.value.moveSettingsCorrespondence,
         }[timeControlToCadencyName(hostedGame.value)];
     });
 

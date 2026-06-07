@@ -20,7 +20,7 @@ import PlayerAccountPassword from './PlayerAccountPassword.js';
 import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
-import PlayerSettings from './PlayerSettings.js';
+import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import Premove from './Premove.js';
 import Rating from './Rating.js';
@@ -47,6 +47,7 @@ export {
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
     HostedGameToPlayer,
+    MoveSettings,
     OnlinePlayers,
     OnlinePlayer,
     Player,
