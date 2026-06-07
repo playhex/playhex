@@ -21,7 +21,6 @@ import AppTournamentDescription from '../components/AppTournamentDescription.vue
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';
 import AppChannel from '../../components/AppChannel.vue';
-import useNotificationStore from '../../../stores/notificationStore.js';
 
 const {
     tournament,
@@ -39,10 +38,6 @@ const {
     currentTournamentSubscription,
     subscribeCheckIn,
 } = useTournamentCurrentSubscription(tournament);
-
-const {
-    requestPermission,
-} = useNotificationStore();
 
 const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: true });
 </script>pages/PageTournamentUpcomi
@@ -165,13 +160,13 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                             <p class="card-text mb-1">
                                 <button
                                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
-                                    @click="async () => { requestPermission(); subscribeCheckIn() }"
+                                    @click="subscribeCheckIn"
                                     class="btn btn-outline-info"
                                 ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                                 <button
                                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
-                                    @click="async () => { requestPermission(); subscribeCheckIn() }"
+                                    @click="subscribeCheckIn"
                                     class="btn btn-success me-3"
                                 >{{ $t('tournament_checkin') }}</button>
                             </p>

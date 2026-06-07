@@ -8,7 +8,6 @@ import AppTournamentStartsAt from './AppTournamentStartsAt.vue';
 import { getActiveTournamentMatches, isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription.js';
 import AppChannelMessagesCount from '../../components/AppChannelMessagesCount.vue';
-import useNotificationStore from '../../../stores/notificationStore.js';
 
 const props = defineProps({
     tournament: {
@@ -23,10 +22,6 @@ const {
     currentTournamentSubscription,
     subscribeCheckIn,
 } = useTournamentCurrentSubscription(tournament);
-
-const {
-    requestPermission,
-} = useNotificationStore();
 </script>
 
 <template>
@@ -49,13 +44,13 @@ const {
                 <!-- subscribe / ckeck-in / unsubscribe -->
                 <button
                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
-                    @click.prevent="async () => { requestPermission(); subscribeCheckIn() }"
+                    @click.prevent="subscribeCheckIn"
                     class="btn btn-sm btn-outline-info"
                 ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                 <button
                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
-                    @click.prevent="async () => { requestPermission(); subscribeCheckIn() }"
+                    @click.prevent="subscribeCheckIn"
                     class="btn btn-success me-3"
                 >{{ $t('tournament_checkin') }}</button>
 
