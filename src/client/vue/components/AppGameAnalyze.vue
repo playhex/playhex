@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType, onMounted, ref, watch } from 'vue';
+import { PropType, onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
 import { GameAnalyzeChart } from '../../game-analyze/GameAnalyzeChart.js';
@@ -28,6 +28,10 @@ const {
     enableSimulationMode,
 } = useCurrentGameStore();
 
+let gameAnalyzeFacade: null | GameAnalyzeFacade = null;
+let lastSelectedMoveIndex: null | number = null;
+let cleanupFacadeListeners: (() => void) | null = null;
+
 onMounted(() => {
     if (!gameAnalyzeContainer.value) {
         throw new Error('element with ref="gameAnalyzeContainer" not found');
@@ -38,8 +42,6 @@ onMounted(() => {
         themes[usePlayerLocalSettingsStore().displayedTheme()],
     );
 
-    let gameAnalyzeFacade: null | GameAnalyzeFacade = null;
-
     if (gameView.value) {
         // update game view position when clicking on a move on analyze chart
         gameAnalyzeFacade = new GameAnalyzeFacade(
@@ -47,6 +49,10 @@ onMounted(() => {
             analyze,
             showPositionAt => enableSimulationMode().goToMainPosition(showPositionAt),
         );
+
+        if (lastSelectedMoveIndex !== null) {
+            gameAnalyzeFacade.selectMove(lastSelectedMoveIndex);
+        }
     }
 
     gameAnalyzeChart.on('highlightedMoveChanged', moveIndex => {
@@ -54,10 +60,12 @@ onMounted(() => {
     });
 
     gameAnalyzeChart.on('moveSelected', moveIndex => {
+        lastSelectedMoveIndex = moveIndex;
         gameAnalyzeFacade?.selectMove(moveIndex);
     });
 
     const onMainCursorChanged = (index: number) => {
+        lastSelectedMoveIndex = index;
         gameAnalyzeChart.setHighlightedMove(index);
         gameAnalyzeFacade?.selectMove(index);
         moveAnalyze.value = analyze[index] ?? null;
@@ -72,15 +80,27 @@ onMounted(() => {
         gameAnalyzeFacade?.showCurrentAnalysisMarks();
     };
 
+    cleanupFacadeListeners = () => {
+        simulatePlayingGameFacade.value?.off('mainCursorChanged', onMainCursorChanged);
+        simulatePlayingGameFacade.value?.off('simulationCursorChanged', onSimulationCursorChanged);
+    };
+
     // update game analyze cursor when rewind/forward position with arrows or buttons
     watch(simulatePlayingGameFacade, (facade, oldFacade) => {
         oldFacade?.off('mainCursorChanged', onMainCursorChanged);
         oldFacade?.off('simulationCursorChanged', onSimulationCursorChanged);
         facade?.on('mainCursorChanged', onMainCursorChanged);
         facade?.on('simulationCursorChanged', onSimulationCursorChanged);
-    });
+    }, { immediate: true });
 
     void gameAnalyzeChart.mount(gameAnalyzeContainer.value);
+});
+
+onUnmounted(() => {
+    gameAnalyzeFacade?.hideCurrentAnalysisMarks();
+    gameAnalyzeFacade = null;
+    cleanupFacadeListeners?.();
+    cleanupFacadeListeners = null;
 });
 </script>
 
