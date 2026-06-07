@@ -9,6 +9,8 @@ import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
+import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
+import { isCorrespondence } from '../../../../shared/app/timeControlUtils.js';
 
 const { visible, confirm, cancel } = useDisclosure();
 
@@ -22,7 +24,10 @@ const props = defineProps({
 const gameOptions = reactive(props.gameOptions);
 
 const timeControl = toRef(gameOptions.timeControlType);
-watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
+watch<TimeControlType>(timeControl, t => {
+    gameOptions.timeControlType = t;
+    gameOptions.opponentMustBeRegistered = isCorrespondence({ ...gameOptions, timeControlType: t });
+}, { immediate: true });
 
 const showSecondaryOptions = ref(false);
 </script>
@@ -67,7 +72,11 @@ const showSecondaryOptions = ref(false);
                             <AppSwapRule v-model="gameOptions.swapRule" />
                         </div>
 
-                        <AppAllowExploration v-model="gameOptions.explorationAllowed" />
+                        <div class="mb-3">
+                            <AppAllowExploration v-model="gameOptions.explorationAllowed" />
+                        </div>
+
+                        <AppOpponentMustBeRegistered v-model="gameOptions.opponentMustBeRegistered" />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" @click="cancel()">{{ $t('cancel') }}</button>

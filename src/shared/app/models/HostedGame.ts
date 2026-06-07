@@ -107,6 +107,15 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     opponentPublicId: null | string;
 
+    /**
+     * If true, only registered players can join,
+     * i.e guests cannot join.
+     * By default, should be: enabled for correspondence, disabled for live.
+     */
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
+    opponentMustBeRegistered: boolean;
+
     @Column({ type: 'json' })
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Type((type) => {
@@ -271,6 +280,7 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
     hostedGame.timeControlType = structuredClone(gameOptions.timeControlType);
     hostedGame.timeControl = null;
     hostedGame.explorationAllowed = params.gameOptions?.explorationAllowed ?? true;
+    hostedGame.opponentMustBeRegistered = params.gameOptions?.opponentMustBeRegistered ?? false;
     hostedGame.host = params.host ?? null;
     hostedGame.chatMessages = [];
     hostedGame.moves = [];

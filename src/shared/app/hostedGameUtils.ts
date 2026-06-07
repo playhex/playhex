@@ -44,6 +44,18 @@ export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean 
     return true;
 };
 
+/**
+ * Returns true when a guest tries to join a game that requires registered players.
+ * In this case the join button should be visible but disabled.
+ */
+export const isGuestBlockedFromRegisteredOnlyGame = (hostedGame: HostedGame, player: null | Player): boolean => {
+    if (!player || !player.isGuest) {
+        return false;
+    }
+
+    return hostedGame.opponentMustBeRegistered;
+};
+
 export const getPlayer = (hostedGame: HostedGame, position: number): null | Player => {
     return hostedGame.hostedGameToPlayers[position].player ?? null;
 };

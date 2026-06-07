@@ -18,7 +18,7 @@ import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { apiPostRematch } from '../../apiClient.js';
-import { canJoin, getPlayers, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
+import { canJoin, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
@@ -303,13 +303,16 @@ const {
                     :gameView="gameView"
                 />
 
-                <div v-if="hostedGame && canJoin(hostedGame, loggedInPlayer)" class="join-button-container">
+                <div v-if="hostedGame && (canJoin(hostedGame, loggedInPlayer) || isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer))" class="join-button-container">
                     <div class="d-flex justify-content-center">
-                        <button
-                            class="btn btn-lg"
-                            :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
-                            @click="join()"
-                        >Accept</button>
+                        <span :title="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer) ? $t('cannot_join_registered_only') : undefined">
+                            <button
+                                class="btn btn-lg"
+                                :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
+                                @click="join()"
+                                :disabled="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer)"
+                            >Accept</button>
+                        </span>
                     </div>
                 </div>
             </div>

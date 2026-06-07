@@ -11,7 +11,7 @@ import { getMyIndex, getOpponent } from '../../services/context-utils.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import AppPseudo from '../components/AppPseudo.vue';
-import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame } from '../../../shared/app/hostedGameUtils.js';
+import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
 import { isUncommonBoardsize } from '../../../shared/app/hostedGameOptionsUtils.js';
 import { HostedGame, Tournament } from '../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
@@ -215,13 +215,15 @@ for (const locale of getPlayerLocales()) {
                                                 class="btn btn-sm btn-outline-secondary py-0"
                                                 :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
                                             >{{ $t('game.watch') }}</router-link>
-                                            <button
-                                                v-if="canJoin(hostedGame, authStore.loggedInPlayer)"
+                                            <span
+                                                v-if="canJoin(hostedGame, authStore.loggedInPlayer) || isGuestBlockedFromRegisteredOnlyGame(hostedGame, authStore.loggedInPlayer)"
+                                                :title="isGuestBlockedFromRegisteredOnlyGame(hostedGame, authStore.loggedInPlayer) ? $t('cannot_join_registered_only') : undefined"
+                                            ><button
                                                 class="btn btn-sm py-0 ms-2"
                                                 :class="hostedGame.softRemoved ? 'btn-outline-secondary text-decoration-line-through' : isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
                                                 @click="joinGame(hostedGame)"
-                                                :disabled="Boolean(hostedGame.softRemoved)"
-                                            >{{ $t('lobby_join') }}</button>
+                                                :disabled="Boolean(hostedGame.softRemoved) || isGuestBlockedFromRegisteredOnlyGame(hostedGame, authStore.loggedInPlayer)"
+                                            >{{ $t('lobby_join') }}</button></span>
                                             <span v-if="hostedGame.ranked" class="text-warning ms-2"><IconTrophyFill /> {{ $t('ranked') }}</span>
                                         </td>
                                         <td>

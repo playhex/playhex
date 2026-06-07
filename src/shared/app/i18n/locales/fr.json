@@ -628,8 +628,11 @@
     "moderation_reason": {
         "chat_insults": "Insultes ou comportement inapproprié dans le chat"
     },
-    "allow_exploration": "Autoriser l'exploration",
+    "allow_exploration": "Autoriser l’exploration",
     "allow_exploration_help": "Permet d’essayer des variantes en jouant les deux couleurs avant de soumettre un coup. Si désactivé, les coups conditionnels sont également désactivés.",
+    "opponent_must_be_registered": "Joueurs avec compte uniquement",
+    "opponent_must_be_registered_help": "Les invités ne peuvent pas rejoindre cette partie. Seuls les joueurs avec un compte sont acceptés.",
+    "cannot_join_registered_only": "Cette partie est réservée aux joueurs avec un compte. Créez un compte ou connectez-vous pour rejoindre.",
     "no_active_tournament": "Aucun tournoi en cours pour le moment.",
     "no_upcoming_tournament": "Aucun tournoi à venir pour le moment.",
     "update": "Mettre à jour",

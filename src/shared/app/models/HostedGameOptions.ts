@@ -93,6 +93,15 @@ export default class HostedGameOptions implements TimeControlBoardsize
     @IsOptional()
     @Expose()
     explorationAllowed = true;
+
+    /**
+     * If true, only registered players (non-guests) can join.
+     * Default: false for live games, true for correspondence games.
+     */
+    @IsBoolean()
+    @IsOptional()
+    @Expose()
+    opponentMustBeRegistered = false;
 }
 
 /**
@@ -110,6 +119,7 @@ export const cloneGameOptions = (gameOptions: HostedGameOptions): HostedGameOpti
     clone.opponentPublicId = gameOptions.opponentPublicId;
     clone.timeControlType = gameOptions.timeControlType;
     clone.explorationAllowed = gameOptions.explorationAllowed;
+    clone.opponentMustBeRegistered = gameOptions.opponentMustBeRegistered;
 
     return clone;
 };

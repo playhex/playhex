@@ -8,6 +8,7 @@ import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/a
 import { IconTrophy } from '../../icons.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
+import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
 import useLobbyStore from '../../../stores/lobbyStore.js';
 import { storeToRefs } from 'pinia';
 
@@ -29,6 +30,7 @@ watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
 // ranked: by default, exploration is enabled for correspondence (and can be changed by host)
 watch(currentLobby, () => {
     gameOptions.explorationAllowed = currentLobby.value === 'correspondence';
+    gameOptions.opponentMustBeRegistered = currentLobby.value === 'correspondence';
 }, { immediate: true });
 </script>
 
@@ -51,7 +53,11 @@ watch(currentLobby, () => {
                         </div>
                     </div>
                     <div class="modal-body border-top">
-                        <AppAllowExploration v-model="gameOptions.explorationAllowed" />
+                        <div class="mb-3">
+                            <AppAllowExploration v-model="gameOptions.explorationAllowed" />
+                        </div>
+
+                        <AppOpponentMustBeRegistered v-model="gameOptions.opponentMustBeRegistered" />
                     </div>
 
                     <div class="modal-footer">

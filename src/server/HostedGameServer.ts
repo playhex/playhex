@@ -659,6 +659,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Cannot join game created by system.';
         }
 
+        // Cannot join as guest if host requires opponent with account only
+        if (this.hostedGame.opponentMustBeRegistered && player.isGuest) {
+            this.logger.notice('Player tried to join game as guest but host wants only registered players', { joiner: player.pseudo });
+            return 'Cannot join game as guest, host want only players with account.';
+        }
+
         this.players.push(player);
 
         this.gameEventEmitter.emitGameJoined(this.hostedGame, player);
