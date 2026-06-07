@@ -537,6 +537,18 @@
         "title": "Paramètres de coup"
     },
     "donate": "Faire un don à PlayHex",
+    "enable_notifications_overlay": {
+        "title": "Activer les notifications ?",
+        "enable": "Activer les notifications",
+        "later": "Ignorer",
+        "you_will_be_notified": "Vous serez notifié(e) :",
+        "also_notified_for": "Vous serez aussi notifié(e) :",
+        "notifications": {
+            "tournament_checkin_opens": "Quand les inscriptions au tournoi ouvrent",
+            "correspondence_your_turn": "Quand c'est votre tour dans une partie par correspondance",
+            "rematch": "Quand vous recevez une offre de revanche"
+        }
+    },
     "notifications": "Notifications",
     "mark_all_as_read": "Marquer comme lues",
     "no_notifications": "Aucune notification.",

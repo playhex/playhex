@@ -582,6 +582,18 @@
         "read_strategy_guide": "Read a deeper strategy guide"
     },
     "donate": "Donate to PlayHex",
+    "enable_notifications_overlay": {
+        "title": "Enable notifications?",
+        "enable": "Enable notifications",
+        "later": "Ignore",
+        "you_will_be_notified": "You'll be notified:",
+        "also_notified_for": "You'll also be notified:",
+        "notifications": {
+            "tournament_checkin_opens": "When tournament check-in opens",
+            "correspondence_your_turn": "When it's your turn in a correspondence game",
+            "rematch": "When you receive a rematch offer"
+        }
+    },
     "notifications": "Notifications",
     "mark_all_as_read": "Mark as read",
     "no_notifications": "No notifications.",

@@ -8,6 +8,7 @@ import AppTournamentStartsAt from './AppTournamentStartsAt.vue';
 import { getActiveTournamentMatches, isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription.js';
 import AppChannelMessagesCount from '../../components/AppChannelMessagesCount.vue';
+import { useEnableNotificationsAfterTournamentSubscribe } from '../../composables/enableNotificationsAfterTournamentSubscribe.js';
 
 const props = defineProps({
     tournament: {
@@ -22,6 +23,13 @@ const {
     currentTournamentSubscription,
     subscribeCheckIn,
 } = useTournamentCurrentSubscription(tournament);
+
+const { promptIfNeeded } = useEnableNotificationsAfterTournamentSubscribe('tournament_checkin_opens');
+
+const subscribeAndPrompt = async () => {
+    void subscribeCheckIn();
+    await promptIfNeeded();
+};
 </script>
 
 <template>
@@ -44,13 +52,13 @@ const {
                 <!-- subscribe / ckeck-in / unsubscribe -->
                 <button
                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
-                    @click.prevent="subscribeCheckIn"
+                    @click.prevent="subscribeAndPrompt"
                     class="btn btn-sm btn-outline-info"
                 ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
                 <button
                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
-                    @click.prevent="subscribeCheckIn"
+                    @click.prevent="subscribeAndPrompt"
                     class="btn btn-success me-3"
                 >{{ $t('tournament_checkin') }}</button>
 
