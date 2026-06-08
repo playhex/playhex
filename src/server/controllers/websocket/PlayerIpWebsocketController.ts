@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
 import PlayerIpService from '../../services/PlayerIpService.js';
+import { getClientIp } from '../../services/security/getClientIp.js';
 
 @Service()
 export default class PlayerIpWebsocketController implements WebsocketControllerInterface
@@ -18,7 +19,7 @@ export default class PlayerIpWebsocketController implements WebsocketControllerI
             return;
         }
 
-        const ip = socket.handshake.address;
+        const ip = getClientIp(socket);
 
         void this.playerIpService.logPlayerIp(player, ip);
     }

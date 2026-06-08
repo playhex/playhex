@@ -4,6 +4,7 @@ import { sessionMiddleware } from '../sessionMiddleware.js';
 import { Container } from 'typedi';
 import PlayerRepository from '../../repositories/PlayerRepository.js';
 import BannedIpService from '../BannedIpService.js';
+import { getClientIp } from './getClientIp.js';
 
 const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     // Makes express and socketio aware of session in cookie
@@ -14,7 +15,7 @@ const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     const bannedIpService = Container.get(BannedIpService);
 
     io.use(async (socket, next) => {
-        const ip = socket.handshake.address;
+        const ip = getClientIp(socket);
         const ban = await bannedIpService.getActiveBan(ip);
 
         if (ban !== null) {
