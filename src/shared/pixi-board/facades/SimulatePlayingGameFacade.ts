@@ -118,6 +118,14 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
         return this.playingGameFacade;
     }
 
+    /**
+     * @returns Current player in the simulation
+     */
+    getCurrentPlayerIndex()
+    {
+        return this.playingGameFacade.getCurrentPlayerIndex();
+    }
+
     getMainCursor(): number
     {
         return this.mainCursor;
@@ -375,11 +383,14 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
         };
     }
 
-    destroy(): void
+    destroy(reset = true): void
     {
-        this.resetSimulationAndRewind();
-        this.initialPlayingGameFacade.setLastMoveMarksVisible(true);
-        this.initialPlayingGameFacade.resumeView();
+        if (reset) {
+            this.resetSimulationAndRewind();
+            this.initialPlayingGameFacade.setLastMoveMarksVisible(true);
+            this.initialPlayingGameFacade.resumeView();
+        }
+
         this.playingGameFacade.destroy();
     }
 }

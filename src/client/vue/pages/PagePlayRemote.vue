@@ -23,7 +23,7 @@ import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoinin
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
-import AppHexplorerLink from '../components/AppHexplorerLink.vue';
+import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 
 const head = injectHead();
 

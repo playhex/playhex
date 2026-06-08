@@ -1,42 +1,52 @@
 <script setup lang="ts">
-import { GameView, Hex, PlayingGameFacade } from '@playhex/pixi-board';
+import { GameView, Hex, PlayingGameFacade, SimulatePlayingGameFacade } from '@playhex/pixi-board';
 import { Graphics } from 'pixi.js';
-import { whenever } from '@vueuse/core';
-import { computed, ref, useTemplateRef } from 'vue';
+import { onKeyDown, whenever } from '@vueuse/core';
+import { computed, ref, shallowRef, useTemplateRef } from 'vue';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade';
 import { ToolInterface } from '../tools/ToolInterface';
 import { PlaceStonesAlternatelyTool } from '../tools/PlaceStonesAlternatelyTool';
 import { PlaceStoneTool } from '../tools/PlaceStoneTool';
-import { shallowRef } from 'vue';
 import { useHead } from '@unhead/vue';
 import { coordsToMove } from '../../../../shared/move-notation/move-notation';
 import { parseHexworldString } from '../../../../shared/app/hexworld';
 import { HexMove } from '../../../../shared/move-notation/hex-move-notation';
+import { UndoableActionsStack } from '../undoredo/undoredo';
+import { $ } from 'vue-router/dist/useApi-D6ckOsFy.js';
 
 useHead({
     title: 'Hexplorer',
 });
 
-const createGameViewFromUrlHash = (): null | GameView => {
+/**
+ * Actions made so far.
+ * Can be undo/redo.
+ */
+const actionsStack = ref(new UndoableActionsStack());
+
+const initGameViewFromUrlHash = (): { gameView: GameView, playingGameFacade: PlayingGameFacade, simulatePlayingGameFacade: SimulatePlayingGameFacade } => {
     const { hash } = document.location;
 
     if (hash.length <= 1) {
-        return null;
+        const gameView = new GameView(11);
+        const playingGameFacade = new PlayingGameFacade(gameView, true, [], false);
+        const simulatePlayingGameFacade = new SimulatePlayingGameFacade(playingGameFacade);
+
+        return { gameView, playingGameFacade, simulatePlayingGameFacade };
     }
 
     const { size, moves } = parseHexworldString(hash.substring(1));
 
     const gameView = new GameView(size);
-
     const playingGameFacade = new PlayingGameFacade(gameView, true, moves as HexMove[], false);
-    playingGameFacade.destroy();
+    const simulatePlayingGameFacade = new SimulatePlayingGameFacade(playingGameFacade);
 
-    return gameView;
+    return { gameView, playingGameFacade, simulatePlayingGameFacade };
 };
 
-const gameView = createGameViewFromUrlHash() ?? new GameView(11);
+const { gameView, playingGameFacade, simulatePlayingGameFacade } = initGameViewFromUrlHash();
 const gameViewElement = useTemplateRef('game-view-element');
-const currentPlayer = ref<'red' | 'blue'>('red');
+const currentPlayer = ref<0 | 1>(0);
 
 const currentTool = shallowRef<ToolInterface>(new PlaceStonesAlternatelyTool(gameView));
 const whiteWin = ref(0.5);
@@ -47,8 +57,7 @@ const blueBarHeightCss = computed(() => `${whiteWin.value * 100}%`);
 new PlayerSettingsFacade(gameView);
 
 gameView.on('hexClicked', move => {
-    currentTool.value.apply(move);
-    currentPlayer.value = currentPlayer.value === 'blue' ? 'red' : 'blue';
+    actionsStack.value.pushAndDo(currentTool.value.createUndoableAction(move));
 });
 
 let policyOverlays: Graphics[][] = [];
@@ -117,6 +126,8 @@ const applyPolicy = (policy: number[][], color: 'black' | 'white'): void => {
     }
 };
 
+const cachedAnal: { [cacheKey: string]: AnalOutput } = {};
+
 const updateAnal = async () => {
     const black: string[] = [];
     const white: string[] = [];
@@ -135,20 +146,93 @@ const updateAnal = async () => {
         }
     }
 
-    const result = await anal({
+    const analInput: AnalInput = {
         size: gameView.getBoardsize(),
-        color: currentPlayer.value === 'red' ? 'black' : 'white',
+        color: currentPlayer.value === 0 ? 'black' : 'white',
         black: black.join(' '),
         white: white.join(' '),
-    });
+    };
+
+    const cacheKey = [
+        analInput.size,
+        analInput.color,
+        analInput.black,
+        analInput.white,
+    ].join('|');
+
+    const result = cachedAnal[cacheKey] ?? (cachedAnal[cacheKey] = await anal(analInput));
 
     whiteWin.value = result.whiteWin;
-    applyPolicy(result.policy, currentPlayer.value === 'red' ? 'black' : 'white');
+    applyPolicy(result.policy, currentPlayer.value === 0 ? 'black' : 'white');
 };
 
 gameView.on('hexClicked', () => {
     void updateAnal();
 });
+
+/**
+ * Custom mode allow place any stone anywhere.
+ * Once in custom mode, simulated playing game is no longer used,
+ * and can get back to normal mode only by undoing actions.
+ */
+const modeCustom = ref<boolean>(false);
+
+const goCustomMode = () => {
+    actionsStack.value.pushAndDo({
+        do: () => {
+            modeCustom.value = true;
+        },
+        undo: () => {
+            modeCustom.value = false;
+        },
+    });
+};
+
+// ctrl+Z/Y
+onKeyDown(
+    e => (e.ctrlKey || e.metaKey) && e.key === 'z',
+    e => {
+        e.preventDefault();
+        actionsStack.value.undo();
+    },
+);
+
+onKeyDown(
+    e => (e.ctrlKey || e.metaKey) && e.key === 'y',
+    e => {
+        e.preventDefault();
+        actionsStack.value.redo();
+    },
+);
+
+// left/right
+onKeyDown(
+    'ArrowLeft',
+    e => {
+        if (modeCustom.value) {
+            return;
+        }
+
+        e.preventDefault();
+        simulatePlayingGameFacade.rewind();
+        currentPlayer.value = simulatePlayingGameFacade.getCurrentPlayerIndex();
+        void updateAnal();
+    },
+);
+
+onKeyDown(
+    'ArrowRight',
+    e => {
+        if (modeCustom.value) {
+            return;
+        }
+
+        e.preventDefault();
+        simulatePlayingGameFacade.forward();
+        currentPlayer.value = simulatePlayingGameFacade.getCurrentPlayerIndex();
+        void updateAnal();
+    },
+);
 </script>
 
 <template>
@@ -162,25 +246,59 @@ gameView.on('hexClicked', () => {
 
     <div class="bottom-menu">
         <button
-            @click="currentTool = new PlaceStonesAlternatelyTool(gameView)"
-            class="btn btn-outline-success"
-        >alt</button>
+            v-if="!modeCustom"
+            @click="goCustomMode"
+            class="btn btn-outline-warning"
+        >go custom mode</button>
 
-        <button
-            @click="currentTool = new PlaceStoneTool(gameView, 0)"
-            class="btn btn-outline-danger"
-        >red</button>
+        <p v-else>custom mode</p>
 
-        <button
-            @click="currentTool = new PlaceStoneTool(gameView, 1)"
-            class="btn btn-outline-primary"
-        >blue</button>
+        <template v-if="modeCustom">
+            <button
+                @click="actionsStack.undo()"
+                class="btn btn-outline-warning"
+                :disabled="!actionsStack.canUndo()"
+            >undo</button>
 
-        <button
-            @click="currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue'; updateAnal()"
-            class="btn"
-            :class="currentPlayer === 'red' ? 'btn-outline-danger' : 'btn-outline-primary'"
-        >current: {{ currentPlayer }}</button>
+            <button
+                @click="actionsStack.redo()"
+                class="btn btn-outline-warning"
+                :disabled="!actionsStack.canRedo()"
+            >redo</button>
+
+            <button
+                @click="currentTool = new PlaceStonesAlternatelyTool(gameView)"
+                class="btn btn-outline-success"
+            >alt</button>
+
+            <button
+                @click="currentTool = new PlaceStoneTool(gameView, 0)"
+                class="btn btn-outline-danger"
+            >red</button>
+
+            <button
+                @click="currentTool = new PlaceStoneTool(gameView, 1)"
+                class="btn btn-outline-primary"
+            >blue</button>
+
+            <button
+                @click="currentPlayer = currentPlayer === 0 ? 1 : 0; updateAnal()"
+                class="btn"
+                :class="currentPlayer === 0 ? 'btn-outline-danger' : 'btn-outline-primary'"
+            >current: {{ currentPlayer }}</button>
+        </template>
+
+        <template v-else>
+            <button
+                @click="simulatePlayingGameFacade.rewind()"
+                class="btn btn-outline-primary"
+            >back</button>
+
+            <button
+                @click="simulatePlayingGameFacade.forward()"
+                class="btn btn-outline-primary"
+            >forward</button>
+        </template>
     </div>
 </template>
 

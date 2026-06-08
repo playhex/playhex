@@ -37,6 +37,7 @@ import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
+import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 
 const props = defineProps({
     hostedGame: {
@@ -629,6 +630,14 @@ watch(gameUIMode, () => {
                     v-if="game"
                     :hostedGame
                     :game
+                    :orientation
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                />
+
+                <!-- Hexplorer -->
+                <AppHexplorerLink
+                    v-if="game"
+                    :hostedGame
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                 />

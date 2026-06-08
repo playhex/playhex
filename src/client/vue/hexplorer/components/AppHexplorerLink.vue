@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { PropType, toRefs } from 'vue';
-import { createHexworldString } from '../../../shared/app/hexworld.js';
-import useAuthStore from '../../stores/authStore.js';
+import { createHexworldString } from '../../../../shared/app/hexworld.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { GameView } from '@playhex/pixi-board';
-import { canExportGame } from '../../../shared/app/hostedGameUtils.js';
-import HostedGame from '../../../shared/app/models/HostedGame.js';
+import { canExportGame } from '../../../../shared/app/hostedGameUtils.js';
+import { HostedGame } from '../../../../shared/app/models/index.js';
+
+/*
+ * Link that redirect to Hexplorer,
+ * and initialize position to this hostedGame
+ */
 
 const props = defineProps({
     hostedGame: {

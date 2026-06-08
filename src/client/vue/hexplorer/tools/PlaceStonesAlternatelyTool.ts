@@ -1,6 +1,7 @@
 import { GameView } from '@playhex/pixi-board';
 import { Move } from '../../../../shared/move-notation/move-notation.js';
 import { ToolInterface } from './ToolInterface.js';
+import { UndoableAction } from '../undoredo/undoredo.js';
 
 export class PlaceStonesAlternatelyTool implements ToolInterface
 {
@@ -13,9 +14,20 @@ export class PlaceStonesAlternatelyTool implements ToolInterface
         this.currentColor = initialColor;
     }
 
-    apply(move: Move): void
+    createUndoableAction(move: Move): UndoableAction
     {
-        this.gameView.setStone(move, this.currentColor);
-        this.currentColor = 1 - this.currentColor as 0 | 1;
+        const previousStone = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+        const previousCurrentColor = this.currentColor;
+
+        return {
+            do: () => {
+                this.gameView.setStone(move, this.currentColor);
+                this.currentColor = 1 - this.currentColor as 0 | 1;
+            },
+            undo: () => {
+                this.gameView.setStone(move, previousStone);
+                this.currentColor = previousCurrentColor;
+            },
+        };
     }
 }

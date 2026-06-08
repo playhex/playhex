@@ -1,6 +1,7 @@
 import { Move } from '../../../../shared/move-notation/move-notation';
+import { UndoableAction } from '../undoredo/undoredo';
 
 export interface ToolInterface
 {
-    apply(move: Move): void;
+    createUndoableAction(move: Move): UndoableAction;
 }
