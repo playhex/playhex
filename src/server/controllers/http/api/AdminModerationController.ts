@@ -10,6 +10,8 @@ import { ROLE_MODERATOR } from '../../../services/roles.js';
 import { HostedGame } from '../../../../shared/app/models/index.js';
 import type AbstractChatMessage from '../../../../shared/app/models/AbstractChatMessage.js';
 import ChannelChatMessageRepository from '../../../repositories/ChannelChatMessageRepository.js';
+import PlayerIpService from '../../../services/PlayerIpService.js';
+import BannedIpService from '../../../services/BannedIpService.js';
 
 type MessageFromAnySource =
     { message: AbstractChatMessage, source: 'game', data: HostedGame }
@@ -28,6 +30,8 @@ export default class AdminModerationController
         private playerRepository: PlayerRepository,
         private moderationService: ModerationService,
         private channelChatMessageRepository: ChannelChatMessageRepository,
+        private playerIpService: PlayerIpService,
+        private bannedIpService: BannedIpService,
     ) {}
 
     @Get('/api/admin/moderation/players')
@@ -64,6 +68,31 @@ export default class AdminModerationController
         const actions = await this.playerModerationActionRepository.findActionsForPlayer(player, true);
 
         return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action'] });
+    }
+
+    @Get('/api/admin/moderation/banned-ips')
+    async getBannedIps()
+    {
+        return await this.bannedIpService.getActiveBans();
+    }
+
+    @Get('/api/admin/moderation/players/:publicId/ips')
+    async getPlayerIps(
+        @Param('publicId') publicId: string,
+    ) {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (!player) {
+            throw new NotFoundError(`Player "${publicId}" not found`);
+        }
+
+        const ips = await this.playerIpService.getIpsForPlayerWithOthers(player);
+
+        return ips.map(({ ip, lastUsedAt, otherPlayers }) => ({
+            ip,
+            lastUsedAt,
+            otherPlayers: instanceToPlain(otherPlayers, { groups: [GROUP_DEFAULT] }),
+        }));
     }
 
     /**

@@ -17,4 +17,24 @@ export default class BannedIpService
             bannedUntil: Or(IsNull(), MoreThan(new Date())),
         });
     }
+
+    async getActiveBans(): Promise<BannedIp[]>
+    {
+        return await this.bannedIpRepository.find({
+            where: { bannedUntil: Or(IsNull(), MoreThan(new Date())) },
+            order: { bannedAt: 'desc' },
+        });
+    }
+
+    async banIp(ip: string, bannedUntil: Date, reason: string): Promise<void>
+    {
+        await this.bannedIpRepository
+            .createQueryBuilder()
+            .insert()
+            .into(BannedIp)
+            .values({ ip, bannedAt: new Date(), bannedUntil, reason })
+            .orUpdate(['bannedAt', 'bannedUntil', 'reason'], ['ip'])
+            .execute()
+        ;
+    }
 }

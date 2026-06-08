@@ -74,6 +74,14 @@ export default class PlayerModerationAction
     nicknameModerated: null | string;
 
     /**
+     * If set, all known IPs of the player have been banned until this date.
+     */
+    @Column({ type: Date, nullable: true })
+    @Type(() => Date)
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    ipBannedUntil: null | Date;
+
+    /**
      * Player has view this action and clicked "ok"
      */
     @Column({ type: Date, nullable: true })

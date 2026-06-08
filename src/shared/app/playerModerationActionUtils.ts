@@ -30,4 +30,8 @@ export class PostPlayerModerationAction
 
     @IsOptional()
     moderateNickname?: string;
+
+    @IsOptional()
+    @IsDate()
+    ipBannedUntil?: Date;
 }

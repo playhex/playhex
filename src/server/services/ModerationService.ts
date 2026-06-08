@@ -4,13 +4,20 @@ import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
 import HostedGameStore from '../store/HostedGameStore.js';
 import { PostPlayerModerationAction } from '../repositories/PlayerModerationActionRepository.js';
 import { Repository } from 'typeorm';
-import { Player, PlayerModerationAction } from '../../shared/app/models/index.js';
+import { Player, PlayerIp, PlayerModerationAction } from '../../shared/app/models/index.js';
 import { notifier } from './notifications/notifier.js';
 import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
 import PlayerAvatarService from './PlayerAvatarService.js';
+import BannedIpService from './BannedIpService.js';
 import logger from './logger.js';
 
 export class CreateAndSaveError extends Error {}
+
+const MODERATION_REASONS: Record<string, string> = {
+    'moderation_reason.chat_insults': 'Insults or inappropriate behavior in chat',
+    'moderation_reason.avatar_inappropriate': 'Inappropriate avatar image',
+    'moderation_reason.nickname_inappropriate': 'Inappropriate nickname',
+};
 
 @Service()
 export default class ModerationService
@@ -20,12 +27,16 @@ export default class ModerationService
         private hostedGameStore: HostedGameStore,
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private playerAvatarService: PlayerAvatarService,
+        private bannedIpService: BannedIpService,
 
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
 
         @Inject('Repository<PlayerModerationAction>')
         private playerModerationActionRepository: Repository<PlayerModerationAction>,
+
+        @Inject('Repository<PlayerIp>')
+        private playerIpRepository: Repository<PlayerIp>,
     ) {}
 
     async moderateDeleteChatMessages(publicIds: string[]): Promise<{ deletedInDb: number, deletedInMemory: number, deletedInChannels: number }>
@@ -54,6 +65,7 @@ export default class ModerationService
         action.chatBlockedUntil = post.chatBlockedUntil ?? null;
         action.avatarBlockedUntil = post.avatarBlockedUntil ?? null;
         action.nicknameModerated = post.moderateNickname ?? null;
+        action.ipBannedUntil = post.ipBannedUntil ?? null;
         action.acknowledgedAt = null;
         action.createdAt = new Date();
         action.relatedChatMessages = [];
@@ -74,6 +86,10 @@ export default class ModerationService
 
         await this.playerModerationActionRepository.save(action);
 
+        if (action.ipBannedUntil) {
+            await this.banPlayerIps(player, action);
+        }
+
         if (action.avatarBlockedUntil) {
             await this.playerAvatarService.deleteAvatar(player.avatarPath, player.avatarThumbnailPath).catch(reason => {
                 logger.notice('Error while deleting moderated avatar', { reason });
@@ -84,6 +100,35 @@ export default class ModerationService
         notifier.emit('moderationActionTaken', action);
 
         return action;
+    }
+
+    private async banPlayerIps(player: Player, action: PlayerModerationAction): Promise<void>
+    {
+        const ips = await this.playerIpRepository.find({
+            where: { player: { id: player.id } },
+        });
+
+        if (!ips.length) return;
+
+        const parts: string[] = [];
+
+        if (action.reason) parts.push(`reason: ${MODERATION_REASONS[action.reason] ?? action.reason}`);
+        if (action.reasonDetails) parts.push(`details: ${action.reasonDetails}`);
+
+        const messages = [
+            ...action.relatedChatMessages.map(m => m.player?.pseudo ? `${m.player.pseudo}: ${m.content}` : null),
+            ...action.relatedChannelChatMessages.map(m => m.player?.pseudo ? `${m.player.pseudo}: ${m.content}` : null),
+        ].filter(Boolean) as string[];
+
+        if (messages.length) {
+            parts.push(`messages:\n${messages.map(m => `- ${m}`).join('\n')}`);
+        }
+
+        const reason = parts.join('\n') || 'moderated';
+
+        await Promise.all(
+            ips.map(({ ip }) => this.bannedIpService.banIp(ip, action.ipBannedUntil!, reason)),
+        );
     }
 
     /**

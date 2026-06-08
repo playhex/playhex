@@ -13,8 +13,9 @@ export default class ChatMessageRepository
 
     async findMultipleByPublicId(publicIds: string[]): Promise<ChatMessage[]>
     {
-        return await this.chatMessageRepository.findBy({
-            publicId: In(publicIds),
+        return await this.chatMessageRepository.find({
+            where: { publicId: In(publicIds) },
+            relations: { player: true },
         });
     }
 

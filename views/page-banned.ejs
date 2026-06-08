@@ -33,7 +33,7 @@
         <p class="label">Until</p>
         <p><strong><%= bannedUntil !== null ? bannedUntil.toUTCString() : 'Permanently' %></strong></p>
         <p class="label">Reason</p>
-        <p><%= reason %></p>
+        <p><%- reason.replace(/\n/g, '<br>') %></p>
     </div>
 </body>
 </html>
