@@ -195,12 +195,12 @@ onUnmounted(() => {
             </button>
 
             <!-- backward -->
-            <button type="button" @click="backward()" class="btn btn-outline-primary" ref="btnRewindBack">
+            <button type="button" @click="backward()" class="btn btn-outline-primary flex-grow-1" ref="btnRewindBack">
                 <IconChevronLeft />
             </button>
 
             <!-- forward -->
-            <button type="button" @click="forward()" class="btn btn-outline-primary" ref="btnRewindForward">
+            <button type="button" @click="forward()" class="btn btn-outline-primary flex-grow-1" ref="btnRewindForward">
                 <IconChevronRight />
             </button>
 
@@ -320,4 +320,8 @@ onUnmounted(() => {
         display flex
         justify-content center
         gap 0.25em
+        padding 0 0.25em
+
+        button
+            max-width 6em
 </style>
