@@ -13,6 +13,7 @@ import FeaturedCorrespondenceGamesWebsocketController from './FeaturedCorrespond
 import ThumbnailGameWebsocketController from './ThumbnailGameWebsocketController.js';
 import PlayingGamesCountWebsocketController from './PlayingGamesCountWebsocketController.js';
 import ChannelWebsocketController from './ChannelWebsocketController.js';
+import PlayerIpWebsocketController from './PlayerIpWebsocketController.js';
 
 export interface WebsocketControllerInterface
 {
@@ -50,6 +51,7 @@ export function registerWebsocketControllers() {
         Container.get(PlayerGamesWebsocketController),
         Container.get(ServerStatusWebsocketController),
         Container.get(SpectatorWebsocketController),
+        Container.get(PlayerIpWebsocketController),
     ];
 
     const io = Container.get(HexServer);

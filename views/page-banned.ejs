@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Banned</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1">
+    <style>
+        body {
+            margin: 0;
+            padding: 2em;
+            font-family: sans-serif;
+            background-color: #212529;
+            color: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .card {
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { font-size: 2em; margin-bottom: 0.5em; color: #dc3545; }
+        p { margin: 0.5em 0; line-height: 1.6; }
+        .label { color: #adb5bd; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>You have been banned</h1>
+        <p class="label">Until</p>
+        <p><strong><%= bannedUntil !== null ? bannedUntil.toUTCString() : 'Permanently' %></strong></p>
+        <p class="label">Reason</p>
+        <p><%= reason %></p>
+    </div>
+</body>
+</html>

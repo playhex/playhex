@@ -1,4 +1,5 @@
 import AIConfig from './AIConfig.js';
+import BannedIp from './BannedIp.js';
 import Channel from './Channel.js';
 import ChannelChatMessage from './ChannelChatMessage.js';
 import ChatMessage from './ChatMessage.js';
@@ -20,6 +21,7 @@ import PlayerAccountPassword from './PlayerAccountPassword.js';
 import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
+import PlayerIp from './PlayerIp.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import Premove from './Premove.js';
@@ -35,6 +37,7 @@ import TournamentParticipant from './TournamentParticipant.js';
 export {
     HostedGame,
     AIConfig,
+    BannedIp,
     Channel,
     ChannelChatMessage,
     ChatMessage,
@@ -52,6 +55,7 @@ export {
     OnlinePlayer,
     Player,
     PlayerAccountPassword,
+    PlayerIp,
     PlayerModerationAction,
     PlayerNotification,
     PlayerSettings,
@@ -71,6 +75,7 @@ export {
 export const entities = {
     HostedGame,
     AIConfig,
+    BannedIp,
     Channel,
     ChannelChatMessage,
     ChatMessage,
@@ -86,6 +91,7 @@ export const entities = {
     OnlinePlayers,
     Player,
     PlayerAccountPassword,
+    PlayerIp,
     PlayerModerationAction,
     PlayerNotification,
     PlayerPushSubscription,
