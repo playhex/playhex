@@ -19,7 +19,7 @@ i18n.on('languageChanged', () => {
             <p>{{ seo.title }}</p>
         </div>
         <div class="link-icons d-flex justify-content-center gap-4 text-center">
-            <a href="https://feedback.alcalyn.app" target="_blank">
+            <a href="https://feedback.playhex.org" target="_blank">
                 <IconChatDots class="text-body" />
                 <br>
                 {{ $t('feedback') }}
