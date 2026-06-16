@@ -1,4 +1,4 @@
-import { gameToHexworldLink } from '../hexworld.js';
+import { gameToHexworldLink, parseHexworldString } from '../hexworld.js';
 import { Game } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
@@ -101,5 +101,28 @@ describe('hexworld', () => {
         const link = gameToHexworldLink(hostedGame, 0);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#11c1,c2d4c6:rw');
+    });
+
+    describe('parseHexworldString', () => {
+        it('parse simple', () => {
+            const parsed = parseHexworldString('9r9c1,e5g6c6i9b3');
+
+            assert.strictEqual(parsed.size, 9);
+            assert.deepStrictEqual(parsed.moves, ['e5', 'g6', 'c6', 'i9', 'b3']);
+        });
+
+        it('parse swap and pass', () => {
+            const parsed = parseHexworldString('9r9c1,e5:sc6:pb3');
+
+            assert.strictEqual(parsed.size, 9);
+            assert.deepStrictEqual(parsed.moves, ['e5', 'swap-pieces', 'c6', 'pass', 'b3']);
+        });
+
+        it('ignore resign', () => {
+            const parsed = parseHexworldString('9r9c1,e5g6c6i9b3:rw');
+
+            assert.strictEqual(parsed.size, 9);
+            assert.deepStrictEqual(parsed.moves, ['e5', 'g6', 'c6', 'i9', 'b3']);
+        });
     });
 });
