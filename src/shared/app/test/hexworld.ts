@@ -111,6 +111,13 @@ describe('hexworld', () => {
             assert.deepStrictEqual(parsed.moves, ['e5', 'g6', 'c6', 'i9', 'b3']);
         });
 
+        it('parse boardsize only', () => {
+            const parsed = parseHexworldString('11,e5g6c6i9b3');
+
+            assert.strictEqual(parsed.size, 11);
+            assert.deepStrictEqual(parsed.moves, ['e5', 'g6', 'c6', 'i9', 'b3']);
+        });
+
         it('parse swap and pass', () => {
             const parsed = parseHexworldString('9r9c1,e5:sc6:pb3');
 
