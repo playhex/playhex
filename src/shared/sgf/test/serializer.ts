@@ -1,8 +1,8 @@
 import assert from 'assert';
-import { sgfToString, writeNodesRecursive } from '../sgf.js';
+import { sgfToString, writeNodesRecursive } from '../serializer.js';
 import type { SGF } from '../types.js';
 
-describe('SGF', () => {
+describe('SGF Serializer', () => {
     it('generate SGF string from simple SGF object', () => {
         const sgf: SGF = {
             FF: 4,
