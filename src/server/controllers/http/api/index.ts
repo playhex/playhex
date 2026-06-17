@@ -27,6 +27,7 @@ import PlayerAvatarController from './PlayerAvatarController.js';
 import PlayerCountryFlagController from './PlayerCountryFlagController.js';
 import { checkAuthorization } from '../../../services/roles.js';
 import ChannelController from './ChannelController.js';
+import ChangelogController from './ChangelogController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -84,6 +85,7 @@ export const registerApi = (app: Express) => {
             RatingController,
             SearchController,
             ServerInfoController,
+            ChangelogController,
         ],
     });
 

@@ -542,6 +542,17 @@ export const apiGetContributors = async (): Promise<PlayHexContributors> => {
     return await response.json();
 };
 
+export const apiGetChangelog = async (): Promise<string> => {
+    const response = await fetch('/api/changelog', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return await response.json();
+};
+
 export const apiGetPlayerActiveGames = async (playerPublicId: string): Promise<HostedGame[]> => {
     const response = await fetch(`/api/players/${playerPublicId}/active-games`, {
         method: 'GET',

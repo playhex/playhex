@@ -132,6 +132,11 @@ const routes: RouteRecordRaw[] = [
                 path: 'privacy',
                 component: () => import('./pages/content/PagePrivacyPolicy.vue'),
             },
+            {
+                name: 'changelog',
+                path: 'changelog',
+                component: () => import('./pages/content/PageChangelog.vue'),
+            },
         ],
     },
     {
