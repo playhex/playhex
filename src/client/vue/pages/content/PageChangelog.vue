@@ -32,5 +32,5 @@ void (async () => {
     padding-bottom 0.125em
 
 :deep(h3)
-    font-size 0.8em !important
+    font-size 1.25em !important
 </style>
