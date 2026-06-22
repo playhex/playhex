@@ -4,6 +4,7 @@ import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { t } from 'i18next';
+import { IconPersonFillExclamation } from '../../../vue/icons.js';
 
 notifier.on('gameStart', hostedGame => {
     if (isBotGame(hostedGame)) {
@@ -36,7 +37,9 @@ notifier.on('gameStart', hostedGame => {
         t('game_with_player_has_started', { player: pseudoString(opponent, 'pseudo') }),
         {
             level: 'success',
-            autoCloseAfter: 10000,
+            autoCloseAfter: 0,
+            closable: false,
+            icon: IconPersonFillExclamation,
             actions: [
                 { label: t('go_to_the_game'), action: {
                     name: 'online-game',

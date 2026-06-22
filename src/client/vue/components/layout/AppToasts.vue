@@ -57,6 +57,8 @@ const clickToast = (toast: Toast): void => {
         >
             <div class="d-flex">
                 <div class="toast-body">
+                    <component :is="toast.options.icon" v-if="toast.options.icon" class="toast-icon d-block mx-auto mb-2" />
+
                     {{ toast.message }}
 
                     <template v-for="{ label, action, classes }, key in toast.options.actions" :key>
@@ -77,6 +79,7 @@ const clickToast = (toast: Toast): void => {
                 </div>
 
                 <button
+                    v-if="toast.options.closable"
                     type="button"
                     class="btn-close btn-close-white me-2 m-auto"
                     data-bs-dismiss="toast"
@@ -104,4 +107,16 @@ const clickToast = (toast: Toast): void => {
 
 .clickable
     cursor pointer
+
+.toast-icon
+    font-size 5em
+    animation heartbeat 2.5s infinite
+
+@keyframes heartbeat
+    0%, 100%
+        transform scale(1)
+    10%
+        transform scale(1.2)
+    20%
+        transform scale(1)
 </style>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { Component, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { BootstrapLevel } from '../../shared/app/bootstrapLevels.js';
 import { RouteLocationAsRelativeTyped } from 'vue-router';
@@ -13,7 +13,9 @@ const useToastsStore = defineStore('toastsStore', () => {
 
         toasts.value.push(toast);
 
-        setInterval(() => deleteToast(toast), toast.options.autoCloseAfter);
+        if (toast.options.autoCloseAfter > 0) {
+            setInterval(() => deleteToast(toast), toast.options.autoCloseAfter);
+        }
     };
 
     const deleteToast = (toast: Toast): void => {
@@ -40,9 +42,20 @@ export type ToastOptions = {
 
     /**
      * In milliseconds, automatically close toast.
-     * Defaults to 4000.
+     * Defaults to 4000. Use 0 to disable auto-close (toast stays until manually dismissed).
      */
     autoCloseAfter: number;
+
+    /**
+     * Shows a big animated icon in the toast, e.g when a player joined my game
+     */
+    icon?: Component;
+
+    /**
+     * Whether to show the close button (X).
+     * Defaults to true.
+     */
+    closable: boolean;
 
     /**
      * Show links or buttons.
@@ -104,6 +117,7 @@ const createToast = (message: string, options?: Partial<ToastOptions>): Toast =>
 const defaultToastOptions: ToastOptions = {
     level: 'info',
     autoCloseAfter: 4000,
+    closable: true,
     actions: [],
 };
 
