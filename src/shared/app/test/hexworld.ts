@@ -131,5 +131,9 @@ describe('hexworld', () => {
             assert.strictEqual(parsed.size, 9);
             assert.deepStrictEqual(parsed.moves, ['e5', 'g6', 'c6', 'i9', 'b3']);
         });
+
+        it('throws when board is not square', () => {
+            assert.throws(() => parseHexworldString('11x5,d2e3'));
+        });
     });
 });

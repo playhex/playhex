@@ -53,13 +53,17 @@ export const createHexworldString = (hostedGame: HostedGame, orientation: number
  * Parses 14r1c1,d3:sa3... to { size: 14, moves: ["d3", "swap-pieces",  "a3", ...]' }
  */
 export const parseHexworldString = (hexworldString: string): { size: number, moves: string[] } => {
-    const match = hexworldString.match(/^(\d+)[^,]*,(.*)$/);
+    const match = hexworldString.match(/^(\d+)(?:x(\d+))?[^,]*,(.*)$/);
 
     if (!match) {
         throw new Error('Invalid Hexworld string');
     }
 
-    const [, sizeStr, movesStr] = match;
+    const [, sizeStr, heightStr, movesStr] = match;
+
+    if (heightStr !== undefined && heightStr !== sizeStr) {
+        throw new Error('Non-square boards are not supported');
+    }
     const moves = movesStr.match(/([a-z]+\d+)|(:s|:p|:r.|:f.)/g);
 
     if (!moves) {
