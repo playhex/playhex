@@ -123,6 +123,14 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
         return this.playingGameFacade;
     }
 
+    /**
+     * @returns Current player in the simulation
+     */
+    getCurrentPlayerIndex()
+    {
+        return this.playingGameFacade.getCurrentPlayerIndex();
+    }
+
     getMainCursor(): number
     {
         return this.mainCursor;
@@ -131,6 +139,24 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
     getSimulationCursor(): number
     {
         return this.simulationCursor;
+    }
+
+    /**
+     * Full main line, as it was when simulation started (fixed).
+     */
+    getMainLine(): HexMove[]
+    {
+        return [...this.mainLine];
+    }
+
+    /**
+     * Current simulation line, including moves beyond simulation cursor
+     * (kept so rewinding within the simulation still shows its future moves).
+     * Empty if no simulation is in progress.
+     */
+    getSimulationLine(): HexMove[]
+    {
+        return [...this.simulationLine];
     }
 
     /**
