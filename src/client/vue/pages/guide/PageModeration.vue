@@ -68,15 +68,48 @@ const currentExample = ref<null | PlayerModerationAction>(null);
     <h1>Moderation</h1>
 
     <p>
-        PlayHex moderators may take action against players who engage in inappropriate behavior,
-        such as insults, harassment, or spam in the chat.
+        PlayHex moderation team checks new chat messages and nicknames,
+        and can take actions in case content is not appropriate.
+    </p>
+
+    <h2>Policy</h2>
+
+    <p>
+        All chat messages and nicknames are public, everyone can see them, even children.
+        So just do not post content that is inappropriate.
     </p>
 
     <p>
-        Moderators regularly check posted messages in all games to take such measures.
+        It is obvious for 99% of players, but for the 1% who need more explanation, do not post:
     </p>
 
-    <h2>Moderation actions</h2>
+    <ul>
+        <li>insults</li>
+        <li>hate speech</li>
+        <li>harassment in any form</li>
+        <li>racism, discrimination</li>
+        <li>sexism</li>
+        <li>sexual content</li>
+        <li>spam</li>
+    </ul>
+
+    <p>
+        Moderation will tolerate things, like if you are obviously friends and insult each other,
+        or insulting bots, or just testing the moderation reactivity.
+        But when in doubt, you may receive a warning.
+    </p>
+
+    <p>
+        You will always receive a warning first, unless you post truly inappropriate content.
+        If you repeat behavior you have already been warned about,
+        you won't be able to post new chat messages for a variable period.
+    </p>
+
+    <p>
+        If you create a new account and reoffend, you'll be IP-banned.
+    </p>
+
+    <h2>Moderation action</h2>
 
     <p>A moderation action can be one of the following:</p>
 
@@ -84,12 +117,26 @@ const currentExample = ref<null | PlayerModerationAction>(null);
         <li>
             <strong>Warning</strong>: a reminder that certain behavior is not acceptable.
             No restriction is applied, but repeated violations may lead to stronger measures.
-            <a href="#" @click.prevent="currentExample = warningExample">See&nbsp;example</a>.
+            <button class="btn btn-sm btn-outline-primary" @click.prevent="currentExample = warningExample">See&nbsp;example</button>.
         </li>
         <li>
             <strong>Chat restriction</strong>: the player cannot send chat messages until a specified date.
             They can still play games normally.
-            <a href="#" @click.prevent="currentExample = restrictionExample">See&nbsp;example</a>.
+            <button class="btn btn-sm btn-outline-primary" @click.prevent="currentExample = restrictionExample">See&nbsp;example</button>.
+        </li>
+        <li>
+            <strong>Nickname moderation</strong>: if inappropriate, will be changed to "moderated XXX".
+            At this time, it's not yet possible to change your nickname, so you'll be stuck with "moderated XXX"
+            until I develop the ability to change your nickname.
+        </li>
+        <li>
+            <strong>Avatar moderation</strong>: if inappropriate, will be deleted.
+            Avatar deletion may also be followed by being unable to set a new avatar for a period.
+        </li>
+        <li>
+            <strong>IP ban</strong>, until a specified date.
+            Don't burn your IPs: attempting to evade an IP ban
+            (for example through VPNs or alternate IPs) may result in longer or permanent bans.
         </li>
     </ul>
 
@@ -107,11 +154,9 @@ const currentExample = ref<null | PlayerModerationAction>(null);
         in the notifications panel (the mailbox icon in the header).
     </p>
 
-    <h2>Chat restriction notice in games</h2>
-
     <p>
-        When a player in a game is chat-restricted, a notice is shown in the chat area to
-        all participants, so everyone knows why that player is not responding in chat.
+        Messages that are fully deleted by moderation are replaced with
+        <em>Message deleted by moderation</em>.
     </p>
 
     <h2>Shadow deletion</h2>
@@ -121,11 +166,6 @@ const currentExample = ref<null | PlayerModerationAction>(null);
         A shadow-deleted message is hidden from everyone except its author,
         who still sees it as if it were normal.
         This allows moderators to remove inappropriate content discreetly.
-    </p>
-
-    <p>
-        Messages that are fully deleted by moderation are replaced with
-        <em>Message deleted by moderation</em> for all players, including the author.
     </p>
 
     <AppPlayerModerationActionOverlay
