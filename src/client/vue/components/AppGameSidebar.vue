@@ -246,7 +246,7 @@ const downloadSGF = (): void => {
     filename += getPlayers(hostedGame.value).map(player => pseudoString(player, 'slug')).join('-vs-');
     filename += '.sgf';
 
-    downloadString(hostedGameToSGF(hostedGame.value), filename);
+    downloadString(hostedGameToSGF(hostedGame.value), filename, 'application/x-go-sgf');
 };
 
 const ctrlSListener = (e: KeyboardEvent) => {

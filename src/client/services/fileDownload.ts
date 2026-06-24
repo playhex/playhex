@@ -1,3 +1,6 @@
+/**
+ * @param mimeType For SGF file, use "application/x-go-sgf"
+ */
 const downloadString = (content: string, filename: string, mimeType = 'text/plain'): void => {
     const a = document.createElement('a');
     const blob = new Blob([content], { type: mimeType });
