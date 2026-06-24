@@ -132,7 +132,12 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     const listenLobbyEvents = (): void => {
         socket.on('lobbyUpdate', games => {
-            for (const hostedGame of games) {
+            // Sort newest first so initial games list, and any new game appearing in this batch,
+            // are well ordered. Already known games keep their existing position (no sort here)
+            // to avoid layout shift when a game already displayed gets updated.
+            const sortedGames = [...games].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+            for (const hostedGame of sortedGames) {
                 if (hostedGames.value[hostedGame.publicId]) {
                     updateHostedGame(hostedGames.value[hostedGame.publicId], hostedGame);
                 } else {
