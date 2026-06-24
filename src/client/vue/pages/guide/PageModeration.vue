@@ -5,9 +5,10 @@ import { ref } from 'vue';
 import PlayerModerationAction from '../../../../shared/app/models/PlayerModerationAction.js';
 import Player from '../../../../shared/app/models/Player.js';
 import ChatMessage from '../../../../shared/app/models/ChatMessage.js';
+import { t } from 'i18next';
 
 useSeoMeta({
-    title: 'Moderation',
+    title: t('moderation'),
 });
 
 const examplePlayer = Object.assign(new Player(), {

@@ -44,7 +44,6 @@ i18n.on('languageChanged', () => {
             <AppLiberapayLink class="mt-4" />
         </div>
         <p class="infos">
-            <span>{{ $t('project_under_development') }}</span>
             <router-link v-if="date" :to="{ name: 'changelog' }">{{ $t('last_change', { date }) }}</router-link>
             <router-link :to="{ name: 'tutorial' }">{{ $t('tutorial.label') }}</router-link>
             <router-link :to="{ name: 'offline-lobby' }">{{ $t('play_offline') }}</router-link>
@@ -54,6 +53,7 @@ i18n.on('languageChanged', () => {
             <router-link :to="{ name: 'rescue' }">Rescue page</router-link>
             <router-link :to="{ name: 'export-games-data' }">Export games data</router-link>
             <a href="https://stats.uptimerobot.com/mJrbJF1nfb" target="_blank">Server status</a>
+            <router-link :to="{ name: 'guide-moderation' }">{{ $t('moderation') }}</router-link>
             <router-link :to="{ name: 'privacy' }">{{ $t('privacy_policy') }}</router-link>
             <router-link :to="{ name: 'license' }">{{ $t('license_agpl') }}</router-link>
         </p>

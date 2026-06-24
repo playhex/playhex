@@ -621,6 +621,7 @@
         "time": "timeout"
     },
     "player_chat_restricted": "{player} cannot reply in chat (chat restricted).",
+    "moderation": "Moderation",
     "moderation_action_overlay": {
         "title": "Moderation notice",
         "warning_only": "This is a warning.",
