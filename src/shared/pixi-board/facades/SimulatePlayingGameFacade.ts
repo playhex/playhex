@@ -96,6 +96,11 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
          * the board position is restored to the one in PlayingGameFacade.
          */
         private initialPlayingGameFacade: PlayingGameFacade,
+
+        /**
+         * Set false to disable showing 1, 2, 3, ... on simulated moves.
+         */
+        private showNumbersOnSimulatedMoves = true,
     ) {
         super();
 
@@ -236,6 +241,10 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
 
     private addNumber(move: HexMove, number: number): void
     {
+        if (!this.showNumbersOnSimulatedMoves) {
+            return;
+        }
+
         if (move === 'pass') {
             return;
         }
