@@ -1,3 +1,31 @@
+## June 24, 2026
+*New on PlayHex, since last month*
+
+### Hexplorer!
+Try it: https://playhex.org/hexplorer
+- Analyze a position, explore lines
+- Show **policy heat map** and red/blue advantage (only katahex intuition is supported for now)
+- **AutoPlay**: replay a game just before a blunder or try a puzzle
+- **Setup mode**: create an custom position (be aware that katahex will respond weirdly in too custom positions)
+- **Marks**: triangle, circles, text, highlighted... (all marks supported by SGF so they are exported as SGF as well)
+- **Import any Hex game**, from PlayHex, AbstractPlay, HexWorld link, raw moves...
+- Save/Load an exploration tree
+
+Send me all feedback, there are probably many things you want to do but cannot yet with Hexplorer.
+
+### Added
+- Added this changelog history
+- When subscribing to a tournament, we now suggest to enable notifications to actually send a notification when player needs to register to tournament in order to participate
+- Hide best move / current move marks while rewinding an ended game by collapsing the AI analysis graph
+- When creating a game, you can now require you opponent to have an account. This is enabled by default for correspondence games, and disabled for real-time games
+### Changed
+- Your opponent has now a bigger notification when you join their game while they are playing against a bot
+
+### Moderation
+I enforced moderation by now having a tool to quickly see all new chat messages and nicknames,
+moderate them, sending you a warning, and if necessary, temporary block chat.
+In worst cases, like trying to bypass moderation (creating secondary account and recidive), your IP will also banned.
+
 ## May 20, 2026
 *New on PlayHex, since last 2 months*
 
