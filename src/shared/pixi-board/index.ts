@@ -9,8 +9,12 @@ export { themes } from './BoardTheme.js';
 
 // Entities
 export { default as Anchor44Mark } from './entities/Anchor44Mark.js';
+export { default as CircleMark } from './entities/CircleMark.js';
+export { default as CrossMark } from './entities/CrossMark.js';
 export { default as HexagonMark } from './entities/HexagonMark.js';
 export { default as LastMoveMark } from './entities/LastMoveMark.js';
+export { default as SelectMark } from './entities/SelectMark.js';
+export { default as SquareMark } from './entities/SquareMark.js';
 export { default as Stone } from './entities/Stone.js';
 export { default as SwappableMark } from './entities/SwappableMark.js';
 export { default as SwappedMark } from './entities/SwappedMark.js';
