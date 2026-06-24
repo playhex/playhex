@@ -50,6 +50,7 @@ export class PlayingGameFacade
         private swapAllowed = true,
         initialMoves: HexMove[] = [],
         showLastMovesMarks = true,
+        private startingPlayer: 0 | 1 = 0,
     ) {
         this.gameMarksFacade = new GameMarksFacade(gameView);
         this.gameMarksFacade.setVisible(showLastMovesMarks);
@@ -102,7 +103,7 @@ export class PlayingGameFacade
      */
     getCurrentPlayerIndex(): 0 | 1
     {
-        return this.moves.length % 2 as 0 | 1;
+        return (this.moves.length + this.startingPlayer) % 2 as 0 | 1;
     }
 
     /**
