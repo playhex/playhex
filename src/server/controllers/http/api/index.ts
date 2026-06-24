@@ -28,6 +28,8 @@ import PlayerCountryFlagController from './PlayerCountryFlagController.js';
 import { checkAuthorization } from '../../../services/roles.js';
 import ChannelController from './ChannelController.js';
 import ChangelogController from './ChangelogController.js';
+import HexplorerController from './HexplorerController.js';
+import HexGameImporterController from './HexGameImporterController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -86,6 +88,8 @@ export const registerApi = (app: Express) => {
             SearchController,
             ServerInfoController,
             ChangelogController,
+            HexplorerController,
+            HexGameImporterController,
         ],
     });
 

@@ -54,6 +54,14 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        name: 'hexplorer',
+        path: '/hexplorer',
+        component: () => import('./hexplorer/pages/PageHexplorer.vue'),
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
         name: 'online-players',
         path: '/online-players',
         component: () => import('./pages/PageOnlinePlayers.vue'),

@@ -13,6 +13,63 @@ type SGFNode = {
      * https://www.red-bean.com/sgf/properties.html#N
      */
     N?: string;
+
+    /**
+     * Add black stones (setup, not a played move).
+     *
+     * https://www.red-bean.com/sgf/properties.html#AB
+     */
+    AB?: string[];
+
+    /**
+     * Add white stones (setup, not a played move).
+     *
+     * https://www.red-bean.com/sgf/properties.html#AW
+     */
+    AW?: string[];
+
+    /**
+     * Mark points with a triangle.
+     *
+     * https://www.red-bean.com/sgf/properties.html#TR
+     */
+    TR?: string[];
+
+    /**
+     * Mark points with a circle.
+     *
+     * https://www.red-bean.com/sgf/properties.html#CR
+     */
+    CR?: string[];
+
+    /**
+     * Mark points with a square.
+     *
+     * https://www.red-bean.com/sgf/properties.html#SQ
+     */
+    SQ?: string[];
+
+    /**
+     * Mark points with an 'X'.
+     *
+     * https://www.red-bean.com/sgf/properties.html#MA
+     */
+    MA?: string[];
+
+    /**
+     * Selected points, used to highlight points.
+     *
+     * https://www.red-bean.com/sgf/properties.html#SL
+     */
+    SL?: string[];
+
+    /**
+     * Label points with a letter or text.
+     * Each value is a composed `coordinate:text` string, e.g. `a1:A`.
+     *
+     * https://www.red-bean.com/sgf/properties.html#LB
+     */
+    LB?: string[];
 };
 
 export type SGF = SGFNode & {

@@ -44,6 +44,33 @@ const write = <T extends (SGF & SGFMove)>(sgf: T, properties: (keyof T)[]): stri
 };
 
 /**
+ * Write down a list-valued property, i.e one bracket per value.
+ * Example: `writeList('TR', ['c3', 'd4'])` outputs `TR[c3][d4]`.
+ */
+const writeList = (key: string, values: undefined | string[]): string => {
+    if (!values || values.length === 0) {
+        return '';
+    }
+
+    return key + values.map(value => '[' + String(escapeSgfValue(value)) + ']').join('');
+};
+
+/**
+ * Markup properties, valid on both root and move nodes.
+ */
+const writeMarkup = (sgf: SGF & SGFMove): string => {
+    return writeList('AB', sgf.AB)
+        + writeList('AW', sgf.AW)
+        + writeList('TR', sgf.TR)
+        + writeList('CR', sgf.CR)
+        + writeList('SQ', sgf.SQ)
+        + writeList('MA', sgf.MA)
+        + writeList('SL', sgf.SL)
+        + writeList('LB', sgf.LB)
+    ;
+};
+
+/**
  * Render root node properties, i.e `FF[4]GM[11]...`
  */
 const writeRoot = (sgf: SGF): string => {
@@ -68,7 +95,7 @@ const writeRoot = (sgf: SGF): string => {
 
         // Root node info
         'N', 'GC', 'C',
-    ]);
+    ]) + writeMarkup(sgf);
 };
 
 /**
@@ -84,7 +111,7 @@ const writeNode = (sgfMove: SGFMove): string => {
 
         // Node name and comment
         'N', 'C',
-    ]);
+    ]) + writeMarkup(sgfMove);
 };
 
 /**
