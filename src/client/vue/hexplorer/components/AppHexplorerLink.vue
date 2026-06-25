@@ -27,7 +27,11 @@ const { hostedGame, orientation } = toRefs(props);
 const { loggedInPlayer } = toRefs(useAuthStore());
 
 const shouldDisplayLink = (): boolean => {
-    if (!loggedInPlayer.value) {
+    if (!loggedInPlayer.value || loggedInPlayer.value.isGuest) {
+        return false;
+    }
+
+    if (!['ended', 'canceled'].includes(hostedGame.value.state)) {
         return false;
     }
 
