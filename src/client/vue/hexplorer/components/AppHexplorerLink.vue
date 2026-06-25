@@ -31,6 +31,10 @@ const shouldDisplayLink = (): boolean => {
         return false;
     }
 
+    if (hostedGame.value.opponentType === 'ai') {
+        return true;
+    }
+
     if (!['ended', 'canceled'].includes(hostedGame.value.state)) {
         return false;
     }

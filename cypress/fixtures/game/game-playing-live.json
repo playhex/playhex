@@ -1,0 +1,68 @@
+{
+    "publicId": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "pseudo": "Player A",
+        "publicId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "player-a",
+        "createdAt": "2024-03-25T20:03:25.194Z"
+    },
+    "hostedGameToPlayers": [
+        {
+            "player": {
+                "pseudo": "Player A",
+                "publicId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "player-a",
+                "createdAt": "2024-03-25T20:03:25.194Z"
+            }
+        },
+        {
+            "player": {
+                "pseudo": "Player B",
+                "publicId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "player-b",
+                "createdAt": "2024-03-25T20:03:25.194Z"
+            }
+        }
+    ],
+    "timeControl": {
+        "state": "running",
+        "currentPlayer": 0,
+        "players": [
+            {
+                "totalRemainingTime": "2024-03-28T11:17:00.158Z"
+            },
+            {
+                "totalRemainingTime": 600000
+            }
+        ]
+    },
+    "boardsize": 11,
+    "firstPlayer": null,
+    "swapRule": true,
+    "opponentType": "human",
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
+        }
+    },
+    "chatMessages": [],
+    "state": "playing",
+    "createdAt": "2024-03-28T11:06:58.317Z",
+    "moves": [],
+    "moveTimestamps": [],
+    "currentPlayerIndex": 0,
+    "winner": null,
+    "outcome": null,
+    "startedAt": "2024-03-28T11:06:58.318Z",
+    "lastMoveAt": null,
+    "endedAt": null
+}
