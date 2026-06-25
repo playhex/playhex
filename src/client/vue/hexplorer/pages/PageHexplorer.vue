@@ -35,6 +35,8 @@ import {
     IconTriangle,
     IconX,
     IconEraser,
+    IconPercent,
+    IconStarFill,
     IconXLg,
 } from '../../icons.js';
 import { hexGameImporter } from '../../../../shared/app/hex-game-importer/index.js';
@@ -381,7 +383,7 @@ const onAnalysisFileSelected = async (event: Event) => {
 
         <div class="sidebar bg-body-tertiary" v-if="sidebarOpen">
             <div class="sidebar-content p-3">
-                <div class="table-responsive border rounded bg-body mb-3">
+                <div class="table-responsive border rounded bg-body mb-2">
                     <table class="table table-sm table-borderless align-middle mb-0 color-settings">
                         <thead>
                             <tr class="text-muted small">
@@ -430,6 +432,27 @@ const onAnalysisFileSelected = async (event: Event) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="d-flex gap-3 px-1 mb-3">
+                    <div class="form-check form-check-inline mb-0">
+                        <input
+                            id="policy-show-numbers"
+                            type="checkbox"
+                            class="form-check-input"
+                            v-model="state.policyShowNumbers"
+                        >
+                        <label class="form-check-label small d-flex align-items-center gap-1" for="policy-show-numbers"><IconPercent /> {{ $t('hexplorer.policy_show_numbers') }}</label>
+                    </div>
+                    <div class="form-check form-check-inline mb-0">
+                        <input
+                            id="policy-show-best-mark"
+                            type="checkbox"
+                            class="form-check-input"
+                            v-model="state.policyShowBestMark"
+                        >
+                        <label class="form-check-label small d-flex align-items-center gap-1" for="policy-show-best-mark"><IconStarFill /> {{ $t('hexplorer.policy_show_best_mark') }}</label>
+                    </div>
                 </div>
 
                 <h6 class="d-flex align-items-center gap-2 mb-2">

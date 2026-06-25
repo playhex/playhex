@@ -199,6 +199,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         whiteWin.value = showWinrate ? result.whiteWin : undefined;
 
         if (showPolicy && result.policy) {
+            policyOverlayFacade.setShowNumbers(state.value.policyShowNumbers);
+            policyOverlayFacade.setShowBestMark(state.value.policyShowBestMark);
             policyOverlayFacade.apply(result.policy, color);
         }
 
@@ -591,6 +593,16 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         [() => state.value.winrateEnabled, () => state.value.policyEnabled],
         () => void updateAnalysis(),
         { deep: true },
+    );
+
+    // Toggling policy display options just re-renders the cached overlay, no new analysis needed.
+    watch(
+        [() => state.value.policyShowNumbers, () => state.value.policyShowBestMark],
+        () => {
+            policyOverlayFacade.setShowNumbers(state.value.policyShowNumbers);
+            policyOverlayFacade.setShowBestMark(state.value.policyShowBestMark);
+            policyOverlayFacade.reapply();
+        },
     );
 
     // Sync URL hash with the current position so sharing the URL restores the position.

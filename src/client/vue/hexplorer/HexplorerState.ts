@@ -21,6 +21,8 @@ export type HexplorerState = {
     autoPlay: [boolean, boolean];
     winrateEnabled: [boolean, boolean];
     policyEnabled: [boolean, boolean];
+    policyShowNumbers: boolean;
+    policyShowBestMark: boolean;
 
     // Board size, move tree and current position, kept live in the state (the GameView,
     // GameTree and currentNodeId are views/mirrors of these), so the whole analysis
@@ -36,6 +38,8 @@ export const createHexplorerState = (boardsize = 11): HexplorerState => ({
     autoPlay: [false, false],
     winrateEnabled: [true, true],
     policyEnabled: [true, true],
+    policyShowNumbers: false,
+    policyShowBestMark: false,
     boardsize,
     currentNodeId: ROOT_ID,
     nodes: createRootNodes(),

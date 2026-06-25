@@ -685,6 +685,8 @@
         "change_current_player": "Change the player to move",
         "win_rate": "Win%",
         "policy": "Policy",
+        "policy_show_numbers": "Show policy numbers",
+        "policy_show_best_mark": "Mark best move",
         "autoplay": "Auto-play",
         "evaluation": "Evaluation",
         "engine": "Engine",
