@@ -32,6 +32,8 @@
 
     <%- include('partials/sentry.ejs') %>
 
+    <script src="/statics/reflect-metadata.js"></script>
+
     <% for(const assetUrl of Object.values(manifest)) { %>
         <% if (!assetUrl.endsWith('.css')) { %>
         <script type="module" src="<%- assetUrl %>"></script>

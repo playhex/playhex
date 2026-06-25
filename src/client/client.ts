@@ -4,7 +4,6 @@ import 'bootstrap/js/src/collapse.js';
 import 'bootstrap/js/src/offcanvas.js';
 import './base.styl';
 
-import 'reflect-metadata';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import { createHead } from '@unhead/vue/client';

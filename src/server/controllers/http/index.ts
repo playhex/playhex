@@ -4,6 +4,7 @@ import path from 'path';
 import { registerApi } from './api/index.js';
 import { staticsRouter } from './misc/statics-router.js';
 import { pagesRouter } from './misc/pages-router.js';
+import { reflectMetadataRouter } from './misc/reflect-metadata-router.js';
 import { seoRouter } from './misc/seo-router.js';
 import { pwaRouter } from './misc/pwa-router.js';
 import logger from '../../services/logger.js';
@@ -17,6 +18,7 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use(ipBanMiddleware);
     app.use(preRenderedRouter());
     app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
+    app.use(reflectMetadataRouter());
     app.use('/avatars', express.static(avatarsPath));
     registerApi(app);
     app.use(await staticsRouter(httpServer));
