@@ -587,6 +587,37 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         { deep: true },
     );
 
+    // Sync URL hash with the current position so sharing the URL restores the position.
+    // Format: "{size}c1,{moves_to_cursor},{continuation}" where continuation is the
+    // remaining moves in the current evaluation line (so the tree is preserved on reload).
+    watch(currentNodeId, () => {
+        const size = gameViewRef.value?.getBoardsize() ?? 11;
+
+        const movesStr = (nodes: TreeNode[]): string =>
+            nodes
+                .filter(node => node.data?.type === 'move')
+                .map(node => {
+                    const move = (node.data as { type: 'move'; move: HexMove }).move;
+                    if (move === 'swap-pieces') return ':s';
+                    if (move === 'pass') return ':p';
+                    return move;
+                })
+                .join('');
+
+        const line = currentLine.value; // root → lineLeaf
+        const cursorIndex = line.findIndex(node => node.id === currentNodeId.value);
+        const before = cursorIndex >= 0 ? line.slice(0, cursorIndex + 1) : line;
+        const after = cursorIndex >= 0 ? line.slice(cursorIndex + 1) : [];
+
+        const movesBefore = movesStr(before);
+        const movesAfter = movesStr(after);
+        const hash = movesAfter
+            ? `${size}c1,${movesBefore},${movesAfter}`
+            : `${size}c1,${movesBefore}`;
+
+        window.history.replaceState(null, '', `#${hash}`);
+    });
+
     const goSetupMode = (): void => {
         state.value.setupMode = true;
         currentTool.value = createAlternatingTool();
@@ -677,23 +708,27 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     };
 
     /**
-     * Adds a straight chain of move nodes from root, returning the id of the last one added.
+     * Adds a straight chain of move nodes from root, returning the ids of all added nodes
+     * (index 0 = ROOT_ID, index 1 = first move, …, index n = last move).
      */
-    const addMoveChain = (moves: HexMove[]): number => {
+    const addMoveChain = (moves: HexMove[]): number[] => {
+        const ids: number[] = [ROOT_ID];
         let parentId = ROOT_ID;
 
         for (const move of moves) {
             parentId = tree.addMove(parentId, move).id;
+            ids.push(parentId);
         }
 
-        return parentId;
+        return ids;
     };
 
     // Initial setup from URL hash
-    const { gameView: initGV, playingGameFacade: initPGF, moves: initMoves } = initGameViewFromUrlHash(fromHash);
+    const { gameView: initGV, playingGameFacade: initPGF, moves: initMoves, cursorMoveCount: initCursorMoveCount } = initGameViewFromUrlHash(fromHash);
     setupGameInstances(initGV, initPGF);
     currentTool.value = createAlternatingTool();
-    goToNode(addMoveChain(initMoves));
+    const initNodeIds = addMoveChain(initMoves);
+    goToNode(initNodeIds[initCursorMoveCount ?? initNodeIds.length - 1] ?? ROOT_ID);
 
     /**
      * Mount the current game view to a DOM element.
@@ -715,7 +750,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         state.value.playerBlackName = playerBlackName;
         state.value.playerWhiteName = playerWhiteName;
 
-        goToNode(addMoveChain(moves));
+        const nodeIds = addMoveChain(moves);
+        goToNode(nodeIds[nodeIds.length - 1] ?? ROOT_ID);
     };
 
     /**
@@ -861,7 +897,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     };
 };
 
-const initGameViewFromUrlHash = (hash?: string): { gameView: GameView, playingGameFacade: PlayingGameFacade, moves: HexMove[] } => {
+const initGameViewFromUrlHash = (hash?: string): { gameView: GameView, playingGameFacade: PlayingGameFacade, moves: HexMove[], cursorMoveCount?: number } => {
     if (!hash || hash.length <= 1) {
         const gameView = new GameView(11);
         const playingGameFacade = new PlayingGameFacade(gameView, true, [], false);
@@ -871,11 +907,13 @@ const initGameViewFromUrlHash = (hash?: string): { gameView: GameView, playingGa
 
     let size = 11;
     let moves: HexMove[] = [];
+    let cursorMoveCount: number | undefined;
 
     try {
         const parsed = parseHexworldString(hash.substring(1));
         size = parsed.size;
         moves = parsed.moves as HexMove[];
+        cursorMoveCount = parsed.cursorMoveCount;
     } catch {
         // invalid hash, ignore and do not crash
     }
@@ -883,5 +921,5 @@ const initGameViewFromUrlHash = (hash?: string): { gameView: GameView, playingGa
     const gameView = new GameView(size);
     const playingGameFacade = new PlayingGameFacade(gameView, true, [], false);
 
-    return { gameView, playingGameFacade, moves };
+    return { gameView, playingGameFacade, moves, cursorMoveCount };
 };

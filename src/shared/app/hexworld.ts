@@ -51,8 +51,11 @@ export const createHexworldString = (hostedGame: HostedGame, orientation: number
 
 /**
  * Parses 14r1c1,d3:sa3... to { size: 14, moves: ["d3", "swap-pieces",  "a3", ...]' }
+ *
+ * Supports a cursor comma: "11c1,h4e7f9,b9c3" means the full line is h4 e7 f9 b9 c3,
+ * with the cursor at f9 (cursorMoveCount = 3). When present, cursorMoveCount is returned.
  */
-export const parseHexworldString = (hexworldString: string): { size: number, moves: string[] } => {
+export const parseHexworldString = (hexworldString: string): { size: number, moves: string[], cursorMoveCount?: number } => {
     const match = hexworldString.match(/^(\d+)(?:x(\d+))?[^,]*,(.*)$/);
 
     if (!match) {
@@ -64,7 +67,17 @@ export const parseHexworldString = (hexworldString: string): { size: number, mov
     if (heightStr !== undefined && heightStr !== sizeStr) {
         throw new Error('Non-square boards are not supported');
     }
-    const moves = movesStr.match(/([a-z]+\d+)|(:s|:p|:r.|:f.)/g);
+
+    // Cursor comma: "played_moves,continuation" — join segments to parse uniformly
+    let cursorMoveCount: number | undefined;
+    let fullMovesStr = movesStr;
+    const commaIndex = movesStr.indexOf(',');
+    if (commaIndex !== -1) {
+        cursorMoveCount = (movesStr.slice(0, commaIndex).match(/([a-z]+\d+)|(:s|:p)/g) ?? []).length;
+        fullMovesStr = movesStr.slice(0, commaIndex) + movesStr.slice(commaIndex + 1);
+    }
+
+    const moves = fullMovesStr.match(/([a-z]+\d+)|(:s|:p|:r.|:f.)/g);
 
     if (!moves) {
         throw new Error('Error while parsing moves');
@@ -89,5 +102,6 @@ export const parseHexworldString = (hexworldString: string): { size: number, mov
     return {
         size: parseInt(sizeStr),
         moves: moves.filter(m => m),
+        cursorMoveCount,
     };
 };
