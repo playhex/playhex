@@ -46,6 +46,7 @@
         "currentPlayerIndex": 0,
         "winner": null,
         "outcome": null,
+        "createdAt": "2023-12-20T22:18:22.189Z",
         "startedAt": null,
         "lastMoveAt": null,
         "endedAt": null
@@ -207,6 +208,7 @@
         "currentPlayerIndex": 0,
         "winner": 1,
         "outcome": "resign",
+        "createdAt": "2023-12-20T22:18:22.189Z",
         "startedAt": "2023-12-20T22:18:22.189Z",
         "lastMoveAt": "2023-12-20T22:18:58.967Z",
         "endedAt": "2023-12-20T22:19:03.033Z"
@@ -638,6 +640,7 @@
         "currentPlayerIndex": 1,
         "winner": 1,
         "outcome": "path",
+        "createdAt": "2023-12-20T22:19:14.189Z",
         "startedAt": "2023-12-20T22:19:14.189Z",
         "lastMoveAt": "2023-12-20T22:22:00.698Z",
         "endedAt": "2023-12-20T22:22:00.704Z"
@@ -874,6 +877,7 @@
         "currentPlayerIndex": 0,
         "winner": 0,
         "outcome": "path",
+        "createdAt": "2023-12-21T06:17:58.803Z",
         "startedAt": "2023-12-21T06:17:58.803Z",
         "lastMoveAt": "2023-12-21T06:19:40.520Z",
         "endedAt": "2023-12-21T06:19:40.523Z"

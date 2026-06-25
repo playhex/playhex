@@ -2,7 +2,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { glob } from 'glob';
 import hexProgram from './hexProgram.js';
-import { coordsToMove } from '../../shared/move-notation/move-notation.js';
 
 /**
  * How to change object in each file.
@@ -12,28 +11,15 @@ import { coordsToMove } from '../../shared/move-notation/move-notation.js';
  * @returns Object after change
  */
 const migrate = (before: any): any => {
-    if (!Array.isArray(before.movesHistory)) {
-        return before;
+    if (Array.isArray(before)) {
+        return before.map(migrate);
     }
 
-    const moves = [];
-    const moveTimestamps = [];
-
-    for (const { row, col, specialMoveType, playedAt } of before.movesHistory) {
-        if (specialMoveType) {
-            moves.push(specialMoveType);
-        } else {
-            moves.push(coordsToMove({ row, col }));
-        }
-
-        moveTimestamps.push(playedAt);
+    if (typeof before.startedAt === 'string' && typeof before.createdAt === 'undefined') {
+        before.createdAt = before.startedAt;
     }
 
-    const entries = Object.entries(before);
-    const position = entries.findIndex(([key]) => key === 'movesHistory');
-    entries.splice(position, 1, ['moves', moves], ['moveTimestamps', moveTimestamps]);
-
-    return Object.fromEntries(entries);
+    return before;
 };
 
 const fixturesFolder = './cypress/fixtures';

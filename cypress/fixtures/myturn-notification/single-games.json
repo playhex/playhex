@@ -126,6 +126,7 @@
         "currentPlayerIndex": 1,
         "winner": 1,
         "outcome": "path",
+        "createdAt": "2023-12-22T15:14:36.967Z",
         "startedAt": "2023-12-22T15:14:36.967Z",
         "lastMoveAt": "2023-12-22T15:14:40.711Z",
         "endedAt": "2023-12-22T15:14:40.711Z"
@@ -202,6 +203,7 @@
         "currentPlayerIndex": 1,
         "winner": null,
         "outcome": null,
+        "createdAt": "2023-12-22T15:14:43.794Z",
         "startedAt": "2023-12-22T15:14:43.794Z",
         "lastMoveAt": "2023-12-22T15:14:48.796Z",
         "endedAt": null
