@@ -670,6 +670,7 @@
         "alternating_placement": "Alternating placement",
         "place_red_stone": "Place a red stone",
         "place_blue_stone": "Place a blue stone",
+        "remove_stone": "Remove a stone",
         "mark_cross": "Mark with a cross",
         "mark_triangle": "Mark with a triangle",
         "mark_square": "Mark with a square",

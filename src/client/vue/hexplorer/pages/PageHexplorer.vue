@@ -5,6 +5,7 @@ import { defineOverlay } from '@overlastic/vue';
 import { t } from 'i18next';
 import { PlaceStoneTool } from '../tools/PlaceStoneTool';
 import { PlaceStonesAlternatelyTool } from '../tools/PlaceStonesAlternatelyTool';
+import { RemoveStoneTool } from '../tools/RemoveStoneTool';
 import { useHead } from '@unhead/vue';
 import { useHexplorer } from '../composables/useHexplorer.js';
 import {
@@ -33,6 +34,7 @@ import {
     IconTrash,
     IconTriangle,
     IconX,
+    IconEraser,
     IconXLg,
 } from '../../icons.js';
 import { hexGameImporter } from '../../../../shared/app/hex-game-importer/index.js';
@@ -82,6 +84,7 @@ const {
     importGame,
     resetState,
     createAlternatingTool,
+    createRemoveStoneTool,
     createMarkTool,
     exportSgf,
     exportAnalysis,
@@ -105,6 +108,7 @@ const selectedAnalyzerName = computed({
 });
 
 const isAlternatingToolSelected = computed(() => currentTool.value instanceof PlaceStonesAlternatelyTool);
+const isRemoveToolSelected = computed(() => currentTool.value instanceof RemoveStoneTool);
 const selectedStoneColor = computed(() => currentTool.value instanceof PlaceStoneTool ? currentTool.value.color : null);
 const selectedMarkType = computed(() => currentTool.value instanceof PlaceMarkTool ? currentTool.value.markType : null);
 
@@ -269,6 +273,13 @@ const onAnalysisFileSelected = async (event: Event) => {
                         :class="selectedStoneColor === 1 ? 'btn-primary' : 'btn-outline-primary'"
                         :title="$t('hexplorer.place_blue_stone')"
                     ><IconCircleFill /></button>
+
+                    <button
+                        @click="currentTool = createRemoveStoneTool()"
+                        class="btn"
+                        :class="isRemoveToolSelected ? 'btn-warning' : 'btn-outline-warning'"
+                        :title="$t('hexplorer.remove_stone')"
+                    ><IconEraser /></button>
                 </div>
 
                 <div class="btn-group" v-if="state.setupMode">

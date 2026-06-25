@@ -3,5 +3,5 @@ import { UndoableAction } from '../undoredo/undoredo.js';
 
 export interface ToolInterface
 {
-    createUndoableAction(move: Move): UndoableAction;
+    createUndoableAction(move: Move): UndoableAction | null;
 }

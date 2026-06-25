@@ -4,6 +4,7 @@ import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { computed, Ref, ref, shallowRef, watch } from 'vue';
 import { ToolInterface } from '../tools/ToolInterface.js';
 import { PlaceStonesAlternatelyTool } from '../tools/PlaceStonesAlternatelyTool.js';
+import { RemoveStoneTool } from '../tools/RemoveStoneTool.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { PolicyOverlayFacade } from '../../../../shared/pixi-board/facades/PolicyOverlayFacade.js';
 import { UndoableActionsStack } from '../undoredo/undoredo.js';
@@ -322,6 +323,10 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         return new PlaceStonesAlternatelyTool(gameView, state.value);
     };
 
+    const createRemoveStoneTool = (): RemoveStoneTool => {
+        return new RemoveStoneTool(gameView);
+    };
+
     /**
      * Creates a tool that toggles the given mark type on clicked cells.
      */
@@ -368,6 +373,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         for (const node of path) {
             if (node.data !== null) {
                 if (node.data.type === 'setup') {
+                    clearBoard();
                     applySetupStones(node.data.stones);
                     pgf.destroy();
                     pgf = new PlayingGameFacade(gameView, false, [], false, node.data.nextPlayer);
@@ -670,8 +676,11 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
         gameView.on('hexClicked', async move => {
             if (state.value.setupMode) {
-                await actionsStack.value.pushAndDo(currentTool.value.createUndoableAction(move));
-                await updateAnalysis();
+                const action = currentTool.value.createUndoableAction(move);
+                if (action !== null) {
+                    await actionsStack.value.pushAndDo(action);
+                    await updateAnalysis();
+                }
             } else {
                 playMove(move);
             }
@@ -888,6 +897,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         importGame,
         resetState,
         createAlternatingTool,
+        createRemoveStoneTool,
         createMarkTool,
         exportSgf,
         exportAnalysis,

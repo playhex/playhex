@@ -45,6 +45,7 @@ export { default as IconDot } from '~icons/bi/dot';
 export { default as IconDownload } from '~icons/bi/download';
 export { default as IconExclamationTriangle } from '~icons/bi/exclamation-triangle';
 export { default as IconExclamationTriangleFill } from '~icons/bi/exclamation-triangle-fill';
+export { default as IconEraser } from '~icons/bi/eraser';
 export { default as IconEye } from '~icons/bi/eye';
 export { default as IconFileEarmarkPlus } from '~icons/bi/file-earmark-plus';
 export { default as IconFileEarmarkText } from '~icons/bi/file-earmark-text';

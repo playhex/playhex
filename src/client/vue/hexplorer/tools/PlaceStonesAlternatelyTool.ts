@@ -11,9 +11,12 @@ export class PlaceStonesAlternatelyTool implements ToolInterface
         private state: HexplorerState,
     ) {}
 
-    createUndoableAction(move: Move): UndoableAction
+    createUndoableAction(move: Move): UndoableAction | null
     {
-        const previousStone = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+        if (this.gameView.getStone(move) !== null) {
+            return null;
+        }
+
         const previousCurrentPlayer = this.state.currentPlayer;
 
         return {
@@ -22,7 +25,7 @@ export class PlaceStonesAlternatelyTool implements ToolInterface
                 this.state.currentPlayer = 1 - this.state.currentPlayer as 0 | 1;
             },
             undo: () => {
-                this.gameView.setStone(move, previousStone);
+                this.gameView.setStone(move, null);
                 this.state.currentPlayer = previousCurrentPlayer;
             },
         };

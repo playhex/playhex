@@ -3,29 +3,26 @@ import { Move } from '../../../../shared/move-notation/move-notation.js';
 import { ToolInterface } from './ToolInterface.js';
 import { UndoableAction } from '../undoredo/undoredo.js';
 
-export class PlaceStoneTool implements ToolInterface
+export class RemoveStoneTool implements ToolInterface
 {
     constructor(
         private gameView: GameView,
-        readonly color: 0 | 1,
     ) {}
 
     createUndoableAction(move: Move): UndoableAction | null
     {
-        const existing = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+        const previousStone = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
 
-        if (existing !== null && existing !== this.color) {
+        if (previousStone === null) {
             return null;
         }
 
-        const toggling = existing === this.color;
-
         return {
             do: () => {
-                this.gameView.setStone(move, toggling ? null : this.color);
+                this.gameView.setStone(move, null);
             },
             undo: () => {
-                this.gameView.setStone(move, toggling ? this.color : null);
+                this.gameView.setStone(move, previousStone);
             },
         };
     }

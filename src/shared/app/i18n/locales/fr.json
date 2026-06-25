@@ -659,6 +659,7 @@
         "alternating_placement": "Placement alterné",
         "place_red_stone": "Placer une pierre rouge",
         "place_blue_stone": "Placer une pierre bleue",
+        "remove_stone": "Retirer une pierre",
         "mark_cross": "Marquer d'une croix",
         "mark_triangle": "Marquer d'un triangle",
         "mark_square": "Marquer d'un carré",
