@@ -1,23 +1,4 @@
-import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
-
-export type AnalysisInput = {
-    size: number;
-    color: 'black' | 'white';
-    black: string[];
-    white: string[];
-};
-
-export type AnalysisOutput = {
-    whiteWin?: number;
-    policy?: number[][];
-
-    /**
-     * Move the engine recommends to play for the position's player to move,
-     * or null/undefined if it has no recommendation (e.g a noop engine, or no legal move).
-     * Used by auto-play.
-     */
-    recommendedMove?: null | HexMove;
-};
+import type { AnalysisInput, AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 
 export interface AnalyzerInterface
 {

@@ -1,7 +1,8 @@
 import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { coordsToMove } from '../../../../shared/move-notation/move-notation.js';
+import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 import { LocalStorageCache } from '../services/cachedAnalysis.js';
-import { AnalysisInput, AnalysisOutput, AnalyzerInterface } from './AnalyzerInterface.js';
+import { AnalyzerInterface } from './AnalyzerInterface.js';
 
 export class KatahexIntuitionAnalyzer implements AnalyzerInterface
 {
@@ -9,12 +10,8 @@ export class KatahexIntuitionAnalyzer implements AnalyzerInterface
 
     async analyzePosition(input: AnalysisInput): Promise<AnalysisOutput>
     {
-        // Sort so the cache key (and request payload) is the same regardless of stone iteration order.
-        const black = [...input.black].sort();
-        const white = [...input.white].sort();
-        const cacheKey = [input.size, input.color, black.join(','), white.join(',')].join('|');
-
-        return await this.cache.getItem(cacheKey, () => this.fetchPositionAnalyze({ ...input, black, white }));
+        const cacheKey = analysisCacheKey(input);
+        return await this.cache.getItem(cacheKey, () => this.fetchPositionAnalyze(input));
     }
 
     /**
