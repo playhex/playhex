@@ -18,7 +18,6 @@ import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { onBeforeRouteLeave } from 'vue-router';
 import { BoardMarksLayer, MarkType } from '../BoardMarksLayer.js';
 import { PlaceMarkTool } from '../tools/PlaceMarkTool.js';
-import { UndoableAction } from '../undoredo/undoredo.js';
 import { gameTreeToSgf } from '../exportSgf.js';
 import { sgfToString } from '../../../../shared/sgf/index.js';
 import { downloadString } from '../../../services/fileDownload.js';
@@ -64,48 +63,37 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     let policyOverlayFacade: PolicyOverlayFacade = null!;
     let marksLayer: BoardMarksLayer = null!;
 
-    // Drag-paint state for the select tool: tracks whether a drag is in progress,
-    // the value being painted (true = select, false = deselect), and which cells
-    // were changed during the drag along with their previous values (for undo).
+    // Drag-paint state: active when the user holds the pointer down over cells in setup mode.
+    // Each visited cell's per-cell UndoableAction is stored so the whole drag can be
+    // registered as a single undo/redo entry when the pointer is released.
     let isDragPainting = false;
-    let dragValue: boolean | null = null;
-    const dragChangedCells = new Map<Move, boolean>();
+    let dragMode: 'add' | 'remove' | null = null;
+    let dragJustCommitted = false;
+    const dragCellActions = new Map<Move, { do: () => void, undo: () => void }>();
 
     const endDragPainting = async (): Promise<void> => {
-        if (!isDragPainting || dragChangedCells.size === 0) {
+        if (!isDragPainting || dragCellActions.size === 0) {
             isDragPainting = false;
             return;
         }
 
-        const changedEntries = [...dragChangedCells.entries()];
-        const newValue = dragValue!;
+        const actions = [...dragCellActions.values()];
 
         isDragPainting = false;
-        dragValue = null;
-        dragChangedCells.clear();
+        dragMode = null;
+        dragCellActions.clear();
+        dragJustCommitted = true;
 
-        // Revert live changes so actionsStack.pushAndDo can re-apply them cleanly.
-        for (const [move, previousValue] of changedEntries) {
-            marksLayer.setSelected(move, previousValue);
-        }
+        // Revert live changes so pushAndDo can re-apply them via do().
+        for (const a of [...actions].reverse()) a.undo();
 
-        const action: UndoableAction = {
-            do: () => {
-                for (const [move] of changedEntries) {
-                    marksLayer.setSelected(move, newValue);
-                }
-            },
-            undo: () => {
-                for (const [move, previousValue] of changedEntries) {
-                    marksLayer.setSelected(move, previousValue);
-                }
-            },
-        };
-
-        await actionsStack.value.pushAndDo(action);
+        await actionsStack.value.pushAndDo({
+            do: () => { for (const a of actions) a.do(); },
+            undo: () => { for (const a of [...actions].reverse()) a.undo(); },
+        });
     };
 
-    useEventListener(document, 'pointerup', endDragPainting);
+    useEventListener(document, 'pointerup', () => { void endDragPainting(); });
 
     // Reactive ref exposed to the template
     const gameViewRef = shallowRef<GameView>(null!);
@@ -659,7 +647,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
             nodes
                 .filter(node => node.data?.type === 'move')
                 .map(node => {
-                    const move = (node.data as { type: 'move'; move: HexMove }).move;
+                    const move = (node.data as { type: 'move', move: HexMove }).move;
                     if (move === 'swap-pieces') return ':s';
                     if (move === 'pass') return ':p';
                     return move;
@@ -732,27 +720,50 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
         gameView.on('hexPointerDown', move => {
             if (!state.value.setupMode) return;
-            if (!(currentTool.value instanceof PlaceMarkTool) || currentTool.value.markType !== 'select') return;
+
+            const tool = currentTool.value;
+
+            if (!tool.getDragMode) return;
+
+            const mode = tool.getDragMode(move);
+
+            if (mode === null) return;
 
             isDragPainting = true;
-            dragValue = !marksLayer.isSelected(move);
-            dragChangedCells.clear();
-            dragChangedCells.set(move, marksLayer.isSelected(move));
-            marksLayer.setSelected(move, dragValue);
+            dragMode = mode;
+            dragCellActions.clear();
+
+            const action = tool.createDragAction!(move, mode);
+
+            if (action) {
+                action.do();
+                dragCellActions.set(move, action);
+            }
         });
 
         gameView.on('hexHovered', move => {
-            if (!isDragPainting || dragValue === null) return;
-            if (dragChangedCells.has(move)) return;
+            if (!isDragPainting || dragMode === null) return;
+            if (dragCellActions.has(move)) return;
 
-            dragChangedCells.set(move, marksLayer.isSelected(move));
-            marksLayer.setSelected(move, dragValue);
+            const tool = currentTool.value;
+
+            if (!tool.createDragAction) return;
+
+            const action = tool.createDragAction(move, dragMode);
+
+            if (!action) return;
+
+            action.do();
+            dragCellActions.set(move, action);
         });
 
         gameView.on('hexClicked', async move => {
             if (state.value.setupMode) {
-                // select tool is handled entirely via hexPointerDown + drag; skip here
-                if (currentTool.value instanceof PlaceMarkTool && currentTool.value.markType === 'select') return;
+                // If a drag just committed this click's cell, skip to avoid double-applying.
+                if (dragJustCommitted) {
+                    dragJustCommitted = false;
+                    return;
+                }
 
                 const action = currentTool.value.createUndoableAction(move);
                 if (action !== null) {
@@ -773,8 +784,9 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
      */
     const rebuildBoard = async (boardsize: number): Promise<void> => {
         isDragPainting = false;
-        dragValue = null;
-        dragChangedCells.clear();
+        dragMode = null;
+        dragJustCommitted = false;
+        dragCellActions.clear();
 
         playingGameFacade?.destroy();
         gameView?.destroy();

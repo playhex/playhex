@@ -26,4 +26,14 @@ export class RemoveStoneTool implements ToolInterface
             },
         };
     }
+
+    getDragMode(_move: Move): 'remove'
+    {
+        return 'remove';
+    }
+
+    createDragAction(move: Move, _mode: 'add' | 'remove'): UndoableAction | null
+    {
+        return this.createUndoableAction(move);
+    }
 }

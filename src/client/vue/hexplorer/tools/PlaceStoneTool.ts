@@ -29,4 +29,34 @@ export class PlaceStoneTool implements ToolInterface
             },
         };
     }
+
+    getDragMode(move: Move): 'add' | 'remove' | null
+    {
+        const existing = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+
+        if (existing !== null && existing !== this.color) return null; // opponent stone: no drag
+
+        return existing === this.color ? 'remove' : 'add';
+    }
+
+    createDragAction(move: Move, mode: 'add' | 'remove'): UndoableAction | null
+    {
+        const existing = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+
+        if (mode === 'add') {
+            if (existing !== null) return null; // skip occupied cells
+
+            return {
+                do: () => this.gameView.setStone(move, this.color),
+                undo: () => this.gameView.setStone(move, null),
+            };
+        }
+
+        if (existing !== this.color) return null; // skip cells without this color
+
+        return {
+            do: () => this.gameView.setStone(move, null),
+            undo: () => this.gameView.setStone(move, this.color),
+        };
+    }
 }
