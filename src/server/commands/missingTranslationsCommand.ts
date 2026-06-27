@@ -52,7 +52,14 @@ const deepMerge = (target: NestedObject, patch: NestedObject): NestedObject => {
 const readStdin = (): Promise<string> => new Promise(resolve => {
     let data = '';
     process.stdin.setEncoding('utf-8');
-    process.stdin.on('data', chunk => data += String(chunk));
+    process.stdin.on('data', (chunk: string) => {
+        data += chunk;
+        // "EOF" on its own line acts as a terminator, like Ctrl+D
+        if (/^EOF\s*$/m.test(data)) {
+            resolve(data.replace(/\nEOF\s*$/, '').replace(/^EOF\s*$/, ''));
+            process.stdin.destroy();
+        }
+    });
     process.stdin.on('end', () => resolve(data));
 });
 
@@ -88,7 +95,7 @@ hexProgram
         const separator = '='.repeat(10);
         process.stderr.write(`${separator}\nTranslate to ${localeName}:\n\n`);
         console.log(JSON.stringify(missing, null, 4));
-        process.stderr.write(`${separator}\n\nWaiting for ${localeName} translation... Paste translated JSON and press Ctrl+D...\n`);
+        process.stderr.write(`${separator}\n\nWaiting for ${localeName} translation... Paste translated JSON and press Ctrl+D (or type EOF on a new line)...\n`);
 
         const input = await readStdin();
 

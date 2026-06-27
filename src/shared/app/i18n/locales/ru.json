@@ -49,7 +49,9 @@
         "more_options": "Больше опций"
     },
     "player_settings": {
-        "title": "Настройки"
+        "title": "Настройки",
+        "change_avatar": "Изменить аватар",
+        "crop_avatar": "Настроить ава��ар"
     },
     "background_theme": {
         "title": "Тема",
@@ -635,9 +637,91 @@
         "details": "Подробности",
         "related_messages": "Связанные сообщения",
         "acknowledge": "Я прочитал и понял",
-        "scroll_hint": "Прочитайте и подтвердите ниже"
+        "scroll_hint": "Прочитайте и подтвердите ниже",
+        "nickname_moderated_title": "Никнейм проверен модератором",
+        "nickname_moderated_body": "Ваш никнейм «{{former}}» был изменён модератором на «{{moderated}}». Вы по-прежнему можете входить с вашим фактическим логином, но никнейм игрока изменился."
     },
     "moderation_reason": {
-        "chat_insults": "Оскорбления или неподобающее поведение в чате"
+        "chat_insults": "Оскорбления или неподобающее поведение в чате",
+        "avatar_inappropriate": "Неподходящий аватар",
+        "nickname_inappropriate": "Неподходящий никнейм"
+    },
+    "opponent_must_be_registered": "Только зарегистрированные игроки",
+    "opponent_must_be_registered_help": "Гости не могут присоединиться к этой игре. Разрешены только игроки с учётной записью.",
+    "cannot_join_registered_only": "Эта игра доступна только игрокам с учётной записью. Создайте аккаунт или войдите, чтобы присоединиться.",
+    "view_games": "Просмотреть игры",
+    "lobby_playing_now_short": "Играет",
+    "lobby_no_correspondence_games_now": "Сейчас нет игр по переписке.",
+    "lobby_observe_live": "Наблюдать за жив��ми играми",
+    "observe_all_playing_games": "Наблюдать за всеми теку��ими играми",
+    "enable_notifications_overlay": {
+        "title": "Включить уведомления?",
+        "enable": "Включить уведом��ения",
+        "later": "Игнорировать",
+        "you_will_be_notified": "Вы получите уведомление:",
+        "also_notified_for": "Вы также получите уведомление о:",
+        "notifications": {
+            "tournament_checkin_opens": "Когда откроется регистрация на турнир",
+            "correspondence_your_turn": "Когда наступит ваш ход в игре по переписке",
+            "rematch": "Когда вы получите предложение реванша"
+        }
+    },
+    "moderation": "Модерация",
+    "country_flag": {
+        "title": "Флаг ст��аны",
+        "explain": "Отображать флаг вашей страны рядом с никнеймом.",
+        "suggestions": "Предложено вашим браузером:",
+        "all_countries": "Все страны:",
+        "search_placeholder": "Поиск страны…",
+        "remove": "Удалить флаг"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Режим настройки",
+        "validate": "Подтверд��ть",
+        "undo_placement": "Отменить размещение",
+        "redo_placement": "Повторить размещение",
+        "alternating_placement": "Поочерёдное размещение",
+        "place_red_stone": "Поставить красный камень",
+        "place_blue_stone": "П��ставить синий к��мень",
+        "remove_stone": "Убрать камень",
+        "mark_cross": "Отметить крестом",
+        "mark_triangle": "Отметить треугольником",
+        "mark_square": "Отметить квадратом",
+        "mark_circle": "Отметить кругом",
+        "highlight_cell": "Выделить клетку",
+        "label_text": "Текст метки",
+        "add_label": "Добавить метку",
+        "go_back": "Назад",
+        "go_forward": "Вперёд",
+        "delete_branch": "Удалит�� эту ветку",
+        "pass_turn": "Пропустить ход",
+        "change_current_player": "Изменить ходящего игрока",
+        "win_rate": "Выигрыш%",
+        "policy": "Полити��а",
+        "policy_show_numbers": "Показать номера политики",
+        "policy_show_best_mark": "Отметить лучший ход",
+        "autoplay": "Автовоспроизведение",
+        "evaluation": "Оценка",
+        "engine": "Движок",
+        "move_history": "История ходов",
+        "current_analysis": "Текущий анализ",
+        "load": "Загрузить",
+        "save": "Сохранить",
+        "download_sgf": "Скача��ь как SGF",
+        "analysis_json_load": "Загрузить анализ (JSON)",
+        "analysis_json_save": "Сохранит�� анализ (JSON)",
+        "import": "Импортировать",
+        "new_analysis": "Новый анализ",
+        "new": "Новый",
+        "import_a_game": "Импортировать любую игру Hex",
+        "format_not_supported": "Неизвестный формат.",
+        "import_placeholder": "URL, ссылка HexWorld, нотация ходов...",
+        "formats_supported": "Поддерживаемые форматы",
+        "move_list": "Список ходов",
+        "playhex_link": "Ссылка PlayHex",
+        "hexworld_link": "Ссылка HexWorld",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Скопировать из «Отладочная информация» под игровой доской"
     }
 }

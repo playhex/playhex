@@ -49,7 +49,9 @@
         "more_options": "Mais opções"
     },
     "player_settings": {
-        "title": "Configurações"
+        "title": "Configurações",
+        "change_avatar": "Alterar avatar",
+        "crop_avatar": "Ajustar avatar"
     },
     "background_theme": {
         "title": "Tema",
@@ -620,10 +622,14 @@
         "details": "Detalhes",
         "related_messages": "Mensagens relacionadas",
         "acknowledge": "Li e entendi",
-        "scroll_hint": "Leia e aceite abaixo"
+        "scroll_hint": "Leia e aceite abaixo",
+        "nickname_moderated_title": "Alcunha moderada",
+        "nickname_moderated_body": "A sua alcunha \"{{former}}\" foi moderada para \"{{moderated}}\". Pode continuar a iniciar sessão com o seu login atual, mas a alcunha do seu jogador foi alterada."
     },
     "moderation_reason": {
-        "chat_insults": "Insultos ou comportamento inadequado no chat"
+        "chat_insults": "Insultos ou comportamento inadequado no chat",
+        "avatar_inappropriate": "Avatar inapropriado",
+        "nickname_inappropriate": "Alcunha inapropriada"
     },
     "player_loses_reason": {
         "default": "{player} perde.",
@@ -631,5 +637,83 @@
         "time": "{player} estoura o tempo.",
         "resign": "{player} desiste.",
         "forfeit": "{player} perde por desistência."
+    },
+    "opponent_must_be_registered": "Apenas jogadores registados",
+    "opponent_must_be_registered_help": "Convidados não podem participar neste jogo. Apenas jogadores com uma conta são permitidos.",
+    "cannot_join_registered_only": "Este jogo é restrito a jogadores com uma conta. Crie uma conta ou inicie sessão para participar.",
+    "view_games": "Ver jogos",
+    "lobby_playing_now_short": "A jogar",
+    "lobby_no_correspondence_games_now": "Nenhum jogo por correspondência a decorrer agora.",
+    "lobby_observe_live": "Observar jogos ao vivo",
+    "observe_all_playing_games": "Observar todos os jogos em curso",
+    "enable_notifications_overlay": {
+        "title": "Ativar notificações?",
+        "enable": "Ativar notificações",
+        "later": "Ignorar",
+        "you_will_be_notified": "Será notificado:",
+        "also_notified_for": "Também será notificado para:",
+        "notifications": {
+            "tournament_checkin_opens": "Quando o check-in do torneio abrir",
+            "correspondence_your_turn": "Quando for a sua vez num jogo por correspondência",
+            "rematch": "Quando receber uma oferta de revanche"
+        }
+    },
+    "moderation": "Moderação",
+    "country_flag": {
+        "title": "Bandeira do país",
+        "explain": "Mostrar a bandeira do seu país ao lado da sua alcunha.",
+        "suggestions": "Sugerido pelo seu navegador:",
+        "all_countries": "Todos os países:",
+        "search_placeholder": "Pesquisar país…",
+        "remove": "Remover bandeira"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Modo de configuração",
+        "validate": "Validar",
+        "undo_placement": "Desfazer colocação",
+        "redo_placement": "Refazer colocação",
+        "alternating_placement": "Colocação alternada",
+        "place_red_stone": "Colocar uma pedra vermelha",
+        "place_blue_stone": "Colocar uma pedra azul",
+        "remove_stone": "Remover uma pedra",
+        "mark_cross": "Marcar com uma cruz",
+        "mark_triangle": "Marcar com um triângulo",
+        "mark_square": "Marcar com um quadrado",
+        "mark_circle": "Marcar com um círculo",
+        "highlight_cell": "Destacar célula",
+        "label_text": "Texto da etiqueta",
+        "add_label": "Adicionar etiqueta",
+        "go_back": "Voltar atrás",
+        "go_forward": "Avançar",
+        "delete_branch": "Eliminar este ramo",
+        "pass_turn": "Passar a vez",
+        "change_current_player": "Alterar o jogador a mover",
+        "win_rate": "Vitórias%",
+        "policy": "Política",
+        "policy_show_numbers": "Mostrar números de política",
+        "policy_show_best_mark": "Marcar melhor jogada",
+        "autoplay": "Reprodução automática",
+        "evaluation": "Avaliação",
+        "engine": "Motor",
+        "move_history": "Historial de jogadas",
+        "current_analysis": "Análise atual",
+        "load": "Carregar",
+        "save": "Guardar",
+        "download_sgf": "Descarregar como SGF",
+        "analysis_json_load": "Carregar análise (JSON)",
+        "analysis_json_save": "Guardar análise (JSON)",
+        "import": "Importar",
+        "new_analysis": "Nova análise",
+        "new": "Novo",
+        "import_a_game": "Importar qualquer jogo Hex",
+        "format_not_supported": "Formato não reconhecido.",
+        "import_placeholder": "URL, link HexWorld, notação de jogadas...",
+        "formats_supported": "Formatos suportados",
+        "move_list": "Lista de jogadas",
+        "playhex_link": "Link PlayHex",
+        "hexworld_link": "Link HexWorld",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Copiar de \"Informação de depuração\" abaixo do tabuleiro"
     }
 }

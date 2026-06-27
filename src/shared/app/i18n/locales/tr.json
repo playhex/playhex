@@ -55,7 +55,9 @@
         "more_options": "Daha çok seçenek"
     },
     "player_settings": {
-        "title": "Ayarlar"
+        "title": "Ayarlar",
+        "change_avatar": "Avatarı değiştir",
+        "crop_avatar": "Avatarı ayarla"
     },
     "background_theme": {
         "title": "Tema",
@@ -98,7 +100,7 @@
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Oyun {player} tarafından {timeAgo} oluşturuldu.",
     "game_created_by_system_time_ago": "Oyun {timeAgo} sistem tarafından oluşturuldu.",
-    "game_was_created_by_player_time_ago": "Oyun {{player}} tarafından oluşturulmuştu, {{timeAgo}}.",
+    "game_was_created_by_player_time_ago": "Oyun {player} tarafından oluşturulmuştu, {timeAgo}.",
     "log_out": "Çıkış yap",
     "log_in": "Giriş yap",
     "sign_up": "Kayıt ol",
@@ -621,9 +623,91 @@
         "details": "Detaylar",
         "related_messages": "İlgili mesajlar",
         "acknowledge": "Okudum ve anladım",
-        "scroll_hint": "Aşağıyı okuyup kabul edin"
+        "scroll_hint": "Aşağıyı okuyup kabul edin",
+        "nickname_moderated_title": "Takma ad moderasyona alındı",
+        "nickname_moderated_body": "\"{{former}}\" takma adınız \"{{moderated}}\" olarak değiştirildi. Gerçek kullanıcı adınızla giriş yapmaya devam edebilirsiniz, ancak oyuncu takma adınız değişti."
     },
     "moderation_reason": {
-        "chat_insults": "Sohbette hakaret veya uygunsuz davranış"
+        "chat_insults": "Sohbette hakaret veya uygunsuz davranış",
+        "avatar_inappropriate": "Uygunsuz avatar",
+        "nickname_inappropriate": "Uygunsuz takma ad"
+    },
+    "opponent_must_be_registered": "Yalnızca kayıtlı oyuncular",
+    "opponent_must_be_registered_help": "Misafirler bu oyuna katılamaz. Yalnızca hesabı olan oyunculara izin verilir.",
+    "cannot_join_registered_only": "Bu oyun yalnızca hesabı olan oyuncularla sınırlıdır. Katılmak için hesap oluşturun veya giriş yapın.",
+    "view_games": "Oyunları görüntüle",
+    "lobby_playing_now_short": "Oynuyor",
+    "lobby_no_correspondence_games_now": "Şu an oynanmakta olan yazışma oyunu yok.",
+    "lobby_observe_live": "Canlı oyunları izle",
+    "observe_all_playing_games": "Oynanan tüm oyunları izle",
+    "enable_notifications_overlay": {
+        "title": "Bildirimler etkinleştirilsin mi?",
+        "enable": "Bildirimleri etkinleştir",
+        "later": "Yoksay",
+        "you_will_be_notified": "Bildirim alacaksınız:",
+        "also_notified_for": "Bunlar için de bildirim alacaksınız:",
+        "notifications": {
+            "tournament_checkin_opens": "Turnuva girişi açıldığında",
+            "correspondence_your_turn": "Yazışma oyununda sıranız geldiğinde",
+            "rematch": "Rövanş teklifi aldığınızda"
+        }
+    },
+    "moderation": "Moderasyon",
+    "country_flag": {
+        "title": "Ülke bayrağı",
+        "explain": "Takma adınızın yanında ülke bayrağınızı gösterin.",
+        "suggestions": "Tarayıcınızdan öneri:",
+        "all_countries": "Tüm ülkeler:",
+        "search_placeholder": "Ülke ara…",
+        "remove": "Bayrağı kaldır"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Kurulum modu",
+        "validate": "Doğrula",
+        "undo_placement": "Yerleştirmeyi geri al",
+        "redo_placement": "Yerleştirmeyi yeniden yap",
+        "alternating_placement": "Dönüşümlü yerleştirme",
+        "place_red_stone": "Kırmızı taş yerleştir",
+        "place_blue_stone": "Mavi taş yerleştir",
+        "remove_stone": "Taşı kaldır",
+        "mark_cross": "Çarpı ile işaretle",
+        "mark_triangle": "Üçgen ile işaretle",
+        "mark_square": "Kare ile işaretle",
+        "mark_circle": "Daire ile işaretle",
+        "highlight_cell": "Hücreyi vurgula",
+        "label_text": "Etiket metni",
+        "add_label": "Etiket ekle",
+        "go_back": "Geri git",
+        "go_forward": "İleri git",
+        "delete_branch": "Bu dalı sil",
+        "pass_turn": "Sırayı geç",
+        "change_current_player": "Oynayacak oyuncuyu değiştir",
+        "win_rate": "Kazanma%",
+        "policy": "Politika",
+        "policy_show_numbers": "Politika numaralarını göster",
+        "policy_show_best_mark": "En iyi hamleyi işaretle",
+        "autoplay": "Otomatik oynat",
+        "evaluation": "Değerlendirme",
+        "engine": "Motor",
+        "move_history": "Hamle geçmişi",
+        "current_analysis": "Mevcut analiz",
+        "load": "Yükle",
+        "save": "Kaydet",
+        "download_sgf": "SGF olarak indir",
+        "analysis_json_load": "Analizi yükle (JSON)",
+        "analysis_json_save": "Analizi kaydet (JSON)",
+        "import": "İçe aktar",
+        "new_analysis": "Yeni analiz",
+        "new": "Yeni",
+        "import_a_game": "Herhangi bir Hex oyununu içe aktar",
+        "format_not_supported": "Tanınmayan biçim.",
+        "import_placeholder": "URL, HexWorld bağlantısı, hamle gösterimi...",
+        "formats_supported": "Desteklenen biçimler",
+        "move_list": "Hamle listesi",
+        "playhex_link": "PlayHex bağlantısı",
+        "hexworld_link": "HexWorld bağlantısı",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Oyun tahtasının altındaki \"Hata ayıklama bilgisi\"nden kopyala"
     }
 }

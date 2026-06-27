@@ -39,7 +39,9 @@
     },
     "last_move": "Dernier coup",
     "player_settings": {
-        "title": "Préférences"
+        "title": "Préférences",
+        "change_avatar": "Changer l'avatar",
+        "crop_avatar": "Ajuster l'avatar"
     },
     "background_theme": {
         "title": "Thème",
@@ -635,10 +637,14 @@
         "details": "Détails",
         "related_messages": "Messages concernés",
         "acknowledge": "J'ai lu et compris",
-        "scroll_hint": "Lire et accepter en bas"
+        "scroll_hint": "Lire et accepter en bas",
+        "nickname_moderated_title": "Pseudo modéré",
+        "nickname_moderated_body": "Votre pseudo \"{{former}}\" a été modéré en \"{{moderated}}\". Vous pouvez toujours vous connecter avec votre identifiant habituel, mais le pseudo de votre joueur a changé."
     },
     "moderation_reason": {
-        "chat_insults": "Insultes ou comportement inapproprié dans le chat"
+        "chat_insults": "Insultes ou comportement inapproprié dans le chat",
+        "avatar_inappropriate": "Avatar inapproprié",
+        "nickname_inappropriate": "Pseudo inapproprié"
     },
     "allow_exploration": "Autoriser l’exploration",
     "allow_exploration_help": "Permet d’essayer des variantes en jouant les deux couleurs avant de soumettre un coup. Si désactivé, les coups conditionnels sont également désactivés.",
@@ -695,6 +701,22 @@
         "playhex_link": "Lien PlayHex",
         "hexworld_link": "Lien HexWorld",
         "abstract_play_url": "Abstract Play : URL",
-        "abstract_play_debug": "Abstract Play : copier depuis « Debugging information » sous le plateau"
+        "abstract_play_debug": "Abstract Play : copier depuis « Debugging information » sous le plateau",
+        "policy_show_numbers": "Afficher les numéros de politique",
+        "policy_show_best_mark": "Marquer le meilleur coup"
+    },
+    "view_games": "Voir les parties",
+    "lobby_playing_now_short": "En cours",
+    "lobby_no_correspondence_games_now": "Aucune partie par correspondance en cours.",
+    "lobby_observe_live": "Observer les parties en direct",
+    "observe_all_playing_games": "Observer toutes les parties en cours",
+    "moderation": "Modération",
+    "country_flag": {
+        "title": "Drapeau du pays",
+        "explain": "Afficher votre drapeau national à côté de votre pseudo.",
+        "suggestions": "Suggéré par votre navigateur :",
+        "all_countries": "Tous les pays :",
+        "search_placeholder": "Rechercher un pays…",
+        "remove": "Supprimer le drapeau"
     }
 }

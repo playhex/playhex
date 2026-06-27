@@ -49,7 +49,9 @@
         "more_options": "オプションを増やす"
     },
     "player_settings": {
-        "title": "設定"
+        "title": "設定",
+        "change_avatar": "アバターを変更",
+        "crop_avatar": "アバターを調整"
     },
     "background_theme": {
         "title": "テーマ",
@@ -614,10 +616,14 @@
         "details": "詳細",
         "related_messages": "関連メッセージ",
         "acknowledge": "読み、理解しました",
-        "scroll_hint": "下まで読んで同意してください"
+        "scroll_hint": "下まで読んで同意してください",
+        "nickname_moderated_title": "ニックネームがモデレートされました",
+        "nickname_moderated_body": "あなたのニックネーム「{{former}}」が「{{moderated}}」にモデレートされました。実際のログインでは引き続きログインできますが、プレイヤーのニックネームが変更されました。"
     },
     "moderation_reason": {
-        "chat_insults": "チャットでの侮辱または不適切な行為"
+        "chat_insults": "チャットでの侮辱または不適切な行為",
+        "avatar_inappropriate": "不適切なアバター",
+        "nickname_inappropriate": "不適切なニックネーム"
     },
     "player_loses_reason": {
         "default": "{player} の負けです。",
@@ -625,5 +631,83 @@
         "time": "{player} が時間切れです。",
         "resign": "{player} が投了しました。",
         "forfeit": "{player} の不戦敗です。"
+    },
+    "opponent_must_be_registered": "登録プレイヤーのみ",
+    "opponent_must_be_registered_help": "ゲストはこのゲームに参加できません。アカウントを持つプレイヤーのみ許可されます。",
+    "cannot_join_registered_only": "このゲームはアカウントを持つプレイヤーのみ参加できます。参加するにはアカウントを作成またはログインしてください。",
+    "view_games": "ゲームを見る",
+    "lobby_playing_now_short": "プレイ中",
+    "lobby_no_correspondence_games_now": "現在進行中の通信ゲームはありません。",
+    "lobby_observe_live": "ライブゲームを観戦",
+    "observe_all_playing_games": "進行中のすべてのゲームを観戦",
+    "enable_notifications_overlay": {
+        "title": "通知を有効にしますか？",
+        "enable": "通知を有効にする",
+        "later": "無視",
+        "you_will_be_notified": "通知を受け取る項目：",
+        "also_notified_for": "次の項目についても通知を受け取ります：",
+        "notifications": {
+            "tournament_checkin_opens": "トーナメントのチェックインが開いたとき",
+            "correspondence_your_turn": "通信ゲームであなたの番になったとき",
+            "rematch": "リマッチのオファーを受け取ったとき"
+        }
+    },
+    "moderation": "モデレーション",
+    "country_flag": {
+        "title": "国旗",
+        "explain": "ニックネームの横に国旗を表示します。",
+        "suggestions": "ブラウザからの提案：",
+        "all_countries": "すべての国：",
+        "search_placeholder": "国を検索…",
+        "remove": "旗を削除"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "セットアップモード",
+        "validate": "確認",
+        "undo_placement": "配置を元に戻す",
+        "redo_placement": "配置をやり直す",
+        "alternating_placement": "交互配置",
+        "place_red_stone": "赤い石を置く",
+        "place_blue_stone": "青い石を置く",
+        "remove_stone": "石を取り除く",
+        "mark_cross": "×印でマーク",
+        "mark_triangle": "三角形でマーク",
+        "mark_square": "四角形でマーク",
+        "mark_circle": "円でマーク",
+        "highlight_cell": "セルをハイライト",
+        "label_text": "ラベルテキスト",
+        "add_label": "ラベルを追加",
+        "go_back": "戻る",
+        "go_forward": "進む",
+        "delete_branch": "このブランチを削除",
+        "pass_turn": "パス",
+        "change_current_player": "手番のプレイヤーを変更",
+        "win_rate": "勝率%",
+        "policy": "方針",
+        "policy_show_numbers": "方針の数値を表示",
+        "policy_show_best_mark": "最善手をマーク",
+        "autoplay": "自動再生",
+        "evaluation": "評価",
+        "engine": "エンジン",
+        "move_history": "手順履歴",
+        "current_analysis": "現在の分析",
+        "load": "読み込む",
+        "save": "保存",
+        "download_sgf": "SGFとしてダウンロード",
+        "analysis_json_load": "分析を読み込む (JSON)",
+        "analysis_json_save": "分析を保存する (JSON)",
+        "import": "インポート",
+        "new_analysis": "新しい分析",
+        "new": "新規",
+        "import_a_game": "任意のHexゲームをインポート",
+        "format_not_supported": "認識できない形式です。",
+        "import_placeholder": "URL、HexWorldリンク、手順表記...",
+        "formats_supported": "サポートされている形式",
+        "move_list": "手順リスト",
+        "playhex_link": "PlayHexリンク",
+        "hexworld_link": "HexWorldリンク",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: ゲームボード下の「デバッグ情報」からコピー"
     }
 }

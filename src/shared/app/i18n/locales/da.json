@@ -49,7 +49,9 @@
         "more_options": "Flere muligheder"
     },
     "player_settings": {
-        "title": "Indstillinger"
+        "title": "Indstillinger",
+        "change_avatar": "Skift avatar",
+        "crop_avatar": "Tilpas avatar"
     },
     "background_theme": {
         "title": "Tema",
@@ -614,10 +616,14 @@
         "details": "Detaljer",
         "related_messages": "Relaterede beskeder",
         "acknowledge": "Jeg har læst og forstået",
-        "scroll_hint": "Læs og accepter nedenfor"
+        "scroll_hint": "Læs og accepter nedenfor",
+        "nickname_moderated_title": "Kaldenavn modereret",
+        "nickname_moderated_body": "Dit kaldenavn \"{{former}}\" er blevet modereret til \"{{moderated}}\". Du kan stadig logge ind med dit faktiske login, men dit spillerkaldenavn er ændret."
     },
     "moderation_reason": {
-        "chat_insults": "Fornærmelser eller upassende opførsel i chatten"
+        "chat_insults": "Fornærmelser eller upassende opførsel i chatten",
+        "avatar_inappropriate": "Upassende avatar",
+        "nickname_inappropriate": "Upassende kaldenavn"
     },
     "player_loses_reason": {
         "default": "{player} taber.",
@@ -625,5 +631,83 @@
         "time": "{player} løber tør for tid.",
         "resign": "{player} opgiver.",
         "forfeit": "{player} taber på walkover."
+    },
+    "opponent_must_be_registered": "Kun registrerede spillere",
+    "opponent_must_be_registered_help": "Gæster kan ikke deltage i dette spil. Kun spillere med en konto er tilladt.",
+    "cannot_join_registered_only": "Dette spil er forbeholdt spillere med en konto. Opret en konto eller log ind for at deltage.",
+    "view_games": "Se spil",
+    "lobby_playing_now_short": "Spiller",
+    "lobby_no_correspondence_games_now": "Ingen korrespondancespil i gang nu.",
+    "lobby_observe_live": "Følg live-spil",
+    "observe_all_playing_games": "Følg alle igangværende spil",
+    "enable_notifications_overlay": {
+        "title": "Aktiver notifikationer?",
+        "enable": "Aktiver notifikationer",
+        "later": "Ignorer",
+        "you_will_be_notified": "Du vil blive notificeret:",
+        "also_notified_for": "Du vil også blive notificeret om:",
+        "notifications": {
+            "tournament_checkin_opens": "Når turneringstilmelding åbner",
+            "correspondence_your_turn": "Når det er din tur i et korrespondancespil",
+            "rematch": "Når du modtager et rematchtilbud"
+        }
+    },
+    "moderation": "Moderation",
+    "country_flag": {
+        "title": "Landsflag",
+        "explain": "Vis dit landsflag ved siden af dit kaldenavn.",
+        "suggestions": "Foreslået af din browser:",
+        "all_countries": "Alle lande:",
+        "search_placeholder": "Søg land…",
+        "remove": "Fjern flag"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Opsætningstilstand",
+        "validate": "Valider",
+        "undo_placement": "Fortryd placering",
+        "redo_placement": "Gentag placering",
+        "alternating_placement": "Skiftende placering",
+        "place_red_stone": "Placer en rød sten",
+        "place_blue_stone": "Placer en blå sten",
+        "remove_stone": "Fjern en sten",
+        "mark_cross": "Markér med et kryds",
+        "mark_triangle": "Markér med en trekant",
+        "mark_square": "Markér med et kvadrat",
+        "mark_circle": "Markér med en cirkel",
+        "highlight_cell": "Fremhæv celle",
+        "label_text": "Labeltekst",
+        "add_label": "Tilføj label",
+        "go_back": "Gå tilbage",
+        "go_forward": "Gå frem",
+        "delete_branch": "Slet denne gren",
+        "pass_turn": "Spring tur over",
+        "change_current_player": "Skift spilleren der skal flytte",
+        "win_rate": "Vinderrate%",
+        "policy": "Politik",
+        "policy_show_numbers": "Vis politiknumre",
+        "policy_show_best_mark": "Markér bedste træk",
+        "autoplay": "Automatisk afspilning",
+        "evaluation": "Evaluering",
+        "engine": "Motor",
+        "move_history": "Trækhistorik",
+        "current_analysis": "Aktuel analyse",
+        "load": "Indlæs",
+        "save": "Gem",
+        "download_sgf": "Download som SGF",
+        "analysis_json_load": "Indlæs analyse (JSON)",
+        "analysis_json_save": "Gem analyse (JSON)",
+        "import": "Importer",
+        "new_analysis": "Ny analyse",
+        "new": "Ny",
+        "import_a_game": "Importer et hvilket som helst Hex-spil",
+        "format_not_supported": "Ukendt format.",
+        "import_placeholder": "URL, HexWorld-link, træknotation...",
+        "formats_supported": "Understøttede formater",
+        "move_list": "Trækliste",
+        "playhex_link": "PlayHex-link",
+        "hexworld_link": "HexWorld-link",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Kopiér fra \"Fejlfindingsoplysninger\" under spillebrættet"
     }
 }

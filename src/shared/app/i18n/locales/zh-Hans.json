@@ -49,7 +49,9 @@
         "more_options": "更多选项"
     },
     "player_settings": {
-        "title": "设置"
+        "title": "设置",
+        "change_avatar": "更换头像",
+        "crop_avatar": "调整头像"
     },
     "background_theme": {
         "title": "主题",
@@ -143,7 +145,7 @@
     "pass": "跳过",
     "close": "关闭",
     "ranked": "排名赛",
-    "rating": "评分：{{rating}}",
+    "rating": "评分",
     "new_game": "新游戏",
     "players": "玩家",
     "player": "玩家",
@@ -614,10 +616,14 @@
         "details": "详情",
         "related_messages": "相关消息",
         "acknowledge": "我已阅读并理解",
-        "scroll_hint": "请阅读下方内容并确认"
+        "scroll_hint": "请阅读下方内容并确认",
+        "nickname_moderated_title": "昵称已被审核",
+        "nickname_moderated_body": "您的昵称「{{former}}」已被审核修改为「{{moderated}}」。您仍可使用原登录名登录，但玩家昵称已更改。"
     },
     "moderation_reason": {
-        "chat_insults": "聊天中的侮辱或不当行为"
+        "chat_insults": "聊天中的侮辱或不当行为",
+        "avatar_inappropriate": "不当头像",
+        "nickname_inappropriate": "不当昵称"
     },
     "player_loses_reason": {
         "default": "{player} 失败。",
@@ -625,5 +631,83 @@
         "time": "{player} 超时。",
         "resign": "{player} 认输。",
         "forfeit": "{player} 弃权落败。"
+    },
+    "opponent_must_be_registered": "仅限注册玩家",
+    "opponent_must_be_registered_help": "访客不能加入此游戏。仅允许拥有账户的玩家参与。",
+    "cannot_join_registered_only": "此游戏仅限拥有账户的玩家。请创建账户或登录以参与。",
+    "view_games": "查看对局",
+    "lobby_playing_now_short": "对局中",
+    "lobby_no_correspondence_games_now": "目前没有进行中的通信对局。",
+    "lobby_observe_live": "观看直播对局",
+    "observe_all_playing_games": "观看所有进行中的对局",
+    "enable_notifications_overlay": {
+        "title": "是否启用通知？",
+        "enable": "启用通知",
+        "later": "忽略",
+        "you_will_be_notified": "您将收到通知：",
+        "also_notified_for": "您还将收到以下通知：",
+        "notifications": {
+            "tournament_checkin_opens": "当赛事签到开放时",
+            "correspondence_your_turn": "当通信对局轮到您时",
+            "rematch": "当您收到复仇赛邀请时"
+        }
+    },
+    "moderation": "管理",
+    "country_flag": {
+        "title": "国家旗帜",
+        "explain": "在昵称旁显示您的国家旗帜。",
+        "suggestions": "浏览器推荐：",
+        "all_countries": "所有国家：",
+        "search_placeholder": "搜索国家…",
+        "remove": "移除旗帜"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "布局模式",
+        "validate": "确认",
+        "undo_placement": "撤销落子",
+        "redo_placement": "重做落子",
+        "alternating_placement": "交替落子",
+        "place_red_stone": "放置红色棋子",
+        "place_blue_stone": "放置蓝色棋子",
+        "remove_stone": "移除棋子",
+        "mark_cross": "标记叉号",
+        "mark_triangle": "标记三角形",
+        "mark_square": "标记方形",
+        "mark_circle": "标记圆形",
+        "highlight_cell": "高亮单元格",
+        "label_text": "标签文本",
+        "add_label": "添加标签",
+        "go_back": "后退",
+        "go_forward": "前进",
+        "delete_branch": "删除此分支",
+        "pass_turn": "跳过回合",
+        "change_current_player": "更改当前行棋方",
+        "win_rate": "胜率%",
+        "policy": "策略",
+        "policy_show_numbers": "显示策略数值",
+        "policy_show_best_mark": "标记最佳着法",
+        "autoplay": "自动播放",
+        "evaluation": "评估",
+        "engine": "引擎",
+        "move_history": "棋步历史",
+        "current_analysis": "当前分析",
+        "load": "载入",
+        "save": "保存",
+        "download_sgf": "下载为SGF",
+        "analysis_json_load": "载入分析（JSON）",
+        "analysis_json_save": "保存分析（JSON）",
+        "import": "导入",
+        "new_analysis": "新建分析",
+        "new": "新建",
+        "import_a_game": "导入任意Hex对局",
+        "format_not_supported": "无法识别的格式。",
+        "import_placeholder": "URL、HexWorld链接、棋步记谱...",
+        "formats_supported": "支持的格式",
+        "move_list": "棋步列表",
+        "playhex_link": "PlayHex链接",
+        "hexworld_link": "HexWorld链接",
+        "abstract_play_url": "Abstract Play：URL",
+        "abstract_play_debug": "Abstract Play：从棋盘下方的「调试信息」复制"
     }
 }

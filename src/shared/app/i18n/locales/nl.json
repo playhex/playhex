@@ -49,7 +49,9 @@
         "more_options": "Meer opties"
     },
     "player_settings": {
-        "title": "Instellingen"
+        "title": "Instellingen",
+        "change_avatar": "Avatar wijzigen",
+        "crop_avatar": "Avatar aanpassen"
     },
     "background_theme": {
         "title": "Thema",
@@ -614,10 +616,14 @@
         "details": "Details",
         "related_messages": "Gerelateerde berichten",
         "acknowledge": "Ik heb dit gelezen en begrepen",
-        "scroll_hint": "Lees hieronder en accepteer"
+        "scroll_hint": "Lees hieronder en accepteer",
+        "nickname_moderated_title": "Bijnaam gematigd",
+        "nickname_moderated_body": "Uw bijnaam \"{{former}}\" is gematigd naar \"{{moderated}}\". U kunt nog steeds inloggen met uw werkelijke login, maar de bijnaam van uw speler is gewijzigd."
     },
     "moderation_reason": {
-        "chat_insults": "Beledigingen of ongepast gedrag in chat"
+        "chat_insults": "Beledigingen of ongepast gedrag in chat",
+        "avatar_inappropriate": "Ongepaste avatar",
+        "nickname_inappropriate": "Ongepaste bijnaam"
     },
     "player_loses_reason": {
         "default": "{player} verliest.",
@@ -625,5 +631,83 @@
         "time": "{player} verliest op tijd.",
         "resign": "{player} geeft op.",
         "forfeit": "{player} verliest door forfait."
+    },
+    "opponent_must_be_registered": "Alleen geregistreerde spelers",
+    "opponent_must_be_registered_help": "Gasten kunnen niet deelnemen aan dit spel. Alleen spelers met een account zijn toegestaan.",
+    "cannot_join_registered_only": "Dit spel is beperkt tot spelers met een account. Maak een account aan of log in om deel te nemen.",
+    "view_games": "Spellen bekijken",
+    "lobby_playing_now_short": "Speelt",
+    "lobby_no_correspondence_games_now": "Er zijn momenteel geen correspondentiespellen bezig.",
+    "lobby_observe_live": "Live spellen bekijken",
+    "observe_all_playing_games": "Alle lopende spellen bekijken",
+    "enable_notifications_overlay": {
+        "title": "Meldingen inschakelen?",
+        "enable": "Meldingen inschakelen",
+        "later": "Negeren",
+        "you_will_be_notified": "U wordt gemeld:",
+        "also_notified_for": "U wordt ook gemeld voor:",
+        "notifications": {
+            "tournament_checkin_opens": "Wanneer toernooi-inchecken opent",
+            "correspondence_your_turn": "Wanneer het uw beurt is in een correspondentiespel",
+            "rematch": "Wanneer u een rematch-aanbod ontvangt"
+        }
+    },
+    "moderation": "Moderatie",
+    "country_flag": {
+        "title": "Landvlag",
+        "explain": "Toon uw landvlag naast uw bijnaam.",
+        "suggestions": "Gesuggereerd door uw browser:",
+        "all_countries": "Alle landen:",
+        "search_placeholder": "Land zoeken…",
+        "remove": "Vlag verwijderen"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Instellingsmodus",
+        "validate": "Valideren",
+        "undo_placement": "Plaatsing ongedaan maken",
+        "redo_placement": "Plaatsing opnieuw uitvoeren",
+        "alternating_placement": "Afwisselende plaatsing",
+        "place_red_stone": "Rode steen plaatsen",
+        "place_blue_stone": "Blauwe steen plaatsen",
+        "remove_stone": "Steen verwijderen",
+        "mark_cross": "Markeren met een kruis",
+        "mark_triangle": "Markeren met een driehoek",
+        "mark_square": "Markeren met een vierkant",
+        "mark_circle": "Markeren met een cirkel",
+        "highlight_cell": "Cel markeren",
+        "label_text": "Labeltekst",
+        "add_label": "Label toevoegen",
+        "go_back": "Terug gaan",
+        "go_forward": "Vooruit gaan",
+        "delete_branch": "Deze tak verwijderen",
+        "pass_turn": "Beurt overslaan",
+        "change_current_player": "De speler die moet bewegen wijzigen",
+        "win_rate": "Winst%",
+        "policy": "Beleid",
+        "policy_show_numbers": "Beleidsnummers tonen",
+        "policy_show_best_mark": "Beste zet markeren",
+        "autoplay": "Automatisch afspelen",
+        "evaluation": "Evaluatie",
+        "engine": "Motor",
+        "move_history": "Zetgeschiedenis",
+        "current_analysis": "Huidige analyse",
+        "load": "Laden",
+        "save": "Opslaan",
+        "download_sgf": "Downloaden als SGF",
+        "analysis_json_load": "Analyse laden (JSON)",
+        "analysis_json_save": "Analyse opslaan (JSON)",
+        "import": "Importeren",
+        "new_analysis": "Nieuwe analyse",
+        "new": "Nieuw",
+        "import_a_game": "Elk Hex-spel importeren",
+        "format_not_supported": "Onbekend formaat.",
+        "import_placeholder": "URL, HexWorld-link, zetnotatie...",
+        "formats_supported": "Ondersteunde formaten",
+        "move_list": "Zetlijst",
+        "playhex_link": "PlayHex-link",
+        "hexworld_link": "HexWorld-link",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Kopiëren van \"Debuginformatie\" onder het speelbord"
     }
 }

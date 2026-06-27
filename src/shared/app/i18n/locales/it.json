@@ -49,7 +49,9 @@
         "more_options": "Più opzioni"
     },
     "player_settings": {
-        "title": "Impostazioni"
+        "title": "Impostazioni",
+        "change_avatar": "Cambia avatar",
+        "crop_avatar": "Regola avatar"
     },
     "background_theme": {
         "title": "Tema",
@@ -620,10 +622,14 @@
         "details": "Dettagli",
         "related_messages": "Messaggi correlati",
         "acknowledge": "Ho letto e compreso",
-        "scroll_hint": "Leggi e accetta sotto"
+        "scroll_hint": "Leggi e accetta sotto",
+        "nickname_moderated_title": "Nickname moderato",
+        "nickname_moderated_body": "Il tuo nickname \"{{former}}\" è stato moderato in \"{{moderated}}\". Puoi ancora accedere con il tuo login attuale, ma il nickname del tuo giocatore è cambiato."
     },
     "moderation_reason": {
-        "chat_insults": "Insulti o comportamento inappropriato in chat"
+        "chat_insults": "Insulti o comportamento inappropriato in chat",
+        "avatar_inappropriate": "Avatar inappropriato",
+        "nickname_inappropriate": "Nickname inappropriato"
     },
     "player_loses_reason": {
         "default": "{player} perde.",
@@ -631,5 +637,83 @@
         "time": "{player} esaurisce il tempo.",
         "resign": "{player} si arrende.",
         "forfeit": "{player} perde per forfait."
+    },
+    "opponent_must_be_registered": "Solo giocatori registrati",
+    "opponent_must_be_registered_help": "Gli ospiti non possono partecipare a questa partita. Solo i giocatori con un account sono ammessi.",
+    "cannot_join_registered_only": "Questa partita è riservata ai giocatori con un account. Crea un account o accedi per partecipare.",
+    "view_games": "Visualizza partite",
+    "lobby_playing_now_short": "In corso",
+    "lobby_no_correspondence_games_now": "Nessuna partita per corrispondenza in corso.",
+    "lobby_observe_live": "Osserva le partite in diretta",
+    "observe_all_playing_games": "Osserva tutte le partite in corso",
+    "enable_notifications_overlay": {
+        "title": "Abilitare le notifiche?",
+        "enable": "Abilita notifiche",
+        "later": "Ignora",
+        "you_will_be_notified": "Riceverai notifiche:",
+        "also_notified_for": "Riceverai anche notifiche per:",
+        "notifications": {
+            "tournament_checkin_opens": "Quando si apre il check-in del torneo",
+            "correspondence_your_turn": "Quando è il tuo turno in una partita per corrispondenza",
+            "rematch": "Quando ricevi un'offerta di rivincita"
+        }
+    },
+    "moderation": "Moderazione",
+    "country_flag": {
+        "title": "Bandiera del paese",
+        "explain": "Mostra la bandiera del tuo paese accanto al tuo nickname.",
+        "suggestions": "Suggerito dal tuo browser:",
+        "all_countries": "Tutti i paesi:",
+        "search_placeholder": "Cerca paese…",
+        "remove": "Rimuovi bandiera"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Modalità configurazione",
+        "validate": "Valida",
+        "undo_placement": "Annulla posizionamento",
+        "redo_placement": "Ripeti posizionamento",
+        "alternating_placement": "Posizionamento alternato",
+        "place_red_stone": "Posiziona una pietra rossa",
+        "place_blue_stone": "Posiziona una pietra blu",
+        "remove_stone": "Rimuovi una pietra",
+        "mark_cross": "Segna con una croce",
+        "mark_triangle": "Segna con un triangolo",
+        "mark_square": "Segna con un quadrato",
+        "mark_circle": "Segna con un cerchio",
+        "highlight_cell": "Evidenzia cella",
+        "label_text": "Testo etichetta",
+        "add_label": "Aggiungi etichetta",
+        "go_back": "Indietro",
+        "go_forward": "Avanti",
+        "delete_branch": "Elimina questo ramo",
+        "pass_turn": "Passa il turno",
+        "change_current_player": "Cambia il giocatore che deve muovere",
+        "win_rate": "Vittorie%",
+        "policy": "Politica",
+        "policy_show_numbers": "Mostra numeri di politica",
+        "policy_show_best_mark": "Segna la mossa migliore",
+        "autoplay": "Riproduzione automatica",
+        "evaluation": "Valutazione",
+        "engine": "Motore",
+        "move_history": "Cronologia mosse",
+        "current_analysis": "Analisi corrente",
+        "load": "Carica",
+        "save": "Salva",
+        "download_sgf": "Scarica come SGF",
+        "analysis_json_load": "Carica analisi (JSON)",
+        "analysis_json_save": "Salva analisi (JSON)",
+        "import": "Importa",
+        "new_analysis": "Nuova analisi",
+        "new": "Nuovo",
+        "import_a_game": "Importa qualsiasi partita Hex",
+        "format_not_supported": "Formato non riconosciuto.",
+        "import_placeholder": "URL, link HexWorld, notazione mosse...",
+        "formats_supported": "Formati supportati",
+        "move_list": "Lista mosse",
+        "playhex_link": "Link PlayHex",
+        "hexworld_link": "Link HexWorld",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Copia da \"Informazioni di debug\" sotto la scacchiera"
     }
 }

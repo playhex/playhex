@@ -49,7 +49,9 @@
         "less_options": "Weniger Optionen"
     },
     "player_settings": {
-        "title": "Einstellungen"
+        "title": "Einstellungen",
+        "change_avatar": "Avatar ändern",
+        "crop_avatar": "Avatar anpassen"
     },
     "background_theme": {
         "light": "Hell",
@@ -621,9 +623,91 @@
         "details": "Details",
         "related_messages": "Zugehörige Nachrichten",
         "acknowledge": "Ich habe gelesen und verstanden",
-        "scroll_hint": "Unten lesen und akzeptieren"
+        "scroll_hint": "Unten lesen und akzeptieren",
+        "nickname_moderated_title": "Spitzname moderiert",
+        "nickname_moderated_body": "Ihr Spitzname \"{{former}}\" wurde zu \"{{moderated}}\" moderiert. Sie können sich weiterhin mit Ihrem tatsächlichen Login anmelden, aber der Spitzname Ihres Spielers hat sich geändert."
     },
     "moderation_reason": {
-        "chat_insults": "Beleidigungen oder unangemessenes Verhalten im Chat"
+        "chat_insults": "Beleidigungen oder unangemessenes Verhalten im Chat",
+        "avatar_inappropriate": "Unangemessener Avatar",
+        "nickname_inappropriate": "Unangemessener Spitzname"
+    },
+    "opponent_must_be_registered": "Nur registrierte Spieler",
+    "opponent_must_be_registered_help": "Gäste können diesem Spiel nicht beitreten. Nur Spieler mit einem Konto sind erlaubt.",
+    "cannot_join_registered_only": "Dieses Spiel ist auf Spieler mit einem Konto beschränkt. Erstellen Sie ein Konto oder melden Sie sich an, um teilzunehmen.",
+    "view_games": "Spiele anzeigen",
+    "lobby_playing_now_short": "Spielt",
+    "lobby_no_correspondence_games_now": "Derzeit kein Korrespondenzspiel im Gange.",
+    "lobby_observe_live": "Live-Spiele beobachten",
+    "observe_all_playing_games": "Alle laufenden Spiele beobachten",
+    "enable_notifications_overlay": {
+        "title": "Benachrichtigungen aktivieren?",
+        "enable": "Benachrichtigungen aktivieren",
+        "later": "Ignorieren",
+        "you_will_be_notified": "Sie werden benachrichtigt:",
+        "also_notified_for": "Sie werden auch benachrichtigt für:",
+        "notifications": {
+            "tournament_checkin_opens": "Wenn der Turnier-Check-in öffnet",
+            "correspondence_your_turn": "Wenn Sie in einem Korrespondenzspiel an der Reihe sind",
+            "rematch": "Wenn Sie ein Rückkampf-Angebot erhalten"
+        }
+    },
+    "moderation": "Moderation",
+    "country_flag": {
+        "title": "Landesflagge",
+        "explain": "Zeigen Sie Ihre Landesflagge neben Ihrem Spitznamen an.",
+        "suggestions": "Von Ihrem Browser vorgeschlagen:",
+        "all_countries": "Alle Länder:",
+        "search_placeholder": "Land suchen…",
+        "remove": "Flagge entfernen"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Einrichtungsmodus",
+        "validate": "Validieren",
+        "undo_placement": "Platzierung rückgängig machen",
+        "redo_placement": "Platzierung wiederholen",
+        "alternating_placement": "Abwechselnde Platzierung",
+        "place_red_stone": "Roten Stein platzieren",
+        "place_blue_stone": "Blauen Stein platzieren",
+        "remove_stone": "Stein entfernen",
+        "mark_cross": "Mit einem Kreuz markieren",
+        "mark_triangle": "Mit einem Dreieck markieren",
+        "mark_square": "Mit einem Quadrat markieren",
+        "mark_circle": "Mit einem Kreis markieren",
+        "highlight_cell": "Zelle hervorheben",
+        "label_text": "Beschriftungstext",
+        "add_label": "Beschriftung hinzufügen",
+        "go_back": "Zurück",
+        "go_forward": "Vorwärts",
+        "delete_branch": "Diesen Zweig löschen",
+        "pass_turn": "Zug auslassen",
+        "change_current_player": "Den ziehenden Spieler ändern",
+        "win_rate": "Gewinnrate%",
+        "policy": "Richtlinie",
+        "policy_show_numbers": "Richtliniennummern anzeigen",
+        "policy_show_best_mark": "Besten Zug markieren",
+        "autoplay": "Automatische Wiedergabe",
+        "evaluation": "Bewertung",
+        "engine": "Engine",
+        "move_history": "Zughistorie",
+        "current_analysis": "Aktuelle Analyse",
+        "load": "Laden",
+        "save": "Speichern",
+        "download_sgf": "Als SGF herunterladen",
+        "analysis_json_load": "Analyse laden (JSON)",
+        "analysis_json_save": "Analyse speichern (JSON)",
+        "import": "Importieren",
+        "new_analysis": "Neue Analyse",
+        "new": "Neu",
+        "import_a_game": "Beliebiges Hex-Spiel importieren",
+        "format_not_supported": "Unbekanntes Format.",
+        "import_placeholder": "URL, HexWorld-Link, Zugnotation...",
+        "formats_supported": "Unterstützte Formate",
+        "move_list": "Zugliste",
+        "playhex_link": "PlayHex-Link",
+        "hexworld_link": "HexWorld-Link",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Aus \"Debugging-Informationen\" unter dem Spielbrett kopieren"
     }
 }
