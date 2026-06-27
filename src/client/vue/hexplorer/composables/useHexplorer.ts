@@ -9,7 +9,7 @@ import { PlayerSettingsFacade } from '../../../services/board-view-facades/Playe
 import { PolicyOverlayFacade } from '../../../../shared/pixi-board/facades/PolicyOverlayFacade.js';
 import { UndoableActionsStack } from '../undoredo/undoredo.js';
 import { coordsToMove, Move } from '../../../../shared/move-notation/move-notation.js';
-import { onKeyDown } from '@vueuse/core';
+import { onKeyDown, useEventListener } from '@vueuse/core';
 import { createHexplorerState, HexplorerState } from '../HexplorerState.js';
 import { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
 import { GameTree, ROOT_ID, SetupStone, TreeNode } from '../GameTree.js';
@@ -18,6 +18,7 @@ import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { onBeforeRouteLeave } from 'vue-router';
 import { BoardMarksLayer, MarkType } from '../BoardMarksLayer.js';
 import { PlaceMarkTool } from '../tools/PlaceMarkTool.js';
+import { UndoableAction } from '../undoredo/undoredo.js';
 import { gameTreeToSgf } from '../exportSgf.js';
 import { sgfToString } from '../../../../shared/sgf/index.js';
 import { downloadString } from '../../../services/fileDownload.js';
@@ -62,6 +63,49 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     let playingGameFacade: PlayingGameFacade = null!;
     let policyOverlayFacade: PolicyOverlayFacade = null!;
     let marksLayer: BoardMarksLayer = null!;
+
+    // Drag-paint state for the select tool: tracks whether a drag is in progress,
+    // the value being painted (true = select, false = deselect), and which cells
+    // were changed during the drag along with their previous values (for undo).
+    let isDragPainting = false;
+    let dragValue: boolean | null = null;
+    const dragChangedCells = new Map<Move, boolean>();
+
+    const endDragPainting = async (): Promise<void> => {
+        if (!isDragPainting || dragChangedCells.size === 0) {
+            isDragPainting = false;
+            return;
+        }
+
+        const changedEntries = [...dragChangedCells.entries()];
+        const newValue = dragValue!;
+
+        isDragPainting = false;
+        dragValue = null;
+        dragChangedCells.clear();
+
+        // Revert live changes so actionsStack.pushAndDo can re-apply them cleanly.
+        for (const [move, previousValue] of changedEntries) {
+            marksLayer.setSelected(move, previousValue);
+        }
+
+        const action: UndoableAction = {
+            do: () => {
+                for (const [move] of changedEntries) {
+                    marksLayer.setSelected(move, newValue);
+                }
+            },
+            undo: () => {
+                for (const [move, previousValue] of changedEntries) {
+                    marksLayer.setSelected(move, previousValue);
+                }
+            },
+        };
+
+        await actionsStack.value.pushAndDo(action);
+    };
+
+    useEventListener(document, 'pointerup', endDragPainting);
 
     // Reactive ref exposed to the template
     const gameViewRef = shallowRef<GameView>(null!);
@@ -686,8 +730,30 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
         new PlayerSettingsFacade(gameView);
 
+        gameView.on('hexPointerDown', move => {
+            if (!state.value.setupMode) return;
+            if (!(currentTool.value instanceof PlaceMarkTool) || currentTool.value.markType !== 'select') return;
+
+            isDragPainting = true;
+            dragValue = !marksLayer.isSelected(move);
+            dragChangedCells.clear();
+            dragChangedCells.set(move, marksLayer.isSelected(move));
+            marksLayer.setSelected(move, dragValue);
+        });
+
+        gameView.on('hexHovered', move => {
+            if (!isDragPainting || dragValue === null) return;
+            if (dragChangedCells.has(move)) return;
+
+            dragChangedCells.set(move, marksLayer.isSelected(move));
+            marksLayer.setSelected(move, dragValue);
+        });
+
         gameView.on('hexClicked', async move => {
             if (state.value.setupMode) {
+                // select tool is handled entirely via hexPointerDown + drag; skip here
+                if (currentTool.value instanceof PlaceMarkTool && currentTool.value.markType === 'select') return;
+
                 const action = currentTool.value.createUndoableAction(move);
                 if (action !== null) {
                     await actionsStack.value.pushAndDo(action);
@@ -706,6 +772,10 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
      * resetting the whole tree back to its root.
      */
     const rebuildBoard = async (boardsize: number): Promise<void> => {
+        isDragPainting = false;
+        dragValue = null;
+        dragChangedCells.clear();
+
         playingGameFacade?.destroy();
         gameView?.destroy();
 

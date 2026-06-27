@@ -30,6 +30,16 @@ type GameViewEvents = {
     hexClickedSecondary: (move: Move) => void;
 
     /**
+     * Pointer pressed down on a hex (fires before hexClicked).
+     */
+    hexPointerDown: (move: Move) => void;
+
+    /**
+     * Pointer moved over a hex (fires during hover or drag).
+     */
+    hexHovered: (move: Move) => void;
+
+    /**
      * Board orientation changed.
      */
     orientationChanged: () => void;
@@ -601,6 +611,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
                 this.hexes[row][col] = hex;
 
                 hexesContainer.addChild(hex);
+
+                hex.on('pointerdown', () => {
+                    this.emit('hexPointerDown', coordsToMove({ row, col }));
+                });
+
+                hex.on('pointerover', () => {
+                    this.emit('hexHovered', coordsToMove({ row, col }));
+                });
 
                 hex.on('touchstart', () => {
                     this.longPressTimeout = setTimeout(() => {
