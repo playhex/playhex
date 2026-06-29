@@ -1,6 +1,7 @@
 import { t } from 'i18next';
 import TimeControlType from '../time-control/TimeControlType.js';
 import { TimeControlBoardsize } from './models/TimeControlBoardsize.js';
+import PlayerFavoriteTimeControl from './models/PlayerFavoriteTimeControl.js';
 
 /**
  * Returns average seconds per move
@@ -33,7 +34,14 @@ export const calcAverageSecondsPerMove = (timeControlBoardsize: TimeControlBoard
     }
 };
 
+/**
+ * Separate families of cadencies, as separated on loby
+ */
+export type TimeControlCadency = 'live' | 'correspondence';
 
+/**
+ * Cadencies as separated for icons, which makes a distinction between live-normal and live-blitz
+ */
 export type TimeControlCadencyName = 'blitz' | 'normal' | 'correspondence';
 
 /**
@@ -323,33 +331,25 @@ export const defaultTimeControlTypes: {
     fast: {
         family: 'fischer',
         options: {
-            initialTime: 300 * 1000,
-            timeIncrement: 2 * 1000,
+            initialTime: 2 * 60 * 1000,
+            timeIncrement: 5 * 1000,
         },
     },
     normal: {
         family: 'fischer',
         options: {
-            initialTime: 600 * 1000,
-            timeIncrement: 5 * 1000,
+            initialTime: 5 * 60 * 1000,
+            timeIncrement: 10 * 1000,
         },
     },
     long: {
         family: 'fischer',
         options: {
-            initialTime: 1800 * 1000,
-            timeIncrement: 15 * 1000,
+            initialTime: 10 * 60 * 1000,
+            timeIncrement: 20 * 1000,
         },
     },
     correspondenceFast: {
-        family: 'fischer',
-        options: {
-            initialTime: DAY_MS,
-            timeIncrement: DAY_MS,
-            maxTime: DAY_MS,
-        },
-    },
-    correspondenceNormal: {
         family: 'fischer',
         options: {
             initialTime: 3 * DAY_MS,
@@ -357,15 +357,39 @@ export const defaultTimeControlTypes: {
             maxTime: 3 * DAY_MS,
         },
     },
+    correspondenceNormal: {
+        family: 'fischer',
+        options: {
+            initialTime: 5 * DAY_MS,
+            timeIncrement: DAY_MS,
+            maxTime: 5 * DAY_MS,
+        },
+    },
     correspondenceLong: {
         family: 'fischer',
         options: {
             initialTime: 7 * DAY_MS,
-            timeIncrement: DAY_MS,
+            timeIncrement: 2 * DAY_MS,
             maxTime: 7 * DAY_MS,
         },
     },
 };
+
+const livePresetName = (key: 'fast' | 'normal' | 'long', tc: TimeControlType): string => {
+    const opts = tc.options as { initialTime: number, timeIncrement?: number };
+    const mins = Math.round(opts.initialTime / 60000);
+    const secs = Math.round((opts.timeIncrement ?? 0) / 1000);
+    return secs > 0 ? `${t(`time_control.${key}`)} ${mins} + ${secs}` : `${t(`time_control.${key}`)} ${mins}`;
+};
+
+export const getDefaultFavoriteTimeControls = (): PlayerFavoriteTimeControl[] => [
+    { name: livePresetName('fast', defaultTimeControlTypes.fast), cadency: 'live', timeControlType: defaultTimeControlTypes.fast, order: 0 },
+    { name: livePresetName('normal', defaultTimeControlTypes.normal), cadency: 'live', timeControlType: defaultTimeControlTypes.normal, order: 1 },
+    { name: livePresetName('long', defaultTimeControlTypes.long), cadency: 'live', timeControlType: defaultTimeControlTypes.long, order: 2 },
+    { name: null, cadency: 'correspondence', timeControlType: defaultTimeControlTypes.correspondenceFast, order: 3 },
+    { name: null, cadency: 'correspondence', timeControlType: defaultTimeControlTypes.correspondenceNormal, order: 4 },
+    { name: null, cadency: 'correspondence', timeControlType: defaultTimeControlTypes.correspondenceLong, order: 5 },
+];
 
 /**
  * Get step number from initialTime within the given steps array.

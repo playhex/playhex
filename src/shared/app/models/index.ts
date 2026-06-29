@@ -22,6 +22,7 @@ import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
 import PlayerIp from './PlayerIp.js';
+import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import Premove from './Premove.js';
@@ -55,6 +56,7 @@ export {
     OnlinePlayer,
     Player,
     PlayerAccountPassword,
+    PlayerFavoriteTimeControl,
     PlayerIp,
     PlayerModerationAction,
     PlayerNotification,
@@ -91,6 +93,7 @@ export const entities = {
     OnlinePlayers,
     Player,
     PlayerAccountPassword,
+    PlayerFavoriteTimeControl,
     PlayerIp,
     PlayerModerationAction,
     PlayerNotification,

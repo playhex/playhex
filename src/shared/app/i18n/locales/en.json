@@ -81,7 +81,11 @@
         "periods_time": "Periods time",
         "fast": "Fast",
         "normal": "Normal",
-        "long": "Long"
+        "long": "Long",
+        "last": "last",
+        "edit_presets": "Reorganize",
+        "edit_presets_title": "Reorganize presets",
+        "no_presets": "No presets"
     },
     "i_play": {
         "title": "I play",

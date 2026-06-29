@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { apiGetActiveGames } from '../../apiClient.js';
-import { isLive, isCorrespondence } from '../../../shared/app/timeControlUtils.js';
+import { isLive, isCorrespondence, TimeControlCadency } from '../../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../../shared/app/hostedGameUtils.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
@@ -27,7 +27,7 @@ const router = useRouter();
 const route = useRoute();
 const currentLobby = computed(() => route.params.mode === 'correspondence' ? 'correspondence' : 'live');
 const sort = ref<SortKey>(route.params.mode === 'correspondence' ? 'most-moves' : 'recently-started');
-const setLobby = (mode: 'live' | 'correspondence') => router.push({ name: 'playing-games', params: { mode } });
+const setLobby = (mode: TimeControlCadency) => router.push({ name: 'playing-games', params: { mode } });
 
 onMounted(async () => {
     const games = await apiGetActiveGames();

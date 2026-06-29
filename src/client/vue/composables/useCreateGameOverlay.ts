@@ -7,6 +7,7 @@ import { apiPostGame } from '../../apiClient.js';
 import Create1vAIRankedOverlay from '../components/overlay/Create1vAIRankedOverlay.vue';
 import Create1vAIOverlay from '../components/overlay/Create1vAIOverlay.vue';
 import { createGameOptionsFromUrlHash } from '../../services/create-game-options-from-url-hash.js';
+import usePlayerFavoriteTimeControlsStore from '../../stores/playerFavoriteTimeControlsStore.js';
 
 export const allowRankedBotGames: boolean = ALLOW_RANKED_BOT_GAMES === 'true';
 
@@ -17,6 +18,7 @@ const create1vAIOverlay = defineOverlay(Create1vAIOverlay);
 
 export const useCreateGameOverlay = () => {
     const router = useRouter();
+    const { setLastCustomTimeControl } = usePlayerFavoriteTimeControlsStore();
 
     const goToGame = async (gameId: string) => {
         await router.push({
@@ -37,6 +39,7 @@ export const useCreateGameOverlay = () => {
 
         try {
             gameOptions = await create1v1RankedOverlay({ gameOptions });
+            setLastCustomTimeControl(gameOptions.timeControlType);
 
             const hostedGame = await apiPostGame(gameOptions);
             await goToGame(hostedGame.publicId);
@@ -55,6 +58,7 @@ export const useCreateGameOverlay = () => {
 
         try {
             gameOptions = await create1v1FriendlyOverlay({ gameOptions });
+            setLastCustomTimeControl(gameOptions.timeControlType);
 
             const hostedGame = await apiPostGame(gameOptions);
             await goToGame(hostedGame.publicId);
@@ -73,6 +77,7 @@ export const useCreateGameOverlay = () => {
 
         try {
             gameOptions = await create1vAIRankedOverlay({ gameOptions });
+            setLastCustomTimeControl(gameOptions.timeControlType);
 
             const hostedGame = await apiPostGame(gameOptions);
             await goToGame(hostedGame.publicId);
@@ -91,6 +96,7 @@ export const useCreateGameOverlay = () => {
 
         try {
             gameOptions = await create1vAIOverlay({ gameOptions });
+            setLastCustomTimeControl(gameOptions.timeControlType);
 
             const hostedGame = await apiPostGame(gameOptions);
             await goToGame(hostedGame.publicId);

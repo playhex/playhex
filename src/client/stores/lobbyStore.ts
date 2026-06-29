@@ -6,7 +6,7 @@ import { computed, ref, watchEffect } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
 import { cancelGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
-import { isCorrespondence, isLive } from '../../shared/app/timeControlUtils.js';
+import { isCorrespondence, isLive, TimeControlCadency } from '../../shared/app/timeControlUtils.js';
 
 /**
  * Do not hide games directly from lobby when game started or canceled,
@@ -50,7 +50,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
      */
     const endedHostedGames = ref<HostedGame[]>([]);
 
-    const currentLobby = ref<'live' | 'correspondence'>('live');
+    const currentLobby = ref<TimeControlCadency>('live');
 
     const waitingGamesCount = computed<{ live: number, correspondence: number }>(() => {
         const count = { live: 0, correspondence: 0 };

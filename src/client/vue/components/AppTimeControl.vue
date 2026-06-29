@@ -1,17 +1,28 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import { IconCalendar, IconLightningChargeFill } from '../icons.js';
-import { DAY_MS, correspondenceInitialTimeSteps, correspondenceSecondaryTimeSteps, defaultTimeControlTypes, getInitialTimeStep, getSecondaryTimeStep, isSameTimeControlType, liveInitialTimeSteps, liveSecondaryTimeSteps, msToDuration } from '../../../shared/app/timeControlUtils.js';
-import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { t } from 'i18next';
+import { defineOverlay } from '@overlastic/vue';
+import { IconCalendar, IconLightningChargeFill, IconPencilSquare, IconSave2 } from '../icons.js';
+import { DAY_MS, TimeControlCadency, correspondenceInitialTimeSteps, correspondenceSecondaryTimeSteps, defaultTimeControlTypes, getInitialTimeStep, getSecondaryTimeStep, isSameTimeControlType, liveInitialTimeSteps, liveSecondaryTimeSteps, msToDuration, timeControlToString } from '../../../shared/app/timeControlUtils.js';
+import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import useLobbyStore from '../../stores/lobbyStore.js';
+import usePlayerFavoriteTimeControlsStore from '../../stores/playerFavoriteTimeControlsStore.js';
+import useAuthStore from '../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
+import EditFavoriteTimeControlsOverlay from './overlay/EditFavoriteTimeControlsOverlay.vue';
 
 const timeControlType = defineModel<TimeControlType>({
     required: true,
 });
 
 const { currentLobby } = storeToRefs(useLobbyStore());
+const { loggedInPlayer } = storeToRefs(useAuthStore());
+
+const playerFavoriteStore = usePlayerFavoriteTimeControlsStore();
+const { favoriteTimeControls, lastCustomLive, lastCustomCorrespondence } = storeToRefs(playerFavoriteStore);
+const { getBaseForCadency, saveFavoriteTimeControl, replaceFavoriteTimeControls } = playerFavoriteStore;
+
+const editFavoriteTimeControlsOverlay = defineOverlay(EditFavoriteTimeControlsOverlay);
 
 const currentInitialTimeSteps = computed(() =>
     currentLobby.value === 'live' ? liveInitialTimeSteps : correspondenceInitialTimeSteps,
@@ -21,21 +32,23 @@ const currentSecondaryTimeSteps = computed(() =>
     currentLobby.value === 'live' ? liveSecondaryTimeSteps : correspondenceSecondaryTimeSteps,
 );
 
-const liveSuggestedTimeControls: { label: string, timeControl: TimeControlType }[] = [
-    { label: `${t('time_control.fast')} 5 + 2`, timeControl: defaultTimeControlTypes.fast },
-    { label: `${t('time_control.normal')} 10 + 5`, timeControl: defaultTimeControlTypes.normal },
-    { label: `${t('time_control.long')} 30 + 15`, timeControl: defaultTimeControlTypes.long },
-];
+const suggestedTimeControls = computed((): { label: string, timeControl: TimeControlType }[] => {
+    const last = currentLobby.value === 'live' ? lastCustomLive.value : lastCustomCorrespondence.value;
 
-const correspondenceSuggestedTimeControls: { label: string, timeControl: TimeControlType }[] = [
-    { label: `${t('time_control.fast')} 1d + 1d`, timeControl: defaultTimeControlTypes.correspondenceFast },
-    { label: `${t('time_control.normal')} 3d + 1d`, timeControl: defaultTimeControlTypes.correspondenceNormal },
-    { label: `${t('time_control.long')} 7d + 1d`, timeControl: defaultTimeControlTypes.correspondenceLong },
-];
+    return favoriteTimeControls.value
+        .filter(f => f.cadency === currentLobby.value)
+        .map(f => {
+            const isLast = last !== null && isSameTimeControlType(f.timeControlType, last.timeControlType);
+            const base = f.name ?? timeControlToString(f.timeControlType);
+            return {
+                label: isLast ? `${base} (${t('time_control.last')})` : base,
+                timeControl: f.timeControlType,
+            };
+        })
+    ;
+});
 
-const suggestedTimeControls = computed(() =>
-    currentLobby.value === 'live' ? liveSuggestedTimeControls : correspondenceSuggestedTimeControls,
-);
+const customTimeControl = ref<null | { label: string, timeControl: TimeControlType }>(null);
 
 const capped = ref(false);
 
@@ -66,20 +79,45 @@ const selectTimeControl = (timeControl: TimeControlType): void => {
     secondaryTimeStep.value = getSecondaryTimeStep(timeControl, currentSecondaryTimeSteps.value);
 };
 
-const changeCadence = (newCadence: 'live' | 'correspondence'): void => {
+const changeCadence = (newCadence: TimeControlCadency): void => {
     currentLobby.value = newCadence;
 };
 
-// when currentLobby changes and doesn't match the current time control, reset to default
+// On mount: pre-select last custom if any, otherwise ensure TC matches current cadency
+const initialLast = currentLobby.value === 'live' ? lastCustomLive.value : lastCustomCorrespondence.value;
+if (initialLast !== null) {
+    selectTimeControl(initialLast.timeControlType);
+} else {
+    const currentIsLive = timeControlType.value.options.initialTime < DAY_MS;
+    if (currentLobby.value === 'live' && !currentIsLive) {
+        selectTimeControl(defaultTimeControlTypes.normal);
+    } else if (currentLobby.value === 'correspondence' && currentIsLive) {
+        selectTimeControl(defaultTimeControlTypes.correspondenceNormal);
+    }
+}
+
+// When cadency changes and TC doesn't match, switch to last custom or default
 watch(currentLobby, lobby => {
     const currentIsLive = timeControlType.value.options.initialTime < DAY_MS;
 
     if (lobby === 'live' && !currentIsLive) {
-        selectTimeControl(defaultTimeControlTypes.normal);
+        selectTimeControl(lastCustomLive.value?.timeControlType ?? defaultTimeControlTypes.normal);
     } else if (lobby === 'correspondence' && currentIsLive) {
-        selectTimeControl(defaultTimeControlTypes.correspondenceNormal);
+        selectTimeControl(lastCustomCorrespondence.value?.timeControlType ?? defaultTimeControlTypes.correspondenceNormal);
     }
-}, { immediate: true });
+});
+
+// track custom time control: update when sliders produce a non-preset value, freeze otherwise
+watch(timeControlType, tc => {
+    if (suggestedTimeControls.value.some(({ timeControl }) => isSameTimeControlType(tc, timeControl))) {
+        return;
+    }
+
+    customTimeControl.value = {
+        label: timeControlToString(tc),
+        timeControl: { family: tc.family, options: { ...tc.options } } as TimeControlType,
+    };
+});
 
 // update initialTime when sliding
 watch(initialTimeStep, step => {
@@ -115,6 +153,40 @@ watch(capped, isCapped => {
         : undefined
     ;
 });
+
+// clear customTimeControl if it's now part of the saved favorites (e.g. after saving)
+watch(suggestedTimeControls, (suggested) => {
+    if (customTimeControl.value !== null && suggested.some(({ timeControl }) => isSameTimeControlType(customTimeControl.value!.timeControl, timeControl))) {
+        customTimeControl.value = null;
+    }
+});
+
+const isSaving = ref(false);
+
+const handleSave = async (): Promise<void> => {
+    if (customTimeControl.value === null || isSaving.value) {
+        return;
+    }
+
+    isSaving.value = true;
+
+    try {
+        await saveFavoriteTimeControl(currentLobby.value, customTimeControl.value.timeControl);
+    } finally {
+        isSaving.value = false;
+    }
+};
+
+const handleEdit = async (): Promise<void> => {
+    const cadency = currentLobby.value;
+
+    try {
+        const updated = await editFavoriteTimeControlsOverlay({ favorites: getBaseForCadency(cadency) });
+        await replaceFavoriteTimeControls(cadency, updated);
+    } catch {
+        // overlay cancelled
+    }
+};
 </script>
 
 <template>
@@ -141,9 +213,38 @@ watch(capped, isCapped => {
         :class="isSameTimeControlType(timeControlType, timeControl)
             ? (currentLobby === 'live' ? 'btn-success' : 'btn-warning')
             : (currentLobby === 'live' ? 'btn-outline-success' : 'btn-outline-warning')"
-        class="btn btn-sm me-2"
+        class="btn btn-sm me-2 mb-2"
         type="button"
     >{{ label }}</button>
+
+    <!-- Custom time control button: shown when sliders produce a value not matching any preset -->
+    <button
+        v-if="customTimeControl !== null"
+        @click="selectTimeControl(customTimeControl.timeControl)"
+        :class="isSameTimeControlType(timeControlType, customTimeControl.timeControl)
+            ? (currentLobby === 'live' ? 'btn-success' : 'btn-warning')
+            : (currentLobby === 'live' ? 'btn-outline-success' : 'btn-outline-warning')"
+        class="btn btn-sm me-2 mb-2"
+        type="button"
+    >{{ customTimeControl.label }}</button>
+
+    <!-- Save / Edit preset buttons -->
+    <div class="d-flex gap-2 mb-2">
+        <button
+            v-if="loggedInPlayer !== null && customTimeControl !== null"
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            :disabled="isSaving"
+            @click="handleSave()"
+        ><IconSave2 /> {{ $t('save') }}</button>
+
+        <button
+            v-if="loggedInPlayer !== null"
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            @click="handleEdit()"
+        ><IconPencilSquare /> {{ $t('time_control.edit_presets') }}</button>
+    </div>
 
     <div class="mt-2">
         <!-- Initial time label -->

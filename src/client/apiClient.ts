@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
@@ -384,6 +384,31 @@ export const apiPatchPlayerSettings = async (playerSettings: PlayerSettings): Pr
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(playerSettings),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetPlayerFavoriteTimeControls = async (): Promise<PlayerFavoriteTimeControl[]> => {
+    const response = await fetch('/api/player-favorite-time-controls', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return response.json();
+};
+
+export const apiPutPlayerFavoriteTimeControls = async (cadency: 'live' | 'correspondence', favorites: PlayerFavoriteTimeControl[]): Promise<void> => {
+    const response = await fetch(`/api/player-favorite-time-controls?cadency=${cadency}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(favorites),
     });
 
     await checkResponse(response);

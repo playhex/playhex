@@ -465,7 +465,11 @@
         "periods_time": "Temps d'une période",
         "fast": "Rapide",
         "normal": "Temps réel",
-        "long": "Lente"
+        "long": "Lente",
+        "last": "dernier",
+        "edit_presets": "Réorganiser",
+        "edit_presets_title": "Réorganiser les favoris",
+        "no_presets": "Aucun favori"
     },
     "i_play": {
         "title": "Je joue",
