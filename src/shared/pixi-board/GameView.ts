@@ -301,7 +301,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         element.appendChild(canvas);
 
         // Allow native page scrolling on mobile. Pixi sets touch-action:none by default.
-        canvas.style.touchAction = 'pan-y';
+        // Prevent being scroll blocked when GameView take most of screen, or to scroll horizontally in "My games" section on lobby
+        canvas.style.touchAction = 'auto';
         canvas.addEventListener('touchmove', () => this.clearLongPressTimeout(), { passive: true });
         canvas.addEventListener('pointercancel', () => this.clearLongPressTimeout());
     }
