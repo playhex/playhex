@@ -6,6 +6,7 @@ import { entities } from '../shared/app/models/index.js';
 import logger from './services/logger.js';
 import { errorToString } from '../shared/app/utils.js';
 import { TypeOrmLogger } from './services/TypeORMLogger.js';
+import { patchAppDataSourceDestroy } from './repositories/typeormUtils.js';
 
 const { DATABASE_URL, DATABASE_LOG_QUERIES_SLOWER_THAN } = process.env;
 
@@ -43,6 +44,8 @@ export const AppDataSource = new DataSource({
         undefined: 'ignore', // to make this example not throw (since typeorm 1.0.0): where { deletedAt: onlyAlive ? IsNull() : undefined }
     },
 });
+
+patchAppDataSourceDestroy(AppDataSource);
 
 AppDataSource.initialize().catch(reason => {
     logger.crit('Could not initialize data source', { reason: errorToString(reason) });
