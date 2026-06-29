@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import 'bootstrap/js/dist/dropdown.js';
 import useLobbyStore from '../../stores/lobbyStore.js';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
-import { Ref, watch, watchEffect } from 'vue';
+import { Ref, watchEffect } from 'vue';
 import useAuthStore from '../../stores/authStore.js';
 import { useRoute, useRouter } from 'vue-router';
 import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
@@ -24,6 +24,8 @@ import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
+import { computeTimeControlAtMoveIndex } from '../../../shared/app/hostedGameUtils.js';
+import { type GameTimeData } from '../../../shared/time-control/TimeControl.js';
 
 const head = injectHead();
 
@@ -37,6 +39,7 @@ const {
     game,
     hostedGame,
     gameView,
+    simulatePlayingGameFacade,
 
     players,
     localPlayerIndex,
@@ -78,6 +81,33 @@ const orientation = useGameViewOrientation(gameView);
 const { localSettings } = usePlayerLocalSettingsStore();
 
 useGame(gameId);
+
+/*
+ * Clock replay: show time remaining at the rewinded position when replaying a finished game.
+ */
+const simulationMainCursor = ref<number>(0);
+
+const onMainCursorChanged = (index: number) => {
+    simulationMainCursor.value = index;
+};
+
+watch(simulatePlayingGameFacade, (facade, oldFacade) => {
+    oldFacade?.off('mainCursorChanged', onMainCursorChanged);
+    if (facade) {
+        simulationMainCursor.value = facade.getMainCursor();
+        facade.on('mainCursorChanged', onMainCursorChanged);
+    } else {
+        simulationMainCursor.value = 0;
+    }
+}, { immediate: true });
+
+const effectiveTimeControlValues = computed<null | GameTimeData>(() => {
+    if (!hostedGame.value?.timeControl) return null;
+    if (!simulatePlayingGameFacade.value || hostedGame.value.state !== 'ended') {
+        return hostedGame.value.timeControl;
+    }
+    return computeTimeControlAtMoveIndex(hostedGame.value, simulationMainCursor.value);
+});
 
 const makeTitle = (hostedGame: HostedGame) => {
     const players = hostedGame.hostedGameToPlayers.map(h => h.player);
@@ -300,7 +330,7 @@ const {
                     v-if="hostedGame"
                     :players
                     :timeControlOptions="hostedGame.timeControlType"
-                    :timeControlValues="hostedGame.timeControl!"
+                    :timeControlValues="effectiveTimeControlValues"
                     :gameView="gameView"
                 />
 

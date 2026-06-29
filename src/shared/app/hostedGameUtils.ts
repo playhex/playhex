@@ -5,6 +5,7 @@ import SearchGamesParameters from './SearchGamesParameters.js';
 import { isCorrespondence, TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 import { GameData } from '../game-engine/normalization.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
+import { createTimeControl } from '../time-control/createTimeControl.js';
 
 export const hasPlayer = (hostedGame: HostedGame, player: Player): boolean => {
     if (hostedGame.host !== null && hostedGame.host.publicId === player.publicId) {
@@ -466,4 +467,39 @@ export const assignEngineGameData = (hostedGame: HostedGame, gameData: GameData)
     hostedGame.startedAt = gameData.startedAt;
     hostedGame.lastMoveAt = gameData.lastMoveAt;
     hostedGame.endedAt = gameData.endedAt;
+};
+
+/**
+ * Compute what the time control state was at a given move index during a finished game replay.
+ * Returns a fully paused GameTimeData snapshot for that position.
+ *
+ * moveIndex 0 = empty board (initial times), moveIndex N = after N moves have been played.
+ */
+export const computeTimeControlAtMoveIndex = (
+    hostedGame: HostedGame,
+    moveIndex: number,
+): GameTimeData => {
+    const { timeControlType, moveTimestamps, endedAt } = hostedGame;
+    const timeControl = createTimeControl(timeControlType);
+
+    if (moveIndex === 0 || moveTimestamps.length === 0) {
+        return timeControl.getValues();
+    }
+
+    const n = Math.min(moveIndex, moveTimestamps.length);
+
+    for (let i = 0; i < n; i++) {
+        if (i === 0) {
+            timeControl.start(moveTimestamps[0], null);
+        }
+        timeControl.push((i % 2) as PlayerIndex, moveTimestamps[i], null);
+    }
+
+    const freezeAt = moveIndex < moveTimestamps.length
+        ? moveTimestamps[moveIndex]
+        : (endedAt ?? moveTimestamps[moveTimestamps.length - 1]);
+
+    timeControl.finish(freezeAt);
+
+    return timeControl.getValues();
 };

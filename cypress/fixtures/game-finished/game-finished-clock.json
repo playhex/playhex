@@ -1,0 +1,129 @@
+{
+    "publicId": "00000000-0000-0000-0000-000000000000",
+    "host": {
+        "pseudo": "Test player",
+        "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "test-player",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "hostedGameToPlayers": [
+        {
+            "player": {
+                "publicId": "determinist-random-bot|5cb5cf43-803e-422f-867d-9e751e5e3758",
+                "pseudo": "Determinist random bot",
+                "slug": "",
+                "isBot": true,
+                "isGuest": false,
+                "createdAt": "2024-01-24T20:18:49.470Z"
+            }
+        },
+        {
+            "player": {
+                "pseudo": "Test player",
+                "publicId": "cec49907-633e-49cb-b720-7dad6c248753",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "test-player",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
+        }
+    ],
+    "timeControl": {
+        "state": "over",
+        "currentPlayer": 0,
+        "players": [
+            {
+                "totalRemainingTime": 59985
+            },
+            {
+                "totalRemainingTime": 49900
+            }
+        ]
+    },
+    "boardsize": 11,
+    "firstPlayer": 1,
+    "swapRule": true,
+    "opponentType": "ai",
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 60000,
+            "timeIncrement": 0
+        }
+    },
+    "chatMessages": [],
+    "state": "ended",
+    "createdAt": "2024-01-24T20:18:49.470Z",
+    "moves": [
+        "g3",
+        "h6",
+        "i3",
+        "i8",
+        "b8",
+        "g6",
+        "d5",
+        "i5",
+        "e7",
+        "k5",
+        "c9",
+        "f6",
+        "e8",
+        "e6",
+        "e3",
+        "d7",
+        "a6",
+        "c6",
+        "h2",
+        "a7",
+        "i10",
+        "b7",
+        "b6",
+        "d6",
+        "c2",
+        "j4",
+        "d4",
+        "e10",
+        "b11",
+        "k4"
+    ],
+    "moveTimestamps": [
+        "2024-01-24T20:18:49.471Z",
+        "2024-01-24T20:18:50.124Z",
+        "2024-01-24T20:18:50.125Z",
+        "2024-01-24T20:18:50.736Z",
+        "2024-01-24T20:18:50.736Z",
+        "2024-01-24T20:18:51.384Z",
+        "2024-01-24T20:18:51.385Z",
+        "2024-01-24T20:18:51.761Z",
+        "2024-01-24T20:18:51.762Z",
+        "2024-01-24T20:18:52.227Z",
+        "2024-01-24T20:18:52.228Z",
+        "2024-01-24T20:18:53.420Z",
+        "2024-01-24T20:18:53.421Z",
+        "2024-01-24T20:18:53.650Z",
+        "2024-01-24T20:18:53.651Z",
+        "2024-01-24T20:18:54.106Z",
+        "2024-01-24T20:18:54.108Z",
+        "2024-01-24T20:18:55.250Z",
+        "2024-01-24T20:18:55.251Z",
+        "2024-01-24T20:18:55.640Z",
+        "2024-01-24T20:18:55.641Z",
+        "2024-01-24T20:18:55.975Z",
+        "2024-01-24T20:18:55.976Z",
+        "2024-01-24T20:18:56.375Z",
+        "2024-01-24T20:18:56.376Z",
+        "2024-01-24T20:18:57.565Z",
+        "2024-01-24T20:18:57.566Z",
+        "2024-01-24T20:18:58.833Z",
+        "2024-01-24T20:18:58.834Z",
+        "2024-01-24T20:18:59.585Z"
+    ],
+    "currentPlayerIndex": 1,
+    "winner": 1,
+    "outcome": "path",
+    "startedAt": "2024-01-24T20:18:49.470Z",
+    "lastMoveAt": "2024-01-24T20:18:59.586Z",
+    "endedAt": "2024-01-24T20:18:59.586Z"
+}
