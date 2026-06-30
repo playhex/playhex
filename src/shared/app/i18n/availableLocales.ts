@@ -36,6 +36,10 @@ export const availableLocales: AvailableLocales = {
         label: '🇸🇦 العربية (Arabic)',
         loader: () => import('date-fns/locale/ar') as unknown as DefaultExportLocale,
     },
+    cs: {
+        label: '🇨🇿 Čeština (Czech)',
+        loader: () => import('date-fns/locale/cs') as unknown as DefaultExportLocale,
+    },
     da: {
         label: '🇩🇰 Dansk (Danish)',
         loader: () => import('date-fns/locale/da') as unknown as DefaultExportLocale,
@@ -76,6 +80,10 @@ export const availableLocales: AvailableLocales = {
     fi: {
         label: '🇫🇮 Suomi (Finnish)',
         loader: () => import('date-fns/locale/fi') as unknown as DefaultExportLocale,
+    },
+    hu: {
+        label: '🇭🇺 Magyar (Hungarian)',
+        loader: () => import('date-fns/locale/hu') as unknown as DefaultExportLocale,
     },
     id: {
         label: '🇮🇩 Indonesia (Indonesian)',
