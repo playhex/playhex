@@ -11,10 +11,6 @@
 
     <%- include('partials/seo-tags.ejs') %>
 
-    <% if (useCDN) { %>
-        <%- include('partials/cdn.ejs') %>
-    <% } %>
-
     <% for(const assetUrl of Object.values(manifest)) { %>
         <% if (assetUrl.endsWith('.css')) { %>
         <link rel="preload" href="<%- assetUrl %>" as="style" onload="this.onload=null;this.rel='stylesheet'">
