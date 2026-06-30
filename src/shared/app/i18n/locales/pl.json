@@ -49,7 +49,9 @@
         "more_options": "Więcej opcji"
     },
     "player_settings": {
-        "title": "Ustawienia"
+        "title": "Ustawienia",
+        "change_avatar": "Zmień awatar",
+        "crop_avatar": "Dostosuj awatar"
     },
     "background_theme": {
         "title": "Motyw",
@@ -69,7 +71,11 @@
         "fast": "Szybka",
         "normal": "Normalna",
         "long": "Długa",
-        "capped_abbreviation": "cap."
+        "capped_abbreviation": "cap.",
+        "last": "ostatni",
+        "edit_presets": "Przeorganizuj",
+        "edit_presets_title": "Przeorganizuj presety",
+        "no_presets": "Brak presetów"
     },
     "i_play": {
         "title": "Gram jako",
@@ -635,9 +641,91 @@
         "details": "Szczegóły",
         "related_messages": "Powiązane wiadomości",
         "acknowledge": "Przeczytałem i rozumiem",
-        "scroll_hint": "Przeczytaj i zaakceptuj poniżej"
+        "scroll_hint": "Przeczytaj i zaakceptuj poniżej",
+        "nickname_moderated_title": "Pseudonim zmodyfikowany",
+        "nickname_moderated_body": "Twój pseudonim „{{former}}” został zmieniony przez moderację na „{{moderated}}”. Nadal możesz logować się swoim właściwym loginem, ale pseudonim gracza został zmieniony."
     },
     "moderation_reason": {
-        "chat_insults": "Obelgi lub niestosowne zachowanie na czacie"
+        "chat_insults": "Obelgi lub niestosowne zachowanie na czacie",
+        "avatar_inappropriate": "Nieodpowiedni awatar",
+        "nickname_inappropriate": "Nieodpowiedni pseudonim"
+    },
+    "opponent_must_be_registered": "Tylko zarejestrowani gracze",
+    "opponent_must_be_registered_help": "Goście nie mogą dołączyć do tej gry. Dozwoleni są tylko gracze posiadający konto.",
+    "cannot_join_registered_only": "Ta gra jest dostępna tylko dla graczy posiadających konto. Utwórz konto lub zaloguj się, aby dołączyć.",
+    "view_games": "Zobacz gry",
+    "lobby_playing_now_short": "Grają",
+    "lobby_no_correspondence_games_now": "Brak aktualnie rozgrywanych gier korespondencyjnych.",
+    "lobby_observe_live": "Obserwuj gry na żywo",
+    "observe_all_playing_games": "Obserwuj wszystkie trwające gry",
+    "enable_notifications_overlay": {
+        "title": "Włączyć powiadomienia?",
+        "enable": "Włącz powiadomienia",
+        "later": "Ignoruj",
+        "you_will_be_notified": "Otrzymasz powiadomienia:",
+        "also_notified_for": "Otrzymasz również powiadomienia:",
+        "notifications": {
+            "tournament_checkin_opens": "Gdy otworzy się meldowanie do turnieju",
+            "correspondence_your_turn": "Gdy nadejdzie twoja kolej w grze korespondencyjnej",
+            "rematch": "Gdy otrzymasz propozycję rewanżu"
+        }
+    },
+    "moderation": "Moderacja",
+    "country_flag": {
+        "title": "Flaga kraju",
+        "explain": "Wyświetlaj flagę swojego kraju obok pseudonimu.",
+        "suggestions": "Sugestie z przeglądarki:",
+        "all_countries": "Wszystkie kraje:",
+        "search_placeholder": "Szukaj kraju…",
+        "remove": "Usuń flagę"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Tryb ustawiania",
+        "validate": "Zatwierdź",
+        "undo_placement": "Cofnij ustawienie",
+        "redo_placement": "Ponów ustawienie",
+        "alternating_placement": "Naprzemienne ustawianie",
+        "place_red_stone": "Postaw czerwony kamień",
+        "place_blue_stone": "Postaw niebieski kamień",
+        "remove_stone": "Usuń kamień",
+        "mark_cross": "Oznacz krzyżykiem",
+        "mark_triangle": "Oznacz trójkątem",
+        "mark_square": "Oznacz kwadratem",
+        "mark_circle": "Oznacz kółkiem",
+        "highlight_cell": "Podświetl pole",
+        "label_text": "Tekst etykiety",
+        "add_label": "Dodaj etykietę",
+        "go_back": "Cofnij",
+        "go_forward": "Dalej",
+        "delete_branch": "Usuń tę gałąź",
+        "pass_turn": "Pomiń ruch",
+        "change_current_player": "Zmień gracza wykonującego ruch",
+        "win_rate": "Wygrana%",
+        "policy": "Strategia",
+        "policy_show_numbers": "Pokaż numery strategii",
+        "policy_show_best_mark": "Oznacz najlepszy ruch",
+        "autoplay": "Auto-odtwarzanie",
+        "evaluation": "Ocena",
+        "engine": "Silnik",
+        "move_history": "Historia ruchów",
+        "current_analysis": "Bieżąca analiza",
+        "load": "Wczytaj",
+        "save": "Zapisz",
+        "download_sgf": "Pobierz jako SGF",
+        "analysis_json_load": "Wczytaj analizę (JSON)",
+        "analysis_json_save": "Zapisz analizę (JSON)",
+        "import": "Importuj",
+        "new_analysis": "Nowa analiza",
+        "new": "Nowy",
+        "import_a_game": "Zaimportuj dowolną grę Hex",
+        "format_not_supported": "Nieznany format.",
+        "import_placeholder": "URL, link HexWorld, notacja ruchów...",
+        "formats_supported": "Obsługiwane formaty",
+        "move_list": "Lista ruchów",
+        "playhex_link": "Link PlayHex",
+        "hexworld_link": "Link HexWorld",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Skopiuj z „Informacji debugowania” pod planszą"
     }
 }
