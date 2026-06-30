@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import HttpBackend from 'i18next-http-backend';
 import { loadDateFnsLocale } from './dateFns.js';
 import { availableLocales } from './availableLocales.js';
+import { applyTextDirection, isRtlLocale, setBootstrapStylesheet } from './rtl.js';
 
 export {
     availableLocales,
@@ -95,9 +96,14 @@ const getSupportedBrowserLocale = (): null | string => {
  */
 export const autoLocale = (): string => getPlayerSelectedLocale() ?? getSupportedBrowserLocale() ?? 'en';
 
+// Switch to the RTL Bootstrap build early (before i18n finishes initializing) when the locale is
+// right-to-left. For LTR locales the stylesheet rendered in the page <head> is kept as-is.
+setBootstrapStylesheet(isRtlLocale(autoLocale()));
+
 const setI18nLanguage = (locale: string) => {
     void i18n.changeLanguage(locale);
     document.querySelector('html')!.setAttribute('lang', locale);
+    applyTextDirection(locale);
 };
 
 const loadLocaleMessages = async (locale: string) => {

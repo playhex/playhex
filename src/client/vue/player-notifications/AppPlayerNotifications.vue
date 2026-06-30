@@ -142,7 +142,7 @@ const ack = async (hostedGamePublicId?: string) => {
 <style lang="stylus" scoped>
 .badge-notifications
     padding 0.2em 0.4em
-    margin-left 0.3em
+    margin-inline-start 0.3em
 
 .player-notifications-container
     position absolute
@@ -150,7 +150,7 @@ const ack = async (hostedGamePublicId?: string) => {
     max-width 100%
     padding 0.5em
     top 3em
-    right 0
+    inset-inline-end 0
     z-index 500
 
     .player-notifications

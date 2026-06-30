@@ -203,8 +203,8 @@ const sortedGames = computed(() => {
             font-size 1em
 
     tr:first-child, td:first-child
-        padding-left 1em
+        padding-inline-start 1em
 
     tr:last-child, td:last-child
-        padding-right 1em
+        padding-inline-end 1em
 </style>

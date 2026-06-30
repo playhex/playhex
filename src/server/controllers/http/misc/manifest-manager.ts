@@ -29,6 +29,8 @@ const flattenViteManifest = (raw: ViteManifest): ManifestType => {
 
 let manifestCache: null | ManifestType = null;
 
+const readRawManifest = (): ViteManifest => JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8')) as ViteManifest;
+
 export function getManifest(): ManifestType {
     if (IS_DEV) {
         return {
@@ -41,12 +43,33 @@ export function getManifest(): ManifestType {
         return manifestCache;
     }
 
-    const raw = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8')) as ViteManifest;
-    manifestCache = flattenViteManifest(raw);
+    manifestCache = flattenViteManifest(readRawManifest());
 
     if (Object.keys(manifestCache).length === 0) {
         throw new Error('manifest.json has no entry or vendor chunks');
     }
 
     return manifestCache;
+}
+
+let bootstrapStylesheetUrlCache: null | string = null;
+
+/**
+ * URL of the (LTR) Bootstrap stylesheet, rendered directly in the page <head> so it loads
+ * without waiting for the JS bundle (avoids a flash of unstyled content). The client swaps it
+ * to the RTL build at runtime for right-to-left locales (see src/shared/app/i18n/rtl.ts).
+ *
+ * Served as a plain file (see registerHttpControllers), with the Bootstrap version as a cache
+ * buster since the service worker caches /statics/ responses indefinitely.
+ */
+export function getBootstrapStylesheetUrl(): string {
+    if (bootstrapStylesheetUrlCache !== null) {
+        return bootstrapStylesheetUrlCache;
+    }
+
+    const { version } = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'node_modules', 'bootstrap', 'package.json'), 'utf-8')) as { version: string };
+
+    bootstrapStylesheetUrlCache = `/statics/bootstrap-css/bootstrap.min.css?v=${version}`;
+
+    return bootstrapStylesheetUrlCache;
 }

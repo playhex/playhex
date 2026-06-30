@@ -113,7 +113,7 @@ const resources: Resource[] = [
         position relative
 
         .illustration
-            margin-right 1em
+            margin-inline-end 1em
             text-align right
 
             min-width 20%

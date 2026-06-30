@@ -1032,10 +1032,10 @@ watch(gameUIMode, () => {
 
         .time
             font-family monospace
-            margin-right 0.5em
+            margin-inline-end 0.5em
 
         .player
-            margin-right 0.5em
+            margin-inline-end 0.5em
 
         .content
             overflow-wrap break-word
@@ -1113,7 +1113,7 @@ watch(gameUIMode, () => {
         text-decoration none
 
         > *
-            margin-left 1em
+            margin-inline-start 1em
 
 .chat-messages
     .chat-header-move

@@ -276,7 +276,7 @@ nav
         position static
         box-shadow none
         padding 0
-        padding-left 1em
+        padding-inline-start 1em
         white-space nowrap
         list-style none
 

@@ -32,6 +32,10 @@ type AvailableLocales = {
  *      https://hosted.weblate.org/projects/playhex/#reports (left menu, JSON, since beginning).
  */
 export const availableLocales: AvailableLocales = {
+    ar: {
+        label: '🇸🇦 العربية (Arabic)',
+        loader: () => import('date-fns/locale/ar') as unknown as DefaultExportLocale,
+    },
     da: {
         label: '🇩🇰 Dansk (Danish)',
         loader: () => import('date-fns/locale/da') as unknown as DefaultExportLocale,

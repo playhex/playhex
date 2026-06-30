@@ -20,6 +20,8 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
     app.use(reflectMetadataRouter());
     app.use('/avatars', express.static(avatarsPath));
+    // Bootstrap CSS (LTR + RTL builds) served as plain files, referenced directly in the page <head>.
+    app.use('/statics/bootstrap-css', express.static(path.join(process.cwd(), 'node_modules', 'bootstrap', 'dist', 'css')));
     registerApi(app);
     app.use(await staticsRouter(httpServer));
     app.use(pwaRouter());

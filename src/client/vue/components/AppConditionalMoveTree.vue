@@ -114,7 +114,7 @@ ul
 
     li.list-inline-item
         vertical-align top
-        margin-right 0
+        margin-inline-end 0
 
     .selected
         background-color rgba(127, 127, 127, 0.2)

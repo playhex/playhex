@@ -585,11 +585,11 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
 .player-btns > *
     margin-bottom 0.5em
-    margin-right 1em
+    margin-inline-end 1em
 
 .avatar-wrapper
     position relative
-    margin-right 1em
+    margin-inline-end 1em
     height 100%
 
     .player-status

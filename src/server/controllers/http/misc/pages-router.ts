@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getManifest } from './manifest-manager.js';
+import { getManifest, getBootstrapStylesheetUrl } from './manifest-manager.js';
 import { seo } from '../../../../shared/app/seo.js';
 
 export function pagesRouter(): Router {
@@ -11,6 +11,7 @@ export function pagesRouter(): Router {
 
         res.render('page.ejs', {
             manifest,
+            bootstrapCssUrl: getBootstrapStylesheetUrl(),
             seo,
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,

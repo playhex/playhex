@@ -621,7 +621,7 @@ const onAnalysisFileSelected = async (event: Event) => {
         top 0
         bottom 0
         right 0
-        margin-right 0.75em
+        margin-inline-end 0.75em
 
     .label-input
         width auto

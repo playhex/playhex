@@ -102,10 +102,10 @@ h4
 
 tr
     td:first-child, th:first-child
-        padding-left 0
+        padding-inline-start 0
 
     td:last-child, th:last-child
-        padding-right 0
+        padding-inline-end 0
 
 .board-container
     width 12em

@@ -182,11 +182,11 @@ const sendMessage = async () => {
 
         .time
             font-family monospace
-            margin-right 0.4em
+            margin-inline-end 0.4em
 
         .player
             font-weight bold
-            margin-right 0.4em
+            margin-inline-end 0.4em
 
         .content
             overflow-wrap break-word
