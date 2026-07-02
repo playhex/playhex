@@ -134,7 +134,7 @@ export const msToDuration = (ms: number, precision = 2): string => {
     ms -= parts[1] * 3600000;
     parts.push(floor(ms / 60000));
     ms -= parts[2] * 60000;
-    parts.push(floor(ms / 1000));
+    parts.push(ms / 1000);
 
     const tokens = [];
 
@@ -269,6 +269,8 @@ export const correspondenceInitialTimeSteps: number[] = [
 
 export const liveSecondaryTimeSteps: number[] = [
     0 * 1000,
+    0.2 * 1000,
+    0.5 * 1000,
     1 * 1000,
     2 * 1000,
     3 * 1000,

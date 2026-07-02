@@ -42,6 +42,8 @@ export const correspondenceInitialTimeSteps: number[] = [
 
 export const liveSecondaryTimeSteps: number[] = [
     0 * 1000,
+    0.2 * 1000,
+    0.5 * 1000,
     1 * 1000,
     2 * 1000,
     3 * 1000,
