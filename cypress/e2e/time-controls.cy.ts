@@ -76,11 +76,8 @@ describe('Time controls', () => {
 
         // Change initial time AFTER checking Capped Fischer to make sure maxTime updates
         // Initial time: 2h
-        cy
-            .get('input#custom-initial-time')
-            .invoke('val', 23)
-            .trigger('input')
-        ;
+        cy.slidePrimaryTimeControl(2, 'h');
+        cy.slideSecondaryTimeControl(2, 's');
 
         cy.contains('Initial time: 2h');
 
@@ -89,8 +86,8 @@ describe('Time controls', () => {
         cy.contains('.sidebar', 'Playing');
         cy.get('.nav-game-sidebar').contains('Info').click();
 
-        cy.contains('2h + 2s cap. 5min').should('not.exist');
-        cy.contains('2h + 2s cap.');
+        cy.contains(/2h \+ 2s cap\. \d/).should('not.exist');
+        cy.contains(/2h \+ 2s cap\./);
     });
 
     it('cancels a game when timeout with only one move', () => {
@@ -128,11 +125,8 @@ describe('Time controls', () => {
         ;
 
         // Initial time: 2d
-        cy
-            .get('input#custom-initial-time')
-            .invoke('val', 1)
-            .trigger('input')
-        ;
+        cy.slidePrimaryTimeControl(2, 'd');
+        cy.slideSecondaryTimeControl(1, 'd');
 
         cy.contains('Initial time: 2d');
 

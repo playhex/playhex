@@ -1,4 +1,7 @@
 /// <reference types="cypress" />
+
+import { correspondenceInitialTimeSteps, correspondenceSecondaryTimeSteps, liveInitialTimeSteps, liveSecondaryTimeSteps, toMs } from './timeControlsSliders';
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -173,4 +176,34 @@ Cypress.Commands.add('receiveGameStarted', fixtureFile => {
 
 Cypress.Commands.add('receiveMoved', (gameId, move, moveIndex, byPlayerIndex) => {
     cy.receiveSocketIoMessage('moved', gameId, { move, playedAt: new Date() }, moveIndex, byPlayerIndex);
+});
+
+Cypress.Commands.add('slidePrimaryTimeControl', (value, unit) => {
+    const ms = toMs(value, unit);
+    let index = liveInitialTimeSteps.indexOf(ms);
+
+    if (index < 0) {
+        index = correspondenceInitialTimeSteps.indexOf(ms);
+    }
+
+    if (index < 0) {
+        throw new Error(`No primary time control value for ${value}${unit} (${ms}ms)`);
+    }
+
+    cy.get('input#custom-initial-time').invoke('val', index).trigger('input');
+});
+
+Cypress.Commands.add('slideSecondaryTimeControl', (value, unit) => {
+    const ms = toMs(value, unit);
+    let index = liveSecondaryTimeSteps.indexOf(ms);
+
+    if (index < 0) {
+        index = correspondenceSecondaryTimeSteps.indexOf(ms);
+    }
+
+    if (index < 0) {
+        throw new Error(`No secondary time control value for ${value}${unit} (${ms}ms)`);
+    }
+
+    cy.get('input#custom-time-increment').invoke('val', index).trigger('input');
 });

@@ -77,5 +77,19 @@ declare namespace Cypress {
          * Pass the player object to include in the broadcasted message.
          */
         mockSendChannelChat(player: object): Chainable;
+
+        /**
+         * When creating a game, slide to select initial time to the given value.
+         * Ex: slidePrimaryTimeControl(10, 'minutes')
+         * Ex: slidePrimaryTimeControl(3, 'days')
+         */
+        slidePrimaryTimeControl(value: number, unit: 's' | 'min' | 'h' | 'd'): Chainable;
+
+        /**
+         * When creating a game, slide to select time increment (or byo yomi period) to the given value.
+         * Ex: slideSecondaryTimeControl(10, 'seconds')
+         * Ex: slideSecondaryTimeControl(1, 'day')
+         */
+        slideSecondaryTimeControl(value: number, unit: 's' | 'min' | 'h' | 'd'): Chainable;
     }
 }

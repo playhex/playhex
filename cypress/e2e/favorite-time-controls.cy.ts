@@ -24,8 +24,8 @@ describe('Favorite time controls', () => {
         modal().contains('Normal 5 + 10 (last)');
 
         // 3. Slide to a custom TC "5min + 30s"
-        cy.get('input#custom-initial-time').invoke('val', 10).trigger('input');
-        cy.get('input#custom-time-increment').invoke('val', 15).trigger('input');
+        cy.slidePrimaryTimeControl(5, 'min');
+        cy.slideSecondaryTimeControl(30, 's');
 
         modal().contains('5min + 30s');
 
