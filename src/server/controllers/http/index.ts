@@ -13,6 +13,7 @@ import { HttpError } from 'routing-controllers';
 import { preRenderedRouter } from './misc/pre-rendered-router.js';
 import { avatarsPath } from '../../services/PlayerAvatarService.js';
 import { ipBanMiddleware } from '../../services/security/ipBanMiddleware.js';
+import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../../services/rate-limiters.js';
 
 export const registerHttpControllers = async (app: Express, httpServer: http.Server): Promise<void> => {
     app.use(ipBanMiddleware);
@@ -40,6 +41,16 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
             res
                 .status(err.httpCode)
                 .send(normalizeDomainHttpError(err))
+                .end()
+            ;
+
+            return;
+        }
+
+        if (err instanceof RateLimitReachedError) {
+            res
+                .status(429)
+                .send(errorToRateLimitReachedErrorPayload(err))
                 .end()
             ;
 

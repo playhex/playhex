@@ -20,6 +20,7 @@ import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 import { isBotGame } from '../../shared/app/hostedGameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
+import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
 
 export class GameError extends Error {}
 
@@ -631,6 +632,9 @@ export default class HostedGameStore
     /**
      * @param publicId HostedGame public id to post message on.
      * @param chatMessage ChatMessage to post, with player, content and date.
+     *
+     * @throws {RateLimitReachedError}
+     * @throws {RateLimiterServerError}
      */
     async postChatMessage(publicId: string, chatMessage: ChatMessage): Promise<string | true>
     {
@@ -640,6 +644,10 @@ export default class HostedGameStore
             if (await this.playerModerationActionRepository.isCurrentlyChatRestricted(chatMessage.player.publicId)) {
                 return 'chat_restricted';
             }
+        }
+
+        if (chatMessage.player) {
+            await rateLimiterConsumeChatMessage(chatMessage.player.publicId);
         }
 
         // shadow delete chat message if player is shadow banned for chat messages

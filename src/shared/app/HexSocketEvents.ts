@@ -5,6 +5,7 @@ import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, HostedGame, Player, Rating } from './models/index.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
+import { WebsocketActionError } from './Types.js';
 
 export type HexClientToServerEvents = {
     /**
@@ -47,7 +48,7 @@ export type HexClientToServerEvents = {
     /**
      * A player send a chat message on a game
      */
-    sendChat: (gameId: string, content: string, answer: (result: true | string) => void) => void;
+    sendChat: (gameId: string, content: string, answer: (error?: WebsocketActionError) => void) => void;
 
     /**
      * I am active.
@@ -77,7 +78,7 @@ export type HexClientToServerEvents = {
     /**
      * A player send a chat message in a channel
      */
-    sendChannelChat: (channel: string, content: string, answer: (result: true | string) => void) => void;
+    sendChannelChat: (channel: string, content: string, answer: (error?: WebsocketActionError) => void) => void;
 };
 
 export type HexServerToClientEvents = {

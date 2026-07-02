@@ -11,6 +11,7 @@ import { IsBoolean } from 'class-validator';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 import { type HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import logger from '../../../services/logger.js';
+import { rateLimiterConsumeCreateGame } from '../../../services/rate-limiters.js';
 
 class AnswerUndoBody
 {
@@ -89,6 +90,8 @@ export default class GameController
         @AuthenticatedPlayer() host: Player,
         @Body() gameOptions: HostedGameOptions,
     ) {
+        await rateLimiterConsumeCreateGame(host.publicId);
+
         try {
             const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions, host }, { persist: false });
 

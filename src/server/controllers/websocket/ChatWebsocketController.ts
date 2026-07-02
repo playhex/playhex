@@ -6,6 +6,7 @@ import { ChatMessage } from '../../../shared/app/models/index.js';
 import { plainToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { validateOrReject } from 'class-validator';
 import logger from '../../services/logger.js';
+import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../../services/rate-limiters.js';
 
 @Service()
 export default class ChatWebsocketController implements WebsocketControllerInterface
@@ -20,7 +21,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
             const { player } = socket.data;
 
             if (player === null) {
-                answer('Player not found');
+                answer({ reason: 'server_error' });
                 return;
             }
 
@@ -39,9 +40,28 @@ export default class ChatWebsocketController implements WebsocketControllerInter
                 return e.message;
             }
 
-            const result = await this.hostedGameStore.postChatMessage(gameId, chatMessage);
+            try {
+                const result = await this.hostedGameStore.postChatMessage(gameId, chatMessage);
 
-            answer(result);
+                if (result !== true) {
+                    answer({ reason: 'client_error', payload: { translationKey: result } });
+                    return;
+                }
+            } catch (e) {
+                if (e instanceof RateLimitReachedError) {
+                    answer({
+                        reason: 'rate_limited',
+                        payload: errorToRateLimitReachedErrorPayload(e),
+                    });
+
+                    return;
+                }
+
+                answer({ reason: 'server_error' });
+                return;
+            }
+
+            answer();
         });
     }
 }

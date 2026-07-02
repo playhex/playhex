@@ -11,6 +11,8 @@ import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 import { ActiveTournamentsFilters } from '../shared/app/tournamentUtils.js';
 import { ConditionalMovesStruct } from '@playhex/pixi-board';
+import { isRateLimitReachedErrorPayload } from '../shared/app/rate-limiters.js';
+import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
 
 /**
  * @throws {DomainHttpError}
@@ -38,6 +40,11 @@ const checkResponse = async (response: Response): Promise<void> => {
 
         if (isDomainHttpErrorPayload(payload)) {
             throw denormalizeDomainHttpError(payload);
+        }
+
+        if (isRateLimitReachedErrorPayload(payload)) {
+            showToastFromRateLimitPayload(payload);
+            throw new Error(payload.type);
         }
 
         if (isValidationError(payload)) {
@@ -275,6 +282,8 @@ export const apiPostGame = async (gameOptions: Partial<HostedGameOptions> = {}):
         },
         body: JSON.stringify(gameOptions),
     });
+
+    await checkResponse(response);
 
     return plainToInstance(HostedGame, await response.json());
 };

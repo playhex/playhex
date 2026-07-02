@@ -5,6 +5,10 @@ import { defineStore } from 'pinia';
 import useAuthStore from './authStore.js';
 import { watch, ref } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
+import { WebsocketActionError } from '../../shared/app/Types.js';
+import { showToastFromRateLimitPayload } from '../services/rate-limiter.js';
+import useToastsStore from './toastsStore.js';
+import { t } from 'i18next';
 
 /**
  * Use global io if overriden, else use normal io.
@@ -56,12 +60,27 @@ const useSocketStore = defineStore('socketStore', () => {
         connected.value = false;
     });
 
+    const handleMessageError = (error: WebsocketActionError, unhandledErrorMessage = 'server error') => {
+        if (error.reason === 'rate_limited') {
+            showToastFromRateLimitPayload(error.payload);
+            return;
+        }
+
+        if (error.reason === 'client_error') {
+            useToastsStore().addToast(t(error.payload.translationKey), { level: 'danger' });
+            return;
+        }
+
+        useToastsStore().addToast(unhandledErrorMessage, { level: 'danger' });
+    };
+
     return {
         socket,
         connected,
         joinRoom,
         leaveRoom,
         reconnectSocket,
+        handleMessageError,
     };
 });
 

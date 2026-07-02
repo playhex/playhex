@@ -942,13 +942,14 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 throw new Error('no hostedGame');
             }
 
-            socket.emit('sendChat', hostedGame.value.publicId, content, answer => {
-                if (answer === true) {
-                    resolve();
+            socket.emit('sendChat', hostedGame.value.publicId, content, error => {
+                if (error) {
+                    useSocketStore().handleMessageError(error, 'could not post message, server error');
+                    reject(new Error(error.reason));
                     return;
                 }
 
-                reject(new Error(answer));
+                resolve();
             });
         });
     };

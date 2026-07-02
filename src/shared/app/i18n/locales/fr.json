@@ -498,6 +498,13 @@
         "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
     },
     "player_made_a_move": "{{player}} a joué",
+    "rate_limit_reached": "Cette action ({{rateLimiterName}}) vous a été limitée. Attendez {{seconds}} secondes avant de réessayer.",
+    "rate_limiter": {
+        "chat_message": "l'envoi de messages",
+        "account_creation": "la création de compte",
+        "failed_login": "la connexion",
+        "create_game": "la création de partie"
+    },
     "game_with_player_has_started": "{{player}} a rejoint votre partie et la partie a commencé",
     "conditional_moves": {
         "title": "Coups conditionnels",

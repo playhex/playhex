@@ -470,6 +470,13 @@
     "contributors": "Contributors",
     "no_yet_data": "Who knows!",
     "player_made_a_move": "{{player}} made a move",
+    "rate_limit_reached": "This action ({{rateLimiterName}}) has been rate limited to you. Wait {{seconds}} seconds before retry.",
+    "rate_limiter": {
+        "chat_message": "sending chat messages",
+        "account_creation": "creating an account",
+        "failed_login": "logging in",
+        "create_game": "creating a game"
+    },
     "game_with_player_has_started": "{{player}} has joined your game and the game has started",
     "last_move": "Last move",
     "total_played_games": "Total played games",

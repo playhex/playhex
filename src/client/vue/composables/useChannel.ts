@@ -28,12 +28,14 @@ export const useChannel = (channelName: string) => {
     });
 
     const postMessage = (content: string): Promise<void> => new Promise((resolve, reject) => {
-        socket.emit('sendChannelChat', channelName, content, result => {
-            if (result === true) {
-                resolve();
-            } else {
-                reject(new Error(result));
+        socket.emit('sendChannelChat', channelName, content, error => {
+            if (error) {
+                socketStore.handleMessageError(error, 'could not post message, server error');
+                reject(new Error(error.reason));
+                return;
             }
+
+            resolve();
         });
     });
 

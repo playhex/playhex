@@ -9,6 +9,7 @@ import type { Request } from 'express';
 import { IsString } from 'class-validator';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { InvalidPseudoError, PseudoTooLongError, PseudoTooShortError } from '../../../../shared/app/pseudoUtils.js';
+import { rateLimiterConsumeAccountCreation, rateLimiterConsumeFailedLogin } from '../../../services/rate-limiters.js';
 
 class LoginPasswordInput
 {
@@ -69,7 +70,10 @@ export default class AuthController
     async signup(
         @Body() body: LoginPasswordInput,
         @Session() session: SessionData,
+        @Req() request: Request,
     ) {
+        await rateLimiterConsumeAccountCreation(request.ip);
+
         try {
             const player = await this.playerRepository.createPlayer(body.pseudo.trim(), body.password);
 
@@ -101,7 +105,10 @@ export default class AuthController
     async signupFromGuest(
         @AuthenticatedPlayer() player: Player,
         @Body() body: LoginPasswordInput,
+        @Req() request: Request,
     ) {
+        await rateLimiterConsumeAccountCreation(request.ip);
+
         try {
             const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo.trim(), body.password);
 
@@ -135,6 +142,7 @@ export default class AuthController
     async login(
         @Body() body: LoginPasswordInput,
         @Session() session: SessionData,
+        @Req() request: Request,
     ) {
         try {
             const player = await authenticate(body.pseudo.trim(), body.password);
@@ -144,10 +152,12 @@ export default class AuthController
             return player;
         } catch (e) {
             if (e instanceof LoginNotExistingError) {
+                await rateLimiterConsumeFailedLogin(request.ip);
                 throw new DomainHttpError(403, 'pseudo_not_existing');
             }
 
             if (e instanceof InvalidPasswordError) {
+                await rateLimiterConsumeFailedLogin(request.ip);
                 throw new DomainHttpError(403, 'invalid_password');
             }
 

@@ -9,6 +9,7 @@ import logger from '../../services/logger.js';
 import ChannelChatMessageRepository from '../../repositories/ChannelChatMessageRepository.js';
 import { ChannelNotFoundError, ChannelsService } from '../../services/ChannelsService.js';
 import PlayerModerationActionRepository from '../../repositories/PlayerModerationActionRepository.js';
+import { RateLimitReachedError, errorToRateLimitReachedErrorPayload, rateLimiterConsumeChatMessage } from '../../services/rate-limiters.js';
 
 const CHANNEL_ROOM_PREFIX = 'channels/';
 
@@ -28,12 +29,28 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
             const { player } = socket.data;
 
             if (player === null) {
-                answer('Player not found');
+                answer({ reason: 'server_error' });
                 return;
             }
 
             if (await this.playerModerationActionRepository.isCurrentlyChatRestricted(player.publicId)) {
-                answer('chat_restricted');
+                answer({ reason: 'client_error', payload: { translationKey: 'chat_restricted' } });
+                return;
+            }
+
+            try {
+                await rateLimiterConsumeChatMessage(player.publicId);
+            } catch (e) {
+                if (e instanceof RateLimitReachedError) {
+                    answer({
+                        reason: 'rate_limited',
+                        payload: errorToRateLimitReachedErrorPayload(e),
+                    });
+
+                    return;
+                }
+
+                answer({ reason: 'server_error' });
                 return;
             }
 
@@ -43,11 +60,12 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
                 channel = await this.channelsService.getChannel(channelName);
             } catch (e) {
                 if (e instanceof ChannelNotFoundError) {
-                    answer(e.message);
+                    answer({ reason: 'client_error', payload: { translationKey: e.message } });
                     return;
                 }
 
-                throw e;
+                answer({ reason: 'server_error' });
+                return;
             }
 
             const message = new ChannelChatMessage();
@@ -63,7 +81,7 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
                 });
             } catch (e) {
                 logger.warning('Channel chat validation failed', { validationError: e });
-                answer(String(e));
+                answer({ reason: 'server_error' });
                 return;
             }
 
@@ -72,7 +90,7 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
                 .emit('channelChatMessagePosted', channelName, instanceToInstance(message))
             ;
 
-            answer(true);
+            answer();
 
             await this.channelChatMessageRepository.save(message);
         });

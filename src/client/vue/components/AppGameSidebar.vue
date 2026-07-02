@@ -36,7 +36,6 @@ import { parseMove, validateMove } from '../../../shared/move-notation/move-nota
 import { GameView } from '@playhex/pixi-board';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
-import useToastsStore from '../../stores/toastsStore.js';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 
@@ -150,9 +149,7 @@ const sendChat = async () => {
     try {
         await sendChatMessage(message);
     } catch (e) {
-        useToastsStore().addToast(e.message ?? 'could not post message', {
-            level: 'danger',
-        });
+        chatInput.value = message;
     }
 };
 

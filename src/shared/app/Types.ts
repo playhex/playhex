@@ -1,6 +1,7 @@
 import { GameTimeData } from '../time-control/TimeControl.js';
 import TimeControlType from '../time-control/TimeControlType.js';
 import { Translator } from './i18n/availableLocales.js';
+import { RateLimitReachedErrorPayload } from './rate-limiters.js';
 
 export type Tuple<T> = [T, T];
 
@@ -63,3 +64,19 @@ export type AIConfigStatusData = {
      */
     powerfulPeerAvailable: boolean;
 };
+
+type TWebsocketActionError<Reason extends string = string, Payload = unknown> = {
+    reason: Reason;
+    payload: Payload;
+};
+
+export type WebsocketActionError =
+    // Rate limiter error (displayed to player)
+    | TWebsocketActionError<'rate_limited', RateLimitReachedErrorPayload>
+
+    // Generic error payload, displayed to player
+    | TWebsocketActionError<'client_error', { translationKey: string }>
+
+    // Generic system error, should not occur, not displayed to player
+    | { reason: 'server_error' }
+;
