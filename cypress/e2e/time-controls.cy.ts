@@ -32,7 +32,7 @@ describe('Time controls', () => {
 
             .contains('Live')
             .closest('div')
-            .contains('Normal 10 + 5')
+            .contains('Long 10 + 20')
             .click()
         ;
 
@@ -49,7 +49,7 @@ describe('Time controls', () => {
 
             .contains('Live')
             .closest('div')
-            .contains('Fast 5 + 2')
+            .contains('Normal 5 + 10')
             .click()
         ;
 
@@ -66,7 +66,7 @@ describe('Time controls', () => {
 
             .contains('Live')
             .closest('div')
-            .contains('Fast 5 + 2')
+            .contains('Normal 5 + 10')
             .click()
 
             .closest('.modal-content')

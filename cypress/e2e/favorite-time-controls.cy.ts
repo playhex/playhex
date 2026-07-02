@@ -13,7 +13,7 @@ describe('Favorite time controls', () => {
 
         // 1. Create a game with "Normal 10 + 5"
         cy.createAIGameWithRandom(false);
-        modal().contains('Normal 10 + 5').click();
+        modal().contains('Normal 5 + 10').click();
         cy.submitAIGame();
 
         // 2. Go back to lobby and verify "(last)" label
@@ -21,7 +21,7 @@ describe('Favorite time controls', () => {
         cy.get('.menu-top').contains(pseudo);
 
         cy.createAIGameWithRandom(false);
-        modal().contains('Normal 10 + 5 (last)');
+        modal().contains('Normal 5 + 10 (last)');
 
         // 3. Slide to a custom TC "5min + 30s"
         cy.get('input#custom-initial-time').invoke('val', 10).trigger('input');
