@@ -1,0 +1,14 @@
+# Debug the client ip as seen by the server (req.ip / req.ips),
+# to verify the "trust proxy" setting (TRUST_PROXY) against X-Forwarded-For spoofing.
+
+# Real ip, without spoofing.
+GET /api/admin/ip
+Authorization: Bearer {{ adminPassword }}
+
+###
+# With a spoofed X-Forwarded-For.
+# If TRUST_PROXY is too high (or true), req.ip will become the spoofed value.
+
+GET /api/admin/ip
+Authorization: Bearer {{ adminPassword }}
+X-Forwarded-For: 1.2.3.4

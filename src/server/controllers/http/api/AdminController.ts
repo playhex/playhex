@@ -3,7 +3,8 @@ import { IsNumber, IsString, Max, Min } from 'class-validator';
 import HostedGameStore from '../../../store/HostedGameStore.js';
 import { PreRenderedService } from '../../../services/PreRenderedService.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
-import { Authorized, Body, Delete, HttpError, JsonController, NotFoundError, Param, Patch, Post } from 'routing-controllers';
+import { Authorized, Body, Delete, Get, HttpError, JsonController, NotFoundError, Param, Patch, Post, Req } from 'routing-controllers';
+import type { Request } from 'express';
 import { Player, Tournament, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
@@ -44,6 +45,28 @@ export default class AdminController
         private gameStaleEvaluator: GameStaleEvaluator,
         private autoCancelStaleGames: AutoCancelStaleGames,
     ) {}
+
+    /**
+     * Returns the client IP as seen by the server (req.ip).
+     * Useful to verify the "trust proxy" setting: check whether an
+     * attacker-supplied X-Forwarded-For header can spoof req.ip
+     * (which feeds IP bans and rate limiters).
+     *
+     * @example
+     * curl -H 'Authorization: Bearer <ADMIN_PASSWORD>' http://localhost:3000/api/admin/ip
+     * curl -H 'Authorization: Bearer <ADMIN_PASSWORD>' -H 'X-Forwarded-For: 1.2.3.4' http://localhost:3000/api/admin/ip
+     */
+    @Get('/api/admin/ip')
+    getIp(
+        @Req() req: Request,
+    ) {
+        return {
+            ip: req.ip,
+            ips: req.ips,
+            forwardedFor: req.headers['x-forwarded-for'],
+            trustProxy: process.env.TRUST_PROXY ?? null,
+        };
+    }
 
     /**
      * Reset pre rendered pages in cache.

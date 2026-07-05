@@ -22,7 +22,8 @@ logger.info(`*******************************************`);
 
 const app = express();
 app.disable('x-powered-by');
-app.set('trust proxy', true); // req.ip reads X-Forwarded-For when behind a reverse proxy
+// Number of trusted reverse proxies, so req.ip reads the right X-Forwarded-For entry. See TRUST_PROXY in .env.dist
+app.set('trust proxy', Number(process.env.TRUST_PROXY ?? 0));
 
 registerCors(app);
 
