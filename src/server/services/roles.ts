@@ -1,4 +1,5 @@
 import { HttpError } from 'routing-controllers';
+import { rateLimiterConsumeFailedApiKey } from './rate-limiters.js';
 
 /**
  * Can do operations from AdminController (maintenance, debug, cancel game manually, shadow ban...)
@@ -12,8 +13,9 @@ export const ROLE_MODERATOR = 'MODERATOR';
 
 /**
  * Check authorization given provided token and required roles.
+ * Rate limited by ip on invalid token to prevent brute-forcing admin/moderator passwords.
  */
-export const checkAuthorization = (authorizationHeader: undefined | string, roles: string[]): boolean => {
+export const checkAuthorization = async (authorizationHeader: undefined | string, roles: string[], ip: string | undefined): Promise<boolean> => {
     if (roles.length === 0) {
         return false; // Not using @Authorized() with no roles provided for now
     }
@@ -34,6 +36,7 @@ export const checkAuthorization = (authorizationHeader: undefined | string, role
     }
 
     if (!userRole) {
+        await rateLimiterConsumeFailedApiKey(ip);
         throw new HttpError(403, 'Invalid admin token');
     }
 

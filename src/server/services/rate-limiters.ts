@@ -40,6 +40,15 @@ const createGameLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit brute-force of admin/moderator api key by ip.
+ */
+const failedApiKeyLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.failed_api_key',
+    points: 10,
+    duration: 300,
+});
+
+/**
  * Error thrown from rate limiter
  */
 export class RateLimiterError extends Error {}
@@ -110,4 +119,10 @@ export const rateLimiterConsumeFailedLogin = async (ip: string | undefined) => {
 
 export const rateLimiterConsumeCreateGame = async (playerPublicId: string) => {
     await consume(createGameLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeFailedApiKey = async (ip: string | undefined) => {
+    if (ip) {
+        await consume(failedApiKeyLimiter, ip);
+    }
 };

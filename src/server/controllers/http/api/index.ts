@@ -62,8 +62,10 @@ export const registerApi = (app: Express) => {
 
             return player;
         },
-        authorizationChecker: (action, roles): boolean => {
-            return checkAuthorization((action.request as Request).get('Authorization'), roles);
+        authorizationChecker: async (action, roles): Promise<boolean> => {
+            const request = action.request as Request;
+
+            return checkAuthorization(request.get('Authorization'), roles, request.ip);
         },
         controllers: [
             OnlinePlayersController,
