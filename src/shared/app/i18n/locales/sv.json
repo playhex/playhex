@@ -55,7 +55,9 @@
         "more_options": "Fler alternativ"
     },
     "player_settings": {
-        "title": "Inställningar"
+        "title": "Inställningar",
+        "change_avatar": "Byt avatar",
+        "crop_avatar": "Justera avatar"
     },
     "background_theme": {
         "title": "Tema",
@@ -75,7 +77,11 @@
         "periods_time": "Periodtid",
         "fast": "Snabb",
         "normal": "Normal",
-        "long": "Lång"
+        "long": "Lång",
+        "last": "senaste",
+        "edit_presets": "Ordna om",
+        "edit_presets_title": "Ordna om förinställningar",
+        "no_presets": "Inga förinställningar"
     },
     "i_play": {
         "title": "Jag spelar",
@@ -621,9 +627,98 @@
         "details": "Detaljer",
         "related_messages": "Relaterade meddelanden",
         "acknowledge": "Jag har läst och förstått",
-        "scroll_hint": "Läs och godkänn nedan"
+        "scroll_hint": "Läs och godkänn nedan",
+        "nickname_moderated_title": "Smeknamn modererat",
+        "nickname_moderated_body": "Ditt smeknamn \"{{former}}\" har modererats till \"{{moderated}}\". Du kan fortfarande logga in med ditt vanliga användarnamn, men ditt spelares smeknamn har ändrats."
     },
     "moderation_reason": {
-        "chat_insults": "Förolämpningar eller olämpligt beteende i chatten"
+        "chat_insults": "Förolämpningar eller olämpligt beteende i chatten",
+        "avatar_inappropriate": "Olämplig avatar",
+        "nickname_inappropriate": "Olämpligt smeknamn"
+    },
+    "opponent_must_be_registered": "Endast registrerade spelare",
+    "opponent_must_be_registered_help": "Gäster kan inte gå med i detta parti. Endast spelare med ett konto får delta.",
+    "cannot_join_registered_only": "Detta parti är begränsat till spelare med ett konto. Skapa ett konto eller logga in för att gå med.",
+    "view_games": "Visa partier",
+    "lobby_playing_now_short": "Spelar",
+    "lobby_no_correspondence_games_now": "Inga pågående korrespondenspartier just nu.",
+    "lobby_observe_live": "Titta på direktsända partier",
+    "rate_limit_reached": "Den här åtgärden ({{rateLimiterName}}) är tillfälligt begränsad för dig. Vänta {{seconds}} sekunder innan du försöker igen.",
+    "rate_limiter": {
+        "chat_message": "skicka chattmeddelanden",
+        "account_creation": "skapa ett konto",
+        "failed_login": "logga in",
+        "create_game": "skapa ett parti"
+    },
+    "observe_all_playing_games": "Titta på alla pågående partier",
+    "enable_notifications_overlay": {
+        "title": "Aktivera aviseringar?",
+        "enable": "Aktivera aviseringar",
+        "later": "Ignorera",
+        "you_will_be_notified": "Du får aviseringar:",
+        "also_notified_for": "Du får även aviseringar:",
+        "notifications": {
+            "tournament_checkin_opens": "När incheckningen till en turnering öppnar",
+            "correspondence_your_turn": "När det är din tur i ett korrespondensparti",
+            "rematch": "När du får ett erbjudande om returmatch"
+        }
+    },
+    "moderation": "Moderering",
+    "country_flag": {
+        "title": "Landsflagga",
+        "explain": "Visa din landsflagga bredvid ditt smeknamn.",
+        "suggestions": "Föreslaget utifrån din webbläsare:",
+        "all_countries": "Alla länder:",
+        "search_placeholder": "Sök land…",
+        "remove": "Ta bort flagga"
+    },
+    "hexplorer": {
+        "title": "Hexplorer",
+        "setup_mode": "Uppställningsläge",
+        "validate": "Verifiera",
+        "undo_placement": "Ångra placering",
+        "redo_placement": "Gör om placering",
+        "alternating_placement": "Alternerande placering",
+        "place_red_stone": "Placera en röd sten",
+        "place_blue_stone": "Placera en blå sten",
+        "remove_stone": "Ta bort en sten",
+        "mark_cross": "Markera med ett kryss",
+        "mark_triangle": "Markera med en triangel",
+        "mark_square": "Markera med en fyrkant",
+        "mark_circle": "Markera med en cirkel",
+        "highlight_cell": "Markera ruta",
+        "label_text": "Etikettext",
+        "add_label": "Lägg till etikett",
+        "go_back": "Gå tillbaka",
+        "go_forward": "Gå framåt",
+        "delete_branch": "Ta bort denna gren",
+        "pass_turn": "Passa",
+        "change_current_player": "Byt spelare som ska dra",
+        "win_rate": "Vinst%",
+        "policy": "Policy",
+        "policy_show_numbers": "Visa policynummer",
+        "policy_show_best_mark": "Markera bästa drag",
+        "autoplay": "Spela upp automatiskt",
+        "evaluation": "Utvärdering",
+        "engine": "Motor",
+        "move_history": "Draghistorik",
+        "current_analysis": "Aktuell analys",
+        "load": "Läs in",
+        "save": "Spara",
+        "download_sgf": "Ladda ner som SGF",
+        "analysis_json_load": "Läs in analys (JSON)",
+        "analysis_json_save": "Spara analys (JSON)",
+        "import": "Importera",
+        "new_analysis": "Ny analys",
+        "new": "Ny",
+        "import_a_game": "Importera ett Hex-parti",
+        "format_not_supported": "Okänt format.",
+        "import_placeholder": "URL, HexWorld-länk, dragnotation...",
+        "formats_supported": "Format som stöds",
+        "move_list": "Draglista",
+        "playhex_link": "PlayHex-länk",
+        "hexworld_link": "HexWorld-länk",
+        "abstract_play_url": "Abstract Play: URL",
+        "abstract_play_debug": "Abstract Play: Kopiera från \"Debugging information\" under spelbrädet"
     }
 }
