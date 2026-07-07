@@ -1,5 +1,5 @@
 import { Game as EngineGame, Game, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
-import { HostedGameState } from '../shared/app/Types.js';
+import { CancelHostedGameReason, HostedGameState } from '../shared/app/Types.js';
 import { ChatMessage, Player, HostedGameToPlayer, HostedGame, Premove } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
@@ -67,6 +67,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      * Players premoves, for live games.
      */
     private premoves: [null | Premove, null | Premove] = [null, null];
+
+    /**
+     * Reason of the next cancelation, set just before calling this.game.cancel()
+     * or doCancel(), and consumed by the "canceled" game event listener / doCancel().
+     */
+    private pendingCancelReason: null | CancelHostedGameReason = null;
 
     private io: HexServer = Container.get(HexServer);
 
@@ -446,7 +452,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.saveState();
 
             this.logger.info('Game canceled.');
-            this.doCancel(date);
+            this.doCancel(date, this.pendingCancelReason);
         });
     }
 
@@ -953,20 +959,27 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         const now = new Date();
 
+        this.pendingCancelReason = this.hostedGame.host?.publicId === player.publicId
+            ? 'by_host'
+            : 'by_opponent'
+        ;
+
         if (this.game !== null) {
             this.game.cancel(now);
         } else {
-            this.doCancel(now);
+            this.doCancel(now, this.pendingCancelReason);
         }
 
         return true;
     }
 
-    systemCancel(): void
+    systemCancel(cancelReason: CancelHostedGameReason): void
     {
-        this.logger.info('System cancel game');
+        this.logger.info('System cancel game', { cancelReason });
 
         const now = new Date();
+
+        this.pendingCancelReason = cancelReason;
 
         if (this.game !== null) {
             if (this.game.isEnded()) {
@@ -975,13 +988,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 this.game.cancel(now);
             }
         } else {
-            this.doCancel(now);
+            this.doCancel(now, cancelReason);
         }
     }
 
-    private doCancel(date: Date): void
+    private doCancel(date: Date, cancelReason: null | CancelHostedGameReason): void
     {
         this.hostedGame.state = 'canceled';
+        this.hostedGame.cancelReason = cancelReason;
+        this.pendingCancelReason = null;
         this.hostedGame.endedAt = date;
 
         this.gameEventEmitter.emitGameCanceled(this.hostedGame, { date });

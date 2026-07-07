@@ -102,7 +102,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
                     hostedGamePublicId: hostedGame.publicId,
                 });
 
-                activeGame.systemCancel();
+                activeGame.systemCancel('host_left');
             }
         }
     }

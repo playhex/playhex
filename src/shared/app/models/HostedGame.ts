@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad, type Relation } from 'typeorm';
 import { ColumnUUID, longText } from '../custom-typeorm.js';
 import Player from './Player.js';
-import type { HostedGameState } from '../Types.js';
+import type { CancelHostedGameReason, HostedGameState } from '../Types.js';
 import HostedGameOptions from './HostedGameOptions.js';
 import type { GameTimeData } from '../../time-control/TimeControl.js';
 import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
@@ -175,6 +175,13 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     outcome: null | Outcome;
 
     /**
+     * Why this game has been canceled, if state is "canceled".
+     */
+    @Column({ type: String, length: 15, nullable: true })
+    @Expose()
+    cancelReason: null | CancelHostedGameReason;
+
+    /**
      * When this game is played in a tournament, else null.
      */
     @OneToOne(() => TournamentMatch, tournamentMatch => tournamentMatch.hostedGame)
@@ -223,6 +230,9 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Type(() => Date)
     lastMoveAt: null | Date;
 
+    /**
+     * Ended at, or canceled at date.
+     */
     @Column({ type: Date, precision: 3, nullable: true })
     @Expose()
     @Type(() => Date)
@@ -288,6 +298,7 @@ export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGam
     hostedGame.currentPlayerIndex = 0;
     hostedGame.winner = null;
     hostedGame.outcome = null;
+    hostedGame.cancelReason = null;
     hostedGame.hostedGameToPlayers = [];
     hostedGame.rematchedFrom = params.rematchedFrom ?? null;
     hostedGame.tournamentMatch = params.tournamentMatch ?? null;

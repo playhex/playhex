@@ -23,6 +23,44 @@ export const hostedGameStates = [
 
 export type HostedGameState = typeof hostedGameStates[number];
 
+/**
+ * Possible cancel reasons.
+ * Must be <= 15 characters.
+ */
+export const cancelHostedGameReasons = [
+    /**
+     * Host canceled their game manually
+     */
+    'by_host',
+
+    /**
+     * Player joined a game and canceled it
+     */
+    'by_opponent',
+
+    /**
+     * Stale because host created a game and went offline
+     */
+    'host_left',
+
+    /**
+     * Stale because game started but first move not played
+     */
+    'inactive',
+
+    /**
+     * Canceled automatically by tournament system
+     */
+    'tourney_system',
+
+    /**
+     * Canceled manually by admin
+     */
+    'admin',
+] as const;
+
+export type CancelHostedGameReason = typeof cancelHostedGameReasons[number];
+
 export type GithubContributor = {
     username: string;
     link: string;

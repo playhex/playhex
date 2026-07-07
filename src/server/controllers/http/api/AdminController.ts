@@ -190,7 +190,7 @@ export default class AdminController
             throw new NotFoundError(`HostedGame "${publicId}" not found`);
         }
 
-        hostedGameServer.systemCancel();
+        hostedGameServer.systemCancel('admin');
     }
 
     @Post('/api/admin/persist-tournaments')

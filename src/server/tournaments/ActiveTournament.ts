@@ -850,7 +850,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             if (tournamentMatch.hostedGame) {
                 this.hostedGameAccessor
                     .getHostedGameServer(tournamentMatch.hostedGame.publicId)
-                    ?.systemCancel()
+                    ?.systemCancel('tourney_system')
                 ;
 
                 tournamentMatch.hostedGame = null;
@@ -1236,7 +1236,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                     continue;
                 }
 
-                hostedGameServer.systemCancel();
+                hostedGameServer.systemCancel('tourney_system');
             }
 
             this.doCancelTournament();

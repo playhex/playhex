@@ -79,7 +79,7 @@ export class AutoCancelStaleGames
                     ...result,
                 });
 
-                activeGame.systemCancel();
+                activeGame.systemCancel('inactive');
             }
 
             reasons.push({
