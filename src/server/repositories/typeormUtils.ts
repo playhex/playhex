@@ -18,6 +18,12 @@ export const isDuplicateError = (e: unknown): e is QueryFailedError => {
  * Example: Running `typeorm migration:generate` with a schema error
  * will throw with an unrelated error message.
  * This patch will display the actual schema error.
+ *
+ * destroy() is only ever called from one-off CLI scripts (`yarn hex ...`,
+ * `yarn typeorm ...`), never from the long-running server. mysql2's pool.end()
+ * sends a QUIT command to each pooled connection and waits for the server's
+ * response before closing the socket, which does not reliably happen in these
+ * short-lived processes and leaves them hanging. Force exit once cleanup is done.
  */
 export const patchAppDataSourceDestroy = (dataSource: DataSource): void => {
     const baseDestroy = dataSource.destroy.bind(dataSource);
@@ -28,5 +34,7 @@ export const patchAppDataSourceDestroy = (dataSource: DataSource): void => {
         } catch {
             /* ignore */
         }
+
+        process.exit(0);
     };
 };
