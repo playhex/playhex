@@ -70,6 +70,7 @@ export { default as IconMailboxFlag } from '~icons/bi/mailbox-flag';
 export { default as IconMoonFill } from '~icons/bi/moon-fill';
 export { default as IconMoonStarsFill } from '~icons/bi/moon-stars-fill';
 export { default as IconStarFill } from '~icons/bi/star-fill';
+export { default as IconPartyPopper } from '~icons/lucide/party-popper';
 export { default as IconPcDisplayHorizontal } from '~icons/bi/pc-display-horizontal';
 export { default as IconPencilSquare } from '~icons/bi/pencil-square';
 export { default as IconPeople } from '~icons/bi/people';

@@ -44,6 +44,13 @@ hexProgram
                 new Date(now + 1000),
             ),
             createPlayerNotification(
+                'gameEnded',
+                { iWon: false, opponent: 'Peter' },
+                player,
+                hostedGame,
+                new Date(now + 1000),
+            ),
+            createPlayerNotification(
                 'gameCanceled',
                 null,
                 player,

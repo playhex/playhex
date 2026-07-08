@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PlayerNotification } from '../../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { IconTablerSwords } from '../../icons.js';
 
 defineProps({
     playerNotification: {
@@ -12,7 +13,8 @@ defineProps({
 
 <template>
     <p>
-        <span class="text-success">
+        <span class="text-warning">
+            <IconTablerSwords />
             {{ $t('player_challenged_you', { player: playerNotification.parameters.player }) }}
         </span>
 

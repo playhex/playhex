@@ -17,7 +17,7 @@ defineProps({
 
         {{ playerNotification.parameters.player }}
         <span class="ms-2">
-            <small class="fst-italic">{{ playerNotification.parameters.text }}</small>
+            <small class="fst-italic text-body">{{ playerNotification.parameters.text }}</small>
         </span>
 
         <small class="float-end text-secondary">{{ formatDistanceToNowStrict(playerNotification.createdAt, {

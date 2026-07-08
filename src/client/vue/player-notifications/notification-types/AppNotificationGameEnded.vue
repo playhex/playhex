@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatDistanceToNowStrict } from 'date-fns';
 import { PlayerNotification } from '../../../../shared/app/models/index.js';
+import { IconPartyPopper } from '../../icons.js';
 
 defineProps({
     playerNotification: {
@@ -13,6 +14,7 @@ defineProps({
 <template>
     <p>
         <span v-if="playerNotification.parameters.iWon" class="text-success">
+            <IconPartyPopper />
             {{ $t('notification.you_won') }}
         </span>
 
