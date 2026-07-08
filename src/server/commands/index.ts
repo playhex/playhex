@@ -12,5 +12,6 @@ import './exportGamesCommand.js';
 import './checkTestsRequirements.js';
 import './migrateCypressFixtures.js';
 import './missingTranslationsCommand.js';
+import './createFakeNotificationsCommand.js';
 
 hexProgram.parse();

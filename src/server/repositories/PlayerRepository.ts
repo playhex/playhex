@@ -1,6 +1,6 @@
 import { Player, PlayerAccountPassword } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
 import logger from '../services/logger.js';
 import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils.js';
@@ -45,6 +45,23 @@ export default class PlayerRepository
             slug,
             isBot: true,
         });
+    }
+
+    /**
+     * Finds a player from a single identifier that can be either
+     * its numeric id, its publicId (uuid), or its slug.
+     */
+    async getPlayerByIdPublicIdOrSlug(identifier: number | string): Promise<null | Player>
+    {
+        if (typeof identifier === 'number' || /^\d+$/.test(identifier)) {
+            return await this.playerRepository.findOneBy({ id: Number(identifier) });
+        }
+
+        if (isUuid(identifier)) {
+            return await this.getPlayer(identifier);
+        }
+
+        return await this.getPlayerBySlug(identifier);
     }
 
     async searchPlayers(params: SearchPlayersParameters): Promise<Player[]>
