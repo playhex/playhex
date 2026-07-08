@@ -406,8 +406,6 @@ export const apiGetPlayerFavoriteTimeControls = async (): Promise<PlayerFavorite
         },
     });
 
-    await checkResponse(response);
-
     return response.json();
 };
 
