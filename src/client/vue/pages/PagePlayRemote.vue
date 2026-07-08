@@ -342,7 +342,7 @@ const {
                                 :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
                                 @click="join()"
                                 :disabled="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer)"
-                            >Accept</button>
+                            >{{ $t('game.accept') }}</button>
                         </span>
                     </div>
                 </div>
