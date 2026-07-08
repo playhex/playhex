@@ -4,6 +4,7 @@ import AppNotificationChatMessage from './notification-types/AppNotificationChat
 import AppNotificationCustom from './notification-types/AppNotificationCustom.vue';
 import AppNotificationFallback from './notification-types/AppNotificationFallback.vue';
 import AppNotificationGameCanceled from './notification-types/AppNotificationGameCanceled.vue';
+import AppNotificationGameChallenge from './notification-types/AppNotificationGameChallenge.vue';
 import AppNotificationGameEnded from './notification-types/AppNotificationGameEnded.vue';
 import AppNotificationMyOpponentHasBeenModerated from './notification-types/AppNotificationMyOpponentHasBeenModerated.vue';
 
@@ -27,6 +28,10 @@ defineProps({
     <AppNotificationGameCanceled
         v-else-if="playerNotification.type === 'gameCanceled'"
         :playerNotification="(playerNotification as PlayerNotification<'gameCanceled'>)"
+    />
+    <AppNotificationGameChallenge
+        v-else-if="playerNotification.type === 'gameChallenge'"
+        :playerNotification="(playerNotification as PlayerNotification<'gameChallenge'>)"
     />
     <AppNotificationMyOpponentHasBeenModerated
         v-else-if="playerNotification.type === 'myOpponentHasBeenModerated'"

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX } from '../../icons.js';
-import { HostedGame, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
+import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconTrophy, IconPeople, IconX } from '../../icons.js';
+import { HostedGame, HostedGameOptions, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
+import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import { format } from 'date-fns';
@@ -85,6 +86,23 @@ const player: Ref<null | Player> = loggedInPlayer.value?.slug === slug
 ;
 
 const playerNotFound = ref(false);
+
+const { create1v1RankedAndJoinGame, create1v1FriendlyAndJoinGame } = useCreateGameOverlay();
+
+const challenge = (mode: 'ranked' | 'friendly') => {
+    if (!player.value) {
+        return;
+    }
+
+    const gameOptions = new HostedGameOptions();
+    gameOptions.opponentPublicId = player.value.publicId;
+
+    if (mode === 'ranked') {
+        void create1v1RankedAndJoinGame(gameOptions, player.value);
+    } else {
+        void create1v1FriendlyAndJoinGame(gameOptions, player.value);
+    }
+};
 
 void (async () => {
     try {
@@ -398,6 +416,20 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         :to="{ name: 'settings' }"
                         class="btn btn-sm btn-outline-primary"
                     ><IconGear /> {{ $t('player_settings.title') }}</router-link>
+                </div>
+
+                <div v-if="player && !isMe(player) && !player.isBot" class="player-btns mt-3">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-warning"
+                        @click="challenge('ranked')"
+                    ><IconTrophy /> {{ $t('challenge_ranked') }}</button>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-success"
+                        @click="challenge('friendly')"
+                    ><IconPeople /> {{ $t('challenge_friendly') }}</button>
                 </div>
             </div>
         </div>

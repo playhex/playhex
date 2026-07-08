@@ -1,0 +1,55 @@
+{
+    "publicId": "40000000-0000-0000-0000-00000000cccc",
+    "host": {
+        "pseudo": "Challenger",
+        "publicId": "30000000-0000-0000-0000-000000000003",
+        "isGuest": false,
+        "isBot": false,
+        "slug": "challenger",
+        "createdAt": "2024-01-24T16:33:29.586Z"
+    },
+    "hostedGameToPlayers": [
+        {
+            "player": {
+                "pseudo": "Challenger",
+                "publicId": "30000000-0000-0000-0000-000000000003",
+                "isGuest": false,
+                "isBot": false,
+                "slug": "challenger",
+                "createdAt": "2024-01-24T16:33:29.586Z"
+            }
+        }
+    ],
+    "timeControl": {
+        "state": "ready",
+        "currentPlayer": 0,
+        "players": [
+            { "totalRemainingTime": 600000 },
+            { "totalRemainingTime": 600000 }
+        ]
+    },
+    "boardsize": 11,
+    "firstPlayer": null,
+    "swapRule": true,
+    "opponentType": "player",
+    "opponentPublicId": "10000000-0000-0000-0000-000000000001",
+    "timeControlType": {
+        "family": "fischer",
+        "options": {
+            "initialTime": 600000,
+            "timeIncrement": 5000,
+            "maxTime": 600000
+        }
+    },
+    "chatMessages": [],
+    "state": "created",
+    "createdAt": "2024-01-25T10:00:00.000Z",
+    "moves": [],
+    "moveTimestamps": [],
+    "currentPlayerIndex": 0,
+    "winner": null,
+    "outcome": null,
+    "startedAt": null,
+    "lastMoveAt": null,
+    "endedAt": null
+}

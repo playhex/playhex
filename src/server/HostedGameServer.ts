@@ -18,7 +18,7 @@ import { AutoSaveInterface } from './auto-save/AutoSaveInterface.js';
 import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
-import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, toEngineGameData } from '../shared/app/hostedGameUtils.js';
+import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/hostedGameUtils.js';
 import type { HexMove } from '../shared/move-notation/hex-move-notation.js';
 import { GameEventsEmitter } from './services/game-events-emitter/GameEventsEmitter.js';
 
@@ -665,6 +665,16 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Cannot join game created by system.';
         }
 
+        // Game is a nominative challenge: only the targeted player can join.
+        // Checked before opponentMustBeRegistered so a challenged guest can still join.
+        if (this.hostedGame.opponentType === 'player'
+            && this.hostedGame.opponentPublicId !== null
+            && this.hostedGame.opponentPublicId !== player.publicId
+        ) {
+            this.logger.notice('Player tried to join a game reserved for another player', { joiner: player.pseudo });
+            return 'This game is reserved for another player.';
+        }
+
         // Cannot join as guest if host requires opponent with account only
         if (this.hostedGame.opponentMustBeRegistered && player.isGuest) {
             this.logger.notice('Player tried to join game as guest but host wants only registered players', { joiner: player.pseudo });
@@ -924,7 +934,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private canCancel(player: Player): true | string
     {
-        if (!this.isPlayerInGame(player)) {
+        if (!this.isPlayerInGame(player) && !isChallengeTargetOf(this.hostedGame, player)) {
             this.logger.notice('A player not in the game tried to cancel game', { player: player.pseudo });
             return 'you are not a player of this game';
         }
@@ -959,9 +969,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         const now = new Date();
 
-        this.pendingCancelReason = this.hostedGame.host?.publicId === player.publicId
-            ? 'by_host'
-            : 'by_opponent'
+        this.pendingCancelReason = isChallengeTargetOf(this.hostedGame, player)
+            ? 'declined'
+            : this.hostedGame.host?.publicId === player.publicId
+                ? 'by_host'
+                : 'by_opponent'
         ;
 
         if (this.game !== null) {

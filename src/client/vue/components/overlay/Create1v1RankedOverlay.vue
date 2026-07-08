@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDisclosure } from '@overlastic/vue';
-import { PropType, reactive, toRef, watch } from 'vue';
-import { HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { PropType, reactive, ref, toRef, watch } from 'vue';
+import { HostedGameOptions, Player } from '../../../../shared/app/models/index.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
@@ -9,6 +9,7 @@ import { IconTrophy } from '../../icons.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
 import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
+import AppOpponentPlayerSelect from './create-game/AppOpponentPlayerSelect.vue';
 import useLobbyStore from '../../../stores/lobbyStore.js';
 import { storeToRefs } from 'pinia';
 
@@ -18,6 +19,11 @@ const props = defineProps({
     gameOptions: {
         type: Object as PropType<HostedGameOptions>,
         required: true,
+    },
+    presetOpponent: {
+        type: Object as PropType<null | Player>,
+        required: false,
+        default: null,
     },
 });
 
@@ -32,6 +38,11 @@ watch(currentLobby, () => {
     gameOptions.explorationAllowed = currentLobby.value === 'correspondence';
     gameOptions.opponentMustBeRegistered = currentLobby.value === 'correspondence';
 }, { immediate: true });
+
+const selectedOpponent = ref<null | Player>(props.presetOpponent);
+watch(selectedOpponent, player => {
+    gameOptions.opponentPublicId = player?.publicId ?? null;
+});
 </script>
 
 <template>
@@ -55,6 +66,11 @@ watch(currentLobby, () => {
                     <div class="modal-body border-top">
                         <div class="mb-3">
                             <AppAllowExploration v-model="gameOptions.explorationAllowed" />
+                        </div>
+
+                        <div class="mb-3">
+                            <h6>{{ $t('challenge_player') }}</h6>
+                            <AppOpponentPlayerSelect v-model="selectedOpponent" />
                         </div>
 
                         <AppOpponentMustBeRegistered v-model="gameOptions.opponentMustBeRegistered" />

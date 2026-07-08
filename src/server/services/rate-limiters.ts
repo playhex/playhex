@@ -40,6 +40,24 @@ const createGameLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit total challenges (nominative games) a player can send.
+ */
+const challengePlayerLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.challenge_player',
+    points: 8,
+    duration: 300,
+});
+
+/**
+ * Prevent a player from repeatedly challenging the same target (harassment).
+ */
+const challengeSameTargetLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.challenge_same_target',
+    points: 2,
+    duration: 180,
+});
+
+/**
  * Limit brute-force of admin/moderator api key by ip.
  */
 const failedApiKeyLimiter = new RateLimiterMemory({
@@ -119,6 +137,14 @@ export const rateLimiterConsumeFailedLogin = async (ip: string | undefined) => {
 
 export const rateLimiterConsumeCreateGame = async (playerPublicId: string) => {
     await consume(createGameLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeChallengePlayer = async (playerPublicId: string) => {
+    await consume(challengePlayerLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeChallengeSameTarget = async (playerPublicId: string, targetPublicId: string) => {
+    await consume(challengeSameTargetLimiter, `${playerPublicId}:${targetPublicId}`);
 };
 
 export const rateLimiterConsumeFailedApiKey = async (ip: string | undefined) => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDisclosure } from '@overlastic/vue';
 import { PropType, reactive, ref, toRef, watch } from 'vue';
-import HostedGameOptions from '../../../../shared/app/models/HostedGameOptions.js';
+import { HostedGameOptions, Player } from '../../../../shared/app/models/index.js';
 import { IconCaretDownFill, IconCaretRight } from '../../icons.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
@@ -10,6 +10,7 @@ import AppSwapRule from './create-game/AppSwapRule.vue';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
 import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
+import AppOpponentPlayerSelect from './create-game/AppOpponentPlayerSelect.vue';
 import { isCorrespondence } from '../../../../shared/app/timeControlUtils.js';
 
 const { visible, confirm, cancel } = useDisclosure();
@@ -18,6 +19,11 @@ const props = defineProps({
     gameOptions: {
         type: Object as PropType<HostedGameOptions>,
         required: true,
+    },
+    presetOpponent: {
+        type: Object as PropType<null | Player>,
+        required: false,
+        default: null,
     },
 });
 
@@ -29,7 +35,12 @@ watch<TimeControlType>(timeControl, t => {
     gameOptions.opponentMustBeRegistered = isCorrespondence({ ...gameOptions, timeControlType: t });
 }, { immediate: true });
 
-const showSecondaryOptions = ref(false);
+const selectedOpponent = ref<null | Player>(props.presetOpponent);
+watch(selectedOpponent, player => {
+    gameOptions.opponentPublicId = player?.publicId ?? null;
+});
+
+const showSecondaryOptions = ref(props.presetOpponent !== null);
 </script>
 
 <template>
@@ -74,6 +85,11 @@ const showSecondaryOptions = ref(false);
 
                         <div class="mb-3">
                             <AppAllowExploration v-model="gameOptions.explorationAllowed" />
+                        </div>
+
+                        <div class="mb-3">
+                            <h6>{{ $t('challenge_player') }}</h6>
+                            <AppOpponentPlayerSelect v-model="selectedOpponent" />
                         </div>
 
                         <AppOpponentMustBeRegistered v-model="gameOptions.opponentMustBeRegistered" />

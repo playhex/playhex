@@ -1,10 +1,11 @@
 import useToastsStore from '../../../../client/stores/toastsStore.js';
+import { apiPostCancel } from '../../../apiClient.js';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { t } from 'i18next';
-import { IconPersonFillExclamation } from '../../../vue/icons.js';
+import { IconPersonFillExclamation, IconTablerSwords } from '../../../vue/icons.js';
 
 notifier.on('gameStart', hostedGame => {
     if (isBotGame(hostedGame)) {
@@ -109,6 +110,31 @@ notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
             { level: 'danger' },
         );
     }
+});
+
+notifier.on('gameChallengeCreated', hostedGame => {
+    if (hostedGame.host === null) {
+        return;
+    }
+
+    useToastsStore().addToast(
+        t('player_challenged_you', { player: pseudoString(hostedGame.host, 'pseudo') }),
+        {
+            level: 'success',
+            autoCloseAfter: 0,
+            closable: true,
+            icon: IconTablerSwords,
+            actions: [
+                { label: t('go_to_the_game'), action: {
+                    name: 'online-game',
+                    params: { gameId: hostedGame.publicId },
+                } },
+                { label: t('decline_challenge'), classes: 'btn btn-sm btn-outline-warning', action: () => {
+                    void apiPostCancel(hostedGame.publicId);
+                } },
+            ],
+        },
+    );
 });
 
 notifier.on('rematchOffer', hostedGame => {

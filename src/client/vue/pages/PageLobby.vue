@@ -11,18 +11,18 @@ import { getMyIndex, getOpponent } from '../../services/context-utils.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import AppPseudo from '../components/AppPseudo.vue';
-import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
+import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isChallengeTargetOf, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
 import { isUncommonBoardsize } from '../../../shared/app/hostedGameOptionsUtils.js';
 import { HostedGame, Tournament } from '../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useRouter } from 'vue-router';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import { onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
-import { apiGetActiveTournaments } from '../../apiClient.js';
+import { apiGetActiveTournaments, apiPostCancel } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppCijmTournamentCard2026 from '../components/AppCijmTournamentCard2026.vue';
-import { IconCalendar, IconCircleFill, IconEye, IconLightningChargeFill, IconSearch, IconTrophyFill } from '../icons.js';
+import { IconCalendar, IconCircleFill, IconEye, IconLightningChargeFill, IconSearch, IconTablerSwords, IconTrophyFill, IconX } from '../icons.js';
 import AppLobbyFeaturesLiveGames from '../components/AppLobbyFeaturesLiveGames.vue';
 import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesCorrespondenceGames.vue';
 import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
@@ -71,6 +71,14 @@ const joinGame = async (hostedGame: HostedGame) => {
         name: 'online-game',
         params: { gameId: hostedGame.publicId },
     });
+};
+
+const declineChallenge = async (hostedGame: HostedGame) => {
+    const result = await apiPostCancel(hostedGame.publicId);
+
+    if (result !== true) {
+        useToastsStore().addToast('Could not decline challenge', { level: 'danger' });
+    }
 };
 
 // Featured tournaments
@@ -130,43 +138,75 @@ for (const locale of getPlayerLocales()) {
                     </div>
 
                     <div class="d-flex flex-nowrap gap-3 overflow-auto pb-2">
-                        <router-link
-                            v-for="(myGame, i) of mySortedGames"
-                            :key="myGame.publicId"
-                            :to="{ name: 'online-game', params: { gameId: myGame.publicId } }"
-                            class="card flex-shrink-0 game-card text-decoration-none"
-                            :class="myGame.isMyTurn ? (isBotGame(myGame.hostedGame) ? 'border-primary' : 'border-success') : ''"
-                        >
-                            <div class="card-body p-2 d-flex flex-column align-items-center gap-1">
-                                <div class="d-flex align-items-center gap-1 w-100 justify-content-between">
-                                    <span class="small text-body-secondary">vs</span>
-                                    <span class="fw-semibold small text-truncate text-body text-right">
-                                        <AppPseudo v-if="myGame.hostedGame" :player="getOpponent(myGame.hostedGame)!" rating onlineStatus />
+                        <template v-for="(myGame, i) of mySortedGames" :key="myGame.publicId">
+                            <router-link
+                                v-if="isChallengeTargetOf(myGame.hostedGame, authStore.loggedInPlayer)"
+                                :to="{ name: 'online-game', params: { gameId: myGame.publicId } }"
+                                class="card flex-shrink-0 game-card challenge-card text-decoration-none border-warning"
+                            >
+                                <div class="card-body p-2 d-flex flex-column align-items-center justify-content-center gap-2">
+                                    <div class="d-flex align-items-center gap-1 text-warning fw-semibold small text-center">
+                                        <IconTablerSwords class="flex-shrink-0" />
+                                        {{ $t('lobby_challenges_you_badge') }}
+                                    </div>
+
+                                    <span class="fw-semibold small text-truncate text-body">
+                                        <AppPseudo v-if="myGame.hostedGame.host" :player="myGame.hostedGame.host" rating onlineStatus />
                                     </span>
+
+                                    <div class="btn-group btn-group-sm">
+                                        <button
+                                            type="button"
+                                            class="btn btn-success"
+                                            @click.stop.prevent="joinGame(myGame.hostedGame)"
+                                        >{{ $t('game.accept') }}</button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-warning"
+                                            :title="$t('decline_challenge')"
+                                            @click.stop.prevent="declineChallenge(myGame.hostedGame)"
+                                        ><IconX /></button>
+                                    </div>
                                 </div>
+                            </router-link>
 
-                                <AppGameThumbnail v-if="i < 6" :gamePublicId="myGame.publicId" class="game-thumb" />
-                                <!-- Prevent displaying too many game views here -->
-                                <AppRhombusAutoOrientation v-else class="game-thumb" />
+                            <router-link
+                                v-else
+                                :to="{ name: 'online-game', params: { gameId: myGame.publicId } }"
+                                class="card flex-shrink-0 game-card text-decoration-none"
+                                :class="myGame.isMyTurn ? (isBotGame(myGame.hostedGame) ? 'border-primary' : 'border-success') : ''"
+                            >
+                                <div class="card-body p-2 d-flex flex-column align-items-center gap-1">
+                                    <div class="d-flex align-items-center gap-1 w-100 justify-content-between">
+                                        <span class="small text-body-secondary">vs</span>
+                                        <span class="fw-semibold small text-truncate text-body text-right">
+                                            <AppPseudo v-if="myGame.hostedGame" :player="getOpponent(myGame.hostedGame)!" rating onlineStatus />
+                                        </span>
+                                    </div>
 
-                                <div class="d-flex justify-content-between w-100 align-items-end">
-                                    <template v-if="!isBotGame(myGame.hostedGame)">
-                                        <span v-if="myGame.isMyTurn" class="badge text-bg-success pulse-badge">{{ $t('lobby_your_turn_badge') }}</span>
-                                        <span v-else class="badge text-bg-secondary">{{ $t('lobby_waiting_badge') }}</span>
-                                    </template>
+                                    <AppGameThumbnail v-if="i < 6" :gamePublicId="myGame.publicId" class="game-thumb" />
+                                    <!-- Prevent displaying too many game views here -->
+                                    <AppRhombusAutoOrientation v-else class="game-thumb" />
 
-                                    <!-- empty div to align chrono right -->
-                                    <span v-else class="badge text-bg-primary">{{ $t('bot') }}</span>
+                                    <div class="d-flex justify-content-between w-100 align-items-end">
+                                        <template v-if="!isBotGame(myGame.hostedGame)">
+                                            <span v-if="myGame.isMyTurn" class="badge text-bg-success pulse-badge">{{ $t('lobby_your_turn_badge') }}</span>
+                                            <span v-else class="badge text-bg-secondary">{{ $t('lobby_waiting_badge') }}</span>
+                                        </template>
 
-                                    <AppChrono
-                                        v-if="getMyIndex(myGame.hostedGame) !== null && myGame.hostedGame.timeControl?.players[getMyIndex(myGame.hostedGame)!]"
-                                        :playerTimeData="myGame.hostedGame.timeControl.players[getMyIndex(myGame.hostedGame)!]"
-                                        :timeControlOptions="myGame.hostedGame.timeControlType"
-                                        class="chrono"
-                                    />
+                                        <!-- empty div to align chrono right -->
+                                        <span v-else class="badge text-bg-primary">{{ $t('bot') }}</span>
+
+                                        <AppChrono
+                                            v-if="getMyIndex(myGame.hostedGame) !== null && myGame.hostedGame.timeControl?.players[getMyIndex(myGame.hostedGame)!]"
+                                            :playerTimeData="myGame.hostedGame.timeControl.players[getMyIndex(myGame.hostedGame)!]"
+                                            :timeControlOptions="myGame.hostedGame.timeControlType"
+                                            class="chrono"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        </router-link>
+                            </router-link>
+                        </template>
                     </div>
                 </section>
 
@@ -376,6 +416,19 @@ for (const locale of getPlayerLocales()) {
 .game-thumb
     margin auto
     height 95px
+
+.challenge-card
+    justify-content center
+
+@css {
+    .challenge-card {
+        background: rgba(var(--bs-warning-rgb), 0.08);
+    }
+
+    .challenge-card:hover {
+        background: rgba(var(--bs-warning-rgb), 0.15);
+    }
+}
 
 .chrono
     font-size 0.75em

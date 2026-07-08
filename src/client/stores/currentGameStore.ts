@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import HostedGame from '../../shared/app/models/HostedGame.js';
 import { PlayingGameFacade } from '@playhex/pixi-board';
-import { addMove, cancelGame, canExplore, canPlayerUndo, cloneHostedGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, canExplore, canPlayerUndo, cloneHostedGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -1003,6 +1003,18 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         ;
     });
 
+    /**
+     * Whether I'm the target of a nominative challenge I have not joined yet,
+     * and can decline it.
+     */
+    const canDeclineChallenge = computed((): boolean => {
+        if (hostedGame.value === null) {
+            return false;
+        }
+
+        return isChallengeTargetOf(hostedGame.value, loggedInPlayer.value);
+    });
+
     const sendCancel = async (): Promise<string | true> => {
         if (!hostedGame.value) {
             throw new Error('unexpected no hostedGame');
@@ -1273,6 +1285,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         unreadMessages,
         isReadingChatMessages,
         canCancel,
+        canDeclineChallenge,
         canRematch,
         spectators,
         conditionalMovesEditor,

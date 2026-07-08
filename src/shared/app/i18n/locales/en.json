@@ -247,6 +247,7 @@
     "lobby_my_current_games": "My current games",
     "lobby_your_turn_badge": "Your turn",
     "lobby_waiting_badge": "Waiting",
+    "lobby_challenges_you_badge": "Challenges you!",
     "lobby_join": "Join",
     "lobby_game_no_longer_available": "Game no longer available",
     "lobby_active_players_one": "active player",
@@ -429,6 +430,7 @@
         "confirmLabel": "Yes, I resign",
         "cancelLabel": "No, continue playing"
     },
+    "decline_challenge": "Decline challenge",
     "auto": "Auto",
     "conditional_moves": {
         "title": "Conditional moves",
@@ -475,7 +477,9 @@
         "chat_message": "sending chat messages",
         "account_creation": "creating an account",
         "failed_login": "logging in",
-        "create_game": "creating a game"
+        "create_game": "creating a game",
+        "challenge_player": "challenging a player",
+        "challenge_same_target": "challenging this player again"
     },
     "game_with_player_has_started": "{{player}} has joined your game and the game has started",
     "last_move": "Last move",
@@ -617,6 +621,12 @@
     },
     "player_sent_you_rematch_offer": "{{ player }} challenged you to a rematch!",
     "player_sent_rematch_offer": "{{ player }} sent a rematch offer",
+    "challenge_player": "Challenge a player",
+    "player_challenged_you": "{{ player }} has challenged you to a game!",
+    "challenge_ranked": "Challenge (ranked)",
+    "challenge_friendly": "Challenge (friendly)",
+    "already_have_open_challenge_against_this_player": "You already have a pending challenge against this player.",
+    "cannot_challenge_yourself": "You cannot challenge yourself.",
     "short_time_unit": {
         "day": "d",
         "hour": "h",

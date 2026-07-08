@@ -150,6 +150,12 @@ Cypress.Commands.add('receivePlayerGamesUpdate', fixtureFile => {
     });
 });
 
+Cypress.Commands.add('receiveMyGamesUpdate', fixtureFile => {
+    cy.fixture(fixtureFile).then((fixtures: unknown[]) => {
+        cy.receiveSocketIoMessage('playerGamesUpdate', fixtures.map(fixture => plainToInstance(HostedGame, fixture)));
+    });
+});
+
 Cypress.Commands.add('mockSendChannelChat', (player) => {
     socketIoMock.once('sendChannelChat', (channel: string, content: string, answer: (result: true | string) => void) => {
         answer(true);

@@ -5,6 +5,7 @@ import { apiGetPlayerNotifications } from '../apiClient.js';
 import useAuthStore from './authStore.js';
 import { GamePlayerNotifications, groupPlayerNotificationByGame } from '../../shared/app/playerNotificationUtils.js';
 import useSocketStore from './socketStore.js';
+import { notifier } from '../services/notifications/notifier.js';
 
 /**
  * Stores player notifications: the ones in the header.
@@ -43,6 +44,10 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
         }
 
         playerNotifications.value.push(playerNotification);
+    });
+
+    socket.on('gameChallengeCreated', hostedGame => {
+        notifier.emit('gameChallengeCreated', hostedGame);
     });
 
     return {

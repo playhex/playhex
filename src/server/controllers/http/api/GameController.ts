@@ -1,17 +1,19 @@
 import type { Response } from 'express';
 import { format } from 'content-range';
-import HostedGameStore, { GameError } from '../../../store/HostedGameStore.js';
+import HostedGameStore, { AlreadyHaveOpenChallengeAgainstThisPlayerError, CannotChallengeYourselfError, GameError } from '../../../store/HostedGameStore.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, HttpError, JsonController, Param, Post, QueryParams, Res } from 'routing-controllers';
 import { Player, HostedGameOptions } from '../../../../shared/app/models/index.js';
 import { Service } from 'typedi';
 import { Expose } from '../../../../shared/app/class-transformer-custom.js';
+import { TranslatableHttpError } from '../../../../shared/app/TranslatableHttpError.js';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
 import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
 import { type HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import logger from '../../../services/logger.js';
-import { rateLimiterConsumeCreateGame } from '../../../services/rate-limiters.js';
+import { rateLimiterConsumeCreateGame, rateLimiterConsumeChallengePlayer, rateLimiterConsumeChallengeSameTarget } from '../../../services/rate-limiters.js';
+import { isChallengeGame } from '../../../../shared/app/hostedGameUtils.js';
 
 class AnswerUndoBody
 {
@@ -92,26 +94,44 @@ export default class GameController
     ) {
         await rateLimiterConsumeCreateGame(host.publicId);
 
-        try {
-            const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions, host }, { persist: false });
+        const isChallenge = isChallengeGame(gameOptions);
 
-            // Persist game:
-            // asynchronously to return it faster,
-            // but soon because we need to have a persisted entity to add relations from other entities (PlayerNotification, ChatMessage, ...)
-            hostedGameServer.persist()
-                .catch(e => {
-                    logger.warning('Could not persist game asynchronously after created it', {
-                        hostedGamePublicId: hostedGameServer.getPublicId(),
-                        errorMessage: e.message ?? e,
-                    });
-                })
-            ;
+        if (isChallenge) {
+            await rateLimiterConsumeChallengePlayer(host.publicId);
+            await rateLimiterConsumeChallengeSameTarget(host.publicId, gameOptions.opponentPublicId!);
+        }
+
+        try {
+            // Challenges must be persisted synchronously: the challenged player notification
+            // (mailbox, if offline) needs a persisted hostedGame with relations available.
+            // Other games persist asynchronously to return faster.
+            const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions, host }, { persist: isChallenge });
+
+            if (!isChallenge) {
+                hostedGameServer.persist()
+                    .catch(e => {
+                        logger.warning('Could not persist game asynchronously after created it', {
+                            hostedGamePublicId: hostedGameServer.getPublicId(),
+                            errorMessage: e.message ?? e,
+                        });
+                    })
+                ;
+            }
 
             return hostedGameServer.getHostedGame();
         } catch (e) {
+            if (e instanceof CannotChallengeYourselfError) {
+                throw new TranslatableHttpError(400, 'cannot_challenge_yourself');
+            }
+
+            if (e instanceof AlreadyHaveOpenChallengeAgainstThisPlayerError) {
+                throw new TranslatableHttpError(409, 'already_have_open_challenge_against_this_player');
+            }
+
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);
             }
+
             throw e;
         }
     }

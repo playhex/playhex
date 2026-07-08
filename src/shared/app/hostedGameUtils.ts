@@ -1,4 +1,4 @@
-import { HostedGame, HostedGameToPlayer, Player, Rating } from './models/index.js';
+import { HostedGame, HostedGameOptions, HostedGameToPlayer, Player, Rating } from './models/index.js';
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters from './SearchGamesParameters.js';
@@ -39,6 +39,11 @@ export const canJoin = (hostedGame: HostedGame, player: null | Player): boolean 
 
     // Cannot join if game is full
     if (hostedGame.hostedGameToPlayers.length >= 2) {
+        return false;
+    }
+
+    // Cannot join a game destinated to another player (challenge)
+    if (isChallengeGame(hostedGame) && hostedGame.opponentPublicId !== player.publicId) {
         return false;
     }
 
@@ -179,6 +184,28 @@ export const hasWon = (hostedGame: HostedGame, player: Player): boolean => {
 
 export const isBotGame = (hostedGame: HostedGame): boolean => {
     return hostedGame.opponentType === 'ai';
+};
+
+/**
+ * Whether this game is a nominative challenge: reserved for a specific human opponent.
+ * Such games should not appear in public lobby.
+ */
+export const isChallengeGame = (hostedGame: HostedGameOptions): hostedGame is HostedGameOptions & { opponentType: 'player', opponentPublicId: string } => {
+    return hostedGame.opponentType === 'player' && hostedGame.opponentPublicId !== null;
+};
+
+/**
+ * Whether player is the target of a nominative challenge, and has not joined it yet.
+ */
+export const isChallengeTargetOf = (hostedGame: HostedGame, player: null | Player): boolean => {
+    if (!player) {
+        return false;
+    }
+
+    return hostedGame.state === 'created'
+        && isChallengeGame(hostedGame)
+        && hostedGame.opponentPublicId === player.publicId
+    ;
 };
 
 export const is1v1Game = (hostedGame: HostedGame): boolean => {

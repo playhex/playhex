@@ -225,6 +225,12 @@ export type HexServerToClientEvents = {
     playerNotification: (playerNotification: PlayerNotification) => void;
 
     /**
+     * I have just been challenged by another player (nominative game, opponentPublicId set to me).
+     * Sent to my private player room, whatever page I'm on.
+     */
+    gameChallengeCreated: (hostedGame: HostedGame) => void;
+
+    /**
      * A spectator (non-player) started watching a game.
      */
     spectatorJoined: (gameId: string, player: Player) => void;

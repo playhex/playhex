@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, HostedGame, PlayerModerationAction, Tournament } from '../../../shared/app/models/index.js';
+import { ChatMessage, HostedGame, Player, PlayerModerationAction, Tournament } from '../../../shared/app/models/index.js';
 import { TimestampedMove } from '../../../shared/game-engine/Types.js';
 
 type NotifiableEvents = {
@@ -23,6 +23,13 @@ type NotifiableEvents = {
      * A game has been canceled.
      */
     gameCanceled: (hostedGame: HostedGame) => void;
+
+    /**
+     * A player has just been challenged nominatively by another player.
+     *
+     * @param opponent The challenged player (targeted by hostedGame.opponentPublicId)
+     */
+    gameChallengeCreated: (hostedGame: HostedGame, opponent: Player) => void;
 
     /**
      * Chat message received on a game.

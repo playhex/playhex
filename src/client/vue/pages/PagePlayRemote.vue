@@ -46,6 +46,7 @@ const {
     shouldDisplayConfirmMove,
     confirmMove,
     canCancel,
+    canDeclineChallenge,
     shouldDisplayAnswerUndoMove,
     shouldDisplayUndoMove,
     shouldEnableUndoMove,
@@ -220,6 +221,13 @@ const cancel = async (): Promise<void> => {
 };
 
 /*
+ * Decline challenge
+ */
+const declineChallenge = async (): Promise<void> => {
+    await sendCancel();
+};
+
+/*
  * Rematch
  */
 const canAcceptRematch: Ref<boolean> = ref(false);
@@ -334,8 +342,8 @@ const {
                     :gameView="gameView"
                 />
 
-                <div v-if="hostedGame && (canJoin(hostedGame, loggedInPlayer) || isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer))" class="join-button-container">
-                    <div class="d-flex justify-content-center">
+                <div v-if="hostedGame && canJoin(hostedGame, loggedInPlayer)" class="join-button-container">
+                    <div class="d-flex flex-column align-items-center gap-2">
                         <span :title="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer) ? $t('cannot_join_registered_only') : undefined">
                             <button
                                 class="btn btn-lg"
@@ -344,6 +352,13 @@ const {
                                 :disabled="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer)"
                             >{{ $t('game.accept') }}</button>
                         </span>
+
+                        <button
+                            v-if="canDeclineChallenge"
+                            type="button"
+                            class="btn btn-outline-warning"
+                            @click="declineChallenge()"
+                        >{{ $t('decline_challenge') }}</button>
                     </div>
                 </div>
             </div>

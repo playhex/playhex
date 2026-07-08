@@ -7,7 +7,7 @@ import { HostedGame } from '../../shared/app/models/index.js';
 import Rooms from '../../shared/app/Rooms.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
-import { addMove, cancelGame, cloneHostedGame, endGame, handleTimeControlUpdate, isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, cloneHostedGame, endGame, handleTimeControlUpdate, hasPlayer, isBotGame, isChallengeTargetOf } from '../../shared/app/hostedGameUtils.js';
 import { iAmInGame } from '../services/context-utils.js';
 import { notifier } from '../services/notifications/notifier.js';
 
@@ -39,11 +39,22 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         return Object.keys(myGames.value).length;
     });
 
+    const isPlaying = (game: CurrentGame): boolean => {
+        return game.hostedGame.state === 'playing';
+    };
+
     /**
-     * Number of games where it's my turn to play.
+     * Whether this is a nominative challenge addressed to me, that I have not joined yet.
+     */
+    const isIncomingChallenge = (game: CurrentGame): boolean => {
+        return isChallengeTargetOf(game.hostedGame, authStore.loggedInPlayer);
+    };
+
+    /**
+     * Number of games where it's my turn to play, plus pending challenges addressed to me.
      */
     const myTurnCount = computed((): number => {
-        return Object.values(myGames.value)
+        const myTurnPlaying = Object.values(myGames.value)
             .filter(game =>
                 isPlaying(game)
                 && !isBotGame(game.hostedGame)
@@ -51,6 +62,13 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             )
             .length
         ;
+
+        const incomingChallenges = Object.values(myGames.value)
+            .filter(isIncomingChallenge)
+            .length
+        ;
+
+        return myTurnPlaying + incomingChallenges;
     });
 
     const byMostUrgentFirst = (game0: CurrentGame, game1: CurrentGame): number => {
@@ -73,17 +91,18 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         return timeValueToMilliseconds(time0, now) - timeValueToMilliseconds(time1, now);
     };
 
-    const isPlaying = (game: CurrentGame): boolean => {
-        return game.hostedGame.state === 'playing';
-    };
-
+    /**
+     * Playing games first (non-bot before bot), then pending challenges addressed to me,
+     * so an incoming challenge appears after my playing games but before bot games.
+     */
     const mySortedGames = computed((): CurrentGame[] => {
-        const playingGames = Object.values(myGames.value)
-            .filter(game => isPlaying(game))
-            .sort(byMostUrgentFirst)
-        ;
+        const allGames = Object.values(myGames.value);
 
-        return playingGames;
+        const playingNonBot = allGames.filter(game => isPlaying(game) && !isBotGame(game.hostedGame)).sort(byMostUrgentFirst);
+        const incomingChallenges = allGames.filter(isIncomingChallenge);
+        const playingBot = allGames.filter(game => isPlaying(game) && isBotGame(game.hostedGame)).sort(byMostUrgentFirst);
+
+        return [...playingNonBot, ...incomingChallenges, ...playingBot];
     });
 
     /**
@@ -104,7 +123,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
 
     socket.on('gameCreated', (hostedGame: HostedGame) => {
-        if (!iAmInGame(hostedGame)) {
+        if (!iAmInGame(hostedGame) && !isChallengeTargetOf(hostedGame, authStore.loggedInPlayer)) {
             return;
         }
 
@@ -208,9 +227,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
 
         for (const hostedGame of initialGames) {
             const { publicId: id, currentPlayerIndex } = hostedGame;
+            const iAmParticipant = hasPlayer(hostedGame, me);
 
-            // I'm not in the game
-            if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
+            // I'm not in the game, and not the target of a pending challenge
+            if (!iAmParticipant && !isChallengeTargetOf(hostedGame, me)) {
                 continue;
             }
 
@@ -222,8 +242,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             let isMyTurn = false;
             let myColor: null | PlayerIndex = null;
 
-            myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
-            isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === me.publicId;
+            if (iAmParticipant) {
+                myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
+                isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === me.publicId;
+            }
 
             myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: cloneHostedGame(hostedGame) };
         }

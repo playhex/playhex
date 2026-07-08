@@ -2,6 +2,7 @@ import { defineOverlay } from '@overlastic/vue';
 import { useRouter } from 'vue-router';
 import Create1v1RankedOverlay from '../components/overlay/Create1v1RankedOverlay.vue';
 import HostedGameOptions from '../../../shared/app/models/HostedGameOptions.js';
+import { Player } from '../../../shared/app/models/index.js';
 import Create1v1FriendlyOverlay from '../components/overlay/Create1v1FriendlyOverlay.vue';
 import { apiPostGame } from '../../apiClient.js';
 import Create1vAIRankedOverlay from '../components/overlay/Create1vAIRankedOverlay.vue';
@@ -32,13 +33,13 @@ export const useCreateGameOverlay = () => {
     /*
      * 1 vs 1 - ranked
      */
-    const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions(), presetOpponent: null | Player = null) => {
         gameOptions.opponentType = 'player';
         gameOptions.ranked = true;
         gameOptions.explorationAllowed = false;
 
         try {
-            gameOptions = await create1v1RankedOverlay({ gameOptions });
+            gameOptions = await create1v1RankedOverlay({ gameOptions, presetOpponent });
             setLastCustomTimeControl(gameOptions.timeControlType);
 
             const hostedGame = await apiPostGame(gameOptions);
@@ -51,13 +52,13 @@ export const useCreateGameOverlay = () => {
     /*
      * 1 vs 1 - friendly
      */
-    const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions(), presetOpponent: null | Player = null) => {
         gameOptions.opponentType = 'player';
         gameOptions.ranked = false;
         gameOptions.explorationAllowed = true;
 
         try {
-            gameOptions = await create1v1FriendlyOverlay({ gameOptions });
+            gameOptions = await create1v1FriendlyOverlay({ gameOptions, presetOpponent });
             setLastCustomTimeControl(gameOptions.timeControlType);
 
             const hostedGame = await apiPostGame(gameOptions);

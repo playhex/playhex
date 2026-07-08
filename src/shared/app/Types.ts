@@ -39,6 +39,11 @@ export const cancelHostedGameReasons = [
     'by_opponent',
 
     /**
+     * Challenged player declined a nominative challenge before joining it
+     */
+    'declined',
+
+    /**
      * Stale because host created a game and went offline
      */
     'host_left',

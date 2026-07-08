@@ -17,12 +17,14 @@ import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
-import { isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf } from '../../shared/app/hostedGameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
 
 export class GameError extends Error {}
+export class CannotChallengeYourselfError extends GameError {}
+export class AlreadyHaveOpenChallengeAgainstThisPlayerError extends GameError {}
 
 @Service()
 export default class HostedGameStore
@@ -279,7 +281,7 @@ export default class HostedGameStore
     getWaiting1v1GamesData(): HostedGame[]
     {
         return Object.values(this.activeGames)
-            .filter(game => game.getHostedGame().state === 'created' && !isBotGame(game.getHostedGame()))
+            .filter(game => game.getHostedGame().state === 'created' && !isBotGame(game.getHostedGame()) && !isChallengeGame(game.getHostedGame()))
             .map(game => game.getHostedGame())
         ;
     }
@@ -350,6 +352,66 @@ export default class HostedGameStore
     }
 
     /**
+     * Tracks host+target pairs that have passed resolveChallengeTarget but are not yet
+     * registered in this.activeGames, to close the race window opened by the await below
+     * (two concurrent challenges from the same host to the same target would otherwise
+     * both read activeGames before either is inserted into it).
+     */
+    private readonly pendingChallengeKeys = new Set<string>();
+
+    private challengeKey(hostPublicId: string, opponentPublicId: string): string
+    {
+        return `${hostPublicId}:${opponentPublicId}`;
+    }
+
+    /**
+     * When creating a nominative challenge (opponentType player + opponentPublicId set),
+     * resolves and validates the challenged player: must exist, cannot be the host himself,
+     * and host cannot already have a pending (not yet joined) challenge against the same player.
+     */
+    private async resolveChallengeTarget(host: null | Player, opponentPublicId: string): Promise<Player>
+    {
+        if (host && host.publicId === opponentPublicId) {
+            throw new CannotChallengeYourselfError();
+        }
+
+        const opponent = await this.playerRepository.findOne({ where: { publicId: opponentPublicId } });
+
+        if (opponent === null) {
+            throw new GameError('Challenged player not found.');
+        }
+
+        if (opponent.isBot) {
+            throw new GameError('Cannot challenge a bot.');
+        }
+
+        if (host !== null) {
+            const key = this.challengeKey(host.publicId, opponentPublicId);
+
+            const alreadyChallenged = this.pendingChallengeKeys.has(key) || Object.values(this.activeGames).some(game => {
+                const g = game.getHostedGame();
+
+                return g.state === 'created'
+                    && g.opponentType === 'player'
+                    && g.opponentPublicId === opponentPublicId
+                    && g.host !== null
+                    && g.host.publicId === host.publicId
+                ;
+            });
+
+            if (alreadyChallenged) {
+                throw new AlreadyHaveOpenChallengeAgainstThisPlayerError();
+            }
+
+            // Reserved synchronously: no await happens between here and the game being
+            // added to this.activeGames, so a concurrent call cannot slip past this check.
+            this.pendingChallengeKeys.add(key);
+        }
+
+        return opponent;
+    }
+
+    /**
      * Officially creates a new hosted game, emit event to clients.
      */
     async createGame(
@@ -375,40 +437,77 @@ export default class HostedGameStore
             this.onlinePlayerService.notifyPlayerActivity(params.host);
         }
 
-        const hostedGame = createHostedGame(params);
-        const hostedGameServer = this.createHostedGameServerForHostedGame(hostedGame);
+        let challengedOpponent: null | Player = null;
+        const challengeKey = params.host && isChallengeGame(params.gameOptions)
+            ? this.challengeKey(params.host.publicId, params.gameOptions.opponentPublicId)
+            : null;
 
-        hostedGameServer.saveState();
+        if (isChallengeGame(params.gameOptions)) {
+            try {
+                challengedOpponent = await this.resolveChallengeTarget(params.host ?? null, params.gameOptions.opponentPublicId);
+            } catch (e) {
+                if (challengeKey !== null) {
+                    this.pendingChallengeKeys.delete(challengeKey);
+                }
 
-        logger.info('Hosted game created.', { host: params.host?.pseudo ?? null, publicId: hostedGame.publicId });
-
-        this.gameEventEmitter.emitGameCreated(hostedGame);
-
-        if (createOptions.aiJoinAuto ?? true) {
-            await this.makeAIJoinGameIfApplicable(hostedGameServer, params);
-        }
-
-        this.activeGames[hostedGameServer.getPublicId()] = hostedGameServer;
-
-        this.listenHostedGameServer(hostedGameServer);
-
-        if (!(createOptions.persist ?? true)) {
-            return hostedGameServer;
+                throw e;
+            }
         }
 
         try {
-            await hostedGameServer.persist();
-        } catch (e) {
-            logger.error('Could not persist game after creation', {
-                hostedGamePublicId: hostedGameServer.getPublicId(),
-                message: e.message,
-                stack: e.stack,
-            });
+            const hostedGame = createHostedGame(params);
+            const hostedGameServer = this.createHostedGameServerForHostedGame(hostedGame);
 
-            throw e;
+            hostedGameServer.saveState();
+
+            logger.info('Hosted game created.', { host: params.host?.pseudo ?? null, publicId: hostedGame.publicId });
+
+            this.gameEventEmitter.emitGameCreated(hostedGame);
+
+            // Rematching a challenge already notifies the opponent through the rematch offer,
+            // no need to also notify them as if it were a new, unrelated challenge.
+            const isRematch = params.rematchedFrom != null;
+
+            if (challengedOpponent !== null && !isRematch) {
+                this.gameEventEmitter.emitGameChallengeCreated(hostedGame);
+            }
+
+            if (createOptions.aiJoinAuto ?? true) {
+                await this.makeAIJoinGameIfApplicable(hostedGameServer, params);
+            }
+
+            this.activeGames[hostedGameServer.getPublicId()] = hostedGameServer;
+
+            this.listenHostedGameServer(hostedGameServer);
+
+            if (!(createOptions.persist ?? true)) {
+                return hostedGameServer;
+            }
+
+            try {
+                await hostedGameServer.persist();
+            } catch (e) {
+                logger.error('Could not persist game after creation', {
+                    hostedGamePublicId: hostedGameServer.getPublicId(),
+                    message: e.message,
+                    stack: e.stack,
+                });
+
+                throw e;
+            }
+
+            if (challengedOpponent !== null && !isRematch) {
+                notifier.emit('gameChallengeCreated', hostedGame, challengedOpponent);
+            }
+
+            return hostedGameServer;
+        } finally {
+            // Now either registered in activeGames (the authoritative check going forward)
+            // or the whole creation failed: either way the reservation is no longer needed.
+            if (challengeKey !== null) {
+                this.pendingChallengeKeys.delete(challengeKey);
+            }
         }
-
-        return hostedGameServer;
     }
 
     async rematchGame(host: Player, publicId: string): Promise<HostedGame>
@@ -434,7 +533,15 @@ export default class HostedGameStore
             throw new GameError('Cannot rematch an active game');
         }
 
-        const params = { gameOptions: cloneGameOptions(game), host, rematchedFrom: game };
+        const gameOptions = cloneGameOptions(game);
+
+        // On rematch, the target is the opponent.
+        // Also, since we clone previous gameOptions, prevent reusing same opponentPublicId,
+        // and bug "cannot challenge self".
+        const otherPlayer = getOtherPlayer(game, host);
+        gameOptions.opponentPublicId = otherPlayer?.publicId ?? null;
+
+        const params = { gameOptions, host, rematchedFrom: game };
 
         const rematch = await this.createGame(params, { persist: false, aiJoinAuto: false }); // do not persist because will persist later in the transaction, at same time as rematchId
         game.rematch = rematch.getHostedGame();
@@ -495,11 +602,16 @@ export default class HostedGameStore
         const hostedGameServers: HostedGameServer[] = [];
 
         for (const key in this.activeGames) {
-            if (!this.activeGames[key].isPlayerInGame(player)) {
+            const hostedGameServer = this.activeGames[key];
+
+            if (
+                !hostedGameServer.isPlayerInGame(player)
+                && !isChallengeTargetOf(hostedGameServer.getHostedGame(), player)
+            ) {
                 continue;
             }
 
-            hostedGameServers.push(this.activeGames[key]);
+            hostedGameServers.push(hostedGameServer);
         }
 
         return hostedGameServers;

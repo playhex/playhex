@@ -154,6 +154,34 @@ notifier.on('gameCanceled', async hostedGame => {
     }
 });
 
+/**
+ * Tells player that they have been nominatively challenged by another player.
+ *
+ * Should send only when player is offline or inactive,
+ * as active players are already notified in real time (toast + sound).
+ */
+notifier.on('gameChallengeCreated', async (hostedGame, opponent) => {
+    if (onlinePlayerService.isActive(opponent)) {
+        return;
+    }
+
+    if (hostedGame.host === null) {
+        return;
+    }
+
+    const playerNotification = createPlayerNotification(
+        'gameChallenge',
+        {
+            player: pseudoString(hostedGame.host),
+        },
+        opponent,
+        hostedGame,
+        hostedGame.createdAt,
+    );
+
+    await playerNotificationService.addNotification(playerNotification);
+});
+
 notifier.on('moderationActionTaken', async action => {
     if (action.relatedChatMessages.length === 0) {
         return;

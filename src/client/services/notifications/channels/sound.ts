@@ -77,3 +77,7 @@ notifier.on('rematchOffer', hostedGame => {
 
     playAudioIfNotMuted('/sounds/lisp/NewChallenge.ogg');
 });
+
+notifier.on('gameChallengeCreated', () => {
+    playAudioIfNotMuted('/sounds/lisp/NewChallenge.ogg');
+});

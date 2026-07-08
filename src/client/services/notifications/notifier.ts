@@ -27,6 +27,12 @@ type NotifiableEvents = {
     rematchOffer: (hostedGame: HostedGame) => void;
 
     /**
+     * I have just been nominatively challenged by another player.
+     * hostedGame.host is the challenger.
+     */
+    gameChallengeCreated: (hostedGame: HostedGame) => void;
+
+    /**
      * Chat message received on a game
      */
     chatMessage: (hostedGame: HostedGame, chatMessage: ChatMessage) => void;

@@ -42,6 +42,16 @@ type PlayerNotificationTypes = {
     gameCanceled: null;
 
     /**
+     * A player has nominatively challenged me to a game
+     */
+    gameChallenge: {
+        /**
+         * Nickname of player who challenged me
+         */
+        player: string;
+    };
+
+    /**
      * A moderation action has been taken against a player that I met
      */
     myOpponentHasBeenModerated: {
