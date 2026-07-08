@@ -3,6 +3,7 @@ import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared
 import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
+import { isTranslatableHttpErrorPayload } from '../shared/app/TranslatableHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
@@ -13,6 +14,7 @@ import { ActiveTournamentsFilters } from '../shared/app/tournamentUtils.js';
 import { ConditionalMovesStruct } from '@playhex/pixi-board';
 import { isRateLimitReachedErrorPayload } from '../shared/app/rate-limiters.js';
 import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
+import { showToastForTranslatableError } from './services/showToastForTranslatableError.js';
 
 /**
  * @throws {DomainHttpError}
@@ -40,6 +42,11 @@ const checkResponse = async (response: Response): Promise<void> => {
 
         if (isDomainHttpErrorPayload(payload)) {
             throw denormalizeDomainHttpError(payload);
+        }
+
+        if (isTranslatableHttpErrorPayload(payload)) {
+            showToastForTranslatableError(payload);
+            throw new Error(payload.translationKey);
         }
 
         if (isRateLimitReachedErrorPayload(payload)) {
