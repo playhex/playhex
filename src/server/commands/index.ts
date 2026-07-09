@@ -14,6 +14,7 @@ import './checkTestsRequirements.js';
 import './migrateCypressFixtures.js';
 import './missingTranslationsCommand.js';
 import './createFakeNotificationsCommand.js';
+import './generateStatsCommand.js';
 
 await hexProgram.parseAsync();
 

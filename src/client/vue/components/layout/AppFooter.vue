@@ -52,6 +52,7 @@ i18n.on('languageChanged', () => {
             <router-link :to="{ name: 'contributors' }">{{ $t('contributors') }}</router-link>
             <router-link :to="{ name: 'rescue' }">Rescue page</router-link>
             <router-link :to="{ name: 'export-games-data' }">Export games data</router-link>
+            <router-link :to="{ name: 'statistics' }">{{ $t('statistics.title') }}</router-link>
             <a href="https://stats.uptimerobot.com/mJrbJF1nfb" target="_blank">Server status</a>
             <router-link :to="{ name: 'guide-moderation' }">{{ $t('moderation') }}</router-link>
             <router-link :to="{ name: 'privacy' }">{{ $t('privacy_policy') }}</router-link>

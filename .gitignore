@@ -6,6 +6,7 @@ cypress/screenshots/
 size-stats-*.json
 var/
 /assets/export-data/
+/assets/stats/
 /views/pre-rendered/
 tsconfig.tsbuildinfo
 assets/avatars/
