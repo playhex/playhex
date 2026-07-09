@@ -1,9 +1,12 @@
-/**
- * Row is number
- * Col is letter
- */
 export type Coords = {
+    /**
+     * Row is number (minus 1)
+     */
     row: number;
+
+    /**
+     * Col is letter (minus 1)
+     */
     col: number;
 };
 
