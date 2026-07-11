@@ -5,6 +5,7 @@ import ChannelChatMessage from './ChannelChatMessage.js';
 import ChatMessage from './ChatMessage.js';
 import ConditionalMoves from './ConditionalMoves.js';
 import GameAnalyze from './GameAnalyze.js';
+import GamePositionBand from './GamePositionBand.js';
 import HostedGame from './HostedGame.js';
 import HostedGameOptions from './HostedGameOptions.js';
 import {
@@ -44,6 +45,7 @@ export {
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
+    GamePositionBand,
     HostedGameOptions,
     HostedGameOptionsTimeControl,
     OptionsFischer,
@@ -83,6 +85,7 @@ export const entities = {
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
+    GamePositionBand,
     HostedGameOptions,
     HostedGameOptionsTimeControl,
     OptionsFischer,

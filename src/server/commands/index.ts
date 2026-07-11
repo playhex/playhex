@@ -16,6 +16,7 @@ import './missingTranslationsCommand.js';
 import './createFakeNotificationsCommand.js';
 import './generateStatsCommand.js';
 import './findSimilarGamesCommand.js';
+import './indexGamePositionsCommand.js';
 
 await hexProgram.parseAsync();
 

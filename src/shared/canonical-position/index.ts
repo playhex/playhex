@@ -48,7 +48,7 @@ export type PositionDiff = {
  * after swap-pieces (if any) is made,
  * and without pass moves.
  */
-type StandardizedPosition = {
+export type StandardizedPosition = {
     boardsize: number;
     black: Coords[];
     white: Coords[];
@@ -176,7 +176,7 @@ const colors = ['black', 'white'] as const;
  * black: [{ row: ... col: ... }]
  * white: [{ row: ... col: ... }]
  */
-const movesToStandardizedPosition = (movesString: string, boardsize: number): StandardizedPosition => {
+export const movesToStandardizedPosition = (movesString: string, boardsize: number): StandardizedPosition => {
     const moves = movesString.split(' ') as unknown as HexMove[];
 
     const standardizedPosition: StandardizedPosition = {
