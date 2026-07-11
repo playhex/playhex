@@ -173,7 +173,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         ;
     }
 
-    getPlayerIndex(player: Player): null | number
+    getPlayerIndex(player: Player): null | 0 | 1
     {
         const index = this.players.findIndex(p => p.publicId === player.publicId);
 
@@ -181,7 +181,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return null;
         }
 
-        return index;
+        return index as 0 | 1;
     }
 
     getState(): HostedGameState
@@ -735,6 +735,13 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
     }
 
+    /**
+     * Receiving player premove.
+     *
+     * Race conditions to avoid:
+     * - receiving premove too late, for previous move, must not be played now (https://github.com/playhex/playhex/issues/131)
+     * - receiving premove too late, after opponent player, must play it now (https://github.com/playhex/playhex/issues/160)
+     */
     playerPremove(player: Player, premove: Premove): true | string
     {
         if (this.hostedGame.state !== 'playing') {
@@ -747,7 +754,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game not yet started, cannot make a move';
         }
 
-        if (!this.isPlayerInGame(player)) {
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (playerIndex === null) {
             this.logger.notice('A player not in the game tried to register a premove', { player: player.pseudo });
             return 'you are not a player of this game';
         }
@@ -757,19 +766,27 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'a move is already played at this index';
         }
 
-        this.premoves[this.getPlayerIndex(player) as PlayerIndex] = premove;
+        if (playerIndex === this.game.getCurrentPlayerIndex()) {
+            this.logger.notice('Premove received too late, but still my turn to play, fire it now', { player: player.pseudo });
+            this.playerMove(player, premove.move);
+            return true;
+        }
+
+        this.premoves[playerIndex] = premove;
 
         return true;
     }
 
     playerCancelPremove(player: Player): true | string
     {
-        if (!this.isPlayerInGame(player)) {
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (playerIndex === null) {
             this.logger.notice('A player not in the game tried to cancel a premove', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
-        this.premoves[this.getPlayerIndex(player) as PlayerIndex] = null;
+        this.premoves[playerIndex] = null;
 
         return true;
     }
@@ -802,7 +819,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'there is already an undo request';
         }
 
-        const reason = this.game.canPlayerUndo(playerIndex as PlayerIndex);
+        const reason = this.game.canPlayerUndo(playerIndex);
 
         if (reason !== true) {
             return reason;
@@ -1041,7 +1058,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         if (this.game !== null) {
-            this.game.forfeit(playerIndex as PlayerIndex, now);
+            this.game.forfeit(playerIndex, now);
         } else {
             this.doEnd(1 - playerIndex as PlayerIndex, 'forfeit', now);
         }

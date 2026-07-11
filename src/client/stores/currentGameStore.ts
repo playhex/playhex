@@ -524,7 +524,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
                     if (game.value.getBoard().isEmpty(move)) {
                         // set or replace premove
-                        void sendPremove(move);
+                        sendPremove(move).catch(reason => {
+                            playingGameFacade.value?.removePreviewedMove();
+                            throw reason;
+                        });
                         playingGameFacade.value?.setPreviewedMove(move, localPlayerIndex.value);
                     } else if (playingGameFacade.value?.hasPreviewedMove()) {
                         // cancel premove when click on occupied cell
