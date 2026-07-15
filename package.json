@@ -31,7 +31,7 @@
     "serve:prod": "yarn build && yarn start:prod",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn build-server\" \"yarn build-client\"",
     "typeorm": "TS_NODE_PROJECT=src/server/tsconfig.json typeorm-ts-node-esm -d src/server/data-source.ts",
-    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/shared/tsconfig.json\" mocha 'src/**/**/**/test/**/**/**/*.ts' --extension ts --ignore 'src/**/node_modules/**' --ignore 'src/**/pixi-board/**'",
+    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/shared/tsconfig.json\" mocha 'src/**/**/**/test/**/**/**/*.ts' --extension ts --ignore 'src/**/node_modules/**' --ignore 'src/**/pixi-board/**' --exit",
     "test:e2e": "yarn hex check-tests-requirements && concurrently --kill-others --names SERVER,CYPRESS \"yarn serve:prod\" \"wait-on http://localhost:${PORT:-3000} && yarn cypress run --browser firefox\"",
     "test:all": "yarn test:unit && yarn test:e2e",
     "test": "yarn test:unit"
