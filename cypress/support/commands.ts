@@ -141,6 +141,12 @@ Cypress.Commands.add('receiveLobbyUpdate', fixtureFile => {
     });
 });
 
+Cypress.Commands.add('receiveLobbyGameCreated', fixtureFile => {
+    cy.fixture(fixtureFile).then((fixture: unknown) => {
+        cy.receiveSocketIoMessage('lobbyGameCreated', plainToInstance(HostedGame, fixture));
+    });
+});
+
 Cypress.Commands.add('receivePlayerGamesUpdate', fixtureFile => {
     cy.fixture(fixtureFile).then((fixtures: unknown[]) => {
         const hostedGames = fixtures.map(fixture => plainToInstance(HostedGame, fixture));

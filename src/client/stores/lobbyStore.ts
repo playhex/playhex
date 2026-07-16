@@ -4,9 +4,10 @@ import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
 import { computed, ref, watchEffect } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
-import { cancelGame, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { cancelGame, hasPlayer, isChallengeGame, isChallengeTargetOf, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { isCorrespondence, isLive, TimeControlCadency } from '../../shared/app/timeControlUtils.js';
+import useAuthStore from './authStore.js';
 
 /**
  * Do not hide games directly from lobby when game started or canceled,
@@ -37,6 +38,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     const socketStore = useSocketStore();
     const { socket, joinRoom } = socketStore;
+    const authStore = useAuthStore();
 
     /**
      * List of games waiting for opponent, show on lobby in created section,
@@ -155,6 +157,17 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         });
 
         socket.on('lobbyGameCreated', (hostedGame: HostedGame) => {
+            // Nominative challenges are not part of the public lobby,
+            // except for the host and the targeted player, who should still see it there.
+            if (isChallengeGame(hostedGame)) {
+                const player = authStore.loggedInPlayer;
+                const isRelevantToMe = null !== player && (hasPlayer(hostedGame, player) || isChallengeTargetOf(hostedGame, player));
+
+                if (!isRelevantToMe) {
+                    return;
+                }
+            }
+
             hostedGames.value[hostedGame.publicId] = hostedGame;
         });
 

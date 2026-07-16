@@ -52,6 +52,11 @@ declare namespace Cypress {
         receiveLobbyUpdate(fixtureFile: string): Chainable;
 
         /**
+         * Simulate a "lobbyGameCreated" message with a fixture file (single game, will be denormalized).
+         */
+        receiveLobbyGameCreated(fixtureFile: string): Chainable;
+
+        /**
          * Simulate a "playerGamesUpdate" message with a fixture file (will be denormalized).
          * Also emits the same games as a "lobbyUpdate" message.
          */

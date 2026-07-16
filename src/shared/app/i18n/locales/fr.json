@@ -670,6 +670,14 @@
     "opponent_must_be_registered": "Joueurs avec compte uniquement",
     "opponent_must_be_registered_help": "Les invités ne peuvent pas rejoindre cette partie. Seuls les joueurs avec un compte sont acceptés.",
     "cannot_join_registered_only": "Cette partie est réservée aux joueurs avec un compte. Créez un compte ou connectez-vous pour rejoindre.",
+    "cannot_join_reason": {
+        "not_logged_in": "Connectez-vous pour rejoindre cette partie.",
+        "is_host": "Vous êtes l'hôte de cette partie, en attente d'un adversaire.",
+        "is_host_challenge": "Vous êtes l'hôte de cette partie, en attente de la réponse de {{pseudo}}.",
+        "reserved_for_other_player": "Cette partie est un défi réservé à un autre joueur.",
+        "reserved_for_other_player_named": "Cette partie est un défi réservé à {{pseudo}}.",
+        "other": "Vous ne pouvez pas rejoindre cette partie."
+    },
     "no_active_tournament": "Aucun tournoi en cours pour le moment.",
     "no_upcoming_tournament": "Aucun tournoi à venir pour le moment.",
     "update": "Mettre à jour",

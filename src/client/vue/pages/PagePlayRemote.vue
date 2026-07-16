@@ -17,8 +17,8 @@ import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import { apiPostRematch } from '../../apiClient.js';
-import { canJoin, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
+import { apiPostRematch, getPlayer } from '../../apiClient.js';
+import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
@@ -101,6 +101,102 @@ watch(simulatePlayingGameFacade, (facade, oldFacade) => {
         simulationMainCursor.value = 0;
     }
 }, { immediate: true });
+
+/**
+ * When the "Accept" button is not shown on a waiting game (state "created"),
+ * explain why, instead of showing nothing.
+ * canJoin() alone drives whether we show anything at all; the few checks below
+ * only pick which text to display, they do not re-decide whether joining is possible.
+ */
+const cannotJoinReasonType = computed<null
+    | 'cannot_join_registered_only'
+    | 'cannot_join_reason.not_logged_in'
+    | 'cannot_join_reason.is_host'
+    | 'cannot_join_reason.reserved_for_other_player'
+    | 'cannot_join_reason.other'
+>(() => {
+    if (!hostedGame.value || hostedGame.value.state !== 'created') {
+        return null;
+    }
+
+    if (isGuestBlockedFromRegisteredOnlyGame(hostedGame.value, loggedInPlayer.value)) {
+        return 'cannot_join_registered_only';
+    }
+
+    if (canJoin(hostedGame.value, loggedInPlayer.value)) {
+        return null;
+    }
+
+    if (!loggedInPlayer.value) {
+        return 'cannot_join_reason.not_logged_in';
+    }
+
+    if (hostedGame.value.host?.publicId === loggedInPlayer.value.publicId) {
+        return 'cannot_join_reason.is_host';
+    }
+
+    if (isChallengeGame(hostedGame.value) && hostedGame.value.opponentPublicId !== loggedInPlayer.value.publicId) {
+        return 'cannot_join_reason.reserved_for_other_player';
+    }
+
+    return 'cannot_join_reason.other';
+});
+
+/**
+ * Pseudo of the targeted opponent, fetched by publicId, when relevant to the displayed reason.
+ */
+const cannotJoinOpponentPseudo = ref<null | string>(null);
+
+watch([cannotJoinReasonType, hostedGame], async ([reasonType, game]) => {
+    cannotJoinOpponentPseudo.value = null;
+
+    if (reasonType !== 'cannot_join_reason.is_host' && reasonType !== 'cannot_join_reason.reserved_for_other_player') {
+        return;
+    }
+
+    if (!game || game.opponentPublicId === null) {
+        return;
+    }
+
+    try {
+        const opponent = await getPlayer(game.opponentPublicId);
+        cannotJoinOpponentPseudo.value = pseudoString(opponent, 'pseudo');
+    } catch (e) {
+        // Could not fetch opponent, fall back to a generic message without pseudo.
+    }
+}, { immediate: true });
+
+const cannotJoinReasonKey = computed<null | string>(() => {
+    const type = cannotJoinReasonType.value;
+
+    if (!type) {
+        return null;
+    }
+
+    if (type === 'cannot_join_reason.is_host' && cannotJoinOpponentPseudo.value) {
+        return 'cannot_join_reason.is_host_challenge';
+    }
+
+    if (type === 'cannot_join_reason.reserved_for_other_player' && cannotJoinOpponentPseudo.value) {
+        return 'cannot_join_reason.reserved_for_other_player_named';
+    }
+
+    return type;
+});
+
+/**
+ * Whether the "Accept" button itself should render.
+ * Registered-only games block guests entirely now: show the reason instead of a disabled button.
+ */
+const showAcceptButton = computed<boolean>(() => {
+    if (!hostedGame.value) {
+        return false;
+    }
+
+    return canJoin(hostedGame.value, loggedInPlayer.value)
+        && !isGuestBlockedFromRegisteredOnlyGame(hostedGame.value, loggedInPlayer.value)
+    ;
+});
 
 const effectiveTimeControlValues = computed<null | GameTimeData>(() => {
     if (!hostedGame.value?.timeControl) return null;
@@ -342,16 +438,16 @@ const {
                     :gameView="gameView"
                 />
 
-                <div v-if="hostedGame && canJoin(hostedGame, loggedInPlayer)" class="join-button-container">
+                <div v-if="hostedGame && (showAcceptButton || canDeclineChallenge || cannotJoinReasonKey)" class="join-button-container">
                     <div class="d-flex flex-column align-items-center gap-2">
-                        <span :title="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer) ? $t('cannot_join_registered_only') : undefined">
-                            <button
-                                class="btn btn-lg"
-                                :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
-                                @click="join()"
-                                :disabled="isGuestBlockedFromRegisteredOnlyGame(hostedGame, loggedInPlayer)"
-                            >{{ $t('game.accept') }}</button>
-                        </span>
+                        <button
+                            v-if="showAcceptButton"
+                            class="btn btn-lg"
+                            :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
+                            @click="join()"
+                        >{{ $t('game.accept') }}</button>
+
+                        <p v-else-if="cannotJoinReasonKey" class="text-center mb-0">{{ $t(cannotJoinReasonKey, { pseudo: cannotJoinOpponentPseudo }) }}</p>
 
                         <button
                             v-if="canDeclineChallenge"
@@ -522,10 +618,11 @@ const {
 
 <style scoped lang="stylus">
 .join-button-container
-    top 0
+    top 15%
     position absolute
     width 100%
-    margin-top 1em
+    background rgba(0, 0, 0, 0.1)
+    padding 1em 0
 
 .board-container
     position relative // center "Accept" button relative to this container
