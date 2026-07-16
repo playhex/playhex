@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cache';
+const CACHE_NAME = 'cache-v2';
 
 self.addEventListener('install', () => {
     self.skipWaiting();
@@ -65,6 +65,9 @@ const getCachePolicy = (request) => {
 
         [url => url.startsWith('/locales/'), CachePolicy.CACHE_FIRST],
         [url => url.startsWith('/images/'), CachePolicy.CACHE_FIRST],
+
+        // Not content-hashed, unlike other /statics/ files: must revalidate against network.
+        [url => url === '/statics/reflect-metadata.js', CachePolicy.NETWORK_FIRST],
         [url => url.startsWith('/statics/'), CachePolicy.CACHE_FIRST],
     ];
 
