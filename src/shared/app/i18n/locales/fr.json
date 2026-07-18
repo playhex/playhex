@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Jouer au Hex en ligne",
+    "lobby_title": "Jouer au Y en ligne",
     "lobby": {
         "no_waiting_games": "Pas de partie en attente pour l'instant. Créez-en une !",
         "watch_current_games": "Observer les parties",
@@ -685,7 +685,7 @@
     "tournaments_page_intro": "Voici les tournois de Hex, qui peuvent être <strong>organisés par n’importe qui</strong> sous différents formats tels que le système suisse ou l’élimination directe.<br>Vous pouvez regarder les parties des tournois en cours ou rejoindre un tournoi à venir.<br><strong>Pour participer</strong>, assurez-vous de <strong>vous enregistrer à temps</strong>. Vous pouvez vous abonner pour recevoir une notification lorsque les inscriptions ouvrent.<br>Consultez la description du tournoi pour les détails comme les horaires d’enregistrement, le format et les participants.",
     "bot": "Ordi",
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Mode configuration",
         "validate": "Valider",
         "undo_placement": "Annuler le placement",

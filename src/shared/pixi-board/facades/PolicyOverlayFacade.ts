@@ -95,7 +95,10 @@ export class PolicyOverlayFacade
             for (let col = 0; col < size; ++col) {
                 const g = new Graphics();
                 this.overlays[row][col] = g;
-                this.gameView.getHexByCoords({ row, col }).addChild(g);
+
+                if (this.gameView.isOnBoard(row, col)) {
+                    this.gameView.getHexByCoords({ row, col }).addChild(g);
+                }
             }
         }
 

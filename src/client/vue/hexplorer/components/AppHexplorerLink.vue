@@ -47,7 +47,7 @@ const shouldDisplayLink = (): boolean => {
     <router-link
         v-if="shouldDisplayLink()"
         :to="{
-            name: 'hexplorer',
+            name: 'yxplorer',
             hash: '#' + createHexworldString(hostedGame, orientation ?? GameView.ORIENTATION_DIAMOND),
         }"
     >{{ $t('hexplorer.title') }}</router-link>

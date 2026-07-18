@@ -7,9 +7,7 @@ import Stone from './entities/Stone.js';
 import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '../move-notation/move-notation.js';
 import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
 
-const { min, max, sin, cos, sqrt, ceil, PI } = Math;
-const SQRT_3_2 = sqrt(3) / 2;
-const PI_3 = PI / 3;
+const { min, max, sin, cos, ceil, PI } = Math;
 const PI_6 = PI / 6;
 
 export type GameViewSize = {
@@ -196,7 +194,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private coordsTexts: Text[] = [];
 
-    private sidesGraphics: [Graphics, Graphics];
+    private sidesGraphics: Graphics[];
 
     private resizeObserver: null | ResizeObserver = null;
 
@@ -255,6 +253,31 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     getBoardsize(): number
     {
         return this.boardsize;
+    }
+
+    /**
+     * Whether a cell is on the triangular Y board (lower-left triangle).
+     */
+    isOnBoard(row: number, col: number): boolean
+    {
+        return row >= 0 && col >= 0 && row + col <= this.boardsize - 1;
+    }
+
+    /**
+     * Centroid of the triangle (average of its three corner cells),
+     * used as rotation pivot and to fit the board in its container.
+     */
+    private getBoardCentroid(): PointData
+    {
+        const lastI = this.boardsize - 1;
+        const c0 = Hex.coords(0, 0);
+        const c1 = Hex.coords(0, lastI);
+        const c2 = Hex.coords(lastI, 0);
+
+        return {
+            x: (c0.x + c1.x + c2.x) / 3,
+            y: (c0.y + c1.y + c2.y) / 3,
+        };
     }
 
     private init(): void
@@ -380,7 +403,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     {
         for (let row = 0; row < this.boardsize; ++row) {
             for (let col = 0; col < this.boardsize; ++col) {
-                this.hexes[row][col].updateTheme(this.theme);
+                if (this.isOnBoard(row, col)) {
+                    this.hexes[row][col].updateTheme(this.theme);
+                }
             }
         }
 
@@ -404,16 +429,9 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.updateCoordsTextsOrientation();
         this.updateEntitiesRotation();
 
-        this.gameContainer.pivot = Hex.coords(
-            this.boardsize / 2 - 0.5,
-            this.boardsize / 2 - 0.5,
-        );
+        this.gameContainer.pivot = this.getBoardCentroid();
 
-        this.gameContainer.position = {
-            x: wrapperSize.width / 2,
-            y: wrapperSize.height / 2,
-        };
-
+        // autoResize() sets scale and the centered position.
         this.autoResize();
     }
 
@@ -523,56 +541,44 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      */
     private autoResize(): void
     {
-        const { rotation } = this.gameContainer;
-
-        const boardHeight = Hex.RADIUS * this.boardsize * 1.5 - 0.5;
-        const boardWidth = Hex.RADIUS * this.boardsize * SQRT_3_2;
         const wrapperSize = this.getWrapperSize();
 
         if (wrapperSize === null) {
             return;
         }
 
-        const boardCorner0 = {
-            x: wrapperSize.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
-            y: wrapperSize.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
-        };
+        const { rotation } = this.gameContainer;
+        const pivot = this.getBoardCentroid();
+        const lastI = this.boardsize - 1;
 
-        const boardCorner1 = {
-            x: wrapperSize.width / 2 + boardWidth * cos(rotation - PI_3),
-            y: wrapperSize.height / 2 + boardWidth * sin(rotation - PI_3),
-        };
+        // The three triangle corners (cell centers), in game container space,
+        // rotated around the pivot to get their on-screen bounding box.
+        const corners = [
+            Hex.coords(0, 0),
+            Hex.coords(0, lastI),
+            Hex.coords(lastI, 0),
+        ].map(p => {
+            const dx = p.x - pivot.x;
+            const dy = p.y - pivot.y;
 
-        const boardCorner2 = {
-            x: wrapperSize.width - boardCorner0.x,
-            y: wrapperSize.height - boardCorner0.y,
-        };
+            return {
+                x: dx * cos(rotation) - dy * sin(rotation),
+                y: dx * sin(rotation) + dy * cos(rotation),
+            };
+        });
 
-        const boardCorner3 = {
-            x: wrapperSize.width - boardCorner1.x,
-            y: wrapperSize.height - boardCorner1.y,
-        };
+        const xs = corners.map(c => c.x);
+        const ys = corners.map(c => c.y);
 
-        const boardMaxCorner0 = {
-            x: min(boardCorner0.x, boardCorner1.x, boardCorner2.x, boardCorner3.x),
-            y: min(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
-        };
+        const minX = min(...xs);
+        const maxX = max(...xs);
+        const minY = min(...ys);
+        const maxY = max(...ys);
 
-        const boardMaxCorner1 = {
-            x: max(boardCorner0.x, boardCorner1.x, boardCorner2.x, boardCorner3.x),
-            y: max(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
-        };
-
-        let boxWidth = boardMaxCorner1.x - boardMaxCorner0.x;
-        let boxHeight = boardMaxCorner1.y - boardMaxCorner0.y;
-
-        // Add margin to prevent cells to be slightly cropped.
-        // Depending on orientation, either width or height margin is needed.
-        if ([1, 2, 3].includes(this.getOrientation() % 6)) {
-            boxWidth += 30;
-        } else {
-            boxHeight += 30;
-        }
+        // Corners are cell centers; add margin for the cells and colored sides
+        // that extend beyond them.
+        let boxWidth = maxX - minX + Hex.RADIUS * 3;
+        let boxHeight = maxY - minY + Hex.RADIUS * 3;
 
         // Add margin to display coords around the board
         if (this.displayCoords) {
@@ -586,6 +592,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         );
 
         this.gameContainer.scale = { x: scale, y: scale };
+
+        // A triangle's centroid is not its bounding-box center, so centering on
+        // the pivot alone leaves it off-centre. Offset the position so the
+        // rotated bounding box is centered in the wrapper.
+        const boxCenterX = (minX + maxX) / 2;
+        const boxCenterY = (minY + maxY) / 2;
+
+        this.gameContainer.position = {
+            x: wrapperSize.width / 2 - boxCenterX * scale,
+            y: wrapperSize.height / 2 - boxCenterY * scale,
+        };
     }
 
     private clearLongPressTimeout(): void
@@ -605,6 +622,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         for (let row = 0; row < this.boardsize; ++row) {
             for (let col = 0; col < this.boardsize; ++col) {
+                // Only build cells that are on the triangular board
+                if (!this.isOnBoard(row, col)) {
+                    continue;
+                }
+
                 const hex = new Hex(this.theme);
 
                 hex.position = Hex.coords(row, col);
@@ -654,88 +676,77 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private createColoredSides(): Container
     {
-        // Initialize both sides at class level to change them later (light on/off)
-        this.sidesGraphics = [new Graphics(), new Graphics()];
-
-        let g: Graphics;
-        const to = (a: PointData, b: PointData = { x: 0, y: 0 }, c: PointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x + c.x, a.y + b.y + c.y);
-        const m = (a: PointData, b: PointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
-        const middle = (a: PointData, b: PointData): PointData => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+        // One Graphics per triangle side, kept at class level to change alpha later.
+        this.sidesGraphics = [new Graphics(), new Graphics(), new Graphics()];
 
         const sideRelativeWidth = 0.35;
-        const sideWidth = Hex.RADIUS * sideRelativeWidth;
         const sideDist = Hex.RADIUS * (sideRelativeWidth + 1);
-        const { colorA, colorB } = this.theme;
+        const { colorSide0, colorSide1, colorSide2 } = this.theme;
         const lastI = this.boardsize - 1;
-        const boardMiddle: PointData = middle(Hex.coords(0, 0), Hex.coords(lastI, lastI));
+        const centroid = this.getBoardCentroid();
 
-        // Set sides colors
-        this.sidesGraphics[0].setStrokeStyle({ width: 0 });
-        this.sidesGraphics[0].setFillStyle({ color: colorA });
-        this.sidesGraphics[1].setStrokeStyle({ width: 0 });
-        this.sidesGraphics[1].setFillStyle({ color: colorB });
+        /**
+         * Draw one colored border along a triangle side.
+         * Walks the outward corners of each boundary cell (offset by sideDist),
+         * then closes to the triangle centroid. The interior is covered by the
+         * hex cells drawn on top, so only the outer fringe remains visible.
+         *
+         * @param cells Boundary cells in order along the side.
+         * @param cornerIndices Which hex corners face outward for this side.
+         */
+        const drawSide = (g: Graphics, color: number, cells: Coords[], cornerIndices: number[]): void => {
+            g.setStrokeStyle({ width: 0 });
+            g.setFillStyle({ color });
 
-        // 1. Top: from a1 to i1 (red)
-        g = this.sidesGraphics[0];
-        m(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
+            let started = false;
 
-        for (let i = 0; i < lastI; ++i) {
-            to(Hex.coords(0, i), Hex.cornerCoords(0, sideDist));
-            to(Hex.coords(0, i), Hex.cornerCoords(1), Hex.cornerCoords(0, sideWidth));
-        }
+            for (const cell of cells) {
+                const base = Hex.coords(cell.row, cell.col);
 
-        to(Hex.coords(0, lastI), Hex.cornerCoords(0, sideDist));
-        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
-        to(boardMiddle);
+                for (const ci of cornerIndices) {
+                    const corner = Hex.cornerCoords(ci, sideDist);
+                    const point = { x: base.x + corner.x, y: base.y + corner.y };
 
-        g.fill();
+                    if (!started) {
+                        g.moveTo(point.x, point.y);
+                        started = true;
+                    } else {
+                        g.lineTo(point.x, point.y);
+                    }
+                }
+            }
 
-        // 2. Right: from i1 to i9 (blue)
-        g = this.sidesGraphics[1];
-        m(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
+            g.lineTo(centroid.x, centroid.y);
+            g.fill();
+        };
 
-        for (let i = 0; i < lastI; ++i) {
-            to(Hex.coords(i, lastI), Hex.cornerCoords(1, sideDist));
-            to(Hex.coords(i, lastI), Hex.cornerCoords(2), Hex.cornerCoords(1, sideWidth));
-        }
+        const range = Array(this.boardsize).fill(0).map((_, i) => i);
 
-        to(Hex.coords(lastI, lastI), Hex.cornerCoords(1, sideDist));
-        to(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
-        to(boardMiddle);
+        // Side 0 (top, row 0): outward corners face up
+        drawSide(
+            this.sidesGraphics[0],
+            colorSide0,
+            range.map(i => ({ row: 0, col: i })),
+            [5, 0, 1],
+        );
 
-        g.fill();
+        // Side 2 (hypotenuse, row + col === lastI): outward corners face lower-right
+        drawSide(
+            this.sidesGraphics[2],
+            colorSide2,
+            range.map(i => ({ row: i, col: lastI - i })),
+            [1, 2, 3],
+        );
 
-        // 3. Bottom: from i9 to a9 (red)
-        g = this.sidesGraphics[0];
-        m(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
+        // Side 1 (left, col 0): outward corners face lower-left, walked bottom to top
+        drawSide(
+            this.sidesGraphics[1],
+            colorSide1,
+            range.map(i => ({ row: lastI - i, col: 0 })),
+            [3, 4, 5],
+        );
 
-        for (let i = lastI; i > 0; --i) {
-            to(Hex.coords(lastI, i), Hex.cornerCoords(3, sideDist));
-            to(Hex.coords(lastI, i), Hex.cornerCoords(4), Hex.cornerCoords(3, sideWidth));
-        }
-
-        to(Hex.coords(lastI, 0), Hex.cornerCoords(3, sideDist));
-        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
-        to(boardMiddle);
-
-        g.fill();
-
-        // 4. Left: from a9 to a1 (blue)
-        g = this.sidesGraphics[1];
-        m(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
-
-        for (let i = lastI; i > 0; --i) {
-            to(Hex.coords(i, 0), Hex.cornerCoords(4, sideDist));
-            to(Hex.coords(i, 0), Hex.cornerCoords(5), Hex.cornerCoords(4, sideWidth));
-        }
-
-        to(Hex.coords(0, 0), Hex.cornerCoords(4, sideDist));
-        to(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
-        to(boardMiddle);
-
-        g.fill();
-
-        // Add both sides into a single container
+        // Add all three sides into a single container
         const sidesContainer = new Container();
         sidesContainer.addChild(...this.sidesGraphics);
 
@@ -797,13 +808,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         };
 
         for (let i = 0; i < this.boardsize; ++i) {
-            const number = rowToNumber(i);
-            container.addChild(createText(number, i, -1));
-            container.addChild(createText(number, i, this.boardsize));
+            // Row numbers along the left side (col 0)
+            container.addChild(createText(rowToNumber(i), i, -1));
 
-            const letter = colToLetter(i);
-            container.addChild(createText(letter, -1, i));
-            container.addChild(createText(letter, this.boardsize, i));
+            // Column letters along the top side (row 0)
+            container.addChild(createText(colToLetter(i), -1, i));
         }
 
         this.updateCoordsTextsOrientation();
@@ -818,18 +827,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
     }
 
-    highlightSides(red: boolean, blue: boolean): void
+    /**
+     * In Y both players share all three sides, so the three colored borders
+     * are always highlighted (or dimmed) together.
+     */
+    highlightSides(highlight = true): void
     {
-        this.sidesGraphics[0].alpha = red ? 1 : 0.25;
-        this.sidesGraphics[1].alpha = blue ? 1 : 0.25;
-    }
+        const alpha = highlight ? 1 : 0.25;
 
-    highlightSideForPlayer(playerIndex: 0 | 1): void
-    {
-        this.highlightSides(
-            playerIndex === 0,
-            playerIndex === 1,
-        );
+        for (const sideGraphics of this.sidesGraphics) {
+            sideGraphics.alpha = alpha;
+        }
     }
 
     getStone(move: Move): null | Stone

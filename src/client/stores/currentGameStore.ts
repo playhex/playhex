@@ -593,17 +593,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return;
         }
 
-        if (game.value.isCanceled()) {
-            gameView.value.highlightSides(true, true);
-            return;
-        }
-
-        if (game.value.isEnded()) {
-            gameView.value.highlightSideForPlayer(game.value.getStrictWinner());
-            return;
-        }
-
-        gameView.value.highlightSideForPlayer(game.value.getCurrentPlayerIndex());
+        // In Y both players connect all three sides, so they are always shown.
+        gameView.value.highlightSides(true);
     };
 
     /**
@@ -1098,11 +1089,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            const winningPath = game.getBoard().getShortestWinningPath();
+            const winningPath = game.getBoard().getShortestWinningPathGroups();
 
             if (winningPath) {
                 animatorFacade = new AnimatorFacade(gameView);
-                await animatorFacade.animatePath(winningPath);
+                await animatorFacade.animatePathGroups(winningPath);
 
                 if (disposed) {
                     return;

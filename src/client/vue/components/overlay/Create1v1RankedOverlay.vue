@@ -56,7 +56,7 @@ watch(selectedOpponent, player => {
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <AppBoardsize v-model="gameOptions.boardsize" :boardsizeMin="RANKED_BOARDSIZE_MIN" :boardsizeMax="RANKED_BOARDSIZE_MAX" :sizesSelection="[11, 13, 14, 17, 19]" />
+                            <AppBoardsize v-model="gameOptions.boardsize" :boardsizeMin="RANKED_BOARDSIZE_MIN" :boardsizeMax="RANKED_BOARDSIZE_MAX" />
                         </div>
 
                         <div class="mb-3">

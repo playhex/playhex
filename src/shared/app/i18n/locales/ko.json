@@ -1,5 +1,5 @@
 {
-    "lobby_title": "온라인에서 Hex 플레이",
+    "lobby_title": "온라인에서 Y 플레이",
     "lobby": {
         "no_waiting_games": "현재 이용 가능한 게임이 없습니다. 새 게임을 만들어보세요!",
         "watch_current_games": "현재 진행 중인 게임 보기",
@@ -662,7 +662,7 @@
         "remove": "국기 제거"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "설정 모드",
         "validate": "확인",
         "undo_placement": "배치 취소",

@@ -20,7 +20,7 @@ const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) 
  * @param orientation Board rotation from 0 to 11, where 0 is the "Flat" one.
  */
 export const gameToHexworldLink = (hostedGame: HostedGame, orientation: number = 11): string => {
-    return `https://hexworld.org/board/#${createHexworldString(hostedGame, orientation)}`;
+    return `https://hexanna1.github.io/hex-study/y.html#${createHexworldString(hostedGame, orientation)}`;
 };
 
 /**

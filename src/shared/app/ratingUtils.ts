@@ -2,8 +2,8 @@ import { Glicko2, Glicko2Settings } from 'glicko2';
 import { HostedGame, Player, Rating } from './models/index.js';
 import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 
-export const RANKED_BOARDSIZE_MIN = 11;
-export const RANKED_BOARDSIZE_MAX = 19;
+export const RANKED_BOARDSIZE_MIN = 14;
+export const RANKED_BOARDSIZE_MAX = 34;
 
 export type BoardsizeCategory = 'small' | 'medium' | 'large';
 

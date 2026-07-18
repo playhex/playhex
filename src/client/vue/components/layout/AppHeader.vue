@@ -106,9 +106,9 @@ const {
     <nav class="navbar navbar-expand-sm bg-body-secondary menu-top shadow-sm">
         <div class="container-fluid">
 
-            <!-- PlayHex -->
-            <router-link :to="{ name: 'home' }" class="navbar-brand" aria-label="Go to PlayHex lobby">
-                Play<span class="text-danger">Hex</span>
+            <!-- PlaY -->
+            <router-link :to="{ name: 'home' }" class="navbar-brand" aria-label="Go to PlaY lobby">
+                Pla<span class="text-danger">Y</span>
                 <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
             </router-link>
 
@@ -123,9 +123,9 @@ const {
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                 <div class="offcanvas-header py-0">
 
-                    <!-- PlayHex in offcanvas -->
-                    <router-link :to="{ name: 'home' }" @click="closeOffcanvas" class="navbar-brand" aria-label="Go to PlayHex lobby">
-                        Play<span class="text-danger">Hex</span>
+                    <!-- PlaY in offcanvas -->
+                    <router-link :to="{ name: 'home' }" @click="closeOffcanvas" class="navbar-brand" aria-label="Go to PlaY lobby">
+                        Pla<span class="text-danger">Y</span>
                         <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
                     </router-link>
 
@@ -185,8 +185,8 @@ const {
 
                         <li class="nav-item">
                             <router-link
-                                :to="{ name: 'hexplorer' }"
-                                :class="{ active: routeName?.startsWith('hexplorer') }"
+                                :to="{ name: 'yxplorer' }"
+                                :class="{ active: routeName?.startsWith('yxplorer') }"
                                 class="nav-link"
                                 @click="closeOffcanvas"
                             >{{ $t('hexplorer.title') }}</router-link>

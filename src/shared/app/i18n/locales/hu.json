@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Hex online játék",
+    "lobby_title": "Y online játék",
     "lobby": {
         "no_waiting_games": "Jelenleg nincs elérhető játék. Hozz létre egyet!",
         "watch_current_games": "Folyamatban lévő játékok megtekintése",
@@ -666,7 +666,7 @@
         "remove": "Zászló eltávolítása"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Beállítási mód",
         "validate": "Érvényesítés",
         "undo_placement": "Elhelyezés visszavonása",

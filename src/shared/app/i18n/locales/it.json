@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Gioca a Hex online",
+    "lobby_title": "Gioca a Y online",
     "lobby": {
         "no_waiting_games": "Nessun gioco disponibile in questo momento. Crea uno nuovo!",
         "watch_current_games": "Guarda i giochi in corso",
@@ -668,7 +668,7 @@
         "remove": "Rimuovi bandiera"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Modalità configurazione",
         "validate": "Valida",
         "undo_placement": "Annulla posizionamento",

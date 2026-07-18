@@ -1,5 +1,5 @@
 {
-    "lobby_title": "オンラインでHexをプレイ",
+    "lobby_title": "オンラインでYをプレイ",
     "lobby": {
         "no_waiting_games": "現在利用可能なゲームはありません。新しいゲームを作成しましょう！",
         "watch_current_games": "現在のゲームを観戦する",
@@ -662,7 +662,7 @@
         "remove": "旗を削除"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "セットアップモード",
         "validate": "確認",
         "undo_placement": "配置を元に戻す",

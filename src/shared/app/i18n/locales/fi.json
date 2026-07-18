@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Pelaa Hexiä verkossa",
+    "lobby_title": "Pelaa Y:tä verkossa",
     "lobby": {
         "no_waiting_games": "Ei saatavilla olevia pelejä tällä hetkellä. Luo uusi!",
         "watch_current_games": "Katso käynnissä olevia pelejä",
@@ -662,7 +662,7 @@
     },
     "moderation": "Moderointi",
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Asetustila",
         "validate": "Vahvista",
         "undo_placement": "Kumoa sijoitus",

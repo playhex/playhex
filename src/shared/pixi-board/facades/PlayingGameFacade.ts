@@ -1,4 +1,4 @@
-import { mirrorMove, Move } from '../../move-notation/move-notation.js';
+import { Move } from '../../move-notation/move-notation.js';
 import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
 import GameView from '../GameView.js';
 import { GameMarksFacade } from './GameMarksFacade.js';
@@ -144,7 +144,8 @@ export class PlayingGameFacade
                 throw new Error('Cannot swap a special move');
             }
 
-            const mirror = mirrorMove(firstMove);
+            // In Y, swapping keeps the same cell and only changes the stone color.
+            const mirror = firstMove;
             this.moves.push(move);
             this.placedStones = {};
             this.placedStones[mirror] = 1;
@@ -220,7 +221,7 @@ export class PlayingGameFacade
                     throw new Error('Unexpected special move as first move');
                 }
 
-                const mirror = mirrorMove(swapped);
+                const mirror = swapped;
 
                 delete this.placedStones[mirror];
                 this.placedStones[swapped] = 0;
@@ -279,7 +280,7 @@ export class PlayingGameFacade
                 throw new Error('Unexpected special move as first move');
             }
 
-            const swappedCoords = mirrorMove(firstMove);
+            const swappedCoords = firstMove;
 
             this.gameMarksFacade.markSwapped(swappedCoords);
             return;
@@ -329,7 +330,7 @@ export class PlayingGameFacade
                 throw new Error('Unexpected special move as first move');
             }
 
-            this.previewMoveFacade.preview(mirrorMove(firstMove), 1, firstMove);
+            this.previewMoveFacade.preview(firstMove, 1, firstMove);
             return;
         }
 
@@ -430,7 +431,7 @@ export class PlayingGameFacade
                 throw new Error('Unexpected special move as first move');
             }
 
-            const swappedCoords = mirrorMove(first);
+            const swappedCoords = first;
 
             this.addText('S', swappedCoords);
         } else {

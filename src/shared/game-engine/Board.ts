@@ -1,17 +1,23 @@
 import { Coords, Move, parseMove } from '../move-notation/move-notation.js';
-import { PathItem, PlayerIndex } from './Types.js';
+import { PlayerIndex } from './Types.js';
 
-export const BOARD_DEFAULT_SIZE = 11;
+export const BOARD_DEFAULT_SIZE = 17;
 
 /**
- * Hex board.
+ * Y board.
  * Can set any cell, no rule check.
- * Check winning path.
+ * Check winning group.
  *
- * https://www.red-bean.com/sgf/hex.html
+ * The board is a triangle of hexagonal cells. It is stored in a square
+ * `size x size` array, but only the cells with `row + col <= size - 1` are on
+ * the board (the lower-left triangle). The three sides are:
  *
- * Player 0 = red = black: must connect top to bottom
- * Player 1 = blue = white: must connect left to right
+ * - side 0 (top):        row === 0
+ * - side 1 (left):       col === 0
+ * - side 2 (hypotenuse): row + col === size - 1
+ *
+ * Both players (0 = red, 1 = blue) win the same way: connect all three sides
+ * with a single contiguous group of their own stones. There are no draws.
  */
 export default class Board
 {
@@ -70,14 +76,15 @@ export default class Board
 
     containsCoords(row: number, col: number): boolean
     {
-        return row >= 0 && row < this.size && col >= 0 && col < this.size;
+        // Only the lower-left triangle (row + col <= size - 1) is on the board.
+        return row >= 0 && col >= 0 && row + col <= this.size - 1;
     }
 
     containsMove(move: Move): boolean
     {
         const { row, col } = parseMove(move);
 
-        return row >= 0 && row < this.size && col >= 0 && col < this.size;
+        return this.containsCoords(row, col);
     }
 
     /**
@@ -92,24 +99,23 @@ export default class Board
     }
 
     /**
-     * @param playerIndex Returns cell of side of which player
-     * @param sideIndex Returns top/left or bottom/right
+     * Get the cells forming one of the three sides of the triangle.
+     *
+     * @param sideIndex 0 = top (row 0), 1 = left (col 0), 2 = hypotenuse (row + col === size - 1)
      */
-    getSideCells(playerIndex: PlayerIndex, sideIndex: 0 | 1): Coords[]
+    getSideCells(sideIndex: 0 | 1 | 2): Coords[]
     {
         const z = this.size - 1;
 
         return Array(this.size)
             .fill(0)
-            .map((_, i) => playerIndex === 0
-                ? sideIndex
-                    ? { row: z, col: i } // bottom
-                    : { row: 0, col: i } // top
-                : sideIndex
-                    ? { row: i, col: z } // right
-                    : { row: i, col: 0 } // left
-                ,
-            )
+            .map((_, i) => {
+                switch (sideIndex) {
+                    case 0: return { row: 0, col: i }; // top
+                    case 1: return { row: i, col: 0 }; // left
+                    case 2: return { row: i, col: z - i }; // hypotenuse
+                }
+            })
         ;
     }
 
@@ -128,59 +134,88 @@ export default class Board
 
     hasPlayerConnection(playerIndex: PlayerIndex): boolean
     {
-        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
-
-        const visited: { [key: string]: true } = {};
-        const frontier: Coords[] = [];
-
-        this.getSideCells(playerIndex, 0).forEach(cell => {
-            if (playerIndex === this.hexes[cell.row][cell.col]) {
-                frontier.push(cell);
-                visited[hash(cell)] = true;
-            }
-        });
-
-        let current: undefined | Coords;
-
-        while ((current = frontier.shift())) {
-            if (this.isCellOnSide(current, playerIndex, 1)) {
-                return true;
-            }
-
-            this
-                .getNeighboors(current, playerIndex)
-                .forEach(cell => {
-                    if (!visited[hash(cell)]) {
-                        frontier.push(cell);
-                        visited[hash(cell)] = true;
-                    }
-                })
-            ;
-        }
-
-        return false;
-    }
-
-    private flattenPath(pathItem: PathItem): Coords[]
-    {
-        const path: Coords[] = [];
-        let current: null | PathItem = pathItem;
-
-        while (current) {
-            path.unshift(current.cell);
-
-            current = current.parent;
-        }
-
-        return path;
+        return this.findWinningGroup(playerIndex) !== null;
     }
 
     /**
-     * Get list of cells of the winning path.
+     * Find a connected group of the player's stones that touches all three
+     * sides of the triangle (a Y win), or null if the player has none.
+     *
+     * Only components that touch side 0 (top) can win (a group touching all
+     * three sides necessarily touches side 0), so we seed the search there.
+     */
+    private findWinningGroup(playerIndex: PlayerIndex): null | Coords[]
+    {
+        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
+
+        const visited: { [key: string]: true } = {};
+
+        const seeds = this
+            .getSideCells(0)
+            .filter(cell => this.hexes[cell.row][cell.col] === playerIndex)
+        ;
+
+        for (const seed of seeds) {
+            if (visited[hash(seed)]) {
+                continue;
+            }
+
+            const group: Coords[] = [];
+            const sidesTouched = [false, false, false];
+            const frontier: Coords[] = [seed];
+            visited[hash(seed)] = true;
+
+            let current: undefined | Coords;
+
+            while ((current = frontier.shift())) {
+                group.push(current);
+
+                for (const sideIndex of [0, 1, 2] as const) {
+                    if (this.isCellOnSide(current, sideIndex)) {
+                        sidesTouched[sideIndex] = true;
+                    }
+                }
+
+                this
+                    .getNeighboors(current, playerIndex)
+                    .forEach(cell => {
+                        if (!visited[hash(cell)]) {
+                            frontier.push(cell);
+                            visited[hash(cell)] = true;
+                        }
+                    })
+                ;
+            }
+
+            if (sidesTouched[0] && sidesTouched[1] && sidesTouched[2]) {
+                return group;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the cells of the shortest winning path: a minimal "Y" of the winner's
+     * stones connecting all three sides through a single junction cell.
      * Can be null, even with a winner,
      * when winner has won on time or resignation by example.
      */
     getShortestWinningPath(): null | Coords[]
+    {
+        const groups = this.getShortestWinningPathGroups();
+
+        return groups && groups.flat();
+    }
+
+    /**
+     * Same as getShortestWinningPath(), but cells are grouped by their distance
+     * from the junction cell: group 0 is the junction alone, group 1 is the
+     * (up to 3) cells one step away on each leg, group 2 the cells two steps
+     * away, etc. Cells within the same group are equidistant from the junction
+     * and meant to be animated in parallel, fanning out toward the three sides.
+     */
+    getShortestWinningPathGroups(): null | Coords[][]
     {
         const winnerIndex = this.calculateWinner();
 
@@ -188,57 +223,145 @@ export default class Board
             return null;
         }
 
-        const visited: { [key: string]: true } = {};
-        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
-        const pathHeads: PathItem[] = this
-            .getSideCells(winnerIndex, 0)
-            .filter(cell => this.hexes[cell.row][cell.col] === winnerIndex)
-            .map<PathItem>(cell => {
-                visited[hash(cell)] = true;
-
-                return {
-                    parent: null,
-                    cell,
-                };
-            })
-        ;
-
-        let pathHead: undefined | PathItem;
-
-        while ((pathHead = pathHeads.shift())) {
-            if (this.isCellOnSide(pathHead.cell, winnerIndex, 1)) {
-                return this.flattenPath(pathHead);
-            }
-
-            this.getNeighboors(pathHead.cell, winnerIndex)
-                .forEach(cell => {
-                    if (!visited[hash(cell)]) {
-                        const pathItem: PathItem = {
-                            parent: pathHead as PathItem,
-                            cell,
-                        };
-
-                        pathHeads.push(pathItem);
-                        visited[hash(cell)] = true;
-                    }
-                })
-            ;
-        }
-
-        return null;
+        return this.getWinningYPath(winnerIndex);
     }
 
-    isCellOnSide(cell: Coords, playerIndex: PlayerIndex, sideIndex: 0 | 1): boolean
+    /**
+     * Compute the shortest "Y" path of the player's stones connecting the three
+     * sides through a junction cell (the cell minimizing the total distance to
+     * the three sides). Returns the path grouped by distance from the junction
+     * (see getShortestWinningPathGroups()), or null if the player has no
+     * winning connection.
+     */
+    private getWinningYPath(playerIndex: PlayerIndex): null | Coords[][]
     {
-        const z = this.size - 1;
+        const hash = (cell: Coords): string => cell.row + '_' + cell.col;
 
-        return playerIndex === 0
-            ? sideIndex
-                ? cell.row === z // bottom
-                : cell.row === 0 // top
-            : sideIndex
-                ? cell.col === z // right
-                : cell.col === 0; // left
+        // Multi-source BFS from one side, staying on the player's stones.
+        const bfsFromSide = (sideIndex: 0 | 1 | 2): {
+            dist: { [key: string]: number };
+            parent: { [key: string]: null | Coords };
+        } => {
+            const dist: { [key: string]: number } = {};
+            const parent: { [key: string]: null | Coords } = {};
+            const frontier: Coords[] = [];
+
+            this.getSideCells(sideIndex).forEach(cell => {
+                if (this.hexes[cell.row][cell.col] === playerIndex) {
+                    const h = hash(cell);
+
+                    if (!(h in dist)) {
+                        dist[h] = 0;
+                        parent[h] = null;
+                        frontier.push(cell);
+                    }
+                }
+            });
+
+            let current: undefined | Coords;
+
+            while ((current = frontier.shift())) {
+                const ch = hash(current);
+
+                this.getNeighboors(current, playerIndex).forEach(cell => {
+                    const h = hash(cell);
+
+                    if (!(h in dist)) {
+                        dist[h] = dist[ch] + 1;
+                        parent[h] = current as Coords;
+                        frontier.push(cell);
+                    }
+                });
+            }
+
+            return { dist, parent };
+        };
+
+        const bfs = [bfsFromSide(0), bfsFromSide(1), bfsFromSide(2)];
+
+        // Junction = cell reachable from all three sides with minimal total distance
+        let junction: null | Coords = null;
+        let bestCost = Infinity;
+
+        for (let row = 0; row < this.size; ++row) {
+            for (let col = 0; col < this.size; ++col) {
+                if (this.hexes[row][col] !== playerIndex) {
+                    continue;
+                }
+
+                const h = row + '_' + col;
+
+                if (h in bfs[0].dist && h in bfs[1].dist && h in bfs[2].dist) {
+                    const cost = bfs[0].dist[h] + bfs[1].dist[h] + bfs[2].dist[h];
+
+                    if (cost < bestCost) {
+                        bestCost = cost;
+                        junction = { row, col };
+                    }
+                }
+            }
+        }
+
+        if (junction === null) {
+            return null;
+        }
+
+        // Reconstruct the three legs, each ordered from the junction outward to its side.
+        const legs = bfs.map(({ parent }) => {
+            const leg: Coords[] = [];
+            let current: null | Coords = junction;
+
+            while (current) {
+                leg.push(current);
+                current = parent[hash(current)] ?? null;
+            }
+
+            return leg; // junction -> side source
+        });
+
+        // Group legs by distance from the junction so the animation starts at
+        // the junction (group 0) and fans out to the three sides simultaneously,
+        // one group per distance step.
+        const seen: { [key: string]: true } = {};
+        const groups: Coords[][] = [];
+        const maxLen = Math.max(...legs.map(leg => leg.length));
+
+        for (let d = 0; d < maxLen; ++d) {
+            const group: Coords[] = [];
+
+            for (const leg of legs) {
+                const cell = leg[d];
+
+                if (!cell) {
+                    continue;
+                }
+
+                const h = hash(cell);
+
+                if (!seen[h]) {
+                    seen[h] = true;
+                    group.push(cell);
+                }
+            }
+
+            if (group.length > 0) {
+                groups.push(group);
+            }
+        }
+
+        return groups;
+    }
+
+    /**
+     * @param sideIndex 0 = top (row 0), 1 = left (col 0), 2 = hypotenuse (row + col === size - 1)
+     */
+    isCellOnSide(cell: Coords, sideIndex: 0 | 1 | 2): boolean
+    {
+        switch (sideIndex) {
+            case 0: return cell.row === 0; // top
+            case 1: return cell.col === 0; // left
+            case 2: return cell.row + cell.col === this.size - 1; // hypotenuse
+        }
     }
 
     /**

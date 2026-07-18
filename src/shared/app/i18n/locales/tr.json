@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Play Hex çevrimiçi",
+    "lobby_title": "Play Y çevrimiçi",
     "lobby": {
         "no_waiting_games": "Şu anda açık oyun bulunmamaktadır. Yeni bir tane oluştur!",
         "watch_current_games": "Aktif oyunları izle",
@@ -662,7 +662,7 @@
         "remove": "Bayrağı kaldır"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Kurulum modu",
         "validate": "Doğrula",
         "undo_placement": "Yerleştirmeyi geri al",

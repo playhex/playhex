@@ -41,9 +41,12 @@ export const calcRandomMove = async (game: Game, waitBeforePlay = 0, determinist
 
     const possibleMoves: HexMove[] = [];
 
+    const board = game.getBoard();
+
     for (let row = 0; row < game.getSize(); ++row) {
         for (let col = 0; col < game.getSize(); ++col) {
-            if (game.getBoard().isEmpty(coordsToMove({ row, col }))) {
+            // Only cells inside the triangle are playable
+            if (board.containsCoords(row, col) && board.isEmpty(coordsToMove({ row, col }))) {
                 possibleMoves.push(coordsToMove({ row, col }));
             }
         }

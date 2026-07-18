@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Hex online spielen",
+    "lobby_title": "Y online spielen",
     "lobby": {
         "no_waiting_games": "Derzeit sind keine Spiele verfügbar. Erstelle ein neues!",
         "watch_current_games": "Aktuelle Spiele ansehen",
@@ -662,7 +662,7 @@
         "remove": "Flagge entfernen"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Einrichtungsmodus",
         "validate": "Validieren",
         "undo_placement": "Platzierung rückgängig machen",

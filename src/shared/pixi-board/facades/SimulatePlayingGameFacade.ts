@@ -2,7 +2,7 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import { isSpecialHexMove, type HexMove } from '../../move-notation/hex-move-notation.js';
 import { PlayingGameFacade } from './PlayingGameFacade.js';
 import TextMark from '../entities/TextMark.js';
-import { mirrorMove, parseMove } from '../../move-notation/move-notation.js';
+import { parseMove } from '../../move-notation/move-notation.js';
 import { BoardEntity } from '../BoardEntity.js';
 import GameView from '../GameView.js';
 
@@ -282,7 +282,8 @@ export class SimulatePlayingGameFacade extends TypedEmitter<SimulatePlayingGameF
                 throw new Error('Unexpected first move not just coordinates');
             }
 
-            move = mirrorMove(firstMove);
+            // In Y, swapping keeps the same cell and only changes the stone color.
+            move = firstMove;
         }
 
         const mark = new TextMark(String(number)).setCoords(parseMove(move));

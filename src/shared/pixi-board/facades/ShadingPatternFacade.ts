@@ -17,6 +17,10 @@ export class ShadingPatternFacade
 
         for (let row = 0; row < size; ++row) {
             for (let col = 0; col < size; ++col) {
+                if (!this.gameView.isOnBoard(row, col)) {
+                    continue;
+                }
+
                 this.gameView
                     .getHexByCoords({ row, col })
                     .setCellShading(shadingPattern.calc(row, col, size) * intensity);

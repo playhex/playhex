@@ -17,34 +17,36 @@ describe('Game', () => {
         assert.strictEqual(game.getSize(), 3);
 
         // Players legal moves
-        game.move('b2', 0);
-        assert.strictEqual(game.getBoard().getCell('b2'), 0);
+        game.move('a1', 0);
+        assert.strictEqual(game.getBoard().getCell('a1'), 0);
         assert.strictEqual(game.getLastMoveIndex(), 0);
 
         assert.strictEqual(emitted['played'], true);
 
-        game.move('c2', 1);
-        assert.strictEqual(game.getBoard().getCell('c2'), 1);
+        game.move('b1', 1);
+        assert.strictEqual(game.getBoard().getCell('b1'), 1);
         assert.strictEqual(game.getLastMoveIndex(), 1);
 
         // Illegal moves
-        assert.throws(() => game.move('a1', 1), { message: 'Move a1: Not your turn' });
+        assert.throws(() => game.move('a3', 1), { message: 'Move a3: Not your turn' });
         assert.throws(() => game.move('a10', 0), { message: 'Move a10: Cell outside board' });
-        assert.throws(() => game.move('b2', 0), { message: 'Move b2: This cell is already occupied' });
+        assert.throws(() => game.move('c2', 0), { message: 'Move c2: Cell outside board' });
+        assert.throws(() => game.move('a1', 0), { message: 'Move a1: This cell is already occupied' });
 
-        // Game end
-        game.move('b3', 0);
-        game.move('a3', 1);
+        // Game end: player 0 connects the whole left side (a1-a2-a3),
+        // which links all three sides of the triangle at the corners.
+        game.move('a2', 0);
+        game.move('c1', 1);
         assert.strictEqual(game.isEnded(), false, 'Game is not yet ended');
         assert.strictEqual(emitted['ended'], false);
-        game.move('b1', 0);
+        game.move('a3', 0);
 
         assert.strictEqual(emitted['ended'], true);
         assert.strictEqual(game.isEnded(), true, 'Game is now ended, player 0 won');
         assert.strictEqual(game.getStrictWinner(), 0, 'Player 0 is the winner');
 
         // Cannot move anymore
-        assert.throws(() => game.move('c3', 1), { message: 'Move c3: Game is finished' });
+        assert.throws(() => game.move('b2', 1), { message: 'Move b2: Game is finished' });
     });
 
     it('Resign', () => {
@@ -52,7 +54,7 @@ describe('Game', () => {
 
         // Players legal moves
         game.move('b2', 0);
-        game.move('b3', 1);
+        game.move('a2', 1);
 
         // Resign
         game.resign(1, new Date());
@@ -67,8 +69,8 @@ describe('Game', () => {
         game.move('c2', 0);
         game.move('swap-pieces', 1);
 
-        assert.strictEqual(game.getBoard().getCell('c2'), null);
-        assert.strictEqual(game.getBoard().getCell('b3'), 1);
+        // In Y, swap keeps the same cell and only changes the stone color.
+        assert.strictEqual(game.getBoard().getCell('c2'), 1);
         assert.strictEqual(game.getCurrentPlayerIndex(), 0);
     });
 
@@ -167,11 +169,11 @@ describe('Game', () => {
     it('recreates a won game from raw data object', () => {
         const game = new Game(3);
 
-        game.move('b2', 0);
-        game.move('c2', 1);
-        game.move('b3', 0);
-        game.move('a3', 1);
-        game.move('b1', 0);
+        game.move('a1', 0);
+        game.move('b1', 1);
+        game.move('a2', 0);
+        game.move('c1', 1);
+        game.move('a3', 0);
 
         const gameData = game.toData();
         const restoredGame = Game.fromData(gameData);
@@ -195,16 +197,16 @@ describe('Game', () => {
         const firstMoveDate = new Date();
 
         // Players legal moves
-        game.move(coordsToMove({ row: 1, col: 1 }), 0, firstMoveDate);
+        game.move(coordsToMove({ row: 0, col: 0 }), 0, firstMoveDate);
 
         assert.strictEqual(lastMoveAt, firstMoveDate);
 
-        // Game end
-        game.move('c2', 1);
-        game.move('b3', 0);
-        game.move('a3', 1);
+        // Game end: player 0 connects the whole left side (a1-a2-a3)
+        game.move('b1', 1);
+        game.move('a2', 0);
+        game.move('c1', 1);
         const lastMoveDate = new Date();
-        game.move('b1', 0, lastMoveDate);
+        game.move('a3', 0, lastMoveDate);
 
         assert.strictEqual(lastEndedAt, lastMoveDate);
         assert.strictEqual(game.getLastMoveAt(), lastMoveDate);
@@ -217,7 +219,7 @@ describe('Game', () => {
 
             game.move('a1', 0);
             game.move('b2', 1);
-            game.move('c3', 0);
+            game.move('a3', 0);
 
             game.undoMove();
 
@@ -227,7 +229,7 @@ describe('Game', () => {
 
             assert.strictEqual(game.getBoard().getCell('a1'), 0);
             assert.strictEqual(game.getBoard().getCell('b2'), 1);
-            assert.strictEqual(game.getBoard().getCell('c3'), null);
+            assert.strictEqual(game.getBoard().getCell('a3'), null);
         });
 
         it('undo swap move', () => {
@@ -270,7 +272,7 @@ describe('Game', () => {
             game.move('a1', 0);
             game.move('b2', 1);
             game.move('c3', 0);
-            game.move('d4', 1);
+            game.move('e1', 1);
 
             game.playerUndo(0);
 
@@ -281,7 +283,7 @@ describe('Game', () => {
             assert.strictEqual(game.getBoard().getCell('a1'), 0);
             assert.strictEqual(game.getBoard().getCell('b2'), 1);
             assert.strictEqual(game.getBoard().getCell('c3'), null);
-            assert.strictEqual(game.getBoard().getCell('d4'), null);
+            assert.strictEqual(game.getBoard().getCell('e1'), null);
         });
 
         it('player undo his swap move after opponent played', () => {
@@ -289,7 +291,7 @@ describe('Game', () => {
 
             game.move('a2', 0);
             game.move('swap-pieces', 1);
-            game.move('c3', 0);
+            game.move('a3', 0);
 
             game.playerUndo(1);
 
@@ -299,7 +301,7 @@ describe('Game', () => {
 
             assert.strictEqual(game.getBoard().getCell('a2'), 0);
             assert.strictEqual(game.getBoard().getCell('b1'), null);
-            assert.strictEqual(game.getBoard().getCell('c3'), null);
+            assert.strictEqual(game.getBoard().getCell('a3'), null);
         });
 
         it('player undo dry run', () => {
@@ -307,7 +309,7 @@ describe('Game', () => {
 
             game.move('a2', 0);
             game.move('swap-pieces', 1);
-            game.move('c3', 0);
+            game.move('a3', 0);
 
             const moves = game.playerUndoDryRun(1);
 
@@ -344,7 +346,7 @@ describe('Game', () => {
         it('passes on second move', () => {
             const game = new Game(3);
 
-            game.move('c2', 0);
+            game.move('b1', 0);
             game.move('pass', 1);
 
             assert.strictEqual(game.getCurrentPlayerIndex(), 0);
@@ -366,7 +368,7 @@ describe('Game', () => {
         it('passes after swap move', () => {
             const game = new Game(3);
 
-            game.move('c2', 0);
+            game.move('b1', 0);
             game.move('swap-pieces', 1);
             game.move('pass', 0);
 

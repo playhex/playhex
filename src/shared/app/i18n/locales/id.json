@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Mainkan Hex online",
+    "lobby_title": "Mainkan Y online",
     "lobby": {
         "no_waiting_games": "Tidak ada permainan tersedia saat ini. Buat yang baru!",
         "watch_current_games": "Tonton permainan yang sedang berlangsung",
@@ -657,7 +657,7 @@
         "remove": "Hapus bendera"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Mode penyiapan",
         "validate": "Validasi",
         "undo_placement": "Batalkan penempatan",

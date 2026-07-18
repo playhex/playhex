@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Hrát Hex online",
+    "lobby_title": "Hrát Y online",
     "lobby": {
         "no_waiting_games": "Momentálně nejsou k dispozici žádné hry. Vytvořte novou!",
         "watch_current_games": "Sledovat aktuální hry",
@@ -674,7 +674,7 @@
         "remove": "Odstranit vlajku"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Režim nastavení",
         "validate": "Ověřit",
         "undo_placement": "Vrátit umístění",

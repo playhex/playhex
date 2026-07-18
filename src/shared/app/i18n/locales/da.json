@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Spil Hex online",
+    "lobby_title": "Spil Y online",
     "lobby": {
         "no_waiting_games": "Ingen spil tilgængelige lige nu. Opret et nyt!",
         "watch_current_games": "Se nuværende spil",
@@ -662,7 +662,7 @@
         "remove": "Fjern flag"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Opsætningstilstand",
         "validate": "Valider",
         "undo_placement": "Fortryd placering",

@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Сыграйте в Hex с игроками со всего мира",
+    "lobby_title": "Сыграйте в Y с игроками со всего мира",
     "lobby": {
         "no_waiting_games": "Сейчас нет доступных игр. Создайте новую!",
         "watch_current_games": "Смотреть текущие игры",
@@ -676,7 +676,7 @@
         "remove": "Удалить флаг"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Режим настройки",
         "validate": "Подтверд��ть",
         "undo_placement": "Отменить размещение",

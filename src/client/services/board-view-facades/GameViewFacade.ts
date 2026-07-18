@@ -3,7 +3,7 @@ import { GameView } from '@playhex/pixi-board';
 import { PlayingGameFacade } from '@playhex/pixi-board';
 import { PreviewMoveFacade } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
-import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
+import { Move } from '../../../shared/move-notation/move-notation.js';
 import { OrientationMode } from '@playhex/pixi-board';
 import { HexMove, isSpecialHexMove } from '../../../shared/move-notation/hex-move-notation.js';
 import { SimulatePlayingGameFacade } from '@playhex/pixi-board';
@@ -113,17 +113,8 @@ export class GameViewFacade
      */
     highlightSidesFromGame(): void
     {
-        if (this.game.isCanceled()) {
-            this.gameView.highlightSides(true, true);
-            return;
-        }
-
-        if (this.game.isEnded()) {
-            this.gameView.highlightSideForPlayer(this.game.getStrictWinner());
-            return;
-        }
-
-        this.gameView.highlightSideForPlayer(this.game.getCurrentPlayerIndex());
+        // In Y both players connect all three sides, so they are always shown.
+        this.gameView.highlightSides(true);
     }
 
     hasPreviewedMove(): boolean
@@ -151,7 +142,8 @@ export class GameViewFacade
                 throw new Error('Unexpected special move as first move');
             }
 
-            this.previewMoveFacade.preview(mirrorMove(firstMove), 0, firstMove);
+            // In Y, swapping keeps the same cell and only changes the stone color.
+            this.previewMoveFacade.preview(firstMove, 0, firstMove);
             return;
         }
 

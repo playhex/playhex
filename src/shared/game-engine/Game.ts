@@ -6,7 +6,7 @@ import { GameData } from './normalization.js';
 import IllegalUndo from './errors/IllegalUndo.js';
 import NotYourTurnError from './errors/NotYourTurnError.js';
 import CellAlreadyOccupiedError from './errors/CellAlreadyOccupiedError.js';
-import { mirrorMove, Move } from '../move-notation/move-notation.js';
+import { Move } from '../move-notation/move-notation.js';
 import { HexMove, isSpecialHexMove } from '../move-notation/hex-move-notation.js';
 
 type GameEvents = {
@@ -321,6 +321,10 @@ export default class Game extends TypedEmitter<GameEvents>
      * Returns swapped and mirror moves from first move.
      * Won't check whether 2nd move is actual swap move.
      *
+     * In Y, swapping does not mirror the cell: the second player simply takes
+     * over the first player's stone in place, so the "mirror" cell is the same
+     * cell as the first move, only the stone color changes.
+     *
      * @throws {Error} Requires first move to be played to get swapped and mirror coords.
      */
     getSwapCoords(): { swapped: Move, mirror: Move }
@@ -337,7 +341,7 @@ export default class Game extends TypedEmitter<GameEvents>
 
         return {
             swapped: firstMove.move,
-            mirror: mirrorMove(firstMove.move),
+            mirror: firstMove.move,
         };
     }
 

@@ -7,8 +7,30 @@ import { coordsToMove } from '../../move-notation/move-notation.js';
 const _ = null;
 
 describe('Board', () => {
+    describe('containsCoords', () => {
+        it('accepts cells inside the triangle and rejects the rest', () => {
+            const board = new Board(3);
+
+            // On the triangle (row + col <= size - 1)
+            assert.ok(board.containsCoords(0, 0));
+            assert.ok(board.containsCoords(0, 2));
+            assert.ok(board.containsCoords(2, 0));
+            assert.ok(board.containsCoords(1, 1));
+
+            // Off the triangle
+            assert.ok(!board.containsCoords(2, 1));
+            assert.ok(!board.containsCoords(2, 2));
+            assert.ok(!board.containsCoords(1, 2));
+            assert.ok(!board.containsCoords(-1, 0));
+
+            // Same through containsMove
+            assert.ok(board.containsMove('a1'));
+            assert.ok(!board.containsMove('c3'));
+        });
+    });
+
     describe('getNeighboors', () => {
-        it('returns neighboords cells of b2', () => {
+        it('returns only in-triangle neighboors of b2', () => {
             const board = new Board(3);
 
             const neighboors = board
@@ -16,118 +38,76 @@ describe('Board', () => {
                 .map(c => coordsToMove(c))
             ;
 
-            assert.strictEqual(neighboors.length, 6);
-            assert.ok(neighboors.includes('a2'));
-            assert.ok(neighboors.includes('c2'));
-            assert.ok(neighboors.includes('b1'));
-            assert.ok(neighboors.includes('c1'));
-            assert.ok(neighboors.includes('b3'));
-            assert.ok(neighboors.includes('a3'));
+            // (1,2) and (2,1) are off the triangle, so 4 neighbours remain
+            assert.strictEqual(neighboors.length, 4);
+            assert.ok(neighboors.includes('a2')); // (1,0)
+            assert.ok(neighboors.includes('b1')); // (0,1)
+            assert.ok(neighboors.includes('c1')); // (0,2)
+            assert.ok(neighboors.includes('a3')); // (2,0)
         });
     });
 
     describe('getSideCells', () => {
-        it('returns side cells of red player', () => {
+        it('returns cells of the three triangle sides', () => {
             const board = new Board(3);
 
-            const topCells = board.getSideCells(0, 0);
-            const bottomCells = board.getSideCells(0, 1);
+            const top = board.getSideCells(0);
+            const left = board.getSideCells(1);
+            const hypotenuse = board.getSideCells(2);
 
-            assert.deepStrictEqual(topCells.map(c => coordsToMove(c)), ['a1', 'b1', 'c1']);
-            assert.deepStrictEqual(bottomCells.map(c => coordsToMove(c)), ['a3', 'b3', 'c3']);
-        });
-
-        it('returns side cells of blue player', () => {
-            const board = new Board(3);
-
-            const topCells = board.getSideCells(1, 0);
-            const bottomCells = board.getSideCells(1, 1);
-
-            assert.deepStrictEqual(topCells.map(c => coordsToMove(c)), ['a1', 'a2', 'a3']);
-            assert.deepStrictEqual(bottomCells.map(c => coordsToMove(c)), ['c1', 'c2', 'c3']);
+            assert.deepStrictEqual(top.map(c => coordsToMove(c)), ['a1', 'b1', 'c1']);
+            assert.deepStrictEqual(left.map(c => coordsToMove(c)), ['a1', 'a2', 'a3']);
+            assert.deepStrictEqual(hypotenuse.map(c => coordsToMove(c)), ['c1', 'b2', 'a3']);
         });
     });
 
     describe('hasConnection', () => {
-        it('No connection, missing one', () => {
-            const board = new Board(5);
-
-            board.setCell(coordsToMove({ row: 0, col: 0 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 1 }), 1);
-            //board.setCell(coordsToMove({ row: 0, col: 2 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 3 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 4 }), 1);
-
-            assert.strictEqual(board.calculateWinner(), null);
-        });
-
-        it('Connection, straight line', () => {
-            const board = new Board(5);
-
-            board.setCell(coordsToMove({ row: 0, col: 0 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 1 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 2 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 3 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 4 }), 1);
-
-            assert.strictEqual(board.calculateWinner(), 1);
-        });
-
-        it('No connection, blocked by opponent', () => {
-            const board = new Board(5);
-
-            board.setCell(coordsToMove({ row: 0, col: 0 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 1 }), 0);
-            board.setCell(coordsToMove({ row: 0, col: 2 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 3 }), 1);
-            board.setCell(coordsToMove({ row: 0, col: 4 }), 1);
-
-            assert.strictEqual(board.calculateWinner(), null);
-        });
-
-        it('Connection by player 1', () => {
+        it('Win: a group touching all three sides', () => {
+            // Player 1 "Y" shape meeting near the center and reaching each side
             const board = Board.createFromGrid([
-                [1 , 1 , _ , 0 , _],
-                  [_ , _ , 1 , 1 , _],
-                    [1 , 1 , _ , 1 , _],
-                      [_ , 0 , 1 , _ , _],
-                        [_ , _ , 1 , 1 , 1],
+                [_ , _ , 1 , _ , _],
+                  [1 , 1 , 1 , _ , _],
+                    [_ , _ , 1 , _ , _],
+                      [_ , _ , _ , _ , _],
+                        [_ , _ , _ , _ , _],
             ]);
 
             assert.strictEqual(board.calculateWinner(), 1);
         });
 
-        it('Connection by player 0', () => {
+        it('Win: a full side connects the two other sides at the corners', () => {
+            // Whole left column (col 0) links top corner (0,0) and hypotenuse corner (4,0)
             const board = Board.createFromGrid([
-                [_ , _ , _ , 0 , _],
-                  [_ , _ , _ , 0 , _],
-                    [_ , _ , 0 , 0 , 0],
-                      [_ , 0 , _ , _ , 0],
-                        [_ , _ , _ , _ , 0],
+                [0 , _ , _ , _ , _],
+                  [0 , _ , _ , _ , _],
+                    [0 , _ , _ , _ , _],
+                      [0 , _ , _ , _ , _],
+                        [0 , _ , _ , _ , _],
             ]);
 
             assert.strictEqual(board.calculateWinner(), 0);
         });
 
-        it('No connection', () => {
+        it('No win: a group touching only two sides', () => {
+            // Touches top and left but not the hypotenuse
             const board = Board.createFromGrid([
-                [_ , _ , _ , 0 , _],
-                  [_ , _ , _ , 0 , 1],
-                    [_ , _ , 0 , _ , 0],
-                      [_ , 0 , _ , _ , 0],
-                        [1 , _ , _ , _ , 0],
+                [_ , 0 , _ , _ , _],
+                  [0 , 0 , _ , _ , _],
+                    [_ , _ , _ , _ , _],
+                      [_ , _ , _ , _ , _],
+                        [_ , _ , _ , _ , _],
             ]);
 
             assert.strictEqual(board.calculateWinner(), null);
         });
 
-        it('No connection, long paths', () => {
+        it('No win: three sides touched, but by two disconnected groups', () => {
             const board = Board.createFromGrid([
-                [0 , 0 , _ , 0 , _],
-                  [1 , 0 , 1 , 0 , 1],
-                    [0 , _ , 0 , _ , 0],
-                      [0 , 0 , 0 , 1 , 0],
-                        [1 , 1 , 1 , 1 , 0],
+                [_ , 0 , _ , _ , _],
+                  [0 , _ , _ , _ , _],
+                    [_ , _ , 0 , _ , _],
+                      [_ , _ , _ , _ , _],
+                        [_ , _ , _ , _ , _],
             ]);
 
             assert.strictEqual(board.calculateWinner(), null);
@@ -135,54 +115,60 @@ describe('Board', () => {
     });
 
     describe('getShortestWinningPath', () => {
-        it('returns shortest path by player 1', () => {
+        it('returns the winning group spanning all three sides', () => {
             const board = Board.createFromGrid([
-                [1 , 1 , _ , 0 , _],
-                  [_ , _ , 1 , 1 , _],
-                    [1 , 1 , _ , 1 , _],
-                      [_ , 0 , 1 , _ , _],
-                        [_ , _ , 1 , 1 , 1],
+                [_ , _ , 1 , _ , _],
+                  [1 , 1 , 1 , _ , _],
+                    [_ , _ , 1 , _ , _],
+                      [_ , _ , _ , _ , _],
+                        [_ , _ , _ , _ , _],
             ]);
 
-            assert.deepStrictEqual(board.getShortestWinningPath(), [
-                { row: 2, col: 0 },
-                { row: 2, col: 1 },
-                { row: 1, col: 2 },
-                { row: 1, col: 3 },
-                { row: 2, col: 3 },
-                { row: 3, col: 2 },
-                { row: 4, col: 2 },
-                { row: 4, col: 3 },
-                { row: 4, col: 4 },
-            ]);
+            const path = board.getShortestWinningPath();
+
+            assert.ok(path !== null);
+            assert.strictEqual(path.length, 5);
+
+            const moves = path.map(c => coordsToMove(c));
+
+            // Reaches all three sides
+            assert.ok(moves.includes(coordsToMove({ row: 0, col: 2 }))); // top
+            assert.ok(moves.includes(coordsToMove({ row: 1, col: 0 }))); // left
+            assert.ok(moves.includes(coordsToMove({ row: 2, col: 2 }))); // hypotenuse
+
+            // Path starts at the junction where the three legs converge, then fans
+            // out toward the sides. For this shape the minimal-total-distance
+            // junction is (0, 2), from which the left and hypotenuse legs branch.
+            assert.deepStrictEqual(path[0], { row: 0, col: 2 });
         });
 
-        it('returns shortest path by player 0', () => {
+        it('returns the minimal Y path, excluding stones off the path', () => {
+            // Player 1 wins with the whole left column; the (1,1) stone is a
+            // dead-end branch and must not be part of the shortest winning path.
             const board = Board.createFromGrid([
-                [_ , _ , _ , 0 , _],
-                  [_ , 0 , 0 , 0 , _],
-                    [0 , _ , _ , 0 , 0],
-                      [0 , 0 , _ , _ , 0],
-                        [_ , 0 , _ , _ , 0],
+                [1 , _ , _ , _ , _],
+                  [1 , 1 , _ , _ , _],
+                    [1 , _ , _ , _ , _],
+                      [1 , _ , _ , _ , _],
+                        [1 , _ , _ , _ , _],
             ]);
 
-            assert.deepStrictEqual(board.getShortestWinningPath(), [
-                { row: 0, col: 3 },
-                { row: 1, col: 3 },
-                { row: 2, col: 3 },
-                { row: 2, col: 4 },
-                { row: 3, col: 4 },
-                { row: 4, col: 4 },
-            ]);
+            const path = board.getShortestWinningPath();
+
+            assert.ok(path !== null);
+            assert.strictEqual(path.length, 5);
+
+            const moves = path.map(c => coordsToMove(c));
+            assert.ok(!moves.includes(coordsToMove({ row: 1, col: 1 })), 'dead-end stone excluded');
         });
 
-        it('returns shortest path, null if no winning path', () => {
+        it('returns null when there is no winner', () => {
             const board = Board.createFromGrid([
-                [1 , 1 , 1 , 1 , _],
-                  [_ , 0 , 0 , 0 , _],
-                    [0 , _ , _ , 0 , 0],
-                      [0 , 0 , _ , _ , 0],
-                        [_ , 0 , _ , _ , 0],
+                [_ , 0 , _ , _ , _],
+                  [0 , 0 , _ , _ , _],
+                    [_ , _ , _ , _ , _],
+                      [_ , _ , _ , _ , _],
+                        [_ , _ , _ , _ , _],
             ]);
 
             assert.strictEqual(board.getShortestWinningPath(), null);

@@ -4,7 +4,7 @@ import GameView from '../../GameView.js';
 import { PlayingGameFacade } from '../../facades/PlayingGameFacade.js';
 
 describe('PlayingGameFacade', () => {
-    it('previews swap move', () => {
+    it('previews swap move, keeping the same cell and only changing color', () => {
         const gameView = new GameView(3);
         const playingGameFacade = new PlayingGameFacade(gameView, true);
 
@@ -12,19 +12,19 @@ describe('PlayingGameFacade', () => {
         playingGameFacade.addMove('a2');
 
         assert.strictEqual(gameView.getStone('a2')?.getPlayerIndex() ?? null, 0);
-        assert.strictEqual(gameView.getStone('b1')?.getPlayerIndex() ?? null, null);
+        assert.strictEqual(gameView.getStone('a2')?.isFaded() ?? null, false);
 
-        // blue previews swap move
+        // blue previews swap move: same cell a2 becomes blue
         playingGameFacade.setPreviewedMove('swap-pieces', 1);
 
-        assert.strictEqual(gameView.getStone('a2')?.getPlayerIndex() ?? null, null);
-        assert.strictEqual(gameView.getStone('b1')?.getPlayerIndex() ?? null, 1);
+        assert.strictEqual(gameView.getStone('a2')?.getPlayerIndex() ?? null, 1);
+        assert.strictEqual(gameView.getStone('a2')?.isFaded() ?? null, true);
 
         // blue cancel preview, swap preview is reverted
         playingGameFacade.removePreviewedMove();
 
         assert.strictEqual(gameView.getStone('a2')?.getPlayerIndex() ?? null, 0);
-        assert.strictEqual(gameView.getStone('b1')?.getPlayerIndex() ?? null, null);
+        assert.strictEqual(gameView.getStone('a2')?.isFaded() ?? null, false);
     });
 
     it('previews swap move when move is played on long diagonale, so swapped move is same coords as move', () => {

@@ -814,7 +814,7 @@ watch(gameUIMode, () => {
                 <div class="row mt-2" v-if="playerSettingsFacade && playerSettings">
                     <div class="col-12" v-if="playerSettingsFacade.getCurrentOrientationMode() === 'landscape'">
                         <div class="btn-group" role="group">
-                            <template v-for="orientation in [0, 11, 10]" :key="orientation">
+                            <template v-for="orientation in [10, 11]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationLandscape" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation">
                                     <AppRhombus :orientation />
@@ -824,7 +824,7 @@ watch(gameUIMode, () => {
                     </div>
                     <div class="col-12" v-if="playerSettingsFacade.getCurrentOrientationMode() === 'portrait'">
                         <div class="btn-group" role="group">
-                            <template v-for="orientation in [1, 9, 2]" :key="orientation">
+                            <template v-for="orientation in [1, 2]" :key="orientation">
                                 <input type="radio" class="btn-check" v-model="playerSettings.orientationPortrait" :value="orientation" :id="'landscape-radio-' + orientation" autocomplete="off">
                                 <label class="btn" :for="'landscape-radio-' + orientation">
                                     <AppRhombus :orientation />

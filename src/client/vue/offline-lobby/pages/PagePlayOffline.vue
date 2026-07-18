@@ -216,11 +216,11 @@ const initWinOverlay = (game: Game, gameView: GameView) => {
     const endedCallback = async () => {
         if (disposed) return;
 
-        const winningPath = game.getBoard().getShortestWinningPath();
+        const winningPath = game.getBoard().getShortestWinningPathGroups();
 
         if (winningPath) {
             const animatorFacade = new AnimatorFacade(gameView);
-            await animatorFacade.animatePath(winningPath);
+            await animatorFacade.animatePathGroups(winningPath);
 
             if (disposed) return;
         }

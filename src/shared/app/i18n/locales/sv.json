@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Spela Hex online",
+    "lobby_title": "Spela Y online",
     "lobby": {
         "no_waiting_games": "Inga spel tillgängliga just nu. Skapa ett nytt!",
         "watch_current_games": "Titta på pågående spel",
@@ -673,7 +673,7 @@
         "remove": "Ta bort flagga"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Uppställningsläge",
         "validate": "Verifiera",
         "undo_placement": "Ångra placering",

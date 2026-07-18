@@ -283,7 +283,7 @@ onUnmounted(() => {
     width 2rem
     height 1.732rem // width * cos(30)
 
-// Default, top left, top right
+// Default (orientation 2, 6, 10): player-a top-left, player-b top-right
 .player-a
     left 0
     top 0
@@ -293,25 +293,50 @@ onUnmounted(() => {
     right 0
     top 0
 
-// Put left player to bottom
+// The layout repeats every 4 orientations, so each rule lists n, n+4, n+8.
+
+// player-a to bottom-left (orientation 0)
 .orientation-0,
-.orientation-1,
-.orientation-6,
-.orientation-7
+.orientation-4,
+.orientation-8
     .player-a
         flex-direction column-reverse
         top auto
         bottom 0
 
-// Put right player to bottom
-.orientation-3,
+// player-a to top-right (orientation 1)
+.orientation-1,
+.orientation-5,
+.orientation-9
+    .player-a
+        left auto
+        right 0
+        top 0
+        text-align right
+
+// player-b to bottom-right (orientation 0 and 1)
+.orientation-0,
+.orientation-1,
 .orientation-4,
-.orientation-9,
-.orientation-10
+.orientation-5,
+.orientation-8,
+.orientation-9
     .player-b
         flex-direction column-reverse
         top auto
         bottom 0
+
+// player-b to bottom-left (orientation 3)
+.orientation-3,
+.orientation-7,
+.orientation-11
+    .player-b
+        flex-direction column-reverse
+        top auto
+        bottom 0
+        left 0
+        right auto
+        text-align left
 
 .app-board.has-rewind-controls
     height calc(100% - 3rem)

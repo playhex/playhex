@@ -1,5 +1,5 @@
 {
-    "lobby_title": "Play Hex online",
+    "lobby_title": "Play Y online",
     "lobby": {
         "no_waiting_games": "No games available right now. Create a new one!",
         "watch_current_games": "Watch current games",
@@ -560,14 +560,14 @@
         "accept": "Accept rematch",
         "view": "View rematch"
     },
-    "how_to_play_hex": "How to play Hex",
+    "how_to_play_hex": "How to play Y",
     "tutorial": {
         "label": "Tutorial",
-        "are_you_new_to_hex": "Are you new to Hex?",
-        "learn_hex_in_1_minute": "Learn to play Hex in 1 minute",
-        "hex_is_simple_and_has_two_rules": "Hex is a simple game, but hard to master. It has <strong>only 2 rules</strong>.",
-        "rule_1_connect_your_sides": "Rule 1: Connect Your Sides",
-        "to_win_you_must_connect_with_path": "To win, you must <strong>connect your sides</strong> with a fully connected path.",
+        "are_you_new_to_hex": "Are you new to Y?",
+        "learn_hex_in_1_minute": "Learn to play Y in 1 minute",
+        "hex_is_simple_and_has_two_rules": "Y is a simple game, but hard to master. It has <strong>only 2 rules</strong>.",
+        "rule_1_connect_your_sides": "Rule 1: Connect All Three Sides",
+        "to_win_you_must_connect_with_path": "To win, you must <strong>connect all three sides</strong> of the triangle with a fully connected group.",
         "demo_0_step_example": "Here is a game example. {red} is connecting {red} sides.",
         "demo_0_step_lets_play": "Let's play! You are {red}. Try to connect {red} sides.",
         "demo_0_step_congrats": "Congrats! You won the game!",
@@ -592,7 +592,7 @@
         "show_swap_map": "Show me where exactly where are fair opening moves for 11×11 board.",
         "swap_map_explain": "Below is a \"swap map\" for 11×11 boards. If {red}'s first move is in a red cell, it gives {red} an advantage, and {blue} should swap. So {red} should play their first move near the boundary between red and blue cells, where the cells are less opaque.",
         "swap_map_credits": "Author: hzy, source: zhihu.com",
-        "congrats_you_know_play_hex": "Congrats! You now know how to play Hex!",
+        "congrats_you_know_play_hex": "Congrats! You now know how to play Y!",
         "what_to_do_next": "What to do next",
         "play_vs_ai_desc": "Play a complete game against an easy AI opponent",
         "play_vs_ai_button": "Play vs AI",
@@ -605,7 +605,7 @@
         "what_should_i_learn_now": "What should I learn now",
         "read_strategy_guide": "Read a deeper strategy guide"
     },
-    "donate": "Donate to PlayHex",
+    "donate": "Donate to PlaY",
     "enable_notifications_overlay": {
         "title": "Enable notifications?",
         "enable": "Enable notifications",
@@ -692,7 +692,7 @@
         "remove": "Remove flag"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Setup mode",
         "validate": "Validate",
         "undo_placement": "Undo placement",
@@ -735,14 +735,14 @@
         "import_placeholder": "URL, HexWorld link, move notation...",
         "formats_supported": "Supported formats",
         "move_list": "Move list",
-        "playhex_link": "PlayHex link",
+        "playhex_link": "PlaY link",
         "hexworld_link": "HexWorld link",
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Copy from \"Debugging information\" below game board"
     },
     "statistics": {
-        "title": "PlayHex statistics",
-        "seo_description": "PlayHex statistics: games, players, board sizes, win rates...",
+        "title": "PlaY statistics",
+        "seo_description": "PlaY statistics: games, players, board sizes, win rates...",
         "period": {
             "last_7_days": "Last 7 days",
             "last_28_days": "Last 28 days",

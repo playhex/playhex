@@ -54,8 +54,8 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
-        name: 'hexplorer',
-        path: '/hexplorer',
+        name: 'yxplorer',
+        path: '/yxplorer',
         component: () => import('./hexplorer/pages/PageHexplorer.vue'),
         meta: {
             displayFooter: false,

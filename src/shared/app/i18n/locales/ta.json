@@ -27,7 +27,7 @@
         "resign": "{player} ராசினாமா செய்கிறார்.",
         "forfeit": "{player} ஒரு பறிமுதல் என்று அறிவிக்கப்படுகிறது."
     },
-    "lobby_title": "ஆன்லைனில் Hex விளையாடு",
+    "lobby_title": "ஆன்லைனில் Y விளையாடு",
     "lobby": {
         "no_waiting_games": "இப்போது எந்த விளையாட்டுகளும் கிடைக்கவில்லை. புதிய ஒன்றை உருவாக்கவும்!",
         "watch_current_games": "தற்போதைய விளையாட்டுகளைப் பாருங்கள்",
@@ -662,7 +662,7 @@
         "remove": "கொடியை அகற்று"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "அமைப்பு முறை",
         "validate": "சரிபார்",
         "undo_placement": "வைப்பை செயல்தவிர்",

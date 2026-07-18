@@ -21,7 +21,7 @@ const props = defineProps({
     sizesSelection: {
         type: Array as PropType<number[]>,
         required: false,
-        default: () => [9, 11, 13, 14, 19],
+        default: () => [14, 17, 21, 24, 27],
     },
 });
 

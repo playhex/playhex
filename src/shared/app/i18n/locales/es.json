@@ -250,7 +250,7 @@
         "resign": "¡{player} gana!",
         "forfeit": "¡{player} gana por abandono!"
     },
-    "lobby_title": "Juega a Hex en línea",
+    "lobby_title": "Juega a Y en línea",
     "last_change": "Última modificación: {{date}}",
     "create_account": "Crear una cuenta",
     "license_agpl": "Licencia AGPL-3.0",
@@ -680,7 +680,7 @@
         "remove": "Quitar bandera"
     },
     "hexplorer": {
-        "title": "Hexplorer",
+        "title": "Yxplorer",
         "setup_mode": "Modo de configuración",
         "validate": "Validar",
         "undo_placement": "Deshacer colocación",
