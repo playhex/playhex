@@ -114,8 +114,17 @@ const cannotJoinReasonType = computed<null
     | 'cannot_join_reason.is_host'
     | 'cannot_join_reason.reserved_for_other_player'
     | 'cannot_join_reason.other'
+    | 'cannot_join_reason.game_canceled'
 >(() => {
-    if (!hostedGame.value || hostedGame.value.state !== 'created') {
+    if (!hostedGame.value) {
+        return null;
+    }
+
+    if (hostedGame.value.state === 'canceled') {
+        return 'cannot_join_reason.game_canceled';
+    }
+
+    if (hostedGame.value.state !== 'created') {
         return null;
     }
 

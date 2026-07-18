@@ -676,7 +676,8 @@
         "is_host_challenge": "Vous êtes l'hôte de cette partie, en attente de la réponse de {{pseudo}}.",
         "reserved_for_other_player": "Cette partie est un défi réservé à un autre joueur.",
         "reserved_for_other_player_named": "Cette partie est un défi réservé à {{pseudo}}.",
-        "other": "Vous ne pouvez pas rejoindre cette partie."
+        "other": "Vous ne pouvez pas rejoindre cette partie.",
+        "game_canceled": "Cette partie a été annulée."
     },
     "no_active_tournament": "Aucun tournoi en cours pour le moment.",
     "no_upcoming_tournament": "Aucun tournoi à venir pour le moment.",

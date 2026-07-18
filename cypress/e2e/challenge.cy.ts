@@ -126,4 +126,13 @@ describe('Challenge a player', () => {
         cy.contains('button', 'Accept').should('not.exist');
         cy.contains('TargetPlayer');
     });
+
+    it('explains that the game has been canceled instead of showing "Accept" when state is canceled', () => {
+        cy.visit('/games/90000000-0000-0000-0000-000000009999');
+        cy.receiveGameUpdate('challenge/game-canceled.json');
+        cy.contains('Loading game…').should('not.exist');
+
+        cy.contains('button', 'Accept').should('not.exist');
+        cy.contains('This game has been canceled.');
+    });
 });

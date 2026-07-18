@@ -106,7 +106,8 @@
         "is_host_challenge": "You are the host of this game, waiting for {{pseudo}} to accept.",
         "reserved_for_other_player": "This game is a challenge reserved for another player.",
         "reserved_for_other_player_named": "This game is a challenge reserved for {{pseudo}}.",
-        "other": "You cannot join this game."
+        "other": "You cannot join this game.",
+        "game_canceled": "This game has been canceled."
     },
     "toggle_coords": "Toggle the display of coordinates",
     "toggle_coords_short": "Toggle coordinates",
