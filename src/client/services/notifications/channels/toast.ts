@@ -39,7 +39,7 @@ notifier.on('gameStart', hostedGame => {
         {
             level: 'success',
             autoCloseAfter: 0,
-            closable: false,
+            closable: true,
             icon: IconPersonFillExclamation,
             actions: [
                 { label: t('go_to_the_game'), action: {
