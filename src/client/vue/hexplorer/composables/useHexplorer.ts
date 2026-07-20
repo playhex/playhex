@@ -68,12 +68,10 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     // registered as a single undo/redo entry when the pointer is released.
     let isDragPainting = false;
     let dragMode: 'add' | 'remove' | null = null;
-    let dragJustCommitted = false;
     const dragCellActions = new Map<Move, { do: () => void, undo: () => void }>();
 
     const endDragPainting = async (): Promise<void> => {
-        if (!isDragPainting || dragCellActions.size === 0) {
-            isDragPainting = false;
+        if (!isDragPainting) {
             return;
         }
 
@@ -82,7 +80,10 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         isDragPainting = false;
         dragMode = null;
         dragCellActions.clear();
-        dragJustCommitted = true;
+
+        if (actions.length === 0) {
+            return;
+        }
 
         // Revert live changes so pushAndDo can re-apply them via do().
         for (const a of [...actions].reverse()) a.undo();
@@ -91,6 +92,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
             do: () => { for (const a of actions) a.do(); },
             undo: () => { for (const a of [...actions].reverse()) a.undo(); },
         });
+
+        await updateAnalysis();
     };
 
     useEventListener(document, 'pointerup', () => { void endDragPainting(); });
@@ -759,9 +762,10 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
         gameView.on('hexClicked', async move => {
             if (state.value.setupMode) {
-                // If a drag just committed this click's cell, skip to avoid double-applying.
-                if (dragJustCommitted) {
-                    dragJustCommitted = false;
+                // Drag-capable tools already handled this cell on pointerdown, and the whole
+                // drag (even a single-cell one) is committed on pointerup by endDragPainting.
+                // Acting on the click too would apply the tool twice on the same cell.
+                if (currentTool.value.getDragMode) {
                     return;
                 }
 
@@ -785,7 +789,6 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     const rebuildBoard = async (boardsize: number): Promise<void> => {
         isDragPainting = false;
         dragMode = null;
-        dragJustCommitted = false;
         dragCellActions.clear();
 
         playingGameFacade?.destroy();
