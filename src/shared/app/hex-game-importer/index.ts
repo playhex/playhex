@@ -1,6 +1,7 @@
 import { AbstractPlay } from './handlers/AbstractPlay.js';
 import { AbstractPlayJson } from './handlers/AbstractPlayJson.js';
 import { HexWorldLink } from './handlers/HexWorldLink.js';
+import { LittleGolemLink } from './handlers/LittleGolemLink.js';
 import { LittleGolemSGF } from './handlers/LittleGolemSGF.js';
 import { PlayHexLink } from './handlers/PlayHexLink.js';
 import { RawMoves } from './handlers/RawMoves.js';
@@ -15,6 +16,7 @@ import { BackendFetchHexGameImporter } from './BackendFetchHexGameImporter.js';
  */
 export const hexGameImporter = new HexGameImporter(
     [
+        new LittleGolemLink(),
         new LittleGolemSGF(), // must come before SGF, whose supports() is a loose "(;" prefix check
         new SGF(),
         new AbstractPlay(),

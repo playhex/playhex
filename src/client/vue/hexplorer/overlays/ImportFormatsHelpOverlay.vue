@@ -73,6 +73,9 @@ const doImport = async () => {
                             <dt>SGF (Little Golem ".hsgf")</dt>
                             <dd class="text-muted small">(;FF[4]...;B[ii];W[swap];B[dc]...)</dd>
 
+                            <dt>Little Golem link</dt>
+                            <dd class="text-muted small">https://littlegolem.net/jsp/game/game.jsp?gid=1512976</dd>
+
                             <dt>{{ $t('hexplorer.playhex_link') }}</dt>
                             <dd class="text-muted small">https://playhex.org/games/0d1f8e8c-3000-49ff-831a-84c20e514528</dd>
 

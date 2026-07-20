@@ -1,6 +1,7 @@
 import { AbstractPlay } from '../../shared/app/hex-game-importer/handlers/AbstractPlay.js';
 import { AbstractPlayJson } from '../../shared/app/hex-game-importer/handlers/AbstractPlayJson.js';
 import { HexWorldLink } from '../../shared/app/hex-game-importer/handlers/HexWorldLink.js';
+import { LittleGolemLink } from '../../shared/app/hex-game-importer/handlers/LittleGolemLink.js';
 import { LittleGolemSGF } from '../../shared/app/hex-game-importer/handlers/LittleGolemSGF.js';
 import { PlayHexLink } from '../../shared/app/hex-game-importer/handlers/PlayHexLink.js';
 import { RawMoves } from '../../shared/app/hex-game-importer/handlers/RawMoves.js';
@@ -16,6 +17,7 @@ const apiBaseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT 
  * has shouldFetchFromBackend() === true (see BackendFetchHexGameImporter.ts).
  */
 export const hexGameImporter = new HexGameImporter([
+    new LittleGolemLink(),
     new LittleGolemSGF(), // must come before SGF, whose supports() is a loose "(;" prefix check
     new SGF(),
     new AbstractPlay(),
