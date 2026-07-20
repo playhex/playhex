@@ -70,6 +70,9 @@ const doImport = async () => {
                             <dt>SGF</dt>
                             <dd class="text-muted small">(;FF[4]...;B[f3];W[swap-pieces];B[d4]...)</dd>
 
+                            <dt>SGF (Little Golem ".hsgf")</dt>
+                            <dd class="text-muted small">(;FF[4]...;B[ii];W[swap];B[dc]...)</dd>
+
                             <dt>{{ $t('hexplorer.playhex_link') }}</dt>
                             <dd class="text-muted small">https://playhex.org/games/0d1f8e8c-3000-49ff-831a-84c20e514528</dd>
 
