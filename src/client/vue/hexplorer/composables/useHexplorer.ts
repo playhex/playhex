@@ -210,13 +210,18 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         const showWinrate = state.value.winrateEnabled[player];
         const showPolicy = state.value.policyEnabled[player];
 
+        // Claim a request id before anything else, including the "nothing to display" case:
+        // it also invalidates any in-flight request, which would otherwise still apply its
+        // result (computed with the previous settings) once it resolves.
+        const requestId = ++analysisRequestId;
+
         // Nothing to display for the color to move: hide the winrate bar.
         if (!analyzer || (!showWinrate && !showPolicy)) {
             whiteWin.value = undefined;
+            analysisLoading.value = false;
             return;
         }
 
-        const requestId = ++analysisRequestId;
         const nodeId = currentNodeId.value;
         const { black, white } = getBoardStones(gameView);
         const color = player === 0 ? 'black' : 'white';
@@ -224,7 +229,20 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
         analysisLoading.value = true;
 
-        const result = await analyzer.analyzePosition({ size, color, black, white });
+        let result: Awaited<ReturnType<AnalyzerInterface['analyzePosition']>>;
+
+        try {
+            result = await analyzer.analyzePosition({ size, color, black, white });
+        } catch (e) {
+            // Do not leave the loading indicator spinning forever on a failed analysis.
+            if (requestId === analysisRequestId) {
+                analysisLoading.value = false;
+            }
+
+            // eslint-disable-next-line no-console
+            console.error('Error while analyzing position', e);
+            return;
+        }
 
         if (requestId !== analysisRequestId) {
             return; // a newer request has started since; this result is stale, discard it
@@ -339,15 +357,30 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
             }
 
             const { black, white } = getBlackWhiteFromGame(game);
-            const result = await analyzer.analyzePosition({
-                size: boardsize,
-                color: game.getCurrentPlayerIndex() === 0 ? 'black' : 'white',
-                black,
-                white,
-            });
 
-            if (typeof result.whiteWin === 'number') {
-                evalsByNodeId.value.set(node.id, result.whiteWin);
+            let whiteWin: number | undefined;
+
+            try {
+                whiteWin = (await analyzer.analyzePosition({
+                    size: boardsize,
+                    color: game.getCurrentPlayerIndex() === 0 ? 'black' : 'white',
+                    black,
+                    white,
+                })).whiteWin;
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error('Error while analyzing ancestor position', e);
+                return;
+            }
+
+            // The analyzer may have been swapped while we were computing (see setAnalyzer,
+            // which drops the cache): these numbers now belong to a previous engine, discard them.
+            if (currentAnalyzer.value !== analyzer) {
+                return;
+            }
+
+            if (typeof whiteWin === 'number') {
+                evalsByNodeId.value.set(node.id, whiteWin);
             }
         }
     };
@@ -930,40 +963,47 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         goToNode(targetId);
     };
 
+    /**
+     * Shortcuts are bound on the window, so they must not steal keys from a field
+     * being typed in (mark label, player names, board size): there, arrows move the
+     * caret and ctrl+Z undoes the text, not the board.
+     */
+    const isTyping = (e: KeyboardEvent): boolean => {
+        const target = e.target as HTMLElement | null;
+
+        if (!target) {
+            return false;
+        }
+
+        return target.isContentEditable
+            || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+    };
+
     const bindKeys = () => {
+        // Runs the given handler, unless the user is typing in a form field.
+        const boardShortcut = (run: () => void) => (e: KeyboardEvent) => {
+            if (isTyping(e)) {
+                return;
+            }
+
+            e.preventDefault();
+            run();
+        };
+
         // ctrl+Z/Y
         onKeyDown(
             e => (e.ctrlKey || e.metaKey) && e.key === 'z',
-            e => {
-                e.preventDefault();
-                void undo();
-            },
+            boardShortcut(() => void undo()),
         );
 
         onKeyDown(
             e => (e.ctrlKey || e.metaKey) && e.key === 'y',
-            e => {
-                e.preventDefault();
-                void redo();
-            },
+            boardShortcut(() => void redo()),
         );
 
         // left/right
-        onKeyDown(
-            'ArrowLeft',
-            e => {
-                e.preventDefault();
-                void undo();
-            },
-        );
-
-        onKeyDown(
-            'ArrowRight',
-            e => {
-                e.preventDefault();
-                void redo();
-            },
-        );
+        onKeyDown('ArrowLeft', boardShortcut(() => void undo()));
+        onKeyDown('ArrowRight', boardShortcut(() => void redo()));
     };
 
     return {
