@@ -161,7 +161,7 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             // except for the host and the targeted player, who should still see it there.
             if (isChallengeGame(hostedGame)) {
                 const player = authStore.loggedInPlayer;
-                const isRelevantToMe = null !== player && (hasPlayer(hostedGame, player) || isChallengeTargetOf(hostedGame, player));
+                const isRelevantToMe = player !== null && (hasPlayer(hostedGame, player) || isChallengeTargetOf(hostedGame, player));
 
                 if (!isRelevantToMe) {
                     return;

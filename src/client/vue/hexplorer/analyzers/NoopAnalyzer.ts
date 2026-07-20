@@ -1,4 +1,5 @@
-import { AnalysisOutput, AnalyzerInterface } from './AnalyzerInterface.js';
+import { type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
+import { AnalyzerInterface } from './AnalyzerInterface.js';
 
 export class NoopAnalyzer implements AnalyzerInterface
 {

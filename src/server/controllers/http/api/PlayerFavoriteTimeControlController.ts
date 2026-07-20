@@ -18,7 +18,7 @@ export default class PlayerFavoriteTimeControlController
         @AuthenticatedPlayer() player: Player,
     ): Promise<PlayerFavoriteTimeControl[]>
     {
-        return this.playerFavoriteTimeControlRepository.getForPlayer(player.publicId);
+        return await this.playerFavoriteTimeControlRepository.getForPlayer(player.publicId);
     }
 
     @Put('/api/player-favorite-time-controls')

@@ -13,7 +13,7 @@ export default class PlayerFavoriteTimeControlRepository
 
     async getForPlayer(publicId: string): Promise<PlayerFavoriteTimeControl[]>
     {
-        return this.repository.find({
+        return await this.repository.find({
             where: {
                 player: { publicId },
             },

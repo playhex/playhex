@@ -718,7 +718,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
         new PlayerSettingsFacade(gameView);
 
-        gameView.on('hexPointerDown', move => {
+        gameView.on('hexPointerDown', async move => {
             if (!state.value.setupMode) return;
 
             const tool = currentTool.value;
@@ -736,12 +736,12 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
             const action = tool.createDragAction!(move, mode);
 
             if (action) {
-                action.do();
+                await action.do();
                 dragCellActions.set(move, action);
             }
         });
 
-        gameView.on('hexHovered', move => {
+        gameView.on('hexHovered', async move => {
             if (!isDragPainting || dragMode === null) return;
             if (dragCellActions.has(move)) return;
 
@@ -753,7 +753,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
             if (!action) return;
 
-            action.do();
+            await action.do();
             dragCellActions.set(move, action);
         });
 

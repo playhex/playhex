@@ -7,7 +7,6 @@ import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
-import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
 import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
 import AppOpponentPlayerSelect from './create-game/AppOpponentPlayerSelect.vue';
@@ -29,8 +28,8 @@ const props = defineProps({
 
 const gameOptions = reactive(props.gameOptions);
 
-const timeControl = toRef(gameOptions.timeControlType);
-watch<TimeControlType>(timeControl, t => {
+const timeControl = toRef(gameOptions, 'timeControlType');
+watch(timeControl, t => {
     gameOptions.timeControlType = t;
     gameOptions.opponentMustBeRegistered = isCorrespondence({ ...gameOptions, timeControlType: t });
 }, { immediate: true });

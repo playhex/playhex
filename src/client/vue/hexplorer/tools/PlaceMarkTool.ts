@@ -2,7 +2,7 @@ import { Ref, unref } from 'vue';
 import { Move } from '../../../../shared/move-notation/move-notation.js';
 import { ToolInterface } from './ToolInterface.js';
 import { UndoableAction } from '../undoredo/undoredo.js';
-import { BoardMarksLayer, MarkType, ShapeMarkType } from '../BoardMarksLayer.js';
+import { BoardMarksLayer, MarkType } from '../BoardMarksLayer.js';
 
 /**
  * Toggles a mark on the clicked cell: places it if absent or different,
@@ -83,7 +83,7 @@ export class PlaceMarkTool implements ToolInterface
             };
         }
 
-        const markType = this.markType as ShapeMarkType; // narrowed: 'select' branch already returned
+        const markType = this.markType;
         const text = unref(this.text);
         const previousType = this.marksLayer.getMarkType(move);
         const previousText = this.marksLayer.getMarkText(move);

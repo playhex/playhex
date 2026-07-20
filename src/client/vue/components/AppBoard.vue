@@ -24,7 +24,7 @@ const props = defineProps({
         default: null,
     },
     timeControlValues: {
-        type: Object as PropType<GameTimeData>,
+        type: Object as PropType<null | GameTimeData>,
         required: false,
         default: null,
     },

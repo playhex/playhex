@@ -98,7 +98,7 @@ export default class GameController
 
         if (isChallenge) {
             await rateLimiterConsumeChallengePlayer(host.publicId);
-            await rateLimiterConsumeChallengeSameTarget(host.publicId, gameOptions.opponentPublicId!);
+            await rateLimiterConsumeChallengeSameTarget(host.publicId, gameOptions.opponentPublicId);
         }
 
         try {
