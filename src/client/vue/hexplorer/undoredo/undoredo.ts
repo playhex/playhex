@@ -46,16 +46,6 @@ export class UndoableActionsStack
         await this.stack[this.cursor].do();
     }
 
-    /**
-     * Discards the redo-able actions ahead of the cursor, without undoing anything.
-     * Used when the board changed by some other mean (e.g navigating the game),
-     * making the pending redo actions stale (they were recorded against a different board position).
-     */
-    clearRedo(): void
-    {
-        this.stack.splice(this.cursor + 1);
-    }
-
     canUndo(): boolean
     {
         return this.cursor >= 0;
@@ -64,10 +54,5 @@ export class UndoableActionsStack
     canRedo(): boolean
     {
         return this.stack.length > this.cursor + 1;
-    }
-
-    getCursorAndLength(): [number, number]
-    {
-        return [this.cursor, this.stack.length];
     }
 }

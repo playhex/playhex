@@ -10,9 +10,17 @@ export class PlaceStoneTool implements ToolInterface
         readonly color: 0 | 1,
     ) {}
 
+    /**
+     * Color of the stone currently on this cell, if any.
+     */
+    private stoneAt(move: Move): null | 0 | 1
+    {
+        return this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+    }
+
     createUndoableAction(move: Move): UndoableAction | null
     {
-        const existing = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+        const existing = this.stoneAt(move);
 
         if (existing !== null && existing !== this.color) {
             return null;
@@ -32,7 +40,7 @@ export class PlaceStoneTool implements ToolInterface
 
     getDragMode(move: Move): 'add' | 'remove' | null
     {
-        const existing = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+        const existing = this.stoneAt(move);
 
         if (existing !== null && existing !== this.color) return null; // opponent stone: no drag
 
@@ -41,7 +49,7 @@ export class PlaceStoneTool implements ToolInterface
 
     createDragAction(move: Move, mode: 'add' | 'remove'): UndoableAction | null
     {
-        const existing = this.gameView.getStone(move)?.getPlayerIndex() ?? null;
+        const existing = this.stoneAt(move);
 
         if (mode === 'add') {
             if (existing !== null) return null; // skip occupied cells

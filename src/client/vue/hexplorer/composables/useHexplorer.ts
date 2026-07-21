@@ -1,5 +1,5 @@
 import { GameView, PlayingGameFacade } from '@playhex/pixi-board';
-import { parseHexworldString } from '../../../../shared/app/hexworld.js';
+import { movesToHexworldString, parseHexworldString } from '../../../../shared/app/hexworld.js';
 import { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import { computed, Ref, ref, shallowRef, watch } from 'vue';
 import { ToolInterface } from '../tools/ToolInterface.js';
@@ -21,6 +21,31 @@ import { PlaceMarkTool } from '../tools/PlaceMarkTool.js';
 import { gameTreeToSgf } from '../exportSgf.js';
 import { sgfToString } from '../../../../shared/sgf/index.js';
 import { downloadString } from '../../../services/fileDownload.js';
+import { DragPainter } from '../DragPainter.js';
+
+/**
+ * Walks a square board and splits the stones it holds into a black and a white move list,
+ * whatever the board actually is (visible GameView, headless Game…).
+ */
+const splitStonesByColor = (boardsize: number, playerIndexAt: (move: Move) => null | 0 | 1): { black: Move[], white: Move[] } => {
+    const black: Move[] = [];
+    const white: Move[] = [];
+
+    for (let row = 0; row < boardsize; ++row) {
+        for (let col = 0; col < boardsize; ++col) {
+            const move = coordsToMove({ row, col });
+            const player = playerIndexAt(move);
+
+            if (player === null) {
+                continue;
+            }
+
+            (player === 0 ? black : white).push(move);
+        }
+    }
+
+    return { black, white };
+};
 
 export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | null = null) => {
     /**
@@ -63,37 +88,13 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     let policyOverlayFacade: PolicyOverlayFacade = null!;
     let marksLayer: BoardMarksLayer = null!;
 
-    // Drag-paint state: active when the user holds the pointer down over cells in setup mode.
-    // Each visited cell's per-cell UndoableAction is stored so the whole drag can be
-    // registered as a single undo/redo entry when the pointer is released.
-    let isDragPainting = false;
-    let dragMode: 'add' | 'remove' | null = null;
-    const dragCellActions = new Map<Move, { do: () => void, undo: () => void }>();
+    // Paints cells while the pointer is held down in setup mode (see DragPainter).
+    const dragPainter = new DragPainter();
 
     const endDragPainting = async (): Promise<void> => {
-        if (!isDragPainting) {
-            return;
+        if (await dragPainter.pointerUp(actionsStack.value)) {
+            await updateAnalysis();
         }
-
-        const actions = [...dragCellActions.values()];
-
-        isDragPainting = false;
-        dragMode = null;
-        dragCellActions.clear();
-
-        if (actions.length === 0) {
-            return;
-        }
-
-        // Revert live changes so pushAndDo can re-apply them via do().
-        for (const a of [...actions].reverse()) a.undo();
-
-        await actionsStack.value.pushAndDo({
-            do: () => { for (const a of actions) a.do(); },
-            undo: () => { for (const a of [...actions].reverse()) a.undo(); },
-        });
-
-        await updateAnalysis();
     };
 
     useEventListener(document, 'pointerup', () => { void endDragPainting(); });
@@ -140,6 +141,18 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     };
 
     /**
+     * Settles on the node the board now shows: tracks it, syncs the color to move
+     * from the facade, and (re)starts the analysis of the new position.
+     * Assumes the board has already been updated (replayed or appended to).
+     */
+    const showNode = (id: number): void => {
+        setCurrentNode(id);
+        state.value.currentPlayer = playingGameFacade.getCurrentPlayerIndex();
+
+        void updateAnalysis();
+    };
+
+    /**
      * The line currently shown in the evaluation graph: root → tracked leaf.
      */
     const currentLine = computed<TreeNode[]>(() => tree.getPath(lineLeafId.value));
@@ -160,26 +173,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
      * Unlike playingGameFacade.getMoves(), this also reflects stones placed
      * directly on the view in setup mode.
      */
-    const getBoardStones = (gv: GameView): { black: Move[], white: Move[] } => {
-        const black: Move[] = [];
-        const white: Move[] = [];
-
-        for (let i = 0; i < gv.getBoardsize(); ++i) {
-            for (let j = 0; j < gv.getBoardsize(); ++j) {
-                const move = coordsToMove({ row: j, col: i });
-                const stone = gv.getStone(move);
-
-                if (!stone) {
-                    continue;
-                }
-
-                if (stone.getPlayerIndex() === 0) black.push(move);
-                if (stone.getPlayerIndex() === 1) white.push(move);
-            }
-        }
-
-        return { black, white };
-    };
+    const getBoardStones = (gv: GameView): { black: Move[], white: Move[] } =>
+        splitStonesByColor(gv.getBoardsize(), move => gv.getStone(move)?.getPlayerIndex() ?? null);
 
     const clearBoard = (): void => {
         const { black, white } = getBoardStones(gameView);
@@ -268,24 +263,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
      */
     const getBlackWhiteFromGame = (game: Game): { black: Move[], white: Move[] } => {
         const cells = game.getBoard().getCells();
-        const black: Move[] = [];
-        const white: Move[] = [];
 
-        for (let row = 0; row < cells.length; ++row) {
-            for (let col = 0; col < cells[row].length; ++col) {
-                const player = cells[row][col];
-
-                if (player === null) {
-                    continue;
-                }
-
-                const move = coordsToMove({ row, col });
-
-                (player === 0 ? black : white).push(move);
-            }
-        }
-
-        return { black, white };
+        return splitStonesByColor(cells.length, move => game.getBoard().getCell(move));
     };
 
     /**
@@ -358,10 +337,10 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 
             const { black, white } = getBlackWhiteFromGame(game);
 
-            let whiteWin: number | undefined;
+            let nodeWhiteWin: number | undefined;
 
             try {
-                whiteWin = (await analyzer.analyzePosition({
+                nodeWhiteWin = (await analyzer.analyzePosition({
                     size: boardsize,
                     color: game.getCurrentPlayerIndex() === 0 ? 'black' : 'white',
                     black,
@@ -379,8 +358,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
                 return;
             }
 
-            if (typeof whiteWin === 'number') {
-                evalsByNodeId.value.set(node.id, whiteWin);
+            if (typeof nodeWhiteWin === 'number') {
+                evalsByNodeId.value.set(node.id, nodeWhiteWin);
             }
         }
     };
@@ -467,20 +446,18 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         }
 
         playingGameFacade = pgf;
-        setCurrentNode(id);
-        state.value.currentPlayer = playingGameFacade.getCurrentPlayerIndex();
+        showNode(id);
 
-        void updateAnalysis();
         void fillAncestorEvals(path);
     };
+
+    const currentParentId = computed<number | null>(() => tree.getNode(currentNodeId.value).parentId);
 
     // Back/forward are manual navigation, so (like history/eval clicks) they stop auto-play.
     // Otherwise stepping back would immediately be replayed by the auto-player.
     const goToParent = (): void => {
-        const node = tree.getNode(currentNodeId.value);
-
-        if (node.parentId !== null) {
-            userGoToNode(node.parentId);
+        if (currentParentId.value !== null) {
+            userGoToNode(currentParentId.value);
         }
     };
 
@@ -495,21 +472,19 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     /**
      * Whether the currently displayed node can be deleted (the root cannot).
      */
-    const canDeleteCurrentNode = computed<boolean>(() => tree.getNode(currentNodeId.value).parentId !== null);
+    const canDeleteCurrentNode = computed<boolean>(() => currentParentId.value !== null);
 
     /**
      * Deletes the currently displayed node and all its descendants, then goes to its parent.
      */
     const deleteCurrentNode = (): void => {
-        const node = tree.getNode(currentNodeId.value);
+        const parentId = currentParentId.value;
 
-        if (node.parentId === null) {
+        if (parentId === null) {
             return;
         }
 
-        const { parentId } = node;
-
-        tree.removeNode(node.id);
+        tree.removeNode(currentNodeId.value);
 
         for (const id of [...evalsByNodeId.value.keys()]) {
             if (!tree.nodes.value.some(n => n.id === id)) {
@@ -564,10 +539,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         // Already explored this move from here: cell is guaranteed empty at this position, safe to replay.
         if (existing) {
             playingGameFacade.addMove(guessed);
-            setCurrentNode(existing.id);
-            state.value.currentPlayer = playingGameFacade.getCurrentPlayerIndex();
-
-            void updateAnalysis();
+            showNode(existing.id);
             return;
         }
 
@@ -577,12 +549,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
             return;
         }
 
-        const node = tree.addMove(currentNodeId.value, guessed);
-
-        setCurrentNode(node.id);
-        state.value.currentPlayer = playingGameFacade.getCurrentPlayerIndex();
-
-        void updateAnalysis();
+        showNode(tree.addMove(currentNodeId.value, guessed).id);
     };
 
     /**
@@ -673,36 +640,34 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         },
     );
 
-    // Sync URL hash with the current position so sharing the URL restores the position.
-    // Format: "{size}c1,{moves_to_cursor},{continuation}" where continuation is the
-    // remaining moves in the current evaluation line (so the tree is preserved on reload).
-    watch(currentNodeId, () => {
+    const nodesToMovesString = (nodes: TreeNode[]): string => movesToHexworldString(
+        nodes
+            .filter(node => node.data?.type === 'move')
+            .map(node => (node.data as { type: 'move', move: HexMove }).move),
+    );
+
+    /**
+     * Sync URL hash with the current position so sharing the URL restores the position.
+     * Format: "{size}c1,{moves_to_cursor},{continuation}" where continuation is the
+     * remaining moves in the current evaluation line (so the tree is preserved on reload).
+     */
+    const syncUrlHash = (): void => {
         const size = gameViewRef.value?.getBoardsize() ?? 11;
-
-        const movesStr = (nodes: TreeNode[]): string =>
-            nodes
-                .filter(node => node.data?.type === 'move')
-                .map(node => {
-                    const move = (node.data as { type: 'move', move: HexMove }).move;
-                    if (move === 'swap-pieces') return ':s';
-                    if (move === 'pass') return ':p';
-                    return move;
-                })
-                .join('');
-
         const line = currentLine.value; // root → lineLeaf
         const cursorIndex = line.findIndex(node => node.id === currentNodeId.value);
         const before = cursorIndex >= 0 ? line.slice(0, cursorIndex + 1) : line;
         const after = cursorIndex >= 0 ? line.slice(cursorIndex + 1) : [];
 
-        const movesBefore = movesStr(before);
-        const movesAfter = movesStr(after);
+        const movesBefore = nodesToMovesString(before);
+        const movesAfter = nodesToMovesString(after);
         const hash = movesAfter
             ? `${size}c1,${movesBefore},${movesAfter}`
             : `${size}c1,${movesBefore}`;
 
         window.history.replaceState(null, '', `#${hash}`);
-    });
+    };
+
+    watch(currentNodeId, syncUrlHash);
 
     const goSetupMode = (): void => {
         state.value.setupMode = true;
@@ -755,42 +720,13 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         new PlayerSettingsFacade(gameView);
 
         gameView.on('hexPointerDown', async move => {
-            if (!state.value.setupMode) return;
-
-            const tool = currentTool.value;
-
-            if (!tool.getDragMode) return;
-
-            const mode = tool.getDragMode(move);
-
-            if (mode === null) return;
-
-            isDragPainting = true;
-            dragMode = mode;
-            dragCellActions.clear();
-
-            const action = tool.createDragAction!(move, mode);
-
-            if (action) {
-                await action.do();
-                dragCellActions.set(move, action);
+            if (state.value.setupMode) {
+                await dragPainter.pointerDown(currentTool.value, move);
             }
         });
 
         gameView.on('hexHovered', async move => {
-            if (!isDragPainting || dragMode === null) return;
-            if (dragCellActions.has(move)) return;
-
-            const tool = currentTool.value;
-
-            if (!tool.createDragAction) return;
-
-            const action = tool.createDragAction(move, dragMode);
-
-            if (!action) return;
-
-            await action.do();
-            dragCellActions.set(move, action);
+            await dragPainter.pointerHover(currentTool.value, move);
         });
 
         gameView.on('hexClicked', async move => {
@@ -820,9 +756,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
      * resetting the whole tree back to its root.
      */
     const rebuildBoard = async (boardsize: number): Promise<void> => {
-        isDragPainting = false;
-        dragMode = null;
-        dragCellActions.clear();
+        dragPainter.reset();
 
         playingGameFacade?.destroy();
         gameView?.destroy();

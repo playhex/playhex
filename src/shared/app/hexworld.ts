@@ -1,4 +1,5 @@
 import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
+import type { HexMove } from '../move-notation/hex-move-notation.js';
 import HostedGame from './models/HostedGame.js';
 
 const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) => {
@@ -24,23 +25,30 @@ export const gameToHexworldLink = (hostedGame: HostedGame, orientation: number =
 };
 
 /**
+ * Encodes moves as a Hexworld moves string, 'e6:sf7i8g10j10'.
+ * Special moves have their own token: ':s' for swap, ':p' for pass.
+ */
+export const movesToHexworldString = (moves: HexMove[]): string => moves
+    .map(move => {
+        if (move === 'swap-pieces') {
+            return ':s';
+        }
+        if (move === 'pass') {
+            return ':p';
+        }
+        return move;
+    })
+    .join('')
+;
+
+/**
  * Generate Hexworld string from hostedGame, '15c1,e6:sf7i8g10j10'
  * to pass as query hash.
  */
 export const createHexworldString = (hostedGame: HostedGame, orientation: number = 11): string => {
     if (orientation < 0 || orientation > 11)
         throw new Error('Invalid board orientation');
-    const moves = hostedGame.moves
-        .map(move => {
-            if (move === 'swap-pieces') {
-                return ':s';
-            }
-            if (move === 'pass') {
-                return ':p';
-            }
-            return move;
-        })
-        .join('');
+    const moves = movesToHexworldString(hostedGame.moves);
     const size = hostedGame.boardsize;
     const outcome = outcomeToHexworld(hostedGame.outcome, hostedGame.winner);
     // from 1 to 12 (closed), shifted by -2

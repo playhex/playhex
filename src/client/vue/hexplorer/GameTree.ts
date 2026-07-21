@@ -42,17 +42,12 @@ export const createRootNodes = (): TreeNode[] => [createRootNode()];
  */
 export class GameTree
 {
-    private nextId: number;
+    private nextId = ROOT_ID + 1;
 
     constructor(
         readonly nodes: Ref<TreeNode[]> = ref(createRootNodes()),
     ) {
-        this.nextId = this.nodes.value.reduce((max, node) => Math.max(max, node.id), ROOT_ID) + 1;
-    }
-
-    getRoot(): TreeNode
-    {
-        return this.getNode(ROOT_ID);
+        this.reload();
     }
 
     getNode(id: number): TreeNode

@@ -22,6 +22,17 @@ export class PlaceMarkTool implements ToolInterface
         private text?: string | Ref<string>,
     ) {}
 
+    /**
+     * Whether the cell already holds the mark this tool would place,
+     * i.e whether placing it again should instead remove it.
+     * Labels also have to carry the same text to count as the same mark.
+     */
+    private holdsSameMark(move: Move): boolean
+    {
+        return this.marksLayer.getMarkType(move) === this.markType
+            && (this.markType !== 'label' || this.marksLayer.getMarkText(move) === unref(this.text));
+    }
+
     createUndoableAction(move: Move): UndoableAction
     {
         const markType = this.markType;
@@ -44,9 +55,7 @@ export class PlaceMarkTool implements ToolInterface
         const previousType = this.marksLayer.getMarkType(move);
         const previousText = this.marksLayer.getMarkText(move);
 
-        const isSame = previousType === markType
-            && (markType !== 'label' || previousText === text);
-
+        const isSame = this.holdsSameMark(move);
         const newType = isSame ? null : markType;
         const newText = isSame ? undefined : text;
 
@@ -98,10 +107,7 @@ export class PlaceMarkTool implements ToolInterface
         }
 
         // mode === 'add': place the mark, replacing any existing mark
-        const isSame = previousType === markType
-            && (markType !== 'label' || previousText === text);
-
-        if (isSame) return null;
+        if (this.holdsSameMark(move)) return null;
 
         return {
             do: () => this.marksLayer.setMark(move, markType, text),
