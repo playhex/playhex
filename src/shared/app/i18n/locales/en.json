@@ -582,7 +582,7 @@
         "swapped": "Nice! You're ahead now. Let’s see if you can beat this beginner AI.",
         "not_swapped": "Ah, you decided not to swap, leaving the advantage to your opponent — but you can still win against this beginner AI.",
         "swap_won": "Nice, you beat the computer!",
-        "swap_lost": "Damn! No worries — you probably just need to play a few more games to figure out how to beat this AI.",
+        "swap_lost": "Darn! No worries — you probably just need to play a few more games to figure out how to beat this AI.",
         "swap_rule_keeps_games_balanced": "The swap rule keeps games balanced:",
         "red_strong_get_swapped": "{red} opens with a strong move → {blue} swaps and gets the advantage.",
         "red_weak_dont_get_swapped": "{red} opens with a weak move → {blue} does not swap, keeps the advantage and places a blue stone.",
