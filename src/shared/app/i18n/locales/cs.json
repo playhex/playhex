@@ -330,6 +330,7 @@
     "tournament_organized_by": "Organizuje { player }",
     "tournament_admins": "Správci turnaje",
     "admins_one": "Správce: { players }",
+    "admins_few": "",
     "admins_other": "Správci: { players }",
     "checkin_opens_time_before": "Registrace se otevře {{ time }} předem.",
     "tournament_subscribe": "Mám zájem!",

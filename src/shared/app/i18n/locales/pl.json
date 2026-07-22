@@ -557,7 +557,8 @@
     "lobby_join": "Dołącz",
     "lobby_game_no_longer_available": "Gra nie jest już dostępna",
     "lobby_active_players_one": "aktywny gracz",
-    "lobby_active_players_other": "aktywni gracze",
+    "lobby_active_players_few": "",
+    "lobby_active_players_many": "",
     "lobby_playing_now": "Grają teraz",
     "lobby_no_live_games_now": "Obecnie nie ma gier na żywo.",
     "lobby_observe_correspondence": "Obserwuj gry korespondencyjne",
@@ -590,15 +591,11 @@
     "nav_archives": "Archiwum",
     "update": "Aktualizuj",
     "tournaments_page_intro": "Oto turnieje Hex, które mogą być <strong>organizowane przez każdego</strong> w różnych formatach, takich jak system szwajcarski lub pucharowy.<br>Możesz oglądać gry z trwających turniejów albo dołączyć do nadchodzącego.<br><strong>Aby wziąć udział</strong>, pamiętaj, aby <strong>zameldować się na czas</strong>. Możesz zasubskrybować powiadomienie, gdy meldowanie zostanie otwarte.<br>Sprawdź opis turnieju, aby poznać szczegóły, takie jak godziny meldowania, format i uczestnicy.",
-    "n_people_are_interested_other": "{{count}} osób jest zainteresowanych",
-    "n_participants_other": "{{ count }} uczestników",
-    "n_playing_games_other": "{{ count }} trwających gier",
-    "n_matches_played_other": "{{ count }} rozegranych meczów",
     "tournament_admins": "Administratorzy turnieju",
     "admins_one": "Administrator: { players }",
-    "admins_other": "Administratorzy: { players }",
+    "admins_few": "",
+    "admins_many": "",
     "tournament_unsubscribe": "Nie jestem już zainteresowany.",
-    "n_rounds_other": "{{ count }} rund",
     "tournament_slug_duplicate": "Turniej o tej samej nazwie URL już istnieje",
     "tournament_seeding_methods": {
         "title": "Rozstawienie",
@@ -610,7 +607,6 @@
         "rating_random_help": "Gracze są rozstawiani według rankingu, ale z losowym elementem zależnym od odchylenia rankingu glicko2. Jeśli w pierwszej rundzie są wolne losy, silniejsi gracze je otrzymują."
     },
     "chat_message_moderated": "Wiadomość usunięta przez moderację",
-    "n_characters_other": "{{count}} znaków",
     "resign_confirm_overlay": {
         "title": "Poddaj grę",
         "message": "Czy na pewno chcesz poddać grę?",
@@ -618,7 +614,6 @@
         "cancelLabel": "Nie, kontynuuj grę"
     },
     "bot": "Bot",
-    "n_total_games_other": "{{count}} gier łącznie.",
     "donate": "Wesprzyj PlayHex",
     "notifications": "Powiadomienia",
     "mark_all_as_read": "Oznacz wszystko jako przeczytane",
