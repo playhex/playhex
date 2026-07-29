@@ -11,6 +11,13 @@ const useToastsStore = defineStore('toastsStore', () => {
     const addToast = (message: string, options?: Partial<ToastOptions>): void => {
         const toast = createToast(message, options);
 
+        if (toast.options.tag) {
+            toasts.value
+                .filter(t => t.options.tag === toast.options.tag)
+                .forEach(deleteToast)
+            ;
+        }
+
         toasts.value.push(toast);
 
         if (toast.options.autoCloseAfter > 0) {
@@ -56,6 +63,13 @@ export type ToastOptions = {
      * Defaults to true.
      */
     closable: boolean;
+
+    /**
+     * If set, showing a new toast with the same tag
+     * removes the previous one with this tag,
+     * to prevent accumulating too many toasts for the same kind of event/error.
+     */
+    tag?: string;
 
     /**
      * Show links or buttons.

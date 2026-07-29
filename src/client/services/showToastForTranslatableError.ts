@@ -4,9 +4,11 @@ import useToastsStore from '../stores/toastsStore';
 
 export const showToastForTranslatableError = (payload: TranslatableHttpErrorPayload) => {
     useToastsStore().addToast(
-        t(payload.translationKey),
+        t(payload.translationKey, payload.translationParameters),
         {
             level: 'danger',
+            tag: payload.translationKey,
+            autoCloseAfter: 8000,
         },
     );
 };

@@ -10,6 +10,7 @@ export class TranslatableHttpError extends Error
         readonly httpStatus: number,
 
         readonly translationKey: string,
+        readonly translationParameters?: { [key: string]: undefined | string },
     ) {
         super(translationKey);
     }
@@ -19,6 +20,7 @@ export class TranslatableHttpError extends Error
         return {
             type: 'translatable_http_error',
             translationKey: this.translationKey,
+            translationParameters: this.translationParameters,
         };
     }
 }
@@ -26,6 +28,7 @@ export class TranslatableHttpError extends Error
 export type TranslatableHttpErrorPayload = {
     type: 'translatable_http_error';
     translationKey: string;
+    translationParameters?: { [key: string]: undefined | string };
 };
 
 export const isTranslatableHttpErrorPayload = (payload: unknown): payload is TranslatableHttpErrorPayload => {
