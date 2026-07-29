@@ -17,7 +17,7 @@ useHead({ title: t('playing_games.title') });
 
 const TOP_COUNT = 6;
 
-type SortKey = 'recently-started' | 'most-moves' | 'longest' | 'player-rating';
+type SortKey = 'recently-started' | 'recently-played' | 'most-moves' | 'longest' | 'player-rating';
 type ViewMode = 'top' | 'all';
 
 const allPlayingGames = ref<HostedGame[]>([]);
@@ -68,6 +68,14 @@ const sortedGames = computed(() => {
 
         case 'player-rating':
             return games.sort((a, b) => maxRating(b) - maxRating(a));
+
+        case 'recently-played':
+            return games.sort((a, b) => {
+                const dateA = a.moveTimestamps[a.moveTimestamps.length - 1] ?? a.startedAt ?? a.createdAt;
+                const dateB = b.moveTimestamps[a.moveTimestamps.length - 1] ?? b.startedAt ?? b.createdAt;
+
+                return dateB.getTime() - dateA.getTime();
+            });
     }
 });
 </script>
@@ -109,6 +117,7 @@ const sortedGames = computed(() => {
                 <!-- Sort -->
                 <select v-model="sort" class="form-select form-select-sm w-auto">
                     <option value="recently-started">{{ $t('sort_recently_started') }}</option>
+                    <option value="recently-played">{{ $t('sort_recently_played') }}</option>
                     <option value="most-moves">{{ $t('sort_most_moves') }}</option>
                     <option value="longest">{{ $t('sort_longest_game') }}</option>
                     <option value="player-rating">{{ $t('sort_player_rating') }}</option>

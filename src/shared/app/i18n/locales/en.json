@@ -281,6 +281,7 @@
         "no_correspondence_games": "No correspondence games in progress"
     },
     "sort_recently_started": "Recently started",
+    "sort_recently_played": "Recently played",
     "sort_most_moves": "Most moves played",
     "sort_longest_game": "Longest game",
     "sort_player_rating": "Player rating",
