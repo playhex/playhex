@@ -3,6 +3,7 @@ import { coordsToMove } from '../../../../shared/move-notation/move-notation.js'
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 import { LocalStorageCache } from '../services/cachedAnalysis.js';
 import { AnalyzerInterface } from './AnalyzerInterface.js';
+import { apiPostHexplorerAnalyzePosition } from '../../../apiClient.js';
 
 export class KatahexIntuitionAnalyzer implements AnalyzerInterface
 {
@@ -58,20 +59,7 @@ export class KatahexIntuitionAnalyzer implements AnalyzerInterface
 
     private async fetchPositionAnalyze(input: AnalysisInput): Promise<AnalysisOutput>
     {
-        const response = await fetch('/api/hexplorer/analyze-position', {
-            method: 'post',
-            body: JSON.stringify(input),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(await response.text());
-        }
-
-        const result = await response.json() as AnalysisOutput;
+        const result = await apiPostHexplorerAnalyzePosition(input);
 
         result.recommendedMove = this.recommendedMoveFromPolicy(result.policy, input.black, input.white);
 

@@ -15,6 +15,7 @@ import { ConditionalMovesStruct } from '@playhex/pixi-board';
 import { isRateLimitReachedErrorPayload } from '../shared/app/rate-limiters.js';
 import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
 import { showToastForTranslatableError } from './services/showToastForTranslatableError.js';
+import { AnalysisInput, AnalysisOutput } from '../shared/app/hexplorer.js';
 
 /**
  * @throws {DomainHttpError}
@@ -985,6 +986,21 @@ export const apiUpdatePlayerCountryFlag = async (publicId: string, countryFlag: 
     });
 
     await checkResponse(response);
+};
+
+export const apiPostHexplorerAnalyzePosition = async (input: AnalysisInput): Promise<AnalysisOutput> => {
+    const response = await fetch('/api/hexplorer/analyze-position', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
 };
 
 export const apiUploadPlayerAvatar = async (publicId: string, blob: Blob, mimeType: string): Promise<{ avatarPath: string, avatarThumbnailPath: string }> => {
