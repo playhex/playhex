@@ -1,3 +1,47 @@
+## July 29, 2026
+*New on PlayHex, since last month*
+
+🎉 This month marks a **huge milestone**: for the first time ever, server costs have been fully **covered by donations**!
+
+I started developing PlayHex in November 2022 as a side project to test things.
+I continued it to see how it goes, and now every month, there are 1k human games, 20k bot games!
+
+Thanks to
+[Mason](https://playhex.org/@mason),
+[Bobson](https://playhex.org/@bobson8),
+[Falsifian](https://playhex.org/@falsifian),
+[Defn](https://playhex.org/@defn),
+and 3 anonymouses
+on [Liberapay](https://liberapay.com/PlayHex/)!
+
+If this level of support continues, the next goal is to register PlayHex as an official **non-profit organization**. This is a key step toward **organizing official tournaments**, though smaller community tournaments can already be held or sponsored without legal non-profit status.
+
+### New
+- Import games from **Little Golem** (link or .hsgf file)
+- 📊 PlayHex **statistics page**: https://playhex.org/statistics
+- ⚔ **Challenge a player** directly
+- Remember last time control settings, allow to **customize favorite time controls**
+- New time increment values for **bullet games: +0.2 and +0.5 seconds**
+- Show clock state when rewinding an ended game to see how much time opponent had to play
+- On waiting and canceled games, clearly describe the current status of the game
+- New languages: Arabic (with RTL support), Czech, Hungarian
+### Hexplorer
+- Drag to place stones and marks, and highlight multiple cells
+- Setup mode: toggle stones instead of replacing, allow removing a stone
+- Add options to show policy numbers and mark "best move"
+- Keep Hexworld link in sync with current move in Hexplorer
+- Fixed keyboard shortcuts (arrows, ctrl+Z) hijacking input while typing
+- Fixed stale analysis results, stuck spinner, and stale cached evals when switching engine
+- Fixed setup mode glitches with alt tool and ctrl+Z
+- Cache analysis server-side so shared analysis links load instantly
+### Changed
+- Show reason why you cannot join a game
+- "Player is waiting for me" card can now be closed
+- Show newest correspondence game first in lobby
+### Fixed
+- Fixed race condition: a premove received right after opponent's move is now played immediately instead of held
+- Fixed horizontal scroll on lobby "My turn to play" section on mobile
+
 ## June 24, 2026
 *New on PlayHex, since last month*
 
