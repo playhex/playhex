@@ -7,6 +7,9 @@ import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../..
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/models/HostedGameOptions.js';
 import { IsHexCoordinate } from '../../../../shared/app/validator/IsHexCoordinate.js';
 import { rateLimiterConsumeAnalyzePosition } from '../../../services/rate-limiters.js';
+import { SimilarPlayingPositionChecker } from '../../../services/anti-cheat/SimilarPlayingPositionChecker.js';
+import { Move } from '../../../../shared/move-notation/move-notation.js';
+import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../../../services/anti-cheat/SimilarPositionDetectedError.js';
 
 const ANALYSIS_CACHE_TTL_SECONDS = 7 * 24 * 3600;
 
@@ -56,12 +59,30 @@ if (redisClient) {
 @Service()
 export default class HexplorerController
 {
+    constructor(
+        private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
+    ) {}
+
     @Post('/api/hexplorer/analyze-position')
     async analyzePosition(
         @Body() body: AnalyzePositionInput,
         @Req() request: Request,
     ): Promise<AnalysisOutput> {
         await rateLimiterConsumeAnalyzePosition(request.ip);
+
+        try {
+            this.similarPlayingPositionChecker.checkPosition({
+                boardsize: body.size,
+                black: body.black as Move[],
+                white: body.white as Move[],
+            });
+        } catch (e) {
+            if (e instanceof SimilarPositionDetectedError) {
+                throw similarPositionDetectedToTranslatableHttpError(e);
+            }
+
+            throw e;
+        }
 
         const cacheKey = redisKeyPrefix + analysisCacheKey(body);
 

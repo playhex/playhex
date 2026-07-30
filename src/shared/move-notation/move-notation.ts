@@ -1,9 +1,12 @@
-/**
- * Row is number
- * Col is letter
- */
 export type Coords = {
+    /**
+     * Row is number (minus 1)
+     */
     row: number;
+
+    /**
+     * Col is letter (minus 1)
+     */
     col: number;
 };
 
@@ -59,11 +62,57 @@ export const mirrorCoords = (coords: Coords): Coords => ({
     col: coords.row,
 });
 
+const memoizedMirror: { [move: Move]: Move } = {};
+
 /**
  * Mirror a move (for swap), "a2" => "b1"
+ *
+ * through the long diagonal
  */
 export const mirrorMove = (move: Move): Move => {
-    return coordsToMove(mirrorCoords(parseMove(move)));
+    if (!memoizedMirror[move]) {
+        memoizedMirror[move] = coordsToMove(mirrorCoords(parseMove(move)));
+    }
+
+    return memoizedMirror[move];
+};
+
+const memoizedMirrorShort: { [boardsize: number]: { [move: Move]: Move } } = {};
+
+export const mirrorShortDiagonal = (move: Move, boardsize: number): Move => {
+    if (!memoizedMirrorShort[boardsize]) {
+        memoizedMirrorShort[boardsize] = {};
+    }
+
+    if (!memoizedMirrorShort[boardsize][move]) {
+        const { row, col } = parseMove(move);
+
+        return coordsToMove({
+            row: boardsize - col - 1,
+            col: boardsize - row - 1,
+        });
+    }
+
+    return memoizedMirrorShort[boardsize][move];
+};
+
+const memoizedMirrorCenter: { [boardsize: number]: { [move: Move]: Move } } = {};
+
+export const mirrorCenter = (move: Move, boardsize: number): Move => {
+    if (!memoizedMirrorCenter[boardsize]) {
+        memoizedMirrorCenter[boardsize] = {};
+    }
+
+    if (!memoizedMirrorCenter[boardsize][move]) {
+        const { row, col } = parseMove(move);
+
+        return coordsToMove({
+            row: boardsize - row - 1,
+            col: boardsize - col - 1,
+        });
+    }
+
+    return memoizedMirrorCenter[boardsize][move];
 };
 
 /**

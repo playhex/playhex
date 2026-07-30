@@ -742,6 +742,7 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Copy from \"Debugging information\" below game board"
     },
+    "flagged_position_error": "This position is too similar to a currently playing game. AI refuses to analyze or play it. Playing game: {{source}} (mirror: {{mirror}}).",
     "statistics": {
         "title": "PlayHex statistics",
         "seo_description": "PlayHex statistics: games, players, board sizes, win rates...",
