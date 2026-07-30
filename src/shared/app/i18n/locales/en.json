@@ -489,7 +489,8 @@
         "failed_login": "logging in",
         "create_game": "creating a game",
         "challenge_player": "challenging a player",
-        "challenge_same_target": "challenging this player again"
+        "challenge_same_target": "challenging this player again",
+        "analyze_position": "analyzing positions"
     },
     "game_with_player_has_started": "{{player}} has joined your game and the game has started",
     "last_move": "Last move",

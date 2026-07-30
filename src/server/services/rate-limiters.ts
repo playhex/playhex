@@ -67,6 +67,16 @@ const failedApiKeyLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit hexplorer position analysis, which triggers an expensive AI backend call
+ * on cache miss. Prevents a single player from overloading the analyzer.
+ */
+const analyzePositionLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.analyze_position',
+    points: 180,
+    duration: 60,
+});
+
+/**
  * Error thrown from rate limiter
  */
 export class RateLimiterError extends Error {}
@@ -150,5 +160,11 @@ export const rateLimiterConsumeChallengeSameTarget = async (playerPublicId: stri
 export const rateLimiterConsumeFailedApiKey = async (ip: string | undefined) => {
     if (ip) {
         await consume(failedApiKeyLimiter, ip);
+    }
+};
+
+export const rateLimiterConsumeAnalyzePosition = async (ip: string | undefined) => {
+    if (ip) {
+        await consume(analyzePositionLimiter, ip);
     }
 };
