@@ -945,6 +945,16 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Copy from \"Debugging information\" below game board"
     },
+    "anti_cheat": {
+        "flagged_position": "This position is too similar to a currently playing game: {{source}}. AI refuses to analyze or play it.",
+        "flagged_position_mirrored_long_diagonal": "This position is too similar to a currently playing game, mirrored around the long diagonal: {{source}}. AI refuses to analyze or play it.",
+        "flagged_position_mirrored_short_diagonal": "This position is too similar to a currently playing game, mirrored around the short diagonal: {{source}}. AI refuses to analyze or play it.",
+        "flagged_position_mirrored_center": "This position is too similar to a currently playing game, mirrored around the center: {{source}}. AI refuses to analyze or play it.",
+        "bot_game_canceled": "Game canceled: this position is too similar to a currently playing game ({{source}}). AI refuses to play it.",
+        "bot_game_canceled_mirrored_long_diagonal": "Game canceled: this position is too similar to a currently playing game ({{source}}, mirrored around the long diagonal). AI refuses to play it.",
+        "bot_game_canceled_mirrored_short_diagonal": "Game canceled: this position is too similar to a currently playing game ({{source}}, mirrored around the short diagonal). AI refuses to play it.",
+        "bot_game_canceled_mirrored_center": "Game canceled: this position is too similar to a currently playing game ({{source}}, mirrored around the center). AI refuses to play it."
+    },
     "statistics": {
         "title": "PlayHex statistics",
         "seo_description": "PlayHex statistics: games, players, board sizes, win rates...",

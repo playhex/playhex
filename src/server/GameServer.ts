@@ -21,6 +21,8 @@ import { errorToLogger, errorToString } from '../shared/app/utils.js';
 import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/gameUtils.js';
 import type { HexMove } from '../shared/move-notation/hex-move-notation.js';
 import { GameEventsEmitter } from './services/game-events-emitter/GameEventsEmitter.js';
+import { SimilarPositionDetectedError } from './services/anti-cheat/SimilarPositionDetectedError.js';
+import { SimilarPlayingPositionChecker } from './services/anti-cheat/SimilarPlayingPositionChecker.js';
 
 type GameEvents = {
     played: () => void;
@@ -277,6 +279,11 @@ export default class GameServer extends TypedEmitter<GameEvents>
                 this.playerResign(player);
             }
         } catch (e) {
+            if (e instanceof SimilarPositionDetectedError) {
+                this.cancelBecauseSimilarPosition(e);
+                return;
+            }
+
             if (e instanceof IllegalMove) {
                 this.logger.error('From makeAIMoveIfApplicable(): an AI played an illegal move', { err: e.message, slug: player.slug });
             } else {
@@ -1005,6 +1012,33 @@ export default class GameServer extends TypedEmitter<GameEvents>
         }
 
         return true;
+    }
+
+    /**
+     * Strong AI refused to play because position is too similar to a currently playing 1v1 game.
+     * Cancel this bot game instead of letting the AI resign or wait forever.
+     */
+    private cancelBecauseSimilarPosition(error: SimilarPositionDetectedError): void
+    {
+        const humanPlayer = this.players.find(player => !player.isBot);
+        const { position: { source }, mirror } = error.getComparisonResult();
+        const mirrorSuffix = mirror ? `, mirrored around the ${mirror.replaceAll('-', ' ')}` : '';
+
+        void Container.get(SimilarPlayingPositionChecker).flag(error, {
+            context: 'bot_game',
+            playerPublicId: humanPlayer?.publicId ?? null,
+            botGamePublicId: this.getPublicId(),
+        });
+
+        this.postSystemChatMessage(
+            `Game canceled: this position is too similar to a currently playing game (${source}${mirrorSuffix}). AI refuses to play it.`,
+            mirror
+                ? `anti_cheat.bot_game_canceled_mirrored_${mirror.replaceAll('-', '_')}`
+                : 'anti_cheat.bot_game_canceled',
+            { source },
+        );
+
+        this.systemCancel('anti_cheat');
     }
 
     systemCancel(cancelReason: CancelGameReason): void

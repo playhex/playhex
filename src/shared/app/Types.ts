@@ -62,6 +62,11 @@ export const cancelGameReasons = [
      * Canceled manually by admin
      */
     'admin',
+
+    /**
+     * Game against a strong AI reached a position too similar to a currently playing 1v1 game
+     */
+    'anti_cheat',
 ] as const;
 
 export type CancelGameReason = typeof cancelGameReasons[number];

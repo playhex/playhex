@@ -35,6 +35,7 @@ import PlayerStats from './PlayerStats.js';
 import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
 import Premove from './Premove.js';
 import Rating from './Rating.js';
+import SimilarPositionFlag from './SimilarPositionFlag.js';
 import Tournament from './Tournament.js';
 import TournamentAdmin from './TournamentAdmin.js';
 import TournamentBannedPlayer from './TournamentBannedPlayer.js';
@@ -83,6 +84,7 @@ export {
     PlayerPushSubscription,
     Premove,
     Rating,
+    SimilarPositionFlag,
     Tournament,
     TournamentAdmin,
     TournamentBannedPlayer,
@@ -128,6 +130,7 @@ export const entities = {
     PlayerSettings,
     PlayerStats,
     Rating,
+    SimilarPositionFlag,
     Tournament,
     TournamentAdmin,
     TournamentBannedPlayer,

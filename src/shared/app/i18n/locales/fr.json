@@ -945,6 +945,16 @@
         "remove": "Supprimer le drapeau",
         "set_yours": "Choisir votre drapeau"
     },
+    "anti_cheat": {
+        "flagged_position": "Cette position est trop proche d'une partie en cours : {{source}}. L'IA refuse de l'analyser ou de la jouer.",
+        "flagged_position_mirrored_long_diagonal": "Cette position est trop proche d'une partie en cours, en miroir sur la grande diagonale : {{source}}. L'IA refuse de l'analyser ou de la jouer.",
+        "flagged_position_mirrored_short_diagonal": "Cette position est trop proche d'une partie en cours, en miroir sur la petite diagonale : {{source}}. L'IA refuse de l'analyser ou de la jouer.",
+        "flagged_position_mirrored_center": "Cette position est trop proche d'une partie en cours, en miroir par rapport au centre : {{source}}. L'IA refuse de l'analyser ou de la jouer.",
+        "bot_game_canceled": "Partie annulée : cette position est trop proche d'une partie en cours ({{source}}). L'IA refuse de la jouer.",
+        "bot_game_canceled_mirrored_long_diagonal": "Partie annulée : cette position est trop proche d'une partie en cours ({{source}}, en miroir sur la grande diagonale). L'IA refuse de la jouer.",
+        "bot_game_canceled_mirrored_short_diagonal": "Partie annulée : cette position est trop proche d'une partie en cours ({{source}}, en miroir sur la petite diagonale). L'IA refuse de la jouer.",
+        "bot_game_canceled_mirrored_center": "Partie annulée : cette position est trop proche d'une partie en cours ({{source}}, en miroir par rapport au centre). L'IA refuse de la jouer."
+    },
     "statistics": {
         "title": "Statistiques PlayHex",
         "seo_description": "Statistiques PlayHex : parties, joueurs, tailles de plateau, taux de victoire...",

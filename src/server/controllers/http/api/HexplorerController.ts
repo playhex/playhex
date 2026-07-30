@@ -1,4 +1,4 @@
-import { Body, JsonController, Post, Req } from 'routing-controllers';
+import { BadRequestError, Body, CurrentUser, JsonController, Post, Req } from 'routing-controllers';
 import type { Request } from 'express';
 import { Service } from 'typedi';
 import { createClient } from 'redis';
@@ -7,6 +7,11 @@ import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../..
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/models/GameOptions.js';
 import { IsHexCoordinate } from '../../../../shared/app/validator/IsHexCoordinate.js';
 import { rateLimiterConsumeAnalyzePosition } from '../../../services/rate-limiters.js';
+import { SimilarPlayingPositionChecker } from '../../../services/anti-cheat/SimilarPlayingPositionChecker.js';
+import type { Move } from '../../../../shared/move-notation/move-notation.js';
+import { InvalidPositionError, type CanonicalPosition } from '../../../../shared/position-comparator/position-comparator.js';
+import { Player } from '../../../../shared/app/models/index.js';
+import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../../../services/anti-cheat/SimilarPositionDetectedError.js';
 
 const ANALYSIS_CACHE_TTL_SECONDS = 7 * 24 * 3600;
 
@@ -56,14 +61,53 @@ if (redisClient) {
 @Service()
 export default class HexplorerController
 {
+    constructor(
+        private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
+    ) {}
+
     @Post('/api/hexplorer/analyze-position')
     async analyzePosition(
         @Body() body: AnalyzePositionInput,
         @Req() request: Request,
+        @CurrentUser() player?: Player,
     ): Promise<AnalysisOutput> {
         await rateLimiterConsumeAnalyzePosition(request.ip);
 
-        const cacheKey = redisKeyPrefix + analysisCacheKey(body);
+        let position: CanonicalPosition;
+
+        try {
+            position = this.similarPlayingPositionChecker.checkPosition({
+                boardsize: body.size,
+                black: body.black as Move[],
+                white: body.white as Move[],
+            });
+        } catch (e) {
+            if (e instanceof InvalidPositionError) {
+                throw new BadRequestError(e.message);
+            }
+
+            if (e instanceof SimilarPositionDetectedError) {
+                void this.similarPlayingPositionChecker.flag(e, {
+                    context: 'hexplorer',
+                    playerPublicId: player?.publicId ?? null,
+                    ip: request.ip ?? null,
+                });
+
+                throw similarPositionDetectedToTranslatableHttpError(e);
+            }
+
+            throw e;
+        }
+
+        // Only use the checked position from now on, never the raw input
+        const input: AnalysisInput = {
+            size: body.size,
+            color: body.color,
+            black: position.black,
+            white: position.white,
+        };
+
+        const cacheKey = redisKeyPrefix + analysisCacheKey(input);
 
         if (redisClient) {
             const cached = await redisClient.get(cacheKey);
@@ -79,9 +123,9 @@ export default class HexplorerController
         const response = await fetch(HEX_AI_API + '/analyze-position', {
             method: 'post',
             body: JSON.stringify({
-                ...body,
-                black: body.black.join(' '),
-                white: body.white.join(' '),
+                ...input,
+                black: input.black.join(' '),
+                white: input.white.join(' '),
             }),
             headers: {
                 'Accept': 'application/json',

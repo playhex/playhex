@@ -8,6 +8,7 @@ import GameServer from '../GameServer.js';
 import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
+import { MIN_BOT_LEVEL_CHECKED, SimilarPlayingPositionChecker } from './anti-cheat/SimilarPlayingPositionChecker.js';
 
 export class FindAIError extends Error {}
 
@@ -127,14 +128,23 @@ export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): 
         aiConfig = playerFull.aiConfig;
     }
 
-    if (aiConfig.isRemote) {
-        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config);
-    }
-
     const engineGame = gameServer.getEngineGame();
 
     if (engineGame === null) {
         throw new Error('makeAIPlayerMove() called with a Game without game');
+    }
+
+    // Strong enough bots refuse to play a position similar to a currently playing 1v1 game.
+    // Throws SimilarPositionDetectedError, handled by GameServer.
+    if ((aiConfig.relativeLevel ?? Infinity) >= MIN_BOT_LEVEL_CHECKED) {
+        Container.get(SimilarPlayingPositionChecker).checkPosition({
+            boardsize: engineGame.getSize(),
+            moves: engineGame.getMovesHistory().map(({ move }) => move),
+        });
+    }
+
+    if (aiConfig.isRemote) {
+        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config);
     }
 
     switch (aiConfig.engine) {

@@ -1,9 +1,12 @@
-/**
- * Row is number
- * Col is letter
- */
 export type Coords = {
+    /**
+     * Row is number (minus 1)
+     */
     row: number;
+
+    /**
+     * Col is letter (minus 1)
+     */
     col: number;
 };
 
@@ -61,9 +64,35 @@ export const mirrorCoords = (coords: Coords): Coords => ({
 
 /**
  * Mirror a move (for swap), "a2" => "b1"
+ *
+ * through the long diagonal
  */
 export const mirrorMove = (move: Move): Move => {
     return coordsToMove(mirrorCoords(parseMove(move)));
+};
+
+/**
+ * Mirror a move through the short diagonal, "a2" => "j11" on 11x11
+ */
+export const mirrorShortDiagonal = (move: Move, boardsize: number): Move => {
+    const { row, col } = parseMove(move);
+
+    return coordsToMove({
+        row: boardsize - col - 1,
+        col: boardsize - row - 1,
+    });
+};
+
+/**
+ * Mirror a move through the center, "a2" => "k10" on 11x11
+ */
+export const mirrorCenter = (move: Move, boardsize: number): Move => {
+    const { row, col } = parseMove(move);
+
+    return coordsToMove({
+        row: boardsize - row - 1,
+        col: boardsize - col - 1,
+    });
 };
 
 /**
