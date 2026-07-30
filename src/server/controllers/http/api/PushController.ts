@@ -1,8 +1,8 @@
-import { type PushSubscription } from 'web-push';
 import { Service } from 'typedi';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, JsonController, Post, Put } from 'routing-controllers';
 import { Player, PlayerPushSubscription } from '../../../../shared/app/models/index.js';
+import { PUSH_SUBSCRIBE } from '../../../../shared/app/models/PlayerPushSubscription.js';
 import PlayerPushSubscriptionRepository from '../../../repositories/PlayerPushSubscriptionRepository.js';
 import { PushNotificationSender } from '../../../services/PushNotificationsSender.js';
 import { PushPayload } from '../../../../shared/app/PushPayload.js';
@@ -26,13 +26,13 @@ export default class PushController
     @Put('/api/push-subscriptions')
     postSubscription(
         @AuthenticatedPlayer() player: Player,
-        @Body() pushSubscriptionJSON: PushSubscription,
+        @Body({
+            validate: { groups: [PUSH_SUBSCRIBE] },
+            transform: { groups: [PUSH_SUBSCRIBE] },
+        }) playerPushSubscription: PlayerPushSubscription,
     ) {
-        const playerPushSubscription = new PlayerPushSubscription();
-
-        Object.assign(playerPushSubscription, pushSubscriptionJSON);
-
         playerPushSubscription.player = player;
+        playerPushSubscription.createdAt = new Date();
 
         return this.playerPushSubscriptionRepository.addPlayerPushSubscription(playerPushSubscription);
     }
