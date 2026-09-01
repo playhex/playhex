@@ -93,6 +93,12 @@ export default class HexplorerController
             }
         }
 
+        const t = true;
+        if (t) return {
+            recommendedMove: 'd4',
+            whiteWin: 0.2,
+        }; // TODO remove
+
         if (!HEX_AI_API) {
             throw new Error('Cannot use HexAiApiClient, HEX_AI_API must be set in env vars');
         }

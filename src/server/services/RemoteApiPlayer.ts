@@ -5,12 +5,14 @@ import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
 import HostedGameServer from '../HostedGameServer.js';
 import { HexMove, isMoveValid } from '../../shared/move-notation/hex-move-notation.js';
+import { SimilarPlayingPositionChecker } from './anti-cheat/SimilarPlayingPositionChecker.js';
 
 @Service()
 export default class RemoteApiPlayer
 {
     constructor(
         private hexRemotePlayerApi: HexAiApiClient,
+        private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
     ) {}
 
     private async fetchMove(engine: string, game: Game, config: { [key: string]: unknown }): Promise<HexMove>
@@ -55,6 +57,11 @@ export default class RemoteApiPlayer
         if (game === null) {
             throw new Error('Cannot send move request to api, no game');
         }
+
+        this.similarPlayingPositionChecker.checkPosition({
+            boardsize: game.getSize(),
+            moves: game.getMovesHistory().map(({ move }) => move),
+        });
 
         const measure = new TimeMeasureMetric('ai_time_to_respond', {
             engine,

@@ -181,6 +181,8 @@ const isCanonicalPosition = (position: Position | CanonicalPosition): position i
  *
  * Returns results sorted by distance, closest first.
  *
+ * @param reference is usually the game that AI will analyze
+ * @param candidates are usually games currently played that should not be analyzed
  * @param maxDistance Skip positions if distance is greater. Will optimize by skipping more and sorting less positions.
  */
 export const comparePositions = (reference: Position | CanonicalPosition, candidates: Position[], maxDistance = 1000): ComparisonResult[] => {
