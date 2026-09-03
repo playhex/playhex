@@ -136,3 +136,16 @@ export const makesCoordsInteractive = (str: string, boardsize: number): string =
 };
 
 export const formatMessagePostedHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+/**
+ * On mobile, "Enter" key of the virtual keyboard should not send the chat message:
+ * it is too easy to send a message unintentionally while trying to type a new line.
+ * On mobile, message is sent with the send button.
+ *
+ * Should be used on "keydown" event of chat inputs.
+ */
+export const blockEnterOnMobile = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+        event.preventDefault();
+    }
+};

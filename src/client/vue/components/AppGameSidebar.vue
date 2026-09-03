@@ -10,7 +10,7 @@ import { ChatMessage, HostedGame, Player } from '../../../shared/app/models/inde
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
-import { canPlayerChatInGame, formatMessagePostedHour, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
+import { canPlayerChatInGame, blockEnterOnMobile, formatMessagePostedHour, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
@@ -969,6 +969,7 @@ watch(gameUIMode, () => {
                     <div class="input-group">
                         <input
                             v-model="chatInput"
+                            @keydown="blockEnterOnMobile"
                             ref="chatInputElement"
                             class="form-control bg-body-tertiary"
                             aria-describedby="message-submit"

@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 import { IconSendFill } from '../icons.js';
 import { useChannel } from '../composables/useChannel.js';
 import useAuthStore from '../../stores/authStore.js';
-import { sanitizeMessage, makeLinksClickable } from '../../../shared/app/chatUtils.js';
+import { sanitizeMessage, makeLinksClickable, blockEnterOnMobile } from '../../../shared/app/chatUtils.js';
 import AppPseudo from './AppPseudo.vue';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 
@@ -144,6 +144,7 @@ const sendMessage = async () => {
                 <input
                     :value="chatInput"
                     @input="chatInput = ($event.target as HTMLInputElement).value"
+                    @keydown="blockEnterOnMobile"
                     class="form-control bg-body-tertiary"
                     :placeholder="(loggedInPlayer && !isChatBlocked) ? $t('chat_message_placeholder') : ''"
                     maxlength="1000"
