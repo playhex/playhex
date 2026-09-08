@@ -12,11 +12,37 @@ import type AbstractChatMessage from '../../../../shared/app/models/AbstractChat
 import ChannelChatMessageRepository from '../../../repositories/ChannelChatMessageRepository.js';
 import PlayerIpService from '../../../services/PlayerIpService.js';
 import BannedIpService from '../../../services/BannedIpService.js';
+import { IsDateString, IsOptional } from 'class-validator';
+import ModerationSettingRepository from '../../../repositories/ModerationSettingRepository.js';
 
 type MessageFromAnySource =
     { message: AbstractChatMessage, source: 'game', data: HostedGame }
     | { message: AbstractChatMessage, source: 'channel', data: string }
 ;
+
+/**
+ * Tabs of the moderation interface which can be marked as seen.
+ */
+const SEEN_TABS = ['messages', 'players', 'avatars'] as const;
+
+type SeenTab = typeof SEEN_TABS[number];
+
+const seenSettingKey = (tab: SeenTab): string => `seen:${tab}`;
+
+/**
+ * Number of already seen messages still returned, to keep some context.
+ */
+const SEEN_MESSAGES_CONTEXT = 20;
+
+class PostSeenInput
+{
+    /**
+     * Date to store as "seen" date. Defaults to now.
+     */
+    @IsOptional()
+    @IsDateString()
+    date?: string;
+}
 
 @JsonController()
 @Service()
@@ -32,7 +58,51 @@ export default class AdminModerationController
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private playerIpService: PlayerIpService,
         private bannedIpService: BannedIpService,
+        private moderationSettingRepository: ModerationSettingRepository,
     ) {}
+
+    /**
+     * Dates when moderator marked each tab as seen.
+     * Stored server side (and not in local storage)
+     * to keep it synchronized between all moderator devices.
+     *
+     * @returns e.g { "messages": "2026-09-08T12:00:00.000Z", "players": null, "avatars": null }
+     */
+    @Get('/api/admin/moderation/seen')
+    async getSeen(): Promise<{ [tab in SeenTab]: null | string }>
+    {
+        const settings = await this.moderationSettingRepository.getAll();
+        const seen = {} as { [tab in SeenTab]: null | string };
+
+        for (const tab of SEEN_TABS) {
+            seen[tab] = settings[seenSettingKey(tab)] ?? null;
+        }
+
+        return seen;
+    }
+
+    /**
+     * Marks a tab as seen, at provided date, or now.
+     */
+    @Post('/api/admin/moderation/seen/:tab')
+    async postSeen(
+        @Param('tab') tab: string,
+        @Body({ required: false }) body: undefined | PostSeenInput,
+    ): Promise<{ tab: string, date: string }> {
+        if (!SEEN_TABS.includes(tab as SeenTab)) {
+            throw new BadRequestError(`Unexpected tab "${tab}", expected one of: ${SEEN_TABS.join(', ')}`);
+        }
+
+        const date = body?.date ? new Date(body.date) : new Date();
+
+        if (isNaN(date.getTime())) {
+            throw new BadRequestError(`Invalid date "${body?.date}"`);
+        }
+
+        await this.moderationSettingRepository.set(seenSettingKey(tab as SeenTab), date.toISOString());
+
+        return { tab, date: date.toISOString() };
+    }
 
     @Get('/api/admin/moderation/players')
     async getLastRegisteredPlayers()
@@ -96,7 +166,9 @@ export default class AdminModerationController
     }
 
     /**
-     * Get all recent chat messages from any source (game or channel).
+     * Get recent chat messages from any source (game or channel).
+     * Returns messages not yet seen by moderator,
+     * plus a few already seen messages to keep some context.
      *
      * @returns Last messages, most recent first, like: [
      *  { message: { ... }, source: 'game', sourceId: '123abc...' },
@@ -140,7 +212,20 @@ export default class AdminModerationController
 
         allMessages.sort((a, b) => b.message.createdAt.getTime() - a.message.createdAt.getTime());
 
-        return allMessages;
+        const seenAt = await this.moderationSettingRepository.get(seenSettingKey('messages'));
+
+        if (seenAt === null) {
+            return allMessages;
+        }
+
+        const firstSeenIndex = allMessages.findIndex(entry => entry.message.createdAt <= new Date(seenAt));
+
+        if (firstSeenIndex < 0) {
+            return allMessages;
+        }
+
+        // Keep all unseen messages, and only a few seen ones for context
+        return allMessages.slice(0, firstSeenIndex + SEEN_MESSAGES_CONTEXT);
     }
 
     @Get('/api/admin/moderation/actions')

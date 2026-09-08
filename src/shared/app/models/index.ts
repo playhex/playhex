@@ -15,6 +15,7 @@ import {
     HostedGameOptionsTimeControlByoYomi,
 } from './HostedGameOptionsTimeControl.js';
 import HostedGameToPlayer from './HostedGameToPlayer.js';
+import ModerationSetting from './ModerationSetting.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
 import PlayerAccountPassword from './PlayerAccountPassword.js';
@@ -51,6 +52,7 @@ export {
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
     HostedGameToPlayer,
+    ModerationSetting,
     MoveSettings,
     OnlinePlayers,
     OnlinePlayer,
@@ -90,6 +92,7 @@ export const entities = {
     OptionsByoYomi,
     HostedGameOptionsTimeControlByoYomi,
     HostedGameToPlayer,
+    ModerationSetting,
     OnlinePlayers,
     Player,
     PlayerAccountPassword,

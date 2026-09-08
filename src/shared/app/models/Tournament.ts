@@ -334,7 +334,7 @@ export default class Tournament implements TimeControlBoardsize
      * Set a number of seconds before official start since when to display it.
      */
     @Column({ default: 0 })
-    @Expose({ groups: ['tournament:admin:edit'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'tournament:admin:edit'] })
     @IsInt({ groups: ['tournament:admin:edit'] })
     @IsOptional({ groups: ['tournament:admin:edit'] })
     featuredFromInSeconds: number;
