@@ -637,6 +637,16 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         if (hostedGame.state === 'canceled') {
+            if (this.tournament.state !== 'running') {
+                this.logger.info('game has been canceled, but do not recreate because tournament is no longer running', {
+                    matchKey,
+                    hostedGamePublicId: hostedGame.publicId,
+                    tournamentState: this.tournament.state,
+                });
+
+                return;
+            }
+
             this.logger.info('game has been canceled, recreate', { matchKey, hostedGamePublicId: hostedGame.publicId });
             await this.doStartTournamentMatch(tournamentMatch);
             addTournamentHistory(this.tournament, 'match_canceled_recreated', {
@@ -731,6 +741,17 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         });
 
         hostedGameServer.on('canceled', async () => {
+            // Prevent recreate game when tournament has been canceled or is over.
+            if (this.tournament.state !== 'running') {
+                this.logger.info('game has been canceled, but do not recreate because tournament is no longer running', {
+                    hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
+                    matchKey: tournamentMatchKey(tournamentMatch),
+                    tournamentState: this.tournament.state,
+                });
+
+                return;
+            }
+
             // Prevent recreate game while we "reset and recreate" previous game.
             if (!tournamentMatch.player1 || !tournamentMatch.player2) {
                 this.logger.info('game has been canceled, but do not recreate because players have been removed', {
@@ -1221,7 +1242,16 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         if (this.tournament.state === 'running') {
+            // Must mark tournament as canceled before canceling games,
+            // to prevent canceled games to be recreated.
+            this.doCancelTournament();
+
             for (const match of this.tournament.matches) {
+                // Back to "waiting" to prevent match still displayed as playing in a canceled tournament
+                if (match.state === 'playing') {
+                    match.state = 'waiting';
+                }
+
                 if (!match.hostedGame) {
                     continue;
                 }
@@ -1239,7 +1269,6 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                 hostedGameServer.systemCancel('tourney_system');
             }
 
-            this.doCancelTournament();
             return;
         }
 
