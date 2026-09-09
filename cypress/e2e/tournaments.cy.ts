@@ -50,6 +50,10 @@ describe('Tournaments', () => {
         cy.contains('1 participant');
         cy.contains('Your participation is confirmed!');
 
+        // Checking-in prompts to enable notifications, dismiss it
+        cy.contains('.modal', 'Enable notifications?').contains('button', 'Ignore').click();
+        cy.get('.modal').should('not.exist');
+
         // Unsubscribe
         cy.contains('I am no longer interested').click();
         cy.contains('0 participants');

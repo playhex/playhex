@@ -99,6 +99,9 @@ let socketIoMocked = false;
 
 beforeEach(() => {
     socketIoMocked = false;
+
+    // socketIoMock is a singleton: drop listeners left by apps loaded in previous tests
+    socketIoMock.removeAllListeners();
 });
 
 Cypress.Commands.add('mockSocketIO', () => {
@@ -115,16 +118,28 @@ Cypress.Commands.add('receiveSocketIoMessage', (type, ...args) => {
         throw new Error('Cannot emit mocked socket message, must call "cy.mockSocketIO()" at the beginning of the test');
     }
 
-    Cypress.log({
-        name: 'receiveSocketIoMessage',
-        message: type,
-        consoleProps: () => ({
-            eventName: type,
-            args,
-        }),
-    });
+    // "cy.visit()" resolves before the app is mounted, wait for it to listen or the message is lost
+    cy
+        .wrap(null, { log: false })
+        .should(() => {
+            expect(
+                socketIoMock.listenerCount(type),
+                `app should be listening to "${type}" socket messages`,
+            ).to.be.greaterThan(0);
+        })
+        .then(() => {
+            Cypress.log({
+                name: 'receiveSocketIoMessage',
+                message: type,
+                consoleProps: () => ({
+                    eventName: type,
+                    args,
+                }),
+            });
 
-    socketIoMock.emit(type, ...args);
+            socketIoMock.emit(type, ...args);
+        })
+    ;
 });
 
 Cypress.Commands.add('receiveGameUpdate', fixtureFile => {
@@ -163,8 +178,8 @@ Cypress.Commands.add('receiveMyGamesUpdate', fixtureFile => {
 });
 
 Cypress.Commands.add('mockSendChannelChat', (player) => {
-    socketIoMock.once('sendChannelChat', (channel: string, content: string, answer: (result: true | string) => void) => {
-        answer(true);
+    socketIoMock.once('sendChannelChat', (channel: string, content: string, answer: (error?: unknown) => void) => {
+        answer();
         socketIoMock.emit('channelChatMessagePosted', channel, {
             publicId: `test-${Date.now()}`,
             content,
