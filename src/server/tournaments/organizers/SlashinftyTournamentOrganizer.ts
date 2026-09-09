@@ -418,7 +418,12 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         if (tournament.stage1Format === 'single-elimination') {
             const [rounds] = groupAndSortTournamentMatches(tournament.matches);
             const finalRound = rounds[rounds.length - 1];
-            const semiFinalRound = rounds[rounds.length - 2];
+
+            // Only one round, i.e tournament with 2 participants: there is no semi final
+            const semiFinalRound = rounds.length > 1
+                ? rounds[rounds.length - 2]
+                : []
+            ;
 
             const [final, petiteFinal] = finalRound;
 

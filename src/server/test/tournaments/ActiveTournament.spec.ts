@@ -162,5 +162,51 @@ describe('ActiveTournament', () => {
             assert.strictEqual(matches[5].round, 2, 'tournament.matches index 5, round is 2');
             assert.strictEqual(matches[5].number, 1, 'tournament.matches index 5, number is 1');
         });
+
+        it('can start a single elimination tournament with only 2 participants', async () => {
+            const tournament = createTournamentFromCreateInput({
+                ...createTournamentDefaultsCreate(),
+                title: 'Test',
+                stage1Format: 'single-elimination',
+                startOfficialAt: new Date(),
+                startDelayInSeconds: -1,
+            });
+
+            tournament.subscriptions = Array(2).fill(null).map((_, i) => {
+                const subscription = new TournamentSubscription();
+
+                subscription.checkedIn = new Date();
+                subscription.subscribedAt = new Date();
+                subscription.tournament = tournament;
+
+                subscription.player = new Player();
+                subscription.player.publicId = uuidv4();
+                subscription.player.pseudo = `Player ${i}`;
+                subscription.player.slug = `player-${i}`;
+
+                return subscription;
+            });
+
+            const activeTournament = new ActiveTournament(
+                tournament,
+                getTournamentEngine(tournament),
+                new NoopHostedGameAccessor(),
+                new NoopAutoSave(tournament),
+            );
+
+            await activeTournament.init();
+
+            await activeTournament.startNow();
+
+            assert.strictEqual(tournament.state, 'running');
+
+            const { matches } = tournament;
+            const [rounds] = groupAndSortTournamentMatches(matches);
+
+            assert.strictEqual(rounds.length, 1, 'there is a single round');
+            assert.strictEqual(rounds[0][0].label, 'final', 'first match of the single round is the final');
+            assert.strictEqual(rounds[0][0].state, 'playing', 'final has started');
+            assert.ok(!matches.some(match => match.label === 'semi_final'), 'there is no semi final');
+        });
     });
 });
