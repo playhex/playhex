@@ -68,6 +68,16 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             playerSeeds: players.map(p => `${p.name} (${p.value})`).join(', '),
         });
 
+        /**
+         * A petite final requires both semi final losers,
+         * so with less than 4 participants, there is no semi final,
+         * and the tournament library would create an empty match that will never be played.
+         */
+        const consolation = players.length >= 4
+            ? tournament.consolation ?? undefined
+            : false
+        ;
+
         const toTournament = tournamentOrganizer.createTournament(tournament.title, {
             stageOne: {
                 format: tournament.stage1Format ?? undefined,
@@ -75,11 +85,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                     ? getSwissTotalRounds(tournament) // Explicitely set number of rounds, because when letting undefined, I get weird number of rounds
                     : undefined
                 ,
-                consolation: tournament.consolation ?? undefined,
+                consolation,
             },
             stageTwo: tournament.stage2Format ? {
                 format: tournament.stage2Format ?? undefined,
-                consolation: tournament.consolation ?? undefined,
+                consolation,
             } : undefined,
             players,
             seating: true, // Seat players depending on their ratings (always rely on toPlayer.value)

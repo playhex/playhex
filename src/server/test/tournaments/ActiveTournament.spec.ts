@@ -203,6 +203,7 @@ describe('ActiveTournament', () => {
             const { matches } = tournament;
             const [rounds] = groupAndSortTournamentMatches(matches);
 
+            assert.strictEqual(matches.length, 1, 'there is a single match, no empty petite final');
             assert.strictEqual(rounds.length, 1, 'there is a single round');
             assert.strictEqual(rounds[0][0].label, 'final', 'first match of the single round is the final');
             assert.strictEqual(rounds[0][0].state, 'playing', 'final has started');
