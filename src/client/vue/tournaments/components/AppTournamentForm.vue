@@ -383,21 +383,6 @@ defineExpose({
         </li>
     </ul>
 
-    <h3>{{ $t('tournament_admins') }}</h3>
-
-    <p>
-        Admins can do the same things than organizer.
-        You can add admins to manage tournament
-        in case you are not here, or playing a tournament game.
-    </p>
-
-    <p>
-        You will be able to add admins after tournament is created,
-        on Manage tournament page.
-        <!-- Yeah, this easier like that. -->
-        <!-- Having a single controller that handle add/remove players instead adding a one to many in PATCH tournament. -->
-    </p>
-
     <!-- Global errors on form. -->
     <!-- Should be display near submit button to make sure we see the error before submit. -->
     <p class="text-danger" v-if="globalError">{{ globalError }}</p>

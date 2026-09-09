@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { t } from 'i18next';
 import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiCancelTournament, apiPutTournamentAdmins } from '../../../apiClient.js';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
@@ -13,6 +13,8 @@ import AppTournamentForm from '../components/AppTournamentForm.vue';
 import { ComponentExposed } from 'vue-component-type-helpers';
 import { useRouter } from 'vue-router';
 import AppPlayerSelectMultiple from '../components/AppPlayerSelectMultiple.vue';
+import ConfirmationOverlay from '../../components/overlay/ConfirmationOverlay.vue';
+import { defineOverlay } from '@overlastic/vue';
 
 const {
     tournament,
@@ -21,11 +23,63 @@ const {
 } = useTournamentFromUrl();
 
 useHead({
-    title: () => (tournament.value === false ? null : tournament.value?.title) ?? 'Manage tournament',
+    title: () => (tournament.value === false ? null : tournament.value?.title) ?? t('manage_tournament_page.title'),
 });
 
 const router = useRouter();
 const tournamentForm = useTemplateRef<ComponentExposed<typeof AppTournamentForm>>('tournamentForm');
+const confirmationOverlay = defineOverlay(ConfirmationOverlay);
+
+/*
+ * Panels
+ */
+type Panel = 'edit' | 'actions' | 'admins' | 'participants' | 'banned';
+
+const availablePanels = computed<Panel[]>(() => {
+    if (!tournament.value) {
+        return [];
+    }
+
+    const panels: Panel[] = [];
+
+    if (tournament.value.state === 'created') {
+        panels.push('edit');
+    }
+
+    if (tournament.value.state !== 'ended') {
+        panels.push('actions');
+    }
+
+    panels.push('admins');
+
+    if (tournament.value.state === 'created') {
+        panels.push('participants');
+    }
+
+    panels.push('banned');
+
+    return panels;
+});
+
+const currentPanel = ref<Panel>('edit');
+
+watch(availablePanels, panels => {
+    if (panels.length > 0 && !panels.includes(currentPanel.value)) {
+        currentPanel.value = panels[0];
+    }
+});
+
+/**
+ * @returns Number to display in sidebar next to panel label, or null for panels without count.
+ */
+const panelCount = (panel: Panel): null | number => {
+    switch (panel) {
+        case 'admins': return selectedAdmins.value.length;
+        case 'participants': return tournament.value ? tournament.value.subscriptions.length : null;
+        case 'banned': return tournamentBannedPlayers.value?.length ?? null;
+        default: return null;
+    }
+};
 
 const editTournament = async () => {
     if (!tournament.value) {
@@ -57,7 +111,7 @@ const editTournament = async () => {
         });
 
         useToastsStore().addToast(
-            'Tournament updated successfully.',
+            t('manage_tournament_page.tournament_updated'),
             {
                 level: 'success',
             },
@@ -78,7 +132,7 @@ const editTournament = async () => {
         }
 
         useToastsStore().addToast(
-            'Error while creating tournament',
+            t('manage_tournament_page.tournament_update_error'),
             {
                 level: 'danger',
             },
@@ -93,6 +147,20 @@ const iterateTournament = async () => {
 };
 
 const startTournament = async () => {
+    try {
+        await confirmationOverlay({
+            title: t('manage_tournament_page.start_now'),
+            message: t('manage_tournament_page.start_now_confirm'),
+            confirmLabel: t('manage_tournament_page.start_now'),
+            confirmClass: 'btn-success',
+            cancelLabel: t('cancel'),
+            cancelClass: 'btn-outline-primary',
+        });
+    } catch (e) {
+        // start canceled
+        return;
+    }
+
     try {
         await apiPostStartTournament(slug);
     } catch (e) {
@@ -170,10 +238,24 @@ const unbanPlayer = async (player: Player): Promise<void> => {
  * Cancel tournament
  */
 const cancelTournament = async () => {
+    try {
+        await confirmationOverlay({
+            title: t('manage_tournament_page.cancel_tournament'),
+            message: t('manage_tournament_page.cancel_tournament_confirm'),
+            confirmLabel: t('manage_tournament_page.cancel_tournament'),
+            confirmClass: 'btn-danger',
+            cancelLabel: t('cancel'),
+            cancelClass: 'btn-outline-primary',
+        });
+    } catch (e) {
+        // cancelation canceled
+        return;
+    }
+
     await apiCancelTournament(slug);
 
     useToastsStore().addToast(
-        `Tournament ${slug} has been canceled.`,
+        t('manage_tournament_page.tournament_canceled', { slug }),
         {
             level: 'warning',
         },
@@ -196,7 +278,12 @@ const updateAdmins = async () => {
     await apiPutTournamentAdmins(slug, admins);
 
     useToastsStore().addToast(
-        `Admins updated. Now they are: ${admins.length === 0 ? '- none -' : admins.map(admin => admin.pseudo).join(', ')}`,
+        t('manage_tournament_page.admins_updated', {
+            admins: admins.length === 0
+                ? t('manage_tournament_page.no_admin')
+                : admins.map(admin => admin.pseudo).join(', ')
+            ,
+        }),
         {
             level: 'success',
         },
@@ -210,96 +297,124 @@ const updateAdmins = async () => {
             :to="{ name: 'tournament', params: { slug }}"
             class="btn btn-outline-primary float-end"
         >
-            Back
+            {{ $t('manage_tournament_page.back') }}
         </router-link>
 
-        <h1>Manage tournament <span v-if="tournament">{{ tournament.title }}</span></h1>
+        <h1>{{ $t('manage_tournament_page.title') }} <span v-if="tournament">{{ tournament.title }}</span></h1>
 
-        <template v-if="tournament && 'created' === tournament.state">
-            <h2>Edit</h2>
+        <p v-if="null === tournament">{{ $t('loading_tournament') }}</p>
+        <p v-else-if="false === tournament">{{ $t('tournament_not_found') }}</p>
 
-            <p v-if="false === iAmHost()" class="text-warning">Tournament can be edited by host only.</p>
+        <div v-else class="row mt-4">
+            <nav class="col-lg-3 mb-3">
+                <div class="list-group">
+                    <button
+                        v-for="panel in availablePanels"
+                        :key="panel"
+                        type="button"
+                        class="list-group-item list-group-item-action"
+                        :class="{ active: currentPanel === panel }"
+                        @click="currentPanel = panel"
+                    >
+                        {{ $t(`manage_tournament_page.panel.${panel}`) }}
+                        <span v-if="null !== panelCount(panel)" class="badge text-bg-secondary float-end">{{ panelCount(panel) }}</span>
+                    </button>
+                </div>
+            </nav>
 
-            <form @submit.prevent="editTournament">
-                <AppTournamentForm :tournament ref="tournamentForm" />
+            <div class="col-lg-9">
 
-                <button type="submit" class="btn btn-success">Submit modifications</button>
-            </form>
-        </template>
+                <!-- Edit tournament -->
+                <section v-if="'edit' === currentPanel">
+                    <h2>{{ $t('manage_tournament_page.panel.edit') }}</h2>
 
-        <template v-if="tournament">
-            <h2>{{ $t('tournament_admins') }}</h2>
+                    <p v-if="false === iAmHost()" class="text-warning">{{ $t('manage_tournament_page.edit_host_only') }}</p>
 
-            <AppPlayerSelectMultiple
-                v-model="selectedAdmins"
-                placeholder="Add admins"
-            />
+                    <form @submit.prevent="editTournament">
+                        <AppTournamentForm :tournament ref="tournamentForm" />
 
-            <p>
-                Admins can do the same things than organizer.
-                You can add admins to manage tournament
-                in case you are not here, or playing a tournament game.
-            </p>
+                        <button type="submit" class="btn btn-success">{{ $t('manage_tournament_page.submit_modifications') }}</button>
+                    </form>
+                </section>
 
-            <button @click="updateAdmins" class="btn btn-success">Update admins</button>
-        </template>
+                <!-- Admins -->
+                <section v-if="'admins' === currentPanel">
+                    <h2>{{ $t('tournament_admins') }}</h2>
 
-        <template v-if="tournament && 'created' === tournament.state">
-            <h2>Subscribers</h2>
+                    <AppPlayerSelectMultiple
+                        v-model="selectedAdmins"
+                        :placeholder="$t('manage_tournament_page.add_admins')"
+                    />
 
-            <ul>
-                <li
-                    v-for="subscription in tournament.subscriptions"
-                    :key="subscription.player.publicId"
-                >
-                    <button @click="kickPlayer(subscription)" class="btn btn-sm btn-outline-warning me-2">Kick</button>
-                    <button @click="banPlayer(subscription.player)" class="btn btn-sm btn-outline-danger me-2">Kick & Ban</button>
-                    {{ subscription.player.pseudo }}
-                    <span v-if="subscription.checkedIn">(checked-in)</span>
-                </li>
-            </ul>
-        </template>
+                    <p>{{ $t('manage_tournament_page.admins_help') }}</p>
 
-        <h2>Banned players</h2>
+                    <button @click="updateAdmins" class="btn btn-success">{{ $t('manage_tournament_page.update_admins') }}</button>
+                </section>
 
-        <p v-if="null === tournamentBannedPlayers">{{ $t('loading') }}</p>
-        <p v-else-if="0 === tournamentBannedPlayers.length">(none)</p>
-        <ul v-else>
-            <li
-                v-for="tournamentBannedPlayer in tournamentBannedPlayers"
-                :key="tournamentBannedPlayer.player.publicId"
-            >
-                <button @click="unbanPlayer(tournamentBannedPlayer.player)" class="btn btn-sm btn-outline-success me-2">Unban</button>
-                {{ tournamentBannedPlayer.player.pseudo }}
-            </li>
-        </ul>
+                <!-- Participants -->
+                <section v-if="'participants' === currentPanel">
+                    <h2>{{ $t('manage_tournament_page.panel.participants') }}</h2>
 
-        <h2>Manual actions</h2>
+                    <p v-if="0 === tournament.subscriptions.length">{{ $t('manage_tournament_page.none') }}</p>
+                    <ul v-else>
+                        <li
+                            v-for="subscription in tournament.subscriptions"
+                            :key="subscription.player.publicId"
+                        >
+                            <button @click="kickPlayer(subscription)" class="btn btn-sm btn-outline-warning me-2">{{ $t('manage_tournament_page.kick') }}</button>
+                            <button @click="banPlayer(subscription.player)" class="btn btn-sm btn-outline-danger me-2">{{ $t('manage_tournament_page.kick_and_ban') }}</button>
+                            {{ subscription.player.pseudo }}
+                            <span v-if="subscription.checkedIn">({{ $t('tournament_checkedin') }})</span>
+                        </li>
+                    </ul>
+                </section>
 
-        <template v-if="tournament && 'created' === tournament.state">
-            <button
-                @click="startTournament"
-                class="btn btn-success"
-            >Start tournament now</button>
-        </template>
+                <!-- Banned players -->
+                <section v-if="'banned' === currentPanel">
+                    <h2>{{ $t('manage_tournament_page.panel.banned') }}</h2>
 
-        <br>
+                    <p v-if="null === tournamentBannedPlayers">{{ $t('loading') }}</p>
+                    <p v-else-if="0 === tournamentBannedPlayers.length">{{ $t('manage_tournament_page.none') }}</p>
+                    <ul v-else>
+                        <li
+                            v-for="tournamentBannedPlayer in tournamentBannedPlayers"
+                            :key="tournamentBannedPlayer.player.publicId"
+                        >
+                            <button @click="unbanPlayer(tournamentBannedPlayer.player)" class="btn btn-sm btn-outline-success me-2">{{ $t('manage_tournament_page.unban') }}</button>
+                            {{ tournamentBannedPlayer.player.pseudo }}
+                        </li>
+                    </ul>
+                </section>
 
-        <template v-if="tournament && 'ended' !== tournament.state">
-            <button @click="iterateTournament" class="btn btn-warning">Progress now</button>
-            <p><small>In case tournament seems stuck (next games not starting), this button should fix it by checking whole tournament state</small></p>
-        </template>
+                <!-- Actions -->
+                <section v-if="'actions' === currentPanel">
+                    <h2>{{ $t('manage_tournament_page.panel.actions') }}</h2>
 
-        <br>
+                    <template v-if="'created' === tournament.state">
+                        <h3>{{ $t('manage_tournament_page.start_now') }}</h3>
+                        <p>{{ $t('manage_tournament_page.start_now_help') }}</p>
+                        <button @click="startTournament" class="btn btn-success">{{ $t('manage_tournament_page.start_now') }}</button>
+                    </template>
 
-        <template v-if="tournament && 'ended' !== tournament.state">
-            <button @click="cancelTournament" class="btn btn-danger">Cancel</button>
-            <p><small>Cancels the tournament. It won't appear again in tournaments list. If tournament was started, active games will be canceled.</small></p>
-        </template>
+                    <h3>{{ $t('manage_tournament_page.progress_now') }}</h3>
+                    <p>{{ $t('manage_tournament_page.progress_now_help') }}</p>
+                    <button @click="iterateTournament" class="btn btn-warning">{{ $t('manage_tournament_page.progress_now') }}</button>
+
+                    <h3>{{ $t('manage_tournament_page.cancel_tournament') }}</h3>
+                    <p>{{ $t('manage_tournament_page.cancel_tournament_help') }}</p>
+                    <button @click="cancelTournament" class="btn btn-danger">{{ $t('manage_tournament_page.cancel_tournament') }}</button>
+                </section>
+
+            </div>
+        </div>
     </div>
 </template>
 
 <style lang="stylus" scoped>
-h2, h3, h4
+h2
+    margin-bottom 1em
+
+h3
     margin-top 1.5em
+    font-size 1.25rem
 </style>
