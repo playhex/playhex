@@ -9,8 +9,8 @@ describe('Pass', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('button', 'Pass').click();
 
-        cy.contains('Pass my turn?');
-        cy.contains('Yes, pass').click();
+        // No confirmation against a bot
+        cy.contains('Pass my turn?', { timeout: 100 }).should('not.exist');
 
         cy.wait(200); // Wait to make sure cypress capture js error and fail if any
     });
@@ -63,8 +63,9 @@ describe('Pass', () => {
         cy.receiveGameUpdate('pass/game-created.json');
         cy.contains('Loading game…').should('not.exist');
 
-        // Pass not shown while waiting for opponent to join
-        cy.get('[aria-label="Secondary actions"]').click();
+        // Pass not shown while waiting for opponent to join,
+        // and the secondary actions menu is hidden because it would be empty
+        cy.get('[aria-label="Secondary actions"]', { timeout: 100 }).should('not.exist');
         cy.contains('Pass', { timeout: 100 }).should('not.exist');
 
         // Opponent joins — game starts, but it's their turn (they play first)

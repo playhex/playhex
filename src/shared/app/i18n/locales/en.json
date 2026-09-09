@@ -553,7 +553,13 @@
         "takeback_request_denied": "{{ player }}'s request to takeback their move has been denied.",
         "undo_move": "Takeback",
         "accept": "Accept undo",
-        "reject": "Reject"
+        "reject": "Reject",
+        "takeback_confirm_overlay": {
+            "title": "Ask for a takeback?",
+            "message": "This sends a takeback request to your opponent, who can accept or decline it.",
+            "confirmLabel": "Yes, send the request",
+            "cancelLabel": "Oops no, keep playing"
+        }
     },
     "ping": {
         "ping_ms": "Ping: {{ms}}ms",

@@ -18,7 +18,7 @@ import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { HostedGame } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { apiPostRematch, getPlayer } from '../../apiClient.js';
-import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
+import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/hostedGameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
@@ -408,6 +408,12 @@ watch(isSidebarCurrentlyOpen, () => {
  * Pass
  */
 const pass = async () => {
+    // No confirmation needed against a bot: nothing is asked to a human opponent.
+    if (isPlayingVsBot.value) {
+        await sendPass();
+        return;
+    }
+
     try {
         await confirmationOverlay({
             title: t('pass_confirm_overlay.title'),
@@ -423,6 +429,67 @@ const pass = async () => {
         // noop, player said no
     }
 };
+
+/*
+ * Takeback
+ */
+const takeback = async () => {
+    // No confirmation needed against a bot: the takeback is applied right away.
+    if (isPlayingVsBot.value) {
+        await askUndo();
+        return;
+    }
+
+    try {
+        await confirmationOverlay({
+            title: t('undo.takeback_confirm_overlay.title'),
+            message: t('undo.takeback_confirm_overlay.message'),
+            confirmLabel: t('undo.takeback_confirm_overlay.confirmLabel'),
+            confirmClass: 'btn-primary',
+            cancelLabel: t('undo.takeback_confirm_overlay.cancelLabel'),
+            cancelClass: 'btn-outline-primary',
+        });
+
+        await askUndo();
+    } catch (e) {
+        // noop, player said no
+    }
+};
+
+const isPlayingVsBot = computed<boolean>(() => hostedGame.value !== null
+    && isBotGame(hostedGame.value),
+);
+
+/**
+ * In games against a bot, takeback is a common action: always show it in the bottom bar.
+ * In games against a human, it stays in the secondary actions menu.
+ */
+const shouldDisplayUndoMoveInBar = computed<boolean>(() => shouldDisplayUndoMove.value
+    && isPlayingVsBot.value,
+);
+
+const shouldDisplayUndoMoveInMenu = computed<boolean>(() => shouldDisplayUndoMove.value
+    && !shouldDisplayUndoMoveInBar.value,
+);
+
+const shouldShowHexworldLink = computed<boolean>(() => game.value !== null
+    && hostedGame.value !== null
+    && canShowHexworldLink(hostedGame.value, loggedInPlayer.value),
+);
+
+const shouldShowHexplorerLink = computed<boolean>(() => game.value !== null
+    && hostedGame.value !== null
+    && canShowHexplorerLink(hostedGame.value, loggedInPlayer.value),
+);
+
+/**
+ * Do not render the secondary actions menu when it would be empty.
+ */
+const hasSecondaryActions = computed<boolean>(() => shouldShowPass.value
+    || shouldDisplayUndoMoveInMenu.value
+    || shouldShowHexworldLink.value
+    || shouldShowHexplorerLink.value,
+);
 
 /*
  * Warning when guest joining correspondence game
@@ -472,136 +539,161 @@ const {
             <nav class="menu-game navbar" v-if="hostedGame">
                 <div class="buttons container-fluid">
 
-                    <!-- rewind mode -->
-                    <button type="button" v-if="null !== gameView" @click="() => enableSimulationMode()" class="btn btn-outline-primary">
-                        <IconRewind />
-                    </button>
+                    <!-- Left spacer, same width as the right one so that the buttons stay centered -->
+                    <div class="buttons-side" aria-hidden="true"></div>
 
-                    <!-- Conditional moves -->
-                    <button type="button" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGame, loggedInPlayer)" @click="startConditionalMoves()" class="btn btn-outline-primary">
-                        <IconSignpostSplit />
-                    </button>
+                    <div class="buttons-main">
 
-                    <!-- Resign -->
-                    <button type="button" class="btn btn-outline-danger" v-if="canResign && !canCancel" @click="resign()">
-                        <IconFlag />
-                        <span class="hide-sm">{{ ' ' + $t('resign') }}</span>
-                    </button>
-
-                    <!-- Cancel -->
-                    <button type="button" class="btn btn-outline-warning" v-if="canCancel" @click="cancel()">
-                        <IconXLg />
-                        <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
-                    </button>
-
-                    <!-- Confirm move -->
-                    <button
-                        v-if="shouldDisplayConfirmMove"
-                        :class="confirmMove ? 'btn-success' : 'btn-outline-secondary'"
-                        :disabled="!confirmMove"
-                        @click="confirmMove && confirmMove()"
-                        type="button"
-                        class="btn"
-                    >
-                        <IconCheck />
-                        <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
-                        <span class="hide-sm">{{ ' ' + $t('confirm_move.button_label') }}</span>
-                    </button>
-
-                    <!-- Undo accept -->
-                    <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(true)">
-                        <IconCheck />
-                        <span class="hide-sm">{{ $t('undo.accept') }}</span>
-                    </button>
-
-                    <!-- Undo reject -->
-                    <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(false)">
-                        <IconX />
-                        <span class="hide-sm">{{ $t('undo.reject') }}</span>
-                    </button>
-
-                    <!-- Rematch -->
-                    <button type="button" class="btn btn-outline-primary" v-if="canRematch" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
-                        <IconRepeat />
-                        <span class="hide-sm">{{ ' ' + $t('rematch.label') }}</span>
-                    </button>
-
-                    <!-- Accept / View rematch -->
-                    <template v-else-if="hostedGame.rematch?.publicId">
-                        <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
-                            {{ ' ' + $t('rematch.accept') }}
+                        <!-- rewind mode -->
+                        <button type="button" v-if="null !== gameView" @click="() => enableSimulationMode()" class="btn btn-outline-primary">
+                            <IconRewind />
                         </button>
-                        <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGame.rematch.publicId } }" class="btn btn-outline-primary">
-                            {{ ' ' + $t('rematch.view') }}
-                        </router-link>
-                    </template>
+
+                        <!-- Conditional moves -->
+                        <button type="button" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGame, loggedInPlayer)" @click="startConditionalMoves()" class="btn btn-outline-primary">
+                            <IconSignpostSplit />
+                        </button>
+
+                        <!-- Resign -->
+                        <button type="button" class="btn btn-outline-danger" v-if="canResign && !canCancel" @click="resign()">
+                            <IconFlag />
+                            <span class="hide-sm">{{ ' ' + $t('resign') }}</span>
+                        </button>
+
+                        <!-- Cancel -->
+                        <button type="button" class="btn btn-outline-warning" v-if="canCancel" @click="cancel()">
+                            <IconXLg />
+                            <span class="hide-sm">{{ ' ' + $t('cancel') }}</span>
+                        </button>
+
+                        <!-- Confirm move -->
+                        <button
+                            v-if="shouldDisplayConfirmMove"
+                            :class="confirmMove ? 'btn-success' : 'btn-outline-secondary'"
+                            :disabled="!confirmMove"
+                            @click="confirmMove && confirmMove()"
+                            type="button"
+                            class="btn"
+                        >
+                            <IconCheck />
+                            <span class="hide-sm">
+                                <span class="d-md-none">{{ ' ' + $t('confirm_move.button_label_short') }}</span>
+                                <span class="d-none d-md-inline">{{ ' ' + $t('confirm_move.button_label') }}</span>
+                            </span>
+                        </button>
+
+                        <!-- Takeback, always shown in bottom bar in games against a bot -->
+                        <button
+                            v-if="shouldDisplayUndoMoveInBar"
+                            type="button"
+                            class="btn btn-outline-primary"
+                            :disabled="!shouldEnableUndoMove"
+                            @click="takeback()"
+                        >
+                            <IconArrowCounterclockwise />
+                            <span class="hide-sm">{{ ' ' + $t('undo.undo_move') }}</span>
+                        </button>
+
+                        <!-- Undo accept -->
+                        <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(true)">
+                            <IconCheck />
+                            <span class="hide-sm">{{ $t('undo.accept') }}</span>
+                        </button>
+
+                        <!-- Undo reject -->
+                        <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(false)">
+                            <IconX />
+                            <span class="hide-sm">{{ $t('undo.reject') }}</span>
+                        </button>
+
+                        <!-- Rematch -->
+                        <button type="button" class="btn btn-outline-primary" v-if="canRematch" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
+                            <IconRepeat />
+                            <span class="hide-sm">{{ ' ' + $t('rematch.label') }}</span>
+                        </button>
+
+                        <!-- Accept / View rematch -->
+                        <template v-else-if="hostedGame.rematch?.publicId">
+                            <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
+                                {{ ' ' + $t('rematch.accept') }}
+                            </button>
+                            <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGame.rematch.publicId } }" class="btn btn-outline-primary">
+                                {{ ' ' + $t('rematch.view') }}
+                            </router-link>
+                        </template>
+
+                        <!-- Secondary actions dropup -->
+                        <div class="dropup" v-if="hasSecondaryActions">
+
+                            <!-- Dropup button -->
+                            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Secondary actions" aria-expanded="false" data-bs-auto-close="true">
+                                <IconList />
+                            </button>
+
+                            <!-- Secondary actions -->
+                            <div class="dropdown-menu dropdown-menu-end">
+
+                                <!-- Pass -->
+                                <button
+                                    v-if="shouldShowPass"
+                                    type="button"
+                                    class="dropdown-item"
+                                    :class="shouldEnablePass ? 'text-warning' : 'text-secondary disabled'"
+                                    :disabled="!shouldEnablePass"
+                                    @click="pass()"
+                                >
+                                    <IconArrowDownUp />
+                                    {{ $t('pass') }}
+                                </button>
+
+                                <div v-if="shouldShowPass && shouldDisplayUndoMoveInMenu"><hr class="dropdown-divider"></div>
+
+                                <!-- Undo -->
+                                <button
+                                    v-if="shouldDisplayUndoMoveInMenu"
+                                    type="button"
+                                    class="dropdown-item"
+                                    :class="shouldEnableUndoMove ? 'text-primary' : 'disabled'"
+                                    :disabled="!shouldEnableUndoMove"
+                                    @click="takeback()"
+                                >
+                                    <IconArrowCounterclockwise />
+                                    {{ $t('undo.undo_move') }}
+                                </button>
+
+                                <div v-if="(shouldShowHexworldLink || shouldShowHexplorerLink) && (shouldShowPass || shouldDisplayUndoMoveInMenu)"><hr class="dropdown-divider"></div>
+
+                                <!-- Explore -->
+                                <AppHexWorldExplore
+                                    v-if="game"
+                                    :hostedGame
+                                    :game
+                                    :orientation
+                                    :label="$t('explore')"
+                                    class="dropdown-item"
+                                />
+
+                                <!-- Hexplorer -->
+                                <AppHexplorerLink
+                                    v-if="game"
+                                    :hostedGame
+                                    :orientation
+                                    class="dropdown-item"
+                                />
+                            </div>
+                        </div>
+
+                    </div>
 
                     <!-- Right button, open sidebar -->
-                    <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat">
-                        <IconArrowBarLeft />
-                        <span v-if="unreadMessages > 0" class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
-                            {{ unreadMessages }}
-                            <span class="d-none">{{ ' ' + $t('unread_messages') }}</span>
-                        </span>
-                    </button>
-
-                    <!-- Secondary actions dropup -->
-                    <div class="dropup-center dropup">
-
-                        <!-- Dropup button -->
-                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Secondary actions" aria-expanded="false" data-bs-auto-close="true">
-                            <IconList />
+                    <div class="buttons-side buttons-side-right">
+                        <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="showSidebar()" aria-label="Open game sidebar and chat">
+                            <IconArrowBarLeft />
+                            <span v-if="unreadMessages > 0" class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">
+                                {{ unreadMessages }}
+                                <span class="d-none">{{ ' ' + $t('unread_messages') }}</span>
+                            </span>
                         </button>
-
-                        <!-- Secondary actions -->
-                        <div class="dropdown-menu">
-
-                            <!-- Pass -->
-                            <button
-                                v-if="shouldShowPass"
-                                type="button"
-                                class="dropdown-item"
-                                :class="shouldEnablePass ? 'text-warning' : 'text-secondary disabled'"
-                                :disabled="!shouldEnablePass"
-                                @click="pass()"
-                            >
-                                <IconArrowDownUp />
-                                {{ $t('pass') }}
-                            </button>
-
-                            <!-- Undo -->
-                            <button
-                                v-if="shouldDisplayUndoMove"
-                                type="button"
-                                class="dropdown-item"
-                                :class="shouldEnableUndoMove ? 'text-primary' : 'disabled'"
-                                :disabled="!shouldEnableUndoMove"
-                                @click="askUndo()"
-                            >
-                                <IconArrowCounterclockwise />
-                                {{ $t('undo.undo_move') }}
-                            </button>
-
-                            <div><hr class="dropdown-divider"></div>
-
-                            <!-- Explore -->
-                            <AppHexWorldExplore
-                                v-if="game"
-                                :hostedGame
-                                :game
-                                :orientation
-                                :label="$t('explore')"
-                                class="dropdown-item"
-                            />
-
-                            <!-- Hexplorer -->
-                            <AppHexplorerLink
-                                v-if="game"
-                                :hostedGame
-                                :orientation
-                                class="dropdown-item"
-                            />
-                        </div>
                     </div>
 
                 </div>
@@ -647,6 +739,31 @@ const {
 .buttons
     position relative
     display flex
+    flex-wrap nowrap // .navbar > .container-fluid wraps by default, buttons must stay on a single line
+    align-items center
+    justify-content center
+    gap 0.5em
+
+    // Keep the secondary actions menu inside the viewport on small screens
+    .dropdown-menu
+        max-width calc(100vw - 1rem)
+
+// Buttons stay centered in the bar: both sides take the same amount of free space.
+// When there is no room left, the left one shrinks to nothing and the buttons are
+// simply pushed left, instead of overlapping the "open sidebar" button.
+.buttons-side
+    display flex
+    flex 1 1 0
+    min-width 0
+
+.buttons-side-right
+    justify-content flex-end
+    min-width min-content // never shrink below the "open sidebar" button, so it stays fully visible on the right
+
+.buttons-main
+    display flex
+    flex-wrap nowrap
+    flex 0 0 auto
     justify-content center
     gap 0.5em
 
@@ -663,9 +780,7 @@ const {
         height calc(100dvh - 3rem) // 3rem = header height
 
     .open-sidebar-btn
-        position absolute
-        right 0
-        margin-right 0.75em
+        position relative // anchor the unread messages badge
 
 sidebarOpen()
     .game
@@ -708,7 +823,7 @@ sidebarOpen()
         @media (min-width: 1400px)
             width 32%
 
-    .open-sidebar-btn
+    .buttons-side
         display none
 
 .sidebar-open

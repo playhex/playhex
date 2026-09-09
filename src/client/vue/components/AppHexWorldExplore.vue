@@ -3,7 +3,7 @@ import { computed, PropType, toRefs } from 'vue';
 import { gameToHexworldLink } from '../../../shared/app/hexworld.js';
 import useAuthStore from '../../stores/authStore.js';
 import { GameView } from '@playhex/pixi-board';
-import { canExportGame } from '../../../shared/app/hostedGameUtils.js';
+import { canShowHexworldLink } from '../../../shared/app/hostedGameUtils.js';
 import HostedGame from '../../../shared/app/models/HostedGame.js';
 import Game from '../../../shared/game-engine/Game.js';
 
@@ -31,13 +31,7 @@ const props = defineProps({
 const { hostedGame, label, orientation } = toRefs(props);
 const { loggedInPlayer } = toRefs(useAuthStore());
 
-const shouldDisplayHexworldLink = (): boolean => {
-    if (!loggedInPlayer.value) {
-        return false;
-    }
-
-    return canExportGame(hostedGame.value, loggedInPlayer.value);
-};
+const shouldDisplayHexworldLink = (): boolean => canShowHexworldLink(hostedGame.value, loggedInPlayer.value);
 
 const hexworldLink = computed(() => gameToHexworldLink(
     hostedGame.value,

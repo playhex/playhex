@@ -3,7 +3,7 @@ import { PropType, toRefs } from 'vue';
 import { createHexworldString } from '../../../../shared/app/hexworld.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { GameView } from '@playhex/pixi-board';
-import { canExportGame } from '../../../../shared/app/hostedGameUtils.js';
+import { canShowHexplorerLink } from '../../../../shared/app/hostedGameUtils.js';
 import { HostedGame } from '../../../../shared/app/models/index.js';
 
 /*
@@ -26,21 +26,7 @@ const props = defineProps({
 const { hostedGame, orientation } = toRefs(props);
 const { loggedInPlayer } = toRefs(useAuthStore());
 
-const shouldDisplayLink = (): boolean => {
-    if (!loggedInPlayer.value || loggedInPlayer.value.isGuest) {
-        return false;
-    }
-
-    if (hostedGame.value.opponentType === 'ai') {
-        return true;
-    }
-
-    if (!['ended', 'canceled'].includes(hostedGame.value.state)) {
-        return false;
-    }
-
-    return canExportGame(hostedGame.value, loggedInPlayer.value);
-};
+const shouldDisplayLink = (): boolean => canShowHexplorerLink(hostedGame.value, loggedInPlayer.value);
 </script>
 
 <template>

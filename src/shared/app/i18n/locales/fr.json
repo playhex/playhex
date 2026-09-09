@@ -559,7 +559,13 @@
         "reject": "Refuser",
         "player_wants_to_takeback": "{{ player }} souhaite reprendre son coup",
         "player_takeback_his_move": "{{ player }} a repris son coup.",
-        "takeback_request_denied": "La demande de reprise de {{ player }} a été refusée."
+        "takeback_request_denied": "La demande de reprise de {{ player }} a été refusée.",
+        "takeback_confirm_overlay": {
+            "title": "Demander une reprise ?",
+            "message": "Cela envoie une demande de reprise à votre adversaire, qui pourra l'accepter ou la refuser.",
+            "confirmLabel": "Oui, envoyer la demande",
+            "cancelLabel": "Oups non, continuons"
+        }
     },
     "pass": "Passer",
     "pass_confirm_overlay": {

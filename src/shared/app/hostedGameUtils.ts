@@ -391,6 +391,36 @@ export const canPlayerUndo = (hostedGame: HostedGame, playerIndex: 0 | 1): boole
  * This should disable Hexworld link, SGF export.
  * Should be disabled in playing games, though watchers may want to use Hexworld.
  */
+/**
+ * Whether the "Explore on HexWorld" link should be displayed for this player.
+ */
+export const canShowHexworldLink = (hostedGame: HostedGame, player: null | Player): boolean => {
+    if (!player) {
+        return false;
+    }
+
+    return canExportGame(hostedGame, player);
+};
+
+/**
+ * Whether the "Hexplorer" link should be displayed for this player.
+ */
+export const canShowHexplorerLink = (hostedGame: HostedGame, player: null | Player): boolean => {
+    if (!player || player.isGuest) {
+        return false;
+    }
+
+    if (isBotGame(hostedGame)) {
+        return true;
+    }
+
+    if (!['ended', 'canceled'].includes(hostedGame.state)) {
+        return false;
+    }
+
+    return canExportGame(hostedGame, player);
+};
+
 export const canExportGame = (hostedGame: HostedGame, player: Player): boolean => {
     if (isBotGame(hostedGame)) {
         return true;
