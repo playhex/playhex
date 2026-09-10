@@ -55,8 +55,11 @@ const secondaryNotifications = computed(() => allNotifications.filter(n => n !==
                         </div>
 
                         <!-- Other notifications list -->
-                        <p class="text-body-secondary text-start small mb-2">{{ $t('enable_notifications_overlay.also_notified_for') }}</p>
-                        <ul class="list-unstyled text-start text-body-secondary small mb-0">
+                        <p v-if="props.featuredNotification" class="text-body-secondary text-start small mb-2">{{ $t('enable_notifications_overlay.also_notified_for') }}</p>
+                        <ul
+                            class="list-unstyled text-start mb-0"
+                            :class="props.featuredNotification ? 'text-body-secondary small' : ''"
+                        >
                             <li
                                 v-for="(notif, i) in secondaryNotifications"
                                 :key="notif"
