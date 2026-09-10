@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
+import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { isTranslatableHttpErrorPayload } from '../shared/app/TranslatableHttpError.js';
@@ -623,6 +623,26 @@ export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | 
     await checkResponse(response);
 
     return plainToInstance(PlayerStats, await response.json());
+};
+
+/**
+ * Stats of playerPublicId against opponentPublicId, from playerPublicId point of view.
+ */
+export const apiGetHeadToHeadStats = async (playerPublicId: string, opponentPublicId: string): Promise<null | PlayerHeadToHeadStats> => {
+    const response = await fetch(`/api/players/${playerPublicId}/head-to-head/${opponentPublicId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(PlayerHeadToHeadStats, await response.json());
 };
 
 export const apiGetConditionalMoves = async (hostedGamePublicId: string): Promise<ConditionalMoves> => {

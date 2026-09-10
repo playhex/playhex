@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconTrophy, IconPeople, IconX, IconFlag } from '../../icons.js';
-import { HostedGame, HostedGameOptions, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
-import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
+import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
+import { HostedGame, HostedGameOptions, Player, PlayerHeadToHeadStats, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
+import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
@@ -14,6 +14,7 @@ import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
 import AppGameRulesSummary from '../../components/AppGameRulesSummary.vue';
 import AppPlayerStats from '../../components/AppPlayerStats.vue';
+import AppPlayerHeadToHead from '../../components/AppPlayerHeadToHead.vue';
 import AppPlayerRatingChart from '../../components/AppPlayerRatingChart.vue';
 import AppTablePlayerRating from '../../components/AppTablePlayerRating.vue';
 import AppSearchGamesParameters from '../../components/AppSearchGamesParameters.vue';
@@ -237,6 +238,46 @@ watchEffect(async () => {
 
     playerStats.value = await apiGetPlayerStats(player.value.publicId);
 });
+
+/*
+ * Head to head stats, only when visiting another (non bot) player profile while logged in
+ */
+const headToHead = ref<null | PlayerHeadToHeadStats>(null);
+
+const shouldShowHeadToHead = computed<boolean>(() => player.value !== null
+    && loggedInPlayer.value !== null
+    && !player.value.isBot
+    && !isMe(player.value),
+);
+
+watchEffect(async () => {
+    if (!shouldShowHeadToHead.value || player.value === null || loggedInPlayer.value === null) {
+        headToHead.value = null;
+        return;
+    }
+
+    headToHead.value = await apiGetHeadToHeadStats(loggedInPlayer.value.publicId, player.value.publicId);
+});
+
+/**
+ * Filter games history on both players, and scroll to it.
+ */
+const showOurGames = () => {
+    if (player.value === null || loggedInPlayer.value === null) {
+        return;
+    }
+
+    searchGamesParameters.value.players = [
+        { publicId: player.value.publicId },
+        { publicId: loggedInPlayer.value.publicId },
+    ];
+
+    searchGamesParameters.value.paginationPage = 0;
+
+    gamesHistoryHeading.value?.scrollIntoView({ behavior: 'smooth' });
+};
+
+const gamesHistoryHeading = useTemplateRef<HTMLElement>('gamesHistoryHeading');
 
 const playerCurrentRatings = ref<null | Partial<Record<RatingCategory, Rating>>>(null);
 
@@ -467,21 +508,15 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                     ><IconGear /> {{ $t('player_settings.title') }}</router-link>
                 </div>
 
-                <div v-if="player && !isMe(player) && !player.isBot" class="player-btns mt-3">
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-warning"
-                        @click="challenge('ranked')"
-                    ><IconTrophy /> {{ $t('challenge_ranked') }}</button>
-
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-success"
-                        @click="challenge('friendly')"
-                    ><IconPeople /> {{ $t('challenge_friendly') }}</button>
-                </div>
             </div>
         </div>
+
+        <AppPlayerHeadToHead
+            v-if="shouldShowHeadToHead && headToHead"
+            :headToHead
+            @showOurGames="showOurGames"
+            @challenge="challenge"
+        />
 
         <AppPlayerStats v-if="playerStats" :playerStats />
 
@@ -582,7 +617,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
             </table>
         </div>
 
-        <h3>{{ $t('player_game_history') }}</h3>
+        <h3 ref="gamesHistoryHeading">{{ $t('player_game_history') }}</h3>
 
         <AppSearchGamesParameters :searchGamesParameters />
 

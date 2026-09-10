@@ -26,6 +26,7 @@ import PlayerIp from './PlayerIp.js';
 import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
+import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
 import Premove from './Premove.js';
 import Rating from './Rating.js';
 import Tournament from './Tournament.js';
@@ -64,6 +65,7 @@ export {
     PlayerNotification,
     PlayerSettings,
     PlayerStats,
+    PlayerHeadToHeadStats,
     PlayerPushSubscription,
     Premove,
     Rating,
