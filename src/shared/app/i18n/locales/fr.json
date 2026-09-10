@@ -784,7 +784,8 @@
         "suggestions": "Suggéré par votre navigateur :",
         "all_countries": "Tous les pays :",
         "search_placeholder": "Rechercher un pays…",
-        "remove": "Supprimer le drapeau"
+        "remove": "Supprimer le drapeau",
+        "set_yours": "Choisir votre drapeau"
     },
     "statistics": {
         "title": "Statistiques PlayHex",

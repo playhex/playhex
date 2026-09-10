@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconTrophy, IconPeople, IconX } from '../../icons.js';
+import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconTrophy, IconPeople, IconX, IconFlag } from '../../icons.js';
 import { HostedGame, HostedGameOptions, Player, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
@@ -31,10 +31,11 @@ import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/hostedGameU
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
-import { apiGetPlayerIsCurrentlyChatRestricted, apiUploadPlayerAvatar } from '../../../apiClient.js';
+import { apiGetPlayerIsCurrentlyChatRestricted, apiUploadPlayerAvatar, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
 import useToastsStore from '../../../stores/toastsStore.js';
 import { defineOverlay } from '@overlastic/vue';
 import AppAvatarCropOverlay from '../../components/overlay/AppAvatarCropOverlay.vue';
+import AppFlagSelectorOverlay from '../../components/overlay/AppFlagSelectorOverlay.vue';
 
 const { slug } = useRoute().params;
 
@@ -325,6 +326,43 @@ const onAvatarFileSelected = async (event: Event) => {
     }
 };
 
+/*
+ * Country flag shortcut: when I have no flag yet, I can set it from my profile page
+ */
+const flagSelectorOverlay = defineOverlay(AppFlagSelectorOverlay);
+
+const canSetCountryFlag = computed(() => player.value !== null
+    && isMe(player.value)
+    && !player.value.isGuest
+    && !player.value.countryFlag,
+);
+
+const setCountryFlag = async () => {
+    if (!player.value) {
+        return;
+    }
+
+    let countryFlag: null | string;
+
+    try {
+        countryFlag = await flagSelectorOverlay({ modelValue: player.value.countryFlag ?? null });
+    } catch {
+        return; // user cancelled
+    }
+
+    try {
+        await apiUpdatePlayerCountryFlag(player.value.publicId, countryFlag);
+
+        player.value.countryFlag = countryFlag;
+    } catch (e) {
+        if (!(e instanceof Error)) {
+            throw e;
+        }
+
+        useToastsStore().addToast(e.message, { level: 'danger' });
+    }
+};
+
 const timeRangeUpdated = (from: null | Date, to: null | Date) => {
     let isZoomed = from || to;
 
@@ -376,7 +414,18 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                 <AppOnlineStatus v-if="player" :player class="player-status" />
             </div>
             <div>
-                <h2><AppPseudo v-if="player" :player flag /><template v-else>…</template></h2>
+                <h2 class="pseudo-heading">
+                    <AppPseudo v-if="player" :player flag /><template v-else>…</template>
+
+                    <button
+                        v-if="canSetCountryFlag"
+                        type="button"
+                        class="empty-flag"
+                        :title="$t('country_flag.set_yours')"
+                        :aria-label="$t('country_flag.set_yours')"
+                        @click="setCountryFlag()"
+                    ><IconFlag /></button>
+                </h2>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM y')
@@ -665,6 +714,34 @@ td:first-child, th:first-child
         transition opacity 0.15s
 
     &:hover .avatar-upload-hint
+        opacity 1
+
+.pseudo-heading
+    display flex
+    flex-wrap wrap
+    align-items center
+    column-gap 0.4em
+
+.empty-flag
+    display inline-flex
+    align-items center
+    justify-content center
+    width 1.7em
+    height 1.25em
+    padding 0
+    font-size 0.75em
+    line-height 1
+    color var(--bs-secondary-color)
+    background none
+    border 1px dashed var(--bs-secondary-color)
+    opacity 0.65
+
+    svg
+        font-size 0.8em
+
+    &:hover
+        color var(--bs-primary)
+        border-color var(--bs-primary)
         opacity 1
 
 .avatar-img

@@ -740,7 +740,8 @@
         "suggestions": "Suggested from your browser:",
         "all_countries": "All countries:",
         "search_placeholder": "Search country…",
-        "remove": "Remove flag"
+        "remove": "Remove flag",
+        "set_yours": "Set your country flag"
     },
     "hexplorer": {
         "title": "Hexplorer",
