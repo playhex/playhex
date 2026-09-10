@@ -78,8 +78,8 @@ notifier.on('move', (hostedGame, timestampedMove) => {
 });
 
 notifier.on('takebackRequested', (hostedGame, byPlayer) => {
-    // Only display to my opponent and watchers
-    if (isMe(byPlayer)) {
+    // Only display to watchers: players see the takeback request bar above the board
+    if (iAmInGame(hostedGame)) {
         return;
     }
 

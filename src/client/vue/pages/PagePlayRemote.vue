@@ -8,7 +8,7 @@ import { defineOverlay } from '@overlastic/vue';
 import { Ref, watchEffect } from 'vue';
 import useAuthStore from '../../stores/authStore.js';
 import { useRoute, useRouter } from 'vue-router';
-import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconX, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
+import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
@@ -47,7 +47,6 @@ const {
     confirmMove,
     canCancel,
     canDeclineChallenge,
-    shouldDisplayAnswerUndoMove,
     shouldDisplayUndoMove,
     shouldEnableUndoMove,
     canResign,
@@ -62,7 +61,6 @@ const {
     useGame,
 
     askUndo,
-    answerUndo,
     sendPass,
     sendResign,
     sendCancel,
@@ -592,18 +590,6 @@ const {
                         >
                             <IconArrowCounterclockwise />
                             <span class="hide-sm">{{ ' ' + $t('undo.undo_move') }}</span>
-                        </button>
-
-                        <!-- Undo accept -->
-                        <button type="button" class="btn btn-success" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(true)">
-                            <IconCheck />
-                            <span class="hide-sm">{{ $t('undo.accept') }}</span>
-                        </button>
-
-                        <!-- Undo reject -->
-                        <button type="button" class="btn btn-danger" v-if="shouldDisplayAnswerUndoMove" @click="answerUndo(false)">
-                            <IconX />
-                            <span class="hide-sm">{{ $t('undo.reject') }}</span>
                         </button>
 
                         <!-- Rematch -->

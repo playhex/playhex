@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
+import { computed, onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { storeToRefs } from 'pinia';
 import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';
 import AppChrono from './AppChrono.vue';
@@ -10,6 +10,7 @@ import TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
+import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -39,15 +40,37 @@ const {
 const {
     game,
     gameView,
+    hostedGame,
     conditionalMovesEditor,
     gameUIMode,
+    shouldDisplayAnswerUndoMove,
 } = storeToRefs(useCurrentGameStore());
 
 const {
     stopConditionalMoves,
     enableSimulationMode,
     disableSimulationMode,
+    answerUndo,
 } = useCurrentGameStore();
+
+/*
+ * Takeback request from opponent
+ */
+
+/**
+ * Pseudo of the player who asked for a takeback, to show it in the takeback request bar.
+ */
+const undoRequestPseudo = computed<string>(() => {
+    const undoRequest = hostedGame.value?.undoRequest;
+
+    if (undoRequest === null || undoRequest === undefined) {
+        return '';
+    }
+
+    const player = players.value[undoRequest];
+
+    return player ? pseudoString(player, 'pseudo') : '';
+});
 
 /*
  * Add pixi view
@@ -134,7 +157,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' }">
+    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerUndoMove }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
@@ -242,6 +265,23 @@ onUnmounted(() => {
                 <IconX />
             </button>
         </div>
+
+        <!-- Opponent asked for a takeback: accept or reject it -->
+        <div class="rewind-controls takeback-request" v-else-if="shouldDisplayAnswerUndoMove">
+            <p class="takeback-request-text">{{ $t('undo.player_wants_to_takeback', { player: undoRequestPseudo }) }}</p>
+
+            <!-- Accept takeback -->
+            <button type="button" @click="answerUndo(true)" class="btn btn-success">
+                <IconCheck />
+                <span class="btn-label d-none d-lg-inline">{{ ' ' + $t('undo.accept') }}</span>
+            </button>
+
+            <!-- Reject takeback -->
+            <button type="button" @click="answerUndo(false)" class="btn btn-danger">
+                <IconX />
+                <span class="btn-label d-none d-lg-inline">{{ ' ' + $t('undo.reject') }}</span>
+            </button>
+        </div>
     </div>
 </template>
 
@@ -319,9 +359,21 @@ onUnmounted(() => {
     .rewind-controls
         display flex
         justify-content center
+        align-items center
         gap 0.25em
         padding 0 0.25em
 
         button
             max-width 6em
+
+    .takeback-request
+        button
+            max-width none
+            white-space nowrap
+
+    .takeback-request-text
+        margin 0
+        overflow hidden
+        text-overflow ellipsis
+        white-space nowrap
 </style>

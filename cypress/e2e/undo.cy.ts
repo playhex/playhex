@@ -10,8 +10,9 @@ describe('Undo', () => {
 
         cy.contains('.sidebar', 'Playing');
 
-        cy.contains('.menu-game', 'Accept undo');
-        cy.contains('.menu-game', 'Reject');
+        cy.contains('.takeback-request', 'wants to takeback their move');
+        cy.contains('.takeback-request', 'Accept undo');
+        cy.contains('.takeback-request', 'Reject');
     });
 
     it('player undo his swap move', () => {
