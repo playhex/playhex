@@ -31,7 +31,7 @@ describe('Country flag setting', () => {
     it('shows the flag section in settings for registered players', () => {
         interceptSettings();
 
-        cy.visit('/settings');
+        cy.visit('/settings#country-flag');
 
         cy.get('#country-flag').should('exist');
         cy.get('#country-flag').contains('Country flag');
@@ -40,7 +40,7 @@ describe('Country flag setting', () => {
     it('does not show the flag section for guests', () => {
         interceptSettings({ ...player, isGuest: true });
 
-        cy.visit('/settings');
+        cy.visit('/settings#country-flag');
 
         cy.get('#country-flag').should('not.exist');
     });
@@ -51,7 +51,7 @@ describe('Country flag setting', () => {
             req.reply({ body: { countryFlag: req.body.countryFlag } });
         }).as('updateFlag');
 
-        cy.visit('/settings');
+        cy.visit('/settings#country-flag');
 
         cy.get('#country-flag input[type=search]').type(' ');
         cy.get('#country-flag .flag-btn').first().click();
@@ -65,7 +65,7 @@ describe('Country flag setting', () => {
             req.reply({ body: { countryFlag: req.body.countryFlag } });
         }).as('updateFlag');
 
-        cy.visit('/settings');
+        cy.visit('/settings#country-flag');
 
         cy.get('#country-flag input[type=search]').type('France');
         cy.get('#country-flag').contains('button', '🇫🇷').click();
@@ -79,7 +79,7 @@ describe('Country flag setting', () => {
             req.reply({ body: { countryFlag: req.body.countryFlag } });
         }).as('updateFlag');
 
-        cy.visit('/settings');
+        cy.visit('/settings#country-flag');
 
         cy.get('#country-flag').contains('Remove flag').click();
 
@@ -89,7 +89,7 @@ describe('Country flag setting', () => {
     it('highlights the currently selected flag', () => {
         interceptSettings(playerWithFlag);
 
-        cy.visit('/settings');
+        cy.visit('/settings#country-flag');
 
         cy.get('#country-flag input[type=search]').type(' ');
         cy.get('#country-flag .flag-btn.btn-primary').should('contain', '🇫🇷');

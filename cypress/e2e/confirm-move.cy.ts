@@ -14,6 +14,8 @@ describe('Confirm move', () => {
         cy.contains(/Guest \d+/).click();
         cy.contains('Settings').click();
 
+        cy.contains('.list-group-item', 'Game').click();
+
         cy.contains('Move settings');
 
         cy.get('[for="move-settings-normal-3"]').click();

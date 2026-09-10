@@ -41,7 +41,16 @@
     "player_settings": {
         "title": "Préférences",
         "change_avatar": "Changer l'avatar",
-        "crop_avatar": "Ajuster l'avatar"
+        "crop_avatar": "Ajuster l'avatar",
+        "panel": {
+            "interface": "Interface",
+            "account": "Compte",
+            "game": "Partie",
+            "board": "Plateau",
+            "notifications": "Notifications"
+        },
+        "audio": "Audio",
+        "moderation": "Modération"
     },
     "background_theme": {
         "title": "Thème",

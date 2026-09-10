@@ -57,7 +57,16 @@
     "player_settings": {
         "title": "Settings",
         "change_avatar": "Change avatar",
-        "crop_avatar": "Adjust avatar"
+        "crop_avatar": "Adjust avatar",
+        "panel": {
+            "interface": "Interface",
+            "account": "Account",
+            "game": "Game",
+            "board": "Board",
+            "notifications": "Notifications"
+        },
+        "audio": "Audio",
+        "moderation": "Moderation"
     },
     "player_menu": {
         "open_menu": "Open player menu",
