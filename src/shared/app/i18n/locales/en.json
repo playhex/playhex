@@ -59,11 +59,21 @@
         "change_avatar": "Change avatar",
         "crop_avatar": "Adjust avatar"
     },
+    "player_menu": {
+        "open_menu": "Open player menu",
+        "my_account": "My account",
+        "my_guest_account": "My guest account",
+        "enable_notifications": "Enable notifications",
+        "notifications_enabled": "Notifications enabled",
+        "notifications_blocked": "Notifications blocked",
+        "more_languages": "More languages"
+    },
     "background_theme": {
         "title": "Theme",
         "dark": "Dark",
         "light": "Light"
     },
+    "audio": "Audio",
     "muted": {
         "on": "Mute",
         "off": "Play"

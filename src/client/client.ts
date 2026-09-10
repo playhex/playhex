@@ -11,6 +11,7 @@ import App from './vue/App.vue';
 import router from './vue/router.js';
 import unoverlay from '@overlastic/vue';
 import usePlayerLocalSettingsStore from './stores/playerLocalSettingsStore.js';
+import useAuthStore from './stores/authStore.js';
 import I18NextVue from 'i18next-vue';
 import i18next from 'i18next';
 import useMatomo from './vue/useMatomo.js';
@@ -32,6 +33,11 @@ useMatomo(vueApp);
 
 // Load store now to set dark/light theme early enough and prevent blinking
 usePlayerLocalSettingsStore();
+
+// authStore, socketStore and playersStore reference each other.
+// authStore must be the one initialized first, else socketStore would be
+// initialized while still partial, and playersStore would get an undefined socket.
+useAuthStore();
 
 void preloadAssets();
 

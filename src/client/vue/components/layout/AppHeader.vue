@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import useAuthStore from '../../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload, IconPersonFill } from '../../icons.js';
-import AppPseudo from '../AppPseudo.vue';
+import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload } from '../../icons.js';
+import AppPlayerMenu from './AppPlayerMenu.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
 import { useServerVersionChecker } from '../../composables/useServerVersionChecker.js';
-import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
-
-const { loggedInPlayer } = storeToRefs(useAuthStore());
 
 const siteTitleSuffix = SITE_TITLE_SUFFIX;
 
@@ -238,24 +234,8 @@ const {
                 <!-- Player notifications -->
                 <AppPlayerNotifications />
 
-                <!-- Player nickname -->
-                <p class="nav-player-item">
-                    <template v-if="loggedInPlayer">
-                        <router-link
-                            :to="{ name: 'player', params: { slug: loggedInPlayer.slug } }"
-                            class="link-body-emphasis"
-                            :title="pseudoString(loggedInPlayer)"
-                            :aria-label="pseudoString(loggedInPlayer)"
-                        >
-                            <img v-if="loggedInPlayer.avatarThumbnailPath ?? loggedInPlayer.avatarPath" :src="(loggedInPlayer.avatarThumbnailPath ?? loggedInPlayer.avatarPath)!" :alt="loggedInPlayer.pseudo" class="nav-avatar" />
-                            <template v-else>
-                                <IconPersonFill class="nav-avatar-icon" />
-                                <AppPseudo :player="loggedInPlayer" classes="d-none d-sm-inline" />
-                            </template>
-                        </router-link>
-                    </template>
-                    <template v-else>{{ $t('logging_in') }}</template>
-                </p>
+                <!-- Player menu -->
+                <AppPlayerMenu />
             </div>
         </div>
     </nav>
@@ -293,20 +273,6 @@ nav
     &:hover .nav-submenu,
     &:focus-within .nav-submenu
         display block
-
-.nav-player-item
-    font-size 1.1em
-
-.nav-avatar
-    width 1.75em
-    clip-path polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)
-    object-fit cover
-    vertical-align middle
-    font-size 1.5em
-
-.nav-avatar-icon
-    font-size 1.5em
-    vertical-align middle
 
 .my-turn-notif
     position relative
