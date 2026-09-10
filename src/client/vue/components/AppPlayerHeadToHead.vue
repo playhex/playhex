@@ -125,7 +125,7 @@ const hasGames = computed<boolean>(() => headToHead.totalGames > 0);
                 <div class="score mx-auto text-center">
                     <div v-if="headToHead.liveGames > 0" class="mt-4">
                         <p class="mb-0 text-body-secondary">{{ $t('total_play_time') }}</p>
-                        <p class="display-6 mb-0">
+                        <p class="display-6 my-1">
                             <IconClockHistory class="text-body-secondary" />
                             {{ ' ' }}
                             {{ msToDuration(1000 * headToHead.totalPlayTimeSeconds) }}
@@ -134,7 +134,7 @@ const hasGames = computed<boolean>(() => headToHead.totalGames > 0);
                     </div>
 
                     <div class="d-flex justify-content-center gap-4 mt-4">
-                        <p class="small mb-0 text-body-secondary">
+                        <p v-if="headToHead.totalGames > 1" class="small mb-0 text-body-secondary">
                             {{ $t('first_game_together') }}
                             <br />
                             <router-link
