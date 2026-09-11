@@ -224,10 +224,9 @@ const {
 } = storeToRefs(useNotificationStore());
 
 const {
+    isNotificationSupported,
     requestPermission,
 } = useNotificationStore();
-
-const isNotificationSupported = typeof Notification !== 'undefined';
 </script>
 
 <template>

@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
+import { usePermission } from '@vueuse/core';
 import { subscribeToPushNotifications as baseSubscribeToPushNotifications } from '../services/registerServiceWorker.js';
+import { getNotificationPermission, isNotificationSupported, requestNotificationPermission } from '../services/browserNotification.js';
 
 /**
  * Manage Notifications permission, push subscription
@@ -10,7 +12,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     /**
      * Whether player has granted, denied permission, or has not yet been asked.
      */
-    const permission = ref(Notification?.permission ?? 'denied');
+    const permission = ref<NotificationPermission>(getNotificationPermission());
 
     /**
      * Whether push subscription has been successfully sent to server.
@@ -21,26 +23,28 @@ const useNotificationStore = defineStore('notificationStore', () => {
      * @returns State of permission after prompt. False if notifications not supported by browser.
      */
     const requestPermission = async (): Promise<false | NotificationPermission> => {
-        if (typeof Notification === 'undefined') {
+        const result = await requestNotificationPermission();
+
+        if (result === false) {
             return false;
         }
 
-        permission.value = await Notification.requestPermission();
+        permission.value = result;
 
         return permission.value;
     };
 
-    // Listens notification permission change
-    void navigator.permissions.query({ name: 'notifications' }).then(permissionStatus => {
-        permissionStatus.addEventListener('change', () => {
-            if (permissionStatus.state === 'prompt') {
-                permission.value = 'default';
-            } else {
-                permission.value = permissionStatus.state;
-            }
+    /*
+     * Listens notification permission change.
+     * usePermission() handles browsers without Permissions API, or not knowing
+     * the 'notifications' descriptor (iOS Safari): it then just stays on 'prompt' and never changes.
+     * Its state is only used as a change signal, Notification.permission stays the source of truth.
+     */
+    const notificationsPermissionState = usePermission('notifications');
 
-            subscribed.value = false;
-        });
+    watch(notificationsPermissionState, () => {
+        permission.value = getNotificationPermission();
+        subscribed.value = false;
     });
 
     /**
@@ -68,6 +72,7 @@ const useNotificationStore = defineStore('notificationStore', () => {
     });
 
     return {
+        isNotificationSupported,
         permission,
         subscribed,
         requestPermission,

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import router from '../vue/router.js';
 import { apiPutPushSubscription } from '../apiClient.js';
+import { getNotificationPermission } from './browserNotification.js';
 
 /**
  * Register service worker, and returns a ServiceWorkerRegistration,
@@ -88,11 +89,7 @@ export const getSubscription = async (): Promise<PushSubscription | null> => {
  * and post it to server so that server can send me push notifications.
  */
 export const subscribeToPushNotifications = async (): Promise<null | PushSubscription> => {
-    if (typeof Notification === 'undefined') {
-        return null;
-    }
-
-    if (Notification.permission !== 'granted') {
+    if (getNotificationPermission() !== 'granted') {
         return null;
     }
 

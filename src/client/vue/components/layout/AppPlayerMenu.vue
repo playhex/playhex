@@ -108,8 +108,8 @@ watch(router.currentRoute, () => closeMenu());
  * Notifications
  */
 const { permission } = storeToRefs(useNotificationStore());
+const { isNotificationSupported } = useNotificationStore();
 const openEnableNotificationsOverlay = defineOverlay(EnableNotificationsOverlay);
-const isNotificationSupported = typeof Notification !== 'undefined';
 
 const enableNotifications = async (): Promise<void> => {
     try {

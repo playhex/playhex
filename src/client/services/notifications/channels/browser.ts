@@ -5,6 +5,7 @@ import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import router from '../../../vue/router.js';
 import { isBotGame } from '../../../../shared/app/hostedGameUtils.js';
 import { serviceWorkerRegistrationPromise } from '../../registerServiceWorker.js';
+import { getNotificationPermission } from '../../browserNotification.js';
 import { RouteLocationAsRelativeTyped } from 'vue-router';
 
 const icon = '/images/logo-transparent.svg';
@@ -26,11 +27,7 @@ const sanitizeNotificationBody = (body: string): string => {
 };
 
 const sendNotification = async (options: NotificationOptions, route: RouteLocationAsRelativeTyped, title = 'PlayHex') => {
-    if (typeof Notification === 'undefined') {
-        return;
-    }
-
-    if (Notification.permission !== 'granted') {
+    if (getNotificationPermission() !== 'granted') {
         return;
     }
 
