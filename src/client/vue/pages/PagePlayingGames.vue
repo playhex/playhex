@@ -6,7 +6,7 @@ import { isLive, isCorrespondence, TimeControlCadency } from '../../../shared/ap
 import { isBotGame } from '../../../shared/app/hostedGameUtils.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { IconLightningChargeFill, IconCalendar, IconList, IconGrid3x3GapFill } from '../icons.js';
+import { IconLightningChargeFill, IconCalendar } from '../icons.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useHead } from '@unhead/vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -15,14 +15,22 @@ import { t } from 'i18next';
 
 useHead({ title: t('playing_games.title') });
 
-const TOP_COUNT = 6;
+/**
+ * Thumbnails displayed above the list, only a single row:
+ * 1 on small screens, 2 on medium, 3 on large, 4 on extra large.
+ * Extra ones are hidden with responsive display classes.
+ */
+const THUMBNAILS_COLUMN_CLASSES = [
+    'col-12 col-sm-6 col-md-4 col-xl-3',
+    'col-sm-6 col-md-4 col-xl-3 d-none d-sm-block',
+    'col-md-4 col-xl-3 d-none d-md-block',
+    'col-xl-3 d-none d-xl-block',
+];
 
 type SortKey = 'recently-started' | 'recently-played' | 'most-moves' | 'longest' | 'player-rating';
-type ViewMode = 'top' | 'all';
 
 const allPlayingGames = ref<HostedGame[]>([]);
 const loading = ref(true);
-const view = ref<ViewMode>('top');
 const router = useRouter();
 const route = useRoute();
 const currentLobby = computed(() => route.params.mode === 'correspondence' ? 'correspondence' : 'live');
@@ -78,6 +86,8 @@ const sortedGames = computed(() => {
             });
     }
 });
+
+const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLUMN_CLASSES.length));
 </script>
 
 <template>
@@ -122,24 +132,6 @@ const sortedGames = computed(() => {
                     <option value="longest">{{ $t('sort_longest_game') }}</option>
                     <option value="player-rating">{{ $t('sort_player_rating') }}</option>
                 </select>
-
-                <!-- View toggle -->
-                <div class="btn-group btn-group-sm" role="group" aria-label="View mode">
-                    <button
-                        @click="view = 'top'"
-                        class="btn"
-                        :class="view === 'top' ? 'btn-secondary' : 'btn-outline-secondary'"
-                        type="button"
-                        :title="`Top ${TOP_COUNT} thumbnails`"
-                    ><IconGrid3x3GapFill /> Top {{ TOP_COUNT }}</button>
-                    <button
-                        @click="view = 'all'"
-                        class="btn"
-                        :class="view === 'all' ? 'btn-secondary' : 'btn-outline-secondary'"
-                        type="button"
-                        title="All games as table"
-                    ><IconList /> {{ $t('all') }}</button>
-                </div>
             </div>
 
             <div v-if="loading" class="card-body text-secondary">
@@ -150,21 +142,21 @@ const sortedGames = computed(() => {
                 <i>{{ $t(currentLobby === 'live' ? 'playing_games.no_live_games' : 'playing_games.no_correspondence_games') }}</i>
             </div>
 
-            <!-- Thumbnail grid (top view) -->
-            <div v-else-if="view === 'top'" class="card-body">
+            <!-- First games as thumbnails, a single row depending on screen size -->
+            <div v-else class="card-body pb-0">
                 <div class="row g-2">
                     <div
-                        v-for="game in sortedGames.slice(0, TOP_COUNT)"
+                        v-for="(game, index) in thumbnailGames"
                         :key="game.publicId"
-                        class="col-12 col-sm-6 col-md-4 col-xl-3"
+                        :class="THUMBNAILS_COLUMN_CLASSES[index]"
                     >
                         <AppGameThumbnailLobbyLiveCard :gamePublicId="game.publicId" />
                     </div>
                 </div>
             </div>
 
-            <!-- Table (all view) -->
-            <div v-else class="table-responsive">
+            <!-- All games as table -->
+            <div v-if="!loading && baseGames.length > 0" class="table-responsive">
                 <table class="table table-borderless table-hover mb-0">
                     <thead>
                         <tr class="small text-body-secondary">
