@@ -94,6 +94,16 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             players,
             seating: true, // Seat players depending on their ratings (always rely on toPlayer.value)
             sorting: 'descending', // descending to give bye to stronger players (assume toPlayer.value is a rating: higher value is first)
+            scoring: {
+                // A bye must not give points: player did not win anything.
+                // Only for formats where score is used as is in standings:
+                // in elimination formats, score is used to rank players by how far they went,
+                // so a bye must still count as a step forward.
+                bye: tournament.stage1Format === 'swiss' || tournament.stage1Format === 'round-robin'
+                    ? 0
+                    : 1
+                ,
+            },
         }, tournament.publicId);
 
         toTournaments[tournament.publicId] = toTournament;
