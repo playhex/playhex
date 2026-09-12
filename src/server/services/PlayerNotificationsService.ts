@@ -4,6 +4,7 @@ import { PlayerNotification } from '../../shared/app/models/index.js';
 import { HexServer } from '../server.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 import Rooms from '../../shared/app/Rooms.js';
+import { addLegacyAliases } from './legacyPayloadAliases.js';
 
 @Service()
 export class PlayerNotificationsService
@@ -17,9 +18,9 @@ export class PlayerNotificationsService
     {
         Container.get(HexServer)
             .to(Rooms.player(playerNotification.player.publicId))
-            .emit('playerNotification', instanceToPlain(playerNotification, {
+            .emit('playerNotification', addLegacyAliases(instanceToPlain(playerNotification, {
                 groups: ['playerNotification'],
-            }))
+            })))
         ;
 
         if (playerNotification.game && typeof playerNotification.game.id === 'undefined') {

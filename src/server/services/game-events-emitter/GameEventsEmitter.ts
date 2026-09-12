@@ -2,6 +2,7 @@ import { Container, Service } from 'typedi';
 import { Game, Player, ChatMessage, Rating } from '../../../shared/app/models/index.js';
 import { HexServer } from '../../server.js';
 import Rooms from '../../../shared/app/Rooms.js';
+import { addLegacyAliases } from '../legacyPayloadAliases.js';
 import { isBotGame, isChallengeGame } from '../../../shared/app/gameUtils.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
@@ -59,11 +60,11 @@ export class GameEventsEmitter
     {
         io().to([
             ...lobbyRooms(game),
-        ]).emit('lobbyGameCreated', instanceToInstance(game, { groups: ['lobby'] }));
+        ]).emit('lobbyGameCreated', addLegacyAliases(instanceToInstance(game, { groups: ['lobby'] })));
 
         io().to([
             ...gamePlayersRooms(game),
-        ]).emit('gameCreated', instanceToInstance(game));
+        ]).emit('gameCreated', addLegacyAliases(instanceToInstance(game)));
     }
 
     emitGameJoined(game: Game, player: Player): void
@@ -77,7 +78,7 @@ export class GameEventsEmitter
 
     emitGameStarted(game: Game): void
     {
-        const gameSerialized = instanceToInstance(game);
+        const gameSerialized = addLegacyAliases(instanceToInstance(game));
 
         io().to([
             ...lobbyRooms(game),
@@ -154,7 +155,7 @@ export class GameEventsEmitter
 
         io().to([
             ...lobbyRooms(game),
-        ]).emit('lobbyGameEnded', instanceToInstance(game));
+        ]).emit('lobbyGameEnded', addLegacyAliases(instanceToInstance(game)));
     }
 
     emitGameCanceled(game: Game, canceledAt: { date: Date }): void
@@ -185,7 +186,7 @@ export class GameEventsEmitter
 
         io().to([
             Rooms.player(game.opponentPublicId),
-        ]).emit('gameChallengeCreated', instanceToInstance(game));
+        ]).emit('gameChallengeCreated', addLegacyAliases(instanceToInstance(game)));
     }
 
     emitRematchAvailable(game: Game, rematchPublicId: string): void

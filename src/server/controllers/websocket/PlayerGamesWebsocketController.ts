@@ -3,6 +3,7 @@ import PlayerRepository from '../../repositories/PlayerRepository.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
+import { addLegacyAliases } from '../../services/legacyPayloadAliases.js';
 
 @Service()
 export default class PlayerGamesWebsocketController implements WebsocketControllerInterface
@@ -22,6 +23,6 @@ export default class PlayerGamesWebsocketController implements WebsocketControll
         if (player == null) return;
         const games = this.gameStore.getPlayerActiveGames(player)
             .map(g => g.getGame());
-        socket.emit('playerGamesUpdate', games);
+        socket.emit('playerGamesUpdate', addLegacyAliases(games));
     }
 }
