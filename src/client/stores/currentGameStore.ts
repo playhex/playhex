@@ -5,7 +5,7 @@ import { addMove, cancelGame, canExplore, canPlayerUndo, cloneHostedGame, endGam
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
-import Game from '../../shared/game-engine/Game.js';
+import EngineGame from '../../shared/game-engine/EngineGame.js';
 import usePlayerSettingsStore from './playerSettingsStore.js';
 import { GameView } from '@playhex/pixi-board';
 import Rooms from '../../shared/app/Rooms.js';
@@ -62,7 +62,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const hostedGame = ref<null | HostedGame>(null);
     const spectators = ref<Player[]>([]);
 
-    const game = shallowRef<null | Game>(null);
+    const engineGame = shallowRef<null | EngineGame>(null);
     const gameView = shallowRef<GameView | null>(null);
     const playingGameFacade = shallowRef<null | PlayingGameFacade>(null);
     const playerSettingsFacade = shallowRef<null | PlayerSettingsFacade>(null);
@@ -111,20 +111,20 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         const unlisten = listenSocketMessages(gamePublicId, hostedGameInitialData => {
             hostedGame.value = cloneHostedGame(hostedGameInitialData);
             removeShadowDeletedMessages(hostedGame.value);
-            game.value = Game.fromData(toEngineGameData(hostedGame.value));
+            engineGame.value = EngineGame.fromData(toEngineGameData(hostedGame.value));
             gameView.value = new GameView(hostedGame.value.boardsize);
             playerSettingsFacade.value = new PlayerSettingsFacade(gameView.value);
             playingGameFacade.value = new PlayingGameFacade(
                 gameView.value,
-                game.value.getAllowSwap(),
-                game.value.getMovesHistory().map(moveTimestamped => moveTimestamped.move),
+                engineGame.value.getAllowSwap(),
+                engineGame.value.getMovesHistory().map(moveTimestamped => moveTimestamped.move),
             );
 
             listenHexClick();
             listenHexSecondaryClick();
-            listenModel(playingGameFacade.value, game.value);
+            listenModel(playingGameFacade.value, engineGame.value);
 
-            initWinOverlay(game.value, gameView.value, hostedGame.value);
+            initWinOverlay(engineGame.value, gameView.value, hostedGame.value);
         });
 
         watchEffect(() => {
@@ -149,7 +149,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             playingGameFacade.value = null;
             gameView.value?.destroy();
             gameView.value = null;
-            game.value = null;
+            engineGame.value = null;
             hostedGame.value = null;
             hostedGamePublicId.value = null;
             spectators.value = [];
@@ -196,16 +196,16 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             addMove(hostedGame.value, timestampedMove, moveIndex, byPlayerIndex);
 
             // Do nothing if game not loaded
-            if (!game.value) {
+            if (!engineGame.value) {
                 return;
             }
 
             // Ignore server move because already played locally
-            if (moveIndex <= game.value.getLastMoveIndex()) {
+            if (moveIndex <= engineGame.value.getLastMoveIndex()) {
                 return;
             }
 
-            game.value.move(timestampedMove.move, byPlayerIndex, timestampedMove.playedAt);
+            engineGame.value.move(timestampedMove.move, byPlayerIndex, timestampedMove.playedAt);
 
             playSoundForMove(timestampedMove.move);
 
@@ -245,22 +245,22 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            if (accept && game.value) {
+            if (accept && engineGame.value) {
                 if (hostedGame.value.undoRequest === null) {
                     throw new Error('undo answered but no undo request');
                 }
 
-                game.value.playerUndo(hostedGame.value.undoRequest as 0 | 1);
+                engineGame.value.playerUndo(hostedGame.value.undoRequest as 0 | 1);
             }
 
             const { undoRequest } = hostedGame.value;
 
             hostedGame.value.undoRequest = null;
 
-            if (game.value) {
-                hostedGame.value.currentPlayerIndex = game.value.getCurrentPlayerIndex();
-                hostedGame.value.moves = game.value.getMovesHistory().map(move => move.move);
-                hostedGame.value.moveTimestamps = game.value.getMovesHistory().map(move => move.playedAt);
+            if (engineGame.value) {
+                hostedGame.value.currentPlayerIndex = engineGame.value.getCurrentPlayerIndex();
+                hostedGame.value.moves = engineGame.value.getMovesHistory().map(move => move.move);
+                hostedGame.value.moveTimestamps = engineGame.value.getMovesHistory().map(move => move.playedAt);
             }
 
             if (undoRequest === null) {
@@ -292,16 +292,16 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             endGame(hostedGame.value, winner, outcome, date);
 
             // Do nothing if game not loaded
-            if (game.value === null) {
+            if (engineGame.value === null) {
                 return;
             }
 
             // If game is not already ended locally by server response anticipation
-            if (game.value.isEnded()) {
+            if (engineGame.value.isEnded()) {
                 return;
             }
 
-            game.value.declareWinner(winner, outcome, date);
+            engineGame.value.declareWinner(winner, outcome, date);
         });
 
         on('gameCanceled', (gameId, { date }) => {
@@ -312,16 +312,16 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             cancelGame(hostedGame.value, date);
 
             // Do nothing if game not loaded
-            if (game.value === null) {
+            if (engineGame.value === null) {
                 return;
             }
 
             // If game is not already ended locally by server response anticipation
-            if (game.value.isEnded()) {
+            if (engineGame.value.isEnded()) {
                 return;
             }
 
-            game.value.cancel(date);
+            engineGame.value.cancel(date);
         });
 
         on('rematchAvailable', (gameId, rematchId) => {
@@ -414,15 +414,15 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         };
     };
 
-    const listenModel = (playingGameFacade: PlayingGameFacade, game: Game): void => {
+    const listenModel = (playingGameFacade: PlayingGameFacade, engineGame: EngineGame): void => {
         highlightSidesFromGame();
 
-        game.on('played', move => {
+        engineGame.on('played', move => {
             playingGameFacade.addMove(move.move);
             highlightSidesFromGame();
         });
 
-        game.on('undo', async undoneMovesTimestamped => {
+        engineGame.on('undo', async undoneMovesTimestamped => {
             const undoneMoves = undoneMovesTimestamped.map(timestampedMove => timestampedMove.move);
 
             for (let i = 0; i < undoneMoves.length; ++i) {
@@ -440,13 +440,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             }
         });
 
-        game.on('ended', () => highlightSidesFromGame());
-        game.on('canceled', () => highlightSidesFromGame());
+        engineGame.on('ended', () => highlightSidesFromGame());
+        engineGame.on('canceled', () => highlightSidesFromGame());
 
-        game.on('updated', () => {
+        engineGame.on('updated', () => {
             playingGameFacade.undoAllMoves();
 
-            for (const timestampedMove of game.getMovesHistory()) {
+            for (const timestampedMove of engineGame.getMovesHistory()) {
                 playingGameFacade.addMove(timestampedMove.move);
             }
         });
@@ -458,11 +458,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         gameView.value.on('hexClicked', async (move: HexMove) => {
-            if (!hostedGame.value || !game.value) {
+            if (!hostedGame.value || !engineGame.value) {
                 throw new Error('hex clicked but hosted game is null');
             }
 
-            move = game.value.moveOrSwapPieces(move);
+            move = engineGame.value.moveOrSwapPieces(move);
 
             try {
                 /*
@@ -506,7 +506,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                  * Premove
                  */
                 if (MoveSettings.PREMOVE === moveSettings.value && !isMyTurn.value) {
-                    if (game.value.isEnded()) {
+                    if (engineGame.value.isEnded()) {
                         return;
                     }
 
@@ -522,7 +522,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                         throw new Error('Unexpected swap-pieces or pass move here');
                     }
 
-                    if (game.value.getBoard().isEmpty(move)) {
+                    if (engineGame.value.getBoard().isEmpty(move)) {
                         // set or replace premove
                         sendPremove(move).catch(reason => {
                             playingGameFacade.value?.removePreviewedMove();
@@ -538,11 +538,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                     return;
                 }
 
-                game.value.checkMove(move, localPlayerIndex.value);
+                engineGame.value.checkMove(move, localPlayerIndex.value);
 
                 // Send move if move preview is not enabled
                 if (!shouldDisplayConfirmMove.value) {
-                    game.value.move(move, localPlayerIndex.value);
+                    engineGame.value.move(move, localPlayerIndex.value);
                     await sendMove(move);
                     return;
                 }
@@ -557,12 +557,12 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
                 // Buffer move sending: will be sent later, when click on "Confirm move"
                 confirmMove.value = async () => {
-                    if (localPlayerIndex.value === null || !game.value) {
+                    if (localPlayerIndex.value === null || !engineGame.value) {
                         throw new Error('game or localPlayerIndex is now null');
                     }
 
                     removeConfirmMove();
-                    game.value.move(move, localPlayerIndex.value);
+                    engineGame.value.move(move, localPlayerIndex.value);
 
                     await sendMove(move);
                 };
@@ -589,21 +589,21 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     };
 
     const highlightSidesFromGame = (): void => {
-        if (!game.value || !gameView.value) {
+        if (!engineGame.value || !gameView.value) {
             return;
         }
 
-        if (game.value.isCanceled()) {
+        if (engineGame.value.isCanceled()) {
             gameView.value.highlightSides(true, true);
             return;
         }
 
-        if (game.value.isEnded()) {
-            gameView.value.highlightSideForPlayer(game.value.getStrictWinner());
+        if (engineGame.value.isEnded()) {
+            gameView.value.highlightSideForPlayer(engineGame.value.getStrictWinner());
             return;
         }
 
-        gameView.value.highlightSideForPlayer(game.value.getCurrentPlayerIndex());
+        gameView.value.highlightSideForPlayer(engineGame.value.getCurrentPlayerIndex());
     };
 
     /**
@@ -729,11 +729,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
 
     const sendPass = async () => {
-        if (localPlayerIndex.value === null || !game.value) {
+        if (localPlayerIndex.value === null || !engineGame.value) {
             return;
         }
 
-        game.value.move('pass', localPlayerIndex.value);
+        engineGame.value.move('pass', localPlayerIndex.value);
         await sendMove('pass');
     };
 
@@ -748,13 +748,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     });
 
     const shouldEnablePass = computed((): boolean => {
-        if (!hostedGame.value || !game.value) {
+        if (!hostedGame.value || !engineGame.value) {
             return false;
         }
 
         return hostedGame.value.state === 'playing'
             && isMyTurn.value
-            && canPassAgain(game.value)
+            && canPassAgain(engineGame.value)
         ;
     });
 
@@ -783,14 +783,14 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
 
     const sendPremove = async (move: HexMove): Promise<void> => {
-        if (!game.value) {
+        if (!engineGame.value) {
             throw new Error('Cannot premove next move, needs game to know which is next move index');
         }
 
         const premove = new Premove();
 
         premove.move = move;
-        premove.moveIndex = game.value.getLastMoveIndex() + 2;
+        premove.moveIndex = engineGame.value.getLastMoveIndex() + 2;
 
         return await new Promise((resolve, reject) => {
             if (!hostedGame.value) {
@@ -860,7 +860,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * Whether we should enable the button because cannot undo now
      */
     const shouldEnableUndoMove = computed<boolean>(() => {
-        if (!hostedGame.value || localPlayerIndex.value === null || !game.value) {
+        if (!hostedGame.value || localPlayerIndex.value === null || !engineGame.value) {
             return false;
         }
 
@@ -1085,7 +1085,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
     let disposeWinOverlay: null | (() => void) = null;
 
-    const initWinOverlay = (game: Game, gameView: GameView, hostedGame: HostedGame) => {
+    const initWinOverlay = (engineGame: EngineGame, gameView: GameView, hostedGame: HostedGame) => {
         if (disposeWinOverlay) {
             disposeWinOverlay();
             disposeWinOverlay = null;
@@ -1098,7 +1098,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            const winningPath = game.getBoard().getShortestWinningPath();
+            const winningPath = engineGame.getBoard().getShortestWinningPath();
 
             if (winningPath) {
                 animatorFacade = new AnimatorFacade(gameView);
@@ -1110,20 +1110,20 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             }
 
             await defineOverlay(GameFinishedOverlay)({
-                game,
+                engineGame,
                 players: hostedGame.hostedGameToPlayers
                     .map(hostedGameToPlayer => hostedGameToPlayer.player)
                 ,
             });
         };
 
-        game.on('ended', endedCallback);
-        game.on('canceled', endedCallback);
+        engineGame.on('ended', endedCallback);
+        engineGame.on('canceled', endedCallback);
 
         disposeWinOverlay = () => {
             disposed = true;
-            game.off('ended', endedCallback);
-            game.off('canceled', endedCallback);
+            engineGame.off('ended', endedCallback);
+            engineGame.off('canceled', endedCallback);
             animatorFacade = null;
         };
     };
@@ -1266,7 +1266,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     return {
         hostedGame,
-        game,
+        engineGame,
         gameView,
         gameUIMode,
         playingGameFacade,

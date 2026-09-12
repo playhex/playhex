@@ -1,4 +1,4 @@
-import { Game, PlayerIndex } from '../game-engine/index.js';
+import { EngineGame, PlayerIndex } from '../game-engine/index.js';
 import { AbstractTimeControl } from '../time-control/TimeControl.js';
 
 /**
@@ -6,7 +6,7 @@ import { AbstractTimeControl } from '../time-control/TimeControl.js';
  * to allow timeControl switch when player moved,
  * or make game end by time when timeControl emitted elapsed event.
  */
-export const bindTimeControlToGame = (game: Game, timeControl: AbstractTimeControl) => {
+export const bindTimeControlToGame = (game: EngineGame, timeControl: AbstractTimeControl) => {
     game.prependListener('played', (move, moveIndex, byPlayerIndex) => {
         // Start time control on first move
         if (timeControl.getState() === 'ready') {

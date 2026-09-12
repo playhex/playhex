@@ -53,7 +53,7 @@ const props = defineProps({
 const { hostedGame, gameView } = toRefs(props);
 
 const {
-    game,
+    engineGame,
     gameUIMode,
     conditionalMovesEditor,
     conditionalMovesState,
@@ -625,16 +625,16 @@ watch(gameUIMode, () => {
 
                 <!-- HexWorld link -->
                 <AppHexWorldExplore
-                    v-if="game"
+                    v-if="engineGame"
                     :hostedGame
-                    :game
+                    :engineGame
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                 />
 
                 <!-- Hexplorer -->
                 <AppHexplorerLink
-                    v-if="game"
+                    v-if="engineGame"
                     :hostedGame
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"

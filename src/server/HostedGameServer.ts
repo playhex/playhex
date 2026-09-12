@@ -1,4 +1,4 @@
-import { Game as EngineGame, Game, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
+import { EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { CancelHostedGameReason, HostedGameState } from '../shared/app/Types.js';
 import { ChatMessage, Player, HostedGameToPlayer, HostedGame, Premove } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
@@ -53,7 +53,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     /**
      * Null if not yet started, or ended and reloaded from database
      */
-    private game: null | EngineGame = null;
+    private engineGame: null | EngineGame = null;
 
     /**
      * Players waiting in lobby including host,
@@ -69,7 +69,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private premoves: [null | Premove, null | Premove] = [null, null];
 
     /**
-     * Reason of the next cancelation, set just before calling this.game.cancel()
+     * Reason of the next cancelation, set just before calling this.engineGame.cancel()
      * or doCancel(), and consumed by the "canceled" game event listener / doCancel().
      */
     private pendingCancelReason: null | CancelHostedGameReason = null;
@@ -118,15 +118,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         if (this.hostedGame.startedAt) {
             try {
-                this.game = EngineGame.fromData(toEngineGameData(this.hostedGame));
-                this.listenGame(this.game);
+                this.engineGame = EngineGame.fromData(toEngineGameData(this.hostedGame));
+                this.listenEngineGame(this.engineGame);
             } catch (e) {
                 baseLogger.error('Could not recreate game from data', { data: this.hostedGame });
                 throw e;
             }
         }
 
-        if (this.game !== null) {
+        if (this.engineGame !== null) {
             this.bindTimeControl();
             this.makeAutomatedMoves().catch(e => {
                 this.logger.error('Error in init, while makeAutomatedMoves()', errorToLogger(e));
@@ -155,9 +155,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return this.hostedGame.publicId;
     }
 
-    getGame(): null | EngineGame
+    getEngineGame(): null | EngineGame
     {
-        return this.game;
+        return this.engineGame;
     }
 
     getPlayers(): Player[]
@@ -206,32 +206,32 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private makePremoveIfApplicable()
     {
-        if (this.game === null) {
+        if (this.engineGame === null) {
             return;
         }
 
-        if (this.game.isEnded()) {
+        if (this.engineGame.isEnded()) {
             return;
         }
 
-        const premove = this.premoves[this.game.getCurrentPlayerIndex()];
+        const premove = this.premoves[this.engineGame.getCurrentPlayerIndex()];
 
         if (premove === null) {
             return;
         }
 
         // Ignore premove if it was for a previous move
-        if (premove.moveIndex !== this.game.getLastMoveIndex() + 1) {
-            this.logger.notice('Premove ignored because not for current index', { premove, lastMoveIndex: this.game.getLastMoveIndex() });
-            this.premoves[this.game.getCurrentPlayerIndex()] = null;
+        if (premove.moveIndex !== this.engineGame.getLastMoveIndex() + 1) {
+            this.logger.notice('Premove ignored because not for current index', { premove, lastMoveIndex: this.engineGame.getLastMoveIndex() });
+            this.premoves[this.engineGame.getCurrentPlayerIndex()] = null;
             return;
         }
 
         this.logger.info('Play premove', { premove });
 
-        this.premoves[this.game.getCurrentPlayerIndex()] = null; // Must reset premove before playerMove(), else getCurrentPlayerIndex() will point to other player
+        this.premoves[this.engineGame.getCurrentPlayerIndex()] = null; // Must reset premove before playerMove(), else getCurrentPlayerIndex() will point to other player
 
-        const player = this.players[this.game.getCurrentPlayerIndex()];
+        const player = this.players[this.engineGame.getCurrentPlayerIndex()];
         const result = this.playerMove(player, premove.move);
 
         if (result !== true) {
@@ -245,27 +245,27 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private async makeAIMoveIfApplicable(): Promise<void>
     {
-        if (this.game === null) {
+        if (this.engineGame === null) {
             return;
         }
 
-        const player = this.players[this.game.getCurrentPlayerIndex()];
+        const player = this.players[this.engineGame.getCurrentPlayerIndex()];
 
         if (!player.isBot) {
             return;
         }
 
         try {
-            const boardPosition = this.game.getMovesHistoryAsString();
+            const boardPosition = this.engineGame.getMovesHistoryAsString();
             const move = await makeAIPlayerMove(player, this);
 
             // Player canceled or resigned while ai was processing, do nothing.
-            if (this.game.isEnded()) {
+            if (this.engineGame.isEnded()) {
                 return;
             }
 
             // Ignore, board position has changed while AI was computing. Occurs when move has been undone.
-            if (this.game.getMovesHistoryAsString() !== boardPosition) {
+            if (this.engineGame.getMovesHistoryAsString() !== boardPosition) {
                 this.logger.info('Board position changed while AI was computing, ignoring AI move');
                 return;
             }
@@ -302,11 +302,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
-        if (this.game === null) {
+        if (this.engineGame === null) {
             return;
         }
 
-        const lastMove = this.game.getLastMove();
+        const lastMove = this.engineGame.getLastMove();
 
         if (lastMove === null) {
             return;
@@ -315,7 +315,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         try {
             this.logger.info('Conditional moves: checking', { lastMove });
 
-            const player = this.players[this.game.getCurrentPlayerIndex()];
+            const player = this.players[this.engineGame.getCurrentPlayerIndex()];
             const conditionalMovesRepository = Container.get(ConditionalMovesRepository);
 
             const move = await conditionalMovesRepository.shift(player, this.hostedGame, lastMove.move);
@@ -328,7 +328,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.logger.info('Conditional moves: conditional move matched.', { lastMove, move });
 
             // Game has ended, either win, or opponent resigned while fetching conditional move
-            if (this.game.isEnded()) {
+            if (this.engineGame.isEnded()) {
                 return;
             }
 
@@ -348,11 +348,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private getLastPlayerMove(): null | TimestampedMove
     {
-        if (this.game === null) {
+        if (this.engineGame === null) {
             return null;
         }
 
-        const movesHistory = this.game.getMovesHistory();
+        const movesHistory = this.engineGame.getMovesHistory();
         let i = movesHistory.length - 1;
 
         if (this.players[i % 2].isBot) {
@@ -363,7 +363,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             }
         }
 
-        return this.game.getMovesHistory()[i];
+        return this.engineGame.getMovesHistory()[i];
     }
 
     /**
@@ -374,7 +374,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private async makeAIAnswerUndoIfApplicable(): Promise<void>
     {
-        if (this.hostedGame === null || this.game === null || this.hostedGame.state !== 'playing' || typeof this.hostedGame.undoRequest !== 'number') {
+        if (this.hostedGame === null || this.engineGame === null || this.hostedGame.state !== 'playing' || typeof this.hostedGame.undoRequest !== 'number') {
             return;
         }
 
@@ -409,18 +409,18 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
     }
 
-    private listenGame(game: EngineGame): void
+    private listenEngineGame(engineGame: EngineGame): void
     {
         /**
          * Listen on played event, move can come from AI
          */
-        game.on('played', (timestampedMove, moveIndex, byPlayerIndex) => {
+        engineGame.on('played', (timestampedMove, moveIndex, byPlayerIndex) => {
             this.saveState();
 
             this.gameEventEmitter.emitMoved(this.hostedGame, timestampedMove, moveIndex, byPlayerIndex);
             this.gameEventEmitter.emitTimeControlUpdate(this.hostedGame, this.timeControl);
 
-            if (!game.isEnded()) {
+            if (!engineGame.isEnded()) {
                 this.makeAutomatedMoves().catch(e => {
                     this.logger.error('Game played event: error in makeAutomatedMoves()', errorToLogger(e));
                 });
@@ -429,7 +429,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.cancelUndoRequestIfAny(byPlayerIndex);
             this.emit('played');
 
-            if (!game.isEnded()) {
+            if (!engineGame.isEnded()) {
                 notifier.emit('move', this.hostedGame, timestampedMove);
             }
         });
@@ -438,7 +438,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * Listen on ended event, can come from game that turned into a winning position,
          * or time control that elapsed and made a winner.
          */
-        game.on('ended', (winner, outcome, date) => {
+        engineGame.on('ended', (winner, outcome, date) => {
             this.saveState();
 
             this.doEnd(winner, outcome, date);
@@ -448,7 +448,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
          * Listen on canceled event, can come from game timed out with less than 2 moves,
          * or player canceled because nobody joined.
          */
-        game.on('canceled', (date) => {
+        engineGame.on('canceled', (date) => {
             this.saveState();
 
             this.logger.info('Game canceled.');
@@ -473,12 +473,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     bindTimeControl(): void
     {
-        if (!this.game) {
+        if (!this.engineGame) {
             this.logger.error('Cannot call bindTimeControl() now, game is not yet created.');
             return;
         }
 
-        bindTimeControlToGame(this.game, this.timeControl);
+        bindTimeControlToGame(this.engineGame, this.timeControl);
     }
 
     isPlayerInGame(player: Player): boolean
@@ -493,7 +493,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
-        if (this.game !== null) {
+        if (this.engineGame !== null) {
             this.logger.warning('Cannot init game, already started');
             return;
         }
@@ -508,9 +508,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.hostedGame.state = 'playing';
         this.hostedGame.startedAt = new Date();
 
-        this.game = Game.fromData(toEngineGameData(this.hostedGame));
+        this.engineGame = EngineGame.fromData(toEngineGameData(this.hostedGame));
 
-        this.listenGame(this.game);
+        this.listenEngineGame(this.engineGame);
 
         this.saveState();
 
@@ -706,7 +706,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game is not playing';
         }
 
-        if (!this.game) {
+        if (!this.engineGame) {
             this.logger.warning('Tried to make a move but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot make a move';
         }
@@ -716,13 +716,13 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
-        if (move === 'pass' && !canPassAgain(this.game)) {
+        if (move === 'pass' && !canPassAgain(this.engineGame)) {
             this.logger.notice('Tried to pass again', { player: player.pseudo });
             return 'cannot pass infinitely. Now, play';
         }
 
         try {
-            this.game.move(move, this.getPlayerIndex(player) as PlayerIndex, playedAt);
+            this.engineGame.move(move, this.getPlayerIndex(player) as PlayerIndex, playedAt);
 
             return true;
         } catch (e) {
@@ -749,7 +749,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game is not playing';
         }
 
-        if (!this.game) {
+        if (!this.engineGame) {
             this.logger.warning('Tried to register a premove but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot make a move';
         }
@@ -761,12 +761,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
-        if (premove.moveIndex <= this.game.getLastMoveIndex()) {
-            this.logger.notice('Premove received too late, a move has already been played for this index', { player: player.pseudo, premove, lastMoveIndex: this.game.getLastMoveIndex() });
+        if (premove.moveIndex <= this.engineGame.getLastMoveIndex()) {
+            this.logger.notice('Premove received too late, a move has already been played for this index', { player: player.pseudo, premove, lastMoveIndex: this.engineGame.getLastMoveIndex() });
             return 'a move is already played at this index';
         }
 
-        if (playerIndex === this.game.getCurrentPlayerIndex()) {
+        if (playerIndex === this.engineGame.getCurrentPlayerIndex()) {
             this.logger.notice('Premove received too late, but still my turn to play, fire it now', { player: player.pseudo });
             this.playerMove(player, premove.move);
             return true;
@@ -800,7 +800,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game is not playing';
         }
 
-        if (!this.game) {
+        if (!this.engineGame) {
             this.logger.warning('Tried to ask undo but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot ask undo';
         }
@@ -819,7 +819,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'there is already an undo request';
         }
 
-        const reason = this.game.canPlayerUndo(playerIndex);
+        const reason = this.engineGame.canPlayerUndo(playerIndex);
 
         if (reason !== true) {
             return reason;
@@ -851,7 +851,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
-        if (!this.game) {
+        if (!this.engineGame) {
             this.logger.warning('Tried to answer undo but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot answer undo';
         }
@@ -869,7 +869,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'cannot answer own undo request';
         }
 
-        const timeControlAfterUndo = recreateTimeControlAfterUndo(hostedGame, this.game.playerUndoDryRun(hostedGame.undoRequest as PlayerIndex).length, now);
+        const timeControlAfterUndo = recreateTimeControlAfterUndo(hostedGame, this.engineGame.playerUndoDryRun(hostedGame.undoRequest as PlayerIndex).length, now);
 
         if (accept && timeControlAfterUndo === null) {
             this.logger.notice('An undo request has been accepted, but will make time control elapsing. Ignoring');
@@ -879,7 +879,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         let undoneMoves: HexMove[] = [];
 
         if (accept) {
-            undoneMoves = this.game.playerUndo(hostedGame.undoRequest as PlayerIndex).map(({ move }) => move);
+            undoneMoves = this.engineGame.playerUndo(hostedGame.undoRequest as PlayerIndex).map(({ move }) => move);
         }
 
         const playerUndoing = this.players[hostedGame.undoRequest];
@@ -927,7 +927,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game is not playing';
         }
 
-        if (!this.game) {
+        if (!this.engineGame) {
             this.logger.warning('Tried to resign but game is not yet created.', { player: player.pseudo });
             return 'Game not yet started, cannot resign';
         }
@@ -940,7 +940,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         const now = new Date();
 
         try {
-            this.game.resign(this.getPlayerIndex(player) as PlayerIndex, now);
+            this.engineGame.resign(this.getPlayerIndex(player) as PlayerIndex, now);
 
             return true;
         } catch (e) {
@@ -961,11 +961,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game is not playing nor created';
         }
 
-        if (this.game === null) {
+        if (this.engineGame === null) {
             return true;
         }
 
-        if (this.game.getMovesHistory().length >= this.players.length) {
+        if (this.engineGame.getMovesHistory().length >= this.players.length) {
             this.logger.notice('A player tried to cancel, but too late, every player played a move', { player: player.pseudo });
             return 'cannot cancel now, each player has played at least one move';
         }
@@ -993,8 +993,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
                 : 'by_opponent'
         ;
 
-        if (this.game !== null) {
-            this.game.cancel(now);
+        if (this.engineGame !== null) {
+            this.engineGame.cancel(now);
         } else {
             this.doCancel(now, this.pendingCancelReason);
         }
@@ -1010,11 +1010,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.pendingCancelReason = cancelReason;
 
-        if (this.game !== null) {
-            if (this.game.isEnded()) {
+        if (this.engineGame !== null) {
+            if (this.engineGame.isEnded()) {
                 this.logger.warning('systemCancel() but game is already canceled. Ignore');
             } else {
-                this.game.cancel(now);
+                this.engineGame.cancel(now);
             }
         } else {
             this.doCancel(now, cancelReason);
@@ -1057,8 +1057,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             throw new Error('Cannot forfeit this player, not in game');
         }
 
-        if (this.game !== null) {
-            this.game.forfeit(playerIndex, now);
+        if (this.engineGame !== null) {
+            this.engineGame.forfeit(playerIndex, now);
         } else {
             this.doEnd(1 - playerIndex as PlayerIndex, 'forfeit', now);
         }
@@ -1092,11 +1092,11 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private saveGameState(): void
     {
-        if (this.game === null) {
+        if (this.engineGame === null) {
             return;
         }
 
-        assignEngineGameData(this.hostedGame, this.game.toData());
+        assignEngineGameData(this.hostedGame, this.engineGame.toData());
     }
 
     private savePlayersState(): void

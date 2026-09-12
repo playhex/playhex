@@ -38,7 +38,7 @@ const {
 } = toRefs(props);
 
 const {
-    game,
+    engineGame,
     gameView,
     hostedGame,
     conditionalMovesEditor,
@@ -160,7 +160,7 @@ onUnmounted(() => {
     <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerUndoMove }">
         <div class="board-container" ref="pixiApp"></div>
 
-        <div v-if="game" :class="['game-info-overlay', `orientation-${orientation}`]">
+        <div v-if="engineGame" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
                 <p v-if="players">
                     <template v-if="players[0]">
@@ -175,7 +175,7 @@ onUnmounted(() => {
                         />
                     </template>
                     <span v-else class="fst-italic">{{ $t('waiting') }}</span>
-                    <span v-if="game.getWinner() === 0">&nbsp;<IconTrophyFill class="text-warning" /></span>
+                    <span v-if="engineGame.getWinner() === 0">&nbsp;<IconTrophyFill class="text-warning" /></span>
                 </p>
                 <AppChrono
                     v-if="timeControlOptions && timeControlValues"
@@ -186,7 +186,7 @@ onUnmounted(() => {
             </div>
             <div class="player player-b">
                 <p v-if="players">
-                    <span v-if="game.getWinner() === 1"><IconTrophyFill class="text-warning" />&nbsp;</span>
+                    <span v-if="engineGame.getWinner() === 1"><IconTrophyFill class="text-warning" />&nbsp;</span>
                     <template v-if="players[1]">
                         <AppPlayerAvatar v-if="players[1].avatarThumbnailPath ?? players[1].avatarPath" :player="players[1]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo

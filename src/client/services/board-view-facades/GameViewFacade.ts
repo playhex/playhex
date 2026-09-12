@@ -1,4 +1,4 @@
-import Game from '../../../shared/game-engine/Game.js';
+import EngineGame from '../../../shared/game-engine/EngineGame.js';
 import { GameView } from '@playhex/pixi-board';
 import { PlayingGameFacade } from '@playhex/pixi-board';
 import { PreviewMoveFacade } from '@playhex/pixi-board';
@@ -32,7 +32,7 @@ export class GameViewFacade
 
     constructor(
         private gameView: GameView,
-        private game: Game,
+        private game: EngineGame,
     ) {
         this.playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
@@ -56,7 +56,7 @@ export class GameViewFacade
         return this.gameView;
     }
 
-    getGame(): Game
+    getGame(): EngineGame
     {
         return this.game;
     }

@@ -1,11 +1,11 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Game } from '../index.js';
+import { EngineGame } from '../index.js';
 import { coordsToMove } from '../../move-notation/move-notation.js';
 
 describe('Game', () => {
     it('Runs an entire game', () => {
-        const game = new Game(3);
+        const game = new EngineGame(3);
 
         const emitted = {
             played: false,
@@ -48,7 +48,7 @@ describe('Game', () => {
     });
 
     it('Resign', () => {
-        const game = new Game(3);
+        const game = new EngineGame(3);
 
         // Players legal moves
         game.move('b2', 0);
@@ -62,7 +62,7 @@ describe('Game', () => {
     });
 
     it('swap pieces', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.move('c2', 0);
         game.move('swap-pieces', 1);
@@ -73,7 +73,7 @@ describe('Game', () => {
     });
 
     it('cannot swap pieces if rule has been disabled', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.setAllowSwap(false);
 
@@ -86,7 +86,7 @@ describe('Game', () => {
     });
 
     it('cannot swap pieces in the middle of the game', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.move('a1', 0);
         game.move('b2', 1);
@@ -95,7 +95,7 @@ describe('Game', () => {
     });
 
     it('cannot swap twice', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.move('a1', 0);
         game.move('swap-pieces', 1);
@@ -103,7 +103,7 @@ describe('Game', () => {
     });
 
     it('recreate a playing Game from raw data object', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.setAllowSwap(false);
 
@@ -117,7 +117,7 @@ describe('Game', () => {
         assert.ok(gameData.movesHistory[0].playedAt instanceof Date);
 
 
-        const restoredGame = Game.fromData(gameData);
+        const restoredGame = EngineGame.fromData(gameData);
 
         assert.strictEqual(game.getSize(), restoredGame.getSize());
         assert.strictEqual(game.getMovesHistory().length, restoredGame.getMovesHistory().length);
@@ -128,7 +128,7 @@ describe('Game', () => {
     });
 
     it('recreate a resigned Game from raw data object', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.setAllowSwap(false);
 
@@ -138,7 +138,7 @@ describe('Game', () => {
         game.resign(0, new Date());
 
         const gameData = game.toData();
-        const restoredGame = Game.fromData(gameData);
+        const restoredGame = EngineGame.fromData(gameData);
 
         assert.strictEqual(game.getWinner(), restoredGame.getWinner());
         assert.strictEqual(game.getOutcome(), restoredGame.getOutcome());
@@ -146,7 +146,7 @@ describe('Game', () => {
     });
 
     it('recreate a canceled Game from raw data object', () => {
-        const game = new Game(5);
+        const game = new EngineGame(5);
 
         game.setAllowSwap(false);
 
@@ -156,7 +156,7 @@ describe('Game', () => {
         game.cancel(new Date());
 
         const gameData = game.toData();
-        const restoredGame = Game.fromData(gameData);
+        const restoredGame = EngineGame.fromData(gameData);
 
         assert.strictEqual(game.getWinner(), restoredGame.getWinner());
         assert.strictEqual(game.getOutcome(), restoredGame.getOutcome());
@@ -165,7 +165,7 @@ describe('Game', () => {
     });
 
     it('recreates a won game from raw data object', () => {
-        const game = new Game(3);
+        const game = new EngineGame(3);
 
         game.move('b2', 0);
         game.move('c2', 1);
@@ -174,7 +174,7 @@ describe('Game', () => {
         game.move('b1', 0);
 
         const gameData = game.toData();
-        const restoredGame = Game.fromData(gameData);
+        const restoredGame = EngineGame.fromData(gameData);
 
         assert.strictEqual(game.getWinner(), restoredGame.getWinner());
         assert.strictEqual(game.getOutcome(), restoredGame.getOutcome());
@@ -184,7 +184,7 @@ describe('Game', () => {
     });
 
     it('provides consistent timestamping', () => {
-        const game = new Game(3);
+        const game = new EngineGame(3);
 
         let lastMoveAt: null | Date = null;
         let lastEndedAt: null | Date = null;
@@ -213,7 +213,7 @@ describe('Game', () => {
 
     describe('Undo move', () => {
         it('undo simple move', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('a1', 0);
             game.move('b2', 1);
@@ -231,7 +231,7 @@ describe('Game', () => {
         });
 
         it('undo swap move', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('a2', 0);
             game.move('swap-pieces', 1);
@@ -247,7 +247,7 @@ describe('Game', () => {
         });
 
         it('player undo move', () => {
-            const game = new Game(5);
+            const game = new EngineGame(5);
 
             game.move('a1', 0);
             game.move('b2', 1);
@@ -265,7 +265,7 @@ describe('Game', () => {
         });
 
         it('player undo move after opponent played', () => {
-            const game = new Game(5);
+            const game = new EngineGame(5);
 
             game.move('a1', 0);
             game.move('b2', 1);
@@ -285,7 +285,7 @@ describe('Game', () => {
         });
 
         it('player undo his swap move after opponent played', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('a2', 0);
             game.move('swap-pieces', 1);
@@ -303,7 +303,7 @@ describe('Game', () => {
         });
 
         it('player undo dry run', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('a2', 0);
             game.move('swap-pieces', 1);
@@ -319,7 +319,7 @@ describe('Game', () => {
 
     describe('Pass', () => {
         it('passes', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('a1', 0);
             game.move('a2', 1);
@@ -331,7 +331,7 @@ describe('Game', () => {
         });
 
         it('passes on first move, then we cannot pass a swap move', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('pass', 0);
 
@@ -342,7 +342,7 @@ describe('Game', () => {
         });
 
         it('passes on second move', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('c2', 0);
             game.move('pass', 1);
@@ -354,7 +354,7 @@ describe('Game', () => {
         });
 
         it('passes twice', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('pass', 0);
             game.move('pass', 1);
@@ -364,7 +364,7 @@ describe('Game', () => {
         });
 
         it('passes after swap move', () => {
-            const game = new Game(3);
+            const game = new EngineGame(3);
 
             game.move('c2', 0);
             game.move('swap-pieces', 1);

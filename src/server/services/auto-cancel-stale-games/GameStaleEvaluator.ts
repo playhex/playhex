@@ -20,7 +20,7 @@ export class GameStaleEvaluator
     isStale(hostedGameServer: HostedGameServer): StaleEvaluatorResult
     {
         const hostedGame = hostedGameServer.getHostedGame();
-        const game = hostedGameServer.getGame();
+        const engineGame = hostedGameServer.getEngineGame();
 
         // Do not mark tournament matches as stale
         if (hostedGame.tournamentMatch) {
@@ -29,7 +29,7 @@ export class GameStaleEvaluator
 
         // bot game, empty
         if (isBotGame(hostedGame) && isPlayingAndEmpty(hostedGameServer)) {
-            const startedAt = game!.getStartedAt();
+            const startedAt = engineGame!.getStartedAt();
 
             if (isTimingPast(startedAt, timings.emptyBotGame)) {
                 return yes('bot game empty for too long', { startedAt });
@@ -40,8 +40,8 @@ export class GameStaleEvaluator
 
         // 1v1, correspondence, empty
         if (is1v1Game(hostedGame) && isCorrespondence(hostedGame) && isPlayingAndEmpty(hostedGameServer)) {
-            const lastActivityAt = game?.getLastMoveAt()
-                ?? game?.getStartedAt()
+            const lastActivityAt = engineGame?.getLastMoveAt()
+                ?? engineGame?.getStartedAt()
                 ?? hostedGameServer.getHostedGame().createdAt
             ;
 
@@ -56,7 +56,7 @@ export class GameStaleEvaluator
 
             // 1v1, live, empty
             if (isPlayingAndEmpty(hostedGameServer)) {
-                const startedAt = game!.getStartedAt();
+                const startedAt = engineGame!.getStartedAt();
 
                 if (isTimingPast(startedAt, timings.empty1v1Live)) {
                     return yes('1v1 live empty for too long', { startedAt });

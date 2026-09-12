@@ -43,7 +43,7 @@ type GameEvents = {
     updated: () => void;
 };
 
-export default class Game extends TypedEmitter<GameEvents>
+export default class EngineGame extends TypedEmitter<GameEvents>
 {
     private board: Board;
     private currentPlayerIndex: PlayerIndex = 0;
@@ -112,7 +112,7 @@ export default class Game extends TypedEmitter<GameEvents>
         return this.movesHistory;
     }
 
-    setMovesHistory(movesHistory: TimestampedMove[]): Game
+    setMovesHistory(movesHistory: TimestampedMove[]): EngineGame
     {
         this.movesHistory = movesHistory;
 
@@ -650,9 +650,9 @@ export default class Game extends TypedEmitter<GameEvents>
         }
     }
 
-    static fromData(gameData: GameData): Game
+    static fromData(gameData: GameData): EngineGame
     {
-        const game = new Game(gameData.size);
+        const game = new EngineGame(gameData.size);
 
         game.allowSwap = gameData.allowSwap;
 

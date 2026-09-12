@@ -3,13 +3,13 @@ import { PropType } from 'vue';
 import { useDisclosure } from '@overlastic/vue';
 import AppPseudo from '../../components/AppPseudo.vue';
 import Player from '../../../../shared/app/models/Player.js';
-import { Game } from '../../../../shared/game-engine/index.js';
+import { EngineGame } from '../../../../shared/game-engine/index.js';
 
 const { visible, confirm } = useDisclosure();
 
 const props = defineProps({
     game: {
-        type: Game,
+        type: EngineGame,
         required: true,
     },
     players: {

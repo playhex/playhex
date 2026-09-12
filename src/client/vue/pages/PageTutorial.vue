@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DOMPurify from 'dompurify';
-import { calcRandomMove, Game, PlayerIndex } from '../../../shared/game-engine/index.js';
+import { calcRandomMove, EngineGame, PlayerIndex } from '../../../shared/game-engine/index.js';
 import { ref, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import CellAlreadyOccupiedError from '../../../shared/game-engine/errors/CellAlreadyOccupiedError.js';
@@ -22,7 +22,7 @@ useHead({
 });
 
 // Demo 0: show full path and play random bot
-const game0 = new Game(6);
+const game0 = new EngineGame(6);
 game0.setAllowSwap(false);
 const container0 = ref<HTMLElement>();
 const demo0Step = ref(0);
@@ -91,7 +91,7 @@ for (const [action, wait] of animation) {
 }
 
 // Demo 1: swap and play davies 1
-const gameSwap = new Game(9);
+const gameSwap = new EngineGame(9);
 const container1 = ref<HTMLElement>();
 const gameView1 = new GameView(gameSwap.getSize());
 new GameViewFacade(gameView1, gameSwap);

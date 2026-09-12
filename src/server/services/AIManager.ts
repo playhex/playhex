@@ -131,9 +131,9 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
         return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, hostedGameServer, aiConfig.config);
     }
 
-    const game = hostedGameServer.getGame();
+    const engineGame = hostedGameServer.getEngineGame();
 
-    if (game === null) {
+    if (engineGame === null) {
         throw new Error('makeAIPlayerMove() called with a HostedGame without game');
     }
 
@@ -143,7 +143,7 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
                 throw new Error('Invalid config for aiConfig');
             }
 
-            return await calcRandomMove(game, waitTimeBeforeRandomMove(aiConfig.config), aiConfig.config.determinist);
+            return await calcRandomMove(engineGame, waitTimeBeforeRandomMove(aiConfig.config), aiConfig.config.determinist);
 
         case 'davies':
             if (!validateConfigDavies(aiConfig.config)) {
@@ -151,8 +151,8 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
             }
 
             return getBestMove(
-                game.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
-                game.getMovesHistory().map(timestampedMove => timestampedMove.move),
+                engineGame.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
+                engineGame.getMovesHistory().map(timestampedMove => timestampedMove.move),
                 aiConfig.config.level,
             ) as HexMove;
     }

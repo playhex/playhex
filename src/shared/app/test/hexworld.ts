@@ -1,5 +1,5 @@
 import { gameToHexworldLink, parseHexworldString } from '../hexworld.js';
-import { Game } from '../../game-engine/index.js';
+import { EngineGame } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
 import { assignEngineGameData } from '../hostedGameUtils.js';
@@ -7,7 +7,7 @@ import { HostedGame } from '../models/index.js';
 
 describe('hexworld', () => {
     it('generates review link from game', () => {
-        const game = new Game(9);
+        const game = new EngineGame(9);
 
         game.move('e5', 0);
         game.move('g6', 1);
@@ -24,7 +24,7 @@ describe('hexworld', () => {
     });
 
     it('generates review link from game having a swap pieces move', () => {
-        const game = new Game(9);
+        const game = new EngineGame(9);
 
         game.move('b3', 0);
         game.move('swap-pieces', 1);
@@ -41,7 +41,7 @@ describe('hexworld', () => {
     });
 
     it('generates review link from game having a pass move', () => {
-        const game = new Game(9);
+        const game = new EngineGame(9);
 
         game.move('b3', 0);
         game.move('swap-pieces', 1);
@@ -58,7 +58,7 @@ describe('hexworld', () => {
     });
 
     it('generates review link from a resigned game', () => {
-        const game = new Game(9);
+        const game = new EngineGame(9);
 
         game.move('b3', 0);
         game.move('swap-pieces', 1);
@@ -74,7 +74,7 @@ describe('hexworld', () => {
     });
 
     it('generates review link from a timed out game', () => {
-        const game = new Game(11);
+        const game = new EngineGame(11);
 
         game.move('b3', 0);
         game.move('c11', 1);
@@ -89,7 +89,7 @@ describe('hexworld', () => {
     });
 
     it('generates a review link for the "Flat" board rotation', () => {
-        const game = new Game(11);
+        const game = new EngineGame(11);
         game.move('c2', 0);
         game.move('d4', 1);
         game.move('c6', 0);

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { t } from 'i18next';
 import { Ref, ref, shallowRef, onUnmounted } from 'vue';
-import { Game, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
+import { EngineGame, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
 import { findLocalAIByName, instanciateAi } from '../localAi.js';
@@ -20,11 +20,11 @@ useHead({
     title: t('play_offline'),
 });
 
-const game = shallowRef<Game | null>(null);
+const game = shallowRef<EngineGame | null>(null);
 const gameView = shallowRef<GameView | null>(null);
 let gameViewFacade = shallowRef<null | GameViewFacade>(null);
 let lastGameOptions: OfflineAIGameOptions;
-let calculateMove: (game: Game) => Promise<HexMove>;
+let calculateMove: (game: EngineGame) => Promise<HexMove>;
 
 const init = (): void => {
     // Player started a new game
@@ -48,7 +48,7 @@ const init = (): void => {
 
 const players: Ref<Player[]> = ref([]);
 
-const makeAIMoveIfApplicable = async (game: Game, players: Player[]): Promise<void> => {
+const makeAIMoveIfApplicable = async (game: EngineGame, players: Player[]): Promise<void> => {
     const player = players[game.getCurrentPlayerIndex()];
 
     if (!player.isBot || game.isEnded()) {
@@ -97,7 +97,7 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
 
     const playerIndex = players.value.findIndex(p => !p.isBot);
 
-    game.value = new Game(gameOptions.boardsize);
+    game.value = new EngineGame(gameOptions.boardsize);
 
     game.value.setAllowSwap(gameOptions.swapRule);
 
@@ -155,7 +155,7 @@ const reloadCurrentGame = (currentGame: OfflineGame) => {
 
     const playerIndex = players.value.findIndex(p => !p.isBot);
 
-    game.value = Game.fromData(currentGame.gameData);
+    game.value = EngineGame.fromData(currentGame.gameData);
 
     gameView.value = new GameView(game.value.getSize());
     gameViewFacade.value = new GameViewFacade(gameView.value, game.value);
@@ -208,7 +208,7 @@ const gameFinishedOverlay = defineOverlay(OfflineGameFinishedOverlay);
 
 let disposeWinOverlay: null | (() => void) = null;
 
-const initWinOverlay = (game: Game, gameView: GameView) => {
+const initWinOverlay = (game: EngineGame, gameView: GameView) => {
     disposeWinOverlay?.();
 
     let disposed = false;

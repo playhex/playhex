@@ -5,15 +5,15 @@ import useAuthStore from '../../stores/authStore.js';
 import { GameView } from '@playhex/pixi-board';
 import { canShowHexworldLink } from '../../../shared/app/hostedGameUtils.js';
 import HostedGame from '../../../shared/app/models/HostedGame.js';
-import Game from '../../../shared/game-engine/Game.js';
+import EngineGame from '../../../shared/game-engine/EngineGame.js';
 
 const props = defineProps({
     hostedGame: {
         type: Object as PropType<HostedGame>,
         required: true,
     },
-    game: {
-        type: Object as PropType<Game>,
+    engineGame: {
+        type: Object as PropType<EngineGame>,
         required: true,
     },
     orientation: {

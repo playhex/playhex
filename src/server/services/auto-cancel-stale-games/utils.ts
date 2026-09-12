@@ -7,13 +7,13 @@ export const isTimingPast = (lastActivity: Date, timing: number, now = new Date(
 
 export const isPlayingAndEmpty = (hostedGameServer: HostedGameServer): null | boolean => {
     const hostedGame = hostedGameServer.getHostedGame();
-    const game = hostedGameServer.getGame();
+    const engineGame = hostedGameServer.getEngineGame();
 
     if (hostedGame.state !== 'playing') {
         return false;
     }
 
-    if (!game) {
+    if (!engineGame) {
         baseLogger.warning('Err: game started but no game, cannot say', {
             hostedGamePublicId: hostedGameServer.getPublicId(),
         });
@@ -21,5 +21,5 @@ export const isPlayingAndEmpty = (hostedGameServer: HostedGameServer): null | bo
         return null;
     }
 
-    return game.getMovesHistory().length === 0;
+    return engineGame.getMovesHistory().length === 0;
 };

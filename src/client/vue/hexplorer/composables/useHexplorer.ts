@@ -13,7 +13,7 @@ import { onKeyDown, useEventListener } from '@vueuse/core';
 import { createHexplorerState, HexplorerState } from '../HexplorerState.js';
 import { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
 import { GameTree, ROOT_ID, SetupStone, TreeNode } from '../GameTree.js';
-import Game from '../../../../shared/game-engine/Game.js';
+import EngineGame from '../../../../shared/game-engine/EngineGame.js';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { onBeforeRouteLeave } from 'vue-router';
 import { BoardMarksLayer, MarkType } from '../BoardMarksLayer.js';
@@ -25,7 +25,7 @@ import { DragPainter } from '../DragPainter.js';
 
 /**
  * Walks a square board and splits the stones it holds into a black and a white move list,
- * whatever the board actually is (visible GameView, headless Game…).
+ * whatever the board actually is (visible GameView, headless EngineGame…).
  */
 const splitStonesByColor = (boardsize: number, playerIndexAt: (move: Move) => null | 0 | 1): { black: Move[], white: Move[] } => {
     const black: Move[] = [];
@@ -258,20 +258,20 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     };
 
     /**
-     * Replays moves on a headless Game instance (independent of the visible GameView)
+     * Replays moves on a headless EngineGame instance (independent of the visible GameView)
      * and returns the black/white stones currently on its board.
      */
-    const getBlackWhiteFromGame = (game: Game): { black: Move[], white: Move[] } => {
+    const getBlackWhiteFromGame = (game: EngineGame): { black: Move[], white: Move[] } => {
         const cells = game.getBoard().getCells();
 
         return splitStonesByColor(cells.length, move => game.getBoard().getCell(move));
     };
 
     /**
-     * Applies a single tree node (setup or move) onto a headless Game instance.
+     * Applies a single tree node (setup or move) onto a headless EngineGame instance.
      * Returns false if the move was illegal, meaning replay should stop here.
      */
-    const applyNodeToGame = (game: Game, node: TreeNode): boolean => {
+    const applyNodeToGame = (game: EngineGame, node: TreeNode): boolean => {
         if (node.data === null) {
             return true;
         }
@@ -293,11 +293,11 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     };
 
     /**
-     * Replays the path from root to the given node on a headless Game instance,
+     * Replays the path from root to the given node on a headless EngineGame instance,
      * so its win/end state can be inspected (used to stop auto-play on a finished game).
      */
-    const buildGameAt = (nodeId: number): Game => {
-        const game = new Game(gameView.getBoardsize());
+    const buildGameAt = (nodeId: number): EngineGame => {
+        const game = new EngineGame(gameView.getBoardsize());
 
         for (const node of tree.getPath(nodeId)) {
             if (!applyNodeToGame(game, node)) {
@@ -311,7 +311,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     /**
      * Computes/caches the evaluation of every not-yet-cached ancestor along the given path
      * (the path's last node, i.e the currently displayed one, is left to updateAnalysis()).
-     * Runs on a headless Game instance, independent of the visible board, so it can run in
+     * Runs on a headless EngineGame instance, independent of the visible board, so it can run in
      * the background without blocking or racing with further navigation.
      */
     const fillAncestorEvals = async (path: TreeNode[]): Promise<void> => {
@@ -322,7 +322,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         }
 
         const boardsize = gameView.getBoardsize();
-        const game = new Game(boardsize);
+        const game = new EngineGame(boardsize);
 
         for (let i = 0; i < path.length - 1; ++i) {
             const node = path[i];

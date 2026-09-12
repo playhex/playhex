@@ -1,4 +1,4 @@
-import { Game } from '../game-engine/index.js';
+import { EngineGame } from '../game-engine/index.js';
 
 /**
  * Number of consecutive pass moves allowed in a game.
@@ -12,7 +12,7 @@ export const MAX_CONSECUTIVE_PASSES = 2;
  * Whether it is possible to play a pass move now in this game,
  * given its moves history.
  */
-export const canPassAgain = (game: Game): boolean => {
+export const canPassAgain = (game: EngineGame): boolean => {
     const movesHistory = game.getMovesHistory();
     const { length } = movesHistory;
 

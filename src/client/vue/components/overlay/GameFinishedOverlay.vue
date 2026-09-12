@@ -3,14 +3,14 @@ import { PropType } from 'vue';
 import { useDisclosure } from '@overlastic/vue';
 import AppPseudo from '../AppPseudo.vue';
 import Player from '../../../../shared/app/models/Player.js';
-import { Game } from '../../../../shared/game-engine/index.js';
+import { EngineGame } from '../../../../shared/game-engine/index.js';
 import AppPlayerAvatar from '../AppPlayerAvatar.vue';
 
 const { visible, confirm } = useDisclosure();
 
 const props = defineProps({
-    game: {
-        type: Game,
+    engineGame: {
+        type: EngineGame,
         required: true,
     },
     players: {
@@ -19,11 +19,11 @@ const props = defineProps({
     },
 });
 
-const { players, game } = props;
+const { players, engineGame } = props;
 
-const winner: null | Player = game.isCanceled()
+const winner: null | Player = engineGame.isCanceled()
     ? null
-    : players[game.getStrictWinner()]
+    : players[engineGame.getStrictWinner()]
 ;
 
 </script>
@@ -43,13 +43,13 @@ const winner: null | Player = game.isCanceled()
                             :player="winner"
                         />
                         <p v-if="null !== winner" class="lead m-0">
-                            <i18next :translation="$t('player_wins_by.' + (game.getOutcome() ?? 'default'))">
+                            <i18next :translation="$t('player_wins_by.' + (engineGame.getOutcome() ?? 'default'))">
                                 <template #player>
                                     <AppPseudo
                                         :player="winner"
                                         is="strong"
                                         flag
-                                        :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
+                                        :classes="0 === engineGame.getStrictWinner() ? 'text-danger' : 'text-primary'"
                                     />
                                 </template>
                             </i18next>

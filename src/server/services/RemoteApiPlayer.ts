@@ -1,5 +1,5 @@
 import logger from './logger.js';
-import { Game, IllegalMove } from '../../shared/game-engine/index.js';
+import { EngineGame, IllegalMove } from '../../shared/game-engine/index.js';
 import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
 import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
@@ -13,7 +13,7 @@ export default class RemoteApiPlayer
         private hexRemotePlayerApi: HexAiApiClient,
     ) {}
 
-    private async fetchMove(engine: string, game: Game, config: { [key: string]: unknown }): Promise<HexMove>
+    private async fetchMove(engine: string, game: EngineGame, config: { [key: string]: unknown }): Promise<HexMove>
     {
         const payload: CalculateMoveRequest = {
             game: {
@@ -50,21 +50,21 @@ export default class RemoteApiPlayer
 
     async makeMove(engine: string, hostedGameServer: HostedGameServer, config: { maxGames?: number, treeSearch?: boolean }): Promise<null | HexMove>
     {
-        const game = hostedGameServer.getGame();
+        const engineGame = hostedGameServer.getEngineGame();
 
-        if (game === null) {
+        if (engineGame === null) {
             throw new Error('Cannot send move request to api, no game');
         }
 
         const measure = new TimeMeasureMetric('ai_time_to_respond', {
             engine,
             level: config.maxGames ?? (config.treeSearch ? 500000 : 0),
-            boardsize: game.getSize(),
+            boardsize: engineGame.getSize(),
             gameId: hostedGameServer.getPublicId(),
         });
 
         try {
-            const move = await this.fetchMove(engine, game, config);
+            const move = await this.fetchMove(engine, engineGame, config);
             measure.finished();
             return move;
         } catch (e) {

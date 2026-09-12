@@ -36,7 +36,7 @@ if (Array.isArray(gameId)) {
 }
 
 const {
-    game,
+    engineGame,
     hostedGame,
     gameView,
     simulatePlayingGameFacade,
@@ -470,12 +470,12 @@ const shouldDisplayUndoMoveInMenu = computed<boolean>(() => shouldDisplayUndoMov
     && !shouldDisplayUndoMoveInBar.value,
 );
 
-const shouldShowHexworldLink = computed<boolean>(() => game.value !== null
+const shouldShowHexworldLink = computed<boolean>(() => engineGame.value !== null
     && hostedGame.value !== null
     && canShowHexworldLink(hostedGame.value, loggedInPlayer.value),
 );
 
-const shouldShowHexplorerLink = computed<boolean>(() => game.value !== null
+const shouldShowHexplorerLink = computed<boolean>(() => engineGame.value !== null
     && hostedGame.value !== null
     && canShowHexplorerLink(hostedGame.value, loggedInPlayer.value),
 );
@@ -651,9 +651,9 @@ const {
 
                                 <!-- Explore -->
                                 <AppHexWorldExplore
-                                    v-if="game"
+                                    v-if="engineGame"
                                     :hostedGame
-                                    :game
+                                    :engineGame
                                     :orientation
                                     :label="$t('explore')"
                                     class="dropdown-item"
@@ -661,7 +661,7 @@ const {
 
                                 <!-- Hexplorer -->
                                 <AppHexplorerLink
-                                    v-if="game"
+                                    v-if="engineGame"
                                     :hostedGame
                                     :orientation
                                     class="dropdown-item"

@@ -1,5 +1,5 @@
 import { getBestMove, getBestMoveCustomPosition, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
-import { Game } from '../game-engine/index.js';
+import { EngineGame } from '../game-engine/index.js';
 import { PlayerIndex } from '../time-control/TimeControl.js';
 import { coordsToMove, parseMove } from '../move-notation/move-notation.js';
 import { HexMove, isSpecialHexMove } from '../../shared/move-notation/hex-move-notation.js';
@@ -8,7 +8,7 @@ import { HexMove, isSpecialHexMove } from '../../shared/move-notation/hex-move-n
  * Uses Davies AI to compute a move from a Game.
  * Davies only supports 11x11 boards.
  */
-export const calcDaviesMove = async (game: Game, daviesLevel = 7, waitBeforePlay = 0): Promise<HexMove> => {
+export const calcDaviesMove = async (game: EngineGame, daviesLevel = 7, waitBeforePlay = 0): Promise<HexMove> => {
     if (game.getSize() !== 11) {
         throw new Error('Davies AI only supports 11x11');
     }
@@ -48,7 +48,7 @@ export const calcDaviesMoveCustomPosition = async (playerTurn: PlayerIndex, posi
  * Fill outside cells with stones to create a 9x9 board.
  * Then shift move input and output to use davies AI on 9x9 board.
  */
-export const calcDaviesMoveFor9x9Board = async (game: Game, daviesLevel = 7, waitBeforePlay = 0): Promise<HexMove> => {
+export const calcDaviesMoveFor9x9Board = async (game: EngineGame, daviesLevel = 7, waitBeforePlay = 0): Promise<HexMove> => {
     if (game.getSize() !== 9) {
         throw new Error('calcDaviesMoveFor9x9Board() only supports 9x9');
     }

@@ -7,7 +7,7 @@ import { defineOverlay } from '@overlastic/vue';
 import { useRouter } from 'vue-router';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
-import { Game } from '../../../../shared/game-engine/index.js';
+import { EngineGame } from '../../../../shared/game-engine/index.js';
 import { onMounted, ref } from 'vue';
 import { GameView } from '@playhex/pixi-board';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
@@ -50,7 +50,7 @@ onMounted(() => {
         return;
     }
 
-    const game = Game.fromData(currentGame.gameData);
+    const game = EngineGame.fromData(currentGame.gameData);
     const gameView = new GameView(game.getSize());
     const gameViewFacade = new GameViewFacade(gameView, game);
 
