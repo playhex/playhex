@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { HostedGameOptions, HostedGame, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { isTranslatableHttpErrorPayload } from '../shared/app/TranslatableHttpError.js';
@@ -173,7 +173,7 @@ export const authChangePassword = async (oldPassword: string, newPassword: strin
     return plainToInstance(Player, await response.json());
 };
 
-export const apiGetActiveGames = async (): Promise<HostedGame[]> => {
+export const apiGetActiveGames = async (): Promise<Game[]> => {
     const response = await fetch('/api/games/active', {
         method: 'get',
         headers: {
@@ -183,15 +183,15 @@ export const apiGetActiveGames = async (): Promise<HostedGame[]> => {
 
     await checkResponse(response);
 
-    return (await response.json() as HostedGame[])
-        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    return (await response.json() as Game[])
+        .map(game => plainToInstance(Game, game))
     ;
 };
 
 /**
  * Won't return active games, but can return created and playing games if persisted.
  */
-export const getGames = async (searchGamesParameters: SearchGamesParameters = {}): Promise<{ results: HostedGame[], count: null | number }> => {
+export const getGames = async (searchGamesParameters: SearchGamesParameters = {}): Promise<{ results: Game[], count: null | number }> => {
     const response = await fetch(`/api/games?${qs.stringify(searchGamesParameters)}`, {
         method: 'get',
         headers: {
@@ -201,12 +201,12 @@ export const getGames = async (searchGamesParameters: SearchGamesParameters = {}
 
     await checkResponse(response);
 
-    const hostedGames = (await response.json() as HostedGame[])
-        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    const games = (await response.json() as Game[])
+        .map(game => plainToInstance(Game, game))
     ;
 
     return {
-        results: hostedGames,
+        results: games,
         count: parse(response.headers.get('Content-Range') ?? '')?.size ?? null,
     };
 };
@@ -266,7 +266,7 @@ export const getSearchPlayers = async (searchPlayersParameters: SearchPlayersPar
     ;
 };
 
-export const getGame = async (gameId: string): Promise<null | HostedGame> => {
+export const getGame = async (gameId: string): Promise<null | Game> => {
     const response = await fetch(`/api/games/${gameId}`, {
         method: 'get',
         headers: {
@@ -278,10 +278,10 @@ export const getGame = async (gameId: string): Promise<null | HostedGame> => {
         return null;
     }
 
-    return plainToInstance(HostedGame, await response.json());
+    return plainToInstance(Game, await response.json());
 };
 
-export const apiPostGame = async (gameOptions: Partial<HostedGameOptions> = {}): Promise<HostedGame> => {
+export const apiPostGame = async (gameOptions: Partial<GameOptions> = {}): Promise<Game> => {
     const response = await fetch('/api/games', {
         method: 'post',
         headers: {
@@ -293,7 +293,7 @@ export const apiPostGame = async (gameOptions: Partial<HostedGameOptions> = {}):
 
     await checkResponse(response);
 
-    return plainToInstance(HostedGame, await response.json());
+    return plainToInstance(Game, await response.json());
 };
 
 export const apiPostAskUndo = async (gameId: string): Promise<true | string> => {
@@ -360,7 +360,7 @@ export const apiPostCancel = async (gameId: string): Promise<true | string> => {
     return response.text();
 };
 
-export const apiPostRematch = async (gameId: string): Promise<HostedGame> => {
+export const apiPostRematch = async (gameId: string): Promise<Game> => {
     const response = await fetch(`/api/games/${gameId}/rematch`, {
         method: 'post',
         headers: {
@@ -368,7 +368,7 @@ export const apiPostRematch = async (gameId: string): Promise<HostedGame> => {
         },
     });
 
-    return plainToInstance(HostedGame, await response.json());
+    return plainToInstance(Game, await response.json());
 };
 
 export const apiGetOnlinePlayers = async (): Promise<OnlinePlayers> => {
@@ -429,8 +429,8 @@ export const apiPutPlayerFavoriteTimeControls = async (cadency: 'live' | 'corres
     await checkResponse(response);
 };
 
-export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content' | 'hostedGameId'>): Promise<void> => {
-    const response = await fetch(`/api/games/${chatMessage.hostedGameId}/chat-messages`, {
+export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content' | 'gameId'>): Promise<void> => {
+    const response = await fetch(`/api/games/${chatMessage.gameId}/chat-messages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -593,7 +593,7 @@ export const apiGetChangelog = async (): Promise<string> => {
     return await response.json();
 };
 
-export const apiGetPlayerActiveGames = async (playerPublicId: string): Promise<HostedGame[]> => {
+export const apiGetPlayerActiveGames = async (playerPublicId: string): Promise<Game[]> => {
     const response = await fetch(`/api/players/${playerPublicId}/active-games`, {
         method: 'GET',
         headers: {
@@ -603,8 +603,8 @@ export const apiGetPlayerActiveGames = async (playerPublicId: string): Promise<H
 
     await checkResponse(response);
 
-    return (await response.json() as HostedGame[])
-        .map(hostedGame => plainToInstance(HostedGame, hostedGame))
+    return (await response.json() as Game[])
+        .map(game => plainToInstance(Game, game))
     ;
 };
 
@@ -645,8 +645,8 @@ export const apiGetHeadToHeadStats = async (playerPublicId: string, opponentPubl
     return plainToInstance(PlayerHeadToHeadStats, await response.json());
 };
 
-export const apiGetConditionalMoves = async (hostedGamePublicId: string): Promise<ConditionalMoves> => {
-    const response = await fetch(`/api/games/${hostedGamePublicId}/conditional-moves`, {
+export const apiGetConditionalMoves = async (gamePublicId: string): Promise<ConditionalMoves> => {
+    const response = await fetch(`/api/games/${gamePublicId}/conditional-moves`, {
         method: 'get',
         headers: {
             'Accept': 'application/json',
@@ -658,8 +658,8 @@ export const apiGetConditionalMoves = async (hostedGamePublicId: string): Promis
     return plainToInstance(ConditionalMoves, await response.json());
 };
 
-export const apiPatchConditionalMoves = async (hostedGamePublicId: string, conditionalMoves: ConditionalMovesStruct): Promise<ConditionalMoves> => {
-    const response = await fetch(`/api/games/${hostedGamePublicId}/conditional-moves`, {
+export const apiPatchConditionalMoves = async (gamePublicId: string, conditionalMoves: ConditionalMovesStruct): Promise<ConditionalMoves> => {
+    const response = await fetch(`/api/games/${gamePublicId}/conditional-moves`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -872,16 +872,16 @@ export const apiDeleteTournamentBannedPlayer = async (tournamentSlug: string, pl
     await checkResponse(response);
 };
 
-export const apiPostForfeitTournamentMatchPlayer = async (tournamentSlug: string, hostedGamePublicId: string, player: Player): Promise<void> => {
-    const response = await fetch(`/api/tournaments/${tournamentSlug}/games/${hostedGamePublicId}/players/${player.publicId}/forfeit`, {
+export const apiPostForfeitTournamentMatchPlayer = async (tournamentSlug: string, gamePublicId: string, player: Player): Promise<void> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/games/${gamePublicId}/players/${player.publicId}/forfeit`, {
         method: 'post',
     });
 
     await checkResponse(response);
 };
 
-export const apiPostResetAndRecreateGame = async (tournamentSlug: string, hostedGamePublicId: string): Promise<void> => {
-    const response = await fetch(`/api/tournaments/${tournamentSlug}/games/${hostedGamePublicId}/reset-recreate`, {
+export const apiPostResetAndRecreateGame = async (tournamentSlug: string, gamePublicId: string): Promise<void> => {
+    const response = await fetch(`/api/tournaments/${tournamentSlug}/games/${gamePublicId}/reset-recreate`, {
         method: 'post',
     });
 
@@ -971,11 +971,11 @@ export const apiPatchPlayerModerationActionAcknowledge = async (publicId: string
     await checkResponse(response);
 };
 
-export const apiPostPlayerNotificationsAcknowledge = async (hostedGamePublicId?: string): Promise<void> => {
+export const apiPostPlayerNotificationsAcknowledge = async (gamePublicId?: string): Promise<void> => {
     let url = '/api/player-notifications/acknowledge';
 
-    if (hostedGamePublicId) {
-        url += '?hostedGamePublicId=' + hostedGamePublicId;
+    if (gamePublicId) {
+        url += '?gamePublicId=' + gamePublicId;
     }
 
     const response = await fetch(url, {

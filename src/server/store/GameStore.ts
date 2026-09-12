@@ -1,23 +1,23 @@
 import { Inject, Service } from 'typedi';
-import HostedGameServer from '../HostedGameServer.js';
-import { Player, ChatMessage, HostedGame, HostedGameOptions, Rating, Premove } from '../../shared/app/models/index.js';
+import GameServer from '../GameServer.js';
+import { Player, ChatMessage, Game, GameOptions, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
-import HostedGameRepository from '../repositories/HostedGameRepository.js';
+import GameRepository from '../repositories/GameRepository.js';
 import logger from '../services/logger.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
-import { cloneGameOptions } from '../../shared/app/models/HostedGameOptions.js';
+import { cloneGameOptions } from '../../shared/app/models/GameOptions.js';
 import { AppDataSource } from '../data-source.js';
 import RatingRepository from '../repositories/RatingRepository.js';
 import { isDuplicateError } from '../repositories/typeormUtils.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
-import { createHostedGame, CreateHostedGameParams } from '../../shared/app/models/HostedGame.js';
+import { createGame, CreateGameParams } from '../../shared/app/models/Game.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
-import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf } from '../../shared/app/hostedGameUtils.js';
+import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf } from '../../shared/app/gameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
@@ -28,7 +28,7 @@ export class CannotChallengeYourselfError extends GameError {}
 export class AlreadyHaveOpenChallengeAgainstThisPlayerError extends GameError {}
 
 @Service()
-export default class HostedGameStore
+export default class GameStore
 {
     /**
      * All currently created and playing games, from creation to game ended (then archived into database).
@@ -37,10 +37,10 @@ export default class HostedGameStore
      * Each playing game can contains a persisted copy,
      * but the most updated game should be in memory.
      */
-    private activeGames: { [publicId: string]: HostedGameServer } = {};
+    private activeGames: { [publicId: string]: GameServer } = {};
 
     /**
-     * Keep timeout thread id of hosted games to persist in N minutes
+     * Keep timeout thread id of games to persist in N minutes
      * if no activity.
      * Prevent too much data loss in case server crashes.
      */
@@ -49,7 +49,7 @@ export default class HostedGameStore
     private gamesLoadedPromise = Promise.withResolvers<true>();
 
     constructor(
-        private hostedGameRepository: HostedGameRepository,
+        private gameRepository: GameRepository,
         private ratingRepository: RatingRepository,
         private onlinePlayerService: OnlinePlayersService,
         private gameEventEmitter: GameEventsEmitter,
@@ -74,32 +74,32 @@ export default class HostedGameStore
 
         await AppDataSource.initialize();
 
-        const games = await this.hostedGameRepository.findMany({
+        const games = await this.gameRepository.findMany({
             where: [
                 { state: 'created' },
                 { state: 'playing' },
             ],
         });
 
-        for (const hostedGame of games) {
-            logger.info(`Loading game ${hostedGame.publicId}...`);
+        for (const game of games) {
+            logger.info(`Loading game ${game.publicId}...`);
 
-            if (this.activeGames[hostedGame.publicId]) {
+            if (this.activeGames[game.publicId]) {
                 return;
             }
 
             // Check whether data.createdAt is an instance of Date and not a string,
             // to check whether denormalization with superjson worked.
-            if (!(hostedGame.createdAt instanceof Date)) {
+            if (!(game.createdAt instanceof Date)) {
                 logger.error(
-                    'HostedGame.fromData(): Error while trying to recreate a HostedGame from data,'
+                    'Game.fromData(): Error while trying to recreate a Game from data,'
                     + ' createdAt is not an instance of Date.',
                 );
             }
 
-            this.activeGames[hostedGame.publicId] = this.createHostedGameServerForHostedGame(hostedGame);
+            this.activeGames[game.publicId] = this.createGameServer(game);
 
-            this.listenHostedGameServer(this.activeGames[hostedGame.publicId]);
+            this.listenGameServer(this.activeGames[game.publicId]);
         }
 
         logger.info(`${games.length} games loaded.`);
@@ -136,34 +136,34 @@ export default class HostedGameStore
         return allSuccess;
     }
 
-    private listenHostedGameServer(hostedGameServer: HostedGameServer): void
+    private listenGameServer(gameServer: GameServer): void
     {
-        if (hostedGameServer.getState() === 'ended') {
-            this.onGameEnded(hostedGameServer).catch(e => {
+        if (gameServer.getState() === 'ended') {
+            this.onGameEnded(gameServer).catch(e => {
                 logger.error('onGameEnded returned an error in isStateEnded', errorToLogger(e));
             });
 
             return;
         }
 
-        if (hostedGameServer.getState() === 'canceled') {
-            this.onGameCanceled(hostedGameServer).catch(e => {
+        if (gameServer.getState() === 'canceled') {
+            this.onGameCanceled(gameServer).catch(e => {
                 logger.error('onGameCanceled returned an error in canceled precheck', errorToLogger(e));
             });
 
             return;
         }
 
-        this.persistAfterDelayOfInactivity(hostedGameServer);
+        this.persistAfterDelayOfInactivity(gameServer);
 
-        hostedGameServer.on('ended', () => {
-            this.onGameEnded(hostedGameServer).catch(e => {
+        gameServer.on('ended', () => {
+            this.onGameEnded(gameServer).catch(e => {
                 logger.error('onGameEnded returned an error in ended event', errorToLogger(e));
             });
         });
 
-        hostedGameServer.on('canceled', () => {
-            this.onGameCanceled(hostedGameServer).catch(e => {
+        gameServer.on('canceled', () => {
+            this.onGameCanceled(gameServer).catch(e => {
                 logger.error('onGameCanceled returned an error in cancelede event', errorToLogger(e));
             });
         });
@@ -172,11 +172,11 @@ export default class HostedGameStore
     /**
      * Activity made on a game, makes persist in new 5 minutes
      */
-    private resetActivityTimeout(hostedGameServer: HostedGameServer): void
+    private resetActivityTimeout(gameServer: GameServer): void
     {
-        this.clearActivityTimeout(hostedGameServer);
-        this.persistWhenNoActivity[hostedGameServer.getPublicId()] = setTimeout(
-            () => void hostedGameServer.persist(),
+        this.clearActivityTimeout(gameServer);
+        this.persistWhenNoActivity[gameServer.getPublicId()] = setTimeout(
+            () => void gameServer.persist(),
             300 * 1000, // Persist after 5min inactivity
         );
     }
@@ -184,108 +184,108 @@ export default class HostedGameStore
     /**
      * Cancel planned persist
      */
-    private clearActivityTimeout(hostedGameServer: HostedGameServer): void
+    private clearActivityTimeout(gameServer: GameServer): void
     {
-        if (this.persistWhenNoActivity[hostedGameServer.getPublicId()]) {
-            clearTimeout(this.persistWhenNoActivity[hostedGameServer.getPublicId()]);
-            delete this.persistWhenNoActivity[hostedGameServer.getPublicId()];
+        if (this.persistWhenNoActivity[gameServer.getPublicId()]) {
+            clearTimeout(this.persistWhenNoActivity[gameServer.getPublicId()]);
+            delete this.persistWhenNoActivity[gameServer.getPublicId()];
         }
     }
 
     /**
      * Persist game when no activity in case server restart
      */
-    private persistAfterDelayOfInactivity(hostedGameServer: HostedGameServer): void
+    private persistAfterDelayOfInactivity(gameServer: GameServer): void
     {
-        hostedGameServer.on('played', () => this.resetActivityTimeout(hostedGameServer));
-        hostedGameServer.on('chat', () => this.resetActivityTimeout(hostedGameServer));
+        gameServer.on('played', () => this.resetActivityTimeout(gameServer));
+        gameServer.on('chat', () => this.resetActivityTimeout(gameServer));
     }
 
     /**
      * Flush game from memory, persist into database
      */
-    private async flushHostedGame(hostedGameServer: HostedGameServer): Promise<void>
+    private async flushGame(gameServer: GameServer): Promise<void>
     {
-        this.clearActivityTimeout(hostedGameServer);
-        await hostedGameServer.persist();
-        delete this.activeGames[hostedGameServer.getPublicId()];
+        this.clearActivityTimeout(gameServer);
+        await gameServer.persist();
+        delete this.activeGames[gameServer.getPublicId()];
     }
 
     /**
      * Things to do when game has ended
      */
-    private async onGameEnded(hostedGameServer: HostedGameServer): Promise<void>
+    private async onGameEnded(gameServer: GameServer): Promise<void>
     {
-        await this.flushHostedGame(hostedGameServer);
+        await this.flushGame(gameServer);
 
-        if (hostedGameServer.getHostedGame().ranked) {
-            const newRatings = await this.updateRatings(hostedGameServer);
+        if (gameServer.getGame().ranked) {
+            const newRatings = await this.updateRatings(gameServer);
 
-            this.gameEventEmitter.emitRatingsUpdated(hostedGameServer.getHostedGame(), newRatings);
+            this.gameEventEmitter.emitRatingsUpdated(gameServer.getGame(), newRatings);
         }
     }
 
     /**
      * Things to do when game has canceled
      */
-    private async onGameCanceled(hostedGameServer: HostedGameServer): Promise<void>
+    private async onGameCanceled(gameServer: GameServer): Promise<void>
     {
-        await this.flushHostedGame(hostedGameServer);
+        await this.flushGame(gameServer);
     }
 
     /**
      * Update players ratings
      */
-    private async updateRatings(hostedGameServer: HostedGameServer): Promise<Rating[]>
+    private async updateRatings(gameServer: GameServer): Promise<Rating[]>
     {
         try {
-            const newRatings = await this.ratingRepository.updateAfterGame(hostedGameServer.getHostedGame());
+            const newRatings = await this.ratingRepository.updateAfterGame(gameServer.getGame());
 
             await this.ratingRepository.persistRatings(newRatings);
-            await this.playerRepository.save(hostedGameServer.getPlayers());
+            await this.playerRepository.save(gameServer.getPlayers());
 
             return newRatings;
         } catch (e) {
             logger.error('Error while persist ratings for game', {
-                hostedGamePublicId: hostedGameServer.getPublicId(),
-                players: hostedGameServer.getPlayers().map(player => player.pseudo),
+                gamePublicId: gameServer.getPublicId(),
+                players: gameServer.getPlayers().map(player => player.pseudo),
                 reason: e.message,
             });
 
-            throw new Error('Error while persist ratings for game ' + hostedGameServer.getPublicId());
+            throw new Error('Error while persist ratings for game ' + gameServer.getPublicId());
         }
     }
 
-    getActiveGames(): { [key: string]: HostedGameServer }
+    getActiveGames(): { [key: string]: GameServer }
     {
         return this.activeGames;
     }
 
-    getActiveGame(gameId: string): null | HostedGameServer
+    getActiveGame(gameId: string): null | GameServer
     {
         return this.activeGames[gameId] ?? null;
     }
 
-    getActiveGamesData(): HostedGame[]
+    getActiveGamesData(): Game[]
     {
         return Object.values(this.activeGames)
-            .map(game => game.getHostedGame())
+            .map(gameServer => gameServer.getGame())
         ;
     }
 
-    getActive1v1GamesData(): HostedGame[]
+    getActive1v1GamesData(): Game[]
     {
         return Object.values(this.activeGames)
-            .filter(game => !isBotGame(game.getHostedGame()))
-            .map(game => game.getHostedGame())
+            .filter(gameServer => !isBotGame(gameServer.getGame()))
+            .map(gameServer => gameServer.getGame())
         ;
     }
 
-    getWaiting1v1GamesData(): HostedGame[]
+    getWaiting1v1GamesData(): Game[]
     {
         return Object.values(this.activeGames)
-            .filter(game => game.getHostedGame().state === 'created' && !isBotGame(game.getHostedGame()) && !isChallengeGame(game.getHostedGame()))
-            .map(game => game.getHostedGame())
+            .filter(gameServer => gameServer.getGame().state === 'created' && !isBotGame(gameServer.getGame()) && !isChallengeGame(gameServer.getGame()))
+            .map(gameServer => gameServer.getGame())
         ;
     }
 
@@ -294,9 +294,9 @@ export default class HostedGameStore
         const chatMessages: ChatMessage[] = [];
 
         for (const key in this.activeGames) {
-            const hostedGame = this.activeGames[key].getHostedGame();
+            const game = this.activeGames[key].getGame();
 
-            for (const chatMessage of hostedGame.chatMessages) {
+            for (const chatMessage of game.chatMessages) {
                 // Already persisted
                 if (chatMessage.id) {
                     continue;
@@ -312,39 +312,39 @@ export default class HostedGameStore
                     continue;
                 }
 
-                chatMessages.push({ ...chatMessage, hostedGame });
+                chatMessages.push({ ...chatMessage, game });
             }
         }
 
         return chatMessages;
     }
 
-    async getActiveOrArchivedGame(publicId: string): Promise<HostedGame | null>
+    async getActiveOrArchivedGame(publicId: string): Promise<Game | null>
     {
         if (this.activeGames[publicId]) {
-            return this.activeGames[publicId].getHostedGame();
+            return this.activeGames[publicId].getGame();
         }
 
-        return await this.hostedGameRepository.findUnique(publicId);
+        return await this.gameRepository.findUnique(publicId);
     }
 
-    private createHostedGameServerForHostedGame(hostedGame: HostedGame): HostedGameServer
+    private createGameServer(game: Game): GameServer
     {
-        if (hostedGame.host !== null) {
-            hostedGame.host = this.playerIdentityMap.resolve(hostedGame.host);
+        if (game.host !== null) {
+            game.host = this.playerIdentityMap.resolve(game.host);
         }
 
-        for (const hostedGameToPlayer of hostedGame.hostedGameToPlayers) {
-            hostedGameToPlayer.player = this.playerIdentityMap.resolve(hostedGameToPlayer.player);
+        for (const gameToPlayer of game.gameToPlayers) {
+            gameToPlayer.player = this.playerIdentityMap.resolve(gameToPlayer.player);
         }
 
-        return new HostedGameServer(
-            hostedGame,
-            new AutoSave<HostedGame>(() => this.hostedGameRepository.persist(hostedGame)),
+        return new GameServer(
+            game,
+            new AutoSave<Game>(() => this.gameRepository.persist(game)),
         );
     }
 
-    async makeAIJoinGameIfApplicable(hostedGameServer: HostedGameServer, params: CreateHostedGameParams & { gameOptions: HostedGameOptions })
+    async makeAIJoinGameIfApplicable(gameServer: GameServer, params: CreateGameParams & { gameOptions: GameOptions })
     {
         if (params.gameOptions.opponentType !== 'ai') {
             return;
@@ -353,7 +353,7 @@ export default class HostedGameStore
         try {
             const opponent = await findAIOpponent(params.gameOptions);
             if (opponent == null) throw new GameError('No matching AI found');
-            hostedGameServer.playerJoin(opponent);
+            gameServer.playerJoin(opponent);
         } catch (e) {
             if (e instanceof FindAIError) {
                 throw new GameError(e.message);
@@ -399,8 +399,8 @@ export default class HostedGameStore
         if (host !== null) {
             const key = this.challengeKey(host.publicId, opponentPublicId);
 
-            const alreadyChallenged = this.pendingChallengeKeys.has(key) || Object.values(this.activeGames).some(game => {
-                const g = game.getHostedGame();
+            const alreadyChallenged = this.pendingChallengeKeys.has(key) || Object.values(this.activeGames).some(gameServer => {
+                const g = gameServer.getGame();
 
                 return g.state === 'created'
                     && g.opponentType === 'player'
@@ -423,10 +423,10 @@ export default class HostedGameStore
     }
 
     /**
-     * Officially creates a new hosted game, emit event to clients.
+     * Officially creates a new game, emit event to clients.
      */
     async createGame(
-        params: CreateHostedGameParams & { gameOptions: HostedGameOptions },
+        params: CreateGameParams & { gameOptions: GameOptions },
         createOptions: {
             /**
              * Defaults to true: game are persisted before returned.
@@ -443,7 +443,7 @@ export default class HostedGameStore
              */
             aiJoinAuto?: boolean;
         } = { persist: true, aiJoinAuto: true },
-    ): Promise<HostedGameServer> {
+    ): Promise<GameServer> {
         if (params.host) {
             this.onlinePlayerService.notifyPlayerActivity(params.host);
         }
@@ -466,40 +466,40 @@ export default class HostedGameStore
         }
 
         try {
-            const hostedGame = createHostedGame(params);
-            const hostedGameServer = this.createHostedGameServerForHostedGame(hostedGame);
+            const game = createGame(params);
+            const gameServer = this.createGameServer(game);
 
-            hostedGameServer.saveState();
+            gameServer.saveState();
 
-            logger.info('Hosted game created.', { host: params.host?.pseudo ?? null, publicId: hostedGame.publicId });
+            logger.info('Game created.', { host: params.host?.pseudo ?? null, publicId: game.publicId });
 
-            this.gameEventEmitter.emitGameCreated(hostedGame);
+            this.gameEventEmitter.emitGameCreated(game);
 
             // Rematching a challenge already notifies the opponent through the rematch offer,
             // no need to also notify them as if it were a new, unrelated challenge.
             const isRematch = params.rematchedFrom != null;
 
             if (challengedOpponent !== null && !isRematch) {
-                this.gameEventEmitter.emitGameChallengeCreated(hostedGame);
+                this.gameEventEmitter.emitGameChallengeCreated(game);
             }
 
             if (createOptions.aiJoinAuto ?? true) {
-                await this.makeAIJoinGameIfApplicable(hostedGameServer, params);
+                await this.makeAIJoinGameIfApplicable(gameServer, params);
             }
 
-            this.activeGames[hostedGameServer.getPublicId()] = hostedGameServer;
+            this.activeGames[gameServer.getPublicId()] = gameServer;
 
-            this.listenHostedGameServer(hostedGameServer);
+            this.listenGameServer(gameServer);
 
             if (!(createOptions.persist ?? true)) {
-                return hostedGameServer;
+                return gameServer;
             }
 
             try {
-                await hostedGameServer.persist();
+                await gameServer.persist();
             } catch (e) {
                 logger.error('Could not persist game after creation', {
-                    hostedGamePublicId: hostedGameServer.getPublicId(),
+                    gamePublicId: gameServer.getPublicId(),
                     message: e.message,
                     stack: e.stack,
                 });
@@ -508,10 +508,10 @@ export default class HostedGameStore
             }
 
             if (challengedOpponent !== null && !isRematch) {
-                notifier.emit('gameChallengeCreated', hostedGame, challengedOpponent);
+                notifier.emit('gameChallengeCreated', game, challengedOpponent);
             }
 
-            return hostedGameServer;
+            return gameServer;
         } finally {
             // Now either registered in activeGames (the authoritative check going forward)
             // or the whole creation failed: either way the reservation is no longer needed.
@@ -521,7 +521,7 @@ export default class HostedGameStore
         }
     }
 
-    async rematchGame(host: Player, publicId: string): Promise<HostedGame>
+    async rematchGame(host: Player, publicId: string): Promise<Game>
     {
         logger.info('rematch game', { hostPublicId: host.publicId, publicId });
 
@@ -530,12 +530,12 @@ export default class HostedGameStore
         if (game === null) {
             throw new GameError(`no game ${publicId}`);
         }
-        if (!game.hostedGameToPlayers.some(p => p.player.publicId === host.publicId)) {
+        if (!game.gameToPlayers.some(p => p.player.publicId === host.publicId)) {
             throw new GameError('Player not in the game');
         }
         if (game.rematch != null && this.activeGames[game.rematch.publicId]) {
             logger.info('rematch game: already has rematch, return', { publicId, rematchPublicId: game.rematch.publicId });
-            return this.activeGames[game.rematch.publicId].getHostedGame();
+            return this.activeGames[game.rematch.publicId].getGame();
         }
         if (game.rematch != null) {
             throw new GameError('An inactive rematch game already exists');
@@ -555,7 +555,7 @@ export default class HostedGameStore
         const params = { gameOptions, host, rematchedFrom: game };
 
         const rematch = await this.createGame(params, { persist: false, aiJoinAuto: false }); // do not persist because will persist later in the transaction, at same time as rematchId
-        game.rematch = rematch.getHostedGame();
+        game.rematch = rematch.getGame();
 
         try {
             logger.info('persist rematch game, and rematched game', {
@@ -564,7 +564,7 @@ export default class HostedGameStore
                 rematchRematchedFrom: game.rematch.rematchedFrom?.publicId,
             });
 
-            await this.hostedGameRepository.persistMultiple([game, game.rematch]);
+            await this.gameRepository.persistMultiple([game, game.rematch]);
 
             await this.makeAIJoinGameIfApplicable(rematch, params);
         } catch (e) {
@@ -585,7 +585,7 @@ export default class HostedGameStore
                     throw new Error('Unexpected empty game.id');
                 }
 
-                game.rematch = await this.hostedGameRepository.findRematch(game.id);
+                game.rematch = await this.gameRepository.findRematch(game.id);
 
                 logger.info('First rematch found:', {
                     game: game.publicId,
@@ -608,37 +608,37 @@ export default class HostedGameStore
         return game.rematch;
     }
 
-    getPlayerActiveGames(player: Player): HostedGameServer[]
+    getPlayerActiveGames(player: Player): GameServer[]
     {
-        const hostedGameServers: HostedGameServer[] = [];
+        const gameServers: GameServer[] = [];
 
         for (const key in this.activeGames) {
-            const hostedGameServer = this.activeGames[key];
+            const gameServer = this.activeGames[key];
 
             if (
-                !hostedGameServer.isPlayerInGame(player)
-                && !isChallengeTargetOf(hostedGameServer.getHostedGame(), player)
+                !gameServer.isPlayerInGame(player)
+                && !isChallengeTargetOf(gameServer.getGame(), player)
             ) {
                 continue;
             }
 
-            hostedGameServers.push(hostedGameServer);
+            gameServers.push(gameServer);
         }
 
-        return hostedGameServers;
+        return gameServers;
     }
 
     playerJoinGame(player: Player, gameId: string): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const joinResult = hostedGame.playerJoin(player);
+        const joinResult = game.playerJoin(player);
 
         if (typeof joinResult === 'string') {
             return joinResult;
@@ -649,111 +649,111 @@ export default class HostedGameStore
 
     playerMove(player: Player, gameId: string, move: HexMove): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerMove(player, move);
+        const result = game.playerMove(player, move);
 
         return result;
     }
 
     playerPremove(player: Player, gameId: string, premove: Premove): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerPremove(player, premove);
+        const result = game.playerPremove(player, premove);
 
         return result;
     }
 
     playerCancelPremove(player: Player, gameId: string): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerCancelPremove(player);
+        const result = game.playerCancelPremove(player);
 
         return result;
     }
 
     playerAskUndo(player: Player, gameId: string): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerAskUndo(player);
+        const result = game.playerAskUndo(player);
 
         return result;
     }
 
     playerAnswerUndo(player: Player, gameId: string, accept: boolean): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerAnswerUndo(player, accept);
+        const result = game.playerAnswerUndo(player, accept);
 
         return result;
     }
 
     playerResign(player: Player, gameId: string): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerResign(player);
+        const result = game.playerResign(player);
 
         return result;
     }
 
     playerCancel(player: Player, gameId: string): string | true
     {
-        const hostedGame = this.activeGames[gameId];
+        const game = this.activeGames[gameId];
 
-        if (!hostedGame) {
+        if (!game) {
             return 'no active game ' + gameId;
         }
 
         this.onlinePlayerService.notifyPlayerActivity(player);
 
-        const result = hostedGame.playerCancel(player);
+        const result = game.playerCancel(player);
 
         return result;
     }
 
     /**
-     * @param publicId HostedGame public id to post message on.
+     * @param publicId Game public id to post message on.
      * @param chatMessage ChatMessage to post, with player, content and date.
      *
      * @throws {RateLimitReachedError}
@@ -778,40 +778,40 @@ export default class HostedGameStore
             chatMessage.shadowDeleted = true;
         }
 
-        const hostedGameServer = this.activeGames[publicId];
+        const gameServer = this.activeGames[publicId];
 
         // Game is in memory, push chat message
-        if (hostedGameServer) {
+        if (gameServer) {
             let error: true | string;
-            if ((error = canChatMessageBePostedInGame(chatMessage, hostedGameServer.getHostedGame())) !== true) {
+            if ((error = canChatMessageBePostedInGame(chatMessage, gameServer.getGame())) !== true) {
                 return error;
             }
 
-            hostedGameServer.postChatMessage(chatMessage);
+            gameServer.postChatMessage(chatMessage);
             return true;
         }
 
         // Game is not in memory, store chat message directly in database, on persisted game
-        const hostedGame = await this.hostedGameRepository.findUnique(publicId);
+        const game = await this.gameRepository.findUnique(publicId);
 
-        if (hostedGame === null) {
+        if (game === null) {
             logger.notice('Tried to chat on a non-existant game', { chatMessage });
             return `Game ${publicId} not found`;
         }
 
         let error: true | string;
-        if ((error = canChatMessageBePostedInGame(chatMessage, hostedGame)) !== true) {
+        if ((error = canChatMessageBePostedInGame(chatMessage, game)) !== true) {
             return error;
         }
 
-        chatMessage.hostedGame = hostedGame;
+        chatMessage.game = game;
 
         // Game is in database, insert chat message into database
         await this.chatMessageRepository.save(chatMessage);
 
-        notifier.emit('chatMessage', hostedGame, chatMessage);
+        notifier.emit('chatMessage', game, chatMessage);
 
-        this.gameEventEmitter.emitChat(hostedGame, chatMessage);
+        this.gameEventEmitter.emitChat(game, chatMessage);
 
         return true;
     }
@@ -822,7 +822,7 @@ export default class HostedGameStore
         let deleted = 0;
 
         for (const key in this.activeGames) {
-            for (const chatMessage of this.activeGames[key].getHostedGame().chatMessages) {
+            for (const chatMessage of this.activeGames[key].getGame().chatMessages) {
                 if (publicIdSet.has(chatMessage.publicId)) {
                     chatMessage.deletedByModeration = true;
                     ++deleted;
@@ -843,7 +843,7 @@ export default class HostedGameStore
         for (const key in this.activeGames) {
             const activeGame = this.activeGames[key];
 
-            for (const chatMessage of activeGame.getHostedGame().chatMessages) {
+            for (const chatMessage of activeGame.getGame().chatMessages) {
                 if (chatMessage.player?.publicId === playerPublicId
                     && !whitelistedChatMessage[chatMessage.content]
                     && !chatMessage.shadowDeleted

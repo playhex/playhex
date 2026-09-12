@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
-import HostedGameStore from '../store/HostedGameStore.js';
+import GameStore from '../store/GameStore.js';
 import { isLive } from '../../shared/app/timeControlUtils.js';
-import { isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { isBotGame } from '../../shared/app/gameUtils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { notifier } from './notifications/notifier.js';
 
@@ -13,7 +13,7 @@ type PlayingGamesCountEvents = {
 export class PlayingGamesCount extends TypedEmitter<PlayingGamesCountEvents>
 {
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {
         super();
 
@@ -26,10 +26,10 @@ export class PlayingGamesCount extends TypedEmitter<PlayingGamesCountEvents>
     {
         let live = 0;
         let correspondence = 0;
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
 
         for (const key in activeGames) {
-            const game = activeGames[key].getHostedGame();
+            const game = activeGames[key].getGame();
 
             if (game.state !== 'playing' || isBotGame(game)) {
                 continue;

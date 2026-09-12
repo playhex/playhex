@@ -8,7 +8,7 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "hostedGameToPlayers": [
+    "gameToPlayers": [
         {
             "player": {
                 "publicId": "77656f2d-0d80-48ba-b2d3-8f2816ced08c",

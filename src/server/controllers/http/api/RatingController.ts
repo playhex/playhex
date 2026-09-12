@@ -4,7 +4,7 @@ import { Inject, Service } from 'typedi';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import RatingRepository from '../../../repositories/RatingRepository.js';
 import { ratingCategories, validateRatingCategory } from '../../../../shared/app/ratingUtils.js';
-import { HostedGame } from '../../../../shared/app/models/index.js';
+import { Game } from '../../../../shared/app/models/index.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 
 @JsonController()
@@ -15,8 +15,8 @@ export default class RatingController
         private playerRepository: PlayerRepository,
         private ratingRepository: RatingRepository,
 
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     @Get('/api/players/:publicId/current-ratings')
@@ -77,7 +77,7 @@ export default class RatingController
             throw new HttpError(400, 'Invalid category');
         }
 
-        const game = await this.hostedGameRepository.findOneBy({ publicId });
+        const game = await this.gameRepository.findOneBy({ publicId });
 
         if (game === null) {
             throw new HttpError(404, 'Game not found');

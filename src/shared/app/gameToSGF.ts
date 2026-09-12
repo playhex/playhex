@@ -1,14 +1,14 @@
 import { isSameDay } from 'date-fns';
 import { SGF, SGFColor, sgfToString } from '../sgf/index.js';
-import { HostedGame, ChatMessage } from './models/index.js';
+import { Game, ChatMessage } from './models/index.js';
 import { pseudoString } from './pseudoUtils.js';
-import { guessDemerHandicapFromHostedGame } from './demerHandicap.js';
+import { guessDemerHandicapFromGame } from './demerHandicap.js';
 import { isRatingConfident } from './ratingUtils.js';
 import { SGFMove } from '../sgf/types.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
 import { PlayerIndex } from '../time-control/TimeControl.js';
 import { ByoYomiTimeControl } from '../time-control/time-controls/ByoYomiTimeControl.js';
-import { getTimestampedMoves } from './hostedGameUtils.js';
+import { getTimestampedMoves } from './gameUtils.js';
 
 const baseSGF: SGF = {
     FF: 4,
@@ -25,12 +25,12 @@ const baseSGF: SGF = {
  * Chat messages posted before first move are on first move.
  * Then, all messages are on the move they are posted when given move was last played move.
  */
-const getMovesChatMessages = (hostedGame: HostedGame): ChatMessage[][] => {
-    if (!hostedGame) {
+const getMovesChatMessages = (game: Game): ChatMessage[][] => {
+    if (!game) {
         return [];
     }
 
-    const { moveTimestamps } = hostedGame;
+    const { moveTimestamps } = game;
 
     if (moveTimestamps.length === 0) {
         // If there is no move, there is no move node in sgf to contain chat messages.
@@ -38,7 +38,7 @@ const getMovesChatMessages = (hostedGame: HostedGame): ChatMessage[][] => {
         return [];
     }
 
-    const { chatMessages } = hostedGame;
+    const { chatMessages } = game;
     const movesChatMessages: ChatMessage[][] = Array(moveTimestamps.length).fill(null).map(() => []);
     let i = 0;
 
@@ -53,23 +53,23 @@ const getMovesChatMessages = (hostedGame: HostedGame): ChatMessage[][] => {
     return movesChatMessages;
 };
 
-export const hostedGameToSGF = (hostedGame: HostedGame): string => {
+export const gameToSGF = (game: Game): string => {
     const sgf: SGF = {
         ...baseSGF,
-        PC: `https://playhex.org/games/${hostedGame.publicId}`,
-        GN: hostedGame.publicId,
-        SZ: hostedGame.boardsize,
+        PC: `https://playhex.org/games/${game.publicId}`,
+        GN: game.publicId,
+        SZ: game.boardsize,
     };
 
     // Moves
-    const timestampedMoves = getTimestampedMoves(hostedGame);
+    const timestampedMoves = getTimestampedMoves(game);
 
     if (timestampedMoves && timestampedMoves.length > 0) {
-        const timeControl = createTimeControl(hostedGame.timeControlType);
+        const timeControl = createTimeControl(game.timeControlType);
         timeControl.start(timestampedMoves[0].playedAt, timestampedMoves[0].playedAt);
 
         const colors: SGFColor[] = ['B', 'W'];
-        const movesChatMessages = getMovesChatMessages(hostedGame);
+        const movesChatMessages = getMovesChatMessages(game);
 
         sgf.moves = timestampedMoves.map((timestampedMove, index) => {
             const sgfMove: SGFMove = {};
@@ -106,13 +106,13 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // DT, date of the game
-    if (hostedGame.endedAt && hostedGame.startedAt) {
-        if (isSameDay(hostedGame.endedAt, hostedGame.startedAt)) {
+    if (game.endedAt && game.startedAt) {
+        if (isSameDay(game.endedAt, game.startedAt)) {
             // Played in same day, outputs "YYYY-MM-DD"
-            sgf.DT = hostedGame.startedAt.toISOString().substring(0, 10);
+            sgf.DT = game.startedAt.toISOString().substring(0, 10);
         } else {
-            const startedAtStr = hostedGame.startedAt.toISOString().substring(0, 10);
-            const endedAtStr = hostedGame.endedAt.toISOString().substring(0, 10);
+            const startedAtStr = game.startedAt.toISOString().substring(0, 10);
+            const endedAtStr = game.endedAt.toISOString().substring(0, 10);
 
             if (startedAtStr.substring(0, 7) === endedAtStr.substring(0, 7)) {
                 // Played in multiple days of same month, outputs "YYYY-MM-DD,DD"
@@ -125,13 +125,13 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // RE, outcome
-    if (hostedGame.endedAt) {
-        if (hostedGame.winner === null) {
+    if (game.endedAt) {
+        if (game.winner === null) {
             sgf.RE = 'Void';
         } else {
-            sgf.RE = hostedGame.winner === 0 ? 'B+' : 'W+';
+            sgf.RE = game.winner === 0 ? 'B+' : 'W+';
 
-            switch (hostedGame.outcome) {
+            switch (game.outcome) {
                 case 'resign': sgf.RE += 'Resign'; break;
                 case 'time': sgf.RE += 'Time'; break;
                 case 'forfeit': sgf.RE += 'Forfeit'; break;
@@ -142,18 +142,18 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // PB PW, players name
-    if (hostedGame.startedAt) {
-        sgf.PB = pseudoString(hostedGame.hostedGameToPlayers[0].player, 'pseudo');
-        sgf.PW = pseudoString(hostedGame.hostedGameToPlayers[1].player, 'pseudo');
+    if (game.startedAt) {
+        sgf.PB = pseudoString(game.gameToPlayers[0].player, 'pseudo');
+        sgf.PW = pseudoString(game.gameToPlayers[1].player, 'pseudo');
     }
 
     // BR, WR, players ratings if available (rated games only)
-    if (hostedGame.ratings?.length > 0) {
-        const { ratings, hostedGameToPlayers } = hostedGame;
+    if (game.ratings?.length > 0) {
+        const { ratings, gameToPlayers } = game;
         const { round } = Math;
 
-        const blackRating = ratings.find(rating => rating.player.publicId === hostedGameToPlayers[0].player.publicId);
-        const whiteRating = ratings.find(rating => rating.player.publicId === hostedGameToPlayers[1].player.publicId);
+        const blackRating = ratings.find(rating => rating.player.publicId === gameToPlayers[0].player.publicId);
+        const whiteRating = ratings.find(rating => rating.player.publicId === gameToPlayers[1].player.publicId);
 
         if (blackRating) {
             sgf.BR = round(blackRating.rating) + (isRatingConfident(blackRating) ? '' : '?');
@@ -165,7 +165,7 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // TM, OT, LC, LT, time control
-    const { timeControlType } = hostedGame;
+    const { timeControlType } = game;
     sgf.TM = msToSeconds(timeControlType.options.initialTime);
 
     if (timeControlType.family === 'fischer') {
@@ -183,14 +183,14 @@ export const hostedGameToSGF = (hostedGame: HostedGame): string => {
     }
 
     // HA, guess Demer handicap from game settings and pass moves
-    sgf.HA = guessDemerHandicapFromHostedGame(hostedGame);
+    sgf.HA = guessDemerHandicapFromGame(game);
 
 
     // EV, RO, tournament
-    if (hostedGame.tournamentMatch) {
-        const tournamentTitle = hostedGame.tournamentMatch.tournament.title;
-        const roundNumber = hostedGame.tournamentMatch.round;
-        const matchType = hostedGame.tournamentMatch.label;
+    if (game.tournamentMatch) {
+        const tournamentTitle = game.tournamentMatch.tournament.title;
+        const roundNumber = game.tournamentMatch.round;
+        const matchType = game.tournamentMatch.label;
 
         sgf.EV = tournamentTitle;
         sgf.RO = '' + roundNumber;

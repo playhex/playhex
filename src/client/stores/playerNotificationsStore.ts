@@ -46,8 +46,8 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
         playerNotifications.value.push(playerNotification);
     });
 
-    socket.on('gameChallengeCreated', hostedGame => {
-        notifier.emit('gameChallengeCreated', hostedGame);
+    socket.on('gameChallengeCreated', game => {
+        notifier.emit('gameChallengeCreated', game);
     });
 
     return {

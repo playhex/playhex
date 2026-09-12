@@ -3,13 +3,13 @@ import { computed, PropType, toRefs } from 'vue';
 import { gameToHexworldLink } from '../../../shared/app/hexworld.js';
 import useAuthStore from '../../stores/authStore.js';
 import { GameView } from '@playhex/pixi-board';
-import { canShowHexworldLink } from '../../../shared/app/hostedGameUtils.js';
-import HostedGame from '../../../shared/app/models/HostedGame.js';
+import { canShowHexworldLink } from '../../../shared/app/gameUtils.js';
+import Game from '../../../shared/app/models/Game.js';
 import EngineGame from '../../../shared/game-engine/EngineGame.js';
 
 const props = defineProps({
-    hostedGame: {
-        type: Object as PropType<HostedGame>,
+    game: {
+        type: Object as PropType<Game>,
         required: true,
     },
     engineGame: {
@@ -28,13 +28,13 @@ const props = defineProps({
     },
 });
 
-const { hostedGame, label, orientation } = toRefs(props);
+const { game, label, orientation } = toRefs(props);
 const { loggedInPlayer } = toRefs(useAuthStore());
 
-const shouldDisplayHexworldLink = (): boolean => canShowHexworldLink(hostedGame.value, loggedInPlayer.value);
+const shouldDisplayHexworldLink = (): boolean => canShowHexworldLink(game.value, loggedInPlayer.value);
 
 const hexworldLink = computed(() => gameToHexworldLink(
-    hostedGame.value,
+    game.value,
     orientation.value ?? GameView.ORIENTATION_DIAMOND,
 ));
 </script>

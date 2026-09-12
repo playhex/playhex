@@ -1,4 +1,4 @@
-import HostedGameStore from '../../store/HostedGameStore.js';
+import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
@@ -9,7 +9,7 @@ import { instanceToInstance } from '../../../shared/app/class-transformer-custom
 export default class LobbyWebsocketController implements WebsocketControllerInterface
 {
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {}
 
     onConnection(socket: HexSocket): void
@@ -22,7 +22,7 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
                 return;
             }
 
-            answer(this.hostedGameStore.playerJoinGame(player, gameId));
+            answer(this.gameStore.playerJoinGame(player, gameId));
         });
     }
 
@@ -32,7 +32,7 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
             return;
         }
 
-        const games = this.hostedGameStore.getWaiting1v1GamesData();
+        const games = this.gameStore.getWaiting1v1GamesData();
         socket.emit('lobbyUpdate', games.map(game => instanceToInstance(game, { groups: ['lobby'] })));
     }
 }

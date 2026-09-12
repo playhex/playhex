@@ -1,6 +1,6 @@
 import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
 import type { HexMove } from '../move-notation/hex-move-notation.js';
-import HostedGame from './models/HostedGame.js';
+import Game from './models/Game.js';
 
 const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) => {
     if (winner == null)
@@ -20,8 +20,8 @@ const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) 
  * @param game
  * @param orientation Board rotation from 0 to 11, where 0 is the "Flat" one.
  */
-export const gameToHexworldLink = (hostedGame: HostedGame, orientation: number = 11): string => {
-    return `https://hexworld.org/board/#${createHexworldString(hostedGame, orientation)}`;
+export const gameToHexworldLink = (game: Game, orientation: number = 11): string => {
+    return `https://hexworld.org/board/#${createHexworldString(game, orientation)}`;
 };
 
 /**
@@ -42,15 +42,15 @@ export const movesToHexworldString = (moves: HexMove[]): string => moves
 ;
 
 /**
- * Generate Hexworld string from hostedGame, '15c1,e6:sf7i8g10j10'
+ * Generate Hexworld string from game, '15c1,e6:sf7i8g10j10'
  * to pass as query hash.
  */
-export const createHexworldString = (hostedGame: HostedGame, orientation: number = 11): string => {
+export const createHexworldString = (game: Game, orientation: number = 11): string => {
     if (orientation < 0 || orientation > 11)
         throw new Error('Invalid board orientation');
-    const moves = movesToHexworldString(hostedGame.moves);
-    const size = hostedGame.boardsize;
-    const outcome = outcomeToHexworld(hostedGame.outcome, hostedGame.winner);
+    const moves = movesToHexworldString(game.moves);
+    const size = game.boardsize;
+    const outcome = outcomeToHexworld(game.outcome, game.winner);
     // from 1 to 12 (closed), shifted by -2
     const hexworldRotation = (((orientation - 2) % 12) + 11) % 12 + 1;
     const rotationConfig = hexworldRotation === 10 ? '' : 'r' + hexworldRotation;

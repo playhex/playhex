@@ -10,14 +10,14 @@ import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
 import { storeToRefs } from 'pinia';
 import { AIConfigStatusData } from '../../../../shared/app/Types.js';
 import { apiGetAiConfigsStatus } from '../../../apiClient.js';
-import { AIConfig, HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { AIConfig, GameOptions } from '../../../../shared/app/models/index.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 
 const { visible, confirm, cancel } = useDisclosure();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<HostedGameOptions>,
+        type: Object as PropType<GameOptions>,
         required: true,
     },
 });

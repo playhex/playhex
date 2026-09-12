@@ -9,7 +9,7 @@
             "isBot": false,
             "countryFlag": "🇫🇷"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "cfb0bb91-60af-468b-b470-4fa10dfadfc4",

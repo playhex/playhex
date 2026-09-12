@@ -12,11 +12,11 @@ type GamesApiResponse = {
     state: 'created' | 'canceled' | 'playing' | 'ended';
 
     /**
-     * Always sorted by player order (see HostedGame's @AfterLoad sort hook),
+     * Always sorted by player order (see Game's @AfterLoad sort hook),
      * so index 0 is black (order 0) and index 1 is white (order 1).
      * "order" itself is not exposed by the api.
      */
-    hostedGameToPlayers: { player: { pseudo: string } }[];
+    gameToPlayers: { player: { pseudo: string } }[];
 };
 
 /**
@@ -80,8 +80,8 @@ export class PlayHexLink implements ImporterHandlerInterface
         return {
             boardsize: game.boardsize,
             moves: game.moves,
-            playerBlackName: game.hostedGameToPlayers[0]?.player.pseudo,
-            playerWhiteName: game.hostedGameToPlayers[1]?.player.pseudo,
+            playerBlackName: game.gameToPlayers[0]?.player.pseudo,
+            playerWhiteName: game.gameToPlayers[1]?.player.pseudo,
         };
     }
 }

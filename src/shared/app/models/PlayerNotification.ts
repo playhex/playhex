@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
-import { HostedGame, Player } from './index.js';
+import { Game, Player } from './index.js';
 import { Type } from 'class-transformer';
 import { ColumnUUID } from '../../app/custom-typeorm.js';
 
@@ -63,7 +63,7 @@ type PlayerNotificationTypes = {
         /**
          * One of the game with the relevant moderated chat messages
          */
-        hostedGame?: HostedGame;
+        game?: Game;
     };
 
     /**
@@ -107,9 +107,9 @@ export default class PlayerNotification<NotificationType extends keyof PlayerNot
      * link to this game.
      * Can be used to group notifications per game.
      */
-    @ManyToOne(() => HostedGame, { nullable: true })
+    @ManyToOne(() => Game, { nullable: true })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification'] })
-    hostedGame: null | Relation<HostedGame>;
+    game: null | Relation<Game>;
 
     /**
      * Text of the notification.
@@ -151,14 +151,14 @@ export const createPlayerNotification = <T extends keyof PlayerNotificationTypes
     type: T,
     parameters: PlayerNotificationTypes[T],
     player: Player,
-    hostedGame: null | HostedGame,
+    game: null | Game,
     createdAt = new Date(),
 ): PlayerNotification => {
     const playerNotification = new PlayerNotification<T>();
 
     playerNotification.publicId = uuidv4();
     playerNotification.player = player;
-    playerNotification.hostedGame = hostedGame;
+    playerNotification.game = game;
     playerNotification.type = type;
     playerNotification.parameters = parameters;
     playerNotification.createdAt = createdAt;

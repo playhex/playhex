@@ -2,14 +2,14 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import { areSamePlayers, deduplicatePlayers } from '../../shared/app/playerUtils.js';
 import { Player, Tournament, TournamentAdmin, TournamentMatch, TournamentParticipant, TournamentSubscription } from '../../shared/app/models/index.js';
 import baseLogger from '../services/logger.js';
-import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer } from '../../shared/app/hostedGameUtils.js';
+import { getStrictLoserPlayer, getStrictWinnerIndex, getStrictWinnerPlayer } from '../../shared/app/gameUtils.js';
 import { AccountRequiredTournamentError, CannotStartTournamentMatchError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, TournamentError } from './TournamentError.js';
 import { TournamentEngineInterface } from './organizers/TournamentEngineInterface.js';
 import { createGameOptionsForTournament, tournamentStartsAutomatically, tournamentMatchKey, findTournamentMatchByRoundAndNumber, parseTournamentMatchKey, getCheckInOpensDate, slugifyTournamentName, isCheckInOpen } from '../../shared/app/tournamentUtils.js';
-import HostedGameServer from '../HostedGameServer.js';
+import GameServer from '../GameServer.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
-import { HostedGameAccessorInterface } from './hosted-game-accessor/HostedGameAccessorInterface.js';
+import { GameAccessorInterface } from './game-accessor/GameAccessorInterface.js';
 import { AutoSaveInterface } from '../auto-save/AutoSaveInterface.js';
 import { isSameTimeControlType, timeControlToString } from '../../shared/app/timeControlUtils.js';
 import { notifier } from '../services/notifications/notifier.js';
@@ -48,7 +48,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
     constructor(
         private tournament: Tournament,
         private tournamentEngine: TournamentEngineInterface,
-        private hostedGameAccessor: HostedGameAccessorInterface,
+        private gameAccessor: GameAccessorInterface,
         private autoSave: AutoSaveInterface<Tournament>,
     ) {
         super();
@@ -88,20 +88,20 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         for (const tournamentMatch of this.tournament.matches) {
-            if (tournamentMatch.hostedGame !== null && tournamentMatch.state === 'playing') {
-                const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(tournamentMatch.hostedGame.publicId);
+            if (tournamentMatch.game !== null && tournamentMatch.state === 'playing') {
+                const gameServer = this.gameAccessor.getGameServer(tournamentMatch.game.publicId);
 
-                if (hostedGameServer === null) {
-                    this.logger.notice('While tournament initialization, no active hosted game for this tournamentMatch. Assume it will be solved in next iteration and continue with other tournamentMatches', {
+                if (gameServer === null) {
+                    this.logger.notice('While tournament initialization, no active game for this tournamentMatch. Assume it will be solved in next iteration and continue with other tournamentMatches', {
                         matchKey: tournamentMatchKey(tournamentMatch),
                         tournamentMatchState: tournamentMatch.state,
-                        hostedGameState: tournamentMatch.hostedGame.state,
+                        gameState: tournamentMatch.game.state,
                     });
 
                     continue;
                 }
 
-                this.listenHostedGameServer(tournamentMatch, hostedGameServer);
+                this.listenGameServer(tournamentMatch, gameServer);
             }
         }
 
@@ -458,7 +458,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                 if (tournamentMatch.state === 'done') {
                     this.logger.warning('A game was done, but still active in tournament engine. Reporting winner.', {
                         tournamentMatchId: tournamentMatch.id,
-                        hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
+                        gamePublicId: tournamentMatch.game?.publicId,
                         matchKey: tournamentMatchKey(tournamentMatch),
                     });
 
@@ -613,41 +613,41 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      */
     private async checkPlayingGameHasEnded(tournamentMatch: TournamentMatch): Promise<void>
     {
-        const { hostedGame } = tournamentMatch;
+        const { game } = tournamentMatch;
         const matchKey = tournamentMatchKey(tournamentMatch);
 
         this.logger.debug('Check if game has ended', {
             matchKey,
-            hostedGameState: tournamentMatch.hostedGame?.state,
+            gameState: tournamentMatch.game?.state,
         });
 
-        if (!hostedGame) {
-            this.logger.error('No hostedGame for active tournamentMatch', { matchKey });
+        if (!game) {
+            this.logger.error('No game for active tournamentMatch', { matchKey });
             return;
         }
 
-        if (hostedGame.state === 'playing') {
+        if (game.state === 'playing') {
             this.logger.debug('still playing, do nothing.', { matchKey });
             return;
         }
 
-        if (hostedGame.state === 'created') {
-            this.logger.error('Unexpected tournament match state: "created"', { matchKey, hostedGamePublicId: hostedGame.publicId });
+        if (game.state === 'created') {
+            this.logger.error('Unexpected tournament match state: "created"', { matchKey, gamePublicId: game.publicId });
             return;
         }
 
-        if (hostedGame.state === 'canceled') {
+        if (game.state === 'canceled') {
             if (this.tournament.state !== 'running') {
                 this.logger.info('game has been canceled, but do not recreate because tournament is no longer running', {
                     matchKey,
-                    hostedGamePublicId: hostedGame.publicId,
+                    gamePublicId: game.publicId,
                     tournamentState: this.tournament.state,
                 });
 
                 return;
             }
 
-            this.logger.info('game has been canceled, recreate', { matchKey, hostedGamePublicId: hostedGame.publicId });
+            this.logger.info('game has been canceled, recreate', { matchKey, gamePublicId: game.publicId });
             await this.doStartTournamentMatch(tournamentMatch);
             addTournamentHistory(this.tournament, 'match_canceled_recreated', {
                 group: tournamentMatch.group,
@@ -657,8 +657,8 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             return;
         }
 
-        if (hostedGame.state !== 'ended') {
-            this.logger.error('Unexpected tournament match state', { hostedGamePublicId: hostedGame.publicId, state: hostedGame.state });
+        if (game.state !== 'ended') {
+            this.logger.error('Unexpected tournament match state', { gamePublicId: game.publicId, state: game.state });
             return;
         }
 
@@ -667,26 +667,26 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
     private doMarkGameAsEnded(tournamentMatch: TournamentMatch): void
     {
-        const { hostedGame } = tournamentMatch;
+        const { game } = tournamentMatch;
         const matchKey = tournamentMatchKey(tournamentMatch);
 
-        if (!hostedGame) {
-            this.logger.error('No hostedGame for active tournamentMatch', { matchKey });
+        if (!game) {
+            this.logger.error('No game for active tournamentMatch', { matchKey });
             return;
         }
 
-        if (hostedGame.state !== 'ended') {
-            this.logger.error('doMarkGameAsEnded must be used on "ended" game', { matchKey, hostedGamePublicId: hostedGame.publicId, state: hostedGame.state });
+        if (game.state !== 'ended') {
+            this.logger.error('doMarkGameAsEnded must be used on "ended" game', { matchKey, gamePublicId: game.publicId, state: game.state });
             return;
         }
 
-        const winnerIndex = getStrictWinnerIndex(hostedGame);
+        const winnerIndex = getStrictWinnerIndex(game);
 
         this.logger.info('Tournament game has ended, report winner', { matchKey, winnerIndex });
 
         this.tournamentEngine.reportWinner(this.tournament, tournamentMatch, winnerIndex);
         tournamentMatch.state = 'done';
-        let endedAt = hostedGame.endedAt;
+        let endedAt = game.endedAt;
 
         if (!endedAt) {
             this.logger.warning('No game endedAt date for an ended tournament match. Assume match just ended now.', {
@@ -697,12 +697,12 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         }
 
         addTournamentHistory(this.tournament, 'match_ended', {
-            hostedGamePublicId: hostedGame.publicId,
+            gamePublicId: game.publicId,
             group: tournamentMatch.group,
             round: tournamentMatch.round,
             number: tournamentMatch.number,
-            winnerPseudo: pseudoString(getStrictWinnerPlayer(hostedGame)),
-            loserPseudo: pseudoString(getStrictLoserPlayer(hostedGame)),
+            winnerPseudo: pseudoString(getStrictWinnerPlayer(game)),
+            loserPseudo: pseudoString(getStrictLoserPlayer(game)),
         }, endedAt);
 
         this.emit('gameEnded', tournamentMatch);
@@ -721,30 +721,30 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
 
         tournamentMatch.tournament = this.tournament;
 
-        const hostedGameServer = await this.hostedGameAccessor.createHostedGameServer(createGameOptionsForTournament(this.tournament), tournamentMatch);
+        const gameServer = await this.gameAccessor.createGameServer(createGameOptionsForTournament(this.tournament), tournamentMatch);
 
         tournamentMatch.state = 'playing';
-        tournamentMatch.hostedGame = hostedGameServer.getHostedGame();
+        tournamentMatch.game = gameServer.getGame();
 
-        this.listenHostedGameServer(tournamentMatch, hostedGameServer);
+        this.listenGameServer(tournamentMatch, gameServer);
 
         this.emit('gameStarted', tournamentMatch);
     }
 
-    private listenHostedGameServer(tournamentMatch: TournamentMatch, hostedGameServer: HostedGameServer): void
+    private listenGameServer(tournamentMatch: TournamentMatch, gameServer: GameServer): void
     {
-        hostedGameServer.on('ended', async () => {
+        gameServer.on('ended', async () => {
             this.doMarkGameAsEnded(tournamentMatch);
             this.checkEndedGamesAreReported(); // For round robin, report wins from next rounds if any, because it may not be supported by tournament library
             await this.createNextGames();
             this.endTournamentIfEnded();
         });
 
-        hostedGameServer.on('canceled', async () => {
+        gameServer.on('canceled', async () => {
             // Prevent recreate game when tournament has been canceled or is over.
             if (this.tournament.state !== 'running') {
                 this.logger.info('game has been canceled, but do not recreate because tournament is no longer running', {
-                    hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
+                    gamePublicId: tournamentMatch.game?.publicId,
                     matchKey: tournamentMatchKey(tournamentMatch),
                     tournamentState: this.tournament.state,
                 });
@@ -755,7 +755,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             // Prevent recreate game while we "reset and recreate" previous game.
             if (!tournamentMatch.player1 || !tournamentMatch.player2) {
                 this.logger.info('game has been canceled, but do not recreate because players have been removed', {
-                    hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
+                    gamePublicId: tournamentMatch.game?.publicId,
                     matchKey: tournamentMatchKey(tournamentMatch),
                 });
 
@@ -763,7 +763,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             }
 
             this.logger.info('game has been canceled, recreate', {
-                hostedGamePublicId: tournamentMatch.hostedGame?.publicId,
+                gamePublicId: tournamentMatch.game?.publicId,
                 matchKey: tournamentMatchKey(tournamentMatch),
             });
 
@@ -790,37 +790,37 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      * @throws {TournamentError} If cannot forfeit now, because game not yet started or game is already ended
      * @throws {Error} In case of unnexpected error
      */
-    forfeitGamePlayer(hostedGamePublicId: string, playerPublicId: string): void
+    forfeitGamePlayer(gamePublicId: string, playerPublicId: string): void
     {
         const tournamentMatch = this.tournament.matches
-            .find(g => g.hostedGame?.publicId === hostedGamePublicId)
+            .find(g => g.game?.publicId === gamePublicId)
         ;
 
         if (!tournamentMatch) {
-            throw new GamePlayerNotFoundTournamentError('No hosted game with this public id');
+            throw new GamePlayerNotFoundTournamentError('No game with this public id');
         }
 
         if (tournamentMatch.state !== 'playing') {
             throw new TournamentError('Cannot forfeit now, tournament match is not playing');
         }
 
-        if (!tournamentMatch.hostedGame) {
-            throw new Error('Missing hosted game');
+        if (!tournamentMatch.game) {
+            throw new Error('Missing game');
         }
 
-        const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(hostedGamePublicId);
+        const gameServer = this.gameAccessor.getGameServer(gamePublicId);
 
-        if (!hostedGameServer) {
-            throw new Error('Missing hosted game server');
+        if (!gameServer) {
+            throw new Error('Missing game server');
         }
 
-        const player = hostedGameServer.getPlayerByPublicId(playerPublicId);
+        const player = gameServer.getPlayerByPublicId(playerPublicId);
 
         if (!player) {
             throw new GamePlayerNotFoundTournamentError('This player is not in this game');
         }
 
-        hostedGameServer.systemForfeit(player);
+        gameServer.systemForfeit(player);
     }
 
     /**
@@ -833,22 +833,22 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
      * @throws {TournamentError} If cannot forfeit now, because game not yet started or game is already ended
      * @throws {Error} In case of unnexpected error
      */
-    async resetAndRecreateGame(hostedGamePublicId: string): Promise<void>
+    async resetAndRecreateGame(gamePublicId: string): Promise<void>
     {
         const tournamentMatch = this.tournament.matches
-            .find(g => g.hostedGame?.publicId === hostedGamePublicId)
+            .find(g => g.game?.publicId === gamePublicId)
         ;
 
         if (!tournamentMatch) {
-            throw new GamePlayerNotFoundTournamentError('No hosted game with this public id');
+            throw new GamePlayerNotFoundTournamentError('No game with this public id');
         }
 
         if (tournamentMatch.state !== 'done') {
             throw new TournamentError('Cannot clear results now, tournament match is not ended');
         }
 
-        if (!tournamentMatch.hostedGame) {
-            throw new Error('Missing hosted game');
+        if (!tournamentMatch.game) {
+            throw new Error('Missing game');
         }
 
         const cancelNextGame = (matchKey: null | string): void => {
@@ -868,19 +868,19 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             tournamentMatch.player1 = null;
             tournamentMatch.player2 = null;
 
-            if (tournamentMatch.hostedGame) {
-                this.hostedGameAccessor
-                    .getHostedGameServer(tournamentMatch.hostedGame.publicId)
+            if (tournamentMatch.game) {
+                this.gameAccessor
+                    .getGameServer(tournamentMatch.game.publicId)
                     ?.systemCancel('tourney_system')
                 ;
 
-                tournamentMatch.hostedGame = null;
+                tournamentMatch.game = null;
             }
         };
 
         this.tournamentEngine.resetAndRecreateMatch(this.tournament, tournamentMatch);
 
-        // Cancel next games, and set hostedGame to null
+        // Cancel next games, and set game to null
         cancelNextGame(tournamentMatch.winnerPath);
         cancelNextGame(tournamentMatch.loserPath);
 
@@ -1252,21 +1252,21 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                     match.state = 'waiting';
                 }
 
-                if (!match.hostedGame) {
+                if (!match.game) {
                     continue;
                 }
 
-                const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(match.hostedGame.publicId);
+                const gameServer = this.gameAccessor.getGameServer(match.game.publicId);
 
-                if (!hostedGameServer) {
-                    this.logger.warning('Trying to cancel game in tournament, but hostedGameServer not found', {
-                        hostedGamePublicId: match.hostedGame.publicId,
+                if (!gameServer) {
+                    this.logger.warning('Trying to cancel game in tournament, but gameServer not found', {
+                        gamePublicId: match.game.publicId,
                     });
 
                     continue;
                 }
 
-                hostedGameServer.systemCancel('tourney_system');
+                gameServer.systemCancel('tourney_system');
             }
 
             return;

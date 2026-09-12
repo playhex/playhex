@@ -9,7 +9,7 @@
             "slug": "guest-8385",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "8385",
@@ -95,7 +95,7 @@
             "slug": "player-test",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "determinist-random-bot|fcb366fb-58c3-430c-aed0-8f72a79cbb50",

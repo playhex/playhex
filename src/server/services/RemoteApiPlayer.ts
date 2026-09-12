@@ -3,7 +3,7 @@ import { EngineGame, IllegalMove } from '../../shared/game-engine/index.js';
 import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
 import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
-import HostedGameServer from '../HostedGameServer.js';
+import GameServer from '../GameServer.js';
 import { HexMove, isMoveValid } from '../../shared/move-notation/hex-move-notation.js';
 
 @Service()
@@ -48,9 +48,9 @@ export default class RemoteApiPlayer
         }
     }
 
-    async makeMove(engine: string, hostedGameServer: HostedGameServer, config: { maxGames?: number, treeSearch?: boolean }): Promise<null | HexMove>
+    async makeMove(engine: string, gameServer: GameServer, config: { maxGames?: number, treeSearch?: boolean }): Promise<null | HexMove>
     {
-        const engineGame = hostedGameServer.getEngineGame();
+        const engineGame = gameServer.getEngineGame();
 
         if (engineGame === null) {
             throw new Error('Cannot send move request to api, no game');
@@ -60,7 +60,7 @@ export default class RemoteApiPlayer
             engine,
             level: config.maxGames ?? (config.treeSearch ? 500000 : 0),
             boardsize: engineGame.getSize(),
-            gameId: hostedGameServer.getPublicId(),
+            gameId: gameServer.getPublicId(),
         });
 
         try {

@@ -4,7 +4,7 @@ import { Player, Tournament, TournamentSubscription } from '../../../shared/app/
 import { createTournamentDefaultsCreate, createTournamentFromCreateInput } from '../../../shared/app/models/Tournament.js';
 import { ActiveTournament } from '../../tournaments/ActiveTournament.js';
 import type { TournamentEngineInterface } from '../../tournaments/organizers/TournamentEngineInterface.js';
-import { NoopHostedGameAccessor } from '../../tournaments/hosted-game-accessor/NoopHostedGameAccessor.js';
+import { NoopGameAccessor } from '../../tournaments/game-accessor/NoopGameAccessor.js';
 import { NoopAutoSave } from '../../auto-save/NoopAutoSave.js';
 import { getTournamentEngine } from '../../tournaments/organizers/getTournamentEngine.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -52,7 +52,7 @@ describe('ActiveTournament', () => {
             const activeTournament = new ActiveTournament(
                 tournament,
                 organizer,
-                new NoopHostedGameAccessor(),
+                new NoopGameAccessor(),
                 new NoopAutoSave(tournament),
             );
 
@@ -109,7 +109,7 @@ describe('ActiveTournament', () => {
             const activeTournament = new ActiveTournament(
                 tournament,
                 getTournamentEngine(tournament),
-                new NoopHostedGameAccessor(),
+                new NoopGameAccessor(),
                 new NoopAutoSave(tournament),
             );
 
@@ -190,7 +190,7 @@ describe('ActiveTournament', () => {
             const activeTournament = new ActiveTournament(
                 tournament,
                 getTournamentEngine(tournament),
-                new NoopHostedGameAccessor(),
+                new NoopGameAccessor(),
                 new NoopAutoSave(tournament),
             );
 

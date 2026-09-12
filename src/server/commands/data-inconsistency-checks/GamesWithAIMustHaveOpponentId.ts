@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
@@ -12,8 +12,8 @@ import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesChecke
 export class GamesWithAIMustHaveOpponentId implements DataInconsistenciesCheckerInterface
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     getDescription(): string
@@ -24,22 +24,22 @@ export class GamesWithAIMustHaveOpponentId implements DataInconsistenciesChecker
     async run(): Promise<string[]>
     {
         type Result = {
-            hostedGame_publicId: string;
-            hostedGame_createdAt: Date;
+            game_publicId: string;
+            game_createdAt: Date;
         };
 
-        const missingAiPublicId: Result[] = await this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .where('hostedGame.opponentType = "ai"')
-            .andWhere('hostedGame.opponentPublicId is null')
+        const missingAiPublicId: Result[] = await this.gameRepository
+            .createQueryBuilder('game')
+            .where('game.opponentType = "ai"')
+            .andWhere('game.opponentPublicId is null')
             .execute()
         ;
 
-        const hostedGameToString = (hostedGame: Result) => [
-            hostedGame.hostedGame_publicId,
-            hostedGame.hostedGame_createdAt,
+        const gameToString = (game: Result) => [
+            game.game_publicId,
+            game.game_createdAt,
         ].join(' ');
 
-        return missingAiPublicId.map(hostedGame => hostedGameToString(hostedGame));
+        return missingAiPublicId.map(game => gameToString(game));
     }
 }

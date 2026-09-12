@@ -7,13 +7,13 @@ import { Bar } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import '../../services/chartJsDateFnsAdapter.js';
 import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import AppSearchGamesParameters from '../components/AppSearchGamesParameters.vue';
 import { getGames, getGamesStats } from '../../apiClient.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { getStrictWinnerPlayer } from '../../../shared/app/hostedGameUtils.js';
+import { getStrictWinnerPlayer } from '../../../shared/app/gameUtils.js';
 import { useSearchGamesPagination } from '../composables/searchGamesPagination.js';
 import { useSearchGamesSyncHash } from '../composables/searchGamesSyncHash.js';
 
@@ -21,7 +21,7 @@ useSeoMeta({
     title: 'Games archive',
 });
 
-const gamesHistory = ref<null | HostedGame[]>(null);
+const gamesHistory = ref<null | Game[]>(null);
 const totalResults = ref<null | number>(null);
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -206,12 +206,12 @@ const chartBackgroundPlugin = {
                             </td>
 
                             <td>
-                                <AppPseudo v-if="game.hostedGameToPlayers[0]" :player="game.hostedGameToPlayers[0].player" classes="text-danger" />
+                                <AppPseudo v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" classes="text-danger" />
                                 <span v-else>-</span>
                             </td>
 
                             <td>
-                                <AppPseudo v-if="game.hostedGameToPlayers[1]" :player="game.hostedGameToPlayers[1].player" classes="text-primary" />
+                                <AppPseudo v-if="game.gameToPlayers[1]" :player="game.gameToPlayers[1].player" classes="text-primary" />
                                 <span v-else>-</span>
                             </td>
 

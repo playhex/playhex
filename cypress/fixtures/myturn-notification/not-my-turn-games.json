@@ -9,7 +9,7 @@
             "slug": "guest-3248",
             "createdAt": "2024-01-19T16:52:33.770Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "3248",

@@ -43,8 +43,8 @@ export interface TournamentEngineInterface
      * Will add/update TournamentMatch in tournament.matches
      * from tournament engine.
      *
-     * TournamentMatch are added with 0, 1 or 2 players, and without HostedGame.
-     * HostedGame should be created/started once players are known and ready.
+     * TournamentMatch are added with 0, 1 or 2 players, and without Game.
+     * Game should be created/started once players are known and ready.
      *
      * Also fill winnerPath and loserPath.
      *

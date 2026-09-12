@@ -1,4 +1,4 @@
-import { HostedGameOptions, Player, Tournament, TournamentMatch, TournamentParticipant } from './models/index.js';
+import { GameOptions, Player, Tournament, TournamentMatch, TournamentParticipant } from './models/index.js';
 import { slugify } from './slugify.js';
 
 /**
@@ -65,8 +65,8 @@ export const SEEDING_METHOD_DEFAULT: SeedingMethod = 'rating_random';
 
 export const slugifyTournamentName = (tournamentName: string): string => slugify(tournamentName);
 
-export const createGameOptionsForTournament = (tournament: Tournament): HostedGameOptions => {
-    const gameOptions = new HostedGameOptions();
+export const createGameOptionsForTournament = (tournament: Tournament): GameOptions => {
+    const gameOptions = new GameOptions();
 
     gameOptions.boardsize = tournament.boardsize;
     gameOptions.timeControlType = tournament.timeControlType;
@@ -283,11 +283,11 @@ export const rankParticipantsDoubleElimination = (tournament: Tournament): void 
 
     // Set 1st and 2nd ranks to grand final players
     if (grandFinal.state === 'done') {
-        if (!grandFinal.hostedGame) {
-            throw new Error('match done but no hostedGame');
+        if (!grandFinal.game) {
+            throw new Error('match done but no game');
         }
 
-        if (grandFinal.hostedGame.winner === null) {
+        if (grandFinal.game.winner === null) {
             throw new Error('match done but no winner');
         }
 
@@ -429,7 +429,7 @@ export const getTopPlayers = (tournament: Tournament, top = 3): TournamentPartic
 };
 
 export const getMatchWinnerStrict = (tournamentMatch: TournamentMatch): Player => {
-    const winner = tournamentMatch.hostedGame?.winner;
+    const winner = tournamentMatch.game?.winner;
 
     if (winner !== 0 && winner !== 1) {
         throw new Error('getMatchWinnerStrict called but no winner');
@@ -456,7 +456,7 @@ export const getMatchLoser = (tournamentMatch: TournamentMatch): null | Player =
 };
 
 export const getMatchLoserStrict = (tournamentMatch: TournamentMatch): Player => {
-    const winner = tournamentMatch.hostedGame?.winner;
+    const winner = tournamentMatch.game?.winner;
 
     if (winner !== 0 && winner !== 1) {
         throw new Error('getMatchLoserStrict called but no winner');

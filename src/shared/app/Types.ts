@@ -14,20 +14,20 @@ export type TimeControlOptionsValues = {
     values: GameTimeData;
 };
 
-export const hostedGameStates = [
+export const gameStates = [
     'created',
     'canceled',
     'playing',
     'ended',
 ] as const;
 
-export type HostedGameState = typeof hostedGameStates[number];
+export type GameState = typeof gameStates[number];
 
 /**
  * Possible cancel reasons.
  * Must be <= 15 characters.
  */
-export const cancelHostedGameReasons = [
+export const cancelGameReasons = [
     /**
      * Host canceled their game manually
      */
@@ -64,7 +64,7 @@ export const cancelHostedGameReasons = [
     'admin',
 ] as const;
 
-export type CancelHostedGameReason = typeof cancelHostedGameReasons[number];
+export type CancelGameReason = typeof cancelGameReasons[number];
 
 export type GithubContributor = {
     username: string;

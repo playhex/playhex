@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
-import { HostedGame } from '../../shared/app/models/index.js';
+import { Game } from '../../shared/app/models/index.js';
 import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
 import { computed, ref, watchEffect } from 'vue';
 import Rooms from '../../shared/app/Rooms.js';
-import { cancelGame, hasPlayer, isChallengeGame, isChallengeTargetOf, matchSearchParams, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { cancelGame, hasPlayer, isChallengeGame, isChallengeTargetOf, matchSearchParams, updateGame } from '../../shared/app/gameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { isCorrespondence, isLive, TimeControlCadency } from '../../shared/app/timeControlUtils.js';
 import useAuthStore from './authStore.js';
@@ -44,20 +44,20 @@ const useLobbyStore = defineStore('lobbyStore', () => {
      * List of games waiting for opponent, show on lobby in created section,
      * and keep track of updates.
      */
-    const hostedGames = ref<{ [key: string]: HostedGame & SoftRemovable }>({});
+    const games = ref<{ [key: string]: Game & SoftRemovable }>({});
 
     /**
      * List of last ended games, show on lobby in ended games,
      * updates when an active game ends.
      */
-    const endedHostedGames = ref<HostedGame[]>([]);
+    const endedGames = ref<Game[]>([]);
 
     const currentLobby = ref<TimeControlCadency>('live');
 
     const waitingGamesCount = computed<{ live: number, correspondence: number }>(() => {
         const count = { live: 0, correspondence: 0 };
-        for (const publicId in hostedGames.value) {
-            const game = hostedGames.value[publicId];
+        for (const publicId in games.value) {
+            const game = games.value[publicId];
             if (isSoftRemoved(game)) continue;
             if (isLive(game)) ++count.live;
             else ++count.correspondence;
@@ -65,11 +65,11 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         return count;
     });
 
-    const currentLobbyHostedGames = computed<(HostedGame & SoftRemovable)[]>(() => {
+    const currentLobbyGames = computed<(Game & SoftRemovable)[]>(() => {
         if (currentLobby.value === 'live') {
-            return Object.values(hostedGames.value).filter(hostedGame => isLive(hostedGame));
+            return Object.values(games.value).filter(game => isLive(game));
         } else {
-            return Object.values(hostedGames.value).filter(hostedGame => isCorrespondence(hostedGame));
+            return Object.values(games.value).filter(game => isCorrespondence(game));
         }
     });
 
@@ -82,11 +82,11 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const clearSoftRemovedGames = (immediate = false): void => {
         const now = new Date();
 
-        for (const id in hostedGames.value) {
-            const game = hostedGames.value[id];
+        for (const id in games.value) {
+            const game = games.value[id];
 
             if (game.softRemoved && (now > game.softRemoved || immediate)) {
-                delete hostedGames.value[id];
+                delete games.value[id];
             }
         }
     };
@@ -99,16 +99,16 @@ const useLobbyStore = defineStore('lobbyStore', () => {
         return !softRemovable.softRemoved;
     };
 
-    const getOrFetchHostedGame = async (gameId: string): Promise<null | HostedGame> => {
-        return hostedGames.value[gameId] ?? await getGame(gameId);
+    const getOrFetchGame = async (gameId: string): Promise<null | Game> => {
+        return games.value[gameId] ?? await getGame(gameId);
     };
 
     /**
      * Join a game to play if there is a free slot.
      */
-    const joinGame = async (hostedGamePublicId: string): Promise<void> => {
+    const joinGame = async (gamePublicId: string): Promise<void> => {
         return await new Promise((resolve, reject) => {
-            socket.emit('joinGame', hostedGamePublicId, (answer: true | string) => {
+            socket.emit('joinGame', gamePublicId, (answer: true | string) => {
                 if (answer === true) {
                     resolve();
                     return;
@@ -129,25 +129,25 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     const updateLastEndedGames = async () => {
         const { results } = await getGames(lastEndedGamesParameters);
 
-        endedHostedGames.value = results;
+        endedGames.value = results;
     };
 
     const listenLobbyEvents = (): void => {
-        socket.on('lobbyUpdate', games => {
+        socket.on('lobbyUpdate', updatedGames => {
             // Sort newest first so initial games list, and any new game appearing in this batch,
             // are well ordered. Already known games keep their existing position (no sort here)
             // to avoid layout shift when a game already displayed gets updated.
-            const sortedGames = [...games].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+            const sortedGames = [...updatedGames].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-            for (const hostedGame of sortedGames) {
-                if (hostedGames.value[hostedGame.publicId]) {
-                    updateHostedGame(hostedGames.value[hostedGame.publicId], hostedGame);
+            for (const game of sortedGames) {
+                if (games.value[game.publicId]) {
+                    updateGame(games.value[game.publicId], game);
                 } else {
-                    hostedGames.value[hostedGame.publicId] = hostedGame;
+                    games.value[game.publicId] = game;
                 }
 
-                if (hostedGames.value[hostedGame.publicId].state !== 'created') {
-                    hostedGames.value[hostedGame.publicId].softRemoved = softRemoveDate();
+                if (games.value[game.publicId].state !== 'created') {
+                    games.value[game.publicId].softRemoved = softRemoveDate();
                 }
             }
 
@@ -156,44 +156,44 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             void updateLastEndedGames();
         });
 
-        socket.on('lobbyGameCreated', (hostedGame: HostedGame) => {
+        socket.on('lobbyGameCreated', (game: Game) => {
             // Nominative challenges are not part of the public lobby,
             // except for the host and the targeted player, who should still see it there.
-            if (isChallengeGame(hostedGame)) {
+            if (isChallengeGame(game)) {
                 const player = authStore.loggedInPlayer;
-                const isRelevantToMe = player !== null && (hasPlayer(hostedGame, player) || isChallengeTargetOf(hostedGame, player));
+                const isRelevantToMe = player !== null && (hasPlayer(game, player) || isChallengeTargetOf(game, player));
 
                 if (!isRelevantToMe) {
                     return;
                 }
             }
 
-            hostedGames.value[hostedGame.publicId] = hostedGame;
+            games.value[game.publicId] = game;
         });
 
-        socket.on('lobbyGameStarted', (hostedGame: HostedGame) => {
-            if (hostedGames.value[hostedGame.publicId]) {
-                hostedGames.value[hostedGame.publicId].softRemoved = softRemoveDate();
+        socket.on('lobbyGameStarted', (game: Game) => {
+            if (games.value[game.publicId]) {
+                games.value[game.publicId].softRemoved = softRemoveDate();
             }
         });
 
         socket.on('gameCanceled', (gameId, { date }) => {
-            if (hostedGames.value[gameId]) {
-                cancelGame(hostedGames.value[gameId], date);
+            if (games.value[gameId]) {
+                cancelGame(games.value[gameId], date);
 
-                hostedGames.value[gameId].softRemoved = softRemoveDate();
+                games.value[gameId].softRemoved = softRemoveDate();
             }
         });
 
-        socket.on('lobbyGameEnded', (hostedGame: HostedGame) => {
-            if (!matchSearchParams(hostedGame, lastEndedGamesParameters)) {
+        socket.on('lobbyGameEnded', (game: Game) => {
+            if (!matchSearchParams(game, lastEndedGamesParameters)) {
                 return;
             }
 
-            endedHostedGames.value.unshift(hostedGame);
+            endedGames.value.unshift(game);
 
-            while (endedHostedGames.value.length > 5) {
-                endedHostedGames.value.pop();
+            while (endedGames.value.length > 5) {
+                endedGames.value.pop();
             }
         });
     };
@@ -211,13 +211,13 @@ const useLobbyStore = defineStore('lobbyStore', () => {
     });
 
     return {
-        hostedGames,
-        endedHostedGames,
+        games,
+        endedGames,
         currentLobby,
-        currentLobbyHostedGames,
+        currentLobbyGames,
         waitingGamesCount,
         joinGame,
-        getOrFetchHostedGame,
+        getOrFetchGame,
         clearSoftRemovedGames,
         isSoftRemoved,
         excludeSoftRemoved,

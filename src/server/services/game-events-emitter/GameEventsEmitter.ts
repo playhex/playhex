@@ -1,8 +1,8 @@
 import { Container, Service } from 'typedi';
-import { HostedGame, Player, ChatMessage, Rating } from '../../../shared/app/models/index.js';
+import { Game, Player, ChatMessage, Rating } from '../../../shared/app/models/index.js';
 import { HexServer } from '../../server.js';
 import Rooms from '../../../shared/app/Rooms.js';
-import { isBotGame, isChallengeGame } from '../../../shared/app/hostedGameUtils.js';
+import { isBotGame, isChallengeGame } from '../../../shared/app/gameUtils.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
 import { AbstractTimeControl } from '../../../shared/time-control/TimeControl.js';
@@ -17,14 +17,14 @@ import { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
 const io = () => Container.get(HexServer);
 
 /**
- * Rooms for all players in given hostedGame,
+ * Rooms for all players in given game,
  * plus the challenged opponent room when it's a nominative challenge they have not joined yet.
  */
-const gamePlayersRooms = (hostedGame: HostedGame): string[] => {
-    const rooms = new Set(hostedGame.hostedGameToPlayers.map(({ player }) => Rooms.playerGames(player.publicId)));
+const gamePlayersRooms = (game: Game): string[] => {
+    const rooms = new Set(game.gameToPlayers.map(({ player }) => Rooms.playerGames(player.publicId)));
 
-    if (isChallengeGame(hostedGame) && hostedGame.opponentPublicId !== null) {
-        rooms.add(Rooms.playerGames(hostedGame.opponentPublicId));
+    if (isChallengeGame(game) && game.opponentPublicId !== null) {
+        rooms.add(Rooms.playerGames(game.opponentPublicId));
     }
 
     return [...rooms];
@@ -34,13 +34,13 @@ const gamePlayersRooms = (hostedGame: HostedGame): string[] => {
  * Rooms for game lobby, or bot lobby.
  * Challenge games are reserved for a specific opponent and must never appear in a public lobby.
  */
-const lobbyRooms = (hostedGame: HostedGame): string[] => {
-    if (isChallengeGame(hostedGame)) {
+const lobbyRooms = (game: Game): string[] => {
+    if (isChallengeGame(game)) {
         return [];
     }
 
     return [
-        isBotGame(hostedGame)
+        isBotGame(game)
             ? Rooms.lobbyBotGames
             : Rooms.lobby
         ,
@@ -55,144 +55,144 @@ const lobbyRooms = (hostedGame: HostedGame): string[] => {
 @Service()
 export class GameEventsEmitter
 {
-    emitGameCreated(hostedGame: HostedGame): void
+    emitGameCreated(game: Game): void
     {
         io().to([
-            ...lobbyRooms(hostedGame),
-        ]).emit('lobbyGameCreated', instanceToInstance(hostedGame, { groups: ['lobby'] }));
+            ...lobbyRooms(game),
+        ]).emit('lobbyGameCreated', instanceToInstance(game, { groups: ['lobby'] }));
 
         io().to([
-            ...gamePlayersRooms(hostedGame),
-        ]).emit('gameCreated', instanceToInstance(hostedGame));
+            ...gamePlayersRooms(game),
+        ]).emit('gameCreated', instanceToInstance(game));
     }
 
-    emitGameJoined(hostedGame: HostedGame, player: Player): void
+    emitGameJoined(game: Game, player: Player): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-            Rooms.thumbnailGame(hostedGame.publicId),
-        ]).emit('gameJoined', hostedGame.publicId, player);
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+            Rooms.thumbnailGame(game.publicId),
+        ]).emit('gameJoined', game.publicId, player);
     }
 
-    emitGameStarted(hostedGame: HostedGame): void
+    emitGameStarted(game: Game): void
     {
-        const hostedGameSerialized = instanceToInstance(hostedGame);
+        const gameSerialized = instanceToInstance(game);
 
         io().to([
-            ...lobbyRooms(hostedGame),
-        ]).emit('lobbyGameStarted', hostedGameSerialized);
+            ...lobbyRooms(game),
+        ]).emit('lobbyGameStarted', gameSerialized);
 
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-            Rooms.thumbnailGame(hostedGame.publicId),
-        ]).emit('gameStarted', hostedGameSerialized);
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+            Rooms.thumbnailGame(game.publicId),
+        ]).emit('gameStarted', gameSerialized);
     }
 
-    emitMoved(hostedGame: HostedGame, timestampedMove: TimestampedMove, moveIndex: number, byPlayerIndex: 0 | 1): void
-    {
-        io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-            Rooms.thumbnailGame(hostedGame.publicId),
-        ]).emit('moved', hostedGame.publicId, timestampedMove, moveIndex, byPlayerIndex);
-    }
-
-    emitTimeControlUpdate(hostedGame: HostedGame, timeControl: AbstractTimeControl): void
+    emitMoved(game: Game, timestampedMove: TimestampedMove, moveIndex: number, byPlayerIndex: 0 | 1): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-        ]).emit('timeControlUpdate', hostedGame.publicId, timeControl.getValues());
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+            Rooms.thumbnailGame(game.publicId),
+        ]).emit('moved', game.publicId, timestampedMove, moveIndex, byPlayerIndex);
     }
 
-    emitChat(hostedGame: HostedGame, chatMessage: ChatMessage): void
+    emitTimeControlUpdate(game: Game, timeControl: AbstractTimeControl): void
+    {
+        io().to([
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('timeControlUpdate', game.publicId, timeControl.getValues());
+    }
+
+    emitChat(game: Game, chatMessage: ChatMessage): void
     {
         if (chatMessage.deletedByModeration) {
             return;
         }
 
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-        ]).emit('chat', hostedGame.publicId, instanceToInstance(chatMessage));
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('chat', game.publicId, instanceToInstance(chatMessage));
     }
 
-    emitAskUndo(hostedGame: HostedGame, byPlayerIndex: number): void
+    emitAskUndo(game: Game, byPlayerIndex: number): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-        ]).emit('askUndo', hostedGame.publicId, byPlayerIndex);
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('askUndo', game.publicId, byPlayerIndex);
     }
 
-    emitAnswerUndo(hostedGame: HostedGame, accept: boolean, undoneMoves: HexMove[]): void
+    emitAnswerUndo(game: Game, accept: boolean, undoneMoves: HexMove[]): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-            Rooms.thumbnailGame(hostedGame.publicId),
-        ]).emit('answerUndo', hostedGame.publicId, accept, undoneMoves);
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+            Rooms.thumbnailGame(game.publicId),
+        ]).emit('answerUndo', game.publicId, accept, undoneMoves);
     }
 
-    emitCancelUndo(hostedGame: HostedGame): void
+    emitCancelUndo(game: Game): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-        ]).emit('cancelUndo', hostedGame.publicId);
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('cancelUndo', game.publicId);
     }
 
-    emitGameEnded(hostedGame: HostedGame, winner: 0 | 1, outcome: Outcome, endedAt: { date: Date }): void
+    emitGameEnded(game: Game, winner: 0 | 1, outcome: Outcome, endedAt: { date: Date }): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...gamePlayersRooms(hostedGame),
-            Rooms.thumbnailGame(hostedGame.publicId),
-        ]).emit('ended', hostedGame.publicId, winner, outcome, endedAt);
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+            Rooms.thumbnailGame(game.publicId),
+        ]).emit('ended', game.publicId, winner, outcome, endedAt);
 
         io().to([
-            ...lobbyRooms(hostedGame),
-        ]).emit('lobbyGameEnded', instanceToInstance(hostedGame));
+            ...lobbyRooms(game),
+        ]).emit('lobbyGameEnded', instanceToInstance(game));
     }
 
-    emitGameCanceled(hostedGame: HostedGame, canceledAt: { date: Date }): void
+    emitGameCanceled(game: Game, canceledAt: { date: Date }): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...lobbyRooms(hostedGame),
-            ...gamePlayersRooms(hostedGame),
-            Rooms.thumbnailGame(hostedGame.publicId),
-        ]).emit('gameCanceled', hostedGame.publicId, canceledAt);
+            Rooms.game(game.publicId),
+            ...lobbyRooms(game),
+            ...gamePlayersRooms(game),
+            Rooms.thumbnailGame(game.publicId),
+        ]).emit('gameCanceled', game.publicId, canceledAt);
     }
 
-    emitRatingsUpdated(hostedGame: HostedGame, newRatings: Rating[]): void
+    emitRatingsUpdated(game: Game, newRatings: Rating[]): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-            ...(isChallengeGame(hostedGame) ? [] : [Rooms.lobby, Rooms.lobbyBotGames]),
-        ]).emit('ratingsUpdated', hostedGame.publicId, instanceToInstance(newRatings.filter(rating => rating.category === 'overall'), {
+            Rooms.game(game.publicId),
+            ...(isChallengeGame(game) ? [] : [Rooms.lobby, Rooms.lobbyBotGames]),
+        ]).emit('ratingsUpdated', game.publicId, instanceToInstance(newRatings.filter(rating => rating.category === 'overall'), {
             groups: ['rating'],
         }));
     }
 
-    emitGameChallengeCreated(hostedGame: HostedGame): void
+    emitGameChallengeCreated(game: Game): void
     {
-        if (hostedGame.opponentPublicId === null) {
+        if (game.opponentPublicId === null) {
             return;
         }
 
         io().to([
-            Rooms.player(hostedGame.opponentPublicId),
-        ]).emit('gameChallengeCreated', instanceToInstance(hostedGame));
+            Rooms.player(game.opponentPublicId),
+        ]).emit('gameChallengeCreated', instanceToInstance(game));
     }
 
-    emitRematchAvailable(hostedGame: HostedGame, rematchPublicId: string): void
+    emitRematchAvailable(game: Game, rematchPublicId: string): void
     {
         io().to([
-            Rooms.game(hostedGame.publicId),
-        ]).emit('rematchAvailable', hostedGame.publicId, rematchPublicId);
+            Rooms.game(game.publicId),
+        ]).emit('rematchAvailable', game.publicId, rematchPublicId);
     }
 
     emitSpectatorJoined(gameId: string, player: Player): void

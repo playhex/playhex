@@ -1,19 +1,19 @@
 import assert from 'assert';
 import { ChatMessage, Player } from '../models/index.js';
 import { RichChat } from '../rich-chat.js';
-import { createHostedGame } from '../models/HostedGame.js';
+import { createGame } from '../models/Game.js';
 import { coordsToMove } from '../../move-notation/move-notation.js';
 
 describe('Rich Chat', () => {
     it('yield date headers', () => {
-        const hostedGame = createHostedGame();
+        const game = createGame();
         const red = new Player();
         const blue = new Player();
 
         red.pseudo = 'red';
         blue.pseudo = 'blue';
 
-        hostedGame.startedAt = new Date('2024-08-24T12:00:00Z');
+        game.startedAt = new Date('2024-08-24T12:00:00Z');
 
         const message0 = new ChatMessage();
         message0.content = 'Hi';
@@ -30,13 +30,13 @@ describe('Rich Chat', () => {
         message2.createdAt = new Date('2024-08-25T10:00:00Z');
         message2.player = blue;
 
-        hostedGame.chatMessages = [
+        game.chatMessages = [
             message0,
             message1,
             message2,
         ];
 
-        const richChat = new RichChat(hostedGame)
+        const richChat = new RichChat(game)
             .getRichChatMessages()
             .filter(item => item instanceof ChatMessage || item.type === 'date')
         ;
@@ -50,15 +50,15 @@ describe('Rich Chat', () => {
     });
 
     it('yield move number headers', () => {
-        const hostedGame = createHostedGame();
+        const game = createGame();
         const red = new Player();
         const blue = new Player();
 
         red.pseudo = 'red';
         blue.pseudo = 'blue';
 
-        hostedGame.startedAt = new Date('2024-08-24T12:00:00Z');
-        hostedGame.moves = [
+        game.startedAt = new Date('2024-08-24T12:00:00Z');
+        game.moves = [
             coordsToMove({ row: 0, col: 0 }),
             coordsToMove({ row: 0, col: 1 }),
             coordsToMove({ row: 0, col: 2 }),
@@ -66,7 +66,7 @@ describe('Rich Chat', () => {
             coordsToMove({ row: 0, col: 4 }),
             coordsToMove({ row: 0, col: 5 }),
         ];
-        hostedGame.moveTimestamps = [
+        game.moveTimestamps = [
             new Date('2024-08-24T12:01:00Z'),
             new Date('2024-08-24T12:01:01Z'),
             new Date('2024-08-24T12:01:02Z'),
@@ -75,7 +75,7 @@ describe('Rich Chat', () => {
             new Date('2024-08-24T12:07:00Z'),
         ];
 
-        hostedGame.chatMessages = [];
+        game.chatMessages = [];
 
         const message0 = new ChatMessage();
         message0.content = 'Hi';
@@ -92,13 +92,13 @@ describe('Rich Chat', () => {
         message2.createdAt = new Date('2024-08-24T12:05:01Z');
         message2.player = blue;
 
-        hostedGame.chatMessages = [
+        game.chatMessages = [
             message0,
             message1,
             message2,
         ];
 
-        const richChat = new RichChat(hostedGame)
+        const richChat = new RichChat(game)
             .getRichChatMessages()
             .filter(item => item instanceof ChatMessage || item.type === 'move')
         ;

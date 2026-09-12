@@ -3,7 +3,7 @@ import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Get, JsonController, Param, QueryParam } from 'routing-controllers';
 import StatsRepository from '../../../repositories/StatsRepository.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
-import HostedGameStore from '../../../store/HostedGameStore.js';
+import GameStore from '../../../store/GameStore.js';
 
 @JsonController()
 @Service()
@@ -12,7 +12,7 @@ export default class PlayerController
     constructor(
         private playerRepository: PlayerRepository,
         private statsRepository: StatsRepository,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {}
 
     /**
@@ -55,8 +55,8 @@ export default class PlayerController
             throw new DomainHttpError(404, 'player_not_found');
         }
 
-        return this.hostedGameStore.getPlayerActiveGames(player)
-            .map(g => g.getHostedGame())
+        return this.gameStore.getPlayerActiveGames(player)
+            .map(g => g.getGame())
         ;
     }
 

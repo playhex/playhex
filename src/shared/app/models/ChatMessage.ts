@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, type Relation } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
-import HostedGame from './HostedGame.js';
+import Game from './Game.js';
 import { Expose } from '../class-transformer-custom.js';
 import AbstractChatMessage from './AbstractChatMessage.js';
 
@@ -12,10 +12,10 @@ export default class ChatMessage extends AbstractChatMessage
 {
     @IsNotEmpty()
     @Column()
-    hostedGameId: number;
+    gameId: number;
 
-    @ManyToOne(() => HostedGame, hostedGame => hostedGame.chatMessages)
+    @ManyToOne(() => Game, game => game.chatMessages)
     @JoinColumn()
     @Expose({ groups: ['player_moderation_action'] })
-    hostedGame: Relation<HostedGame>;
+    game: Relation<Game>;
 }

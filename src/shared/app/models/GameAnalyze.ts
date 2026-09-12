@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { Expose } from '../class-transformer-custom.js';
-import HostedGame from './HostedGame.js';
+import Game from './Game.js';
 import type { HexMove } from '../../move-notation/hex-move-notation.js';
 
 export type GameAnalyzeData = ({
@@ -27,11 +27,11 @@ export const hasGameAnalyzeErrored = (gameAnalyze: GameAnalyze): boolean =>
 export default class GameAnalyze
 {
     @PrimaryColumn()
-    hostedGameId: number;
+    gameId: number;
 
-    @OneToOne(() => HostedGame)
+    @OneToOne(() => Game)
     @JoinColumn()
-    hostedGame: Relation<HostedGame>;
+    game: Relation<Game>;
 
     /**
      * If null but endedAt is not,

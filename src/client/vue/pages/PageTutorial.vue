@@ -201,7 +201,7 @@ const { aiConfigs } = storeToRefs(useAiConfigsStore());
 const playVsAI = async () => {
     const firstAiConfig = aiConfigs.value[0]; // Should be the easiest AI
 
-    const hostedGame = await apiPostGame({
+    const game = await apiPostGame({
         boardsize: 11,
         opponentType: 'ai',
         ranked: false,
@@ -218,13 +218,13 @@ const playVsAI = async () => {
     await router.push({
         name: 'online-game',
         params: {
-            gameId: hostedGame.publicId,
+            gameId: game.publicId,
         },
     });
 };
 
 const playVsPlayer = async () => {
-    const hostedGame = await apiPostGame({
+    const game = await apiPostGame({
         boardsize: 11,
         opponentType: 'player',
         ranked: false,
@@ -240,7 +240,7 @@ const playVsPlayer = async () => {
     await router.push({
         name: 'online-game',
         params: {
-            gameId: hostedGame.publicId,
+            gameId: game.publicId,
         },
     });
 };

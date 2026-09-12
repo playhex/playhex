@@ -98,7 +98,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
                 <AppPseudo v-if="tournamentMatch.player1" :player="tournamentMatch.player1" flag />
                 <span v-else>-</span>
                 <IconTrophyFill
-                    v-if="'done' === tournamentMatch.state && 0 === tournamentMatch.hostedGame?.winner"
+                    v-if="'done' === tournamentMatch.state && 0 === tournamentMatch.game?.winner"
                     class="text-warning ms-1"
                 />
             </p>
@@ -112,7 +112,7 @@ const playerHighlightClasses = (player: null | Player = null): string => {
                 <AppPseudo v-if="tournamentMatch.player2" :player="tournamentMatch.player2" flag />
                 <span v-else>-</span>
                 <IconTrophyFill
-                    v-if="'done' === tournamentMatch.state && 1 === tournamentMatch.hostedGame?.winner"
+                    v-if="'done' === tournamentMatch.state && 1 === tournamentMatch.game?.winner"
                     class="text-warning ms-1"
                 />
             </p>
@@ -127,8 +127,8 @@ const playerHighlightClasses = (player: null | Player = null): string => {
             </span>
 
             <RouterLink
-                v-if="tournamentMatch.hostedGame"
-                :to="{ name: 'online-game', params: { gameId: tournamentMatch.hostedGame.publicId } }"
+                v-if="tournamentMatch.game"
+                :to="{ name: 'online-game', params: { gameId: tournamentMatch.game.publicId } }"
             >{{ $t('game.watch') }}</RouterLink>
         </div>
     </div>

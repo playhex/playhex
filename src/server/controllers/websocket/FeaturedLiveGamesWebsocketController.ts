@@ -14,7 +14,7 @@ export default class FeaturedLiveGamesWebsocketController implements WebsocketCo
         featuredGames.on('featuredLiveGamesUpdated', featuredGames => {
             this.io
                 .to(Rooms.featuredLiveGames)
-                .emit('featuredLiveGamesUpdate', featuredGames.map(hostedGame => hostedGame.publicId))
+                .emit('featuredLiveGamesUpdate', featuredGames.map(game => game.publicId))
             ;
         });
     }
@@ -32,7 +32,7 @@ export default class FeaturedLiveGamesWebsocketController implements WebsocketCo
      */
     getFeaturedGames()
     {
-        return this.featuredGames.getFeaturedGames().map(hostedGame => hostedGame.publicId);
+        return this.featuredGames.getFeaturedGames().map(game => game.publicId);
     }
 
     onJoinRoom(socket: HexSocket, room: string)

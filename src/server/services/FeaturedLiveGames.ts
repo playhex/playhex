@@ -1,13 +1,13 @@
 import { Service } from 'typedi';
-import HostedGameStore from '../store/HostedGameStore.js';
-import { HostedGame } from '../../shared/app/models/index.js';
+import GameStore from '../store/GameStore.js';
+import { Game } from '../../shared/app/models/index.js';
 import { calcAverageSecondsPerMove, isLive } from '../../shared/app/timeControlUtils.js';
-import { isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { isBotGame } from '../../shared/app/gameUtils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { notifier } from './notifications/notifier.js';
 
 type FeaturedLiveGamesEvents = {
-    featuredLiveGamesUpdated: (featuredGames: HostedGame[]) => void;
+    featuredLiveGamesUpdated: (featuredGames: Game[]) => void;
 };
 
 const MAX_FEATURED_GAMES = 2;
@@ -25,31 +25,31 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
      * Same for everyone.
      * Not recomputed everytime to let us view same featured game until the end (unless becomes stale).
      */
-    private featuredGames: HostedGame[] = [];
+    private featuredGames: Game[] = [];
 
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {
         super();
 
         void (async () => {
-            await this.hostedGameStore.isReady();
+            await this.gameStore.isReady();
             this.featuredGames = this.calcInitialFeaturedGames();
         })();
 
-        notifier.on('gameStart', hostedGame => this.onGameStarted(hostedGame));
-        notifier.on('gameCanceled', hostedGame => this.onGameEnded(hostedGame));
-        notifier.on('gameEnd', hostedGame => this.onGameEnded(hostedGame));
+        notifier.on('gameStart', game => this.onGameStarted(game));
+        notifier.on('gameCanceled', game => this.onGameEnded(game));
+        notifier.on('gameEnd', game => this.onGameEnded(game));
     }
 
-    onGameStarted(hostedGame: HostedGame): void
+    onGameStarted(game: Game): void
     {
-        if (!this.isPlayingLive1v1(hostedGame)) {
+        if (!this.isPlayingLive1v1(game)) {
             return;
         }
 
         if (this.featuredGames.length < MAX_FEATURED_GAMES) {
-            this.featuredGames.push(hostedGame);
+            this.featuredGames.push(game);
             this.emit('featuredLiveGamesUpdated', this.featuredGames);
             return;
         }
@@ -57,20 +57,20 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
         const index = this.featuredGames.findIndex(featuredGame => featuredGame.state !== 'playing');
 
         if (index >= 0) {
-            this.featuredGames[index] = hostedGame;
+            this.featuredGames[index] = game;
             this.emit('featuredLiveGamesUpdated', this.featuredGames);
             return;
         }
     }
 
-    onGameEnded(hostedGame: HostedGame): void
+    onGameEnded(game: Game): void
     {
-        if (!this.featuredGames.includes(hostedGame)) {
+        if (!this.featuredGames.includes(game)) {
             return;
         }
 
         setTimeout(() => {
-            const index = this.featuredGames.indexOf(hostedGame);
+            const index = this.featuredGames.indexOf(game);
 
             if (index < 0) {
                 return;
@@ -88,39 +88,39 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
         }, 30000);
     }
 
-    private findReplacementGame(): HostedGame | null
+    private findReplacementGame(): Game | null
     {
         let bestScore: null | number = null;
-        let bestHostedGame: null | HostedGame = null;
+        let bestGame: null | Game = null;
 
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
 
         for (const publicId in activeGames) {
-            const hostedGame = activeGames[publicId].getHostedGame();
+            const game = activeGames[publicId].getGame();
 
-            if (!this.isPlayingLive1v1(hostedGame) || this.featuredGames.includes(hostedGame)) {
+            if (!this.isPlayingLive1v1(game) || this.featuredGames.includes(game)) {
                 continue;
             }
 
-            const score = this.calcGameScore(hostedGame);
+            const score = this.calcGameScore(game);
 
             if (bestScore === null || score > bestScore) {
                 bestScore = score;
-                bestHostedGame = hostedGame;
+                bestGame = game;
             }
         }
 
-        return bestHostedGame;
+        return bestGame;
     }
 
-    private isPlayingLive1v1(hostedGame: HostedGame): boolean
+    private isPlayingLive1v1(game: Game): boolean
     {
-        return hostedGame.state === 'playing' && isLive(hostedGame) && !isBotGame(hostedGame);
+        return game.state === 'playing' && isLive(game) && !isBotGame(game);
     }
 
-    private calcGameScore(hostedGame: HostedGame): number
+    private calcGameScore(game: Game): number
     {
-        return -calcAverageSecondsPerMove(hostedGame);
+        return -calcAverageSecondsPerMove(game);
     }
 
     /**
@@ -133,20 +133,20 @@ export class FeaturedLiveGames extends TypedEmitter<FeaturedLiveGamesEvents>
      * just return best games atm, no update,
      * probably not same algorithm to select featured games
      */
-    calcInitialFeaturedGames(): HostedGame[]
+    calcInitialFeaturedGames(): Game[]
     {
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
 
-        const featuredGames: HostedGame[] = [];
+        const featuredGames: Game[] = [];
 
         for (const publicId in activeGames) {
-            const hostedGame = activeGames[publicId].getHostedGame();
+            const game = activeGames[publicId].getGame();
 
-            if (!this.isPlayingLive1v1(hostedGame)) {
+            if (!this.isPlayingLive1v1(game)) {
                 continue;
             }
 
-            featuredGames.push(hostedGame);
+            featuredGames.push(game);
         }
 
         featuredGames.sort((a, b) => {

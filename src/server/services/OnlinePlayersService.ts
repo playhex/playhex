@@ -177,13 +177,13 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
         return this.onlinePlayers[player.publicId]?.onlinePlayer.active ?? false;
     }
 
-    isOnGamePage(player: Player, hostedGamePublicId: string): boolean
+    isOnGamePage(player: Player, gamePublicId: string): boolean
     {
         const currentPage = this.onlinePlayers[player.publicId]?.onlinePlayer.currentPage;
 
         return currentPage !== null
             && currentPage.page === 'game'
-            && currentPage.gameId === hostedGamePublicId
+            && currentPage.gameId === gamePublicId
         ;
     }
 

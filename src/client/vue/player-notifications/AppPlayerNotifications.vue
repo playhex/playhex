@@ -24,19 +24,19 @@ onClickOutside(notificationsElement, () => {
     showNotifications.value = false;
 });
 
-const ack = async (hostedGamePublicId?: string) => {
+const ack = async (gamePublicId?: string) => {
     // if list is loaded, remove acknowledged notifications from local list
     if (Array.isArray(playerNotifications.value)) {
-        if (hostedGamePublicId) {
+        if (gamePublicId) {
             playerNotifications.value = playerNotifications.value
-                .filter(notification => notification.hostedGame?.publicId !== hostedGamePublicId)
+                .filter(notification => notification.game?.publicId !== gamePublicId)
             ;
         } else {
             playerNotifications.value = [];
         }
     }
 
-    await apiPostPlayerNotificationsAcknowledge(hostedGamePublicId);
+    await apiPostPlayerNotificationsAcknowledge(gamePublicId);
 };
 </script>
 
@@ -94,25 +94,25 @@ const ack = async (hostedGamePublicId?: string) => {
 
                 <div v-else class="list-group list-group-flush overflow-auto">
                     <template
-                        v-for="{ hostedGame, playerNotifications } in gamePlayerNotifications"
-                        :key="hostedGame?.publicId ?? 'null'"
+                        v-for="{ game, playerNotifications } in gamePlayerNotifications"
+                        :key="game?.publicId ?? 'null'"
                     >
                         <router-link
-                            v-if="hostedGame"
+                            v-if="game"
                             class="list-group-item list-group-item-action"
-                            @click.prevent="showNotifications = false; ack(hostedGame.publicId)"
-                            :to="!hostedGame ? '#' : {
+                            @click.prevent="showNotifications = false; ack(game.publicId)"
+                            :to="!game ? '#' : {
                                 name: 'online-game',
                                 params: {
-                                    gameId: hostedGame.publicId,
+                                    gameId: game.publicId,
                                 },
                             }"
                         >
                             <h6 class="mb-1">
-                                {{ $t('game_against_player', { player: pseudoStringOptional(getOpponent(hostedGame)) }) }}
+                                {{ $t('game_against_player', { player: pseudoStringOptional(getOpponent(game)) }) }}
                                 &nbsp;
                                 <span class="text-secondary small">
-                                    {{ $t('game_created_short', { date: formatRelative(hostedGame.createdAt, new Date()) }) }}
+                                    {{ $t('game_created_short', { date: formatRelative(game.createdAt, new Date()) }) }}
                                 </span>
                             </h6>
 

@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { HostedGame, Player, Tournament, TournamentMatch, TournamentParticipant } from '../models/index.js';
+import { Game, Player, Tournament, TournamentMatch, TournamentParticipant } from '../models/index.js';
 import { calculateRanksOfLosersBracketRounds, findParticipantByPlayerStrict, groupAndSortTournamentMatches, rankParticipantsDoubleElimination, sortAndRankParticipants } from '../tournamentUtils.js';
 
 const p = (playerId: number, score: number, tiebreak: number = 0): TournamentParticipant => {
@@ -52,8 +52,8 @@ const createTestTournament = (brackets: [number, number, number, null | string, 
         tournamentMatch.player1 = findOrCreatePlayer(p1);
         tournamentMatch.player2 = findOrCreatePlayer(p2);
         tournamentMatch.state = winner === null ? 'waiting' : 'done';
-        tournamentMatch.hostedGame = new HostedGame();
-        tournamentMatch.hostedGame.winner = winner;
+        tournamentMatch.game = new Game();
+        tournamentMatch.game.winner = winner;
 
         tournament.matches.push(tournamentMatch);
     }

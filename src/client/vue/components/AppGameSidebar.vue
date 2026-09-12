@@ -6,7 +6,7 @@ import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import AppPseudo from './AppPseudo.vue';
-import { ChatMessage, HostedGame, Player } from '../../../shared/app/models/index.js';
+import { ChatMessage, Game, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
@@ -17,15 +17,15 @@ import useAnalyzeStore from '../../stores/analyzeStore.js';
 import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import { hostedGameToSGF } from '../../../shared/app/hostedGameToSGF.js';
+import { gameToSGF } from '../../../shared/app/gameToSGF.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
 import AppGameAnalyzeSummary from './AppGameAnalyzeSummary.vue';
-import { guessDemerHandicapFromHostedGame } from '../../../shared/app/demerHandicap.js';
+import { guessDemerHandicapFromGame } from '../../../shared/app/demerHandicap.js';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
-import { canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/hostedGameUtils.js';
+import { canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/gameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import AppSpectatorCount from './AppSpectatorCount.vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
@@ -40,8 +40,8 @@ import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 
 const props = defineProps({
-    hostedGame: {
-        type: Object as PropType<HostedGame>,
+    game: {
+        type: Object as PropType<Game>,
         required: true,
     },
     gameView: {
@@ -50,7 +50,7 @@ const props = defineProps({
     },
 });
 
-const { hostedGame, gameView } = toRefs(props);
+const { game, gameView } = toRefs(props);
 
 const {
     engineGame,
@@ -94,8 +94,8 @@ const formatChatDateHeader = (date: Date): string => {
     return intlFormat(date, { day: 'numeric', month: 'long' }, { locale: autoLocale() });
 };
 const formatDateInfo = (date: null | Date): string => date === null ? '-' : intlFormat(date, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }, { locale: autoLocale() });
-const formatGameDuration = (hostedGame: HostedGame): string => {
-    const { startedAt, endedAt } = hostedGame;
+const formatGameDuration = (game: Game): string => {
+    const { startedAt, endedAt } = game;
 
     if (!startedAt) {
         return '-';
@@ -113,7 +113,7 @@ const formatGameDuration = (hostedGame: HostedGame): string => {
 };
 
 const playerColor = (player: Player): string => {
-    const index = getPlayerIndex(hostedGame.value, player);
+    const index = getPlayerIndex(game.value, player);
 
     if (index === 0) {
         return 'text-danger';
@@ -126,7 +126,7 @@ const playerColor = (player: Player): string => {
     return '';
 };
 
-const chatInput = useChatInputStore().getChatInput(hostedGame.value.publicId);
+const chatInput = useChatInputStore().getChatInput(game.value.publicId);
 const chatMessagesElement = ref<HTMLElement>();
 const chatInputElement = ref<HTMLElement>();
 
@@ -136,7 +136,7 @@ const scrollChatToBottom = () => nextTick(() => {
     }
 });
 
-watch(hostedGame.value.chatMessages, () => scrollChatToBottom());
+watch(game.value.chatMessages, () => scrollChatToBottom());
 
 const sendChat = async () => {
     if (chatInput.value === '') {
@@ -231,20 +231,20 @@ const isChatMessage = (object: unknown): object is ChatMessage => {
  * SGF download
  */
 const downloadSGF = (): void => {
-    if (!loggedInPlayer.value || !hostedGame.value) {
+    if (!loggedInPlayer.value || !game.value) {
         return;
     }
 
-    if (!canExportGame(hostedGame.value, loggedInPlayer.value)) {
+    if (!canExportGame(game.value, loggedInPlayer.value)) {
         return;
     }
 
-    let filename = 'playhex-' + (hostedGame.value.startedAt ?? hostedGame.value.createdAt).toISOString().substring(0, 10) + '-';
+    let filename = 'playhex-' + (game.value.startedAt ?? game.value.createdAt).toISOString().substring(0, 10) + '-';
 
-    filename += getPlayers(hostedGame.value).map(player => pseudoString(player, 'slug')).join('-vs-');
+    filename += getPlayers(game.value).map(player => pseudoString(player, 'slug')).join('-vs-');
     filename += '.sgf';
 
-    downloadString(hostedGameToSGF(hostedGame.value), filename, 'application/x-go-sgf');
+    downloadString(gameToSGF(game.value), filename, 'application/x-go-sgf');
 };
 
 const ctrlSListener = (e: KeyboardEvent) => {
@@ -331,7 +331,7 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
 };
 
 const renderMessage = (str: string): string => {
-    const { boardsize } = hostedGame.value;
+    const { boardsize } = game.value;
 
     str = sanitizeMessage(str);
     str = makeLinksClickable(str);
@@ -345,21 +345,21 @@ const renderMessage = (str: string): string => {
  * Game analyze
  */
 const analyzeStore = useAnalyzeStore();
-const gameId = hostedGame.value.publicId;
+const gameId = game.value.publicId;
 const gameAnalyze = analyzeStore.getAnalyze(gameId);
 const analyzeSummarized = ref(false);
 
 const shouldShowAnalyzeBlock = (): boolean => {
-    if (!hostedGame.value) {
+    if (!game.value) {
         return false;
     }
 
-    return hostedGame.value.state === 'ended'
-        && hostedGame.value.moves.length >= 2
+    return game.value.state === 'ended'
+        && game.value.moves.length >= 2
     ;
 };
 
-if (hostedGame.value.state === 'ended') {
+if (game.value.state === 'ended') {
     analyzeStore.loadAnalyze(gameId);
 }
 
@@ -383,7 +383,7 @@ const isTab = (...tabs: Tab[]): boolean => tabs.includes(currentTab.value);
 const handicap = ref<'N/S' | number>();
 
 watchEffect(() => {
-    handicap.value = guessDemerHandicapFromHostedGame(hostedGame.value);
+    handicap.value = guessDemerHandicapFromGame(game.value);
 });
 
 /*
@@ -414,7 +414,7 @@ const orientation = useGameViewOrientation(gameView);
 const chatRestrictedPlayers = ref<Set<string>>(new Set());
 
 void (async () => {
-    const players = getPlayers(hostedGame.value);
+    const players = getPlayers(game.value);
     const results = await Promise.all(
         players.map(async player => ({
             publicId: player.publicId,
@@ -436,7 +436,7 @@ const isChatInputEnabled = computed<boolean>(() => {
         return false;
     }
 
-    return canPlayerChatInGame(loggedInPlayer.value, hostedGame.value) === true;
+    return canPlayerChatInGame(loggedInPlayer.value, game.value) === true;
 });
 
 const getMoveSettingsHelpKey = (moveSettings: MoveSettings): string => {
@@ -484,7 +484,7 @@ watch(gameUIMode, () => {
         <nav class="nav nav-game-sidebar nav-pills nav-fill">
             <a class="nav-link" :class="tabActiveClass('main')" @click.prevent="currentTab = 'main'" href="#"><IconHouse /> <span class="d-none d-md-inline">{{ $t('game.title') }}</span></a>
 
-            <a class="nav-link" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGame, loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
+            <a class="nav-link" v-if="loggedInPlayer && shouldShowConditionalMoves(game, loggedInPlayer)" :class="tabActiveClass('conditional_moves')" @click.prevent="currentTab = 'conditional_moves'" href="#">
                 <IconSignpostSplit />
                 {{ ' ' }}
                 <span class="d-none d-md-inline">
@@ -503,24 +503,24 @@ watch(gameUIMode, () => {
         -->
         <div class="sidebar-block block-game-title" v-if="isTab('main', 'info')">
             <div class="container-fluid">
-                <h3 v-if="hostedGame.state === 'created'">{{ $t('waiting_for_an_opponent') }}</h3>
-                <h3 v-if="hostedGame.state === 'canceled'">{{ $t('game_has_been_canceled') }}</h3>
-                <h3 v-if="hostedGame.state === 'playing'">{{ $t('game.playing') }}</h3>
-                <h3 v-if="hostedGame.state === 'ended'">
+                <h3 v-if="game.state === 'created'">{{ $t('waiting_for_an_opponent') }}</h3>
+                <h3 v-if="game.state === 'canceled'">{{ $t('game_has_been_canceled') }}</h3>
+                <h3 v-if="game.state === 'playing'">{{ $t('game.playing') }}</h3>
+                <h3 v-if="game.state === 'ended'">
                     <i18next :translation="$t('player_wins_by.default')">
                         <template #player>
-                            <AppPseudo :player="getStrictWinnerPlayer(hostedGame)" :classes="playerColor(getStrictWinnerPlayer(hostedGame))" />
+                            <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="playerColor(getStrictWinnerPlayer(game))" />
                         </template>
                     </i18next>
-                    <AppRatingChange v-if="hostedGame.ranked" :ratingChange="getRating(hostedGame, getStrictWinnerPlayer(hostedGame))?.ratingChange ?? 0" class="smaller ms-2" />
+                    <AppRatingChange v-if="game.ranked" :ratingChange="getRating(game, getStrictWinnerPlayer(game))?.ratingChange ?? 0" class="smaller ms-2" />
                 </h3>
-                <p v-if="hostedGame.state === 'ended'" class="mb-0">
-                    <i18next :translation="$t('player_loses_reason.' + (hostedGame.outcome ?? 'default'))">
+                <p v-if="game.state === 'ended'" class="mb-0">
+                    <i18next :translation="$t('player_loses_reason.' + (game.outcome ?? 'default'))">
                         <template #player>
-                            <AppPseudo :player="getStrictLoserPlayer(hostedGame)" :classes="playerColor(getStrictLoserPlayer(hostedGame))" />
+                            <AppPseudo :player="getStrictLoserPlayer(game)" :classes="playerColor(getStrictLoserPlayer(game))" />
                         </template>
                     </i18next>
-                    <AppRatingChange v-if="hostedGame.ranked" :ratingChange="getRating(hostedGame, getStrictLoserPlayer(hostedGame))?.ratingChange ?? 0" class="ms-2" />
+                    <AppRatingChange v-if="game.ranked" :ratingChange="getRating(game, getStrictLoserPlayer(game))?.ratingChange ?? 0" class="ms-2" />
                 </p>
             </div>
         </div>
@@ -532,85 +532,85 @@ watch(gameUIMode, () => {
             <div class="container-fluid">
 
                 <!-- created -->
-                <template v-if="'created' === hostedGame.state">
-                    <p v-if="null !== hostedGame.host">
+                <template v-if="'created' === game.state">
+                    <p v-if="null !== game.host">
                         <i18next :translation="$t('game_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudo onlineStatus :player="hostedGame.host!" />
+                                <AppPseudo onlineStatus :player="game.host!" />
                             </template>
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(game.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                     <p v-else>
                         <i18next :translation="$t('game_created_by_system_time_ago')">
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(game.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                 </template>
 
                 <!-- canceled -->
-                <template v-if="'canceled' === hostedGame.state">
-                    <p v-if="null !== hostedGame.host">
+                <template v-if="'canceled' === game.state">
+                    <p v-if="null !== game.host">
                         <i18next :translation="$t('game_was_created_by_player_time_ago')">
                             <template #player>
-                                <AppPseudo onlineStatus :player="hostedGame.host!" />
+                                <AppPseudo onlineStatus :player="game.host!" />
                             </template>
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(game.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                     <p v-else>
                         <i18next :translation="$t('game_created_by_system_time_ago')">
                             <template #timeAgo>
-                                {{ formatDistanceToNow(hostedGame.createdAt, { addSuffix: true }) }}
+                                {{ formatDistanceToNow(game.createdAt, { addSuffix: true }) }}
                             </template>
                         </i18next>
                     </p>
                 </template>
 
                 <!-- playing -->
-                <template v-if="'playing' === hostedGame.state">
+                <template v-if="'playing' === game.state">
                     <p>
-                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGame.startedAt!, 'd MMMM yyyy p') }}</small>
+                        <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(game.startedAt!, 'd MMMM yyyy p') }}</small>
                         <br>
                         <small>
                             {{ $t('2dots', { s: $t('last_move') }) }}
-                            <template v-if="hostedGame.lastMoveAt">{{ formatRelative(hostedGame.lastMoveAt!, useServerDateStore().newDate()) }}</template>
+                            <template v-if="game.lastMoveAt">{{ formatRelative(game.lastMoveAt!, useServerDateStore().newDate()) }}</template>
                             <template v-else>-</template>
                         </small>
                     </p>
                 </template>
 
                 <!-- ended -->
-                <template v-if="hostedGame.state === 'ended'">
+                <template v-if="game.state === 'ended'">
                     <p>
-                        <small v-if="hostedGame.startedAt && hostedGame.endedAt">
+                        <small v-if="game.startedAt && game.endedAt">
 
                             <!-- Game played is same day, show short form: "Played date/hour -> hour" -->
-                            <template v-if="isSameDay(hostedGame.startedAt!, hostedGame.endedAt!)">
-                                {{ format(hostedGame.startedAt!, 'd MMMM yyyy p') }}
+                            <template v-if="isSameDay(game.startedAt!, game.endedAt!)">
+                                {{ format(game.startedAt!, 'd MMMM yyyy p') }}
                                 →
-                                {{ format(hostedGame.endedAt!, 'p') }}
+                                {{ format(game.endedAt!, 'p') }}
                             </template>
 
                             <!-- Game played on multiple days, show dates, no times, and no need to repeat year -->
                             <template v-else>
-                                {{ format(hostedGame.startedAt!, 'd MMMM') }}
+                                {{ format(game.startedAt!, 'd MMMM') }}
                                 →
-                                {{ format(hostedGame.endedAt!, 'd MMMM yyyy') }}
+                                {{ format(game.endedAt!, 'd MMMM yyyy') }}
                             </template>
                         </small>
 
                         <!-- Fallback to naive form if missing a date, should not be used -->
                         <template v-else>
-                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(hostedGame.startedAt!, 'd MMMM yyyy p') }}</small>
+                            <small>{{ $t('2dots', { s: $t('game.started') }) }} {{ format(game.startedAt!, 'd MMMM yyyy p') }}</small>
                             <br>
-                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(hostedGame.endedAt!, 'd MMMM p') }}</small>
+                            <small>{{ $t('2dots', { s: $t('game.finished') }) }} {{ format(game.endedAt!, 'd MMMM p') }}</small>
                         </template>
                     </p>
                 </template>
@@ -626,7 +626,7 @@ watch(gameUIMode, () => {
                 <!-- HexWorld link -->
                 <AppHexWorldExplore
                     v-if="engineGame"
-                    :hostedGame
+                    :game
                     :engineGame
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
@@ -635,7 +635,7 @@ watch(gameUIMode, () => {
                 <!-- Hexplorer -->
                 <AppHexplorerLink
                     v-if="engineGame"
-                    :hostedGame
+                    :game
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                 />
@@ -649,7 +649,7 @@ watch(gameUIMode, () => {
 
                 <!-- Download SGF -->
                 <button
-                    v-if="loggedInPlayer && canExportGame(hostedGame, loggedInPlayer)"
+                    v-if="loggedInPlayer && canExportGame(game, loggedInPlayer)"
                     type="button"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                     @click="downloadSGF();"
@@ -674,7 +674,7 @@ watch(gameUIMode, () => {
         -->
         <div class="sidebar-block block-game-options" v-if="isTab('main', 'info')">
             <router-link
-                v-for="tournamentMatch in hostedGame.tournamentMatch ? [hostedGame.tournamentMatch!] : []"
+                v-for="tournamentMatch in game.tournamentMatch ? [game.tournamentMatch!] : []"
                 :to="{ name: 'tournament', params: { slug: tournamentMatch.tournament.slug }, hash: '#match-' + tournamentMatchKey(tournamentMatch) }"
                 class="btn btn-warning btn-block btn-tournament"
             >
@@ -690,12 +690,12 @@ watch(gameUIMode, () => {
             </router-link>
 
             <div class="container-fluid">
-                <p v-if="hostedGame.ranked" class="text-warning">
+                <p v-if="game.ranked" class="text-warning">
                     <IconTrophyFill /> {{ $t('ranked') }}
                 </p>
                 <p v-else>
                     <span class="text-success"><IconPeopleFill /> {{ $t('friendly') }}</span>
-                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="hostedGame" /></small>
+                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="game" /></small>
                 </p>
             </div>
         </div>
@@ -708,33 +708,33 @@ watch(gameUIMode, () => {
                 <dl class="row">
                     <dt class="col-md-5">{{ $t('game.host') }}</dt>
                     <dd class="col-md-7">
-                        <AppPseudo v-if="hostedGame.host" :player="hostedGame.host!" :classes="playerColor(hostedGame.host!)" />
+                        <AppPseudo v-if="game.host" :player="game.host!" :classes="playerColor(game.host!)" />
                         <i v-else>System</i>
                     </dd>
 
                     <dt class="col-md-5">{{ $t('game.time_control') }}</dt>
-                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></dd>
+                    <dd class="col-md-7"><AppTimeControlLabel :timeControlBoardsize="game" /></dd>
 
                     <dt class="col-md-5">{{ $t('game.board_size') }}</dt>
-                    <dd class="col-md-7">{{ hostedGame.boardsize }}</dd>
+                    <dd class="col-md-7">{{ game.boardsize }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.created') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.createdAt) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(game.createdAt) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.started') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.startedAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(game.startedAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('last_move') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.lastMoveAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(game.lastMoveAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.finished') }}</dt>
-                    <dd class="col-md-7">{{ formatDateInfo(hostedGame.endedAt ?? null) }}</dd>
+                    <dd class="col-md-7">{{ formatDateInfo(game.endedAt ?? null) }}</dd>
 
                     <dt class="col-md-5">{{ $t('game.duration') }}</dt>
-                    <dd class="col-md-7">{{ formatGameDuration(hostedGame) }}</dd>
+                    <dd class="col-md-7">{{ formatGameDuration(game) }}</dd>
 
                     <dt class="col-md-5">{{ $t('moves') }}</dt>
-                    <dd class="col-md-7">{{ hostedGame.moves.length ?? 0 }}</dd>
+                    <dd class="col-md-7">{{ game.moves.length ?? 0 }}</dd>
 
                     <dt class="col-md-5">{{ $t('handicap.title') }}</dt>
                     <dd class="col-md-7" v-if="(0 === handicap)">{{ $t('handicap.none') }}</dd>
@@ -743,7 +743,7 @@ watch(gameUIMode, () => {
                     <dd class="col-md-7" v-else>-</dd>
 
                     <dt class="col-md-5">{{ $t('allow_exploration') }}</dt>
-                    <dd class="col-md-7" v-if="hostedGame.explorationAllowed">{{ $t('yes') }}</dd>
+                    <dd class="col-md-7" v-if="game.explorationAllowed">{{ $t('yes') }}</dd>
                     <dd class="col-md-7" v-else>{{ $t('no') }}</dd>
                 </dl>
             </div>
@@ -756,7 +756,7 @@ watch(gameUIMode, () => {
             <div class="container-fluid">
 
                 <div class="mb-2" v-if="playerSettings">
-                    <template v-if="'blitz' === timeControlToCadencyName(hostedGame)">
+                    <template v-if="'blitz' === timeControlToCadencyName(game)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconLightningChargeFill /> {{ $t('time_cadency.blitz') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsBlitz" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -770,7 +770,7 @@ watch(gameUIMode, () => {
                         </div>
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsBlitz)) }}</div>
                     </template>
-                    <template v-if="'normal' === timeControlToCadencyName(hostedGame)">
+                    <template v-if="'normal' === timeControlToCadencyName(game)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconAlarmFill /> {{ $t('time_cadency.normal') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsNormal" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -784,7 +784,7 @@ watch(gameUIMode, () => {
                         </div>
                         <div class="form-text" id="move-settings-help">{{ $t(getMoveSettingsHelpKey(playerSettings.moveSettingsNormal)) }}</div>
                     </template>
-                    <template v-if="'correspondence' === timeControlToCadencyName(hostedGame)">
+                    <template v-if="'correspondence' === timeControlToCadencyName(game)">
                         <label for="move-settings-radio" class="col-form-label">{{ $t('move_settings.title') }} <small>(<IconCalendar /> {{ $t('time_cadency.correspondence') }})</small></label>
                         <div class="btn-group" id="move-settings-radio" role="group" aria-describedby="move-settings-help">
                             <input v-model="playerSettings.moveSettingsCorrespondence" :value="MoveSettings.PREMOVE" type="radio" class="btn-check" id="move-settings-1" autocomplete="off">
@@ -955,7 +955,7 @@ watch(gameUIMode, () => {
 
                 <form class="chat-input">
                     <div
-                        v-for="player in getPlayers(hostedGame).filter(p => chatRestrictedPlayers.has(p.publicId))"
+                        v-for="player in getPlayers(game).filter(p => chatRestrictedPlayers.has(p.publicId))"
                         :key="player.publicId"
                         class="chat-restriction-notice"
                     >

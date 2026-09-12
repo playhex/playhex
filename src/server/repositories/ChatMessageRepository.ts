@@ -38,7 +38,7 @@ export default class ChatMessageRepository
     async getLastChatMessagesForModeration(since: Date): Promise<ChatMessage[]>
     {
         return await this.chatMessageRepository.find({
-            relations: { player: true, hostedGame: true },
+            relations: { player: true, game: true },
             where: {
                 contentTranslationKey: IsNull(),
                 deletedByModeration: false,

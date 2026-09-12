@@ -1,10 +1,10 @@
-import { HostedGameOptions, Player } from '../../shared/app/models/index.js';
+import { GameOptions, Player } from '../../shared/app/models/index.js';
 import { calcRandomMove } from '../../shared/game-engine/index.js';
 import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { Container } from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer.js';
 import logger from './logger.js';
-import HostedGameServer from '../HostedGameServer.js';
+import GameServer from '../GameServer.js';
 import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
@@ -22,7 +22,7 @@ const findPlayerWithAIConfig = async (publicId: string): Promise<null | Player> 
     });
 };
 
-export const findAIOpponent = async (gameOptions: HostedGameOptions): Promise<null | Player> => {
+export const findAIOpponent = async (gameOptions: GameOptions): Promise<null | Player> => {
     const publicId = gameOptions.opponentPublicId;
 
     if (!publicId) {
@@ -106,7 +106,7 @@ const waitTimeBeforeRandomMove = (aiConfig: { wait?: number }): number => {
     return 0;
 };
 
-export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedGameServer): Promise<null | HexMove> => {
+export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): Promise<null | HexMove> => {
     const { isBot } = player;
     let { aiConfig } = player;
 
@@ -128,13 +128,13 @@ export const makeAIPlayerMove = async (player: Player, hostedGameServer: HostedG
     }
 
     if (aiConfig.isRemote) {
-        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, hostedGameServer, aiConfig.config);
+        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config);
     }
 
-    const engineGame = hostedGameServer.getEngineGame();
+    const engineGame = gameServer.getEngineGame();
 
     if (engineGame === null) {
-        throw new Error('makeAIPlayerMove() called with a HostedGame without game');
+        throw new Error('makeAIPlayerMove() called with a Game without game');
     }
 
     switch (aiConfig.engine) {

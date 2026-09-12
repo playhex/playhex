@@ -383,7 +383,7 @@ describe('Authentication', () => {
             const game = gameResponse.body;
 
             assert.doesNotHaveAnyKeys(game.host, ['id', 'password']);
-            assert.doesNotHaveAnyKeys(game.hostedGameToPlayers[0].player, ['id', 'password']);
+            assert.doesNotHaveAnyKeys(game.gameToPlayers[0].player, ['id', 'password']);
         });
 
         /*
@@ -408,8 +408,8 @@ describe('Authentication', () => {
 
             for (let i = 0; i < persistedGames.length; ++i) {
                 assert.doesNotHaveAnyKeys(persistedGames[i].host ?? {}, ['id', 'password']);
-                assert.doesNotHaveAnyKeys(persistedGames[i].hostedGameToPlayers[0].player, ['id', 'password']);
-                assert.doesNotHaveAnyKeys(persistedGames[i].hostedGameToPlayers[1].player, ['id', 'password']);
+                assert.doesNotHaveAnyKeys(persistedGames[i].gameToPlayers[0].player, ['id', 'password']);
+                assert.doesNotHaveAnyKeys(persistedGames[i].gameToPlayers[1].player, ['id', 'password']);
             }
         });
     });

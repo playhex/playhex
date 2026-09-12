@@ -2,103 +2,103 @@ import { gameToHexworldLink, parseHexworldString } from '../hexworld.js';
 import { EngineGame } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
-import { assignEngineGameData } from '../hostedGameUtils.js';
-import { HostedGame } from '../models/index.js';
+import { assignEngineGameData } from '../gameUtils.js';
+import { Game } from '../models/index.js';
 
 describe('hexworld', () => {
     it('generates review link from game', () => {
-        const game = new EngineGame(9);
+        const engineGame = new EngineGame(9);
 
-        game.move('e5', 0);
-        game.move('g6', 1);
-        game.move('c6', 0);
-        game.move('i9', 1);
-        game.move('b3', 0);
+        engineGame.move('e5', 0);
+        engineGame.move('g6', 1);
+        engineGame.move('c6', 0);
+        engineGame.move('i9', 1);
+        engineGame.move('b3', 0);
 
-        const hostedGame = new HostedGame();
-        assignEngineGameData(hostedGame, game.toData());
+        const game = new Game();
+        assignEngineGameData(game, engineGame.toData());
 
-        const link = gameToHexworldLink(hostedGame);
+        const link = gameToHexworldLink(game);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,e5g6c6i9b3');
     });
 
     it('generates review link from game having a swap pieces move', () => {
-        const game = new EngineGame(9);
+        const engineGame = new EngineGame(9);
 
-        game.move('b3', 0);
-        game.move('swap-pieces', 1);
-        game.move('c6', 0);
-        game.move('i9', 1);
-        game.move('c4', 0);
+        engineGame.move('b3', 0);
+        engineGame.move('swap-pieces', 1);
+        engineGame.move('c6', 0);
+        engineGame.move('i9', 1);
+        engineGame.move('c4', 0);
 
-        const hostedGame = new HostedGame();
-        assignEngineGameData(hostedGame, game.toData());
+        const game = new Game();
+        assignEngineGameData(game, engineGame.toData());
 
-        const link = gameToHexworldLink(hostedGame);
+        const link = gameToHexworldLink(game);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6i9c4');
     });
 
     it('generates review link from game having a pass move', () => {
-        const game = new EngineGame(9);
+        const engineGame = new EngineGame(9);
 
-        game.move('b3', 0);
-        game.move('swap-pieces', 1);
-        game.move('c6', 0);
-        game.move('i9', 1);
-        game.move('pass', 0);
+        engineGame.move('b3', 0);
+        engineGame.move('swap-pieces', 1);
+        engineGame.move('c6', 0);
+        engineGame.move('i9', 1);
+        engineGame.move('pass', 0);
 
-        const hostedGame = new HostedGame();
-        assignEngineGameData(hostedGame, game.toData());
+        const game = new Game();
+        assignEngineGameData(game, engineGame.toData());
 
-        const link = gameToHexworldLink(hostedGame);
+        const link = gameToHexworldLink(game);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6i9:p');
     });
 
     it('generates review link from a resigned game', () => {
-        const game = new EngineGame(9);
+        const engineGame = new EngineGame(9);
 
-        game.move('b3', 0);
-        game.move('swap-pieces', 1);
-        game.move('c6', 0);
-        game.resign(1, new Date());
+        engineGame.move('b3', 0);
+        engineGame.move('swap-pieces', 1);
+        engineGame.move('c6', 0);
+        engineGame.resign(1, new Date());
 
-        const hostedGame = new HostedGame();
-        assignEngineGameData(hostedGame, game.toData());
+        const game = new Game();
+        assignEngineGameData(game, engineGame.toData());
 
-        const link = gameToHexworldLink(hostedGame);
+        const link = gameToHexworldLink(game);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#9r9c1,b3:sc6:rw');
     });
 
     it('generates review link from a timed out game', () => {
-        const game = new EngineGame(11);
+        const engineGame = new EngineGame(11);
 
-        game.move('b3', 0);
-        game.move('c11', 1);
-        game.loseByTime(new Date());
+        engineGame.move('b3', 0);
+        engineGame.move('c11', 1);
+        engineGame.loseByTime(new Date());
 
-        const hostedGame = new HostedGame();
-        assignEngineGameData(hostedGame, game.toData());
+        const game = new Game();
+        assignEngineGameData(game, engineGame.toData());
 
-        const link = gameToHexworldLink(hostedGame);
+        const link = gameToHexworldLink(game);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#11r9c1,b3c11:fb');
     });
 
     it('generates a review link for the "Flat" board rotation', () => {
-        const game = new EngineGame(11);
-        game.move('c2', 0);
-        game.move('d4', 1);
-        game.move('c6', 0);
-        game.resign(1, new Date());
+        const engineGame = new EngineGame(11);
+        engineGame.move('c2', 0);
+        engineGame.move('d4', 1);
+        engineGame.move('c6', 0);
+        engineGame.resign(1, new Date());
 
-        const hostedGame = new HostedGame();
-        assignEngineGameData(hostedGame, game.toData());
+        const game = new Game();
+        assignEngineGameData(game, engineGame.toData());
 
-        const link = gameToHexworldLink(hostedGame, 0);
+        const link = gameToHexworldLink(game, 0);
 
         assert.strictEqual(link, 'https://hexworld.org/board/#11c1,c2d4c6:rw');
     });

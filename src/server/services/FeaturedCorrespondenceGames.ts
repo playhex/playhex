@@ -1,14 +1,14 @@
 import { Service } from 'typedi';
-import HostedGameStore from '../store/HostedGameStore.js';
-import { HostedGame } from '../../shared/app/models/index.js';
+import GameStore from '../store/GameStore.js';
+import { Game } from '../../shared/app/models/index.js';
 import { isCorrespondence } from '../../shared/app/timeControlUtils.js';
-import { isBotGame } from '../../shared/app/hostedGameUtils.js';
+import { isBotGame } from '../../shared/app/gameUtils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { notifier } from './notifications/notifier.js';
 import { glicko2Settings } from '../../shared/app/ratingUtils.js';
 
 type FeaturedCorrespondenceGamesEvents = {
-    featuredCorrespondenceGamesUpdated: (featuredGames: HostedGame[]) => void;
+    featuredCorrespondenceGamesUpdated: (featuredGames: Game[]) => void;
 };
 
 const MAX_FEATURED_GAMES = 2;
@@ -31,12 +31,12 @@ const DECREASE_SCORE_FEW_MOVES = 10;
 export class FeaturedCorrespondenceGames extends TypedEmitter<FeaturedCorrespondenceGamesEvents>
 {
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {
         super();
 
-        const emitUpdate = (hostedGame: HostedGame) => {
-            if (this.isCorrespondence1v1(hostedGame)) {
+        const emitUpdate = (game: Game) => {
+            if (this.isCorrespondence1v1(game)) {
                 this.emit('featuredCorrespondenceGamesUpdated', this.getFeaturedGames());
             }
         };
@@ -46,51 +46,51 @@ export class FeaturedCorrespondenceGames extends TypedEmitter<FeaturedCorrespond
         notifier.on('gameCanceled', emitUpdate);
 
         // Update when a move is played so games crossing the MIN_MOVES threshold get picked up.
-        // Note: on 'move', hostedGame.moves has not yet been incremented,
+        // Note: on 'move', game.moves has not yet been incremented,
         // so a game becomes visible one move after crossing MIN_MOVES (acceptable for correspondence).
-        notifier.on('move', (hostedGame) => {
-            if (this.isCorrespondence1v1(hostedGame)) {
+        notifier.on('move', (game) => {
+            if (this.isCorrespondence1v1(game)) {
                 this.emit('featuredCorrespondenceGamesUpdated', this.getFeaturedGames());
             }
         });
     }
 
-    private isCorrespondence1v1(hostedGame: HostedGame): boolean
+    private isCorrespondence1v1(game: Game): boolean
     {
-        return hostedGame.state === 'playing'
-            && isCorrespondence(hostedGame)
-            && !isBotGame(hostedGame);
+        return game.state === 'playing'
+            && isCorrespondence(game)
+            && !isBotGame(game);
     }
 
-    private calcGameScore(hostedGame: HostedGame): number
+    private calcGameScore(game: Game): number
     {
-        const ratings = hostedGame.hostedGameToPlayers.map(
+        const ratings = game.gameToPlayers.map(
             p => p.player?.currentRating?.rating ?? glicko2Settings.rating,
         );
 
         let score = ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
 
         // Make early games less visible
-        if (hostedGame.moves.length < DECREASE_SCORE_FEW_MOVES) {
-            score += (hostedGame.moves.length * (10000 / DECREASE_SCORE_FEW_MOVES)) - 10000;
+        if (game.moves.length < DECREASE_SCORE_FEW_MOVES) {
+            score += (game.moves.length * (10000 / DECREASE_SCORE_FEW_MOVES)) - 10000;
         }
 
         return score;
     }
 
-    getFeaturedGames(): HostedGame[]
+    getFeaturedGames(): Game[]
     {
-        const activeGames = this.hostedGameStore.getActiveGames();
-        const candidates: HostedGame[] = [];
+        const activeGames = this.gameStore.getActiveGames();
+        const candidates: Game[] = [];
 
         for (const publicId in activeGames) {
-            const hostedGame = activeGames[publicId].getHostedGame();
+            const game = activeGames[publicId].getGame();
 
-            if (!this.isCorrespondence1v1(hostedGame) || hostedGame.moves.length < MIN_MOVES) {
+            if (!this.isCorrespondence1v1(game) || game.moves.length < MIN_MOVES) {
                 continue;
             }
 
-            candidates.push(hostedGame);
+            candidates.push(game);
         }
 
         candidates.sort((a, b) => this.calcGameScore(b) - this.calcGameScore(a));

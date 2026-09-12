@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { GameAnalyze, HostedGame } from '../../shared/app/models/index.js';
+import { GameAnalyze, Game } from '../../shared/app/models/index.js';
 import { Repository } from 'typeorm';
 
 @Service()
@@ -9,13 +9,13 @@ export default class GameAnalyzeRepository
         @Inject('Repository<GameAnalyze>')
         private gameAnalyzeRepository: Repository<GameAnalyze>,
 
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     async persist(gamePublicId: string, gameAnalyze: GameAnalyze): Promise<void>
     {
-        gameAnalyze.hostedGame = await this.hostedGameRepository.findOneOrFail({
+        gameAnalyze.game = await this.gameRepository.findOneOrFail({
             select: {
                 id: true,
             },
@@ -30,7 +30,7 @@ export default class GameAnalyzeRepository
     async findByGamePublicId(publicId: string): Promise<null | GameAnalyze>
     {
         return await this.gameAnalyzeRepository.findOneBy({
-            hostedGame: {
+            game: {
                 publicId: publicId,
             },
         });

@@ -4,7 +4,7 @@ import { Service } from 'typedi';
 import { createClient } from 'redis';
 import { ArrayMaxSize, IsArray, IsIn, IsInt, Max, Min, Validate } from 'class-validator';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
-import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/models/HostedGameOptions.js';
+import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/models/GameOptions.js';
 import { IsHexCoordinate } from '../../../../shared/app/validator/IsHexCoordinate.js';
 import { rateLimiterConsumeAnalyzePosition } from '../../../services/rate-limiters.js';
 

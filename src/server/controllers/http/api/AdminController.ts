@@ -1,11 +1,11 @@
 import { Service } from 'typedi';
 import { IsNumber, IsString, Max, Min } from 'class-validator';
-import HostedGameStore from '../../../store/HostedGameStore.js';
+import GameStore from '../../../store/GameStore.js';
 import { PreRenderedService } from '../../../services/PreRenderedService.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Authorized, Body, Delete, Get, HttpError, JsonController, NotFoundError, Param, Patch, Post, Req } from 'routing-controllers';
 import type { Request } from 'express';
-import { Player, Tournament, HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { Player, Tournament, GameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
 import { PushNotificationSender } from '../../../services/PushNotificationsSender.js';
@@ -37,7 +37,7 @@ export default class AdminController
 {
     constructor(
         private preRenderedService: PreRenderedService,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private tournamentStore: TournamentStore,
         private playerRepository: PlayerRepository,
         private chatMessageRepository: ChatMessageRepository,
@@ -80,19 +80,19 @@ export default class AdminController
     @Post('/api/admin/persist-games')
     async persistGames()
     {
-        const allSuccess = await this.hostedGameStore.persistPlayingGames();
+        const allSuccess = await this.gameStore.persistPlayingGames();
 
         if (!allSuccess) {
             throw new HttpError(500, 'Some games could not be persisted');
         }
     }
 
-    @Post('/api/admin/games/:hostedGamePublicId/players/:playerPublicId/forfeit')
+    @Post('/api/admin/games/:gamePublicId/players/:playerPublicId/forfeit')
     forfeitGame(
-        @Param('hostedGamePublicId') hostedGamePublicId: string,
+        @Param('gamePublicId') gamePublicId: string,
         @Param('playerPublicId') playerPublicId: string,
     ) {
-        const activeGame = this.hostedGameStore.getActiveGame(hostedGamePublicId);
+        const activeGame = this.gameStore.getActiveGame(gamePublicId);
 
         if (!activeGame) {
             throw new HttpError(400, 'No active game with this public id');
@@ -124,7 +124,7 @@ export default class AdminController
         const ai0 = await findAIBySlug(body.ai0Slug);
         const ai1 = await findAIBySlug(body.ai1Slug);
 
-        const gameOptions = new HostedGameOptions();
+        const gameOptions = new GameOptions();
 
         gameOptions.opponentType = 'ai';
         gameOptions.opponentPublicId = ai1.publicId;
@@ -137,12 +137,12 @@ export default class AdminController
             },
         };
 
-        const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions }, { persist: false, aiJoinAuto: false });
+        const gameServer = await this.gameStore.createGame({ gameOptions }, { persist: false, aiJoinAuto: false });
 
-        hostedGameServer.playerJoin(ai0, true);
-        hostedGameServer.playerJoin(ai1, true);
+        gameServer.playerJoin(ai0, true);
+        gameServer.playerJoin(ai1, true);
 
-        return hostedGameServer.getHostedGame();
+        return gameServer.getGame();
     }
 
     @Post('/api/admin/players/:publicId/shadow-ban')
@@ -156,7 +156,7 @@ export default class AdminController
         }
 
         const playerShadowBanned = await this.playerRepository.shadowBan(publicId);
-        const shadowDeletedChatMessagesInActiveGames = this.hostedGameStore.shadowDeletePlayerChatMessages(publicId);
+        const shadowDeletedChatMessagesInActiveGames = this.gameStore.shadowDeletePlayerChatMessages(publicId);
         const shadowDeletedChatMessagesInPersistedGames = await this.chatMessageRepository.shadowDeletePlayerMessages(player);
 
         return {
@@ -184,13 +184,13 @@ export default class AdminController
     cancelGame(
         @Param('publicId') publicId: string,
     ) {
-        const hostedGameServer = this.hostedGameStore.getActiveGame(publicId);
+        const gameServer = this.gameStore.getActiveGame(publicId);
 
-        if (hostedGameServer === null) {
-            throw new NotFoundError(`HostedGame "${publicId}" not found`);
+        if (gameServer === null) {
+            throw new NotFoundError(`Game "${publicId}" not found`);
         }
 
-        hostedGameServer.systemCancel('admin');
+        gameServer.systemCancel('admin');
     }
 
     @Post('/api/admin/persist-tournaments')
@@ -258,11 +258,11 @@ export default class AdminController
         return this.autoCancelStaleGames.checkAllGames(false);
     }
 
-    @Post('/api/admin/games/:hostedGamePublicId/debug-staleness')
+    @Post('/api/admin/games/:gamePublicId/debug-staleness')
     postDebugStaleness(
-        @Param('hostedGamePublicId') hostedGamePublicId: string,
+        @Param('gamePublicId') gamePublicId: string,
     ) {
-        const activeGame = this.hostedGameStore.getActiveGame(hostedGamePublicId);
+        const activeGame = this.gameStore.getActiveGame(gamePublicId);
 
         if (!activeGame) {
             throw new HttpError(400, 'No active game with this public id');

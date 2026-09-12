@@ -1,5 +1,5 @@
-import HostedGameServer from '../../HostedGameServer.js';
-import { is1v1Game, isBotGame } from '../../../shared/app/hostedGameUtils.js';
+import GameServer from '../../GameServer.js';
+import { is1v1Game, isBotGame } from '../../../shared/app/gameUtils.js';
 import { no, StaleEvaluatorResult, yes } from './StaleEvaluatorResult.js';
 import { Service } from 'typedi';
 import { timings } from './timings.js';
@@ -17,18 +17,18 @@ import { isCorrespondence } from '../../../shared/app/timeControlUtils.js';
 @Service()
 export class GameStaleEvaluator
 {
-    isStale(hostedGameServer: HostedGameServer): StaleEvaluatorResult
+    isStale(gameServer: GameServer): StaleEvaluatorResult
     {
-        const hostedGame = hostedGameServer.getHostedGame();
-        const engineGame = hostedGameServer.getEngineGame();
+        const game = gameServer.getGame();
+        const engineGame = gameServer.getEngineGame();
 
         // Do not mark tournament matches as stale
-        if (hostedGame.tournamentMatch) {
+        if (game.tournamentMatch) {
             return no('this is a tournament game');
         }
 
         // bot game, empty
-        if (isBotGame(hostedGame) && isPlayingAndEmpty(hostedGameServer)) {
+        if (isBotGame(game) && isPlayingAndEmpty(gameServer)) {
             const startedAt = engineGame!.getStartedAt();
 
             if (isTimingPast(startedAt, timings.emptyBotGame)) {
@@ -39,10 +39,10 @@ export class GameStaleEvaluator
         }
 
         // 1v1, correspondence, empty
-        if (is1v1Game(hostedGame) && isCorrespondence(hostedGame) && isPlayingAndEmpty(hostedGameServer)) {
+        if (is1v1Game(game) && isCorrespondence(game) && isPlayingAndEmpty(gameServer)) {
             const lastActivityAt = engineGame?.getLastMoveAt()
                 ?? engineGame?.getStartedAt()
-                ?? hostedGameServer.getHostedGame().createdAt
+                ?? gameServer.getGame().createdAt
             ;
 
             if (isTimingPast(lastActivityAt, timings.empty1v1Correspondence)) {
@@ -52,10 +52,10 @@ export class GameStaleEvaluator
             return no('1v1 correspondence empty, but timing still ok', { lastActivityAt });
         }
 
-        if (is1v1Game(hostedGame) && !isCorrespondence(hostedGame)) {
+        if (is1v1Game(game) && !isCorrespondence(game)) {
 
             // 1v1, live, empty
-            if (isPlayingAndEmpty(hostedGameServer)) {
+            if (isPlayingAndEmpty(gameServer)) {
                 const startedAt = engineGame!.getStartedAt();
 
                 if (isTimingPast(startedAt, timings.empty1v1Live)) {
@@ -70,10 +70,10 @@ export class GameStaleEvaluator
         }
 
         return no('game is not in a configuration that may be stale', {
-            is1v1: is1v1Game(hostedGame),
-            isBot: isBotGame(hostedGame),
-            isPlayingAndEmpty: isPlayingAndEmpty(hostedGameServer),
-            isCorrepondence: isCorrespondence(hostedGame),
+            is1v1: is1v1Game(game),
+            isBot: isBotGame(game),
+            isPlayingAndEmpty: isPlayingAndEmpty(gameServer),
+            isCorrepondence: isCorrespondence(game),
         });
     }
 }

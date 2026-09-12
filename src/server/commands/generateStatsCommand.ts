@@ -136,27 +136,27 @@ type GameRow = {
 const fetchGameRows = (from: null | Date, to: Date): Promise<GameRow[]> => {
     return AppDataSource.query(`
         SELECT
-            hg.boardsize AS boardsize,
-            hg.opponentType AS opponentType,
-            hg.timeControlType AS timeControlType,
-            hg.winner AS winner,
-            hg.moves AS moves,
-            hg.moveTimestamps AS moveTimestamps,
-            hg.ranked AS ranked,
-            hg.outcome AS outcome,
-            hg.swapRule AS swapRule,
+            g.boardsize AS boardsize,
+            g.opponentType AS opponentType,
+            g.timeControlType AS timeControlType,
+            g.winner AS winner,
+            g.moves AS moves,
+            g.moveTimestamps AS moveTimestamps,
+            g.ranked AS ranked,
+            g.outcome AS outcome,
+            g.swapRule AS swapRule,
             p0.id AS player0Id,
             p0.isBot AS player0IsBot,
             p1.id AS player1Id,
             p1.isBot AS player1IsBot
-        FROM hosted_game hg
-        JOIN hosted_game_to_player hgp0 ON hgp0.hostedGameId = hg.id AND hgp0.\`order\` = 0
-        JOIN player p0 ON p0.id = hgp0.playerId
-        JOIN hosted_game_to_player hgp1 ON hgp1.hostedGameId = hg.id AND hgp1.\`order\` = 1
-        JOIN player p1 ON p1.id = hgp1.playerId
-        WHERE hg.state = 'ended'
-        ${from ? 'AND hg.endedAt >= ?' : ''}
-        AND hg.endedAt < ?
+        FROM game g
+        JOIN game_to_player gp0 ON gp0.gameId = g.id AND gp0.\`order\` = 0
+        JOIN player p0 ON p0.id = gp0.playerId
+        JOIN game_to_player gp1 ON gp1.gameId = g.id AND gp1.\`order\` = 1
+        JOIN player p1 ON p1.id = gp1.playerId
+        WHERE g.state = 'ended'
+        ${from ? 'AND g.endedAt >= ?' : ''}
+        AND g.endedAt < ?
     `, from ? [from, to] : [to]);
 };
 

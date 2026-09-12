@@ -2,7 +2,7 @@
 import { toRefs } from 'vue';
 import { Player, Tournament } from '../../../../../shared/app/models/index.js';
 import { byRank } from '../../../../../shared/app/tournamentUtils.js';
-import { getWinnerPlayer } from '../../../../../shared/app/hostedGameUtils.js';
+import { getWinnerPlayer } from '../../../../../shared/app/gameUtils.js';
 
 const props = defineProps({
     tournament: {
@@ -19,22 +19,22 @@ const { tournament } = toRefs(props);
 const playerGamesHistory = (player: Player) => {
     const history: { endedAt: Date, win: boolean }[] = [];
 
-    for (const game of tournament.value.matches) {
-        if (!game.hostedGame || !game.player1 || !game.player2) {
+    for (const match of tournament.value.matches) {
+        if (!match.game || !match.player1 || !match.player2) {
             continue;
         }
 
-        if (game.player1.publicId !== player.publicId && game.player2.publicId !== player.publicId) {
+        if (match.player1.publicId !== player.publicId && match.player2.publicId !== player.publicId) {
             continue;
         }
 
-        const winner = getWinnerPlayer(game.hostedGame);
+        const winner = getWinnerPlayer(match.game);
 
         if (!winner) {
             continue;
         }
 
-        let endedAt = game.hostedGame.endedAt;
+        let endedAt = match.game.endedAt;
 
         if (typeof endedAt === 'string') {
             endedAt = new Date(endedAt);

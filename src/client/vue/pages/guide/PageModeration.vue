@@ -25,7 +25,7 @@ const exampleMessage0 = Object.assign(new ChatMessage(), {
     content: "you're a total noob",
     createdAt: new Date(new Date().getTime() - 60000 * 15),
     player: examplePlayer,
-    hostedGame: { publicId: '00000000-0000-0000-0000-000000000042' },
+    game: { publicId: '00000000-0000-0000-0000-000000000042' },
     shadowDeleted: false,
     deletedByModeration: true,
 });
@@ -35,7 +35,7 @@ const exampleMessage1 = Object.assign(new ChatMessage(), {
     content: 'go play with bots you noob',
     createdAt: new Date(new Date().getTime() - 60000 * 16),
     player: examplePlayer,
-    hostedGame: { publicId: '00000000-0000-0000-0000-000000000042' },
+    game: { publicId: '00000000-0000-0000-0000-000000000042' },
     shadowDeleted: false,
     deletedByModeration: true,
 });

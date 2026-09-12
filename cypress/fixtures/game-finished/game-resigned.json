@@ -8,7 +8,7 @@
         "slug": "aa",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "hostedGameToPlayers": [
+    "gameToPlayers": [
         {
             "player": {
                 "publicId": "determinist-random-bot|d6902ed2-5e33-46f3-998f-3739cb24d50b",

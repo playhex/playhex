@@ -1,11 +1,11 @@
 import assert from 'assert';
-import { HostedGame } from '../models/index.js';
+import { Game } from '../models/index.js';
 import { plainToInstance } from '../class-transformer-custom.js';
-import { hostedGameToSGF } from '../hostedGameToSGF.js';
+import { gameToSGF } from '../gameToSGF.js';
 
-describe('hostedGameToSGF', () => {
-    it('generates SGF from an HostedGame instance', () => {
-        const hostedGame: HostedGame = plainToInstance(HostedGame, {
+describe('gameToSGF', () => {
+    it('generates SGF from an Game instance', () => {
+        const game: Game = plainToInstance(Game, {
             moves: 'a2 swap-pieces k5 f6 e3'.split(' '),
             moveTimestamps: [
                 '2024-08-27T20:00:00.000Z',
@@ -34,7 +34,7 @@ describe('hostedGameToSGF', () => {
                 createdAt: '2024-08-25T14:09:33.524Z',
                 currentRating: null,
             },
-            hostedGameToPlayers: [
+            gameToPlayers: [
                 {
                     player: {
                         pseudo: 'Random bot',
@@ -97,13 +97,13 @@ describe('hostedGameToSGF', () => {
         });
 
         assert.strictEqual(
-            hostedGameToSGF(hostedGame),
+            gameToSGF(game),
             '(;FF[4]CA[UTF-8]AP[PlayHex:0.0.0]SO[PlayHex.org]PC[https://playhex.org/games/b9113964-070b-4b7a-84c1-a7b590261ec7]GM[11]SZ[11]PB[Random bot]PW[aaa]DT[2024-08-27]HA[0]RE[B+Resign]TM[600]OT[fischer 5 capped];B[a2]BL[600];W[swap-pieces]WL[595];B[k5]BL[595];W[f6]WL[590];B[e3]BL[580])',
         );
     });
 
     it('generates SGF from a byo yomi game', () => {
-        const hostedGame: HostedGame = plainToInstance(HostedGame, {
+        const game: Game = plainToInstance(Game, {
             publicId: '99efbf69-a506-4438-9c39-f3daeaf55d37',
             host: {
                 pseudo: 'Aaaa',
@@ -114,7 +114,7 @@ describe('hostedGameToSGF', () => {
                 createdAt: '2025-08-20T15:43:00.000Z',
                 currentRating: null,
             },
-            hostedGameToPlayers: [
+            gameToPlayers: [
                 {
                     player: {
                         pseudo: 'Davies 7',
@@ -195,7 +195,7 @@ describe('hostedGameToSGF', () => {
             rematch: null,
             rematchedFrom: {
                 publicId: '4f7b0ffb-6982-4d29-8736-18c9e07ad955',
-                hostedGameToPlayers: [
+                gameToPlayers: [
                     {
                         player: {
                             pseudo: 'Aaaa',
@@ -261,7 +261,7 @@ describe('hostedGameToSGF', () => {
         });
 
         assert.strictEqual(
-            hostedGameToSGF(hostedGame),
+            gameToSGF(game),
             '(;FF[4]CA[UTF-8]AP[PlayHex:0.0.0]SO[PlayHex.org]PC[https://playhex.org/games/99efbf69-a506-4438-9c39-f3daeaf55d37]GM[11]SZ[11]PB[Davies 7]PW[Aaaa]DT[2025-08-21]HA[0]RE[B+Resign]TM[10]OT[3x5 byo-yomi];B[j2]BL[10]OB[3];W[h7]WL[6]OW[3];B[f8]BL[7]OB[3];W[e4]WL[2]OW[3];B[g6]BL[4]OB[3];W[d7]WL[5]OW[1];B[g5]BL[1]OB[3];W[i3]WL[5]OW[1];B[h3]BL[5]OB[2];W[i4]WL[5]OW[1];B[e10]BL[5]OB[2])',
         );
     });

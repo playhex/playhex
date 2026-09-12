@@ -1,6 +1,6 @@
 import { EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
-import { CancelHostedGameReason, HostedGameState } from '../shared/app/Types.js';
-import { ChatMessage, Player, HostedGameToPlayer, HostedGame, Premove } from '../shared/app/models/index.js';
+import { CancelGameReason, GameState } from '../shared/app/Types.js';
+import { ChatMessage, Player, GameToPlayer, Game, Premove } from '../shared/app/models/index.js';
 import { bindTimeControlToGame } from '../shared/app/bindTimeControlToGame.js';
 import { HexServer } from './server.js';
 import baseLogger from './services/logger.js';
@@ -10,7 +10,7 @@ import { canPassAgain } from '../shared/app/passUtils.js';
 import { Container } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager.js';
-import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromHostedGame.js';
+import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromGame.js';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository.js';
 import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
 import { notifier } from './services/notifications/index.js';
@@ -18,11 +18,11 @@ import { AutoSaveInterface } from './auto-save/AutoSaveInterface.js';
 import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
-import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/hostedGameUtils.js';
+import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/gameUtils.js';
 import type { HexMove } from '../shared/move-notation/hex-move-notation.js';
 import { GameEventsEmitter } from './services/game-events-emitter/GameEventsEmitter.js';
 
-type HostedGameEvents = {
+type GameEvents = {
     played: () => void;
     ended: () => void;
     canceled: () => void;
@@ -35,7 +35,7 @@ type HostedGameEvents = {
  * Re-emits some game event.
  *
  * Can, and should be persisted for following purposes:
- *  - once created, to have an hostedGameId and persist relations (e.g correspondence moves)
+ *  - once created, to have an gameId and persist relations (e.g correspondence moves)
  *  - archive games once finished (in database)
  *  - before server restart (probably not applicable for blitz. Redis should be suffisant, as optional)
  *  - at intervals to prevent game data loss on server crash (for long games, still playing but no players activity. Redis should be suffisant, as optional)
@@ -48,7 +48,7 @@ type HostedGameEvents = {
  * and persisted only on game finished.
  * Unless server restart, a player become temporarly inactive, or correspondace game.
  */
-export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
+export default class GameServer extends TypedEmitter<GameEvents>
 {
     /**
      * Null if not yet started, or ended and reloaded from database
@@ -72,15 +72,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      * Reason of the next cancelation, set just before calling this.engineGame.cancel()
      * or doCancel(), and consumed by the "canceled" game event listener / doCancel().
      */
-    private pendingCancelReason: null | CancelHostedGameReason = null;
+    private pendingCancelReason: null | CancelGameReason = null;
 
     private io: HexServer = Container.get(HexServer);
 
     private logger = baseLogger;
 
     constructor(
-        private hostedGame: HostedGame,
-        private autoSave: AutoSaveInterface<HostedGame>,
+        private game: Game,
+        private autoSave: AutoSaveInterface<Game>,
         private gameEventEmitter: GameEventsEmitter = Container.get(GameEventsEmitter),
     ) {
         super();
@@ -91,37 +91,37 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private init(): void
     {
-        this.players = this.hostedGame.hostedGameToPlayers
+        this.players = this.game.gameToPlayers
             .sort((a, b) => a.order - b.order)
             .map(h => h.player)
         ;
 
         try {
             this.timeControl = createTimeControl(
-                this.hostedGame.timeControlType,
-                this.hostedGame.timeControl,
+                this.game.timeControlType,
+                this.game.timeControl,
             );
         } catch (e) {
             baseLogger.error('Could not recreate time control instance from persisted data', {
                 ...errorToLogger(e),
-                hostedGamePublicId: this.hostedGame.publicId,
-                hostedGame: this.hostedGame,
+                gamePublicId: this.game.publicId,
+                game: this.game,
             });
 
             throw e;
         }
 
         this.timeControl = createTimeControl(
-            this.hostedGame.timeControlType,
-            this.hostedGame.timeControl,
+            this.game.timeControlType,
+            this.game.timeControl,
         );
 
-        if (this.hostedGame.startedAt) {
+        if (this.game.startedAt) {
             try {
-                this.engineGame = EngineGame.fromData(toEngineGameData(this.hostedGame));
+                this.engineGame = EngineGame.fromData(toEngineGameData(this.game));
                 this.listenEngineGame(this.engineGame);
             } catch (e) {
-                baseLogger.error('Could not recreate game from data', { data: this.hostedGame });
+                baseLogger.error('Could not recreate game from data', { data: this.game });
                 throw e;
             }
         }
@@ -139,20 +139,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private createChildLogger()
     {
-        const { publicId } = this.hostedGame;
+        const { publicId } = this.game;
 
         if (typeof publicId !== 'string') {
-            throw new Error('hostedGame publicId must be defined');
+            throw new Error('game publicId must be defined');
         }
 
         this.logger = baseLogger.child({
-            hostedGamePublicId: publicId,
+            gamePublicId: publicId,
         });
     }
 
     getPublicId(): string
     {
-        return this.hostedGame.publicId;
+        return this.game.publicId;
     }
 
     getEngineGame(): null | EngineGame
@@ -184,9 +184,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return index as 0 | 1;
     }
 
-    getState(): HostedGameState
+    getState(): GameState
     {
-        return this.hostedGame.state;
+        return this.game.state;
     }
 
     /**
@@ -298,7 +298,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private async makeConditionalMovesIfApplicable(): Promise<void>
     {
         // Do not lose time querying database for conditional moves if game is not correspondence
-        if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(this.hostedGame))) {
+        if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(this.game))) {
             return;
         }
 
@@ -318,7 +318,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             const player = this.players[this.engineGame.getCurrentPlayerIndex()];
             const conditionalMovesRepository = Container.get(ConditionalMovesRepository);
 
-            const move = await conditionalMovesRepository.shift(player, this.hostedGame, lastMove.move);
+            const move = await conditionalMovesRepository.shift(player, this.game, lastMove.move);
 
             if (move === null) {
                 this.logger.info('Conditional moves: no conditional move.', { lastMove });
@@ -374,17 +374,17 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private async makeAIAnswerUndoIfApplicable(): Promise<void>
     {
-        if (this.hostedGame === null || this.engineGame === null || this.hostedGame.state !== 'playing' || typeof this.hostedGame.undoRequest !== 'number') {
+        if (this.game === null || this.engineGame === null || this.game.state !== 'playing' || typeof this.game.undoRequest !== 'number') {
             return;
         }
 
-        const player = this.players[1 - this.hostedGame.undoRequest];
+        const player = this.players[1 - this.game.undoRequest];
 
         if (!player.isBot) {
             return;
         }
 
-        const { ranked } = this.hostedGame;
+        const { ranked } = this.game;
 
         if (!ranked) {
             this.playerAnswerUndo(player, true);
@@ -417,8 +417,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         engineGame.on('played', (timestampedMove, moveIndex, byPlayerIndex) => {
             this.saveState();
 
-            this.gameEventEmitter.emitMoved(this.hostedGame, timestampedMove, moveIndex, byPlayerIndex);
-            this.gameEventEmitter.emitTimeControlUpdate(this.hostedGame, this.timeControl);
+            this.gameEventEmitter.emitMoved(this.game, timestampedMove, moveIndex, byPlayerIndex);
+            this.gameEventEmitter.emitTimeControlUpdate(this.game, this.timeControl);
 
             if (!engineGame.isEnded()) {
                 this.makeAutomatedMoves().catch(e => {
@@ -430,7 +430,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             this.emit('played');
 
             if (!engineGame.isEnded()) {
-                notifier.emit('move', this.hostedGame, timestampedMove);
+                notifier.emit('move', this.game, timestampedMove);
             }
         });
 
@@ -458,17 +458,17 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private doEnd(winner: PlayerIndex, outcome: Outcome, date: Date): void
     {
-        this.hostedGame.state = 'ended';
-        this.hostedGame.outcome = outcome;
+        this.game.state = 'ended';
+        this.game.outcome = outcome;
 
-        this.gameEventEmitter.emitGameEnded(this.hostedGame, winner, outcome, { date });
-        this.gameEventEmitter.emitTimeControlUpdate(this.hostedGame, this.timeControl);
+        this.gameEventEmitter.emitGameEnded(this.game, winner, outcome, { date });
+        this.gameEventEmitter.emitTimeControlUpdate(this.game, this.timeControl);
 
         this.logger.info('Game ended.', { winner, outcome });
 
         this.emit('ended');
 
-        notifier.emit('gameEnd', this.hostedGame);
+        notifier.emit('gameEnd', this.game);
     }
 
     bindTimeControl(): void
@@ -488,7 +488,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private async createAndStartGame(): Promise<void>
     {
-        if (this.hostedGame.state === 'canceled') {
+        if (this.game.state === 'canceled') {
             this.logger.warning('Cannot init game, canceled');
             return;
         }
@@ -505,10 +505,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.affectPlayersColors();
 
-        this.hostedGame.state = 'playing';
-        this.hostedGame.startedAt = new Date();
+        this.game.state = 'playing';
+        this.game.startedAt = new Date();
 
-        this.engineGame = EngineGame.fromData(toEngineGameData(this.hostedGame));
+        this.engineGame = EngineGame.fromData(toEngineGameData(this.game));
 
         this.listenEngineGame(this.engineGame);
 
@@ -516,12 +516,12 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         this.bindTimeControl();
 
-        this.gameEventEmitter.emitGameStarted(this.hostedGame);
-        this.gameEventEmitter.emitTimeControlUpdate(this.hostedGame, this.timeControl);
+        this.gameEventEmitter.emitGameStarted(this.game);
+        this.gameEventEmitter.emitTimeControlUpdate(this.game, this.timeControl);
 
-        this.logger.info('Game Started.', { startedAt: this.hostedGame.startedAt });
+        this.logger.info('Game Started.', { startedAt: this.game.startedAt });
 
-        notifier.emit('gameStart', this.hostedGame);
+        notifier.emit('gameStart', this.game);
 
         await this.autoSave.save();
 
@@ -536,15 +536,15 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         // Assume system has already set random colors as needed.
         // If games are created by a tournament system,
         // we assume tournament system already affect players colors randomly or depending on last match.
-        if (this.hostedGame.host === null) {
-            if (this.hostedGame.firstPlayer === null) {
+        if (this.game.host === null) {
+            if (this.game.firstPlayer === null) {
                 this.logger.info('Game created by system, do not shuffle players color');
                 return;
             }
 
             this.logger.info('Game created by system, but fixed colors, set fixed colors');
 
-            if (this.hostedGame.firstPlayer === 1) {
+            if (this.game.firstPlayer === 1) {
                 this.players.reverse();
             }
 
@@ -552,7 +552,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         // In case of rematch, alternate colors from previous game instead of random
-        if (this.hostedGame.rematchedFrom !== null) {
+        if (this.game.rematchedFrom !== null) {
             this.logger.info('Rematch alternate colors: should alternate?');
 
             if (this.shouldAlternateColorsFromRematchedGame()) {
@@ -565,7 +565,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         // Random colors
-        if (this.hostedGame.firstPlayer === null) {
+        if (this.game.firstPlayer === null) {
             this.logger.info('Affect random colors');
 
             if (Math.random() < 0.5) {
@@ -579,7 +579,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         // Fixed colors
         this.logger.info('Set fixed colors');
 
-        if (this.hostedGame.firstPlayer === 1) {
+        if (this.game.firstPlayer === 1) {
             this.players.reverse();
         }
     }
@@ -594,28 +594,28 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     private shouldAlternateColorsFromRematchedGame(): boolean
     {
         // no a rematch, do nothing
-        if (this.hostedGame.rematchedFrom === null) {
+        if (this.game.rematchedFrom === null) {
             return false;
         }
 
         // Do not alternate if previous game is not played, i.e canceled
-        if (this.hostedGame.rematchedFrom.state !== 'ended') {
-            this.logger.info('Rematch alternate colors: no, previous game is not ended', { state: this.hostedGame.rematchedFrom.state });
+        if (this.game.rematchedFrom.state !== 'ended') {
+            this.logger.info('Rematch alternate colors: no, previous game is not ended', { state: this.game.rematchedFrom.state });
             return false;
         }
 
-        const previousPlayersIds = this.hostedGame.rematchedFrom.hostedGameToPlayers.map(hostedGameToPlayer => hostedGameToPlayer.playerId);
+        const previousPlayersIds = this.game.rematchedFrom.gameToPlayers.map(gameToPlayer => gameToPlayer.playerId);
         const currentPlayersIds = this.players.map(player => player.id ?? 0);
 
         const samePlayers = currentPlayersIds.every(id => previousPlayersIds.includes(id));
         const sameOrder = currentPlayersIds[0] === previousPlayersIds[0] && currentPlayersIds[1] === previousPlayersIds[1];
 
         // If players have fixed positions (host plays first or second), keep same colors as before
-        if (this.hostedGame.firstPlayer !== null) {
+        if (this.game.firstPlayer !== null) {
             if (sameOrder) {
-                this.logger.info('Rematch alternate colors: no, colors are fixed, and players have same order', { state: this.hostedGame.rematchedFrom.state });
+                this.logger.info('Rematch alternate colors: no, colors are fixed, and players have same order', { state: this.game.rematchedFrom.state });
             } else {
-                this.logger.info('Rematch alternate colors: yes, colors are fixed, but players have not same order (the non-host rematched)', { state: this.hostedGame.rematchedFrom.state });
+                this.logger.info('Rematch alternate colors: yes, colors are fixed, but players have not same order (the non-host rematched)', { state: this.game.rematchedFrom.state });
             }
 
             return !sameOrder;
@@ -642,14 +642,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     playerJoin(player: Player, isSystem = false): true | string
     {
-        if (this.hostedGame.state !== 'created') {
-            this.logger.notice('Player tried to join but hosted game has started or ended', { joiner: player.pseudo });
+        if (this.game.state !== 'created') {
+            this.logger.notice('Player tried to join but game has started or ended', { joiner: player.pseudo });
             return 'Game has started or ended';
         }
 
         // Check whether game is full
         if (this.players.length >= 2) {
-            this.logger.notice('Player tried to join but hosted game is full', { joiner: player.pseudo });
+            this.logger.notice('Player tried to join but game is full', { joiner: player.pseudo });
             return 'Game is full';
         }
 
@@ -660,30 +660,30 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
 
         // Cannot join games created by system
-        if (this.hostedGame.host === null && !isSystem) {
+        if (this.game.host === null && !isSystem) {
             this.logger.notice('Player tried to join game created by system', { joiner: player.pseudo });
             return 'Cannot join game created by system.';
         }
 
         // Game is a nominative challenge: only the targeted player can join.
         // Checked before opponentMustBeRegistered so a challenged guest can still join.
-        if (this.hostedGame.opponentType === 'player'
-            && this.hostedGame.opponentPublicId !== null
-            && this.hostedGame.opponentPublicId !== player.publicId
+        if (this.game.opponentType === 'player'
+            && this.game.opponentPublicId !== null
+            && this.game.opponentPublicId !== player.publicId
         ) {
             this.logger.notice('Player tried to join a game reserved for another player', { joiner: player.pseudo });
             return 'This game is reserved for another player.';
         }
 
         // Cannot join as guest if host requires opponent with account only
-        if (this.hostedGame.opponentMustBeRegistered && player.isGuest) {
+        if (this.game.opponentMustBeRegistered && player.isGuest) {
             this.logger.notice('Player tried to join game as guest but host wants only registered players', { joiner: player.pseudo });
             return 'Cannot join game as guest, host want only players with account.';
         }
 
         this.players.push(player);
 
-        this.gameEventEmitter.emitGameJoined(this.hostedGame, player);
+        this.gameEventEmitter.emitGameJoined(this.game, player);
 
         this.logger.info('Player joined.', { joiner: player.pseudo });
 
@@ -701,8 +701,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     {
         this.logger.info('Move played', { move, player: player.pseudo });
 
-        if (this.hostedGame.state !== 'playing') {
-            this.logger.notice('Player tried to move but hosted game is not playing', { player: player.pseudo });
+        if (this.game.state !== 'playing') {
+            this.logger.notice('Player tried to move but game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -744,8 +744,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     playerPremove(player: Player, premove: Premove): true | string
     {
-        if (this.hostedGame.state !== 'playing') {
-            this.logger.notice('Player tried to register a premove but hosted game is not playing', { player: player.pseudo });
+        if (this.game.state !== 'playing') {
+            this.logger.notice('Player tried to register a premove but game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -795,8 +795,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     {
         this.logger.info('Player ask undo', { player: player.pseudo });
 
-        if (this.hostedGame.state !== 'playing') {
-            this.logger.notice('Player tried to ask undo but hosted game is not playing', { player: player.pseudo });
+        if (this.game.state !== 'playing') {
+            this.logger.notice('Player tried to ask undo but game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -812,10 +812,10 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'you are not a player of this game';
         }
 
-        const hostedGame = this.getHostedGame();
+        const game = this.getGame();
 
-        if (hostedGame.undoRequest !== null) {
-            this.logger.notice('A player tried to ask undo but there is already an undo request', { player: player.pseudo, undoRequest: hostedGame.undoRequest });
+        if (game.undoRequest !== null) {
+            this.logger.notice('A player tried to ask undo but there is already an undo request', { player: player.pseudo, undoRequest: game.undoRequest });
             return 'there is already an undo request';
         }
 
@@ -825,8 +825,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return reason;
         }
 
-        hostedGame.undoRequest = playerIndex;
-        this.gameEventEmitter.emitAskUndo(this.hostedGame, playerIndex);
+        game.undoRequest = playerIndex;
+        this.gameEventEmitter.emitAskUndo(this.game, playerIndex);
 
         this.makeAIAnswerUndoIfApplicable().catch(e => {
             this.logger.error('Error in makeAIAnswerUndoIfApplicable()', errorToLogger(e));
@@ -839,8 +839,8 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     {
         this.logger.info('Player answer undo request', { player: player.pseudo, accept });
 
-        if (this.hostedGame.state !== 'playing') {
-            this.logger.notice('Player tried to answer undo but hosted game is not playing', { player: player.pseudo });
+        if (this.game.state !== 'playing') {
+            this.logger.notice('Player tried to answer undo but game is not playing', { player: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -856,20 +856,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return 'Game not yet started, cannot answer undo';
         }
 
-        const hostedGame = this.getHostedGame();
+        const game = this.getGame();
         const now = new Date();
 
-        if (hostedGame.undoRequest === null) {
-            this.logger.notice('A player tried to answer undo but there is no undo request', { player: player.pseudo, undoRequest: hostedGame.undoRequest });
+        if (game.undoRequest === null) {
+            this.logger.notice('A player tried to answer undo but there is no undo request', { player: player.pseudo, undoRequest: game.undoRequest });
             return 'there is no undo request';
         }
 
-        if (hostedGame.undoRequest === playerIndex) {
-            this.logger.notice('A player tried to answer his own undo request', { player: player.pseudo, undoRequest: hostedGame.undoRequest });
+        if (game.undoRequest === playerIndex) {
+            this.logger.notice('A player tried to answer his own undo request', { player: player.pseudo, undoRequest: game.undoRequest });
             return 'cannot answer own undo request';
         }
 
-        const timeControlAfterUndo = recreateTimeControlAfterUndo(hostedGame, this.engineGame.playerUndoDryRun(hostedGame.undoRequest as PlayerIndex).length, now);
+        const timeControlAfterUndo = recreateTimeControlAfterUndo(game, this.engineGame.playerUndoDryRun(game.undoRequest as PlayerIndex).length, now);
 
         if (accept && timeControlAfterUndo === null) {
             this.logger.notice('An undo request has been accepted, but will make time control elapsing. Ignoring');
@@ -879,20 +879,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         let undoneMoves: HexMove[] = [];
 
         if (accept) {
-            undoneMoves = this.engineGame.playerUndo(hostedGame.undoRequest as PlayerIndex).map(({ move }) => move);
+            undoneMoves = this.engineGame.playerUndo(game.undoRequest as PlayerIndex).map(({ move }) => move);
         }
 
-        const playerUndoing = this.players[hostedGame.undoRequest];
+        const playerUndoing = this.players[game.undoRequest];
         this.saveGameState();
-        hostedGame.undoRequest = null;
-        this.gameEventEmitter.emitAnswerUndo(this.hostedGame, accept, undoneMoves);
+        game.undoRequest = null;
+        this.gameEventEmitter.emitAnswerUndo(this.game, accept, undoneMoves);
 
         if (accept) {
             this.timeControl.setValues(timeControlAfterUndo!.getValues(), now);
-            hostedGame.timeControl = this.timeControl.getValues();
-            this.gameEventEmitter.emitTimeControlUpdate(this.hostedGame, this.timeControl);
+            game.timeControl = this.timeControl.getValues();
+            this.gameEventEmitter.emitTimeControlUpdate(this.game, this.timeControl);
 
-            if (!isBotGame(this.hostedGame)) {
+            if (!isBotGame(this.game)) {
                 this.postSystemChatMessage(
                     pseudoString(playerUndoing) + ' took back their move.',
                     'undo.player_takeback_his_move',
@@ -910,20 +910,20 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
      */
     private cancelUndoRequestIfAny(playerIndex: number): void
     {
-        if (!this.hostedGame || typeof this.hostedGame.undoRequest !== 'number') {
+        if (!this.game || typeof this.game.undoRequest !== 'number') {
             return;
         }
 
-        if (playerIndex === this.hostedGame.undoRequest) {
-            this.hostedGame.undoRequest = null;
-            this.gameEventEmitter.emitCancelUndo(this.hostedGame);
+        if (playerIndex === this.game.undoRequest) {
+            this.game.undoRequest = null;
+            this.gameEventEmitter.emitCancelUndo(this.game);
         }
     }
 
     playerResign(player: Player): true | string
     {
-        if (this.hostedGame.state !== 'playing') {
-            this.logger.notice('Player tried to resign but hosted game is not playing', { joiner: player.pseudo });
+        if (this.game.state !== 'playing') {
+            this.logger.notice('Player tried to resign but game is not playing', { joiner: player.pseudo });
             return 'Game is not playing';
         }
 
@@ -951,13 +951,13 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
     private canCancel(player: Player): true | string
     {
-        if (!this.isPlayerInGame(player) && !isChallengeTargetOf(this.hostedGame, player)) {
+        if (!this.isPlayerInGame(player) && !isChallengeTargetOf(this.game, player)) {
             this.logger.notice('A player not in the game tried to cancel game', { player: player.pseudo });
             return 'you are not a player of this game';
         }
 
-        if (this.hostedGame.state !== 'playing' && this.hostedGame.state !== 'created') {
-            this.logger.notice('Player tried to cancel but hosted game is not playing nor created', { joiner: player.pseudo });
+        if (this.game.state !== 'playing' && this.game.state !== 'created') {
+            this.logger.notice('Player tried to cancel but game is not playing nor created', { joiner: player.pseudo });
             return 'Game is not playing nor created';
         }
 
@@ -986,9 +986,9 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         const now = new Date();
 
-        this.pendingCancelReason = isChallengeTargetOf(this.hostedGame, player)
+        this.pendingCancelReason = isChallengeTargetOf(this.game, player)
             ? 'declined'
-            : this.hostedGame.host?.publicId === player.publicId
+            : this.game.host?.publicId === player.publicId
                 ? 'by_host'
                 : 'by_opponent'
         ;
@@ -1002,7 +1002,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         return true;
     }
 
-    systemCancel(cancelReason: CancelHostedGameReason): void
+    systemCancel(cancelReason: CancelGameReason): void
     {
         this.logger.info('System cancel game', { cancelReason });
 
@@ -1021,21 +1021,21 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         }
     }
 
-    private doCancel(date: Date, cancelReason: null | CancelHostedGameReason): void
+    private doCancel(date: Date, cancelReason: null | CancelGameReason): void
     {
-        this.hostedGame.state = 'canceled';
-        this.hostedGame.cancelReason = cancelReason;
+        this.game.state = 'canceled';
+        this.game.cancelReason = cancelReason;
         this.pendingCancelReason = null;
-        this.hostedGame.endedAt = date;
+        this.game.endedAt = date;
 
-        this.gameEventEmitter.emitGameCanceled(this.hostedGame, { date });
-        this.gameEventEmitter.emitTimeControlUpdate(this.hostedGame, this.timeControl);
+        this.gameEventEmitter.emitGameCanceled(this.game, { date });
+        this.gameEventEmitter.emitTimeControlUpdate(this.game, this.timeControl);
 
-        this.logger.info('hosted game server canceled', { date });
+        this.logger.info('game server canceled', { date });
 
         this.emit('canceled');
 
-        notifier.emit('gameCanceled', this.hostedGame);
+        notifier.emit('gameCanceled', this.game);
     }
 
     systemForfeit(player: Player): void
@@ -1046,7 +1046,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             throw new Error('Cannot forfeit this player, not in game');
         }
 
-        if (this.hostedGame.state !== 'playing' && this.hostedGame.state !== 'created') {
+        if (this.game.state !== 'playing' && this.game.state !== 'created') {
             throw new Error('Game is not playing nor created');
         }
 
@@ -1070,7 +1070,7 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
 
         chatMessage.player = null;
         chatMessage.content = content;
-        chatMessage.hostedGame = this.hostedGame;
+        chatMessage.game = this.game;
         chatMessage.createdAt = now;
         chatMessage.contentTranslationKey = translationKey;
         chatMessage.translationParameters = translationParameters;
@@ -1081,14 +1081,14 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
     postChatMessage(chatMessage: ChatMessage)
     {
         this.logger.info('Chat message posted', { gamePublicId: this.getPublicId(), author: chatMessage.player?.pseudo, content: chatMessage.content, createdAt: chatMessage.createdAt });
-        this.hostedGame.chatMessages.push(chatMessage);
-        notifier.emit('chatMessage', this.hostedGame, chatMessage);
-        this.gameEventEmitter.emitChat(this.hostedGame, chatMessage);
+        this.game.chatMessages.push(chatMessage);
+        notifier.emit('chatMessage', this.game, chatMessage);
+        this.gameEventEmitter.emitChat(this.game, chatMessage);
         this.emit('chat');
     }
 
     /**
-     * Save game state into hostedGame.
+     * Save game state into game.
      */
     private saveGameState(): void
     {
@@ -1096,36 +1096,36 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
             return;
         }
 
-        assignEngineGameData(this.hostedGame, this.engineGame.toData());
+        assignEngineGameData(this.game, this.engineGame.toData());
     }
 
     private savePlayersState(): void
     {
         for (let i = 0; i < this.players.length; ++i) {
             const player = this.players[i];
-            let hostedGameToPlayer = this.hostedGame.hostedGameToPlayers.find(h => h.player.publicId === player.publicId);
+            let gameToPlayer = this.game.gameToPlayers.find(h => h.player.publicId === player.publicId);
 
-            if (undefined === hostedGameToPlayer) {
-                hostedGameToPlayer = new HostedGameToPlayer();
-                this.hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
+            if (undefined === gameToPlayer) {
+                gameToPlayer = new GameToPlayer();
+                this.game.gameToPlayers.push(gameToPlayer);
             }
 
-            hostedGameToPlayer.hostedGame = this.hostedGame;
-            hostedGameToPlayer.player = player;
-            hostedGameToPlayer.order = i;
+            gameToPlayer.game = this.game;
+            gameToPlayer.player = player;
+            gameToPlayer.order = i;
         }
 
-        this.hostedGame.hostedGameToPlayers.sort((a, b) => a.order - b.order);
+        this.game.gameToPlayers.sort((a, b) => a.order - b.order);
     }
 
     private saveTimeControlState(): void
     {
-        this.hostedGame.timeControl = this.timeControl.getValues();
+        this.game.timeControl = this.timeControl.getValues();
     }
 
     /**
      * Save players, game and time control state from this attributes to entity attributes.
-     * Should be called to have a fresh hostedGame entity, e.g before sending it as an event,
+     * Should be called to have a fresh game entity, e.g before sending it as an event,
      * or before persisting to database.
      */
     saveState(): void
@@ -1135,16 +1135,16 @@ export default class HostedGameServer extends TypedEmitter<HostedGameEvents>
         this.saveTimeControlState();
     }
 
-    persist(): Promise<HostedGame>
+    persist(): Promise<Game>
     {
         this.saveState();
         return this.autoSave.save();
     }
 
-    getHostedGame(): HostedGame
+    getGame(): Game
     {
         this.saveState();
 
-        return this.hostedGame;
+        return this.game;
     }
 }

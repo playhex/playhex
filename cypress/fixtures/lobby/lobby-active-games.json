@@ -8,7 +8,7 @@
             "isGuest": false,
             "isBot": false
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "afb0bb91-60af-468b-b470-4fa10dfadfc4",
@@ -142,7 +142,7 @@
             "isGuest": false,
             "isBot": false
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "ffb0bb91-60af-468b-b470-4fa10dfadfc4",

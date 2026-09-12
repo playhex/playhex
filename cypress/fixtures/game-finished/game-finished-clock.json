@@ -8,7 +8,7 @@
         "slug": "test-player",
         "createdAt": "2024-01-24T16:33:29.586Z"
     },
-    "hostedGameToPlayers": [
+    "gameToPlayers": [
         {
             "player": {
                 "publicId": "determinist-random-bot|5cb5cf43-803e-422f-867d-9e751e5e3758",

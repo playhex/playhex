@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 import { Expose } from '../class-transformer-custom.js';
 import Player from './Player.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
-import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
+import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeControlFischer } from './GameOptionsTimeControl.js';
 import { TimeControlIsLiveOrCorrespondence } from '../validator/TimeControlIsLiveOrCorrespondence.js';
 import { keysOf } from '../utils.js';
 import { type TimeControlCadency } from '../timeControlUtils.js';
@@ -45,9 +45,9 @@ export default class PlayerFavoriteTimeControl
     @ValidateNested()
     @Type((type) => {
         switch ((type?.object as PlayerFavoriteTimeControl).timeControlType?.family) {
-            case 'fischer': return HostedGameOptionsTimeControlFischer;
-            case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
-            default: return HostedGameOptionsTimeControl;
+            case 'fischer': return GameOptionsTimeControlFischer;
+            case 'byoyomi': return GameOptionsTimeControlByoYomi;
+            default: return GameOptionsTimeControl;
         }
     })
     @Column({ type: 'json' })

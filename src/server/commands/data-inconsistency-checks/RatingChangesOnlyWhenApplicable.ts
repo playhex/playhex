@@ -1,14 +1,14 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 @Service()
 export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheckerInterface
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     getDescription(): string
@@ -19,45 +19,45 @@ export class RatingChangesOnlyWhenApplicable implements DataInconsistenciesCheck
     async run(): Promise<string[]>
     {
         type Result = {
-            hostedGame_publicId: string;
-            hostedGame_createdAt: Date;
+            game_publicId: string;
+            game_createdAt: Date;
         };
 
-        const canceled: Result[] = await this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .innerJoin('hostedGame.ratings', 'rating')
-            .where('hostedGame.state = "canceled"')
-            .groupBy('hostedGame.id')
+        const canceled: Result[] = await this.gameRepository
+            .createQueryBuilder('game')
+            .innerJoin('game.ratings', 'rating')
+            .where('game.state = "canceled"')
+            .groupBy('game.id')
             .execute()
         ;
 
-        const unrated: Result[] = await this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .innerJoin('hostedGame.ratings', 'rating')
-            .where('not hostedGame.ranked')
-            .groupBy('hostedGame.id')
+        const unrated: Result[] = await this.gameRepository
+            .createQueryBuilder('game')
+            .innerJoin('game.ratings', 'rating')
+            .where('not game.ranked')
+            .groupBy('game.id')
             .execute()
         ;
 
-        const missingRating: Result[] = await this.hostedGameRepository.query(`
-            select hg.publicId as hostedGame_publicId, hg.createdAt as hostedGame_createdAt
-            from hosted_game hg
-            left join rating_games_hosted_game r on hg.id = r.hostedgameid
-            where hg.ranked
-            and r.hostedgameid is null
-            and hg.state in ('ended', 'forfeited')
+        const missingRating: Result[] = await this.gameRepository.query(`
+            select g.publicId as game_publicId, g.createdAt as game_createdAt
+            from game g
+            left join rating_games_game r on g.id = r.gameId
+            where g.ranked
+            and r.gameId is null
+            and g.state in ('ended', 'forfeited')
         `);
 
-        const hostedGameToString = (label: string, hostedGame: Result) => [
+        const gameToString = (label: string, game: Result) => [
             label,
-            hostedGame.hostedGame_publicId,
-            hostedGame.hostedGame_createdAt,
+            game.game_publicId,
+            game.game_createdAt,
         ].join(' ');
 
         return [
-            ...canceled.map(hostedGame => hostedGameToString('canceled but rated', hostedGame)),
-            ...unrated.map(hostedGame => hostedGameToString('unrated in options but having ratings', hostedGame)),
-            ...missingRating.map(hostedGame => hostedGameToString('rated in options but no ratings', hostedGame)),
+            ...canceled.map(game => gameToString('canceled but rated', game)),
+            ...unrated.map(game => gameToString('unrated in options but having ratings', game)),
+            ...missingRating.map(game => gameToString('rated in options but no ratings', game)),
         ];
     }
 }

@@ -1,4 +1,4 @@
-import { HostedGameToPlayer, PlayerHeadToHeadStats, PlayerStats } from '../../shared/app/models/index.js';
+import { GameToPlayer, PlayerHeadToHeadStats, PlayerStats } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { timeControlToCadencyName } from '../../shared/app/timeControlUtils.js';
@@ -8,18 +8,18 @@ import type TimeControlType from '../../shared/time-control/TimeControlType.js';
 export default class StatsRepository
 {
     constructor(
-        @Inject('Repository<HostedGameToPlayer>')
-        private hostedGameToPlayerRepository: Repository<HostedGameToPlayer>,
+        @Inject('Repository<GameToPlayer>')
+        private gameToPlayerRepository: Repository<GameToPlayer>,
     ) {}
 
     async getPlayerStats(playerId: number): Promise<PlayerStats>
     {
         const playerStats = new PlayerStats();
-        const playedGamesQueryBuilder = this.hostedGameToPlayerRepository
-            .createQueryBuilder('hgp')
-            .innerJoin('hgp.hostedGame', 'hostedGame')
-            .where('hgp.playerId = :playerId')
-            .andWhere('hostedGame.state = "ended"')
+        const playedGamesQueryBuilder = this.gameToPlayerRepository
+            .createQueryBuilder('gp')
+            .innerJoin('gp.game', 'game')
+            .where('gp.playerId = :playerId')
+            .andWhere('game.state = "ended"')
             .setParameters({ playerId })
         ;
 
@@ -34,10 +34,10 @@ export default class StatsRepository
          * Total played games by 1v1 ranked/unranked
          */
         const totalByRanked: { ranked: number, total: string }[] = await playedGamesQueryBuilder.clone()
-            .select('hostedGame.ranked as ranked')
+            .select('game.ranked as ranked')
             .addSelect('count(*) as total')
-            .andWhere('hostedGame.opponentType = "player"')
-            .groupBy('hostedGame.ranked')
+            .andWhere('game.opponentType = "player"')
+            .groupBy('game.ranked')
             .getRawMany()
         ;
 
@@ -52,7 +52,7 @@ export default class StatsRepository
          * Total bot games
          */
         playerStats.totalBotGames = await playedGamesQueryBuilder.clone()
-            .andWhere('hostedGame.opponentType = "ai"')
+            .andWhere('game.opponentType = "ai"')
             .getCount()
         ;
 
@@ -60,9 +60,9 @@ export default class StatsRepository
          * Total played games by board size
          */
         const preferredBoardsizes: { boardsize: number, total: string }[] = await playedGamesQueryBuilder.clone()
-            .select('hostedGame.boardsize as boardsize, count(*) as total')
-            .groupBy('hostedGame.boardsize')
-            .orderBy('hostedGame.boardsize')
+            .select('game.boardsize as boardsize, count(*) as total')
+            .groupBy('game.boardsize')
+            .orderBy('game.boardsize')
             .getRawMany()
         ;
 
@@ -96,25 +96,25 @@ export default class StatsRepository
             boardsize: number;
             timeControlType: TimeControlType;
             won: number;
-        }[] = await this.hostedGameToPlayerRepository
-            .createQueryBuilder('hgp')
+        }[] = await this.gameToPlayerRepository
+            .createQueryBuilder('gp')
             .comment('head to head stats')
-            .innerJoin('hgp.hostedGame', 'hostedGame')
+            .innerJoin('gp.game', 'game')
             .innerJoin(
-                HostedGameToPlayer,
+                GameToPlayer,
                 'opponent',
-                'opponent.hostedGameId = hgp.hostedGameId and opponent.order != hgp.order and opponent.playerId = :opponentId',
+                'opponent.gameId = gp.gameId and opponent.order != gp.order and opponent.playerId = :opponentId',
             )
-            .select('hostedGame.publicId', 'publicId')
-            .addSelect('hostedGame.startedAt', 'startedAt')
-            .addSelect('hostedGame.endedAt', 'endedAt')
-            .addSelect('hostedGame.boardsize', 'boardsize')
-            .addSelect('hostedGame.timeControlType', 'timeControlType')
-            .addSelect('case when hgp.order = hostedGame.winner then 1 else 0 end', 'won')
-            .where('hgp.playerId = :playerId')
-            .andWhere('hostedGame.state = :state')
-            .andWhere('hostedGame.opponentType = :opponentType')
-            .orderBy('hostedGame.endedAt', 'ASC')
+            .select('game.publicId', 'publicId')
+            .addSelect('game.startedAt', 'startedAt')
+            .addSelect('game.endedAt', 'endedAt')
+            .addSelect('game.boardsize', 'boardsize')
+            .addSelect('game.timeControlType', 'timeControlType')
+            .addSelect('case when gp.order = game.winner then 1 else 0 end', 'won')
+            .where('gp.playerId = :playerId')
+            .andWhere('game.state = :state')
+            .andWhere('game.opponentType = :opponentType')
+            .orderBy('game.endedAt', 'ASC')
             .setParameters({ playerId, opponentId, state: 'ended', opponentType: 'player' })
             .getRawMany()
         ;

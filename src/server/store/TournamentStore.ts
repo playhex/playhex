@@ -9,8 +9,8 @@ import { getTournamentEngine } from '../tournaments/organizers/getTournamentEngi
 import { ActiveTournamentsFilters, isFeaturedNow, isPlayerInvolved, tournamentMatchKey } from '../../shared/app/tournamentUtils.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
-import type { HostedGameAccessorInterface } from '../tournaments/hosted-game-accessor/HostedGameAccessorInterface.js';
-import { HostedGameAccessor } from '../tournaments/hosted-game-accessor/HostedGameAccessor.js';
+import type { GameAccessorInterface } from '../tournaments/game-accessor/GameAccessorInterface.js';
+import { GameAccessor } from '../tournaments/game-accessor/GameAccessor.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import TournamentRepository from '../repositories/TournamentRepository.js';
 
@@ -25,8 +25,8 @@ export default class TournamentStore
     constructor(
         private tournamentRepository: TournamentRepository,
 
-        @Inject(() => HostedGameAccessor)
-        private hostedGameAccessor: HostedGameAccessorInterface,
+        @Inject(() => GameAccessor)
+        private gameAccessor: GameAccessorInterface,
     ) {
         this.loadActiveTournaments().catch(e => {
             logger.error('Error while loading tournaments', errorToLogger(e));
@@ -74,21 +74,21 @@ export default class TournamentStore
 
     private async createActiveTournament(tournament: Tournament): Promise<ActiveTournament>
     {
-        // Replace instance of hostedGame by same instance of hostedGame from active games
+        // Replace instance of game by same instance of game from active games
         for (const tournamentMatch of tournament.matches) {
-            const { hostedGame } = tournamentMatch;
+            const { game } = tournamentMatch;
 
-            if (hostedGame === null) {
+            if (game === null) {
                 continue;
             }
 
-            const hostedGameServer = this.hostedGameAccessor.getHostedGameServer(hostedGame.publicId);
+            const gameServer = this.gameAccessor.getGameServer(game.publicId);
 
-            if (hostedGameServer === null) {
-                if (hostedGame.state !== 'ended') {
+            if (gameServer === null) {
+                if (game.state !== 'ended') {
                     logger.warning('Could not find tournament active game', {
-                        tournamentPublicId: hostedGame.publicId,
-                        hostedGameState: hostedGame.state,
+                        tournamentPublicId: game.publicId,
+                        gameState: game.state,
                         matchNumber: tournamentMatchKey(tournamentMatch),
                     });
                 }
@@ -96,13 +96,13 @@ export default class TournamentStore
                 continue;
             }
 
-            tournamentMatch.hostedGame = hostedGameServer.getHostedGame();
+            tournamentMatch.game = gameServer.getGame();
         }
 
         const activeTournament = new ActiveTournament(
             tournament,
             getTournamentEngine(tournament),
-            this.hostedGameAccessor,
+            this.gameAccessor,
             new AutoSave(() => this.save(tournament)),
         );
 

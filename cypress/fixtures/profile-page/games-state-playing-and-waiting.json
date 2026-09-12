@@ -9,7 +9,7 @@
             "slug": "player-test",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Player Test",
@@ -56,7 +56,7 @@
             "slug": "player-test",
             "createdAt": "2024-01-19T10:23:11.600Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Player Test",

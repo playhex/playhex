@@ -1,13 +1,13 @@
 import { Authorized, BadRequestError, Body, Delete, Get, JsonController, NotFoundError, Param, Post } from 'routing-controllers';
 import { Service } from 'typedi';
 import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
-import HostedGameStore from '../../../store/HostedGameStore.js';
+import GameStore from '../../../store/GameStore.js';
 import PlayerModerationActionRepository, { PostPlayerModerationAction } from '../../../repositories/PlayerModerationActionRepository.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import ModerationService, { CreateAndSaveError } from '../../../services/ModerationService.js';
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { ROLE_MODERATOR } from '../../../services/roles.js';
-import { HostedGame } from '../../../../shared/app/models/index.js';
+import { Game } from '../../../../shared/app/models/index.js';
 import type AbstractChatMessage from '../../../../shared/app/models/AbstractChatMessage.js';
 import ChannelChatMessageRepository from '../../../repositories/ChannelChatMessageRepository.js';
 import PlayerIpService from '../../../services/PlayerIpService.js';
@@ -16,7 +16,7 @@ import { IsDateString, IsOptional } from 'class-validator';
 import ModerationSettingRepository from '../../../repositories/ModerationSettingRepository.js';
 
 type MessageFromAnySource =
-    { message: AbstractChatMessage, source: 'game', data: HostedGame }
+    { message: AbstractChatMessage, source: 'game', data: Game }
     | { message: AbstractChatMessage, source: 'channel', data: string }
 ;
 
@@ -51,7 +51,7 @@ export default class AdminModerationController
 {
     constructor(
         private chatMessageRepository: ChatMessageRepository,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private playerModerationActionRepository: PlayerModerationActionRepository,
         private playerRepository: PlayerRepository,
         private moderationService: ModerationService,
@@ -181,7 +181,7 @@ export default class AdminModerationController
         const SINCE = new Date(new Date().getTime() - 86400000 * 14); // 2 weeks of history
 
         const persistedMessages = await this.chatMessageRepository.getLastChatMessagesForModeration(SINCE);
-        const inMemoryMessages = this.hostedGameStore.getUnpersistedChatMessagesForModeration();
+        const inMemoryMessages = this.gameStore.getUnpersistedChatMessagesForModeration();
         const channelMessages = await this.channelChatMessageRepository.getLastMessagesForModeration(SINCE);
 
         const allMessages: MessageFromAnySource[] = [];
@@ -190,7 +190,7 @@ export default class AdminModerationController
             allMessages.push({
                 source: 'game',
                 message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
-                data: instanceToPlain(message.hostedGame, { groups: ['moderation'] }),
+                data: instanceToPlain(message.game, { groups: ['moderation'] }),
             });
         }
 
@@ -198,7 +198,7 @@ export default class AdminModerationController
             allMessages.push({
                 source: 'game',
                 message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
-                data: instanceToPlain(message.hostedGame, { groups: ['moderation'] }),
+                data: instanceToPlain(message.game, { groups: ['moderation'] }),
             });
         }
 

@@ -2,9 +2,9 @@ import { Service } from 'typedi';
 import { Body, ForbiddenError, Get, JsonController, NotFoundError, Param, Patch } from 'routing-controllers';
 import { ConditionalMoves, Player } from '../../../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
-import HostedGameStore from '../../../store/HostedGameStore.js';
+import GameStore from '../../../store/GameStore.js';
 import ConditionalMovesRepository from '../../../repositories/ConditionalMovesRepository.js';
-import { hasPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { hasPlayer } from '../../../../shared/app/gameUtils.js';
 
 @JsonController()
 @Service()
@@ -12,7 +12,7 @@ export default class GameConditionalMovesController
 {
     constructor(
         private conditionalMovesRepository: ConditionalMovesRepository,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {}
 
     @Get('/api/games/:publicId/conditional-moves')
@@ -20,13 +20,13 @@ export default class GameConditionalMovesController
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
     ): Promise<ConditionalMoves> {
-        const hostedGame = await this.hostedGameStore.getActiveOrArchivedGame(publicId);
+        const game = await this.gameStore.getActiveOrArchivedGame(publicId);
 
-        if (hostedGame === null) {
+        if (game === null) {
             throw new NotFoundError(`No active game with id '${publicId}'.`);
         }
 
-        let conditionalMoves = await this.conditionalMovesRepository.find(player, hostedGame);
+        let conditionalMoves = await this.conditionalMovesRepository.find(player, game);
 
         if (conditionalMoves !== null) {
             return conditionalMoves;
@@ -46,21 +46,21 @@ export default class GameConditionalMovesController
         @Param('publicId') publicId: string,
         @Body() conditionalMoves: ConditionalMoves,
     ): Promise<ConditionalMoves> {
-        const hostedGame = await this.hostedGameStore.getActiveOrArchivedGame(publicId);
+        const game = await this.gameStore.getActiveOrArchivedGame(publicId);
 
-        if (hostedGame === null) {
+        if (game === null) {
             throw new NotFoundError(`No active game with id '${publicId}'.`);
         }
 
-        if (!hasPlayer(hostedGame, player)) {
+        if (!hasPlayer(game, player)) {
             throw new ForbiddenError(`Player '${player.pseudo} not in this game'`);
         }
 
-        const entity = await this.conditionalMovesRepository.find(player, hostedGame);
+        const entity = await this.conditionalMovesRepository.find(player, game);
 
         if (entity === null) {
             conditionalMoves.player = player;
-            conditionalMoves.hostedGame = hostedGame;
+            conditionalMoves.game = game;
         } else {
             entity.tree = conditionalMoves.tree;
 

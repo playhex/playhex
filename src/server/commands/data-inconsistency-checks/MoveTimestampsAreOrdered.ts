@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
@@ -26,8 +26,8 @@ import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesChecke
 export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInterface
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     getDescription(): string
@@ -37,10 +37,10 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
 
     async run(): Promise<string[]>
     {
-        const games = await this.hostedGameRepository.find();
+        const games = await this.gameRepository.find();
 
         const unordereds: {
-            game: HostedGame;
+            game: Game;
             moves: number[];
         }[] = [];
 
@@ -61,7 +61,7 @@ export class MoveTimestampsAreOrdered implements DataInconsistenciesCheckerInter
         return unordereds.map(unordered => {
             const { game, moves } = unordered;
 
-            return `publicId ${game.publicId} hostedGameId ${game.id} ; moves ${moves.join(', ')} (length = ${game.moveTimestamps.length}, opponentType = ${game.opponentType})`;
+            return `publicId ${game.publicId} gameId ${game.id} ; moves ${moves.join(', ')} (length = ${game.moveTimestamps.length}, opponentType = ${game.opponentType})`;
         });
     }
 }

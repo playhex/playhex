@@ -13,11 +13,11 @@ const props = defineProps({
     },
 });
 
-const { gameView, hostedGame, spectatorsCount } = useGameThumbnail(props.gamePublicId);
+const { gameView, game, spectatorsCount } = useGameThumbnail(props.gamePublicId);
 const gameViewElement = ref<HTMLElement>();
 
 const showLive = computed(() => {
-    return hostedGame.value && hostedGame.value.state === 'playing' && isLive(hostedGame.value);
+    return game.value && game.value.state === 'playing' && isLive(game.value);
 });
 
 watch(gameView, async () => {
@@ -32,25 +32,25 @@ watch(gameView, async () => {
 <template>
     <div class="card h-100" :class="{ 'live-game-card': showLive }">
         <router-link :to="{ name: 'online-game', params: { gameId: gamePublicId } }" class="card-body text-decoration-none p-2">
-            <div v-if="hostedGame" class="mb-2">
+            <div v-if="game" class="mb-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="player-col text-start">
-                        <AppPseudo v-if="hostedGame.hostedGameToPlayers[0]" :player="hostedGame.hostedGameToPlayers[0].player" flag classes="fw-bold small text-danger" />
+                        <AppPseudo v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" flag classes="fw-bold small text-danger" />
                     </div>
-                    <small v-if="hostedGame.state !== 'playing'">
+                    <small v-if="game.state !== 'playing'">
                         Just ended
                     </small>
                     <span v-else-if="showLive" class="live-badge">
                         <IconCircleFill class="live-dot" /> LIVE
                     </span>
                     <div class="player-col text-end">
-                        <AppPseudo v-if="hostedGame.hostedGameToPlayers[1]" :player="hostedGame.hostedGameToPlayers[1].player" flag classes="fw-bold small text-primary" />
+                        <AppPseudo v-if="game.gameToPlayers[1]" :player="game.gameToPlayers[1].player" flag classes="fw-bold small text-primary" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-1">
-                    <AppPlayerRating v-if="hostedGame.hostedGameToPlayers[0]" :player="hostedGame.hostedGameToPlayers[0].player" class="rating-text" />
+                    <AppPlayerRating v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" class="rating-text" />
                     <small v-if="spectatorsCount > 0"><IconEye /> {{ spectatorsCount }}</small>
-                    <AppPlayerRating v-if="hostedGame.hostedGameToPlayers[1]" :player="hostedGame.hostedGameToPlayers[1].player" class="rating-text" />
+                    <AppPlayerRating v-if="game.gameToPlayers[1]" :player="game.gameToPlayers[1].player" class="rating-text" />
                 </div>
             </div>
             <div class="d-flex justify-content-center">

@@ -9,7 +9,7 @@
         "createdAt": "2024-07-17T06:00:42.268Z",
         "currentRating": null
     },
-    "hostedGameToPlayers": [
+    "gameToPlayers": [
         {
             "player": {
                 "pseudo": "8064",

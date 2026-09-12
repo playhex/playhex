@@ -47,12 +47,12 @@ hexProgram
  */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const migrateMergeGameIntoHostedGame = (before: any): any => {
-    // Merge Game into HostedGame
+const migrateMergeGameIntoGame = (before: any): any => {
+    // Merge Game into Game
 
     const merge = (object: any) => {
         if (!object.publicId || !object.host) {
-            // not a hosted game
+            // not a game
             return;
         }
 

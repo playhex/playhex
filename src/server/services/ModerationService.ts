@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Inject, Service } from 'typedi';
 import ChatMessageRepository from '../repositories/ChatMessageRepository.js';
-import HostedGameStore from '../store/HostedGameStore.js';
+import GameStore from '../store/GameStore.js';
 import { PostPlayerModerationAction } from '../repositories/PlayerModerationActionRepository.js';
 import { Repository } from 'typeorm';
 import { Player, PlayerIp, PlayerModerationAction } from '../../shared/app/models/index.js';
@@ -25,7 +25,7 @@ export default class ModerationService
 {
     constructor(
         private chatMessageRepository: ChatMessageRepository,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private playerAvatarService: PlayerAvatarService,
         private bannedIpService: BannedIpService,
@@ -44,7 +44,7 @@ export default class ModerationService
     async moderateDeleteChatMessages(publicIds: string[]): Promise<{ deletedInDb: number, deletedInMemory: number, deletedInChannels: number }>
     {
         return {
-            deletedInMemory: this.hostedGameStore.moderateDeleteChatMessages(publicIds),
+            deletedInMemory: this.gameStore.moderateDeleteChatMessages(publicIds),
             deletedInDb: await this.chatMessageRepository.moderateDeleteChatMessages(publicIds),
             deletedInChannels: await this.channelChatMessageRepository.moderateDeleteChatMessages(publicIds),
         };
@@ -76,7 +76,7 @@ export default class ModerationService
         if (Array.isArray(post.relatedChatMessages) && post.relatedChatMessages.length > 0) {
             // /!\ Chat messages must be persisted in database,
             // i.e can't add a relation if message is only in memory because just posted.
-            // So we need to persist hosted games containing those chat messages first.
+            // So we need to persist games containing those chat messages first.
             await this.persistGamesHavingChatMessages(post.relatedChatMessages);
 
             // Chat messages
@@ -137,18 +137,18 @@ export default class ModerationService
     }
 
     /**
-     * Persist hosted games containing at least one of given chat messages.
+     * Persist games containing at least one of given chat messages.
      * Needed to have a chat message id in database.
      */
     async persistGamesHavingChatMessages(chatMessagePublicIds: string[]): Promise<void>
     {
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
 
         for (const key in activeGames) {
             const activeGame = activeGames[key];
-            const hostedGame = activeGame.getHostedGame();
+            const game = activeGame.getGame();
 
-            for (const chatMessage of hostedGame.chatMessages) {
+            for (const chatMessage of game.chatMessages) {
                 if (chatMessage.id) {
                     continue;
                 }

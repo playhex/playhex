@@ -1,5 +1,5 @@
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import { HostedGameOptions } from '../models/index.js';
+import { GameOptions } from '../models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../ratingUtils.js';
 
 /**
@@ -8,7 +8,7 @@ import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../ratingUtils.js';
  */
 abstract class OptionsEligibleForRanked implements ValidatorConstraintInterface
 {
-    abstract validateOptions(options: HostedGameOptions): boolean;
+    abstract validateOptions(options: GameOptions): boolean;
 
     validate(ranked: boolean, args: ValidationArguments): Promise<boolean> | boolean
     {
@@ -18,8 +18,8 @@ abstract class OptionsEligibleForRanked implements ValidatorConstraintInterface
 
         const { object } = args;
 
-        if (!(object instanceof HostedGameOptions)) {
-            throw new Error('@OptionsEligibleForRanked expected to be used on an instance of HostedGameOptions');
+        if (!(object instanceof GameOptions)) {
+            throw new Error('@OptionsEligibleForRanked expected to be used on an instance of GameOptions');
         }
 
         return this.validateOptions(object);
@@ -29,7 +29,7 @@ abstract class OptionsEligibleForRanked implements ValidatorConstraintInterface
 @ValidatorConstraint({ name: 'boardsizeEligibleForRanked', async: false })
 export class BoardsizeEligibleForRanked extends OptionsEligibleForRanked
 {
-    validateOptions(options: HostedGameOptions): boolean
+    validateOptions(options: GameOptions): boolean
     {
         return options.boardsize >= RANKED_BOARDSIZE_MIN && options.boardsize <= RANKED_BOARDSIZE_MAX;
     }
@@ -43,7 +43,7 @@ export class BoardsizeEligibleForRanked extends OptionsEligibleForRanked
 @ValidatorConstraint({ name: 'firstPlayerEligibleForRanked', async: false })
 export class FirstPlayerEligibleForRanked extends OptionsEligibleForRanked
 {
-    validateOptions(options: HostedGameOptions): boolean
+    validateOptions(options: GameOptions): boolean
     {
         return options.firstPlayer === null;
     }
@@ -57,7 +57,7 @@ export class FirstPlayerEligibleForRanked extends OptionsEligibleForRanked
 @ValidatorConstraint({ name: 'swapRuleEligibleForRanked', async: false })
 export class SwapRuleEligibleForRanked extends OptionsEligibleForRanked
 {
-    validateOptions(options: HostedGameOptions): boolean
+    validateOptions(options: GameOptions): boolean
     {
         return options.swapRule === true;
     }
@@ -71,7 +71,7 @@ export class SwapRuleEligibleForRanked extends OptionsEligibleForRanked
 @ValidatorConstraint({ name: 'opponentTypeEligibleForRanked', async: false })
 export class OpponentTypeEligibleForRanked extends OptionsEligibleForRanked
 {
-    validateOptions(options: HostedGameOptions): boolean
+    validateOptions(options: GameOptions): boolean
     {
         if (process.env.ALLOW_RANKED_BOT_GAMES === 'true') {
             return true;

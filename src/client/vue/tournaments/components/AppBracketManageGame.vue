@@ -31,22 +31,22 @@ const showManage = ref(false);
             Manage
         </button>
 
-        <template v-if="showManage && 'running' === tournament.state && tournamentMatch.hostedGame">
+        <template v-if="showManage && 'running' === tournament.state && tournamentMatch.game">
             <button
                 v-if="tournamentMatch.player1"
-                @click="apiPostForfeitTournamentMatchPlayer(tournament.slug, tournamentMatch.hostedGame.publicId, tournamentMatch.player1)"
+                @click="apiPostForfeitTournamentMatchPlayer(tournament.slug, tournamentMatch.game.publicId, tournamentMatch.player1)"
                 :disabled="'playing' !== tournamentMatch.state"
                 class="btn btn-outline-warning mt-1"
             >Forfeit {{ tournamentMatch.player1.pseudo }}</button>
             <button
                 v-if="tournamentMatch.player2"
-                @click="apiPostForfeitTournamentMatchPlayer(tournament.slug, tournamentMatch.hostedGame.publicId, tournamentMatch.player2)"
+                @click="apiPostForfeitTournamentMatchPlayer(tournament.slug, tournamentMatch.game.publicId, tournamentMatch.player2)"
                 :disabled="'playing' !== tournamentMatch.state"
                 class="btn btn-outline-warning mt-1"
             >Forfeit {{ tournamentMatch.player2.pseudo }}</button>
 
             <button
-                @click="apiPostResetAndRecreateGame(tournament.slug, tournamentMatch.hostedGame.publicId)"
+                @click="apiPostResetAndRecreateGame(tournament.slug, tournamentMatch.game.publicId)"
                 :disabled="'done' !== tournamentMatch.state"
                 class="btn btn-outline-danger mt-1"
             >Reset and recreate</button>

@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import logger from '../logger.js';
-import HostedGameStore from '../../store/HostedGameStore.js';
+import GameStore from '../../store/GameStore.js';
 import OnlinePlayersService from '../OnlinePlayersService.js';
 import { Player } from '../../../shared/app/models/index.js';
 import { timings } from './timings.js';
@@ -25,7 +25,7 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
 
     constructor(
         private onlinePlayersService: OnlinePlayersService,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {
         super();
 
@@ -51,20 +51,20 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
      */
     private checkAllCreatedGames(): void
     {
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
 
         for (const publicId in activeGames) {
             const activeGame = activeGames[publicId];
-            const hostedGame = activeGame.getHostedGame();
+            const game = activeGame.getGame();
 
             if (
-                (hostedGame.state === 'created' || isPlayingAndEmpty(activeGame))
-                && hostedGame.host
-                && !this.onlinePlayersService.isOnline(hostedGame.host)
-                && !hostedGame.tournamentMatch
-                && isLive(hostedGame)
+                (game.state === 'created' || isPlayingAndEmpty(activeGame))
+                && game.host
+                && !this.onlinePlayersService.isOnline(game.host)
+                && !game.tournamentMatch
+                && isLive(game)
             ) {
-                this.onPlayerDisconnect(hostedGame.host);
+                this.onPlayerDisconnect(game.host);
             }
         }
     }
@@ -85,21 +85,21 @@ export class AutoCancelCreatedGames extends TypedEmitter<AutoCancelCreatedGamesE
 
     private cancelPlayerLiveWaitingGame(player: Player): void
     {
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
 
         for (const publicId in activeGames) {
             const activeGame = activeGames[publicId];
-            const hostedGame = activeGame.getHostedGame();
+            const game = activeGame.getGame();
 
             if (
-                (hostedGame.state === 'created' || isPlayingAndEmpty(activeGame))
-                && hostedGame.host
-                && hostedGame.host.publicId === player.publicId
-                && !hostedGame.tournamentMatch
-                && isLive(hostedGame)
+                (game.state === 'created' || isPlayingAndEmpty(activeGame))
+                && game.host
+                && game.host.publicId === player.publicId
+                && !game.tournamentMatch
+                && isLive(game)
             ) {
                 logger.info('Auto cancel created games: cancel waiting or empty game because host left', {
-                    hostedGamePublicId: hostedGame.publicId,
+                    gamePublicId: game.publicId,
                 });
 
                 activeGame.systemCancel('host_left');

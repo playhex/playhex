@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsIn, IsNumber, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
-import { HostedGameState } from './Types.js';
+import { GameState } from './Types.js';
 
-export const gameStates: HostedGameState[] = [
+export const gameStates: GameState[] = [
     'ended',
     'canceled',
 ] as const;

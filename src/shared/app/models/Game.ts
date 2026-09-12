@@ -2,41 +2,41 @@ import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, OneToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, Index, ManyToMany, AfterLoad, type Relation } from 'typeorm';
 import { ColumnUUID, longText } from '../custom-typeorm.js';
 import Player from './Player.js';
-import type { CancelHostedGameReason, HostedGameState } from '../Types.js';
-import HostedGameOptions from './HostedGameOptions.js';
+import type { CancelGameReason, GameState } from '../Types.js';
+import GameOptions from './GameOptions.js';
 import type { GameTimeData } from '../../time-control/TimeControl.js';
 import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/ByoYomiTimeControl.js';
 import ChatMessage from './ChatMessage.js';
-import HostedGameToPlayer from './HostedGameToPlayer.js';
+import GameToPlayer from './GameToPlayer.js';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
-import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
+import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeControlFischer } from './GameOptionsTimeControl.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
 import { type Outcome } from '../../game-engine/Types.js';
 import type { HexMove } from '../../move-notation/hex-move-notation.js';
 
 @Entity()
-@Index(keysOf<HostedGame>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
-@Index(keysOf<HostedGame>()('state', 'boardsize')) // For stats on boardsizes
+@Index(keysOf<Game>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
+@Index(keysOf<Game>()('state', 'boardsize')) // For stats on boardsizes
 // For archive page
 // The ones ending with "_desc": set index order desc manually on endedAt column
-@Index('index_endedAt', keysOf<HostedGame>()('endedAt'))
-@Index('index_endedAt_desc', keysOf<HostedGame>()('endedAt'))
-@Index('index_state_endedAt', keysOf<HostedGame>()('state', 'endedAt'))
-@Index('index_state_endedAt_desc', keysOf<HostedGame>()('state', 'endedAt'))
-@Index('index_state_opponentType_endedAt', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
-@Index('index_state_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'opponentType', 'endedAt'))
-@Index('index_state_ranked_opponentType_endedAt', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
-@Index('index_state_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('state', 'ranked', 'opponentType', 'endedAt'))
-@Index('index_ranked_opponentType_endedAt', keysOf<HostedGame>()('ranked', 'opponentType', 'endedAt'))
-@Index('index_ranked_opponentType_endedAt_desc', keysOf<HostedGame>()('ranked', 'opponentType', 'endedAt'))
-@Index('index_opponentType_endedAt', keysOf<HostedGame>()('opponentType', 'endedAt'))
-@Index('index_opponentType_endedAt_desc', keysOf<HostedGame>()('opponentType', 'endedAt'))
-export default class HostedGame implements TimeControlBoardsize, HostedGameOptions
+@Index('index_endedAt', keysOf<Game>()('endedAt'))
+@Index('index_endedAt_desc', keysOf<Game>()('endedAt'))
+@Index('index_state_endedAt', keysOf<Game>()('state', 'endedAt'))
+@Index('index_state_endedAt_desc', keysOf<Game>()('state', 'endedAt'))
+@Index('index_state_opponentType_endedAt', keysOf<Game>()('state', 'opponentType', 'endedAt'))
+@Index('index_state_opponentType_endedAt_desc', keysOf<Game>()('state', 'opponentType', 'endedAt'))
+@Index('index_state_ranked_opponentType_endedAt', keysOf<Game>()('state', 'ranked', 'opponentType', 'endedAt'))
+@Index('index_state_ranked_opponentType_endedAt_desc', keysOf<Game>()('state', 'ranked', 'opponentType', 'endedAt'))
+@Index('index_ranked_opponentType_endedAt', keysOf<Game>()('ranked', 'opponentType', 'endedAt'))
+@Index('index_ranked_opponentType_endedAt_desc', keysOf<Game>()('ranked', 'opponentType', 'endedAt'))
+@Index('index_opponentType_endedAt', keysOf<Game>()('opponentType', 'endedAt'))
+@Index('index_opponentType_endedAt_desc', keysOf<Game>()('opponentType', 'endedAt'))
+export default class Game implements TimeControlBoardsize, GameOptions
 {
     @PrimaryGeneratedColumn()
     id?: number;
@@ -57,14 +57,14 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Type(() => Player)
     host: null | Relation<Player>;
 
-    @OneToMany(() => HostedGameToPlayer, hostedGameToPlayer => hostedGameToPlayer.hostedGame, { cascade: true, persistence: false })
+    @OneToMany(() => GameToPlayer, gameToPlayer => gameToPlayer.game, { cascade: true, persistence: false })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
-    @Type(() => HostedGameToPlayer)
-    hostedGameToPlayers: HostedGameToPlayer[];
+    @Type(() => GameToPlayer)
+    gameToPlayers: GameToPlayer[];
 
     @Column({ type: String, length: 15 })
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
-    state: HostedGameState;
+    state: GameState;
 
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Column()
@@ -120,10 +120,10 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
-        switch ((type?.object as HostedGame).timeControlType?.family) {
-            case 'fischer': return HostedGameOptionsTimeControlFischer;
-            case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
-            default: return HostedGameOptionsTimeControl;
+        switch ((type?.object as Game).timeControlType?.family) {
+            case 'fischer': return GameOptionsTimeControlFischer;
+            case 'byoyomi': return GameOptionsTimeControlByoYomi;
+            default: return GameOptionsTimeControl;
         }
     })
     timeControlType: TimeControlType;
@@ -141,7 +141,7 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     explorationAllowed: boolean;
 
-    @OneToMany(() => ChatMessage, chatMessage => chatMessage.hostedGame, { cascade: true })
+    @OneToMany(() => ChatMessage, chatMessage => chatMessage.game, { cascade: true })
     @Expose()
     @Type(() => ChatMessage)
     chatMessages: Relation<ChatMessage>[];
@@ -179,12 +179,12 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
      */
     @Column({ type: String, length: 15, nullable: true })
     @Expose()
-    cancelReason: null | CancelHostedGameReason;
+    cancelReason: null | CancelGameReason;
 
     /**
      * When this game is played in a tournament, else null.
      */
-    @OneToOne(() => TournamentMatch, tournamentMatch => tournamentMatch.hostedGame)
+    @OneToOne(() => TournamentMatch, tournamentMatch => tournamentMatch.game)
     @Expose()
     @Type(() => TournamentMatch)
     tournamentMatch: null | Relation<TournamentMatch> = null;
@@ -200,20 +200,20 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     /**
      * Link to next game if this game has been rematched.
      */
-    @OneToOne(() => HostedGame)
+    @OneToOne(() => Game)
     @JoinColumn()
     @Expose()
-    @Type(() => HostedGame)
-    rematch: null | Relation<HostedGame> = null;
+    @Type(() => Game)
+    rematch: null | Relation<Game> = null;
 
     /**
      * Link to previous game if this game is a rematch.
      */
-    @OneToOne(() => HostedGame)
+    @OneToOne(() => Game)
     @JoinColumn()
     @Expose()
-    @Type(() => HostedGame)
-    rematchedFrom: null | Relation<HostedGame> = null;
+    @Type(() => Game)
+    rematchedFrom: null | Relation<Game> = null;
 
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
@@ -257,67 +257,67 @@ export default class HostedGame implements TimeControlBoardsize, HostedGameOptio
     @AfterLoad()
     sortPlayersPosition()
     {
-        if (this?.hostedGameToPlayers?.length > 1) {
-            this.hostedGameToPlayers.sort((a, b) => a.order - b.order);
+        if (this?.gameToPlayers?.length > 1) {
+            this.gameToPlayers.sort((a, b) => a.order - b.order);
         }
     }
 }
 
-export type CreateHostedGameParams = {
-    gameOptions?: HostedGameOptions;
+export type CreateGameParams = {
+    gameOptions?: GameOptions;
     host?: null | Player;
-    rematchedFrom?: null | HostedGame;
+    rematchedFrom?: null | Game;
     tournamentMatch?: null | TournamentMatch;
 };
 
 /**
- * Create a new HostedGame
+ * Create a new Game
  * from parameters provided while creating a new game.
  */
-export const createHostedGame = (params: CreateHostedGameParams = {}): HostedGame => {
-    const hostedGame = new HostedGame();
+export const createGame = (params: CreateGameParams = {}): Game => {
+    const game = new Game();
 
-    const gameOptions = params.gameOptions ?? new HostedGameOptions();
+    const gameOptions = params.gameOptions ?? new GameOptions();
 
-    hostedGame.publicId = uuidv4();
-    hostedGame.state = 'created';
-    hostedGame.ranked = gameOptions.ranked;
-    hostedGame.boardsize = gameOptions.boardsize;
-    hostedGame.firstPlayer = gameOptions.firstPlayer;
-    hostedGame.swapRule = gameOptions.swapRule;
-    hostedGame.opponentType = gameOptions.opponentType;
-    hostedGame.opponentPublicId = gameOptions.opponentPublicId;
-    hostedGame.timeControlType = structuredClone(gameOptions.timeControlType);
-    hostedGame.timeControl = null;
-    hostedGame.explorationAllowed = params.gameOptions?.explorationAllowed ?? true;
-    hostedGame.opponentMustBeRegistered = params.gameOptions?.opponentMustBeRegistered ?? false;
-    hostedGame.host = params.host ?? null;
-    hostedGame.chatMessages = [];
-    hostedGame.moves = [];
-    hostedGame.moveTimestamps = [];
-    hostedGame.currentPlayerIndex = 0;
-    hostedGame.winner = null;
-    hostedGame.outcome = null;
-    hostedGame.cancelReason = null;
-    hostedGame.hostedGameToPlayers = [];
-    hostedGame.rematchedFrom = params.rematchedFrom ?? null;
-    hostedGame.tournamentMatch = params.tournamentMatch ?? null;
-    hostedGame.createdAt = new Date();
-    hostedGame.startedAt = null;
-    hostedGame.lastMoveAt = null;
-    hostedGame.endedAt = null;
+    game.publicId = uuidv4();
+    game.state = 'created';
+    game.ranked = gameOptions.ranked;
+    game.boardsize = gameOptions.boardsize;
+    game.firstPlayer = gameOptions.firstPlayer;
+    game.swapRule = gameOptions.swapRule;
+    game.opponentType = gameOptions.opponentType;
+    game.opponentPublicId = gameOptions.opponentPublicId;
+    game.timeControlType = structuredClone(gameOptions.timeControlType);
+    game.timeControl = null;
+    game.explorationAllowed = params.gameOptions?.explorationAllowed ?? true;
+    game.opponentMustBeRegistered = params.gameOptions?.opponentMustBeRegistered ?? false;
+    game.host = params.host ?? null;
+    game.chatMessages = [];
+    game.moves = [];
+    game.moveTimestamps = [];
+    game.currentPlayerIndex = 0;
+    game.winner = null;
+    game.outcome = null;
+    game.cancelReason = null;
+    game.gameToPlayers = [];
+    game.rematchedFrom = params.rematchedFrom ?? null;
+    game.tournamentMatch = params.tournamentMatch ?? null;
+    game.createdAt = new Date();
+    game.startedAt = null;
+    game.lastMoveAt = null;
+    game.endedAt = null;
 
     if (params.host) {
-        const hostedGameToPlayer = new HostedGameToPlayer();
+        const gameToPlayer = new GameToPlayer();
 
-        hostedGameToPlayer.hostedGame = hostedGame;
-        hostedGameToPlayer.player = params.host;
-        hostedGameToPlayer.order = 0;
+        gameToPlayer.game = game;
+        gameToPlayer.player = params.host;
+        gameToPlayer.order = 0;
 
-        hostedGame.hostedGameToPlayers.push(hostedGameToPlayer);
+        game.gameToPlayers.push(gameToPlayer);
     }
 
-    return hostedGame;
+    return game;
 };
 
 const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): null | GameTimeData => {

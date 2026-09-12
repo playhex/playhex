@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { ConditionalMoves, HostedGame, Player } from '../../shared/app/models/index.js';
+import { ConditionalMoves, Game, Player } from '../../shared/app/models/index.js';
 import { conditionalMovesShift, getNextMovesAfterLine } from '../../shared/pixi-board/conditional-moves/conditionalMovesUtils.js';
 import logger from '../services/logger.js';
 import { Move } from '../../shared/move-notation/move-notation.js';
@@ -14,18 +14,18 @@ export default class ConditionalMovesRepository
         private conditionalMovesRepository: Repository<ConditionalMoves>,
     ) {}
 
-    find(player: Player, hostedGame: HostedGame): Promise<null | ConditionalMoves>
+    find(player: Player, game: Game): Promise<null | ConditionalMoves>
     {
         return this.conditionalMovesRepository.findOneBy({
             playerId: player.id,
-            hostedGameId: hostedGame.id,
+            gameId: game.id,
         });
     }
 
     save(conditionalMoves: ConditionalMoves): Promise<ConditionalMoves>
     {
         logger.info('Conditional moves updated', {
-            hostedGameId: conditionalMoves.hostedGameId,
+            gameId: conditionalMoves.gameId,
             player: conditionalMoves.playerId,
             nextMoves: getNextMovesAfterLine(conditionalMoves.tree, []),
         });
@@ -41,16 +41,16 @@ export default class ConditionalMovesRepository
      *
      * @returns answer, or null if no answer for this move
      */
-    async shift(player: Player, hostedGame: HostedGame, lastMove: HexMove): Promise<null | Move>
+    async shift(player: Player, game: Game, lastMove: HexMove): Promise<null | Move>
     {
-        const conditionalMoves = await this.find(player, hostedGame);
+        const conditionalMoves = await this.find(player, game);
 
         if (conditionalMoves === null) {
             return null;
         }
 
         logger.info('Conditional moves candidates', {
-            hostedGamePublicId: hostedGame.publicId,
+            gamePublicId: game.publicId,
             player: player.slug,
             lastMove,
             nextMoves: getNextMovesAfterLine(conditionalMoves.tree, []),
@@ -58,7 +58,7 @@ export default class ConditionalMovesRepository
 
         if (isSpecialHexMove(lastMove)) {
             logger.info('Conditional moves: answer to special moves not supported, ignore, but keep lines', {
-                hostedGamePublicId: hostedGame.publicId,
+                gamePublicId: game.publicId,
                 player: player.slug,
                 lastMove,
                 nextMoves: getNextMovesAfterLine(conditionalMoves.tree, []),

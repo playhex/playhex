@@ -1,6 +1,6 @@
 import { defineOverlay } from '@overlastic/vue';
 import { storeToRefs } from 'pinia';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import useAuthStore from '../../stores/authStore.js';
 import GuestJoiningCorrepondenceWarningOverlay from '../components/overlay/GuestJoiningCorrepondenceWarningOverlay.vue';
 import { isCorrespondence } from '../../../shared/app/timeControlUtils.js';
@@ -17,12 +17,12 @@ export const useGuestJoiningCorrespondenceWarning = () => {
 
     const createGuestJoiningCorrepondenceWarningOverlay: () => Promise<void> = defineOverlay(GuestJoiningCorrepondenceWarningOverlay);
 
-    const isGuestJoiningCorrepondence = (hostedGame: HostedGame): boolean => {
+    const isGuestJoiningCorrepondence = (game: Game): boolean => {
         if (loggedInPlayer.value === null) {
             return false;
         }
 
-        if (loggedInPlayer.value.isGuest && isCorrespondence(hostedGame)) {
+        if (loggedInPlayer.value.isGuest && isCorrespondence(game)) {
             return true;
         }
 

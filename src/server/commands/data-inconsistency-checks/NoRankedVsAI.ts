@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 const { ALLOW_RANKED_BOT_GAMES } = process.env;
@@ -9,8 +9,8 @@ const { ALLOW_RANKED_BOT_GAMES } = process.env;
 export class NoRankedVsAI implements DataInconsistenciesCheckerInterface
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
 
         private allowRankedBotGames: boolean = ALLOW_RANKED_BOT_GAMES === 'true',
     ) {}
@@ -28,7 +28,7 @@ export class NoRankedVsAI implements DataInconsistenciesCheckerInterface
             return [];
         }
 
-        const rankedBotGames = await this.hostedGameRepository.findBy({
+        const rankedBotGames = await this.gameRepository.findBy({
             ranked: true,
             opponentType: 'ai',
         });

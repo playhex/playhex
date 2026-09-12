@@ -9,7 +9,7 @@
             "slug": "me",
             "createdAt": "2024-01-24T16:33:29.586Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Me",
@@ -74,7 +74,7 @@
             "slug": "challenger",
             "createdAt": "2024-01-24T16:33:29.586Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Challenger",
@@ -129,7 +129,7 @@
             "slug": "rival",
             "createdAt": "2024-01-24T16:33:29.586Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Rival",

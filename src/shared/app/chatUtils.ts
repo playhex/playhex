@@ -1,15 +1,15 @@
 import { colToLetter, Move, parseMove } from '../move-notation/move-notation.js';
-import { HostedGame, Player, ChatMessage } from './models/index.js';
+import { Game, Player, ChatMessage } from './models/index.js';
 
-export const canPlayerChatInGame = (player: null | Player, hostedGame: HostedGame): true | string => {
+export const canPlayerChatInGame = (player: null | Player, game: Game): true | string => {
     if (player === null) {
         return 'no player';
     }
 
     if (
-        hostedGame.state !== 'created'
+        game.state !== 'created'
         && player.isGuest
-        && hostedGame.hostedGameToPlayers.every(p => p.player.publicId !== player.publicId)
+        && game.gameToPlayers.every(p => p.player.publicId !== player.publicId)
     ) {
         return 'Guests cannot chat on started games if they are not in the game';
     }
@@ -17,13 +17,13 @@ export const canPlayerChatInGame = (player: null | Player, hostedGame: HostedGam
     return true;
 };
 
-export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, hostedGame: HostedGame): true | string => {
+export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, game: Game): true | string => {
     // Allow all "system" messages
     if (chatMessage.player === null) {
         return true;
     }
 
-    return canPlayerChatInGame(chatMessage.player, hostedGame);
+    return canPlayerChatInGame(chatMessage.player, game);
 };
 
 /**

@@ -41,7 +41,7 @@ import { correspondenceInitialTimeSteps, correspondenceSecondaryTimeSteps, liveI
 
 const { socketIoMock } = require('./socketIoMock');
 const { plainToInstance } = require('../../src/shared/app/class-transformer-custom');
-const { HostedGame, OnlinePlayers } = require('../../src/shared/app/models');
+const { Game, OnlinePlayers } = require('../../src/shared/app/models');
 
 /*
  * To add a command, also add declaration in ./index.d.ts
@@ -144,36 +144,36 @@ Cypress.Commands.add('receiveSocketIoMessage', (type, ...args) => {
 
 Cypress.Commands.add('receiveGameUpdate', fixtureFile => {
     cy.fixture(fixtureFile).then((fixture: unknown) => {
-        const hostedGame = plainToInstance(HostedGame, fixture);
+        const game = plainToInstance(Game, fixture);
 
-        cy.receiveSocketIoMessage('gameUpdate', hostedGame.publicId, plainToInstance(HostedGame, fixture));
+        cy.receiveSocketIoMessage('gameUpdate', game.publicId, plainToInstance(Game, fixture));
     });
 });
 
 Cypress.Commands.add('receiveLobbyUpdate', fixtureFile => {
     cy.fixture(fixtureFile).then((fixtures: unknown[]) => {
-        cy.receiveSocketIoMessage('lobbyUpdate', fixtures.map(fixture => plainToInstance(HostedGame, fixture)));
+        cy.receiveSocketIoMessage('lobbyUpdate', fixtures.map(fixture => plainToInstance(Game, fixture)));
     });
 });
 
 Cypress.Commands.add('receiveLobbyGameCreated', fixtureFile => {
     cy.fixture(fixtureFile).then((fixture: unknown) => {
-        cy.receiveSocketIoMessage('lobbyGameCreated', plainToInstance(HostedGame, fixture));
+        cy.receiveSocketIoMessage('lobbyGameCreated', plainToInstance(Game, fixture));
     });
 });
 
 Cypress.Commands.add('receivePlayerGamesUpdate', fixtureFile => {
     cy.fixture(fixtureFile).then((fixtures: unknown[]) => {
-        const hostedGames = fixtures.map(fixture => plainToInstance(HostedGame, fixture));
+        const games = fixtures.map(fixture => plainToInstance(Game, fixture));
 
-        cy.receiveSocketIoMessage('lobbyUpdate', hostedGames);
-        cy.receiveSocketIoMessage('playerGamesUpdate', hostedGames);
+        cy.receiveSocketIoMessage('lobbyUpdate', games);
+        cy.receiveSocketIoMessage('playerGamesUpdate', games);
     });
 });
 
 Cypress.Commands.add('receiveMyGamesUpdate', fixtureFile => {
     cy.fixture(fixtureFile).then((fixtures: unknown[]) => {
-        cy.receiveSocketIoMessage('playerGamesUpdate', fixtures.map(fixture => plainToInstance(HostedGame, fixture)));
+        cy.receiveSocketIoMessage('playerGamesUpdate', fixtures.map(fixture => plainToInstance(Game, fixture)));
     });
 });
 
@@ -197,7 +197,7 @@ Cypress.Commands.add('receiveOnlinePlayersUpdate', fixtureFile => {
 
 Cypress.Commands.add('receiveGameStarted', fixtureFile => {
     cy.fixture(fixtureFile).then((fixture: unknown) => {
-        cy.receiveSocketIoMessage('gameStarted', plainToInstance(HostedGame, fixture));
+        cy.receiveSocketIoMessage('gameStarted', plainToInstance(Game, fixture));
     });
 });
 

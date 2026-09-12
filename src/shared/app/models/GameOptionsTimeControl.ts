@@ -12,7 +12,7 @@ export type TimeControlTypeFamily = (typeof timeControlTypeValues)[number];
 
 // These object use @Expose from class-transformer instead of custom @Expose to always expose fields no matter if there is a serialization group.
 
-export class HostedGameOptionsTimeControl
+export class GameOptionsTimeControl
 {
     @Expose()
     @IsIn(timeControlTypeValues, { always: true })
@@ -49,7 +49,7 @@ export class OptionsFischer implements FischerTimeControlOptions
     maxTime?: number;
 }
 
-export class HostedGameOptionsTimeControlFischer extends HostedGameOptionsTimeControl
+export class GameOptionsTimeControlFischer extends GameOptionsTimeControl
 {
     @Expose()
     override family: 'fischer';
@@ -81,7 +81,7 @@ export class OptionsByoYomi implements ByoYomiTimeControlOptions
     periodsCount: number;
 }
 
-export class HostedGameOptionsTimeControlByoYomi extends HostedGameOptionsTimeControl
+export class GameOptionsTimeControlByoYomi extends GameOptionsTimeControl
 {
     @Expose()
     override family: 'byoyomi';

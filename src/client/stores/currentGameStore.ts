@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
-import HostedGame from '../../shared/app/models/HostedGame.js';
+import Game from '../../shared/app/models/Game.js';
 import { PlayingGameFacade } from '@playhex/pixi-board';
-import { addMove, cancelGame, canExplore, canPlayerUndo, cloneHostedGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateHostedGame } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, canExplore, canPlayerUndo, cloneGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateGame } from '../../shared/app/gameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -57,9 +57,9 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const socketStore = useSocketStore();
     const { socket } = socketStore;
 
-    const hostedGamePublicId = ref<null | string>(null);
+    const currentGamePublicId = ref<null | string>(null);
 
-    const hostedGame = ref<null | HostedGame>(null);
+    const game = ref<null | Game>(null);
     const spectators = ref<Player[]>([]);
 
     const engineGame = shallowRef<null | EngineGame>(null);
@@ -106,13 +106,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * when component in unmount.
      */
     const useGame = (gamePublicId: string) => {
-        hostedGamePublicId.value = gamePublicId;
+        currentGamePublicId.value = gamePublicId;
 
-        const unlisten = listenSocketMessages(gamePublicId, hostedGameInitialData => {
-            hostedGame.value = cloneHostedGame(hostedGameInitialData);
-            removeShadowDeletedMessages(hostedGame.value);
-            engineGame.value = EngineGame.fromData(toEngineGameData(hostedGame.value));
-            gameView.value = new GameView(hostedGame.value.boardsize);
+        const unlisten = listenSocketMessages(gamePublicId, gameInitialData => {
+            game.value = cloneGame(gameInitialData);
+            removeShadowDeletedMessages(game.value);
+            engineGame.value = EngineGame.fromData(toEngineGameData(game.value));
+            gameView.value = new GameView(game.value.boardsize);
             playerSettingsFacade.value = new PlayerSettingsFacade(gameView.value);
             playingGameFacade.value = new PlayingGameFacade(
                 gameView.value,
@@ -124,7 +124,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             listenHexSecondaryClick();
             listenModel(playingGameFacade.value, engineGame.value);
 
-            initWinOverlay(engineGame.value, gameView.value, hostedGame.value);
+            initWinOverlay(engineGame.value, gameView.value, game.value);
         });
 
         watchEffect(() => {
@@ -150,13 +150,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             gameView.value?.destroy();
             gameView.value = null;
             engineGame.value = null;
-            hostedGame.value = null;
-            hostedGamePublicId.value = null;
+            game.value = null;
+            currentGamePublicId.value = null;
             spectators.value = [];
         });
     };
 
-    const listenSocketMessages = (gamePublicId: string, onFirstUpdate: (hostedGameInitialData: HostedGame) => void) => {
+    const listenSocketMessages = (gamePublicId: string, onFirstUpdate: (gameInitialData: Game) => void) => {
         const unlisteners: (() => void)[] = [];
 
         const on: typeof socket.on = (name: Parameters<typeof socket.on>[0], listener: Parameters<typeof socket.on>[1]) => {
@@ -165,35 +165,35 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return socket.on(name, listener);
         };
 
-        on('gameUpdate', (publicId, hostedGameData) => {
+        on('gameUpdate', (publicId, gameData) => {
             // ignore if not my game, or already initialized
-            if (publicId !== gamePublicId || hostedGame.value !== null) {
+            if (publicId !== gamePublicId || game.value !== null) {
                 return;
             }
 
             // I received update but game seems not to exists.
-            if (hostedGameData === null) {
+            if (gameData === null) {
                 void router.push({ name: 'home' });
                 return;
             }
 
-            onFirstUpdate(hostedGameData);
+            onFirstUpdate(gameData);
         });
 
-        on('gameStarted', (hostedGameData) => {
-            if (gamePublicId !== hostedGameData.publicId || !hostedGame.value) {
+        on('gameStarted', (gameData) => {
+            if (gamePublicId !== gameData.publicId || !game.value) {
                 return;
             }
 
-            updateHostedGame(hostedGame.value, hostedGameData);
+            updateGame(game.value, gameData);
         });
 
         on('moved', (gameId, timestampedMove, moveIndex, byPlayerIndex) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            addMove(hostedGame.value, timestampedMove, moveIndex, byPlayerIndex);
+            addMove(game.value, timestampedMove, moveIndex, byPlayerIndex);
 
             // Do nothing if game not loaded
             if (!engineGame.value) {
@@ -215,81 +215,81 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
 
         on('timeControlUpdate', (gameId, gameTimeData) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            handleTimeControlUpdate(hostedGame.value, gameTimeData);
+            handleTimeControlUpdate(game.value, gameTimeData);
 
             notifyWhenLowTime(gameTimeData);
         });
 
         on('askUndo', (gameId, byPlayerIndex) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            hostedGame.value.undoRequest = byPlayerIndex;
+            game.value.undoRequest = byPlayerIndex;
 
-            const player = getPlayer(hostedGame.value, byPlayerIndex);
+            const player = getPlayer(game.value, byPlayerIndex);
 
             if (!player) {
                 throw new Error('No player at position ' + byPlayerIndex + ', cannot emit notification');
             }
 
-            notifier.emit('takebackRequested', hostedGame.value, player);
+            notifier.emit('takebackRequested', game.value, player);
         });
 
         on('answerUndo', (gameId, accept) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
             if (accept && engineGame.value) {
-                if (hostedGame.value.undoRequest === null) {
+                if (game.value.undoRequest === null) {
                     throw new Error('undo answered but no undo request');
                 }
 
-                engineGame.value.playerUndo(hostedGame.value.undoRequest as 0 | 1);
+                engineGame.value.playerUndo(game.value.undoRequest as 0 | 1);
             }
 
-            const { undoRequest } = hostedGame.value;
+            const { undoRequest } = game.value;
 
-            hostedGame.value.undoRequest = null;
+            game.value.undoRequest = null;
 
             if (engineGame.value) {
-                hostedGame.value.currentPlayerIndex = engineGame.value.getCurrentPlayerIndex();
-                hostedGame.value.moves = engineGame.value.getMovesHistory().map(move => move.move);
-                hostedGame.value.moveTimestamps = engineGame.value.getMovesHistory().map(move => move.playedAt);
+                game.value.currentPlayerIndex = engineGame.value.getCurrentPlayerIndex();
+                game.value.moves = engineGame.value.getMovesHistory().map(move => move.move);
+                game.value.moveTimestamps = engineGame.value.getMovesHistory().map(move => move.playedAt);
             }
 
             if (undoRequest === null) {
                 throw new Error('There was no undo request, cannot emit notification');
             }
 
-            const takebackPlayer = getPlayer(hostedGame.value, undoRequest);
+            const takebackPlayer = getPlayer(game.value, undoRequest);
 
             if (!takebackPlayer) {
                 throw new Error('No player at position ' + undoRequest + ', cannot emit notification');
             }
 
-            notifier.emit('takebackAnswered', hostedGame.value, accept, takebackPlayer);
+            notifier.emit('takebackAnswered', game.value, accept, takebackPlayer);
         });
 
         on('cancelUndo', (gameId) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            hostedGame.value.undoRequest = null;
+            game.value.undoRequest = null;
         });
 
         on('ended', (gameId, winner, outcome, { date }) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            endGame(hostedGame.value, winner, outcome, date);
+            endGame(game.value, winner, outcome, date);
 
             // Do nothing if game not loaded
             if (engineGame.value === null) {
@@ -305,11 +305,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
 
         on('gameCanceled', (gameId, { date }) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            cancelGame(hostedGame.value, date);
+            cancelGame(game.value, date);
 
             // Do nothing if game not loaded
             if (engineGame.value === null) {
@@ -325,34 +325,34 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
 
         on('rematchAvailable', (gameId, rematchId) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
-            const rematch = useLobbyStore().hostedGames[rematchId];
+            const rematch = useLobbyStore().games[rematchId];
 
-            hostedGame.value.rematch = rematch;
+            game.value.rematch = rematch;
 
-            notifier.emit('rematchOffer', hostedGame.value);
+            notifier.emit('rematchOffer', game.value);
         });
 
         on('ratingsUpdated', (gameId, ratings) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
             // Add rating change of this game
-            hostedGame.value.ratings = ratings;
+            game.value.ratings = ratings;
 
             // Update player current rating to update view
             ratings.forEach(rating => {
-                if (!hostedGame.value) {
+                if (!game.value) {
                     return;
                 }
 
-                const player = hostedGame.value
-                    .hostedGameToPlayers
-                    .find(hostedGameToPlayer => hostedGameToPlayer.player.publicId === rating.player.publicId)
+                const player = game.value
+                    .gameToPlayers
+                    .find(gameToPlayer => gameToPlayer.player.publicId === rating.player.publicId)
                     ?.player
                 ;
 
@@ -365,7 +365,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         });
 
         on('chat', (gameId: string, chatMessage: ChatMessage) => {
-            if (gameId !== gamePublicId || !hostedGame.value) {
+            if (gameId !== gamePublicId || !game.value) {
                 return;
             }
 
@@ -373,7 +373,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            hostedGame.value.chatMessages.push(chatMessage);
+            game.value.chatMessages.push(chatMessage);
             richChat.value?.postChatMessage(chatMessage);
 
             if (!isReadingChatMessages.value) {
@@ -458,8 +458,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         gameView.value.on('hexClicked', async (move: HexMove) => {
-            if (!hostedGame.value || !engineGame.value) {
-                throw new Error('hex clicked but hosted game is null');
+            if (!game.value || !engineGame.value) {
+                throw new Error('hex clicked but game is null');
             }
 
             move = engineGame.value.moveOrSwapPieces(move);
@@ -473,7 +473,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                         return;
                     }
 
-                    if (canExplore(hostedGame.value, loggedInPlayer.value)) {
+                    if (canExplore(game.value, loggedInPlayer.value)) {
                         simulatePlayingGameFacade.value.addSimulationMoveOrForward(move);
                     }
 
@@ -486,7 +486,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 }
 
                 // Next actions only available when game is playing
-                if (hostedGame.value.state !== 'playing') {
+                if (game.value.state !== 'playing') {
                     return;
                 }
 
@@ -611,11 +611,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * Returns null if player is a watcher.
      */
     const localPlayerIndex = computed<null | 0 | 1>(() => {
-        if (loggedInPlayer.value === null || !hostedGame.value) {
+        if (loggedInPlayer.value === null || !game.value) {
             return null;
         }
 
-        const playerIndex = getPlayerIndex(hostedGame.value, loggedInPlayer.value);
+        const playerIndex = getPlayerIndex(game.value, loggedInPlayer.value);
 
         if (playerIndex === -1) {
             return null;
@@ -625,19 +625,19 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     });
 
     const players = computed<Player[]>(() => {
-        if (hostedGame.value === null) {
+        if (game.value === null) {
             return [];
         }
 
-        return getPlayers(hostedGame.value);
+        return getPlayers(game.value);
     });
 
     const isMyTurn = computed(() => {
-        if (hostedGame.value === null) {
+        if (game.value === null) {
             return false;
         }
 
-        return isPlayerTurn(hostedGame.value, loggedInPlayer.value);
+        return isPlayerTurn(game.value, loggedInPlayer.value);
     });
 
     /**
@@ -645,7 +645,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * MoveSettings is whether we should submit move immediately or ask confirm.
      */
     const moveSettings = computed<null | MoveSettings>(() => {
-        if (hostedGame.value === null || playerSettings.value === null) {
+        if (game.value === null || playerSettings.value === null) {
             return null;
         }
 
@@ -653,7 +653,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             blitz: playerSettings.value.moveSettingsBlitz,
             normal: playerSettings.value.moveSettingsNormal,
             correspondence: playerSettings.value.moveSettingsCorrespondence,
-        }[timeControlToCadencyName(hostedGame.value)];
+        }[timeControlToCadencyName(game.value)];
     });
 
     // Remove premove or move confirmation when changing player settings
@@ -676,7 +676,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * on whether there is a pre-selected move to submit or not.
      */
     const shouldDisplayConfirmMove = computed<boolean>(() => {
-        if (hostedGame.value === null) {
+        if (game.value === null) {
             return false;
         }
 
@@ -686,7 +686,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         // Game has ended. Still display button when game is not yet started to make sure it works
-        if (hostedGame.value.state === 'ended') {
+        if (game.value.state === 'ended') {
             return false;
         }
 
@@ -707,11 +707,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     const sendMove = async (move: HexMove): Promise<void> => {
         return await new Promise((resolve, reject) => {
-            if (!hostedGame.value) {
-                throw new Error('no hostedGame');
+            if (!game.value) {
+                throw new Error('no game');
             }
 
-            socket.emit('move', hostedGame.value.publicId, move, answer => {
+            socket.emit('move', game.value.publicId, move, answer => {
                 if (answer === true) {
                     resolve();
                     return;
@@ -738,21 +738,21 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     };
 
     const shouldShowPass = computed((): boolean => {
-        if (!hostedGame.value) {
+        if (!game.value) {
             return false;
         }
 
-        return hostedGame.value.state === 'playing'
+        return game.value.state === 'playing'
             && localPlayerIndex.value !== null
         ;
     });
 
     const shouldEnablePass = computed((): boolean => {
-        if (!hostedGame.value || !engineGame.value) {
+        if (!game.value || !engineGame.value) {
             return false;
         }
 
-        return hostedGame.value.state === 'playing'
+        return game.value.state === 'playing'
             && isMyTurn.value
             && canPassAgain(engineGame.value)
         ;
@@ -763,19 +763,19 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
 
     const canResign = computed((): boolean => {
-        if (localPlayerIndex.value === null || !hostedGame.value) {
+        if (localPlayerIndex.value === null || !game.value) {
             return false;
         }
 
-        return hostedGame.value.state === 'playing';
+        return game.value.state === 'playing';
     });
 
     const sendResign = async (): Promise<string | true> => {
-        if (!hostedGame.value) {
-            throw new Error('no hosted game');
+        if (!game.value) {
+            throw new Error('no game');
         }
 
-        return await apiPostResign(hostedGame.value.publicId);
+        return await apiPostResign(game.value.publicId);
     };
 
     /*
@@ -793,11 +793,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         premove.moveIndex = engineGame.value.getLastMoveIndex() + 2;
 
         return await new Promise((resolve, reject) => {
-            if (!hostedGame.value) {
-                throw new Error('no hostedGame');
+            if (!game.value) {
+                throw new Error('no game');
             }
 
-            socket.emit('premove', hostedGame.value.publicId, premove, answer => {
+            socket.emit('premove', game.value.publicId, premove, answer => {
                 if (answer === true) {
                     resolve();
                     return;
@@ -810,11 +810,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     const cancelPremove = async (): Promise<void> => {
         return await new Promise((resolve, reject) => {
-            if (!hostedGame.value) {
-                throw new Error('no hostedGame');
+            if (!game.value) {
+                throw new Error('no game');
             }
 
-            socket.emit('cancelPremove', hostedGame.value.publicId, answer => {
+            socket.emit('cancelPremove', game.value.publicId, answer => {
                 if (answer === true) {
                     resolve();
                     return;
@@ -834,7 +834,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * disabled or not.
      */
     const shouldDisplayUndoMove = computed<boolean>(() => {
-        if (hostedGame.value === null || playerSettings.value === null) {
+        if (game.value === null || playerSettings.value === null) {
             return false;
         }
 
@@ -843,13 +843,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return false;
         }
 
-        if (hostedGame.value.state !== 'playing') {
+        if (game.value.state !== 'playing') {
             return false;
         }
 
         // Show a disabled button if I sent an undo request,
         // but hide it if opponent sent an undo request.
-        if (hostedGame.value.undoRequest === (1 - localPlayerIndex.value)) {
+        if (game.value.undoRequest === (1 - localPlayerIndex.value)) {
             return false;
         }
 
@@ -860,12 +860,12 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * Whether we should enable the button because cannot undo now
      */
     const shouldEnableUndoMove = computed<boolean>(() => {
-        if (!hostedGame.value || localPlayerIndex.value === null || !engineGame.value) {
+        if (!game.value || localPlayerIndex.value === null || !engineGame.value) {
             return false;
         }
 
-        return hostedGame.value.undoRequest !== localPlayerIndex.value
-            && canPlayerUndo(hostedGame.value, localPlayerIndex.value)
+        return game.value.undoRequest !== localPlayerIndex.value
+            && canPlayerUndo(game.value, localPlayerIndex.value)
         ;
     });
 
@@ -873,31 +873,31 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * Whether we should display "Accept" or "Reject" opponent takeback request.
      */
     const shouldDisplayAnswerUndoMove = computed<boolean>(() => {
-        if (!hostedGame.value || localPlayerIndex.value === null) {
+        if (!game.value || localPlayerIndex.value === null) {
             return false;
         }
 
-        if (hostedGame.value.state !== 'playing') {
+        if (game.value.state !== 'playing') {
             return false;
         }
 
-        return hostedGame.value.undoRequest === 1 - localPlayerIndex.value;
+        return game.value.undoRequest === 1 - localPlayerIndex.value;
     });
 
     const askUndo = async () => {
-        if (!hostedGame.value) {
+        if (!game.value) {
             return;
         }
 
-        return await apiPostAskUndo(hostedGame.value.publicId);
+        return await apiPostAskUndo(game.value.publicId);
     };
 
     const answerUndo = async (accept: boolean) => {
-        if (!hostedGame.value) {
+        if (!game.value) {
             return;
         }
 
-        return await apiPostAnswerUndo(hostedGame.value.publicId, accept);
+        return await apiPostAnswerUndo(game.value.publicId, accept);
     };
 
     /*
@@ -925,9 +925,9 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
     const isReadingChatMessages = ref(false);
 
-    watch(hostedGame, () => {
-        richChat.value = hostedGame.value
-            ? new RichChat(hostedGame.value)
+    watch(game, () => {
+        richChat.value = game.value
+            ? new RichChat(game.value)
             : null
         ;
     });
@@ -941,11 +941,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     const sendChatMessage = async (content: string): Promise<void> => {
         return await new Promise((resolve, reject) => {
-            if (!hostedGame.value) {
-                throw new Error('no hostedGame');
+            if (!game.value) {
+                throw new Error('no game');
             }
 
-            socket.emit('sendChat', hostedGame.value.publicId, content, error => {
+            socket.emit('sendChat', game.value.publicId, content, error => {
                 if (error) {
                     useSocketStore().handleMessageError(error, 'could not post message, server error');
                     reject(new Error(error.reason));
@@ -962,11 +962,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * Will be transformed to clickable coords later.
      */
     const pasteCoordsInChat = (move: Move) => {
-        if (!hostedGame.value) {
-            throw new Error('Cannot past coords in chat, no hostedGame');
+        if (!game.value) {
+            throw new Error('Cannot past coords in chat, no game');
         }
 
-        const chatInput = useChatInputStore().getChatInput(hostedGame.value.publicId);
+        const chatInput = useChatInputStore().getChatInput(game.value.publicId);
 
         if (chatInput.value.length > 0 && !chatInput.value.match(/\s$/)) {
             chatInput.value += ' ';
@@ -978,7 +978,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     /**
      * On init, remove shadow banned chat messages
      */
-    const removeShadowDeletedMessages = (hostedGame: HostedGame): void => {
+    const removeShadowDeletedMessages = (game: Game): void => {
         // Append '#unban' to the url and refresh to see shadow banned chat messages
         if (window.location.hash === '#unban') {
             return;
@@ -986,7 +986,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         const { loggedInPlayer } = useAuthStore();
 
-        hostedGame.chatMessages = hostedGame.chatMessages
+        game.chatMessages = game.chatMessages
             .filter(chatMessage => checkShadowDeleted(chatMessage, loggedInPlayer))
         ;
     };
@@ -996,13 +996,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
 
     const canCancel = computed((): boolean => {
-        if (localPlayerIndex.value === null || hostedGame.value === null) {
+        if (localPlayerIndex.value === null || game.value === null) {
             return false;
         }
 
-        return hostedGame.value.state !== 'canceled'
-            && hostedGame.value.state !== 'ended'
-            && hostedGame.value.moves.length < 2
+        return game.value.state !== 'canceled'
+            && game.value.state !== 'ended'
+            && game.value.moves.length < 2
         ;
     });
 
@@ -1011,19 +1011,19 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      * and can decline it.
      */
     const canDeclineChallenge = computed((): boolean => {
-        if (hostedGame.value === null) {
+        if (game.value === null) {
             return false;
         }
 
-        return isChallengeTargetOf(hostedGame.value, loggedInPlayer.value);
+        return isChallengeTargetOf(game.value, loggedInPlayer.value);
     });
 
     const sendCancel = async (): Promise<string | true> => {
-        if (!hostedGame.value) {
-            throw new Error('unexpected no hostedGame');
+        if (!game.value) {
+            throw new Error('unexpected no game');
         }
 
-        return await apiPostCancel(hostedGame.value.publicId);
+        return await apiPostCancel(game.value.publicId);
     };
 
     /*
@@ -1034,13 +1034,13 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return false;
         }
 
-        if (!hostedGame.value) {
+        if (!game.value) {
             return false;
         }
 
-        return (hostedGame.value.state === 'ended'
-            || hostedGame.value.state === 'canceled')
-            && hostedGame.value.rematch == null;
+        return (game.value.state === 'ended'
+            || game.value.state === 'canceled')
+            && game.value.rematch == null;
     });
 
     /*
@@ -1085,7 +1085,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
     let disposeWinOverlay: null | (() => void) = null;
 
-    const initWinOverlay = (engineGame: EngineGame, gameView: GameView, hostedGame: HostedGame) => {
+    const initWinOverlay = (engineGame: EngineGame, gameView: GameView, game: Game) => {
         if (disposeWinOverlay) {
             disposeWinOverlay();
             disposeWinOverlay = null;
@@ -1111,8 +1111,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
             await defineOverlay(GameFinishedOverlay)({
                 engineGame,
-                players: hostedGame.hostedGameToPlayers
-                    .map(hostedGameToPlayer => hostedGameToPlayer.player)
+                players: game.gameToPlayers
+                    .map(gameToPlayer => gameToPlayer.player)
                 ,
             });
         };
@@ -1164,18 +1164,18 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     };
 
     watch([loggedInPlayer, localPlayerIndex], async () => {
-        if (!hostedGame.value || !loggedInPlayer.value || localPlayerIndex.value === null) {
+        if (!game.value || !loggedInPlayer.value || localPlayerIndex.value === null) {
             stopConditionalMoves();
             conditionalMovesEditor.value = null;
             conditionalMovesState.value = null;
             return;
         }
 
-        if (!shouldShowConditionalMoves(hostedGame.value, loggedInPlayer.value)) {
+        if (!shouldShowConditionalMoves(game.value, loggedInPlayer.value)) {
             return;
         }
 
-        const conditionalMoves = await apiGetConditionalMoves(hostedGame.value.publicId);
+        const conditionalMoves = await apiGetConditionalMoves(game.value.publicId);
 
         conditionalMovesState.value = createConditionalMovesState(
             localPlayerIndex.value,
@@ -1188,11 +1188,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         conditionalMovesEditor.value = new ConditionalMovesEditor(conditionalMovesState.value);
 
         conditionalMovesEditor.value.on('conditionalMovesSubmitted', async conditionalMoves => {
-            if (!hostedGame.value) {
-                throw new Error('Cannot patch conditional moves, no hostedGame');
+            if (!game.value) {
+                throw new Error('Cannot patch conditional moves, no game');
             }
 
-            await apiPatchConditionalMoves(hostedGame.value.publicId, conditionalMoves);
+            await apiPatchConditionalMoves(game.value.publicId, conditionalMoves);
         });
     });
 
@@ -1255,17 +1255,17 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         const serverDate = useServerDateStore().newDate();
 
         lowTimeNotificationThread = setTimeout(() => {
-            if (!hostedGame.value) {
+            if (!game.value) {
                 return;
             }
 
-            notifier.emit('gameTimeControlWarning', hostedGame.value);
+            notifier.emit('gameTimeControlWarning', game.value);
         }, timeValueToMilliseconds(totalRemainingTime, serverDate) - 10000);
     };
 
 
     return {
-        hostedGame,
+        game,
         engineGame,
         gameView,
         gameUIMode,

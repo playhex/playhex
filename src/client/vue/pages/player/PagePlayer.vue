@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
-import { HostedGame, HostedGameOptions, Player, PlayerHeadToHeadStats, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
+import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
@@ -28,7 +28,7 @@ import { watchEffect } from 'vue';
 import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
-import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/hostedGameUtils.js';
+import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/gameUtils.js';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
@@ -96,7 +96,7 @@ const challenge = (mode: 'ranked' | 'friendly') => {
         return;
     }
 
-    const gameOptions = new HostedGameOptions();
+    const gameOptions = new GameOptions();
     gameOptions.opponentPublicId = player.value.publicId;
 
     if (mode === 'ranked') {
@@ -129,7 +129,7 @@ void (async () => {
  * Current games
  */
 const { mySortedGames } = storeToRefs(useMyGamesStore());
-const otherPlayerActiveGames = ref<HostedGame[]>([]);
+const otherPlayerActiveGames = ref<Game[]>([]);
 
 watchEffect(async () => {
     if (player.value === null || loggedInPlayer.value?.publicId === player.value.publicId) {
@@ -140,23 +140,23 @@ watchEffect(async () => {
     otherPlayerActiveGames.value = await apiGetPlayerActiveGames(player.value.publicId);
 });
 
-const currentGames = computed((): HostedGame[] => {
+const currentGames = computed((): Game[] => {
     if (player.value === null) return [];
 
     if (loggedInPlayer.value?.publicId === player.value.publicId) {
         return mySortedGames.value
-            .map(g => g.hostedGame)
-            .filter(hostedGame => hostedGame.state === 'playing')
+            .map(g => g.game)
+            .filter(game => game.state === 'playing')
         ;
     }
 
-    return otherPlayerActiveGames.value.filter(hostedGame => hostedGame.state === 'playing');
+    return otherPlayerActiveGames.value.filter(game => game.state === 'playing');
 });
 
 /*
  * Games history
  */
-const gamesHistory = ref<null | HostedGame[]>(null);
+const gamesHistory = ref<null | Game[]>(null);
 const totalResults = ref<null | number>(null);
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -664,7 +664,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                             <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
                             <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
 
-                            <td v-if="game.hostedGameToPlayers.length < 2">-</td>
+                            <td v-if="game.gameToPlayers.length < 2">-</td>
                             <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
 
                             <td>{{ game.boardsize }}</td>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { apiGetActiveGames } from '../../apiClient.js';
 import { isLive, isCorrespondence, TimeControlCadency } from '../../../shared/app/timeControlUtils.js';
-import { isBotGame } from '../../../shared/app/hostedGameUtils.js';
+import { isBotGame } from '../../../shared/app/gameUtils.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { IconLightningChargeFill, IconCalendar } from '../icons.js';
@@ -29,7 +29,7 @@ const THUMBNAILS_COLUMN_CLASSES = [
 
 type SortKey = 'recently-started' | 'recently-played' | 'most-moves' | 'longest' | 'player-rating';
 
-const allPlayingGames = ref<HostedGame[]>([]);
+const allPlayingGames = ref<Game[]>([]);
 const loading = ref(true);
 const router = useRouter();
 const route = useRoute();
@@ -47,9 +47,9 @@ const liveGames = computed(() => allPlayingGames.value.filter(g => isLive(g)));
 const correspondenceGames = computed(() => allPlayingGames.value.filter(g => isCorrespondence(g)));
 const baseGames = computed(() => currentLobby.value === 'live' ? liveGames.value : correspondenceGames.value);
 
-const maxRating = (game: HostedGame): number => {
+const maxRating = (game: Game): number => {
     return Math.max(
-        ...game.hostedGameToPlayers.map(p => p.player?.currentRating?.rating ?? 1500),
+        ...game.gameToPlayers.map(p => p.player?.currentRating?.rating ?? 1500),
     );
 };
 
@@ -178,10 +178,10 @@ const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLU
                                 >{{ $t('game.watch') }}</router-link>
                             </td>
                             <td>
-                                <AppPseudo v-if="game.hostedGameToPlayers[0]" :player="game.hostedGameToPlayers[0].player" rating classes="text-danger" />
+                                <AppPseudo v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" rating classes="text-danger" />
                             </td>
                             <td>
-                                <AppPseudo v-if="game.hostedGameToPlayers[1]" :player="game.hostedGameToPlayers[1].player" rating classes="text-primary" />
+                                <AppPseudo v-if="game.gameToPlayers[1]" :player="game.gameToPlayers[1].player" rating classes="text-primary" />
                             </td>
                             <td>{{ game.boardsize }}×{{ game.boardsize }}</td>
                             <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>

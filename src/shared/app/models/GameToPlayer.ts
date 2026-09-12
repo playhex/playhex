@@ -1,18 +1,18 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
-import HostedGame from './HostedGame.js';
+import Game from './Game.js';
 import Player from './Player.js';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Type } from 'class-transformer';
 
 @Entity()
-export default class HostedGameToPlayer
+export default class GameToPlayer
 {
     @PrimaryColumn()
-    hostedGameId: number;
+    gameId: number;
 
-    @ManyToOne(() => HostedGame, hostedGame => hostedGame.hostedGameToPlayers)
+    @ManyToOne(() => Game, game => game.gameToPlayers)
     @JoinColumn()
-    hostedGame: Relation<HostedGame>;
+    game: Relation<Game>;
 
     @Column()
     playerId: number;

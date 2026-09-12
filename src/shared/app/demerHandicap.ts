@@ -1,5 +1,5 @@
 import type { HexMove } from '../move-notation/hex-move-notation.js';
-import { HostedGame } from './models/index.js';
+import { Game } from './models/index.js';
 
 /**
  * Guess Demer handicap from game options and pass moves.
@@ -66,10 +66,10 @@ export const guessDemerHandicap = (swapRule: boolean, firstPlayerPredefined: boo
     return handicap;
 };
 
-export const guessDemerHandicapFromHostedGame = (hostedGame: HostedGame): number | 'N/S' => {
+export const guessDemerHandicapFromGame = (game: Game): number | 'N/S' => {
     return guessDemerHandicap(
-        hostedGame.swapRule,
-        hostedGame.firstPlayer !== null,
-        hostedGame.moves,
+        game.swapRule,
+        game.firstPlayer !== null,
+        game.moves,
     );
 };

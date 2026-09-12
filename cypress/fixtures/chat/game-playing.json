@@ -8,7 +8,7 @@
         "slug": "aaa",
         "createdAt": "2024-03-05T10:16:32.291Z"
     },
-    "hostedGameToPlayers": [
+    "gameToPlayers": [
         {
             "player": {
                 "pseudo": "aaa",

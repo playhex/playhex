@@ -1,10 +1,10 @@
-import { getOtherPlayer, getStrictWinnerPlayer } from './hostedGameUtils.js';
-import { HostedGame, Player, Tournament } from './models/index.js';
+import { getOtherPlayer, getStrictWinnerPlayer } from './gameUtils.js';
+import { Game, Player, Tournament } from './models/index.js';
 import { pseudoString } from './pseudoUtils.js';
 import { PushPayload } from './PushPayload.js';
 import { getCheckInOpensDate } from './tournamentUtils.js';
 
-const gameTag = (hostedGame: HostedGame): string => `game-${hostedGame.publicId}`;
+const gameTag = (game: Game): string => `game-${game.publicId}`;
 const tournamentTag = (tournament: Tournament): string => `tournament-${tournament.publicId}`;
 
 /**
@@ -12,9 +12,9 @@ const tournamentTag = (tournament: Tournament): string => `tournament-${tourname
  */
 export class PushNotificationFactory
 {
-    static createPlayerJoinedAndGameStartedNotification(player: Player, hostedGame: HostedGame): PushPayload
+    static createPlayerJoinedAndGameStartedNotification(player: Player, game: Game): PushPayload
     {
-        const otherPlayer = getOtherPlayer(hostedGame, player);
+        const otherPlayer = getOtherPlayer(game, player);
 
         if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
@@ -25,16 +25,16 @@ export class PushNotificationFactory
         const push = new PushPayload(description);
 
         push.title = 'Your game has started';
-        push.goToPath = `/games/${hostedGame.publicId}`;
-        push.date = hostedGame.startedAt ?? new Date();
-        push.tag = gameTag(hostedGame);
+        push.goToPath = `/games/${game.publicId}`;
+        push.date = game.startedAt ?? new Date();
+        push.tag = gameTag(game);
 
         return push;
     }
 
-    static createGameCreatedBySystemStartedNotification(player: Player, hostedGame: HostedGame): PushPayload
+    static createGameCreatedBySystemStartedNotification(player: Player, game: Game): PushPayload
     {
-        const otherPlayer = getOtherPlayer(hostedGame, player);
+        const otherPlayer = getOtherPlayer(game, player);
 
         if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
@@ -45,16 +45,16 @@ export class PushNotificationFactory
         const push = new PushPayload(description);
 
         push.title = 'Your game has started';
-        push.goToPath = `/games/${hostedGame.publicId}`;
-        push.date = hostedGame.startedAt ?? new Date();
-        push.tag = gameTag(hostedGame);
+        push.goToPath = `/games/${game.publicId}`;
+        push.date = game.startedAt ?? new Date();
+        push.tag = gameTag(game);
 
         return push;
     }
 
-    static createTurnToPlayNotification(player: Player, hostedGame: HostedGame, movePlayedAt: Date): PushPayload
+    static createTurnToPlayNotification(player: Player, game: Game, movePlayedAt: Date): PushPayload
     {
-        const otherPlayer = getOtherPlayer(hostedGame, player);
+        const otherPlayer = getOtherPlayer(game, player);
 
         if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
@@ -65,17 +65,17 @@ export class PushNotificationFactory
         const push = new PushPayload(description);
 
         push.title = 'Your turn';
-        push.goToPath = `/games/${hostedGame.publicId}`;
+        push.goToPath = `/games/${game.publicId}`;
         push.date = movePlayedAt;
-        push.tag = gameTag(hostedGame);
+        push.tag = gameTag(game);
 
         return push;
     }
 
-    static createGameEndedNotification(player: Player, hostedGame: HostedGame): PushPayload
+    static createGameEndedNotification(player: Player, game: Game): PushPayload
     {
-        const otherPlayer = getOtherPlayer(hostedGame, player);
-        const winner = getStrictWinnerPlayer(hostedGame);
+        const otherPlayer = getOtherPlayer(game, player);
+        const winner = getStrictWinnerPlayer(game);
 
         if (otherPlayer === null) {
             throw new Error('No other player, cannot create push');
@@ -86,9 +86,9 @@ export class PushNotificationFactory
         const push = new PushPayload(description);
 
         push.title = 'Your game has ended';
-        push.goToPath = `/games/${hostedGame.publicId}`;
-        push.date = hostedGame.endedAt ?? new Date();
-        push.tag = gameTag(hostedGame);
+        push.goToPath = `/games/${game.publicId}`;
+        push.date = game.endedAt ?? new Date();
+        push.tag = gameTag(game);
 
         return push;
     }

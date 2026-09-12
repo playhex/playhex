@@ -1,6 +1,6 @@
 import { isSameDay } from 'date-fns';
-import { ChatMessage, HostedGame } from './models/index.js';
-import { getTimestampedMoves } from './hostedGameUtils.js';
+import { ChatMessage, Game } from './models/index.js';
+import { getTimestampedMoves } from './gameUtils.js';
 
 /*
  * Take a game chat messages, and adds between chat messages:
@@ -40,14 +40,14 @@ export class RichChat
     private generators: AbstractChatHeaderGenerator[];
 
     constructor(
-        hostedGame: HostedGame,
+        game: Game,
     ) {
         this.generators = [
-            new MoveNumberHeader(hostedGame),
-            new DateHeader(hostedGame),
+            new MoveNumberHeader(game),
+            new DateHeader(game),
         ];
 
-        for (const chatMessage of hostedGame.chatMessages) {
+        for (const chatMessage of game.chatMessages) {
             this.postChatMessage(chatMessage);
         }
     }
@@ -70,7 +70,7 @@ export class RichChat
 abstract class AbstractChatHeaderGenerator
 {
     constructor(
-        protected hostedGame: HostedGame,
+        protected game: Game,
     ) {
         this.init();
     }
@@ -117,7 +117,7 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        const timestampedMoves = getTimestampedMoves(this.hostedGame);
+        const timestampedMoves = getTimestampedMoves(this.game);
         let currentMoveNumber = this.lastMoveNumber;
 
         while (

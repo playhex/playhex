@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDisclosure } from '@overlastic/vue';
 import { PropType, reactive, ref, toRef, watch } from 'vue';
-import { HostedGameOptions, Player } from '../../../../shared/app/models/index.js';
+import { GameOptions, Player } from '../../../../shared/app/models/index.js';
 import { IconCaretDownFill, IconCaretRight } from '../../icons.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
@@ -16,7 +16,7 @@ const { visible, confirm, cancel } = useDisclosure();
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<HostedGameOptions>,
+        type: Object as PropType<GameOptions>,
         required: true,
     },
     presetOpponent: {

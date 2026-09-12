@@ -9,7 +9,7 @@
             "slug": "julien",
             "createdAt": "2024-02-17T21:49:13.621Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Julien",
@@ -66,7 +66,7 @@
             "slug": "julien",
             "createdAt": "2024-02-17T21:49:13.621Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Julien",
@@ -123,7 +123,7 @@
             "slug": "julien",
             "createdAt": "2024-02-17T21:49:13.621Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Julien",
@@ -180,7 +180,7 @@
             "slug": "julien",
             "createdAt": "2024-02-17T21:49:13.621Z"
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Julien",

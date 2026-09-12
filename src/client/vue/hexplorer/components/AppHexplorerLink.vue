@@ -3,17 +3,17 @@ import { PropType, toRefs } from 'vue';
 import { createHexworldString } from '../../../../shared/app/hexworld.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { GameView } from '@playhex/pixi-board';
-import { canShowHexplorerLink } from '../../../../shared/app/hostedGameUtils.js';
-import { HostedGame } from '../../../../shared/app/models/index.js';
+import { canShowHexplorerLink } from '../../../../shared/app/gameUtils.js';
+import { Game } from '../../../../shared/app/models/index.js';
 
 /*
  * Link that redirect to Hexplorer,
- * and initialize position to this hostedGame
+ * and initialize position to this game
  */
 
 const props = defineProps({
-    hostedGame: {
-        type: Object as PropType<HostedGame>,
+    game: {
+        type: Object as PropType<Game>,
         required: true,
     },
     orientation: {
@@ -23,10 +23,10 @@ const props = defineProps({
     },
 });
 
-const { hostedGame, orientation } = toRefs(props);
+const { game, orientation } = toRefs(props);
 const { loggedInPlayer } = toRefs(useAuthStore());
 
-const shouldDisplayLink = (): boolean => canShowHexplorerLink(hostedGame.value, loggedInPlayer.value);
+const shouldDisplayLink = (): boolean => canShowHexplorerLink(game.value, loggedInPlayer.value);
 </script>
 
 <template>
@@ -34,7 +34,7 @@ const shouldDisplayLink = (): boolean => canShowHexplorerLink(hostedGame.value, 
         v-if="shouldDisplayLink()"
         :to="{
             name: 'hexplorer',
-            hash: '#' + createHexworldString(hostedGame, orientation ?? GameView.ORIENTATION_DIAMOND),
+            hash: '#' + createHexworldString(game, orientation ?? GameView.ORIENTATION_DIAMOND),
         }"
     >{{ $t('hexplorer.title') }}</router-link>
 </template>

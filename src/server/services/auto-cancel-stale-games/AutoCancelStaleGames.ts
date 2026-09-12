@@ -1,4 +1,4 @@
-import HostedGameStore from '../../store/HostedGameStore.js';
+import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { GameStaleEvaluator } from './GameStaleEvaluator.js';
 import logger from '../logger.js';
@@ -21,7 +21,7 @@ export class AutoCancelStaleGames
     private intervalThread: null | NodeJS.Timeout = null;
 
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private gameStaleEvaluator: GameStaleEvaluator,
     ) {}
 
@@ -61,7 +61,7 @@ export class AutoCancelStaleGames
      */
     checkAllGames(cancelStaleGames = false): object[]
     {
-        const activeGames = this.hostedGameStore.getActiveGames();
+        const activeGames = this.gameStore.getActiveGames();
         const reasons: object[] = [];
 
         logger.debug('Check all active games staleness', {
@@ -75,7 +75,7 @@ export class AutoCancelStaleGames
 
             if (result.shouldCancel && cancelStaleGames) {
                 logger.info('Detected a stale game, cancel it', {
-                    hostedGamePublicId: activeGame.getPublicId(),
+                    gamePublicId: activeGame.getPublicId(),
                     ...result,
                 });
 
@@ -83,7 +83,7 @@ export class AutoCancelStaleGames
             }
 
             reasons.push({
-                hostedGamePublicId: activeGame.getPublicId(),
+                gamePublicId: activeGame.getPublicId(),
                 url: `${process.env.BASE_URL ?? ''}/games/${activeGame.getPublicId()}`,
                 ...result,
             });

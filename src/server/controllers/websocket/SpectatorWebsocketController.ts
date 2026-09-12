@@ -1,8 +1,8 @@
-import HostedGameStore from '../../store/HostedGameStore.js';
+import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
-import { hasPlayer } from '../../../shared/app/hostedGameUtils.js';
+import { hasPlayer } from '../../../shared/app/gameUtils.js';
 import { GameEventsEmitter } from '../../services/game-events-emitter/GameEventsEmitter.js';
 import { GameSpectators } from '../../services/GameSpectators.js';
 
@@ -12,7 +12,7 @@ export default class SpectatorWebsocketController implements WebsocketController
 
     constructor(
         private gameSpectators: GameSpectators,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private gameEventsEmitter: GameEventsEmitter,
     ) {}
 
@@ -38,10 +38,10 @@ export default class SpectatorWebsocketController implements WebsocketController
         const { player } = socket.data;
         if (player === null) return;
 
-        const activeGame = this.hostedGameStore.getActiveGame(gameId);
+        const activeGame = this.gameStore.getActiveGame(gameId);
         if (activeGame === null) return;
 
-        if (hasPlayer(activeGame.getHostedGame(), player)) return;
+        if (hasPlayer(activeGame.getGame(), player)) return;
 
         if (this.gameSpectators.addSpectator(gameId, player)) {
             this.gameEventsEmitter.emitSpectatorJoined(gameId, player);

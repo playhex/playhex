@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesCheckerInterface.js';
 
 /**
@@ -12,8 +12,8 @@ import { DataInconsistenciesCheckerInterface } from './DataInconsistenciesChecke
 export class TimeoutGamesWithLessThan2MovesMustBeCanceled implements DataInconsistenciesCheckerInterface
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     getDescription(): string
@@ -24,30 +24,30 @@ export class TimeoutGamesWithLessThan2MovesMustBeCanceled implements DataInconsi
     async run(): Promise<string[]>
     {
         type Result = {
-            hostedGame_publicId: string;
-            hostedGame_createdAt: Date;
-            hostedGame_ranked: 0 | 1;
+            game_publicId: string;
+            game_createdAt: Date;
+            game_ranked: 0 | 1;
         };
 
-        const uncanceled: Result[] = await this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .where('hostedGame.outcome = "time"')
-            .andWhere('hostedGame.state = "ended"')
+        const uncanceled: Result[] = await this.gameRepository
+            .createQueryBuilder('game')
+            .where('game.outcome = "time"')
+            .andWhere('game.state = "ended"')
             .andWhere(`CASE
-                WHEN hostedGame.moves = '' OR hostedGame.moves IS NULL THEN 0
-                ELSE LENGTH(hostedGame.moves) - LENGTH(REPLACE(hostedGame.moves, ' ', '')) + 1
+                WHEN game.moves = '' OR game.moves IS NULL THEN 0
+                ELSE LENGTH(game.moves) - LENGTH(REPLACE(game.moves, ' ', '')) + 1
             END < 2`)
-            .groupBy('hostedGame.id')
+            .groupBy('game.id')
             .execute()
         ;
 
-        const hostedGameToString = (label: string, hostedGame: Result) => [
+        const gameToString = (label: string, game: Result) => [
             label,
-            hostedGame.hostedGame_publicId,
-            hostedGame.hostedGame_createdAt,
-            hostedGame.hostedGame_ranked ? '(ranked)' : '',
+            game.game_publicId,
+            game.game_createdAt,
+            game.game_ranked ? '(ranked)' : '',
         ].join(' ');
 
-        return uncanceled.map(hostedGame => hostedGameToString('timeout with <2 moves but not canceled', hostedGame));
+        return uncanceled.map(game => gameToString('timeout with <2 moves but not canceled', game));
     }
 }

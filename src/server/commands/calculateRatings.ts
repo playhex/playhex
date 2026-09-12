@@ -2,7 +2,7 @@ import { Container } from 'typedi';
 import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
-import { HostedGame, Player } from '../../shared/app/models/index.js';
+import { Game, Player } from '../../shared/app/models/index.js';
 import RatingRepository from '../repositories/RatingRepository.js';
 import { mustAnswerYes } from './utils/question.js';
 
@@ -11,7 +11,7 @@ import { mustAnswerYes } from './utils/question.js';
 
     update player set currentRatingId = null;
     set foreign_key_checks = 0;
-    truncate rating_games_hosted_game;
+    truncate rating_games_game;
     truncate rating;
     set foreign_key_checks = 1;
 
@@ -29,11 +29,11 @@ hexProgram
 
         const ratingRepository = Container.get(RatingRepository);
         const playerRepository = Container.get<Repository<Player>>('Repository<Player>');
-        const hostedGameRepository = Container.get<Repository<HostedGame>>('Repository<HostedGame>');
+        const gameRepository = Container.get<Repository<Game>>('Repository<Game>');
 
-        const ratedGames = await hostedGameRepository.find({
+        const ratedGames = await gameRepository.find({
             relations: {
-                hostedGameToPlayers: {
+                gameToPlayers: {
                     player: {
                         currentRating: {
                             player: true,
@@ -46,7 +46,7 @@ hexProgram
                 state: In(['ended', 'forfeited']),
             },
             order: {
-                hostedGameToPlayers: {
+                gameToPlayers: {
                     order: 'asc',
                 },
                 endedAt: 'asc',
@@ -57,13 +57,13 @@ hexProgram
 
         let i = 0;
 
-        for (const hostedGame of ratedGames) {
-            console.log('game', hostedGame.publicId, ++i, '/', ratedGames.length);
+        for (const game of ratedGames) {
+            console.log('game', game.publicId, ++i, '/', ratedGames.length);
 
-            const newRatings = await ratingRepository.updateAfterGame(hostedGame);
+            const newRatings = await ratingRepository.updateAfterGame(game);
 
             await ratingRepository.persistRatings(newRatings);
-            await playerRepository.save(hostedGame.hostedGameToPlayers.map(h => h.player));
+            await playerRepository.save(game.gameToPlayers.map(h => h.player));
         }
 
         console.log('DONE');

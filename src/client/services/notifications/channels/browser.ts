@@ -3,7 +3,7 @@ import { getOpponent, hasFocus, iAmInGame, isMe, viewingGame } from '../../conte
 import { notifier } from '../notifier.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import router from '../../../vue/router.js';
-import { isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import { isBotGame } from '../../../../shared/app/gameUtils.js';
 import { serviceWorkerRegistrationPromise } from '../../registerServiceWorker.js';
 import { getNotificationPermission } from '../../browserNotification.js';
 import { RouteLocationAsRelativeTyped } from 'vue-router';
@@ -49,28 +49,28 @@ const sendNotification = async (options: NotificationOptions, route: RouteLocati
     await serviceWorkerRegistration.showNotification(title, computedOptions);
 };
 
-notifier.on('gameStart', (hostedGame) => {
-    if (isBotGame(hostedGame)) {
+notifier.on('gameStart', (game) => {
+    if (isBotGame(game)) {
         return;
     }
 
-    if (viewingGame(hostedGame) && hasFocus()) {
+    if (viewingGame(game) && hasFocus()) {
         return;
     }
 
-    if (hostedGame.host === null) {
+    if (game.host === null) {
         // If no host, notify if I am in the game.
-        if (!iAmInGame(hostedGame)) {
+        if (!iAmInGame(game)) {
             return;
         }
     } else {
         // Only notify game host. Player who just joined don't need to be notified, neither are watchers.
-        if (!isMe(hostedGame.host)) {
+        if (!isMe(game.host)) {
             return;
         }
     }
 
-    const opponent = getOpponent(hostedGame);
+    const opponent = getOpponent(game);
 
     if (opponent === null) {
         return;
@@ -84,12 +84,12 @@ notifier.on('gameStart', (hostedGame) => {
         },
         {
             name: 'online-game',
-            params: { gameId: hostedGame.publicId },
+            params: { gameId: game.publicId },
         },
     );
 });
 
-notifier.on('chatMessage', (hostedGame, chatMessage) => {
+notifier.on('chatMessage', (game, chatMessage) => {
     if (chatMessage.player === null) {
         return;
     }
@@ -98,11 +98,11 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         return;
     }
 
-    if (!iAmInGame(hostedGame)) {
+    if (!iAmInGame(game)) {
         return;
     }
 
-    if (viewingGame(hostedGame) && hasFocus()) {
+    if (viewingGame(game) && hasFocus()) {
         return;
     }
 
@@ -114,7 +114,7 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
         },
         {
             name: 'online-game',
-            params: { gameId: hostedGame.publicId },
+            params: { gameId: game.publicId },
         },
         chatMessage.player ? pseudoString(chatMessage.player) : 'PlayHex',
     );

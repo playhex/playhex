@@ -1,34 +1,34 @@
 import useToastsStore from '../../../../client/stores/toastsStore.js';
 import { apiPostCancel } from '../../../apiClient.js';
-import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/gameUtils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { t } from 'i18next';
 import { IconPersonFillExclamation, IconTablerSwords } from '../../../vue/icons.js';
 
-notifier.on('gameStart', hostedGame => {
-    if (isBotGame(hostedGame)) {
+notifier.on('gameStart', game => {
+    if (isBotGame(game)) {
         return;
     }
 
-    if (viewingGame(hostedGame)) {
+    if (viewingGame(game)) {
         return;
     }
 
-    if (hostedGame.host === null) {
+    if (game.host === null) {
         // If no host, notify if I am in the game
-        if (!iAmInGame(hostedGame)) {
+        if (!iAmInGame(game)) {
             return;
         }
     } else {
         // Do not notify player who just joined, because he is now aware that game started obviously
-        if (!isMe(hostedGame.host)) {
+        if (!isMe(game.host)) {
             return;
         }
     }
 
-    const opponent = getOpponent(hostedGame);
+    const opponent = getOpponent(game);
 
     if (opponent === null) {
         return;
@@ -44,7 +44,7 @@ notifier.on('gameStart', hostedGame => {
             actions: [
                 { label: t('go_to_the_game'), action: {
                     name: 'online-game',
-                    params: { gameId: hostedGame.publicId },
+                    params: { gameId: game.publicId },
                 } },
             ],
         },
@@ -52,18 +52,18 @@ notifier.on('gameStart', hostedGame => {
 });
 
 // Toast when my opponent passed, or, if I'm watching, any player passed
-notifier.on('move', (hostedGame, timestampedMove) => {
+notifier.on('move', (game, timestampedMove) => {
     if (timestampedMove.move !== 'pass') {
         return;
     }
 
-    const currentPlayer = getCurrentPlayer(hostedGame);
+    const currentPlayer = getCurrentPlayer(game);
 
     if (currentPlayer === null) {
         return;
     }
 
-    const passingPlayer = getOtherPlayer(hostedGame, currentPlayer);
+    const passingPlayer = getOtherPlayer(game, currentPlayer);
 
     if (passingPlayer === null || isMe(passingPlayer)) {
         return;
@@ -77,9 +77,9 @@ notifier.on('move', (hostedGame, timestampedMove) => {
     );
 });
 
-notifier.on('takebackRequested', (hostedGame, byPlayer) => {
+notifier.on('takebackRequested', (game, byPlayer) => {
     // Only display to watchers: players see the takeback request bar above the board
-    if (iAmInGame(hostedGame)) {
+    if (iAmInGame(game)) {
         return;
     }
 
@@ -91,8 +91,8 @@ notifier.on('takebackRequested', (hostedGame, byPlayer) => {
     );
 });
 
-notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
-    const opponent = getOtherPlayer(hostedGame, playerTakeback);
+notifier.on('takebackAnswered', (game, accepted, playerTakeback) => {
+    const opponent = getOtherPlayer(game, playerTakeback);
 
     // Only display to player who requested takeback and watchers (so: everyone except playerTakeback's opponent)
     if (opponent && isMe(opponent)) {
@@ -112,13 +112,13 @@ notifier.on('takebackAnswered', (hostedGame, accepted, playerTakeback) => {
     }
 });
 
-notifier.on('gameChallengeCreated', hostedGame => {
-    if (hostedGame.host === null) {
+notifier.on('gameChallengeCreated', game => {
+    if (game.host === null) {
         return;
     }
 
     useToastsStore().addToast(
-        t('player_challenged_you', { player: pseudoString(hostedGame.host, 'pseudo') }),
+        t('player_challenged_you', { player: pseudoString(game.host, 'pseudo') }),
         {
             level: 'success',
             autoCloseAfter: 0,
@@ -127,18 +127,18 @@ notifier.on('gameChallengeCreated', hostedGame => {
             actions: [
                 { label: t('go_to_the_game'), action: {
                     name: 'online-game',
-                    params: { gameId: hostedGame.publicId },
+                    params: { gameId: game.publicId },
                 } },
                 { label: t('decline_challenge'), classes: 'btn btn-sm btn-outline-warning', action: () => {
-                    void apiPostCancel(hostedGame.publicId);
+                    void apiPostCancel(game.publicId);
                 } },
             ],
         },
     );
 });
 
-notifier.on('rematchOffer', hostedGame => {
-    const rematchRequester = hostedGame.rematch?.host;
+notifier.on('rematchOffer', game => {
+    const rematchRequester = game.rematch?.host;
 
     if (!rematchRequester) {
         return;
@@ -149,7 +149,7 @@ notifier.on('rematchOffer', hostedGame => {
         return;
     }
 
-    if (iAmInGame(hostedGame)) {
+    if (iAmInGame(game)) {
         useToastsStore().addToast(
             t('player_sent_you_rematch_offer', { player: pseudoString(rematchRequester, 'pseudo') }),
             { level: 'success' },

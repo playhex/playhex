@@ -1,5 +1,5 @@
 import { Glicko2, Glicko2Settings } from 'glicko2';
-import { HostedGame, Player, Rating } from './models/index.js';
+import { Game, Player, Rating } from './models/index.js';
 import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 
 export const RANKED_BOARDSIZE_MIN = 11;
@@ -88,9 +88,9 @@ export const getBoardsizeCategory = (boardsize: number): BoardsizeCategory => {
  * Returns rating categories and sub-categories for a given game.
  * I.e ["overall", "small", "blitz", "small.blitz"]
  */
-export const getRatingCategoriesFromGame = (hostedGame: HostedGame): RatingCategory[] => {
-    const cadency = timeControlToCadencyName(hostedGame);
-    const boardsize = getBoardsizeCategory(hostedGame.boardsize);
+export const getRatingCategoriesFromGame = (game: Game): RatingCategory[] => {
+    const cadency = timeControlToCadencyName(game);
+    const boardsize = getBoardsizeCategory(game.boardsize);
 
     return [
         'overall',

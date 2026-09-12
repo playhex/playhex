@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { BOARD_DEFAULT_SIZE, type PlayerIndex } from '../../game-engine/index.js';
 import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { Expose } from '../class-transformer-custom.js';
-import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer } from './HostedGameOptionsTimeControl.js';
+import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeControlFischer } from './GameOptionsTimeControl.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
@@ -18,7 +18,7 @@ export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176
  * for when we POST a games through api with partial values:
  * class-transformer will use default values.
  */
-export default class HostedGameOptions implements TimeControlBoardsize
+export default class GameOptions implements TimeControlBoardsize
 {
     @Expose()
     @IsBoolean()
@@ -77,10 +77,10 @@ export default class HostedGameOptions implements TimeControlBoardsize
     @ValidateNested()
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
-        switch ((type?.object as HostedGameOptions).timeControlType?.family) {
-            case 'fischer': return HostedGameOptionsTimeControlFischer;
-            case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
-            default: return HostedGameOptionsTimeControl;
+        switch ((type?.object as GameOptions).timeControlType?.family) {
+            case 'fischer': return GameOptionsTimeControlFischer;
+            case 'byoyomi': return GameOptionsTimeControlByoYomi;
+            default: return GameOptionsTimeControl;
         }
     })
     timeControlType: TimeControlType = structuredClone(defaultTimeControlTypes.normal);
@@ -108,8 +108,8 @@ export default class HostedGameOptions implements TimeControlBoardsize
  * Recreate a new game options instance to attribute to a new game with same options.
  * Cannot reuse same instance because two game cannot share same instance (one to one).
  */
-export const cloneGameOptions = (gameOptions: HostedGameOptions): HostedGameOptions => {
-    const clone = new HostedGameOptions();
+export const cloneGameOptions = (gameOptions: GameOptions): GameOptions => {
+    const clone = new GameOptions();
 
     clone.ranked = gameOptions.ranked;
     clone.boardsize = gameOptions.boardsize;

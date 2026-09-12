@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
 import { instanceToInstance } from '../class-transformer-custom.js';
-import { HostedGame, HostedGameToPlayer, Player, Rating } from '../models/index.js';
+import { Game, GameToPlayer, Player, Rating } from '../models/index.js';
 import { denormalize, normalize } from '../serializer.js';
 
 const createPlayer = (): Player => {
@@ -32,26 +32,26 @@ const createPlayer = (): Player => {
 describe('lobby serialization', () => {
     it('keeps player currentRating in lobby group', () => {
         const player = createPlayer();
-        const hostedGame = new HostedGame();
+        const game = new Game();
 
-        hostedGame.host = player;
+        game.host = player;
 
-        const hostedGameToPlayer = new HostedGameToPlayer();
-        hostedGameToPlayer.player = player;
-        hostedGameToPlayer.order = 0;
-        hostedGame.hostedGameToPlayers = [hostedGameToPlayer];
+        const gameToPlayer = new GameToPlayer();
+        gameToPlayer.player = player;
+        gameToPlayer.order = 0;
+        game.gameToPlayers = [gameToPlayer];
 
-        const serialized = instanceToInstance(hostedGame, { groups: ['lobby'] });
+        const serialized = instanceToInstance(game, { groups: ['lobby'] });
 
         assert.strictEqual(serialized.host?.currentRating?.rating, 1789, 'host rating');
         assert.strictEqual(serialized.host?.countryFlag, '🇫🇷', 'host flag');
-        assert.strictEqual(serialized.hostedGameToPlayers[0].player.currentRating?.rating, 1789, 'player rating');
-        assert.strictEqual(serialized.hostedGameToPlayers[0].player.shadowBanned, undefined, 'no leak of non lobby fields');
+        assert.strictEqual(serialized.gameToPlayers[0].player.currentRating?.rating, 1789, 'player rating');
+        assert.strictEqual(serialized.gameToPlayers[0].player.shadowBanned, undefined, 'no leak of non lobby fields');
 
         // Through socket wire format
-        const received = denormalize(normalize(serialized)) as HostedGame;
+        const received = denormalize(normalize(serialized)) as Game;
 
         assert.strictEqual(received.host?.currentRating?.rating, 1789, 'host rating after socket serialization');
-        assert.strictEqual(received.hostedGameToPlayers[0].player.currentRating?.rating, 1789, 'player rating after socket serialization');
+        assert.strictEqual(received.gameToPlayers[0].player.currentRating?.rating, 1789, 'player rating after socket serialization');
     });
 });

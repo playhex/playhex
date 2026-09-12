@@ -15,16 +15,16 @@ import { t } from 'i18next';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
-import { HostedGame } from '../../../shared/app/models/index.js';
+import { Game } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { apiPostRematch, getPlayer } from '../../apiClient.js';
-import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/hostedGameUtils.js';
+import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/gameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
-import { computeTimeControlAtMoveIndex } from '../../../shared/app/hostedGameUtils.js';
+import { computeTimeControlAtMoveIndex } from '../../../shared/app/gameUtils.js';
 import { type GameTimeData } from '../../../shared/time-control/TimeControl.js';
 
 const head = injectHead();
@@ -37,7 +37,7 @@ if (Array.isArray(gameId)) {
 
 const {
     engineGame,
-    hostedGame,
+    game,
     gameView,
     simulatePlayingGameFacade,
 
@@ -114,23 +114,23 @@ const cannotJoinReasonType = computed<null
     | 'cannot_join_reason.other'
     | 'cannot_join_reason.game_canceled'
 >(() => {
-    if (!hostedGame.value) {
+    if (!game.value) {
         return null;
     }
 
-    if (hostedGame.value.state === 'canceled') {
+    if (game.value.state === 'canceled') {
         return 'cannot_join_reason.game_canceled';
     }
 
-    if (hostedGame.value.state !== 'created') {
+    if (game.value.state !== 'created') {
         return null;
     }
 
-    if (isGuestBlockedFromRegisteredOnlyGame(hostedGame.value, loggedInPlayer.value)) {
+    if (isGuestBlockedFromRegisteredOnlyGame(game.value, loggedInPlayer.value)) {
         return 'cannot_join_registered_only';
     }
 
-    if (canJoin(hostedGame.value, loggedInPlayer.value)) {
+    if (canJoin(game.value, loggedInPlayer.value)) {
         return null;
     }
 
@@ -138,11 +138,11 @@ const cannotJoinReasonType = computed<null
         return 'cannot_join_reason.not_logged_in';
     }
 
-    if (hostedGame.value.host?.publicId === loggedInPlayer.value.publicId) {
+    if (game.value.host?.publicId === loggedInPlayer.value.publicId) {
         return 'cannot_join_reason.is_host';
     }
 
-    if (isChallengeGame(hostedGame.value) && hostedGame.value.opponentPublicId !== loggedInPlayer.value.publicId) {
+    if (isChallengeGame(game.value) && game.value.opponentPublicId !== loggedInPlayer.value.publicId) {
         return 'cannot_join_reason.reserved_for_other_player';
     }
 
@@ -154,7 +154,7 @@ const cannotJoinReasonType = computed<null
  */
 const cannotJoinOpponentPseudo = ref<null | string>(null);
 
-watch([cannotJoinReasonType, hostedGame], async ([reasonType, game]) => {
+watch([cannotJoinReasonType, game], async ([reasonType, game]) => {
     cannotJoinOpponentPseudo.value = null;
 
     if (reasonType !== 'cannot_join_reason.is_host' && reasonType !== 'cannot_join_reason.reserved_for_other_player') {
@@ -196,26 +196,26 @@ const cannotJoinReasonKey = computed<null | string>(() => {
  * Registered-only games block guests entirely now: show the reason instead of a disabled button.
  */
 const showAcceptButton = computed<boolean>(() => {
-    if (!hostedGame.value) {
+    if (!game.value) {
         return false;
     }
 
-    return canJoin(hostedGame.value, loggedInPlayer.value)
-        && !isGuestBlockedFromRegisteredOnlyGame(hostedGame.value, loggedInPlayer.value)
+    return canJoin(game.value, loggedInPlayer.value)
+        && !isGuestBlockedFromRegisteredOnlyGame(game.value, loggedInPlayer.value)
     ;
 });
 
 const effectiveTimeControlValues = computed<null | GameTimeData>(() => {
-    if (!hostedGame.value?.timeControl) return null;
-    if (!simulatePlayingGameFacade.value || hostedGame.value.state !== 'ended') {
-        return hostedGame.value.timeControl;
+    if (!game.value?.timeControl) return null;
+    if (!simulatePlayingGameFacade.value || game.value.state !== 'ended') {
+        return game.value.timeControl;
     }
-    return computeTimeControlAtMoveIndex(hostedGame.value, simulationMainCursor.value);
+    return computeTimeControlAtMoveIndex(game.value, simulationMainCursor.value);
 });
 
-const makeTitle = (hostedGame: HostedGame) => {
-    const players = hostedGame.hostedGameToPlayers.map(h => h.player);
-    const { state } = hostedGame;
+const makeTitle = (game: Game) => {
+    const players = game.gameToPlayers.map(h => h.player);
+    const { state } = game;
     const playerPseudos = players.map(p => pseudoString(p, 'pseudo'));
     if (players.length < 2 && state === 'created')
         return `${t('game.title_waiting')} ${playerPseudos[0]}`;
@@ -223,7 +223,7 @@ const makeTitle = (hostedGame: HostedGame) => {
     if (state === 'playing' && loggedInPlayer.value != null) {
         const player = loggedInPlayer.value;
         const index = players.findIndex(p => p.publicId === player.publicId);
-        if (index != null && hostedGame.currentPlayerIndex === index) {
+        if (index != null && game.currentPlayerIndex === index) {
             yourTurn = `• ${t('game.title_your_turn')} • `;
         }
     }
@@ -234,13 +234,13 @@ const makeTitle = (hostedGame: HostedGame) => {
 /*
  * Set page title and seo fields
  */
-watch(hostedGame, hostedGame => {
-    if (!hostedGame) {
+watch(game, game => {
+    if (!game) {
         return;
     }
 
-    const playerPseudos = getPlayers(hostedGame).map(p => p.pseudo);
-    const { state, host } = hostedGame;
+    const playerPseudos = getPlayers(game).map(p => p.pseudo);
+    const { state, host } = game;
     const description = state === 'created'
         ? `Hex game, hosted by ${host?.pseudo ?? 'system'}, waiting for an opponent.`
         : `Hex game, ${playerPseudos.join(' versus ')}.`
@@ -248,8 +248,8 @@ watch(hostedGame, hostedGame => {
 
     useSeoMeta({
         title: computed(() => {
-            if (hostedGame == null) return '';
-            return makeTitle(hostedGame);
+            if (game == null) return '';
+            return makeTitle(game);
         }),
         description,
         ogDescription: description,
@@ -261,11 +261,11 @@ watch(hostedGame, hostedGame => {
  * Join game
  */
 const join = async () => {
-    if (hostedGame.value === null) {
+    if (game.value === null) {
         return;
     }
 
-    if (isGuestJoiningCorrepondence(hostedGame.value)) {
+    if (isGuestJoiningCorrepondence(game.value)) {
         try {
             await createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
@@ -273,7 +273,7 @@ const join = async () => {
         }
     }
 
-    return lobbyStore.joinGame(hostedGame.value.publicId);
+    return lobbyStore.joinGame(game.value.publicId);
 };
 
 const confirmationOverlay = defineOverlay(ConfirmationOverlay);
@@ -337,8 +337,8 @@ const canAcceptRematch: Ref<boolean> = ref(false);
 const rematchRequestOngoing = ref(false);
 
 watchEffect(() => {
-    if (!hostedGame.value) return;
-    const rematch = hostedGame.value.rematch ?? null;
+    if (!game.value) return;
+    const rematch = game.value.rematch ?? null;
     if (rematch == null) return;
     if (loggedInPlayer.value == null) return;
     if (localPlayerIndex.value === null) return;
@@ -346,37 +346,37 @@ watchEffect(() => {
 });
 
 const createOrAcceptRematch = async (): Promise<void> => {
-    if (!hostedGame.value) {
+    if (!game.value) {
         throw new Error('Error while trying to rematch, no current game');
     }
 
-    const rematchId = hostedGame.value.rematch?.publicId ?? null;
-    let hostedGameRematch: null | HostedGame = null;
+    const rematchId = game.value.rematch?.publicId ?? null;
+    let gameRematch: null | Game = null;
 
     try {
         rematchRequestOngoing.value = true;
 
         if (rematchId != null) {
-            hostedGameRematch = await lobbyStore.getOrFetchHostedGame(rematchId);
+            gameRematch = await lobbyStore.getOrFetchGame(rematchId);
 
-            if (hostedGameRematch == null) {
+            if (gameRematch == null) {
                 throw new Error('A rematch game does not exist');
             }
         } else {
-            hostedGameRematch = await apiPostRematch(hostedGame.value.publicId);
+            gameRematch = await apiPostRematch(game.value.publicId);
         }
     } finally {
         rematchRequestOngoing.value = false;
     }
 
-    if (canJoin(hostedGameRematch, loggedInPlayer.value)) {
-        await lobbyStore.joinGame(hostedGameRematch.publicId);
+    if (canJoin(gameRematch, loggedInPlayer.value)) {
+        await lobbyStore.joinGame(gameRematch.publicId);
     }
 
     await router.push({
         name: 'online-game',
         params: {
-            gameId: hostedGameRematch.publicId,
+            gameId: gameRematch.publicId,
         },
     });
 };
@@ -454,8 +454,8 @@ const takeback = async () => {
     }
 };
 
-const isPlayingVsBot = computed<boolean>(() => hostedGame.value !== null
-    && isBotGame(hostedGame.value),
+const isPlayingVsBot = computed<boolean>(() => game.value !== null
+    && isBotGame(game.value),
 );
 
 /**
@@ -471,13 +471,13 @@ const shouldDisplayUndoMoveInMenu = computed<boolean>(() => shouldDisplayUndoMov
 );
 
 const shouldShowHexworldLink = computed<boolean>(() => engineGame.value !== null
-    && hostedGame.value !== null
-    && canShowHexworldLink(hostedGame.value, loggedInPlayer.value),
+    && game.value !== null
+    && canShowHexworldLink(game.value, loggedInPlayer.value),
 );
 
 const shouldShowHexplorerLink = computed<boolean>(() => engineGame.value !== null
-    && hostedGame.value !== null
-    && canShowHexplorerLink(hostedGame.value, loggedInPlayer.value),
+    && game.value !== null
+    && canShowHexplorerLink(game.value, loggedInPlayer.value),
 );
 
 /**
@@ -499,25 +499,25 @@ const {
 </script>
 
 <template>
-    <div v-show="hostedGame" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : 'sidebar-closed')">
+    <div v-show="game" class="game-and-sidebar-container" :class="localSettings.openSidebar ? 'sidebar-open' : (undefined === localSettings.openSidebar ? 'sidebar-auto' : 'sidebar-closed')">
         <div class="game bg-body">
 
             <!-- Game board, "Accept" button -->
             <div class="board-container">
                 <AppBoard
-                    v-if="hostedGame"
+                    v-if="game"
                     :players
-                    :timeControlOptions="hostedGame.timeControlType"
+                    :timeControlOptions="game.timeControlType"
                     :timeControlValues="effectiveTimeControlValues"
                     :gameView="gameView"
                 />
 
-                <div v-if="hostedGame && (showAcceptButton || canDeclineChallenge || cannotJoinReasonKey)" class="join-button-container">
+                <div v-if="game && (showAcceptButton || canDeclineChallenge || cannotJoinReasonKey)" class="join-button-container">
                     <div class="d-flex flex-column align-items-center gap-2">
                         <button
                             v-if="showAcceptButton"
                             class="btn btn-lg"
-                            :class="isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
+                            :class="isGuestJoiningCorrepondence(game) ? 'btn-outline-warning' : 'btn-success'"
                             @click="join()"
                         >{{ $t('game.accept') }}</button>
 
@@ -534,7 +534,7 @@ const {
             </div>
 
             <!-- Control buttons at bottom of game board (resign, undo, confirm move, ...) -->
-            <nav class="menu-game navbar" v-if="hostedGame">
+            <nav class="menu-game navbar" v-if="game">
                 <div class="buttons container-fluid">
 
                     <!-- Left spacer, same width as the right one so that the buttons stay centered -->
@@ -548,7 +548,7 @@ const {
                         </button>
 
                         <!-- Conditional moves -->
-                        <button type="button" v-if="loggedInPlayer && shouldShowConditionalMoves(hostedGame, loggedInPlayer)" @click="startConditionalMoves()" class="btn btn-outline-primary">
+                        <button type="button" v-if="loggedInPlayer && shouldShowConditionalMoves(game, loggedInPlayer)" @click="startConditionalMoves()" class="btn btn-outline-primary">
                             <IconSignpostSplit />
                         </button>
 
@@ -599,11 +599,11 @@ const {
                         </button>
 
                         <!-- Accept / View rematch -->
-                        <template v-else-if="hostedGame.rematch?.publicId">
+                        <template v-else-if="game.rematch?.publicId">
                             <button v-if="canAcceptRematch" type="button" class="btn btn-success" @click="createOrAcceptRematch()" :disabled="rematchRequestOngoing">
                                 {{ ' ' + $t('rematch.accept') }}
                             </button>
-                            <router-link v-else :to="{ name: 'online-game', params: { gameId: hostedGame.rematch.publicId } }" class="btn btn-outline-primary">
+                            <router-link v-else :to="{ name: 'online-game', params: { gameId: game.rematch.publicId } }" class="btn btn-outline-primary">
                                 {{ ' ' + $t('rematch.view') }}
                             </router-link>
                         </template>
@@ -652,7 +652,7 @@ const {
                                 <!-- Explore -->
                                 <AppHexWorldExplore
                                     v-if="engineGame"
-                                    :hostedGame
+                                    :game
                                     :engineGame
                                     :orientation
                                     :label="$t('explore')"
@@ -662,7 +662,7 @@ const {
                                 <!-- Hexplorer -->
                                 <AppHexplorerLink
                                     v-if="engineGame"
-                                    :hostedGame
+                                    :game
                                     :orientation
                                     class="dropdown-item"
                                 />
@@ -687,16 +687,16 @@ const {
         </div>
 
         <!-- Game sidebar -->
-        <div class="sidebar bg-body" v-if="hostedGame && gameView">
+        <div class="sidebar bg-body" v-if="game && gameView">
             <AppGameSidebar
-                :hostedGame
+                :game
                 :gameView
                 @close="showSidebar(false)"
             />
         </div>
     </div>
 
-    <div v-if="!hostedGame" class="container-fluid my-3">
+    <div v-if="!game" class="container-fluid my-3">
         <p class="lead text-center">{{ $t('loading_game') }}</p>
     </div>
 

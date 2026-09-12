@@ -1,4 +1,4 @@
-import { HostedGame } from '../../shared/app/models/index.js';
+import { Game } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
 import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
@@ -6,22 +6,22 @@ import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { AnalyzeGameRequest } from '../services/HexAiApiClient.js';
 
 /**
- * Relations to load in order to recreate an HostedGame in memory.
+ * Relations to load in order to recreate an Game in memory.
  */
-const relations: FindOptionsRelations<HostedGame> = {
+const relations: FindOptionsRelations<Game> = {
     chatMessages: {
         player: true,
     },
     rematch: {
         host: true,
-        hostedGameToPlayers: {
+        gameToPlayers: {
             player: {
                 currentRating: true,
             },
         },
     },
     rematchedFrom: {
-        hostedGameToPlayers: {
+        gameToPlayers: {
             player: {
                 currentRating: true,
             },
@@ -33,7 +33,7 @@ const relations: FindOptionsRelations<HostedGame> = {
     host: {
         currentRating: true,
     },
-    hostedGameToPlayers: {
+    gameToPlayers: {
         player: {
             currentRating: true,
         },
@@ -43,60 +43,60 @@ const relations: FindOptionsRelations<HostedGame> = {
     },
 };
 
-const order: FindOptionsOrder<HostedGame> = {
+const order: FindOptionsOrder<Game> = {
     chatMessages: {
         createdAt: 'asc',
     },
-    hostedGameToPlayers: {
+    gameToPlayers: {
         order: 'asc',
     },
 };
 
 /**
- * Layer between HostedGame and database.
+ * Layer between Game and database.
  */
 @Service()
-export default class HostedGameRepository
+export default class GameRepository
 {
     constructor(
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
-    async persist(hostedGame: HostedGame): Promise<HostedGame>
+    async persist(game: Game): Promise<Game>
     {
-        logger.info('Persisting a game...', { publicId: hostedGame.publicId });
+        logger.info('Persisting a game...', { publicId: game.publicId });
 
-        const result = await this.hostedGameRepository.save(hostedGame);
+        const result = await this.gameRepository.save(game);
 
-        logger.info('Hosted game persisting done', { publicId: hostedGame.publicId, id: hostedGame.id });
+        logger.info('Game persisting done', { publicId: game.publicId, id: game.id });
 
         return result;
     }
 
     /**
-     * Persist multiple hostedGame in a transaction.
+     * Persist multiple game in a transaction.
      * Used to persist game and its rematch, with rematch from and to.
      */
-    async persistMultiple(hostedGames: HostedGame[]): Promise<HostedGame[]>
+    async persistMultiple(games: Game[]): Promise<Game[]>
     {
-        return await this.hostedGameRepository.save(hostedGames, {
+        return await this.gameRepository.save(games, {
             transaction: true,
         });
     }
 
-    async deleteIfExists(hostedGame: HostedGame): Promise<void>
+    async deleteIfExists(game: Game): Promise<void>
     {
-        logger.info('Delete a game if exists...', { publicId: hostedGame.publicId });
+        logger.info('Delete a game if exists...', { publicId: game.publicId });
 
-        await this.hostedGameRepository.remove(hostedGame);
+        await this.gameRepository.remove(game);
 
-        logger.info('Deleted.', { publicId: hostedGame.publicId, hostedGame });
+        logger.info('Deleted.', { publicId: game.publicId, game });
     }
 
-    async findUnique(publicId: string): Promise<null | HostedGame>
+    async findUnique(publicId: string): Promise<null | Game>
     {
-        return await this.hostedGameRepository.findOne({
+        return await this.gameRepository.findOne({
             relations,
             order,
             where: {
@@ -109,9 +109,9 @@ export default class HostedGameRepository
         });
     }
 
-    async findRematch(rematchedFromId: number): Promise<null | HostedGame>
+    async findRematch(rematchedFromId: number): Promise<null | Game>
     {
-        return await this.hostedGameRepository.findOne({
+        return await this.gameRepository.findOne({
             relations,
             order,
             where: {
@@ -122,9 +122,9 @@ export default class HostedGameRepository
         });
     }
 
-    async findMany(criteria?: FindManyOptions<HostedGame>): Promise<HostedGame[]>
+    async findMany(criteria?: FindManyOptions<Game>): Promise<Game[]>
     {
-        return await this.hostedGameRepository.find({
+        return await this.gameRepository.find({
             ...criteria,
             relations,
             order,
@@ -137,7 +137,7 @@ export default class HostedGameRepository
      */
     async getAnalyzeGameRequest(publicId: string): Promise<null | AnalyzeGameRequest>
     {
-        const hostedGame = await this.hostedGameRepository.findOne({
+        const game = await this.gameRepository.findOne({
             select: {
                 boardsize: true,
                 moves: true,
@@ -148,11 +148,11 @@ export default class HostedGameRepository
             },
         });
 
-        if (hostedGame === null) {
+        if (game === null) {
             return null;
         }
 
-        const { moves, boardsize } = hostedGame;
+        const { moves, boardsize } = game;
 
         if (!Array.isArray(moves)) {
             throw new Error('Unexpected data in game.movesHistory');
@@ -170,11 +170,11 @@ export default class HostedGameRepository
      *
      * @param withPagination Set false to ignore pagination parameters, used to count(*) all games
      */
-    private queryBuilderSearchMinimal(params: SearchGamesParameters, withPagination = true): SelectQueryBuilder<HostedGame>
+    private queryBuilderSearchMinimal(params: SearchGamesParameters, withPagination = true): SelectQueryBuilder<Game>
     {
-        const queryBuilder = this.hostedGameRepository
-            .createQueryBuilder('hostedGame')
-            .comment('search hosted games')
+        const queryBuilder = this.gameRepository
+            .createQueryBuilder('game')
+            .comment('search games')
         ;
 
         if (withPagination) {
@@ -186,14 +186,14 @@ export default class HostedGameRepository
 
         if (undefined !== params.opponentType) {
             queryBuilder
-                .andWhere('hostedGame.opponentType = :opponentType')
+                .andWhere('game.opponentType = :opponentType')
                 .setParameter('opponentType', params.opponentType)
             ;
         }
 
         if (undefined !== params.ranked) {
             queryBuilder
-                .andWhere('hostedGame.ranked = :ranked')
+                .andWhere('game.ranked = :ranked')
                 .setParameter('ranked', params.ranked)
             ;
         }
@@ -203,9 +203,9 @@ export default class HostedGameRepository
                 Filter games containing player0 AND player1 (if defined).
 
                 select *
-                from hosted_game_to_player a
-                inner join hosted_game_to_player b
-                    on a.hostedGameId = b.hostedGameId
+                from game_to_player a
+                inner join game_to_player b
+                    on a.gameId = b.gameId
                     and a.playerId != b.playerId
                 left join player pa on a.playerId = pa.id
                 left join player pb on b.playerId = pb.id
@@ -216,7 +216,7 @@ export default class HostedGameRepository
 
             if (undefined !== playerA?.publicId) {
                 queryBuilder
-                    .innerJoin('hostedGame.hostedGameToPlayers', 'a')
+                    .innerJoin('game.gameToPlayers', 'a')
                     .leftJoin('a.player', 'playerA')
                     .andWhere('playerA.publicId = :playerAPublicId')
                     .setParameter('playerAPublicId', playerA.publicId)
@@ -225,7 +225,7 @@ export default class HostedGameRepository
 
             if (undefined !== playerB?.publicId) {
                 queryBuilder
-                    .innerJoin('hostedGame.hostedGameToPlayers', 'b', 'a.hostedGameId = b.hostedGameId and a.playerId != b.playerId')
+                    .innerJoin('game.gameToPlayers', 'b', 'a.gameId = b.gameId and a.playerId != b.playerId')
                     .leftJoin('b.player', 'playerB')
                     .andWhere('playerB.publicId = :playerBPublicId')
                     .setParameter('playerBPublicId', playerB.publicId)
@@ -235,27 +235,27 @@ export default class HostedGameRepository
 
         if (Array.isArray(params.states) && params.states.length > 0) {
             queryBuilder
-                .andWhere('hostedGame.state in (:states)')
+                .andWhere('game.state in (:states)')
                 .setParameter('states', params.states)
             ;
         }
 
         if (undefined !== params.fromEndedAt) {
             queryBuilder
-                .andWhere('hostedGame.endedAt >= :fromEndedAt')
+                .andWhere('game.endedAt >= :fromEndedAt')
                 .setParameter('fromEndedAt', params.fromEndedAt)
             ;
         }
 
         if (undefined !== params.toEndedAt) {
             queryBuilder
-                .andWhere('hostedGame.endedAt <= :toEndedAt')
+                .andWhere('game.endedAt <= :toEndedAt')
                 .setParameter('toEndedAt', params.toEndedAt)
             ;
         }
 
         if (undefined !== params.endedAtSort) {
-            queryBuilder.orderBy('hostedGame.endedAt', params.endedAtSort === 'desc' ? 'DESC' : 'ASC');
+            queryBuilder.orderBy('game.endedAt', params.endedAtSort === 'desc' ? 'DESC' : 'ASC');
         }
 
         return queryBuilder;
@@ -265,23 +265,23 @@ export default class HostedGameRepository
      * Search with all required relations.
      * Can be used to return all game data.
      */
-    private queryBuilderSearch(params: SearchGamesParameters): SelectQueryBuilder<HostedGame>
+    private queryBuilderSearch(params: SearchGamesParameters): SelectQueryBuilder<Game>
     {
         return this.queryBuilderSearchMinimal(params)
-            .leftJoin('hostedGame.host', 'playerHost')
+            .leftJoin('game.host', 'playerHost')
             .addSelect('playerHost')
             .leftJoin('playerHost.currentRating', 'hostCurrentRating')
             .addSelect('hostCurrentRating')
-            .leftJoin('hostedGame.hostedGameToPlayers', 'hostedGameToPlayer')
-            .addSelect('hostedGameToPlayer')
-            .leftJoin('hostedGameToPlayer.player', 'player')
+            .leftJoin('game.gameToPlayers', 'gameToPlayer')
+            .addSelect('gameToPlayer')
+            .leftJoin('gameToPlayer.player', 'player')
             .addSelect('player')
             .leftJoin('player.currentRating', 'currentRating')
             .addSelect('currentRating')
         ;
     }
 
-    async search(params: SearchGamesParameters): Promise<{ results: HostedGame[], count: number }>
+    async search(params: SearchGamesParameters): Promise<{ results: Game[], count: number }>
     {
         // cannot use getManyAndCount because the many is fast because indexed and paginated,
         // but the count part will fetch all data relations, not paginated, just to count.
@@ -297,11 +297,11 @@ export default class HostedGameRepository
 
         // we search stats only on ended games, so endedAt should not be null
         queryBuilder
-            .select('date(hostedGame.endedAt)', 'date')
+            .select('date(game.endedAt)', 'date')
             .addSelect('count(*) as totalGames')
-            .andWhere('hostedGame.endedAt is not null')
-            .groupBy('date(hostedGame.endedAt)')
-            .orderBy('date(hostedGame.endedAt)', 'ASC')
+            .andWhere('game.endedAt is not null')
+            .groupBy('date(game.endedAt)')
+            .orderBy('date(game.endedAt)', 'ASC')
         ;
 
         const results: { date: string, totalGames: string }[] = await queryBuilder.getRawMany();
@@ -313,13 +313,13 @@ export default class HostedGameRepository
     }
 
     /**
-     * Retrieve hostedGame in which a chatMessage has been posted.
+     * Retrieve game in which a chatMessage has been posted.
      */
-    async findHostedGameFromChatMessage(chatMessagePublicId: string): Promise<null | HostedGame>
+    async findGameFromChatMessage(chatMessagePublicId: string): Promise<null | Game>
     {
-        const hostedGame = await this.hostedGameRepository.findOne({
+        const game = await this.gameRepository.findOne({
             relations: {
-                hostedGameToPlayers: {
+                gameToPlayers: {
                     player: true,
                 },
             },
@@ -330,6 +330,6 @@ export default class HostedGameRepository
             },
         });
 
-        return hostedGame;
+        return game;
     };
 }

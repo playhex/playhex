@@ -1,4 +1,4 @@
-import HostedGameStore from '../../store/HostedGameStore.js';
+import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
@@ -12,7 +12,7 @@ import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../.
 export default class ChatWebsocketController implements WebsocketControllerInterface
 {
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
     ) {}
 
     onConnection(socket: HexSocket): void
@@ -41,7 +41,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
             }
 
             try {
-                const result = await this.hostedGameStore.postChatMessage(gameId, chatMessage);
+                const result = await this.gameStore.postChatMessage(gameId, chatMessage);
 
                 if (result !== true) {
                     answer({ reason: 'client_error', payload: { translationKey: result } });

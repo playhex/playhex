@@ -8,7 +8,7 @@
             "isGuest": true,
             "isBot": false
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
@@ -60,7 +60,7 @@
             "isGuest": true,
             "isBot": false
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
@@ -222,7 +222,7 @@
             "isGuest": true,
             "isBot": false
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "1f21396d-3848-4f59-825a-d53ca674a809",
@@ -654,7 +654,7 @@
             "isGuest": true,
             "isBot": false
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "publicId": "0808f397-9e12-45af-bd5b-42885fe36212",

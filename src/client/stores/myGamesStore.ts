@@ -3,11 +3,11 @@ import { computed, ref, watch } from 'vue';
 import { useHead } from '@unhead/vue';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
-import { HostedGame } from '../../shared/app/models/index.js';
+import { Game } from '../../shared/app/models/index.js';
 import Rooms from '../../shared/app/Rooms.js';
 import { PlayerIndex } from '../../shared/game-engine/index.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
-import { addMove, cancelGame, cloneHostedGame, endGame, handleTimeControlUpdate, hasPlayer, isBotGame, isChallengeTargetOf } from '../../shared/app/hostedGameUtils.js';
+import { addMove, cancelGame, cloneGame, endGame, handleTimeControlUpdate, hasPlayer, isBotGame, isChallengeTargetOf } from '../../shared/app/gameUtils.js';
 import { iAmInGame } from '../services/context-utils.js';
 import { notifier } from '../services/notifications/notifier.js';
 
@@ -15,7 +15,7 @@ export type CurrentGame = {
     publicId: string;
     isMyTurn: boolean;
     myColor: null | PlayerIndex;
-    hostedGame: HostedGame;
+    game: Game;
 };
 
 /**
@@ -39,15 +39,15 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
         return Object.keys(myGames.value).length;
     });
 
-    const isPlaying = (game: CurrentGame): boolean => {
-        return game.hostedGame.state === 'playing';
+    const isPlaying = (myGame: CurrentGame): boolean => {
+        return myGame.game.state === 'playing';
     };
 
     /**
      * Whether this is a nominative challenge addressed to me, that I have not joined yet.
      */
-    const isIncomingChallenge = (game: CurrentGame): boolean => {
-        return isChallengeTargetOf(game.hostedGame, authStore.loggedInPlayer);
+    const isIncomingChallenge = (myGame: CurrentGame): boolean => {
+        return isChallengeTargetOf(myGame.game, authStore.loggedInPlayer);
     };
 
     /**
@@ -55,10 +55,10 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      */
     const myTurnCount = computed((): number => {
         const myTurnPlaying = Object.values(myGames.value)
-            .filter(game =>
-                isPlaying(game)
-                && !isBotGame(game.hostedGame)
-                && game.isMyTurn,
+            .filter(myGame =>
+                isPlaying(myGame)
+                && !isBotGame(myGame.game)
+                && myGame.isMyTurn,
             )
             .length
         ;
@@ -76,16 +76,16 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return 0;
         }
 
-        if (isBotGame(game0.hostedGame) !== isBotGame(game1.hostedGame)) {
-            return isBotGame(game0.hostedGame) ? 1 : -1;
+        if (isBotGame(game0.game) !== isBotGame(game1.game)) {
+            return isBotGame(game0.game) ? 1 : -1;
         }
 
         if (game0.isMyTurn !== game1.isMyTurn) {
             return game0.isMyTurn ? -1 : 1;
         }
 
-        const time0 = game0.hostedGame.timeControl?.players[game0.myColor].totalRemainingTime ?? Infinity;
-        const time1 = game1.hostedGame.timeControl?.players[game1.myColor].totalRemainingTime ?? Infinity;
+        const time0 = game0.game.timeControl?.players[game0.myColor].totalRemainingTime ?? Infinity;
+        const time1 = game1.game.timeControl?.players[game1.myColor].totalRemainingTime ?? Infinity;
         const now = new Date();
 
         return timeValueToMilliseconds(time0, now) - timeValueToMilliseconds(time1, now);
@@ -98,9 +98,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     const mySortedGames = computed((): CurrentGame[] => {
         const allGames = Object.values(myGames.value);
 
-        const playingNonBot = allGames.filter(game => isPlaying(game) && !isBotGame(game.hostedGame)).sort(byMostUrgentFirst);
+        const playingNonBot = allGames.filter(myGame => isPlaying(myGame) && !isBotGame(myGame.game)).sort(byMostUrgentFirst);
         const incomingChallenges = allGames.filter(isIncomingChallenge);
-        const playingBot = allGames.filter(game => isPlaying(game) && isBotGame(game.hostedGame)).sort(byMostUrgentFirst);
+        const playingBot = allGames.filter(myGame => isPlaying(myGame) && isBotGame(myGame.game)).sort(byMostUrgentFirst);
 
         return [...playingNonBot, ...incomingChallenges, ...playingBot];
     });
@@ -115,35 +115,35 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
      */
     const mostUrgentGame = computed((): null | CurrentGame => {
         const playingGames = mySortedGames.value
-            .filter(game => !isBotGame(game.hostedGame))
+            .filter(myGame => !isBotGame(myGame.game))
         ;
 
         return playingGames[0] ?? null;
     });
 
 
-    socket.on('gameCreated', (hostedGame: HostedGame) => {
-        if (!iAmInGame(hostedGame) && !isChallengeTargetOf(hostedGame, authStore.loggedInPlayer)) {
+    socket.on('gameCreated', (game: Game) => {
+        if (!iAmInGame(game) && !isChallengeTargetOf(game, authStore.loggedInPlayer)) {
             return;
         }
 
-        myGames.value[hostedGame.publicId] = {
-            publicId: hostedGame.publicId,
+        myGames.value[game.publicId] = {
+            publicId: game.publicId,
             isMyTurn: false,
             myColor: null,
-            hostedGame: cloneHostedGame(hostedGame),
+            game: cloneGame(game),
         };
     });
 
-    socket.on('gameStarted', (hostedGame: HostedGame) => {
-        const { currentPlayerIndex, publicId } = hostedGame;
+    socket.on('gameStarted', (game: Game) => {
+        const { currentPlayerIndex, publicId } = game;
         const me = authStore.loggedInPlayer;
 
         if (me === null) {
             return;
         }
 
-        if (!hostedGame.hostedGameToPlayers.some(p => p.player.publicId === me.publicId)) {
+        if (!game.gameToPlayers.some(p => p.player.publicId === me.publicId)) {
             return;
         }
 
@@ -152,16 +152,16 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
                 publicId,
                 isMyTurn: false,
                 myColor: null,
-                hostedGame: cloneHostedGame(hostedGame),
+                game: cloneGame(game),
             };
         }
 
-        const myColor = hostedGame.hostedGameToPlayers[0].player.publicId === authStore.loggedInPlayer?.publicId ? 0 : 1;
+        const myColor = game.gameToPlayers[0].player.publicId === authStore.loggedInPlayer?.publicId ? 0 : 1;
         myGames.value[publicId].myColor = myColor;
-        myGames.value[publicId].isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === authStore.loggedInPlayer?.publicId;
-        myGames.value[publicId].hostedGame = hostedGame;
+        myGames.value[publicId].isMyTurn = game.gameToPlayers[currentPlayerIndex].player.publicId === authStore.loggedInPlayer?.publicId;
+        myGames.value[publicId].game = game;
 
-        notifier.emit('gameStart', hostedGame);
+        notifier.emit('gameStart', game);
     });
 
     socket.on('moved', (gameId, timestampedMove, moveIndex, byPlayerIndex) => {
@@ -169,11 +169,11 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        addMove(myGames.value[gameId].hostedGame, timestampedMove, moveIndex, byPlayerIndex);
+        addMove(myGames.value[gameId].game, timestampedMove, moveIndex, byPlayerIndex);
 
         myGames.value[gameId].isMyTurn = myGames.value[gameId].myColor !== byPlayerIndex;
 
-        notifier.emit('move', myGames.value[gameId].hostedGame, timestampedMove);
+        notifier.emit('move', myGames.value[gameId].game, timestampedMove);
     });
 
     socket.on('timeControlUpdate', (gameId, gameTimeData) => {
@@ -181,7 +181,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        handleTimeControlUpdate(myGames.value[gameId].hostedGame, gameTimeData);
+        handleTimeControlUpdate(myGames.value[gameId].game, gameTimeData);
     });
 
     socket.on('chat', (gameId, chatMessage) => {
@@ -189,9 +189,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        myGames.value[gameId].hostedGame.chatMessages.push(chatMessage);
+        myGames.value[gameId].game.chatMessages.push(chatMessage);
 
-        notifier.emit('chatMessage', myGames.value[gameId].hostedGame, chatMessage);
+        notifier.emit('chatMessage', myGames.value[gameId].game, chatMessage);
     });
 
     socket.on('ended', (gameId: string, winner, outcome, { date }) => {
@@ -199,9 +199,9 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        endGame(myGames.value[gameId].hostedGame, winner, outcome, date);
+        endGame(myGames.value[gameId].game, winner, outcome, date);
 
-        notifier.emit('gameEnd', myGames.value[gameId].hostedGame);
+        notifier.emit('gameEnd', myGames.value[gameId].game);
 
         delete myGames.value[gameId];
     });
@@ -211,31 +211,31 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        cancelGame(myGames.value[gameId].hostedGame, date);
+        cancelGame(myGames.value[gameId].game, date);
 
-        notifier.emit('gameEnd', myGames.value[gameId].hostedGame);
+        notifier.emit('gameEnd', myGames.value[gameId].game);
 
         delete myGames.value[gameId];
     });
 
-    socket.on('playerGamesUpdate', (initialGames: HostedGame[]) => {
+    socket.on('playerGamesUpdate', (initialGames: Game[]) => {
         const me = authStore.loggedInPlayer;
 
         if (me === null) return;
 
         myGames.value = {};
 
-        for (const hostedGame of initialGames) {
-            const { publicId: id, currentPlayerIndex } = hostedGame;
-            const iAmParticipant = hasPlayer(hostedGame, me);
+        for (const game of initialGames) {
+            const { publicId: id, currentPlayerIndex } = game;
+            const iAmParticipant = hasPlayer(game, me);
 
             // I'm not in the game, and not the target of a pending challenge
-            if (!iAmParticipant && !isChallengeTargetOf(hostedGame, me)) {
+            if (!iAmParticipant && !isChallengeTargetOf(game, me)) {
                 continue;
             }
 
             // Game finished
-            if (hostedGame.state === 'ended') {
+            if (game.state === 'ended') {
                 continue;
             }
 
@@ -243,11 +243,11 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             let myColor: null | PlayerIndex = null;
 
             if (iAmParticipant) {
-                myColor = hostedGame.hostedGameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
-                isMyTurn = hostedGame.hostedGameToPlayers[currentPlayerIndex].player.publicId === me.publicId;
+                myColor = game.gameToPlayers[0].player.publicId === me.publicId ? 0 : 1;
+                isMyTurn = game.gameToPlayers[currentPlayerIndex].player.publicId === me.publicId;
             }
 
-            myGames.value[hostedGame.publicId] = { publicId: id, isMyTurn, myColor, hostedGame: cloneHostedGame(hostedGame) };
+            myGames.value[game.publicId] = { publicId: id, isMyTurn, myColor, game: cloneGame(game) };
         }
     });
 

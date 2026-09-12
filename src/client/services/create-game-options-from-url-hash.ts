@@ -1,18 +1,18 @@
-import { HostedGameOptions } from '../../shared/app/models/index.js';
+import { GameOptions } from '../../shared/app/models/index.js';
 
 /**
- * Creates an instance of HostedGameOptions from options in url hash.
+ * Creates an instance of GameOptions from options in url hash.
  *
  * Example:
  * createGameOptionsFromUrlHash('#create-1v1-friendly'); // => returns options with opponentType = 'player' and ranked is false
- * createGameOptionsFromUrlHash(); // => reads from window location hash and returns a HostedGameOptions
+ * createGameOptionsFromUrlHash(); // => reads from window location hash and returns a GameOptions
  */
-export const createGameOptionsFromUrlHash = (hash: string = document.location.hash): null | HostedGameOptions => {
+export const createGameOptionsFromUrlHash = (hash: string = document.location.hash): null | GameOptions => {
     if (!hash || !hash.startsWith('#create-')) {
         return null;
     }
 
-    const gameOptions: HostedGameOptions = new HostedGameOptions();
+    const gameOptions: GameOptions = new GameOptions();
 
     // Allow writing "#create-hex-monthly" in hash instead of "#create-hexmonthly"
     hash = hash.replace('hex-monthly', 'hexmonthly');

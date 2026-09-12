@@ -1,19 +1,19 @@
 import type { Response } from 'express';
 import { format } from 'content-range';
-import HostedGameStore, { AlreadyHaveOpenChallengeAgainstThisPlayerError, CannotChallengeYourselfError, GameError } from '../../../store/HostedGameStore.js';
+import GameStore, { AlreadyHaveOpenChallengeAgainstThisPlayerError, CannotChallengeYourselfError, GameError } from '../../../store/GameStore.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { Body, Get, HttpError, JsonController, Param, Post, QueryParams, Res } from 'routing-controllers';
-import { Player, HostedGameOptions } from '../../../../shared/app/models/index.js';
+import { Player, GameOptions } from '../../../../shared/app/models/index.js';
 import { Service } from 'typedi';
 import { Expose } from '../../../../shared/app/class-transformer-custom.js';
 import { TranslatableHttpError } from '../../../../shared/app/TranslatableHttpError.js';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import GameRepository from '../../../repositories/GameRepository.js';
 import { type HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
 import logger from '../../../services/logger.js';
 import { rateLimiterConsumeCreateGame, rateLimiterConsumeChallengePlayer, rateLimiterConsumeChallengeSameTarget } from '../../../services/rate-limiters.js';
-import { isChallengeGame } from '../../../../shared/app/hostedGameUtils.js';
+import { isChallengeGame } from '../../../../shared/app/gameUtils.js';
 
 class AnswerUndoBody
 {
@@ -27,8 +27,8 @@ class AnswerUndoBody
 export default class GameController
 {
     constructor(
-        private hostedGameStore: HostedGameStore,
-        private hostedGameRepository: HostedGameRepository,
+        private gameStore: GameStore,
+        private gameRepository: GameRepository,
     ) {}
 
     /**
@@ -40,7 +40,7 @@ export default class GameController
         @QueryParams() searchParams: SearchGamesParameters,
         @Res() res: Response,
     ) {
-        const { results, count } = await this.hostedGameRepository.search(searchParams);
+        const { results, count } = await this.gameRepository.search(searchParams);
 
         const contentRange = format({
             unit: 'games',
@@ -60,7 +60,7 @@ export default class GameController
     async getStatsAll(
         @QueryParams() searchParams: SearchGamesParameters,
     ) {
-        const results = await this.hostedGameRepository.searchStatsByDay(searchParams);
+        const results = await this.gameRepository.searchStatsByDay(searchParams);
 
         return results;
     }
@@ -71,14 +71,14 @@ export default class GameController
     @Get('/api/games/active')
     getActiveGames(
     ) {
-        return this.hostedGameStore.getActiveGamesData();
+        return this.gameStore.getActiveGamesData();
     }
 
     @Get('/api/games/:publicId')
     async getOne(
         @Param('publicId') publicId: string,
     ) {
-        const game = await this.hostedGameStore.getActiveOrArchivedGame(publicId);
+        const game = await this.gameStore.getActiveOrArchivedGame(publicId);
 
         if (game === null) {
             throw new HttpError(404, 'Game not found');
@@ -90,7 +90,7 @@ export default class GameController
     @Post('/api/games')
     async create(
         @AuthenticatedPlayer() host: Player,
-        @Body() gameOptions: HostedGameOptions,
+        @Body() gameOptions: GameOptions,
     ) {
         await rateLimiterConsumeCreateGame(host.publicId);
 
@@ -103,22 +103,22 @@ export default class GameController
 
         try {
             // Challenges must be persisted synchronously: the challenged player notification
-            // (mailbox, if offline) needs a persisted hostedGame with relations available.
+            // (mailbox, if offline) needs a persisted game with relations available.
             // Other games persist asynchronously to return faster.
-            const hostedGameServer = await this.hostedGameStore.createGame({ gameOptions, host }, { persist: isChallenge });
+            const gameServer = await this.gameStore.createGame({ gameOptions, host }, { persist: isChallenge });
 
             if (!isChallenge) {
-                hostedGameServer.persist()
+                gameServer.persist()
                     .catch(e => {
                         logger.warning('Could not persist game asynchronously after created it', {
-                            hostedGamePublicId: hostedGameServer.getPublicId(),
+                            gamePublicId: gameServer.getPublicId(),
                             errorMessage: e.message ?? e,
                         });
                     })
                 ;
             }
 
-            return hostedGameServer.getHostedGame();
+            return gameServer.getGame();
         } catch (e) {
             if (e instanceof CannotChallengeYourselfError) {
                 throw new TranslatableHttpError(400, 'cannot_challenge_yourself');
@@ -142,7 +142,7 @@ export default class GameController
         @AuthenticatedPlayer() host: Player,
     ) {
         try {
-            return await this.hostedGameStore.rematchGame(host, publicId);
+            return await this.gameStore.rematchGame(host, publicId);
         } catch (e) {
             if (e instanceof GameError) {
                 throw new HttpError(400, e.message);
@@ -156,7 +156,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = this.hostedGameStore.playerJoinGame(player, publicId);
+        const result = this.gameStore.playerJoinGame(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -169,7 +169,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @Body() move: HexMove,
     ) {
-        const result = this.hostedGameStore.playerMove(player, publicId, move);
+        const result = this.gameStore.playerMove(player, publicId, move);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -181,7 +181,7 @@ export default class GameController
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
     ) {
-        const result = this.hostedGameStore.playerAskUndo(player, publicId);
+        const result = this.gameStore.playerAskUndo(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -194,7 +194,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @Body() answerUndoBody: AnswerUndoBody,
     ) {
-        const result = this.hostedGameStore.playerAnswerUndo(player, publicId, answerUndoBody.accept);
+        const result = this.gameStore.playerAnswerUndo(player, publicId, answerUndoBody.accept);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -206,7 +206,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = this.hostedGameStore.playerResign(player, publicId);
+        const result = this.gameStore.playerResign(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);
@@ -218,7 +218,7 @@ export default class GameController
         @Param('publicId') publicId: string,
         @AuthenticatedPlayer() player: Player,
     ) {
-        const result = this.hostedGameStore.playerCancel(player, publicId);
+        const result = this.gameStore.playerCancel(player, publicId);
 
         if (result !== true) {
             throw new HttpError(400, result);

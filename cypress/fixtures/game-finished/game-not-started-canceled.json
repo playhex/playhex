@@ -9,7 +9,7 @@
         "createdAt": "2024-01-24T16:33:29.586Z",
         "currentRating": null
     },
-    "hostedGameToPlayers": [
+    "gameToPlayers": [
         {
             "player": {
                 "pseudo": "aa",

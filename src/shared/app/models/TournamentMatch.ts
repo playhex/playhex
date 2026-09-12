@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, type Relation, Unique } from 'typeorm';
 import Tournament from './Tournament.js';
-import HostedGame from './HostedGame.js';
+import Game from './Game.js';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 import { Type } from 'class-transformer';
@@ -16,10 +16,10 @@ export default class TournamentMatch
     @Expose()
     tournament: Relation<Tournament>;
 
-    @OneToOne(() => HostedGame, hostedGame => hostedGame.tournamentMatch, { nullable: true })
+    @OneToOne(() => Game, game => game.tournamentMatch, { nullable: true })
     @JoinColumn()
     @Expose()
-    hostedGame: null | Relation<HostedGame> = null;
+    game: null | Relation<Game> = null;
 
     @ManyToOne(() => Player)
     @Expose()
@@ -38,11 +38,11 @@ export default class TournamentMatch
      * - playing: players are known and game has started
      * - done: game has ended and winner has been reported
      *
-     * Not same state as hostedGame.state:
-     * - this state can be "playing" while hosted game has ended
+     * Not same state as game.state:
+     * - this state can be "playing" while game has ended
      *  when tournament workflow has not reported the winner to the tournament engine.
-     * - this state can be "playing" while hosted game has been canceled,
-     *  in this case, hosted game must be recreated.
+     * - this state can be "playing" while game has been canceled,
+     *  in this case, game must be recreated.
      *
      * Transitions:
      * - if state is "waiting" and both players known, game should start and state become "playing"

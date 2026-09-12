@@ -8,7 +8,7 @@ import { Expose, GROUP_DEFAULT, plainToInstance } from '../class-transformer-cus
 import { ColumnUUID } from '../custom-typeorm.js';
 import Player from './Player.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../ratingUtils.js';
-import { HostedGameOptionsTimeControl, HostedGameOptionsTimeControlByoYomi, HostedGameOptionsTimeControlFischer, maxTimeControlInputTime } from './HostedGameOptionsTimeControl.js';
+import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeControlFischer, maxTimeControlInputTime } from './GameOptionsTimeControl.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import TournamentParticipant from './TournamentParticipant.js';
 import TournamentMatch from './TournamentMatch.js';
@@ -183,15 +183,15 @@ export default class Tournament implements TimeControlBoardsize
     @IsObject({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @ValidateNested({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
     @Transform(({ value }) => !value ? null : value.family === 'fischer'
-        ? plainToInstance(HostedGameOptionsTimeControlFischer, value)
-        : plainToInstance(HostedGameOptionsTimeControlByoYomi, value),
-    ) // make sure timeControl is a HostedGameOptionsTimeControl and not a raw object, and make validation works
+        ? plainToInstance(GameOptionsTimeControlFischer, value)
+        : plainToInstance(GameOptionsTimeControlByoYomi, value),
+    ) // make sure timeControl is a GameOptionsTimeControl and not a raw object, and make validation works
     @Type((type) => {
         // Made by hand because discriminator is buggy, waiting for: https://github.com/typestack/class-transformer/pull/1118
         switch ((type?.object as Tournament).timeControlType?.family) {
-            case 'fischer': return HostedGameOptionsTimeControlFischer;
-            case 'byoyomi': return HostedGameOptionsTimeControlByoYomi;
-            default: return HostedGameOptionsTimeControl;
+            case 'fischer': return GameOptionsTimeControlFischer;
+            case 'byoyomi': return GameOptionsTimeControlByoYomi;
+            default: return GameOptionsTimeControl;
         }
     })
     timeControlType: TimeControlType;

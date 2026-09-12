@@ -6,9 +6,9 @@ import { GameAnalyze, ChatMessage } from '../../../../shared/app/models/index.js
 import { HexServer } from '../../../server.js';
 import Rooms from '../../../../shared/app/Rooms.js';
 import logger from '../../../services/logger.js';
-import HostedGameStore from '../../../store/HostedGameStore.js';
+import GameStore from '../../../store/GameStore.js';
 import { errorToLogger } from '../../../../shared/app/utils.js';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import GameRepository from '../../../repositories/GameRepository.js';
 import { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
 
 @JsonController()
@@ -17,9 +17,9 @@ export default class GameAnalyzeController
 {
     constructor(
         private gameAnalyzeRepository: GameAnalyzeRepository,
-        private hostedGameRepository: HostedGameRepository,
+        private gameRepository: GameRepository,
         private hexAiApiClient: HexAiApiClient,
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private io: HexServer,
     ) {}
 
@@ -47,7 +47,7 @@ export default class GameAnalyzeController
             return gameAnalyze;
         }
 
-        const analyzeGameRequest = await this.hostedGameRepository.getAnalyzeGameRequest(publicId);
+        const analyzeGameRequest = await this.gameRepository.getAnalyzeGameRequest(publicId);
 
         if (analyzeGameRequest === null) {
             throw new HttpError(404, 'Game not found or not finished');
@@ -68,7 +68,7 @@ export default class GameAnalyzeController
 
             this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 
-            await this.hostedGameStore.postChatMessage(publicId, this.createGameAnalyzeAvailableChatMessage(gameAnalyze));
+            await this.gameStore.postChatMessage(publicId, this.createGameAnalyzeAvailableChatMessage(gameAnalyze));
         })().catch(e => {
             logger.error('Error in game analyze', errorToLogger(e));
             gameAnalyze.analyze = null;

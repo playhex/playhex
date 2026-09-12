@@ -3,7 +3,7 @@ import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
-import { ChatMessage, GameAnalyze, HostedGame, Player, Rating } from './models/index.js';
+import { ChatMessage, GameAnalyze, Game, Player, Rating } from './models/index.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 import { WebsocketActionError } from './Types.js';
 
@@ -73,7 +73,7 @@ export type HexClientToServerEvents = {
      * and only one thumbnail may receive the event.
      * So we need that each thumbnail request independently a full update.
      */
-    thumbnailGameUpdateRequest: (gameId: string, answer: (hostedGame: HostedGame | null, spectatorsCount: number) => void) => void;
+    thumbnailGameUpdateRequest: (gameId: string, answer: (game: Game | null, spectatorsCount: number) => void) => void;
 
     /**
      * A player send a chat message in a channel
@@ -85,13 +85,13 @@ export type HexServerToClientEvents = {
     /**
      * A game has been created.
      */
-    gameCreated: (hostedGame: HostedGame) => void;
+    gameCreated: (game: Game) => void;
 
     /**
      * A game has been created.
      * Just the info needed to display game on lobby
      */
-    lobbyGameCreated: (hostedGame: HostedGame) => void;
+    lobbyGameCreated: (game: Game) => void;
 
     /**
      * A player joined gameId.
@@ -102,14 +102,14 @@ export type HexServerToClientEvents = {
      * Game has started.
      * All info are sent again.
      */
-    gameStarted: (hostedGame: HostedGame) => void;
+    gameStarted: (game: Game) => void;
 
     /**
      * Game has started.
      * All info are sent again.
      * Just the info needed to display game on lobby
      */
-    lobbyGameStarted: (hostedGame: HostedGame) => void;
+    lobbyGameStarted: (game: Game) => void;
 
     /**
      * Game has been canceled.
@@ -142,7 +142,7 @@ export type HexServerToClientEvents = {
      *
      * This event is for lobby, and contains
      */
-    lobbyGameEnded: (hostedGame: HostedGame) => void;
+    lobbyGameEnded: (game: Game) => void;
 
     /**
      * Some players ratings have been updated
@@ -228,7 +228,7 @@ export type HexServerToClientEvents = {
      * I have just been challenged by another player (nominative game, opponentPublicId set to me).
      * Sent to my private player room, whatever page I'm on.
      */
-    gameChallengeCreated: (hostedGame: HostedGame) => void;
+    gameChallengeCreated: (game: Game) => void;
 
     /**
      * A spectator (non-player) started watching a game.
@@ -249,7 +249,7 @@ export type HexServerToClientEvents = {
     // Room updates
 
     /** State for the `Rooms.lobby` room. */
-    lobbyUpdate: (games: HostedGame[]) => void;
+    lobbyUpdate: (games: Game[]) => void;
 
     /** State for the `Rooms.onlinePlayers` room. */
     onlinePlayersUpdate: (onlinePlayers: OnlinePlayers) => void;
@@ -266,10 +266,10 @@ export type HexServerToClientEvents = {
      * so we should show a message like "game not found" or redirect player.
      * Happens in dev, when I restart server, game no longer in memory
      */
-    gameUpdate: (gameId: string, game: HostedGame | null) => void;
+    gameUpdate: (gameId: string, game: Game | null) => void;
 
     /** State for the `Rooms.playerGames` room. */
-    playerGamesUpdate: (myGames: HostedGame[]) => void;
+    playerGamesUpdate: (myGames: Game[]) => void;
 
     /**
      * Message sent when joining featured games room.

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { IconCheck, IconExclamationTriangleFill } from '../icons.js';
-import HostedGameOptions from '../../../shared/app/models/HostedGameOptions.js';
+import GameOptions from '../../../shared/app/models/GameOptions.js';
 import { PropType } from 'vue';
 
 const props = defineProps({
     gameOptions: {
-        type: Object as PropType<HostedGameOptions>,
+        type: Object as PropType<GameOptions>,
         required: true,
     },
 

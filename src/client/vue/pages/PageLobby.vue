@@ -11,9 +11,9 @@ import { getMyIndex, getOpponent } from '../../services/context-utils.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import AppPseudo from '../components/AppPseudo.vue';
-import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isChallengeTargetOf, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/hostedGameUtils.js';
-import { isUncommonBoardsize } from '../../../shared/app/hostedGameOptionsUtils.js';
-import { HostedGame, Tournament } from '../../../shared/app/models/index.js';
+import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isChallengeTargetOf, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/gameUtils.js';
+import { isUncommonBoardsize } from '../../../shared/app/gameOptionsUtils.js';
+import { Game, Tournament } from '../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useRouter } from 'vue-router';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
@@ -42,7 +42,7 @@ const { mySortedGames, myTurnCount } = storeToRefs(useMyGamesStore());
 const { activePlayersCount } = storeToRefs(useOnlinePlayersStore());
 const lobbyStore = useLobbyStore();
 const { clearSoftRemovedGames } = lobbyStore;
-const { currentLobby, currentLobbyHostedGames, endedHostedGames, waitingGamesCount } = storeToRefs(lobbyStore);
+const { currentLobby, currentLobbyGames, endedGames, waitingGamesCount } = storeToRefs(lobbyStore);
 const { live: livePlayingCount, correspondence: correspondencePlayingCount } = storeToRefs(usePlayingGamesCountStore());
 const authStore = useAuthStore();
 
@@ -51,8 +51,8 @@ const {
     isGuestJoiningCorrepondence,
 } = useGuestJoiningCorrespondenceWarning();
 
-const joinGame = async (hostedGame: HostedGame) => {
-    if (isGuestJoiningCorrepondence(hostedGame)) {
+const joinGame = async (game: Game) => {
+    if (isGuestJoiningCorrepondence(game)) {
         try {
             await createGuestJoiningCorrepondenceWarningOverlay();
         } catch (e) {
@@ -61,7 +61,7 @@ const joinGame = async (hostedGame: HostedGame) => {
     }
 
     try {
-        await lobbyStore.joinGame(hostedGame.publicId);
+        await lobbyStore.joinGame(game.publicId);
     } catch (e) {
         useToastsStore().addToast('Could not join game', { level: 'danger' });
         return;
@@ -69,12 +69,12 @@ const joinGame = async (hostedGame: HostedGame) => {
 
     await router.push({
         name: 'online-game',
-        params: { gameId: hostedGame.publicId },
+        params: { gameId: game.publicId },
     });
 };
 
-const declineChallenge = async (hostedGame: HostedGame) => {
-    const result = await apiPostCancel(hostedGame.publicId);
+const declineChallenge = async (game: Game) => {
+    const result = await apiPostCancel(game.publicId);
 
     if (result !== true) {
         useToastsStore().addToast('Could not decline challenge', { level: 'danger' });
@@ -140,7 +140,7 @@ for (const locale of getPlayerLocales()) {
                     <div class="d-flex flex-nowrap gap-3 overflow-auto pb-2">
                         <template v-for="(myGame, i) of mySortedGames" :key="myGame.publicId">
                             <router-link
-                                v-if="isChallengeTargetOf(myGame.hostedGame, authStore.loggedInPlayer)"
+                                v-if="isChallengeTargetOf(myGame.game, authStore.loggedInPlayer)"
                                 :to="{ name: 'online-game', params: { gameId: myGame.publicId } }"
                                 class="card flex-shrink-0 game-card challenge-card text-decoration-none border-warning"
                             >
@@ -151,20 +151,20 @@ for (const locale of getPlayerLocales()) {
                                     </div>
 
                                     <span class="fw-semibold small text-truncate text-body">
-                                        <AppPseudo v-if="myGame.hostedGame.host" :player="myGame.hostedGame.host" rating onlineStatus />
+                                        <AppPseudo v-if="myGame.game.host" :player="myGame.game.host" rating onlineStatus />
                                     </span>
 
                                     <div class="btn-group btn-group-sm">
                                         <button
                                             type="button"
                                             class="btn btn-success"
-                                            @click.stop.prevent="joinGame(myGame.hostedGame)"
+                                            @click.stop.prevent="joinGame(myGame.game)"
                                         >{{ $t('game.accept') }}</button>
                                         <button
                                             type="button"
                                             class="btn btn-outline-warning"
                                             :title="$t('decline_challenge')"
-                                            @click.stop.prevent="declineChallenge(myGame.hostedGame)"
+                                            @click.stop.prevent="declineChallenge(myGame.game)"
                                         ><IconX /></button>
                                     </div>
                                 </div>
@@ -174,13 +174,13 @@ for (const locale of getPlayerLocales()) {
                                 v-else
                                 :to="{ name: 'online-game', params: { gameId: myGame.publicId } }"
                                 class="card flex-shrink-0 game-card text-decoration-none"
-                                :class="myGame.isMyTurn ? (isBotGame(myGame.hostedGame) ? 'border-primary' : 'border-success') : ''"
+                                :class="myGame.isMyTurn ? (isBotGame(myGame.game) ? 'border-primary' : 'border-success') : ''"
                             >
                                 <div class="card-body p-2 d-flex flex-column align-items-center gap-1">
                                     <div class="d-flex align-items-center gap-1 w-100 justify-content-between">
                                         <span class="small text-body-secondary">vs</span>
                                         <span class="fw-semibold small text-truncate text-body text-right">
-                                            <AppPseudo v-if="myGame.hostedGame" :player="getOpponent(myGame.hostedGame)!" rating onlineStatus />
+                                            <AppPseudo v-if="myGame.game" :player="getOpponent(myGame.game)!" rating onlineStatus />
                                         </span>
                                     </div>
 
@@ -189,7 +189,7 @@ for (const locale of getPlayerLocales()) {
                                     <AppRhombusAutoOrientation v-else class="game-thumb" />
 
                                     <div class="d-flex justify-content-between w-100 align-items-end">
-                                        <template v-if="!isBotGame(myGame.hostedGame)">
+                                        <template v-if="!isBotGame(myGame.game)">
                                             <span v-if="myGame.isMyTurn" class="badge text-bg-success pulse-badge">{{ $t('lobby_your_turn_badge') }}</span>
                                             <span v-else class="badge text-bg-secondary">{{ $t('lobby_waiting_badge') }}</span>
                                         </template>
@@ -198,9 +198,9 @@ for (const locale of getPlayerLocales()) {
                                         <span v-else class="badge text-bg-primary">{{ $t('bot') }}</span>
 
                                         <AppChrono
-                                            v-if="getMyIndex(myGame.hostedGame) !== null && myGame.hostedGame.timeControl?.players[getMyIndex(myGame.hostedGame)!]"
-                                            :playerTimeData="myGame.hostedGame.timeControl.players[getMyIndex(myGame.hostedGame)!]"
-                                            :timeControlOptions="myGame.hostedGame.timeControlType"
+                                            v-if="getMyIndex(myGame.game) !== null && myGame.game.timeControl?.players[getMyIndex(myGame.game)!]"
+                                            :playerTimeData="myGame.game.timeControl.players[getMyIndex(myGame.game)!]"
+                                            :timeControlOptions="myGame.game.timeControlType"
                                             class="chrono"
                                         />
                                     </div>
@@ -236,7 +236,7 @@ for (const locale of getPlayerLocales()) {
                                 </button>
                             </div>
                         </div>
-                        <div v-if="currentLobbyHostedGames.length > 0" class="table-responsive waiting-games-list">
+                        <div v-if="currentLobbyGames.length > 0" class="table-responsive waiting-games-list">
                             <table class="table text-nowrap table-borderless table-hover mb-0">
                                 <thead>
                                     <tr class="small text-body-secondary">
@@ -249,32 +249,32 @@ for (const locale of getPlayerLocales()) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="hostedGame in currentLobbyHostedGames" :key="hostedGame.publicId" :class="{ 'soft-removed': hostedGame.softRemoved }">
+                                    <tr v-for="game in currentLobbyGames" :key="game.publicId" :class="{ 'soft-removed': game.softRemoved }">
                                         <td>
                                             <router-link
                                                 class="btn btn-sm btn-outline-secondary py-0"
-                                                :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
+                                                :to="{ name: 'online-game', params: { gameId: game.publicId } }"
                                             >{{ $t('game.watch') }}</router-link>
                                             <span
-                                                v-if="canJoin(hostedGame, authStore.loggedInPlayer) || isGuestBlockedFromRegisteredOnlyGame(hostedGame, authStore.loggedInPlayer)"
-                                                :title="isGuestBlockedFromRegisteredOnlyGame(hostedGame, authStore.loggedInPlayer) ? $t('cannot_join_registered_only') : undefined"
+                                                v-if="canJoin(game, authStore.loggedInPlayer) || isGuestBlockedFromRegisteredOnlyGame(game, authStore.loggedInPlayer)"
+                                                :title="isGuestBlockedFromRegisteredOnlyGame(game, authStore.loggedInPlayer) ? $t('cannot_join_registered_only') : undefined"
                                             ><button
                                                 class="btn btn-sm py-0 ms-2"
-                                                :class="hostedGame.softRemoved ? 'btn-outline-secondary text-decoration-line-through' : isGuestJoiningCorrepondence(hostedGame) ? 'btn-outline-warning' : 'btn-success'"
-                                                @click="joinGame(hostedGame)"
-                                                :disabled="Boolean(hostedGame.softRemoved) || isGuestBlockedFromRegisteredOnlyGame(hostedGame, authStore.loggedInPlayer)"
+                                                :class="game.softRemoved ? 'btn-outline-secondary text-decoration-line-through' : isGuestJoiningCorrepondence(game) ? 'btn-outline-warning' : 'btn-success'"
+                                                @click="joinGame(game)"
+                                                :disabled="Boolean(game.softRemoved) || isGuestBlockedFromRegisteredOnlyGame(game, authStore.loggedInPlayer)"
                                             >{{ $t('lobby_join') }}</button></span>
-                                            <span v-if="hostedGame.ranked" class="text-warning ms-2"><IconTrophyFill /> {{ $t('ranked') }}</span>
+                                            <span v-if="game.ranked" class="text-warning ms-2"><IconTrophyFill /> {{ $t('ranked') }}</span>
                                         </td>
                                         <td>
-                                            <AppPseudo v-if="hostedGame.host" :player="hostedGame.host" flag onlineStatus rating />
+                                            <AppPseudo v-if="game.host" :player="game.host" flag onlineStatus rating />
                                             <i v-else>{{ $t('system') }}</i>
                                         </td>
-                                        <template v-if="!hostedGame.softRemoved">
-                                            <td :class="{ 'text-warning': isUncommonBoardsize(hostedGame) }">{{ hostedGame.boardsize }}×{{ hostedGame.boardsize }}</td>
-                                            <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
-                                            <td class="small"><AppGameRulesSummary :gameOptions="hostedGame" /></td>
-                                            <td class="text-body-secondary small">{{ formatDistanceToNowStrict(hostedGame.createdAt, { addSuffix: true }) }}</td>
+                                        <template v-if="!game.softRemoved">
+                                            <td :class="{ 'text-warning': isUncommonBoardsize(game) }">{{ game.boardsize }}×{{ game.boardsize }}</td>
+                                            <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                                            <td class="small"><AppGameRulesSummary :gameOptions="game" /></td>
+                                            <td class="text-body-secondary small">{{ formatDistanceToNowStrict(game.createdAt, { addSuffix: true }) }}</td>
                                         </template>
                                         <td v-else colspan="4"><small>{{ $t('lobby_game_no_longer_available') }}</small></td>
                                     </tr>
@@ -343,24 +343,24 @@ for (const locale of getPlayerLocales()) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="hostedGame in endedHostedGames" :key="hostedGame.publicId">
+                                    <tr v-for="game in endedGames" :key="game.publicId">
                                         <td>
                                             <router-link
                                                 class="btn btn-sm btn-outline-secondary py-0"
-                                                :to="{ name: 'online-game', params: { gameId: hostedGame.publicId } }"
+                                                :to="{ name: 'online-game', params: { gameId: game.publicId } }"
                                             >{{ $t('game.review') }}</router-link>
                                         </td>
-                                        <td><span v-if="hostedGame.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-sm-inline">{{ $t('ranked') }}</span></span></td>
-                                        <template v-if="hostedGame.winner !== null">
-                                            <td><AppPseudo :player="getStrictWinnerPlayer(hostedGame)" flag rating classes="fw-semibold" /></td>
-                                            <td><AppPseudo :player="getStrictLoserPlayer(hostedGame)" flag rating classes="text-body-secondary" /></td>
+                                        <td><span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-sm-inline">{{ $t('ranked') }}</span></span></td>
+                                        <template v-if="game.winner !== null">
+                                            <td><AppPseudo :player="getStrictWinnerPlayer(game)" flag rating classes="fw-semibold" /></td>
+                                            <td><AppPseudo :player="getStrictLoserPlayer(game)" flag rating classes="text-body-secondary" /></td>
                                         </template>
                                         <template v-else>
                                             <td colspan="2" class="text-body-secondary">-</td>
                                         </template>
-                                        <td>{{ hostedGame.boardsize }}×{{ hostedGame.boardsize }}</td>
-                                        <td><AppTimeControlLabel :timeControlBoardsize="hostedGame" /></td>
-                                        <td class="text-body-secondary small">{{ formatDistanceToNowStrict(hostedGame.endedAt ?? hostedGame.createdAt, { addSuffix: true }) }}</td>
+                                        <td>{{ game.boardsize }}×{{ game.boardsize }}</td>
+                                        <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                                        <td class="text-body-secondary small">{{ formatDistanceToNowStrict(game.endedAt ?? game.createdAt, { addSuffix: true }) }}</td>
                                     </tr>
                                 </tbody>
                             </table>

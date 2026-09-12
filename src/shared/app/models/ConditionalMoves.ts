@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { IsArray, IsOptional, Validate } from 'class-validator';
-import HostedGame from './HostedGame.js';
+import Game from './Game.js';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 import { IsValidConditionalMovesTree } from '../validator/IsValidConditionalMovesTree.js';
@@ -10,10 +10,10 @@ import type { ConditionalMovesLine, ConditionalMovesTree } from '../../pixi-boar
 export default class ConditionalMoves
 {
     @PrimaryColumn()
-    hostedGameId: number;
+    gameId: number;
 
-    @ManyToOne(() => HostedGame)
-    hostedGame: Relation<HostedGame>;
+    @ManyToOne(() => Game)
+    game: Relation<Game>;
 
     @PrimaryColumn()
     playerId: number;

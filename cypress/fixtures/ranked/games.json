@@ -17,7 +17,7 @@
                 "ratingChange": 162.31089390629768
             }
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "2943",
@@ -93,7 +93,7 @@
                 "ratingChange": 162.31089390629768
             }
         },
-        "hostedGameToPlayers": [
+        "gameToPlayers": [
             {
                 "player": {
                     "pseudo": "Determinist random bot",

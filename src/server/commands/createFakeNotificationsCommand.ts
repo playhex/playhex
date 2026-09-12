@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 import { AppDataSource } from '../data-source.js';
-import { HostedGame, PlayerNotification } from '../../shared/app/models/index.js';
+import { Game, PlayerNotification } from '../../shared/app/models/index.js';
 import { createPlayerNotification } from '../../shared/app/models/PlayerNotification.js';
 import PlayerRepository from '../repositories/PlayerRepository.js';
 import hexProgram from './hexProgram.js';
@@ -21,10 +21,10 @@ hexProgram
             throw new Error(`No player found with id, publicId or slug "${playerIdentifier}"`);
         }
 
-        const hostedGame = await AppDataSource.getRepository(HostedGame).findOne({ where: {} });
+        const game = await AppDataSource.getRepository(Game).findOne({ where: {} });
 
-        if (!hostedGame) {
-            console.warn('No hosted game found in database, notifications will be created without a linked game.');
+        if (!game) {
+            console.warn('No game found in database, notifications will be created without a linked game.');
         }
 
         const now = Date.now();
@@ -33,42 +33,42 @@ hexProgram
                 'chatMessage',
                 { player: 'Piet', text: 'Hello, do you want to read my new poem?' },
                 player,
-                hostedGame,
+                game,
                 new Date(now),
             ),
             createPlayerNotification(
                 'gameEnded',
                 { iWon: true, opponent: 'John' },
                 player,
-                hostedGame,
+                game,
                 new Date(now + 1000),
             ),
             createPlayerNotification(
                 'gameEnded',
                 { iWon: false, opponent: 'Peter' },
                 player,
-                hostedGame,
+                game,
                 new Date(now + 1000),
             ),
             createPlayerNotification(
                 'gameCanceled',
                 null,
                 player,
-                hostedGame,
+                game,
                 new Date(now + 2000),
             ),
             createPlayerNotification(
                 'gameChallenge',
                 { player: 'Tom' },
                 player,
-                hostedGame,
+                game,
                 new Date(now + 3000),
             ),
             createPlayerNotification(
                 'myOpponentHasBeenModerated',
-                { player: 'Koko', hostedGame: hostedGame ?? undefined },
+                { player: 'Koko', game: game ?? undefined },
                 player,
-                hostedGame,
+                game,
                 new Date(now + 4000),
             ),
             createPlayerNotification(

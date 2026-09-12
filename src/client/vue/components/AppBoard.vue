@@ -40,7 +40,7 @@ const {
 const {
     engineGame,
     gameView,
-    hostedGame,
+    game,
     conditionalMovesEditor,
     gameUIMode,
     shouldDisplayAnswerUndoMove,
@@ -61,7 +61,7 @@ const {
  * Pseudo of the player who asked for a takeback, to show it in the takeback request bar.
  */
 const undoRequestPseudo = computed<string>(() => {
-    const undoRequest = hostedGame.value?.undoRequest;
+    const undoRequest = game.value?.undoRequest;
 
     if (undoRequest === null || undoRequest === undefined) {
         return '';

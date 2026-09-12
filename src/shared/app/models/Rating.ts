@@ -1,7 +1,7 @@
 import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import type { RatingCategory } from '../ratingUtils.js';
 import Player from './Player.js';
-import HostedGame from './HostedGame.js';
+import Game from './Game.js';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { keysOf } from '../utils.js';
 
@@ -19,9 +19,9 @@ export default class Rating
     /**
      * Which game(s) have issued this new player rating
      */
-    @ManyToMany(() => HostedGame, hostedGame => hostedGame.ratings)
+    @ManyToMany(() => Game, game => game.ratings)
     @JoinTable()
-    games: HostedGame[];
+    games: Game[];
 
     /**
      * Category of rating, "overall" for overall rating,

@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
-import { HostedGame, Player, Rating } from '../../shared/app/models/index.js';
+import { Game, Player, Rating } from '../../shared/app/models/index.js';
 import { RatingCategory, createInitialRating, createRanking, getRatingCategoriesFromGame } from '../../shared/app/ratingUtils.js';
 
 @Service()
@@ -80,7 +80,7 @@ export default class RatingRepository
         );
     }
 
-    findGameRatingUpdates(hostedGame: HostedGame, category: RatingCategory): Promise<Rating[]>
+    findGameRatingUpdates(game: Game, category: RatingCategory): Promise<Rating[]>
     {
         return this.ratingRepository.find({
             relations: {
@@ -88,7 +88,7 @@ export default class RatingRepository
             },
             where: {
                 games: {
-                    id: hostedGame.id,
+                    id: game.id,
                 },
                 category,
             },
@@ -100,9 +100,9 @@ export default class RatingRepository
      * Also update Player.currentRating,
      * so player should be persisted after this method.
      */
-    async updateAfterGame(hostedGame: HostedGame): Promise<Rating[]>
+    async updateAfterGame(game: Game): Promise<Rating[]>
     {
-        const { winner, endedAt } = hostedGame;
+        const { winner, endedAt } = game;
 
         if (typeof winner !== 'number' || !endedAt) {
             throw new Error('Cannot update players rating, game must have ended');
@@ -110,12 +110,12 @@ export default class RatingRepository
 
         const newRatings: Rating[] = [];
 
-        for (const category of getRatingCategoriesFromGame(hostedGame)) {
+        for (const category of getRatingCategoriesFromGame(game)) {
 
             // Load players previous ratings for this category
-            const ratings = await Promise.all(hostedGame
-                .hostedGameToPlayers
-                .map(hostedGameToPlayer => this.findPlayerRating(hostedGameToPlayer.player, category)),
+            const ratings = await Promise.all(game
+                .gameToPlayers
+                .map(gameToPlayer => this.findPlayerRating(gameToPlayer.player, category)),
             );
 
             // Keep previous rating to set ratingChange
@@ -136,14 +136,14 @@ export default class RatingRepository
             glicko2Players.forEach((glicko2Player, index) => {
                 const rating = new Rating();
 
-                rating.player = hostedGame.hostedGameToPlayers[index].player;
+                rating.player = game.gameToPlayers[index].player;
                 rating.category = category;
                 rating.createdAt = endedAt;
                 rating.rating = glicko2Player.getRating();
                 rating.ratingChange = glicko2Player.getRating() - previousPlayersRating[index];
                 rating.deviation = glicko2Player.getRd();
                 rating.volatility = glicko2Player.getVol();
-                rating.games = [hostedGame];
+                rating.games = [game];
 
                 if (category === 'overall') {
                     rating.player.currentRating = rating;

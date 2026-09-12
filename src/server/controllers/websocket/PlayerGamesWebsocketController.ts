@@ -1,4 +1,4 @@
-import HostedGameStore from '../../store/HostedGameStore.js';
+import GameStore from '../../store/GameStore.js';
 import PlayerRepository from '../../repositories/PlayerRepository.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
@@ -8,7 +8,7 @@ import { HexSocket } from '../../server.js';
 export default class PlayerGamesWebsocketController implements WebsocketControllerInterface
 {
     constructor(
-        private hostedGameStore: HostedGameStore,
+        private gameStore: GameStore,
         private playerRepository: PlayerRepository,
     ) {}
 
@@ -20,8 +20,8 @@ export default class PlayerGamesWebsocketController implements WebsocketControll
         if (playerId == null) return;
         const player = await this.playerRepository.getPlayer(playerId);
         if (player == null) return;
-        const games = this.hostedGameStore.getPlayerActiveGames(player)
-            .map(g => g.getHostedGame());
+        const games = this.gameStore.getPlayerActiveGames(player)
+            .map(g => g.getGame());
         socket.emit('playerGamesUpdate', games);
     }
 }

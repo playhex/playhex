@@ -1,7 +1,7 @@
 import { iAmInGame, isMe, isMyTurn, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
-import { getLoserPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import { getLoserPlayer, isBotGame } from '../../../../shared/app/gameUtils.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 
 function playAudioIfNotMuted(filename: string): void {
@@ -9,9 +9,9 @@ function playAudioIfNotMuted(filename: string): void {
     playAudio(filename);
 }
 
-notifier.on('gameStart', (hostedGame) => {
+notifier.on('gameStart', (game) => {
     if (!(
-        iAmInGame(hostedGame)
+        iAmInGame(game)
     )) {
         return;
     }
@@ -19,14 +19,14 @@ notifier.on('gameStart', (hostedGame) => {
     playAudioIfNotMuted('/sounds/lisp/GenericNotify.ogg');
 });
 
-notifier.on('gameEnd', (hostedGame) => {
+notifier.on('gameEnd', (game) => {
     if (!(
-        iAmInGame(hostedGame) || viewingGame(hostedGame)
+        iAmInGame(game) || viewingGame(game)
     )) {
         return;
     }
 
-    const loser = getLoserPlayer(hostedGame);
+    const loser = getLoserPlayer(game);
 
     if (loser === null) {
         playAudioIfNotMuted('/sounds/lisp/GenericNotify.ogg');
@@ -40,8 +40,8 @@ notifier.on('gameEnd', (hostedGame) => {
     }
 });
 
-notifier.on('chatMessage', (hostedGame, chatMessage) => {
-    if (!viewingGame(hostedGame)) {
+notifier.on('chatMessage', (game, chatMessage) => {
+    if (!viewingGame(game)) {
         return;
     }
 
@@ -56,22 +56,22 @@ notifier.on('chatMessage', (hostedGame, chatMessage) => {
     playAudioIfNotMuted('/sounds/lisp/NewPM.ogg');
 });
 
-notifier.on('gameTimeControlWarning', (hostedGame) => {
-    if (!isMyTurn(hostedGame)) {
+notifier.on('gameTimeControlWarning', (game) => {
+    if (!isMyTurn(game)) {
         return;
     }
 
     playAudioIfNotMuted('/sounds/lisp/LowTime.ogg');
 });
 
-notifier.on('rematchOffer', hostedGame => {
+notifier.on('rematchOffer', game => {
     // Play sound to both players in game
-    if (!iAmInGame(hostedGame)) {
+    if (!iAmInGame(game)) {
         return;
     }
 
     // Only play sound for 1v1 games
-    if (isBotGame(hostedGame)) {
+    if (isBotGame(game)) {
         return;
     }
 

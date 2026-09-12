@@ -5,16 +5,16 @@ import ChannelChatMessage from './ChannelChatMessage.js';
 import ChatMessage from './ChatMessage.js';
 import ConditionalMoves from './ConditionalMoves.js';
 import GameAnalyze from './GameAnalyze.js';
-import HostedGame from './HostedGame.js';
-import HostedGameOptions from './HostedGameOptions.js';
+import Game from './Game.js';
+import GameOptions from './GameOptions.js';
 import {
-    HostedGameOptionsTimeControl,
+    GameOptionsTimeControl,
     OptionsFischer,
-    HostedGameOptionsTimeControlFischer,
+    GameOptionsTimeControlFischer,
     OptionsByoYomi,
-    HostedGameOptionsTimeControlByoYomi,
-} from './HostedGameOptionsTimeControl.js';
-import HostedGameToPlayer from './HostedGameToPlayer.js';
+    GameOptionsTimeControlByoYomi,
+} from './GameOptionsTimeControl.js';
+import GameToPlayer from './GameToPlayer.js';
 import ModerationSetting from './ModerationSetting.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
@@ -38,7 +38,7 @@ import TournamentSubscription from './TournamentSubscription.js';
 import TournamentParticipant from './TournamentParticipant.js';
 
 export {
-    HostedGame,
+    Game,
     AIConfig,
     BannedIp,
     Channel,
@@ -46,13 +46,13 @@ export {
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
-    HostedGameOptions,
-    HostedGameOptionsTimeControl,
+    GameOptions,
+    GameOptionsTimeControl,
     OptionsFischer,
-    HostedGameOptionsTimeControlFischer,
+    GameOptionsTimeControlFischer,
     OptionsByoYomi,
-    HostedGameOptionsTimeControlByoYomi,
-    HostedGameToPlayer,
+    GameOptionsTimeControlByoYomi,
+    GameToPlayer,
     ModerationSetting,
     MoveSettings,
     OnlinePlayers,
@@ -79,7 +79,7 @@ export {
 };
 
 export const entities = {
-    HostedGame,
+    Game,
     AIConfig,
     BannedIp,
     Channel,
@@ -87,13 +87,13 @@ export const entities = {
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
-    HostedGameOptions,
-    HostedGameOptionsTimeControl,
+    GameOptions,
+    GameOptionsTimeControl,
     OptionsFischer,
-    HostedGameOptionsTimeControlFischer,
+    GameOptionsTimeControlFischer,
     OptionsByoYomi,
-    HostedGameOptionsTimeControlByoYomi,
-    HostedGameToPlayer,
+    GameOptionsTimeControlByoYomi,
+    GameToPlayer,
     ModerationSetting,
     OnlinePlayers,
     Player,
@@ -120,8 +120,8 @@ const errored = Object.keys(entities).filter(name => !entities[name as keyof typ
 if (errored.length > 0) {
     /*
      * Occurs not sure why, but i.e when adding both lines, in this order:
-     * import HostedGame from '../shared/app/models/HostedGame.js';
-     * import { HostedGameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models/index.js';
+     * import Game from '../shared/app/models/Game.js';
+     * import { GameOptions, Player, ChatMessage, OnlinePlayers, PlayerSettings, AIConfig, GameAnalyze } from '../shared/app/models/index.js';
      *
      * Also, 'ReferenceError: Cannot access 'X' before initialization' is related,
      * we must use 'index.js' import to prevent error.

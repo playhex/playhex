@@ -1,16 +1,16 @@
 import { validate } from 'class-validator';
-import { HostedGameOptions, HostedGameOptionsTimeControlFischer, OptionsFischer } from '../models/index.js';
+import { GameOptions, GameOptionsTimeControlFischer, OptionsFischer } from '../models/index.js';
 import assert from 'assert';
 
-describe('HostedGameOptions', () => {
+describe('GameOptions', () => {
     it('validate ranked', async () => {
-        const options = new HostedGameOptions();
+        const options = new GameOptions();
 
         options.boardsize = 11;
         options.firstPlayer = null;
         options.swapRule = true;
 
-        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType = new GameOptionsTimeControlFischer();
         options.timeControlType.family = 'fischer';
         options.timeControlType.options = new OptionsFischer();
         options.timeControlType.options.initialTime = 600000;
@@ -25,13 +25,13 @@ describe('HostedGameOptions', () => {
     });
 
     it('not validate ranked with boardsize = 9', async () => {
-        const options = new HostedGameOptions();
+        const options = new GameOptions();
 
         options.boardsize = 9;
         options.firstPlayer = null;
         options.swapRule = true;
 
-        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType = new GameOptionsTimeControlFischer();
         options.timeControlType.family = 'fischer';
         options.timeControlType.options = new OptionsFischer();
         options.timeControlType.options.initialTime = 600000;
@@ -46,13 +46,13 @@ describe('HostedGameOptions', () => {
     });
 
     it('not validate ranked when host wants to play first', async () => {
-        const options = new HostedGameOptions();
+        const options = new GameOptions();
 
         options.boardsize = 14;
         options.firstPlayer = 0;
         options.swapRule = true;
 
-        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType = new GameOptionsTimeControlFischer();
         options.timeControlType.family = 'fischer';
         options.timeControlType.options = new OptionsFischer();
         options.timeControlType.options.initialTime = 600000;
@@ -67,13 +67,13 @@ describe('HostedGameOptions', () => {
     });
 
     it('not validate ranked with swap rule disabled', async () => {
-        const options = new HostedGameOptions();
+        const options = new GameOptions();
 
         options.boardsize = 19;
         options.firstPlayer = null;
         options.swapRule = false;
 
-        options.timeControlType = new HostedGameOptionsTimeControlFischer();
+        options.timeControlType = new GameOptionsTimeControlFischer();
         options.timeControlType.family = 'fischer';
         options.timeControlType.options = new OptionsFischer();
         options.timeControlType.options.initialTime = 600000;

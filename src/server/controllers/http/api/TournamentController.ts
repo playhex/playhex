@@ -208,11 +208,11 @@ export default class TournamentController
         }
     }
 
-    @Post('/api/tournaments/:slug/games/:hostedGamePublicId/players/:playerPublicId/forfeit')
+    @Post('/api/tournaments/:slug/games/:gamePublicId/players/:playerPublicId/forfeit')
     postForfeitGamePlayer(
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
-        @Param('hostedGamePublicId') hostedGamePublicId: string,
+        @Param('gamePublicId') gamePublicId: string,
         @Param('playerPublicId') playerPublicId: string,
     ) {
         const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
@@ -224,7 +224,7 @@ export default class TournamentController
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
         try {
-            activeTournament.forfeitGamePlayer(hostedGamePublicId, playerPublicId);
+            activeTournament.forfeitGamePlayer(gamePublicId, playerPublicId);
         } catch (e) {
             if (e instanceof GamePlayerNotFoundTournamentError) {
                 throw new NotFoundError(e.message);
@@ -238,11 +238,11 @@ export default class TournamentController
         }
     }
 
-    @Post('/api/tournaments/:slug/games/:hostedGamePublicId/reset-recreate')
+    @Post('/api/tournaments/:slug/games/:gamePublicId/reset-recreate')
     async postResetAndRecreateGame(
         @AuthenticatedPlayer() player: Player,
         @Param('slug') slug: string,
-        @Param('hostedGamePublicId') hostedGamePublicId: string,
+        @Param('gamePublicId') gamePublicId: string,
     ) {
         const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
 
@@ -253,7 +253,7 @@ export default class TournamentController
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
         try {
-            await activeTournament.resetAndRecreateGame(hostedGamePublicId);
+            await activeTournament.resetAndRecreateGame(gamePublicId);
         } catch (e) {
             if (e instanceof TooDeepResetError) {
                 throw new BadRequestError(e.message);

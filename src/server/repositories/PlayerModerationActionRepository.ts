@@ -33,7 +33,7 @@ export default class PlayerModerationActionRepository
             relations: {
                 player: true,
                 relatedChatMessages: {
-                    hostedGame: true,
+                    game: true,
                     player: true,
                 },
                 relatedChannelChatMessages: {
@@ -74,7 +74,7 @@ export default class PlayerModerationActionRepository
             relations: {
                 player: true,
                 relatedChatMessages: {
-                    hostedGame: true,
+                    game: true,
                     player: true,
                 },
                 relatedChannelChatMessages: {

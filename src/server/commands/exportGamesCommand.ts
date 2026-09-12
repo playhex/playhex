@@ -110,30 +110,30 @@ hexProgram
         const gameResults = await AppDataSource.query(`
             select
                 *
-            from hosted_game hg
-            where hg.state = 'ended'
+            from game g
+            where g.state = 'ended'
         `);
 
         const playerResults = await AppDataSource.query(`
             select
-                hg.id,
-                hgp.order,
+                g.id,
+                gp.order,
                 p.isBot,
                 p.isGuest,
                 p.pseudo,
                 r.rating,
                 r.deviation
-            from hosted_game hg
-            left join hosted_game_to_player hgp on hgp.hostedGameId = hg.id
-            left join player p on hgp.playerId = p.id
-            left join rating_games_hosted_game rghg on rghg.hostedGameId = hg.id
-            left join rating r on r.id = rghg.ratingId
-            where hg.state = 'ended'
+            from game g
+            left join game_to_player gp on gp.gameId = g.id
+            left join player p on gp.playerId = p.id
+            left join rating_games_game rg on rg.gameId = g.id
+            left join rating r on r.id = rg.ratingId
+            where g.state = 'ended'
             and r.id is null or (
                 r.playerId = p.id
                 and r.category = 'overall'
             )
-            order by hg.id, hgp.order
+            order by g.id, gp.order
         `);
 
         type Player = {
@@ -143,7 +143,7 @@ hexProgram
             deviation?: number;
         };
 
-        const gamePlayers: { [hostedGameId: number]: [null | Player, null | Player] } = [];
+        const gamePlayers: { [gameId: number]: [null | Player, null | Player] } = [];
 
         for (const playerResult of playerResults) {
             if (!gamePlayers[playerResult.id]) {

@@ -1,7 +1,7 @@
 import { defineOverlay } from '@overlastic/vue';
 import { useRouter } from 'vue-router';
 import Create1v1RankedOverlay from '../components/overlay/Create1v1RankedOverlay.vue';
-import HostedGameOptions from '../../../shared/app/models/HostedGameOptions.js';
+import GameOptions from '../../../shared/app/models/GameOptions.js';
 import { Player } from '../../../shared/app/models/index.js';
 import Create1v1FriendlyOverlay from '../components/overlay/Create1v1FriendlyOverlay.vue';
 import { apiPostGame } from '../../apiClient.js';
@@ -33,7 +33,7 @@ export const useCreateGameOverlay = () => {
     /*
      * 1 vs 1 - ranked
      */
-    const create1v1RankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions(), presetOpponent: null | Player = null) => {
+    const create1v1RankedAndJoinGame = async (gameOptions: GameOptions = new GameOptions(), presetOpponent: null | Player = null) => {
         gameOptions.opponentType = 'player';
         gameOptions.ranked = true;
         gameOptions.explorationAllowed = false;
@@ -42,8 +42,8 @@ export const useCreateGameOverlay = () => {
             gameOptions = await create1v1RankedOverlay({ gameOptions, presetOpponent });
             setLastCustomTimeControl(gameOptions.timeControlType);
 
-            const hostedGame = await apiPostGame(gameOptions);
-            await goToGame(hostedGame.publicId);
+            const game = await apiPostGame(gameOptions);
+            await goToGame(game.publicId);
         } catch (e) {
             // noop, player just closed popin
         }
@@ -52,7 +52,7 @@ export const useCreateGameOverlay = () => {
     /*
      * 1 vs 1 - friendly
      */
-    const create1v1FriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions(), presetOpponent: null | Player = null) => {
+    const create1v1FriendlyAndJoinGame = async (gameOptions: GameOptions = new GameOptions(), presetOpponent: null | Player = null) => {
         gameOptions.opponentType = 'player';
         gameOptions.ranked = false;
         gameOptions.explorationAllowed = true;
@@ -61,8 +61,8 @@ export const useCreateGameOverlay = () => {
             gameOptions = await create1v1FriendlyOverlay({ gameOptions, presetOpponent });
             setLastCustomTimeControl(gameOptions.timeControlType);
 
-            const hostedGame = await apiPostGame(gameOptions);
-            await goToGame(hostedGame.publicId);
+            const game = await apiPostGame(gameOptions);
+            await goToGame(game.publicId);
         } catch (e) {
             // noop, player just closed popin
         }
@@ -71,7 +71,7 @@ export const useCreateGameOverlay = () => {
     /*
      * 1 vs AI ranked
      */
-    const create1vAIRankedAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    const create1vAIRankedAndJoinGame = async (gameOptions: GameOptions = new GameOptions()) => {
         gameOptions.opponentType = 'ai';
         gameOptions.ranked = true;
         gameOptions.explorationAllowed = true;
@@ -80,8 +80,8 @@ export const useCreateGameOverlay = () => {
             gameOptions = await create1vAIRankedOverlay({ gameOptions });
             setLastCustomTimeControl(gameOptions.timeControlType);
 
-            const hostedGame = await apiPostGame(gameOptions);
-            await goToGame(hostedGame.publicId);
+            const game = await apiPostGame(gameOptions);
+            await goToGame(game.publicId);
         } catch (e) {
             // noop, player just closed popin
         }
@@ -90,7 +90,7 @@ export const useCreateGameOverlay = () => {
     /*
      * 1 vs AI
      */
-    const create1vAIFriendlyAndJoinGame = async (gameOptions: HostedGameOptions = new HostedGameOptions()) => {
+    const create1vAIFriendlyAndJoinGame = async (gameOptions: GameOptions = new GameOptions()) => {
         gameOptions.opponentType = 'ai';
         gameOptions.ranked = false;
         gameOptions.explorationAllowed = true;
@@ -99,8 +99,8 @@ export const useCreateGameOverlay = () => {
             gameOptions = await create1vAIOverlay({ gameOptions });
             setLastCustomTimeControl(gameOptions.timeControlType);
 
-            const hostedGame = await apiPostGame(gameOptions);
-            await goToGame(hostedGame.publicId);
+            const game = await apiPostGame(gameOptions);
+            await goToGame(game.publicId);
         } catch (e) {
             // noop, player just closed popin
         }

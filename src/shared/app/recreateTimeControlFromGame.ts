@@ -1,8 +1,8 @@
 import { PlayerIndex } from '../game-engine/index.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
 import { AbstractTimeControl, TimeControlError } from '../time-control/TimeControl.js';
-import { getTimestampedMoves } from './hostedGameUtils.js';
-import { HostedGame } from './models/index.js';
+import { getTimestampedMoves } from './gameUtils.js';
+import { Game } from './models/index.js';
 
 /**
  * While undoing moves, we need to revert the chrono state like it was before playing undone move(s).
@@ -16,9 +16,9 @@ import { HostedGame } from './models/index.js';
  * @param ignoreLastMoves Number of last moves to ignore, because they will be undone
  * @param now "Now" date to use to check if last move is not elapsing
  */
-export const recreateTimeControlAfterUndo = (hostedGame: HostedGame, ignoreLastMoves: number, now: Date): null | AbstractTimeControl => {
-    const { timeControlType } = hostedGame;
-    const timestampedMoves = getTimestampedMoves(hostedGame);
+export const recreateTimeControlAfterUndo = (game: Game, ignoreLastMoves: number, now: Date): null | AbstractTimeControl => {
+    const { timeControlType } = game;
+    const timestampedMoves = getTimestampedMoves(game);
 
     try {
         const timeControl = createTimeControl(timeControlType);

@@ -2,7 +2,7 @@ import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { Get, JsonController, NotFoundError, Post, QueryParam } from 'routing-controllers';
 import { AuthenticatedPlayer } from '../middlewares.js';
-import { Player, PlayerNotification, HostedGame } from '../../../../shared/app/models/index.js';
+import { Player, PlayerNotification, Game } from '../../../../shared/app/models/index.js';
 
 @JsonController()
 @Service()
@@ -12,8 +12,8 @@ export default class PlayerController
         @Inject('Repository<PlayerNotification>')
         private playerNotificationRepository: Repository<PlayerNotification>,
 
-        @Inject('Repository<HostedGame>')
-        private hostedGameRepository: Repository<HostedGame>,
+        @Inject('Repository<Game>')
+        private gameRepository: Repository<Game>,
     ) {}
 
     @Get('/api/player-notifications')
@@ -33,17 +33,17 @@ export default class PlayerController
                 createdAt: 'asc', // ascendant to display chat messages and game end chronologically in notifications
             },
             relations: {
-                hostedGame: {
-                    hostedGameToPlayers: {
+                game: {
+                    gameToPlayers: {
                         player: true,
                     },
                 },
             },
             select: {
-                hostedGame: {
+                game: {
                     publicId: true,
                     createdAt: true,
-                    hostedGameToPlayers: true,
+                    gameToPlayers: true,
                 },
             },
             take: 50,
@@ -52,13 +52,13 @@ export default class PlayerController
 
     /**
      * Marks all player notifications as read.
-     * If hostedGamePublicId is provided,
+     * If gamePublicId is provided,
      * only mark notifications from this game as read.
      */
     @Post('/api/player-notifications/acknowledge')
     async postAcknowledgeNotifications(
         @AuthenticatedPlayer() player: Player,
-        @QueryParam('hostedGamePublicId') hostedGamePublicId?: string,
+        @QueryParam('gamePublicId') gamePublicId?: string,
     ) {
         if (!player.id) {
             throw new Error('Unexpected no player id');
@@ -72,18 +72,18 @@ export default class PlayerController
             })
         ;
 
-        if (hostedGamePublicId) {
-            const hostedGame = await this.hostedGameRepository.findOne({
-                where: { publicId: hostedGamePublicId },
+        if (gamePublicId) {
+            const game = await this.gameRepository.findOne({
+                where: { publicId: gamePublicId },
                 select: { id: true },
             });
 
-            if (!hostedGame) {
-                throw new NotFoundError(`No hosted game with public id "${hostedGamePublicId}"`);
+            if (!game) {
+                throw new NotFoundError(`No game with public id "${gamePublicId}"`);
             }
 
             queryBuilder
-                .andWhere('hostedGameId = :hostedGameId', { hostedGameId: hostedGame.id })
+                .andWhere('gameId = :gameId', { gameId: game.id })
             ;
         }
 

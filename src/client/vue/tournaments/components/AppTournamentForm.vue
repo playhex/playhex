@@ -148,7 +148,7 @@ onMounted(async () => {
 const validateTournament = async (): Promise<boolean> => {
     cleanFormErrors();
 
-    Object.assign(tournament.value, plainToInstance(Tournament, instanceToPlain(tournament.value))); // for time control, to transform from object to HostedGameOptionsTimeControl and prevent validation error
+    Object.assign(tournament.value, plainToInstance(Tournament, instanceToPlain(tournament.value))); // for time control, to transform from object to GameOptionsTimeControl and prevent validation error
 
     const errors = await validate(tournament.value, { groups: ['tournament:create'] });
 

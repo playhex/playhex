@@ -3,15 +3,15 @@ import { notifier } from '../notifier.js';
 import { truncateText } from '../../../../shared/app/utils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { createPlayerNotification } from '../../../../shared/app/models/PlayerNotification.js';
-import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer } from '../../../../shared/app/hostedGameUtils.js';
+import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer } from '../../../../shared/app/gameUtils.js';
 import logger from '../../../services/logger.js';
 import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
 import { PlayerNotificationsService } from '../../../services/PlayerNotificationsService.js';
-import HostedGameRepository from '../../../repositories/HostedGameRepository.js';
+import GameRepository from '../../../repositories/GameRepository.js';
 
 const onlinePlayerService = Container.get(OnlinePlayersService);
 const playerNotificationService = Container.get(PlayerNotificationsService);
-const hostedGamePersister = Container.get(HostedGameRepository);
+const gamePersister = Container.get(GameRepository);
 
 /*
  * Adds notifications in the player header, in the UI.
@@ -28,7 +28,7 @@ const hostedGamePersister = Container.get(HostedGameRepository);
  * - offline or inactive => always
  * - active => in ended games only, if not already on this game page
  */
-notifier.on('chatMessage', async (hostedGame, chatMessage) => {
+notifier.on('chatMessage', async (game, chatMessage) => {
 
     // No notification for system messages
     if (chatMessage.player === null) {
@@ -40,7 +40,7 @@ notifier.on('chatMessage', async (hostedGame, chatMessage) => {
         return;
     }
 
-    for (const { player } of hostedGame.hostedGameToPlayers) {
+    for (const { player } of game.gameToPlayers) {
 
         // Do not notify chat message sender
         if (player.publicId === chatMessage.player.publicId) {
@@ -54,8 +54,8 @@ notifier.on('chatMessage', async (hostedGame, chatMessage) => {
 
         // Do not add notification if player is active, and game is active or player is on the page already
         if (onlinePlayerService.isActive(player)) {
-            const isGameActive = hostedGame.state === 'playing' || hostedGame.state === 'created';
-            const playerIsWatching = onlinePlayerService.isOnGamePage(player, hostedGame.publicId);
+            const isGameActive = game.state === 'playing' || game.state === 'created';
+            const playerIsWatching = onlinePlayerService.isOnGamePage(player, game.publicId);
 
             if (isGameActive || playerIsWatching) {
                 continue;
@@ -69,7 +69,7 @@ notifier.on('chatMessage', async (hostedGame, chatMessage) => {
                 text: truncateText(chatMessage.content),
             },
             player,
-            hostedGame,
+            game,
             chatMessage.createdAt,
         );
 
@@ -84,30 +84,30 @@ notifier.on('chatMessage', async (hostedGame, chatMessage) => {
  * Should send only when player is offline.
  * May notify both players, e.g in case of a player timeout while offline.
  */
-notifier.on('gameEnd', async hostedGame => {
+notifier.on('gameEnd', async game => {
     // No notification for bot game ended
-    if (hostedGame.opponentType === 'ai') {
+    if (game.opponentType === 'ai') {
         return;
     }
 
-    const winner = getWinnerPlayer(hostedGame);
-    const loser = getLoserPlayer(hostedGame);
+    const winner = getWinnerPlayer(game);
+    const loser = getLoserPlayer(game);
 
     if (!winner || !loser) {
         logger.warning('Cannot add notification for gameEnded, no winner or loser', {
-            hostedGamePublicId: hostedGame.publicId,
+            gamePublicId: game.publicId,
         });
 
         return;
     }
 
-    for (const { player } of hostedGame.hostedGameToPlayers) {
+    for (const { player } of game.gameToPlayers) {
         // Do not notify player if active
         if (onlinePlayerService.isActive(player)) {
             continue;
         }
 
-        const opponent = getOtherPlayer(hostedGame, player);
+        const opponent = getOtherPlayer(game, player);
 
         const playerNotification = createPlayerNotification(
             'gameEnded',
@@ -116,8 +116,8 @@ notifier.on('gameEnd', async hostedGame => {
                 opponent: opponent ? pseudoString(opponent) : '?',
             },
             player,
-            hostedGame,
-            hostedGame.endedAt ?? new Date(),
+            game,
+            game.endedAt ?? new Date(),
         );
 
         await playerNotificationService.addNotification(playerNotification);
@@ -130,13 +130,13 @@ notifier.on('gameEnd', async hostedGame => {
  *
  * Should send only when player is offline.
  */
-notifier.on('gameCanceled', async hostedGame => {
+notifier.on('gameCanceled', async game => {
     // No notification for bot game canceled
-    if (hostedGame.opponentType === 'ai') {
+    if (game.opponentType === 'ai') {
         return;
     }
 
-    for (const { player } of hostedGame.hostedGameToPlayers) {
+    for (const { player } of game.gameToPlayers) {
         // Do not notify player if active
         if (onlinePlayerService.isActive(player)) {
             continue;
@@ -146,8 +146,8 @@ notifier.on('gameCanceled', async hostedGame => {
             'gameCanceled',
             null,
             player,
-            hostedGame,
-            hostedGame.endedAt ?? new Date(),
+            game,
+            game.endedAt ?? new Date(),
         );
 
         await playerNotificationService.addNotification(playerNotification);
@@ -160,23 +160,23 @@ notifier.on('gameCanceled', async hostedGame => {
  * Should send only when player is offline or inactive,
  * as active players are already notified in real time (toast + sound).
  */
-notifier.on('gameChallengeCreated', async (hostedGame, opponent) => {
+notifier.on('gameChallengeCreated', async (game, opponent) => {
     if (onlinePlayerService.isActive(opponent)) {
         return;
     }
 
-    if (hostedGame.host === null) {
+    if (game.host === null) {
         return;
     }
 
     const playerNotification = createPlayerNotification(
         'gameChallenge',
         {
-            player: pseudoString(hostedGame.host),
+            player: pseudoString(game.host),
         },
         opponent,
-        hostedGame,
-        hostedGame.createdAt,
+        game,
+        game.createdAt,
     );
 
     await playerNotificationService.addNotification(playerNotification);
@@ -187,13 +187,13 @@ notifier.on('moderationActionTaken', async action => {
         return;
     }
 
-    const hostedGame = await hostedGamePersister.findHostedGameFromChatMessage(action.relatedChatMessages[0].publicId);
+    const game = await gamePersister.findGameFromChatMessage(action.relatedChatMessages[0].publicId);
 
-    if (!hostedGame) {
+    if (!game) {
         return;
     }
 
-    for (const participant of getPlayers(hostedGame)) {
+    for (const participant of getPlayers(game)) {
         if (participant.publicId === action.player.publicId) {
             continue;
         }
@@ -206,10 +206,10 @@ notifier.on('moderationActionTaken', async action => {
             'myOpponentHasBeenModerated',
             {
                 player: pseudoString(action.player),
-                hostedGame: undefined,
+                game: undefined,
             },
             participant,
-            hostedGame,
+            game,
             action.createdAt,
         );
 

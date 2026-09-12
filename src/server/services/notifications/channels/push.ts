@@ -1,57 +1,57 @@
 import { Container } from 'typedi';
-import { getCurrentPlayer, isBotGame } from '../../../../shared/app/hostedGameUtils.js';
+import { getCurrentPlayer, isBotGame } from '../../../../shared/app/gameUtils.js';
 import { PushNotificationFactory } from '../../../../shared/app/PushNotificationFactory.js';
 import { PushNotificationsPool } from '../../../services/PushNotificationsPool.js';
 import { notifier } from '../notifier.js';
 
 const pushNotificationsPool = Container.get(PushNotificationsPool);
 
-notifier.on('gameStart', hostedGame => {
-    if (isBotGame(hostedGame)) {
+notifier.on('gameStart', game => {
+    if (isBotGame(game)) {
         return;
     }
 
-    const { host } = hostedGame;
+    const { host } = game;
 
     // Game created by system, push both players
     if (host === null) {
-        for (const hostedGameToPlayer of hostedGame.hostedGameToPlayers) {
-            const pushPayload = PushNotificationFactory.createGameCreatedBySystemStartedNotification(hostedGameToPlayer.player, hostedGame);
-            pushNotificationsPool.poolNotification(hostedGameToPlayer.player, pushPayload);
+        for (const gameToPlayer of game.gameToPlayers) {
+            const pushPayload = PushNotificationFactory.createGameCreatedBySystemStartedNotification(gameToPlayer.player, game);
+            pushNotificationsPool.poolNotification(gameToPlayer.player, pushPayload);
         }
 
         return;
     }
 
     // Game created by someone, only push player who joined the game
-    const pushPayload = PushNotificationFactory.createPlayerJoinedAndGameStartedNotification(host, hostedGame);
+    const pushPayload = PushNotificationFactory.createPlayerJoinedAndGameStartedNotification(host, game);
     pushNotificationsPool.poolNotification(host, pushPayload);
 });
 
-notifier.on('move', (hostedGame, timestampedMove) => {
-    if (isBotGame(hostedGame)) {
+notifier.on('move', (game, timestampedMove) => {
+    if (isBotGame(game)) {
         return;
     }
 
-    const player = getCurrentPlayer(hostedGame);
+    const player = getCurrentPlayer(game);
 
     if (player === null) {
         return;
     }
 
-    const pushPayload = PushNotificationFactory.createTurnToPlayNotification(player, hostedGame, timestampedMove.playedAt);
+    const pushPayload = PushNotificationFactory.createTurnToPlayNotification(player, game, timestampedMove.playedAt);
 
     pushNotificationsPool.poolNotification(player, pushPayload);
 });
 
-notifier.on('gameEnd', hostedGame => {
-    if (isBotGame(hostedGame)) {
+notifier.on('gameEnd', game => {
+    if (isBotGame(game)) {
         return;
     }
 
-    hostedGame.hostedGameToPlayers.forEach(hostedGameToPlayer => {
-        const { player } = hostedGameToPlayer;
-        const pushPayload = PushNotificationFactory.createGameEndedNotification(player, hostedGame);
+    game.gameToPlayers.forEach(gameToPlayer => {
+        const { player } = gameToPlayer;
+        const pushPayload = PushNotificationFactory.createGameEndedNotification(player, game);
 
         pushNotificationsPool.poolNotification(player, pushPayload);
     });
