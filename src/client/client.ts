@@ -34,9 +34,9 @@ useMatomo(vueApp);
 // Load store now to set dark/light theme early enough and prevent blinking
 usePlayerLocalSettingsStore();
 
-// authStore, socketStore and playersStore reference each other.
+// authStore and socketStore reference each other.
 // authStore must be the one initialized first, else socketStore would be
-// initialized while still partial, and playersStore would get an undefined socket.
+// initialized while still partial.
 useAuthStore();
 
 void preloadAssets();

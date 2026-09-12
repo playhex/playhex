@@ -3,12 +3,10 @@ import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from 
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import useSocketStore from './socketStore.js';
-import usePlayersStore from './playersStore.js';
 
 const useAuthStore = defineStore('authStore', () => {
 
     const { socket } = useSocketStore();
-    const { playerRef } = usePlayersStore();
 
     /**
      * Current logged in player
@@ -18,22 +16,22 @@ const useAuthStore = defineStore('authStore', () => {
     void (async () => {
         try {
             const player = await authMeOrSignupGuest();
-            loggedInPlayer.value = playerRef(player, true);
+            loggedInPlayer.value = player;
         } catch (e) {
             // seems offline
         }
     })();
 
     const login = async (pseudo: string, password: string): Promise<Player> => {
-        return loggedInPlayer.value = playerRef(await authLogin(pseudo, password), true);
+        return loggedInPlayer.value = await authLogin(pseudo, password);
     };
 
     const signup = async (pseudo: string, password: string): Promise<Player> => {
-        return loggedInPlayer.value = playerRef(await authSignupFromGuest(pseudo, password), true);
+        return loggedInPlayer.value = await authSignupFromGuest(pseudo, password);
     };
 
     const logout = async (): Promise<Player> => {
-        return loggedInPlayer.value = playerRef(await authLogout(), true);
+        return loggedInPlayer.value = await authLogout();
     };
 
     socket.on('ratingsUpdated', (gameId, ratings) => {

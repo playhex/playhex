@@ -21,6 +21,7 @@ import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf } from 
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
+import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
 
 export class GameError extends Error {}
 export class CannotChallengeYourselfError extends GameError {}
@@ -53,6 +54,8 @@ export default class HostedGameStore
         private onlinePlayerService: OnlinePlayersService,
         private gameEventEmitter: GameEventsEmitter,
         private playerModerationActionRepository: PlayerModerationActionRepository,
+
+        private playerIdentityMap: PlayerIdentityMap,
 
         @Inject('Repository<ChatMessage>')
         private chatMessageRepository: Repository<ChatMessage>,
@@ -327,6 +330,14 @@ export default class HostedGameStore
 
     private createHostedGameServerForHostedGame(hostedGame: HostedGame): HostedGameServer
     {
+        if (hostedGame.host !== null) {
+            hostedGame.host = this.playerIdentityMap.resolve(hostedGame.host);
+        }
+
+        for (const hostedGameToPlayer of hostedGame.hostedGameToPlayers) {
+            hostedGameToPlayer.player = this.playerIdentityMap.resolve(hostedGameToPlayer.player);
+        }
+
         return new HostedGameServer(
             hostedGame,
             new AutoSave<HostedGame>(() => this.hostedGameRepository.persist(hostedGame)),

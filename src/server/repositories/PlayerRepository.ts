@@ -8,6 +8,7 @@ import { IsNull, Not, QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils.js';
 import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
+import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
 
 export class PseudoAlreadyTakenError extends Error {}
 export class MustBeGuestError extends Error {}
@@ -21,30 +22,45 @@ export default class PlayerRepository
 
         @Inject('Repository<PlayerAccountPassword>')
         private playerAccountPasswordRepository: Repository<PlayerAccountPassword>,
+
+        private playerIdentityMap: PlayerIdentityMap,
     ) {}
+
+    /**
+     * Make sure we always use a same instance for a same player,
+     * so a player updated somewhere is updated everywhere.
+     */
+    private resolveInstance(player: null | Player): null | Player
+    {
+        if (player === null) {
+            return null;
+        }
+
+        return this.playerIdentityMap.resolve(player);
+    }
 
     async getPlayer(publicId: string): Promise<null | Player>
     {
-        return await this.playerRepository.findOne({
+        return this.resolveInstance(await this.playerRepository.findOne({
             where: {
                 publicId,
             },
-        });
+        }));
     }
 
     async getPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return await this.playerRepository.findOneBy({
+        return this.resolveInstance(await this.playerRepository.findOneBy({
             slug,
-        });
+        }));
     }
 
     async getAIPlayerBySlug(slug: string): Promise<null | Player>
     {
-        return await this.playerRepository.findOneBy({
+        return this.resolveInstance(await this.playerRepository.findOneBy({
             slug,
             isBot: true,
-        });
+        }));
     }
 
     /**
@@ -54,7 +70,7 @@ export default class PlayerRepository
     async getPlayerByIdPublicIdOrSlug(identifier: number | string): Promise<null | Player>
     {
         if (typeof identifier === 'number' || /^\d+$/.test(identifier)) {
-            return await this.playerRepository.findOneBy({ id: Number(identifier) });
+            return this.resolveInstance(await this.playerRepository.findOneBy({ id: Number(identifier) }));
         }
 
         if (isUuid(identifier)) {
@@ -288,12 +304,17 @@ export default class PlayerRepository
 
     async updateAvatar(publicId: string, avatarPath: string, avatarThumbnailPath: string): Promise<void>
     {
+        const avatarUpdatedAt = new Date();
+
         await this.playerRepository.createQueryBuilder('player')
             .update()
             .where('publicId = :publicId', { publicId })
-            .set({ avatarPath, avatarThumbnailPath, avatarUpdatedAt: new Date() })
+            .set({ avatarPath, avatarThumbnailPath, avatarUpdatedAt })
             .execute()
         ;
+
+        // Update player instance kept in memory, i.e in games already created
+        Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { avatarPath, avatarThumbnailPath, avatarUpdatedAt });
     }
 
     async updateCountryFlag(publicId: string, countryFlag: string | null): Promise<void>
@@ -304,6 +325,9 @@ export default class PlayerRepository
             .set({ countryFlag })
             .execute()
         ;
+
+        // Update player instance kept in memory, i.e in games already created
+        Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { countryFlag });
     }
 
     async shadowBan(publicId: string): Promise<number | undefined>

@@ -3,12 +3,9 @@ import Player from '../../../shared/app/models/Player.js';
 import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
-import usePlayersStore from '../../stores/playersStore.js';
-import { ref } from 'vue';
-import { watchEffect } from 'vue';
 import AppPlayerRating from './AppPlayerRating.vue';
 
-const props = defineProps({
+defineProps({
     player: {
         type: Object as PropType<Player>,
         required: true,
@@ -58,38 +55,33 @@ const props = defineProps({
         default: 'left',
     },
 });
-
-const p = ref();
-watchEffect(() => {
-    p.value = usePlayersStore().playerRef(props.player);
-});
 </script>
 
 <template>
     <RouterLink
-        :to="p.slug ? { name: 'player', params: { slug: p.slug } } : ''"
+        :to="player.slug ? { name: 'player', params: { slug: player.slug } } : ''"
         class="text-body text-decoration-none pseudo-link"
         :style="{ justifyContent: alignItems === 'right' ? 'flex-end' : 'flex-start' }"
     >
         <span class="nick-group">
             <span v-if="onlineStatus" class="status-icon">
-                <AppOnlineStatus :player="p" />
+                <AppOnlineStatus :player="player" />
             </span>
 
             <component :is="is" :class="classes" class="nick">
-                <span v-if="p.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
-                <span>{{ p.pseudo }}</span>
+                <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
+                <span>{{ player.pseudo }}</span>
             </component>
         </span>
 
-        <span v-if="(flag && p.countryFlag) || rating" class="meta-group">
-            <small v-if="flag && p.countryFlag" aria-hidden="true">{{ p.countryFlag }}</small>
+        <span v-if="(flag && player.countryFlag) || rating" class="meta-group">
+            <small v-if="flag && player.countryFlag" aria-hidden="true">{{ player.countryFlag }}</small>
 
             <template v-if="rating">
                 <!-- adds an invisible space between username and rating to make copy/paste and functionnal tests more readable -->
                 <span class="invisible">&nbsp;</span>
 
-                <AppPlayerRating :player="p" :full="rating === 'full'" />
+                <AppPlayerRating :player="player" :full="rating === 'full'" />
             </template>
         </span>
     </RouterLink>

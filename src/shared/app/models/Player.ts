@@ -3,6 +3,7 @@ import { ColumnUUID } from '../custom-typeorm.js';
 import { Expose, GROUP_DEFAULT as GROUP_DEFAULT } from '../class-transformer-custom.js';
 import AIConfig from './AIConfig.js';
 import { IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 import Rating from './Rating.js';
 import { keysOf } from '../utils.js';
 
@@ -80,7 +81,8 @@ export default class Player
      */
     @OneToOne(() => Rating, { eager: true, cascade: true })
     @JoinColumn()
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
+    @Type(() => Rating)
     currentRating?: Rating;
 
     /**

@@ -28,23 +28,23 @@ export default class Rating
      * or a category name like "blitz", "small", "normal.medium", ...
      */
     @Column({ type: String })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'lobby'] })
     category: RatingCategory;
 
     @Column()
-    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'lobby'] })
     createdAt: Date;
 
     @Column({ type: 'float' })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'lobby'] })
     rating: number;
 
     @Column({ type: 'float' })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'lobby'] })
     deviation: number;
 
     @Column({ type: 'float' })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'lobby'] })
     volatility: number;
 
     /**
@@ -52,6 +52,6 @@ export default class Rating
      * Used to show "+17" next to player username on finished games.
      */
     @Column({ type: 'float', nullable: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'lobby'] })
     ratingChange?: number;
 }

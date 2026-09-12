@@ -10,6 +10,7 @@ import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepo
 import PlayerAvatarService from './PlayerAvatarService.js';
 import BannedIpService from './BannedIpService.js';
 import logger from './logger.js';
+import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
 
 export class CreateAndSaveError extends Error {}
 
@@ -28,6 +29,7 @@ export default class ModerationService
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private playerAvatarService: PlayerAvatarService,
         private bannedIpService: BannedIpService,
+        private playerIdentityMap: PlayerIdentityMap,
 
         @Inject('Repository<Player>')
         private playerRepository: Repository<Player>,
@@ -95,6 +97,9 @@ export default class ModerationService
                 logger.notice('Error while deleting moderated avatar', { reason });
             });
             await this.playerRepository.update({ id: player.id }, { avatarPath: null, avatarThumbnailPath: null, avatarUpdatedAt: null });
+
+            // Update player instance kept in memory, i.e in games already created
+            Object.assign(this.playerIdentityMap.get(player.publicId) ?? {}, { avatarPath: null, avatarThumbnailPath: null, avatarUpdatedAt: null });
         }
 
         notifier.emit('moderationActionTaken', action);
