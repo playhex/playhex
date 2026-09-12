@@ -257,11 +257,22 @@ On development:
 - Develop on blank database
 - Then, import production database, create migration, check `yarn typeorm schema:log`
 - Update Cypress fixtures, see `src/server/commands/migrateCypressFixtures.ts`
-- Check breaking changes are acceptable for client that have not yet updated:
-    - go to next version, `yarn build-server`, `node index.js`
-    - go to current production version, `yarn dev-client`
-    - then test application have no big error
+- Check breaking changes are acceptable for client that have not yet updated.
+  Build the **old client**, then serve it with the **new server** in production mode.
+  `build-client` writes to `dist/statics` and `build-server` to `dist/server`, so both can be built
+  from different commits in the same checkout:
+    ```bash
+    git checkout <current-production-commit>
+    NODE_ENV=production yarn build-client
+
+    git checkout master
+    yarn build-server
+
+    NODE_ENV=production node index.js
+    ```
+    - then test application have no big error (hard reload the browser to make sure the old bundle is used)
     - else, add retrocompat temporary fix (like `get gameData() { return { ... }; } set gameData(x) {}` to keep returning legacy property through api)
+    - once done, rebuild the client from master: `NODE_ENV=production yarn build-client`
 
 On release:
 
