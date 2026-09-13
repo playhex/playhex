@@ -24,30 +24,19 @@ export default class PlayerController
             throw new Error('Unexpected no player id');
         }
 
-        return this.playerNotificationRepository.find({
-            where: {
-                playerId: player.id,
-                isRead: false,
-            },
-            order: {
-                createdAt: 'asc', // ascendant to display chat messages and game end chronologically in notifications
-            },
-            relations: {
-                game: {
-                    gameToPlayers: {
-                        player: true,
-                    },
-                },
-            },
-            select: {
-                game: {
-                    publicId: true,
-                    createdAt: true,
-                    gameToPlayers: true,
-                },
-            },
-            take: 50,
-        });
+        return this.playerNotificationRepository.createQueryBuilder('playerNotification')
+            .where('playerNotification.playerId = :playerId', { playerId: player.id })
+            .andWhere('playerNotification.isRead = false')
+            .leftJoin('playerNotification.game', 'game')
+            .addSelect(['game.id', 'game.publicId', 'game.createdAt'])
+            .leftJoin('game.gameToPlayers', 'gameToPlayers')
+            .addSelect(['gameToPlayers.gameId', 'gameToPlayers.playerId', 'gameToPlayers.order'])
+            .leftJoin('gameToPlayers.player', 'gameToPlayerPlayer')
+            .addSelect(['gameToPlayerPlayer.id', 'gameToPlayerPlayer.publicId', 'gameToPlayerPlayer.pseudo', 'gameToPlayerPlayer.slug', 'gameToPlayerPlayer.isGuest', 'gameToPlayerPlayer.isBot'])
+            .orderBy('playerNotification.createdAt', 'ASC') // ascendant to display chat messages and game end chronologically in notifications
+            .take(50)
+            .getMany()
+        ;
     }
 
     /**
