@@ -15,6 +15,7 @@ import './migrateCypressFixtures.js';
 import './missingTranslationsCommand.js';
 import './createFakeNotificationsCommand.js';
 import './generateStatsCommand.js';
+import './tournamentSubscribePlayersCommand.js';
 
 await hexProgram.parseAsync();
 
