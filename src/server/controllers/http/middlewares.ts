@@ -1,5 +1,5 @@
 import { CurrentUser, HttpError } from 'routing-controllers';
-import { Tournament, Player } from '../../../shared/app/models/index.js';
+import { Tournament, TournamentSeries, Player } from '../../../shared/app/models/index.js';
 
 /**
  * Provide currently authenticated player.
@@ -26,4 +26,21 @@ export const mustBeTournamentOrganizer = (tournament: Tournament, player: Player
     }
 
     throw new HttpError(403, 'Only tournament organizer can do this');
+};
+
+/**
+ * Deny access if authenticated player is not host or admin of the tournament series.
+ *
+ * @throws {HttpError} If player does not manage this series
+ */
+export const mustBeTournamentSeriesHostOrAdmin = (tournamentSeries: TournamentSeries, player: Player): void => {
+    if (tournamentSeries.host.publicId === player.publicId) {
+        return;
+    }
+
+    if (tournamentSeries.admins.some(admin => admin.player.publicId === player.publicId)) {
+        return;
+    }
+
+    throw new HttpError(403, 'Only tournament series host or admins can do this');
 };

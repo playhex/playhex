@@ -2,6 +2,7 @@
 # slug: optional, auto-generated from title if omitted
 # stage1Format: "single-elimination", "double-elimination", "swiss", "round-robin"
 # checkInOpenOffsetSeconds: seconds before startOfficialAt when check-in opens
+# seriesPublicId: optional, attach this tournament to a series. Requires being an organizer of that series.
 
 POST /api/tournaments
 Content-Type: application/json
@@ -25,5 +26,6 @@ Content-Type: application/json
         }
     },
     "startOfficialAt": "2025-06-01T18:00:00.000Z",
-    "checkInOpenOffsetSeconds": 86400
+    "checkInOpenOffsetSeconds": 86400,
+    "seriesPublicId": null
 }

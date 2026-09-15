@@ -1,0 +1,14 @@
+# Edit a tournament series. Requires authentication (must be host or admin).
+# Uses publicId as identifier because slug can be edited.
+
+@seriesPublicId=00000000-0000-0000-0000-000000000000
+
+PATCH /api/tournament-series/{{ seriesPublicId }}
+Content-Type: application/json
+
+{
+    "title": "Hex Monthly",
+    "slug": "hex-monthly",
+    "description": "Monthly tournament, every first sunday.",
+    "titlePattern": "Hex Monthly {n}"
+}

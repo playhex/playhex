@@ -14,6 +14,8 @@ type DomainHttpErrorTypes =
     | 'tournament_player_is_banned'
     | 'tournament_account_required'
     | 'tournament_not_enough_participants_to_start'
+    | 'tournament_series_slug_duplicate'
+    | 'tournament_series_has_tournaments'
 ;
 
 type DomainHttpErrorType = {

@@ -1,0 +1,14 @@
+# Create a tournament series. Requires authentication, anyone can create one.
+# slug: optional, auto-generated from title if omitted
+# titlePattern: optional, supports {n}, {month} and {year}.
+#   Omit it to name instances "<title> <n>".
+
+POST /api/tournament-series
+Content-Type: application/json
+
+{
+    "title": "Hex Monthly",
+    "slug": "hex-monthly",
+    "description": "Monthly tournament, every first sunday.",
+    "titlePattern": "Hex Monthly {n}"
+}

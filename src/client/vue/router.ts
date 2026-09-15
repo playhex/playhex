@@ -54,6 +54,32 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        path: '/tournament-series',
+        component: () => import('./ReloadOnRouteChange.vue'),
+        children: [
+            {
+                name: 'tournament-series',
+                path: '',
+                component: () => import('./tournaments/pages/PageTournamentSeriesList.vue'),
+            },
+            {
+                name: 'tournament-series-create',
+                path: 'create',
+                component: () => import('./tournaments/pages/PageCreateTournamentSeries.vue'),
+            },
+            {
+                name: 'tournament-series-show',
+                path: ':slug',
+                component: () => import('./tournaments/pages/PageTournamentSeries.vue'),
+            },
+            {
+                name: 'tournament-series-edit',
+                path: ':slug/edit',
+                component: () => import('./tournaments/pages/PageEditTournamentSeries.vue'),
+            },
+        ],
+    },
+    {
         name: 'hexplorer',
         path: '/hexplorer',
         component: () => import('./hexplorer/pages/PageHexplorer.vue'),

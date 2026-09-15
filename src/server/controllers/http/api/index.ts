@@ -22,6 +22,7 @@ import GameConditionalMovesController from './GameConditionalMovesController.js'
 import PushController from './PushController.js';
 import TournamentController from './TournamentController.js';
 import TournamentBanController from './TournamentBanController.js';
+import TournamentSeriesController from './TournamentSeriesController.js';
 import AdminModerationController from './AdminModerationController.js';
 import PlayerModerationController from './PlayerModerationController.js';
 import PlayerAvatarController from './PlayerAvatarController.js';
@@ -74,6 +75,7 @@ export const registerApi = (app: Express) => {
             GameAnalyzeController,
             TournamentController,
             TournamentBanController,
+            TournamentSeriesController,
             ChatController,
             ChannelController,
             PlayerController,

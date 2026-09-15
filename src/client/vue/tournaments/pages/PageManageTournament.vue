@@ -3,6 +3,8 @@ import { computed, ref, useTemplateRef, watch } from 'vue';
 import { t } from 'i18next';
 import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiCancelTournament, apiPutTournamentAdmins } from '../../../apiClient.js';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
+import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
+import { tournamentBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import TournamentBannedPlayer from '../../../../shared/app/models/TournamentBannedPlayer.js';
 import Player from '../../../../shared/app/models/Player.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
@@ -293,6 +295,11 @@ const updateAdmins = async () => {
 
 <template>
     <div class="container my-3">
+        <AppBreadcrumb
+            v-if="tournament"
+            :items="tournamentBreadcrumb(tournament, $t('manage_tournament_page.title'))"
+        />
+
         <router-link
             :to="{ name: 'tournament', params: { slug }}"
             class="btn btn-outline-primary float-end"

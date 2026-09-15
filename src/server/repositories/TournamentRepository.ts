@@ -11,6 +11,7 @@ import { Tournament } from '../../shared/app/models/index.js';
  */
 const relations: FindOptionsRelations<Tournament> = {
     organizer: true,
+    series: true,
     subscriptions: {
         player: {
             currentRating: true,
@@ -89,6 +90,52 @@ export default class TournamentRepository
     async slugExists(slug: string): Promise<boolean>
     {
         return await this.tournamentRepository.existsBy({ slug });
+    }
+
+    /**
+     * All tournaments of a series. Active ones may be outdated,
+     * up to date instances are in TournamentStore.
+     */
+    async findBySeries(tournamentSeriesId: number): Promise<Tournament[]>
+    {
+        return await this.tournamentRepository.find({
+            relations: {
+                participants: {
+                    player: true,
+                },
+            },
+            where: {
+                series: { id: tournamentSeriesId },
+            },
+            order: {
+                startOfficialAt: 'desc',
+            },
+            relationLoadStrategy: 'query',
+        });
+    }
+
+    /**
+     * Most recent ended tournament of a series, or null if none ended yet.
+     *
+     * Used to show a series in a list, where loading all its instances would be too much.
+     */
+    async findLastEndedBySeries(tournamentSeriesId: number): Promise<null | Tournament>
+    {
+        return await this.tournamentRepository.findOne({
+            relations: {
+                participants: {
+                    player: true,
+                },
+            },
+            where: {
+                series: { id: tournamentSeriesId },
+                state: 'ended',
+            },
+            order: {
+                startOfficialAt: 'desc',
+            },
+            relationLoadStrategy: 'query',
+        });
     }
 
     async findEndedTournaments(): Promise<Tournament[]>

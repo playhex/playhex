@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { Player, Tournament } from '../../shared/app/models/index.js';
+import { Player, Tournament, TournamentSeries } from '../../shared/app/models/index.js';
 import { by, errorToLogger } from '../../shared/app/utils.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
 import logger from '../services/logger.js';
@@ -220,12 +220,14 @@ export default class TournamentStore
         return result;
     }
 
-    async createTournament(tournament: Tournament, organizer: Player): Promise<Tournament>
+    async createTournament(tournament: Tournament, organizer: Player, series: null | TournamentSeries = null): Promise<Tournament>
     {
         tournament = createTournamentFromCreateInput(tournament);
 
         tournament.createdAt = new Date();
         tournament.organizer = organizer;
+        tournament.series = series;
+        tournament.featuredFromInSeconds = series?.featuredFromInSeconds ?? 0;
 
         addTournamentHistory(tournament, 'created', {
             organizerPseudo: pseudoString(organizer),

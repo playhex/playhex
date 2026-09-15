@@ -1,0 +1,6 @@
+# Delete a tournament series. Requires authentication (must be host or admin).
+# Returns 409 tournament_series_has_tournaments if the series has at least one tournament.
+
+@seriesSlug=hex-monthly
+
+DELETE /api/tournament-series/{{ seriesSlug }}

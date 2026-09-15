@@ -1,0 +1,12 @@
+# Set the admin list for a series. Requires authentication (must be host or admin).
+# Admins can edit the series and create new instances.
+# The host is not part of this list.
+
+@seriesSlug=hex-monthly
+
+PUT /api/tournament-series/{{ seriesSlug }}/admins
+Content-Type: application/json
+
+[
+    { "publicId": "00000000-0000-0000-0000-000000000000" }
+]

@@ -6,6 +6,8 @@ import { by } from '../../../../shared/app/utils.js';
 import { isCheckInOpen } from '../../../../shared/app/tournamentUtils.js';
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
+import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
+import { tournamentBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { t } from 'i18next';
 import AppCountdown from '../../components/AppCountdown.vue';
@@ -53,6 +55,8 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
 <template>
     <template v-if="tournament">
         <div class="container my-3">
+            <AppBreadcrumb :items="tournamentBreadcrumb(tournament)" />
+
             <router-link
                 v-if="iAmHost()"
                 :to="{ name: 'tournament-manage', params: { slug } }"
@@ -62,7 +66,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
             </router-link>
 
             <router-link
-                :to="{ name: 'tournaments-create', hash: '#clone-' + slug }"
+                :to="{ name: 'tournaments-create', query: { clone: slug } }"
                 class="btn btn-sm btn-outline-success float-end ms-2"
             >
                 {{ $t('clone_tournament') }}

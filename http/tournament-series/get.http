@@ -1,0 +1,5 @@
+# Get a tournament series: host, admins, last podium, tournaments, next instance number.
+
+@seriesSlug=hex-monthly
+
+GET /api/tournament-series/{{ seriesSlug }}

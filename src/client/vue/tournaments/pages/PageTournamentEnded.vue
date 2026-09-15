@@ -3,14 +3,16 @@ import { format } from 'date-fns';
 import AppTournamentBracket from '../components/AppTournamentBracket.vue';
 import { useHead } from '@unhead/vue';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
+import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
+import { tournamentBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
 import { getTopPlayers } from '../../../../shared/app/tournamentUtils.js';
 import { formatDurationPrecision } from '../../../../shared/app/dateUtils.js';
 import { computed } from 'vue';
-import { Tournament, TournamentParticipant } from '../../../../shared/app/models/index.js';
-import { t } from 'i18next';
+import { Tournament } from '../../../../shared/app/models/index.js';
+import AppTournamentPodium from '../components/AppTournamentPodium.vue';
 import AppTournamentDescription from '../components/AppTournamentDescription.vue';
 import AppTournamentOrganizerAndAdmins from '../components/AppTournamentOrganizerAndAdmins.vue';
 import AppSeedingInfo from '../components/AppSeedingInfo.vue';
@@ -26,12 +28,15 @@ useHead({
     title: () => tournament.value ? tournament.value.title : 'Tournament',
 });
 
-const topPlayers = computed(() => {
+const podiumPlayers = computed(() => {
     if (!tournament.value) {
         return null;
     }
 
-    return getTopPlayers(tournament.value);
+    return getTopPlayers(tournament.value).map(participant => ({
+        pseudo: participant.player.pseudo,
+        rank: participant.rank ?? 0,
+    }));
 });
 
 const formatTournamentDuration = (tournament: Tournament): string => {
@@ -45,36 +50,15 @@ const formatTournamentDuration = (tournament: Tournament): string => {
     return formatDurationPrecision(start, end);
 };
 
-const getTournamentOrdinal = (tournamentParticipant: TournamentParticipant): string => {
-    const { rank } = tournamentParticipant;
-
-    if (!rank) {
-        return '-';
-    }
-
-    if (rank < 1 || rank > 3) {
-        return '' + rank;
-    }
-
-    return t('tournament_ordinal.' + rank);
-};
-
-const isFirst = (tournamentParticipant: TournamentParticipant): boolean => {
-    return tournamentParticipant.rank === 1;
-};
-
-const colClasses = [
-    'col-12 col-lg-6 order-lg-2',
-    'col-12 col-sm-6 col-lg-3 order-lg-1',
-    'col-12 col-sm-6 col-lg-3 order-lg-3',
-];
 </script>
 
 <template>
     <template v-if="tournament">
         <div class="container-fluid my-3">
+            <AppBreadcrumb :items="tournamentBreadcrumb(tournament)" />
+
             <router-link
-                :to="{ name: 'tournaments-create', hash: '#clone-' + slug }"
+                :to="{ name: 'tournaments-create', query: { clone: slug } }"
                 class="btn btn-sm btn-outline-success float-end ms-2"
             >
                 {{ $t('clone_tournament') }}
@@ -86,20 +70,7 @@ const colClasses = [
 
             <p class="lead">{{ $t('tournament_ended_at', { date: tournament.endedAt ? format(tournament.endedAt, 'd MMMM yyyy p') : '-' }) }}</p>
 
-            <div v-if="null !== topPlayers" class="row">
-                <div
-                    v-for="topPlayer, i of topPlayers"
-                    :class="colClasses[i]"
-                    class="mb-3"
-                >
-                    <div class="card h-100" :class="{ 'border-warning shadow-sm': isFirst(topPlayer) }">
-                        <div class="card-body text-center">
-                            <p class="mb-0" :class="{ 'text-warning': isFirst(topPlayer) }">{{ getTournamentOrdinal(topPlayer) }}</p>
-                            <p class="display-6">{{ topPlayer.player.pseudo }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <AppTournamentPodium v-if="null !== podiumPlayers" :players="podiumPlayers" />
 
             <AppTournamentFormat :tournament />
 

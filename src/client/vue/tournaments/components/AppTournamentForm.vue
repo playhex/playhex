@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, toRefs, watchEffect } from 'vue';
+import { computed, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
 import { validate, ValidationError } from 'class-validator';
 import { Tournament } from '../../../../shared/app/models/index.js';
 import { FailedProperties, toFailedProperties } from '../../../../shared/app/ValidationError.js';
 import { availableStage1Formats, seedingMethods, slugifyTournamentName } from '../../../../shared/app/tournamentUtils.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
 import AppTimeControl from '../../components/AppTimeControl.vue';
-import { apiGetTournament } from '../../../apiClient.js';
+import { apiGetTournament, apiGetTournamentSeries } from '../../../apiClient.js';
+import { TournamentSeriesDto } from '../../../../shared/app/models/TournamentSeriesDto.js';
+import { nextSeriesTitle } from '../../../../shared/app/tournamentSeriesUtils.js';
 import useToastsStore from '../../../stores/toastsStore.js';
 import { cloneTournament } from '../../../../shared/app/models/Tournament.js';
 import AppTournamentFormatImage from './AppTournamentFormatImage.vue';
@@ -22,6 +25,7 @@ const props = defineProps({
 });
 
 const { tournament } = toRefs(props);
+const route = useRoute();
 
 // Tournament slug auto/manual
 const manualSlug = ref((tournament.value.slug ?? '') !== slugifyTournamentName(tournament.value.title));
@@ -108,36 +112,88 @@ const cleanFormErrors = (): void => {
     globalError.value = null;
 };
 
-// Clone tournament
+// Clone tournament, create next instance of a series
 /**
  * Hack to mount AppTimeControl component only when tournament.timeControl is ready.
- * Either now, or if we pass #clone-..., wait for data fetch before mount,
+ * Either now, or if we pass ?clone=..., wait for data fetch before mount,
  * because AppTimeControl won't update if we modify model later.
  */
 const timeControlReady = ref(false);
 
-onMounted(async () => {
+/**
+ * Series this tournament will be an instance of, when coming from a series page.
+ */
+const series = ref<null | TournamentSeriesDto>(null);
+
+/**
+ * Stop auto-resolving the title from the series pattern once host typed his own title.
+ */
+const titleManuallyEdited = ref(false);
+
+const resolveTitleFromSeries = (): void => {
+    if (series.value === null || titleManuallyEdited.value) {
+        return;
+    }
+
+    tournament.value.title = nextSeriesTitle(
+        series.value,
+        series.value.nextTournamentNumber,
+        tournament.value.startOfficialAt ?? new Date(),
+    );
+};
+
+// {month} and {year} depend on start date, so re-resolve title when it changes
+watch(() => tournament.value.startOfficialAt, () => resolveTitleFromSeries());
+
+const LEGACY_CLONE_HASH_PREFIX = '#clone-';
+
+/**
+ * Tournament to clone was previously passed as "#clone-<slug>", it is now "?clone=<slug>".
+ * Keeps old bookmarked or shared links working. Can be dropped once these links are gone.
+ */
+const legacyCloneSlugFromHash = (): null | string => {
     const { hash } = window.location;
 
-    if (!hash.startsWith('#clone-')) {
-        timeControlReady.value = true;
-        return;
+    if (!hash.startsWith(LEGACY_CLONE_HASH_PREFIX)) {
+        return null;
     }
 
-    const sourceTournament = await apiGetTournament(hash.substring(7));
+    return hash.substring(LEGACY_CLONE_HASH_PREFIX.length) || null;
+};
 
-    if (sourceTournament === null) {
-        useToastsStore().addToast(
-            `No tournaments with slug "${hash.substring(7)}"`,
-            { level: 'warning' },
-        );
+onMounted(async () => {
+    const { query } = route;
+    const cloneSlug = typeof query.clone === 'string' ? query.clone : legacyCloneSlugFromHash();
+    const seriesSlug = typeof query.series === 'string' ? query.series : null;
 
-        timeControlReady.value = true;
-        return;
+    if (cloneSlug !== null) {
+        const sourceTournament = await apiGetTournament(cloneSlug);
+
+        if (sourceTournament === null) {
+            useToastsStore().addToast(
+                `No tournaments with slug "${cloneSlug}"`,
+                { level: 'warning' },
+            );
+        } else {
+            cloneTournament(tournament.value, sourceTournament);
+            updateStartAutomatically();
+        }
     }
 
-    cloneTournament(tournament.value, sourceTournament);
-    updateStartAutomatically();
+    if (seriesSlug !== null) {
+        series.value = await apiGetTournamentSeries(seriesSlug);
+
+        if (series.value === null) {
+            useToastsStore().addToast(
+                `No tournament series with slug "${seriesSlug}"`,
+                { level: 'warning' },
+            );
+        } else {
+            tournament.value.seriesPublicId = series.value.publicId;
+            resolveTitleFromSeries();
+        }
+    }
+
     timeControlReady.value = true;
 });
 
@@ -166,10 +222,19 @@ defineExpose({
 </script>
 
 <template>
+    <p v-if="series" class="alert alert-info py-2">
+        <i18next :translation="$t('tournament_part_of_series')">
+            <template #series>
+                <router-link :to="{ name: 'tournament-series-show', params: { slug: series.slug } }">{{ series.title }}</router-link>
+            </template>
+        </i18next>
+    </p>
+
     <div class="mb-3">
         <label for="name" class="form-label">Tournament name</label>
         <input
             v-model="tournament.title"
+            @input="titleManuallyEdited = true"
             type="text"
             class="form-control form-control-lg"
             :class="{ 'is-invalid': failedProperties.title }"

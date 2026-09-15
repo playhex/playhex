@@ -2,6 +2,8 @@
 import AppTournamentBracket from '../components/AppTournamentBracket.vue';
 import { useHead } from '@unhead/vue';
 import { useTournamentFromUrl } from '../composables/tournamentFromUrl.js';
+import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
+import { tournamentBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import AppTournamentHistorySection from '../components/AppTournamentHistorySection.vue';
 import AppTournamentStandings from '../components/AppTournamentStandings.vue';
 import AppTournamentFormat from '../components/AppTournamentFormat.vue';
@@ -27,6 +29,8 @@ useHead({
 <template>
     <template v-if="tournament">
         <div class="container-fluid my-3">
+            <AppBreadcrumb :items="tournamentBreadcrumb(tournament)" />
+
             <router-link
                 v-if="iAmHost()"
                 :to="{ name: 'tournament-manage', params: { slug } }"
@@ -36,7 +40,7 @@ useHead({
             </router-link>
 
             <router-link
-                :to="{ name: 'tournaments-create', hash: '#clone-' + slug }"
+                :to="{ name: 'tournaments-create', query: { clone: slug } }"
                 class="btn btn-sm btn-outline-success float-end ms-2"
             >
                 {{ $t('clone_tournament') }}

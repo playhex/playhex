@@ -1,7 +1,8 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
+import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
 import { isTranslatableHttpErrorPayload } from '../shared/app/TranslatableHttpError.js';
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
@@ -904,6 +905,83 @@ export const apiPutTournamentAdmins = async (tournamentSlug: string, players: Pl
             'Accept': 'application/json',
         },
         body: JSON.stringify(players.map(player => ({ publicId: player.publicId }))),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetTournamentSeriesList = async (): Promise<TournamentSeriesListItemDto[]> => {
+    const response = await fetch('/api/tournament-series', {
+        headers: { 'Accept': 'application/json' },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as TournamentSeriesListItemDto[])
+        .map(dto => plainToInstance(TournamentSeriesListItemDto, dto))
+    ;
+};
+
+export const apiGetTournamentSeries = async (slug: string): Promise<null | TournamentSeriesDto> => {
+    const response = await fetch(`/api/tournament-series/${slug}`, {
+        headers: { 'Accept': 'application/json' },
+    });
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(TournamentSeriesDto, await response.json());
+};
+
+export const apiPostTournamentSeries = async (tournamentSeries: TournamentSeries): Promise<TournamentSeries> => {
+    const response = await fetch('/api/tournament-series', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(instanceToPlain(tournamentSeries, { groups: ['tournamentSeries:create'] })),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(TournamentSeries, await response.json());
+};
+
+export const apiPatchTournamentSeries = async (publicId: string, tournamentSeries: TournamentSeries): Promise<TournamentSeries> => {
+    const response = await fetch(`/api/tournament-series/${publicId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(instanceToPlain(tournamentSeries, { groups: ['tournamentSeries:edit'] })),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(TournamentSeries, await response.json());
+};
+
+export const apiPutTournamentSeriesAdmins = async (slug: string, players: Player[]): Promise<void> => {
+    const response = await fetch(`/api/tournament-series/${slug}/admins`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(players.map(player => ({ publicId: player.publicId }))),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiDeleteTournamentSeries = async (slug: string): Promise<void> => {
+    const response = await fetch(`/api/tournament-series/${slug}`, {
+        method: 'delete',
     });
 
     await checkResponse(response);

@@ -36,6 +36,8 @@ import TournamentMatch from './TournamentMatch.js';
 import TournamentHistory from './TournamentHistory.js';
 import TournamentSubscription from './TournamentSubscription.js';
 import TournamentParticipant from './TournamentParticipant.js';
+import TournamentSeries from './TournamentSeries.js';
+import TournamentSeriesAdmin from './TournamentSeriesAdmin.js';
 
 export {
     Game,
@@ -76,6 +78,8 @@ export {
     TournamentHistory,
     TournamentSubscription,
     TournamentParticipant,
+    TournamentSeries,
+    TournamentSeriesAdmin,
 };
 
 export const entities = {
@@ -113,6 +117,8 @@ export const entities = {
     TournamentHistory,
     TournamentSubscription,
     TournamentParticipant,
+    TournamentSeries,
+    TournamentSeriesAdmin,
 };
 
 const errored = Object.keys(entities).filter(name => !entities[name as keyof typeof entities]);

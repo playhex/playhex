@@ -1,7 +1,7 @@
 import { BadRequestError, Body, Delete, Get, HttpError, JsonController, NotFoundError, Param, Patch, Post, Put, QueryParam } from 'routing-controllers';
 import { Service } from 'typedi';
-import { AuthenticatedPlayer, mustBeTournamentOrganizer } from '../middlewares.js';
-import { Player, Tournament, TournamentSubscription } from '../../../../shared/app/models/index.js';
+import { AuthenticatedPlayer, mustBeTournamentOrganizer, mustBeTournamentSeriesHostOrAdmin } from '../middlewares.js';
+import { Player, Tournament, TournamentSeries, TournamentSubscription } from '../../../../shared/app/models/index.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import TournamentStore from '../../../store/TournamentStore.js';
 import { isDuplicateError } from '../../../repositories/typeormUtils.js';
@@ -10,6 +10,7 @@ import { instanceToPlain } from '../../../../shared/app/class-transformer-custom
 import { AccountRequiredTournamentError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, PlayerIsBannedTournamentError, TooDeepResetError, TournamentError } from '../../../tournaments/TournamentError.js';
 import logger from '../../../services/logger.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
+import TournamentSeriesRepository from '../../../repositories/TournamentSeriesRepository.js';
 import { TournamentListItemDto } from '../../../../shared/app/models/TournamentListItemDto.js';
 import { TournamentBanManager } from '../../../tournaments/services/TournamentBanManager.js';
 
@@ -20,6 +21,7 @@ export default class TournamentController
     constructor(
         private tournamentStore: TournamentStore,
         private tournamentRepository: TournamentRepository,
+        private tournamentSeriesRepository: TournamentSeriesRepository,
         private playerRepository: PlayerRepository,
         private tournamentBanManager: TournamentBanManager,
     ) {}
@@ -70,8 +72,20 @@ export default class TournamentController
             transform: { groups: ['tournament:create'] },
         }) tournament: Tournament,
     ) {
+        let series: null | TournamentSeries = null;
+
+        if (tournament.seriesPublicId) {
+            series = await this.tournamentSeriesRepository.findByPublicId(tournament.seriesPublicId);
+
+            if (series === null) {
+                throw new NotFoundError(`No tournament series with public id "${tournament.seriesPublicId}"`);
+            }
+
+            mustBeTournamentSeriesHostOrAdmin(series, organizer);
+        }
+
         try {
-            return await this.tournamentStore.createTournament(tournament, organizer);
+            return await this.tournamentStore.createTournament(tournament, organizer, series);
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new DomainHttpError(409, 'tournament_slug_duplicate', 'A tournament already exists with same slug');

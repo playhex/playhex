@@ -18,6 +18,7 @@ import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import TournamentHistory from './TournamentHistory.js';
 import { defaultTimeControlTypes } from '../timeControlUtils.js';
 import TournamentAdmin from './TournamentAdmin.js';
+import TournamentSeries from './TournamentSeries.js';
 
 export type TournamentState =
     /**
@@ -115,6 +116,22 @@ export default class Tournament implements TimeControlBoardsize
     @Type(() => TournamentAdmin)
     @IsArray()
     admins: TournamentAdmin[];
+
+    /**
+     * Series this tournament is an instance of, or null.
+     * Set at creation only.
+     */
+    @ManyToOne(() => TournamentSeries, tournamentSeries => tournamentSeries.tournaments, { nullable: true })
+    @Expose()
+    series: null | Relation<TournamentSeries>;
+
+    /**
+     * Not persisted. Write-only channel used at creation to attach this tournament to a series.
+     */
+    @Expose({ groups: ['tournament:create'] })
+    @IsUUID(undefined, { groups: ['tournament:create'] })
+    @IsOptional({ groups: ['tournament:create'] })
+    seriesPublicId?: null | string;
 
     @Column({ type: String, length: 32 })
     @Expose({ groups: [GROUP_DEFAULT, 'tournament:create', 'tournament:edit'] })
@@ -357,6 +374,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.description = null;
     tournament.state = 'created';
     tournament.publicId = uuidv4();
+    tournament.series = null;
     tournament.stage1Format = 'single-elimination';
     tournament.stage1Rounds = null;
     tournament.stage2Format = null;
@@ -415,6 +433,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.publicId = uuidv4();
     tournament.title = input.title;
     tournament.description = input.description;
+    tournament.series = null;
     tournament.slug = input.slug ? slugifyTournamentName(input.slug) : slugifyTournamentName(input.title);
     tournament.admins = [];
     tournament.stage1Format = input.stage1Format;

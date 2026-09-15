@@ -1,0 +1,3 @@
+# Get all tournament series.
+
+GET /api/tournament-series
