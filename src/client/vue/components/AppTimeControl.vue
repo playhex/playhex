@@ -11,6 +11,18 @@ import useAuthStore from '../../stores/authStore.js';
 import { storeToRefs } from 'pinia';
 import EditFavoriteTimeControlsOverlay from './overlay/EditFavoriteTimeControlsOverlay.vue';
 
+const props = defineProps({
+    /**
+     * Keep the time control passed through v-model instead of pre-selecting
+     * player last used one. Used when editing or cloning an existing
+     * time control, which must be displayed as is.
+     */
+    keepInitialValue: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const timeControlType = defineModel<TimeControlType>({
     required: true,
 });
@@ -62,6 +74,15 @@ const setCappedFromTimeControl = (timeControlType: TimeControlType): void => {
 
 setCappedFromTimeControl(timeControlType.value);
 
+// Show the cadency tab matching the time control we must keep,
+// before initializing sliders steps, which depend on current cadency.
+if (props.keepInitialValue) {
+    currentLobby.value = timeControlType.value.options.initialTime < DAY_MS
+        ? 'live'
+        : 'correspondence'
+    ;
+}
+
 const initialTimeStep = ref(getInitialTimeStep(timeControlType.value, currentInitialTimeSteps.value));
 const secondaryTimeStep = ref(getSecondaryTimeStep(timeControlType.value, currentSecondaryTimeSteps.value));
 
@@ -85,7 +106,9 @@ const changeCadence = (newCadence: TimeControlCadency): void => {
 
 // On mount: pre-select last custom if any, otherwise ensure TC matches current cadency
 const initialLast = currentLobby.value === 'live' ? lastCustomLive.value : lastCustomCorrespondence.value;
-if (initialLast !== null) {
+if (props.keepInitialValue) {
+    // keep time control as provided, cadency has already been set from it
+} else if (initialLast !== null) {
     selectTimeControl(initialLast.timeControlType);
 } else {
     const currentIsLive = timeControlType.value.options.initialTime < DAY_MS;

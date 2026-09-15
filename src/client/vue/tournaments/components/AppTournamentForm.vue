@@ -121,6 +121,13 @@ const cleanFormErrors = (): void => {
 const timeControlReady = ref(false);
 
 /**
+ * Whether tournament time control must be displayed as is,
+ * instead of pre-selecting player last used time control:
+ * when editing an existing tournament, or cloning one.
+ */
+const keepTimeControl = ref(undefined !== tournament.value.publicId);
+
+/**
  * Series this tournament will be an instance of, when coming from a series page.
  */
 const series = ref<null | TournamentSeriesDto>(null);
@@ -177,6 +184,7 @@ onMounted(async () => {
         } else {
             cloneTournament(tournament.value, sourceTournament);
             updateStartAutomatically();
+            keepTimeControl.value = true;
         }
     }
 
@@ -388,7 +396,7 @@ defineExpose({
 
     <div class="mb-3">
         <label class="form-label">Time control</label>
-        <AppTimeControl v-if="timeControlReady" v-model="tournament.timeControlType" />
+        <AppTimeControl v-if="timeControlReady" v-model="tournament.timeControlType" :keepInitialValue="keepTimeControl" />
     </div>
 
     <div class="mb-3">

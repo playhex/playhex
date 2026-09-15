@@ -202,8 +202,9 @@ export class TournamentSeriesDto
             rank: participant.rank ?? 0,
         }));
 
-        // Clone the most recent tournament, whatever its state, to reuse latest parameters
-        dto.lastTournamentSlug = sorted[0]?.slug ?? null;
+        // Clone the most recent tournament to reuse latest parameters,
+        // whatever its state, but skip canceled ones which are not relevant.
+        dto.lastTournamentSlug = sorted.find(tournament => tournament.state !== 'canceled')?.slug ?? null;
         dto.tournaments = sorted.map(tournament => TournamentListItemDto.fromTournament(tournament));
 
         return dto;
