@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { FindOptionsRelations, In, Repository } from 'typeorm';
+import { FindOptionsRelations, In, Not, Repository } from 'typeorm';
 import { Tournament } from '../../shared/app/models/index.js';
 
 /**
@@ -135,6 +135,51 @@ export default class TournamentRepository
                 startOfficialAt: 'desc',
             },
             relationLoadStrategy: 'query',
+        });
+    }
+
+    /**
+     * Most recent tournament of a series to use as a model for the next instance,
+     * whatever its state, but skipping canceled ones which are not relevant.
+     * Same criteria as TournamentSeriesDto.lastTournamentSlug.
+     *
+     * Returns null when the series has no instance to clone yet.
+     */
+    async findLastToCloneBySeries(tournamentSeriesId: number): Promise<null | Tournament>
+    {
+        return await this.tournamentRepository.findOne({
+            relations: {
+                organizer: true,
+                admins: {
+                    player: true,
+                },
+            },
+            where: {
+                series: { id: tournamentSeriesId },
+                state: Not<Tournament['state']>('canceled'),
+            },
+            order: {
+                startOfficialAt: 'desc',
+            },
+            relationLoadStrategy: 'query',
+        });
+    }
+
+    /**
+     * Whether a tournament of this series, not canceled, already starts at this exact date.
+     *
+     * Makes auto creation idempotent: an instance is created only once,
+     * and not at all if organizer already created it manually for this date.
+     *
+     * Canceled tournaments are ignored, so a date where organizer canceled an instance
+     * is filled again, like any date having no instance yet.
+     */
+    async existsBySeriesAndStartOfficialAt(tournamentSeriesId: number, startOfficialAt: Date): Promise<boolean>
+    {
+        return await this.tournamentRepository.existsBy({
+            series: { id: tournamentSeriesId },
+            startOfficialAt,
+            state: Not<Tournament['state']>('canceled'),
         });
     }
 

@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { FindOptionsRelations, Not, Repository } from 'typeorm';
+import { FindOptionsRelations, IsNull, Not, Repository } from 'typeorm';
 import { Tournament, TournamentSeries } from '../../shared/app/models/index.js';
 
 const relations: FindOptionsRelations<TournamentSeries> = {
@@ -50,6 +50,21 @@ export default class TournamentSeriesRepository
         return await this.tournamentSeriesRepository.findOne({
             relations,
             where: { publicId },
+            relationLoadStrategy: 'query',
+        });
+    }
+
+    /**
+     * All series which create their next instances automatically.
+     */
+    async findAutoCreateEnabled(): Promise<TournamentSeries[]>
+    {
+        return await this.tournamentSeriesRepository.find({
+            relations,
+            where: {
+                autoCreate: true,
+                autoCreateSchedule: Not(IsNull()),
+            },
             relationLoadStrategy: 'query',
         });
     }

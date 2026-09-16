@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, type Relation } from 'typeorm';
-import { IsArray, IsDate, IsOptional, IsString, IsUUID, Length, Validate } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsInt, IsObject, IsOptional, IsString, IsUUID, Length, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { ColumnUUID } from '../custom-typeorm.js';
@@ -9,8 +9,16 @@ import { slugifyTournamentName } from '../tournamentUtils.js';
 import Player from './Player.js';
 import Tournament from './Tournament.js';
 import TournamentSeriesAdmin from './TournamentSeriesAdmin.js';
+import { TournamentSeriesSchedule } from './TournamentSeriesSchedule.js';
 
 const editGroups = [GROUP_DEFAULT, 'tournamentSeries:create', 'tournamentSeries:edit'];
+
+const autoCreateGroups = [GROUP_DEFAULT, 'tournamentSeries:autoCreate'];
+
+/**
+ * Highest value allowed for autoCreateOffsetSeconds: 1 year.
+ */
+export const AUTO_CREATE_OFFSET_SECONDS_MAX = 365 * 86400;
 
 /**
  * A suite of recurring tournaments, e.g "Hex Monthly".
@@ -100,6 +108,39 @@ export default class TournamentSeries
     createdAt: Date;
 
     /**
+     * Whether next instances of this series are created automatically,
+     * from autoCreateSchedule, by cloning the last instance.
+     */
+    @Column({ default: false })
+    @Expose({ groups: autoCreateGroups })
+    @IsBoolean({ groups: autoCreateGroups })
+    autoCreate: boolean;
+
+    /**
+     * When instances of this series start, in UTC.
+     * Null while auto create has never been configured.
+     */
+    @Column({ type: 'json', nullable: true })
+    @Expose({ groups: autoCreateGroups })
+    @Type(() => TournamentSeriesSchedule)
+    @IsObject({ groups: autoCreateGroups })
+    @ValidateNested({ groups: autoCreateGroups })
+    @IsOptional({ groups: autoCreateGroups })
+    autoCreateSchedule: null | TournamentSeriesSchedule;
+
+    /**
+     * How long before its start date an instance is automatically created.
+     * Organizer inputs it in days, e.g 40 days before.
+     */
+    @Column({ type: Number, nullable: true })
+    @Expose({ groups: autoCreateGroups })
+    @IsInt({ groups: autoCreateGroups })
+    @Min(0, { groups: autoCreateGroups })
+    @Max(AUTO_CREATE_OFFSET_SECONDS_MAX, { groups: autoCreateGroups })
+    @IsOptional({ groups: autoCreateGroups })
+    autoCreateOffsetSeconds: null | number;
+
+    /**
      * Same as Tournament.featuredFromInSeconds, applied to tournaments created in this series.
      * Set by admin only, never exposed through api.
      * Defaults to null: do not force any value on created tournaments.
@@ -136,6 +177,9 @@ export const createTournamentSeriesFromCreateInput = (input: TournamentSeries): 
     tournamentSeries.titlePattern = input.titlePattern || null;
     tournamentSeries.admins = [];
     tournamentSeries.createdAt = new Date();
+    tournamentSeries.autoCreate = false;
+    tournamentSeries.autoCreateSchedule = null;
+    tournamentSeries.autoCreateOffsetSeconds = null;
     tournamentSeries.featuredFromInSeconds = null;
 
     return tournamentSeries;

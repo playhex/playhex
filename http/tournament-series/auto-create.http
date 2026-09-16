@@ -1,0 +1,36 @@
+# Enable and configure automatic creation of the next instances of a series.
+# Requires authentication (must be host or admin).
+# Next instances are created by cloning the last non canceled one,
+# so the series must already have a tournament.
+#
+# Schedule is expressed in UTC. Examples:
+#
+#   every tuesday and thursday at 17:00:
+#       "frequency": "weekly", "weekdays": [2, 4], "hour": 17
+#
+#   the 1st of every month at noon:
+#       "frequency": "monthly", "monthlyMode": "dayOfMonth", "dayOfMonth": 1, "hour": 12
+#
+#   the 3rd saturday of every month at 18:00:
+#       "frequency": "monthly", "monthlyMode": "nthWeekday", "nth": 3, "weekday": 6, "hour": 18
+#       ("nth": -1 for the last one of the month)
+
+@seriesSlug=hex-monthly
+
+PUT /api/tournament-series/{{ seriesSlug }}/auto-create
+Content-Type: application/json
+
+{
+    "autoCreate": true,
+    "autoCreateOffsetSeconds": 864000,
+    "autoCreateSchedule": {
+        "frequency": "monthly",
+        "weekdays": [1],
+        "monthlyMode": "nthWeekday",
+        "dayOfMonth": 1,
+        "nth": 3,
+        "weekday": 6,
+        "hour": 18,
+        "minute": 0
+    }
+}

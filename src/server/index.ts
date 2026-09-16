@@ -14,6 +14,7 @@ import monitorConnectedSockets from './services/monitorConnectedSockets.js';
 import { initTimeControl } from './services/initTimeControl.js';
 import TournamentStore from './store/TournamentStore.js';
 import { initAutoCancelStaleGames } from './services/auto-cancel-stale-games/init.js';
+import { initTournamentSeriesAutoCreate } from './services/tournament-series-auto-create/init.js';
 import { registerCors } from './controllers/http/misc/cors.js';
 
 logger.info(`*******************************************`);
@@ -30,6 +31,7 @@ registerCors(app);
 initTimeControl();
 Container.get(TournamentStore);
 initAutoCancelStaleGames();
+initTournamentSeriesAutoCreate();
 
 const server = http.createServer(app);
 const io = new HexServer(server, {

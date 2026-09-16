@@ -116,7 +116,26 @@ const createNextInstanceRoute = computed(() => {
     return { name: 'tournaments-create', query };
 });
 
+const autoCreatePanelRoute = computed(() => ({
+    name: 'tournament-series-edit',
+    params: { slug: tournamentSeries.value ? tournamentSeries.value.slug : '' },
+    query: { panel: 'auto-create' },
+}));
+
 const formatDate = (date: Date): string => intlFormat(date, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+}, {
+    locale: autoLocale(),
+});
+
+/**
+ * Start date of an upcoming tournament, with the day of week,
+ * useful to know when a recurring tournament is played.
+ */
+const formatStartDate = (date: Date): string => intlFormat(date, {
+    weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -201,6 +220,14 @@ const formatDate = (date: Date): string => intlFormat(date, {
                             >
                                 <IconPlus /> {{ $t('tournament_series_page.create_next_instance') }}
                             </router-link>
+
+                            <router-link
+                                v-if="!nextTournament && iAmHost() && !tournamentSeries.autoCreate"
+                                :to="autoCreatePanelRoute"
+                                class="btn btn-sm btn-outline-secondary mt-2"
+                            >
+                                <IconCalendarEvent /> {{ $t('tournament_series_page.configure_auto_create') }}
+                            </router-link>
                         </div>
                     </div>
 
@@ -248,6 +275,13 @@ const formatDate = (date: Date): string => intlFormat(date, {
                             <p class="card-text"><AppMySubscriptionStatus :tournament="nextTournamentFull" full /></p>
                         </div>
                     </div>
+
+                    <!-- Auto create, only shown to host and admins who can change it -->
+                    <p v-if="iAmHost() && tournamentSeries.autoCreate" class="text-body-secondary"><small>
+                        <IconCalendarEvent class="me-1" />
+                        {{ $t('tournament_series_page.auto_create_enabled') }}
+                        <router-link :to="autoCreatePanelRoute">{{ $t('tournament_series_page.auto_create_manage') }}</router-link>
+                    </small></p>
                 </div>
 
                 <!-- Last ended tournament and its podium -->
@@ -283,7 +317,7 @@ const formatDate = (date: Date): string => intlFormat(date, {
                         <h3 class="h5 mb-0">{{ tournament.title }}</h3>
                         <span>{{ $t('n_participants', { count: tournament.participantsCount }) }}</span>
                     </div>
-                    <small>{{ formatDate(new Date(tournament.startOfficialAt)) }}</small>
+                    <small>{{ formatStartDate(new Date(tournament.startOfficialAt)) }}</small>
                 </router-link>
             </div>
 

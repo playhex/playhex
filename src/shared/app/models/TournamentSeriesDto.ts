@@ -4,6 +4,7 @@ import { getTopPlayers } from '../tournamentUtils.js';
 import { TournamentListItemDto } from './TournamentListItemDto.js';
 import type Tournament from './Tournament.js';
 import type TournamentSeries from './TournamentSeries.js';
+import type { TournamentSeriesSchedule } from './TournamentSeriesSchedule.js';
 
 export class TournamentSeriesPlayerDto
 {
@@ -160,6 +161,24 @@ export class TournamentSeriesDto
     nextTournamentNumber: number;
 
     /**
+     * Whether next instances of this series are created automatically.
+     */
+    @Expose()
+    autoCreate: boolean;
+
+    /**
+     * When instances of this series start, in UTC. Null while never configured.
+     */
+    @Expose()
+    autoCreateSchedule: null | TournamentSeriesSchedule;
+
+    /**
+     * How long before its start date an instance is automatically created.
+     */
+    @Expose()
+    autoCreateOffsetSeconds: null | number;
+
+    /**
      * Top 3 of the last ended tournament of this series.
      */
     @Expose()
@@ -192,6 +211,9 @@ export class TournamentSeriesDto
         dto.host = toPlayerDto(tournamentSeries.host);
         dto.admins = seriesAdmins(tournamentSeries);
         dto.nextTournamentNumber = nextTournamentNumber;
+        dto.autoCreate = tournamentSeries.autoCreate;
+        dto.autoCreateSchedule = tournamentSeries.autoCreateSchedule;
+        dto.autoCreateOffsetSeconds = tournamentSeries.autoCreateOffsetSeconds;
 
         const sorted = sortTournaments(tournaments);
         const lastEnded = sorted.find(tournament => tournament.state === 'ended') ?? null;

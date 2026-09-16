@@ -123,6 +123,7 @@
     "tournament_part_of_series": "Ce tournoi sera une instance de {series}.",
     "tournament_series_slug_duplicate": "Une série de tournois existe déjà avec le même nom d’url.",
     "tournament_series_has_tournaments": "Cette série ne peut pas être supprimée car elle contient des tournois.",
+    "tournament_series_no_tournament_to_clone": "Cette série n’a aucun tournoi à utiliser comme modèle pour la prochaine instance. Créez-en un premier à la main.",
     "breadcrumb": {
         "home": "Accueil",
         "series": "Séries"
@@ -149,7 +150,10 @@
         "create_next_instance": "Créer la prochaine instance",
         "edit": "Modifier la série",
         "no_tournament_yet": "Aucun tournoi n’a encore été joué dans cette série.",
-        "not_found": "Série de tournois introuvable."
+        "not_found": "Série de tournois introuvable.",
+        "configure_auto_create": "Les créer automatiquement",
+        "auto_create_enabled": "Les prochaines instances de cette série sont créées automatiquement.",
+        "auto_create_manage": "Modifier ou arrêter"
     },
     "tournament_series_form": {
         "create_title": "Créer une série de tournois",
@@ -176,6 +180,7 @@
         "panel": {
             "edit": "Modifier la série",
             "admins": "Administrateurs",
+            "auto-create": "Création automatique",
             "delete": "Supprimer la série"
         },
         "add_admins": "Ajouter des administrateurs",
@@ -188,6 +193,41 @@
         "delete_help": "Supprimer définitivement cette série. Possible uniquement si elle ne contient aucun tournoi.",
         "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette série de tournois ?",
         "deleted": "Série de tournois supprimée."
+    },
+    "tournament_series_auto_create": {
+        "help": "Créer automatiquement les prochaines instances de cette série, en clonant la dernière et en la nommant d’après le modèle de nom des instances.",
+        "enable": "Créer automatiquement les prochaines instances",
+        "submit": "Enregistrer la création automatique",
+        "updated": "Paramètres de création automatique enregistrés.",
+        "update_error": "Erreur lors de l’enregistrement des paramètres de création automatique",
+        "frequency": "À quelle fréquence",
+        "frequency_weekly": "Chaque semaine",
+        "frequency_monthly": "Chaque mois",
+        "weekdays": "Jours de la semaine",
+        "monthly_mode": "Quel jour du mois",
+        "monthly_mode_dayOfMonth": "Un numéro de jour",
+        "monthly_mode_nthWeekday": "Un jour de la semaine",
+        "day_of_month": "Jour du mois",
+        "day_of_month_help": "Les mois trop courts pour ce jour sont ignorés, par exemple le 31 ignore février.",
+        "nth": "Lequel",
+        "nth_1": "Premier",
+        "nth_2": "Deuxième",
+        "nth_3": "Troisième",
+        "nth_4": "Quatrième",
+        "nth_last": "Dernier",
+        "weekday": "Jour de la semaine",
+        "start_time": "Heure de début",
+        "start_time_utc": "Soit {{ time }} UTC. Les tournois démarrent toujours à cette heure UTC, elle décale donc d’une heure pour vous aux changements d’heure.",
+        "utc_day_warning": "Cette heure tombe un autre jour en UTC : le jour sélectionné ci-dessus est celui en UTC. Vérifiez la simulation ci-dessous.",
+        "offset_days": "Créer combien de jours avant",
+        "offset_days_help": "Nombre de jours entre la création du tournoi et sa date de début, pour que les joueurs puissent s’inscrire à l’avance.",
+        "simulation": "Prochaines instances",
+        "simulation_help": "Simulation des prochaines instances qui seront créées avec ces paramètres.",
+        "simulation_disabled": "La création automatique est désactivée : ces instances ne seront pas créées. Les paramètres ci-dessus sont conservés pour quand vous la réactiverez.",
+        "simulation_empty": "Aucune instance ne peut être créée avec ces paramètres. Sélectionnez au moins un jour.",
+        "simulation_title": "Nom",
+        "simulation_starts_at": "Démarre le",
+        "simulation_created_at": "Créé après le"
     },
     "manage_tournament": "Gérer",
     "clone_tournament": "Cloner",

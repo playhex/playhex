@@ -16,6 +16,7 @@ type DomainHttpErrorTypes =
     | 'tournament_not_enough_participants_to_start'
     | 'tournament_series_slug_duplicate'
     | 'tournament_series_has_tournaments'
+    | 'tournament_series_no_tournament_to_clone'
 ;
 
 type DomainHttpErrorType = {

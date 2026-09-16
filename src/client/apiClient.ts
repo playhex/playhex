@@ -979,6 +979,19 @@ export const apiPutTournamentSeriesAdmins = async (slug: string, players: Player
     await checkResponse(response);
 };
 
+export const apiPutTournamentSeriesAutoCreate = async (slug: string, tournamentSeries: TournamentSeries): Promise<void> => {
+    const response = await fetch(`/api/tournament-series/${slug}/auto-create`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(instanceToPlain(tournamentSeries, { groups: ['tournamentSeries:autoCreate'] })),
+    });
+
+    await checkResponse(response);
+};
+
 export const apiDeleteTournamentSeries = async (slug: string): Promise<void> => {
     const response = await fetch(`/api/tournament-series/${slug}`, {
         method: 'delete',

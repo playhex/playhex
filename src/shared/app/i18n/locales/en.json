@@ -325,6 +325,7 @@
     "tournament_part_of_series": "This tournament will be an instance of {series}.",
     "tournament_series_slug_duplicate": "A tournament series already exists with the same url name.",
     "tournament_series_has_tournaments": "This series cannot be deleted because it has tournaments.",
+    "tournament_series_no_tournament_to_clone": "This series has no tournament to use as a model for the next instance. Create a first one manually.",
     "breadcrumb": {
         "home": "Home",
         "series": "Series"
@@ -350,7 +351,10 @@
         "create_next_instance": "Create next instance",
         "edit": "Edit series",
         "no_tournament_yet": "No tournament has been played in this series yet.",
-        "not_found": "Tournament series not found."
+        "not_found": "Tournament series not found.",
+        "configure_auto_create": "Create them automatically",
+        "auto_create_enabled": "Next instances of this series are created automatically.",
+        "auto_create_manage": "Change or stop"
     },
     "tournament_series_form": {
         "create_title": "Create a tournament series",
@@ -377,6 +381,7 @@
         "panel": {
             "edit": "Edit series",
             "admins": "Admins",
+            "auto-create": "Auto create",
             "delete": "Delete series"
         },
         "add_admins": "Add admins",
@@ -389,6 +394,41 @@
         "delete_help": "Permanently delete this series. Only possible when it has no tournament.",
         "delete_confirm": "Are you sure you want to delete this tournament series?",
         "deleted": "Tournament series deleted."
+    },
+    "tournament_series_auto_create": {
+        "help": "Create next instances of this series automatically, by cloning the last one and naming it from the instance name pattern.",
+        "enable": "Auto create next instances",
+        "submit": "Save auto create",
+        "updated": "Auto create settings saved.",
+        "update_error": "Error while saving auto create settings",
+        "frequency": "How often",
+        "frequency_weekly": "Every week",
+        "frequency_monthly": "Every month",
+        "weekdays": "Days of week",
+        "monthly_mode": "Which day of the month",
+        "monthly_mode_dayOfMonth": "A day number",
+        "monthly_mode_nthWeekday": "A day of week",
+        "day_of_month": "Day of month",
+        "day_of_month_help": "Months too short for this day are skipped, e.g the 31th skips february.",
+        "nth": "Which one",
+        "nth_1": "First",
+        "nth_2": "Second",
+        "nth_3": "Third",
+        "nth_4": "Fourth",
+        "nth_last": "Last",
+        "weekday": "Day of week",
+        "start_time": "Start time",
+        "start_time_utc": "That is {{ time }} UTC. Tournaments always start at this UTC time, so it moves by an hour for you on daylight saving time changes.",
+        "utc_day_warning": "This time is on another day in UTC: the day selected above is the UTC one. Check the simulation below.",
+        "offset_days": "Create how many days before",
+        "offset_days_help": "Number of days between the tournament creation and its start date, so players can subscribe in advance.",
+        "simulation": "Next instances",
+        "simulation_help": "Simulation of the next instances that will be created with these settings.",
+        "simulation_disabled": "Automatic creation is currently disabled: these instances will not be created. Settings below are kept for when you enable it back.",
+        "simulation_empty": "No instance can be created with these settings. Select at least one day.",
+        "simulation_title": "Name",
+        "simulation_starts_at": "Starts at",
+        "simulation_created_at": "Created after"
     },
     "manage_tournament": "Manage",
     "clone_tournament": "Clone",

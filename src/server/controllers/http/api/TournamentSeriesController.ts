@@ -12,6 +12,7 @@ import TournamentSeriesRepository from '../../../repositories/TournamentSeriesRe
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import TournamentStore from '../../../store/TournamentStore.js';
+import { TournamentSeriesAutoCreate } from '../../../services/tournament-series-auto-create/TournamentSeriesAutoCreate.js';
 import TournamentSeriesAdmin from '../../../../shared/app/models/TournamentSeriesAdmin.js';
 
 @JsonController()
@@ -23,6 +24,7 @@ export default class TournamentSeriesController
         private tournamentRepository: TournamentRepository,
         private playerRepository: PlayerRepository,
         private tournamentStore: TournamentStore,
+        private tournamentSeriesAutoCreate: TournamentSeriesAutoCreate,
     ) {}
 
     @Get('/api/tournament-series')
@@ -143,6 +145,39 @@ export default class TournamentSeriesController
         });
 
         await this.tournamentSeriesRepository.save(tournamentSeries);
+    }
+
+    /**
+     * Enable/disable and configure automatic creation of next instances.
+     */
+    @Put('/api/tournament-series/:slug/auto-create')
+    async putTournamentSeriesAutoCreate(
+        @AuthenticatedPlayer() player: Player,
+        @Param('slug') slug: string,
+        @Body({
+            validate: { groups: ['tournamentSeries:autoCreate'] },
+            transform: { groups: ['tournamentSeries:autoCreate'] },
+        }) input: TournamentSeries,
+    ) {
+        const tournamentSeries = await this.mustFindBySlug(slug);
+
+        mustBeTournamentSeriesHostOrAdmin(tournamentSeries, player);
+
+        // Next instance is created by cloning the last one: there must be one
+        if (input.autoCreate && await this.tournamentRepository.findLastToCloneBySeries(tournamentSeries.id) === null) {
+            throw new DomainHttpError(409, 'tournament_series_no_tournament_to_clone', 'Cannot auto create instances of a series having no tournament to clone');
+        }
+
+        tournamentSeries.autoCreate = input.autoCreate;
+        tournamentSeries.autoCreateSchedule = input.autoCreateSchedule;
+        tournamentSeries.autoCreateOffsetSeconds = input.autoCreateOffsetSeconds;
+
+        await this.tournamentSeriesRepository.save(tournamentSeries);
+
+        // Apply the new schedule right away instead of waiting for the next check
+        if (tournamentSeries.autoCreate) {
+            await this.tournamentSeriesAutoCreate.checkSeries(tournamentSeries);
+        }
     }
 
     @Delete('/api/tournament-series/:slug')

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, useTemplateRef, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import { defineOverlay } from '@overlastic/vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
-import { apiDeleteTournamentSeries, apiPatchTournamentSeries, apiPutTournamentSeriesAdmins } from '../../../apiClient.js';
+import { apiDeleteTournamentSeries, apiPatchTournamentSeries, apiPutTournamentSeriesAdmins, apiPutTournamentSeriesAutoCreate } from '../../../apiClient.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import TournamentSeries from '../../../../shared/app/models/TournamentSeries.js';
 import Player from '../../../../shared/app/models/Player.js';
 import AppTournamentSeriesForm from '../components/AppTournamentSeriesForm.vue';
+import AppTournamentSeriesAutoCreateForm from '../components/AppTournamentSeriesAutoCreateForm.vue';
 import AppPlayerSelectMultiple from '../components/AppPlayerSelectMultiple.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import ConfirmationOverlay from '../../components/overlay/ConfirmationOverlay.vue';
@@ -29,18 +30,38 @@ useHead({
 
 const router = useRouter();
 const seriesForm = useTemplateRef<ComponentExposed<typeof AppTournamentSeriesForm>>('seriesForm');
+const autoCreateForm = useTemplateRef<ComponentExposed<typeof AppTournamentSeriesAutoCreateForm>>('autoCreateForm');
 const confirmationOverlay = defineOverlay(ConfirmationOverlay);
 
-type Panel = 'edit' | 'admins' | 'delete';
+type Panel = 'edit' | 'admins' | 'auto-create' | 'delete';
 
-const panels: Panel[] = ['edit', 'admins', 'delete'];
-const currentPanel = ref<Panel>('edit');
+const panels: Panel[] = ['edit', 'admins', 'auto-create', 'delete'];
+
+const isPanel = (value: unknown): value is Panel => panels.includes(value as Panel);
+
+/**
+ * Panel can be opened directly from url, e.g "?panel=auto-create",
+ * to link to it from the series page.
+ */
+const route = useRoute();
+const currentPanel = ref<Panel>(isPanel(route.query.panel) ? route.query.panel : 'edit');
+
+const openPanel = (panel: Panel): void => {
+    currentPanel.value = panel;
+
+    void router.replace({ query: { ...route.query, panel } });
+};
 
 /**
  * Editable copy, filled once series is loaded.
  */
 const editedSeries = ref<null | TournamentSeries>(null);
 const selectedAdmins = ref<Player[]>([]);
+
+/**
+ * Loaded series, or null while loading or not found.
+ */
+const seriesDto = computed(() => tournamentSeries.value || null);
 
 watch(tournamentSeries, dto => {
     if (!dto) {
@@ -54,6 +75,9 @@ watch(tournamentSeries, dto => {
     series.slug = dto.slug;
     series.description = dto.description;
     series.titlePattern = dto.titlePattern ?? '';
+    series.autoCreate = dto.autoCreate;
+    series.autoCreateSchedule = dto.autoCreateSchedule;
+    series.autoCreateOffsetSeconds = dto.autoCreateOffsetSeconds;
 
     editedSeries.value = series;
 
@@ -108,6 +132,33 @@ const updateAdmins = async (): Promise<void> => {
     }
 
     useToastsStore().addToast(t('tournament_series_manage_page.admins_updated'), { level: 'success' });
+};
+
+const updateAutoCreate = async (): Promise<void> => {
+    if (!editedSeries.value) {
+        return;
+    }
+
+    // Schedule is validated even while auto create is disabled: it is persisted anyway,
+    // so it stays ready to be enabled back later.
+    if (!await autoCreateForm.value?.validateAutoCreate()) {
+        return;
+    }
+
+    try {
+        await apiPutTournamentSeriesAutoCreate(slug, editedSeries.value);
+    } catch (e) {
+        if (e instanceof DomainHttpError && e.type === 'tournament_series_no_tournament_to_clone') {
+            useToastsStore().addToast(t('tournament_series_no_tournament_to_clone'), { level: 'danger' });
+            return;
+        }
+
+        useToastsStore().addToast(t('tournament_series_auto_create.update_error'), { level: 'danger' });
+
+        throw e;
+    }
+
+    useToastsStore().addToast(t('tournament_series_auto_create.updated'), { level: 'success' });
 };
 
 const deleteTournamentSeries = async (): Promise<void> => {
@@ -168,7 +219,7 @@ const deleteTournamentSeries = async (): Promise<void> => {
                         type="button"
                         class="list-group-item list-group-item-action"
                         :class="{ active: currentPanel === panel }"
-                        @click="currentPanel = panel"
+                        @click="openPanel(panel)"
                     >
                         {{ $t(`tournament_series_manage_page.panel.${panel}`) }}
                     </button>
@@ -204,6 +255,44 @@ const deleteTournamentSeries = async (): Promise<void> => {
                     <p>{{ $t('tournament_series_admins_help') }}</p>
 
                     <button @click="updateAdmins" class="btn btn-success">{{ $t('tournament_series_manage_page.update_admins') }}</button>
+                </section>
+
+                <!-- Auto create -->
+                <section v-if="'auto-create' === currentPanel">
+                    <h2>{{ $t('tournament_series_manage_page.panel.auto-create') }}</h2>
+
+                    <p>{{ $t('tournament_series_auto_create.help') }}</p>
+
+                    <form @submit.prevent="updateAutoCreate">
+                        <div class="form-check form-switch mb-3">
+                            <input
+                                v-model="editedSeries.autoCreate"
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="auto-create-enabled"
+                                :disabled="!seriesDto?.lastTournamentSlug"
+                            >
+                            <label class="form-check-label" for="auto-create-enabled">
+                                {{ $t('tournament_series_auto_create.enable') }}
+                            </label>
+                        </div>
+
+                        <p v-if="!seriesDto?.lastTournamentSlug" class="text-warning">
+                            {{ $t('tournament_series_no_tournament_to_clone') }}
+                        </p>
+
+                        <!-- Always visible: settings can be kept while automation is disabled -->
+                        <AppTournamentSeriesAutoCreateForm
+                            :tournamentSeries="editedSeries"
+                            :nextTournamentNumber="seriesDto?.nextTournamentNumber ?? 1"
+                            ref="autoCreateForm"
+                        />
+
+                        <button type="submit" class="btn btn-success">
+                            {{ $t('tournament_series_auto_create.submit') }}
+                        </button>
+                    </form>
                 </section>
 
                 <!-- Delete -->
