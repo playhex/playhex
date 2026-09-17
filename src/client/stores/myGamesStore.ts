@@ -92,17 +92,21 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     };
 
     /**
-     * Playing games first (non-bot before bot), then pending challenges addressed to me,
-     * so an incoming challenge appears after my playing games but before bot games.
+     * Games where it's my turn first, then pending challenges addressed to me,
+     * then games where I'm waiting for opponent, then bot games.
+     * So an incoming challenge is visible before my pending games,
+     * but still after games where I have to play.
      */
     const mySortedGames = computed((): CurrentGame[] => {
         const allGames = Object.values(myGames.value);
 
         const playingNonBot = allGames.filter(myGame => isPlaying(myGame) && !isBotGame(myGame.game)).sort(byMostUrgentFirst);
+        const myTurn = playingNonBot.filter(myGame => myGame.isMyTurn);
+        const opponentTurn = playingNonBot.filter(myGame => !myGame.isMyTurn);
         const incomingChallenges = allGames.filter(isIncomingChallenge);
         const playingBot = allGames.filter(myGame => isPlaying(myGame) && isBotGame(myGame.game)).sort(byMostUrgentFirst);
 
-        return [...playingNonBot, ...incomingChallenges, ...playingBot];
+        return [...myTurn, ...incomingChallenges, ...opponentTurn, ...playingBot];
     });
 
     /**
