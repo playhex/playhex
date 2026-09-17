@@ -2,12 +2,13 @@
 import { computed, ref, watchEffect } from 'vue';
 import { useHead, useSeoMeta } from '@unhead/vue';
 import { format } from 'date-fns';
-import { t } from 'i18next';
+import i18next, { t } from 'i18next';
 import AppRhombus from '../components/AppRhombus.vue';
 import {
     IconAlarmFill,
     IconAspectRatio,
     IconClockHistory,
+    IconEmojiDizzyFill,
     IconFlag,
     IconGraphUp,
     IconHexagonFill,
@@ -22,6 +23,7 @@ import {
     IconRobot,
     IconSignpostSplit,
     IconStarFill,
+    IconStopwatch,
     IconTrophy,
     IconTrophyFill,
 } from '../icons.js';
@@ -39,6 +41,7 @@ type CategoryStats = {
     outcomeCounts: Record<string, number>;
     swapRuleEnabledCount: number;
     swapCount: number;
+    livePlayTimeMs: number;
     totalStonesPlaced: number;
     stonesPlacedByHuman: number;
     stonesPlacedByBot?: number;
@@ -58,6 +61,17 @@ type CommonStats = {
     boardOrientationCounts: { flat: number, diamond: number };
     shadingPatternCounts: Record<string, number>;
     ratingDistribution: Record<string, number>;
+    blunders: {
+        pvpOnly: BlundersStats;
+        allGames: BlundersStats;
+    };
+};
+
+type BlundersStats = {
+    sampleMovesCount: number;
+    sampleBlundersCount: number;
+    totalMovesCount: number;
+    estimatedBlundersCount: number;
 };
 
 const RATING_MAX_DEVIATION = 250;
@@ -130,12 +144,35 @@ const displayedStats = computed<null | CategoryStats>(() => {
     ;
 });
 
+const displayedBlunders = computed<null | BlundersStats>(() => {
+    if (!commonStats.value || typeof commonStats.value === 'string') {
+        return null;
+    }
+
+    return includeBotGames.value
+        ? commonStats.value.blunders.allGames
+        : commonStats.value.blunders.pvpOnly
+    ;
+});
+
 const percent = (count: number, total: number): number => {
     return total === 0 ? 0 : 100 * count / total;
 };
 
 const formatPercent = (count: number, total: number): string => {
     return percent(count, total).toFixed(1) + '%';
+};
+
+/**
+ * Group thousands ("1 123 456") using the locale selected in the app,
+ * not the browser one, so the number reads like the rest of the page.
+ */
+const formatCount = (count: number): string => {
+    return count.toLocaleString(i18next.resolvedLanguage);
+};
+
+const formatHours = (milliseconds: number): string => {
+    return formatCount(Math.round(milliseconds / 3600000));
 };
 
 const sumOfCounts = (counts: Record<string, number>): number => {
@@ -299,24 +336,31 @@ const ratingBarHeight = (count: number): string => {
         <div v-else>
             <h2 class="h4"><IconGraphUp class="me-2" />{{ $t('statistics.games') }}</h2>
 
-            <div class="row row-cols-2 row-cols-md-3 g-2 mb-4">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-2 mb-4">
                 <div class="col">
                     <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small">{{ $t('statistics.total_games') }}</div>
-                        <div class="fs-4">{{ displayedStats.count }}</div>
+                        <div class="fs-4">{{ formatCount(displayedStats.count) }}</div>
                     </div>
                 </div>
                 <div v-if="undefined !== displayedStats.meetsCount" class="col">
                     <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small"><IconPeopleFill class="me-1" />{{ $t('statistics.distinct_player_pairs_met') }}</div>
-                        <div class="fs-4">{{ displayedStats.meetsCount }}</div>
+                        <div class="fs-4">{{ formatCount(displayedStats.meetsCount) }}</div>
                         <div class="form-text mb-0">{{ $t('statistics.distinct_player_pairs_met_help') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="border rounded p-3 text-center h-100">
+                        <div class="text-secondary small"><IconStopwatch class="me-1" />{{ $t('statistics.live_play_time') }}</div>
+                        <div class="fs-4">{{ $t('statistics.hours', { hours: formatHours(displayedStats.livePlayTimeMs) }) }}</div>
+                        <div class="form-text mb-0">{{ $t('statistics.live_play_time_help') }}</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small">{{ $t('statistics.swap_rate') }}</div>
-                        <div class="fs-4">{{ displayedStats.swapCount }}</div>
+                        <div class="fs-4">{{ formatCount(displayedStats.swapCount) }}</div>
                         <div class="text-secondary small">{{ formatPercent(displayedStats.swapCount, displayedStats.swapRuleEnabledCount) }}</div>
                         <div class="form-text mb-0">{{ $t('statistics.swap_rate_help') }}</div>
                     </div>
@@ -539,34 +583,88 @@ const ratingBarHeight = (count: number): string => {
             <pre class="bg-body-tertiary p-2 rounded mb-0"><code>yarn hex generate-stats</code></pre>
         </div>
         <p v-else-if="null === commonStats">{{ $t('loading') }}</p>
-        <div v-else class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
-            <div v-if="displayedStats" class="col">
-                <h3 class="h5"><IconHexagonFill class="me-2" />{{ $t('statistics.stones_placed') }}</h3>
-                <div class="row row-cols-2 g-2">
-                    <div class="col">
-                        <div class="border rounded p-3 text-center h-100">
-                            <div class="text-secondary small">{{ $t('statistics.total') }}</div>
-                            <div class="fs-4">{{ displayedStats.totalStonesPlaced }}</div>
+        <div v-else class="row g-4">
+            <div class="col-12 col-lg-8">
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <div v-if="displayedStats" class="col">
+                        <h3 class="h5"><IconHexagonFill class="me-2" />{{ $t('statistics.stones_placed') }}</h3>
+                        <div class="row row-cols-2 g-2">
+                            <div class="col">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <div class="text-secondary small">{{ $t('statistics.total') }}</div>
+                                    <div class="fs-4">{{ formatCount(displayedStats.totalStonesPlaced) }}</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <div class="text-secondary small"><IconPersonFill class="me-1" />{{ $t('statistics.by_humans') }}</div>
+                                    <div class="fs-4">{{ formatCount(displayedStats.stonesPlacedByHuman) }}</div>
+                                    <div class="text-secondary small">{{ formatPercent(displayedStats.stonesPlacedByHuman, displayedStats.totalStonesPlaced) }}</div>
+                                </div>
+                            </div>
+                            <div v-if="undefined !== displayedStats.stonesPlacedByBot" class="col">
+                                <div class="border rounded p-3 text-center h-100">
+                                    <div class="text-secondary small"><IconRobot class="me-1" />{{ $t('statistics.by_bots') }}</div>
+                                    <div class="fs-4">{{ formatCount(displayedStats.stonesPlacedByBot) }}</div>
+                                    <div class="text-secondary small">{{ formatPercent(displayedStats.stonesPlacedByBot, displayedStats.totalStonesPlaced) }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="border rounded p-3 text-center h-100">
-                            <div class="text-secondary small"><IconPersonFill class="me-1" />{{ $t('statistics.by_humans') }}</div>
-                            <div class="fs-4">{{ displayedStats.stonesPlacedByHuman }}</div>
-                            <div class="text-secondary small">{{ formatPercent(displayedStats.stonesPlacedByHuman, displayedStats.totalStonesPlaced) }}</div>
+
+                    <div v-if="displayedBlunders" class="col">
+                        <h3 class="h5"><IconEmojiDizzyFill class="me-2" />{{ $t('statistics.blunders') }}</h3>
+                        <div class="border rounded p-3 text-center">
+                            <div class="fs-3">{{ formatCount(displayedBlunders.estimatedBlundersCount) }}</div>
+                            <div class="form-text mb-0">{{ $t('statistics.blunders_help', {
+                                percent: formatPercent(displayedBlunders.sampleBlundersCount, displayedBlunders.sampleMovesCount),
+                                sample: formatCount(displayedBlunders.sampleMovesCount),
+                                total: formatCount(displayedBlunders.totalMovesCount),
+                            }) }}</div>
                         </div>
                     </div>
-                    <div v-if="undefined !== displayedStats.stonesPlacedByBot" class="col">
-                        <div class="border rounded p-3 text-center h-100">
-                            <div class="text-secondary small"><IconRobot class="me-1" />{{ $t('statistics.by_bots') }}</div>
-                            <div class="fs-4">{{ displayedStats.stonesPlacedByBot }}</div>
-                            <div class="text-secondary small">{{ formatPercent(displayedStats.stonesPlacedByBot, displayedStats.totalStonesPlaced) }}</div>
+
+                    <div class="col">
+                        <h3 class="h5"><IconPalette class="me-2" />{{ $t('statistics.shading_patterns') }}</h3>
+                        <ul class="list-group list-group-flush">
+                            <li
+                                v-for="[pattern, count] in sortedEntries(commonStats.shadingPatternCounts)"
+                                :key="pattern"
+                                class="list-group-item d-flex justify-content-between align-items-center"
+                            >
+                                {{ shadingPatternLabel(pattern) }}
+                                <span class="badge text-bg-secondary rounded-pill">{{ count }} ({{ formatPercent(count, sumOfCounts(commonStats.shadingPatternCounts)) }})</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col">
+                        <h3 class="h5"><IconAspectRatio class="me-2" />{{ $t('statistics.board_orientation') }}</h3>
+                        <div class="position-relative d-flex border rounded overflow-hidden">
+                            <div class="flex-fill text-center p-3">
+                                <div class="orientation-preview"><AppRhombus :orientation="0" /></div>
+                                <div class="text-secondary small">{{ $t('board_orientation.flat') }}</div>
+                                <div class="fs-4">{{ formatPercent(commonStats.boardOrientationCounts.flat, commonStats.boardOrientationCounts.flat + commonStats.boardOrientationCounts.diamond) }}</div>
+                                <div class="text-secondary small">{{ commonStats.boardOrientationCounts.flat }}</div>
+                            </div>
+                            <div class="flex-fill text-center p-3 border-start">
+                                <div class="orientation-preview"><AppRhombus :orientation="11" /></div>
+                                <div class="text-secondary small">{{ $t('board_orientation.diamond') }}</div>
+                                <div class="fs-4">{{ formatPercent(commonStats.boardOrientationCounts.diamond, commonStats.boardOrientationCounts.flat + commonStats.boardOrientationCounts.diamond) }}</div>
+                                <div class="text-secondary small">{{ commonStats.boardOrientationCounts.diamond }}</div>
+                            </div>
+                            <div class="position-absolute top-50 start-50 translate-middle bg-body border rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm">
+                                <IconLightningChargeFill class="text-warning" />
+                            </div>
+                        </div>
+                        <div class="form-text">
+                            {{ $t('statistics.board_orientation_help') }}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col">
+            <div class="col-12 col-lg-4">
                 <h3 class="h5"><IconFlag class="me-2" />{{ $t('statistics.player_flags') }}</h3>
                 <div class="table-responsive">
                     <table class="table table-sm">
@@ -578,44 +676,6 @@ const ratingBarHeight = (count: number): string => {
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <div class="col">
-                <h3 class="h5"><IconPalette class="me-2" />{{ $t('statistics.shading_patterns') }}</h3>
-                <ul class="list-group list-group-flush">
-                    <li
-                        v-for="[pattern, count] in sortedEntries(commonStats.shadingPatternCounts)"
-                        :key="pattern"
-                        class="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                        {{ shadingPatternLabel(pattern) }}
-                        <span class="badge text-bg-secondary rounded-pill">{{ count }} ({{ formatPercent(count, sumOfCounts(commonStats.shadingPatternCounts)) }})</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="col">
-                <h3 class="h5"><IconAspectRatio class="me-2" />{{ $t('statistics.board_orientation') }}</h3>
-                <div class="position-relative d-flex border rounded overflow-hidden">
-                    <div class="flex-fill text-center p-3">
-                        <div class="orientation-preview"><AppRhombus :orientation="0" /></div>
-                        <div class="text-secondary small">{{ $t('board_orientation.flat') }}</div>
-                        <div class="fs-4">{{ formatPercent(commonStats.boardOrientationCounts.flat, commonStats.boardOrientationCounts.flat + commonStats.boardOrientationCounts.diamond) }}</div>
-                        <div class="text-secondary small">{{ commonStats.boardOrientationCounts.flat }}</div>
-                    </div>
-                    <div class="flex-fill text-center p-3 border-start">
-                        <div class="orientation-preview"><AppRhombus :orientation="11" /></div>
-                        <div class="text-secondary small">{{ $t('board_orientation.diamond') }}</div>
-                        <div class="fs-4">{{ formatPercent(commonStats.boardOrientationCounts.diamond, commonStats.boardOrientationCounts.flat + commonStats.boardOrientationCounts.diamond) }}</div>
-                        <div class="text-secondary small">{{ commonStats.boardOrientationCounts.diamond }}</div>
-                    </div>
-                    <div class="position-absolute top-50 start-50 translate-middle bg-body border rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm">
-                        <IconLightningChargeFill class="text-warning" />
-                    </div>
-                </div>
-                <div class="form-text">
-                    {{ $t('statistics.board_orientation_help') }}
                 </div>
             </div>
         </div>

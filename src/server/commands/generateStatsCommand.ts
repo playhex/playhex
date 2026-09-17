@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { AppDataSource } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { Player, PlayerSettings } from '../../shared/app/models/index.js';
+import type { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import type TimeControlType from '../../shared/time-control/TimeControlType.js';
 
 /**
@@ -22,6 +23,19 @@ const RATING_MAX_DEVIATION = 250;
  * too short to be representative (aborted-ish games, connection tests, etc).
  */
 const MIN_MOVES_COUNT = 4;
+
+/**
+ * A move is counted as a blunder when the analyze gave it a policy ("value") below
+ * BLUNDER_MAX_VALUE, while the best move policy was at least BLUNDER_MIN_VALUE_GAP higher.
+ */
+const BLUNDER_MAX_VALUE = 0.01;
+const BLUNDER_MIN_VALUE_GAP = 0.15;
+
+/**
+ * Game analyzes are loaded by chunks of this size: their json payload is heavy,
+ * loading all of them at once exhausts the heap.
+ */
+const ANALYZE_CHUNK_SIZE = 500;
 
 type CategoryStats = {
     count: number;
@@ -49,6 +63,12 @@ type CategoryStats = {
      * Number of games with the swap rule enabled where the 2nd move was "swap-pieces".
      */
     swapCount: number;
+
+    /**
+     * Total time spent playing live (i.e non correspondence) games, in milliseconds,
+     * summed over each game duration (endedAt - startedAt).
+     */
+    livePlayTimeMs: number;
 
     totalStonesPlaced: number;
     stonesPlacedByHuman: number;
@@ -104,6 +124,7 @@ const createEmptyCategoryStats = (withMeets: boolean): CategoryStats => ({
     outcomeCounts: {},
     swapRuleEnabledCount: 0,
     swapCount: 0,
+    livePlayTimeMs: 0,
     totalStonesPlaced: 0,
     stonesPlacedByHuman: 0,
     stonesPlacedByBot: withMeets ? undefined : 0,
@@ -121,6 +142,8 @@ type GameRow = {
     ranked: 0 | 1;
     outcome: null | string;
     swapRule: 0 | 1;
+    startedAt: null | Date;
+    endedAt: null | Date;
     player0Id: number;
     player0IsBot: 0 | 1;
     player1Id: number;
@@ -145,6 +168,8 @@ const fetchGameRows = (from: null | Date, to: Date): Promise<GameRow[]> => {
             g.ranked AS ranked,
             g.outcome AS outcome,
             g.swapRule AS swapRule,
+            g.startedAt AS startedAt,
+            g.endedAt AS endedAt,
             p0.id AS player0Id,
             p0.isBot AS player0IsBot,
             p1.id AS player1Id,
@@ -176,6 +201,14 @@ const applyGameToStats = (
 
     if (initialTime <= LIVE_MAX_INITIAL_TIME_MS) {
         categoryStats.liveCount++;
+
+        if (game.startedAt !== null && game.endedAt !== null) {
+            const duration = new Date(game.endedAt).getTime() - new Date(game.startedAt).getTime();
+
+            if (duration > 0) {
+                categoryStats.livePlayTimeMs += duration;
+            }
+        }
     } else {
         categoryStats.correspondenceCount++;
     }
@@ -302,6 +335,25 @@ type CommonStats = {
      * so new/inactive players with a wide-open rating don't skew the distribution.
      */
     ratingDistribution: Record<number, number>;
+
+    /**
+     * Blunders, split the same way as period stats so the "include bot games" toggle applies.
+     */
+    blunders: {
+        pvpOnly: BlundersStats;
+        allGames: BlundersStats;
+    };
+};
+
+/**
+ * Only a small part of the games are analyzed, so blunders are counted on these analyzes
+ * (the sample), then extrapolated to the total number of moves ever played.
+ */
+type BlundersStats = {
+    sampleMovesCount: number;
+    sampleBlundersCount: number;
+    totalMovesCount: number;
+    estimatedBlundersCount: number;
 };
 
 /**
@@ -312,6 +364,110 @@ type CommonStats = {
 const ORIENTATION_SHAPE_BY_VALUE: { landscape: Record<number, 'flat' | 'diamond'>, portrait: Record<number, 'flat' | 'diamond'> } = {
     landscape: { 0: 'flat', 10: 'flat', 11: 'diamond' },
     portrait: { 1: 'flat', 9: 'flat', 2: 'diamond' },
+};
+
+const createBlundersStats = (
+    sampleMovesCount: number,
+    sampleBlundersCount: number,
+    totalMovesCount: number,
+): BlundersStats => ({
+    sampleMovesCount,
+    sampleBlundersCount,
+    totalMovesCount,
+    estimatedBlundersCount: sampleMovesCount === 0
+        ? 0
+        : Math.round(totalMovesCount * sampleBlundersCount / sampleMovesCount)
+    ,
+});
+
+const computeBlundersStats = async (): Promise<CommonStats['blunders']> => {
+    let pvpSampleMoves = 0;
+    let pvpSampleBlunders = 0;
+    let allSampleMoves = 0;
+    let allSampleBlunders = 0;
+
+    for (let offset = 0; ; offset += ANALYZE_CHUNK_SIZE) {
+        const rows: { analyze: string | GameAnalyzeData, opponentType: 'player' | 'ai' }[] = await AppDataSource.query(`
+            SELECT
+                ga.\`analyze\` AS \`analyze\`,
+                g.opponentType AS opponentType
+            FROM game_analyze ga
+            JOIN game g ON g.id = ga.gameId
+            WHERE ga.\`analyze\` IS NOT NULL
+            ORDER BY ga.gameId
+            LIMIT ? OFFSET ?
+        `, [ANALYZE_CHUNK_SIZE, offset]);
+
+        if (rows.length === 0) {
+            break;
+        }
+
+        for (const row of rows) {
+            const analyze: GameAnalyzeData = typeof row.analyze === 'string'
+                ? JSON.parse(row.analyze)
+                : row.analyze
+            ;
+
+            if (!Array.isArray(analyze)) {
+                continue;
+            }
+
+            for (const moveAnalyze of analyze) {
+                if (moveAnalyze === null || moveAnalyze.move === undefined || !moveAnalyze.bestMoves?.length) {
+                    continue;
+                }
+
+                const bestValue = moveAnalyze.bestMoves[0].value;
+                const isBlunder = moveAnalyze.move.value < BLUNDER_MAX_VALUE
+                    && bestValue - moveAnalyze.move.value > BLUNDER_MIN_VALUE_GAP
+                ;
+
+                allSampleMoves++;
+
+                if (isBlunder) {
+                    allSampleBlunders++;
+                }
+
+                if (row.opponentType === 'player') {
+                    pvpSampleMoves++;
+
+                    if (isBlunder) {
+                        pvpSampleBlunders++;
+                    }
+                }
+            }
+        }
+    }
+
+    // Total moves played in all ended games, "pass" moves included.
+    // Moves are stored space-separated in a single column, so they are counted by counting separators.
+    const totalMovesRows: { opponentType: 'player' | 'ai', totalMovesCount: null | string | number }[] = await AppDataSource.query(`
+        SELECT
+            g.opponentType AS opponentType,
+            SUM(LENGTH(g.moves) - LENGTH(REPLACE(g.moves, ' ', '')) + 1) AS totalMovesCount
+        FROM game g
+        WHERE g.moves <> ''
+        AND g.state = 'ended'
+        GROUP BY g.opponentType
+    `);
+
+    let pvpTotalMoves = 0;
+    let allTotalMoves = 0;
+
+    for (const row of totalMovesRows) {
+        const totalMovesCount = Number(row.totalMovesCount ?? 0);
+
+        allTotalMoves += totalMovesCount;
+
+        if (row.opponentType === 'player') {
+            pvpTotalMoves += totalMovesCount;
+        }
+    }
+
+    return {
+        pvpOnly: createBlundersStats(pvpSampleMoves, pvpSampleBlunders, pvpTotalMoves),
+        allGames: createBlundersStats(allSampleMoves, allSampleBlunders, allTotalMoves),
+    };
 };
 
 const computeCommonStats = async (): Promise<CommonStats> => {
@@ -378,12 +534,15 @@ const computeCommonStats = async (): Promise<CommonStats> => {
         ratingDistribution[bucket] = (ratingDistribution[bucket] ?? 0) + 1;
     }
 
+    const blunders = await computeBlundersStats();
+
     return {
         generatedAt: new Date().toISOString(),
         playerFlagCounts,
         boardOrientationCounts,
         shadingPatternCounts,
         ratingDistribution,
+        blunders,
     };
 };
 
