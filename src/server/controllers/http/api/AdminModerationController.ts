@@ -7,7 +7,7 @@ import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import ModerationService, { CreateAndSaveError } from '../../../services/ModerationService.js';
 import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-transformer-custom.js';
 import { ROLE_MODERATOR } from '../../../services/roles.js';
-import { Game } from '../../../../shared/app/models/index.js';
+import { ChannelChatMessage, ChatMessage, Game } from '../../../../shared/app/models/index.js';
 import type AbstractChatMessage from '../../../../shared/app/models/AbstractChatMessage.js';
 import ChannelChatMessageRepository from '../../../repositories/ChannelChatMessageRepository.js';
 import PlayerIpService from '../../../services/PlayerIpService.js';
@@ -83,6 +83,9 @@ export default class AdminModerationController
 
     /**
      * Marks a tab as seen, at provided date, or now.
+     *
+     * Provided date should be the date of the most recent element of the tab,
+     * and not "now", so elements created while moderator was reading stay unseen.
      */
     @Post('/api/admin/moderation/seen/:tab')
     async postSeen(
@@ -99,9 +102,14 @@ export default class AdminModerationController
             throw new BadRequestError(`Invalid date "${body?.date}"`);
         }
 
-        await this.moderationSettingRepository.set(seenSettingKey(tab as SeenTab), date.toISOString());
+        // Date comes from moderator browser: prevent a clock in advance
+        // from marking as seen elements which are not yet created.
+        const now = new Date();
+        const seenAt = date > now ? now : date;
 
-        return { tab, date: date.toISOString() };
+        await this.moderationSettingRepository.set(seenSettingKey(tab as SeenTab), seenAt.toISOString());
+
+        return { tab, date: seenAt.toISOString() };
     }
 
     @Get('/api/admin/moderation/players')
@@ -167,7 +175,7 @@ export default class AdminModerationController
 
     /**
      * Get recent chat messages from any source (game or channel).
-     * Returns messages not yet seen by moderator,
+     * Returns all messages not yet seen by moderator, whenever they were posted,
      * plus a few already seen messages to keep some context.
      *
      * @returns Last messages, most recent first, like: [
@@ -178,54 +186,36 @@ export default class AdminModerationController
     @Get('/api/admin/moderation/chat-messages')
     async getLastChatMessages(): Promise<MessageFromAnySource[]>
     {
-        const SINCE = new Date(new Date().getTime() - 86400000 * 14); // 2 weeks of history
+        const seenAtString = await this.moderationSettingRepository.get(seenSettingKey('messages'));
+        const seenAt = seenAtString !== null ? new Date(seenAtString) : null;
 
-        const persistedMessages = await this.chatMessageRepository.getLastChatMessagesForModeration(SINCE);
-        const inMemoryMessages = this.gameStore.getUnpersistedChatMessagesForModeration();
-        const channelMessages = await this.channelChatMessageRepository.getLastMessagesForModeration(SINCE);
+        // When moderator never marked messages as seen, fallback to 2 weeks of history
+        const since = seenAt ?? new Date(new Date().getTime() - 86400000 * 14);
 
-        const allMessages: MessageFromAnySource[] = [];
-
-        for (const message of persistedMessages) {
-            allMessages.push({
-                source: 'game',
-                message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
-                data: instanceToPlain(message.game, { groups: ['moderation'] }),
-            });
-        }
-
-        for (const message of inMemoryMessages) {
-            allMessages.push({
-                source: 'game',
-                message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
-                data: instanceToPlain(message.game, { groups: ['moderation'] }),
-            });
-        }
-
-        for (const message of channelMessages) {
-            allMessages.push({
-                source: 'channel',
-                message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
-                data: message.channel.name,
-            });
-        }
-
-        allMessages.sort((a, b) => b.message.createdAt.getTime() - a.message.createdAt.getTime());
-
-        const seenAt = await this.moderationSettingRepository.get(seenSettingKey('messages'));
+        // All messages posted after the seen date, without any limit:
+        // moderator must always get all unseen messages.
+        const unseenMessages = sortMostRecentFirst([
+            ...(await this.chatMessageRepository.getLastChatMessagesForModeration(since)).map(gameMessageEntry),
+            ...this.gameStore.getUnpersistedChatMessagesForModeration()
+                .filter(message => message.createdAt > since)
+                .map(gameMessageEntry),
+            ...(await this.channelChatMessageRepository.getLastMessagesForModeration(since)).map(channelMessageEntry),
+        ]);
 
         if (seenAt === null) {
-            return allMessages;
+            return unseenMessages;
         }
 
-        const firstSeenIndex = allMessages.findIndex(entry => entry.message.createdAt <= new Date(seenAt));
+        // Then only a few already seen messages, to keep some context.
+        const seenMessages = sortMostRecentFirst([
+            ...(await this.chatMessageRepository.getChatMessagesForModerationBefore(seenAt, SEEN_MESSAGES_CONTEXT)).map(gameMessageEntry),
+            ...this.gameStore.getUnpersistedChatMessagesForModeration()
+                .filter(message => message.createdAt <= seenAt)
+                .map(gameMessageEntry),
+            ...(await this.channelChatMessageRepository.getMessagesForModerationBefore(seenAt, SEEN_MESSAGES_CONTEXT)).map(channelMessageEntry),
+        ]).slice(0, SEEN_MESSAGES_CONTEXT);
 
-        if (firstSeenIndex < 0) {
-            return allMessages;
-        }
-
-        // Keep all unseen messages, and only a few seen ones for context
-        return allMessages.slice(0, firstSeenIndex + SEEN_MESSAGES_CONTEXT);
+        return [...unseenMessages, ...seenMessages];
     }
 
     @Get('/api/admin/moderation/actions')
@@ -290,3 +280,18 @@ export default class AdminModerationController
         }
     }
 }
+
+const gameMessageEntry = (message: ChatMessage): MessageFromAnySource => ({
+    source: 'game',
+    message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
+    data: instanceToPlain(message.game, { groups: ['moderation'] }),
+});
+
+const channelMessageEntry = (message: ChannelChatMessage): MessageFromAnySource => ({
+    source: 'channel',
+    message: instanceToPlain(message, { groups: [GROUP_DEFAULT, 'moderation'] }),
+    data: message.channel.name,
+});
+
+const sortMostRecentFirst = (messages: MessageFromAnySource[]): MessageFromAnySource[] =>
+    messages.sort((a, b) => b.message.createdAt.getTime() - a.message.createdAt.getTime());

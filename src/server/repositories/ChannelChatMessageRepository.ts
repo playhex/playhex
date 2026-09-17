@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { In, IsNull, MoreThan, Repository } from 'typeorm';
+import { In, IsNull, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { ChannelChatMessage } from '../../shared/app/models/index.js';
 
 @Service()
@@ -55,6 +55,27 @@ export default class ChannelChatMessageRepository
                 createdAt: MoreThan(since),
             },
             order: { createdAt: 'desc' },
+        });
+    }
+
+    /**
+     * Last messages posted before a given date, used to display
+     * a few already seen messages in moderation interface.
+     */
+    async getMessagesForModerationBefore(before: Date, take: number): Promise<ChannelChatMessage[]>
+    {
+        return await this.channelChatMessageRepository.find({
+            relations: {
+                channel: true,
+                player: true,
+            },
+            where: {
+                contentTranslationKey: IsNull(),
+                deletedByModeration: false,
+                createdAt: LessThanOrEqual(before),
+            },
+            order: { createdAt: 'desc' },
+            take,
         });
     }
 

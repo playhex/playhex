@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { In, IsNull, MoreThan, Repository } from 'typeorm';
+import { In, IsNull, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { ChatMessage, Player } from '../../shared/app/models/index.js';
 import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 
@@ -45,6 +45,24 @@ export default class ChatMessageRepository
                 createdAt: MoreThan(since),
             },
             order: { createdAt: 'desc' },
+        });
+    }
+
+    /**
+     * Last messages posted before a given date, used to display
+     * a few already seen messages in moderation interface.
+     */
+    async getChatMessagesForModerationBefore(before: Date, take: number): Promise<ChatMessage[]>
+    {
+        return await this.chatMessageRepository.find({
+            relations: { player: true, game: true },
+            where: {
+                contentTranslationKey: IsNull(),
+                deletedByModeration: false,
+                createdAt: LessThanOrEqual(before),
+            },
+            order: { createdAt: 'desc' },
+            take,
         });
     }
 
