@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType, computed, nextTick, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
+import { PropType, computed, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123 } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
@@ -36,6 +36,7 @@ import { parseMove, validateMove } from '../../../shared/move-notation/move-nota
 import { GameView } from '@playhex/pixi-board';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
+import { useStickToBottom } from '../composables/useStickToBottom.js';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 
@@ -130,13 +131,10 @@ const chatInput = useChatInputStore().getChatInput(game.value.publicId);
 const chatMessagesElement = ref<HTMLElement>();
 const chatInputElement = ref<HTMLElement>();
 
-const scrollChatToBottom = () => nextTick(() => {
-    if (chatMessagesElement.value) {
-        chatMessagesElement.value.scrollTop = chatMessagesElement.value.scrollHeight;
-    }
-});
+const { contentChanged: chatContentChanged } = useStickToBottom(chatMessagesElement);
 
-watch(game.value.chatMessages, () => scrollChatToBottom());
+// New message: only scroll if already at bottom, so reading old messages isn't interrupted.
+watch(game.value.chatMessages, () => chatContentChanged());
 
 const sendChat = async () => {
     if (chatInput.value === '') {
@@ -214,7 +212,6 @@ const chatClick = (e: PointerEvent) => {
     e.stopPropagation();
 };
 
-onMounted(() => scrollChatToBottom());
 
 /**
  * Used to know whether object is a ChatMessage or a ChatHeader.

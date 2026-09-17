@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { format, isThisWeek, isToday, isYesterday } from 'date-fns';
-import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
+import { computed, PropType, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import { IconSendFill } from '../icons.js';
 import { useChannel } from '../composables/useChannel.js';
+import { useStickToBottom } from '../composables/useStickToBottom.js';
 import useAuthStore from '../../stores/authStore.js';
 import { sanitizeMessage, makeLinksClickable, blockEnterOnMobile } from '../../../shared/app/chatUtils.js';
 import AppPseudo from './AppPseudo.vue';
@@ -68,23 +69,13 @@ const renderMessage = (content: string): string => {
     return str;
 };
 
-const scrollToBottom = () => nextTick(() => {
-    if (messagesElement.value) {
-        messagesElement.value.scrollTop = messagesElement.value.scrollHeight;
-    }
-});
-
-const isAtBottom = (): boolean => {
-    if (!messagesElement.value) return true;
-    const { scrollTop, scrollHeight, clientHeight } = messagesElement.value;
-    return scrollHeight - scrollTop - clientHeight < 50;
-};
+const { scrollToBottom, contentChanged } = useStickToBottom(messagesElement);
 
 // New message: only scroll if already at bottom, so reading old messages isn't interrupted.
 for (const [name, ch] of Object.entries(channelComposables)) {
-    watch(ch.messages, async () => {
-        if (activeChannel.value === name && isAtBottom()) {
-            await scrollToBottom();
+    watch(ch.messages, () => {
+        if (activeChannel.value === name) {
+            contentChanged();
         }
     }, { deep: true });
 }
