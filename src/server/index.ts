@@ -8,6 +8,7 @@ import { registerWebsocketControllers } from './controllers/websocket/index.js';
 import { HexServer } from './server.js';
 import * as CustomParser from '../shared/app/socketCustomParser.js';
 import socketIoAdminUi from './services/socketIoAdminUi.js';
+import initSockeye from './services/sockeye.js';
 import logger from './services/logger.js';
 import { addSessionMiddlewares } from './services/security/middlewares.js';
 import monitorConnectedSockets from './services/monitorConnectedSockets.js';
@@ -44,6 +45,7 @@ const io = new HexServer(server, {
 
 addSessionMiddlewares(app, io);
 socketIoAdminUi(io);
+initSockeye(app, io);
 monitorConnectedSockets();
 
 Container.set(HexServer, io);
