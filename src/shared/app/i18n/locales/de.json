@@ -709,5 +709,8 @@
         "hexworld_link": "HexWorld-Link",
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Aus \"Debugging-Informationen\" unter dem Spielbrett kopieren"
+    },
+    "statistics": {
+        "hours": "{{hours}} h"
     }
 }
