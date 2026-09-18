@@ -24,8 +24,22 @@ import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
 import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
 
 export class GameError extends Error {}
-export class CannotChallengeYourselfError extends GameError {}
-export class AlreadyHaveOpenChallengeAgainstThisPlayerError extends GameError {}
+
+export class CannotChallengeYourselfError extends GameError
+{
+    constructor()
+    {
+        super('Cannot challenge yourself');
+    }
+}
+
+export class AlreadyHaveOpenChallengeAgainstThisPlayerError extends GameError
+{
+    constructor()
+    {
+        super('You already have an open challenge against this player');
+    }
+}
 
 @Service()
 export default class GameStore
@@ -380,7 +394,7 @@ export default class GameStore
      * resolves and validates the challenged player: must exist, cannot be the host himself,
      * and host cannot already have a pending (not yet joined) challenge against the same player.
      */
-    private async resolveChallengeTarget(host: null | Player, opponentPublicId: string): Promise<Player>
+    private async resolveChallengeTarget(host: null | Player, opponentPublicId: string, isRematch = false): Promise<Player>
     {
         if (host && host.publicId === opponentPublicId) {
             throw new CannotChallengeYourselfError();
@@ -396,7 +410,9 @@ export default class GameStore
             throw new GameError('Cannot challenge a bot.');
         }
 
-        if (host !== null) {
+        // A rematch is not a new, unrelated challenge: it is tied to a finished game,
+        // so the "one open challenge per opponent" rule must not block it.
+        if (host !== null && !isRematch) {
             const key = this.challengeKey(host.publicId, opponentPublicId);
 
             const alreadyChallenged = this.pendingChallengeKeys.has(key) || Object.values(this.activeGames).some(gameServer => {
@@ -449,13 +465,14 @@ export default class GameStore
         }
 
         let challengedOpponent: null | Player = null;
-        const challengeKey = params.host && isChallengeGame(params.gameOptions)
+        const isRematchGame = params.rematchedFrom != null;
+        const challengeKey = params.host && !isRematchGame && isChallengeGame(params.gameOptions)
             ? this.challengeKey(params.host.publicId, params.gameOptions.opponentPublicId)
             : null;
 
         if (isChallengeGame(params.gameOptions)) {
             try {
-                challengedOpponent = await this.resolveChallengeTarget(params.host ?? null, params.gameOptions.opponentPublicId);
+                challengedOpponent = await this.resolveChallengeTarget(params.host ?? null, params.gameOptions.opponentPublicId, isRematchGame);
             } catch (e) {
                 if (challengeKey !== null) {
                     this.pendingChallengeKeys.delete(challengeKey);
@@ -477,9 +494,7 @@ export default class GameStore
 
             // Rematching a challenge already notifies the opponent through the rematch offer,
             // no need to also notify them as if it were a new, unrelated challenge.
-            const isRematch = params.rematchedFrom != null;
-
-            if (challengedOpponent !== null && !isRematch) {
+            if (challengedOpponent !== null && !isRematchGame) {
                 this.gameEventEmitter.emitGameChallengeCreated(game);
             }
 
@@ -507,7 +522,7 @@ export default class GameStore
                 throw e;
             }
 
-            if (challengedOpponent !== null && !isRematch) {
+            if (challengedOpponent !== null && !isRematchGame) {
                 notifier.emit('gameChallengeCreated', game, challengedOpponent);
             }
 
