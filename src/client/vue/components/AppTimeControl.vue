@@ -130,8 +130,11 @@ watch(currentLobby, lobby => {
     }
 });
 
-// track custom time control: update when sliders produce a non-preset value, freeze otherwise
-watch(timeControlType, tc => {
+/**
+ * Show the custom time control button when the time control does not match any preset,
+ * freeze it otherwise.
+ */
+const trackCustomTimeControl = (tc: TimeControlType): void => {
     if (suggestedTimeControls.value.some(({ timeControl }) => isSameTimeControlType(tc, timeControl))) {
         return;
     }
@@ -140,7 +143,14 @@ watch(timeControlType, tc => {
         label: timeControlToString(tc),
         timeControl: { family: tc.family, options: { ...tc.options } } as TimeControlType,
     };
-});
+};
+
+// Initial time control may already be a custom one, e.g when cloning or editing
+// a tournament having a time control which is not in player presets.
+trackCustomTimeControl(timeControlType.value);
+
+// track custom time control: update when sliders produce a non-preset value, freeze otherwise
+watch(timeControlType, tc => trackCustomTimeControl(tc));
 
 // update initialTime when sliding
 watch(initialTimeStep, step => {

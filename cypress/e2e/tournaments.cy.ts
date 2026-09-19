@@ -113,4 +113,48 @@ describe('Tournaments', () => {
         cy.url().should('include', '/tournaments/' + tournamentSlug(tournamentTitle2));
         cy.contains('h1', tournamentTitle2);
     });
+
+    it('keeps cloned tournament time control selected, even if it is not a player preset', () => {
+        cy.visit('/tournaments/create');
+
+        const tournamentTitle = 'Tournament clone tc ' + randomString();
+
+        cy
+            .contains('Tournament name')
+            .click()
+            .type(tournamentTitle)
+        ;
+
+        cy
+            .contains('Start date')
+            .click()
+            .type('2025-01-02T20:30')
+        ;
+
+        // Use a custom time control, i.e not one of the default presets
+        cy.slidePrimaryTimeControl(5, 'min');
+        cy.slideSecondaryTimeControl(30, 's');
+
+        cy.contains('button', '5min + 30s').should('have.class', 'btn-success');
+
+        cy
+            .contains('button', 'Create tournament')
+            .click()
+        ;
+
+        cy.contains('Tournament created successfully');
+
+        // Tournament page can take a few seconds to show up after creation
+        cy.contains('h1', tournamentTitle, { timeout: 20000 });
+
+        // Clone this tournament
+        cy.contains('a', 'Clone').click();
+
+        cy.url().should('include', 'clone=' + tournamentSlug(tournamentTitle));
+
+        // Cloned time control must be displayed as an already selected preset button,
+        // without having to touch the sliders first
+        cy.contains('Initial time: 5min');
+        cy.contains('button', '5min + 30s').should('have.class', 'btn-success');
+    });
 });
