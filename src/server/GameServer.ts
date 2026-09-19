@@ -111,11 +111,6 @@ export default class GameServer extends TypedEmitter<GameEvents>
             throw e;
         }
 
-        this.timeControl = createTimeControl(
-            this.game.timeControlType,
-            this.game.timeControl,
-        );
-
         if (this.game.startedAt) {
             try {
                 this.engineGame = EngineGame.fromData(toEngineGameData(this.game));
