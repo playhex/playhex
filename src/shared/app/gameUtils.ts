@@ -325,7 +325,7 @@ export const matchSearchParams = (game: Game, searchGamesParameters: SearchGames
     }
 
     if (undefined !== searchGamesParameters.toEndedAt && game.endedAt) {
-        if (game.endedAt < searchGamesParameters.toEndedAt) {
+        if (game.endedAt > searchGamesParameters.toEndedAt) {
             return false;
         }
     }
