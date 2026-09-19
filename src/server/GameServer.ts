@@ -355,15 +355,19 @@ export default class GameServer extends TypedEmitter<GameEvents>
         const movesHistory = this.engineGame.getMovesHistory();
         let i = movesHistory.length - 1;
 
+        if (i < 0) {
+            return null;
+        }
+
         if (this.players[i % 2].isBot) {
             --i;
 
-            if (this.players[i % 2].isBot) {
+            if (i < 0 || this.players[i % 2].isBot) {
                 return null;
             }
         }
 
-        return this.engineGame.getMovesHistory()[i];
+        return movesHistory[i];
     }
 
     /**
