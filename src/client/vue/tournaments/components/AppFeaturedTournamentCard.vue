@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { IconBell, IconPeopleFill, IconRecordFill, IconTrophy } from '../../icons.js';
+import { IconBell, IconPeopleFill, IconPlayFill, IconTrophy, IconTrophyFill } from '../../icons.js';
 import { Tournament } from '../../../../shared/app/models/index.js';
 import AppMySubscriptionStatus from './AppMySubscriptionStatus.vue';
 import AppCountdown from '../../components/AppCountdown.vue';
@@ -33,7 +33,9 @@ const subscribeAndPrompt = async () => {
 </script>
 
 <template>
+    <!-- Upcoming: highlighted card -->
     <router-link
+        v-if="tournament.state === 'created'"
         :to="{ name: 'tournament', params: { slug: tournament.slug } }"
         class="card card-bg-icon text-decoration-none border-warning mb-4"
     >
@@ -42,60 +44,73 @@ const subscribeAndPrompt = async () => {
             <h6 class="card-subtitle text-body-secondary">{{ $t('tournament') }}</h6>
             <h4 class="card-title">{{ tournament.title }}</h4>
 
-            <!-- Upcoming -->
-            <template v-if="tournament.state === 'created'">
-                <p class="card-text">
-                    <AppTournamentStartsAt :tournament format="short" />
-                    <span class="text-body-secondary"> (<AppCountdown :date="tournament.startOfficialAt" />)</span>
-                </p>
+            <p class="card-text">
+                <AppTournamentStartsAt :tournament format="short" />
+                <span class="text-body-secondary"> (<AppCountdown :date="tournament.startOfficialAt" />)</span>
+            </p>
 
-                <!-- subscribe / ckeck-in / unsubscribe -->
-                <button
-                    v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
-                    @click.prevent="subscribeAndPrompt"
-                    class="btn btn-sm btn-outline-info"
-                ><IconBell /> {{ $t('tournament_subscribe') }}</button>
+            <!-- subscribe / ckeck-in / unsubscribe -->
+            <button
+                v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
+                @click.prevent="subscribeAndPrompt"
+                class="btn btn-sm btn-outline-info"
+            ><IconBell /> {{ $t('tournament_subscribe') }}</button>
 
-                <button
-                    v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
-                    @click.prevent="subscribeAndPrompt"
-                    class="btn btn-success me-3"
-                >{{ $t('tournament_checkin') }}</button>
+            <button
+                v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
+                @click.prevent="subscribeAndPrompt"
+                class="btn btn-success me-3"
+            >{{ $t('tournament_checkin') }}</button>
 
-                <!-- Current player status on this tournament -->
-                <p class="card-text mb-3">
-                    <AppMySubscriptionStatus :tournament />
-                </p>
+            <!-- Current player status on this tournament -->
+            <p class="card-text mb-3">
+                <AppMySubscriptionStatus :tournament />
+            </p>
 
-                <p v-if="tournament.subscriptions.length > 0" class="card-text">
-                    <small><IconPeopleFill /> {{ $t('n_people_are_interested', { count: tournament.subscriptions.length }) }}</small>
-                    <span class="text-secondary mx-2">•</span>
-                    <small><AppChannelMessagesCount :channel="'tournament-' + tournament.slug" /></small>
-                </p>
-            </template>
+            <p v-if="tournament.subscriptions.length > 0" class="card-text">
+                <small><IconPeopleFill /> {{ $t('n_interested', { count: tournament.subscriptions.length }) }}</small>
+                <span class="text-secondary mx-2">•</span>
+                <small><AppChannelMessagesCount :channel="'tournament-' + tournament.slug" /></small>
+            </p>
+        </div>
+    </router-link>
 
-            <!-- Running -->
-            <template v-else-if="tournament.state === 'running'">
-                <p class="card-text">
-                    <IconPeopleFill />
-                    {{ $t('n_participants', { count: tournament.participants.length }) }}
-                </p>
+    <!-- Running -->
+    <router-link
+        v-else-if="tournament.state === 'running'"
+        :to="{ name: 'tournament', params: { slug: tournament.slug } }"
+        class="card text-decoration-none mb-2"
+    >
+        <div class="card-body py-2">
+            <p class="m-0">
+                <IconPlayFill class="text-danger" />
+                {{ tournament.title }}
+            </p>
+            <p class="m-0 text-body-secondary">
+                <small>{{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}</small>
+                <span class="mx-2">•</span>
+                <small><IconPeopleFill /> {{ $t('n_participants', { count: tournament.participants.length }) }}</small>
+                <span class="mx-2">•</span>
+                <small><AppChannelMessagesCount :channel="'tournament-' + tournament.slug" /></small>
+            </p>
+        </div>
+    </router-link>
 
-                <p class="card-text lead">
-                    <IconRecordFill class="text-danger" />
-                    {{ $t('n_playing_games', { count: getActiveTournamentMatches(tournament).length }) }}
-                </p>
-
-                <AppChannelMessagesCount :channel="'tournament-' + tournament.slug" />
-            </template>
-
-            <!-- Ended -->
-            <template v-else-if="tournament.state === 'ended'">
-                <p class="m-0"><small>{{ $t('tournament_ordinal.1') }}</small></p>
-                <p class="lead">{{ tournament.participants.find(p => 1 === p.rank)?.player.pseudo }}</p>
-
-                <AppChannelMessagesCount :channel="'tournament-' + tournament.slug" />
-            </template>
+    <!-- Ended -->
+    <router-link
+        v-else-if="tournament.state === 'ended'"
+        :to="{ name: 'tournament', params: { slug: tournament.slug } }"
+        class="card text-decoration-none mb-2"
+    >
+        <div class="card-body py-2">
+            <p class="m-0">
+                {{ tournament.title }}
+                <span class="text-body-secondary"><small>({{ $t('tournament_ended') }})</small></span>
+            </p>
+            <p class="m-0">
+                <IconTrophyFill class="text-warning" />
+                {{ tournament.participants.find(p => 1 === p.rank)?.player.pseudo }}
+            </p>
         </div>
     </router-link>
 </template>

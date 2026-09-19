@@ -22,6 +22,6 @@ watch(channel, async () => {
     <span>
         <IconChatRightText v-if="(messagesCount ?? 0) > 0" />
         <IconChatRight v-else />
-        {{ messagesCount === null ? '…' : messagesCount }}
+        {{ messagesCount === null ? '…' : $t('n_messages', { count: messagesCount }) }}
     </span>
 </template>

@@ -17,7 +17,7 @@ import { Game, Tournament } from '../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useRouter } from 'vue-router';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
-import { onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { computed, onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { apiGetActiveTournaments, apiPostCancel } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
@@ -89,6 +89,14 @@ void (async () => {
         featured: true,
     });
 })();
+
+const featuredTournamentsByState = (state: Tournament['state']) => computed<Tournament[]>(
+    () => (featuredTournaments.value ?? []).filter(tournament => tournament.state === state),
+);
+
+const upcomingTournaments = featuredTournamentsByState('created');
+const runningTournaments = featuredTournamentsByState('running');
+const endedTournaments = featuredTournamentsByState('ended');
 
 // Clear soft removed games
 const gamesListElement = useTemplateRef('gamesList');
@@ -390,19 +398,39 @@ for (const locale of getPlayerLocales()) {
                 </router-link>
 
                 <!-- Upcoming events -->
-                <template v-if="featuredTournaments && featuredTournaments.length > 0">
-                    <h2>{{ $t('upcoming_events') }}</h2>
-                </template>
+                <h2 v-if="upcomingTournaments.length > 0">{{ $t('upcoming_events') }}</h2>
 
                 <AppCijmTournamentCard2026 />
 
                 <AppFeaturedTournamentCard
-                    v-for="tournament in featuredTournaments"
+                    v-for="tournament in upcomingTournaments"
                     :key="tournament.publicId"
                     :tournament
                 />
 
                 <AppChannel :channels />
+
+                <!-- Playing tournaments -->
+                <template v-if="runningTournaments.length > 0">
+                    <h6 class="mt-4">{{ $t('playing_tournaments') }}</h6>
+
+                    <AppFeaturedTournamentCard
+                        v-for="tournament in runningTournaments"
+                        :key="tournament.publicId"
+                        :tournament
+                    />
+                </template>
+
+                <!-- Past tournaments -->
+                <template v-if="endedTournaments.length > 0">
+                    <h6 class="mt-4">{{ $t('past_tournaments') }}</h6>
+
+                    <AppFeaturedTournamentCard
+                        v-for="tournament in endedTournaments"
+                        :key="tournament.publicId"
+                        :tournament
+                    />
+                </template>
 
             </div>
         </div>
