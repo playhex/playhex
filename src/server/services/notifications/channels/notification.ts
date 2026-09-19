@@ -3,15 +3,17 @@ import { notifier } from '../notifier.js';
 import { truncateText } from '../../../../shared/app/utils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { createPlayerNotification } from '../../../../shared/app/models/PlayerNotification.js';
-import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer } from '../../../../shared/app/gameUtils.js';
+import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer, hasPlayer } from '../../../../shared/app/gameUtils.js';
 import logger from '../../../services/logger.js';
 import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
 import { PlayerNotificationsService } from '../../../services/PlayerNotificationsService.js';
 import GameRepository from '../../../repositories/GameRepository.js';
+import GameChatNotificationService from '../../../services/GameChatNotificationService.js';
 
 const onlinePlayerService = Container.get(OnlinePlayersService);
 const playerNotificationService = Container.get(PlayerNotificationsService);
 const gamePersister = Container.get(GameRepository);
+const gameChatNotificationService = Container.get(GameChatNotificationService);
 
 /*
  * Adds notifications in the player header, in the UI.
@@ -24,9 +26,14 @@ const gamePersister = Container.get(GameRepository);
  * Tells player that he received a chat message on one of his game.
  * Use case: not miss a message that my opponent posted on a game that ended days ago.
  *
+ * Recipients are players of the game, plus observers who explicitly subscribed
+ * to this game chat, minus players who explicitly unsubscribed.
+ *
  * Should send when player is:
  * - offline or inactive => always
  * - active => in ended games only, if not already on this game page
+ *   (an active observer who subscribed is notified even while the game is playing,
+ *   unless they are already on the game page: that is the point of subscribing)
  */
 notifier.on('chatMessage', async (game, chatMessage) => {
 
@@ -40,7 +47,9 @@ notifier.on('chatMessage', async (game, chatMessage) => {
         return;
     }
 
-    for (const { player } of game.gameToPlayers) {
+    const recipients = await gameChatNotificationService.getChatNotificationRecipients(game);
+
+    for (const player of recipients) {
 
         // Do not notify chat message sender
         if (player.publicId === chatMessage.player.publicId) {
@@ -57,7 +66,7 @@ notifier.on('chatMessage', async (game, chatMessage) => {
             const isGameActive = game.state === 'playing' || game.state === 'created';
             const playerIsWatching = onlinePlayerService.isOnGamePage(player, game.publicId);
 
-            if (isGameActive || playerIsWatching) {
+            if (playerIsWatching || (isGameActive && hasPlayer(game, player))) {
                 continue;
             }
         }

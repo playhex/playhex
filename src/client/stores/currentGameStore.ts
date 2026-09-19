@@ -1,7 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import Game from '../../shared/app/models/Game.js';
 import { PlayingGameFacade } from '@playhex/pixi-board';
-import { addMove, cancelGame, canExplore, canPlayerUndo, cloneGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateGame } from '../../shared/app/gameUtils.js';
+import { addMove, cancelGame, canExplore, canPlayerUndo, cloneGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, hasPlayer, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateGame } from '../../shared/app/gameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -37,6 +37,7 @@ import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
 import { AnimatorFacade } from '@playhex/pixi-board';
 import { defineOverlay } from '@overlastic/vue';
 import GameFinishedOverlay from '../vue/components/overlay/GameFinishedOverlay.vue';
+import useGameChatSubscriptionsStore from './gameChatSubscriptionsStore.js';
 
 /**
  * Current remote game I am focused on.
@@ -376,7 +377,17 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             game.value.chatMessages.push(chatMessage);
             richChat.value?.postChatMessage(chatMessage);
 
-            if (!isReadingChatMessages.value) {
+            /*
+             * myGamesStore already emits this event for games I play in,
+             * so only emit it here for games I only watch,
+             * otherwise sound and browser notification would be played twice.
+             */
+            if (loggedInPlayer.value === null || !hasPlayer(game.value, loggedInPlayer.value)) {
+                notifier.emit('chatMessage', game.value, chatMessage);
+            }
+
+            // Do not show the unread messages badge on a chat muted on this device
+            if (!isReadingChatMessages.value && !usePlayerLocalSettingsStore().isGameChatMuted(game.value.publicId)) {
                 ++unreadMessages.value;
             }
         });
@@ -951,6 +962,9 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                     reject(new Error(error.reason));
                     return;
                 }
+
+                // Posting in a game chat subscribes me to it, server side
+                useGameChatSubscriptionsStore().markSubscribedAfterPost(game.value!);
 
                 resolve();
             });

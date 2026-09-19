@@ -19,6 +19,7 @@ import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '..
 import ServerInfoController from './ServerInfoController.js';
 import SearchController from './SearchController.js';
 import GameConditionalMovesController from './GameConditionalMovesController.js';
+import GameChatSubscriptionController from './GameChatSubscriptionController.js';
 import PushController from './PushController.js';
 import TournamentController from './TournamentController.js';
 import TournamentBanController from './TournamentBanController.js';
@@ -72,6 +73,7 @@ export const registerApi = (app: Express) => {
             OnlinePlayersController,
             GameController,
             GameConditionalMovesController,
+            GameChatSubscriptionController,
             GameAnalyzeController,
             TournamentController,
             TournamentBanController,

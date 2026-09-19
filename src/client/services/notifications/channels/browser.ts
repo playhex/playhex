@@ -7,6 +7,7 @@ import { isBotGame } from '../../../../shared/app/gameUtils.js';
 import { serviceWorkerRegistrationPromise } from '../../registerServiceWorker.js';
 import { getNotificationPermission } from '../../browserNotification.js';
 import { RouteLocationAsRelativeTyped } from 'vue-router';
+import useGameChatSubscriptionsStore from '../../../stores/gameChatSubscriptionsStore.js';
 
 const icon = '/images/logo-transparent.svg';
 
@@ -98,7 +99,8 @@ notifier.on('chatMessage', (game, chatMessage) => {
         return;
     }
 
-    if (!iAmInGame(game)) {
+    // Muted this game chat, or watching a game I did not subscribe to
+    if (!useGameChatSubscriptionsStore().isChatNotificationEnabled(game)) {
         return;
     }
 

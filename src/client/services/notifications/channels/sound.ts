@@ -53,6 +53,11 @@ notifier.on('chatMessage', (game, chatMessage) => {
         return;
     }
 
+    // Chat muted on this device
+    if (usePlayerLocalSettingsStore().isGameChatMuted(game.publicId)) {
+        return;
+    }
+
     playAudioIfNotMuted('/sounds/lisp/NewPM.ogg');
 });
 

@@ -6,6 +6,7 @@ import ChatMessage from './ChatMessage.js';
 import ConditionalMoves from './ConditionalMoves.js';
 import GameAnalyze from './GameAnalyze.js';
 import Game from './Game.js';
+import GameChatSubscription from './GameChatSubscription.js';
 import GameOptions from './GameOptions.js';
 import {
     GameOptionsTimeControl,
@@ -48,6 +49,7 @@ export {
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
+    GameChatSubscription,
     GameOptions,
     GameOptionsTimeControl,
     OptionsFischer,
@@ -91,6 +93,7 @@ export const entities = {
     ChatMessage,
     ConditionalMoves,
     GameAnalyze,
+    GameChatSubscription,
     GameOptions,
     GameOptionsTimeControl,
     OptionsFischer,

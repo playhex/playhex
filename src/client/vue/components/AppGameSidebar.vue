@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, computed, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { IconAlphabet, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123 } from '../icons.js';
+import { IconAlphabet, IconChatDots, IconMeditation, IconMailbox, IconMailboxFlag, IconMuteOff, IconMuteOn, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123 } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
@@ -38,6 +38,7 @@ import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import { useStickToBottom } from '../composables/useStickToBottom.js';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
+import useGameChatSubscriptionsStore from '../../stores/gameChatSubscriptionsStore.js';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 
 const props = defineProps({
@@ -135,6 +136,33 @@ const { contentChanged: chatContentChanged } = useStickToBottom(chatMessagesElem
 
 // New message: only scroll if already at bottom, so reading old messages isn't interrupted.
 watch(game.value.chatMessages, () => chatContentChanged());
+
+/*
+ * Chat mute, on this device only: sound and unread messages badge
+ * while I am on the game page.
+ */
+const playerLocalSettingsStore = usePlayerLocalSettingsStore();
+
+const chatMuted = computed(() => playerLocalSettingsStore.isGameChatMuted(game.value.publicId));
+
+const toggleChatMute = () => playerLocalSettingsStore.toggleGameChatMute(game.value.publicId);
+
+/*
+ * Chat notifications subscription, server side: be notified of new messages while I am away.
+ *
+ * By default, players of the game are subscribed, and observers are not.
+ * Posting a message also subscribes me. Both can be overridden from the bar above the chat.
+ */
+const gameChatSubscriptionsStore = useGameChatSubscriptionsStore();
+
+const chatNotificationsEnabled = computed(() => gameChatSubscriptionsStore.isChatNotificationEnabled(game.value));
+
+const toggleChatNotifications = () => {
+    gameChatSubscriptionsStore.toggleChatNotification(game.value)
+        // eslint-disable-next-line no-console
+        .catch(e => console.error('Could not update chat notifications subscription', e))
+    ;
+};
 
 const sendChat = async () => {
     if (chatInput.value === '') {
@@ -918,7 +946,41 @@ watch(gameUIMode, () => {
         -->
         <div class="sidebar-block block-fill-rest">
             <template v-if="isTab('main')">
-                <div class="chat-messages" ref="chatMessagesElement" @click="chatClick">
+                <div class="chat-notifications-bar">
+                    <h3 class="chat-title">{{ $t('chat') }}</h3>
+
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm text-secondary p-0"
+                        @click="toggleChatMute()"
+                    >
+                        <IconMuteOn v-if="chatMuted" />
+                        <IconMuteOff v-else />
+                        <small>{{ chatMuted ? $t('exit_focus') : $t('let_focus') }}</small>
+                    </button>
+
+                    <button
+                        v-if="loggedInPlayer"
+                        type="button"
+                        class="btn btn-link btn-sm text-secondary p-0"
+                        @click="toggleChatNotifications()"
+                    >
+                        <IconMailboxFlag v-if="chatNotificationsEnabled" />
+                        <IconMailbox v-else />
+                        <small>{{ chatNotificationsEnabled ? $t('discussion_followed') : $t('discussion_not_followed') }}</small>
+                    </button>
+                </div>
+
+                <div v-if="chatMuted" class="chat-focus">
+                    <IconMeditation />
+                    <button
+                        type="button"
+                        class="btn btn-link btn-sm text-secondary p-0"
+                        @click="toggleChatMute()"
+                    ><small>{{ $t('exit_focus') }}</small></button>
+                </div>
+
+                <div v-else class="chat-messages" ref="chatMessagesElement" @click="chatClick">
                     <div class="container-fluid">
                         <div
                             v-for="message, key in richChat?.getRichChatMessages()"
@@ -946,7 +1008,7 @@ watch(gameUIMode, () => {
                                 <small class="header-date text-secondary mt-1">{{ formatChatDateHeader(message.date) }}</small>
                             </template>
                         </div>
-                        <p v-if="!richChat?.getRichChatMessages().length" class="text-secondary">{{ $t('chat') }}</p>
+                        <p v-if="!richChat?.getRichChatMessages().length" class="chat-empty"><IconChatDots /></p>
                     </div>
                 </div>
 
@@ -1019,6 +1081,45 @@ watch(gameUIMode, () => {
         display flex
         flex-direction column
         min-height 0
+
+    .chat-notifications-bar
+        flex 0 0 auto
+        display flex
+        align-items center
+        justify-content flex-end
+        gap 1em
+        padding 0.15em 0.75em
+        border-bottom 1px solid unquote('rgba(var(--bs-secondary-rgb), 0.25)')
+
+        .chat-title
+            flex 1 1 auto
+            margin 0
+            font-size 1rem
+
+        svg
+            margin-inline-end 0.25em
+
+    .chat-focus
+        flex 1 1 auto
+        display flex
+        flex-direction column
+        align-items center
+        justify-content center
+        gap 0.5em
+
+        svg
+            width 9em
+            height 9em
+            opacity 0.12
+
+    .chat-empty
+        text-align center
+        opacity 0.06
+        margin-top 1.5em
+
+        svg
+            width 6em
+            height 6em
 
     .chat-messages
         font-size 0.9em

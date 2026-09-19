@@ -17,6 +17,7 @@ import { isRateLimitReachedErrorPayload } from '../shared/app/rate-limiters.js';
 import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
 import { showToastForTranslatableError } from './services/showToastForTranslatableError.js';
 import { AnalysisInput, AnalysisOutput } from '../shared/app/hexplorer.js';
+import { GameChatSubscriptionItem } from '../shared/app/GameChatSubscriptionItem.js';
 
 /**
  * @throws {DomainHttpError}
@@ -439,6 +440,39 @@ export const apiPostChatMessage = async (chatMessage: Pick<ChatMessage, 'content
         body: JSON.stringify({
             content: chatMessage.content,
         }),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetGameChatSubscriptions = async (): Promise<GameChatSubscriptionItem[]> => {
+    const response = await fetch('/api/game-chat-subscriptions', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+export const apiPutGameChatSubscription = async (gamePublicId: string, enabled: boolean): Promise<void> => {
+    const response = await fetch(`/api/games/${gamePublicId}/chat-subscription`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ enabled }),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiDeleteGameChatSubscription = async (gamePublicId: string): Promise<void> => {
+    const response = await fetch(`/api/games/${gamePublicId}/chat-subscription`, {
+        method: 'DELETE',
     });
 
     await checkResponse(response);

@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Container, Inject, Service } from 'typedi';
 import GameServer from '../GameServer.js';
 import { Player, ChatMessage, Game, GameOptions, Rating, Premove } from '../../shared/app/models/index.js';
 import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
@@ -15,13 +15,14 @@ import OnlinePlayersService from '../services/OnlinePlayersService.js';
 import { createGame, CreateGameParams } from '../../shared/app/models/Game.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
-import { errorToLogger } from '../../shared/app/utils.js';
+import { errorToLogger, errorToString } from '../../shared/app/utils.js';
 import type { HexMove } from '../../shared/move-notation/hex-move-notation.js';
 import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf } from '../../shared/app/gameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
 import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
+import GameChatNotificationService from '../services/GameChatNotificationService.js';
 
 export class GameError extends Error {}
 
@@ -803,6 +804,9 @@ export default class GameStore
             }
 
             gameServer.postChatMessage(chatMessage);
+
+            await this.autoSubscribeChatMessageAuthor(gameServer.getGame(), chatMessage);
+
             return true;
         }
 
@@ -828,7 +832,33 @@ export default class GameStore
 
         this.gameEventEmitter.emitChat(game, chatMessage);
 
+        await this.autoSubscribeChatMessageAuthor(game, chatMessage);
+
         return true;
+    }
+
+    /**
+     * Posting in a game chat subscribes the author to this game chat notifications.
+     * Mostly useful for players who are not in the game: they get notified of the answers.
+     *
+     * Resolved lazily to not add a dependency to GameStore constructor.
+     */
+    private async autoSubscribeChatMessageAuthor(game: Game, chatMessage: ChatMessage): Promise<void>
+    {
+        // System message, or message hidden to others: nothing to subscribe to
+        if (chatMessage.player === null || chatMessage.shadowDeleted) {
+            return;
+        }
+
+        try {
+            await Container.get(GameChatNotificationService).autoSubscribeAuthor(game, chatMessage.player);
+        } catch (e) {
+            logger.warning('Could not auto subscribe chat message author', {
+                gamePublicId: game.publicId,
+                playerPublicId: chatMessage.player.publicId,
+                reason: errorToString(e),
+            });
+        }
     }
 
     moderateDeleteChatMessages(publicIds: string[]): number

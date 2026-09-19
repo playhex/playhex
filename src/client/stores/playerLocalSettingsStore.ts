@@ -45,6 +45,17 @@ export class LocalSettings
      */
     @Expose()
     muteAudio?: boolean;
+
+    /**
+     * Public ids of the games whose chat I muted on this device:
+     * no sound, and no unread messages badge, while I am on the game page.
+     *
+     * This is only about what happens while I am watching the game.
+     * Whether I am notified when I am away is a server side setting,
+     * see game chat subscriptions.
+     */
+    @Expose()
+    mutedGameChats: string[] = [];
 }
 
 const loadLocalSettings = (): LocalSettings => {
@@ -97,6 +108,27 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
         : 'light'
     ;
 
+    /*
+     * Game chats muted on this device
+     */
+    const isGameChatMuted = (gamePublicId: string): boolean => {
+        return localSettings.value.mutedGameChats?.includes(gamePublicId) ?? false;
+    };
+
+    const toggleGameChatMute = (gamePublicId: string): void => {
+        if (!localSettings.value.mutedGameChats) {
+            localSettings.value.mutedGameChats = [];
+        }
+
+        const index = localSettings.value.mutedGameChats.indexOf(gamePublicId);
+
+        if (index < 0) {
+            localSettings.value.mutedGameChats.push(gamePublicId);
+        } else {
+            localSettings.value.mutedGameChats.splice(index, 1);
+        }
+    };
+
     const switchTheme = (): void => {
         localSettings.value.selectedTheme = displayedTheme() === 'light'
             ? 'dark'
@@ -114,6 +146,8 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
 
         switchTheme,
         displayedTheme,
+        isGameChatMuted,
+        toggleGameChatMute,
     };
 
 });
