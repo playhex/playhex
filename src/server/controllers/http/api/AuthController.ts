@@ -33,6 +33,27 @@ class ChangePasswordInput
     newPassword: string;
 }
 
+/**
+ * Start a fresh session for a player who just authenticated (login or account creation).
+ *
+ * The session id must be renewed here: a session id known before authentication
+ * (e.g set by an attacker on a victim's browser) must not stay valid once it carries
+ * an authenticated account. See session fixation.
+ */
+const regenerateSessionFor = (request: Request, player: Player): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        request.session.regenerate(err => {
+            if (err) {
+                reject(err instanceof Error ? err : new Error(String(err)));
+                return;
+            }
+
+            request.session.playerId = player.publicId;
+            resolve();
+        });
+    });
+};
+
 @JsonController()
 @Service()
 export default class AuthController
@@ -69,7 +90,6 @@ export default class AuthController
     @Post('/api/auth/signup')
     async signup(
         @Body() body: LoginPasswordInput,
-        @Session() session: SessionData,
         @Req() request: Request,
     ) {
         await rateLimiterConsumeAccountCreation(request.ip);
@@ -77,7 +97,7 @@ export default class AuthController
         try {
             const player = await this.playerRepository.createPlayer(body.pseudo.trim(), body.password);
 
-            session.playerId = player.publicId;
+            await regenerateSessionFor(request, player);
 
             return player;
         } catch (e) {
@@ -112,6 +132,8 @@ export default class AuthController
         try {
             const upgradedPlayer = await this.playerRepository.upgradeGuest(player.publicId, body.pseudo.trim(), body.password);
 
+            await regenerateSessionFor(request, upgradedPlayer);
+
             return upgradedPlayer;
         } catch (e) {
             if (e instanceof MustBeGuestError) {
@@ -141,13 +163,12 @@ export default class AuthController
     @Post('/api/auth/login')
     async login(
         @Body() body: LoginPasswordInput,
-        @Session() session: SessionData,
         @Req() request: Request,
     ) {
         try {
             const player = await authenticate(body.pseudo.trim(), body.password);
 
-            session.playerId = player.publicId;
+            await regenerateSessionFor(request, player);
 
             return player;
         } catch (e) {
