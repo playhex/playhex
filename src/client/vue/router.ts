@@ -104,7 +104,7 @@ const routes: RouteRecordRaw[] = [
     },
     {
         name: 'playing-games',
-        path: '/playing-games/:mode(live|correspondence)?',
+        path: '/playing-games/:mode(live|correspondence|bot)?',
         component: () => import('./pages/PagePlayingGames.vue'),
     },
     {

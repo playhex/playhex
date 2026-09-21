@@ -2,11 +2,11 @@
 import { computed, onMounted, ref } from 'vue';
 import { Game } from '../../../shared/app/models/index.js';
 import { apiGetActiveGames } from '../../apiClient.js';
-import { isLive, isCorrespondence, TimeControlCadency } from '../../../shared/app/timeControlUtils.js';
+import { isLive, isCorrespondence } from '../../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../../shared/app/gameUtils.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { IconLightningChargeFill, IconCalendar } from '../icons.js';
+import { IconLightningChargeFill, IconCalendar, IconRobot } from '../icons.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useHead } from '@unhead/vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -29,23 +29,53 @@ const THUMBNAILS_COLUMN_CLASSES = [
 
 type SortKey = 'recently-started' | 'recently-played' | 'most-moves' | 'longest' | 'player-rating';
 
+/**
+ * Bot games are in their own view, whatever their cadency,
+ * so this is not a TimeControlCadency.
+ */
+type PlayingGamesView = 'live' | 'correspondence' | 'bot';
+
 const allPlayingGames = ref<Game[]>([]);
 const loading = ref(true);
 const router = useRouter();
 const route = useRoute();
-const currentLobby = computed(() => route.params.mode === 'correspondence' ? 'correspondence' : 'live');
+const currentLobby = computed<PlayingGamesView>(() => {
+    if (route.params.mode === 'correspondence') return 'correspondence';
+    if (route.params.mode === 'bot') return 'bot';
+    return 'live';
+});
 const sort = ref<SortKey>(route.params.mode === 'correspondence' ? 'most-moves' : 'recently-started');
-const setLobby = (mode: TimeControlCadency) => router.push({ name: 'playing-games', params: { mode } });
+const setLobby = (mode: PlayingGamesView) => router.push({ name: 'playing-games', params: { mode } });
 
 onMounted(async () => {
     const games = await apiGetActiveGames();
-    allPlayingGames.value = games.filter(g => g.state === 'playing' && !isBotGame(g));
+    allPlayingGames.value = games.filter(g => g.state === 'playing');
     loading.value = false;
 });
 
-const liveGames = computed(() => allPlayingGames.value.filter(g => isLive(g)));
-const correspondenceGames = computed(() => allPlayingGames.value.filter(g => isCorrespondence(g)));
-const baseGames = computed(() => currentLobby.value === 'live' ? liveGames.value : correspondenceGames.value);
+const liveGames = computed(() => allPlayingGames.value.filter(g => !isBotGame(g) && isLive(g)));
+const correspondenceGames = computed(() => allPlayingGames.value.filter(g => !isBotGame(g) && isCorrespondence(g)));
+const botGames = computed(() => allPlayingGames.value.filter(g => isBotGame(g)));
+
+const baseGames = computed(() => {
+    switch (currentLobby.value) {
+        case 'live': return liveGames.value;
+        case 'correspondence': return correspondenceGames.value;
+        case 'bot': return botGames.value;
+    }
+});
+
+const cardTitleKey = computed(() => ({
+    live: 'playing_games.live_games',
+    correspondence: 'playing_games.correspondence_games',
+    bot: 'bot_games',
+})[currentLobby.value]);
+
+const emptyMessageKey = computed(() => ({
+    live: 'playing_games.no_live_games',
+    correspondence: 'playing_games.no_correspondence_games',
+    bot: 'playing_games.no_bot_games',
+})[currentLobby.value]);
 
 const maxRating = (game: Game): number => {
     return Math.max(
@@ -114,13 +144,22 @@ const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLU
                 <IconCalendar /> {{ $t('time_cadency.correspondence') }}
                 <span class="badge ms-1" :class="currentLobby === 'correspondence' ? 'text-bg-dark' : 'text-bg-warning'">{{ correspondenceGames.length }}</span>
             </button>
+            <button
+                @click="setLobby('bot')"
+                class="btn"
+                :class="currentLobby === 'bot' ? 'btn-info' : 'btn-outline-secondary'"
+                type="button"
+            >
+                <IconRobot /> {{ $t('bot_games') }}
+                <span class="badge ms-1" :class="currentLobby === 'bot' ? 'text-bg-dark' : 'text-bg-info'">{{ botGames.length }}</span>
+            </button>
         </div>
 
         <!-- Games card -->
         <div class="card">
             <div class="card-header d-flex align-items-center gap-2 flex-wrap">
                 <span class="fw-bold me-auto">
-                    {{ $t(currentLobby === 'live' ? 'playing_games.live_games' : 'playing_games.correspondence_games') }}
+                    {{ $t(cardTitleKey) }}
                     <span class="badge text-bg-secondary ms-1">{{ baseGames.length }}</span>
                 </span>
 
@@ -139,7 +178,7 @@ const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLU
             </div>
 
             <div v-else-if="baseGames.length === 0" class="card-body text-secondary">
-                <i>{{ $t(currentLobby === 'live' ? 'playing_games.no_live_games' : 'playing_games.no_correspondence_games') }}</i>
+                <i>{{ $t(emptyMessageKey) }}</i>
             </div>
 
             <!-- First games as thumbnails, a single row depending on screen size -->

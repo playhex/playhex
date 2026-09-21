@@ -96,7 +96,8 @@
         "live_games": "Parties en direct",
         "correspondence_games": "Parties par correspondance",
         "no_live_games": "Pas de parties en direct en cours",
-        "no_correspondence_games": "Pas de parties par correspondance en cours"
+        "no_correspondence_games": "Pas de parties par correspondance en cours",
+        "no_bot_games": "Pas de parties contre l’IA en cours"
     },
     "sort_recently_started": "Les plus récentes",
     "sort_most_moves": "Le plus de coups joués",

@@ -297,7 +297,8 @@
         "live_games": "Live games",
         "correspondence_games": "Correspondence games",
         "no_live_games": "No live games in progress",
-        "no_correspondence_games": "No correspondence games in progress"
+        "no_correspondence_games": "No correspondence games in progress",
+        "no_bot_games": "No bot games in progress"
     },
     "sort_recently_started": "Recently started",
     "sort_recently_played": "Recently played",
