@@ -14,7 +14,7 @@ useHead({
 const onlinePlayersStore = useOnlinePlayersStore();
 onlinePlayersStore.subscribeFullList();
 
-const { players, totalPlayers } = storeToRefs(onlinePlayersStore);
+const { players, totalPlayers, activePlayersCount } = storeToRefs(onlinePlayersStore);
 
 type SortMode = 'rating' | 'alpha';
 const sortMode = ref<SortMode>('rating');
@@ -44,7 +44,7 @@ const sortedPlayers = computed<OnlinePlayer[]>(() => {
 <template>
     <div class="container my-3">
         <div class="d-flex align-items-center gap-3 mb-3">
-            <h1 class="mb-0">{{ $t('online_players_heading', { n: totalPlayers ?? '…' }) }}</h1>
+            <h1 class="mb-0">{{ $t('online_players_heading', { n: activePlayersCount ?? '…' }) }}</h1>
 
             <div class="btn-group btn-group-sm ms-auto">
                 <input type="radio" class="btn-check" id="sort-rating" v-model="sortMode" value="rating" autocomplete="off">
@@ -73,6 +73,13 @@ const sortedPlayers = computed<OnlinePlayer[]>(() => {
     background var(--bs-body-bg)
     border 1px solid var(--bs-border-color)
     font-size 0.9em
+    position relative
+
+    // make the whole item clickable, and not only the player pseudo
+    :deep(.pseudo-link)::after
+        content ''
+        position absolute
+        inset 0
 
     &.inactive
         opacity 0.5
