@@ -40,13 +40,20 @@ const lobbyRooms = (game: Game): string[] => {
         return [];
     }
 
-    return [
-        isBotGame(game)
-            ? Rooms.lobbyBotGames
-            : Rooms.lobby
-        ,
-    ];
+    return startedGameLobbyRooms(game);
 };
+
+/**
+ * Same as lobbyRooms(), but also for challenge games:
+ * once started, a challenge game is a public game like any other,
+ * and must appear then disappear in observable games lists.
+ */
+const startedGameLobbyRooms = (game: Game): string[] => [
+    isBotGame(game)
+        ? Rooms.lobbyBotGames
+        : Rooms.lobby
+    ,
+];
 
 /**
  * Emits game events through websocket.
@@ -81,7 +88,7 @@ export class GameEventsEmitter
         const gameSerialized = addLegacyAliases(instanceToInstance(game));
 
         io().to([
-            ...lobbyRooms(game),
+            ...startedGameLobbyRooms(game),
         ]).emit('lobbyGameStarted', gameSerialized);
 
         io().to([
@@ -154,7 +161,7 @@ export class GameEventsEmitter
         ]).emit('ended', game.publicId, winner, outcome, endedAt);
 
         io().to([
-            ...lobbyRooms(game),
+            ...startedGameLobbyRooms(game),
         ]).emit('lobbyGameEnded', addLegacyAliases(instanceToInstance(game)));
     }
 
@@ -162,7 +169,7 @@ export class GameEventsEmitter
     {
         io().to([
             Rooms.game(game.publicId),
-            ...lobbyRooms(game),
+            ...startedGameLobbyRooms(game),
             ...gamePlayersRooms(game),
             Rooms.thumbnailGame(game.publicId),
         ]).emit('gameCanceled', game.publicId, canceledAt);
@@ -172,7 +179,7 @@ export class GameEventsEmitter
     {
         io().to([
             Rooms.game(game.publicId),
-            ...(isChallengeGame(game) ? [] : [Rooms.lobby, Rooms.lobbyBotGames]),
+            ...startedGameLobbyRooms(game),
         ]).emit('ratingsUpdated', game.publicId, instanceToInstance(newRatings.filter(rating => rating.category === 'overall'), {
             groups: ['rating'],
         }));

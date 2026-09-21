@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 import { Game } from '../../../shared/app/models/index.js';
-import { apiGetActiveGames } from '../../apiClient.js';
-import { isLive, isCorrespondence } from '../../../shared/app/timeControlUtils.js';
-import { isBotGame } from '../../../shared/app/gameUtils.js';
+import usePlayingGamesStore from '../../stores/playingGamesStore.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { IconLightningChargeFill, IconCalendar, IconRobot } from '../icons.js';
@@ -35,8 +34,8 @@ type SortKey = 'recently-started' | 'recently-played' | 'most-moves' | 'longest'
  */
 type PlayingGamesView = 'live' | 'correspondence' | 'bot';
 
-const allPlayingGames = ref<Game[]>([]);
-const loading = ref(true);
+const playingGamesStore = usePlayingGamesStore();
+const { loading, liveGames, correspondenceGames, botGames } = storeToRefs(playingGamesStore);
 const router = useRouter();
 const route = useRoute();
 const currentLobby = computed<PlayingGamesView>(() => {
@@ -47,15 +46,17 @@ const currentLobby = computed<PlayingGamesView>(() => {
 const sort = ref<SortKey>(route.params.mode === 'correspondence' ? 'most-moves' : 'recently-started');
 const setLobby = (mode: PlayingGamesView) => router.push({ name: 'playing-games', params: { mode } });
 
-onMounted(async () => {
-    const games = await apiGetActiveGames();
-    allPlayingGames.value = games.filter(g => g.state === 'playing');
-    loading.value = false;
-});
+onMounted(() => void playingGamesStore.load());
 
-const liveGames = computed(() => allPlayingGames.value.filter(g => !isBotGame(g) && isLive(g)));
-const correspondenceGames = computed(() => allPlayingGames.value.filter(g => !isBotGame(g) && isCorrespondence(g)));
-const botGames = computed(() => allPlayingGames.value.filter(g => isBotGame(g)));
+// Bot games events are only received while their view is displayed
+watch(currentLobby, mode => playingGamesStore.watchingBotGames = mode === 'bot', { immediate: true });
+onBeforeUnmount(() => playingGamesStore.watchingBotGames = false);
+
+/**
+ * While not on bot games view, bot games updates are not received,
+ * so their count would go stale: show it as unknown instead.
+ */
+const botGamesCount = computed(() => playingGamesStore.watchingBotGames ? botGames.value.length : '?');
 
 const baseGames = computed(() => {
     switch (currentLobby.value) {
@@ -147,11 +148,11 @@ const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLU
             <button
                 @click="setLobby('bot')"
                 class="btn"
-                :class="currentLobby === 'bot' ? 'btn-info' : 'btn-outline-secondary'"
+                :class="currentLobby === 'bot' ? 'btn-primary' : 'btn-outline-secondary'"
                 type="button"
             >
                 <IconRobot /> {{ $t('bot_games') }}
-                <span class="badge ms-1" :class="currentLobby === 'bot' ? 'text-bg-dark' : 'text-bg-info'">{{ botGames.length }}</span>
+                <span class="badge ms-1" :class="currentLobby === 'bot' ? 'text-bg-light' : 'text-bg-primary'">{{ botGamesCount }}</span>
             </button>
         </div>
 
