@@ -115,6 +115,8 @@ export const availableLocales: AvailableLocales = {
             { fullName: 'FlyPside', link: 'https://playhex.org/@flypside' },
             { fullName: 'Eryk Michalak', link: 'https://hosted.weblate.org/user/gnu-ewm/' },
             { fullName: 'BlackHat', link: 'https://playhex.org/@blackhat' },
+            { fullName: 'Demon Batuty', link: 'https://hosted.weblate.org/user/przemek15a/' },
+            { fullName: 'Cootje17a', link: 'https://github.com/Cootje17a' },
         ],
     },
     pt: {
@@ -126,6 +128,8 @@ export const availableLocales: AvailableLocales = {
         loader: () => import('date-fns/locale/ru') as unknown as DefaultExportLocale,
         translators: [
             { fullName: 'Maksim Кабанов', link: 'https://hosted.weblate.org/user/law820314/' },
+            { fullName: 'igorantonow314', link: 'https://hosted.weblate.org/user/igorantonow314/' },
+            { fullName: 'vanapro1', link: 'https://hosted.weblate.org/user/vanapro1/' },
         ],
     },
     sv: {
