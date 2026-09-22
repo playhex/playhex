@@ -42,10 +42,9 @@ describe('Tournament series', () => {
 
         // No tournament yet
         cy.contains('No tournament has been played in this series yet.');
-        cy.contains('code', seriesTitle + ' 1');
 
         // Create first instance, title is prefilled from the pattern
-        cy.contains('Create next instance').click();
+        cy.contains('Create next instance').first().click();
         cy.get('#name').should('have.value', seriesTitle + ' 1');
         cy.contains('This tournament will be an instance of');
 
@@ -66,7 +65,10 @@ describe('Tournament series', () => {
 
         // Series now lists its instance, and next one is numbered 2
         cy.contains(seriesTitle + ' 1');
-        cy.contains('code', seriesTitle + ' 2');
+
+        cy.contains('Create next instance').first().click();
+        cy.get('#name').should('have.value', seriesTitle + ' 2');
+        cy.go('back');
 
         // Cannot delete a series having tournaments
         cy.contains('Edit series').click();

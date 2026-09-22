@@ -47,7 +47,7 @@ describe('Avatar display', () => {
         interceptProfilePage(playerWithAvatar);
         cy.visit('/@player-test');
 
-        cy.get('header .nav-avatar')
+        cy.get('header .nav-avatar .player-avatar')
             .should('exist')
             .and('have.attr', 'src')
             .and('include', 'test-uuid_thumb.jpg');
@@ -58,7 +58,7 @@ describe('Avatar display', () => {
 
         cy.visit('/@player-test');
 
-        cy.get('header .nav-avatar-icon').should('exist');
+        cy.get('header .nav-avatar .player-avatar-icon').should('exist');
     });
 });
 
