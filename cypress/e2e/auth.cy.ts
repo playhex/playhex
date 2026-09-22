@@ -151,6 +151,7 @@ describe('Authentication', () => {
 
     it('requires a valid password on signup', () => {
         cy.visit('/signup');
+        cy.containsGuestPseudo('.menu-top');
 
         // Create account
         cy
@@ -189,6 +190,7 @@ describe('Authentication', () => {
         });
 
         cy.visit('/signup');
+        cy.containsGuestPseudo('.menu-top');
 
         // Create account
         cy
@@ -225,6 +227,7 @@ describe('Authentication', () => {
         const password = 'test';
 
         cy.visit('/signup');
+        cy.containsGuestPseudo('.menu-top');
 
         const signupForm = () => cy.contains('h2', 'Create an account').closest('form');
         signupForm().contains('Username').click().type(pseudo);
@@ -289,6 +292,7 @@ describe('Authentication', () => {
         const password = 'test';
 
         cy.visit('/signup');
+        cy.containsGuestPseudo('.menu-top');
 
         const signupForm = () => cy.contains('h2', 'Create an account').closest('form');
         signupForm().contains('Username').click().type(pseudo);

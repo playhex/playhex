@@ -18,7 +18,7 @@ describe('LittleGolemLink', () => {
     it('rejects a downloaded game that is not finished (no RE)', async () => {
         const originalFetch = global.fetch;
 
-        global.fetch = (async () => new Response('(;FF[4]SZ[13];W[am];B[ii])', { status: 200 })) as typeof fetch;
+        global.fetch = () => Promise.resolve(new Response('(;FF[4]SZ[13];W[am];B[ii])', { status: 200 }));
 
         try {
             await assert.rejects(

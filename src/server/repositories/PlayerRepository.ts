@@ -247,24 +247,35 @@ export default class PlayerRepository
             throw new MustBeGuestError();
         }
 
-        player.isGuest = false;
-        player.pseudo = pseudo.trim();
-        player.slug = pseudoSlug(pseudo);
-        player.registeredAt = new Date();
+        // Do not mutate player instance before saving: it is shared (identity map),
+        // and could be reverted by a concurrent getPlayer() while awaiting.
+        const upgrade = {
+            isGuest: false,
+            pseudo: pseudo.trim(),
+            slug: pseudoSlug(pseudo),
+            registeredAt: new Date(),
+        };
 
         const playerAccountPassword = new PlayerAccountPassword();
 
         playerAccountPassword.player = player;
-        playerAccountPassword.login = player.pseudo;
+        playerAccountPassword.login = upgrade.pseudo;
         playerAccountPassword.password = await hashPassword(password);
         playerAccountPassword.createdAt = new Date();
         playerAccountPassword.updatedAt = new Date();
 
         try {
             await this.playerRepository.manager.transaction(async manager => {
-                await manager.save(player);
+                await manager.createQueryBuilder(Player, 'player')
+                    .update()
+                    .where('publicId = :publicId', { publicId })
+                    .set(upgrade)
+                    .execute()
+                ;
                 await manager.save(playerAccountPassword);
             });
+
+            Object.assign(player, upgrade);
 
             logger.info('Player created an account from guest', {
                 pseudo,

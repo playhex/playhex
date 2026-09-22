@@ -1,7 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { sockeye } from '@sockeye-js/collect-socketio';
 import { createMemoryStore } from '@sockeye-js/store-memory';
-import { createRedisStore } from '@sockeye-js/store-redis';
+import { createRedisStore, RedisLike } from '@sockeye-js/store-redis';
 import { dashboard } from '@sockeye-js/ui';
 import { Express, NextFunction, Request, Response } from 'express';
 import { Redis } from 'ioredis';
@@ -64,7 +64,8 @@ const initSockeye = (app: Express, io: Server): void => {
     const { REDIS_URL, REDIS_PREFIX } = process.env;
 
     const store = REDIS_URL
-        ? createRedisStore(new Redis(REDIS_URL), {
+        // ioredis 6 types reject numeric `stop` in zrange, but runtime behaviour is unchanged
+        ? createRedisStore(new Redis(REDIS_URL) as unknown as RedisLike, {
             prefix: (REDIS_PREFIX ?? 'hex') + '-sockeye',
             onError: error => logger.warning('sockeye could not flush its metrics to Redis', { error }),
         })

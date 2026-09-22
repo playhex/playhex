@@ -47,7 +47,7 @@ export class LittleGolemSGF implements ImporterHandlerInterface
         for (const move of sgf.moves ?? []) {
             // Little Golem hex records can start with either color,
             // so read whichever of B/W is actually set on this node.
-            const value = (move.B ?? move.W) as undefined | string;
+            const value = move.B ?? move.W;
 
             if (value === undefined) {
                 continue;

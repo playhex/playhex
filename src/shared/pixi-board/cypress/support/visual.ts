@@ -19,12 +19,12 @@ Cypress.Commands.add('compareSnapshot', (expectedFilename: string) => {
     cy.log('expectedFilename', expectedFilename);
     cy.get('#board canvas').screenshot(expectedFilename, { overwrite: true });
 
-    const update = Cypress.env('UPDATE_SNAPSHOTS') === 'true';
-
-    cy.task<{ created?: boolean, diffPixels?: number, totalPixels?: number }>(
-        '_pixelCompare',
-        { update },
-    ).then(result => {
+    cy.env<{ UPDATE_SNAPSHOTS?: string | boolean }>(['UPDATE_SNAPSHOTS']).then(({ UPDATE_SNAPSHOTS }) => {
+        return cy.task<{ created?: boolean, diffPixels?: number, totalPixels?: number }>(
+            '_pixelCompare',
+            { update: String(UPDATE_SNAPSHOTS) === 'true' },
+        );
+    }).then(result => {
         if (result.created) {
             cy.log(`Reference snapshot created: ${expectedFilename}`);
             return;
