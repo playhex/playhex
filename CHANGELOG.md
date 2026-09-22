@@ -1,3 +1,48 @@
+## September 23, 2026
+*New on PlayHex, since last 2 months*
+
+I made a break in august, but here are changes for september.
+
+I added tournament series and auto creation of tournaments:
+Hex Monthly, for example, will have its own page, with all past Hex Monthlies.
+And every month, tournament can be created automatically if enabled.
+
+### New
+- **Focus mode** on a game to mute chat
+- And as an observer, **subscribe to a chat** to receive mailbox notifications for chat messages
+- **Head to head** on player page: your score against a player, first and last games played together
+- **Shortcut to add your country flag** from your profile
+- New statistics: total **blunders**, and **hours played** on live games
+- New player menu in header, when hover/click your nickname, with some shortcuts
+- You can now observe all bot games in Games > Observe
+
+### Tournaments
+- **Tournament series**! Group tournaments into a series, with an overall leaderboard and a podium
+- A series can **automatically create next instances**
+- Reorganized the tournament **manage page**
+- Do not show playing an ended tournament in **upcoming** tournaments section
+- Fixed bye matches wrongly giving a point in Swiss and round robin
+- Fixed round robin correspondence score board not updating (reported by @Sfcontra, @defn)
+- Fixed tournaments with only 2 participants in single elimination (extra empty match created)
+- Fixed time control not prefilled when cloning a tournament
+
+### Changed
+- Pending **challenges are now shown first** in the "My turn to play" list, and are more visible
+- Reorganized the player **settings page**
+- "Observe games" menu simplified: top games and all games are now shown together
+- Takeback request is displayed above the board, to not overfill the bottom buttons
+- Asking for a takeback now requires a confirmation
+- Pass and takeback shortcuts in bot games (instead of open the secondary menu)
+- **Rematch** is no longer blocked when you already have a pending challenge against that player
+
+### Fixed
+- Fixed session security issue: your session is now regenerated when you log in or create an account
+- Fixed player rating showing ~1500 instead of the real rating, and avatar/flag not updating for other players
+- Fixed mailbox notification showing "Game vs -" without the opponent nickname
+- Fixed chat scrolling down on a new message while you were reading older ones (reported by @hexanna)
+- On mobile, do not send message when clicking on "enter" to prevent unwanted submit (reported by @defn)
+- Fixed a bug that prevent new player panel (in header) to opens (reported by @hexanna)
+
 ## July 29, 2026
 *New on PlayHex, since last month*
 
