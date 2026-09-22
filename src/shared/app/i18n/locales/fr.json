@@ -693,8 +693,7 @@
         "failed_login": "la connexion",
         "create_game": "la création de partie",
         "challenge_player": "défier un joueur",
-        "challenge_same_target": "redéfier ce joueur",
-        "analyze_position": ""
+        "challenge_same_target": "redéfier ce joueur"
     },
     "game_with_player_has_started": "{{player}} a rejoint votre partie et la partie a commencé",
     "conditional_moves": {
@@ -989,18 +988,5 @@
         "opening_moves_note": "Pour les plateaux {{boardsize}}, la taille la plus jouée.",
         "rating_distribution": "Répartition des classements",
         "rating_distribution_note": "Seuls les joueurs non-bots avec un classement stabilisé (déviation inférieure à {{deviation}}) sont comptabilisés. Les invités sont inclus."
-    },
-    "player_menu": {
-        "open_menu": "",
-        "my_account": "",
-        "my_guest_account": "",
-        "enable_notifications": "",
-        "notifications_enabled": "",
-        "notifications_blocked": "",
-        "more_languages": ""
-    },
-    "audio": "",
-    "sort_recently_played": "",
-    "already_have_open_challenge_against_this_player": "",
-    "cannot_challenge_yourself": ""
+    }
 }
