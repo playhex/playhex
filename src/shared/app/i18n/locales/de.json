@@ -978,7 +978,7 @@
         "swap_rate": "",
         "swap_rate_help": "",
         "live_play_time": "",
-        "hours": "{{hours}} Std.",
+        "hours": "{{hours}} h",
         "live_play_time_help": "",
         "blunders": "",
         "blunders_help": "",
