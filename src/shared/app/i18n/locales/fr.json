@@ -694,7 +694,7 @@
         "create_game": "la création de partie",
         "challenge_player": "défier un joueur",
         "challenge_same_target": "redéfier ce joueur",
-        "analyze_position": "analyse des positions"
+        "analyze_position": ""
     },
     "game_with_player_has_started": "{{player}} a rejoint votre partie et la partie a commencé",
     "conditional_moves": {
@@ -991,16 +991,16 @@
         "rating_distribution_note": "Seuls les joueurs non-bots avec un classement stabilisé (déviation inférieure à {{deviation}}) sont comptabilisés. Les invités sont inclus."
     },
     "player_menu": {
-        "open_menu": "Ouvrir le menu du joueur",
-        "my_account": "Mon compte",
-        "my_guest_account": "Mon compte invité",
-        "enable_notifications": "Activer les notifications",
-        "notifications_enabled": "Notifications activées",
-        "notifications_blocked": "Notifications bloquées",
-        "more_languages": "Plus de langues"
+        "open_menu": "",
+        "my_account": "",
+        "my_guest_account": "",
+        "enable_notifications": "",
+        "notifications_enabled": "",
+        "notifications_blocked": "",
+        "more_languages": ""
     },
-    "audio": "Audio",
-    "sort_recently_played": "Récemment joués",
-    "already_have_open_challenge_against_this_player": "Vous avez déjà un défi en attente contre ce joueur.",
-    "cannot_challenge_yourself": "Vous ne pouvez pas vous défier vous-même."
+    "audio": "",
+    "sort_recently_played": "",
+    "already_have_open_challenge_against_this_player": "",
+    "cannot_challenge_yourself": ""
 }
