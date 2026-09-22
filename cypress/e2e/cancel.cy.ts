@@ -1,7 +1,7 @@
 describe('Cancel a game', () => {
     it('displays button to cancel a game', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom();
 
@@ -23,7 +23,7 @@ describe('Cancel a game', () => {
 
     it('cancels successfully an 1v1 game if nobody joined', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy
             .contains('Ranked')

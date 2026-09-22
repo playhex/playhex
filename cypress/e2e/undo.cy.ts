@@ -40,7 +40,7 @@ describe('Undo', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Takeback').click();
 
-        cy.contains(/Guest \d+ took back their move/);
+        cy.containsGuestPseudo(null, /GUEST took back their move/);
 
         cy.wait(200); // Wait to make sure cypress capture js error and fail if any
     });
@@ -70,7 +70,7 @@ describe('Undo', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Takeback').click();
 
-        cy.contains(/Guest \d+ took back their move/);
+        cy.containsGuestPseudo(null, /GUEST took back their move/);
 
         cy.wait(200); // Wait to make sure cypress capture js error and fail if any
     });
@@ -100,7 +100,7 @@ describe('Undo', () => {
         cy.get('[aria-label="Secondary actions"]').click();
         cy.contains('Takeback').click();
 
-        cy.contains(/Guest \d+ took back their move/);
+        cy.containsGuestPseudo(null, /GUEST took back their move/);
 
         cy.wait(200); // Wait to make sure cypress capture js error and fail if any
 

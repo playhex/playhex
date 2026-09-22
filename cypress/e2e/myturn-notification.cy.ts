@@ -110,7 +110,7 @@ describe('My turn notification', () => {
 
     it('does not take bot games into account', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom(false);
 

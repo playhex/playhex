@@ -1,7 +1,7 @@
 describe('Confirm move', () => {
     it('can change "ask move confirm" parameters', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         // Create normal game
         cy.createAIGameWithRandom();
@@ -11,8 +11,7 @@ describe('Confirm move', () => {
         cy.contains('Confirm move').should('not.exist');
 
         // Enable Confirm move in settings
-        cy.contains(/Guest \d+/).click();
-        cy.contains('Settings').click();
+        cy.openPlayerMenu().contains('Settings').click();
 
         cy.contains('.list-group-item', 'Game').click();
 
@@ -21,7 +20,7 @@ describe('Confirm move', () => {
         cy.get('[for="move-settings-normal-3"]').click();
 
         // Go back to game, Confirm move button should be there
-        cy.contains(/Guest \d+/).click();
+        cy.goToMyProfilePage();
         cy.contains('Watch').click();
         cy.contains('button', 'Cancel');
 

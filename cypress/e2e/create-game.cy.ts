@@ -2,7 +2,7 @@ describe('Create game', () => {
     describe('Boardsize', () => {
         it('predefined sizes are reactive with custom input in create AI game form', () => {
             cy.visit('/');
-            cy.get('.menu-top').contains(/Guest \d+/);
+            cy.containsGuestPseudo('.menu-top');
 
             cy.contains('Play vs AI').click();
             cy.contains('label', 'TestBot Determinist instant').click();
@@ -43,7 +43,7 @@ describe('Create game', () => {
 
         it('predefined sizes are reactive with custom input in create 1v1 game form', () => {
             cy.visit('/');
-            cy.get('.menu-top').contains(/Guest \d+/);
+            cy.containsGuestPseudo('.menu-top');
 
             cy.get('.play-buttons').contains('Ranked').click();
 

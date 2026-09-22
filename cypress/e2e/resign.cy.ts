@@ -1,7 +1,7 @@
 describe('Resign a game', () => {
     it('displays button to resign a game', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom();
 

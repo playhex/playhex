@@ -1,6 +1,28 @@
 declare namespace Cypress {
     interface Chainable {
         /**
+         * Assert that a guest pseudo, i.e "Guest 1234", is displayed, and yield the element containing it.
+         * Useful to wait for the page to be loaded and the player logged in.
+         *
+         * cy.containsGuestPseudo(); // anywhere in the page
+         * cy.containsGuestPseudo('.menu-top'); // inside an element matching this selector
+         * cy.containsGuestPseudo('.sidebar', /GUEST wins!/); // with surrounding text, "GUEST" being the guest pseudo
+         * cy.containsGuestPseudo(null, /GUEST wins!/); // anywhere in the page, with surrounding text
+         */
+        containsGuestPseudo(selector?: null | string, pattern?: RegExp): Chainable<JQuery<HTMLElement>>;
+
+        /**
+         * Open the player menu from the top menu, and yield it.
+         */
+        openPlayerMenu(): Chainable<JQuery<HTMLElement>>;
+
+        /**
+         * Open player menu from top menu, then go to my profile page.
+         * Yields the pseudo heading of the profile page.
+         */
+        goToMyProfilePage(): Chainable<JQuery<HTMLElement>>;
+
+        /**
          * Open AI game creation popin, select determinist bot.
          *
          * @param submit Pass submit=false to keep game options popin open. Defaults to true.

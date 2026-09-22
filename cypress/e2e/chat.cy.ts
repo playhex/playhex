@@ -1,19 +1,19 @@
 describe('Chat', () => {
     it('can post chat message', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom();
 
         cy.get('.chat-input input').type('Hello, have a good game!');
         cy.contains('.chat-input button', 'Send').click();
 
-        cy.contains('.chat-messages', /\d+:\d+ Guest \d+ Hello, have a good game!/);
+        cy.containsGuestPseudo('.chat-messages', /\d+:\d+ GUEST Hello, have a good game!/);
         cy.get('.chat-input input').should('have.value', '');
 
         // Chat messages stays after page refresh
         cy.reload();
-        cy.contains('.chat-messages', /\d+:\d+ Guest \d+ Hello, have a good game!/);
+        cy.containsGuestPseudo('.chat-messages', /\d+:\d+ GUEST Hello, have a good game!/);
     });
 
     it('shows previous chat message on game page load', () => {

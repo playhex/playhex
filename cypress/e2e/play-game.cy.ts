@@ -1,7 +1,7 @@
 describe('Play a game to the end', () => {
     beforeEach(() => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom(false);
 
@@ -54,7 +54,7 @@ describe('Play a game to the end', () => {
         cy.play(153, 259);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ wins!/);
+        cy.containsGuestPseudo(null, /GUEST wins!/);
     });
 
     it('loses vs cpu on board size 4', () => {
@@ -94,6 +94,6 @@ describe('Play a game to the end', () => {
         cy.play(236, 217);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ wins!/);
+        cy.containsGuestPseudo(null, /GUEST wins!/);
     });
 });

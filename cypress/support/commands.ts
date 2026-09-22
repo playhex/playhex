@@ -47,6 +47,47 @@ const { Game, OnlinePlayers } = require('../../src/shared/app/models');
  * To add a command, also add declaration in ./index.d.ts
  */
 
+/*
+ * Guest pseudo, as displayed in the page.
+ * "Guest" and the player number are two distinct elements,
+ * separated by a non breaking space, so match whitespaces loosely.
+ */
+const guestPseudoPattern = 'Guest\\s\\d+';
+
+/**
+ * Replaces "GUEST" in a pattern by the guest pseudo pattern.
+ * I.e /GUEST wins!/ becomes /Guest\s\d+ wins!/
+ */
+const guestPseudoRegExp = (pattern: RegExp): RegExp => new RegExp(
+    pattern.source.replace('GUEST', guestPseudoPattern),
+    pattern.flags,
+);
+
+Cypress.Commands.add('containsGuestPseudo', (selector = null, pattern = /GUEST/) => {
+    return cy.get(selector ?? 'body').contains(guestPseudoRegExp(pattern));
+});
+
+/**
+ * Open the player menu, from the player button in top menu.
+ *
+ * Click natively: with "cy.click()", the simulated mouse hover
+ * already opens the menu, and the click would close it back.
+ */
+Cypress.Commands.add('openPlayerMenu', () => {
+    // The menu closes on route change, wait for current page to be rendered before opening it
+    cy.get('main').children().should('have.length.at.least', 1);
+
+    cy.get('.menu-top .player-button').then($playerButton => $playerButton[0].click());
+
+    return cy.get('.player-menu').should('be.visible');
+});
+
+Cypress.Commands.add('goToMyProfilePage', () => {
+    cy.openPlayerMenu().contains(/My (guest )?account/).click();
+
+    return cy.get('h2.pseudo-heading');
+});
+
 Cypress.Commands.add('createAIGameWithRandom', (submit = true, wait = false) => {
     cy.contains('Play vs AI').click();
 

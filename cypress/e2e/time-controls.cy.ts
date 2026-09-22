@@ -1,7 +1,7 @@
 describe('Time controls', () => {
     beforeEach(() => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom(false);
 

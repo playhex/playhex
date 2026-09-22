@@ -17,7 +17,7 @@ const sidebarMustBeHidden = (cy: Cypress.cy): void => {
 describe('Game sidebar', () => {
     beforeEach(() => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
     });
 
     it('is open by default', () => {

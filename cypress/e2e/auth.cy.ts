@@ -1,20 +1,16 @@
 const randomString = (): string => (1E24 * Math.random()).toString(36);
 
 describe('Authentication', () => {
-    it('see profile page, signup, see profile page again, logout, login', () => {
+    it('see player menu, signup, see player menu again, logout, login', () => {
         cy.visit('/');
 
         const pseudo = 'test-' + randomString();
         const password = 'test-password';
 
-        // Show guest profile page
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
+        // Open player menu
+        cy.openPlayerMenu();
 
-        cy.contains('h2', /Guest \d+/);
+        cy.containsGuestPseudo('.player-menu');
 
         // Create account
         cy
@@ -43,28 +39,19 @@ describe('Authentication', () => {
             .click()
         ;
 
-        // Account created, logged in. Show profile page
-        cy
-            .get('.menu-top')
-            .contains(pseudo)
-            .click()
-        ;
+        // Account created, logged in, and redirected to lobby. Open player menu
+        cy.location('pathname').should('eq', '/');
+        cy.openPlayerMenu();
 
-        cy.contains('h2', pseudo);
+        cy.contains('.player-menu', pseudo);
 
-        // Logout
+        // Logout, redirects to my new guest profile page
         cy
             .contains('Log out')
             .click()
         ;
 
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
-
-        cy.contains('h2', /Guest \d+/);
+        cy.containsGuestPseudo('h2.pseudo-heading');
 
         // Login
         cy
@@ -102,16 +89,7 @@ describe('Authentication', () => {
     it('displays invalid username error', () => {
         cy.visit('/');
 
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
-
-        cy
-            .contains('Log in')
-            .click()
-        ;
+        cy.openPlayerMenu().contains('Log in').click();
 
         cy
             .contains('h2', 'Log in')
@@ -145,16 +123,7 @@ describe('Authentication', () => {
 
         cy.visit('/');
 
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
-
-        cy
-            .contains('Log in')
-            .click()
-        ;
+        cy.openPlayerMenu().contains('Log in').click();
 
         cy
             .contains('h2', 'Log in')
@@ -262,8 +231,10 @@ describe('Authentication', () => {
         signupForm().contains('Password').click().type(password);
         signupForm().contains('button', 'Sign up').click();
 
-        cy.get('.menu-top').contains(pseudo).click();
-        cy.contains('Settings').click();
+        cy.location('pathname').should('eq', '/');
+        cy.openPlayerMenu().contains('Settings').click();
+
+        cy.contains('.list-group-item', 'Account').click();
 
         cy.contains('h3', 'Change password').closest('form').as('form');
 
@@ -291,11 +262,11 @@ describe('Authentication', () => {
         cy.get('@form').contains('The password has been changed.');
 
         // Log out
-        cy.get('.menu-top').contains(pseudo).click();
-        cy.contains('Log out').click();
+        cy.openPlayerMenu().contains('Log out').click();
 
-        cy.get('.menu-top').contains(/Guest \d+/).click();
-        cy.contains('Log in').click();
+        // Logout redirects to my new guest profile page
+        cy.containsGuestPseudo('h2.pseudo-heading');
+        cy.openPlayerMenu().contains('Log in').click();
 
         const loginForm = () => cy.contains('h2', 'Log in').closest('form');
 
@@ -420,14 +391,10 @@ describe('Authentication', () => {
         const pseudo = 'test-' + randomString();
         const password = 'test-password';
 
-        // Show guest profile page
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
+        // Open player menu
+        cy.openPlayerMenu();
 
-        cy.contains('h2', /Guest \d+/);
+        cy.containsGuestPseudo('.player-menu');
 
         // Create account
         cy
@@ -456,28 +423,19 @@ describe('Authentication', () => {
             .click()
         ;
 
-        // Account created, logged in. Show profile page
-        cy
-            .get('.menu-top')
-            .contains(pseudo)
-            .click()
-        ;
+        // Account created, logged in, and redirected to lobby. Open player menu
+        cy.location('pathname').should('eq', '/');
+        cy.openPlayerMenu();
 
-        cy.contains('h2', pseudo);
+        cy.contains('.player-menu', pseudo);
 
-        // Logout
+        // Logout, redirects to my new guest profile page
         cy
             .contains('Log out')
             .click()
         ;
 
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
-
-        cy.contains('h2', /Guest \d+/);
+        cy.containsGuestPseudo('h2.pseudo-heading');
 
         // Create account with same nickname
         cy
@@ -511,12 +469,8 @@ describe('Authentication', () => {
         cy.reload();
 
         // Should not be logged as test user, but still as guest
-        cy
-            .get('.menu-top')
-            .contains(/Guest \d+/)
-            .click()
-        ;
+        cy.openPlayerMenu();
 
-        cy.contains('h2', /Guest \d+/);
+        cy.containsGuestPseudo('.player-menu');
     });
 });

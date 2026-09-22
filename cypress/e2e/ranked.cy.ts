@@ -18,7 +18,7 @@ describe('Ranked games', () => {
 
     it('plays a ranked game vs cpu to the end, and rematch: colors must be reversed', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.contains('Ranked vs AI').click();
 
@@ -52,12 +52,12 @@ describe('Ranked games', () => {
         cy.play(425, 417);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ wins!/);
+        cy.containsGuestPseudo(null, /GUEST wins!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
         cy.contains('.sidebar', /TestBot Determinist instant loses. \d+/).closest('div');
-        cy.contains('.sidebar', /Guest \d+ wins! \d+/).closest('div');
+        cy.containsGuestPseudo('.sidebar', /GUEST wins! \d+/).closest('div');
     });
 
     it('displays my game as a ranked one on the lobby', () => {

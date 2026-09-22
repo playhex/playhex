@@ -18,7 +18,7 @@ describe('Rematch', () => {
 
     it('reverses colors from previous game if colors were random', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.contains('Ranked vs AI').click();
 
@@ -52,7 +52,7 @@ describe('Rematch', () => {
         cy.play(425, 417);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ wins!/);
+        cy.containsGuestPseudo(null, /GUEST wins!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
@@ -93,7 +93,7 @@ describe('Rematch', () => {
 
     it('keeps same colors when "host plays first"', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom(false);
 
@@ -128,7 +128,7 @@ describe('Rematch', () => {
         cy.play(153, 259);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ wins!/);
+        cy.containsGuestPseudo(null, /GUEST wins!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
@@ -165,7 +165,7 @@ describe('Rematch', () => {
 
     it('keeps same colors when "host plays second" and host rematch', () => {
         cy.visit('/');
-        cy.get('.menu-top').contains(/Guest \d+/);
+        cy.containsGuestPseudo('.menu-top');
 
         cy.createAIGameWithRandom(false);
 
@@ -200,7 +200,7 @@ describe('Rematch', () => {
         cy.play(404, 405);
 
         cy.contains('Game finished');
-        cy.contains(/Guest \d+ wins!/);
+        cy.containsGuestPseudo(null, /GUEST wins!/);
 
         cy.contains('Game finished').closest('.modal-content').contains('Close').click();
 
