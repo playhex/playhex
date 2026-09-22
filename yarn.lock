@@ -1688,38 +1688,38 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.2.tgz#821f8442f4175d8f0467b9daf26e3a18e2d02af2"
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
-"@sockeye-js/collect-socketio@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sockeye-js/collect-socketio/-/collect-socketio-0.3.0.tgz#b7f80afeda08cb095391ac24580fd22248d80a20"
-  integrity sha512-j/zMWO/oV9t5hX/Hu8vBQDcls2FJZlRoukKn9MIKRGtRGzDso+FsMbWYura7NmFaQqfyb1BdLUOppBcbcUHWjQ==
+"@sockeye-js/collect-socketio@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@sockeye-js/collect-socketio/-/collect-socketio-0.4.0.tgz#9dbd00a76f37bb832c2bb1bc2a51602356b65e1e"
+  integrity sha512-QD0T7C8ScWPvjSsx7PkEMHL8W3ELZ1w/y9Jdc5cgY/HARLeJWUQ/m2QD2mjDNz0Ylh9guM+72rMTFGU3UhThUQ==
   dependencies:
-    "@sockeye-js/core" "^0.3.0"
+    "@sockeye-js/core" "^0.4.0"
 
-"@sockeye-js/core@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sockeye-js/core/-/core-0.3.0.tgz#472a4d56a7d1903e40158e52d2bd70f1247561f6"
-  integrity sha512-SC1R6NbOCO7Tu78Fzsd4TJd2gSEKpIaBYwbUDZ2HTkVw4PRQG6MNs+ZEH6hnfONhJAI+NBV80DeoBFJS/x+3Gw==
+"@sockeye-js/core@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@sockeye-js/core/-/core-0.4.0.tgz#71418f071afde694c1079de059ca053502c40365"
+  integrity sha512-qz9ehQrfiF/ZOa6cvdQIwOEXwPBRraJKeH8xAaf2aZMfIRtFB3k/CqBeFukMjO4OV9S1WSDLMN3qw2dBvB9elw==
 
-"@sockeye-js/store-memory@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sockeye-js/store-memory/-/store-memory-0.3.0.tgz#de2401540355fb0391865d7cc31f697d9e9ddb8b"
-  integrity sha512-8cKNPov812U7xrs/mwI8XF2O4eM4hdBnAUn5YKYFPuwlmlorktQMCJPky9Hi/BSNQvUGBVf7n5AALOKAI0SLOA==
+"@sockeye-js/store-memory@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@sockeye-js/store-memory/-/store-memory-0.4.0.tgz#600f419006e5d01ece4d82591ff92e5ac7af11e7"
+  integrity sha512-CuaMS5hJms6qCuuSTE+0rKl+vC3eUyNP8tJQS/kl1GbiQqEc7+9YFALW9KGpNsOEblMH3dXORbjmoG7tiNCH5g==
   dependencies:
-    "@sockeye-js/core" "^0.3.0"
+    "@sockeye-js/core" "^0.4.0"
 
-"@sockeye-js/store-redis@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sockeye-js/store-redis/-/store-redis-0.3.0.tgz#d238a567fad98237ffb923d1e7233f3394a22d59"
-  integrity sha512-X++p9pOhUpxG5SIwYrn2gbPcyqRyfb6C5d+edT68zkEc3m3GW3P62dwQNCTbCv6nT3oy+4kGeG3ncU8II5vxrA==
+"@sockeye-js/store-redis@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@sockeye-js/store-redis/-/store-redis-0.4.0.tgz#5926be6d400bbd9db5263b9fa681ef5c35536dfd"
+  integrity sha512-PuqS2vjSyz5r1X/92FxvInUuZtaT/SLlwntN6pT7RoUUban+7lQjdRyg8EpfSCzvW5z/84nAxydKSP3UFXAUEw==
   dependencies:
-    "@sockeye-js/core" "^0.3.0"
+    "@sockeye-js/core" "^0.4.0"
 
-"@sockeye-js/ui@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@sockeye-js/ui/-/ui-0.3.0.tgz#3072fcb8fdc49f16eb746cd0f101ac7c867f68c5"
-  integrity sha512-El9RtCg+H6ZDJmskwuSz3lgAOvVQttl4pIv0UtO3yofYibMgVNXkFFKE7t4f2k9pzpzWT/brimCGQdffylbszQ==
+"@sockeye-js/ui@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@sockeye-js/ui/-/ui-0.4.0.tgz#5ad7f9432d55184d7f4dd1972a930d2090aff01d"
+  integrity sha512-Ay3CZ6H47ZjYzC1GoUeif+MO5IXamY77KHROWhsHawtIauALWQKMwVK55BpwIF6PEYG1Hq9gMiijRyhn9sehYg==
   dependencies:
-    "@sockeye-js/core" "^0.3.0"
+    "@sockeye-js/core" "^0.4.0"
 
 "@sqltools/formatter@^1.2.5":
   version "1.2.5"
