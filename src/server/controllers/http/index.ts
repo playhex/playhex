@@ -10,7 +10,6 @@ import { pwaRouter } from './misc/pwa-router.js';
 import logger from '../../services/logger.js';
 import { DomainHttpError, normalizeDomainHttpError } from '../../../shared/app/DomainHttpError.js';
 import { HttpError } from 'routing-controllers';
-import { preRenderedRouter } from './misc/pre-rendered-router.js';
 import { avatarsPath } from '../../services/PlayerAvatarService.js';
 import { ipBanMiddleware } from '../../services/security/ipBanMiddleware.js';
 import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../../services/rate-limiters.js';
@@ -19,7 +18,6 @@ import { legacyAliasesMiddleware } from '../../services/legacyPayloadAliases.js'
 
 export const registerHttpControllers = async (app: Express, httpServer: http.Server): Promise<void> => {
     app.use(ipBanMiddleware);
-    app.use(preRenderedRouter());
     app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
     app.use(reflectMetadataRouter());
     app.use('/avatars', express.static(avatarsPath));

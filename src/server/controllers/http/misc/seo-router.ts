@@ -1,6 +1,27 @@
 import { Router } from 'express';
-import { PreRenderedService } from '../../../services/PreRenderedService.js';
-import { Container } from 'typedi';
+
+/**
+ * Static pages worth indexing in search engines.
+ */
+const sitemapUrls: string[] = [
+    '/',
+    '/landing',
+    '/cs/landing',
+    '/de/landing',
+    '/en/landing',
+    '/fr/landing',
+    '/ja/landing',
+    '/ko/landing',
+    '/pl/landing',
+    '/tr/landing',
+    '/zh/landing',
+    '/guide',
+    '/guide/ai-analysis',
+    '/guide/conditional-moves',
+    '/guide/moderation',
+    '/games-archive',
+    '/export-games-data',
+];
 
 export function seoRouter(): Router {
     const router = Router();
@@ -13,18 +34,11 @@ export function seoRouter(): Router {
         });
     });
 
-    router.get('/sitemap.xml', async (_, res) => {
+    router.get('/sitemap.xml', (_, res) => {
         res.header('Content-Type', 'application/xml');
-
-        const preRenderedService = Container.get(PreRenderedService);
-
-        const urls = await preRenderedService.getAllPreRenderedPaths();
-
-        urls.unshift('/');
-
         res.render('seo/sitemap.xml.ejs', {
             baseUrl,
-            urls,
+            urls: sitemapUrls,
         });
     });
 

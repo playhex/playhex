@@ -1,7 +1,6 @@
 import { Service } from 'typedi';
 import { IsNumber, IsString, Max, Min } from 'class-validator';
 import GameStore from '../../../store/GameStore.js';
-import { PreRenderedService } from '../../../services/PreRenderedService.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Authorized, Body, Delete, Get, HttpError, JsonController, NotFoundError, Param, Patch, Post, Req } from 'routing-controllers';
 import type { Request } from 'express';
@@ -36,7 +35,6 @@ class CreateAiVsAiInput
 export default class AdminController
 {
     constructor(
-        private preRenderedService: PreRenderedService,
         private gameStore: GameStore,
         private tournamentStore: TournamentStore,
         private playerRepository: PlayerRepository,
@@ -66,15 +64,6 @@ export default class AdminController
             forwardedFor: req.headers['x-forwarded-for'],
             trustProxy: process.env.TRUST_PROXY ?? null,
         };
-    }
-
-    /**
-     * Reset pre rendered pages in cache.
-     */
-    @Delete('/api/admin/pre-rendered-pages-cache')
-    async deletePreRenderedPagesCache()
-    {
-        await this.preRenderedService.preloadTemplatesInMemory();
     }
 
     @Post('/api/admin/persist-games')
