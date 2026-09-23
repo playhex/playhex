@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import { useRouter } from 'vue-router';
-import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload } from '../../icons.js';
+import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload, IconCrown } from '../../icons.js';
 import AppPlayerMenu from './AppPlayerMenu.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
@@ -177,6 +177,15 @@ const {
                                 class="nav-link"
                                 @click="closeOffcanvas"
                             >{{ $t('tournaments') }}</router-link>
+                        </li>
+
+                        <li class="nav-item">
+                            <router-link
+                                :to="{ name: 'ladder', params: { slug: 'main' } }"
+                                :class="{ active: routeName?.startsWith('ladder') }"
+                                class="nav-link"
+                                @click="closeOffcanvas"
+                            ><IconCrown class="text-warning" /> {{ $t('ladder.title') }}</router-link>
                         </li>
 
                         <li class="nav-item">

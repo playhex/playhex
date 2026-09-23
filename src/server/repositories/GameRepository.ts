@@ -41,6 +41,7 @@ const relations: FindOptionsRelations<Game> = {
     tournamentMatch: {
         tournament: true,
     },
+    ladderChallenge: true,
 };
 
 const order: FindOptionsOrder<Game> = {

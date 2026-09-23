@@ -123,7 +123,7 @@ const ack = async (gamePublicId?: string) => {
                             />
                         </router-link>
 
-                        <div v-else class="list-group-item">
+                        <div v-else class="list-group-item" @click="e => (e.target as HTMLElement).closest('a') && (showNotifications = false)">
                             <h6 class="mb-1">{{ $t('notifications_misc') }}</h6>
 
                             <AppNotification

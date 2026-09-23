@@ -6,6 +6,7 @@ import AppNotificationFallback from './notification-types/AppNotificationFallbac
 import AppNotificationGameCanceled from './notification-types/AppNotificationGameCanceled.vue';
 import AppNotificationGameChallenge from './notification-types/AppNotificationGameChallenge.vue';
 import AppNotificationGameEnded from './notification-types/AppNotificationGameEnded.vue';
+import AppNotificationLadder from './notification-types/AppNotificationLadder.vue';
 import AppNotificationMyOpponentHasBeenModerated from './notification-types/AppNotificationMyOpponentHasBeenModerated.vue';
 
 defineProps({
@@ -36,6 +37,10 @@ defineProps({
     <AppNotificationMyOpponentHasBeenModerated
         v-else-if="playerNotification.type === 'myOpponentHasBeenModerated'"
         :playerNotification="(playerNotification as PlayerNotification<'myOpponentHasBeenModerated'>)"
+    />
+    <AppNotificationLadder
+        v-else-if="playerNotification.type.startsWith('ladder')"
+        :playerNotification
     />
     <AppNotificationCustom
         v-else-if="playerNotification.type === 'custom'"

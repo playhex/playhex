@@ -960,6 +960,12 @@ export default class GameServer extends TypedEmitter<GameEvents>
             return 'Game is not playing nor created';
         }
 
+        // Ladder challenges cannot be declined, only resigned
+        if (this.game.ladderChallenge) {
+            this.logger.notice('Player tried to cancel a ladder game', { player: player.pseudo });
+            return 'Cannot cancel a ladder game';
+        }
+
         if (this.engineGame === null) {
             return true;
         }

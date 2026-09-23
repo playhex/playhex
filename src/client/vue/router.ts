@@ -54,6 +54,26 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        path: '/king-of-the-hill',
+        component: () => import('./ReloadOnRouteChange.vue'),
+        children: [
+            {
+                path: '',
+                redirect: { name: 'ladder', params: { slug: 'main' } },
+            },
+            {
+                name: 'ladder',
+                path: ':slug',
+                component: () => import('./ladder/pages/PageLadder.vue'),
+            },
+            {
+                name: 'ladder-rules',
+                path: ':slug/rules',
+                component: () => import('./ladder/pages/PageLadderRules.vue'),
+            },
+        ],
+    },
+    {
         path: '/tournament-series',
         component: () => import('./ReloadOnRouteChange.vue'),
         children: [

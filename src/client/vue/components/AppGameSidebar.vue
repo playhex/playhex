@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, computed, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
-import { IconAlphabet, IconChatDots, IconMeditation, IconMailbox, IconMailboxFlag, IconMuteOff, IconMuteOn, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123 } from '../icons.js';
+import { IconAlphabet, IconChatDots, IconMeditation, IconMailbox, IconMailboxFlag, IconMuteOff, IconMuteOn, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123, IconCrown } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
@@ -712,6 +712,15 @@ watch(gameUIMode, () => {
                         number: tournamentMatch.number,
                     }) }}
                 </small>
+            </router-link>
+
+            <router-link
+                v-if="game.ladderChallenge"
+                to="/king-of-the-hill"
+                class="btn btn-warning btn-block btn-tournament"
+            >
+                <IconCrown class="icon" />
+                {{ $t('ladder.ladder_game') }}
             </router-link>
 
             <div class="container-fluid">

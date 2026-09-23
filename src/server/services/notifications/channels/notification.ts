@@ -226,3 +226,67 @@ notifier.on('moderationActionTaken', async action => {
     }
 
 });
+
+/**
+ * Tells defender they have been challenged in a ladder, and the game started.
+ * Always notified: correspondence games, defender must know they have a game to play.
+ */
+notifier.on('ladderChallenge', async challenge => {
+    const playerNotification = createPlayerNotification(
+        'ladderChallenge',
+        {
+            player: pseudoString(challenge.challenger),
+        },
+        challenge.defender,
+        challenge.game,
+        challenge.createdAt,
+    );
+
+    await playerNotificationService.addNotification(playerNotification);
+});
+
+/**
+ * Tells defender they have been challenged in a ladder,
+ * and must accept or decline to play live.
+ */
+notifier.on('ladderLiveProposal', async challenge => {
+    const playerNotification = createPlayerNotification(
+        'ladderLiveProposal',
+        {
+            player: pseudoString(challenge.challenger),
+        },
+        challenge.defender,
+        null,
+        challenge.createdAt,
+    );
+
+    await playerNotificationService.addNotification(playerNotification);
+});
+
+/**
+ * Warns player they timed out a ladder game.
+ */
+notifier.on('ladderStrike', async (player, strikes, removed) => {
+    const playerNotification = createPlayerNotification(
+        'ladderStrike',
+        {
+            strikes,
+            removed,
+        },
+        player,
+        null,
+    );
+
+    await playerNotificationService.addNotification(playerNotification);
+});
+
+notifier.on('ladderRemovedInactive', async player => {
+    const playerNotification = createPlayerNotification(
+        'ladderRemovedInactive',
+        null,
+        player,
+        null,
+    );
+
+    await playerNotificationService.addNotification(playerNotification);
+});
