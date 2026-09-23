@@ -26,6 +26,7 @@ import AppHexWorldExplore from '../components/AppHexWorldExplore.vue';
 import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 import { computeTimeControlAtMoveIndex } from '../../../shared/app/gameUtils.js';
 import { type GameTimeData } from '../../../shared/time-control/TimeControl.js';
+import useToastsStore from '../../stores/toastsStore.js';
 
 const head = injectHead();
 
@@ -320,7 +321,25 @@ const cancel = async (): Promise<void> => {
         return;
     }
 
-    await sendCancel();
+    const result = await sendCancel();
+
+    if (result !== true) {
+        useToastsStore().addToast(
+            game.value?.ladderChallenge ? t('ladder.cannot_cancel') : cancelErrorMessage(result),
+            { level: 'danger' },
+        );
+    }
+};
+
+/**
+ * Server returns error as json, or plain text
+ */
+const cancelErrorMessage = (result: string): string => {
+    try {
+        return JSON.parse(result).message ?? result;
+    } catch (e) {
+        return result;
+    }
 };
 
 /*

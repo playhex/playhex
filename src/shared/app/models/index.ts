@@ -16,6 +16,11 @@ import {
     GameOptionsTimeControlByoYomi,
 } from './GameOptionsTimeControl.js';
 import GameToPlayer from './GameToPlayer.js';
+import Ladder from './Ladder.js';
+import LadderChallenge from './LadderChallenge.js';
+import LadderEvent from './LadderEvent.js';
+import LadderPlayer from './LadderPlayer.js';
+import LadderReign from './LadderReign.js';
 import ModerationSetting from './ModerationSetting.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
@@ -57,6 +62,11 @@ export {
     OptionsByoYomi,
     GameOptionsTimeControlByoYomi,
     GameToPlayer,
+    Ladder,
+    LadderChallenge,
+    LadderEvent,
+    LadderPlayer,
+    LadderReign,
     ModerationSetting,
     MoveSettings,
     OnlinePlayers,
@@ -101,6 +111,11 @@ export const entities = {
     OptionsByoYomi,
     GameOptionsTimeControlByoYomi,
     GameToPlayer,
+    Ladder,
+    LadderChallenge,
+    LadderEvent,
+    LadderPlayer,
+    LadderReign,
     ModerationSetting,
     OnlinePlayers,
     Player,

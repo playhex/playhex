@@ -12,6 +12,7 @@ import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { Transform, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
+import LadderChallenge from './LadderChallenge.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
 import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeControlFischer } from './GameOptionsTimeControl.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
@@ -190,6 +191,14 @@ export default class Game implements TimeControlBoardsize, GameOptions
     tournamentMatch: null | Relation<TournamentMatch> = null;
 
     /**
+     * When this game is played in a ladder, else null.
+     */
+    @OneToOne(() => LadderChallenge, ladderChallenge => ladderChallenge.game)
+    @Expose()
+    @Type(() => LadderChallenge)
+    ladderChallenge: null | Relation<LadderChallenge> = null;
+
+    /**
      * Whether there is a current player undo request.
      * Equals to the index of the player who asked for undo.
      */
@@ -268,6 +277,7 @@ export type CreateGameParams = {
     host?: null | Player;
     rematchedFrom?: null | Game;
     tournamentMatch?: null | TournamentMatch;
+    ladderChallenge?: null | LadderChallenge;
 };
 
 /**
@@ -302,6 +312,7 @@ export const createGame = (params: CreateGameParams = {}): Game => {
     game.gameToPlayers = [];
     game.rematchedFrom = params.rematchedFrom ?? null;
     game.tournamentMatch = params.tournamentMatch ?? null;
+    game.ladderChallenge = params.ladderChallenge ?? null;
     game.createdAt = new Date();
     game.startedAt = null;
     game.lastMoveAt = null;

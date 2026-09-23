@@ -18,6 +18,9 @@ import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
 import { showToastForTranslatableError } from './services/showToastForTranslatableError.js';
 import { AnalysisInput, AnalysisOutput } from '../shared/app/hexplorer.js';
 import { GameChatSubscriptionItem } from '../shared/app/GameChatSubscriptionItem.js';
+import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } from '../shared/app/models/LadderDto.js';
+import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
+import type TimeControlType from '../shared/time-control/TimeControlType.js';
 
 /**
  * @throws {DomainHttpError}
@@ -1176,4 +1179,133 @@ export const apiUploadPlayerAvatar = async (publicId: string, blob: Blob, mimeTy
     await checkResponse(response);
 
     return await response.json();
+};
+
+export const apiGetLadder = async (slug: string): Promise<null | LadderDto> => {
+    const response = await fetch(`/api/ladders/${slug}`);
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderDto, await response.json());
+};
+
+export const apiGetLadderMe = async (slug: string): Promise<LadderMeDto> => {
+    const response = await fetch(`/api/ladders/${slug}/me`);
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderMeDto, await response.json());
+};
+
+export const apiGetLadderPlayerStatus = async (slug: string, playerPublicId: string): Promise<LadderPlayerStatusDto> => {
+    const response = await fetch(`/api/ladders/${slug}/players/${playerPublicId}`);
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderPlayerStatusDto, await response.json());
+};
+
+export const apiPatchLadderMe = async (slug: string, incomingSlots: number): Promise<LadderPlayer> => {
+    const response = await fetch(`/api/ladders/${slug}/me`, {
+        method: 'PATCH',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ incomingSlots }),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderPlayer, await response.json());
+};
+
+/**
+ * @param playerPublicId Only events concerning this player
+ */
+export const apiGetLadderHistory = async (slug: string, page = 0, playerPublicId: null | string = null): Promise<LadderEvent[]> => {
+    const params = new URLSearchParams({ page: String(page) });
+
+    if (playerPublicId !== null) {
+        params.set('player', playerPublicId);
+    }
+
+    const response = await fetch(`/api/ladders/${slug}/history?${params}`);
+
+    await checkResponse(response);
+
+    return (await response.json() as object[]).map(event => plainToInstance(LadderEvent, event));
+};
+
+export const apiGetLadderHallOfFame = async (slug: string): Promise<LadderHallOfFameDto> => {
+    const response = await fetch(`/api/ladders/${slug}/hall-of-fame`);
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderHallOfFameDto, await response.json());
+};
+
+export const apiPostLadderJoin = async (slug: string): Promise<LadderPlayer> => {
+    const response = await fetch(`/api/ladders/${slug}/join`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderPlayer, await response.json());
+};
+
+export const apiPostLadderLeave = async (slug: string): Promise<void> => {
+    const response = await fetch(`/api/ladders/${slug}/leave`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+};
+
+export const apiPostLadderChallenge = async (
+    slug: string,
+    defenderPublicId: string,
+    boardsize: number,
+    liveTimeControlType: null | TimeControlType,
+): Promise<LadderChallenge> => {
+    const response = await fetch(`/api/ladders/${slug}/challenges`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            defenderPublicId,
+            boardsize,
+            liveTimeControlType,
+        }),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderChallenge, await response.json());
+};
+
+export const apiPostLadderAnswerLive = async (challengePublicId: string, accept: boolean): Promise<LadderChallenge> => {
+    const response = await fetch(`/api/ladder-challenges/${challengePublicId}/${accept ? 'accept-live' : 'decline-live'}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(LadderChallenge, await response.json());
 };

@@ -17,6 +17,7 @@ import TournamentStore from './store/TournamentStore.js';
 import { initAutoCancelStaleGames } from './services/auto-cancel-stale-games/init.js';
 import { initTournamentSeriesAutoCreate } from './services/tournament-series-auto-create/init.js';
 import { registerCors } from './controllers/http/misc/cors.js';
+import { initLadder } from './ladder/LadderWatcher.js';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -33,6 +34,7 @@ initTimeControl();
 Container.get(TournamentStore);
 initAutoCancelStaleGames();
 initTournamentSeriesAutoCreate();
+initLadder();
 
 const server = http.createServer(app);
 const io = new HexServer(server, {

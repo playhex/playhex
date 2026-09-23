@@ -16,6 +16,7 @@ import './missingTranslationsCommand.js';
 import './createFakeNotificationsCommand.js';
 import './generateStatsCommand.js';
 import './tournamentSubscribePlayersCommand.js';
+import './ladderJoinPlayersCommand.js';
 
 await hexProgram.parseAsync();
 

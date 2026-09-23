@@ -1,5 +1,5 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { ChatMessage, Game, Player, PlayerModerationAction, Tournament } from '../../../shared/app/models/index.js';
+import { ChatMessage, Game, LadderChallenge, Player, PlayerModerationAction, Tournament } from '../../../shared/app/models/index.js';
 import { TimestampedMove } from '../../../shared/game-engine/Types.js';
 
 type NotifiableEvents = {
@@ -58,6 +58,31 @@ type NotifiableEvents = {
      * @param game One of the game where related chat messages have been posted
      */
     moderationActionTaken: (action: PlayerModerationAction) => void;
+
+    /**
+     * A player challenged another one in a ladder, and the game started.
+     * challenge contains challenger, defender and game.
+     */
+    ladderChallenge: (challenge: LadderChallenge) => void;
+
+    /**
+     * A player challenged another one in a ladder, and proposed to play live.
+     * Defender must accept or decline.
+     */
+    ladderLiveProposal: (challenge: LadderChallenge) => void;
+
+    /**
+     * A player timed out a ladder game, and got a strike.
+     *
+     * @param strikes Number of strikes in the current window, including this one
+     * @param removed Whether player has been removed from ladder because of too many strikes
+     */
+    ladderStrike: (player: Player, strikes: number, removed: boolean) => void;
+
+    /**
+     * A player has been removed from a ladder because of inactivity.
+     */
+    ladderRemovedInactive: (player: Player) => void;
 };
 
 export const notifier = new TypedEmitter<NotifiableEvents>();

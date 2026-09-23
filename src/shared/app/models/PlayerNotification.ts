@@ -67,6 +67,46 @@ type PlayerNotificationTypes = {
     };
 
     /**
+     * A player challenged me in the ladder ("King of the Hill"), game has started
+     */
+    ladderChallenge: {
+        /**
+         * Nickname of the challenger
+         */
+        player: string;
+    };
+
+    /**
+     * A player challenged me in the ladder and proposed to play live
+     */
+    ladderLiveProposal: {
+        /**
+         * Nickname of the challenger
+         */
+        player: string;
+    };
+
+    /**
+     * I timed out a ladder game and got a strike
+     */
+    ladderStrike: {
+        /**
+         * Number of strikes in the current window, including this one
+         */
+        strikes: number;
+
+        /**
+         * Whether I have been removed from the ladder
+         */
+        removed: boolean;
+    };
+
+    /**
+     * I have been removed from the ladder for inactivity
+     */
+    ladderRemovedInactive: null;
+
+    /**
      * Custom notification to display any text
      */
     custom: {

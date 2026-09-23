@@ -27,6 +27,11 @@ export class GameStaleEvaluator
             return no('this is a tournament game');
         }
 
+        // Do not mark ladder games as stale, time control and strikes handle absent players
+        if (game.ladderChallenge) {
+            return no('this is a ladder game');
+        }
+
         // bot game, empty
         if (isBotGame(game) && isPlayingAndEmpty(gameServer)) {
             const startedAt = engineGame!.getStartedAt();
