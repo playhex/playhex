@@ -19,21 +19,21 @@ export default class Player
      * Used for displays
      */
     @Column({ length: 34, unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action', 'channel'] })
     pseudo: string;
 
     /**
      * Used to identify a player
      */
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'player_moderation_action', 'channel'] })
     publicId: string;
 
     /**
      * Show an italized "Guest" before pseudo
      */
     @Column({ default: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action', 'channel'] })
     isGuest: boolean;
 
     /**
@@ -47,7 +47,7 @@ export default class Player
      * Used for link to profile page, SGF file name
      */
     @Column({ length: 34, unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'channel'] })
     slug: string;
 
     /**

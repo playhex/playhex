@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { In, IsNull, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
+import { In, IsNull, LessThan, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { ChannelChatMessage } from '../../shared/app/models/index.js';
 
 @Service()
@@ -15,12 +15,16 @@ export default class ChannelChatMessageRepository
         return await this.channelChatMessageRepository.save(message);
     }
 
-    async findLastMessages(channelName: string, take: number): Promise<ChannelChatMessage[]>
+    /**
+     * @param before If set, only fetch messages posted before this date (pagination)
+     */
+    async findLastMessages(channelName: string, take: number, before?: Date): Promise<ChannelChatMessage[]>
     {
         return await this.channelChatMessageRepository.find({
             where: {
                 channel: { name: channelName },
                 deletedByModeration: false, // do not display "message has been moderated" in channels because annoying in #lobby-en at least
+                ...(before ? { createdAt: LessThan(before) } : {}),
             },
             relations: {
                 player: true,

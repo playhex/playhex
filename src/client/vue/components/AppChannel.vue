@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { format, isThisWeek, isToday, isYesterday } from 'date-fns';
-import { computed, PropType, ref, watch, watchEffect } from 'vue';
+import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import { IconSendFill } from '../icons.js';
 import { useChannel } from '../composables/useChannel.js';
@@ -28,6 +28,8 @@ const activeChannel = ref(channelNames[0]);
 // nested-ref ambiguity in the template (Volar would otherwise see Ref<T> properties).
 const messages = computed(() => channelComposables[activeChannel.value].messages.value);
 const postMessage = (content: string) => channelComposables[activeChannel.value].postMessage(content);
+const hasOlderMessages = computed(() => channelComposables[activeChannel.value].hasOlderMessages.value);
+const loadingOlderMessages = computed(() => channelComposables[activeChannel.value].loadingOlderMessages.value);
 
 // One input string kept per channel so switching tabs doesn't discard typed text.
 const chatInputs = ref<Record<string, string>>(Object.fromEntries(channelNames.map(name => [name, ''])));
@@ -80,6 +82,19 @@ for (const [name, ch] of Object.entries(channelComposables)) {
     }, { deep: true });
 }
 
+// Older messages are prepended: keep the currently visible messages at the same position.
+const loadOlderMessages = async () => {
+    const el = messagesElement.value;
+    const previousScrollHeight = el?.scrollHeight ?? 0;
+
+    await channelComposables[activeChannel.value].loadOlderMessages();
+    await nextTick();
+
+    if (el) {
+        el.scrollTop += el.scrollHeight - previousScrollHeight;
+    }
+};
+
 // Tab switch: always scroll to bottom.
 watch(activeChannel, () => scrollToBottom());
 
@@ -114,6 +129,14 @@ const sendMessage = async () => {
         </div>
 
         <div class="card-body channel-messages" ref="messagesElement">
+            <div v-if="hasOlderMessages" class="text-center">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary mt-2 mb-3"
+                    :disabled="loadingOlderMessages"
+                    @click="loadOlderMessages"
+                >{{ $t('load_older_messages') }}</button>
+            </div>
             <div
                 v-for="message in messages"
                 :key="message.publicId"

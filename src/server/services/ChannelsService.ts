@@ -4,10 +4,9 @@ import { Inject, Service } from 'typedi';
 import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
 import { languagesCodesISO6391 } from '../../shared/app/codes.js';
 import TournamentStore from '../store/TournamentStore.js';
+import { CHANNEL_LAST_MESSAGES_COUNT, CHANNEL_OLDER_MESSAGES_PAGE_SIZE } from '../../shared/app/channelUtils.js';
 
 export class ChannelNotFoundError extends Error {}
-
-const MAX_MESSAGES_PER_CHANNEL = 250;
 
 @Service()
 export class ChannelsService
@@ -23,10 +22,22 @@ export class ChannelsService
     async getLastMessages(channelName: string): Promise<ChannelChatMessage[]>
     {
         const recentMessages = await this.channelChatMessageRepository
-            .findLastMessages(channelName, MAX_MESSAGES_PER_CHANNEL)
+            .findLastMessages(channelName, CHANNEL_LAST_MESSAGES_COUNT)
         ;
 
         return recentMessages.reverse();
+    }
+
+    /**
+     * Messages posted before a given date, used to load older messages.
+     */
+    async getMessagesBefore(channelName: string, before: Date): Promise<ChannelChatMessage[]>
+    {
+        const olderMessages = await this.channelChatMessageRepository
+            .findLastMessages(channelName, CHANNEL_OLDER_MESSAGES_PAGE_SIZE, before)
+        ;
+
+        return olderMessages.reverse();
     }
 
     /**

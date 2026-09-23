@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -1118,6 +1118,18 @@ export const apiGetChannelMessagesCount = async (channelName: string): Promise<n
     await checkResponse(response);
 
     return await response.json();
+};
+
+export const apiGetChannelMessagesBefore = async (channelName: string, before: Date): Promise<ChannelChatMessage[]> => {
+    const url = `/api/channels/${channelName}/messages?before=${encodeURIComponent(before.toISOString())}`;
+
+    const response = await fetch(url);
+
+    await checkResponse(response);
+
+    return (await response.json() as ChannelChatMessage[])
+        .map(message => plainToInstance(ChannelChatMessage, message))
+    ;
 };
 
 export const apiUpdatePlayerCountryFlag = async (publicId: string, countryFlag: string | null): Promise<void> => {

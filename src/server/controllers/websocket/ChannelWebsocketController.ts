@@ -87,7 +87,7 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
 
             this.io
                 .to(Rooms.channel(channelName))
-                .emit('channelChatMessagePosted', channelName, instanceToInstance(message))
+                .emit('channelChatMessagePosted', channelName, instanceToInstance(message, { groups: ['channel'] }))
             ;
 
             answer();
@@ -108,7 +108,7 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
         socket.emit(
             'channelChatMessageUpdate',
             channelName,
-            messages.map(m => instanceToInstance(m)),
+            messages.map(m => instanceToInstance(m, { groups: ['channel'] })),
         );
     }
 }

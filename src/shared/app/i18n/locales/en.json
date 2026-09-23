@@ -593,6 +593,7 @@
     "chat": "Chat",
     "system": "System",
     "chat_message_placeholder": "Message…",
+    "load_older_messages": "Load older messages",
     "chat_message_moderated": "Message deleted by moderation",
     "let_focus": "Let focus",
     "exit_focus": "Exit focus",

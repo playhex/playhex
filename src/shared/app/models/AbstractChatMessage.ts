@@ -18,7 +18,7 @@ export default abstract class AbstractChatMessage
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: ['moderation'] })
+    @Expose({ groups: ['moderation', 'channel'] })
     publicId: string = uuidv4();
 
     @Column({ nullable: true })
@@ -30,13 +30,13 @@ export default abstract class AbstractChatMessage
      */
     @IsObject({ groups: ['post'] })
     @ManyToOne(() => Player)
-    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action', 'channel'] })
     player: null | Player;
 
     @IsString({ groups: ['playerInput', 'post'] })
     @Length(1, 1000, { groups: ['playerInput', 'post'] })
     @Column({ length: 1000 })
-    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action', 'channel'] })
     @Transform(({ value, obj, options }) => serializationShouldHideContent(obj, options.groups) ? '' : value)
     content: string;
 
@@ -48,7 +48,7 @@ export default abstract class AbstractChatMessage
      * or where there is no locale (SGF export may not be translated).
      */
     @Column({ type: String, length: 64, nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'channel'] })
     @Transform(({ value, obj, options }) => serializationShouldHideContent(obj, options.groups) ? 'chat_message_moderated' : value)
     contentTranslationKey: null | string;
 
@@ -56,12 +56,12 @@ export default abstract class AbstractChatMessage
      * Parameters used for "contentTranslationKey"
      */
     @Column({ type: 'json', nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'channel'] })
     translationParameters: null | object;
 
     @IsDate({ groups: ['post'] })
     @Column({ default: () => 'current_timestamp(3)', precision: 3 })
-    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action', 'channel'] })
     @Type(() => Date)
     createdAt: Date;
 
