@@ -1,0 +1,64 @@
+# Dev services. Start with: docker compose up -d
+#
+# .env:
+#   DATABASE_URL="mysql://root:root@localhost:3306/hex"
+#   REDIS_URL=redis://localhost:6379
+#
+# Adminer:      http://localhost:8080
+# Redis Insight: http://localhost:5540
+
+services:
+    mysql:
+        image: mysql:8
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: hex
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql-data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+            interval: 5s
+            timeout: 5s
+            retries: 20
+
+    adminer:
+        image: adminer
+        environment:
+            ADMINER_PREFILL_SERVER: mysql
+            ADMINER_PREFILL_USERNAME: root
+            ADMINER_PREFILL_PASSWORD: root
+            ADMINER_PREFILL_DB: hex
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./docker/adminer/login-prefill.php:/var/www/html/plugins-enabled/login-prefill.php:ro
+        depends_on:
+            - mysql
+
+    redis:
+        image: redis:8
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-data:/data
+
+    redisinsight:
+        image: redis/redisinsight:latest
+        environment:
+            RI_ACCEPT_TERMS_AND_CONDITIONS: "true"
+            RI_REDIS_HOST: redis
+            RI_REDIS_PORT: "6379"
+            RI_REDIS_ALIAS: hex
+        ports:
+            - "5540:5540"
+        volumes:
+            - redisinsight-data:/data
+        depends_on:
+            - redis
+
+volumes:
+    mysql-data:
+    redis-data:
+    redisinsight-data:
