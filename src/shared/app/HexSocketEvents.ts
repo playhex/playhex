@@ -292,7 +292,7 @@ export type HexServerToClientEvents = {
     /**
      * I just subscribed to a channel, receive last chat messages
      */
-    channelChatMessageUpdate: (channel: string, channelChatMessages: ChannelChatMessage[]) => void;
+    channelChatMessageUpdate: (channel: string, channelChatMessages: ChannelChatMessage[], slowMode: null | number) => void;
 
     /**
      * A message has been posted in a channel I subscribed for.

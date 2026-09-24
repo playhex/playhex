@@ -593,6 +593,7 @@
     "chat": "Chat",
     "system": "System",
     "chat_message_placeholder": "Message…",
+    "chat_message_placeholder_slow_mode": "Message… (slow mode: {{ count }} per minute)",
     "load_older_messages": "Load older messages",
     "chat_message_moderated": "Message deleted by moderation",
     "let_focus": "Let focus",
@@ -659,6 +660,7 @@
     "rate_limit_reached": "This action ({{rateLimiterName}}) has been rate limited to you. Wait {{seconds}} seconds before retry.",
     "rate_limiter": {
         "chat_message": "sending chat messages",
+        "channel_slow_mode": "slow mode",
         "account_creation": "creating an account",
         "failed_login": "logging in",
         "create_game": "creating a game",

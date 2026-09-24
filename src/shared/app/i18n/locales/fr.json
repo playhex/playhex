@@ -501,6 +501,7 @@
     "now!": "Maintenant !",
     "see_progression_on_challonge": "Voir la progression sur Challonge",
     "chat_message_placeholder": "Message…",
+    "chat_message_placeholder_slow_mode": "Message… (mode lent : {{ count }} par minute)",
     "load_older_messages": "Charger les messages précédents",
     "chat_message_moderated": "Message supprimé par la modération",
     "let_focus": "Me laisser me concentrer",
@@ -691,6 +692,7 @@
     "rate_limit_reached": "Cette action ({{rateLimiterName}}) vous a été limitée. Attendez {{seconds}} secondes avant de réessayer.",
     "rate_limiter": {
         "chat_message": "l'envoi de messages",
+        "channel_slow_mode": "le mode lent",
         "account_creation": "la création de compte",
         "failed_login": "la connexion",
         "create_game": "la création de partie",

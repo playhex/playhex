@@ -12,6 +12,28 @@ const chatMessageLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Channel slow mode limiters, one per "messages per minute" value.
+ * Keyed by channel and player.
+ */
+const channelSlowModeLimiters = new Map<number, RateLimiterMemory>();
+
+const getChannelSlowModeLimiter = (messagesPerMinute: number): RateLimiterMemory => {
+    let limiter = channelSlowModeLimiters.get(messagesPerMinute);
+
+    if (!limiter) {
+        limiter = new RateLimiterMemory({
+            keyPrefix: 'rate_limiter.channel_slow_mode',
+            points: messagesPerMinute,
+            duration: 60,
+        });
+
+        channelSlowModeLimiters.set(messagesPerMinute, limiter);
+    }
+
+    return limiter;
+};
+
+/**
  * Limit a same ip creating many account.
  * Should not prevent a classroom (same ip) all creating accounts.
  */
@@ -131,6 +153,10 @@ const consume = async (limiter: RateLimiterMemory, key: string, pointsToConsume 
 
 export const rateLimiterConsumeChatMessage = async (playerPublicId: string) => {
     await consume(chatMessageLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeChannelSlowMode = async (channelName: string, messagesPerMinute: number, playerPublicId: string) => {
+    await consume(getChannelSlowModeLimiter(messagesPerMinute), `${channelName}:${playerPublicId}`);
 };
 
 export const rateLimiterConsumeAccountCreation = async (ip: string | undefined) => {

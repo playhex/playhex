@@ -41,6 +41,20 @@ export class ChannelsService
     }
 
     /**
+     * Slow mode of a channel (max messages per minute per player), or null if none.
+     * Does not create channel.
+     */
+    async getSlowMode(channelName: string): Promise<null | number>
+    {
+        const channel = await this.channelRepository.findOne({
+            select: { slowMode: true },
+            where: { name: channelName },
+        });
+
+        return channel?.slowMode ?? null;
+    }
+
+    /**
      * @throws {ChannelNotFoundError} If channel not existing (and cannot be auto created)
      */
     async getChannel(channelName: string): Promise<Channel>

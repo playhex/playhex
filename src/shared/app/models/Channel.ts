@@ -22,6 +22,14 @@ export default class Channel
     @Expose()
     name: string;
 
+    /**
+     * Slow mode: max number of messages a player can post in this channel per minute.
+     * null means no slow mode.
+     */
+    @Column({ type: 'smallint', nullable: true, default: null })
+    @Expose()
+    slowMode: null | number = null;
+
     @OneToMany(() => ChannelChatMessage, channelChatMessage => channelChatMessage.channel, { cascade: true })
     @Expose()
     @Type(() => ChannelChatMessage)

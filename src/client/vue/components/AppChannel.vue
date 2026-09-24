@@ -2,6 +2,7 @@
 import { format, isThisWeek, isToday, isYesterday } from 'date-fns';
 import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
+import { t } from 'i18next';
 import { IconSendFill } from '../icons.js';
 import { useChannel } from '../composables/useChannel.js';
 import { useStickToBottom } from '../composables/useStickToBottom.js';
@@ -30,6 +31,7 @@ const messages = computed(() => channelComposables[activeChannel.value].messages
 const postMessage = (content: string) => channelComposables[activeChannel.value].postMessage(content);
 const hasOlderMessages = computed(() => channelComposables[activeChannel.value].hasOlderMessages.value);
 const loadingOlderMessages = computed(() => channelComposables[activeChannel.value].loadingOlderMessages.value);
+const slowMode = computed(() => channelComposables[activeChannel.value].slowMode.value);
 
 // One input string kept per channel so switching tabs doesn't discard typed text.
 const chatInputs = ref<Record<string, string>>(Object.fromEntries(channelNames.map(name => [name, ''])));
@@ -49,6 +51,18 @@ watchEffect(async () => {
     }
 
     isChatBlocked.value = await apiGetPlayerIsCurrentlyChatRestricted(loggedInPlayer.value.publicId);
+});
+
+const inputPlaceholder = computed((): string => {
+    if (!loggedInPlayer.value || isChatBlocked.value) {
+        return '';
+    }
+
+    if (slowMode.value !== null) {
+        return t('chat_message_placeholder_slow_mode', { count: slowMode.value });
+    }
+
+    return t('chat_message_placeholder');
 });
 
 const messagesElement = ref<HTMLElement>();
@@ -160,7 +174,7 @@ const sendMessage = async () => {
                     @input="chatInput = ($event.target as HTMLInputElement).value"
                     @keydown="blockEnterOnMobile"
                     class="form-control bg-body-tertiary"
-                    :placeholder="(loggedInPlayer && !isChatBlocked) ? $t('chat_message_placeholder') : ''"
+                    :placeholder="inputPlaceholder"
                     maxlength="1000"
                     :disabled="!loggedInPlayer || isChatBlocked"
                 />

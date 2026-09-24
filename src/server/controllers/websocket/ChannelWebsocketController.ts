@@ -9,7 +9,7 @@ import logger from '../../services/logger.js';
 import ChannelChatMessageRepository from '../../repositories/ChannelChatMessageRepository.js';
 import { ChannelNotFoundError, ChannelsService } from '../../services/ChannelsService.js';
 import PlayerModerationActionRepository from '../../repositories/PlayerModerationActionRepository.js';
-import { RateLimitReachedError, errorToRateLimitReachedErrorPayload, rateLimiterConsumeChatMessage } from '../../services/rate-limiters.js';
+import { RateLimitReachedError, errorToRateLimitReachedErrorPayload, rateLimiterConsumeChannelSlowMode, rateLimiterConsumeChatMessage } from '../../services/rate-limiters.js';
 
 const CHANNEL_ROOM_PREFIX = 'channels/';
 
@@ -68,6 +68,24 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
                 return;
             }
 
+            if (channel.slowMode !== null) {
+                try {
+                    await rateLimiterConsumeChannelSlowMode(channel.name, channel.slowMode, player.publicId);
+                } catch (e) {
+                    if (e instanceof RateLimitReachedError) {
+                        answer({
+                            reason: 'rate_limited',
+                            payload: errorToRateLimitReachedErrorPayload(e),
+                        });
+
+                        return;
+                    }
+
+                    answer({ reason: 'server_error' });
+                    return;
+                }
+            }
+
             const message = new ChannelChatMessage();
 
             message.player = player;
@@ -103,12 +121,16 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
         }
 
         const channelName = room.slice(CHANNEL_ROOM_PREFIX.length);
-        const messages = await this.channelsService.getLastMessages(channelName);
+        const [messages, slowMode] = await Promise.all([
+            this.channelsService.getLastMessages(channelName),
+            this.channelsService.getSlowMode(channelName),
+        ]);
 
         socket.emit(
             'channelChatMessageUpdate',
             channelName,
             messages.map(m => instanceToInstance(m, { groups: ['channel'] })),
+            slowMode,
         );
     }
 }

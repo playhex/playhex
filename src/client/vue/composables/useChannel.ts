@@ -17,9 +17,15 @@ export const useChannel = (channelName: string) => {
     const hasOlderMessages = ref(false);
     const loadingOlderMessages = ref(false);
 
-    const onChannelChatMessageUpdate = (channel: string, channelChatMessages: ChannelChatMessage[]) => {
+    /**
+     * Max messages per minute per player, or null if no slow mode
+     */
+    const slowMode = ref<null | number>(null);
+
+    const onChannelChatMessageUpdate = (channel: string, channelChatMessages: ChannelChatMessage[], channelSlowMode: null | number) => {
         if (channel !== channelName) return;
         messages.value = channelChatMessages;
+        slowMode.value = channelSlowMode;
         hasOlderMessages.value = channelChatMessages.length >= CHANNEL_LAST_MESSAGES_COUNT;
     };
 
@@ -76,6 +82,7 @@ export const useChannel = (channelName: string) => {
         hasOlderMessages,
         loadingOlderMessages,
         loadOlderMessages,
+        slowMode,
         postMessage,
     };
 };
