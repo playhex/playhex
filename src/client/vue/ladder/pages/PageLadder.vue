@@ -20,7 +20,7 @@ useHead({
 const { slug, ladderDto, me, reload } = useLadderFromUrl();
 const { challenge } = useLadderChallenge();
 
-type Tab = 'standings' | 'running_games' | 'history' | 'hall_of_fame';
+type Tab = 'standings' | 'running_games' | 'hall_of_fame' | 'history';
 
 const tab = ref<Tab>('standings');
 
@@ -43,21 +43,21 @@ const onChallenge = async (defender: Player): Promise<void> => {
 
         <div v-else-if="ladderDto" class="row">
             <div class="col-12 col-lg-8 order-2 order-lg-1">
-                <ul class="nav nav-tabs mb-3">
-                    <li class="nav-item">
+                <ul class="nav nav-tabs nav-tabs-ladder mb-3">
+                    <li class="nav-item d-flex">
                         <a href="#" class="nav-link" :class="{ active: tab === 'standings' }" @click.prevent="tab = 'standings'"><IconListOl /> {{ $t('ladder.standings') }}</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-flex">
                         <a href="#" class="nav-link" :class="{ active: tab === 'running_games' }" @click.prevent="tab = 'running_games'">
                             <IconTablerSwords /> {{ $t('ladder.running_games') }}
                             <span class="badge text-bg-secondary">{{ ladderDto.runningChallenges.length }}</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" :class="{ active: tab === 'history' }" @click.prevent="tab = 'history'"><IconClockHistory /> {{ $t('ladder.history') }}</a>
-                    </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-flex">
                         <a href="#" class="nav-link" :class="{ active: tab === 'hall_of_fame' }" @click.prevent="tab = 'hall_of_fame'"><IconTrophyFill /> {{ $t('ladder.hall_of_fame') }}</a>
+                    </li>
+                    <li class="nav-item d-flex">
+                        <a href="#" class="nav-link" :class="{ active: tab === 'history' }" @click.prevent="tab = 'history'"><IconClockHistory /> {{ $t('ladder.history') }}</a>
                     </li>
                 </ul>
 
@@ -73,9 +73,9 @@ const onChallenge = async (defender: Player): Promise<void> => {
 
                 <AppLadderRunningChallenges v-else-if="tab === 'running_games'" :challenges="ladderDto.runningChallenges" />
 
-                <AppLadderHistory v-else-if="tab === 'history'" :slug />
-
                 <AppLadderHallOfFame v-else-if="tab === 'hall_of_fame'" :slug />
+
+                <AppLadderHistory v-else-if="tab === 'history'" :slug />
             </div>
 
             <div class="col-12 col-lg-4 order-1 order-lg-2">
@@ -85,3 +85,10 @@ const onChallenge = async (defender: Player): Promise<void> => {
         </div>
     </div>
 </template>
+
+<style lang="stylus" scoped>
+// Page background is bg-body-tertiary, not body-bg: match active tab to it
+.nav-tabs-ladder
+    --bs-nav-tabs-link-active-bg var(--bs-tertiary-bg)
+    --bs-nav-tabs-link-active-border-color var(--bs-border-color) var(--bs-border-color) var(--bs-tertiary-bg)
+</style>
