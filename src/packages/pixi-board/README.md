@@ -16,12 +16,21 @@ npm install @playhex/pixi-board pixi.js tiny-typed-emitter
 
 ## Quick start
 
+```html
+<div id="board" style="width: 600px; height: 400px"></div>
+```
+
 ```ts
 import { GameView } from '@playhex/pixi-board';
 
 const gameView = new GameView(9);
 await gameView.mount(document.getElementById('board'));
+
+gameView.setStone('d4', 0); // red stone
+gameView.setStone('e6', 1); // blue stone
 ```
+
+The container must have a fixed size (see below). The default theme is dark, see Theming below to use the light theme.
 
 ## Usage
 
@@ -58,8 +67,8 @@ a1  b1  c1
 - Simple example: show an empty board and add to the dom
 
 ``` ts
-import { ref, onMounted, shallowRef } from 'vue';
-import GameView from 'pixi-board/GameView.js';
+import { ref, onMounted } from 'vue';
+import { GameView } from '@playhex/pixi-board';
 
 const gameView = new GameView(9);
 const myElement = ref();
@@ -125,7 +134,7 @@ gameView.setOrientation(9); // show board in portrait orientation
 // or use constants for better readability
 gameView.setOrientation(GameView.ORIENTATION_FLAT);
 gameView.setOrientation(GameView.ORIENTATION_DIAMOND);
-gameView.setOrientation(GameView.ORIENTATION_DIAMONDORIENTATION_PORTRAIT_FLAT);
+gameView.setOrientation(GameView.ORIENTATION_PORTRAIT_FLAT);
 
 // or use weird orientations
 gameView.setOrientation(1.6);
@@ -144,10 +153,12 @@ gameView.highlightSideForPlayer(1); // highlight sides for blue, fade red sides
 
 - Theming
 
-For now we can only customize colors
+For now we can only customize colors. Default theme is dark.
 
 ``` ts
-import { themes } from 'pixi-board/BoardTheme.js';
+import { GameView, themes } from '@playhex/pixi-board';
+
+const gameView = new GameView(9, { theme: themes.light }); // Set theme on creation
 
 gameView.setTheme(themes.dark); // Use default dark theme
 gameView.setTheme(themes.light); // Use default light theme
@@ -174,6 +185,8 @@ and provide methods to manipulate the GameView to do more things than just addin
 Can play a game, add stones alternatively, shows last move mark, swap move, can preview next move (used for move confirm or premove).
 
 ``` ts
+import { GameView, PlayingGameFacade } from '@playhex/pixi-board';
+
 const gameView = new GameView(9);
 const playingGameFacade = new PlayingGameFacade(gameView);
 
@@ -284,8 +297,8 @@ Renders board snapshots in a headless browser and compares them against referenc
 npm run test:visual
 ```
 
-- `src/shared/pixi-board/cypress/screenshots-expected`: how board view should looks like
-- `src/shared/pixi-board/cypress/screenshots`: how board view appeared while being under test
+- `cypress/screenshots-expected`: how board view should looks like
+- `cypress/screenshots`: how board view appeared while being under test
 
 **Note**: If a new visual test is added,
 expected screenshots will be automatically added in folder on first run.
