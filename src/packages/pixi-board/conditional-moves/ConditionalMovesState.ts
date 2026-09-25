@@ -1,4 +1,4 @@
-import { Move } from '../../move-notation/move-notation.js';
+import type { Move } from '@playhex/move-notation';
 import { copyConditionalMovesStruct } from './conditionalMovesUtils.js';
 import { ConditionalMovesStruct } from './types.js';
 

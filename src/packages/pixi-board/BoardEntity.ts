@@ -1,6 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 import Hex from './Hex.js';
-import { Coords, Move, parseMove } from '../move-notation/move-notation.js';
+import { Coords, Move, parseMove } from '@playhex/move-notation';
 import { Theme } from './BoardTheme.js';
 
 const PI_6 = Math.PI / 6;

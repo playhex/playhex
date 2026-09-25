@@ -1,7 +1,6 @@
 import { PlayingGameFacade } from '../facades/PlayingGameFacade.js';
 import ConditionalMovesEditor from './ConditionalMovesEditor.js';
-import { Move, parseMove } from '../../move-notation/move-notation.js';
-import type { HexMove } from '../../move-notation/hex-move-notation.js';
+import { Move, parseMove, type HexMove } from '@playhex/move-notation';
 import { getNextMovesAfterLine } from './conditionalMovesUtils.js';
 import TextMark from '../entities/TextMark.js';
 import GameView from '../GameView.js';

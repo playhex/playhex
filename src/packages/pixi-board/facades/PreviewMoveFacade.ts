@@ -1,4 +1,4 @@
-import { Move } from '../../move-notation/move-notation.js';
+import type { Move } from '@playhex/move-notation';
 import GameView from '../GameView.js';
 
 /**

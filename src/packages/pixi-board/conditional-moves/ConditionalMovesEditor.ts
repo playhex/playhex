@@ -1,6 +1,6 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { clearDuplicatedUnplayedLines, conditionalMovesCut, conditionalMovesMergeMoves, conditionalMovesShift, copyConditionalMovesStruct } from './conditionalMovesUtils.js';
-import { Move } from '../../move-notation/move-notation.js';
+import { Move } from '@playhex/move-notation';
 import { ConditionalMovesStruct } from './types.js';
 import { ConditionalMovesState } from './ConditionalMovesState.js';
 

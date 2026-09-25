@@ -1,4 +1,6 @@
-import { BoardEntity, GameView, Hex } from '@playhex/pixi-board';
+import { BoardEntity } from '../BoardEntity.js';
+import GameView from '../GameView.js';
+import Hex from '../Hex.js';
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 
 class PolicyNumberMark extends BoardEntity

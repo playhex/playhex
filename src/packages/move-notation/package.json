@@ -1,0 +1,39 @@
+{
+  "name": "@playhex/move-notation",
+  "version": "1.0.0",
+  "description": "Parse, validate and convert Hex board game move notation (\"a1\", \"swap-pieces\", ...)",
+  "license": "AGPL-3.0-only",
+  "author": "Julien Maulny",
+  "homepage": "https://playhex.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/playhex/playhex.git",
+    "directory": "src/packages/move-notation"
+  },
+  "keywords": [
+    "hex",
+    "board-game"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.lib.json",
+    "prepack": "pnpm run build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  }
+}

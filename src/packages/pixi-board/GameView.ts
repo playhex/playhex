@@ -4,7 +4,7 @@ import { Theme, themes } from './BoardTheme.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { BoardEntity } from './BoardEntity.js';
 import Stone from './entities/Stone.js';
-import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '../move-notation/move-notation.js';
+import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '@playhex/move-notation';
 import { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
@@ -213,7 +213,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Starts when pointer down,
      * cleared when pointer up too quickly, or secondary action triggered.
      */
-    private longPressTimeout: null | NodeJS.Timeout = null;
+    private longPressTimeout: null | ReturnType<typeof setTimeout> = null;
 
     /**
      * How much milliseconds need to hold to trigger secondary action.

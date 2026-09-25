@@ -284,6 +284,11 @@ On release:
 - eventually run `pnpm typeorm schema:sync` if there are only safe migrations (indexes, new columns...)
 - restart server
 
+## Packages
+
+Some parts of PlayHex are published on npm as standalone packages (`src/packages/`),
+see [docs/publishing-packages.md](docs/publishing-packages.md).
+
 ## License
 
 This project is under [AGPL-3.0 license](LICENSE).

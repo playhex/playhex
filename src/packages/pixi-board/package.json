@@ -11,27 +11,23 @@
     "directory": "src/packages/pixi-board"
   },
   "type": "module",
-  "main": "./dist/index.js",
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./dist/index.js"
-    }
+    ".": "./index.ts"
   },
-  "types": "./dist/types/shared/pixi-board/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
+    "build": "rm -rf dist && vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
     "build:visual-test": "vite build --config vite.visual.config.ts",
     "test:visual": "pnpm run build:visual-test && cypress run --browser chrome",
     "test:visual:update": "pnpm run build:visual-test && cypress run --browser chrome --env UPDATE_SNAPSHOTS=true",
     "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT='../tsconfig.json' mocha 'test/**/*.ts' 'resize-observer-debounced/test/**/*.ts' --extension ts --ignore 'test/visual/**'",
     "test": "pnpm run test:unit && pnpm run test:visual",
-    "prepublishOnly": "pnpm run build"
+    "prepack": "pnpm run build"
   },
   "dependencies": {
+    "@playhex/move-notation": "workspace:^",
     "expr-eval-fork": "^3.0.3"
   },
   "peerDependencies": {
@@ -51,5 +47,16 @@
     "ts-node": "^10.9.2",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vite": "^8.3.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
   }
 }

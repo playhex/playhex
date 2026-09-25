@@ -1,4 +1,4 @@
-import { Coords, coordsToMove, Move } from '../../move-notation/move-notation.js';
+import { Coords, coordsToMove, Move } from '@playhex/move-notation';
 import LastMoveMark from '../entities/LastMoveMark.js';
 import GameView from '../GameView.js';
 

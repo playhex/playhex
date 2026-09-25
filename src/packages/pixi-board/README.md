@@ -12,6 +12,8 @@ npm install @playhex/pixi-board pixi.js tiny-typed-emitter
 
 `pixi.js` and `tiny-typed-emitter` are peer dependencies and must be installed alongside the package.
 
+`tiny-typed-emitter` relies on node `events` module: when bundling for the browser, also install `events` (`npm install events`) so your bundler can resolve it.
+
 ## Quick start
 
 ```ts
@@ -295,3 +297,7 @@ validate changes and update reference screenshots with:
 ``` bash
 npm run test:visual:update
 ```
+
+## License
+
+This package is under [AGPL-3.0 license](LICENSE).

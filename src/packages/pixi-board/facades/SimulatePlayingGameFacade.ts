@@ -1,8 +1,7 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { isSpecialHexMove, type HexMove } from '../../move-notation/hex-move-notation.js';
+import { isSpecialHexMove, mirrorMove, parseMove, type HexMove } from '@playhex/move-notation';
 import { PlayingGameFacade } from './PlayingGameFacade.js';
 import TextMark from '../entities/TextMark.js';
-import { mirrorMove, parseMove } from '../../move-notation/move-notation.js';
 import { BoardEntity } from '../BoardEntity.js';
 import GameView from '../GameView.js';
 

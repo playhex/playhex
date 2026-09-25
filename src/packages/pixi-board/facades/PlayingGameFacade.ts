@@ -1,5 +1,4 @@
-import { mirrorMove, Move } from '../../move-notation/move-notation.js';
-import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
+import { HexMove, isSpecialHexMove, mirrorMove, Move } from '@playhex/move-notation';
 import GameView from '../GameView.js';
 import { GameMarksFacade } from './GameMarksFacade.js';
 import { PreviewMoveFacade } from './PreviewMoveFacade.js';

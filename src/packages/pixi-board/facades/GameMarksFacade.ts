@@ -1,5 +1,4 @@
-import { Move, parseMove } from '../../move-notation/move-notation.js';
-import { HexMove, isSpecialHexMove } from '../../move-notation/hex-move-notation.js';
+import { HexMove, isSpecialHexMove, Move, parseMove } from '@playhex/move-notation';
 import GameView from '../GameView.js';
 import SwappableMark from '../entities/SwappableMark.js';
 import SwappedMark from '../entities/SwappedMark.js';
