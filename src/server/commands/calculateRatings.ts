@@ -17,7 +17,7 @@ import { mustAnswerYes } from './utils/question.js';
 
  * then recalc all with this command:
 
-    yarn hex calculate-ratings
+    pnpm hex calculate-ratings
  */
 hexProgram
     .command('calculate-ratings')

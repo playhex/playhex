@@ -330,7 +330,7 @@ const ratingBarHeight = (count: number): string => {
         <p v-if="false === periodStats" class="text-danger">{{ $t('statistics.error_loading') }}</p>
         <div v-else-if="'not-generated' === periodStats" class="alert alert-warning">
             <p class="mb-2">Statistics have not been generated yet. An admin should run the following command:</p>
-            <pre class="bg-body-tertiary p-2 rounded mb-0"><code>yarn hex generate-stats</code></pre>
+            <pre class="bg-body-tertiary p-2 rounded mb-0"><code>pnpm hex generate-stats</code></pre>
         </div>
         <p v-else-if="null === periodStats || null === displayedStats">{{ $t('loading') }}</p>
         <div v-else>
@@ -580,7 +580,7 @@ const ratingBarHeight = (count: number): string => {
         <p v-if="false === commonStats" class="text-danger">{{ $t('statistics.error_loading') }}</p>
         <div v-else-if="'not-generated' === commonStats" class="alert alert-warning">
             <p class="mb-2">Statistics have not been generated yet. An admin should run the following command:</p>
-            <pre class="bg-body-tertiary p-2 rounded mb-0"><code>yarn hex generate-stats</code></pre>
+            <pre class="bg-body-tertiary p-2 rounded mb-0"><code>pnpm hex generate-stats</code></pre>
         </div>
         <p v-else-if="null === commonStats">{{ $t('loading') }}</p>
         <div v-else class="row g-4">

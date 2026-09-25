@@ -25,11 +25,11 @@
   "scripts": {
     "build": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
     "build:visual-test": "vite build --config vite.visual.config.ts",
-    "test:visual": "npm run build:visual-test && cypress run --browser chrome",
-    "test:visual:update": "npm run build:visual-test && cypress run --browser chrome --env UPDATE_SNAPSHOTS=true",
+    "test:visual": "pnpm run build:visual-test && cypress run --browser chrome",
+    "test:visual:update": "pnpm run build:visual-test && cypress run --browser chrome --env UPDATE_SNAPSHOTS=true",
     "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT='../tsconfig.json' mocha 'test/**/*.ts' --extension ts --ignore 'test/visual/**'",
-    "test": "npm run test:unit && npm run test:visual",
-    "prepublishOnly": "npm run build"
+    "test": "pnpm run test:unit && pnpm run test:visual",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "expr-eval-fork": "^3.0.3"

@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
-import { Component, ref } from 'vue';
+import { Component, Ref, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { BootstrapLevel } from '../../shared/app/bootstrapLevels.js';
 import { RouteLocationAsRelativeTyped } from 'vue-router';
 
 const useToastsStore = defineStore('toastsStore', () => {
 
-    const toasts = ref<Toast[]>([]);
+    const toasts: Ref<Toast[]> = ref([]);
 
     const addToast = (message: string, options?: Partial<ToastOptions>): void => {
         const toast = createToast(message, options);

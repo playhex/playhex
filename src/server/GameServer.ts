@@ -1103,7 +1103,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
         }
     }
 
-    postSystemChatMessage(content: string, translationKey: string, translationParameters: null | object = null, now = new Date())
+    postSystemChatMessage(content: string, translationKey: string, translationParameters: null | { [key: string]: unknown } = null, now = new Date())
     {
         const chatMessage = new ChatMessage();
 

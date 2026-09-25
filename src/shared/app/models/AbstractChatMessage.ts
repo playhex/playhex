@@ -57,7 +57,7 @@ export default abstract class AbstractChatMessage
      */
     @Column({ type: 'json', nullable: true })
     @Expose({ groups: [GROUP_DEFAULT, 'channel'] })
-    translationParameters: null | object;
+    translationParameters: null | { [key: string]: unknown };
 
     @IsDate({ groups: ['post'] })
     @Column({ default: () => 'current_timestamp(3)', precision: 3 })

@@ -36,14 +36,14 @@ export default class TournamentHistory
 
     @Column({ type: 'json' })
     @Expose()
-    parameters: object;
+    parameters: { [key: string]: unknown };
 
     @Column()
     @Expose()
     date: Date;
 }
 
-export const addTournamentHistory = (tournament: Tournament, type: HistoryType, parameters: object = {}, date: Date = new Date): TournamentHistory => {
+export const addTournamentHistory = (tournament: Tournament, type: HistoryType, parameters: { [key: string]: unknown } = {}, date: Date = new Date): TournamentHistory => {
     const tournamentHistory = new TournamentHistory();
 
     tournamentHistory.tournament = tournament;

@@ -62,7 +62,7 @@ watchEffect(() => {
     });
 });
 
-// To make an export file available here, run command: yarn hex export-games
+// To make an export file available here, run command: pnpm hex export-games
 
 void (async () => {
     const response = await fetch('/export-data/manifest.json');

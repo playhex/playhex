@@ -36,7 +36,7 @@ const checkBots = async (): Promise<void> => {
     const randomWait = await findBot('test-determinist-wait');
 
     if (!randomInstant || !randomWait) {
-        throw new Error('[FAIL] test bots missing, run: "yarn hex create-test-bots"');
+        throw new Error('[FAIL] test bots missing, run: "pnpm hex create-test-bots"');
     }
 
     if (randomInstant.aiConfig?.config.wait !== 0) {

@@ -13,7 +13,7 @@ Currently hosted here: <https://playhex.org>
 Requires:
 
 - node >= 20
-- yarn
+- pnpm (`corepack enable`, or see https://pnpm.io/installation)
 - mysql or mariadb >=12.1 or postgres
 
 *mariadb 12.1 or more is required to have the unlimited json depth for conditional_moves.tree*
@@ -28,13 +28,13 @@ Then run these commands:
 
 ``` bash
 # Install dependencies
-yarn install
+pnpm install
 
 # Create database schema
-yarn typeorm schema:sync
+pnpm typeorm schema:sync
 
 # Start application
-yarn serve
+pnpm serve
 ```
 
 Wait javascript to be bundled, then the application is available at:
@@ -76,9 +76,9 @@ For development you can use local AI:
 Enable them with:
 
 ``` bash
-yarn hex create-random-bots
-yarn hex create-davies-bots
-yarn hex create-test-bots
+pnpm hex create-random-bots
+pnpm hex create-davies-bots
+pnpm hex create-test-bots
 ```
 
 Determinist random bot will always plays same games
@@ -100,8 +100,8 @@ HEX_AI_API=http://localhost:8088
 And enable ai players in database with:
 
 ``` bash
-yarn hex create-katahex-bots
-yarn hex create-mohex-bots
+pnpm hex create-katahex-bots
+pnpm hex create-mohex-bots
 ```
 
 ## Translate PlayHex
@@ -126,7 +126,7 @@ and only bundle icons we actually use. To add a new icon:
 - Then copy "Components > Unplugin Icons"
 - Add it to `src/client/vue/icons.ts`
 - Then use it in templates
-- Also do `yarn add -D ...` if this set of icons is not yet installed
+- Also do `pnpm add -D ...` if this set of icons is not yet installed
 
 ## Push notifications
 
@@ -137,7 +137,7 @@ To test push notifications:
 Run:
 
 ```
-yarn web-push generate-vapid-keys
+pnpm web-push generate-vapid-keys
 ```
 
 Then put public keys, private keys in your .env, with any email:
@@ -155,35 +155,35 @@ PUSH_VAPID_EMAIL=test@example.org
 
 ``` bash
 # Unit tests (Mocha)
-yarn test
+pnpm test
 
 # e2e tests (Cypress)
-yarn test:e2e
+pnpm test:e2e
 
 # Open Cypress browser
-yarn cypress open
+pnpm cypress open
 # then select "E2E testing" > your browser > Run all tests
 ```
 
 All commands to run Cypress tests in command line:
 
 ``` bash
-yarn hex check-tests-requirements # check environment has no issue that may make tests failing
-yarn serve:prod # serve prod is faster for e2e tests
-yarn cypress run --browser firefox # or another browser, or leave empty
+pnpm hex check-tests-requirements # check environment has no issue that may make tests failing
+pnpm serve:prod # serve prod is faster for e2e tests
+pnpm cypress run --browser firefox # or another browser, or leave empty
 ```
 
 **Warning**: For e2e/cypress tests, there is some configuration requirements:
 
 ``` bash
 # you can run this command to check all missing requirements
-yarn hex check-tests-requirements
+pnpm hex check-tests-requirements
 ```
 
 - Test bots must exists in database, if not, run:
 
 ``` bash
-yarn hex create-test-bots
+pnpm hex create-test-bots
 ```
 
 - Ranked bot games must be allowed.
@@ -208,7 +208,7 @@ Then go to "Sources" tab, browse source files add breakpoints, and do what is ne
 
 ``` bash
 # See which dependencies take more size
-yarn analyse-size
+pnpm analyse-size
 ```
 
 Compare two json files with: <https://happy-water-0887b0b1e.azurestaticapps.net>.
@@ -217,14 +217,14 @@ Compare two json files with: <https://happy-water-0887b0b1e.azurestaticapps.net>
 
 ``` bash
 # upgrade some deps
-yarn upgrade-interactive --latest
+pnpm update --interactive --latest
 
 # check new versions
-yarn outdated check outdated
+pnpm outdated
 
 # sometimes, this works better and fixes weird bugs
 # related to incompatibilies when upgrading a deps
-rm -fr yarn.lock node_modules/ && yarn install
+rm -fr pnpm-lock.yaml node_modules/ && pnpm install
 ```
 
 Upgrade warnings:
@@ -237,16 +237,16 @@ TypeORM migrations:
 
 ``` bash
 # Create a blank migration
-yarn typeorm migration:create src/server/migrations/my-feature
+pnpm typeorm migration:create src/server/migrations/my-feature
 
 # Auto generate migration from schema diff
-yarn typeorm migration:generate src/server/migrations/my-feature
+pnpm typeorm migration:generate src/server/migrations/my-feature
 
 # Run migrations
-yarn typeorm migration:run
+pnpm typeorm migration:run
 ```
 
-Use `yarn typeorm` to see all other TypeORM commands.
+Use `pnpm typeorm` to see all other TypeORM commands.
 
 ### Migrating schema that may break retrocompatibility
 
@@ -255,7 +255,7 @@ When doing a schema migration that is also a breaking change in api:
 On development:
 
 - Develop on blank database
-- Then, import production database, create migration, check `yarn typeorm schema:log`
+- Then, import production database, create migration, check `pnpm typeorm schema:log`
 - Update Cypress fixtures, see `src/server/commands/migrateCypressFixtures.ts`
 - Check breaking changes are acceptable for client that have not yet updated.
   Build the **old client**, then serve it with the **new server** in production mode.
@@ -263,16 +263,16 @@ On development:
   from different commits in the same checkout:
     ```bash
     git checkout <current-production-commit>
-    NODE_ENV=production yarn build-client
+    NODE_ENV=production pnpm build-client
 
     git checkout master
-    yarn build-server
+    pnpm build-server
 
     NODE_ENV=production node index.js
     ```
     - then test application have no big error (hard reload the browser to make sure the old bundle is used)
     - else, add retrocompat temporary fix (like `get gameData() { return { ... }; } set gameData(x) {}` to keep returning legacy property through api)
-    - once done, rebuild the client from master: `NODE_ENV=production yarn build-client`
+    - once done, rebuild the client from master: `NODE_ENV=production pnpm build-client`
 
 On release:
 
@@ -280,8 +280,8 @@ On release:
 - backup database just before migration
 - stop no restart server: update source, rebuild and stop only
 - run `migration.sql`
-- check `yarn typeorm schema:log`
-- eventually run `yarn typeorm schema:sync` if there are only safe migrations (indexes, new columns...)
+- check `pnpm typeorm schema:log`
+- eventually run `pnpm typeorm schema:sync` if there are only safe migrations (indexes, new columns...)
 - restart server
 
 ## License

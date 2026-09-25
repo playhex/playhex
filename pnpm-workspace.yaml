@@ -1,0 +1,13 @@
+packages:
+  - src/shared/pixi-board
+
+# pnpm blocks dependency install scripts by default
+onlyBuiltDependencies:
+  - cypress
+  - esbuild
+  - sharp
+  - '@parcel/watcher'
+  - '@sentry/cli'
+  - protobufjs
+  - vue-demi
+  - tournament-organizer
