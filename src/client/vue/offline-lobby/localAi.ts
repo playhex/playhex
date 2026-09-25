@@ -1,7 +1,7 @@
 import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import EngineGame from '../../../shared/game-engine/EngineGame.js';
 import { calcRandomMove } from '../../../shared/game-engine/randomBot.js';
-import type { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
 
 export type LocalAI = {
     name: string;

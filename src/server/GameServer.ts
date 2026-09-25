@@ -19,7 +19,7 @@ import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
 import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/gameUtils.js';
-import type { HexMove } from '../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../packages/move-notation/hex-move-notation.js';
 import { GameEventsEmitter } from './services/game-events-emitter/GameEventsEmitter.js';
 import { SimilarPositionDetectedError } from './services/anti-cheat/SimilarPositionDetectedError.js';
 import { SimilarPlayingPositionChecker } from './services/anti-cheat/SimilarPlayingPositionChecker.js';

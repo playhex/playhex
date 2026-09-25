@@ -32,7 +32,7 @@ import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
 import { TriangleMark } from '@playhex/pixi-board';
-import { parseMove, validateMove } from '../../../shared/move-notation/move-notation.js';
+import { parseMove, validateMove } from '../../../packages/move-notation/move-notation.js';
 import { GameView } from '@playhex/pixi-board';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';

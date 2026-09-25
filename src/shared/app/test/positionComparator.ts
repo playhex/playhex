@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { type HexMove } from '../../move-notation/hex-move-notation.js';
-import { mirrorCenter, mirrorMove, mirrorShortDiagonal, type Move } from '../../move-notation/move-notation.js';
+import { type HexMove } from '../../../packages/move-notation/hex-move-notation.js';
+import { mirrorCenter, mirrorMove, mirrorShortDiagonal, type Move } from '../../../packages/move-notation/move-notation.js';
 import { type CandidatePosition, comparePositions, createCanonicalPosition, InvalidPositionError, MIRROR_CENTER, MIRROR_LONG_DIAGONAL, MIRROR_SHORT_DIAGONAL, normalizeCanonicalPosition, type Position } from '../../position-comparator/position-comparator.js';
 
 /**

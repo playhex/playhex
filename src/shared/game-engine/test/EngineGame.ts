@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
 import { EngineGame } from '../index.js';
-import { coordsToMove } from '../../move-notation/move-notation.js';
+import { coordsToMove } from '../../../packages/move-notation/move-notation.js';
 
 describe('Game', () => {
     it('Runs an entire game', () => {

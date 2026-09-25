@@ -1,5 +1,5 @@
-import { HexMove } from '../../../move-notation/hex-move-notation.js';
-import { Coords, coordsToMove } from '../../../move-notation/move-notation.js';
+import { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
+import { Coords, coordsToMove } from '../../../../packages/move-notation/move-notation.js';
 import { sgfFromString } from '../../../sgf/index.js';
 import { ImportUserError } from '../errors.js';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';

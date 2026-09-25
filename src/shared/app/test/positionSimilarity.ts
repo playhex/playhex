@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { coordsToMove, type Move } from '../../move-notation/move-notation.js';
+import { coordsToMove, type Move } from '../../../packages/move-notation/move-notation.js';
 import { createCanonicalPosition, jaccardSimilarity } from '../../position-comparator/position-comparator.js';
 import { isSimilarEnough } from '../../position-comparator/position-similarity.js';
 

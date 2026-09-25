@@ -1,4 +1,4 @@
-import { Move } from '../../../../shared/move-notation/move-notation.js';
+import { Move } from '../../../../packages/move-notation/move-notation.js';
 import { UndoableAction } from '../undoredo/undoredo.js';
 
 export interface ToolInterface

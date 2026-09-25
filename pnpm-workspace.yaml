@@ -1,5 +1,5 @@
 packages:
-  - src/shared/pixi-board
+  - src/packages/*
 
 # pnpm blocks dependency install scripts by default
 onlyBuiltDependencies:

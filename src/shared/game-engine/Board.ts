@@ -1,4 +1,4 @@
-import { Coords, Move, parseMove } from '../move-notation/move-notation.js';
+import { Coords, Move, parseMove } from '../../packages/move-notation/move-notation.js';
 import { PathItem, PlayerIndex } from './Types.js';
 
 export const BOARD_DEFAULT_SIZE = 11;

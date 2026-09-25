@@ -1,7 +1,7 @@
 import seedrandom from 'seedrandom';
 import { EngineGame } from '../game-engine/index.js';
-import { coordsToMove } from '../move-notation/move-notation.js';
-import type { HexMove } from '../move-notation/hex-move-notation.js';
+import { coordsToMove } from '../../packages/move-notation/move-notation.js';
+import type { HexMove } from '../../packages/move-notation/hex-move-notation.js';
 
 /**
  * Returns a random number in [0;1[

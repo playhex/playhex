@@ -1,4 +1,4 @@
-import { validateTreeFormat } from '../../pixi-board/conditional-moves/conditionalMovesUtils.js';
+import { validateTreeFormat } from '../../../packages/pixi-board/conditional-moves/conditionalMovesUtils.js';
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
 
 @ValidatorConstraint()

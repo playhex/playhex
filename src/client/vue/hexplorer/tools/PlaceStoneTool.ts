@@ -1,5 +1,5 @@
 import { GameView } from '@playhex/pixi-board';
-import { Move } from '../../../../shared/move-notation/move-notation.js';
+import { Move } from '../../../../packages/move-notation/move-notation.js';
 import { ToolInterface } from './ToolInterface.js';
 import { UndoableAction } from '../undoredo/undoredo.js';
 

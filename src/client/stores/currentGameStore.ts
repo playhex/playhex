@@ -14,7 +14,7 @@ import Player from '../../shared/app/models/Player.js';
 import { MoveSettings } from '../../shared/app/models/PlayerSettings.js';
 import { timeControlToCadencyName } from '../../shared/app/timeControlUtils.js';
 import { apiGetConditionalMoves, apiPatchConditionalMoves, apiPostAnswerUndo, apiPostAskUndo, apiPostCancel, apiPostResign } from '../apiClient.js';
-import { HexMove, isSpecialHexMove } from '../../shared/move-notation/hex-move-notation.js';
+import { HexMove, isSpecialHexMove } from '../../packages/move-notation/hex-move-notation.js';
 import { useChatInputStore } from './chatInputStore.js';
 import usePlayerLocalSettingsStore from './playerLocalSettingsStore.js';
 import { playAudio } from '../../shared/app/audioPlayer.js';
@@ -25,7 +25,7 @@ import { createConditionalMovesState, type ConditionalMovesState } from '@playhe
 import { ConditionalMovesEditor } from '@playhex/pixi-board';
 import { ConditionalMovesFacade } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../services/board-view-facades/PlayerSettingsFacade.js';
-import { Move } from '../../shared/move-notation/move-notation.js';
+import { Move } from '../../packages/move-notation/move-notation.js';
 import { RichChat } from '../../shared/app/rich-chat.js';
 import ChatMessage from '../../shared/app/models/ChatMessage.js';
 import { GameTimeData } from '../../shared/time-control/TimeControl.js';

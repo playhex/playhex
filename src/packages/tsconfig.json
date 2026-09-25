@@ -3,14 +3,13 @@
     "compilerOptions": {
         "target": "ES2019",
         "rootDir": ".",
-        "outDir": "../../dist/shared"
+        "outDir": "../../dist/packages"
     },
     "include": [
         "**/*.ts"
     ],
-    "references": [
-        {
-            "path": "../packages"
-        }
+    "exclude": [
+        "**/node_modules",
+        "**/dist"
     ]
 }

@@ -4,7 +4,7 @@ import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
 import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
 import GameServer from '../GameServer.js';
-import { HexMove, isMoveValid } from '../../shared/move-notation/hex-move-notation.js';
+import { HexMove, isMoveValid } from '../../packages/move-notation/hex-move-notation.js';
 
 @Service()
 export default class RemoteApiPlayer

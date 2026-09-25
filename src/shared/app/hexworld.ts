@@ -1,5 +1,5 @@
 import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
-import type { HexMove } from '../move-notation/hex-move-notation.js';
+import type { HexMove } from '../../packages/move-notation/hex-move-notation.js';
 import Game from './models/Game.js';
 
 const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) => {

@@ -10,7 +10,7 @@ import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vu
 import { GameView } from '@playhex/pixi-board';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
-import type { HexMove } from '../../../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 import AppGameView from '../../components/AppGameView.vue';
 import { useHead } from '@unhead/vue';

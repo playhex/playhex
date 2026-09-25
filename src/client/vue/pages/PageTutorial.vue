@@ -12,7 +12,7 @@ import { IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import { HexagonMark } from '@playhex/pixi-board';
-import type { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
+import type { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
 import { GameView } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';

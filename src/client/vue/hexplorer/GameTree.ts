@@ -1,6 +1,6 @@
 import { ref, Ref } from 'vue';
-import { HexMove } from '../../../shared/move-notation/hex-move-notation.js';
-import { Move } from '../../../shared/move-notation/move-notation.js';
+import { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
+import { Move } from '../../../packages/move-notation/move-notation.js';
 import { MarkPlacement } from './BoardMarksLayer.js';
 
 export type SetupStone = { move: Move, color: 0 | 1 };

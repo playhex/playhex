@@ -44,3 +44,6 @@ export type { ConditionalMovesLine, ConditionalMovesTree, ConditionalMovesStruct
 export { allShadingPatterns, createShadingPattern } from './shading-patterns/shading-patterns.js';
 export type { ShadingPatternType } from './shading-patterns/shading-patterns.js';
 export type { ShadingPatternInterface } from './shading-patterns/ShadingPatternInterface.js';
+
+// Utils
+export { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';

@@ -1,5 +1,5 @@
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import { validateMove } from '../../move-notation/move-notation.js';
+import { validateMove } from '../../../packages/move-notation/move-notation.js';
 
 /**
  * Validates that a value is a valid hex board coordinate (e.g "a1", "d4").

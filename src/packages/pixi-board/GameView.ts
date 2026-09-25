@@ -5,7 +5,7 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import { BoardEntity } from './BoardEntity.js';
 import Stone from './entities/Stone.js';
 import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '../move-notation/move-notation.js';
-import { ResizeObserverDebounced } from '../resize-observer-debounced/ResizeObserverDebounced.js';
+import { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';
 
 const { min, max, sin, cos, sqrt, ceil, PI } = Math;
 const SQRT_3_2 = sqrt(3) / 2;

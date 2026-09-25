@@ -3,9 +3,9 @@ import { GameView } from '@playhex/pixi-board';
 import { PlayingGameFacade } from '@playhex/pixi-board';
 import { PreviewMoveFacade } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
-import { mirrorMove, Move } from '../../../shared/move-notation/move-notation.js';
+import { mirrorMove, Move } from '../../../packages/move-notation/move-notation.js';
 import { OrientationMode } from '@playhex/pixi-board';
-import { HexMove, isSpecialHexMove } from '../../../shared/move-notation/hex-move-notation.js';
+import { HexMove, isSpecialHexMove } from '../../../packages/move-notation/hex-move-notation.js';
 import { SimulatePlayingGameFacade } from '@playhex/pixi-board';
 
 /**

@@ -1,8 +1,8 @@
 import { getBestMove, getBestMoveCustomPosition, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { EngineGame } from '../game-engine/index.js';
 import { PlayerIndex } from '../time-control/TimeControl.js';
-import { coordsToMove, parseMove } from '../move-notation/move-notation.js';
-import { HexMove, isSpecialHexMove } from '../../shared/move-notation/hex-move-notation.js';
+import { coordsToMove, parseMove } from '../../packages/move-notation/move-notation.js';
+import { HexMove, isSpecialHexMove } from '../../packages/move-notation/hex-move-notation.js';
 
 /**
  * Uses Davies AI to compute a move from a Game.

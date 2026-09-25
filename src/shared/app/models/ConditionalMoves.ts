@@ -4,7 +4,7 @@ import Game from './Game.js';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
 import { IsValidConditionalMovesTree } from '../validator/IsValidConditionalMovesTree.js';
-import type { ConditionalMovesLine, ConditionalMovesTree } from '../../pixi-board/conditional-moves/types.js';
+import type { ConditionalMovesLine, ConditionalMovesTree } from '../../../packages/pixi-board/conditional-moves/types.js';
 
 @Entity()
 export default class ConditionalMoves

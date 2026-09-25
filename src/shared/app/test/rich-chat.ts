@@ -2,7 +2,7 @@ import assert from 'assert';
 import { ChatMessage, Player } from '../models/index.js';
 import { RichChat } from '../rich-chat.js';
 import { createGame } from '../models/Game.js';
-import { coordsToMove } from '../../move-notation/move-notation.js';
+import { coordsToMove } from '../../../packages/move-notation/move-notation.js';
 
 describe('Rich Chat', () => {
     it('yield date headers', () => {

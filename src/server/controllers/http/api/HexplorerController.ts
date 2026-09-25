@@ -8,7 +8,7 @@ import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/models/Game
 import { IsHexCoordinate } from '../../../../shared/app/validator/IsHexCoordinate.js';
 import { rateLimiterConsumeAnalyzePosition } from '../../../services/rate-limiters.js';
 import { SimilarPlayingPositionChecker } from '../../../services/anti-cheat/SimilarPlayingPositionChecker.js';
-import type { Move } from '../../../../shared/move-notation/move-notation.js';
+import type { Move } from '../../../../packages/move-notation/move-notation.js';
 import { InvalidPositionError, type CanonicalPosition } from '../../../../shared/position-comparator/position-comparator.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../../../services/anti-cheat/SimilarPositionDetectedError.js';

@@ -1,4 +1,4 @@
-import { HexMove } from '../../../move-notation/hex-move-notation.js';
+import { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
 import { parseHexworldString } from '../../hexworld.js';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';
 import { ImportedGame } from '../types.js';

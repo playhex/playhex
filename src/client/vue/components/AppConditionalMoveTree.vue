@@ -3,7 +3,7 @@ import { PropType } from 'vue';
 import { ConditionalMovesLine, ConditionalMovesTree } from '@playhex/pixi-board';
 import { toRefs } from 'vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
-import { Move } from '../../../shared/move-notation/move-notation.js';
+import { Move } from '../../../packages/move-notation/move-notation.js';
 
 const props = defineProps({
     tree: {

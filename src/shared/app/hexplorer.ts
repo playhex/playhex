@@ -1,4 +1,4 @@
-import type { HexMove } from '../move-notation/hex-move-notation.js';
+import type { HexMove } from '../../packages/move-notation/hex-move-notation.js';
 
 export type AnalysisInput = {
     size: number;

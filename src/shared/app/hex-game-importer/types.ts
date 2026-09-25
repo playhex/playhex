@@ -1,4 +1,4 @@
-import { HexMove } from '../../move-notation/hex-move-notation.js';
+import { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
 
 export type ImportedGame = {
     boardsize: number;
