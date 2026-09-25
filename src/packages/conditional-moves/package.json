@@ -1,0 +1,58 @@
+{
+  "name": "@playhex/conditional-moves",
+  "version": "1.0.0",
+  "description": "Conditional moves tree for Hex board game: premoves to play automatically depending on opponent moves",
+  "license": "AGPL-3.0-only",
+  "author": "Julien Maulny",
+  "homepage": "https://playhex.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/playhex/playhex.git",
+    "directory": "src/packages/conditional-moves"
+  },
+  "keywords": [
+    "hex",
+    "board-game"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./index.ts",
+      "types": "./index.ts",
+      "node": "./dist/index.js",
+      "default": "./index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "rm -rf dist && tsc -b"
+  },
+  "dependencies": {
+    "@playhex/move-notation": "workspace:^"
+  },
+  "peerDependencies": {
+    "tiny-typed-emitter": ">=2"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.6.2",
+    "mocha": "^12.0.2",
+    "tiny-typed-emitter": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  }
+}

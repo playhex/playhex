@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { guessDemerHandicap } from '../demerHandicap.js';
-import type { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 
 const move: HexMove = 'a1';
 const red: HexMove = move;

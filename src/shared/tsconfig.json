@@ -10,7 +10,13 @@
     ],
     "references": [
         {
-            "path": "../packages"
+            "path": "../packages/move-notation"
+        },
+        {
+            "path": "../packages/conditional-moves"
+        },
+        {
+            "path": "../packages/shading-patterns"
         }
     ]
 }

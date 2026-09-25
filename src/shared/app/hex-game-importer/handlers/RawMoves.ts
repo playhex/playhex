@@ -1,5 +1,4 @@
-import { HexMove, isMoveValid, isSpecialHexMove } from '../../../../packages/move-notation/hex-move-notation.js';
-import { parseMove } from '../../../../packages/move-notation/move-notation.js';
+import { HexMove, isMoveValid, isSpecialHexMove, parseMove } from '@playhex/move-notation';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';
 import { ImportedGame } from '../types.js';
 

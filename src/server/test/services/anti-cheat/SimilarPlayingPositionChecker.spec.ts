@@ -4,8 +4,7 @@ import { SimilarPlayingPositionChecker } from '../../../services/anti-cheat/Simi
 import { SimilarPositionDetectedError } from '../../../services/anti-cheat/SimilarPositionDetectedError.js';
 import { type CandidatePositionsProviderInterface } from '../../../services/anti-cheat/CandidatePositionsProviderInterface.js';
 import { createCanonicalPosition, InvalidPositionError, type CandidatePosition } from '../../../../shared/position-comparator/position-comparator.js';
-import type { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
-import type { Move } from '../../../../packages/move-notation/move-notation.js';
+import type { HexMove, Move } from '@playhex/move-notation';
 import type { SimilarPositionFlagInput } from '../../../repositories/SimilarPositionFlagRepository.js';
 import type { SimilarPositionFlag } from '../../../../shared/app/models/index.js';
 

@@ -1,7 +1,7 @@
 import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import Game from './Game.js';
 import Player from './Player.js';
-import type { Move } from '../../../packages/move-notation/move-notation.js';
+import type { Move } from '@playhex/move-notation';
 import type { MirrorType } from '../../position-comparator/position-comparator.js';
 
 export type SimilarPositionFlagContext =

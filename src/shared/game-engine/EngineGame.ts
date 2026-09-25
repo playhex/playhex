@@ -6,8 +6,7 @@ import { GameData } from './normalization.js';
 import IllegalUndo from './errors/IllegalUndo.js';
 import NotYourTurnError from './errors/NotYourTurnError.js';
 import CellAlreadyOccupiedError from './errors/CellAlreadyOccupiedError.js';
-import { mirrorMove, Move } from '../../packages/move-notation/move-notation.js';
-import { HexMove, isSpecialHexMove } from '../../packages/move-notation/hex-move-notation.js';
+import { HexMove, isSpecialHexMove, mirrorMove, Move } from '@playhex/move-notation';
 
 type GameEvents = {
     /**

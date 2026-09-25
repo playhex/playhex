@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, shallowRef } from 'vue';
-import { themes } from '@playhex/pixi-board';
-import { GameView } from '@playhex/pixi-board';
-import { PlayingGameFacade } from '@playhex/pixi-board';
-import { ShadingPatternFacade } from '@playhex/pixi-board';
-import { Anchor44Facade } from '@playhex/pixi-board';
-import { TextMark } from '@playhex/pixi-board';
+import { Anchor44Facade, AnimatorFacade, AutoOrientationFacade, ConditionalMovesFacade, GameView, PlayingGameFacade, ShadingPatternFacade, SimulatePlayingGameFacade, TextMark, themes } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
-import { AnimatorFacade } from '@playhex/pixi-board';
-import { AutoOrientationFacade } from '@playhex/pixi-board';
-import { SimulatePlayingGameFacade } from '@playhex/pixi-board';
-import { ConditionalMovesEditor } from '@playhex/pixi-board';
-import { ConditionalMovesFacade } from '@playhex/pixi-board';
-import { ConditionalMovesState, createConditionalMovesState } from '@playhex/pixi-board';
+import { ConditionalMovesEditor, ConditionalMovesState, createConditionalMovesState } from '@playhex/conditional-moves';
 
 const container = ref<HTMLElement>();
 

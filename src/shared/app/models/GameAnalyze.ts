@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import { Expose } from '../class-transformer-custom.js';
 import Game from './Game.js';
-import type { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 
 export type GameAnalyzeData = ({
     moveIndex: number;

@@ -1,14 +1,12 @@
-import { GameView, PlayingGameFacade } from '@playhex/pixi-board';
+import { GameView, PlayingGameFacade, PolicyOverlayFacade } from '@playhex/pixi-board';
 import { movesToHexworldString, parseHexworldString } from '../../../../shared/app/hexworld.js';
-import { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
+import { coordsToMove, HexMove, Move } from '@playhex/move-notation';
 import { computed, Ref, ref, shallowRef, watch } from 'vue';
 import { ToolInterface } from '../tools/ToolInterface.js';
 import { PlaceStonesAlternatelyTool } from '../tools/PlaceStonesAlternatelyTool.js';
 import { RemoveStoneTool } from '../tools/RemoveStoneTool.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
-import { PolicyOverlayFacade } from '../../../../packages/pixi-board/facades/PolicyOverlayFacade.js';
 import { UndoableActionsStack } from '../undoredo/undoredo.js';
-import { coordsToMove, Move } from '../../../../packages/move-notation/move-notation.js';
 import { onKeyDown, useEventListener } from '@vueuse/core';
 import { createHexplorerState, HexplorerState } from '../HexplorerState.js';
 import { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';

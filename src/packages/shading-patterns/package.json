@@ -1,0 +1,49 @@
+{
+  "name": "@playhex/shading-patterns",
+  "version": "1.0.0",
+  "description": "Shading patterns to color Hex board cells, used to help reading the board",
+  "license": "AGPL-3.0-only",
+  "author": "Julien Maulny",
+  "homepage": "https://playhex.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/playhex/playhex.git",
+    "directory": "src/packages/shading-patterns"
+  },
+  "keywords": [
+    "hex",
+    "board-game"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "source": "./index.ts",
+      "types": "./index.ts",
+      "node": "./dist/index.js",
+      "default": "./index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "rm -rf dist && tsc -b"
+  },
+  "dependencies": {
+    "expr-eval-fork": "^3.0.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  }
+}

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { ConditionalMovesLine, ConditionalMovesTree } from '@playhex/pixi-board';
+import { ConditionalMovesLine, ConditionalMovesTree } from '@playhex/conditional-moves';
 import { toRefs } from 'vue';
 import AppConditionalMoveButton from './AppConditionalMoveButton.vue';
-import { Move } from '../../../packages/move-notation/move-notation.js';
+import { Move } from '@playhex/move-notation';
 
 const props = defineProps({
     tree: {

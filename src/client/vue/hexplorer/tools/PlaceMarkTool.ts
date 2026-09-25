@@ -1,5 +1,5 @@
 import { Ref, unref } from 'vue';
-import { Move } from '../../../../packages/move-notation/move-notation.js';
+import { Move } from '@playhex/move-notation';
 import { ToolInterface } from './ToolInterface.js';
 import { UndoableAction } from '../undoredo/undoredo.js';
 import { BoardMarksLayer, MarkType } from '../BoardMarksLayer.js';

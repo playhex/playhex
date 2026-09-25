@@ -7,7 +7,7 @@ import logger from './logger.js';
 import GameServer from '../GameServer.js';
 import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
-import type { HexMove } from '../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 import { MIN_BOT_LEVEL_CHECKED, SimilarPlayingPositionChecker } from './anti-cheat/SimilarPlayingPositionChecker.js';
 
 export class FindAIError extends Error {}

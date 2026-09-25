@@ -224,12 +224,11 @@ This facade allows to register conditional moves.
 It will pause the view, let player simulates many lines, edit/remove lines, and submit it.
 On submit, it returns an array with conditional moves lines.
 
+State and editor come from [`@playhex/conditional-moves`](../conditional-moves), a dependency of this package.
+
 ``` ts
-import {
-    ConditionalMovesState,
-    createConditionalMovesState,
-} from 'pixi-board/conditional-moves/ConditionalMovesState.js';
-import ConditionalMovesEditor from 'pixi-board/conditional-moves/ConditionalMovesEditor.js';
+import { GameView, PlayingGameFacade, ConditionalMovesFacade } from '@playhex/pixi-board';
+import { createConditionalMovesState, ConditionalMovesEditor } from '@playhex/conditional-moves';
 
 const gameView = new GameView(9);
 const playingGameFacade = new PlayingGameFacade(gameView);

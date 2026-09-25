@@ -1,4 +1,4 @@
-import { Move } from '../../../../packages/move-notation/move-notation.js';
+import { Move } from '@playhex/move-notation';
 import { UndoableAction } from '../undoredo/undoredo.js';
 
 export interface ToolInterface

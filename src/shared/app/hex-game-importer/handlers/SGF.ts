@@ -1,5 +1,4 @@
-import { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
-import { parseMove } from '../../../../packages/move-notation/move-notation.js';
+import { HexMove, parseMove } from '@playhex/move-notation';
 import { sgfFromString } from '../../../sgf/index.js';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';
 import { ImportedGame } from '../types.js';

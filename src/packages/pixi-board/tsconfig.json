@@ -1,0 +1,21 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2019",
+        "rootDir": ".",
+        "outDir": "./dist/dev",
+        "emitDeclarationOnly": true
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ],
+    "references": [
+        { "path": "../move-notation" },
+        { "path": "../conditional-moves" },
+        { "path": "../shading-patterns" }
+    ]
+}

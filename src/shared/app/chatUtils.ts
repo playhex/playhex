@@ -1,4 +1,4 @@
-import { colToLetter, Move, parseMove } from '../../packages/move-notation/move-notation.js';
+import { colToLetter, Move, parseMove } from '@playhex/move-notation';
 import { Game, Player, ChatMessage } from './models/index.js';
 
 export const canPlayerChatInGame = (player: null | Player, game: Game): true | string => {

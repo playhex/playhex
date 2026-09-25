@@ -1,4 +1,4 @@
-import { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
+import { HexMove } from '@playhex/move-notation';
 import { ImportUserError } from '../errors.js';
 
 export type AbstractPlayMoveResult = {

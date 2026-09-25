@@ -1,0 +1,21 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2019",
+        "rootDir": ".",
+        "outDir": "./dist"
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "test"
+    ],
+    "references": [
+        {
+            "path": "../move-notation"
+        }
+    ]
+}

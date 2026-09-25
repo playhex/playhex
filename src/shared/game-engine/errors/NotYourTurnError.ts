@@ -1,4 +1,4 @@
-import type { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 import IllegalMove from './IllegalMove.js';
 
 export default class NotYourTurnError extends IllegalMove

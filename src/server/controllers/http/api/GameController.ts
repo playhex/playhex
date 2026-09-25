@@ -10,7 +10,7 @@ import { TranslatableHttpError } from '../../../../shared/app/TranslatableHttpEr
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
 import { IsBoolean } from 'class-validator';
 import GameRepository from '../../../repositories/GameRepository.js';
-import { type HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 import logger from '../../../services/logger.js';
 import { rateLimiterConsumeCreateGame, rateLimiterConsumeChallengePlayer, rateLimiterConsumeChallengeSameTarget } from '../../../services/rate-limiters.js';
 import { isChallengeGame } from '../../../../shared/app/gameUtils.js';

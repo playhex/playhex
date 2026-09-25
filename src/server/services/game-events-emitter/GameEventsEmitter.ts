@@ -7,7 +7,7 @@ import { isBotGame, isChallengeGame } from '../../../shared/app/gameUtils.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
 import { AbstractTimeControl } from '../../../shared/time-control/TimeControl.js';
-import { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
+import { HexMove } from '@playhex/move-notation';
 
 /**
  * Socket io instance.

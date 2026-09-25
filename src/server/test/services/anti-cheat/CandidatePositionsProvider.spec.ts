@@ -3,7 +3,7 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import { Container } from 'typedi';
 import { CandidatePositionsProvider } from '../../../services/anti-cheat/CandidatePositionsProvider.js';
 import GameStore from '../../../store/GameStore.js';
-import type { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 import { toCanonicalPosition } from '../../../../shared/position-comparator/position-comparator.js';
 import type { GameState } from '../../../../shared/app/Types.js';
 import type { TimestampedMove } from '../../../../shared/game-engine/Types.js';

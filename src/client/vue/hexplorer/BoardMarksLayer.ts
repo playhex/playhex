@@ -1,5 +1,5 @@
 import { BoardEntity, CircleMark, CrossMark, GameView, SelectMark, SquareMark, TextMark, TriangleMark } from '@playhex/pixi-board';
-import { Move } from '../../../packages/move-notation/move-notation.js';
+import { Move } from '@playhex/move-notation';
 
 export type MarkType = 'cross' | 'triangle' | 'square' | 'circle' | 'select' | 'label';
 

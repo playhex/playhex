@@ -1,10 +1,9 @@
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { ConditionalMoves, Game, Player } from '../../shared/app/models/index.js';
-import { conditionalMovesShift, getNextMovesAfterLine } from '../../packages/pixi-board/conditional-moves/conditionalMovesUtils.js';
+import { conditionalMovesShift, getNextMovesAfterLine } from '@playhex/conditional-moves';
 import logger from '../services/logger.js';
-import { Move } from '../../packages/move-notation/move-notation.js';
-import { HexMove, isSpecialHexMove } from '../../packages/move-notation/hex-move-notation.js';
+import { HexMove, isSpecialHexMove, Move } from '@playhex/move-notation';
 
 @Service()
 export default class ConditionalMovesRepository

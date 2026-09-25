@@ -16,7 +16,7 @@ import { createGame, CreateGameParams } from '../../shared/app/models/Game.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger, errorToString } from '../../shared/app/utils.js';
-import type { HexMove } from '../../packages/move-notation/hex-move-notation.js';
+import type { HexMove } from '@playhex/move-notation';
 import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf } from '../../shared/app/gameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';

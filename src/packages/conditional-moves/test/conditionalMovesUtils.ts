@@ -1,6 +1,7 @@
 import assert from 'assert';
-import { conditionalMovesMergeMoves, conditionalMovesShift, clearDuplicatedUnplayedLines, getNextMovesAfterLine, conditionalMovesCut, isSameLines, validateTreeFormat } from '../../conditional-moves/conditionalMovesUtils.js';
-import type { ConditionalMovesLine, ConditionalMovesStruct, ConditionalMovesTree } from '../../conditional-moves/types.js';
+import { describe, it } from 'mocha';
+import { conditionalMovesMergeMoves, conditionalMovesShift, clearDuplicatedUnplayedLines, getNextMovesAfterLine, conditionalMovesCut, isSameLines, validateTreeFormat } from '../conditionalMovesUtils.js';
+import type { ConditionalMovesLine, ConditionalMovesStruct, ConditionalMovesTree } from '../types.js';
 
 const create = (tree: ConditionalMovesTree, unplayedLines: ConditionalMovesLine[] = []): ConditionalMovesStruct => {
     return {

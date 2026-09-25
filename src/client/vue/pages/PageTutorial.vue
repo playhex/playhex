@@ -11,9 +11,8 @@ import useAiConfigsStore from '../../stores/aiConfigsStore.js';
 import { IconBoxArrowUpRight, IconCheck, IconDiscord, IconInfoCircle, IconPeople, IconTablerSwords, IconTrophy } from '../icons.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import { HexagonMark } from '@playhex/pixi-board';
-import type { HexMove } from '../../../packages/move-notation/hex-move-notation.js';
-import { GameView } from '@playhex/pixi-board';
+import { GameView, HexagonMark } from '@playhex/pixi-board';
+import type { HexMove } from '@playhex/move-notation';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { GameViewFacade } from '../../services/board-view-facades/GameViewFacade.js';
 

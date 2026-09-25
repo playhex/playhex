@@ -20,9 +20,18 @@ importers:
       '@overlastic/vue':
         specifier: ^0.9.0
         version: 0.9.0(@typescript/typescript6@6.0.2)
+      '@playhex/conditional-moves':
+        specifier: workspace:*
+        version: link:src/packages/conditional-moves
+      '@playhex/move-notation':
+        specifier: workspace:*
+        version: link:src/packages/move-notation
       '@playhex/pixi-board':
         specifier: workspace:*
         version: link:src/packages/pixi-board
+      '@playhex/shading-patterns':
+        specifier: workspace:*
+        version: link:src/packages/shading-patterns
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8
@@ -403,16 +412,48 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(@sentry/node@10.75.3(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1)))
 
-  src/packages/move-notation: {}
-
-  src/packages/pixi-board:
+  src/packages/conditional-moves:
     dependencies:
       '@playhex/move-notation':
         specifier: workspace:^
         version: link:../move-notation
-      expr-eval-fork:
-        specifier: ^3.0.3
-        version: 3.0.3
+    devDependencies:
+      '@types/mocha':
+        specifier: ^10.0.10
+        version: 10.0.10
+      '@types/node':
+        specifier: ^26.6.2
+        version: 26.6.2
+      mocha:
+        specifier: ^12.0.2
+        version: 12.0.2
+      tiny-typed-emitter:
+        specifier: ^2.1.0
+        version: 2.1.0
+
+  src/packages/move-notation:
+    devDependencies:
+      '@types/mocha':
+        specifier: ^10.0.10
+        version: 10.0.10
+      '@types/node':
+        specifier: ^26.6.2
+        version: 26.6.2
+      mocha:
+        specifier: ^12.0.2
+        version: 12.0.2
+
+  src/packages/pixi-board:
+    dependencies:
+      '@playhex/conditional-moves':
+        specifier: workspace:^
+        version: link:../conditional-moves
+      '@playhex/move-notation':
+        specifier: workspace:^
+        version: link:../move-notation
+      '@playhex/shading-patterns':
+        specifier: workspace:^
+        version: link:../shading-patterns
     devDependencies:
       '@types/node':
         specifier: 26.6.2
@@ -450,6 +491,12 @@ importers:
       vite:
         specifier: ^8.3.0
         version: 8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(sass@1.105.0)(stylus@0.64.0)
+
+  src/packages/shading-patterns:
+    dependencies:
+      expr-eval-fork:
+        specifier: ^3.0.3
+        version: 3.0.3
 
 packages:
 

@@ -12,7 +12,7 @@ export default defineConfig({
             fileName: 'index',
         },
         rollupOptions: {
-            external: ['pixi.js', 'tiny-typed-emitter', 'expr-eval-fork', '@playhex/move-notation'],
+            external: ['pixi.js', 'tiny-typed-emitter', '@playhex/move-notation', '@playhex/conditional-moves', '@playhex/shading-patterns'],
         },
         outDir: 'dist',
         emptyOutDir: true,

@@ -1,5 +1,4 @@
-import { HexMove } from '../../../../packages/move-notation/hex-move-notation.js';
-import { coordsToMove } from '../../../../packages/move-notation/move-notation.js';
+import { coordsToMove, HexMove } from '@playhex/move-notation';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 import { LocalStorageCache } from '../services/cachedAnalysis.js';
 import { AnalyzerInterface } from './AnalyzerInterface.js';

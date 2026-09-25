@@ -15,20 +15,22 @@
     ".": "./index.ts"
   },
   "files": [
-    "dist"
+    "dist/index.js",
+    "dist/types"
   ],
   "scripts": {
     "build": "rm -rf dist && vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
     "build:visual-test": "vite build --config vite.visual.config.ts",
     "test:visual": "pnpm run build:visual-test && cypress run --browser chrome",
     "test:visual:update": "pnpm run build:visual-test && cypress run --browser chrome --env UPDATE_SNAPSHOTS=true",
-    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT='../tsconfig.json' mocha 'test/**/*.ts' 'resize-observer-debounced/test/**/*.ts' --extension ts --ignore 'test/visual/**'",
+    "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT='./tsconfig.json' mocha 'test/**/*.ts' 'resize-observer-debounced/test/**/*.ts' --extension ts --ignore 'test/visual/**'",
     "test": "pnpm run test:unit && pnpm run test:visual",
     "prepack": "pnpm run build"
   },
   "dependencies": {
+    "@playhex/conditional-moves": "workspace:^",
     "@playhex/move-notation": "workspace:^",
-    "expr-eval-fork": "^3.0.3"
+    "@playhex/shading-patterns": "workspace:^"
   },
   "peerDependencies": {
     "pixi.js": ">=8",

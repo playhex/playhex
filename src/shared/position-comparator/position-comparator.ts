@@ -1,5 +1,4 @@
-import { type HexMove } from '../../packages/move-notation/hex-move-notation.js';
-import { coordsToMove, mirrorCenter, mirrorMove, mirrorShortDiagonal, parseMove, validateMove, type Move } from '../../packages/move-notation/move-notation.js';
+import { coordsToMove, type HexMove, mirrorCenter, mirrorMove, mirrorShortDiagonal, type Move, parseMove, validateMove } from '@playhex/move-notation';
 import { countStones, isSimilarEnough, maxPossibleSimilarity, SIMILARITY_THRESHOLD, similarityFromCounts, type Similarity } from './position-similarity.js';
 
 /**

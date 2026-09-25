@@ -12,7 +12,7 @@ import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 import { ActiveTournamentsFilters } from '../shared/app/tournamentUtils.js';
-import { ConditionalMovesStruct } from '@playhex/pixi-board';
+import { ConditionalMovesStruct } from '@playhex/conditional-moves';
 import { isRateLimitReachedErrorPayload } from '../shared/app/rate-limiters.js';
 import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
 import { showToastForTranslatableError } from './services/showToastForTranslatableError.js';

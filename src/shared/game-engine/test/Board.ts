@@ -2,7 +2,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
 import { Board } from '../index.js';
-import { coordsToMove } from '../../../packages/move-notation/move-notation.js';
+import { coordsToMove } from '@playhex/move-notation';
 
 const _ = null;
 

@@ -1,4 +1,4 @@
-import { createShadingPattern, ShadingPatternType } from '../shading-patterns/shading-patterns.js';
+import { createShadingPattern, ShadingPatternType } from '@playhex/shading-patterns';
 import GameView from '../GameView.js';
 
 /**

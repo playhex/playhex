@@ -28,22 +28,13 @@ export { AutoOrientationFacade } from './facades/AutoOrientationFacade.js';
 export type { OrientationMode, PreferredOrientations } from './facades/AutoOrientationFacade.js';
 export { GameMarksFacade } from './facades/GameMarksFacade.js';
 export { PlayingGameFacade } from './facades/PlayingGameFacade.js';
+export { PolicyOverlayFacade } from './facades/PolicyOverlayFacade.js';
 export { PreviewMoveFacade } from './facades/PreviewMoveFacade.js';
 export { ShadingPatternFacade } from './facades/ShadingPatternFacade.js';
 export { SimulatePlayingGameFacade } from './facades/SimulatePlayingGameFacade.js';
 
 // Conditional moves
-export { default as ConditionalMovesEditor } from './conditional-moves/ConditionalMovesEditor.js';
 export { ConditionalMovesFacade } from './conditional-moves/ConditionalMovesFacade.js';
-export type { ConditionalMovesState } from './conditional-moves/ConditionalMovesState.js';
-export { createConditionalMovesState } from './conditional-moves/ConditionalMovesState.js';
-export { conditionalMovesShift, getNextMovesAfterLine } from './conditional-moves/conditionalMovesUtils.js';
-export type { ConditionalMovesLine, ConditionalMovesTree, ConditionalMovesStruct } from './conditional-moves/types.js';
-
-// Shading patterns
-export { allShadingPatterns, createShadingPattern } from './shading-patterns/shading-patterns.js';
-export type { ShadingPatternType } from './shading-patterns/shading-patterns.js';
-export type { ShadingPatternInterface } from './shading-patterns/ShadingPatternInterface.js';
 
 // Utils
 export { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';

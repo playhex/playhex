@@ -16,14 +16,21 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": {
+      "source": "./index.ts",
+      "types": "./index.ts",
+      "node": "./dist/index.js",
+      "default": "./index.ts"
+    }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.lib.json",
-    "prepack": "pnpm run build"
+    "build": "tsc -b",
+    "prepack": "rm -rf dist && tsc -b"
   },
   "publishConfig": {
     "access": "public",
@@ -35,5 +42,10 @@
         "default": "./dist/index.js"
       }
     }
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.6.2",
+    "mocha": "^12.0.2"
   }
 }

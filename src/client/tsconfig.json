@@ -20,7 +20,16 @@
             "path": "../shared"
         },
         {
-            "path": "../packages"
+            "path": "../packages/move-notation"
+        },
+        {
+            "path": "../packages/conditional-moves"
+        },
+        {
+            "path": "../packages/shading-patterns"
+        },
+        {
+            "path": "../packages/pixi-board"
         }
     ]
 }

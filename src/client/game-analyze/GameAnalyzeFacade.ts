@@ -2,8 +2,7 @@ import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import { GameView } from '@playhex/pixi-board';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
-import { validateMove, parseMove, Move } from '../../packages/move-notation/move-notation.js';
-import type { HexMove } from '../../packages/move-notation/hex-move-notation.js';
+import { type HexMove, Move, parseMove, validateMove } from '@playhex/move-notation';
 
 export type MoveAndValue = {
     move: HexMove;
