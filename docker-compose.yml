@@ -14,7 +14,7 @@ services:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: hex
         ports:
-            - "3306:3306"
+            - "13306:3306"
         volumes:
             - mysql-data:/var/lib/mysql
         healthcheck:
@@ -31,7 +31,7 @@ services:
             ADMINER_PREFILL_PASSWORD: root
             ADMINER_PREFILL_DB: hex
         ports:
-            - "8080:8080"
+            - "18080:8080"
         volumes:
             - ./docker/adminer/login-prefill.php:/var/www/html/plugins-enabled/login-prefill.php:ro
         depends_on:
@@ -40,23 +40,23 @@ services:
     redis:
         image: redis:8
         ports:
-            - "6379:6379"
+            - "16379:6379"
         volumes:
             - redis-data:/data
 
-    redisinsight:
-        image: redis/redisinsight:latest
-        environment:
-            RI_ACCEPT_TERMS_AND_CONDITIONS: "true"
-            RI_REDIS_HOST: redis
-            RI_REDIS_PORT: "6379"
-            RI_REDIS_ALIAS: hex
-        ports:
-            - "5540:5540"
-        volumes:
-            - redisinsight-data:/data
-        depends_on:
-            - redis
+    # redisinsight:
+    #     image: redis/redisinsight:latest
+    #     environment:
+    #         RI_ACCEPT_TERMS_AND_CONDITIONS: "true"
+    #         RI_REDIS_HOST: redis
+    #         RI_REDIS_PORT: "6379"
+    #         RI_REDIS_ALIAS: hex
+    #     ports:
+    #         - "5540:5540"
+    #     volumes:
+    #         - redisinsight-data:/data
+    #     depends_on:
+    #         - redis
 
 volumes:
     mysql-data:
