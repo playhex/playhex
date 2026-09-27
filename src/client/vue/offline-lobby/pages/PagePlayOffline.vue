@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { t } from 'i18next';
-import { Ref, ref, shallowRef, onUnmounted } from 'vue';
+import { computed, Ref, ref, shallowRef, onUnmounted } from 'vue';
 import { EngineGame, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { OfflineAIGameOptions } from '../models/OfflineAIGameOptions.js';
@@ -10,31 +10,49 @@ import OfflineGameFinishedOverlay from '../overlay/OfflineGameFinishedOverlay.vu
 import { AnimatorFacade, GameView } from '@playhex/pixi-board';
 import { OfflineGame } from '../models/OfflineGame.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
+import { listenLocalGameSounds } from '../services/localGameSounds.js';
+import { bindLocalBoardDisplay } from '../services/localBoardDisplay.js';
+import AppLocalSimulationControls from '../components/AppLocalSimulationControls.vue';
+import ConfirmationOverlay from '../../components/overlay/ConfirmationOverlay.vue';
+import { IconArrowClockwise, IconArrowCounterclockwise, IconArrowLeft, IconFlag, IconRewind } from '../../icons.js';
 import type { HexMove } from '@playhex/move-notation';
 import { GameViewFacade } from '../../../services/board-view-facades/GameViewFacade.js';
 import AppGameView from '../../components/AppGameView.vue';
 import { useHead } from '@unhead/vue';
 
 useHead({
-    title: t('play_offline'),
+    title: t('local_play.vs_computer'),
 });
 
 const game = shallowRef<EngineGame | null>(null);
 const gameView = shallowRef<GameView | null>(null);
-let gameViewFacade = shallowRef<null | GameViewFacade>(null);
+const gameViewFacade = shallowRef<null | GameViewFacade>(null);
 let lastGameOptions: OfflineAIGameOptions;
 let calculateMove: (game: EngineGame) => Promise<HexMove>;
+
+const players: Ref<Player[]> = ref([]);
+const humanIndex = ref<PlayerIndex>(0);
+
+/**
+ * Incremented when game state changes (move, undo, end),
+ * to refresh computed values depending on game.
+ */
+const gameVersion = ref(0);
+
+const aiThinking = ref(false);
 
 const init = (): void => {
     // Player started a new game
     if (history.state.gameOptions && !history.state.alreadyCreated) {
         initGameFromGameOptions(JSON.parse(history.state.gameOptions));
-        history.state.alreadyCreated = true;
+
+        // Persist in history state, so that a page refresh continues this game instead of creating a new one
+        history.replaceState({ ...history.state, alreadyCreated: true }, '');
         return;
     }
 
     // Player continues current game
-    const currentGame = offlineGamesStorage.getCurrentGame();
+    const currentGame = offlineGamesStorage.getCurrentAIGame();
 
     if (currentGame) {
         reloadCurrentGame(currentGame);
@@ -45,8 +63,6 @@ const init = (): void => {
     initGameFromGameOptions(new OfflineAIGameOptions());
 };
 
-const players: Ref<Player[]> = ref([]);
-
 const makeAIMoveIfApplicable = async (game: EngineGame, players: Player[]): Promise<void> => {
     const player = players[game.getCurrentPlayerIndex()];
 
@@ -54,9 +70,22 @@ const makeAIMoveIfApplicable = async (game: EngineGame, players: Player[]): Prom
         return;
     }
 
-    const move = await calculateMove(game);
+    const movesCount = game.getMovesHistory().length;
 
-    game.move(move, game.getCurrentPlayerIndex());
+    aiThinking.value = true;
+
+    try {
+        const move = await calculateMove(game);
+
+        // Position changed while AI was thinking (restart, ...): ignore this move
+        if (game !== gameViewFacade.value?.getGame() || game.getMovesHistory().length !== movesCount || game.isEnded()) {
+            return;
+        }
+
+        game.move(move, game.getCurrentPlayerIndex());
+    } finally {
+        aiThinking.value = false;
+    }
 };
 
 const offlinePlayer: Player = {
@@ -68,14 +97,97 @@ const offlinePlayer: Player = {
     slug: '',
 };
 
-const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
+const saveGame = (gameOptions: OfflineAIGameOptions): void => {
+    if (!game.value || game.value.isEnded()) {
+        return;
+    }
+
+    const currentGame = new OfflineGame();
+
+    currentGame.gameOptions = gameOptions;
+    currentGame.players = players.value.map(p => {
+        p.currentRating = undefined;
+        return p;
+    });
+    currentGame.gameData = game.value.toData();
+
+    offlineGamesStorage.setCurrentAIGame(currentGame);
+};
+
+let disposeSounds: null | (() => void) = null;
+let unbindBoardDisplay: null | (() => void) = null;
+
+/**
+ * Binds view, AI, storage, sounds and end overlay to a new or reloaded game.
+ */
+const setupGame = (newGame: EngineGame, gameOptions: OfflineAIGameOptions): void => {
     lastGameOptions = gameOptions;
-    const player: Player = offlinePlayer;
+    calculateMove = instanciateAi(findLocalAIByName(gameOptions.ai));
+    humanIndex.value = players.value.findIndex(p => !p.isBot) as PlayerIndex;
+
+    game.value = newGame;
+    gameView.value = new GameView(newGame.getSize());
+    gameViewFacade.value = new GameViewFacade(gameView.value, newGame);
+    simulating.value = false;
+
+    unbindBoardDisplay?.();
+    unbindBoardDisplay = bindLocalBoardDisplay(gameViewFacade.value);
+
+    const newGameViewFacade = gameViewFacade.value;
+
+    gameView.value.on('hexClicked', move => {
+        if (aiThinking.value || newGameViewFacade.isSimulationMode()) {
+            return;
+        }
+
+        try {
+            newGame.move(newGame.moveOrSwapPieces(move), humanIndex.value);
+        } catch (e) {
+            if (!(e instanceof IllegalMove)) {
+                throw e;
+            }
+        }
+    });
+
+    newGame.on('played', () => void makeAIMoveIfApplicable(newGame, players.value));
+    newGame.on('played', () => saveGame(gameOptions));
+    newGame.on('undo', () => saveGame(gameOptions));
+
+    newGame.on('ended', () => {
+        exitSimulation();
+        offlineGamesStorage.clearCurrentAIGame();
+
+        // Do not keep games ended without any move, i.e resigned at start
+        if (newGame.getMovesHistory().length > 0) {
+            offlineGamesStorage.addToHistory('ai', {
+                pseudos: [players.value[0].pseudo, players.value[1].pseudo],
+                gameData: newGame.toData(),
+            });
+        }
+    });
+
+    for (const event of ['played', 'undo', 'ended'] as const) {
+        newGame.on(event, () => ++gameVersion.value);
+    }
+
+    disposeSounds?.();
+    disposeSounds = listenLocalGameSounds(newGame, () => newGame.getWinner() === humanIndex.value
+        ? '/sounds/lisp/Victory.ogg'
+        : '/sounds/lisp/Defeat.ogg',
+    );
+
+    initWinOverlay(newGame, gameView.value);
+
+    ++gameVersion.value;
+
+    void makeAIMoveIfApplicable(newGame, players.value);
+};
+
+const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
     const localAI = findLocalAIByName(gameOptions.ai);
-    calculateMove = instanciateAi(localAI);
 
     players.value = [
-        player,
+        offlinePlayer,
         {
             isBot: true,
             isGuest: false,
@@ -94,110 +206,104 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
         players.value.reverse();
     }
 
-    const playerIndex = players.value.findIndex(p => !p.isBot);
+    const newGame = new EngineGame(gameOptions.boardsize);
 
-    game.value = new EngineGame(gameOptions.boardsize);
+    newGame.setAllowSwap(gameOptions.swapRule);
 
-    game.value.setAllowSwap(gameOptions.swapRule);
-
-    gameView.value = new GameView(game.value.getSize());
-    gameViewFacade.value = new GameViewFacade(gameView.value, game.value);
-
-    gameView.value.on('hexClicked', move => {
-        if (!game.value) {
-            return;
-        }
-
-        const hexMove = game.value.moveOrSwapPieces(move);
-
-        try {
-            game.value.move(hexMove, playerIndex as PlayerIndex);
-        } catch (e) {
-            if (!(e instanceof IllegalMove)) {
-                throw e;
-            }
-        }
-    });
-
-    const saveGame = () => {
-        if (!game.value) {
-            return;
-        }
-
-        const currentGame = new OfflineGame();
-
-        currentGame.gameOptions = gameOptions;
-        currentGame.players = players.value.map(p => {
-            p.currentRating = undefined;
-            return p;
-        });
-        currentGame.gameData = game.value.toData();
-
-        offlineGamesStorage.setCurrentGame(currentGame);
-    };
-
-    void makeAIMoveIfApplicable(game.value, players.value);
-    game.value.on('played', () => game.value && makeAIMoveIfApplicable(game.value, players.value));
-    game.value.on('played', () => saveGame());
-    game.value.on('ended', () => offlineGamesStorage.clearCurrentGame());
-
-    saveGame();
-
-    initWinOverlay(game.value, gameView.value);
+    setupGame(newGame, gameOptions);
+    saveGame(gameOptions);
 };
 
 const reloadCurrentGame = (currentGame: OfflineGame) => {
-    lastGameOptions = currentGame.gameOptions;
     players.value = currentGame.players;
-    const localAI = findLocalAIByName(currentGame.gameOptions.ai);
-    calculateMove = instanciateAi(localAI);
 
-    const playerIndex = players.value.findIndex(p => !p.isBot);
+    setupGame(EngineGame.fromData(currentGame.gameData), currentGame.gameOptions);
+};
 
-    game.value = EngineGame.fromData(currentGame.gameData);
+/*
+ * Simulation mode
+ */
+const simulating = ref(false);
 
-    gameView.value = new GameView(game.value.getSize());
-    gameViewFacade.value = new GameViewFacade(gameView.value, game.value);
+const enterSimulation = (): void => {
+    gameViewFacade.value?.enableSimulationMode();
+    simulating.value = gameViewFacade.value !== null;
+};
 
-    gameView.value.on('hexClicked', move => {
-        if (!game.value) {
-            return;
-        }
+const exitSimulation = (): void => {
+    gameViewFacade.value?.disableSimulationMode();
+    simulating.value = false;
+};
 
-        const hexMove = game.value.moveOrSwapPieces(move);
+/*
+ * Pass, undo, resign
+ */
+const canPass = computed((): boolean => {
+    void gameVersion.value;
 
-        try {
-            game.value.move(hexMove, playerIndex as PlayerIndex);
-        } catch (e) {
-            if (!(e instanceof IllegalMove)) {
-                throw e;
-            }
-        }
-    });
+    return game.value !== null
+        && !game.value.isEnded()
+        && !aiThinking.value
+        && !simulating.value
+        && game.value.getCurrentPlayerIndex() === humanIndex.value
+    ;
+});
 
-    void makeAIMoveIfApplicable(game.value, players.value);
-    game.value.on('played', () => game.value && makeAIMoveIfApplicable(game.value, players.value));
-    game.value.on('played', () => {
-        if (!game.value) {
-            return;
-        }
+const pass = (): void => {
+    if (!game.value || !canPass.value) {
+        return;
+    }
 
-        const nextCurrentGame = new OfflineGame();
+    game.value.pass(humanIndex.value);
+};
 
-        nextCurrentGame.gameOptions = currentGame.gameOptions;
-        nextCurrentGame.players = players.value.map(p => {
-            p.currentRating = undefined;
-            return p;
+const canUndo = computed((): boolean => {
+    void gameVersion.value;
+
+    return game.value !== null
+        && !aiThinking.value
+        && !simulating.value
+        && game.value.canPlayerUndo(humanIndex.value) === true
+    ;
+});
+
+const undo = (): void => {
+    if (!game.value || !canUndo.value) {
+        return;
+    }
+
+    game.value.playerUndo(humanIndex.value);
+};
+
+const canResign = computed((): boolean => {
+    void gameVersion.value;
+
+    return game.value !== null && !game.value.isEnded() && !simulating.value;
+});
+
+const confirmationOverlay = defineOverlay(ConfirmationOverlay);
+
+const resign = async (): Promise<void> => {
+    if (!game.value || !canResign.value) {
+        return;
+    }
+
+    try {
+        await confirmationOverlay({
+            title: t('resign_confirm_overlay.title'),
+            message: t('resign_confirm_overlay.message'),
+            confirmLabel: t('resign_confirm_overlay.confirmLabel'),
+            confirmClass: 'btn-danger',
+            cancelLabel: t('resign_confirm_overlay.cancelLabel'),
+            cancelClass: 'btn-outline-primary',
         });
+    } catch (e) {
+        return;
+    }
 
-        nextCurrentGame.gameData = game.value.toData();
-
-        offlineGamesStorage.setCurrentGame(nextCurrentGame);
-    });
-
-    game.value.on('ended', () => offlineGamesStorage.clearCurrentGame());
-
-    initWinOverlay(game.value, gameView.value);
+    if (!game.value.isEnded()) {
+        game.value.resign(humanIndex.value, new Date());
+    }
 };
 
 /*
@@ -224,10 +330,14 @@ const initWinOverlay = (game: EngineGame, gameView: GameView) => {
             if (disposed) return;
         }
 
-        await gameFinishedOverlay({
+        const result = await gameFinishedOverlay({
             game,
-            players: players.value,
+            pseudos: [players.value[0].pseudo, players.value[1].pseudo],
         });
+
+        if (result === 'rematch' && !disposed) {
+            rematch();
+        }
     };
 
     game.on('ended', endedCallback);
@@ -240,7 +350,16 @@ const initWinOverlay = (game: EngineGame, gameView: GameView) => {
     };
 };
 
-onUnmounted(() => disposeWinOverlay?.());
+onUnmounted(() => {
+    // Do not keep a game without any move, nothing to continue
+    if (game.value && !game.value.isEnded() && game.value.getMovesHistory().length === 0) {
+        offlineGamesStorage.clearCurrentAIGame();
+    }
+
+    disposeWinOverlay?.();
+    disposeSounds?.();
+    unbindBoardDisplay?.();
+});
 
 init();
 
@@ -264,9 +383,29 @@ const rematch = () => {
             class="offline-board-container"
         />
 
-        <div class="game-menu">
-            <router-link class="btn btn-outline-primary" :to="{ name: 'offline-lobby' }">{{ $t('back_to_menu') }}</router-link>
-            <button class="btn btn-outline-warning" @click="rematch">{{ $t('restart') }}</button>
+        <AppLocalSimulationControls
+            v-if="simulating && gameViewFacade"
+            :gameViewFacade
+            @close="exitSimulation"
+        />
+
+        <div v-else class="game-menu">
+            <router-link class="btn btn-outline-primary" :to="{ name: 'offline-lobby' }" :title="$t('back_to_menu')">
+                <IconArrowLeft /><span class="hide-sm">{{ ' ' + $t('back_to_menu') }}</span>
+            </router-link>
+            <button type="button" class="btn btn-outline-primary" :title="$t('local_play.simulation')" @click="enterSimulation">
+                <IconRewind />
+            </button>
+            <button type="button" class="btn btn-warning" :disabled="!canUndo" @click="undo">
+                <IconArrowCounterclockwise /><span class="hide-sm">{{ ' ' + $t('undo.undo_move') }}</span>
+            </button>
+            <button type="button" class="btn btn-primary" :disabled="!canPass" @click="pass">{{ $t('pass') }}</button>
+            <button type="button" class="btn btn-outline-danger" :disabled="!canResign" :title="$t('resign')" @click="resign">
+                <IconFlag /><span class="hide-sm">{{ ' ' + $t('resign') }}</span>
+            </button>
+            <button type="button" class="btn btn-outline-warning" :title="$t('restart')" @click="rematch">
+                <IconArrowClockwise /><span class="hide-sm">{{ ' ' + $t('restart') }}</span>
+            </button>
         </div>
     </div>
 </template>
@@ -290,4 +429,8 @@ const rematch = () => {
     justify-content center
     align-items center
     gap 0.5em
+
+.hide-sm
+    @media (max-width: 575px)
+        display none
 </style>

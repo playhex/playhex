@@ -5,9 +5,13 @@ import AppToasts from './components/layout/AppToasts.vue';
 import AppPlayerModerationActionOverlayAll from './components/AppPlayerModerationActionOverlayAll.vue';
 import { useRouter } from 'vue-router';
 import { computed, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import useAppLayoutStore from '../stores/appLayoutStore.js';
 
 const router = useRouter();
 const { currentRoute } = router;
+
+const { headerHidden } = storeToRefs(useAppLayoutStore());
 
 const displayFooter = computed(() => currentRoute.value.meta.displayFooter ?? true);
 
@@ -20,7 +24,7 @@ router.afterEach(() => { routeLoaded.value = true; });
 
 <template>
     <div class="app-layout bg-body-tertiary">
-        <header class="sticky-top">
+        <header v-if="!headerHidden" class="sticky-top">
             <AppHeader />
         </header>
 

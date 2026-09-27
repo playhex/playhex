@@ -47,6 +47,8 @@ export class PlayerSettingsFacade
 
         if (playerSettings) {
             this.updateOptionsFromPlayerSettings(playerSettings);
+        } else {
+            this.applyOverrideSettingsOnly();
         }
 
         this.onDestroy.push(watch(
@@ -95,6 +97,43 @@ export class PlayerSettingsFacade
             landscape: settings.orientationLandscape,
             portrait: settings.orientationPortrait,
         });
+    }
+
+    /**
+     * Change settings to use instead of player settings, and apply them now.
+     * Used for example in local games, where board orientation is chosen from game menu.
+     */
+    setOverrideSettings(overrideSettings: Partial<PlayerSettings & LocalSettings>): void
+    {
+        this.overrideSettings = overrideSettings;
+
+        const { playerSettings } = usePlayerSettingsStore();
+
+        if (playerSettings) {
+            this.updateOptionsFromPlayerSettings(playerSettings);
+        } else {
+            this.applyOverrideSettingsOnly();
+        }
+    }
+
+    /**
+     * Apply override settings when player settings are not loaded,
+     * e.g when playing offline.
+     */
+    private applyOverrideSettingsOnly(): void
+    {
+        const { showCoords, orientationLandscape, orientationPortrait } = this.overrideSettings;
+
+        if (undefined !== showCoords) {
+            this.gameView.setDisplayCoords(showCoords);
+        }
+
+        if (undefined !== orientationLandscape && undefined !== orientationPortrait) {
+            this.autoOrientationFacade.setPreferredOrientations({
+                landscape: orientationLandscape,
+                portrait: orientationPortrait,
+            });
+        }
     }
 
     updateOptionsFromPlayerLocalSettings(localSettings: LocalSettings): void

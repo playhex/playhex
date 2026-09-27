@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
 import { useDisclosure } from '@overlastic/vue';
-import AppPseudo from '../../components/AppPseudo.vue';
-import Player from '../../../../shared/app/models/Player.js';
-import { EngineGame } from '../../../../shared/game-engine/index.js';
+import { EngineGame, PlayerIndex } from '../../../../shared/game-engine/index.js';
 
+/**
+ * Resolves with "rematch" when player clicked rematch, or undefined when just closed.
+ */
 const { visible, confirm } = useDisclosure();
 
 const props = defineProps({
@@ -12,18 +13,43 @@ const props = defineProps({
         type: EngineGame,
         required: true,
     },
-    players: {
-        type: Array as PropType<Player[]>,
+
+    /**
+     * Players pseudos, indexed by color.
+     */
+    pseudos: {
+        type: Array as unknown as PropType<[string, string]>,
         required: true,
+    },
+
+    /**
+     * Local 1v1 only: player who lost on time before game ended on board.
+     */
+    timeoutLoser: {
+        type: Number as PropType<null | PlayerIndex>,
+        default: null,
+    },
+
+    /**
+     * Local 1v1 only: a player just lost on time, but game is not ended on board.
+     * Players can continue without time instead of closing.
+     */
+    timeoutOnly: {
+        type: Boolean,
+        default: false,
     },
 });
 
-const { players, game } = props;
+const { pseudos, game, timeoutLoser, timeoutOnly } = props;
 
-const winner: null | Player = game.isCanceled()
+const timeWinner: null | PlayerIndex = timeoutLoser === null ? null : (1 - timeoutLoser) as PlayerIndex;
+
+const winner: null | PlayerIndex = timeoutOnly || game.isCanceled()
     ? null
-    : players[game.getStrictWinner()]
+    : game.getStrictWinner()
 ;
+
+const colorClass = (playerIndex: PlayerIndex): string => playerIndex === 0 ? 'text-danger' : 'text-primary';
 </script>
 
 <template>
@@ -36,14 +62,18 @@ const winner: null | Player = game.isCanceled()
                         <button type="button" class="btn-close" @click="confirm()"></button>
                     </div>
                     <div class="modal-body text-center lead">
-                        <p v-if="null !== winner">
+                        <!-- A player lost on time: only show time winner, even if game continued on board -->
+                        <p v-if="null !== timeWinner">
+                            <i18next :translation="$t('local_play.x_wins_on_time', { player: '{player}' })">
+                                <template #player>
+                                    <strong :class="colorClass(timeWinner)">{{ pseudos[timeWinner] }}</strong>
+                                </template>
+                            </i18next>
+                        </p>
+                        <p v-else-if="null !== winner">
                             <i18next :translation="$t('player_wins_by.' + (game.getOutcome() ?? 'default'))">
                                 <template #player>
-                                    <AppPseudo
-                                        :player="winner"
-                                        is="strong"
-                                        :classes="0 === game.getStrictWinner() ? 'text-danger' : 'text-primary'"
-                                    />
+                                    <strong :class="colorClass(winner)">{{ pseudos[winner] }}</strong>
                                 </template>
                             </i18next>
                         </p>
@@ -51,10 +81,22 @@ const winner: null | Player = game.isCanceled()
                     </div>
                     <div class="modal-footer justify-content-center">
                         <button
+                            v-if="timeoutOnly"
+                            type="button"
+                            class="btn btn-outline-primary"
+                            @click="confirm()"
+                        >{{ $t('local_play.continue_without_time') }}</button>
+                        <button
+                            v-else
                             type="button"
                             class="btn btn-outline-primary"
                             @click="confirm()"
                         >{{ $t('close') }}</button>
+                        <button
+                            type="button"
+                            class="btn btn-success"
+                            @click="confirm('rematch')"
+                        >{{ $t('rematch.label') }}</button>
                     </div>
                 </form>
             </div>

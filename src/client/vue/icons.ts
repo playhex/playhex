@@ -108,6 +108,7 @@ export { default as IconStairsUp } from '~icons/mdi/stairs-up';
 export { default as IconSword } from '~icons/mdi/sword';
 export { default as IconSquare } from '~icons/bi/square';
 export { default as IconStopwatch } from '~icons/bi/stopwatch';
+export { default as IconTabletLandscape } from '~icons/bi/tablet-landscape';
 export { default as IconTablerSwords } from '~icons/tabler/swords';
 export { default as IconThreeDots } from '~icons/bi/three-dots';
 export { default as IconTriangle } from '~icons/bi/triangle';

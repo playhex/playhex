@@ -5,4 +5,6 @@
 export const preloadAssets = async () => {
     await import('../vue/offline-lobby/pages/PageOfflineLobby.vue');
     await import('../vue/offline-lobby/pages/PagePlayOffline.vue');
+    await import('../vue/offline-lobby/pages/PagePlayLocal1v1.vue');
+    await import('../vue/offline-lobby/pages/PageLocalGameReview.vue');
 };

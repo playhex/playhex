@@ -2,6 +2,12 @@ import type { Outcome, PlayerIndex } from '../game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
 import Game from './models/Game.js';
 
+/**
+ * Game fields needed to create a Hexworld string,
+ * so that it can also be created from a local game.
+ */
+type HexworldGame = Pick<Game, 'boardsize' | 'moves' | 'outcome' | 'winner'>;
+
 const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) => {
     if (winner == null)
         return '';
@@ -20,7 +26,7 @@ const outcomeToHexworld = (outcome: null | Outcome, winner: PlayerIndex | null) 
  * @param game
  * @param orientation Board rotation from 0 to 11, where 0 is the "Flat" one.
  */
-export const gameToHexworldLink = (game: Game, orientation: number = 11): string => {
+export const gameToHexworldLink = (game: HexworldGame, orientation: number = 11): string => {
     return `https://hexworld.org/board/#${createHexworldString(game, orientation)}`;
 };
 
@@ -45,7 +51,7 @@ export const movesToHexworldString = (moves: HexMove[]): string => moves
  * Generate Hexworld string from game, '15c1,e6:sf7i8g10j10'
  * to pass as query hash.
  */
-export const createHexworldString = (game: Game, orientation: number = 11): string => {
+export const createHexworldString = (game: HexworldGame, orientation: number = 11): string => {
     if (orientation < 0 || orientation > 11)
         throw new Error('Invalid board orientation');
     const moves = movesToHexworldString(game.moves);

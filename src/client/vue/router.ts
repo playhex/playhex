@@ -291,6 +291,22 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./offline-lobby/pages/PageOfflineLobby.vue'),
     },
     {
+        name: 'play-local-1v1',
+        path: '/play-local',
+        component: () => import('./offline-lobby/pages/PagePlayLocal1v1.vue'),
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
+        name: 'local-game-review',
+        path: '/play-local/review/:mode/:index',
+        component: () => import('./offline-lobby/pages/PageLocalGameReview.vue'),
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
         name: 'play-vs-offline-ai',
         path: '/play-vs-ai',
         component: () => import('./offline-lobby/pages/PagePlayOffline.vue'),

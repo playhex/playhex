@@ -56,6 +56,11 @@ export class GameViewFacade
         return this.game;
     }
 
+    getPlayerSettingsFacade(): PlayerSettingsFacade
+    {
+        return this.playerSettingsFacade;
+    }
+
     getPlayingGameFacade(): PlayingGameFacade
     {
         return this.playingGameFacade;
