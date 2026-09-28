@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, shallowRef } from 'vue';
-import { Anchor44Facade, AnimatorFacade, AutoOrientationFacade, ConditionalMovesFacade, GameView, PlayingGameFacade, ShadingPatternFacade, SimulatePlayingGameFacade, TextMark, playhexTheme, resolveTheme } from '@playhex/pixi-board';
+import { Anchor44Facade, AnimatorFacade, AutoOrientationFacade, ConditionalMovesFacade, GameView, PlayingGameFacade, ShadingPatternFacade, SimulatePlayingGameFacade, TextMark, playhexTheme, gobanTheme, resolveTheme } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { ConditionalMovesEditor, ConditionalMovesState, createConditionalMovesState } from '@playhex/conditional-moves';
 
@@ -129,6 +129,8 @@ gameView.on('hexClickedSecondary', move => lastHexSecondaryClicked.value = move)
                         <button class="btn btn-primary" @click.prevent="gameView.toggleDisplayCoords()">Toggle coords</button>
                         <button class="btn btn-primary" @click.prevent="gameView.setTheme(resolveTheme(playhexTheme, 'dark')); bgTheme = 'bg-dark'">Dark</button>
                         <button class="btn btn-primary" @click.prevent="gameView.setTheme(resolveTheme(playhexTheme, 'light')); bgTheme = 'bg-light'">Light</button>
+                        <button class="btn btn-primary" @click.prevent="gameView.setTheme(resolveTheme(gobanTheme, 'dark')); bgTheme = 'bg-dark'">Goban dark</button>
+                        <button class="btn btn-primary" @click.prevent="gameView.setTheme(resolveTheme(gobanTheme, 'light')); bgTheme = 'bg-light'">Goban light</button>
                         <button class="btn btn-primary" @click.prevent="gameView.setOrientation(gameView.getOrientation() + 1)">Rotate</button>
                     </div>
                 </div>

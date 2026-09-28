@@ -10,6 +10,7 @@ export * from './theming/index.js';
 
 // Themes
 export { playhexTheme } from './themes/playhex/index.js';
+export { gobanTheme } from './themes/goban/index.js';
 export { hexworldTheme } from './themes/hexworld/index.js';
 
 // Entities

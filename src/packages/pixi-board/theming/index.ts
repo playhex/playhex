@@ -9,6 +9,8 @@ export { imageBackground } from './renderers/imageBackground.js';
 export type { ImageBackgroundParams } from './renderers/imageBackground.js';
 export { hexBoard } from './renderers/hexBoard.js';
 export type { HexBoardParams } from './renderers/hexBoard.js';
+export { goBoard } from './renderers/goBoard.js';
+export type { GoBoardParams } from './renderers/goBoard.js';
 export { hexStone } from './renderers/hexStone.js';
 export type { HexStoneParams } from './renderers/hexStone.js';
 export { circleStone } from './renderers/circleStone.js';
