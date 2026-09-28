@@ -39,17 +39,17 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(socket.io@4.8.3)
       '@sockeye-js/collect-socketio':
-        specifier: ^0.4.0
-        version: 0.4.0(socket.io@4.8.3)
+        specifier: ^0.5.0
+        version: 0.5.0(socket.io@4.8.3)
       '@sockeye-js/store-memory':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.5.0
+        version: 0.5.0
       '@sockeye-js/store-redis':
-        specifier: ^0.4.0
-        version: 0.4.0(ioredis@6.0.0)
+        specifier: ^0.5.0
+        version: 0.5.0(ioredis@6.0.0)
       '@sockeye-js/ui':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.5.0
+        version: 0.5.0
       '@types/multer':
         specifier: ^2.2.0
         version: 2.2.0
@@ -1553,8 +1553,8 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
-  '@sockeye-js/collect-socketio@0.4.0':
-    resolution: {integrity: sha512-QD0T7C8ScWPvjSsx7PkEMHL8W3ELZ1w/y9Jdc5cgY/HARLeJWUQ/m2QD2mjDNz0Ylh9guM+72rMTFGU3UhThUQ==}
+  '@sockeye-js/collect-socketio@0.5.0':
+    resolution: {integrity: sha512-XVTj/BakaxsIpN7uFfDMqmUceXbxbChnSV9Sqs56+7odRctiXKvwfiHTpNTZntsHuiON4ocGQrGT6ZlvKknwXQ==}
     engines: {node: '>=18'}
     peerDependencies:
       socket.io: '>=4'
@@ -1562,22 +1562,22 @@ packages:
       socket.io:
         optional: true
 
-  '@sockeye-js/core@0.4.0':
-    resolution: {integrity: sha512-qz9ehQrfiF/ZOa6cvdQIwOEXwPBRraJKeH8xAaf2aZMfIRtFB3k/CqBeFukMjO4OV9S1WSDLMN3qw2dBvB9elw==}
+  '@sockeye-js/core@0.5.0':
+    resolution: {integrity: sha512-9NkMDm26c65p3Bw0VijJK/lvDKar3fZbTyNZcewOpT+2MW6ZCZQmCZP3cP56viatrl3SSopTqsXkuxW8WFoVzQ==}
     engines: {node: '>=18'}
 
-  '@sockeye-js/store-memory@0.4.0':
-    resolution: {integrity: sha512-CuaMS5hJms6qCuuSTE+0rKl+vC3eUyNP8tJQS/kl1GbiQqEc7+9YFALW9KGpNsOEblMH3dXORbjmoG7tiNCH5g==}
+  '@sockeye-js/store-memory@0.5.0':
+    resolution: {integrity: sha512-xe2X8xE2NGOA59NlUsumJ2CelzTVyF1OUzTDHzPwV2doIYZXnIfJHsh8cSiNc4iTZLUbjsHRJJCZG4XUBsBycQ==}
     engines: {node: '>=18'}
 
-  '@sockeye-js/store-redis@0.4.0':
-    resolution: {integrity: sha512-PuqS2vjSyz5r1X/92FxvInUuZtaT/SLlwntN6pT7RoUUban+7lQjdRyg8EpfSCzvW5z/84nAxydKSP3UFXAUEw==}
+  '@sockeye-js/store-redis@0.5.0':
+    resolution: {integrity: sha512-5Wiil/03TrdVJ2mKlYN9WmxnpXTllb4evSRI2d0otbZBUki+pE6Uk2rbqCYP/JZCNhjA+LH0jf3TieR2wWs9Qw==}
     engines: {node: '>=18'}
     peerDependencies:
       ioredis: '>=5'
 
-  '@sockeye-js/ui@0.4.0':
-    resolution: {integrity: sha512-Ay3CZ6H47ZjYzC1GoUeif+MO5IXamY77KHROWhsHawtIauALWQKMwVK55BpwIF6PEYG1Hq9gMiijRyhn9sehYg==}
+  '@sockeye-js/ui@0.5.0':
+    resolution: {integrity: sha512-htNvdLQLL2j62LHYYWWNZHFigFaSQa3Mi8mTLgE869FIUmhUH8hzJUbUirFKe10JHpGyIVA0buF3EK9KnsZFCA==}
     engines: {node: '>=18'}
 
   '@sqltools/formatter@1.2.5':
@@ -5945,26 +5945,26 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@sockeye-js/collect-socketio@0.4.0(socket.io@4.8.3)':
+  '@sockeye-js/collect-socketio@0.5.0(socket.io@4.8.3)':
     dependencies:
-      '@sockeye-js/core': 0.4.0
+      '@sockeye-js/core': 0.5.0
     optionalDependencies:
       socket.io: 4.8.3
 
-  '@sockeye-js/core@0.4.0': {}
+  '@sockeye-js/core@0.5.0': {}
 
-  '@sockeye-js/store-memory@0.4.0':
+  '@sockeye-js/store-memory@0.5.0':
     dependencies:
-      '@sockeye-js/core': 0.4.0
+      '@sockeye-js/core': 0.5.0
 
-  '@sockeye-js/store-redis@0.4.0(ioredis@6.0.0)':
+  '@sockeye-js/store-redis@0.5.0(ioredis@6.0.0)':
     dependencies:
-      '@sockeye-js/core': 0.4.0
+      '@sockeye-js/core': 0.5.0
       ioredis: 6.0.0
 
-  '@sockeye-js/ui@0.4.0':
+  '@sockeye-js/ui@0.5.0':
     dependencies:
-      '@sockeye-js/core': 0.4.0
+      '@sockeye-js/core': 0.5.0
 
   '@sqltools/formatter@1.2.5': {}
 
