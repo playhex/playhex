@@ -10,6 +10,7 @@ export * from './theming/index.js';
 
 // Themes
 export { playhexTheme } from './themes/playhex/index.js';
+export { hexworldTheme } from './themes/hexworld/index.js';
 
 // Entities
 export { default as Anchor44Mark } from './entities/Anchor44Mark.js';
