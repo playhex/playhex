@@ -25,3 +25,8 @@ export { textCoords } from './renderers/textCoords.js';
 export type { TextCoordsParams } from './renderers/textCoords.js';
 export type { ShapeMarkParams } from './renderers/shapeMark.js';
 export type { ImageStoneParams } from './renderers/imageStone.js';
+
+// Json themes
+export { createThemeFromJson, JsonThemeError } from './json/createThemeFromJson.js';
+export { jsonRenderersRegistry } from './json/registry.js';
+export type * from './json/JsonTheme.js';
