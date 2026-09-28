@@ -50,8 +50,12 @@ export class AnimatorFacade
         const promises = moves.map(async (move, i): Promise<void> => {
             await this.animateStone(move, i * 80);
 
+            const lastMoveMark = new LastMoveMark()
+                .setPlayerIndex(this.gameView.getStone(typeof move === 'string' ? move : coordsToMove(move))?.getPlayerIndex() ?? null)
+            ;
+
             this.gameView
-                .addEntity(new LastMoveMark(), AnimatorFacade.GROUP_ANIMATE_PATH)
+                .addEntity(lastMoveMark, AnimatorFacade.GROUP_ANIMATE_PATH)
                 .setCoords(move)
             ;
         });

@@ -1,33 +1,20 @@
-import { Container, Text, TextStyle } from 'pixi.js';
-import { BoardEntity } from '../BoardEntity.js';
-import Hex from '../Hex.js';
+import { ThemedMark } from './ThemedMark.js';
+import { textMark } from '../theming/renderers/textMark.js';
+import { MarkRenderer } from '../theming/types.js';
 
 /**
- * Show a 'S' on second player stone if she swapped.
+ * Default swapped mark, when theme does not define one:
+ * a white semi-transparent 'S'.
  */
-export default class SwappedMark extends BoardEntity
+const defaultSwappedMark = textMark({ text: 'S' });
+
+/**
+ * Show a 'S' on second player stone if she swapped, drawn by theme.
+ */
+export default class SwappedMark extends ThemedMark
 {
-    constructor()
+    protected override getRenderer(): MarkRenderer
     {
-        super();
-
-        this.alwaysTop = true;
-    }
-
-    protected override draw(): Container
-    {
-        const coordsTextStyle = new TextStyle({
-            fontFamily: 'Arial',
-            fontSize: Hex.RADIUS * 1.4,
-            fontWeight: 'bold',
-            fill: 0xffffff,
-        });
-
-        const S = new Text({ text: 'S', style: coordsTextStyle });
-
-        S.anchor.set(0.5, 0.5);
-        S.alpha = 0.4;
-
-        return S;
+        return this.theme.swapped ?? defaultSwappedMark;
     }
 }

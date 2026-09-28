@@ -2,7 +2,6 @@
     "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "target": "ES2019",
-        "rootDir": ".",
         "outDir": "./dist/dev",
         "emitDeclarationOnly": true
     },

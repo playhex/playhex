@@ -3,8 +3,7 @@ import { BoardEntity } from '../BoardEntity.js';
 import Hex from '../Hex.js';
 
 /**
- * Show a little white hexagon on a stone to show last move.
- * Should not be used on an empty cell because won't be visible on light theme.
+ * Show a dot on 4-4 cells, styled by theme.
  */
 export default class Anchor44Mark extends BoardEntity
 {
@@ -17,10 +16,25 @@ export default class Anchor44Mark extends BoardEntity
 
     protected override draw(): Container
     {
-        const g = new Graphics();
+        const {
+            color = this.theme.colors.text,
+            alpha = 0.2,
+            size = 0.2,
+            shape = 'circle',
+        } = this.theme.anchor44 ?? {};
 
-        g.circle(0, 0, Hex.RADIUS * 0.2);
-        g.fill({ color: this.theme.textColor, alpha: 0.2 });
+        const g = new Graphics();
+        const radius = Hex.RADIUS * size;
+
+        this.alwaysTop = shape === 'square';
+
+        if (shape === 'square') {
+            g.rect(-radius, -radius, radius * 2, radius * 2);
+        } else {
+            g.circle(0, 0, radius);
+        }
+
+        g.fill({ color, alpha });
 
         return g;
     }
