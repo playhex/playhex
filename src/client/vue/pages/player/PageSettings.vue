@@ -6,18 +6,20 @@ import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { apiPostPushTest, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
-import { watch, Ref, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { watch, Ref, ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { authChangePassword } from '../../../apiClient.js';
-import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale } from '../../../../shared/app/i18n/index.js';
+import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale, autoLocale } from '../../../../shared/app/i18n/index.js';
 import { allShadingPatterns } from '@playhex/shading-patterns';
 import i18n, { t } from 'i18next';
 import { MoveSettings } from '../../../../shared/app/models/index.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
-import { GameView } from '@playhex/pixi-board';
+import { builtinThemes, GameView } from '@playhex/pixi-board';
+import { CUSTOM_BOARD_THEME_ID, customBoardThemeTemplate, getPlayerBoardTheme, parseCustomBoardTheme, THEMING_DOC_URL } from '../../../services/customBoardTheme.js';
+import { intlFormat } from 'date-fns';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import AppPlayerModerationActionList from '../../components/AppPlayerModerationActionList.vue';
 import AppFlagSelector from '../../components/AppFlagSelector.vue';
@@ -128,6 +130,88 @@ onMounted(async () => {
 });
 
 /*
+ * Board theme preview
+ */
+const boardThemeGameView = new GameView(7);
+const boardThemePreview = ref<HTMLElement>();
+
+boardThemeGameView.setStone('c3', 0);
+boardThemeGameView.setStone('e4', 1);
+boardThemeGameView.setStone('d4', 0);
+boardThemeGameView.setStone('d5', 1);
+
+new PlayerSettingsFacade(boardThemeGameView);
+
+onMounted(async () => {
+    if (!boardThemePreview.value) {
+        throw new Error('Missing element with ref="boardThemePreview"');
+    }
+
+    await boardThemeGameView.mount(boardThemePreview.value);
+});
+
+onUnmounted(() => {
+    boardThemeGameView.destroy();
+});
+
+/*
+ * Custom board theme: json edited in a textarea,
+ * saved in player settings only when valid.
+ */
+const customThemeJson = ref('');
+const customThemeError = ref<null | string>(null);
+
+watch(
+    () => playerSettings.value?.customBoardTheme,
+    customBoardTheme => {
+        if (customBoardTheme !== undefined && customBoardTheme !== customThemeJson.value) {
+            customThemeJson.value = customBoardTheme ?? customBoardThemeTemplate;
+            customThemeError.value = null;
+        }
+    },
+    { immediate: true },
+);
+
+// Save template when selecting custom theme for the first time, so that preview shows it
+watch(
+    () => playerSettings.value?.boardTheme,
+    boardTheme => {
+        if (boardTheme === CUSTOM_BOARD_THEME_ID && playerSettings.value && playerSettings.value.customBoardTheme === null) {
+            playerSettings.value.customBoardTheme = customBoardThemeTemplate;
+        }
+    },
+);
+
+const onCustomThemeInput = (): void => {
+    const result = parseCustomBoardTheme(customThemeJson.value);
+
+    if (result instanceof Error) {
+        customThemeError.value = result.message;
+        return;
+    }
+
+    customThemeError.value = null;
+
+    if (playerSettings.value) {
+        playerSettings.value.customBoardTheme = customThemeJson.value;
+    }
+};
+
+const selectedThemeMetadata = computed(() => getPlayerBoardTheme(playerSettings.value?.boardTheme, playerSettings.value?.customBoardTheme).metadata);
+
+const formatThemeReleaseDate = (releaseDate: string): string => intlFormat(
+    new Date(releaseDate),
+    {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        // date-only strings like "2026-09-28" are parsed as UTC midnight, keep same day for all timezones
+        timeZone: /^\d{4}-\d{2}-\d{2}$/.test(releaseDate) ? 'UTC' : undefined,
+    },
+    { locale: autoLocale() },
+);
+
+/*
  * Panels
  */
 type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications';
@@ -146,6 +230,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'change-password': 'account',
     'move-settings': 'game',
     'board': 'board',
+    'board-theme': 'board',
     'board-orientation': 'board',
     'shading-pattern': 'board',
     'push-notifications': 'notifications',
@@ -465,6 +550,56 @@ const {
                                 <label class="form-check-label" for="show-board-dots"><IconDot /> {{ $t('show_44_dots') }}</label>
                             </div>
                         </template>
+                    </section>
+
+                    <section id="board-theme">
+                        <h3>{{ $t('board_theme.title') }}</h3>
+
+                        <div class="row" v-if="playerSettings">
+                            <div class="col-md-8">
+                                <select class="form-select" v-model="playerSettings.boardTheme">
+                                    <option
+                                        v-for="theme in builtinThemes"
+                                        :key="theme.metadata.id"
+                                        :value="theme.metadata.id"
+                                    >{{ theme.metadata.name }}</option>
+                                    <option :value="CUSTOM_BOARD_THEME_ID">{{ $t('board_theme.custom') }}</option>
+                                </select>
+
+                                <p v-if="selectedThemeMetadata.description" class="mt-2 mb-1">{{ selectedThemeMetadata.description }}</p>
+                                <p v-if="selectedThemeMetadata.author" class="mb-0 small text-body-secondary">{{ $t('board_theme.author', { author: selectedThemeMetadata.author }) }}</p>
+                                <p v-if="selectedThemeMetadata.releaseDate" class="mb-0 small text-body-secondary">{{ $t('board_theme.release_date', { date: formatThemeReleaseDate(selectedThemeMetadata.releaseDate) }) }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3" v-if="playerSettings?.boardTheme === CUSTOM_BOARD_THEME_ID">
+                            <div class="col-md-8">
+                                <p class="form-text">
+                                    <i18next :translation="$t('board_theme.custom_help')">
+                                        <template #link>
+                                            <a :href="THEMING_DOC_URL" target="_blank">THEMING.md</a>
+                                        </template>
+                                    </i18next>
+                                </p>
+                                <label for="custom-board-theme" class="form-label">{{ $t('board_theme.custom_json') }}</label>
+                                <textarea
+                                    class="form-control font-monospace"
+                                    :class="{ 'is-invalid': customThemeError !== null }"
+                                    v-model="customThemeJson"
+                                    @input="onCustomThemeInput"
+                                    maxlength="20000"
+                                    id="custom-board-theme"
+                                    rows="12"
+                                    spellcheck="false"
+                                ></textarea>
+                                <div v-if="customThemeError !== null" class="invalid-feedback font-monospace">{{ customThemeError }}</div>
+                            </div>
+                        </div>
+
+                        <h4>{{ $t('preview') }}</h4>
+
+                        <div ref="boardThemePreview" class="board-container">
+                        </div>
                     </section>
 
                     <section id="board-orientation">

@@ -304,7 +304,8 @@ onUnmounted(() => {
     position absolute
     height auto
     max-width 32%
-    margin 0.75rem // To align with bootstrap navbar/container
+    padding 0.75rem // To align with bootstrap navbar/container
+    background-color unquote('rgba(var(--bs-body-bg-rgb), 0.5)')
 
     p
         margin 0

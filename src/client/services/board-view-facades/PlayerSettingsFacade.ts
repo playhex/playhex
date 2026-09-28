@@ -2,7 +2,8 @@ import { GameView } from '@playhex/pixi-board';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerLocalSettingsStore.js';
 import { watch } from 'vue';
-import { themes } from '@playhex/pixi-board';
+import { playhexTheme, resolveTheme, ThemeDefinition } from '@playhex/pixi-board';
+import { getPlayerBoardTheme } from '../customBoardTheme.js';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
 import { Anchor44Facade } from '@playhex/pixi-board';
 import { ShadingPatternFacade } from '@playhex/pixi-board';
@@ -19,6 +20,22 @@ export class PlayerSettingsFacade
     private anchor44Facade: Anchor44Facade;
     private shadingPatternFacade: ShadingPatternFacade;
     private autoOrientationFacade: AutoOrientationFacade;
+
+    /**
+     * Board theme id from player settings, null if not loaded.
+     */
+    private boardThemeId: null | string = null;
+
+    /**
+     * Player json theme, used when boardThemeId is "custom".
+     */
+    private customBoardTheme: null | string = null;
+
+    /**
+     * Theme and mode currently displayed,
+     * to not redraw board when theme did not change.
+     */
+    private appliedTheme: null | { definition: ThemeDefinition, mode: string } = null;
 
     constructor(
         private gameView: GameView,
@@ -90,6 +107,10 @@ export class PlayerSettingsFacade
             ...this.overrideSettings,
         };
 
+        this.boardThemeId = playerSettings.boardTheme;
+        this.customBoardTheme = playerSettings.customBoardTheme ?? null;
+        this.updateTheme();
+
         this.gameView.setDisplayCoords(settings.showCoords);
         this.anchor44Facade.show44Anchors(settings.show44dots);
         this.shadingPatternFacade.setShadingPattern(settings.boardShadingPattern, settings.boardShadingPatternIntensity, settings.boardShadingPatternOption);
@@ -124,6 +145,8 @@ export class PlayerSettingsFacade
     {
         const { showCoords, orientationLandscape, orientationPortrait } = this.overrideSettings;
 
+        this.updateTheme();
+
         if (undefined !== showCoords) {
             this.gameView.setDisplayCoords(showCoords);
         }
@@ -143,8 +166,37 @@ export class PlayerSettingsFacade
             ...this.overrideSettings,
         };
 
-        this.gameView.setTheme(themes[usePlayerLocalSettingsStore().displayedTheme()]);
+        this.updateTheme();
         this.autoOrientationFacade.setForcedOrientationMode(settings.forcedBoardOrientation);
+    }
+
+    /**
+     * Display board theme from player settings,
+     * in light or dark mode depending on local settings.
+     */
+    private updateTheme(): void
+    {
+        const themeDefinition = getPlayerBoardTheme(
+            this.overrideSettings.boardTheme ?? this.boardThemeId,
+            this.overrideSettings.customBoardTheme ?? this.customBoardTheme,
+        );
+        const mode = usePlayerLocalSettingsStore().displayedTheme();
+
+        if (themeDefinition === this.appliedTheme?.definition && mode === this.appliedTheme.mode) {
+            return;
+        }
+
+        this.appliedTheme = { definition: themeDefinition, mode };
+
+        this.gameView.setTheme(resolveTheme(themeDefinition, mode)).catch(e => {
+            // eslint-disable-next-line no-console
+            console.error('Could not apply board theme, using default theme', e);
+
+            if (themeDefinition !== playhexTheme) {
+                this.appliedTheme = { definition: playhexTheme, mode };
+                void this.gameView.setTheme(resolveTheme(playhexTheme, mode));
+            }
+        });
     }
 
     getCurrentOrientationMode(): OrientationMode

@@ -26,7 +26,8 @@ const usePlayerSettingsStore = defineStore('playerSettingsStore', () => {
         const promise = apiGetPlayerSettings();
 
         promise
-            .then(settings => playerSettings.value = settings)
+            // Missing fields (i.e new setting not yet returned by server) keep their default value
+            .then(settings => playerSettings.value = Object.assign(new PlayerSettings(), settings))
             .catch(handleFetchError)
         ;
 

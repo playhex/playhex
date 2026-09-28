@@ -16,7 +16,8 @@
   },
   "files": [
     "dist/index.js",
-    "dist/types"
+    "dist/types",
+    "THEMING.md"
   ],
   "scripts": {
     "build": "rm -rf dist && vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",

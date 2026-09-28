@@ -45,15 +45,22 @@ function startServer(): http.Server {
     const server = http.createServer((req, res) => {
         const urlPath = !req.url || req.url === '/' ? '/index.html' : req.url;
 
-        // Serve index.html from test/visual/, JS bundles from dist/visual-test/
+        // Serve index.html from test/visual/, themes images from themes/, JS bundles from dist/visual-test/
         const filePath = urlPath === '/index.html'
             ? INDEX_HTML
-            : path.join(VISUAL_TEST_DIR, urlPath);
+            : urlPath.startsWith('/themes/')
+                ? path.join(__dirname, urlPath)
+                : path.join(VISUAL_TEST_DIR, urlPath);
 
         try {
             const content = fs.readFileSync(filePath);
             const ext = path.extname(filePath);
-            const contentType = ext === '.js' ? 'application/javascript' : 'text/html';
+            const contentTypes: { [ext: string]: string } = {
+                '.js': 'application/javascript',
+                '.jpg': 'image/jpeg',
+                '.png': 'image/png',
+            };
+            const contentType = contentTypes[ext] ?? 'text/html';
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(content);
         } catch {
