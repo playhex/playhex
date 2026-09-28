@@ -13,6 +13,7 @@ export { playhexTheme } from './themes/playhex/index.js';
 export { gobanTheme } from './themes/goban/index.js';
 export { hexworldTheme } from './themes/hexworld/index.js';
 export { polishNostalgiaTheme } from './themes/polish-nostalgia/index.js';
+export { builtinThemes, getBuiltinTheme } from './builtinThemes.js';
 
 // Entities
 export { default as Anchor44Mark } from './entities/Anchor44Mark.js';

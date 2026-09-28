@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
-import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 import { allShadingPatterns, type ShadingPatternType } from '@playhex/shading-patterns';
 
 export enum MoveSettings {
@@ -72,6 +72,30 @@ export default class PlayerSettings
     @IsBoolean()
     @Column({ default: false })
     show44dots: boolean = false;
+
+    /**
+     * Id of the board theme, i.e "playhex".
+     * Null means default theme.
+     * Not restricted to known themes, client falls back to default theme if unknown.
+     */
+    @Expose()
+    @IsOptional()
+    @IsString()
+    @Length(1, 64)
+    @Column({ type: String, length: 64, nullable: true, default: null })
+    boardTheme: null | string = null;
+
+    /**
+     * Json theme created by player, see JsonTheme type in pixi-board package.
+     * Used when boardTheme is "custom".
+     * Not validated here, client falls back to default theme if invalid.
+     */
+    @Expose()
+    @IsOptional()
+    @IsString()
+    @MaxLength(20000)
+    @Column({ type: 'text', nullable: true })
+    customBoardTheme: null | string = null;
 
     /**
      * Which shading pattern to use,

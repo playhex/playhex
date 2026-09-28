@@ -395,6 +395,14 @@
         "diamond": "Diamant",
         "description": "Votre orientation du plateau préférée pour les orientations portrait ou paysage de votre écran."
     },
+    "board_theme": {
+        "title": "Thème du plateau",
+        "author": "Auteur : {{author}}",
+        "release_date": "Date de publication : {{date}}",
+        "custom": "Thème personnalisé",
+        "custom_help": "Collez votre thème au format json. Format et exemples : {link}",
+        "custom_json": "Json du thème"
+    },
     "shading_patterns": {
         "title": "Motif d'arrière plan",
         "visibility": "Visibilité du motif",

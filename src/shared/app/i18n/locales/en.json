@@ -664,6 +664,14 @@
         "flat_2": "Flat 2",
         "diamond": "Diamond"
     },
+    "board_theme": {
+        "title": "Board theme",
+        "author": "Author: {{author}}",
+        "release_date": "Release date: {{date}}",
+        "custom": "Custom theme",
+        "custom_help": "Paste your theme in json format. Format and examples: {link}",
+        "custom_json": "Theme json"
+    },
     "shading_patterns": {
         "title": "Shading pattern",
         "visibility": "Shading pattern visibility",
