@@ -41,7 +41,7 @@ The class `GameView` provides a board that can be manipulated at low level:
 - add/remove stones
 - handle rotation
 - add marks: show letters, numbers, or symbol on a cell
-- themes: light or dark theme, or add custom colors
+- themes: light or dark theme, custom themes from json or typescript
 
 #### Conventions
 
@@ -153,25 +153,16 @@ gameView.highlightSideForPlayer(1); // highlight sides for blue, fade red sides
 
 - Theming
 
-For now we can only customize colors. Default theme is dark.
+Board appearance is customizable with themes, created from json or in typescript.
+Default theme is PlayHex dark theme, others are builtin (`gobanTheme`, `hexworldTheme`, `polishNostalgiaTheme`):
 
 ``` ts
-import { GameView, themes } from '@playhex/pixi-board';
+import { GameView, gobanTheme, resolveTheme } from '@playhex/pixi-board';
 
-const gameView = new GameView(9, { theme: themes.light }); // Set theme on creation
-
-gameView.setTheme(themes.dark); // Use default dark theme
-gameView.setTheme(themes.light); // Use default light theme
-
-gameView.setTheme({
-    colorA: 0x000000,
-    colorB: 0xffffff,
-    colorEmpty: 0x888888,
-    colorEmptyShade: 0x666666,
-    strokeColor: 0x00ff00,
-    textColor: 0x212529,
-}); // Custom colors
+await gameView.setTheme(resolveTheme(gobanTheme, 'dark'));
 ```
+
+See [THEMING.md](THEMING.md) to use, create and customize themes.
 
 ### Facades
 
