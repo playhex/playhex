@@ -6,6 +6,17 @@
 #
 # Adminer:      http://localhost:8080
 # Redis Insight: http://localhost:5540
+#
+# To override ports or disable services locally,
+# create a docker-compose.override.yml file with:
+#
+# services:
+#     adminer:
+#         ports: !override
+#             - "18080:8080"
+#
+#     redisinsight:
+#         profiles: [disabled]
 
 services:
     mysql:
