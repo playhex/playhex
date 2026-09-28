@@ -28,7 +28,7 @@ export class PushNotificationSender
         }
 
         webPush.setVapidDetails(
-            `mailto:<${PUSH_VAPID_EMAIL}>`,
+            `mailto:${PUSH_VAPID_EMAIL}`, // No <brackets>, Apple push service rejects it with 403 BadJwtToken
             PUSH_VAPID_PUBLIC_KEY!,
             PUSH_VAPID_PRIVATE_KEY!,
         );
