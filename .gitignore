@@ -9,3 +9,4 @@ var/
 /assets/stats/
 tsconfig.tsbuildinfo
 assets/avatars/
+/docker-compose.override.yml
