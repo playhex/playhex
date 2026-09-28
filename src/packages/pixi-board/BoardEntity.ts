@@ -1,7 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 import Hex from './Hex.js';
 import { Coords, Move, parseMove } from '@playhex/move-notation';
-import { Theme } from './BoardTheme.js';
+import { BoardTheme } from './theming/types.js';
+import { destroyDrawnOptions } from './destroyOptions.js';
 
 const PI_6 = Math.PI / 6;
 const PI_3 = Math.PI / 3;
@@ -46,9 +47,9 @@ export class BoardEntity extends Container
     /**
      * Current theme of the GameView.
      */
-    protected theme: Theme;
+    protected theme: BoardTheme;
 
-    initOnce(theme: Theme): void
+    initOnce(theme: BoardTheme): void
     {
         if (this.initialized) {
             this.updatePosition();
@@ -64,16 +65,28 @@ export class BoardEntity extends Container
         this.addChild(this.rotationFixedContainer);
     }
 
-    onThemeUpdated(theme: Theme): void
+    onThemeUpdated(theme: BoardTheme): void
     {
         if (!this.listenThemeChange) {
             return;
         }
 
         this.theme = theme;
+        this.redraw();
+    }
+
+    /**
+     * Redraw this entity, i.e when a parameter changed.
+     * Does nothing if not yet added to a GameView.
+     */
+    protected redraw(): void
+    {
+        if (!this.initialized) {
+            return;
+        }
 
         for (const child of this.rotationFixedContainer.removeChildren()) {
-            child.destroy();
+            child.destroy(destroyDrawnOptions);
         }
 
         this.rotationFixedContainer.addChild(this.draw());
@@ -137,12 +150,16 @@ export class BoardEntity extends Container
      */
     updateRotation(containerRotation: number): void
     {
+        let rotation = 0;
+
         if (this.alwaysTop) {
-            this.rotationFixedContainer.rotation = -containerRotation;
+            rotation = -containerRotation;
         }
 
         if (this.alwaysFlatTop) {
-            this.rotationFixedContainer.rotation = Math.ceil(((this.rotationFixedContainer.rotation / PI_6) + 1) / 2) * PI_3 + PI_6;
+            rotation = Math.ceil(((rotation / PI_6) + 1) / 2) * PI_3 + PI_6;
         }
+
+        this.rotationFixedContainer.rotation = rotation;
     }
 }

@@ -2,7 +2,7 @@ import { GameView } from '@playhex/pixi-board';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerLocalSettingsStore.js';
 import { watch } from 'vue';
-import { themes } from '@playhex/pixi-board';
+import { playhexTheme, resolveTheme } from '@playhex/pixi-board';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
 import { Anchor44Facade } from '@playhex/pixi-board';
 import { ShadingPatternFacade } from '@playhex/pixi-board';
@@ -143,7 +143,7 @@ export class PlayerSettingsFacade
             ...this.overrideSettings,
         };
 
-        this.gameView.setTheme(themes[usePlayerLocalSettingsStore().displayedTheme()]);
+        void this.gameView.setTheme(resolveTheme(playhexTheme, usePlayerLocalSettingsStore().displayedTheme()));
         this.autoOrientationFacade.setForcedOrientationMode(settings.forcedBoardOrientation);
     }
 

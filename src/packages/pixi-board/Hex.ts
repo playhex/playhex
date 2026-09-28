@@ -1,5 +1,4 @@
-import { Container, DestroyOptions, Graphics, PointData } from 'pixi.js';
-import { Theme } from './BoardTheme.js';
+import { Container, DestroyOptions, PointData, Polygon } from 'pixi.js';
 
 const { PI, cos, sin, sqrt } = Math;
 const SQRT3 = sqrt(3);
@@ -7,12 +6,8 @@ const SQRT3 = sqrt(3);
 /**
  * A cell.
  *
- * Default PlayHex theme, only themed by colors, stones are full hexagons.
- *
- * Contains layers:
- * - background, always shown, covers hex board
- * - fading, for shading patterns
- * - stone, may be faded for preview moves
+ * Only handles cell geometry and pointer events (hit area),
+ * cell is drawn by the theme board renderer.
  */
 export default class Hex extends Container
 {
@@ -36,116 +31,18 @@ export default class Hex extends Container
      */
     static readonly OUTER_RADIUS = Hex.RADIUS * (1 + Hex.PADDING);
 
-    /**
-     * Stroke color and empty cell color
-     */
-    private cellBackgroundGraphics: Graphics;
-
-    /**
-     * Layer, variable alpha depending on shading pattern
-     */
-    private cellShading: Graphics;
-
-    constructor(
-        private theme: Theme,
-
-        /**
-         * Shading to apply to background, between 0 and 1.
-         * 0 = not shaded, 1 = shaded,
-         * 0.5 = half-shaded (i.e for tri color shading patterns)...
-         */
-        private shading: number = 0,
-    ) {
+    constructor()
+    {
         super();
 
-        if (shading < 0) {
-            shading = 0;
-        } else if (shading > 1) {
-            shading = 1;
+        const path: PointData[] = [];
+
+        for (let i = 0; i < 6; ++i) {
+            path.push(Hex.cornerCoords(i));
         }
 
-        this.init();
-
+        this.hitArea = new Polygon(path);
         this.eventMode = 'static';
-    }
-
-    private init(): void
-    {
-        this.addChild(
-            this.createCell(),
-            this.cellShading = new Graphics(),
-        );
-
-        this.redrawCellShading();
-        this.redrawHex();
-    }
-
-    private createCell(): Container
-    {
-        const container = new Container();
-        this.cellBackgroundGraphics = new Graphics();
-
-        container.addChild(this.cellBackgroundGraphics);
-
-        return container;
-    }
-
-    private redrawCellShading(): void
-    {
-        this.cellShading.clear();
-
-        this.cellShading.regularPoly(0, 0, Hex.INNER_RADIUS, 6);
-        this.cellShading.fill({ color: this.theme.colorEmptyShade });
-        this.cellShading.alpha = this.shading;
-    }
-
-    /**
-     * Redraw cell, fading and stone when theme changed
-     */
-    private redrawHex(): void
-    {
-        // Redraw cell background with theme colors
-        this.cellBackgroundGraphics.clear();
-
-        // background, stroke color
-        const outperPath: PointData[] = [];
-
-        for (let i = 0; i < 6; ++i) {
-            outperPath.push(Hex.cornerCoords(i, Hex.OUTER_RADIUS));
-        }
-
-        this.cellBackgroundGraphics.poly(outperPath);
-        this.cellBackgroundGraphics.fill({ color: this.theme.strokeColor });
-
-        // cell, empty cell color
-        const innerPath: PointData[] = [];
-
-        for (let i = 0; i < 6; ++i) {
-            innerPath.push(Hex.cornerCoords(i, Hex.INNER_RADIUS));
-        }
-
-        this.cellBackgroundGraphics.poly(innerPath);
-        this.cellBackgroundGraphics.fill({ color: this.theme.colorEmpty });
-
-        this.redrawCellShading();
-    }
-
-    getCellShading(): number
-    {
-        return this.shading;
-    }
-
-    setCellShading(shading: number): void
-    {
-        this.shading = shading;
-        this.cellShading.alpha = shading;
-    }
-
-    updateTheme(theme: Theme): void
-    {
-        this.theme = theme;
-
-        this.redrawHex();
     }
 
     static coords(row: number, col: number): PointData

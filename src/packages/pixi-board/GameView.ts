@@ -1,6 +1,11 @@
-import { Application, Container, Graphics, PointData, Text, TextStyle } from 'pixi.js';
+import { Application, Container } from 'pixi.js';
 import Hex from './Hex.js';
-import { Theme, themes } from './BoardTheme.js';
+import { BoardTheme, BoardView } from './theming/types.js';
+import { resolveTheme } from './theming/resolveTheme.js';
+import { loadTheme, themeNeedsLoading } from './theming/loadTheme.js';
+import { playhexTheme } from './themes/playhex/index.js';
+import { textCoords } from './theming/renderers/textCoords.js';
+import { destroyDrawnOptions } from './destroyOptions.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { BoardEntity } from './BoardEntity.js';
 import Stone from './entities/Stone.js';
@@ -66,6 +71,11 @@ type GameViewEvents = {
     destroyAfter: () => void;
 };
 
+/**
+ * Coords renderer used when theme does not define one.
+ */
+const defaultCoords = textCoords();
+
 const defer = () => {
     let resolve!: () => void;
     let reject!: (reason: Error) => void;
@@ -80,9 +90,10 @@ const defer = () => {
 
 type GameViewOptions = {
     /**
-     * Theme/colors used to display board
+     * Theme used to display board.
+     * To get light or dark version of a theme, use `resolveTheme()`.
      */
-    theme: Theme;
+    theme: BoardTheme;
 
     /**
      * Whether to show cell coords around the board
@@ -103,7 +114,7 @@ type GameViewOptions = {
 };
 
 const defaultOptions: GameViewOptions = {
-    theme: themes.dark,
+    theme: resolveTheme(playhexTheme, 'dark'),
     displayCoords: false,
     orientation: 11,
     interactive: true,
@@ -145,9 +156,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     static STONE_ENTITY_GROUP = '_stone';
 
     /**
-     * Theme/colors used to display board
+     * Theme used to display board
      */
-    private theme: Theme;
+    private theme: BoardTheme;
+
+    /**
+     * Incremented on each setTheme() call,
+     * to ignore a theme loaded after a more recent one has been set.
+     */
+    private themeVersion = 0;
 
     /**
      * Whether to show cell coords around the board
@@ -167,6 +184,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Mounted, pixi app initialized, resize listener added...
      */
     private initialized = false;
+
+    /**
+     * Set when destroy() is called, to stop async mount or setTheme
+     * that were loading theme assets meanwhile.
+     */
+    private destroyed = false;
 
     private hexes: Hex[][] = [];
 
@@ -194,9 +217,30 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * All coords letters.
      * Each of them need to be kept upside when board rotates.
      */
-    private coordsTexts: Text[] = [];
+    private coordsTexts: Container[] = [];
 
-    private sidesGraphics: [Graphics, Graphics];
+    /**
+     * Background of the whole pixi application, drawn by theme.
+     * Not rotated nor scaled with the board.
+     */
+    private backgroundContainer: Container = new Container();
+
+    /**
+     * Contains the board drawn by theme.
+     */
+    private boardContainer: Container = new Container();
+
+    private boardView: BoardView;
+
+    /**
+     * Shading of each cell, kept to reapply them when theme changes.
+     */
+    private cellShadings: number[][];
+
+    /**
+     * Whether sides are highlighted, [player1, player2].
+     */
+    private sidesHighlighted: [boolean, boolean] = [true, true];
 
     private resizeObserver: null | ResizeObserver = null;
 
@@ -265,13 +309,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.setGroupZIndex(GameView.STONE_ENTITY_GROUP, -10);
 
+        this.cellShadings = Array(this.boardsize).fill(null).map(() => Array(this.boardsize).fill(0));
+
         this.gameContainer.addChild(
-            this.createColoredSides(),
+            this.boardContainer,
             this.createHexesContainer(),
             this.entityLayersContainer,
             this.coordsContainer = new Container(),
         );
 
+        this.redrawBoard();
         this.redrawCoords();
     }
 
@@ -291,9 +338,25 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             ...this.getWrapperSize(),
         });
 
-        this.listenContainerElementResize(element);
+        this.pixi.stage.addChild(this.backgroundContainer, this.gameContainer);
 
-        this.pixi.stage.addChild(this.gameContainer);
+        // Load theme assets (i.e images), then redraw everything that has been drawn before assets were loaded
+        if (themeNeedsLoading(this.theme)) {
+            const themeVersion = this.themeVersion;
+            await loadTheme(this.theme);
+
+            if (this.destroyed) {
+                return;
+            }
+
+            if (themeVersion === this.themeVersion) {
+                this.redrawAfterThemeChanged();
+            }
+        }
+
+        this.redrawBackground();
+
+        this.listenContainerElementResize(element);
 
         this.redrawAfterOrientationOrWrapperSizeChanged();
 
@@ -358,6 +421,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         try {
             await this.doMount(element);
+
+            // Destroyed while mounting, never resolve ready()
+            if (this.destroyed) {
+                return;
+            }
+
             this.initPromise.resolve();
             this.initialized = true;
             this.emit('mounted');
@@ -378,14 +447,60 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     private redrawAfterThemeChanged(): void
     {
-        for (let row = 0; row < this.boardsize; ++row) {
-            for (let col = 0; col < this.boardsize; ++col) {
-                this.hexes[row][col].updateTheme(this.theme);
-            }
+        this.redrawBackground();
+        this.redrawBoard();
+        this.updateEntitiesTheme();
+        this.updateEntitiesRotation();
+        this.redrawCoords();
+    }
+
+    /**
+     * Draw or redraw application background, when theme or size changed.
+     */
+    private redrawBackground(): void
+    {
+        for (const child of this.backgroundContainer.removeChildren()) {
+            child.destroy(destroyDrawnOptions);
         }
 
-        this.updateEntitiesTheme();
-        this.redrawCoords();
+        const wrapperSize = this.getWrapperSize();
+
+        if (!this.theme.background || wrapperSize === null) {
+            return;
+        }
+
+        this.backgroundContainer.addChild(this.theme.background({
+            ...wrapperSize,
+            colors: this.theme.colors,
+        }));
+    }
+
+    /**
+     * Draw or redraw board with current theme,
+     * and reapply sides highlight and cells shading.
+     */
+    private redrawBoard(): void
+    {
+        for (const child of this.boardContainer.removeChildren()) {
+            child.destroy(destroyDrawnOptions);
+        }
+
+        this.boardView = this.theme.board({
+            boardsize: this.boardsize,
+            colors: this.theme.colors,
+        });
+
+        this.boardContainer.addChild(this.boardView.container);
+
+        this.highlightSides(...this.sidesHighlighted);
+
+        for (let row = 0; row < this.boardsize; ++row) {
+            for (let col = 0; col < this.boardsize; ++col) {
+                if (this.cellShadings[row][col] !== 0) {
+                    this.boardView.setCellShading?.(row, col, this.cellShadings[row][col]);
+                }
+            }
+        }
     }
 
     private redrawAfterOrientationOrWrapperSizeChanged(): void
@@ -430,6 +545,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         }
 
         this.pixi.renderer.resize(wrapperSize.width, wrapperSize.height);
+        this.redrawBackground();
         this.redrawAfterOrientationOrWrapperSizeChanged();
 
         this.emit('resized');
@@ -505,13 +621,28 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.emit('orientationChanged');
     }
 
-    getTheme(): Theme
+    getTheme(): BoardTheme
     {
         return this.theme;
     }
 
-    setTheme(theme: Theme): void
+    /**
+     * Change theme and redraw board.
+     * Theme assets (i.e images) are loaded before theme is applied.
+     *
+     * @returns Promise resolved when theme is applied
+     */
+    async setTheme(theme: BoardTheme): Promise<void>
     {
+        const themeVersion = ++this.themeVersion;
+
+        await loadTheme(theme);
+
+        // Another theme has been set while loading this one, or view destroyed
+        if (themeVersion !== this.themeVersion || this.destroyed) {
+            return;
+        }
+
         this.theme = theme;
 
         this.redrawAfterThemeChanged();
@@ -605,7 +736,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         for (let row = 0; row < this.boardsize; ++row) {
             for (let col = 0; col < this.boardsize; ++col) {
-                const hex = new Hex(this.theme);
+                const hex = new Hex();
 
                 hex.position = Hex.coords(row, col);
 
@@ -652,96 +783,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         return hexesContainer;
     }
 
-    private createColoredSides(): Container
-    {
-        // Initialize both sides at class level to change them later (light on/off)
-        this.sidesGraphics = [new Graphics(), new Graphics()];
-
-        let g: Graphics;
-        const to = (a: PointData, b: PointData = { x: 0, y: 0 }, c: PointData = { x: 0, y: 0 }) => g.lineTo(a.x + b.x + c.x, a.y + b.y + c.y);
-        const m = (a: PointData, b: PointData = { x: 0, y: 0 }) => g.moveTo(a.x + b.x, a.y + b.y);
-        const middle = (a: PointData, b: PointData): PointData => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-
-        const sideRelativeWidth = 0.35;
-        const sideWidth = Hex.RADIUS * sideRelativeWidth;
-        const sideDist = Hex.RADIUS * (sideRelativeWidth + 1);
-        const { colorA, colorB } = this.theme;
-        const lastI = this.boardsize - 1;
-        const boardMiddle: PointData = middle(Hex.coords(0, 0), Hex.coords(lastI, lastI));
-
-        // Set sides colors
-        this.sidesGraphics[0].setStrokeStyle({ width: 0 });
-        this.sidesGraphics[0].setFillStyle({ color: colorA });
-        this.sidesGraphics[1].setStrokeStyle({ width: 0 });
-        this.sidesGraphics[1].setFillStyle({ color: colorB });
-
-        // 1. Top: from a1 to i1 (red)
-        g = this.sidesGraphics[0];
-        m(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
-
-        for (let i = 0; i < lastI; ++i) {
-            to(Hex.coords(0, i), Hex.cornerCoords(0, sideDist));
-            to(Hex.coords(0, i), Hex.cornerCoords(1), Hex.cornerCoords(0, sideWidth));
-        }
-
-        to(Hex.coords(0, lastI), Hex.cornerCoords(0, sideDist));
-        to(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
-        to(boardMiddle);
-
-        g.fill();
-
-        // 2. Right: from i1 to i9 (blue)
-        g = this.sidesGraphics[1];
-        m(Hex.coords(0, lastI), middle(Hex.cornerCoords(0, sideDist), Hex.cornerCoords(1, sideDist)));
-
-        for (let i = 0; i < lastI; ++i) {
-            to(Hex.coords(i, lastI), Hex.cornerCoords(1, sideDist));
-            to(Hex.coords(i, lastI), Hex.cornerCoords(2), Hex.cornerCoords(1, sideWidth));
-        }
-
-        to(Hex.coords(lastI, lastI), Hex.cornerCoords(1, sideDist));
-        to(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
-        to(boardMiddle);
-
-        g.fill();
-
-        // 3. Bottom: from i9 to a9 (red)
-        g = this.sidesGraphics[0];
-        m(Hex.coords(lastI, lastI), Hex.cornerCoords(2, sideDist));
-
-        for (let i = lastI; i > 0; --i) {
-            to(Hex.coords(lastI, i), Hex.cornerCoords(3, sideDist));
-            to(Hex.coords(lastI, i), Hex.cornerCoords(4), Hex.cornerCoords(3, sideWidth));
-        }
-
-        to(Hex.coords(lastI, 0), Hex.cornerCoords(3, sideDist));
-        to(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
-        to(boardMiddle);
-
-        g.fill();
-
-        // 4. Left: from a9 to a1 (blue)
-        g = this.sidesGraphics[1];
-        m(Hex.coords(lastI, 0), middle(Hex.cornerCoords(3, sideDist), Hex.cornerCoords(4, sideDist)));
-
-        for (let i = lastI; i > 0; --i) {
-            to(Hex.coords(i, 0), Hex.cornerCoords(4, sideDist));
-            to(Hex.coords(i, 0), Hex.cornerCoords(5), Hex.cornerCoords(4, sideWidth));
-        }
-
-        to(Hex.coords(0, 0), Hex.cornerCoords(4, sideDist));
-        to(Hex.coords(0, 0), Hex.cornerCoords(5, sideDist));
-        to(boardMiddle);
-
-        g.fill();
-
-        // Add both sides into a single container
-        const sidesContainer = new Container();
-        sidesContainer.addChild(...this.sidesGraphics);
-
-        return sidesContainer;
-    }
-
     getDisplayCoords(): boolean
     {
         return this.displayCoords;
@@ -769,24 +810,17 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.coordsTexts = [];
 
         for (const child of this.coordsContainer.removeChildren()) {
-            child.destroy();
+            child.destroy(destroyDrawnOptions);
         }
 
         this.coordsContainer.visible = this.displayCoords;
 
         const container = new Container();
 
-        const coordsTextStyle = new TextStyle({
-            fontFamily: 'Arial',
-            fontSize: Hex.RADIUS * 0.6,
-            fill: this.theme.textColor,
-        });
+        const coordsRenderer = this.theme.coords ?? defaultCoords;
 
-        const createText = (string: string, x: number, y: number): Text => {
-            const text = new Text({ text: string, style: coordsTextStyle });
-
-            text.resolution = window.devicePixelRatio * 2;
-            text.anchor.set(0.5, 0.5);
+        const createText = (label: string, x: number, y: number, axis: 'letter' | 'number'): Container => {
+            const text = coordsRenderer({ label, axis, colors: this.theme.colors });
 
             const hexCoords = Hex.coords(x, y);
             text.position.set(hexCoords.x, hexCoords.y);
@@ -798,12 +832,12 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         for (let i = 0; i < this.boardsize; ++i) {
             const number = rowToNumber(i);
-            container.addChild(createText(number, i, -1));
-            container.addChild(createText(number, i, this.boardsize));
+            container.addChild(createText(number, i, -1, 'number'));
+            container.addChild(createText(number, i, this.boardsize, 'number'));
 
             const letter = colToLetter(i);
-            container.addChild(createText(letter, -1, i));
-            container.addChild(createText(letter, this.boardsize, i));
+            container.addChild(createText(letter, -1, i, 'letter'));
+            container.addChild(createText(letter, this.boardsize, i, 'letter'));
         }
 
         this.updateCoordsTextsOrientation();
@@ -820,8 +854,16 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     highlightSides(red: boolean, blue: boolean): void
     {
-        this.sidesGraphics[0].alpha = red ? 1 : 0.25;
-        this.sidesGraphics[1].alpha = blue ? 1 : 0.25;
+        this.sidesHighlighted = [red, blue];
+
+        if (!this.boardView.sides) {
+            return;
+        }
+
+        const { highlighted = 1, faded = 0.25 } = this.theme.sidesAlpha ?? {};
+
+        this.boardView.sides[0].alpha = red ? highlighted : faded;
+        this.boardView.sides[1].alpha = blue ? highlighted : faded;
     }
 
     highlightSideForPlayer(playerIndex: 0 | 1): void
@@ -830,6 +872,25 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             playerIndex === 0,
             playerIndex === 1,
         );
+    }
+
+    getCellShading(coords: Coords): number
+    {
+        return this.cellShadings[coords.row][coords.col];
+    }
+
+    /**
+     * Shade a cell, used to show shading patterns.
+     *
+     * @param shading Between 0 and 1: 0 = not shaded, 1 = shaded,
+     *                0.5 = half-shaded (i.e for tri color shading patterns)...
+     */
+    setCellShading(coords: Coords, shading: number): void
+    {
+        shading = max(0, min(1, shading));
+
+        this.cellShadings[coords.row][coords.col] = shading;
+        this.boardView.setCellShading?.(coords.row, coords.col, shading);
     }
 
     getStone(move: Move): null | Stone
@@ -931,6 +992,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
     destroy(): void
     {
+        this.destroyed = true;
+
         this.emit('destroyBefore');
 
         this.destroyResizeObserver(); // Must disconnect resize observer before destroying pixi app, the observed element

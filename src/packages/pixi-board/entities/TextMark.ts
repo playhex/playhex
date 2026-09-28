@@ -34,7 +34,7 @@ export default class TextMark extends BoardEntity
         const style = new TextStyle({
             fontFamily: 'Arial',
             fontSize: Hex.RADIUS * this.sizeCoef,
-            fill: this.color ?? this.theme.textColor,
+            fill: this.color ?? this.theme.colors.text,
         });
 
         const text = new Text({
