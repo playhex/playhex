@@ -395,6 +395,9 @@
         "diamond": "Diamant",
         "description": "Votre orientation du plateau préférée pour les orientations portrait ou paysage de votre écran."
     },
+    "board_theme": {
+        "title": "Thème du plateau"
+    },
     "shading_patterns": {
         "title": "Motif d'arrière plan",
         "visibility": "Visibilité du motif",

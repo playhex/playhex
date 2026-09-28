@@ -1,5 +1,5 @@
 import { Application, Container, FederatedPointerEvent, Graphics, Rectangle } from 'pixi.js';
-import { ResizeObserverDebounced, Theme, themes } from '@playhex/pixi-board';
+import { BoardTheme, playhexTheme, ResizeObserverDebounced, resolveTheme } from '@playhex/pixi-board';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import { defer } from '../../shared/app/defer.js';
@@ -53,7 +53,7 @@ export class GameAnalyzeChart extends TypedEmitter<GameAnalyzeChartEvents>
 
     constructor(
         private analyze: GameAnalyzeData,
-        private theme: Theme = themes.dark,
+        private theme: BoardTheme = resolveTheme(playhexTheme, 'dark'),
     ) {
         super();
     }
@@ -149,7 +149,7 @@ export class GameAnalyzeChart extends TypedEmitter<GameAnalyzeChartEvents>
                     (movePower - 0.5) * height,
                 );
 
-                graphics.fill({ color: movePower < 0.5 ? this.theme.colorA : this.theme.colorB });
+                graphics.fill({ color: movePower < 0.5 ? this.theme.colors.player1 : this.theme.colors.player2 });
             }
         }
 
@@ -161,7 +161,7 @@ export class GameAnalyzeChart extends TypedEmitter<GameAnalyzeChartEvents>
         this.highlight.visible = false;
         this.highlight.rect(0, 0, barWidth, height);
         this.highlight.stroke({
-            color: this.theme.textColor,
+            color: this.theme.colors.text,
             width: 1,
         });
 

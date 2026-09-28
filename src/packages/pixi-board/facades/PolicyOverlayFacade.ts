@@ -48,7 +48,7 @@ class PolicyStarMark extends BoardEntity
         const g = new Graphics();
         const r = Hex.INNER_RADIUS * 0.5;
         g.star(0, 0, 5, r, r * 0.45);
-        g.fill({ color: this.theme.textColor });
+        g.fill({ color: this.theme.colors.text });
 
         return g;
     }

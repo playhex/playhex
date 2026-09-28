@@ -74,6 +74,17 @@ export default class PlayerSettings
     show44dots: boolean = false;
 
     /**
+     * Id of the board theme, i.e "playhex".
+     * Not restricted to known themes, client falls back to default theme if unknown.
+     */
+    @Expose()
+    @IsOptional()
+    @IsString()
+    @Length(1, 64)
+    @Column({ length: 64, default: 'playhex' })
+    boardTheme: string = 'playhex';
+
+    /**
      * Which shading pattern to use,
      * null for no shading pattern.
      */

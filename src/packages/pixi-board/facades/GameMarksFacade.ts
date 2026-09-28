@@ -45,6 +45,7 @@ export class GameMarksFacade
         }
 
         this.lastMoveMark
+            .setPlayerIndex(this.gameView.getStone(move)?.getPlayerIndex() ?? null)
             .setCoords(parseMove(move))
             .show()
         ;
@@ -58,6 +59,7 @@ export class GameMarksFacade
         this.hideMarks();
 
         this.swappableMark
+            .setPlayerIndex(this.gameView.getStone(move)?.getPlayerIndex() ?? null)
             .setCoords(parseMove(move))
             .show()
         ;
@@ -71,6 +73,7 @@ export class GameMarksFacade
         this.hideMarks();
 
         this.swappedMark
+            .setPlayerIndex(this.gameView.getStone(move)?.getPlayerIndex() ?? null)
             .setCoords(parseMove(move))
             .show()
         ;

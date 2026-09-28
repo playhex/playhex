@@ -4,8 +4,16 @@ export type { GameViewSize } from './GameView.js';
 export { default as Hex } from './Hex.js';
 export { BoardEntity } from './BoardEntity.js';
 export { colorAverage, lighten, darken } from './colorUtils.js';
-export type { Theme } from './BoardTheme.js';
-export { themes } from './BoardTheme.js';
+
+// Theming
+export * from './theming/index.js';
+
+// Themes
+export { playhexTheme } from './themes/playhex/index.js';
+export { gobanTheme } from './themes/goban/index.js';
+export { hexworldTheme } from './themes/hexworld/index.js';
+export { polishNostalgiaTheme } from './themes/polish-nostalgia/index.js';
+export { builtinThemes, getBuiltinTheme } from './builtinThemes.js';
 
 // Entities
 export { default as Anchor44Mark } from './entities/Anchor44Mark.js';

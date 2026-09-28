@@ -664,6 +664,9 @@
         "flat_2": "Flat 2",
         "diamond": "Diamond"
     },
+    "board_theme": {
+        "title": "Board theme"
+    },
     "shading_patterns": {
         "title": "Shading pattern",
         "visibility": "Shading pattern visibility",

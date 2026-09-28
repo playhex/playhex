@@ -5,7 +5,7 @@ import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
 import { GameAnalyzeChart } from '../../game-analyze/GameAnalyzeChart.js';
 import { GameAnalyzeFacade, AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeFacade.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
-import { themes } from '@playhex/pixi-board';
+import { playhexTheme, resolveTheme } from '@playhex/pixi-board';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 
 const props = defineProps({
@@ -39,7 +39,7 @@ onMounted(() => {
 
     const gameAnalyzeChart = new GameAnalyzeChart(
         analyze,
-        themes[usePlayerLocalSettingsStore().displayedTheme()],
+        resolveTheme(playhexTheme, usePlayerLocalSettingsStore().displayedTheme()),
     );
 
     if (gameView.value) {

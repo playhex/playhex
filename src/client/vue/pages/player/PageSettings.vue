@@ -17,7 +17,7 @@ import { MoveSettings } from '../../../../shared/app/models/index.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
-import { GameView } from '@playhex/pixi-board';
+import { builtinThemes, GameView } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import AppPlayerModerationActionList from '../../components/AppPlayerModerationActionList.vue';
 import AppFlagSelector from '../../components/AppFlagSelector.vue';
@@ -128,6 +128,31 @@ onMounted(async () => {
 });
 
 /*
+ * Board theme preview
+ */
+const boardThemeGameView = new GameView(7);
+const boardThemePreview = ref<HTMLElement>();
+
+boardThemeGameView.setStone('c3', 0);
+boardThemeGameView.setStone('e4', 1);
+boardThemeGameView.setStone('d4', 0);
+boardThemeGameView.setStone('d5', 1);
+
+new PlayerSettingsFacade(boardThemeGameView);
+
+onMounted(async () => {
+    if (!boardThemePreview.value) {
+        throw new Error('Missing element with ref="boardThemePreview"');
+    }
+
+    await boardThemeGameView.mount(boardThemePreview.value);
+});
+
+onUnmounted(() => {
+    boardThemeGameView.destroy();
+});
+
+/*
  * Panels
  */
 type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications';
@@ -146,6 +171,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'change-password': 'account',
     'move-settings': 'game',
     'board': 'board',
+    'board-theme': 'board',
     'board-orientation': 'board',
     'shading-pattern': 'board',
     'push-notifications': 'notifications',
@@ -465,6 +491,27 @@ const {
                                 <label class="form-check-label" for="show-board-dots"><IconDot /> {{ $t('show_44_dots') }}</label>
                             </div>
                         </template>
+                    </section>
+
+                    <section id="board-theme">
+                        <h3>{{ $t('board_theme.title') }}</h3>
+
+                        <div class="row" v-if="playerSettings">
+                            <div class="col-md-8">
+                                <select class="form-select" v-model="playerSettings.boardTheme">
+                                    <option
+                                        v-for="theme in builtinThemes"
+                                        :key="theme.metadata.id"
+                                        :value="theme.metadata.id"
+                                    >{{ theme.metadata.name }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h4>{{ $t('preview') }}</h4>
+
+                        <div ref="boardThemePreview" class="board-container">
+                        </div>
                     </section>
 
                     <section id="board-orientation">

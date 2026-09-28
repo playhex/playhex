@@ -1,6 +1,5 @@
-import { Container, Graphics, Ticker } from 'pixi.js';
+import { Container, Ticker } from 'pixi.js';
 import { BoardEntity } from '../BoardEntity.js';
-import Hex from '../Hex.js';
 
 const animationDuration = 50;
 const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
@@ -10,8 +9,7 @@ const animationCurve = Array(animationDuration).fill(0).map((_, i) => {
 });
 
 /**
- * The standard theme Hex stone.
- * A hexagon filling the cell.
+ * A stone, drawn by the theme stone renderer.
  */
 export default class Stone extends BoardEntity
 {
@@ -23,7 +21,6 @@ export default class Stone extends BoardEntity
     ) {
         super();
 
-        this.alwaysFlatTop = true;
         this.listenThemeChange = true;
     }
 
@@ -39,24 +36,22 @@ export default class Stone extends BoardEntity
 
     protected override draw(): Container
     {
-        const g = new Graphics();
+        const { stone, colors } = this.theme;
+        const orientation = stone.orientation ?? 'free';
 
-        g.regularPoly(0, 0, Hex.INNER_RADIUS, 6);
+        this.alwaysTop = orientation === 'upright';
+        this.alwaysFlatTop = orientation === 'flatTop';
 
-        g.fill({
-            color: this.playerIndex === 0
-                ? this.theme.colorA
-                : this.theme.colorB
-            ,
-            alpha: this.faded
-                ? 0.5
-                : 1
-            ,
+        const container = stone.draw({
+            playerIndex: this.playerIndex,
+            colors,
         });
 
-        g.rotation = Math.PI / 6;
+        if (this.faded) {
+            container.alpha = 0.5;
+        }
 
-        return g;
+        return container;
     }
 
     private clearAnimationLoop(): void
