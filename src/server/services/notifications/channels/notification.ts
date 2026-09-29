@@ -266,12 +266,13 @@ notifier.on('ladderLiveProposal', async challenge => {
 /**
  * Warns player they timed out a ladder game.
  */
-notifier.on('ladderStrike', async (player, strikes, removed) => {
+notifier.on('ladderStrike', async (player, strikes, removed, beforeFirstGame) => {
     const playerNotification = createPlayerNotification(
         'ladderStrike',
         {
             strikes,
             removed,
+            beforeFirstGame,
         },
         player,
         null,

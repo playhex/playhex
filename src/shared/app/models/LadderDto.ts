@@ -97,6 +97,13 @@ export class LadderPlayerStatusDto
     @Expose()
     @Type(() => LadderChallenge)
     runningChallenges: LadderChallenge[];
+
+    /**
+     * Player last ended challenges, most recent first
+     */
+    @Expose()
+    @Type(() => LadderChallenge)
+    lastChallenges: LadderChallenge[];
 }
 
 /**

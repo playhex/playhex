@@ -4,6 +4,7 @@ import { Inject, Service } from 'typedi';
 import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepository.js';
 import { languagesCodesISO6391 } from '../../shared/app/codes.js';
 import TournamentStore from '../store/TournamentStore.js';
+import LadderRepository from '../ladder/LadderRepository.js';
 import { CHANNEL_LAST_MESSAGES_COUNT, CHANNEL_OLDER_MESSAGES_PAGE_SIZE } from '../../shared/app/channelUtils.js';
 
 export class ChannelNotFoundError extends Error {}
@@ -14,6 +15,7 @@ export class ChannelsService
     constructor(
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private tournamentStore: TournamentStore,
+        private ladderRepository: LadderRepository,
 
         @Inject('Repository<Channel>')
         private channelRepository: Repository<Channel>,
@@ -103,6 +105,13 @@ export class ChannelsService
             const slug = tournament[1];
 
             return await this.tournamentStore.slugExists(slug);
+        }
+
+        // Allow King of the Hill channels "kotl-[slug]"
+        const ladder = channelName.match(/^kotl-(.*)$/);
+
+        if (ladder) {
+            return await this.ladderRepository.findLadderBySlug(ladder[1]) !== null;
         }
 
         return false;

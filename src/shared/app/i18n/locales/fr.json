@@ -1125,6 +1125,7 @@
             "leave": "{{player}} a quitté le Roi de la colline depuis la place n°{{position}}",
             "removed_inactive": "{{player}} a été retiré de la place n°{{position}} pour inactivité",
             "removed_strikes": "{{player}} a été retiré de la place n°{{position}} après {{strikes}} dépassements de temps",
+            "removed_strikes_before_first_game": "{{player}} a été retiré de la place n°{{position}} après un dépassement de temps sans avoir terminé aucune partie",
             "challenge_won": "{{player}} a battu {{opponent}} et passe de la place n°{{from}} à la place n°{{position}}",
             "challenge_won_no_move": "{{player}} a battu {{opponent}}",
             "challenge_defended": "{{opponent}} a défendu sa place contre {{player}}",
@@ -1170,6 +1171,7 @@
             "live_proposal": "{{player}} vous a défié au Roi de la colline et propose de jouer en direct.",
             "strike": "Vous avez perdu au temps une partie du Roi de la colline (avertissement {{strikes}}).",
             "strike_removed": "Vous avez perdu au temps une partie du Roi de la colline et avez été retiré après {{strikes}} avertissements.",
+            "strike_removed_before_first_game": "Vous avez perdu au temps une partie du Roi de la colline sans avoir terminé aucune partie auparavant, et avez été retiré.",
             "removed_inactive": "Vous avez été retiré du Roi de la colline après 60 jours sans partie."
         },
         "account_age_one": "Votre compte a {{count}} jour.",
@@ -1202,6 +1204,13 @@
         "slot_win_seat": "victoire : n°{{position}}",
         "slot_win_streak": "victoire : série",
         "slot_lose_streak": "défaite : série",
-        "slot_lose_seat": "défaite : place −1"
+        "slot_lose_seat": "défaite : place −1",
+        "last_games": "Dernières parties",
+        "no_last_games": "Aucune partie jouée pour l'instant.",
+        "game_outcome": {
+            "won": "Gagnée",
+            "lost": "Perdue",
+            "voided": "Annulée"
+        }
     }
 }

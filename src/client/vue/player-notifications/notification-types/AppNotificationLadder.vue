@@ -19,7 +19,11 @@ const text = computed((): string => {
         case 'ladderChallenge': return t('ladder.notification.challenge', parameters as PlayerNotification<'ladderChallenge'>['parameters']);
         case 'ladderLiveProposal': return t('ladder.notification.live_proposal', parameters as PlayerNotification<'ladderLiveProposal'>['parameters']);
         case 'ladderStrike': {
-            const { strikes, removed } = parameters as PlayerNotification<'ladderStrike'>['parameters'];
+            const { strikes, removed, beforeFirstGame } = parameters as PlayerNotification<'ladderStrike'>['parameters'];
+
+            if (removed && beforeFirstGame) {
+                return t('ladder.notification.strike_removed_before_first_game');
+            }
 
             return t(removed ? 'ladder.notification.strike_removed' : 'ladder.notification.strike', { strikes });
         }

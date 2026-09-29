@@ -8,7 +8,8 @@ import AppPseudo from '../../components/AppPseudo.vue';
 import AppLadderSlots from './AppLadderSlots.vue';
 import AppLadderTitles from './AppLadderTitles.vue';
 import AppLadderPlayerStats from './AppLadderPlayerStats.vue';
-import { IconExclamationTriangleFill } from '../../icons.js';
+import AppLadderLastChallenges from './AppLadderLastChallenges.vue';
+import { IconExclamationTriangleFill, IconShieldFill, IconSword } from '../../icons.js';
 
 const { visible, confirm } = useDisclosure();
 
@@ -67,16 +68,20 @@ const incomingChallenges = computed((): LadderChallenge[] => status.value
                             </div>
 
                             <template v-if="status.ladderPlayer.state === 'active'">
-                                <h6>{{ $t('ladder.outgoing_slots', { used: status.outgoingUsed, total: status.outgoingTotal }) }}</h6>
+                                <h6><IconSword /> {{ $t('ladder.outgoing_slots', { used: status.outgoingUsed, total: status.outgoingTotal }) }}</h6>
                                 <AppLadderSlots :player :challenges="outgoingChallenges" :total="status.outgoingTotal" :seatsIfWon="status.seatsIfWon" />
 
-                                <h6>{{ $t('ladder.incoming_slots', { used: status.incomingUsed, total: status.incomingTotal }) }}</h6>
+                                <h6><IconShieldFill /> {{ $t('ladder.incoming_slots', { used: status.incomingUsed, total: status.incomingTotal }) }}</h6>
                                 <AppLadderSlots :player :challenges="incomingChallenges" :total="status.incomingTotal" :seatsIfWon="status.seatsIfWon" />
                             </template>
 
                             <hr>
                             <h6>{{ $t('ladder.stats.title_player') }}</h6>
                             <AppLadderPlayerStats :ladderPlayer="status.ladderPlayer" :strikes="status.strikes" :runningChallengesCount="status.runningChallenges.length" />
+
+                            <hr>
+                            <h6>{{ $t('ladder.last_games') }}</h6>
+                            <AppLadderLastChallenges :player :challenges="status.lastChallenges" />
                         </template>
                     </div>
                     <div class="modal-footer">

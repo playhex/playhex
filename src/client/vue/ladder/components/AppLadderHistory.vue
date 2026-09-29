@@ -91,7 +91,9 @@ const eventText = (event: LadderEvent): string => {
         case 'join': return t('ladder.event.join', { player, position: p.position });
         case 'leave': return t('ladder.event.leave', { player, position: p.position });
         case 'removed_inactive': return t('ladder.event.removed_inactive', { player, position: p.position });
-        case 'removed_strikes': return t('ladder.event.removed_strikes', { player, strikes: p.strikes, position: p.position });
+        case 'removed_strikes': return p.beforeFirstGame
+            ? t('ladder.event.removed_strikes_before_first_game', { player, position: p.position })
+            : t('ladder.event.removed_strikes', { player, strikes: p.strikes, position: p.position });
         case 'new_king': return t('ladder.event.new_king', { player });
         case 'giant_slayer': return t('ladder.event.giant_slayer', { player, opponent });
         case 'climber': return t('ladder.event.climber', { player, wins: p.wins });

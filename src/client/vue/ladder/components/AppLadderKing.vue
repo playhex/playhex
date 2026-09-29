@@ -3,6 +3,7 @@ import { PropType } from 'vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { LadderReign } from '../../../../shared/app/models/index.js';
 import AppPseudo from '../../components/AppPseudo.vue';
+import AppPlayerAvatar from '../../components/AppPlayerAvatar.vue';
 import { IconCrown } from '../../icons.js';
 
 defineProps({
@@ -16,7 +17,11 @@ defineProps({
 <template>
     <div class="card border-warning mb-3">
         <div class="card-body d-flex align-items-center gap-3">
-            <IconCrown class="text-warning fs-1" />
+            <div v-if="currentReign?.player.avatarPath" class="king-avatar">
+                <AppPlayerAvatar :player="currentReign.player" />
+                <IconCrown class="king-avatar-crown text-warning" />
+            </div>
+            <IconCrown v-else class="text-warning fs-1" />
 
             <div v-if="currentReign">
                 <small class="text-secondary">{{ $t('ladder.king') }}</small>
@@ -31,3 +36,24 @@ defineProps({
         </div>
     </div>
 </template>
+
+<style lang="stylus" scoped>
+.king-avatar
+    position relative
+    flex-shrink 0
+    font-size 4rem
+    line-height 1
+    padding-top 0.42em // room for the crown
+
+    :deep(.player-avatar)
+        display block
+        width 1em
+        height 0.866em
+
+.king-avatar-crown
+    position absolute
+    top 0
+    left 50%
+    transform translateX(-50%)
+    font-size 0.55em
+</style>

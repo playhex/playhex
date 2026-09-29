@@ -11,7 +11,8 @@ import AppLadderStandings from '../components/AppLadderStandings.vue';
 import AppLadderRunningChallenges from '../components/AppLadderRunningChallenges.vue';
 import AppLadderHistory from '../components/AppLadderHistory.vue';
 import AppLadderHallOfFame from '../components/AppLadderHallOfFame.vue';
-import { IconClockHistory, IconCrown, IconInfoCircle, IconListOl, IconTablerSwords, IconTrophyFill } from '../../icons.js';
+import AppChannel from '../../components/AppChannel.vue';
+import { IconChatRightText, IconClockHistory, IconCrown, IconInfoCircle, IconListOl, IconTablerSwords, IconTrophyFill } from '../../icons.js';
 
 useHead({
     title: t('ladder.title'),
@@ -20,7 +21,7 @@ useHead({
 const { slug, ladderDto, me, reload } = useLadderFromUrl();
 const { challenge } = useLadderChallenge();
 
-type Tab = 'standings' | 'running_games' | 'hall_of_fame' | 'history';
+type Tab = 'standings' | 'running_games' | 'hall_of_fame' | 'history' | 'chat';
 
 const tab = ref<Tab>('standings');
 
@@ -59,6 +60,9 @@ const onChallenge = async (defender: Player): Promise<void> => {
                     <li class="nav-item d-flex">
                         <a href="#" class="nav-link" :class="{ active: tab === 'history' }" @click.prevent="tab = 'history'"><IconClockHistory /> {{ $t('ladder.history') }}</a>
                     </li>
+                    <li class="nav-item d-flex">
+                        <a href="#" class="nav-link" :class="{ active: tab === 'chat' }" @click.prevent="tab = 'chat'"><IconChatRightText /> {{ $t('chat') }}</a>
+                    </li>
                 </ul>
 
                 <AppLadderStandings
@@ -76,6 +80,8 @@ const onChallenge = async (defender: Player): Promise<void> => {
                 <AppLadderHallOfFame v-else-if="tab === 'hall_of_fame'" :slug />
 
                 <AppLadderHistory v-else-if="tab === 'history'" :slug />
+
+                <AppChannel v-else-if="tab === 'chat'" :channels="'kotl-' + ladderDto.ladder.slug" />
             </div>
 
             <div class="col-12 col-lg-4 order-1 order-lg-2">

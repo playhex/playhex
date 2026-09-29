@@ -1112,6 +1112,7 @@
             "leave": "{{player}} left King of the Hill from seat #{{position}}",
             "removed_inactive": "{{player}} was removed for inactivity from seat #{{position}}",
             "removed_strikes": "{{player}} was removed from seat #{{position}} after {{strikes}} timeouts",
+            "removed_strikes_before_first_game": "{{player}} was removed from seat #{{position}} after timing out before finishing any game",
             "challenge_won": "{{player}} beat {{opponent}} and moved from #{{from}} to #{{position}}",
             "challenge_won_no_move": "{{player}} beat {{opponent}}",
             "challenge_defended": "{{opponent}} defended their seat against {{player}}",
@@ -1157,6 +1158,7 @@
             "live_proposal": "{{player}} challenged you on King of the Hill and proposes to play live.",
             "strike": "You timed out a King of the Hill game (strike {{strikes}}).",
             "strike_removed": "You timed out a King of the Hill game and have been removed after {{strikes}} strikes.",
+            "strike_removed_before_first_game": "You timed out a King of the Hill game before finishing any game, and have been removed.",
             "removed_inactive": "You have been removed from King of the Hill after 60 days without a game."
         },
         "account_age_one": "Your account is {{count}} day old.",
@@ -1189,6 +1191,13 @@
         "slot_win_seat": "win: #{{position}}",
         "slot_win_streak": "win: streak",
         "slot_lose_streak": "lose: streak",
-        "slot_lose_seat": "lose: seat −1"
+        "slot_lose_seat": "lose: seat −1",
+        "last_games": "Last games",
+        "no_last_games": "No game played yet.",
+        "game_outcome": {
+            "won": "Won",
+            "lost": "Lost",
+            "voided": "Canceled"
+        }
     }
 }

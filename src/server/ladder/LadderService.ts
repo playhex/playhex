@@ -40,6 +40,11 @@ import { errorToLogger } from '../../shared/app/utils.js';
 const HALL_OF_FAME_SIZE = 10;
 
 /**
+ * Number of last ended challenges displayed in a player status.
+ */
+const LAST_CHALLENGES_COUNT = 5;
+
+/**
  * Used to save only ladder players modified by rules.
  */
 const snapshotPlayers = (players: LadderPlayer[]): Map<LadderPlayer, string> => {
@@ -227,9 +232,13 @@ export default class LadderService
     ): Promise<void> {
         const ladderSize = players.filter(p => p.state === 'active').length;
         const playersById = new Map(players.map(p => [p.playerId, p]));
-        const strikeDates = await this.ladderRepository.findStrikeDates(ladder.id, [playerId], new Date(now.getTime() - this.config.strikesWindowMs));
+        const [strikeDates, lastChallenges] = await Promise.all([
+            this.ladderRepository.findStrikeDates(ladder.id, [playerId], new Date(now.getTime() - this.config.strikesWindowMs)),
+            this.ladderRepository.findLastEndedChallenges(ladder.id, playerId, LAST_CHALLENGES_COUNT),
+        ]);
 
         dto.ladderPlayer = ladderPlayer;
+        dto.lastChallenges = lastChallenges;
         dto.strikes = strikeDates[playerId]?.length ?? 0;
         dto.runningChallenges = runningChallenges.filter(c => c.challengerId === playerId || c.defenderId === playerId);
         dto.outgoingUsed = countOutgoingChallenges(playerId, challenges);
@@ -667,7 +676,7 @@ export default class LadderService
             }
 
             if (report.removedForStrikesPlayerId !== null && struckPlayer !== null) {
-                toSave.push(this.createEvent(ladder, 'removed_strikes', struckPlayer.player, null, current, { strikes: report.strikesCount, position: struckPlayer.leftPosition }, now));
+                toSave.push(this.createEvent(ladder, 'removed_strikes', struckPlayer.player, null, current, { strikes: report.strikesCount, position: struckPlayer.leftPosition, beforeFirstGame: report.removedBeforeFirstGame }, now));
             }
 
             toSave.push(...await this.syncReign(ladder, kingBefore, players, now, currentReign));
@@ -675,7 +684,7 @@ export default class LadderService
             await this.ladderRepository.saveAll(toSave);
 
             if (struckPlayer !== null) {
-                notifier.emit('ladderStrike', struckPlayer.player, report.strikesCount, report.removedForStrikesPlayerId !== null);
+                notifier.emit('ladderStrike', struckPlayer.player, report.strikesCount, report.removedForStrikesPlayerId !== null, report.removedBeforeFirstGame);
             }
         });
     }

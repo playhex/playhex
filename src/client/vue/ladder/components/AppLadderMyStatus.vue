@@ -12,8 +12,9 @@ import useAuthStore from '../../../stores/authStore.js';
 import ConfirmationOverlay from '../../components/overlay/ConfirmationOverlay.vue';
 import AppLadderSlots from './AppLadderSlots.vue';
 import AppLadderPlayerStats from './AppLadderPlayerStats.vue';
+import AppLadderLastChallenges from './AppLadderLastChallenges.vue';
 import AppLadderTitles from './AppLadderTitles.vue';
-import { IconExclamationTriangleFill } from '../../icons.js';
+import { IconExclamationTriangleFill, IconShieldFill, IconSword } from '../../icons.js';
 import { useRouter } from 'vue-router';
 
 const props = defineProps({
@@ -141,7 +142,7 @@ const answerLive = async (challenge: LadderChallenge, accept: boolean) => {
                     </div>
 
                     <!-- Outgoing slots -->
-                    <h6>{{ $t('ladder.outgoing_slots', { used: me.outgoingUsed, total: me.outgoingTotal }) }}</h6>
+                    <h6><IconSword /> {{ $t('ladder.outgoing_slots', { used: me.outgoingUsed, total: me.outgoingTotal }) }}</h6>
                     <p v-if="position === 1 && myOutgoingChallenges.length === 0" class="small text-secondary">{{ $t('ladder.nobody_to_challenge') }}</p>
                     <AppLadderSlots v-else :player="me.ladderPlayer.player" :challenges="myOutgoingChallenges" :total="me.outgoingTotal" :seatsIfWon="me.seatsIfWon" />
 
@@ -162,13 +163,17 @@ const answerLive = async (challenge: LadderChallenge, accept: boolean) => {
                         </div>
                     </div>
 
-                    <h6>{{ $t('ladder.incoming_slots', { used: me.incomingUsed, total: me.incomingTotal }) }}</h6>
+                    <h6><IconShieldFill /> {{ $t('ladder.incoming_slots', { used: me.incomingUsed, total: me.incomingTotal }) }}</h6>
                     <AppLadderSlots :player="me.ladderPlayer.player" :challenges="myIncomingChallenges" :total="me.incomingTotal" :seatsIfWon="me.seatsIfWon" :loading @answerLive="answerLive" />
 
                     <!-- My stats -->
                     <hr>
                     <h6>{{ $t('ladder.stats.title') }}</h6>
                     <AppLadderPlayerStats :ladderPlayer="me.ladderPlayer" :strikes="me.strikes" :runningChallengesCount="me.runningChallenges.length" />
+
+                    <hr>
+                    <h6>{{ $t('ladder.last_games') }}</h6>
+                    <AppLadderLastChallenges :player="me.ladderPlayer.player" :challenges="me.lastChallenges" />
                 </template>
 
                 <template v-if="isMember">

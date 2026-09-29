@@ -77,7 +77,7 @@ type NotifiableEvents = {
      * @param strikes Number of strikes in the current window, including this one
      * @param removed Whether player has been removed from ladder because of too many strikes
      */
-    ladderStrike: (player: Player, strikes: number, removed: boolean) => void;
+    ladderStrike: (player: Player, strikes: number, removed: boolean, beforeFirstGame: boolean) => void;
 
     /**
      * A player has been removed from a ladder because of inactivity.

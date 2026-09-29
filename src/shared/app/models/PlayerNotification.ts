@@ -99,6 +99,12 @@ type PlayerNotificationTypes = {
          * Whether I have been removed from the ladder
          */
         removed: boolean;
+
+        /**
+         * Whether I have been removed on my first strike because I never ended a game since I joined.
+         * Optional for older notifications.
+         */
+        beforeFirstGame?: boolean;
     };
 
     /**

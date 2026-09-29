@@ -487,6 +487,7 @@ describe('ladderRules', () => {
 
         it('voided with strike, removed on second strike', () => {
             const players = createLadder(5);
+            players[2].lastGameEndedAt = ago(10 * DAY);
 
             const report = endChallenge({
                 players,
@@ -504,6 +505,49 @@ describe('ladderRules', () => {
             assert.strictEqual(report.removedForStrikesPlayerId, 3);
             assert.deepStrictEqual(players.map(p => p.position), [1, 2, null, 3, 4]);
             assert.strictEqual(players[2].state, 'removed_strikes');
+            assert.strictEqual(report.removedBeforeFirstGame, false);
+        });
+
+        it('first strike is only a warning when player already ended a game', () => {
+            const players = createLadder(5);
+            players[4].lastGameEndedAt = ago(DAY);
+
+            const report = endChallenge({
+                players,
+                challenger: players[4],
+                defender: players[2],
+                gameEnd: { type: 'ended', winnerPlayerId: 3, outcome: 'time' },
+                kingReignDefenses: 0,
+                previousStrikes: {},
+                now,
+            });
+
+            assert.strictEqual(report.strikePlayerId, 5);
+            assert.strictEqual(report.strikesCount, 1);
+            assert.strictEqual(report.removedForStrikesPlayerId, null);
+            assert.strictEqual(report.removedBeforeFirstGame, false);
+            assert.strictEqual(players[4].state, 'active');
+        });
+
+        it('first strike removes player who never ended a game since joining', () => {
+            const players = createLadder(5);
+
+            const report = endChallenge({
+                players,
+                challenger: players[4],
+                defender: players[2],
+                gameEnd: { type: 'ended', winnerPlayerId: 3, outcome: 'time' },
+                kingReignDefenses: 0,
+                previousStrikes: {},
+                now,
+            });
+
+            assert.strictEqual(report.strikePlayerId, 5);
+            assert.strictEqual(report.strikesCount, 1);
+            assert.strictEqual(report.removedForStrikesPlayerId, 5);
+            assert.strictEqual(report.removedBeforeFirstGame, true);
+            assert.strictEqual(players[4].state, 'removed_strikes');
+            assert.deepStrictEqual(players.map(p => p.position), [1, 2, 3, 4, null]);
         });
     });
 

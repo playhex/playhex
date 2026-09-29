@@ -139,6 +139,7 @@ const minutes = (ms: number): number => Math.round(ms / MINUTE);
             <li>A game canceled because a player did not play their first move gives no result, but that player gets a strike.</li>
             <li>A game canceled by a moderator gives no result and no strike.</li>
             <li><strong>{{ config.strikesToRemove }} strikes in {{ days(config.strikesWindowMs) }} days</strong>: you are removed, and can rejoin at the bottom after {{ days(config.rejoinAfterStrikesMs) }} days.</li>
+            <li><strong>A strike before finishing any game</strong> since you joined: you are removed right away, without warning, and can rejoin at the bottom after {{ days(config.rejoinAfterStrikesMs) }} days.</li>
             <li>Resigning never gives a strike.</li>
         </ul>
 
@@ -146,7 +147,7 @@ const minutes = (ms: number): number => Math.round(ms / MINUTE);
         <p>A player leaves the ladder in three cases:</p>
         <ul>
             <li><strong>Leaving:</strong> you can leave at any time, and rejoin at the bottom after {{ days(config.rejoinAfterLeaveMs) }} days.</li>
-            <li><strong>{{ config.strikesToRemove }} strikes in {{ days(config.strikesWindowMs) }} days:</strong> you are removed, and can rejoin at the bottom after {{ days(config.rejoinAfterStrikesMs) }} days.</li>
+            <li><strong>{{ config.strikesToRemove }} strikes in {{ days(config.strikesWindowMs) }} days</strong>, or <strong>a strike before finishing any game:</strong> you are removed, and can rejoin at the bottom after {{ days(config.rejoinAfterStrikesMs) }} days.</li>
             <li>
                 <strong>No game for {{ days(config.inactivityMs) }} days:</strong> you are removed, and can rejoin at the bottom whenever you want.
                 The {{ days(config.inactivityMs) }} days count from the end of your last game, even a canceled one, or from when you joined if you never played.

@@ -30,6 +30,11 @@ export interface LadderRepositoryInterface
      */
     findRecentChallenges(ladderId: number, since: Date): Promise<LadderChallenge[]>;
 
+    /**
+     * Last ended challenges of a player, as challenger or defender, most recent first, with players and game.
+     */
+    findLastEndedChallenges(ladderId: number, playerId: number, take: number): Promise<LadderChallenge[]>;
+
     findChallengeByPublicId(publicId: string): Promise<null | LadderChallenge>;
     findChallengeByGamePublicId(gamePublicId: string): Promise<null | LadderChallenge>;
 
@@ -135,6 +140,19 @@ export default class LadderRepository implements LadderRepositoryInterface
                 { ladderId, state: In(['pending_live', 'playing']) },
                 { ladderId, state: 'ended', endedAt: MoreThanOrEqual(since) },
             ],
+        });
+    }
+
+    async findLastEndedChallenges(ladderId: number, playerId: number, take: number): Promise<LadderChallenge[]>
+    {
+        return await this.ladderChallengeRepository.find({
+            relations: this.challengeRelations,
+            where: [
+                { ladderId, state: 'ended', challengerId: playerId },
+                { ladderId, state: 'ended', defenderId: playerId },
+            ],
+            order: { endedAt: 'desc' },
+            take,
         });
     }
 

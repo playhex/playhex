@@ -25,6 +25,14 @@ class InMemoryLadderRepository implements LadderRepositoryInterface
     async findPlayers() { return this.players; }
     async findRunningChallenges() { return this.challenges.filter(c => c.state !== 'ended'); }
     async findRecentChallenges() { return this.challenges; }
+    async findLastEndedChallenges(_: number, playerId: number, take: number)
+    {
+        return this.challenges
+            .filter(c => c.state === 'ended' && (c.challengerId === playerId || c.defenderId === playerId))
+            .sort((a, b) => b.endedAt!.getTime() - a.endedAt!.getTime())
+            .slice(0, take)
+        ;
+    }
     async findChallengeByPublicId(publicId: string) { return this.challenges.find(c => c.publicId === publicId) ?? null; }
     async findChallengeByGamePublicId(publicId: string) { return this.challenges.find(c => c.game?.publicId === publicId) ?? null; }
     async findPlayingChallengesWithEndedGame() { return []; }
@@ -219,6 +227,9 @@ describe('LadderService', () => {
             await service.onGameOver(game);
         };
 
+        // Player 3 already ended a game, else first strike would remove him
+        repository.players[2].lastGameEndedAt = new Date(Date.now() - 30 * 86400 * 1000);
+
         await service.challenge(ladder, players[3], players[2].publicId, 13, null);
         await cancel(gameCreator.games[0], 1);
 
@@ -232,6 +243,17 @@ describe('LadderService', () => {
 
         assert.deepStrictEqual(positions(), [1, 2, null, 3]);
         assert.strictEqual(repository.players[2].state, 'removed_strikes');
+    });
+
+    it('timeout before finishing any game: removed on first strike', async () => {
+        const { service, ladder, players, positions, gameCreator, repository, endGame } = await setup(4);
+
+        await service.challenge(ladder, players[3], players[2].publicId, 13, null);
+        await endGame(gameCreator.games[0], 1, 'time');
+
+        assert.deepStrictEqual(positions(), [1, 2, 3, null]);
+        assert.strictEqual(repository.players[3].state, 'removed_strikes');
+        assert.strictEqual(repository.events.find(e => e.type === 'removed_strikes')?.parameters.beforeFirstGame, true);
     });
 
     it('live proposal: no game until answered', async () => {

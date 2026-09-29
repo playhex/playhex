@@ -965,6 +965,9 @@ export type LadderChallengeEndReport = {
     /** Player removed because of strikes, if any */
     removedForStrikesPlayerId: null | number;
 
+    /** Player removed on their first strike because they never ended a game since they joined */
+    removedBeforeFirstGame: boolean;
+
     challengerPositionBefore: null | number;
     defenderPositionBefore: null | number;
     challengerPositionAfter: null | number;
@@ -1006,6 +1009,10 @@ export const endChallenge = ({
 
     applyChallengeResult(players, challenger, defender, result);
 
+    // lastGameEndedAt is reset when joining the ladder
+    const endedAGameBefore = strikePlayerId !== null
+        && (strikePlayerId === challenger.playerId ? challenger : defender).lastGameEndedAt !== null;
+
     challenger.lastGameEndedAt = now;
     defender.lastGameEndedAt = now;
 
@@ -1042,6 +1049,7 @@ export const endChallenge = ({
 
     let strikesCount = 0;
     let removedForStrikesPlayerId: null | number = null;
+    let removedBeforeFirstGame = false;
 
     if (strikePlayerId !== null) {
         const strikeDates = [...(previousStrikes[strikePlayerId] ?? []), now];
@@ -1049,9 +1057,10 @@ export const endChallenge = ({
 
         strikesCount = strikeDates.filter(date => now.getTime() - date.getTime() <= config.strikesWindowMs).length;
 
-        if (struckPlayer.state === 'active' && shouldRemoveForStrikes(strikeDates, now, config)) {
+        if (struckPlayer.state === 'active' && (!endedAGameBefore || shouldRemoveForStrikes(strikeDates, now, config))) {
             removeFromLadder(players, struckPlayer, 'removed_strikes', now, config);
             removedForStrikesPlayerId = strikePlayerId;
+            removedBeforeFirstGame = !endedAGameBefore;
         }
     }
 
@@ -1060,6 +1069,7 @@ export const endChallenge = ({
         strikePlayerId,
         strikesCount,
         removedForStrikesPlayerId,
+        removedBeforeFirstGame,
         challengerPositionBefore,
         defenderPositionBefore,
         challengerPositionAfter: challenger.position,
