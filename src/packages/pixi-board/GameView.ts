@@ -328,10 +328,14 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.pixi = new Application();
 
+        const resolution = ceil(window.devicePixelRatio); // passing devicePixelRatio * 2 here, and no longer need to double resolution of PIXI.Text
+
         await this.pixi.init({
-            antialias: true,
+            // Antialias is useless on high density screens, already rendered at higher resolution.
+            // Also, resizing antialiased canvas froze GPU on some mobiles (Adreno 506), i.e when going fullscreen in landscape.
+            antialias: resolution < 2,
             backgroundAlpha: 0,
-            resolution: ceil(window.devicePixelRatio), // passing devicePixelRatio * 2 here, and no longer need to double resolution of PIXI.Text
+            resolution,
             autoDensity: true,
             resizeTo: element,
             eventMode: this.gameViewOptions.interactive ? 'passive' : 'none',
