@@ -33,6 +33,51 @@ const useSocketStore = defineStore('socketStore', () => {
 
     const connected = ref(false);
 
+    /**
+     * How many subscribers currently need each room.
+     */
+    const roomSubscribersCount = new Map<string, number>();
+
+    /**
+     * Join a room, and stay in it until returned unsubscribe function is called.
+     * Can be called many times for a same room: room is left only when all subscribers unsubscribed.
+     * Room is joined again after a reconnection.
+     *
+     * In a component, prefer `useSocketRoom()`, which unsubscribes on unmount.
+     */
+    const subscribeRoom = (room: string): () => void => {
+        const count = roomSubscribersCount.get(room) ?? 0;
+
+        roomSubscribersCount.set(room, count + 1);
+
+        if (count === 0 && connected.value) {
+            void joinRoom(room);
+        }
+
+        let unsubscribed = false;
+
+        return () => {
+            if (unsubscribed) {
+                return;
+            }
+
+            unsubscribed = true;
+
+            const count = roomSubscribersCount.get(room) ?? 0;
+
+            if (count > 1) {
+                roomSubscribersCount.set(room, count - 1);
+                return;
+            }
+
+            roomSubscribersCount.delete(room);
+
+            if (connected.value) {
+                leaveRoom(room);
+            }
+        };
+    };
+
     /*
      * Reconnect socket when logged in player changed
      */
@@ -54,6 +99,10 @@ const useSocketStore = defineStore('socketStore', () => {
 
     socket.on('connect', () => {
         connected.value = true;
+
+        for (const room of roomSubscribersCount.keys()) {
+            void joinRoom(room);
+        }
     });
 
     socket.on('disconnect', () => {
@@ -79,6 +128,7 @@ const useSocketStore = defineStore('socketStore', () => {
         connected,
         joinRoom,
         leaveRoom,
+        subscribeRoom,
         reconnectSocket,
         handleMessageError,
     };

@@ -4,6 +4,7 @@ import { PropType } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppOnlineStatus from './AppOnlineStatus.vue';
 import AppPlayerRating from './AppPlayerRating.vue';
+import { PlayerOnlineStatus } from '../../../shared/app/Types.js';
 
 defineProps({
     player: {
@@ -24,10 +25,11 @@ defineProps({
     },
 
     /**
-     * Whether to display a green/grey circle on username to show player presence/absence
+     * Whether to display a green/grey circle on username to show player presence/absence.
+     * Pass a status to display it directly, instead of watching player status.
      */
     onlineStatus: {
-        type: Boolean,
+        type: [Boolean, String] as PropType<boolean | PlayerOnlineStatus>,
         default: false,
     },
 
@@ -65,7 +67,7 @@ defineProps({
     >
         <span class="nick-group">
             <span v-if="onlineStatus" class="status-icon">
-                <AppOnlineStatus :player="player" />
+                <AppOnlineStatus :player="player" :status="typeof onlineStatus === 'string' ? onlineStatus : null" />
             </span>
 
             <component :is="is" :class="classes" class="nick">

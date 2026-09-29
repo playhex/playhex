@@ -1,26 +1,25 @@
 import { defineStore } from 'pinia';
-import { ref, watch, watchEffect } from 'vue';
+import { ref, watch } from 'vue';
 import useSocketStore from './socketStore.js';
 import useAuthStore from './authStore.js';
 import { OnlinePlayer } from '../../shared/app/models/index.js';
-import Rooms from '../../shared/app/Rooms.js';
 
 /**
- * Online players store.
+ * Online players list and count.
  *
- * Automatically joins the lightweight `lobbyActiveCount` room,
- * which only provides the count of active (non-idle) players.
+ * Only updated while in the related rooms,
+ * pages join them with `useSocketRoom()`:
+ * - `Rooms.onlinePlayers` for `players` and `totalPlayers`
+ * - `Rooms.onlinePlayersCount` for `activePlayersCount`
  *
- * Call `subscribeFullList()` to also join the `onlinePlayers` room
- * and receive the full player list (used by the online players page).
+ * For a single player status, see `playerOnlineStatusStore`.
  */
 const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
 
-    const socketStore = useSocketStore();
-    const { socket, joinRoom } = socketStore;
+    const { socket } = useSocketStore();
 
     /**
-     * List of connected players. Only populated after `subscribeFullList()` is called.
+     * List of connected players. Only populated while in `Rooms.onlinePlayers`.
      */
     const players = ref<{ [key: string]: OnlinePlayer }>({});
 
@@ -31,7 +30,7 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
 
     /**
      * Count of currently active (non-idle) players.
-     * Populated as soon as the store is initialized (auto-joins lobbyActiveCount room).
+     * Only populated while in `Rooms.onlinePlayersCount`.
      */
     const activePlayersCount = ref<null | number>(null);
 
@@ -76,9 +75,6 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         activePlayersCount.value = active;
     });
 
-    const isPlayerOnline = (playerId: string): boolean => playerId in players.value;
-    const isPlayerActive = (playerId: string): boolean => players.value[playerId]?.active ?? false;
-
     /*
      * Explicitely display my player disconnection
      * because I can't receive event as socket just disconnected
@@ -96,45 +92,10 @@ const useOnlinePlayersStore = defineStore('onlinePlayersStore', () => {
         },
     );
 
-    // Auto-join lightweight room for active count
-    watchEffect(async () => {
-        if (socketStore.connected) {
-            await joinRoom(Rooms.onlinePlayersCount);
-        }
-    });
-
-    let subscribedFullList = false;
-
-    /**
-     * Subscribe to the full online players list.
-     * Should be called by pages/components that need to display all players.
-     * Idempotent: safe to call multiple times.
-     */
-    const subscribeFullList = () => {
-        if (subscribedFullList) {
-            return;
-        }
-
-        subscribedFullList = true;
-
-        watchEffect(async () => {
-            if (socketStore.connected) {
-                await joinRoom(Rooms.onlinePlayers);
-            }
-        });
-    };
-
-    // Still need to get full list of active/inactive players to display the green circle or moon next to players.
-    // TODO refacto to remove this line, and instead make a websocket room for every player to receive online status.
-    subscribeFullList();
-
     return {
         players,
         totalPlayers,
         activePlayersCount,
-        isPlayerOnline,
-        isPlayerActive,
-        subscribeFullList,
     };
 });
 

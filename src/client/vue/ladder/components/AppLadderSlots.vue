@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { LadderChallenge, Player } from '../../../../shared/app/models/index.js';
 import useAuthStore from '../../../stores/authStore.js';
 import useMyGamesStore, { CurrentGame } from '../../../stores/myGamesStore.js';
-import useOnlinePlayersStore from '../../../stores/onlinePlayersStore.js';
+import { usePlayersOnlineStatus } from '../../../stores/playerOnlineStatusStore.js';
 import { getMyIndex } from '../../../services/context-utils.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppChrono from '../../components/AppChrono.vue';
@@ -57,7 +57,7 @@ const emit = defineEmits<{
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 const { myGames } = storeToRefs(useMyGamesStore());
-const onlinePlayersStore = useOnlinePlayersStore();
+const playerOnlineStatusStore = usePlayersOnlineStatus(() => props.challenges.map(challenge => challenge.challenger.publicId));
 
 /**
  * Free slots to display after occupied ones.
@@ -97,7 +97,7 @@ const mustAnswerLive = (challenge: LadderChallenge): boolean => isMe.value
  * Can accept live only if challenger is still active, else they could lose on time while away.
  * Also checked on server.
  */
-const isChallengerActive = (challenge: LadderChallenge): boolean => onlinePlayersStore.isPlayerActive(challenge.challenger.publicId);
+const isChallengerActive = (challenge: LadderChallenge): boolean => playerOnlineStatusStore.isActive(challenge.challenger.publicId);
 
 const isMyTurn = (challenge: LadderChallenge): boolean => getMyGame(challenge)?.isMyTurn ?? false;
 

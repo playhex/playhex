@@ -7,7 +7,7 @@ import AppBoardsize from '../../components/overlay/create-game/AppBoardsize.vue'
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
 import { defaultTimeControlTypes, isSameTimeControlType, timeControlToString } from '../../../../shared/app/timeControlUtils.js';
 import usePlayerFavoriteTimeControlsStore from '../../../stores/playerFavoriteTimeControlsStore.js';
-import useOnlinePlayersStore from '../../../stores/onlinePlayersStore.js';
+import { usePlayersOnlineStatus } from '../../../stores/playerOnlineStatusStore.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { IconTablerSwords } from '../../icons.js';
 import type { LadderChallengeOverlayResult } from '../composables/ladderChallenge.js';
@@ -35,8 +35,8 @@ const proposeLive = ref(false);
  * Live can be proposed only to an active defender, not only connected or idle.
  * Also checked on server.
  */
-const onlinePlayersStore = useOnlinePlayersStore();
-const defenderActive = computed(() => onlinePlayersStore.isPlayerActive(props.defender.publicId));
+const playerOnlineStatusStore = usePlayersOnlineStatus(() => [props.defender.publicId]);
+const defenderActive = computed(() => playerOnlineStatusStore.isActive(props.defender.publicId));
 
 watchEffect(() => {
     if (!defenderActive.value) {

@@ -3,6 +3,14 @@ import { WebsocketControllerInterface } from './index.js';
 import { HexServer, HexSocket } from '../../server.js';
 import OnlinePlayersService from '../../services/OnlinePlayersService.js';
 import Rooms from '../../../shared/app/Rooms.js';
+import { Player } from '../../../shared/app/models/index.js';
+
+/**
+ * Send at most one online players count update per this delay.
+ */
+const PLAYERS_COUNT_THROTTLE_MS = 1000;
+
+const PLAYER_STATUS_ROOM = /^player-status\/(.+)$/;
 
 @Service()
 export default class OnlinePlayersWebsocketController implements WebsocketControllerInterface
@@ -14,11 +22,44 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
         this.listenOnlinePlayersServiceEvents();
     }
 
+    private countThrottleTimeout: null | NodeJS.Timeout = null;
+    private countChangedDuringThrottle = false;
+    private lastEmittedCount: null | { active: number, inactive: number } = null;
+
+    /**
+     * Emits count immediately, then waits a second before emitting again.
+     * If count changed during this second, emits the new count at the end of it.
+     */
     private emitActivePlayersCount(): void
     {
-        this.hexServer.to(Rooms.onlinePlayersCount).emit(
-            'onlinePlayersCount',
-            this.onlinePlayersService.getActiveAndInactivePlayersCount(),
+        if (this.countThrottleTimeout !== null) {
+            this.countChangedDuringThrottle = true;
+            return;
+        }
+
+        const count = this.onlinePlayersService.getActiveAndInactivePlayersCount();
+
+        if (count.active !== this.lastEmittedCount?.active || count.inactive !== this.lastEmittedCount?.inactive) {
+            this.lastEmittedCount = count;
+            this.hexServer.to(Rooms.onlinePlayersCount).emit('onlinePlayersCount', count);
+        }
+
+        this.countThrottleTimeout = setTimeout(() => {
+            this.countThrottleTimeout = null;
+
+            if (this.countChangedDuringThrottle) {
+                this.countChangedDuringThrottle = false;
+                this.emitActivePlayersCount();
+            }
+        }, PLAYERS_COUNT_THROTTLE_MS);
+    }
+
+    private emitPlayerStatus(player: Player): void
+    {
+        this.hexServer.to(Rooms.playerStatus(player.publicId)).emit(
+            'playerStatus',
+            player.publicId,
+            this.onlinePlayersService.getPlayerStatus(player.publicId),
         );
     }
 
@@ -41,6 +82,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                     this.onlinePlayersService.getOnlinePlayersCount(),
                 );
 
+                this.emitPlayerStatus(player);
                 this.emitActivePlayersCount();
             })
 
@@ -55,6 +97,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                     player,
                 );
 
+                this.emitPlayerStatus(player);
                 this.emitActivePlayersCount();
             })
 
@@ -64,6 +107,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
                     player,
                 );
 
+                this.emitPlayerStatus(player);
                 this.emitActivePlayersCount();
             })
 
@@ -94,7 +138,15 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
         }
 
         if (room === Rooms.onlinePlayersCount) {
-            socket.emit('onlinePlayersCount', this.onlinePlayersService.getActiveAndInactivePlayersCount());
+            // Send same count as other clients, the pending throttled emit will update all of them together
+            this.lastEmittedCount ??= this.onlinePlayersService.getActiveAndInactivePlayersCount();
+            socket.emit('onlinePlayersCount', this.lastEmittedCount);
+        }
+
+        const playerStatusPublicId = room.match(PLAYER_STATUS_ROOM)?.[1];
+
+        if (playerStatusPublicId !== undefined) {
+            socket.emit('playerStatus', playerStatusPublicId, this.onlinePlayersService.getPlayerStatus(playerStatusPublicId));
         }
     }
 }

@@ -6,15 +6,17 @@ import AppPseudo from '../components/AppPseudo.vue';
 import { type OnlinePlayer } from '../../../shared/app/models/index.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
+import Rooms from '../../../shared/app/Rooms.js';
+import { useSocketRoom } from '../composables/useSocketRoom.js';
 
 useHead({
     title: t('online_players_title'),
 });
 
-const onlinePlayersStore = useOnlinePlayersStore();
-onlinePlayersStore.subscribeFullList();
+useSocketRoom(Rooms.onlinePlayers);
+useSocketRoom(Rooms.onlinePlayersCount);
 
-const { players, totalPlayers, activePlayersCount } = storeToRefs(onlinePlayersStore);
+const { players, totalPlayers, activePlayersCount } = storeToRefs(useOnlinePlayersStore());
 
 type SortMode = 'rating' | 'alpha';
 const sortMode = ref<SortMode>('rating');
@@ -58,7 +60,7 @@ const sortedPlayers = computed<OnlinePlayer[]>(() => {
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-2">
             <div v-for="onlinePlayer in sortedPlayers" :key="onlinePlayer.player.publicId" class="col">
                 <div class="player-item d-flex align-items-center gap-2 p-2 rounded" :class="{ inactive: !onlinePlayer.active }">
-                    <AppPseudo :player="onlinePlayer.player" rating onlineStatus />
+                    <AppPseudo :player="onlinePlayer.player" rating :onlineStatus="onlinePlayer.active ? 'active' : 'inactive'" />
                 </div>
             </div>
         </div>

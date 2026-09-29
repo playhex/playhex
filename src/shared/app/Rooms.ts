@@ -29,6 +29,13 @@ export default class Rooms
     static readonly onlinePlayersCount = 'online-players-count';
 
     /**
+     * Online status of a given player (active, inactive, offline).
+     * Used to display the green circle next to a player.
+     * Not under "players/" because these rooms are private to the player.
+     */
+    static readonly playerStatus = (playerId: string) => `player-status/${playerId}`;
+
+    /**
      * Full game info (moves).
      * Used on game page.
      */

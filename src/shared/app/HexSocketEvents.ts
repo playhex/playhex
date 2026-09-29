@@ -5,7 +5,7 @@ import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, Game, Player, Rating } from './models/index.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
-import { WebsocketActionError } from './Types.js';
+import { PlayerOnlineStatus, WebsocketActionError } from './Types.js';
 
 export type HexClientToServerEvents = {
     /**
@@ -258,6 +258,12 @@ export type HexServerToClientEvents = {
      * State for the `Rooms.onlinePlayersCount` room. Active and inactive players count.
      */
     onlinePlayersCount: (counts: { active: number, inactive: number }) => void;
+
+    /**
+     * State for the `Rooms.playerStatus(playerPublicId)` room.
+     * Sent on room join, then every time this player status changes.
+     */
+    playerStatus: (playerPublicId: string, status: PlayerOnlineStatus) => void;
 
     /**
      * State for the `Rooms.game` room.

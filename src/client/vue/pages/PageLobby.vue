@@ -28,6 +28,8 @@ import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesC
 import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
 import { useElementHover } from '@vueuse/core';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
+import Rooms from '../../../shared/app/Rooms.js';
+import { useSocketRoom } from '../composables/useSocketRoom.js';
 import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
@@ -40,6 +42,7 @@ useHead({
 const router = useRouter();
 const { mySortedGames, myTurnCount } = storeToRefs(useMyGamesStore());
 const { activePlayersCount } = storeToRefs(useOnlinePlayersStore());
+useSocketRoom(Rooms.onlinePlayersCount);
 const lobbyStore = useLobbyStore();
 const { clearSoftRemovedGames } = lobbyStore;
 const { currentLobby, currentLobbyGames, endedGames, waitingGamesCount } = storeToRefs(lobbyStore);

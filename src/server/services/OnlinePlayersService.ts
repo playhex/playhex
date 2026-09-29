@@ -4,6 +4,7 @@ import { Service } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { DELAY_BEFORE_PLAYER_INACTIVE } from '../../shared/app/playerActivityConfig.js';
 import { OnlinePlayerPage } from '../../shared/app/OnlinePlayerPage.js';
+import { PlayerOnlineStatus } from '../../shared/app/Types.js';
 
 interface OnlinePlayersServiceEvents
 {
@@ -175,6 +176,17 @@ export default class OnlinePlayersService extends TypedEmitter<OnlinePlayersServ
     isActive(player: Player): boolean
     {
         return this.onlinePlayers[player.publicId]?.onlinePlayer.active ?? false;
+    }
+
+    getPlayerStatus(playerPublicId: string): PlayerOnlineStatus
+    {
+        const onlinePlayer = this.onlinePlayers[playerPublicId];
+
+        if (!onlinePlayer) {
+            return 'offline';
+        }
+
+        return onlinePlayer.onlinePlayer.active ? 'active' : 'inactive';
     }
 
     isOnGamePage(player: Player, gamePublicId: string): boolean

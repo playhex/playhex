@@ -5,6 +5,11 @@ import { RateLimitReachedErrorPayload } from './rate-limiters.js';
 
 export type Tuple<T> = [T, T];
 
+/**
+ * Presence of a player, displayed as a green circle, a moon, or a grey circle.
+ */
+export type PlayerOnlineStatus = 'active' | 'inactive' | 'offline';
+
 export type WithRequired<Type, Key extends keyof Type> = Type & {
     [Property in Key]-?: Type[Property];
 };
