@@ -337,7 +337,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             backgroundAlpha: 0,
             resolution,
             autoDensity: true,
-            resizeTo: element,
+            // No resizeTo: renderer is already resized by listenContainerElementResize(), resizing twice reallocates canvas twice
             eventMode: this.gameViewOptions.interactive ? 'passive' : 'none',
             ...this.getWrapperSize(),
         });
