@@ -12,8 +12,6 @@ hexProgram
                 config: { level },
                 boardsizeMin: 11,
                 boardsizeMax: 11,
-                isRemote: false,
-                requireMorePower: false,
                 label: `Davies ${level}`,
                 pseudo: `Davies ${level}`,
                 slug: `davies-${level}`,

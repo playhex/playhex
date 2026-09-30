@@ -138,8 +138,6 @@
         "are_you_sure?": "Är du säker?"
     },
     "workers": {
-        "slow_worker": "Ingen snabb AI är online just nu. Endast begränsad AI är tillgänglig.",
-        "no_worker": "Ingen AI kan beräkna drag just nu. Endast slumpmässiga bottar är tillgängliga.",
         "see_how_to_spawn_a_worker": "Se hur du kan beräkna AI-drag för PlayHex från din dator"
     },
     "game_analysis": {

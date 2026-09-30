@@ -143,8 +143,6 @@
         "are_you_sure?": "Oletko varma?"
     },
     "workers": {
-        "slow_worker": "Yhtään nopeaa workeria ei ole tällä hetkellä paikalla. Vain rajoitettu tekoäly on saatavilla.",
-        "no_worker": "Yksikään worker ei voi laskea siirtoja tällä hetkellä. Vain satunnaiset botit ovat saatavilla.",
         "see_how_to_spawn_a_worker": "Katso miten voit laskea tekoälyn siirtoja PlayHexille omalta tietokoneeltasi"
     },
     "game_analysis": {

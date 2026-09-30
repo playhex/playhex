@@ -136,8 +136,6 @@
         "are_you_sure?": "你确定吗？"
     },
     "workers": {
-        "slow_worker": "当前没有快速的工作者在线。仅有有限的AI可用。",
-        "no_worker": "目前没有工作者可以计算动作。仅有随机机器人可用。",
         "see_how_to_spawn_a_worker": "查看如何从我的电脑为PlayHex计算AI动作"
     },
     "game_analysis": {

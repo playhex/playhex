@@ -11,8 +11,6 @@ type CreateAiConfigParameters = {
     order: number;
     boardsizeMin?: number;
     boardsizeMax?: number;
-    isRemote?: boolean;
-    requireMorePower?: boolean;
     relativeLevel?: number;
 
     pseudo: string;
@@ -73,8 +71,6 @@ export default async (parameters: CreateAiConfigParameters, reusePlayer?: boolea
     aiConfig.order = parameters.order;
     aiConfig.boardsizeMin = parameters.boardsizeMin;
     aiConfig.boardsizeMax = parameters.boardsizeMax;
-    aiConfig.isRemote = parameters.isRemote ?? false;
-    aiConfig.requireMorePower = parameters.requireMorePower ?? false;
     aiConfig.relativeLevel = parameters.relativeLevel;
     aiConfig.player = player;
 

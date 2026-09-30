@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import useSocketStore from './socketStore.js';
+import useToastsStore from './toastsStore.js';
 import { GameAnalyze } from '../../shared/app/models/index.js';
 import { Ref, ref } from 'vue';
 import { apiGetGameAnalyze, apiRequestGameAnalyze } from '../apiClient.js';
+import { t } from 'i18next';
 
 /**
  * Store game analyzes, fetch, update them.
@@ -43,10 +45,18 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
         }
 
         void (async () => {
-            gameAnalyze.value = request
-                ? await apiRequestGameAnalyze(gamePublicId)
-                : await apiGetGameAnalyze(gamePublicId)
-            ;
+            try {
+                gameAnalyze.value = request
+                    ? await apiRequestGameAnalyze(gamePublicId)
+                    : await apiGetGameAnalyze(gamePublicId)
+                ;
+            } catch (e) {
+                if (request) {
+                    useToastsStore().addToast(t('game_analysis.request_failed'), { level: 'danger' });
+                }
+
+                throw e;
+            }
         })();
 
         return gameAnalyze;

@@ -115,9 +115,7 @@
     "initializing_game": "Iniciando partida…",
     "waiting_for_an_opponent": "Esperando contrincante…",
     "workers": {
-        "slow_worker": "En este momento, no hay ningún trabajador rápido en línea. Solo hay disponible una IA limitada.",
-        "see_how_to_spawn_a_worker": "Ver cómo calcular los movimientos de la IA para PlayHex desde mi ordenador",
-        "no_worker": "Ningún trabajador puede calcular movimientos en este momento. Solo hay bots aleatorios disponibles."
+        "see_how_to_spawn_a_worker": "Ver cómo calcular los movimientos de la IA para PlayHex desde mi ordenador"
     },
     "game_analysis": {
         "game_analysis": "Partida analizada por IA",

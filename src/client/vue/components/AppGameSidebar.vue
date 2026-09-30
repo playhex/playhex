@@ -373,6 +373,11 @@ const gameId = game.value.publicId;
 const gameAnalyze = analyzeStore.getAnalyze(gameId);
 const analyzeSummarized = ref(false);
 
+/**
+ * While analyze is processing, moves are analyzed progressively.
+ */
+const analyzedMovesCount = computed((): number => gameAnalyze.value?.analyze?.filter(move => move !== null).length ?? 0);
+
 const shouldShowAnalyzeBlock = (): boolean => {
     if (!game.value) {
         return false;
@@ -898,7 +903,7 @@ watch(gameUIMode, () => {
                 </div>
 
                 <!-- Waiting results -->
-                <p v-else-if="null === gameAnalyze.endedAt" class="text-center analyze-min-height d-flex flex-column justify-content-center">
+                <p v-else-if="null === gameAnalyze.endedAt && null === gameAnalyze.analyze" class="text-center analyze-min-height d-flex flex-column justify-content-center">
                     <span>{{ $t('game_analysis.requested') }}</span>
                     <small class="text-body-secondary">{{ formatDistanceToNow(gameAnalyze.startedAt, { addSuffix: true }) }}</small>
                 </p>
@@ -909,9 +914,9 @@ watch(gameUIMode, () => {
                     <button class="btn btn-sm btn-primary my-2" @click="doAnalyzeGame()">{{ $t('try_again') }}</button>
                 </p>
 
-                <!-- Done, analyze graph -->
-                <template v-else>
-                    <div v-if="!analyzeSummarized" class="analyze-min-height">
+                <!-- Done or in progress, analyze graph -->
+                <template v-else-if="null !== gameAnalyze.analyze">
+                    <div v-if="!analyzeSummarized || null === gameAnalyze.endedAt" class="analyze-min-height">
                         <!-- How it works link -->
                         <small>
                             {{ $t('game_analysis.game_analysis') }}
@@ -921,11 +926,12 @@ watch(gameUIMode, () => {
                                 :title="$t('game_analysis.how_it_works')"
                                 :aria-label="$t('game_analysis.how_it_works')"
                             ><IconInfoCircle /></router-link>
-                            <a href="#" class="ps-2" @click.prevent="analyzeSummarized = true">Collapse</a>
+                            <a v-if="null !== gameAnalyze.endedAt" href="#" class="ps-2" @click.prevent="analyzeSummarized = true">Collapse</a>
+                            <span v-else class="ps-2 text-body-secondary">{{ $t('game_analysis.in_progress', { done: analyzedMovesCount, total: gameAnalyze.analyze.length }) }}</span>
                         </small>
 
-                        <!-- Anayze graph -->
-                        <AppGameAnalyze :analyze="gameAnalyze.analyze" />
+                        <!-- Anayze graph. Chart does not update, recreate it on each analyzed move while in progress -->
+                        <AppGameAnalyze :analyze="gameAnalyze.analyze" :key="analyzedMovesCount" />
                     </div>
 
                     <div v-else>

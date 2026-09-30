@@ -47,6 +47,26 @@ export const sendConnectedSocketsPoint = (active: number, inactive: number): voi
     });
 };
 
+/**
+ * State of an AI engine queue: jobs waiting for a worker, jobs being processed, workers connected.
+ */
+export const sendAiQueuePoint = (type: string, waiting: number, active: number, workersOnline: number): void => {
+    if (influxDBClient === null) {
+        return;
+    }
+
+    const point = Point.measurement('ai_queue')
+        .setTag('type', type)
+        .setIntegerField('waiting', waiting)
+        .setIntegerField('active', active)
+        .setIntegerField('workers_online', workersOnline)
+    ;
+
+    influxDBClient.write(point).catch(reason => {
+        logger.warning('Error while sending data to influxDB', { reason });
+    });
+};
+
 export class TimeMeasureMetric<T extends keyof MetricsTags>
 {
     private tStart: Date;

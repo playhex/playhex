@@ -136,8 +136,6 @@
         "are_you_sure?": "Er du sikker?"
     },
     "workers": {
-        "slow_worker": "Ingen hurtig arbejdskraft er online lige nu. Kun begrænset AI er tilgængelige.",
-        "no_worker": "Ingen arbejdskraft kan beregne træk lige nu. Kun tilfældige bots er tilgængelige.",
         "see_how_to_spawn_a_worker": "Se, hvordan man beregner AI-træk for PlayHex fra min computer"
     },
     "game_analysis": {

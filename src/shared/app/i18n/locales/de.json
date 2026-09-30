@@ -113,8 +113,6 @@
         "confirmation": "Bestätigung"
     },
     "workers": {
-        "slow_worker": "Es ist gerade kein Schnellworker online. Nur begrenzte KI ist verfügbar.",
-        "no_worker": "Kein Worker kann derzeit Züge berechnen. Nur Zufalls-Bots sind verfügbar.",
         "see_how_to_spawn_a_worker": "Zeige mir, wie ich KI-Züge für PlayHex auf meinem Computer berechnen kann"
     },
     "try_again": "Erneut versuchen",

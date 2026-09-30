@@ -150,8 +150,6 @@
         "are_you_sure?": "Jste si jistý?"
     },
     "workers": {
-        "slow_worker": "Momentálně není online žádný rychlý worker. K dispozici je pouze omezená AI.",
-        "no_worker": "Momentálně není k dispozici žádný worker pro výpočet tahů. K dispozici jsou pouze náhodní boti.",
         "see_how_to_spawn_a_worker": "Zjistit, jak počítat tahy AI pro PlayHex z mého počítače"
     },
     "game_analysis": {

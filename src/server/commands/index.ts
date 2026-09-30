@@ -18,6 +18,7 @@ import './generateStatsCommand.js';
 import './tournamentSubscribePlayersCommand.js';
 import './ladderJoinPlayersCommand.js';
 import './findSimilarGamesCommand.js';
+import './aiJobsCommands.js';
 
 await hexProgram.parseAsync();
 

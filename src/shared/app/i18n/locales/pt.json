@@ -136,8 +136,6 @@
         "are_you_sure?": "Você tem certeza?"
     },
     "workers": {
-        "slow_worker": "Nenhum trabalhador rápido está online agora. Apenas IA limitadas estão disponíveis.",
-        "no_worker": "Nenhum trabalhador pode calcular movimentos agora. Apenas bots aleatórios estão disponíveis.",
         "see_how_to_spawn_a_worker": "Veja como calcular movimentos de IA para o PlayHex no meu computador"
     },
     "game_analysis": {

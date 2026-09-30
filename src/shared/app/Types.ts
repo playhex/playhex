@@ -108,14 +108,11 @@ export type PlayHexContributors = {
 
 export type AIConfigStatusData = {
     /**
-     * Whether remote AIs can be run (AIConfig: "isRemote")
+     * AIs that can play right now (their player publicId):
+     * AIs computed by the server (random), and AIs with at least one AI worker connected for their job type.
+     * Other AIs cannot be played.
      */
-    aiApiAvailable: boolean;
-
-    /**
-     * Whether powerful AIs can be run (AIConfig: "requireMorePower")
-     */
-    powerfulPeerAvailable: boolean;
+    availableAiPlayerPublicIds: string[];
 };
 
 type TWebsocketActionError<Reason extends string = string, Payload = unknown> = {

@@ -63,7 +63,8 @@
             "account": "Account",
             "game": "Game",
             "board": "Board",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "ai_workers": "AI workers"
         },
         "audio": "Audio",
         "moderation": "Moderation"
@@ -178,8 +179,7 @@
         "are_you_sure?": "Are you sure?"
     },
     "workers": {
-        "slow_worker": "No fast worker is online right now. Only limited AI is available.",
-        "no_worker": "No worker can compute moves right now. Only random bots are available.",
+        "engine_unavailable": "Some AI engines have no worker online right now, these AIs are not available.",
         "see_how_to_spawn_a_worker": "See how to compute AI moves for PlayHex from my computer"
     },
     "game_analysis": {
@@ -190,7 +190,9 @@
         "errored": "AI analysis failed!",
         "best_move": "best move",
         "best": "best:",
-        "how_it_works": "How it works"
+        "how_it_works": "How it works",
+        "in_progress": "analyzing {{done}}/{{total}}…",
+        "request_failed": "Could not request analysis, no AI worker may be available right now."
     },
     "try_again": "Try again",
     "yes": "Yes",
@@ -1199,5 +1201,15 @@
             "lost": "Lost",
             "voided": "Canceled"
         }
+    },
+    "ai_worker_keys": {
+        "description": "Keys to run AI workers and contribute computing power to PlayHex bots and game analyses. Keep them private.",
+        "revoked": "Revoked",
+        "last_seen": "Last used:",
+        "run_worker": "Run a worker",
+        "key": "Key",
+        "engine": "AI engine",
+        "copy_command": "Copy command",
+        "manage_worker": "How to stop, update, or see logs of a worker"
     }
 }

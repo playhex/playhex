@@ -3,7 +3,7 @@ import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
 import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
-import { AnalyzeGameRequest } from '../services/HexAiApiClient.js';
+import type { AnalyzeGameRequest } from '../ai-jobs/gameAnalyze.js';
 
 /**
  * Relations to load in order to recreate an Game in memory.

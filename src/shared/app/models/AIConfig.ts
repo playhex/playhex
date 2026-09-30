@@ -41,14 +41,6 @@ export default class AIConfig
     @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     boardsizeMax?: null | number;
 
-    @Column({ default: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
-    requireMorePower: boolean;
-
-    @Column({ default: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
-    isRemote: boolean;
-
     @Column('json')
     @Expose({ groups: [GROUP_DEFAULT, 'ai_config'] })
     config: { [key: string]: unknown };

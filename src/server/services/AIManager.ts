@@ -1,16 +1,27 @@
-import { GameOptions, Player } from '../../shared/app/models/index.js';
+import { AIConfig, GameOptions, Player } from '../../shared/app/models/index.js';
 import { calcRandomMove } from '../../shared/game-engine/index.js';
-import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
 import { Container } from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer.js';
 import logger from './logger.js';
 import GameServer from '../GameServer.js';
-import HexAiApiClient from './HexAiApiClient.js';
 import { AppDataSource } from '../data-source.js';
 import type { HexMove } from '@playhex/move-notation';
 import { MIN_BOT_LEVEL_CHECKED, SimilarPlayingPositionChecker } from './anti-cheat/SimilarPlayingPositionChecker.js';
+import AiJobService from '../ai-jobs/AiJobService.js';
+import { getBotJobType } from '../ai-jobs/botTasks.js';
 
 export class FindAIError extends Error {}
+
+/**
+ * Whether this AI can play right now:
+ * its moves are computed by the server (random bots),
+ * or at least one AI worker processing its job type is connected.
+ */
+export const isAIConfigAvailable = ({ engine, config }: Pick<AIConfig, 'engine' | 'config'>): boolean => {
+    const jobType = getBotJobType(engine, config);
+
+    return jobType === null || Container.get(AiJobService).isJobTypeAvailable(jobType);
+};
 
 const findPlayerWithAIConfig = async (publicId: string): Promise<null | Player> => {
     return await AppDataSource.getRepository(Player).findOne({
@@ -40,21 +51,8 @@ export const findAIOpponent = async (gameOptions: GameOptions): Promise<null | P
         throw new FindAIError(`AI player with slug "${player.slug}" (publicId: ${player.publicId}) is missing its config in table AIConfig.`);
     }
 
-    // AI is not on remote AI API, like random bot, moves are computed on this server
-    if (!player.aiConfig.isRemote) {
-        return player;
-    }
-
-    const aiConfigStatus = await Container.get(HexAiApiClient).getPeersStatus();
-
-    // No peer at all
-    if (aiConfigStatus.totalPeers === 0) {
-        throw new FindAIError('Cannot use this remote AI player, AI api currently has no worker');
-    }
-
-    // AI requires more computation power, check there is powerful-enough peers, which should be the case of any primary peer.
-    if (player.aiConfig.requireMorePower && aiConfigStatus.totalPeersPrimary === 0) {
-        throw new FindAIError('Cannot use this remote AI player, AI api currently has no powerful enough worker');
+    if (!isAIConfigAvailable(player.aiConfig)) {
+        throw new FindAIError(`Cannot use this AI player, no ${getBotJobType(player.aiConfig.engine, player.aiConfig.config)} worker currently connected`);
     }
 
     return player;
@@ -65,16 +63,6 @@ export const validateConfigRandom = (config: unknown): config is { determinist: 
         && config !== null
         && 'determinist' in config
         && typeof config.determinist === 'boolean'
-    ;
-};
-
-export const validateConfigDavies = (config: unknown): config is { level: number } => {
-    return typeof config === 'object'
-        && config !== null
-        && 'level' in config
-        && typeof config.level === 'number'
-        && config.level >= 1
-        && config.level <= 10
     ;
 };
 
@@ -143,7 +131,8 @@ export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): 
         });
     }
 
-    if (aiConfig.isRemote) {
+    // Moves computed by AI workers
+    if (getBotJobType(aiConfig.engine, aiConfig.config) !== null) {
         return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config);
     }
 
@@ -154,17 +143,6 @@ export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): 
             }
 
             return await calcRandomMove(engineGame, waitTimeBeforeRandomMove(aiConfig.config), aiConfig.config.determinist);
-
-        case 'davies':
-            if (!validateConfigDavies(aiConfig.config)) {
-                throw new Error('Invalid config for aiConfig');
-            }
-
-            return getBestMove(
-                engineGame.getCurrentPlayerIndex() === 0 ? WHO_RED : WHO_BLUE,
-                engineGame.getMovesHistory().map(timestampedMove => timestampedMove.move),
-                aiConfig.config.level,
-            ) as HexMove;
     }
 
     logger.error(`No local AI play for bot with slug = "${player.slug}"`);

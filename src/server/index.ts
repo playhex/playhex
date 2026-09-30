@@ -18,6 +18,7 @@ import { initAutoCancelStaleGames } from './services/auto-cancel-stale-games/ini
 import { initTournamentSeriesAutoCreate } from './services/tournament-series-auto-create/init.js';
 import { registerCors } from './controllers/http/misc/cors.js';
 import { initLadder } from './ladder/LadderWatcher.js';
+import { initAiJobs } from './ai-jobs/init.js';
 
 logger.info(`*******************************************`);
 logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -35,6 +36,7 @@ Container.get(TournamentStore);
 initAutoCancelStaleGames();
 initTournamentSeriesAutoCreate();
 initLadder();
+initAiJobs().catch(e => logger.error('Could not init AI jobs', { message: e?.message }));
 
 const server = http.createServer(app);
 const io = new HexServer(server, {

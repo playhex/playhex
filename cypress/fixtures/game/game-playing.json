@@ -25,8 +25,6 @@
                     "description": "plays randomly",
                     "boardsizeMin": null,
                     "boardsizeMax": null,
-                    "requireMorePower": false,
-                    "isRemote": false,
                     "config": {
                         "determinist": false
                     }

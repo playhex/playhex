@@ -111,8 +111,6 @@
         "title": "Permainan selesai"
     },
     "workers": {
-        "slow_worker": "Tidak ada pekerja cepat yang online saat ini. Hanya AI terbatas yang tersedia.",
-        "no_worker": "Tidak ada pekerja yang dapat menghitung langkah saat ini. Hanya bot acak yang tersedia.",
         "see_how_to_spawn_a_worker": "Lihat cara menghitung langkah AI untuk PlayHex dari komputer saya"
     },
     "game_analysis": {

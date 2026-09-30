@@ -150,8 +150,6 @@
         "are_you_sure?": "Biztos vagy benne?"
     },
     "workers": {
-        "slow_worker": "Jelenleg nincs gyors worker online. Csak korlátozott AI áll rendelkezésre.",
-        "no_worker": "Jelenleg nincs worker, amely lépéseket tudna számolni. Csak véletlenszerű botok érhetők el.",
         "see_how_to_spawn_a_worker": "Tudd meg, hogyan számolhatsz AI lépéseket a PlayHex számára a saját számítógépeden"
     },
     "game_analysis": {

@@ -1,4 +1,4 @@
-import { BadRequestError, Body, CurrentUser, JsonController, Post, Req } from 'routing-controllers';
+import { BadRequestError, Body, CurrentUser, HttpError, JsonController, Post, Req } from 'routing-controllers';
 import type { Request } from 'express';
 import { Service } from 'typedi';
 import { createClient } from 'redis';
@@ -12,6 +12,7 @@ import type { Move } from '@playhex/move-notation';
 import { InvalidPositionError, type CanonicalPosition } from '../../../../shared/position-comparator/position-comparator.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../../../services/anti-cheat/SimilarPositionDetectedError.js';
+import AiJobService from '../../../ai-jobs/AiJobService.js';
 
 const ANALYSIS_CACHE_TTL_SECONDS = 7 * 24 * 3600;
 
@@ -46,7 +47,7 @@ class AnalyzePositionInput implements AnalysisInput
     white: string[];
 }
 
-const { REDIS_URL, REDIS_PREFIX, HEX_AI_API } = process.env;
+const { REDIS_URL, REDIS_PREFIX } = process.env;
 const redisKeyPrefix = (REDIS_PREFIX ?? 'hex') + '-hexplorer-analysis:';
 
 const redisClient = REDIS_URL
@@ -63,6 +64,7 @@ export default class HexplorerController
 {
     constructor(
         private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
+        private aiJobService: AiJobService,
     ) {}
 
     @Post('/api/hexplorer/analyze-position')
@@ -116,28 +118,15 @@ export default class HexplorerController
             }
         }
 
-        if (!HEX_AI_API) {
-            throw new Error('Cannot use HexAiApiClient, HEX_AI_API must be set in env vars');
+        if (!this.aiJobService.isJobTypeAvailable('katahex-intuition-analyze-position')) {
+            throw new HttpError(503, 'No AI worker can analyze positions right now');
         }
 
-        const response = await fetch(HEX_AI_API + '/analyze-position', {
-            method: 'post',
-            body: JSON.stringify({
-                ...input,
-                black: input.black.join(' '),
-                white: input.white.join(' '),
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
+        const result: AnalysisOutput = await this.aiJobService.analyzePosition({
+            ...input,
+            black: input.black.join(' '),
+            white: input.white.join(' '),
         });
-
-        if (!response.ok) {
-            throw new Error(await response.text());
-        }
-
-        const result = await response.json() as AnalysisOutput;
 
         if (redisClient) {
             void redisClient.set(cacheKey, JSON.stringify(result), {

@@ -27,6 +27,7 @@ import Player from './Player.js';
 import PlayerAccountPassword from './PlayerAccountPassword.js';
 import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
+import PlayerAiWorkerKey from './PlayerAiWorkerKey.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
 import PlayerIp from './PlayerIp.js';
 import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
@@ -81,6 +82,7 @@ export {
     PlayerSettings,
     PlayerStats,
     PlayerHeadToHeadStats,
+    PlayerAiWorkerKey,
     PlayerPushSubscription,
     Premove,
     Rating,
@@ -126,6 +128,7 @@ export const entities = {
     PlayerIp,
     PlayerModerationAction,
     PlayerNotification,
+    PlayerAiWorkerKey,
     PlayerPushSubscription,
     PlayerSettings,
     PlayerStats,

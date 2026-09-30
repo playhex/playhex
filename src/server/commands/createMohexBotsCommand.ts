@@ -31,8 +31,6 @@ hexProgram
                 description: description ?? `max ${maxGames} simulations`,
                 order: 20 + index,
                 boardsizeMax: 13,
-                isRemote: true,
-                requireMorePower: maxGames > 20,
                 pseudo: pseudo ?? `Mohex ${level}`,
                 slug: slug ?? `mohex-${level}`,
                 relativeLevel,

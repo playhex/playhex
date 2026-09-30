@@ -47,7 +47,8 @@
             "account": "Compte",
             "game": "Partie",
             "board": "Plateau",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "ai_workers": "Workers IA"
         },
         "audio": "Audio",
         "moderation": "Modération"
@@ -601,7 +602,9 @@
         "available": "L'analyse par l'IA est maintenant disponible.",
         "errored": "L'analyse a échoué !",
         "how_it_works": "Fonctionnement",
-        "request_analysis": "Demander une analyse par l'IA"
+        "request_analysis": "Demander une analyse par l'IA",
+        "in_progress": "analyse {{done}}/{{total}}…",
+        "request_failed": "Impossible de demander l'analyse, aucun worker IA n'est peut-être disponible pour le moment."
     },
     "try_again": "Réessayer",
     "language": "Langue",
@@ -725,8 +728,7 @@
         "read_more": "voir plus"
     },
     "workers": {
-        "slow_worker": "Pas de serveur puissant en ligne actuellement. Seules les IA limitées sont disponibles.",
-        "no_worker": "Aucun serveur n'est disponible actuellement pour calculer les coups de l'IA. Seules les IA de test sont disponibles.",
+        "engine_unavailable": "Certains moteurs d'IA n'ont aucun worker en ligne actuellement, ces IA ne sont pas disponibles.",
         "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
     },
     "player_made_a_move": "{{player}} a joué",
@@ -1212,5 +1214,15 @@
             "lost": "Perdue",
             "voided": "Annulée"
         }
+    },
+    "ai_worker_keys": {
+        "description": "Clés pour lancer des workers IA et contribuer à la puissance de calcul des bots et des analyses de parties de PlayHex. Gardez-les privées.",
+        "revoked": "Révoquée",
+        "last_seen": "Dernière utilisation :",
+        "run_worker": "Lancer un worker",
+        "key": "Clé",
+        "engine": "Moteur IA",
+        "copy_command": "Copier la commande",
+        "manage_worker": "Comment arrêter, mettre à jour, ou voir les logs d'un worker"
     }
 }

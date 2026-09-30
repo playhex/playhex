@@ -1,37 +1,53 @@
 import logger from './logger.js';
 import { EngineGame, IllegalMove } from '../../shared/game-engine/index.js';
-import HexAiApiClient, { CalculateMoveRequest } from './HexAiApiClient.js';
 import { TimeMeasureMetric } from './metrics.js';
 import { Service } from 'typedi';
 import GameServer from '../GameServer.js';
 import { HexMove, isMoveValid } from '@playhex/move-notation';
+import AiJobService from '../ai-jobs/AiJobService.js';
+import { createBotMoveTask } from '../ai-jobs/botTasks.js';
+import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
 
 @Service()
 export default class RemoteApiPlayer
 {
     constructor(
-        private hexRemotePlayerApi: HexAiApiClient,
+        private aiJobService: AiJobService,
     ) {}
 
-    private async fetchMove(engine: string, game: EngineGame, config: { [key: string]: unknown }): Promise<HexMove>
+    /**
+     * Remaining time on bot clock, to not wait for a move once bot lost on time.
+     */
+    private getRemainingTimeMs(gameServer: GameServer): undefined | number
     {
-        const payload: CalculateMoveRequest = {
-            game: {
+        const timeControl = gameServer.getGame().timeControl;
+
+        if (!timeControl) {
+            return undefined;
+        }
+
+        const remainingTimeMs = timeValueToMilliseconds(timeControl.players[timeControl.currentPlayer].totalRemainingTime, new Date());
+
+        return remainingTimeMs > 0 ? remainingTimeMs : undefined;
+    }
+
+    private async fetchMove(engine: string, game: EngineGame, config: { [key: string]: unknown }, remainingTimeMs?: number): Promise<HexMove>
+    {
+        let moveString: null | string = null;
+
+        try {
+            const task = createBotMoveTask(engine, config, {
                 size: game.getSize(),
                 movesHistory: game.getMovesHistoryAsString(),
                 currentPlayer: game.getCurrentPlayerIndex() === 0 ? 'black' : 'white',
                 swapRule: game.getAllowSwap(),
-            },
-            ai: {
-                ...config,
-                engine,
-            },
-        };
+            });
 
-        let moveString: null | string = null;
+            if (task === null) {
+                throw new Error(`Engine "${engine}" is not computed by AI workers`);
+            }
 
-        try {
-            moveString = await this.hexRemotePlayerApi.calculateMove(payload);
+            moveString = await this.aiJobService.calculateMove(task, remainingTimeMs);
 
             if (moveString === 'resign') {
                 throw new Error('ok, remote player expressely resigned.');
@@ -64,7 +80,7 @@ export default class RemoteApiPlayer
         });
 
         try {
-            const move = await this.fetchMove(engine, engineGame, config);
+            const move = await this.fetchMove(engine, engineGame, config, this.getRemainingTimeMs(gameServer));
             measure.finished();
             return move;
         } catch (e) {

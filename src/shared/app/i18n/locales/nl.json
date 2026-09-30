@@ -123,8 +123,6 @@
         "are_you_sure?": "Weet je het zeker?"
     },
     "workers": {
-        "slow_worker": "Er is momenteel geen snelle worker online. Alleen beperkte AI zijn beschikbaar.",
-        "no_worker": "Er is momenteel geen worker beschikbaar om zetten te berekenen. Alleen willekeurige bots zijn beschikbaar.",
         "see_how_to_spawn_a_worker": "Zie hoe je AI zetten kunt berekenen voor PlayHex vanaf mijn computer"
     },
     "game_analysis": {

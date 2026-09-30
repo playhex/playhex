@@ -149,8 +149,6 @@
         "are_you_sure?": "Emin misin?"
     },
     "workers": {
-        "slow_worker": "Şu anda hızlı çalışan yok. Sadece sınırlı yapay zekâ mevcut.",
-        "no_worker": "Hiçbir çalışan şu anda hamle hesaplayamıyor. Sadece rastgele botlar mevcut.",
         "see_how_to_spawn_a_worker": "Kendi bilgisayarından AI hamlelerini nasıl hesaplayabileceğini öğren"
     },
     "game_analysis": {

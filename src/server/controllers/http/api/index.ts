@@ -14,6 +14,9 @@ import { Player } from '../../../../shared/app/models/index.js';
 import ChatController from './ChatController.js';
 import AIConfigController from './AIConfigController.js';
 import GameAnalyzeController from './GameAnalyzeController.js';
+import AiWorkerController from './AiWorkerController.js';
+import AdminAiWorkersController from './AdminAiWorkersController.js';
+import PlayerAiWorkerKeyController from './PlayerAiWorkerKeyController.js';
 import RatingController from './RatingController.js';
 import { defaultInstanceToPlainOptions, defaultPlainToInstanceOptions } from '../../../../shared/app/class-transformer-custom.js';
 import ServerInfoController from './ServerInfoController.js';
@@ -76,6 +79,9 @@ export const registerApi = (app: Express) => {
             GameConditionalMovesController,
             GameChatSubscriptionController,
             GameAnalyzeController,
+            AiWorkerController,
+            AdminAiWorkersController,
+            PlayerAiWorkerKeyController,
             TournamentController,
             TournamentBanController,
             TournamentSeriesController,

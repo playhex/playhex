@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDisclosure } from '@overlastic/vue';
-import { PropType, reactive, Ref, ref, toRef, watch } from 'vue';
+import { computed, PropType, reactive, Ref, ref, toRef, watch } from 'vue';
 import { IconExclamationTriangle, IconRobot, IconTrophy } from '../../icons.js';
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
@@ -61,24 +61,18 @@ const selectAiConfig = (aiConfig: AIConfig): void => {
 };
 
 const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
-    if (!aiConfig.isRemote) {
-        return true;
-    }
-
     if (aiConfigsStatus.value === null) {
         return false;
     }
 
-    if (aiConfig.isRemote && !aiConfigsStatus.value.aiApiAvailable) {
-        return false;
-    }
-
-    if (aiConfig.requireMorePower && !aiConfigsStatus.value.powerfulPeerAvailable) {
-        return false;
-    }
-
-    return true;
+    return aiConfigsStatus.value.availableAiPlayerPublicIds.includes(aiConfig.player!.publicId);
 };
+
+/**
+ * Whether some AIs cannot be played because no worker is connected for their engine.
+ */
+const hasUnavailableAIConfig = computed((): boolean => aiConfigsStatus.value !== null
+    && aiConfigs.value.some(aiConfig => !isAIConfigAvailable(aiConfig)));
 
 // Automatically select first (easiest) AI on load if none selected yet
 const selectFirstAiConfig = () => {
@@ -108,11 +102,9 @@ watch(aiConfigs, () => {
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
-                        <template v-if="null !== aiConfigsStatus">
-                            <p v-if="!aiConfigsStatus.aiApiAvailable" class="text-danger mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.no_worker') }}</small></p>
-                            <p v-else-if="!aiConfigsStatus.powerfulPeerAvailable" class="text-warning mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.slow_worker') }}</small></p>
-
-                            <p v-if="!aiConfigsStatus.aiApiAvailable || !aiConfigsStatus.powerfulPeerAvailable">
+                        <template v-if="hasUnavailableAIConfig">
+                            <p class="text-warning mb-0"><IconExclamationTriangle /> <small>{{ $t('workers.engine_unavailable') }}</small></p>
+                            <p>
                                 <small>
                                     <router-link
                                         :to="{ name: 'spawn-worker' }"

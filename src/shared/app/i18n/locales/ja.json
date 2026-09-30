@@ -136,8 +136,6 @@
         "are_you_sure?": "よろしいですか？"
     },
     "workers": {
-        "slow_worker": "現在オンラインの高速ワーカーはいません。利用可能なAIは限られています。",
-        "no_worker": "現在、移動を計算できるワーカーはいません。利用可能なランダムボットのみです。",
         "see_how_to_spawn_a_worker": "自分のコンピュータでPlayHexのAI移動を計算する方法を見る"
     },
     "game_analysis": {

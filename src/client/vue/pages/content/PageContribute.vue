@@ -65,9 +65,9 @@ const playerIsFair = ref(0);
 
     <p>
         If you have a not too old computer,
-        you can pull a Hex AI worker and run it.
-        This way, when someone plays against KataHex or MoHex,
-        your computer can compute moves if no faster worker is available.
+        you can run a Hex AI worker.
+        This way, when someone plays against KataHex, MoHex or Davies, or requests a game analysis,
+        your computer helps computing moves.
     </p>
 
     <router-link

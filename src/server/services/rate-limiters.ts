@@ -99,6 +99,16 @@ const analyzePositionLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit jobs an AI worker key can take, to prevent a key taking jobs in loop without processing them.
+ * Generous: fast jobs (raw neural network move) can take less than a second.
+ */
+const aiWorkerNextJobLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.ai_worker_next_job',
+    points: 600,
+    duration: 60,
+});
+
+/**
  * Error thrown from rate limiter
  */
 export class RateLimiterError extends Error {}
@@ -193,4 +203,8 @@ export const rateLimiterConsumeAnalyzePosition = async (ip: string | undefined) 
     if (ip) {
         await consume(analyzePositionLimiter, ip);
     }
+};
+
+export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {
+    await consume(aiWorkerNextJobLimiter, String(aiWorkerKeyId));
 };

@@ -85,24 +85,28 @@ Determinist random bot will always plays same games
 if you play same moves in same order.
 This is useful to reproduce things.
 
-If you need to work with real AI (Katahex, Mohex), see:
-
-<https://github.com/playhex/hex-ai-distributed>
-
-You can install it locally, and with Docker you don't need to compile any ai engine.
-
-Once installed, add to your `.env` file:
-
-```
-HEX_AI_API=http://localhost:8088
-```
-
-And enable ai players in database with:
+If you need to work with real AI (Katahex, Mohex, Davies), enable AI players in database with:
 
 ``` bash
+pnpm hex create-davies-bots
 pnpm hex create-katahex-bots
 pnpm hex create-mohex-bots
 ```
+
+In development, Davies moves are computed by the server.
+Katahex and Mohex moves, game analyses and Hexplorer need an AI worker, see:
+
+<https://github.com/playhex/hex-ai-distributed>
+
+Create a worker key, then run a worker (with Docker you don't need to compile any AI engine):
+
+``` bash
+pnpm hex ai-worker-key:create <your player slug>
+
+docker run --rm --network host -e HEX_URL=http://localhost:3000 -e AI_WORKER_KEY=<key> playhex/worker-katahex
+```
+
+The command is also shown in your settings, "AI workers" panel.
 
 ## Translate PlayHex
 

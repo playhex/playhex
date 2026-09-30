@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
-import { apiPostPushTest, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
+import { apiGetPlayerAiWorkerKeys, apiPostPushTest, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
 import { watch, Ref, ref, computed, onMounted, onBeforeUnmount, onUnmounted, nextTick } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
@@ -13,7 +13,7 @@ import { authChangePassword } from '../../../apiClient.js';
 import { availableLocales, getQuickLocales, setLocale, getPlayerMissingLocale, autoLocale } from '../../../../shared/app/i18n/index.js';
 import { allShadingPatterns } from '@playhex/shading-patterns';
 import i18n, { t } from 'i18next';
-import { MoveSettings } from '../../../../shared/app/models/index.js';
+import { MoveSettings, PlayerAiWorkerKey } from '../../../../shared/app/models/index.js';
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
@@ -23,6 +23,7 @@ import { intlFormat } from 'date-fns';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import AppPlayerModerationActionList from '../../components/AppPlayerModerationActionList.vue';
 import AppFlagSelector from '../../components/AppFlagSelector.vue';
+import copy from 'copy-to-clipboard';
 
 const head = injectHead();
 
@@ -276,9 +277,74 @@ const formatThemeReleaseDate = (releaseDate: string): string => intlFormat(
 /*
  * Panels
  */
-type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications';
+type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications' | 'ai_workers';
 
-const panels: Panel[] = ['interface', 'account', 'game', 'board', 'notifications'];
+/*
+ * AI worker keys, only a few players have one: panel is hidden if player has none.
+ */
+const aiWorkerKeys = ref<PlayerAiWorkerKey[]>([]);
+
+watch(loggedInPlayer, async player => {
+    try {
+        aiWorkerKeys.value = player && !player.isGuest
+            ? await apiGetPlayerAiWorkerKeys()
+            : [];
+    } catch (e) {
+        aiWorkerKeys.value = [];
+
+        // eslint-disable-next-line no-console
+        console.error('Could not load AI worker keys', e);
+    }
+}, { immediate: true });
+
+const panels = computed((): Panel[] => [
+    'interface',
+    'account',
+    'game',
+    'board',
+    'notifications',
+    ...(aiWorkerKeys.value.length > 0 ? ['ai_workers' as const] : []),
+]);
+
+/*
+ * Command to run an AI worker, with selected key and engine.
+ */
+const aiWorkerEngines = ['katahex', 'mohex', 'davies'];
+const enabledAiWorkerKeys = computed(() => aiWorkerKeys.value.filter(aiWorkerKey => aiWorkerKey.enabled));
+const selectedAiWorkerKey = ref<null | PlayerAiWorkerKey>(null);
+const selectedAiWorkerEngine = ref('katahex');
+const aiWorkerCommandCopied = ref(false);
+
+watch(enabledAiWorkerKeys, keys => {
+    selectedAiWorkerKey.value = keys[0] ?? null;
+}, { immediate: true });
+
+const aiWorkerCommand = computed((): string => {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    const engine = selectedAiWorkerEngine.value;
+    const { origin, hostname } = window.location;
+
+    return [
+        'docker run -d --restart unless-stopped',
+        `--name hex-worker-${engine}`,
+
+        // Worker in docker must use host network to reach a hex server running on localhost
+        ...(['localhost', '127.0.0.1'].includes(hostname) ? ['--network host'] : []),
+
+        `-e HEX_URL=${origin}`,
+        `-e AI_WORKER_KEY=${selectedAiWorkerKey.value?.key ?? '<key>'}`,
+        `playhex/worker-${engine}`,
+    ].join(' ');
+});
+
+const copyAiWorkerCommand = async (): Promise<void> => {
+    aiWorkerCommandCopied.value = await copy(aiWorkerCommand.value);
+};
+
+watch(aiWorkerCommand, () => aiWorkerCommandCopied.value = false);
 
 /**
  * In which panel a given section (i.e url hash) is displayed.
@@ -296,6 +362,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'board-orientation': 'board',
     'shading-pattern': 'board',
     'push-notifications': 'notifications',
+    'ai-worker-keys': 'ai_workers',
 };
 
 const currentPanel = ref<Panel>('interface');
@@ -789,6 +856,66 @@ const {
                             :disabled="!subscribed"
                             @click="apiPostPushTest"
                         >Test push notification</button>
+                    </section>
+                </div>
+
+                <!-- AI workers -->
+                <div v-show="'ai_workers' === currentPanel">
+                    <section id="ai-worker-keys">
+                        <h3>{{ $t('player_settings.panel.ai_workers') }}</h3>
+
+                        <p>{{ $t('ai_worker_keys.description') }}</p>
+
+                        <div v-for="aiWorkerKey in aiWorkerKeys" :key="aiWorkerKey.id" class="card mb-3">
+                            <div class="card-body">
+                                <h4 class="card-title mt-0">
+                                    {{ aiWorkerKey.name }}
+                                    <span v-if="!aiWorkerKey.enabled" class="badge text-bg-danger">{{ $t('ai_worker_keys.revoked') }}</span>
+                                </h4>
+
+                                <input
+                                    v-if="aiWorkerKey.enabled"
+                                    type="text"
+                                    class="form-control font-monospace mb-2"
+                                    :value="aiWorkerKey.key"
+                                    readonly
+                                    @focus="($event.target as HTMLInputElement).select()"
+                                >
+
+                                <p class="text-secondary small mb-0">
+                                    {{ $t('ai_worker_keys.last_seen') }}
+                                    {{ aiWorkerKey.lastSeenAt ? new Date(aiWorkerKey.lastSeenAt).toLocaleString() : '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <template v-if="enabledAiWorkerKeys.length > 0">
+                            <h4>{{ $t('ai_worker_keys.run_worker') }}</h4>
+
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-6">
+                                    <label for="ai-worker-key" class="form-label">{{ $t('ai_worker_keys.key') }}</label>
+                                    <select id="ai-worker-key" v-model="selectedAiWorkerKey" class="form-select">
+                                        <option v-for="aiWorkerKey in enabledAiWorkerKeys" :key="aiWorkerKey.id" :value="aiWorkerKey">{{ aiWorkerKey.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="ai-worker-engine" class="form-label">{{ $t('ai_worker_keys.engine') }}</label>
+                                    <select id="ai-worker-engine" v-model="selectedAiWorkerEngine" class="form-select">
+                                        <option v-for="engine in aiWorkerEngines" :key="engine" :value="engine">{{ engine }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <pre class="bg-body-tertiary p-2 mb-2 text-wrap"><code>{{ aiWorkerCommand }}</code></pre>
+
+                            <button type="button" class="btn btn-sm btn-primary" @click="copyAiWorkerCommand">{{ $t('ai_worker_keys.copy_command') }}</button>
+                            <span v-if="aiWorkerCommandCopied" class="text-success ms-2"><IconCheck /> {{ $t('copied!') }}</span>
+
+                            <p class="text-secondary small mt-2 mb-0">
+                                <router-link :to="{ name: 'spawn-worker' }">{{ $t('ai_worker_keys.manage_worker') }}</router-link>
+                            </p>
+                        </template>
                     </section>
                 </div>
 
