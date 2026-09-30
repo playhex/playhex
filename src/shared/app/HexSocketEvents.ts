@@ -165,19 +165,22 @@ export type HexServerToClientEvents = {
     /**
      * A player just disconnected from server.
      * player can be null in case player data were not in list.
+     * Only publicId is sent, client already has player data from playerConnected.
      * totalPlayers is the count of players connected now.
      */
-    playerDisconnected: (player: Player | null, totalPlayers: number) => void;
+    playerDisconnected: (player: Pick<Player, 'publicId'> | null, totalPlayers: number) => void;
 
     /**
      * A player become active.
+     * Only publicId is sent, client already has player data from playerConnected.
      */
-    playerActive: (player: Player) => void;
+    playerActive: (player: Pick<Player, 'publicId'>) => void;
 
     /**
      * A player become inactive.
+     * Only publicId is sent, client already has player data from playerConnected.
      */
-    playerInactive: (player: Player) => void;
+    playerInactive: (player: Pick<Player, 'publicId'>) => void;
 
     /**
      * A chat message has been posted in a game.

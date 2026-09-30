@@ -78,7 +78,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
             .on('playerDisconnected', player => {
                 this.hexServer.to(Rooms.onlinePlayers).emit(
                     'playerDisconnected',
-                    player,
+                    { publicId: player.publicId },
                     this.onlinePlayersService.getOnlinePlayersCount(),
                 );
 
@@ -94,7 +94,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
 
                 this.hexServer.to(Rooms.onlinePlayers).emit(
                     'playerActive',
-                    player,
+                    { publicId: player.publicId },
                 );
 
                 this.emitPlayerStatus(player);
@@ -104,7 +104,7 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
             .on('playerInactive', (player) => {
                 this.hexServer.to(Rooms.onlinePlayers).emit(
                     'playerInactive',
-                    player,
+                    { publicId: player.publicId },
                 );
 
                 this.emitPlayerStatus(player);
