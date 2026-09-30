@@ -323,6 +323,25 @@ describe('ladderRules', () => {
                 [4, 'defender_incoming_full'],
             ]);
         });
+
+        it('lists candidates with when cooldown refusals end', () => {
+            const players = createLadder(5);
+            players[2].lastGameEndedAt = ago(HOUR);
+
+            const candidates = listChallengeCandidates(players[4], players, {
+                ladderSize: 5,
+                ladder: { boardsizeMin: 11, boardsizeMax: 19 },
+                challenges: [endedChallenge(5, 4, 'defender_won', DAY)],
+                now,
+            });
+
+            assert.deepStrictEqual(candidates.map(c => [c.playerId, c.refusal, c.refusalEndsAt?.getTime() ?? null]), [
+                [1, null, null],
+                [2, null, null],
+                [3, 'defender_cooling_down', ago(HOUR).getTime() + defaultLadderRulesConfig.coolingDownMs],
+                [4, 'opponent_cooldown', ago(DAY).getTime() + defaultLadderRulesConfig.revengeCooldownMs],
+            ]);
+        });
     });
 
     describe('results', () => {

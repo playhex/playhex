@@ -736,6 +736,29 @@ export type LadderChallengeableCandidate = {
     playerId: number;
     position: number;
     refusal: null | LadderRefusalReason;
+
+    /**
+     * When refusal ends, for time based refusals (cooldowns). null otherwise.
+     */
+    refusalEndsAt: null | Date;
+};
+
+/**
+ * When a time based refusal ends, so player can be told when they will be able to challenge.
+ * null if refusal does not end by itself at a known date.
+ */
+export const getRefusalEnd = (
+    refusal: null | LadderRefusalReason,
+    challenger: LadderRulesPlayer,
+    defender: LadderRulesPlayer,
+    challenges: LadderRulesChallenge[],
+    config: LadderRulesConfig = defaultLadderRulesConfig,
+): null | Date => {
+    switch (refusal) {
+        case 'defender_cooling_down': return getCoolingDownEnd(defender, config);
+        case 'opponent_cooldown': return getSameOpponentCooldownEnd(challenger.playerId, defender.playerId, challenges, config);
+        default: return null;
+    }
 };
 
 /**
@@ -759,11 +782,16 @@ export const listChallengeCandidates = (
     return players
         .filter(p => p.state === 'active' && p.position !== null && p.position >= range.from && p.position <= range.to)
         .sort((a, b) => a.position! - b.position!)
-        .map(defender => ({
-            playerId: defender.playerId,
-            position: defender.position!,
-            refusal: canChallenge({ ...context, challenger, defender, boardsize: null }),
-        }))
+        .map(defender => {
+            const refusal = canChallenge({ ...context, challenger, defender, boardsize: null });
+
+            return {
+                playerId: defender.playerId,
+                position: defender.position!,
+                refusal,
+                refusalEndsAt: getRefusalEnd(refusal, challenger, defender, context.challenges, context.config),
+            };
+        })
     ;
 };
 

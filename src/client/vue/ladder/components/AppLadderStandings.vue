@@ -8,6 +8,8 @@ import LadderChallengeRefusalOverlay from './LadderChallengeRefusalOverlay.vue';
 import LadderPlayerStatusOverlay from './LadderPlayerStatusOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
 import { t } from 'i18next';
+import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
+import { autoLocale } from '../../../../shared/app/i18n/index.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { IconCrown, IconExclamationTriangleFill, IconGraphUp, IconSearch, IconShieldFill, IconTablerSwords } from '../../icons.js';
 
@@ -58,7 +60,23 @@ const runningChallengesCount = (player: Player): number => props.runningChalleng
     .length
 ;
 
-const refusalText = (ladderPlayer: LadderPlayer): string => t(`ladder.refusal.${candidatesByPlayer.value.get(ladderPlayer.player.publicId)?.refusal}`);
+const formatRefusalEnd = (date: Date): string => intlFormat(
+    date,
+    { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' },
+    { locale: autoLocale() },
+)
+    + ' ('
+    + formatDistanceToNowStrict(date, { addSuffix: true })
+    + ')'
+;
+
+const refusalText = (ladderPlayer: LadderPlayer): string => {
+    const candidate = candidatesByPlayer.value.get(ladderPlayer.player.publicId);
+
+    return t(`ladder.refusal.${candidate?.refusal}`, {
+        date: candidate?.refusalEndsAt ? formatRefusalEnd(candidate.refusalEndsAt) : '',
+    });
+};
 
 const showRefusal = async (ladderPlayer: LadderPlayer): Promise<void> => {
     try {

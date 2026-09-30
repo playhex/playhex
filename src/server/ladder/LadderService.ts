@@ -188,6 +188,7 @@ export default class LadderService
                 candidateDto.player = playersById.get(candidate.playerId)!.player;
                 candidateDto.position = candidate.position;
                 candidateDto.refusal = candidate.refusal;
+                candidateDto.refusalEndsAt = candidate.refusalEndsAt;
 
                 return candidateDto;
             });

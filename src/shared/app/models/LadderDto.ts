@@ -55,6 +55,13 @@ export class LadderChallengeCandidateDto
      */
     @Expose()
     refusal: null | LadderRefusalReason;
+
+    /**
+     * When refusal ends, for cooldowns. null otherwise.
+     */
+    @Expose()
+    @Type(() => Date)
+    refusalEndsAt: null | Date;
 }
 
 /**
