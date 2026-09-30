@@ -19,6 +19,20 @@ const resetDateRange = () => {
     searchGamesParameters.value.endedAtSort = 'desc';
 };
 
+/**
+ * Incomplete date (e.g. year not yet typed) is ignored and shown as invalid.
+ * Class is toggled directly on element to not trigger a re-render, which would reset the input.
+ */
+const onDateInput = (event: Event, key: 'fromEndedAt' | 'toEndedAt') => {
+    const input = event.target as HTMLInputElement;
+
+    input.classList.toggle('is-invalid', input.validity.badInput);
+
+    if (!input.validity.badInput) {
+        searchGamesParameters.value[key] = input.valueAsDate ?? undefined;
+    }
+};
+
 const searchPlayersParameters = ref(new SearchPlayersParameters());
 
 searchPlayersParameters.value.isBot = false;
@@ -70,14 +84,14 @@ searchPlayersParameters.value.isGuest = false;
                     type="date"
                     class="form-control"
                     :value="searchGamesParameters.fromEndedAt?.toISOString().slice(0,10) ?? ''"
-                    @input="searchGamesParameters.fromEndedAt = new Date(($event.target as HTMLInputElement).value)"
+                    @input="onDateInput($event, 'fromEndedAt')"
                 />
                 <span class="input-group-text"><IconArrowRight /></span>
                 <input
                     type="date"
                     class="form-control"
                     :value="searchGamesParameters.toEndedAt?.toISOString().slice(0,10) ?? ''"
-                    @input="searchGamesParameters.toEndedAt = new Date(($event.target as HTMLInputElement).value)"
+                    @input="onDateInput($event, 'toEndedAt')"
                 />
                 <button class="btn btn-sm btn-outline-danger" @click="resetDateRange"><IconX /></button>
             </div>
