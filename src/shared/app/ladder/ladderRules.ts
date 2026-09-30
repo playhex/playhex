@@ -6,7 +6,7 @@
  * Server only loads data, calls these functions, and persists the result.
  * Frontend uses the same functions to display challenge buttons and reasons.
  *
- * Reference: LADDER_RULES.md
+ * Reference: docs/ladder-rules.md
  */
 
 import { isLive } from '../timeControlUtils.js';
