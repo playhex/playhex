@@ -31,7 +31,7 @@ export class GameAnalyzeFacade
 
     constructor(
         private gameView: GameView,
-        private analyze: GameAnalyzeData,
+        private getAnalyze: () => GameAnalyzeData,
         private showPositionAt: (index: number) => void,
     ) {
         this.playedMoveMark.hide();
@@ -122,7 +122,7 @@ export class GameAnalyzeFacade
         }
 
         this.selectedMoveIndex = moveIndex;
-        this.showAnalysisMarks(this.analyze[moveIndex] ?? null);
+        this.showAnalysisMarks(this.getAnalyze()[moveIndex] ?? null);
     }
 
     hideCurrentAnalysisMarks(): void
@@ -135,7 +135,7 @@ export class GameAnalyzeFacade
     showCurrentAnalysisMarks(): void
     {
         if (this.selectedMoveIndex !== null) {
-            this.showAnalysisMarks(this.analyze[this.selectedMoveIndex] ?? null);
+            this.showAnalysisMarks(this.getAnalyze()[this.selectedMoveIndex] ?? null);
         }
     }
 }

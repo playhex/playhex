@@ -7,6 +7,12 @@
 # Adminer:      http://localhost:8080
 # Redis Insight: http://localhost:5540
 #
+# AI worker (katahex: bot moves, game analyzes, Hexplorer), not started by default.
+# Create a key with `pnpm hex ai-worker-key:create <player id or slug>`,
+# set AI_WORKER_KEY in docker-compose.override.yml, then:
+#   docker compose --profile ai up -d katahex
+#   docker compose --profile ai up -d --scale katahex=3 katahex
+#
 # To override ports or disable services locally,
 # create a docker-compose.override.yml file with:
 #
@@ -17,6 +23,10 @@
 #
 #     redisinsight:
 #         profiles: [disabled]
+#
+#     katahex:
+#         environment:
+#             AI_WORKER_KEY: "AtXXXbI"
 
 services:
     mysql:
@@ -68,6 +78,17 @@ services:
             - redisinsight-data:/data
         depends_on:
             - redis
+
+    katahex:
+        image: playhex/worker-katahex
+        profiles: [ai]
+        environment:
+            # hex server runs on host, not in docker
+            HEX_URL: http://host.docker.internal:${PORT:-3000}
+            AI_WORKER_KEY: "XXX"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        restart: unless-stopped
 
 volumes:
     mysql-data:

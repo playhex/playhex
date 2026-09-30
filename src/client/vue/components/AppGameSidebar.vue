@@ -930,8 +930,8 @@ watch(gameUIMode, () => {
                             <span v-else class="ps-2 text-body-secondary">{{ $t('game_analysis.in_progress', { done: analyzedMovesCount, total: gameAnalyze.analyze.length }) }}</span>
                         </small>
 
-                        <!-- Anayze graph. Chart does not update, recreate it on each analyzed move while in progress -->
-                        <AppGameAnalyze :analyze="gameAnalyze.analyze" :key="analyzedMovesCount" />
+                        <!-- Anayze graph -->
+                        <AppGameAnalyze :analyze="gameAnalyze.analyze" />
                     </div>
 
                     <div v-else>
