@@ -5,6 +5,7 @@ import AiJobService, { AiJobError } from '../../ai-jobs/AiJobService.js';
 import AiWorkersRegistry from '../../ai-jobs/worker/AiWorkersRegistry.js';
 import { AI_JOB_TYPES, getEngineAiJobTypes, type AiJobType, type AnalyzeMoveInput, type AnalyzeMoveOutput } from '../../ai-jobs/protocol.js';
 import type { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
+import { MCTS_PLAYOUTS } from '../../../shared/app/mctsSettings.js';
 
 const analyzeMoveOutput = (input: AnalyzeMoveInput): AnalyzeMoveOutput => ({
     moveIndex: input.moveIndex,
@@ -195,6 +196,29 @@ describe('AiJobService', () => {
         }, 50), AiJobError);
 
         assert.deepStrictEqual(await aiJobService.queue.getCounts('katahex-intuition-move'), { waiting: 0, active: 0 });
+    });
+
+    it('sends tree search jobs with playouts set by server', async () => {
+        const { queue } = aiJobService;
+        const input: AnalyzeMoveInput = { moveIndex: 2, move: 'c3', color: 'black', isLastMoveOfGame: false, movesHistory: 'a1 b2', size: 5 };
+
+        const positionPromise = aiJobService.analyzePosition({ size: 5, color: 'black', black: '', white: '' }, true);
+        const movePromise = aiJobService.analyzeMoveMcts(input);
+
+        await setImmediate();
+
+        const positionJob = await queue.reserve(['katahex-mcts-analyze-position'], { waitMs: 0 });
+        const moveJob = await queue.reserve(['katahex-mcts-analyze-move'], { waitMs: 0 });
+
+        assert.ok(positionJob && moveJob);
+        assert.strictEqual((positionJob.task.data as { maxPlayouts: number }).maxPlayouts, MCTS_PLAYOUTS);
+        assert.deepStrictEqual(moveJob.task.data, { ...input, maxPlayouts: MCTS_PLAYOUTS });
+
+        await queue.complete(positionJob.jobId, positionJob.token, { whiteWin: 0.5, policy: [] });
+        await queue.complete(moveJob.jobId, moveJob.token, analyzeMoveOutput(input));
+
+        assert.deepStrictEqual(await positionPromise, { whiteWin: 0.5, policy: [] });
+        assert.deepStrictEqual(await movePromise, analyzeMoveOutput(input));
     });
 
     it('refuses board sizes not supported by engine', async () => {

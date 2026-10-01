@@ -28,7 +28,7 @@ const moveClass = (whiteWin: null | number): string => {
             v-for="move, key in props.analyze"
             :key
             class="move"
-            :class="moveClass(move?.move.whiteWin ?? null)"
+            :class="moveClass(move?.mcts?.move.whiteWin ?? move?.move.whiteWin ?? null)"
         ></div>
     </div>
 </template>

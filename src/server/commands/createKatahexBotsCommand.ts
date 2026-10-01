@@ -11,10 +11,10 @@ hexProgram
         console.log('Creating bot "Katahex intuition"...');
 
         created = await createAiConfigIfNotExists({
-            config: { treeSearch: false },
+            config: { maxPlayouts: 0 },
             engine: 'katahex',
             label: 'Katahex Intuition',
-            description: 'model only',
+            description: 'model only (no simulations)',
             order: 30,
             boardsizeMin: 2,
             boardsizeMax: 32,
@@ -30,15 +30,15 @@ hexProgram
         console.log('Creating bot "Katahex"...');
 
         created = await createAiConfigIfNotExists({
-            config: { treeSearch: true },
+            config: { maxPlayouts: 400 },
             engine: 'katahex',
-            label: 'Katahex Full',
-            description: 'model + simulations',
+            label: 'Katahex 400',
+            description: 'max 400 simulations',
             order: 31,
             boardsizeMin: 2,
             boardsizeMax: 32,
-            pseudo: 'Katahex',
-            slug: 'katahex',
+            pseudo: 'Katahex 400',
+            slug: 'katahex-400',
             relativeLevel: 6,
         }, reusePlayer);
 

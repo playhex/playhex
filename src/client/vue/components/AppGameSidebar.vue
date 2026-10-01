@@ -931,7 +931,7 @@ watch(gameUIMode, () => {
                         </small>
 
                         <!-- Anayze graph -->
-                        <AppGameAnalyze :analyze="gameAnalyze.analyze" />
+                        <AppGameAnalyze :analyze="gameAnalyze.analyze" :gamePublicId="gameId" :deepAnalyzeEnabled="null !== gameAnalyze.endedAt" />
                     </div>
 
                     <div v-else>

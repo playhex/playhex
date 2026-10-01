@@ -541,6 +541,17 @@ export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameA
     return plainToInstance(GameAnalyze, await response.json());
 };
 
+export const apiRequestGameAnalyzeMoveMcts = async (gamePublicId: string, moveIndex: number): Promise<void> => {
+    const response = await fetch(`/api/games/${gamePublicId}/analyze/moves/${moveIndex}/mcts`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+};
+
 export const apiGetGameRatingUpdates = async (gamePublicId: string, category: RatingCategory = 'overall'): Promise<null | Rating[]> => {
     const response = await fetch(`/api/games/${gamePublicId}/ratings/${category}`, {
         method: 'GET',

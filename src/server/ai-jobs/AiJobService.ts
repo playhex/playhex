@@ -6,7 +6,8 @@ import InMemoryAiJobQueue from './queue/InMemoryAiJobQueue.js';
 import AiWorkersRegistry from './worker/AiWorkersRegistry.js';
 import { processDavies } from './queue/localProcessors.js';
 import { consolidateGameAnalyze, hasSwapMove, splitToAnalyzeMoveInputs, type AnalyzeGameRequest } from './gameAnalyze.js';
-import type { AiJobType, AiTask, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, MoveOutput, MoveTask } from './protocol.js';
+import type { AiJobType, AiTask, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, MoveOutput, MoveTask } from './protocol.js';
+import { MCTS_PLAYOUTS } from '../../shared/app/mctsSettings.js';
 import type { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import logger from '../services/logger.js';
 
@@ -37,6 +38,12 @@ const ANALYZE_MOVE_TIMEOUT_MS = 60 * 60_000;
  * (i.e job given back to queue after its worker stopped, and no worker left to take it).
  */
 const ANALYZE_MOVE_PROCESSING_GRACE_MS = 10 * 60_000;
+
+/**
+ * Max time to wait for a single move deep analyze, a player is waiting for it,
+ * but tree search takes time and analyzes are processed after bot moves and Hexplorer.
+ */
+const ANALYZE_MOVE_MCTS_TIMEOUT_MS = 10 * 60_000;
 
 /**
  * Error from AI job: task invalid, no worker processed it in time, or worker failed.
@@ -203,11 +210,31 @@ export default class AiJobService
     }
 
     /**
+     * @param mcts Whether to use tree search, with MCTS_PLAYOUTS, instead of raw neural network output.
+     *
      * @throws {AiJobError}
      */
-    async analyzePosition(input: AnalyzePositionInput): Promise<AnalyzePositionOutput>
+    async analyzePosition(input: AnalyzePositionInput, mcts = false): Promise<AnalyzePositionOutput>
     {
-        return await this.submitAndWait({ type: 'katahex-intuition-analyze-position', data: input }, ANALYZE_POSITION_TIMEOUT_MS) as AnalyzePositionOutput;
+        const task: AiTask = mcts
+            ? { type: 'katahex-mcts-analyze-position', data: { ...input, maxPlayouts: MCTS_PLAYOUTS } }
+            : { type: 'katahex-intuition-analyze-position', data: input }
+        ;
+
+        return await this.submitAndWait(task, ANALYZE_POSITION_TIMEOUT_MS) as AnalyzePositionOutput;
+    }
+
+    /**
+     * Analyze a single move of a game with tree search, with MCTS_PLAYOUTS.
+     *
+     * @throws {AiJobError}
+     */
+    async analyzeMoveMcts(input: AnalyzeMoveInput): Promise<AnalyzeMoveOutput>
+    {
+        return await this.submitAndWait({
+            type: 'katahex-mcts-analyze-move',
+            data: { ...input, maxPlayouts: MCTS_PLAYOUTS },
+        }, ANALYZE_MOVE_MCTS_TIMEOUT_MS) as AnalyzeMoveOutput;
     }
 
     /**

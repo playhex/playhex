@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { consolidateGameAnalyze, hasSwapMove, splitToAnalyzeMoveInputs } from '../../ai-jobs/gameAnalyze.js';
+import { consolidateGameAnalyze, getAnalyzeMoveInput, hasSwapMove, splitToAnalyzeMoveInputs } from '../../ai-jobs/gameAnalyze.js';
 import type { AnalyzeMoveOutput } from '../../ai-jobs/protocol.js';
 
 const moveAnalyze = (moveIndex: number, move: string, whiteWin: number, bestMoves: AnalyzeMoveOutput['bestMoves'] = []): AnalyzeMoveOutput => ({
@@ -30,6 +30,17 @@ describe('gameAnalyze', () => {
             assert.strictEqual(inputs[1].movesHistory, 'a2 swap-pieces');
             assert.strictEqual(hasSwapMove({ size: 11, movesHistory: 'a2 swap-pieces c3' }), true);
             assert.strictEqual(hasSwapMove({ size: 11, movesHistory: 'a2 b3 c3' }), false);
+        });
+    });
+
+    describe('getAnalyzeMoveInput', () => {
+        it('creates task of a single move, same as when splitting game', () => {
+            const request = { size: 11, movesHistory: 'a1 b2 c3' };
+
+            assert.deepStrictEqual(getAnalyzeMoveInput(request, 1), splitToAnalyzeMoveInputs(request)[1]);
+            assert.deepStrictEqual(getAnalyzeMoveInput(request, 2), splitToAnalyzeMoveInputs(request)[2]);
+            assert.strictEqual(getAnalyzeMoveInput(request, 3), null);
+            assert.strictEqual(getAnalyzeMoveInput(request, -1), null);
         });
     });
 

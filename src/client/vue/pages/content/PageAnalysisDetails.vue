@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue';
 import { IconInfoCircleFill } from '../../icons.js';
+import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
 
 useSeoMeta({
     title: 'AI game analysis',
@@ -20,8 +21,8 @@ useSeoMeta({
     <p>
         The AI analysis uses KataHex, a neural network trained by
         <a href="https://github.com/hzyhhzy" target="_blank">hzyhhzy</a>
-        (you can find him on Hex Discord). Currently, only the evaluation from
-        the neural network raw output is used (without MCTS playouts). This
+        (you can find him on Hex Discord). The game analysis uses the evaluation
+        from the neural network raw output (without MCTS playouts). This
         allows to analyze a game in less than 20 seconds using a single average
         worker. The analysis is parallelized, so this time is split when
         multiple workers are up.
@@ -48,8 +49,10 @@ useSeoMeta({
     </p>
 
     <p>
-        In the future, multiple playouts of the Monte Carlo tree search will be
-        run to make the analysis more confident and to get the full lines of
-        moves.
+        Once the game is analyzed, players can request a deep analysis
+        of any move: it runs {{ MCTS_PLAYOUTS }} playouts of the Monte Carlo tree search (MCTS),
+        which makes the evaluation more confident. Deeply analyzed moves are shown
+        in front of the graph, other moves stay in background until they are
+        deeply analyzed too.
     </p>
 </template>

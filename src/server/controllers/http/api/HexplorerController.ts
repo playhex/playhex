@@ -2,11 +2,11 @@ import { BadRequestError, Body, CurrentUser, HttpError, JsonController, Post, Re
 import type { Request } from 'express';
 import { Service } from 'typedi';
 import { createClient } from 'redis';
-import { ArrayMaxSize, IsArray, IsIn, IsInt, Max, Min, Validate } from 'class-validator';
-import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
+import { ArrayMaxSize, IsArray, IsIn, IsInt, IsOptional, Max, Min, Validate } from 'class-validator';
+import { ANALYSIS_ENGINES, analysisCacheKey, type AnalysisEngine, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/models/GameOptions.js';
 import { IsHexCoordinate } from '../../../../shared/app/validator/IsHexCoordinate.js';
-import { rateLimiterConsumeAnalyzePosition } from '../../../services/rate-limiters.js';
+import { rateLimiterConsumeAnalyzePosition, rateLimiterConsumeAnalyzePositionMcts } from '../../../services/rate-limiters.js';
 import { SimilarPlayingPositionChecker } from '../../../services/anti-cheat/SimilarPlayingPositionChecker.js';
 import type { Move } from '@playhex/move-notation';
 import { InvalidPositionError, type CanonicalPosition } from '../../../../shared/position-comparator/position-comparator.js';
@@ -45,6 +45,13 @@ class AnalyzePositionInput implements AnalysisInput
     @ArrayMaxSize(MAX_STONES)
     @Validate(IsHexCoordinate, { each: true })
     white: string[];
+
+    /**
+     * Only the engine can be chosen, its power (i.e playouts) is set by server.
+     */
+    @IsOptional()
+    @IsIn(ANALYSIS_ENGINES)
+    engine?: AnalysisEngine;
 }
 
 const { REDIS_URL, REDIS_PREFIX } = process.env;
@@ -73,6 +80,8 @@ export default class HexplorerController
         @Req() request: Request,
         @CurrentUser() player?: Player,
     ): Promise<AnalysisOutput> {
+        const mcts = body.engine === 'katahex-mcts';
+
         await rateLimiterConsumeAnalyzePosition(request.ip);
 
         let position: CanonicalPosition;
@@ -107,6 +116,7 @@ export default class HexplorerController
             color: body.color,
             black: position.black,
             white: position.white,
+            engine: mcts ? 'katahex-mcts' : 'katahex-intuition',
         };
 
         const cacheKey = redisKeyPrefix + analysisCacheKey(input);
@@ -118,15 +128,21 @@ export default class HexplorerController
             }
         }
 
-        if (!this.aiJobService.isJobTypeAvailable('katahex-intuition-analyze-position')) {
+        if (!this.aiJobService.isJobTypeAvailable(mcts ? 'katahex-mcts-analyze-position' : 'katahex-intuition-analyze-position')) {
             throw new HttpError(503, 'No AI worker can analyze positions right now');
         }
 
+        // Only when a tree search is actually run, cached results are cheap
+        if (mcts) {
+            await rateLimiterConsumeAnalyzePositionMcts(request.ip);
+        }
+
         const result: AnalysisOutput = await this.aiJobService.analyzePosition({
-            ...input,
+            size: input.size,
+            color: input.color,
             black: input.black.join(' '),
             white: input.white.join(' '),
-        });
+        }, mcts);
 
         if (redisClient) {
             void redisClient.set(cacheKey, JSON.stringify(result), {

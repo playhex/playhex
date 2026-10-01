@@ -12,6 +12,7 @@ flowchart LR
     bots["Bots (AIConfig)<br>engine + config"]
     hexplorer["Hexplorer"]
     analyze["Game analyze<br>1 job per move"]
+    deep["Deep analyze<br>of a single move"]
 
     subgraph hex["hex server: AiJobService, one queue per job type"]
         direction TB
@@ -20,9 +21,9 @@ flowchart LR
         q3["mohex"]
         q4["davies"]
         q5["katahex-intuition-analyze-position"]
-        q7["katahex-mcts-analyze-position<br>(not yet used)"]
+        q7["katahex-mcts-analyze-position"]
         q6["katahex-intuition-analyze-move"]
-        q8["katahex-mcts-analyze-move<br>(not yet used)"]
+        q8["katahex-mcts-analyze-move"]
     end
 
     subgraph workers["Workers, pull jobs from /api/ai-workers<br>HTTPS long-polling, Bearer AI_WORKER_KEY"]
@@ -32,19 +33,21 @@ flowchart LR
         wd["playhex/worker-davies<br>ENGINE=davies"]
     end
 
-    bots -- "katahex, treeSearch: false" --> q1
-    bots -- "katahex, treeSearch: true" --> q2
+    bots -- "katahex, maxPlayouts: 0" --> q1
+    bots -- "katahex, maxPlayouts > 0" --> q2
     bots -- "mohex" --> q3
     bots -- "davies" --> q4
-    hexplorer --> q5
+    hexplorer -- "katahex-intuition" --> q5
+    hexplorer -- "katahex-mcts" --> q7
     analyze --> q6
+    deep --> q8
 
     q1 --> wk
     q5 --> wk
     q6 --> wk
     q2 -. "opt-in: AI_JOB_TYPES" .-> wk
-    q7 -.-> wk
-    q8 -.-> wk
+    q7 -. "opt-in" .-> wk
+    q8 -. "opt-in" .-> wk
     q3 --> wm
     q4 --> wd
     q4 -. "dev only" .-> local["davies computed by hex server<br>no worker needed"]
@@ -54,14 +57,14 @@ flowchart LR
 
 | Bot (AIConfig)                    | Job type = queue                     | Task data                      | Worker engine | Docker image             |
 |-----------------------------------|--------------------------------------|--------------------------------|---------------|--------------------------|
-| `katahex`, `treeSearch: false`    | `katahex-intuition-move`             | `KatahexMoveInput`             | `katahex`     | `playhex/worker-katahex` |
-| `katahex`, `treeSearch: true`     | `katahex-mcts-move`                  | `KatahexMoveInput`             | `katahex`     | `playhex/worker-katahex` |
+| `katahex`, `maxPlayouts: 0`       | `katahex-intuition-move`             | `KatahexMoveInput`             | `katahex`     | `playhex/worker-katahex` |
+| `katahex`, `maxPlayouts: N > 0`   | `katahex-mcts-move`                  | `KatahexMctsMoveInput`         | `katahex`     | `playhex/worker-katahex` |
 | `mohex`, `maxGames`               | `mohex`                              | `MohexMoveInput`               | `mohex`       | `playhex/worker-mohex`   |
 | `davies`, `level`                 | `davies`                             | `DaviesMoveInput`              | `davies`      | `playhex/worker-davies`  |
-| (Hexplorer)                       | `katahex-intuition-analyze-position` | `AnalyzePositionInput`         | `katahex`     | `playhex/worker-katahex` |
+| (Hexplorer, intuition)            | `katahex-intuition-analyze-position` | `AnalyzePositionInput`         | `katahex`     | `playhex/worker-katahex` |
 | (Game analyze, one job per move)  | `katahex-intuition-analyze-move`     | `AnalyzeMoveInput`             | `katahex`     | `playhex/worker-katahex` |
-| (not yet used)                    | `katahex-mcts-analyze-position`      | `AnalyzePositionInput`         | `katahex`     | `playhex/worker-katahex` |
-| (not yet used)                    | `katahex-mcts-analyze-move`          | `AnalyzeMoveInput`             | `katahex`     | `playhex/worker-katahex` |
+| (Hexplorer, MCTS)                 | `katahex-mcts-analyze-position`      | `MctsAnalyzePositionInput`     | `katahex`     | `playhex/worker-katahex` |
+| (Deep analyze of a single move)   | `katahex-mcts-analyze-move`          | `MctsAnalyzeMoveInput`         | `katahex`     | `playhex/worker-katahex` |
 | `random`                          | none, computed by server             |                                |               |                          |
 
 - **Engine**: AI program run by a worker (`ENGINES` in protocol). One worker process runs one engine.
@@ -73,7 +76,10 @@ flowchart LR
   A key can be used by multiple workers. Processes default job types of its engine, or the ones listed in `AI_JOB_TYPES` env var.
 - **Opt-in job types**: `katahex-mcts-*` (`OPT_IN_AI_JOB_TYPES` in protocol), require more computing power.
   Not processed by default, only by workers listing them in `AI_JOB_TYPES`.
-  So the `katahex` bot (`treeSearch: true`) is available only when such a worker is connected.
+  So katahex bots with `maxPlayouts > 0`, Hexplorer MCTS and deep analyzes are available only when such a worker is connected.
+- **Playouts**: set by bots config (`maxPlayouts`) for bot moves,
+  and by server (`MCTS_PLAYOUTS` in `src/shared/app/mctsSettings.ts`) for analyzes, clients cannot choose them.
+  `MCTS_PLAYOUTS` is part of MCTS analyzes cache keys (`analysisCacheKey()`), so it can be changed between releases.
 
 ## Dev and prod
 
@@ -122,7 +128,7 @@ sequenceDiagram
 ```
 
 - **Priority**: a worker processing multiple job types gets jobs by `AI_JOB_TYPES` order
-  (bot moves, then Hexplorer, then game analyzes), then oldest first in a queue.
+  (bot moves, then Hexplorer, then game analyzes and deep analyzes), then oldest first in a queue.
   A queue without any worker does not block other queues.
 - **No heartbeat for 30s** (worker killed, laptop closed): job is given to another worker, up to 3 times, then fails.
   The old worker gets 409 and abandons the job.
@@ -148,3 +154,21 @@ Partial results are kept in memory only: if server restarts, the analyze is mark
 Moves not taken by a worker within 1h fail (null in analyze).
 10 minutes later, the analyze ends anyway with moves analyzed so far,
 in case a move job is still waiting in queue with no worker left to take it.
+
+## Deep analyze of a move
+
+Once a game analyze has ended, a logged in player can request a deep analyze of any move
+(`PUT /api/games/:publicId/analyze/moves/:moveIndex/mcts`, rate limited per player).
+
+```mermaid
+flowchart LR
+    player["Player"] -- "PUT .../moves/:moveIndex/mcts" --> job["1 job<br>katahex-mcts-analyze-move<br>maxPlayouts: MCTS_PLAYOUTS"]
+    job --> worker["katahex worker<br>with opt-in mcts job types"]
+    worker -- "result" --> db["analyze[moveIndex].mcts<br>saved in GameAnalyze"]
+    db --> ws["emit websocket 'analyze'"]
+    worker -- "failed or timeout (10 min)" --> failed["emit websocket 'analyzeMoveMctsFailed'"]
+```
+
+- Intuition analyze of the move is kept, deep analyze is added in `mcts`, and displayed instead of intuition.
+- A move already deeply analyzed, or being analyzed, is not analyzed again (pending analyzes kept in memory by `GameAnalyzeController`).
+- Results of a same game are saved one after the other, to not lose one when two finish at the same time.

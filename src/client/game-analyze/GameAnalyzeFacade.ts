@@ -1,4 +1,4 @@
-import { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
+import { GameAnalyzeData, GameAnalyzeMoveMcts } from '../../shared/app/models/GameAnalyze.js';
 import { GameView } from '@playhex/pixi-board';
 import { BestMoveMark } from './BestMoveMark.js';
 import { PlayedMoveMark } from './PlayedMoveMark.js';
@@ -16,6 +16,23 @@ export type AnalyzeMoveOutput = {
     move: MoveAndValue;
     bestMoves: MoveAndValue[];
     whiteWin: number;
+};
+
+/**
+ * Move analyze to display: deep analyze (tree search) if any, else intuition.
+ */
+export const preferMctsAnalyze = (moveAnalyze: undefined | GameAnalyzeData[number]): null | (AnalyzeMoveOutput & { mcts?: GameAnalyzeMoveMcts }) => {
+    if (!moveAnalyze) {
+        return null;
+    }
+
+    if (!moveAnalyze.mcts) {
+        return moveAnalyze;
+    }
+
+    const { whiteWin, move, bestMoves } = moveAnalyze.mcts;
+
+    return { ...moveAnalyze, whiteWin, move, bestMoves };
 };
 
 /**
@@ -122,7 +139,7 @@ export class GameAnalyzeFacade
         }
 
         this.selectedMoveIndex = moveIndex;
-        this.showAnalysisMarks(this.getAnalyze()[moveIndex] ?? null);
+        this.showAnalysisMarks(preferMctsAnalyze(this.getAnalyze()[moveIndex]));
     }
 
     hideCurrentAnalysisMarks(): void
@@ -135,7 +152,7 @@ export class GameAnalyzeFacade
     showCurrentAnalysisMarks(): void
     {
         if (this.selectedMoveIndex !== null) {
-            this.showAnalysisMarks(this.getAnalyze()[this.selectedMoveIndex] ?? null);
+            this.showAnalysisMarks(preferMctsAnalyze(this.getAnalyze()[this.selectedMoveIndex]));
         }
     }
 }

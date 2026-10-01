@@ -15,24 +15,43 @@ export const hasSwapMove = ({ movesHistory }: AnalyzeGameRequest): boolean =>
     movesHistory.split(' ')[1] === 'swap-pieces'
 ;
 
+const parseMoves = (movesHistory: string): string[] =>
+    movesHistory.split(' ').filter(move => move !== '')
+;
+
+const toAnalyzeMoveInput = (size: number, moves: string[], moveIndex: number): AnalyzeMoveInput => ({
+    color: moveIndex % 2 === 0 ? 'black' : 'white',
+    move: moves[moveIndex],
+    moveIndex,
+    movesHistory: moves.slice(0, moveIndex).join(' '),
+    size,
+    isLastMoveOfGame: moveIndex === moves.length - 1,
+});
+
 /**
  * Split a game to analyze in one task per move, to parallelize them.
  * Swap move is not analyzed, it is deduced from third move analyze, see addSwapMoveAnalyze().
  */
 export const splitToAnalyzeMoveInputs = ({ size, movesHistory }: AnalyzeGameRequest): AnalyzeMoveInput[] => {
-    const moves = movesHistory.split(' ').filter(move => move !== '');
+    const moves = parseMoves(movesHistory);
 
     return moves
-        .map((move, moveIndex): AnalyzeMoveInput => ({
-            color: moveIndex % 2 === 0 ? 'black' : 'white',
-            move,
-            moveIndex,
-            movesHistory: moves.slice(0, moveIndex).join(' '),
-            size,
-            isLastMoveOfGame: moveIndex === moves.length - 1,
-        }))
+        .map((_, moveIndex) => toAnalyzeMoveInput(size, moves, moveIndex))
         .filter(input => !(input.moveIndex === 1 && input.move === 'swap-pieces'))
     ;
+};
+
+/**
+ * Input to analyze a single move of a game, or null if there is no move at this index.
+ */
+export const getAnalyzeMoveInput = ({ size, movesHistory }: AnalyzeGameRequest, moveIndex: number): null | AnalyzeMoveInput => {
+    const moves = parseMoves(movesHistory);
+
+    if (moveIndex < 0 || moveIndex >= moves.length) {
+        return null;
+    }
+
+    return toAnalyzeMoveInput(size, moves, moveIndex);
 };
 
 const mirrorMoveAndValue = (moveAndValue: MoveAndValue): MoveAndValue => ({

@@ -2,23 +2,66 @@
 import { PropType, computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { GameAnalyzeData } from '../../../shared/app/models/GameAnalyze.js';
-import { GameAnalyzeFacade, AnalyzeMoveOutput } from '../../game-analyze/GameAnalyzeFacade.js';
+import { GameAnalyzeFacade, preferMctsAnalyze } from '../../game-analyze/GameAnalyzeFacade.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { playhexTheme, resolveTheme } from '@playhex/pixi-board';
+import { isSpecialHexMove } from '@playhex/move-notation';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
+import useAnalyzeStore from '../../stores/analyzeStore.js';
+import useAuthStore from '../../stores/authStore.js';
 
 const props = defineProps({
     analyze: {
         type: Object as PropType<GameAnalyzeData>,
         required: true,
     },
+    gamePublicId: {
+        type: String,
+        required: true,
+    },
+
+    /**
+     * Whether moves can be deeply analyzed, i.e game analyze has ended.
+     */
+    deepAnalyzeEnabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const highlightedIndex = ref<null | number>(null);
-const moveAnalyze = computed((): null | AnalyzeMoveOutput => highlightedIndex.value === null
+const selectedIndex = ref<null | number>(null);
+const moveAnalyze = computed(() => highlightedIndex.value === null
     ? null
-    : props.analyze[highlightedIndex.value] ?? null,
+    : preferMctsAnalyze(props.analyze[highlightedIndex.value]),
 );
+
+/**
+ * Once a move is deeply analyzed, intuition analyzes are shown in background.
+ */
+const hasMcts = computed((): boolean => props.analyze.some(move => move?.mcts));
+
+const analyzeStore = useAnalyzeStore();
+const { loggedInPlayer } = storeToRefs(useAuthStore());
+
+const isDeepAnalyzePending = computed((): boolean => moveAnalyze.value !== null
+    && analyzeStore.isMctsMoveAnalyzePending(props.gamePublicId, moveAnalyze.value.moveIndex),
+);
+
+const canRequestDeepAnalyze = computed((): boolean => props.deepAnalyzeEnabled
+    && loggedInPlayer.value !== null
+    && moveAnalyze.value !== null
+    && !moveAnalyze.value.mcts
+    && !isSpecialHexMove(moveAnalyze.value.move.move),
+);
+
+const requestDeepAnalyze = (): void => {
+    if (moveAnalyze.value === null) {
+        return;
+    }
+
+    void analyzeStore.requestMctsMoveAnalyze(props.gamePublicId, moveAnalyze.value.moveIndex);
+};
 
 const toCssColor = (color: number): string => '#' + color.toString(16).padStart(6, '0');
 
@@ -48,6 +91,12 @@ const displayedWhiteWin = (moveAnalyze: GameAnalyzeData[number]): null | number 
         ?? null
     ;
 };
+
+/**
+ * Color of the bar: player2 (white) when winning, else player1.
+ * Unknown win rate is considered even.
+ */
+const barColorClass = (whiteWin: null | number): string => (whiteWin ?? 0.5) >= 0.5 ? 'player2' : 'player1';
 
 /**
  * Bar from middle, up for player2, down for player1.
@@ -83,8 +132,27 @@ const highlightMove = (moveIndex: number): void => {
 
 const selectMove = (moveIndex: number): void => {
     highlightedIndex.value = moveIndex;
+    selectedIndex.value = moveIndex;
     gameAnalyzeFacade?.selectMove(moveIndex);
 };
+
+/**
+ * Show selected move info again, so it can be deeply analyzed.
+ */
+const unhighlightMove = (): void => {
+    highlightedIndex.value = selectedIndex.value;
+};
+
+// Show deep analyze marks on board once received for selected move.
+// Not while exploring a variation, it would reset it: marks are shown when back to main position.
+watch(
+    () => selectedIndex.value !== null && !!props.analyze[selectedIndex.value]?.mcts,
+    hasMctsResult => {
+        if (hasMctsResult && simulatePlayingGameFacade.value?.getSimulationCursor() === 0) {
+            gameAnalyzeFacade?.showCurrentAnalysisMarks();
+        }
+    },
+);
 
 onMounted(() => {
     if (gameView.value) {
@@ -132,7 +200,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="analyze-chart" :style="chartColors">
+    <div class="analyze-chart" :style="chartColors" @mouseleave="unhighlightMove()">
         <div
             v-for="(move, moveIndex) in props.analyze"
             :key="moveIndex"
@@ -144,8 +212,14 @@ onUnmounted(() => {
             <div v-if="null === displayedWhiteWin(move)" class="pending"></div>
             <div
                 class="bar"
-                :class="(displayedWhiteWin(move) ?? 0.5) >= 0.5 ? 'player2' : 'player1'"
+                :class="[barColorClass(displayedWhiteWin(move)), { background: hasMcts }]"
                 :style="barStyle(displayedWhiteWin(move))"
+            ></div>
+            <div
+                v-if="move?.mcts"
+                class="bar"
+                :class="barColorClass(move.mcts.move.whiteWin)"
+                :style="barStyle(move.mcts.move.whiteWin)"
             ></div>
         </div>
     </div>
@@ -166,6 +240,13 @@ onUnmounted(() => {
                 - {{ $t('game_analysis.best') }} <span :class="moveAnalyze.color">{{ moveAnalyze.bestMoves[0].move }}</span>
                 ({{ moveAnalyze.bestMoves[0].whiteWin?.toFixed(2) ?? '-' }})
             </template>
+
+            <span v-if="moveAnalyze.mcts" class="badge text-bg-secondary ms-1">MCTS {{ moveAnalyze.mcts.playouts }}</span>
+            <span v-else-if="isDeepAnalyzePending" class="text-body-secondary ms-1">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                {{ $t('game_analysis.analyzing') }}
+            </span>
+            <button v-else-if="canRequestDeepAnalyze" type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline" @click="requestDeepAnalyze()">{{ $t('game_analysis.deep_analysis') }}</button>
         </small>
     </div>
 </template>
@@ -197,6 +278,9 @@ onUnmounted(() => {
 
         &.player2
             background-color var(--analyze-player2)
+
+        &.background
+            opacity 0.3
 
     .pending
         position absolute

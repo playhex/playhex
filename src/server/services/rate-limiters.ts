@@ -99,6 +99,25 @@ const analyzePositionLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Same as analyzePositionLimiter, for hexplorer analysis with tree search, way more expensive.
+ * Consumed in addition to analyzePositionLimiter, only when not cached.
+ */
+const analyzePositionMctsLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.analyze_position_mcts',
+    points: 30,
+    duration: 60,
+});
+
+/**
+ * Limit game analyze moves deep analyzes (tree search), by player.
+ */
+const analyzeMoveMctsLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.analyze_move_mcts',
+    points: 30,
+    duration: 300,
+});
+
+/**
  * Limit jobs an AI worker key can take, to prevent a key taking jobs in loop without processing them.
  * Generous: fast jobs (raw neural network move) can take less than a second.
  */
@@ -203,6 +222,16 @@ export const rateLimiterConsumeAnalyzePosition = async (ip: string | undefined) 
     if (ip) {
         await consume(analyzePositionLimiter, ip);
     }
+};
+
+export const rateLimiterConsumeAnalyzePositionMcts = async (ip: string | undefined) => {
+    if (ip) {
+        await consume(analyzePositionMctsLimiter, ip);
+    }
+};
+
+export const rateLimiterConsumeAnalyzeMoveMcts = async (playerPublicId: string) => {
+    await consume(analyzeMoveMctsLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {

@@ -46,8 +46,9 @@ import MoveTree from '../components/MoveTree.vue';
 import ImportFormatsHelpOverlay from '../overlays/ImportFormatsHelpOverlay.vue';
 import { PlaceMarkTool } from '../tools/PlaceMarkTool.js';
 import { NoopAnalyzer } from '../analyzers/NoopAnalyzer';
-import { KatahexIntuitionAnalyzer } from '../analyzers/KatahexIntuitionAnalyzer.js';
+import { KatahexAnalyzer } from '../analyzers/KatahexAnalyzer.js';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
+import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
 
 useHead({
     title: t('hexplorer.title'),
@@ -55,7 +56,8 @@ useHead({
 
 // Available analysis engines, selectable in the sidebar. First one is the default.
 const analyzers: AnalyzerInterface[] = [
-    new KatahexIntuitionAnalyzer(),
+    new KatahexAnalyzer('katahex-intuition', 'Katahex Intuition', 'analysisCache'),
+    new KatahexAnalyzer('katahex-mcts', `Katahex MCTS ${MCTS_PLAYOUTS}`, 'analysisCacheMcts'),
     new NoopAnalyzer(),
 ];
 

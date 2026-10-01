@@ -72,6 +72,19 @@ export type KatahexMoveInput = {
     game: GameInput;
 };
 
+/**
+ * Parameters of katahex tree search (MCTS) jobs.
+ * Always set by the server, never by clients.
+ */
+export type MctsParams = {
+    /**
+     * Limit tree search by limiting playouts (param "maxPlayouts").
+     */
+    maxPlayouts: number;
+};
+
+export type KatahexMctsMoveInput = KatahexMoveInput & MctsParams;
+
 export type MohexMoveInput = {
     game: GameInput;
 
@@ -174,8 +187,17 @@ export type AnalyzePositionInput = {
 
 export type AnalyzePositionOutput = {
     whiteWin: number;
+
+    /**
+     * Value of each cell, rows then cols.
+     * Raw neural network policy for intuition, share of visits for tree search.
+     */
     policy: number[][];
 };
+
+export type MctsAnalyzePositionInput = AnalyzePositionInput & MctsParams;
+
+export type MctsAnalyzeMoveInput = AnalyzeMoveInput & MctsParams;
 
 /**
  * Input and output of each job type.
@@ -189,7 +211,7 @@ type AiJobTypeDefinitions = {
     /**
      * Katahex move with tree search (MCTS). Stronger, requires more computing power.
      */
-    'katahex-mcts-move': { input: KatahexMoveInput, output: MoveOutput };
+    'katahex-mcts-move': { input: KatahexMctsMoveInput, output: MoveOutput };
 
     'mohex': { input: MohexMoveInput, output: MoveOutput };
 
@@ -207,14 +229,16 @@ type AiJobTypeDefinitions = {
     'katahex-intuition-analyze-move': { input: AnalyzeMoveInput, output: AnalyzeMoveOutput };
 
     /**
-     * Same as katahex-intuition-analyze-position, with tree search. Not yet used.
+     * Same as katahex-intuition-analyze-position, with tree search.
+     * Policy is the share of visits of each cell.
      */
-    'katahex-mcts-analyze-position': { input: AnalyzePositionInput, output: AnalyzePositionOutput };
+    'katahex-mcts-analyze-position': { input: MctsAnalyzePositionInput, output: AnalyzePositionOutput };
 
     /**
-     * Same as katahex-intuition-analyze-move, with tree search. Not yet used.
+     * Same as katahex-intuition-analyze-move, with tree search.
+     * whiteWin of played move and all best moves are always set.
      */
-    'katahex-mcts-analyze-move': { input: AnalyzeMoveInput, output: AnalyzeMoveOutput };
+    'katahex-mcts-analyze-move': { input: MctsAnalyzeMoveInput, output: AnalyzeMoveOutput };
 };
 
 export type AiJobType = keyof AiJobTypeDefinitions;

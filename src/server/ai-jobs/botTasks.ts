@@ -9,7 +9,11 @@ type BotConfig = { [key: string]: unknown };
  */
 export const getBotJobType = (engine: string, config: BotConfig): null | AiJobType => {
     switch (engine) {
-        case 'katahex': return config.treeSearch === true ? 'katahex-mcts-move' : 'katahex-intuition-move';
+        // maxPlayouts: 0 for model only, > 0 for tree search
+        case 'katahex': return typeof config.maxPlayouts === 'number' && config.maxPlayouts > 0
+            ? 'katahex-mcts-move'
+            : 'katahex-intuition-move'
+        ;
         case 'mohex': return 'mohex';
         case 'davies': return 'davies';
     }
@@ -17,11 +21,11 @@ export const getBotJobType = (engine: string, config: BotConfig): null | AiJobTy
     return null;
 };
 
-const requireNumber = (config: BotConfig, key: string, min = -Infinity, max = Infinity): number => {
+const requireNumber = (config: BotConfig, key: string, min = -Infinity, max = Infinity, integer = false): number => {
     const value = config[key];
 
-    if (typeof value !== 'number' || value < min || value > max) {
-        throw new Error(`Invalid bot config: "${key}" must be a number in [${min}, ${max}], got ${JSON.stringify(value)}`);
+    if (typeof value !== 'number' || value < min || value > max || (integer && !Number.isInteger(value))) {
+        throw new Error(`Invalid bot config: "${key}" must be ${integer ? 'an integer' : 'a number'} in [${min}, ${max}], got ${JSON.stringify(value)}`);
     }
 
     return value;
@@ -37,8 +41,10 @@ export const createBotMoveTask = (engine: string, config: BotConfig, game: GameI
 
     switch (type) {
         case 'katahex-intuition-move':
-        case 'katahex-mcts-move':
             return { type, data: { game } };
+
+        case 'katahex-mcts-move':
+            return { type, data: { game, maxPlayouts: requireNumber(config, 'maxPlayouts', 1, Infinity, true) } };
 
         case 'mohex':
             return { type, data: { game, maxGames: requireNumber(config, 'maxGames', 1) } };

@@ -222,6 +222,12 @@ export type HexServerToClientEvents = {
     analyze: (gameId: string, gameAnalyze: GameAnalyze) => void;
 
     /**
+     * Deep analyze (tree search) of a move has failed, can be requested again.
+     * When succeeded, "analyze" event is sent instead, with gameAnalyze.analyze[moveIndex].mcts set.
+     */
+    analyzeMoveMctsFailed: (gameId: string, moveIndex: number) => void;
+
+    /**
      * Player just received a player notification,
      * should add it in header.
      */

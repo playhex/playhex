@@ -3,6 +3,29 @@ import { Expose } from '../class-transformer-custom.js';
 import Game from './Game.js';
 import type { HexMove } from '@playhex/move-notation';
 
+/**
+ * Deep analyze of a move, with tree search (MCTS).
+ * whiteWin of played move and best moves are always set.
+ */
+export type GameAnalyzeMoveMcts = {
+    /**
+     * Playouts used for tree search.
+     */
+    playouts: number;
+
+    whiteWin: number;
+    move: {
+        move: HexMove;
+        value: number;
+        whiteWin: number;
+    };
+    bestMoves: {
+        move: HexMove;
+        value: number;
+        whiteWin: number;
+    }[];
+};
+
 export type GameAnalyzeData = ({
     moveIndex: number;
     color: 'black' | 'white';
@@ -17,6 +40,12 @@ export type GameAnalyzeData = ({
         value: number;
         whiteWin?: number;
     }[];
+
+    /**
+     * Set once a deep analyze of this move has been requested and processed.
+     * Intuition analyze above is kept.
+     */
+    mcts?: GameAnalyzeMoveMcts;
 } | null)[];
 
 export const hasGameAnalyzeErrored = (gameAnalyze: GameAnalyze): boolean =>

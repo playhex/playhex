@@ -604,7 +604,10 @@
         "how_it_works": "Fonctionnement",
         "request_analysis": "Demander une analyse par l'IA",
         "in_progress": "analyse {{done}}/{{total}}…",
-        "request_failed": "Impossible de demander l'analyse, aucun worker IA n'est peut-être disponible pour le moment."
+        "request_failed": "Impossible de demander l'analyse, aucun worker IA n'est peut-être disponible pour le moment.",
+        "deep_analysis": "Analyse approfondie",
+        "analyzing": "Analyse en cours…",
+        "deep_analysis_failed": "L'analyse approfondie a échoué, aucun worker IA n'est peut-être disponible pour le moment."
     },
     "try_again": "Réessayer",
     "language": "Langue",

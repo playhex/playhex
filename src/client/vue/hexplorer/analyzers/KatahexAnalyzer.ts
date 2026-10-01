@@ -1,15 +1,32 @@
 import { coordsToMove, HexMove } from '@playhex/move-notation';
-import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
+import { analysisCacheKey, type AnalysisEngine, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 import { LocalStorageCache } from '../services/cachedAnalysis.js';
 import { AnalyzerInterface } from './AnalyzerInterface.js';
 import { apiPostHexplorerAnalyzePosition } from '../../../apiClient.js';
 
-export class KatahexIntuitionAnalyzer implements AnalyzerInterface
+/**
+ * Analyze positions with Katahex on server.
+ * With tree search engine, policy is the share of visits of each cell.
+ */
+export class KatahexAnalyzer implements AnalyzerInterface
 {
-    private cache = new LocalStorageCache<AnalysisOutput>('analysisCache');
+    private cache: LocalStorageCache<AnalysisOutput>;
+
+    /**
+     * @param cacheName Local storage key, one per engine.
+     */
+    constructor(
+        private engine: AnalysisEngine,
+        private name: string,
+        cacheName: string,
+    ) {
+        this.cache = new LocalStorageCache<AnalysisOutput>(cacheName);
+    }
 
     async analyzePosition(input: AnalysisInput): Promise<AnalysisOutput>
     {
+        input = { ...input, engine: this.engine };
+
         const cacheKey = analysisCacheKey(input);
         return await this.cache.getItem(cacheKey, () => this.fetchPositionAnalyze(input));
     }
@@ -48,7 +65,7 @@ export class KatahexIntuitionAnalyzer implements AnalyzerInterface
 
     getName(): string
     {
-        return 'Katahex Intuition';
+        return this.name;
     }
 
     persistCache(): void

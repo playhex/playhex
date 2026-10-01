@@ -192,7 +192,10 @@
         "best": "best:",
         "how_it_works": "How it works",
         "in_progress": "analyzing {{done}}/{{total}}…",
-        "request_failed": "Could not request analysis, no AI worker may be available right now."
+        "request_failed": "Could not request analysis, no AI worker may be available right now.",
+        "deep_analysis": "Deep analysis",
+        "analyzing": "Analyzing…",
+        "deep_analysis_failed": "Deep analysis failed, no AI worker may be available right now."
     },
     "try_again": "Try again",
     "yes": "Yes",
