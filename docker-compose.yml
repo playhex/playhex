@@ -55,6 +55,7 @@ services:
             - "8080:8080"
         volumes:
             - ./docker/adminer/login-prefill.php:/var/www/html/plugins-enabled/login-prefill.php:ro
+            - ./docker/adminer/upload-large-dumps.ini:/usr/local/etc/php/conf.d/0-upload_large_dumps.ini:ro
         depends_on:
             - mysql
 
