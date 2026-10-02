@@ -25,7 +25,7 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import AppRhombus from './AppRhombus.vue';
 import AppRatingChange from './AppRatingChange.vue';
 import AppHexWorldExplore from './AppHexWorldExplore.vue';
-import { canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/gameUtils.js';
+import { canCreatePuzzleFromGame, canExportGame, getPlayerIndex, getPlayers, getRating, getStrictLoserPlayer, getStrictWinnerPlayer, shouldShowConditionalMoves } from '../../../shared/app/gameUtils.js';
 import AppConditionalMoves from './AppConditionalMoves.vue';
 import AppSpectatorCount from './AppSpectatorCount.vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
@@ -668,6 +668,13 @@ watch(gameUIMode, () => {
                     :orientation
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
                 />
+
+                <!-- Create puzzle from this game -->
+                <router-link
+                    v-if="canCreatePuzzleFromGame(game)"
+                    :to="{ name: 'puzzle-create', query: { game: game.publicId } }"
+                    class="btn btn-sm btn-outline-primary me-2 mb-2"
+                >{{ $t('puzzles.create_from_game') }}</router-link>
 
                 <button
                     v-if="playingGameFacade"

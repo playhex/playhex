@@ -8,10 +8,10 @@ import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeE
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { defaultTimeControlTypes } from '../timeControlUtils.js';
 import { TimeControlIsLiveOrCorrespondence } from '../validator/TimeControlIsLiveOrCorrespondence.js';
+import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../boardsizeLimits.js';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
-export const MIN_BOARDSIZE = 1;
-export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176627/1263010163875381288/1350473700457316413
+export { MIN_BOARDSIZE, MAX_BOARDSIZE };
 
 /**
  * DTO for game options, must have default values

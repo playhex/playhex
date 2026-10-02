@@ -19,6 +19,7 @@ import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
 import { type Outcome } from '../../game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
+import { deserializeMoves, serializeMoves } from '../movesSerializer.js';
 
 @Entity()
 @Index(keysOf<Game>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
@@ -347,17 +348,6 @@ const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): nul
     });
 
     return timeControlValue;
-};
-
-const serializeMoves = (moves: HexMove[]): string => {
-    return moves.join(' ');
-};
-
-const deserializeMoves = (value: unknown): HexMove[] => {
-    return typeof value === 'string' && value.length > 0
-        ? value.split(' ') as HexMove[]
-        : []
-    ;
 };
 
 const serializeMoveTimestamps = (moveTimestamp: Date[]): string => {

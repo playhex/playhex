@@ -8,6 +8,7 @@ import { PlaceStonesAlternatelyTool } from '../tools/PlaceStonesAlternatelyTool'
 import { RemoveStoneTool } from '../tools/RemoveStoneTool';
 import { useHead } from '@unhead/vue';
 import { useHexplorer } from '../composables/useHexplorer.js';
+import { HEXPLORER_ANALYSIS_STATE_KEY } from '../HexplorerState.js';
 import {
     IconAlphabet,
     IconArrowBarLeft,
@@ -140,6 +141,7 @@ const gameViewElement = useTemplateRef('game-view-element');
 
 whenever(gameViewElement, async element => {
     await mount(element);
+    await importAnalysisFromHistoryState();
     await updateAnalysis();
 }, {
     once: true,
@@ -195,6 +197,26 @@ const onAnalysisFileSelected = async (event: Event) => {
         analysisImportError.value = e instanceof Error ? e.message : String(e);
     } finally {
         input.value = ''; // allow re-selecting the same file
+    }
+};
+
+/**
+ * Import analysis passed when navigating to Hexplorer, e.g a puzzle.
+ * Removed from history state once imported, to not import it again on reload.
+ */
+const importAnalysisFromHistoryState = async (): Promise<void> => {
+    const analysis: unknown = history.state?.[HEXPLORER_ANALYSIS_STATE_KEY];
+
+    if (typeof analysis !== 'string') {
+        return;
+    }
+
+    history.replaceState({ ...history.state, [HEXPLORER_ANALYSIS_STATE_KEY]: undefined }, '');
+
+    try {
+        await importAnalysis(analysis);
+    } catch (e) {
+        analysisImportError.value = e instanceof Error ? e.message : String(e);
     }
 };
 </script>

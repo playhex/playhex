@@ -1,0 +1,205 @@
+<script setup lang="ts">
+/*
+ * Recursive puzzle tree in editor, same look as Hexplorer MoveTree:
+ * horizontal tree with hexagonal nodes, branches stacked vertically,
+ * connected by straight lines.
+ */
+import { computed } from 'vue';
+import { isElseNode, type PuzzleElseNode, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
+import { IconChatRightText, IconCheck, IconPencilSquare, IconXLg } from '../../icons.js';
+
+type EditorNode = PuzzleNode | PuzzleElseNode;
+
+const props = defineProps<{
+    node: EditorNode;
+
+    /**
+     * Nodes from root (excluded) to this node. Empty for root.
+     */
+    path: EditorNode[];
+
+    selectedNode: EditorNode;
+    playerColor: 0 | 1;
+}>();
+
+const emit = defineEmits<{
+    select: [path: EditorNode[]];
+}>();
+
+const isRoot = computed(() => props.path.length === 0);
+
+/**
+ * Player moves at odd depth, computer answers at even depth.
+ * "else" node shows computer answer.
+ */
+const playerIndex = computed<0 | 1>(() => props.path.length % 2 === 1 && !isElseNode(props.node)
+    ? props.playerColor
+    : (1 - props.playerColor) as 0 | 1,
+);
+
+const label = computed(() => {
+    if (isElseNode(props.node)) {
+        return props.node.else;
+    }
+
+    return props.node.move ?? '';
+});
+
+const isFailed = computed(() => isElseNode(props.node) || props.node.result === 'failed');
+const isSolved = computed(() => !isElseNode(props.node) && props.node.result === 'solved');
+
+const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : props.node.children ?? []);
+</script>
+
+<template>
+    <div class="tree-node">
+        <button
+            type="button"
+            class="tree-node-button"
+            :class="{ 'tree-node-current': node === selectedNode }"
+            :title="isRoot ? $t('puzzles.editor.initial_position') : isElseNode(node) ? `${$t('puzzles.editor.else')} → ${node.else}` : undefined"
+            @click="emit('select', path)"
+        >
+            <AppConditionalMoveButton :label :playerIndex :class="{ 'root-node': isRoot, 'else-node': isElseNode(node) }" />
+            <IconPencilSquare v-if="isRoot" class="root-icon" />
+
+            <IconCheck v-if="isSolved" class="node-badge result-badge text-bg-success" />
+            <IconXLg v-else-if="isFailed" class="node-badge result-badge text-bg-danger" />
+            <IconChatRightText v-if="node.message" class="node-badge message-badge" />
+        </button>
+
+        <!-- Single child: straight line, no extra width per level -->
+        <template v-if="children.length === 1">
+            <div class="tree-stem"></div>
+
+            <AppPuzzleTreeNode
+                :node="children[0]"
+                :path="[...path, children[0]]"
+                :selectedNode
+                :playerColor
+                @select="p => emit('select', p)"
+            />
+        </template>
+
+        <template v-else-if="children.length > 1">
+            <div class="tree-stem"></div>
+
+            <div class="tree-children">
+                <div v-for="(child, index) in children" :key="index" class="tree-child">
+                    <AppPuzzleTreeNode
+                        :node="child"
+                        :path="[...path, child]"
+                        :selectedNode
+                        :playerColor
+                        @select="p => emit('select', p)"
+                    />
+                </div>
+            </div>
+        </template>
+    </div>
+</template>
+
+<style lang="stylus" scoped>
+.tree-node
+    display inline-flex
+    flex-direction row
+    align-items center
+
+.tree-node-button
+    position relative
+    z-index 1 // stay above the connector lines
+    background none
+    border none
+    padding 0
+    margin 0
+    cursor pointer
+    border-radius 4px
+
+    &.tree-node-current
+        outline 2px solid var(--bs-body-color)
+        outline-offset 2px
+
+    :deep(div.hexagons)
+        height 1.5rem
+        width 1.7rem
+
+        &::before
+            font-size 1.7rem
+
+        span
+            font-size 0.65rem
+
+        // Initial position and "else" nodes are not regular moves: neutral colors
+        &.root-node::before
+            color var(--bs-warning) !important
+
+        &.else-node::before
+            color var(--bs-secondary) !important
+
+.root-icon
+    position absolute
+    top 50%
+    left 50%
+    transform translate(-50%, -50%)
+    color var(--bs-white)
+    font-size 0.7rem
+    pointer-events none
+
+.node-badge
+    position absolute
+    font-size 0.55rem
+    pointer-events none
+
+.result-badge
+    top -0.2rem
+    right -0.3rem
+    border-radius 50%
+    padding 0.05rem
+
+.message-badge
+    bottom -0.1rem
+    right -0.3rem
+    color var(--bs-body-color)
+
+.tree-stem
+    height 2px
+    width 0.3rem
+    background var(--bs-border-color)
+
+.tree-children
+    display flex
+    flex-direction column
+    justify-content center
+
+.tree-child
+    position relative
+    display flex
+    flex-direction row
+    align-items center
+    padding 0.15rem 0
+
+    &::before
+        content ''
+        position absolute
+        left 0
+        top 0
+        bottom 0
+        width 2px
+        background var(--bs-border-color)
+
+    &:first-child::before
+        top 50%
+
+    &:last-child::before
+        bottom 50%
+
+    &::after
+        content ''
+        position absolute
+        left 0
+        top 50%
+        height 2px
+        width 0.3rem
+        background var(--bs-border-color)
+</style>

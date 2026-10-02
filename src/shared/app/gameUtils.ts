@@ -421,6 +421,19 @@ export const canShowHexplorerLink = (game: Game, player: null | Player): boolean
     return canExportGame(game, player);
 };
 
+/**
+ * Whether a puzzle can be created from this game.
+ * Like Hexplorer link, but also allowed for guests:
+ * never from a game in progress against a human, to not get help from others.
+ */
+export const canCreatePuzzleFromGame = (game: Game): boolean => {
+    if (isBotGame(game)) {
+        return true;
+    }
+
+    return ['ended', 'canceled'].includes(game.state);
+};
+
 export const canExportGame = (game: Game, player: Player): boolean => {
     if (isBotGame(game)) {
         return true;

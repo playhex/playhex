@@ -1,0 +1,51 @@
+{
+    "title": "Connect the middle",
+    "description": "Red to play and win.",
+    "boardsize": 5,
+    "redStones": "c2 c4",
+    "blueStones": "b3 d3",
+    "lastMove": "d3",
+    "playerColor": "red",
+    "tree": {
+        "message": "Red to play. Connect red stones together, and to both edges.",
+        "children": [
+            {
+                "move": "c3",
+                "message": "Red stones are connected.",
+                "children": [
+                    {
+                        "move": "d1",
+                        "message": "Blue intrudes at the top.",
+                        "children": [
+                            {
+                                "move": "c1",
+                                "result": "solved",
+                                "message": "Well done! Red is now connected to both edges, whatever blue does.",
+                                "children": [
+                                    {
+                                        "move": "c5",
+                                        "message": "Blue intrudes at the bottom.",
+                                        "children": [
+                                            {
+                                                "move": "b5",
+                                                "message": "Red answers and wins."
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "else": "c1",
+                                "message": "Blue plays c1, red is cut from the top edge."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "else": "c3",
+                "message": "Blue plays c3 and cuts both red stones."
+            }
+        ]
+    }
+}

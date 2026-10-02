@@ -17,6 +17,7 @@ import './createFakeNotificationsCommand.js';
 import './generateStatsCommand.js';
 import './tournamentSubscribePlayersCommand.js';
 import './ladderJoinPlayersCommand.js';
+import '../puzzles/createPuzzleCommand.js';
 import './findSimilarGamesCommand.js';
 import './aiJobsCommands.js';
 
