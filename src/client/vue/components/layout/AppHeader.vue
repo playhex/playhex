@@ -99,7 +99,7 @@ const {
 </script>
 
 <template>
-    <nav class="navbar navbar-expand-sm bg-body-secondary menu-top shadow-sm">
+    <nav class="navbar navbar-expand-lg bg-body-secondary menu-top shadow-sm">
         <div class="container-fluid">
 
             <!-- PlayHex -->
@@ -108,7 +108,7 @@ const {
                 <small v-if="siteTitleSuffix" class="text-body-secondary"> - {{ siteTitleSuffix }}</small>
             </router-link>
 
-            <div class="d-sm-none flex-grow-1">
+            <div class="d-lg-none flex-grow-1">
                 <!-- Toggle button in small devices -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -278,7 +278,7 @@ nav
         white-space nowrap
         list-style none
 
-        @media (min-width: 576px)
+        @media (min-width: 992px)
             display none
             position absolute
             top 100%
