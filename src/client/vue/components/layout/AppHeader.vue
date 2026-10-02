@@ -197,6 +197,15 @@ const {
                             >{{ $t('hexplorer.title') }}</router-link>
                         </li>
 
+                        <li class="nav-item">
+                            <router-link
+                                :to="{ name: 'puzzles' }"
+                                :class="{ active: routeName?.startsWith('puzzle') }"
+                                class="nav-link"
+                                @click="closeOffcanvas"
+                            >{{ $t('puzzles.list_title') }}</router-link>
+                        </li>
+
                     </ul>
 
                 </div>

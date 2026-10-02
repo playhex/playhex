@@ -421,6 +421,12 @@ export const canShowHexplorerLink = (game: Game, player: null | Player): boolean
     return canExportGame(game, player);
 };
 
+/**
+ * Whether a puzzle can be created from this game.
+ * Only from ended games, to not get help from others on a game in progress.
+ */
+export const canCreatePuzzleFromGame = (game: Game): boolean => game.state === 'ended';
+
 export const canExportGame = (game: Game, player: Player): boolean => {
     if (isBotGame(game)) {
         return true;

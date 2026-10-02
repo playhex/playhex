@@ -19,35 +19,35 @@ export default class Player
      * Used for displays
      */
     @Column({ length: 34, unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action', 'channel'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'puzzle', 'player_moderation_action', 'channel'] })
     pseudo: string;
 
     /**
      * Used to identify a player
      */
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'player_moderation_action', 'channel'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'puzzle', 'player_moderation_action', 'channel'] })
     publicId: string;
 
     /**
      * Show an italized "Guest" before pseudo
      */
     @Column({ default: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'player_moderation_action', 'channel'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'puzzle', 'player_moderation_action', 'channel'] })
     isGuest: boolean;
 
     /**
      * Used to know that we use an AI to generate moves. Show a robot icon before pseudo
      */
     @Column({ default: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'puzzle'] })
     isBot: boolean;
 
     /**
      * Used for link to profile page, SGF file name
      */
     @Column({ length: 34, unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'channel'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'puzzle', 'channel'] })
     slug: string;
 
     /**
@@ -56,7 +56,7 @@ export default class Player
      * Displayed on profile page.
      */
     @Column({ default: () => 'current_timestamp()' })
-    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'puzzle'] })
     @IsDate()
     createdAt: Date;
 
@@ -95,11 +95,11 @@ export default class Player
     shadowBanned?: boolean;
 
     @Column({ type: String, nullable: true, default: null })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     avatarPath?: null | string;
 
     @Column({ type: String, nullable: true, default: null })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     avatarThumbnailPath?: null | string;
 
     @Column({ type: Date, nullable: true, default: null })
@@ -107,6 +107,6 @@ export default class Player
     avatarUpdatedAt?: null | Date;
 
     @Column({ type: String, nullable: true, default: null, length: 8 })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     countryFlag?: null | string;
 }

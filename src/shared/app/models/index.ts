@@ -35,6 +35,7 @@ import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
 import Premove from './Premove.js';
+import Puzzle from './Puzzle.js';
 import Rating from './Rating.js';
 import SimilarPositionFlag from './SimilarPositionFlag.js';
 import Tournament from './Tournament.js';
@@ -85,6 +86,7 @@ export {
     PlayerAiWorkerKey,
     PlayerPushSubscription,
     Premove,
+    Puzzle,
     Rating,
     SimilarPositionFlag,
     Tournament,
@@ -132,6 +134,7 @@ export const entities = {
     PlayerPushSubscription,
     PlayerSettings,
     PlayerStats,
+    Puzzle,
     Rating,
     SimilarPositionFlag,
     Tournament,

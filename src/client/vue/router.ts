@@ -108,6 +108,40 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        name: 'puzzles',
+        path: '/puzzles',
+        component: () => import('./puzzles/pages/PagePuzzles.vue'),
+    },
+    {
+        name: 'puzzles-mine',
+        path: '/puzzles/my-puzzles',
+        component: () => import('./puzzles/pages/PageMyPuzzles.vue'),
+    },
+    {
+        name: 'puzzle-create',
+        path: '/puzzles/new',
+        component: () => import('./puzzles/pages/PagePuzzleEditor.vue'),
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
+        name: 'puzzle-edit',
+        path: '/puzzles/:publicId/edit',
+        component: () => import('./puzzles/pages/PagePuzzleEditor.vue'),
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
+        name: 'puzzle',
+        path: '/puzzles/:publicId',
+        component: () => import('./puzzles/pages/PagePuzzle.vue'),
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
         name: 'online-players',
         path: '/online-players',
         component: () => import('./pages/PageOnlinePlayers.vue'),

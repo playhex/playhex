@@ -18,7 +18,7 @@ export default class GameToPlayer
     playerId: number;
 
     @ManyToOne(() => Player)
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     @Type(() => Player)
     player: Relation<Player>;
 

@@ -19,6 +19,7 @@ import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { keysOf } from '../utils.js';
 import { type Outcome } from '../../game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
+import { deserializeMoves, serializeMoves } from '../movesSerializer.js';
 
 @Entity()
 @Index(keysOf<Game>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
@@ -43,7 +44,7 @@ export default class Game implements TimeControlBoardsize, GameOptions
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'player_moderation_action', 'moderation'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle', 'player_moderation_action', 'moderation'] })
     publicId: string;
 
     /**
@@ -59,7 +60,7 @@ export default class Game implements TimeControlBoardsize, GameOptions
     host: null | Relation<Player>;
 
     @OneToMany(() => GameToPlayer, gameToPlayer => gameToPlayer.game, { cascade: true, persistence: false })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     @Type(() => GameToPlayer)
     gameToPlayers: GameToPlayer[];
 
@@ -225,12 +226,12 @@ export default class Game implements TimeControlBoardsize, GameOptions
     rematchedFrom: null | Relation<Game> = null;
 
     @Column({ type: Date, default: () => 'current_timestamp(3)', precision: 3 })
-    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     @Type(() => Date)
     createdAt: Date;
 
     @Column({ type: Date, precision: 3, nullable: true })
-    @Expose()
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
     @Type(() => Date)
     startedAt: null | Date;
 
@@ -347,17 +348,6 @@ const deserializeTimeControlValue = (timeControlValue: null | GameTimeData): nul
     });
 
     return timeControlValue;
-};
-
-const serializeMoves = (moves: HexMove[]): string => {
-    return moves.join(' ');
-};
-
-const deserializeMoves = (value: unknown): HexMove[] => {
-    return typeof value === 'string' && value.length > 0
-        ? value.split(' ') as HexMove[]
-        : []
-    ;
 };
 
 const serializeMoveTimestamps = (moveTimestamp: Date[]): string => {

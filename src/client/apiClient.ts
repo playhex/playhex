@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -21,6 +21,7 @@ import { GameChatSubscriptionItem } from '../shared/app/GameChatSubscriptionItem
 import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } from '../shared/app/models/LadderDto.js';
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
+import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 
 /**
  * @throws {DomainHttpError}
@@ -1174,6 +1175,18 @@ export const apiUpdatePlayerCountryFlag = async (publicId: string, countryFlag: 
     await checkResponse(response);
 };
 
+export const apiGetPuzzle = async (publicId: string): Promise<null | Puzzle> => {
+    const response = await fetch(`/api/puzzles/${publicId}`);
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(Puzzle, await response.json());
+};
+
 export const apiPostHexplorerAnalyzePosition = async (input: AnalysisInput): Promise<AnalysisOutput> => {
     const response = await fetch('/api/hexplorer/analyze-position', {
         method: 'post',
@@ -1334,4 +1347,74 @@ export const apiPostLadderAnswerLive = async (challengePublicId: string, accept:
     await checkResponse(response);
 
     return plainToInstance(LadderChallenge, await response.json());
+};
+
+export const apiGetPuzzles = async (): Promise<Puzzle[]> => {
+    const response = await fetch('/api/puzzles');
+
+    await checkResponse(response);
+
+    return (await response.json() as object[]).map(puzzle => plainToInstance(Puzzle, puzzle));
+};
+
+/**
+ * Published and unpublished puzzles of current player.
+ */
+export const apiGetMyPuzzles = async (): Promise<Puzzle[]> => {
+    const response = await fetch('/api/puzzles/mine');
+
+    await checkResponse(response);
+
+    return (await response.json() as object[]).map(puzzle => plainToInstance(Puzzle, puzzle));
+};
+
+export const apiPostPuzzle = async (input: PuzzleInput): Promise<Puzzle> => {
+    const response = await fetch('/api/puzzles', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Puzzle, await response.json());
+};
+
+export const apiPutPuzzle = async (publicId: string, input: PuzzleInput): Promise<Puzzle> => {
+    const response = await fetch(`/api/puzzles/${publicId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Puzzle, await response.json());
+};
+
+export const apiPublishPuzzle = async (publicId: string): Promise<Puzzle> => {
+    const response = await fetch(`/api/puzzles/${publicId}/publish`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Puzzle, await response.json());
+};
+
+export const apiDeletePuzzle = async (publicId: string): Promise<void> => {
+    const response = await fetch(`/api/puzzles/${publicId}`, {
+        method: 'delete',
+    });
+
+    await checkResponse(response);
 };
