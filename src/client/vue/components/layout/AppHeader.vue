@@ -206,6 +206,26 @@ const {
                             >{{ $t('puzzles.list_title') }}</router-link>
                         </li>
 
+                        <li class="nav-item has-submenu">
+                            <router-link
+                                :to="{ name: 'videos' }"
+                                :class="{ active: routeName?.startsWith('video') }"
+                                class="nav-link"
+                                @click="closeOffcanvas(); leaveFocus()"
+                            >{{ $t('nav_community') }}</router-link>
+
+                            <ul class="nav-submenu">
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'videos' }"
+                                        :class="{ active: routeName?.startsWith('video') }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('videos.title') }}</router-link>
+                                </li>
+                            </ul>
+                        </li>
+
                     </ul>
 
                 </div>

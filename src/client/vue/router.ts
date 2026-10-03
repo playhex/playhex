@@ -142,6 +142,16 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        name: 'videos',
+        path: '/videos',
+        component: () => import('./videos/pages/PageVideos.vue'),
+    },
+    {
+        name: 'video-submit',
+        path: '/videos/submit',
+        component: () => import('./videos/pages/PageVideoSubmit.vue'),
+    },
+    {
         name: 'online-players',
         path: '/online-players',
         component: () => import('./pages/PageOnlinePlayers.vue'),

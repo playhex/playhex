@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, Video } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -22,6 +22,7 @@ import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } fr
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
+import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 
 /**
  * @throws {DomainHttpError}
@@ -1424,4 +1425,66 @@ export const apiDeletePuzzle = async (publicId: string): Promise<void> => {
     });
 
     await checkResponse(response);
+};
+
+/**
+ * Accepted videos, most recently added first.
+ */
+export const apiGetVideos = async (): Promise<Video[]> => {
+    const response = await fetch('/api/videos');
+
+    await checkResponse(response);
+
+    return (await response.json() as object[]).map(video => plainToInstance(Video, video));
+};
+
+/**
+ * Get video infos from a link (youtube, vimeo, or any page) to prefill video submission form.
+ */
+export const apiGetVideoMetadata = async (url: string): Promise<VideoMetadata> => {
+    const response = await fetch('/api/videos/metadata', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+/**
+ * Submit a video, will be listed once moderated.
+ * Thumbnail is either an uploaded file, or an url the server will download.
+ */
+export const apiPostVideo = async (input: VideoInput, thumbnail: { file: File } | { url: string }): Promise<Video> => {
+    const formData = new FormData();
+
+    formData.append('url', input.url);
+    formData.append('title', input.title);
+    formData.append('authorName', input.authorName);
+    formData.append('durationSeconds', String(input.durationSeconds));
+    formData.append('languages', JSON.stringify(input.languages));
+    formData.append('keywords', input.keywords);
+
+    if ('file' in thumbnail) {
+        formData.append('thumbnail', thumbnail.file);
+    } else {
+        formData.append('thumbnailUrl', thumbnail.url);
+    }
+
+    const response = await fetch('/api/videos', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+        body: formData,
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Video, await response.json());
 };

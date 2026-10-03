@@ -11,6 +11,7 @@ import logger from '../../services/logger.js';
 import { DomainHttpError, normalizeDomainHttpError } from '../../../shared/app/DomainHttpError.js';
 import { HttpError } from 'routing-controllers';
 import { avatarsPath } from '../../services/PlayerAvatarService.js';
+import { videoThumbnailsPath } from '../../videos/VideoThumbnailService.js';
 import { ipBanMiddleware } from '../../services/security/ipBanMiddleware.js';
 import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../../services/rate-limiters.js';
 import { TranslatableHttpError } from '../../../shared/app/TranslatableHttpError.js';
@@ -21,6 +22,7 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use(express.static(path.join(process.cwd(), 'assets'), { dotfiles: 'allow' }));
     app.use(reflectMetadataRouter());
     app.use('/avatars', express.static(avatarsPath));
+    app.use('/video-thumbnails', express.static(videoThumbnailsPath));
     // Bootstrap CSS (LTR + RTL builds) served as plain files, referenced directly in the page <head>.
     app.use('/statics/bootstrap-css', express.static(path.join(process.cwd(), 'node_modules', 'bootstrap', 'dist', 'css')));
     app.use(legacyAliasesMiddleware); // TODO remove with the HostedGame -> Game backward compatibility shim
