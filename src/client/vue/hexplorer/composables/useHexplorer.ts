@@ -430,7 +430,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         clearBoard();
         marksLayer.clear();
 
-        let pgf = new PlayingGameFacade(gameView, true, [], false);
+        let pgf = new PlayingGameFacade(gameView, true, [], true);
 
         for (const node of path) {
             if (node.data !== null) {
@@ -438,7 +438,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
                     clearBoard();
                     applySetupStones(node.data.stones);
                     pgf.destroy();
-                    pgf = new PlayingGameFacade(gameView, false, [], false, node.data.nextPlayer);
+                    pgf = new PlayingGameFacade(gameView, false, [], true, node.data.nextPlayer);
                 } else {
                     pgf.addMove(node.data.move);
                 }
@@ -775,7 +775,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         gameView?.destroy();
 
         const newGV = new GameView(boardsize);
-        const newPGF = new PlayingGameFacade(newGV, true, [], false);
+        const newPGF = new PlayingGameFacade(newGV, true, [], true);
 
         setupGameInstances(newGV, newPGF);
         currentTool.value = createAlternatingTool();
@@ -995,7 +995,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
 const initGameViewFromUrlHash = (hash?: string): { gameView: GameView, playingGameFacade: PlayingGameFacade, moves: HexMove[], cursorMoveCount?: number } => {
     if (!hash || hash.length <= 1) {
         const gameView = new GameView(11);
-        const playingGameFacade = new PlayingGameFacade(gameView, true, [], false);
+        const playingGameFacade = new PlayingGameFacade(gameView, true, [], true);
 
         return { gameView, playingGameFacade, moves: [] };
     }
@@ -1014,7 +1014,7 @@ const initGameViewFromUrlHash = (hash?: string): { gameView: GameView, playingGa
     }
 
     const gameView = new GameView(size);
-    const playingGameFacade = new PlayingGameFacade(gameView, true, [], false);
+    const playingGameFacade = new PlayingGameFacade(gameView, true, [], true);
 
     return { gameView, playingGameFacade, moves, cursorMoveCount };
 };
