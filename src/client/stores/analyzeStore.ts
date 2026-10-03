@@ -51,11 +51,11 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
                     : await apiGetGameAnalyze(gamePublicId)
                 ;
             } catch (e) {
-                if (request) {
-                    useToastsStore().addToast(t('game_analysis.request_failed'), { level: 'danger' });
+                if (!request) {
+                    throw e;
                 }
 
-                throw e;
+                useToastsStore().addToast(t('game_analysis.request_failed'), { level: 'danger' });
             }
         })();
 
@@ -86,11 +86,9 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
 
         try {
             await apiRequestGameAnalyzeMoveMcts(gamePublicId, moveIndex);
-        } catch (e) {
+        } catch {
             pendingMctsMoveAnalyzes.delete(key);
             useToastsStore().addToast(t('game_analysis.deep_analysis_failed'), { level: 'danger' });
-
-            throw e;
         }
     };
 
