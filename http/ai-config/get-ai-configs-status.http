@@ -1,3 +1,0 @@
-# Get the status of all AI engines (online/offline).
-
-GET /api/ai-configs-status

@@ -16,7 +16,7 @@ export class KatahexAnalyzer implements AnalyzerInterface
      * @param cacheName Local storage key, one per engine.
      */
     constructor(
-        private engine: AnalysisEngine,
+        readonly engine: AnalysisEngine,
         private name: string,
         cacheName: string,
     ) {

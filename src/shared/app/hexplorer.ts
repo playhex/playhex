@@ -9,6 +9,11 @@ export const ANALYSIS_ENGINES = ['katahex-intuition', 'katahex-mcts'] as const;
 
 export type AnalysisEngine = typeof ANALYSIS_ENGINES[number];
 
+/**
+ * No worker online can analyze positions with the requested engine.
+ */
+export class AnalysisEngineUnavailableError extends Error {}
+
 export type AnalysisInput = {
     size: number;
     color: 'black' | 'white';

@@ -1,0 +1,3 @@
+# Get which AIs can play and which Hexplorer engines can analyze, given AI workers online.
+
+GET /api/ai-availability

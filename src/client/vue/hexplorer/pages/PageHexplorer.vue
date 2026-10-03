@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { whenever } from '@vueuse/core';
-import { computed, ref, useTemplateRef } from 'vue';
+import { useIntervalFn, whenever } from '@vueuse/core';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { defineOverlay } from '@overlastic/vue';
 import { t } from 'i18next';
 import { PlaceStoneTool } from '../tools/PlaceStoneTool';
@@ -36,6 +36,7 @@ import {
     IconTriangle,
     IconX,
     IconEraser,
+    IconExclamationTriangle,
     IconPercent,
     IconStarFill,
     IconXLg,
@@ -50,6 +51,8 @@ import { NoopAnalyzer } from '../analyzers/NoopAnalyzer';
 import { KatahexAnalyzer } from '../analyzers/KatahexAnalyzer.js';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
+import type { AiAvailabilityData } from '../../../../shared/app/Types.js';
+import { apiGetAiAvailability } from '../../../apiClient.js';
 
 useHead({
     title: t('hexplorer.title'),
@@ -71,6 +74,7 @@ const {
     state,
     currentTool,
     analysisLoading,
+    analysisError,
     evalHistory,
     evalCursorIndex,
     goToEvalIndex,
@@ -111,6 +115,41 @@ const selectedAnalyzerName = computed({
         setAnalyzer(analyzer);
     },
 });
+
+/*
+ * Engines availability: an engine without online worker cannot be selected.
+ * Refreshed periodically to enable engines when a worker comes online.
+ */
+const aiAvailability = ref<null | AiAvailabilityData>(null);
+
+const refreshEnginesStatus = async (): Promise<void> => {
+    try {
+        aiAvailability.value = await apiGetAiAvailability();
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Could not get analysis engines status', e);
+    }
+};
+
+useIntervalFn(refreshEnginesStatus, 30_000, { immediateCallback: true });
+
+// Server may know engine is unavailable before next refresh
+watch(analysisError, error => {
+    if (error === 'engine_unavailable') {
+        void refreshEnginesStatus();
+    }
+});
+
+const isAnalyzerAvailable = (analyzer: AnalyzerInterface): boolean => {
+    if (!(analyzer instanceof KatahexAnalyzer) || aiAvailability.value === null) {
+        return true;
+    }
+
+    return aiAvailability.value.availableAnalysisEngines.includes(analyzer.engine);
+};
+
+const isCurrentAnalyzerUnavailable = computed(() => analysisError.value === 'engine_unavailable'
+    || (currentAnalyzer.value !== null && !isAnalyzerAvailable(currentAnalyzer.value)));
 
 const isAlternatingToolSelected = computed(() => currentTool.value instanceof PlaceStonesAlternatelyTool);
 const isRemoveToolSelected = computed(() => currentTool.value instanceof RemoveStoneTool);
@@ -489,9 +528,19 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
                         v-model="selectedAnalyzerName"
                         class="form-select form-select-sm"
                     >
-                        <option v-for="a in analyzers" :key="a.getName()" :value="a.getName()">{{ a.getName() }}</option>
+                        <option
+                            v-for="a in analyzers"
+                            :key="a.getName()"
+                            :value="a.getName()"
+                            :disabled="!isAnalyzerAvailable(a)"
+                        >{{ a.getName() }}</option>
                     </select>
                 </div>
+                <div v-if="isCurrentAnalyzerUnavailable" class="mb-3">
+                    <p class="text-warning small mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.engine_unavailable') }}</p>
+                    <router-link :to="{ name: 'spawn-worker' }" class="small">{{ $t('workers.see_how_to_spawn_a_worker') }}</router-link>
+                </div>
+                <p v-else-if="analysisError === 'failed'" class="text-danger small mb-3"><IconExclamationTriangle /> {{ $t('hexplorer.analysis_failed') }}</p>
 
                 <EvaluationGraph
                     :evalHistory

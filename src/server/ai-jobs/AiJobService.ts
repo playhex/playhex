@@ -8,6 +8,7 @@ import { processDavies } from './queue/localProcessors.js';
 import { consolidateGameAnalyze, hasSwapMove, splitToAnalyzeMoveInputs, type AnalyzeGameRequest } from './gameAnalyze.js';
 import type { AiJobType, AiTask, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, MoveOutput, MoveTask } from './protocol.js';
 import { MCTS_PLAYOUTS } from '../../shared/app/mctsSettings.js';
+import type { AnalysisEngine } from '../../shared/app/hexplorer.js';
 import type { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import logger from '../services/logger.js';
 
@@ -44,6 +45,14 @@ const ANALYZE_MOVE_PROCESSING_GRACE_MS = 10 * 60_000;
  * but tree search takes time and analyzes are processed after bot moves and Hexplorer.
  */
 const ANALYZE_MOVE_MCTS_TIMEOUT_MS = 10 * 60_000;
+
+/**
+ * Job type a worker must process to analyze Hexplorer positions with an engine.
+ */
+const ANALYSIS_ENGINE_JOB_TYPES: { [engine in AnalysisEngine]: AiJobType } = {
+    'katahex-intuition': 'katahex-intuition-analyze-position',
+    'katahex-mcts': 'katahex-mcts-analyze-position',
+};
 
 /**
  * Error from AI job: task invalid, no worker processed it in time, or worker failed.
@@ -195,6 +204,14 @@ export default class AiJobService
         }
 
         return this.aiWorkersRegistry.getOnlineWorkers(type).length > 0;
+    }
+
+    /**
+     * Whether Hexplorer positions can be analyzed now with this engine.
+     */
+    isAnalysisEngineAvailable(engine: AnalysisEngine): boolean
+    {
+        return this.isJobTypeAvailable(ANALYSIS_ENGINE_JOB_TYPES[engine]);
     }
 
     /**

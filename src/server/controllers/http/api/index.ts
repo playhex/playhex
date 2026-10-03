@@ -13,6 +13,7 @@ import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import { Player } from '../../../../shared/app/models/index.js';
 import ChatController from './ChatController.js';
 import AIConfigController from './AIConfigController.js';
+import AiAvailabilityController from './AiAvailabilityController.js';
 import GameAnalyzeController from './GameAnalyzeController.js';
 import AiWorkerController from './AiWorkerController.js';
 import AdminAiWorkersController from './AdminAiWorkersController.js';
@@ -101,6 +102,7 @@ export const registerApi = (app: Express) => {
             PlayerAvatarController,
             PlayerCountryFlagController,
             AIConfigController,
+            AiAvailabilityController,
             PushController,
             RatingController,
             SearchController,

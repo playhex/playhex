@@ -20,6 +20,7 @@ import { gameTreeToSgf } from '../exportSgf.js';
 import { sgfToString } from '../../../../shared/sgf/index.js';
 import { downloadString } from '../../../services/fileDownload.js';
 import { DragPainter } from '../DragPainter.js';
+import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 
 /**
  * Walks a square board and splits the stones it holds into a black and a white move list,
@@ -58,6 +59,9 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
     const currentTool = shallowRef<ToolInterface>(null!);
     const whiteWin = ref<number | undefined>(0.5);
     const analysisLoading = ref(false);
+
+    // Why last analysis of current position failed, null if it did not fail.
+    const analysisError = ref<null | 'engine_unavailable' | 'failed'>(null);
 
     // The analyzer currently used to compute winrate/policy. Can be swapped at runtime
     // (see setAnalyzer), e.g to disable analysis (NoopAnalyzer) or change engine.
@@ -208,6 +212,8 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         // result (computed with the previous settings) once it resolves.
         const requestId = ++analysisRequestId;
 
+        analysisError.value = null;
+
         // Nothing to display for the color to move: hide the winrate bar.
         if (!analyzer || (!showWinrate && !showPolicy)) {
             whiteWin.value = undefined;
@@ -228,9 +234,18 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
             result = await analyzer.analyzePosition({ size, color, black, white });
         } catch (e) {
             // Do not leave the loading indicator spinning forever on a failed analysis.
-            if (requestId === analysisRequestId) {
-                analysisLoading.value = false;
+            if (requestId !== analysisRequestId) {
+                return;
             }
+
+            analysisLoading.value = false;
+
+            if (e instanceof AnalysisEngineUnavailableError) {
+                analysisError.value = 'engine_unavailable';
+                return;
+            }
+
+            analysisError.value = 'failed';
 
             // eslint-disable-next-line no-console
             console.error('Error while analyzing position', e);
@@ -946,6 +961,7 @@ export const useHexplorer = (fromHash?: string, analyzer: AnalyzerInterface | nu
         state,
         whiteWin,
         analysisLoading,
+        analysisError,
         currentTool,
         evalHistory,
         evalCursorIndex,

@@ -6,8 +6,8 @@ import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
 import { storeToRefs } from 'pinia';
-import { AIConfigStatusData } from '../../../../shared/app/Types.js';
-import { apiGetAiConfigsStatus } from '../../../apiClient.js';
+import { AiAvailabilityData } from '../../../../shared/app/Types.js';
+import { apiGetAiAvailability } from '../../../apiClient.js';
 import { AIConfig, GameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MIN, RANKED_BOARDSIZE_MAX } from '../../../../shared/app/ratingUtils.js';
 import TimeControlType from '../../../../shared/time-control/TimeControlType.js';
@@ -33,10 +33,10 @@ watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
  */
 const { aiConfigs } = storeToRefs(useAiConfigsStore());
 const selectedAiConfig = ref<AIConfig | null>(null);
-const aiConfigsStatus: Ref<null | AIConfigStatusData> = ref(null);
+const aiAvailability: Ref<null | AiAvailabilityData> = ref(null);
 
 void (async () => {
-    aiConfigsStatus.value = await apiGetAiConfigsStatus();
+    aiAvailability.value = await apiGetAiAvailability();
 })();
 
 const capSelectedBoardsize = () => {
@@ -61,17 +61,17 @@ const selectAiConfig = (aiConfig: AIConfig): void => {
 };
 
 const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
-    if (aiConfigsStatus.value === null) {
+    if (aiAvailability.value === null) {
         return false;
     }
 
-    return aiConfigsStatus.value.availableAiPlayerPublicIds.includes(aiConfig.player!.publicId);
+    return aiAvailability.value.availableAiPlayerPublicIds.includes(aiConfig.player!.publicId);
 };
 
 /**
  * Whether some AIs cannot be played because no worker is connected for their engine.
  */
-const hasUnavailableAIConfig = computed((): boolean => aiConfigsStatus.value !== null
+const hasUnavailableAIConfig = computed((): boolean => aiAvailability.value !== null
     && aiConfigs.value.some(aiConfig => !isAIConfigAvailable(aiConfig)));
 
 // Automatically select first (easiest) AI on load if none selected yet

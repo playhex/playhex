@@ -1,7 +1,5 @@
 import { Get, JsonController, ResponseClassTransformOptions } from 'routing-controllers';
 import { Inject, Service } from 'typedi';
-import type { AIConfigStatusData } from '../../../../shared/app/Types.js';
-import { isAIConfigAvailable } from '../../../services/AIManager.js';
 import { AIConfig } from '../../../../shared/app/models/index.js';
 import { Repository } from 'typeorm';
 
@@ -37,21 +35,5 @@ export default class AIConfigController
                 order: 'asc',
             },
         });
-    }
-
-    @Get('/api/ai-configs-status')
-    async getStatus(): Promise<AIConfigStatusData> {
-        const aiConfigs = await this.aiConfigRepository.find({
-            relations: {
-                player: true,
-            },
-        });
-
-        return {
-            availableAiPlayerPublicIds: aiConfigs
-                .filter(aiConfig => isAIConfigAvailable(aiConfig))
-                .map(aiConfig => aiConfig.player!.publicId)
-            ,
-        };
     }
 }

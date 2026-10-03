@@ -1078,6 +1078,8 @@
         "autoplay": "Auto-play",
         "evaluation": "Évaluation",
         "engine": "Moteur",
+        "engine_unavailable": "Aucun worker IA n'est en ligne pour ce moteur en ce moment, les positions ne peuvent pas être analysées.",
+        "analysis_failed": "Impossible d'analyser cette position.",
         "move_history": "Historique des coups",
         "current_analysis": "Analyse actuelle",
         "load": "Charger",

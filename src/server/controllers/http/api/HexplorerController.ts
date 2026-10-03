@@ -128,7 +128,7 @@ export default class HexplorerController
             }
         }
 
-        if (!this.aiJobService.isJobTypeAvailable(mcts ? 'katahex-mcts-analyze-position' : 'katahex-intuition-analyze-position')) {
+        if (!this.aiJobService.isAnalysisEngineAvailable(input.engine ?? 'katahex-intuition')) {
             throw new HttpError(503, 'No AI worker can analyze positions right now');
         }
 

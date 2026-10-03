@@ -1095,6 +1095,8 @@
         "autoplay": "Auto-play",
         "evaluation": "Evaluation",
         "engine": "Engine",
+        "engine_unavailable": "No AI worker is online for this engine right now, positions cannot be analyzed.",
+        "analysis_failed": "Could not analyze this position.",
         "move_history": "Move history",
         "current_analysis": "Current analysis",
         "load": "Load",

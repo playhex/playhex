@@ -2,6 +2,7 @@ import { GameTimeData } from '../time-control/TimeControl.js';
 import TimeControlType from '../time-control/TimeControlType.js';
 import { Translator } from './i18n/availableLocales.js';
 import { RateLimitReachedErrorPayload } from './rate-limiters.js';
+import type { AnalysisEngine } from './hexplorer.js';
 
 export type Tuple<T> = [T, T];
 
@@ -106,13 +107,19 @@ export type PlayHexContributors = {
     liberapay: LiberapayPatron[];
 };
 
-export type AIConfigStatusData = {
+export type AiAvailabilityData = {
     /**
      * AIs that can play right now (their player publicId):
      * AIs computed by the server (random), and AIs with at least one AI worker connected for their job type.
      * Other AIs cannot be played.
      */
     availableAiPlayerPublicIds: string[];
+
+    /**
+     * Hexplorer engines with at least one AI worker connected to analyze positions.
+     * Other engines cannot analyze positions.
+     */
+    availableAnalysisEngines: AnalysisEngine[];
 };
 
 type TWebsocketActionError<Reason extends string = string, Payload = unknown> = {

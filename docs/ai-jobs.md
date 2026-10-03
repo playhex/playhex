@@ -137,7 +137,7 @@ sequenceDiagram
 - **401**: key invalid or revoked, worker stops.
 
 Online workers are tracked in memory by `AiWorkersRegistry` (seen in the last 60s),
-used to know which AIs are available (`/api/ai-configs-status`), and shown in `/api/admin/ai-workers`.
+used to know which AIs and Hexplorer engines are available (`/api/ai-availability`), and shown in `/api/admin/ai-workers`.
 
 ## Game analyze
 

@@ -1,5 +1,5 @@
 import qs from 'qs';
-import { AIConfigStatusData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
+import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
 import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
@@ -16,7 +16,7 @@ import { ConditionalMovesStruct } from '@playhex/conditional-moves';
 import { isRateLimitReachedErrorPayload } from '../shared/app/rate-limiters.js';
 import { showToastFromRateLimitPayload } from './services/rate-limiter.js';
 import { showToastForTranslatableError } from './services/showToastForTranslatableError.js';
-import { AnalysisInput, AnalysisOutput } from '../shared/app/hexplorer.js';
+import { AnalysisEngineUnavailableError, AnalysisInput, AnalysisOutput } from '../shared/app/hexplorer.js';
 import { GameChatSubscriptionItem } from '../shared/app/GameChatSubscriptionItem.js';
 import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } from '../shared/app/models/LadderDto.js';
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
@@ -495,8 +495,8 @@ export const apiGetAiConfigs = async (): Promise<WithRequired<AIConfig, 'player'
     return await response.json();
 };
 
-export const apiGetAiConfigsStatus = async (): Promise<AIConfigStatusData> => {
-    const response = await fetch(`/api/ai-configs-status`, {
+export const apiGetAiAvailability = async (): Promise<AiAvailabilityData> => {
+    const response = await fetch(`/api/ai-availability`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -1187,6 +1187,9 @@ export const apiGetPuzzle = async (publicId: string): Promise<null | Puzzle> => 
     return plainToInstance(Puzzle, await response.json());
 };
 
+/**
+ * @throws {AnalysisEngineUnavailableError} If no worker is online for this engine.
+ */
 export const apiPostHexplorerAnalyzePosition = async (input: AnalysisInput): Promise<AnalysisOutput> => {
     const response = await fetch('/api/hexplorer/analyze-position', {
         method: 'post',
@@ -1196,6 +1199,10 @@ export const apiPostHexplorerAnalyzePosition = async (input: AnalysisInput): Pro
         },
         body: JSON.stringify(input),
     });
+
+    if (response.status === 503) {
+        throw new AnalysisEngineUnavailableError(`No worker online for engine "${input.engine}"`);
+    }
 
     await checkResponse(response);
 
