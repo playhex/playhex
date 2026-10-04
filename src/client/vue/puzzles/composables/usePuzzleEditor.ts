@@ -53,12 +53,19 @@ const cleanNode = <T extends EditorNode>(node: T): T => {
  *
  * @param puzzle Puzzle to edit, or null to create a new one
  * @param sourceGame Game to create puzzle from
+ * @param initialCollectionPublicId Collection to put created puzzle in
  */
-export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) => {
+export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, initialCollectionPublicId: null | string = null) => {
     const step = ref<EditorStep>(puzzle === null ? 'position' : 'tree');
 
     const title = ref(puzzle?.title ?? '');
     const description = ref(puzzle?.description ?? '');
+
+    /**
+     * Collection to put puzzle in, null for none.
+     */
+    const loadedCollectionPublicId = puzzle === null ? initialCollectionPublicId : puzzle.collection?.publicId ?? null;
+    const collectionPublicId = ref<null | string>(loadedCollectionPublicId);
 
     /**
      * Saved state, changed only by saving.
@@ -514,6 +521,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
         tree: cleanNode(tree.value),
         published: publish,
         gamePublicId: puzzle === null ? sourceGame?.publicId ?? null : undefined,
+        // Sent only if changed, to not move back puzzle to its previous collection
+        // if it has been changed from collection page meanwhile
+        collectionPublicId: puzzle !== null && collectionPublicId.value === loadedCollectionPublicId
+            ? undefined
+            : collectionPublicId.value,
     });
 
     /**
@@ -584,6 +596,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
 
         title,
         description,
+        collectionPublicId,
         published,
         boardsize,
         setBoardsize,

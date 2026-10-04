@@ -8,6 +8,7 @@ import type { PuzzleNode } from '../puzzles/puzzleTree.js';
 import { keysOf } from '../utils.js';
 import Player from './Player.js';
 import Game from './Game.js';
+import PuzzleCollection from './PuzzleCollection.js';
 
 const movesTransformer = {
     from: (value: unknown) => deserializeMoves<Move>(value),
@@ -20,6 +21,7 @@ const movesTransformer = {
  */
 @Entity()
 @Index(keysOf<Puzzle>()('published', 'publishedAt'))
+@Index(keysOf<Puzzle>()('collection', 'collectionPosition'))
 export default class Puzzle
 {
     @PrimaryGeneratedColumn()
@@ -106,6 +108,21 @@ export default class Puzzle
     @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
     @Type(() => Game)
     game: null | Relation<Game>;
+
+    /**
+     * Collection this puzzle is in, if any.
+     */
+    @ManyToOne(() => PuzzleCollection, { nullable: true, onDelete: 'SET NULL' })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    @Type(() => PuzzleCollection)
+    collection: null | Relation<PuzzleCollection>;
+
+    /**
+     * Order in collection, null when not in a collection.
+     */
+    @Column({ type: 'int', nullable: true })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    collectionPosition: null | number;
 
     /**
      * Unpublished puzzles are not listed, but still accessible by their link.

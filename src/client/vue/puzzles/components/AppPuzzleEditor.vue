@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
-import { whenever } from '@vueuse/core';
+import { useWindowFocus, whenever } from '@vueuse/core';
 import { t } from 'i18next';
-import { Game, Puzzle } from '../../../../shared/app/models/index.js';
+import { Game, Puzzle, PuzzleCollection } from '../../../../shared/app/models/index.js';
 import { isElseNode, PUZZLE_DESCRIPTION_MAX_LENGTH, PUZZLE_MESSAGE_MAX_LENGTH, PUZZLE_TITLE_MAX_LENGTH } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
-import { apiDeletePuzzle, apiPostPuzzle, apiPutPuzzle } from '../../../apiClient.js';
+import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle } from '../../../apiClient.js';
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
@@ -22,6 +22,11 @@ const props = defineProps<{
      * Game to create puzzle from.
      */
     sourceGame: null | Game;
+
+    /**
+     * Collection to put created puzzle in.
+     */
+    collectionPublicId?: null | string;
 }>();
 
 const {
@@ -30,6 +35,7 @@ const {
     setStep,
     title,
     description,
+    collectionPublicId,
     published,
     boardsize,
     setBoardsize,
@@ -60,7 +66,7 @@ const {
     blueStones,
     disabledCells,
     toInput,
-} = usePuzzleEditor(props.puzzle, props.sourceGame);
+} = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null);
 
 const gameViewElement = useTemplateRef('game-view-element');
 
@@ -71,6 +77,30 @@ whenever(gameViewElement, async element => {
 });
 
 const sidebarOpen = ref(true);
+
+/**
+ * Collections of author, to put puzzle in one.
+ * Reloaded when coming back from another tab, where a collection may have been created.
+ */
+const collections = ref<PuzzleCollection[]>([]);
+
+const loadCollections = async (): Promise<void> => {
+    try {
+        collections.value = await apiGetMyPuzzleCollections();
+    } catch (e) {
+        // Not essential, puzzle can still be saved without changing its collection
+        console.error('Could not load collections', e);
+        return;
+    }
+
+    // Selected collection may have been deleted from another tab
+    if (!collections.value.some(collection => collection.publicId === collectionPublicId.value)) {
+        collectionPublicId.value = null;
+    }
+};
+
+void loadCollections();
+whenever(useWindowFocus(), loadCollections);
 
 const newBoardsize = ref(boardsize.value);
 
@@ -351,6 +381,21 @@ const deletePuzzle = async (): Promise<void> => {
                     <div class="mb-3">
                         <label class="form-label" for="puzzle-description">{{ $t('puzzles.editor.description') }}</label>
                         <textarea id="puzzle-description" v-model="description" class="form-control" rows="2" :maxlength="PUZZLE_DESCRIPTION_MAX_LENGTH" :placeholder="$t('puzzles.editor.optional')"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="puzzle-collection">{{ $t('puzzles.collections.collection') }}</label>
+                        <select id="puzzle-collection" v-model="collectionPublicId" class="form-select">
+                            <option :value="null">{{ $t('puzzles.collections.no_collection') }}</option>
+                            <option
+                                v-for="collection in collections"
+                                :key="collection.publicId"
+                                :value="collection.publicId"
+                            >{{ collection.name }}</option>
+                        </select>
+                        <div class="form-text">
+                            <router-link :to="{ name: 'puzzle-collection-create' }" target="_blank">{{ $t('puzzles.collections.create') }}</router-link>
+                        </div>
                     </div>
 
                     <div v-if="errors.length > 0" class="small mb-3">

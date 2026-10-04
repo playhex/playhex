@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, Video } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -22,6 +22,7 @@ import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } fr
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
+import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 
 /**
@@ -1421,6 +1422,113 @@ export const apiPublishPuzzle = async (publicId: string): Promise<Puzzle> => {
 
 export const apiDeletePuzzle = async (publicId: string): Promise<void> => {
     const response = await fetch(`/api/puzzles/${publicId}`, {
+        method: 'delete',
+    });
+
+    await checkResponse(response);
+};
+
+/**
+ * Next puzzle to play after this one, or null if this is the last one.
+ * Only publicId and title are set.
+ */
+export const apiGetNextPuzzle = async (publicId: string): Promise<null | Puzzle> => {
+    const response = await fetch(`/api/puzzles/${publicId}/next`);
+
+    await checkResponse(response);
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    return plainToInstance(Puzzle, await response.json());
+};
+
+const fetchPuzzleCollections = async (url: string): Promise<PuzzleCollection[]> => {
+    const response = await fetch(url);
+
+    await checkResponse(response);
+
+    return (await response.json() as object[]).map(collection => plainToInstance(PuzzleCollection, collection));
+};
+
+/**
+ * Collections having at least one published puzzle.
+ */
+export const apiGetPuzzleCollections = (): Promise<PuzzleCollection[]> => fetchPuzzleCollections('/api/puzzle-collections');
+
+/**
+ * All collections of current player, even empty ones.
+ */
+export const apiGetMyPuzzleCollections = (): Promise<PuzzleCollection[]> => fetchPuzzleCollections('/api/puzzle-collections/mine');
+
+/**
+ * Collection and its puzzles in order, drafts included for collection author.
+ */
+export const apiGetPuzzleCollection = async (publicId: string): Promise<null | { collection: PuzzleCollection, puzzles: Puzzle[] }> => {
+    const response = await fetch(`/api/puzzle-collections/${publicId}`);
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    const { collection, puzzles } = await response.json() as { collection: object, puzzles: object[] };
+
+    return {
+        collection: plainToInstance(PuzzleCollection, collection),
+        puzzles: puzzles.map(puzzle => plainToInstance(Puzzle, puzzle)),
+    };
+};
+
+export const apiPostPuzzleCollection = async (input: PuzzleCollectionInput): Promise<PuzzleCollection> => {
+    const response = await fetch('/api/puzzle-collections', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(PuzzleCollection, await response.json());
+};
+
+export const apiPutPuzzleCollection = async (publicId: string, input: PuzzleCollectionInput): Promise<PuzzleCollection> => {
+    const response = await fetch(`/api/puzzle-collections/${publicId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(PuzzleCollection, await response.json());
+};
+
+/**
+ * Sets puzzles of collection, in this order. Used to add, remove and reorder puzzles.
+ */
+export const apiPutPuzzleCollectionPuzzles = async (publicId: string, puzzlePublicIds: string[]): Promise<void> => {
+    const response = await fetch(`/api/puzzle-collections/${publicId}/puzzles`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ puzzlePublicIds }),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiDeletePuzzleCollection = async (publicId: string): Promise<void> => {
+    const response = await fetch(`/api/puzzle-collections/${publicId}`, {
         method: 'delete',
     });
 

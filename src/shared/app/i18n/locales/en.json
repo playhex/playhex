@@ -1068,6 +1068,33 @@
             "save_and_publish": "Save and publish",
             "delete": "Delete puzzle",
             "delete_confirm": "Delete this puzzle?"
+        },
+        "next_puzzle": "Next puzzle",
+        "collections": {
+            "title": "Collections",
+            "recently_updated": "Recently updated collections",
+            "page_title": "Collection {{name}}",
+            "collection": "Collection",
+            "mine": "My collections",
+            "none": "No collections yet.",
+            "no_collection": "No collection",
+            "create": "Create a collection",
+            "edit": "Edit collection",
+            "delete": "Delete collection",
+            "delete_confirm": "Delete this collection? Its puzzles will be kept, without collection.",
+            "name": "Name",
+            "not_found": "Collection not found.",
+            "not_author": "Only the author can edit this collection.",
+            "puzzles_count_one": "{{count}} puzzle",
+            "puzzles_count_other": "{{count}} puzzles",
+            "updated_at": "Updated on {{date}}",
+            "empty": "No puzzles in this collection yet.",
+            "start": "Start",
+            "add_puzzle": "Add one of my puzzles…",
+            "add": "Add",
+            "create_puzzle": "Create a puzzle in this collection",
+            "remove": "Remove from collection",
+            "back_to_collection": "Back to collection"
         }
     },
     "videos": {

@@ -108,38 +108,64 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
-        name: 'puzzles',
         path: '/puzzles',
-        component: () => import('./puzzles/pages/PagePuzzles.vue'),
-    },
-    {
-        name: 'puzzles-mine',
-        path: '/puzzles/my-puzzles',
-        component: () => import('./puzzles/pages/PageMyPuzzles.vue'),
-    },
-    {
-        name: 'puzzle-create',
-        path: '/puzzles/new',
-        component: () => import('./puzzles/pages/PagePuzzleEditor.vue'),
-        meta: {
-            displayFooter: false,
-        },
-    },
-    {
-        name: 'puzzle-edit',
-        path: '/puzzles/:publicId/edit',
-        component: () => import('./puzzles/pages/PagePuzzleEditor.vue'),
-        meta: {
-            displayFooter: false,
-        },
-    },
-    {
-        name: 'puzzle',
-        path: '/puzzles/:publicId',
-        component: () => import('./puzzles/pages/PagePuzzle.vue'),
-        meta: {
-            displayFooter: false,
-        },
+        component: () => import('./ReloadOnRouteChange.vue'), // When going to next puzzle, reload puzzle page
+        children: [
+            {
+                name: 'puzzles',
+                path: '',
+                component: () => import('./puzzles/pages/PagePuzzles.vue'),
+            },
+            {
+                name: 'puzzles-mine',
+                path: 'my-puzzles',
+                component: () => import('./puzzles/pages/PageMyPuzzles.vue'),
+            },
+            {
+                name: 'puzzle-create',
+                path: 'new',
+                component: () => import('./puzzles/pages/PagePuzzleEditor.vue'),
+                meta: {
+                    displayFooter: false,
+                },
+            },
+            {
+                // No collections index page, they are listed on puzzles page
+                path: 'collections',
+                redirect: { name: 'puzzles' },
+            },
+            {
+                name: 'puzzle-collection-create',
+                path: 'collections/new',
+                component: () => import('./puzzles/pages/PagePuzzleCollectionEditor.vue'),
+            },
+            {
+                name: 'puzzle-collection-edit',
+                path: 'collections/:publicId/edit',
+                component: () => import('./puzzles/pages/PagePuzzleCollectionEditor.vue'),
+            },
+            {
+                name: 'puzzle-collection',
+                path: 'collections/:publicId',
+                component: () => import('./puzzles/pages/PagePuzzleCollection.vue'),
+            },
+            {
+                name: 'puzzle-edit',
+                path: ':publicId/edit',
+                component: () => import('./puzzles/pages/PagePuzzleEditor.vue'),
+                meta: {
+                    displayFooter: false,
+                },
+            },
+            {
+                name: 'puzzle',
+                path: ':publicId',
+                component: () => import('./puzzles/pages/PagePuzzle.vue'),
+                meta: {
+                    displayFooter: false,
+                },
+            },
+        ],
     },
     {
         name: 'videos',

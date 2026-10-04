@@ -1053,6 +1053,33 @@
             "save_and_publish": "Enregistrer et publier",
             "delete": "Supprimer le puzzle",
             "delete_confirm": "Supprimer ce puzzle ?"
+        },
+        "next_puzzle": "Puzzle suivant",
+        "collections": {
+            "title": "Collections",
+            "recently_updated": "Collections mises à jour récemment",
+            "page_title": "Collection {{name}}",
+            "collection": "Collection",
+            "mine": "Mes collections",
+            "none": "Aucune collection pour le moment.",
+            "no_collection": "Aucune collection",
+            "create": "Créer une collection",
+            "edit": "Modifier la collection",
+            "delete": "Supprimer la collection",
+            "delete_confirm": "Supprimer cette collection ? Ses puzzles seront conservés, sans collection.",
+            "name": "Nom",
+            "not_found": "Collection introuvable.",
+            "not_author": "Seul l’auteur peut modifier cette collection.",
+            "puzzles_count_one": "{{count}} puzzle",
+            "puzzles_count_other": "{{count}} puzzles",
+            "updated_at": "Mise à jour le {{date}}",
+            "empty": "Aucun puzzle dans cette collection pour le moment.",
+            "start": "Commencer",
+            "add_puzzle": "Ajouter un de mes puzzles…",
+            "add": "Ajouter",
+            "create_puzzle": "Créer un puzzle dans cette collection",
+            "remove": "Retirer de la collection",
+            "back_to_collection": "Retour à la collection"
         }
     },
     "videos": {

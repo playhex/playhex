@@ -42,6 +42,7 @@ export { default as IconChevronRight } from '~icons/bi/chevron-right';
 export { default as IconCircle } from '~icons/fa/circle-o';
 export { default as IconCircleFill } from '~icons/bi/circle-fill';
 export { default as IconCircleHalf } from '~icons/bi/circle-half';
+export { default as IconCollection } from '~icons/bi/collection';
 export { default as IconCrown } from '~icons/mdi/crown';
 export { default as IconCrosshair } from '~icons/bi/crosshair';
 export { default as IconDiagram2 } from '~icons/bi/diagram-2';

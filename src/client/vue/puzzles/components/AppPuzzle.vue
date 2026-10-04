@@ -9,10 +9,13 @@ import { getPuzzleTitle } from '../services/puzzleTitle.js';
 import { usePuzzle } from '../composables/usePuzzle.js';
 import { puzzleToHexplorerAnalysis } from '../services/puzzleToHexplorer.js';
 import { validatePuzzle } from '../../../../shared/app/puzzles/puzzleTree.js';
-import { apiPublishPuzzle } from '../../../apiClient.js';
+import { apiGetNextPuzzle, apiPublishPuzzle } from '../../../apiClient.js';
 import { HEXPLORER_ANALYSIS_STATE_KEY } from '../../hexplorer/HexplorerState.js';
 import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconCheck, IconCircleFill, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';
+import AppPuzzleNextLink from './AppPuzzleNextLink.vue';
+import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
+import { puzzleBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import useAuthStore from '../../../stores/authStore.js';
 
 const props = defineProps<{
@@ -77,6 +80,21 @@ const formatGameDate = (game: Game): string => intlFormat(
     { locale: autoLocale() },
 );
 
+/**
+ * Next puzzle to play once this one ended: next in collection,
+ * or next one in puzzles list. null if none or not loaded yet.
+ */
+const nextPuzzle = ref<null | Puzzle>(null);
+
+void (async () => {
+    try {
+        nextPuzzle.value = await apiGetNextPuzzle(props.puzzle.publicId);
+    } catch (e) {
+        // Not essential, just no next puzzle link
+        console.error('Could not load next puzzle', e);
+    }
+})();
+
 const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.publicId === loggedInPlayer.value?.publicId);
 </script>
 
@@ -100,6 +118,9 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     ><IconArrowLeft /> {{ $t('undo.undo_move') }}</button>
                 </div>
 
+                <!-- Already in sidebar when open -->
+                <AppPuzzleNextLink v-if="ended && !sidebarOpen" :puzzle :nextPuzzle />
+
                 <button
                     type="button"
                     class="btn btn-outline-primary position-absolute end-0 top-50 translate-middle-y me-2"
@@ -113,7 +134,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
         <div v-if="sidebarOpen" class="puzzle-sidebar col-sm-6 col-lg-5 col-xl-4 d-flex flex-column h-100 border-start bg-body-tertiary">
             <div class="flex-grow-1 overflow-auto p-3">
-                <router-link v-if="isAuthor" :to="{ name: 'puzzles-mine' }" class="d-inline-block small mb-2">{{ $t('puzzles.my_puzzles') }}</router-link>
+                <AppBreadcrumb :items="puzzleBreadcrumb(puzzle)" class="puzzle-breadcrumb small" :title="puzzle.collection?.name" />
 
                 <h1 class="h4">{{ getPuzzleTitle(puzzle) }}</h1>
 
@@ -152,6 +173,11 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         class="btn btn-sm btn-outline-primary"
                     ><IconPencilSquare /> {{ $t('puzzles.edit') }}</router-link>
 
+                    <router-link
+                        :to="{ name: 'puzzles-mine' }"
+                        class="btn btn-sm btn-outline-secondary"
+                    >{{ $t('puzzles.my_puzzles') }}</router-link>
+
                     <button
                         v-if="!published"
                         class="btn btn-sm btn-success"
@@ -183,7 +209,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     <span v-else class="text-primary"><IconCircleFill /> {{ $t('game.blue') }}</span>
                 </p>
 
-                <div class="d-flex gap-2">
+                <div class="d-flex flex-wrap gap-2">
                     <button
                         v-if="'failed' === status"
                         @click="undo()"
@@ -195,6 +221,8 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         @click="restart()"
                         class="btn btn-warning"
                     ><IconRepeat /> {{ $t('puzzles.restart') }}</button>
+
+                    <AppPuzzleNextLink v-if="ended" :puzzle :nextPuzzle />
                 </div>
 
                 <hr>
@@ -246,4 +274,23 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
 .pre-line
     white-space pre-line
+
+// One line in narrow sidebar: collection name is truncated
+.puzzle-breadcrumb :deep(.breadcrumb)
+    flex-wrap nowrap
+
+    .breadcrumb-item
+        display flex
+        min-width 0
+        white-space nowrap
+
+        &:last-child
+            flex-shrink 1
+
+        &:not(:last-child)
+            flex-shrink 0
+
+        a
+            overflow hidden
+            text-overflow ellipsis
 </style>

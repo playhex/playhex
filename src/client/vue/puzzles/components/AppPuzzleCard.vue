@@ -4,6 +4,7 @@ import { getPuzzleTitle } from '../services/puzzleTitle.js';
 import AppPuzzleThumbnail from './AppPuzzleThumbnail.vue';
 import AppPseudo from '../../components/AppPseudo.vue';
 import { formatPuzzleDate } from '../services/puzzleDate.js';
+import { IconCollection } from '../../icons.js';
 
 defineProps<{
     puzzle: Puzzle;
@@ -18,6 +19,12 @@ defineProps<{
 
         <div class="card-footer small">
             <router-link :to="{ name: 'puzzle', params: { publicId: puzzle.publicId } }" class="fw-bold d-block text-truncate">{{ getPuzzleTitle(puzzle) }}</router-link>
+
+            <router-link
+                v-if="puzzle.collection"
+                :to="{ name: 'puzzle-collection', params: { publicId: puzzle.collection.publicId } }"
+                class="d-block text-truncate text-body-secondary"
+            ><IconCollection /> {{ puzzle.collection.name }}</router-link>
 
             <div class="d-flex justify-content-between gap-2 text-body-secondary">
                 <span class="text-truncate">

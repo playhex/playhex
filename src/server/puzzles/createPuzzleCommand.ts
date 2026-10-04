@@ -56,6 +56,8 @@ hexProgram
         puzzle.tree = input.tree;
         puzzle.author = null;
         puzzle.game = null;
+        puzzle.collection = null;
+        puzzle.collectionPosition = null;
         puzzle.published = input.published ?? true;
         puzzle.publishedAt = puzzle.published ? new Date() : null;
 

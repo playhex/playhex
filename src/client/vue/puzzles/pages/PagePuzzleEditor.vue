@@ -11,7 +11,8 @@ import useAuthStore from '../../../stores/authStore.js';
 import AppPuzzleEditor from '../components/AppPuzzleEditor.vue';
 
 /*
- * Create a puzzle (/puzzles/new, optionally ?game=<publicId> to start from a game),
+ * Create a puzzle (/puzzles/new, optionally ?game=<publicId> to start from a game,
+ * and ?collection=<publicId> to put it in a collection),
  * or edit an existing one (/puzzles/<publicId>/edit).
  */
 
@@ -20,6 +21,7 @@ const { loggedInPlayer } = storeToRefs(useAuthStore());
 
 const publicId = typeof route.params.publicId === 'string' ? route.params.publicId : null;
 const gamePublicId = typeof route.query.game === 'string' ? route.query.game : null;
+const collectionPublicId = typeof route.query.collection === 'string' ? route.query.collection : null;
 
 useHead({
     title: t(publicId === null ? 'puzzles.editor.create_title' : 'puzzles.editor.edit_title'),
@@ -76,6 +78,7 @@ watch(loggedInPlayer, async player => {
         v-if="'ready' === load.state"
         :puzzle="load.puzzle"
         :sourceGame="load.sourceGame"
+        :collectionPublicId
     />
 
     <div v-else class="container my-3">

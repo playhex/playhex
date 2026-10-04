@@ -126,6 +126,12 @@ export type PuzzleInput = PuzzleDefinition & {
      * Game this puzzle comes from. Only on creation.
      */
     gamePublicId?: null | string;
+
+    /**
+     * Collection to put this puzzle in, null to remove it from its collection.
+     * Undefined keeps current collection.
+     */
+    collectionPublicId?: null | string;
 };
 
 export const PUZZLE_TITLE_MAX_LENGTH = 64;

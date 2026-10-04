@@ -3,10 +3,11 @@ import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import { Puzzle } from '../../../../shared/app/models/index.js';
-import { apiGetMyPuzzles } from '../../../apiClient.js';
+import { Puzzle, PuzzleCollection } from '../../../../shared/app/models/index.js';
+import { apiGetMyPuzzleCollections, apiGetMyPuzzles } from '../../../apiClient.js';
 import useAuthStore from '../../../stores/authStore.js';
 import AppPuzzleListItem from '../components/AppPuzzleListItem.vue';
+import AppPuzzleCollectionListItem from '../components/AppPuzzleCollectionListItem.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import { myPuzzlesBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import { IconPlus } from '../../icons.js';
@@ -21,13 +22,17 @@ const { loggedInPlayer } = storeToRefs(useAuthStore());
  * null: loading
  */
 const puzzles = ref<null | Puzzle[]>(null);
+const collections = ref<PuzzleCollection[]>([]);
 
 watch(loggedInPlayer, async player => {
     if (player === null) {
         return;
     }
 
-    puzzles.value = await apiGetMyPuzzles();
+    [puzzles.value, collections.value] = await Promise.all([
+        apiGetMyPuzzles(),
+        apiGetMyPuzzleCollections(),
+    ]);
 }, { immediate: true });
 
 const drafts = computed(() => puzzles.value?.filter(puzzle => !puzzle.published) ?? []);
@@ -84,6 +89,28 @@ const published = computed(() => puzzles.value?.filter(puzzle => puzzle.publishe
                             :to="{ name: 'puzzle-create' }"
                             class="btn btn-sm btn-outline-success"
                         ><IconPlus /> {{ $t('puzzles.create') }}</router-link>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <h2 class="card-header h5">{{ $t('puzzles.collections.mine') }}</h2>
+
+                    <div v-if="collections.length > 0" class="list-group list-group-flush">
+                        <AppPuzzleCollectionListItem
+                            v-for="collection in collections"
+                            :key="collection.publicId"
+                            :collection
+                            :showAuthor="false"
+                        />
+                    </div>
+
+                    <div class="card-body">
+                        <p v-if="0 === collections.length" class="text-body-secondary">{{ $t('puzzles.collections.none') }}</p>
+
+                        <router-link
+                            :to="{ name: 'puzzle-collection-create' }"
+                            class="btn btn-sm btn-outline-success"
+                        ><IconPlus /> {{ $t('puzzles.collections.create') }}</router-link>
                     </div>
                 </div>
             </div>
