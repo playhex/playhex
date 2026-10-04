@@ -3,6 +3,10 @@ import { hexBoard } from '../../theming/renderers/hexBoard.js';
 import { shapeMark } from '../../theming/renderers/shapeMark.js';
 import { ThemeDefinition } from '../../theming/types.js';
 import { hexworldStone } from '../../theming/renderers/hexworldStone.js';
+import { darken } from '../../colorUtils.js';
+
+const cellColor = 0xd9b479;
+const strokeWidth = 0.05;
 
 /**
  * HexWorld-like theme.
@@ -26,10 +30,10 @@ export const hexworldTheme: ThemeDefinition = {
             text: 0x000000,
         },
         board: hexBoard({
-            cellColor: 0xd9b479,
+            cellColor,
             strokeColor: 0x000000,
             shadingColor: 0x9e8358,
-            strokeWidth: 0.05,
+            strokeWidth,
             sidesColors: [0x000000, 0xf0ebe3],
             frame: true,
             frameMargin: 0.2,
@@ -45,6 +49,12 @@ export const hexworldTheme: ThemeDefinition = {
         anchor44: {
             color: 0x000000,
             alpha: 0.3,
+        },
+        disabledCell: {
+            // Darker than shading pattern, to not be confused with it
+            color: darken(cellColor, 0.4),
+            // Slightly over cell border, to not show a light outline due to antialiasing
+            size: 1 - strokeWidth + 0.01,
         },
         lastMove: shapeMark({
             shape: 'circle',

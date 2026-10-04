@@ -1,5 +1,5 @@
 import { Color } from 'pixi.js';
-import { Anchor44Style, BoardTheme, SidesAlpha, ThemeColors, ThemeDefinition, ThemeMetadata } from '../types.js';
+import { Anchor44Style, BoardTheme, DisabledCellStyle, SidesAlpha, ThemeColors, ThemeDefinition, ThemeMetadata } from '../types.js';
 import { JsonParamType, JsonRendererEntry, jsonRenderersRegistry } from './registry.js';
 
 export class JsonThemeError extends Error
@@ -221,6 +221,22 @@ const createAnchor44 = (value: unknown, path: string): Anchor44Style => {
     return style;
 };
 
+const createDisabledCell = (value: unknown, path: string): DisabledCellStyle => {
+    const disabledCell = expectObject(value, path);
+    const params: { [key: string]: JsonParamType } = { color: 'color', alpha: 'alpha', size: 'number' };
+    const style: { [key: string]: unknown } = {};
+
+    for (const [key, value] of Object.entries(disabledCell)) {
+        if (!params[key]) {
+            throw new JsonThemeError(`${path}.${key}`, 'unknown key, expected one of: color, alpha, size');
+        }
+
+        style[key] = parseParam(value, params[key], `${path}.${key}`);
+    }
+
+    return style;
+};
+
 const createSidesAlpha = (value: unknown, path: string): SidesAlpha => {
     const sidesAlpha = expectObject(value, path);
     const result: SidesAlpha = {};
@@ -242,8 +258,8 @@ const createSidesAlpha = (value: unknown, path: string): SidesAlpha => {
  */
 const createTheme = (variant: JsonObject, path: string): BoardTheme => {
     for (const key of Object.keys(variant)) {
-        if (!['colors', 'background', 'board', 'stones', 'sidesAlpha', 'anchor44', 'lastMove', 'swappable', 'swapped', 'coords'].includes(key)) {
-            throw new JsonThemeError(`${path}.${key}`, 'unknown key, expected one of: colors, background, board, stones, sidesAlpha, anchor44, lastMove, swappable, swapped, coords');
+        if (!['colors', 'background', 'board', 'stones', 'sidesAlpha', 'anchor44', 'disabledCell', 'lastMove', 'swappable', 'swapped', 'coords'].includes(key)) {
+            throw new JsonThemeError(`${path}.${key}`, 'unknown key, expected one of: colors, background, board, stones, sidesAlpha, anchor44, disabledCell, lastMove, swappable, swapped, coords');
         }
     }
 
@@ -275,6 +291,10 @@ const createTheme = (variant: JsonObject, path: string): BoardTheme => {
 
     if (variant.anchor44 !== undefined) {
         theme.anchor44 = createAnchor44(variant.anchor44, `${path}.anchor44`);
+    }
+
+    if (variant.disabledCell !== undefined) {
+        theme.disabledCell = createDisabledCell(variant.disabledCell, `${path}.disabledCell`);
     }
 
     if (variant.background !== undefined) {

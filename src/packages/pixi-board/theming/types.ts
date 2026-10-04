@@ -240,6 +240,29 @@ export type Anchor44Style = {
 };
 
 /**
+ * Style of disabled cells, i.e greyed out cells of a puzzle that cannot be played.
+ * Drawn above board and its shading pattern, below 4-4 anchors, stones and marks.
+ */
+export type DisabledCellStyle = {
+    /**
+     * Defaults to a grey derived from text color,
+     * light on light themes and very dark on dark themes.
+     */
+    color?: number;
+
+    /**
+     * Opacity, between 0 and 1. Defaults to 1, hiding shading pattern.
+     */
+    alpha?: number;
+
+    /**
+     * Radius of the hexagon, relative to cell radius.
+     * Defaults to 0.94, like a cell, to keep grid visible. 1 covers the whole cell, without border.
+     */
+    size?: number;
+};
+
+/**
  * A resolved theme, ready to draw a board.
  */
 export type BoardTheme = {
@@ -258,6 +281,8 @@ export type BoardTheme = {
     sidesAlpha?: SidesAlpha;
 
     anchor44?: Anchor44Style;
+
+    disabledCell?: DisabledCellStyle;
 
     /**
      * Draws coords around the board.
@@ -292,7 +317,7 @@ export type BoardTheme = {
 
 /**
  * Overrides some values of a theme.
- * Colors, anchor44 and sidesAlpha are merged, so can be partially overridden.
+ * Colors, anchor44, disabledCell and sidesAlpha are merged, so can be partially overridden.
  */
 export type BoardThemeOverride = Partial<Omit<BoardTheme, 'colors'>> & {
     colors?: Partial<ThemeColors>;

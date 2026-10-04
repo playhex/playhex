@@ -19,6 +19,7 @@ type PuzzleFile = {
     boardsize: number;
     redStones?: string;
     blueStones?: string;
+    disabledCells?: string;
     lastMove?: null | Move;
     playerColor: 'red' | 'blue';
     tree: Puzzle['tree'];
@@ -49,6 +50,7 @@ hexProgram
         puzzle.boardsize = input.boardsize;
         puzzle.redStones = deserializeMoves(input.redStones);
         puzzle.blueStones = deserializeMoves(input.blueStones);
+        puzzle.disabledCells = deserializeMoves(input.disabledCells);
         puzzle.lastMove = input.lastMove ?? null;
         puzzle.playerColor = input.playerColor === 'red' ? 0 : 1;
         puzzle.tree = input.tree;

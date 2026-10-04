@@ -105,6 +105,12 @@ export type PuzzleDefinition = {
     boardsize: number;
     redStones: Move[];
     blueStones: Move[];
+
+    /**
+     * Cells that cannot be played. Considered occupied: no initial stone nor tree move on them.
+     */
+    disabledCells?: Move[];
+
     lastMove?: null | Move;
     playerColor: 0 | 1;
     tree: PuzzleNode;
@@ -362,7 +368,9 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
         errors.push({ code: 'invalid_player_color', params: { color: String(puzzle.playerColor) } });
     }
 
-    if (!Array.isArray(puzzle.redStones) || !Array.isArray(puzzle.blueStones)) {
+    const disabledCells = puzzle.disabledCells ?? [];
+
+    if (!Array.isArray(puzzle.redStones) || !Array.isArray(puzzle.blueStones) || !Array.isArray(disabledCells)) {
         return [...errors, { code: 'invalid_stones' }];
     }
 
@@ -400,7 +408,8 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
 
     const initialStones = new Set<Move>();
 
-    for (const move of [...puzzle.redStones, ...puzzle.blueStones]) {
+    // Disabled cells are occupied, so no stone nor tree move can be on them
+    for (const move of [...puzzle.redStones, ...puzzle.blueStones, ...disabledCells]) {
         if (!checkMove(move)) {
             continue;
         }

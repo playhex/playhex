@@ -1,5 +1,5 @@
 import { GameMarksFacade, GameView } from '@playhex/pixi-board';
-import { onKeyDown } from '@vueuse/core';
+import { onKeyDown, useEventListener } from '@vueuse/core';
 import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, toRaw } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
@@ -13,7 +13,7 @@ export type EditorStep = 'position' | 'tree' | 'publish';
 /**
  * How a click on board edits initial position.
  */
-export type PositionTool = 'red' | 'blue' | 'erase' | 'last_move';
+export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move';
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -67,6 +67,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
     const boardsize = ref(puzzle?.boardsize ?? sourceGame?.boardsize ?? DEFAULT_BOARDSIZE);
     const redStones = ref<Move[]>(puzzle ? [...puzzle.redStones] : []);
     const blueStones = ref<Move[]>(puzzle ? [...puzzle.blueStones] : []);
+    const disabledCells = ref<Move[]>(puzzle ? [...puzzle.disabledCells] : []);
     const lastMove = ref<null | Move>(puzzle?.lastMove ?? null);
     const playerColor = ref<0 | 1>(puzzle?.playerColor ?? 0);
     // toRaw: puzzle may come from a vue ref, and proxies cannot be cloned
@@ -91,6 +92,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
 
         redStones.value = position.redStones;
         blueStones.value = position.blueStones;
+        // Keep disabled cells, except where a stone has been played
+        disabledCells.value = disabledCells.value.filter(move => !position.redStones.includes(move) && !position.blueStones.includes(move));
         lastMove.value = position.lastMove ?? null;
         playerColor.value = position.playerColor;
         redraw();
@@ -112,6 +115,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
         playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
         gameView.on('hexClicked', move => onHexClicked(move));
+        gameView.on('hexPointerDown', move => onHexPointerDown(move));
+        gameView.on('hexHovered', move => onHexHovered(move));
     };
 
     const destroyGameView = (): void => {
@@ -131,6 +136,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
         boardsize.value = newBoardsize;
         redStones.value = [];
         blueStones.value = [];
+        disabledCells.value = [];
         lastMove.value = null;
         tree.value = {};
         selectedPath.value = [];
@@ -310,7 +316,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
             return;
         }
 
-        if (gameView.getStone(move) !== null) {
+        if (gameView.getStone(move) !== null || disabledCells.value.includes(move)) {
             return;
         }
 
@@ -362,47 +368,87 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
 
     const positionTool = ref<PositionTool>('red');
 
-    const removeStone = (move: Move): void => {
+    /**
+     * Removes stone or disabled cell.
+     */
+    const clearCell = (move: Move): void => {
         redStones.value = redStones.value.filter(m => m !== move);
         blueStones.value = blueStones.value.filter(m => m !== move);
+        disabledCells.value = disabledCells.value.filter(m => m !== move);
 
         if (lastMove.value === move) {
             lastMove.value = null;
         }
     };
 
-    const onPositionHexClicked = (move: Move): void => {
-        const stone = redStones.value.includes(move) ? 0 : blueStones.value.includes(move) ? 1 : null;
+    const paintedCells = { red: redStones, blue: blueStones, disable: disabledCells };
 
-        switch (positionTool.value) {
-            case 'red':
-            case 'blue': {
-                const color = positionTool.value === 'red' ? 0 : 1;
+    /**
+     * Paints cells while pointer is held down, like Hexplorer setup mode (see DragPainter).
+     * Starting on a cell already set by the tool removes along the way instead,
+     * e.g starting on a red stone with red tool removes red stones only.
+     * Null when not painting.
+     */
+    let painting: null | { tool: Exclude<PositionTool, 'last_move'>, add: boolean } = null;
 
-                removeStone(move);
+    const paintCell = (move: Move): void => {
+        const { tool, add } = painting!;
 
-                // Click on a stone of same color removes it
-                if (stone !== color) {
-                    (color === 0 ? redStones : blueStones).value.push(move);
-                }
+        if (tool === 'erase') {
+            clearCell(move);
+        } else {
+            const cells = paintedCells[tool];
 
-                break;
+            if (cells.value.includes(move) === add) {
+                return;
             }
 
-            case 'erase':
-                removeStone(move);
-                break;
+            clearCell(move);
 
-            case 'last_move':
-                // Last move must be an opponent stone
-                if (stone === computerColor.value) {
-                    lastMove.value = lastMove.value === move ? null : move;
-                }
-
-                break;
+            if (add) {
+                cells.value.push(move);
+            }
         }
 
         redraw();
+    };
+
+    function onHexPointerDown(move: Move): void
+    {
+        const tool = positionTool.value;
+
+        if (step.value !== 'position' || tool === 'last_move') {
+            return;
+        }
+
+        painting = { tool, add: tool !== 'erase' && !paintedCells[tool].value.includes(move) };
+        paintCell(move);
+    }
+
+    function onHexHovered(move: Move): void
+    {
+        if (painting !== null) {
+            paintCell(move);
+        }
+    }
+
+    useEventListener(document, 'pointerup', () => {
+        painting = null;
+    });
+
+    /**
+     * Only for last move tool, other tools paint on pointer down.
+     */
+    const onPositionHexClicked = (move: Move): void => {
+        if (positionTool.value !== 'last_move') {
+            return;
+        }
+
+        // Last move must be an opponent stone
+        if ((computerColor.value === 0 ? redStones : blueStones).value.includes(move)) {
+            lastMove.value = lastMove.value === move ? null : move;
+            redraw();
+        }
     };
 
     const clearLastMove = (): void => {
@@ -438,7 +484,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
 
     function redraw(): void
     {
-        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value };
+        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value };
         const moves = step.value === 'tree' ? selectedMoves.value : [];
 
         drawPuzzlePosition(gameView, position, moves);
@@ -462,6 +508,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
         boardsize: boardsize.value,
         redStones: redStones.value,
         blueStones: blueStones.value,
+        disabledCells: disabledCells.value,
         lastMove: lastMove.value,
         playerColor: playerColor.value,
         tree: cleanNode(tree.value),
@@ -542,6 +589,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game) 
         setBoardsize,
         redStones,
         blueStones,
+        disabledCells,
         playerColor,
         setPlayerColor,
         lastMove,

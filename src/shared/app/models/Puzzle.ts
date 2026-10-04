@@ -59,6 +59,15 @@ export default class Puzzle
     blueStones: Move[];
 
     /**
+     * Greyed out cells, to isolate the problem: cannot be played, by player or computer.
+     * Cannot have an initial stone.
+     */
+    @Column({ type: 'text', transformer: movesTransformer })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    @Type(() => String)
+    disabledCells: Move[];
+
+    /**
      * Last move played to reach initial position, marked on board to give context.
      * Must be one of initial stones.
      */

@@ -155,6 +155,20 @@ describe('createThemeFromJson', () => {
         assert.throws(() => createThemeFromJson(json), /^Error: theme.swapped.type: unknown type "image", expected one of: text/);
     });
 
+    it('creates disabled cell style, merged in variants', () => {
+        const json = validTheme();
+        json.theme.disabledCell = { color: '#9e8d76', size: 1 };
+        json.dark = { disabledCell: { color: '#000000' } };
+
+        const definition = createThemeFromJson(json);
+
+        assert.deepStrictEqual(resolveTheme(definition, 'light').disabledCell, { color: 0x9e8d76, size: 1 });
+        assert.deepStrictEqual(resolveTheme(definition, 'dark').disabledCell, { color: 0x000000, size: 1 });
+
+        json.theme.disabledCell = { shape: 'circle' } as never;
+        assert.throws(() => createThemeFromJson(json), /^Error: theme.disabledCell.shape: unknown key/);
+    });
+
     it('creates 4-4 anchors style, merged in variants', () => {
         const json = validTheme();
         json.theme.anchor44 = { color: '#3d2b12', alpha: 1, size: 0.15 };

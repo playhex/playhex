@@ -141,6 +141,23 @@ export type JsonAnchor44 = {
     shape?: 'circle' | 'square';
 };
 
+export type JsonDisabledCell = {
+    /**
+     * Defaults to a grey derived from colors.text, light on light themes, very dark on dark themes
+     */
+    color?: JsonColor;
+
+    /**
+     * Between 0 and 1, defaults to 1
+     */
+    alpha?: number;
+
+    /**
+     * Radius relative to cell radius, defaults to 0.94. 1 covers the whole cell
+     */
+    size?: number;
+};
+
 export type JsonTextCoords = {
     type: 'text';
 
@@ -283,6 +300,11 @@ export type JsonThemeVariant = {
      * Style of 4-4 anchors
      */
     anchor44?: JsonAnchor44;
+
+    /**
+     * Style of disabled cells, i.e greyed out puzzle cells
+     */
+    disabledCell?: JsonDisabledCell;
 
     /**
      * Mark on last played stone

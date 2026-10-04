@@ -10,7 +10,7 @@ import { apiDeletePuzzle, apiPostPuzzle, apiPutPuzzle } from '../../../apiClient
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconLightbulb, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
 
 const props = defineProps<{
     /**
@@ -58,6 +58,7 @@ const {
     draftErrors,
     redStones,
     blueStones,
+    disabledCells,
     toInput,
 } = usePuzzleEditor(props.puzzle, props.sourceGame);
 
@@ -77,7 +78,7 @@ const isValidBoardsize = (size: number): boolean =>
     Number.isInteger(size) && size >= MIN_BOARDSIZE && size <= MAX_BOARDSIZE;
 
 const applyBoardsize = async (): Promise<void> => {
-    const isEmpty = redStones.value.length + blueStones.value.length === 0 && !tree.value.children?.length;
+    const isEmpty = redStones.value.length + blueStones.value.length + disabledCells.value.length === 0 && !tree.value.children?.length;
 
     if (!isEmpty && !confirm(t('puzzles.editor.boardsize_confirm'))) {
         return;
@@ -244,7 +245,10 @@ const deletePuzzle = async (): Promise<void> => {
                             <button class="btn" :class="'red' === positionTool ? 'btn-danger' : 'btn-outline-danger'" @click="positionTool = 'red'"><IconCircleFill /> {{ $t('game.red') }}</button>
                             <button class="btn" :class="'blue' === positionTool ? 'btn-primary' : 'btn-outline-primary'" @click="positionTool = 'blue'"><IconCircleFill /> {{ $t('game.blue') }}</button>
                             <button class="btn" :class="'erase' === positionTool ? 'btn-secondary' : 'btn-outline-secondary'" @click="positionTool = 'erase'"><IconEraser /> {{ $t('puzzles.editor.erase') }}</button>
+                            <button class="btn" :class="'disable' === positionTool ? 'btn-secondary' : 'btn-outline-secondary'" @click="positionTool = 'disable'"><IconHexagonFill /> {{ $t('puzzles.editor.disable_cell') }}</button>
                         </div>
+                        <div class="form-text">{{ $t('puzzles.editor.paint_help') }}</div>
+                        <div v-if="'disable' === positionTool" class="form-text">{{ $t('puzzles.editor.disable_cell_help') }}</div>
                     </div>
 
                     <div class="mb-3">

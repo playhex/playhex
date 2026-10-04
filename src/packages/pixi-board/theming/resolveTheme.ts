@@ -22,6 +22,10 @@ export const resolveTheme = (definition: ThemeDefinition, mode: ThemeMode): Boar
             ...definition.theme.anchor44,
             ...override.anchor44,
         },
+        disabledCell: {
+            ...definition.theme.disabledCell,
+            ...override.disabledCell,
+        },
         sidesAlpha: {
             ...definition.theme.sidesAlpha,
             ...override.sidesAlpha,

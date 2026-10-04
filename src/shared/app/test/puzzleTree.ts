@@ -119,6 +119,18 @@ describe('puzzleTree', () => {
         assert.deepStrictEqual(validatePuzzle(createPuzzle({ redStones: ['e2', 'e3', 'e4', 'e5'], blueStones: [] })), []);
     });
 
+    it('accepts disabled cells', () => {
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['e4', 'e5'] })), []);
+    });
+
+    it('rejects stones and moves on disabled cells', () => {
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['a5'] })), [{ code: 'set_twice', params: { move: 'a5' } }], 'initial stone');
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['b3'] })), [{ code: 'occupied', path: ['c3'], params: { move: 'b3' } }], 'tree move');
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['d4'] })), [{ code: 'occupied', path: [], params: { move: 'd4' } }], 'else answer');
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['f6'] })), [{ code: 'outside_board', params: { move: 'f6' } }], 'outside board');
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: 'e5' as never })), [{ code: 'invalid_stones' }], 'not a list');
+    });
+
     it('rejects invalid puzzles', () => {
         assert.strictEqual(validatePuzzle(createPuzzle({ boardsize: 0 })).length, 1);
         assert.strictEqual(validatePuzzle(createPuzzle({ boardsize: 2 })).length > 0, true, 'moves outside board');

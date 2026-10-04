@@ -6,7 +6,7 @@ import { GameTree, ROOT_ID, SetupStone } from '../../hexplorer/GameTree.js';
 
 /**
  * Creates a Hexplorer analysis from a puzzle:
- * initial position as a setup node, then solution moves.
+ * initial position as a setup node, with disabled cells as crosses, then solution moves.
  * Current position is the initial position.
  */
 export const puzzleToHexplorerAnalysis = (puzzle: Puzzle): string => {
@@ -18,7 +18,7 @@ export const puzzleToHexplorerAnalysis = (puzzle: Puzzle): string => {
         ...puzzle.blueStones.map((move): SetupStone => ({ move, color: 1 })),
     ];
 
-    const setupNode = tree.addSetup(ROOT_ID, stones, puzzle.playerColor);
+    const setupNode = tree.addSetup(ROOT_ID, stones, puzzle.playerColor, puzzle.disabledCells.map(move => ({ move, type: 'cross' })));
     let parentId = setupNode.id;
 
     for (const node of findSolution(puzzle.tree) ?? []) {

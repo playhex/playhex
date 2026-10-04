@@ -175,7 +175,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
     };
 
     const playMove = (move: Move): void => {
-        if (computerThinking.value || gameView.getStone(move) !== null) {
+        if (computerThinking.value || gameView.getStone(move) !== null || puzzle.disabledCells.includes(move)) {
             return;
         }
 

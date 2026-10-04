@@ -101,6 +101,13 @@ All alpha values (opacity) are between 0 and 1.
             "shape": "circle"               // default: "circle". Or "square", always upright
         },
 
+        // Optional, cells that cannot be played (i.e greyed out puzzle cells), hiding shading pattern
+        "disabledCell": {
+            "color": "#232425",             // default: grey derived from colors.text, light on light themes, very dark on dark themes
+            "alpha": 1,                     // default: 1
+            "size": 0.94                    // default: 0.94, like a cell. 1 covers the whole cell, without border
+        },
+
         // Optional, coords around the board. Default: Arial text
         "coords": { "type": "text" },
 
@@ -527,7 +534,7 @@ const myTheme: ThemeDefinition = {
     },
 
     // Overrides theme in light mode.
-    // colors, anchor44 and sidesAlpha are merged, other values are replaced.
+    // colors, anchor44, disabledCell and sidesAlpha are merged, other values are replaced.
     light: {
         colors: { text: 0x212529 },
         background: colorBackground({ color: 0xf8f5ef }),
