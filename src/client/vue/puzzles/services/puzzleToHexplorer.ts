@@ -1,6 +1,6 @@
 import { toRef } from 'vue';
 import { Puzzle } from '../../../../shared/app/models/index.js';
-import { findSolution } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, findSolution } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { createHexplorerState } from '../../hexplorer/HexplorerState.js';
 import { GameTree, ROOT_ID, SetupStone } from '../../hexplorer/GameTree.js';
 
@@ -21,7 +21,7 @@ export const puzzleToHexplorerAnalysis = (puzzle: Puzzle): string => {
     const setupNode = tree.addSetup(ROOT_ID, stones, puzzle.playerColor, puzzle.disabledCells.map(move => ({ move, type: 'cross' })));
     let parentId = setupNode.id;
 
-    for (const node of findSolution(puzzle.tree) ?? []) {
+    for (const node of findSolution(puzzle.tree, createNodeResolver(puzzle.tree)) ?? []) {
         parentId = tree.addMove(parentId, node.move!).id;
     }
 

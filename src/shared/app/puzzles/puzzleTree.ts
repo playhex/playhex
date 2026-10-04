@@ -21,6 +21,11 @@
  * it is played when player plays any other move. Its `else` is the computer answer,
  * e.g to show a threat if player did not defend. An "else" node is always a failing leaf.
  *
+ * Transposition: a same position can be reached by different move orders.
+ * A leaf without result, reaching the same position as another node having children or a result,
+ * continues from this other node, as if it was the same node: see findTranspositions().
+ * Two nodes with children or result must not have the same position.
+ *
  * Example, player must play c3, then b4 or d2 after computer answers b3.
  * Any other first move is answered by c3. Game goes on after b4:
  *
@@ -194,13 +199,21 @@ export const getNodeResult = (node: PuzzleNode | PuzzleElseNode, ended = false):
 };
 
 /**
+ * Returns node to continue from: the transposition target, or node itself.
+ * See createNodeResolver().
+ */
+export type NodeResolver = (node: PuzzleNode) => PuzzleNode;
+
+/**
  * Nodes to reach from this node to solve the puzzle, player moves and computer answers,
  * following first winning player move at each step.
  * Returns empty list if node is already solved, or null if puzzle cannot be solved from this node.
  *
+ * @param resolve To follow transpositions, see createNodeResolver()
  * @param isPlayerMove Whether this node is a player move, so computer answers next
  */
-export const findSolution = (node: PuzzleNode, isPlayerMove = false): null | PuzzleNode[] => {
+export const findSolution = (originalNode: PuzzleNode, resolve: NodeResolver, isPlayerMove = false): null | PuzzleNode[] => {
+    const node = resolve(originalNode);
     const result = getNodeResult(node);
 
     if (result !== null) {
@@ -213,7 +226,7 @@ export const findSolution = (node: PuzzleNode, isPlayerMove = false): null | Puz
     ;
 
     for (const child of candidates) {
-        const solution = findSolution(child, !isPlayerMove);
+        const solution = findSolution(child, resolve, !isPlayerMove);
 
         if (solution !== null) {
             return [child, ...solution];
@@ -221,6 +234,150 @@ export const findSolution = (node: PuzzleNode, isPlayerMove = false): null | Puz
     }
 
     return null;
+};
+
+/**
+ * Identifies a position reached in tree, whatever moves order.
+ * Initial stones are ignored as they are same for all nodes.
+ *
+ * @param moves Moves from root, alternating player and computer
+ */
+export const getPositionKey = (moves: Move[]): string => [0, 1]
+    .map(parity => moves.filter((_, index) => index % 2 === parity).sort().join(','))
+    .join('|')
+;
+
+/**
+ * Position key, prefixed by whether node is in a continuation:
+ * a same position in and out of continuation is not a transposition.
+ *
+ * @param ended Whether puzzle ended before this node (an ancestor has a result)
+ */
+const getNodeKey = (moves: Move[], ended: boolean): string =>
+    `${ended ? 'ended' : 'live'}:${getPositionKey(moves)}`;
+
+/**
+ * Node having children or a result, so it cannot be a transposition.
+ * Accepts unchecked node, see validatePuzzle().
+ */
+const isDefinedNode = (node: { result?: unknown, children?: unknown }): boolean =>
+    node.result !== undefined || (Array.isArray(node.children) && node.children.length > 0);
+
+export type Transposition = {
+    /**
+     * Node to continue from.
+     */
+    target: PuzzleNode;
+
+    /**
+     * Nodes from root (excluded) to target.
+     */
+    path: PuzzleNode[];
+
+    /**
+     * Moves from root to target.
+     */
+    moves: Move[];
+};
+
+type PositionedNode = {
+    node: PuzzleNode;
+
+    /**
+     * Nodes from root (excluded) to this node.
+     */
+    path: PuzzleNode[];
+
+    /**
+     * Moves from root to this node.
+     */
+    moves: Move[];
+
+    /**
+     * See getNodeKey().
+     */
+    key: string;
+};
+
+const toTransposition = ({ node, path, moves }: PositionedNode): Transposition => ({ target: node, path, moves });
+
+/**
+ * All nodes except root and "else" nodes, depth first, with their position.
+ */
+const listPositionedNodes = (tree: PuzzleNode): PositionedNode[] => {
+    const list: PositionedNode[] = [];
+
+    const walk = (node: PuzzleNode, path: PuzzleNode[], moves: Move[], ended: boolean): void => {
+        const childrenEnded = ended || node.result !== undefined;
+
+        for (const child of node.children ?? []) {
+            if (isElseNode(child) || child.move === undefined) {
+                continue;
+            }
+
+            const childPath = [...path, child];
+            const childMoves = [...moves, child.move];
+
+            list.push({ node: child, path: childPath, moves: childMoves, key: getNodeKey(childMoves, childrenEnded) });
+            walk(child, childPath, childMoves, childrenEnded);
+        }
+    };
+
+    walk(tree, [], [], false);
+
+    return list;
+};
+
+/**
+ * Leaves without result reaching same position as another node having children or a result.
+ * Puzzle continues from this other node.
+ *
+ * @returns Transposition by leaf
+ */
+export const findTranspositions = (tree: PuzzleNode): Map<PuzzleNode, Transposition> => {
+    const nodes = listPositionedNodes(tree);
+    const definedByKey = new Map<string, PositionedNode>();
+
+    for (const positioned of nodes) {
+        if (isDefinedNode(positioned.node) && !definedByKey.has(positioned.key)) {
+            definedByKey.set(positioned.key, positioned);
+        }
+    }
+
+    const transpositions = new Map<PuzzleNode, Transposition>();
+
+    for (const { node, key } of nodes) {
+        const target = definedByKey.get(key);
+
+        if (target && !isDefinedNode(node)) {
+            transpositions.set(node, toTransposition(target));
+        }
+    }
+
+    return transpositions;
+};
+
+/**
+ * Follows transpositions of this tree.
+ */
+export const createNodeResolver = (tree: PuzzleNode): NodeResolver => {
+    const transpositions = findTranspositions(tree);
+
+    return node => transpositions.get(node)?.target ?? node;
+};
+
+/**
+ * Node to continue from when reaching same position as this node:
+ * first node with this position having children or a result, else first node with this position.
+ * Returns null if it is this node, i.e this node can be continued.
+ */
+export const findSamePositionNode = (tree: PuzzleNode, node: PuzzleNode): null | Transposition => {
+    const nodes = listPositionedNodes(tree);
+    const key = nodes.find(positioned => positioned.node === node)?.key;
+    const samePosition = nodes.filter(positioned => positioned.key === key);
+    const other = samePosition.find(positioned => isDefinedNode(positioned.node)) ?? samePosition[0];
+
+    return other === undefined || other.node === node ? null : toTransposition(other);
 };
 
 const isInBoard = (move: Move, boardsize: number): boolean => {
@@ -265,6 +422,7 @@ export type PuzzleErrorCode =
     | 'else_in_continuation'
     | 'else_not_last'
     | 'else_always_failed'
+    | 'duplicate_position'
 ;
 
 /**
@@ -450,6 +608,11 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     let nodesCount = 0;
 
     /**
+     * Moves to reach nodes having children or a result, by position, see getNodeKey().
+     */
+    const definedPositions = new Map<string, Move[]>();
+
+    /**
      * @param path Moves played to reach this node
      * @param isPlayerMove Whether this node is a player move, so computer answers next
      * @param ended Whether puzzle ended before this node (an ancestor has a result)
@@ -464,6 +627,18 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
 
         if (node.result !== undefined && ended) {
             errors.push({ code: 'result_in_continuation', path });
+        }
+
+        // Only one of them can be continued, other one should be a transposition leaf
+        if (path.length > 0 && isDefinedNode(node)) {
+            const key = getNodeKey(path, ended);
+            const other = definedPositions.get(key);
+
+            if (other === undefined) {
+                definedPositions.set(key, path);
+            } else {
+                errors.push({ code: 'duplicate_position', path, params: { other: other.join(' ') } });
+            }
         }
 
         if (node.children === undefined) {
@@ -549,7 +724,7 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
 
     if (!Array.isArray(puzzle.tree.children) || puzzle.tree.children.length === 0) {
         errors.push({ code: 'empty_tree' });
-    } else if (errors.length === 0 && !findSolution(puzzle.tree)?.length) {
+    } else if (errors.length === 0 && !findSolution(puzzle.tree, createNodeResolver(puzzle.tree))?.length) {
         // Only on a valid tree, findSolution() expects it. Likely forgot to set which moves solve the puzzle
         errors.push({ code: 'no_solution' });
     }

@@ -990,6 +990,7 @@
             "else_in_continuation": "Le puzzle est déjà terminé, une continuation ne peut pas avoir de nœud « sinon »",
             "else_not_last": "Le nœud « sinon » doit être le dernier",
             "else_always_failed": "Un nœud « sinon » est toujours échoué",
+            "duplicate_position": "Même position que {{other}}, une seule des deux peut avoir un résultat ou une suite",
             "invalid_type": "{{property}} invalide"
         },
         "editor": {
@@ -1029,6 +1030,9 @@
             "next_computer_move": "Suivant : réponse de l'ordi",
             "pick_else_answer": "Cliquez sur la case où l'ordi répond quand le joueur joue un autre coup.",
             "only_one_answer": "L'ordi ne peut avoir qu'une réponse. Supprimez-la d'abord pour la changer.",
+            "transposition_notice": "Cette position existe déjà dans l'arbre ({{moves}}) : la suite continue depuis là.",
+            "transposition_help": "Même position que {{moves}} : le puzzle continue depuis là.",
+            "go_to_transposition": "Aller à cette position",
             "initial_position": "Position initiale",
             "else": "Sinon",
             "else_help": "S'applique quand le joueur joue un coup non prévu : l'ordi répond, puis le puzzle est échoué.",

@@ -2,7 +2,7 @@ import { CircleMark, GameMarksFacade, GameView } from '@playhex/pixi-board';
 import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import { Puzzle } from '../../../../shared/app/models/index.js';
-import { findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
@@ -61,6 +61,11 @@ export const usePuzzle = (puzzle: Puzzle) => {
 
     const playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
+    /**
+     * Tree node to continue from, following transpositions.
+     */
+    const resolve = createNodeResolver(puzzle.tree);
+
     const path = ref<PlayedMove[]>([]);
 
     const computerThinking = ref(false);
@@ -85,8 +90,8 @@ export const usePuzzle = (puzzle: Puzzle) => {
                 continue;
             }
 
-            result ??= getNodeResult(playedMove.node);
-            node = playedMove.node;
+            node = resolve(playedMove.node);
+            result ??= getNodeResult(node);
         }
 
         return { result, node };
@@ -124,7 +129,8 @@ export const usePuzzle = (puzzle: Puzzle) => {
 
         // Set to show "else" node message once, it is on both player move and computer answer
         return [...new Set(path.value.slice(lastPlayerMoveIndex).map(({ node }) => node))]
-            .map(node => node?.message)
+            // Transposition shows target message, unless it has its own
+            .map(node => node === null || isElseNode(node) ? node?.message : node.message || resolve(node).message)
             .filter((message): message is string => !!message)
         ;
     });
@@ -187,7 +193,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
             path.value.push({ move, color, node: child, byComputer: false });
             redraw();
 
-            const answer = color === playerColor ? getComputerAnswer(child) : null;
+            const answer = color === playerColor ? getComputerAnswer(resolve(child)) : null;
 
             if (answer !== null) {
                 playComputerMove(answer.move!, answer);
@@ -221,18 +227,18 @@ export const usePuzzle = (puzzle: Puzzle) => {
         const nodes: PuzzleNode[] = [];
 
         for (const { node } of path.value) {
-            if (node === null || isElseNode(node) || getNodeResult(node) !== null) {
+            if (node === null || isElseNode(node) || getNodeResult(resolve(node)) !== null) {
                 break;
             }
 
             nodes.push(node);
         }
 
-        let solution = findSolution(puzzle.tree);
+        let solution = findSolution(puzzle.tree, resolve);
 
         // Player to play is when an even number of moves have been played
         while (nodes.length > 0) {
-            const nodeSolution = nodes.length % 2 === 0 ? findSolution(nodes[nodes.length - 1]) : null;
+            const nodeSolution = nodes.length % 2 === 0 ? findSolution(nodes[nodes.length - 1], resolve) : null;
 
             if (nodeSolution !== null) {
                 solution = nodeSolution;
@@ -276,7 +282,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         redraw();
     };
 
-    const hasSolution = findSolution(puzzle.tree) !== null;
+    const hasSolution = findSolution(puzzle.tree, resolve) !== null;
 
     gameView.on('hexClicked', move => playMove(move));
 

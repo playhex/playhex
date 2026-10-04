@@ -15,6 +15,7 @@ export { default as IconArrowCounterclockwise } from '~icons/bi/arrow-counterclo
 export { default as IconArrowDown } from '~icons/bi/arrow-down';
 export { default as IconArrowDownUp } from '~icons/bi/arrow-down-up';
 export { default as IconArrowLeft } from '~icons/bi/arrow-left';
+export { default as IconArrowReturnRight } from '~icons/bi/arrow-return-right';
 export { default as IconArrowRight } from '~icons/bi/arrow-right';
 export { default as IconArrowUp } from '~icons/bi/arrow-up';
 export { default as IconAspectRatio } from '~icons/bi/aspect-ratio';

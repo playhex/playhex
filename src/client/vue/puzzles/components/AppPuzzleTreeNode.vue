@@ -3,11 +3,12 @@
  * Recursive puzzle tree in editor, same look as Hexplorer MoveTree:
  * horizontal tree with hexagonal nodes, branches stacked vertically,
  * connected by straight lines.
+ * A transposition leaf is followed by a dashed line and an arrow to the node it continues from.
  */
 import { computed } from 'vue';
-import { isElseNode, type PuzzleElseNode, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { isElseNode, type PuzzleElseNode, type PuzzleNode, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
-import { IconChatRightText, IconCheck, IconPencilSquare, IconXLg } from '../../icons.js';
+import { IconArrowReturnRight, IconChatRightText, IconCheck, IconPencilSquare, IconXLg } from '../../icons.js';
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -21,6 +22,11 @@ const props = defineProps<{
 
     selectedNode: EditorNode;
     playerColor: 0 | 1;
+
+    /**
+     * Transposition by leaf, see findTranspositions().
+     */
+    transpositions: Map<PuzzleNode, Transposition>;
 }>();
 
 const emit = defineEmits<{
@@ -37,6 +43,8 @@ const computerColor = computed(() => (1 - props.playerColor) as 0 | 1);
 const playerIndex = computed<0 | 1>(() => props.path.length % 2 === 1 ? props.playerColor : computerColor.value);
 
 const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : props.node.children ?? []);
+
+const transposition = computed(() => isElseNode(props.node) ? null : props.transpositions.get(props.node) ?? null);
 </script>
 
 <template>
@@ -85,6 +93,19 @@ const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : prop
             <IconChatRightText v-if="node.message" class="node-badge message-badge" />
         </button>
 
+        <!-- Transposition: continues from another node -->
+        <template v-if="transposition">
+            <div class="tree-stem transposition-stem"></div>
+
+            <button
+                type="button"
+                class="transposition-link badge rounded-pill text-bg-info"
+                :title="$t('puzzles.editor.transposition_help', { moves: transposition.moves.join(' ') })"
+                @click="emit('select', transposition.path)"
+                :aria-label="$t('puzzles.editor.go_to_transposition')"
+            ><IconArrowReturnRight /></button>
+        </template>
+
         <!-- Single child: straight line, no extra width per level -->
         <template v-if="children.length === 1">
             <div class="tree-stem"></div>
@@ -94,6 +115,7 @@ const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : prop
                 :path="[...path, children[0]]"
                 :selectedNode
                 :playerColor
+                :transpositions
                 @select="p => emit('select', p)"
             />
         </template>
@@ -108,6 +130,7 @@ const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : prop
                         :path="[...path, child]"
                         :selectedNode
                         :playerColor
+                        :transpositions
                         @select="p => emit('select', p)"
                     />
                 </div>
@@ -182,6 +205,16 @@ const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : prop
     height 2px
     width 0.3rem
     background var(--bs-border-color)
+
+.transposition-stem
+    height 0
+    width 0.6rem
+    background none
+    border-top 2px dashed var(--bs-info)
+
+.transposition-link
+    border none
+    cursor pointer
 
 .tree-children
     display flex

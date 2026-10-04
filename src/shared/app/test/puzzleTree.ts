@@ -1,6 +1,8 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { createNodeResolver, findChild, findElseNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getNodeResult, getPositionKey, isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+
+const noTransposition: NodeResolver = node => node;
 
 const tree: PuzzleNode = {
     message: 'Red to play',
@@ -70,21 +72,23 @@ describe('puzzleTree', () => {
     });
 
     it('finds solution', () => {
-        assert.deepStrictEqual(findSolution(tree)?.map(node => node.move), ['c3', 'b3', 'b4']);
+        const resolve = createNodeResolver(tree);
+
+        assert.deepStrictEqual(findSolution(tree, resolve)?.map(node => node.move), ['c3', 'b3', 'b4']);
 
         const c3 = findChild(tree, 'c3')!;
 
-        assert.deepStrictEqual(findSolution(c3, true)?.map(node => node.move), ['b3', 'b4']);
-        assert.deepStrictEqual(findSolution(findChild(getComputerAnswer(c3)!, 'b4')!, true), []);
-        assert.strictEqual(findSolution(findChild(tree, 'a1')!, true), null);
+        assert.deepStrictEqual(findSolution(c3, resolve, true)?.map(node => node.move), ['b3', 'b4']);
+        assert.deepStrictEqual(findSolution(findChild(getComputerAnswer(c3)!, 'b4')!, resolve, true), []);
+        assert.strictEqual(findSolution(findChild(tree, 'a1')!, resolve, true), null);
 
         // Ignores else node
-        assert.strictEqual(findSolution({ children: [{ else: 'a1' }] }), null);
+        assert.strictEqual(findSolution({ children: [{ else: 'a1' }] }, noTransposition), null);
 
         // Stops at solved node, without continuation
         assert.deepStrictEqual(findSolution({
             children: [{ move: 'a1', result: 'solved', children: [{ move: 'b2' }] }],
-        })?.map(node => node.move), ['a1']);
+        }, noTransposition)?.map(node => node.move), ['a1']);
 
         // Skips first player move when it leads to a failure
         assert.deepStrictEqual(findSolution({
@@ -92,7 +96,7 @@ describe('puzzleTree', () => {
                 { move: 'a1', children: [{ move: 'b2', result: 'failed' }] },
                 { move: 'c3' },
             ],
-        })?.map(node => node.move), ['c3']);
+        }, noTransposition)?.map(node => node.move), ['c3']);
     });
 
     it('validates a valid puzzle', () => {
@@ -242,5 +246,106 @@ describe('puzzleTree', () => {
         const errors = validatePuzzle(createPuzzle({ boardsize: 25, redStones: ['y25'], blueStones: [], tree }));
 
         assert.deepStrictEqual(errors, [{ code: 'too_many_nodes', params: { max: 512 } }]);
+    });
+
+    describe('transpositions', () => {
+        it('computes same key whatever moves order, by color', () => {
+            assert.strictEqual(getPositionKey(['b4', 'b3', 'c3']), getPositionKey(['c3', 'b3', 'b4']));
+            assert.notStrictEqual(getPositionKey(['b4', 'b3', 'c3']), getPositionKey(['b3', 'b4', 'c3']));
+        });
+
+        it('finds transposition leaves', () => {
+            // c3 b3 b4 is continued, b4 b3 c3 reaches same position and continues from there
+            const target: PuzzleNode = { move: 'b4', children: [{ move: 'd4' }] };
+            const transposed: PuzzleNode = { move: 'c3' };
+            const c3: PuzzleNode = { move: 'c3', children: [{ move: 'b3', children: [target] }] };
+            const tree: PuzzleNode = { children: [
+                c3,
+                { move: 'b4', children: [{ move: 'b3', children: [transposed] }] },
+                { move: 'd2', children: [{ move: 'b3', children: [{ move: 'c3' }] }] },
+            ] };
+
+            assert.deepStrictEqual([...findTranspositions(tree).entries()], [[transposed, { target, path: [c3, c3.children![0], target], moves: ['c3', 'b3', 'b4'] }]]);
+        });
+
+        it('ignores leaves with result, leaf to leaf, and different ended state', () => {
+            const ignored = (tree: PuzzleNode, message: string): void => {
+                assert.strictEqual(findTranspositions(tree).size, 0, message);
+            };
+
+            ignored({ children: [
+                { move: 'a1', children: [{ move: 'b2', children: [{ move: 'c3', children: [{ move: 'd4' }] }] }] },
+                { move: 'c3', children: [{ move: 'b2', children: [{ move: 'a1', result: 'failed' }] }] },
+            ] }, 'leaf with result');
+
+            ignored({ children: [
+                { move: 'a1', children: [{ move: 'b2', children: [{ move: 'c3' }] }] },
+                { move: 'c3', children: [{ move: 'b2', children: [{ move: 'a1' }] }] },
+            ] }, 'leaf to leaf');
+
+            ignored({ children: [
+                { move: 'a1', children: [{ move: 'b2', children: [{ move: 'c3', children: [{ move: 'd4' }] }] }] },
+                { move: 'c3', result: 'solved', children: [{ move: 'b2', children: [{ move: 'a1' }] }] },
+            ] }, 'transposition in continuation');
+        });
+
+        it('finds same position node', () => {
+            const leaf: PuzzleNode = { move: 'a1' };
+            const other: PuzzleNode = { move: 'c3' };
+            const tree: PuzzleNode = { children: [
+                { move: 'c3', children: [{ move: 'b2', children: [leaf] }] },
+                { move: 'a1', children: [{ move: 'b2', children: [other] }] },
+            ] };
+
+            const leafPath = [tree.children![0], (tree.children![0] as PuzzleNode).children![0], leaf];
+
+            assert.deepStrictEqual(findSamePositionNode(tree, other)?.path, leafPath, 'first one when none is continued');
+            assert.strictEqual(findSamePositionNode(tree, leaf), null, 'first one can be continued');
+            assert.strictEqual(findSamePositionNode(tree, tree.children![0] as PuzzleNode), null, 'single position');
+
+            other.children = [{ move: 'd4' }];
+
+            assert.deepStrictEqual(findSamePositionNode(tree, leaf)?.moves, ['a1', 'b2', 'c3'], 'continued one');
+            assert.strictEqual(findSamePositionNode(tree, other), null);
+        });
+
+        it('follows transpositions to find solution', () => {
+            const tree: PuzzleNode = { children: [
+                { move: 'a1', children: [{ move: 'b2', children: [{ move: 'c3', children: [{ move: 'd4', children: [{ move: 'b4' }] }] }] }] },
+                { move: 'c3', children: [{ move: 'b2', children: [{ move: 'a1' }] }] },
+            ] };
+            const resolve = createNodeResolver(tree);
+            const transposedLeaf = ((tree.children![1] as PuzzleNode).children![0] as PuzzleNode).children![0] as PuzzleNode;
+
+            assert.strictEqual(getNodeResult(resolve(transposedLeaf)), null);
+            assert.deepStrictEqual(findSolution(transposedLeaf, resolve, true)?.map(node => node.move), ['d4', 'b4']);
+            assert.deepStrictEqual(findSolution(transposedLeaf, noTransposition, true), [], 'leaf when not following transpositions');
+        });
+
+        it('validates puzzle with transpositions', () => {
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { children: [
+                { move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4', children: [{ move: 'd4', children: [{ move: 'd3' }] }] }] }] },
+                { move: 'b4', children: [{ move: 'b3', children: [{ move: 'c3' }] }] },
+            ] } })), []);
+
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { children: [
+                { move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4', result: 'failed' }] }] },
+                { move: 'b4', children: [{ move: 'b3', children: [{ move: 'c3' }] }] },
+            ] } })), [{ code: 'no_solution' }], 'transposed to a failure');
+
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { children: [
+                { move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4', children: [{ move: 'd4', result: 'failed' }] }] }] },
+                { move: 'b4', children: [{ move: 'b3', children: [{ move: 'c3' }] }] },
+            ] } })), [{ code: 'no_solution' }], 'transposed to a refuted move');
+        });
+
+        it('rejects two continued nodes with same position', () => {
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { children: [
+                { move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4', result: 'solved' }] }] },
+                { move: 'b4', children: [{ move: 'b3', children: [{ move: 'c3', result: 'solved' }] }] },
+            ] } })), [{ code: 'duplicate_position', path: ['b4', 'b3', 'c3'], params: { other: 'c3 b3 b4' } }]);
+
+            assert.ok(!isDraftBlockingError({ code: 'duplicate_position' }));
+        });
     });
 });

@@ -1005,6 +1005,7 @@
             "else_in_continuation": "Puzzle already ended, a continuation must not have an \"else\" node",
             "else_not_last": "\"else\" node must be the last one",
             "else_always_failed": "An \"else\" node is always failed",
+            "duplicate_position": "Same position as {{other}}, only one of them can have a result or next moves",
             "invalid_type": "Invalid {{property}}"
         },
         "editor": {
@@ -1044,6 +1045,9 @@
             "next_computer_move": "Next: computer answer",
             "pick_else_answer": "Click on the cell where the computer answers when the player plays any other move.",
             "only_one_answer": "The computer can only have one answer. Delete it first to change it.",
+            "transposition_notice": "This position is already in the tree ({{moves}}): continuing from there.",
+            "transposition_help": "Same position as {{moves}}: the puzzle continues from there.",
+            "go_to_transposition": "Go to this position",
             "initial_position": "Initial position",
             "else": "Else",
             "else_help": "Applies when player plays any move not listed: computer answers, then puzzle is failed.",

@@ -4,7 +4,7 @@ import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, toRaw } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { findElseNode, isDraftBlockingError, isElseNode, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { findElseNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
@@ -199,6 +199,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             && !isInContinuation.value
             && node.result === undefined
             && findElseNode(node) === null
+            && !transpositions.value.has(node)
         ;
     });
 
@@ -211,10 +212,32 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         color: index % 2 === 0 && !isElseNode(node) ? playerColor.value : computerColor.value,
     })));
 
+    /**
+     * Moves to reach the node selection jumped to, after a click on board reached a position already in tree.
+     */
+    const transpositionNotice = ref<null | Move[]>(null);
+
     const selectPath = (path: EditorNode[]): void => {
         selectedPath.value = path;
         pickingElse.value = false;
+        transpositionNotice.value = null;
         redraw();
+    };
+
+    /**
+     * Leaves continuing from another node reaching same position, see findTranspositions().
+     */
+    const transpositions = computed(() => findTranspositions(tree.value));
+
+    const selectedTransposition = computed(() => isElseNode(selectedNode.value)
+        ? null
+        : transpositions.value.get(selectedNode.value) ?? null,
+    );
+
+    const goToTransposition = (): void => {
+        if (selectedTransposition.value !== null) {
+            selectPath(selectedTransposition.value.path);
+        }
     };
 
     const selectParent = (): void => {
@@ -312,6 +335,21 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     const boardError = ref<null | 'only_one_answer'>(null);
 
+    /**
+     * Selects child, or the other node reaching same position if any, as only one of them can be continued.
+     */
+    const selectChild = (child: PuzzleNode): void => {
+        const other = findSamePositionNode(tree.value, child);
+
+        if (other === null) {
+            selectPath([...selectedPath.value, child]);
+            return;
+        }
+
+        selectPath(other.path);
+        transpositionNotice.value = other.moves;
+    };
+
     const onTreeHexClicked = (move: Move): void => {
         boardError.value = null;
 
@@ -325,6 +363,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
         if (gameView.getStone(move) !== null || disabledCells.value.includes(move)) {
             return;
+        }
+
+        // Transposition cannot be continued: continue from the other node
+        if (selectedTransposition.value !== null) {
+            selectPath(selectedTransposition.value.path);
         }
 
         const node = selectedNode.value;
@@ -352,7 +395,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         const child = node.children.find(c => !isElseNode(c) && c.move === move);
 
         if (child) {
-            selectPath([...selectedPath.value, child]);
+            selectChild(child);
             return;
         }
 
@@ -366,7 +409,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         const index = findElseNode(node) === null ? node.children.length : node.children.length - 1;
 
         node.children.splice(index, 0, { move });
-        selectPath([...selectedPath.value, node.children[index]]);
+        selectChild(node.children[index]);
     };
 
     /*
@@ -625,6 +668,10 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         moveSelected,
         deleteSelected,
         boardError,
+        transpositions,
+        selectedTransposition,
+        goToTransposition,
+        transpositionNotice,
 
         errors,
         draftErrors,

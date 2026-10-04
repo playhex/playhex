@@ -10,7 +10,7 @@ import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
 
 const props = defineProps<{
     /**
@@ -60,6 +60,10 @@ const {
     moveSelected,
     deleteSelected,
     boardError,
+    transpositions,
+    selectedTransposition,
+    goToTransposition,
+    transpositionNotice,
     errors,
     draftErrors,
     redStones,
@@ -320,6 +324,7 @@ const deletePuzzle = async (): Promise<void> => {
 
                     <div v-if="pickingElse" class="alert alert-warning py-2">{{ $t('puzzles.editor.pick_else_answer') }}</div>
                     <div v-if="'only_one_answer' === boardError" class="alert alert-warning py-2">{{ $t('puzzles.editor.only_one_answer') }}</div>
+                    <div v-if="transpositionNotice" class="alert alert-info py-2"><IconArrowReturnRight /> {{ $t('puzzles.editor.transposition_notice', { moves: transpositionNotice.join(' ') }) }}</div>
 
                     <div class="move-tree-wrapper bg-body mb-3">
                         <AppPuzzleTreeNode
@@ -327,6 +332,7 @@ const deletePuzzle = async (): Promise<void> => {
                             :path="[]"
                             :selectedNode
                             :playerColor
+                            :transpositions
                             @select="selectPath"
                         />
                     </div>
@@ -343,7 +349,12 @@ const deletePuzzle = async (): Promise<void> => {
                             <p v-if="isElseNode(selectedNode)" class="small text-body-secondary">{{ $t('puzzles.editor.else_help') }}</p>
                             <p v-else-if="isInContinuation" class="small text-body-secondary">{{ $t('puzzles.editor.continuation_help') }}</p>
 
-                            <div v-if="selectedPath.length > 0 && !isElseNode(selectedNode) && !isInContinuation" class="mb-2">
+                            <p v-if="selectedTransposition" class="small text-body-secondary">
+                                {{ $t('puzzles.editor.transposition_help', { moves: selectedTransposition.moves.join(' ') }) }}
+                                <button class="btn btn-sm btn-outline-info ms-1" @click="goToTransposition()"><IconArrowReturnRight /> {{ $t('puzzles.editor.go_to_transposition') }}</button>
+                            </p>
+
+                            <div v-if="selectedPath.length > 0 && !isElseNode(selectedNode) && !isInContinuation && !selectedTransposition" class="mb-2">
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn" :class="!selectedNode.result ? 'btn-secondary' : 'btn-outline-secondary'" @click="setResult(null)">{{ $t('puzzles.editor.result_none') }}</button>
                                     <button class="btn" :class="'solved' === selectedNode.result ? 'btn-success' : 'btn-outline-success'" @click="setResult('solved')">{{ $t('puzzles.editor.result_solved') }}</button>
