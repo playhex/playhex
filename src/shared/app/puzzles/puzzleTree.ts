@@ -26,6 +26,16 @@
  * continues from this other node, as if it was the same node: see findTranspositions().
  * Two nodes with children or result must not have the same position.
  *
+ * Parallel sequences: independent sequences, e.g a forcing move and its answer
+ * that can be played at any time between moves of the main sequence.
+ * Declared in `parallel` of a player choice node having children, they can be played anywhere in its subtree,
+ * without changing the current node of main sequence. Each one is a root-like node:
+ * no move, children are player choices, each player move has a computer answer.
+ * They are optional: only main sequence solves the puzzle, but a failed node in a parallel sequence fails it.
+ * Leaf without result in a parallel sequence just goes back to main sequence.
+ * Their cells must not be used by main sequence nor other parallel sequences.
+ * Not to be confused with transpositions, which merge two nodes reaching same position.
+ *
  * Example, player must play c3, then b4 or d2 after computer answers b3.
  * Any other first move is answered by c3. Game goes on after b4:
  *
@@ -81,6 +91,12 @@ export type PuzzleNode = {
     result?: PuzzleResult;
 
     children?: (PuzzleNode | PuzzleElseNode)[];
+
+    /**
+     * Independent sequences, playable at any time in this node subtree, between main moves.
+     * Each one is a root-like node: no move, children are player choices.
+     */
+    parallel?: PuzzleNode[];
 };
 
 /**
@@ -199,6 +215,26 @@ export const getNodeResult = (node: PuzzleNode | PuzzleElseNode, ended = false):
 };
 
 /**
+ * Root of a parallel sequence: not a move, see PuzzleNode.parallel.
+ * Do not use on tree root.
+ */
+export const isParallelRoot = (node: PuzzleNode | PuzzleElseNode): boolean =>
+    !isElseNode(node) && node.move === undefined;
+
+/**
+ * Nodes of a path from root having a move: without parallel sequences roots.
+ */
+export const filterMoveNodes = <T extends PuzzleNode | PuzzleElseNode>(path: T[]): T[] =>
+    path.filter(node => !isParallelRoot(node));
+
+/**
+ * Same as getNodeResult(), for a node in a parallel sequence:
+ * it can fail the puzzle, but not solve it, as parallel sequences are optional.
+ */
+export const getParallelNodeResult = (node: PuzzleNode): null | PuzzleResult =>
+    node.result === 'failed' ? 'failed' : null;
+
+/**
  * Returns node to continue from: the transposition target, or node itself.
  * See createNodeResolver().
  */
@@ -299,6 +335,9 @@ type PositionedNode = {
     key: string;
 };
 
+const sameItems = (a: unknown[], b: unknown[]): boolean =>
+    a.length === b.length && a.every((item, index) => item === b[index]);
+
 const toTransposition = ({ node, path, moves }: PositionedNode): Transposition => ({ target: node, path, moves });
 
 /**
@@ -367,6 +406,32 @@ export const createNodeResolver = (tree: PuzzleNode): NodeResolver => {
 };
 
 /**
+ * Returns parallel sequences roots playable from this main sequence node:
+ * declared on it or on its ancestors.
+ */
+export type ParallelsFinder = (node: PuzzleNode) => PuzzleNode[];
+
+export const createParallelsFinder = (tree: PuzzleNode): ParallelsFinder => {
+    const parallelsByNode = new Map<PuzzleNode, PuzzleNode[]>();
+
+    const walk = (node: PuzzleNode, inherited: PuzzleNode[]): void => {
+        const parallels = node.parallel?.length ? [...inherited, ...node.parallel] : inherited;
+
+        parallelsByNode.set(node, parallels);
+
+        for (const child of node.children ?? []) {
+            if (!isElseNode(child)) {
+                walk(child, parallels);
+            }
+        }
+    };
+
+    walk(tree, []);
+
+    return node => parallelsByNode.get(node) ?? [];
+};
+
+/**
  * Node to continue from when reaching same position as this node:
  * first node with this position having children or a result, else first node with this position.
  * Returns null if it is this node, i.e this node can be continued.
@@ -389,8 +454,40 @@ const isInBoard = (move: Move, boardsize: number): boolean => {
 const isObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value);
 
-const NODE_KEYS = ['move', 'message', 'result', 'children'];
+const NODE_KEYS = ['move', 'message', 'result', 'children', 'parallel'];
 const ELSE_NODE_KEYS = ['else', 'message', 'result'];
+const PARALLEL_ROOT_KEYS = ['children'];
+
+/**
+ * Cells used by moves of this node descendants, "else" answers and parallel sequences included.
+ * Accepts unchecked node, see validatePuzzle().
+ */
+const collectCells = (node: unknown, cells = new Set<string>()): Set<string> => {
+    if (!isObject(node)) {
+        return cells;
+    }
+
+    for (const child of [
+        ...(Array.isArray(node.children) ? node.children : []),
+        ...(Array.isArray(node.parallel) ? node.parallel : []),
+    ]) {
+        if (!isObject(child)) {
+            continue;
+        }
+
+        if (typeof child.move === 'string') {
+            cells.add(child.move);
+        }
+
+        if (typeof child.else === 'string') {
+            cells.add(child.else);
+        }
+
+        collectCells(child, cells);
+    }
+
+    return cells;
+};
 
 export type PuzzleErrorCode =
     | 'invalid_boardsize'
@@ -423,7 +520,33 @@ export type PuzzleErrorCode =
     | 'else_not_last'
     | 'else_always_failed'
     | 'duplicate_position'
+    | 'parallel_not_list'
+    | 'parallel_on_computer_move'
+    | 'parallel_in_continuation'
+    | 'parallel_nested'
+    | 'empty_parallel'
+    | 'else_in_parallel'
+    | 'solved_in_parallel'
+    | 'parallel_missing_answer'
+    | 'parallel_overlap'
+    | 'parallel_transposition'
+    | 'parallel_on_leaf'
 ;
+
+/**
+ * Where a node is in a parallel sequence.
+ */
+export type PuzzleErrorParallel = {
+    /**
+     * Index of the parallel sequence in `parallel` of the node declaring it.
+     */
+    index: number;
+
+    /**
+     * Moves played in the parallel sequence to reach the node, empty for its root.
+     */
+    path: Move[];
+};
 
 /**
  * Validation error, as a code to translate on client side,
@@ -433,10 +556,16 @@ export type PuzzleError = {
     code: PuzzleErrorCode;
 
     /**
-     * Moves played to reach the tree node where the error is, empty for root.
+     * Main sequence moves played to reach the tree node where the error is, empty for root.
+     * When error is in a parallel sequence, moves to reach the node declaring it.
      * Undefined when error is not in tree.
      */
     path?: Move[];
+
+    /**
+     * Set when error is in a parallel sequence declared on node at `path`.
+     */
+    parallel?: PuzzleErrorParallel;
 
     params?: Record<string, string | number>;
 };
@@ -461,6 +590,7 @@ const DRAFT_BLOCKING_ERRORS: PuzzleErrorCode[] = [
     'invalid_result',
     'children_not_list',
     'node_not_object',
+    'parallel_not_list',
 ];
 
 /**
@@ -481,10 +611,11 @@ export const normalizePuzzleText = (value?: null | string): null | string =>
 /**
  * Not translated, for server side error messages.
  */
-export const puzzleErrorToString = ({ code, path, params }: PuzzleError): string =>
+export const puzzleErrorToString = ({ code, path, parallel, params }: PuzzleError): string =>
     [
         code,
         path === undefined ? null : `after "${path.join(' ') || 'root'}"`,
+        parallel === undefined ? null : `in parallel ${parallel.index + 1} after "${parallel.path.join(' ') || 'root'}"`,
         params === undefined ? null : JSON.stringify(params),
     ].filter(part => part !== null).join(' ');
 
@@ -504,24 +635,40 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     }
 
     /**
-     * Error at this path, or not in tree when path is undefined.
+     * Where a node is in tree, see PuzzleError.
      */
-    const addError = (code: PuzzleErrorCode, path: undefined | Move[], params: PuzzleError['params']): void => {
-        errors.push(path === undefined ? { code, params } : { code, path, params });
+    type Location = {
+        path: Move[];
+        parallel?: PuzzleErrorParallel;
     };
 
     /**
-     * @param path Undefined when text is not in tree
+     * Location of a child of node at this location, reached by this move.
      */
-    const checkText = (value: unknown, property: string, maxLength: number, tooLongCode: PuzzleErrorCode, path?: Move[]): void => {
+    const childLocation = ({ path, parallel }: Location, move: Move): Location => parallel === undefined
+        ? { path: [...path, move] }
+        : { path, parallel: { index: parallel.index, path: [...parallel.path, move] } }
+    ;
+
+    /**
+     * Error at this location, or not in tree when location is undefined.
+     */
+    const addError = (code: PuzzleErrorCode, location?: Location, params?: PuzzleError['params']): void => {
+        errors.push({ code, ...location, ...(params === undefined ? {} : { params }) });
+    };
+
+    /**
+     * @param location Undefined when text is not in tree
+     */
+    const checkText = (value: unknown, property: string, maxLength: number, tooLongCode: PuzzleErrorCode, location?: Location): void => {
         if (value == null) {
             return;
         }
 
         if (typeof value !== 'string') {
-            addError('invalid_type', path, { property });
+            addError('invalid_type', location, { property });
         } else if (value.length > maxLength) {
-            addError(tooLongCode, path, { max: maxLength });
+            addError(tooLongCode, location, { max: maxLength });
         }
     };
 
@@ -543,29 +690,29 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     }
 
     /**
-     * @param path Undefined for initial stones
+     * @param location Undefined for initial stones
      */
-    const checkMove = (move: unknown, path?: Move[]): move is Move => {
+    const checkMove = (move: unknown, location?: Location): move is Move => {
         if (typeof move !== 'string' || !validateMove(move)) {
-            addError('invalid_move', path, { move: String(move) });
+            addError('invalid_move', location, { move: String(move) });
             return false;
         }
 
         if (!isInBoard(move, boardsize)) {
-            addError('outside_board', path, { move });
+            addError('outside_board', location, { move });
             return false;
         }
 
         return true;
     };
 
-    const checkMessage = (node: Record<string, unknown>, path: Move[]): void =>
-        checkText(node.message, 'message', PUZZLE_MESSAGE_MAX_LENGTH, 'message_too_long', path);
+    const checkMessage = (node: Record<string, unknown>, location: Location): void =>
+        checkText(node.message, 'message', PUZZLE_MESSAGE_MAX_LENGTH, 'message_too_long', location);
 
-    const checkKeys = (node: Record<string, unknown>, allowedKeys: string[], path: Move[]): void => {
+    const checkKeys = (node: Record<string, unknown>, allowedKeys: string[], location: Location): void => {
         for (const key of Object.keys(node)) {
             if (!allowedKeys.includes(key)) {
-                errors.push({ code: 'unexpected_property', path, params: { property: key } });
+                addError('unexpected_property', location, { property: key });
             }
         }
     };
@@ -608,119 +755,249 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     let nodesCount = 0;
 
     /**
-     * Moves to reach nodes having children or a result, by position, see getNodeKey().
+     * Counts a node, returns false once limit is exceeded.
      */
-    const definedPositions = new Map<string, Move[]>();
+    const countNode = (): boolean => {
+        if (++nodesCount <= PUZZLE_MAX_NODES) {
+            return true;
+        }
+
+        if (nodesCount === PUZZLE_MAX_NODES + 1) {
+            errors.push({ code: 'too_many_nodes', params: { max: PUZZLE_MAX_NODES } });
+        }
+
+        return false;
+    };
+
+    type PositionedPath = {
+        /**
+         * Moves to reach the node.
+         */
+        path: Move[];
+
+        /**
+         * Parallel sequences roots playable from the node.
+         */
+        parallels: unknown[];
+    };
 
     /**
-     * @param path Moves played to reach this node
+     * Nodes having children or a result, by position, see getNodeKey().
+     * Main sequence only, parallel sequences have no transpositions.
+     */
+    const definedPositions = new Map<string, PositionedPath>();
+
+    /**
+     * Main sequence leaves without result, by position: possible transpositions, checked once all defined nodes are known.
+     */
+    const leafPositions: (PositionedPath & { key: string })[] = [];
+
+    /**
+     * @param location Where this node is, in main or in a parallel sequence
      * @param isPlayerMove Whether this node is a player move, so computer answers next
      * @param ended Whether puzzle ended before this node (an ancestor has a result)
+     * @param parallels Parallel sequences roots declared on ancestors, playable from this node
      */
-    const checkNode = (node: Record<string, unknown>, occupied: Set<Move>, path: Move[], isPlayerMove: boolean, ended: boolean): void => {
-        checkKeys(node, NODE_KEYS, path);
-        checkMessage(node, path);
+    const checkNode = (node: Record<string, unknown>, occupied: Set<Move>, location: Location, isPlayerMove: boolean, ended: boolean, parallels: unknown[]): void => {
+        const { path } = location;
+
+        checkKeys(node, NODE_KEYS, location);
+        checkMessage(node, location);
 
         if (node.result !== undefined && node.result !== 'solved' && node.result !== 'failed') {
-            errors.push({ code: 'invalid_result', path, params: { result: JSON.stringify(node.result) } });
+            addError('invalid_result', location, { result: JSON.stringify(node.result) });
         }
 
         if (node.result !== undefined && ended) {
-            errors.push({ code: 'result_in_continuation', path });
+            addError('result_in_continuation', location);
         }
 
-        // Only one of them can be continued, other one should be a transposition leaf
-        if (path.length > 0 && isDefinedNode(node)) {
-            const key = getNodeKey(path, ended);
-            const other = definedPositions.get(key);
+        if (location.parallel !== undefined) {
+            // Parallel sequences are optional, so they cannot solve the puzzle
+            if (node.result === 'solved') {
+                addError('solved_in_parallel', location);
+            }
 
-            if (other === undefined) {
-                definedPositions.set(key, path);
+            // Else, it would be player turn again after going back to main sequence
+            if (isPlayerMove && !ended && !isDefinedNode(node)) {
+                addError('parallel_missing_answer', location);
+            }
+        } else if (path.length > 0) {
+            const key = getNodeKey(path, ended);
+
+            if (!isDefinedNode(node)) {
+                leafPositions.push({ key, path, parallels });
+            } else if (!definedPositions.has(key)) {
+                definedPositions.set(key, { path, parallels });
             } else {
-                errors.push({ code: 'duplicate_position', path, params: { other: other.join(' ') } });
+                // Only one of them can be continued, other one should be a transposition leaf
+                addError('duplicate_position', location, { other: definedPositions.get(key)!.path.join(' ') });
             }
         }
 
+        if (node.parallel !== undefined) {
+            checkParallels(node, occupied, location, isPlayerMove, ended);
+        }
+
+        const childrenParallels = Array.isArray(node.parallel) ? [...parallels, ...node.parallel] : parallels;
+
+        checkChildren(node, occupied, location, isPlayerMove, ended || node.result !== undefined, childrenParallels);
+    };
+
+    /**
+     * Checks parallel sequences declared on this node.
+     */
+    const checkParallels = (node: Record<string, unknown>, occupied: Set<Move>, location: Location, isPlayerMove: boolean, ended: boolean): void => {
+        if (!Array.isArray(node.parallel)) {
+            addError('parallel_not_list', location);
+            return;
+        }
+
+        if (isPlayerMove) {
+            addError('parallel_on_computer_move', location);
+        }
+
+        if (ended || node.result !== undefined) {
+            addError('parallel_in_continuation', location);
+        }
+
+        if (location.parallel !== undefined) {
+            addError('parallel_nested', location);
+        } else if (!ended && !isDefinedNode(node)) {
+            // Puzzle is solved when reaching this node, or it is a transposition continuing from another node:
+            // parallel sequences could never be played
+            addError('parallel_on_leaf', location);
+        }
+
+        const parallel: unknown[] = node.parallel;
+
+        // Cells used by main sequence from this node, then also by each checked parallel sequence
+        const usedCells = collectCells({ children: node.children });
+
+        for (const [index, root] of parallel.entries()) {
+            if (!countNode()) {
+                return;
+            }
+
+            const rootLocation: Location = { path: location.path, parallel: { index, path: [] } };
+
+            if (!isObject(root)) {
+                addError('node_not_object', rootLocation);
+                continue;
+            }
+
+            checkKeys(root, PARALLEL_ROOT_KEYS, rootLocation);
+
+            if (root.children === undefined || (Array.isArray(root.children) && root.children.length === 0)) {
+                addError('empty_parallel', rootLocation);
+            } else {
+                checkChildren(root, occupied, rootLocation, false, ended, []);
+            }
+
+            const cells = collectCells(root);
+            const overlap = [...cells].find(cell => usedCells.has(cell));
+
+            if (overlap !== undefined) {
+                addError('parallel_overlap', rootLocation, { move: overlap });
+            }
+
+            cells.forEach(cell => usedCells.add(cell));
+        }
+    };
+
+    /**
+     * @param childrenEnded Whether puzzle ended before children
+     */
+    const checkChildren = (node: Record<string, unknown>, occupied: Set<Move>, location: Location, isPlayerMove: boolean, childrenEnded: boolean, parallels: unknown[]): void => {
         if (node.children === undefined) {
             return;
         }
 
         if (!Array.isArray(node.children)) {
-            errors.push({ code: 'children_not_list', path });
+            addError('children_not_list', location);
             return;
         }
 
         const children: unknown[] = node.children;
-        const childrenEnded = ended || node.result !== undefined;
 
         if (isPlayerMove && children.length > 1) {
-            errors.push({ code: 'computer_one_answer', path, params: { count: children.length } });
+            addError('computer_one_answer', location, { count: children.length });
         }
 
         const seen = new Set<Move>();
 
         children.forEach((child, index) => {
-            if (++nodesCount > PUZZLE_MAX_NODES) {
-                if (nodesCount === PUZZLE_MAX_NODES + 1) {
-                    errors.push({ code: 'too_many_nodes', params: { max: PUZZLE_MAX_NODES } });
-                }
-
+            if (!countNode()) {
                 return;
             }
 
             if (!isObject(child)) {
-                errors.push({ code: 'node_not_object', path });
+                addError('node_not_object', location);
                 return;
             }
 
             if ('else' in child) {
                 if (isPlayerMove) {
-                    errors.push({ code: 'else_as_computer_answer', path });
+                    addError('else_as_computer_answer', location);
                 }
 
                 if (childrenEnded) {
-                    errors.push({ code: 'else_in_continuation', path });
+                    addError('else_in_continuation', location);
+                }
+
+                // Would also catch main sequence moves
+                if (location.parallel !== undefined) {
+                    addError('else_in_parallel', location);
                 }
 
                 if (index !== children.length - 1) {
-                    errors.push({ code: 'else_not_last', path });
+                    addError('else_not_last', location);
                 }
 
-                checkKeys(child, ELSE_NODE_KEYS, path);
-                checkMessage(child, path);
+                checkKeys(child, ELSE_NODE_KEYS, location);
+                checkMessage(child, location);
 
                 if (child.result !== undefined && child.result !== 'failed') {
-                    errors.push({ code: 'else_always_failed', path });
+                    addError('else_always_failed', location);
                 }
 
                 // Can be same cell as an expected move: free when else applies, as player played elsewhere
-                if (checkMove(child.else, path) && occupied.has(child.else)) {
-                    errors.push({ code: 'occupied', path, params: { move: child.else } });
+                if (checkMove(child.else, location) && occupied.has(child.else)) {
+                    addError('occupied', location, { move: child.else });
                 }
 
                 return;
             }
 
-            if (!checkMove(child.move, path)) {
+            if (!checkMove(child.move, location)) {
                 return;
             }
 
             if (occupied.has(child.move)) {
-                errors.push({ code: 'occupied', path, params: { move: child.move } });
+                addError('occupied', location, { move: child.move });
                 return;
             }
 
             if (seen.has(child.move)) {
-                errors.push({ code: 'set_twice', path, params: { move: child.move } });
+                addError('set_twice', location, { move: child.move });
             }
 
             seen.add(child.move);
 
-            checkNode(child, new Set([...occupied, child.move]), [...path, child.move], !isPlayerMove, childrenEnded);
+            checkNode(child, new Set([...occupied, child.move]), childLocation(location, child.move), !isPlayerMove, childrenEnded, parallels);
         });
     };
 
-    checkNode(puzzle.tree, initialStones, [], false, false);
+    checkNode(puzzle.tree, initialStones, { path: [] }, false, false, []);
+
+    // Transposition would continue with other parallel sequences, not checked against continued subtree
+    for (const { key, path, parallels } of leafPositions) {
+        const target = definedPositions.get(key);
+
+        if (target !== undefined && !sameItems(target.parallels, parallels)) {
+            errors.push({ code: 'parallel_transposition', path, params: { other: target.path.join(' ') } });
+        }
+    }
 
     if (!Array.isArray(puzzle.tree.children) || puzzle.tree.children.length === 0) {
         errors.push({ code: 'empty_tree' });

@@ -2,7 +2,7 @@ import { CircleMark, GameMarksFacade, GameView } from '@playhex/pixi-board';
 import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import { Puzzle } from '../../../../shared/app/models/index.js';
-import { createNodeResolver, findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, getParallelNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
@@ -16,14 +16,27 @@ export type PuzzleStatus =
 /**
  * A move played on board since initial position.
  */
-type PlayedMove = ColoredMove & {
-    /**
-     * Tree node reached by this move.
-     * An "else" node is set on both player move and computer answer.
-     * Null if move is not in tree: wrong move, or any move played after the end.
-     */
-    node: null | PuzzleNode | PuzzleElseNode;
+type TreeMove =
+    | {
+        /**
+         * Tree node reached by this move.
+         * An "else" node is set on both player move and computer answer.
+         * Null if move is not in tree: wrong move, or any move played after the end.
+         */
+        node: null | PuzzleNode | PuzzleElseNode;
 
+        /**
+         * Root of the parallel sequence this move is in, or null if in main sequence.
+         */
+        parallel: null;
+    }
+    | {
+        node: PuzzleNode;
+        parallel: PuzzleNode;
+    }
+;
+
+type PlayedMove = ColoredMove & TreeMove & {
     /**
      * Played by computer, so undone with the player move before it.
      */
@@ -66,6 +79,8 @@ export const usePuzzle = (puzzle: Puzzle) => {
      */
     const resolve = createNodeResolver(puzzle.tree);
 
+    const findParallels = createParallelsFinder(puzzle.tree);
+
     const path = ref<PlayedMove[]>([]);
 
     const computerThinking = ref(false);
@@ -75,15 +90,38 @@ export const usePuzzle = (puzzle: Puzzle) => {
      */
     let pendingMoveTimeout: null | ReturnType<typeof setTimeout> = null;
 
+    type TreeState = {
+        /**
+         * Result of the first ending node.
+         */
+        result: null | PuzzleResult;
+
+        /**
+         * Current main sequence node, null if moves left the tree.
+         */
+        node: null | PuzzleNode;
+
+        /**
+         * Current node of started parallel sequences, by parallel sequence root.
+         */
+        parallels: Map<PuzzleNode, PuzzleNode>;
+    };
+
     /**
-     * Follows played moves in tree:
-     * result of the first ending node, and current tree node (null if moves left the tree).
+     * Follows played moves in tree.
      */
-    const treeState = computed((): { result: null | PuzzleResult, node: null | PuzzleNode } => {
+    const replay = (playedMoves: PlayedMove[]): TreeState => {
         let result: null | PuzzleResult = null;
         let node: null | PuzzleNode = puzzle.tree;
+        const parallels = new Map<PuzzleNode, PuzzleNode>();
 
-        for (const playedMove of path.value) {
+        for (const playedMove of playedMoves) {
+            if (playedMove.parallel !== null) {
+                parallels.set(playedMove.parallel, playedMove.node);
+                result ??= getParallelNodeResult(playedMove.node);
+                continue;
+            }
+
             if (playedMove.node === null || isElseNode(playedMove.node)) {
                 result ??= 'failed';
                 node = null;
@@ -94,8 +132,10 @@ export const usePuzzle = (puzzle: Puzzle) => {
             result ??= getNodeResult(node);
         }
 
-        return { result, node };
-    });
+        return { result, node, parallels };
+    };
+
+    const treeState = computed(() => replay(path.value));
 
     const nextColor = computed<0 | 1>(() => path.value.length % 2 === 0 ? playerColor : computerColor);
 
@@ -165,7 +205,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
      * Plays a computer move after a short delay.
      * Ignored if cell has been taken, e.g by player move matched by an "else" node.
      */
-    const playComputerMove = (move: Move, node: PuzzleNode | PuzzleElseNode): void => {
+    const playComputerMove = (move: Move, treeMove: TreeMove): void => {
         if (gameView.getStone(move) !== null) {
             return;
         }
@@ -175,9 +215,27 @@ export const usePuzzle = (puzzle: Puzzle) => {
         pendingMoveTimeout = setTimeout(() => {
             pendingMoveTimeout = null;
             computerThinking.value = false;
-            path.value.push({ move, color: computerColor, node, byComputer: true });
+            path.value.push({ move, color: computerColor, ...treeMove, byComputer: true });
             redraw();
         }, COMPUTER_ANSWER_DELAY_MS);
+    };
+
+    /**
+     * Player move in a parallel sequence: started ones, and ones available from current main node.
+     */
+    const findParallelMove = (move: Move): null | Extract<TreeMove, { parallel: PuzzleNode }> => {
+        const { node: treeNode, parallels } = treeState.value;
+        const roots = new Set([...parallels.keys(), ...(treeNode === null ? [] : findParallels(treeNode))]);
+
+        for (const parallel of roots) {
+            const node = findChild(parallels.get(parallel) ?? parallel, move);
+
+            if (node !== null) {
+                return { node, parallel };
+            }
+        }
+
+        return null;
     };
 
     const playMove = (move: Move): void => {
@@ -190,13 +248,30 @@ export const usePuzzle = (puzzle: Puzzle) => {
         const child = treeNode === null ? null : findChild(treeNode, move);
 
         if (child !== null) {
-            path.value.push({ move, color, node: child, byComputer: false });
+            path.value.push({ move, color, node: child, parallel: null, byComputer: false });
             redraw();
 
             const answer = color === playerColor ? getComputerAnswer(resolve(child)) : null;
 
             if (answer !== null) {
-                playComputerMove(answer.move!, answer);
+                playComputerMove(answer.move!, { node: answer, parallel: null });
+            }
+
+            return;
+        }
+
+        const parallelMove = color === playerColor ? findParallelMove(move) : null;
+
+        if (parallelMove !== null) {
+            const { node, parallel } = parallelMove;
+
+            path.value.push({ move, color, node, parallel, byComputer: false });
+            redraw();
+
+            const answer = getComputerAnswer(node);
+
+            if (answer !== null) {
+                playComputerMove(answer.move!, { node: answer, parallel });
             }
 
             return;
@@ -205,11 +280,11 @@ export const usePuzzle = (puzzle: Puzzle) => {
         // Move not in tree: "else" node if any, else wrong move, or free move once ended
         const elseNode = treeNode === null || ended.value ? null : findElseNode(treeNode);
 
-        path.value.push({ move, color, node: elseNode, byComputer: false });
+        path.value.push({ move, color, node: elseNode, parallel: null, byComputer: false });
         redraw();
 
         if (elseNode !== null) {
-            playComputerMove(elseNode.else, elseNode);
+            playComputerMove(elseNode.else, { node: elseNode, parallel: null });
         }
     };
 
@@ -223,36 +298,25 @@ export const usePuzzle = (puzzle: Puzzle) => {
             return;
         }
 
-        // Moves in tree, before puzzle ended
-        const nodes: PuzzleNode[] = [];
-
-        for (const { node } of path.value) {
-            if (node === null || isElseNode(node) || getNodeResult(resolve(node)) !== null) {
-                break;
-            }
-
-            nodes.push(node);
-        }
-
-        let solution = findSolution(puzzle.tree, resolve);
-
         // Player to play is when an even number of moves have been played
-        while (nodes.length > 0) {
-            const nodeSolution = nodes.length % 2 === 0 ? findSolution(nodes[nodes.length - 1], resolve) : null;
+        let movesCount = path.value.length - path.value.length % 2;
+        let solution: null | PuzzleNode[] = null;
 
-            if (nodeSolution !== null) {
-                solution = nodeSolution;
+        for (; movesCount >= 0; movesCount -= 2) {
+            const { result, node } = replay(path.value.slice(0, movesCount));
+
+            solution = result === null && node !== null ? findSolution(node, resolve) : null;
+
+            if (solution !== null) {
                 break;
             }
-
-            nodes.pop();
         }
 
         if (!solution?.length) {
             return;
         }
 
-        path.value = path.value.slice(0, nodes.length);
+        path.value = path.value.slice(0, movesCount);
         redraw();
 
         gameView.addEntity(

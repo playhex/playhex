@@ -10,7 +10,7 @@ import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconPlus, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
 
 const props = defineProps<{
     /**
@@ -53,7 +53,11 @@ const {
     selectParent,
     nextColor,
     isInContinuation,
+    isInParallel,
+    isParallelRootSelected,
     canAddElse,
+    canAddParallel,
+    addParallel,
     pickingElse,
     startPickingElse,
     setResult,
@@ -343,10 +347,12 @@ const deletePuzzle = async (): Promise<void> => {
                             <h2 class="h6">
                                 <template v-if="selectedPath.length === 0">{{ $t('puzzles.editor.initial_position') }}</template>
                                 <template v-else-if="isElseNode(selectedNode)">{{ $t('puzzles.editor.else') }} → {{ selectedNode.else }}</template>
+                                <template v-else-if="isParallelRootSelected">{{ $t('puzzles.editor.parallel') }}</template>
                                 <template v-else>{{ selectedNode.move }}</template>
                             </h2>
 
                             <p v-if="isElseNode(selectedNode)" class="small text-body-secondary">{{ $t('puzzles.editor.else_help') }}</p>
+                            <p v-else-if="isParallelRootSelected" class="small text-body-secondary">{{ $t('puzzles.editor.parallel_help') }}</p>
                             <p v-else-if="isInContinuation" class="small text-body-secondary">{{ $t('puzzles.editor.continuation_help') }}</p>
 
                             <p v-if="selectedTransposition" class="small text-body-secondary">
@@ -354,16 +360,17 @@ const deletePuzzle = async (): Promise<void> => {
                                 <button class="btn btn-sm btn-outline-info ms-1" @click="goToTransposition()"><IconArrowReturnRight /> {{ $t('puzzles.editor.go_to_transposition') }}</button>
                             </p>
 
-                            <div v-if="selectedPath.length > 0 && !isElseNode(selectedNode) && !isInContinuation && !selectedTransposition" class="mb-2">
+                            <div v-if="selectedPath.length > 0 && !isElseNode(selectedNode) && !isParallelRootSelected && !isInContinuation && !selectedTransposition" class="mb-2">
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn" :class="!selectedNode.result ? 'btn-secondary' : 'btn-outline-secondary'" @click="setResult(null)">{{ $t('puzzles.editor.result_none') }}</button>
-                                    <button class="btn" :class="'solved' === selectedNode.result ? 'btn-success' : 'btn-outline-success'" @click="setResult('solved')">{{ $t('puzzles.editor.result_solved') }}</button>
+                                    <button v-if="!isInParallel" class="btn" :class="'solved' === selectedNode.result ? 'btn-success' : 'btn-outline-success'" @click="setResult('solved')">{{ $t('puzzles.editor.result_solved') }}</button>
                                     <button class="btn" :class="'failed' === selectedNode.result ? 'btn-danger' : 'btn-outline-danger'" @click="setResult('failed')">{{ $t('puzzles.editor.result_failed') }}</button>
                                 </div>
                             </div>
 
                             <div class="d-flex flex-wrap gap-1">
                                 <button v-if="canAddElse" class="btn btn-sm btn-outline-warning" @click="startPickingElse()">{{ $t('puzzles.editor.add_else') }}</button>
+                                <button v-if="canAddParallel" class="btn btn-sm btn-outline-secondary" :title="$t('puzzles.editor.parallel_help')" @click="addParallel()"><IconPlus /> {{ $t('puzzles.editor.add_parallel') }}</button>
                                 <button v-if="isElseNode(selectedNode)" class="btn btn-sm btn-outline-warning" @click="changeElseAnswer()">{{ $t('puzzles.editor.change_else_answer') }}</button>
 
                                 <template v-if="selectedPath.length > 0">
@@ -373,7 +380,7 @@ const deletePuzzle = async (): Promise<void> => {
                                 </template>
                             </div>
 
-                            <div class="mt-2">
+                            <div v-if="!isParallelRootSelected" class="mt-2">
                                 <label class="form-label small" for="puzzle-node-message">{{ $t('puzzles.editor.message') }}</label>
                                 <textarea id="puzzle-node-message" v-model="selectedNode.message" class="form-control" rows="2" :maxlength="PUZZLE_MESSAGE_MAX_LENGTH"></textarea>
                             </div>

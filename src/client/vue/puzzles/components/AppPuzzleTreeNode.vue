@@ -4,9 +4,10 @@
  * horizontal tree with hexagonal nodes, branches stacked vertically,
  * connected by straight lines.
  * A transposition leaf is followed by a dashed line and an arrow to the node it continues from.
+ * Parallel sequences are branches after children, with a dashed line and a "‖" root.
  */
 import { computed } from 'vue';
-import { isElseNode, type PuzzleElseNode, type PuzzleNode, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { filterMoveNodes, isElseNode, isParallelRoot, type PuzzleElseNode, type PuzzleNode, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
 import { IconArrowReturnRight, IconChatRightText, IconCheck, IconPencilSquare, IconXLg } from '../../icons.js';
 
@@ -37,12 +38,29 @@ const isRoot = computed(() => props.path.length === 0);
 
 const computerColor = computed(() => (1 - props.playerColor) as 0 | 1);
 
+const isParallelRootNode = computed(() => !isRoot.value && isParallelRoot(props.node));
+
 /**
  * Player moves at odd depth, computer answers at even depth.
+ * Parallel sequence roots are not moves, so not counted.
  */
-const playerIndex = computed<0 | 1>(() => props.path.length % 2 === 1 ? props.playerColor : computerColor.value);
+const playerIndex = computed<0 | 1>(() => filterMoveNodes(props.path).length % 2 === 1
+    ? props.playerColor
+    : computerColor.value,
+);
 
-const children = computed<EditorNode[]>(() => isElseNode(props.node) ? [] : props.node.children ?? []);
+type Branch = {
+    node: EditorNode;
+    parallel: boolean;
+};
+
+/**
+ * Children, then parallel sequences.
+ */
+const branches = computed<Branch[]>(() => isElseNode(props.node) ? [] : [
+    ...(props.node.children ?? []).map(node => ({ node, parallel: false })),
+    ...(props.node.parallel ?? []).map(node => ({ node, parallel: true })),
+]);
 
 const transposition = computed(() => isElseNode(props.node) ? null : props.transpositions.get(props.node) ?? null);
 </script>
@@ -82,10 +100,10 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             type="button"
             class="tree-node-button"
             :class="{ 'tree-node-current': node === selectedNode }"
-            :title="isRoot ? $t('puzzles.editor.initial_position') : undefined"
+            :title="isRoot ? $t('puzzles.editor.initial_position') : isParallelRootNode ? $t('puzzles.editor.parallel') : undefined"
             @click="emit('select', path)"
         >
-            <AppConditionalMoveButton :label="node.move ?? ''" :playerIndex :class="{ 'root-node': isRoot }" />
+            <AppConditionalMoveButton :label="isParallelRootNode ? '‖' : node.move ?? ''" :playerIndex :class="{ 'root-node': isRoot, 'parallel-root': isParallelRootNode }" />
             <IconPencilSquare v-if="isRoot" class="root-icon" />
 
             <IconCheck v-if="node.result === 'solved'" class="node-badge result-badge text-bg-success" />
@@ -107,12 +125,12 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
         </template>
 
         <!-- Single child: straight line, no extra width per level -->
-        <template v-if="children.length === 1">
-            <div class="tree-stem"></div>
+        <template v-if="branches.length === 1">
+            <div class="tree-stem" :class="{ 'parallel-stem': branches[0].parallel }"></div>
 
             <AppPuzzleTreeNode
-                :node="children[0]"
-                :path="[...path, children[0]]"
+                :node="branches[0].node"
+                :path="[...path, branches[0].node]"
                 :selectedNode
                 :playerColor
                 :transpositions
@@ -120,14 +138,14 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             />
         </template>
 
-        <template v-else-if="children.length > 1">
+        <template v-else-if="branches.length > 1">
             <div class="tree-stem"></div>
 
             <div class="tree-children">
-                <div v-for="(child, index) in children" :key="index" class="tree-child">
+                <div v-for="(branch, index) in branches" :key="index" class="tree-child" :class="{ 'tree-child-parallel': branch.parallel }">
                     <AppPuzzleTreeNode
-                        :node="child"
-                        :path="[...path, child]"
+                        :node="branch.node"
+                        :path="[...path, branch.node]"
                         :selectedNode
                         :playerColor
                         :transpositions
@@ -173,7 +191,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
         &.root-node::before
             color var(--bs-warning) !important
 
-        &.else-node::before
+        &.else-node::before, &.parallel-root::before
             color var(--bs-secondary) !important
 
 .root-icon
@@ -211,6 +229,11 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
     width 0.6rem
     background none
     border-top 2px dashed var(--bs-info)
+
+.parallel-stem
+    height 0
+    background none
+    border-top 2px dashed var(--bs-border-color)
 
 .transposition-link
     border none
@@ -251,4 +274,9 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
         height 2px
         width 0.3rem
         background var(--bs-border-color)
+
+    &.tree-child-parallel::after
+        height 0
+        background none
+        border-top 2px dashed var(--bs-border-color)
 </style>

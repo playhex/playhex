@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { createNodeResolver, findChild, findElseNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getNodeResult, getPositionKey, isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getNodeResult, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -346,6 +346,133 @@ describe('puzzleTree', () => {
             ] } })), [{ code: 'duplicate_position', path: ['b4', 'b3', 'c3'], params: { other: 'c3 b3 b4' } }]);
 
             assert.ok(!isDraftBlockingError({ code: 'duplicate_position' }));
+        });
+    });
+
+    describe('parallel sequences', () => {
+        // Main sequence c3 b3 b4 d2, x: a1 then computer answers a2, available at any time
+        const exchange = (): PuzzleNode => ({ children: [{ move: 'a1', children: [{ move: 'a2' }] }] });
+        const mainSequence = (): PuzzleNode[] => [{ move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4', children: [{ move: 'd2' }] }] }] }];
+
+        const errorCodes = (tree: PuzzleNode): string[] => validatePuzzle(createPuzzle({ tree })).map(({ code }) => code);
+
+        it('finds parallel sequences available from a node', () => {
+            const rootParallel = exchange();
+            const nestedParallel: PuzzleNode = { children: [{ move: 'e3', children: [{ move: 'e4' }] }] };
+            const b3: PuzzleNode = { move: 'b3', parallel: [nestedParallel], children: [{ move: 'b4' }] };
+            const c3: PuzzleNode = { move: 'c3', children: [b3] };
+            const d2: PuzzleNode = { move: 'd2' };
+            const tree: PuzzleNode = { parallel: [rootParallel], children: [c3, d2] };
+            const findParallels = createParallelsFinder(tree);
+
+            assert.deepStrictEqual(findParallels(tree), [rootParallel]);
+            assert.deepStrictEqual(findParallels(c3), [rootParallel]);
+            assert.deepStrictEqual(findParallels(d2), [rootParallel], 'sibling branch');
+            assert.deepStrictEqual(findParallels(b3), [rootParallel, nestedParallel]);
+            assert.deepStrictEqual(findParallels(b3.children![0] as PuzzleNode), [rootParallel, nestedParallel], 'inherited in subtree');
+            assert.deepStrictEqual(findParallels(rootParallel), [], 'not a main sequence node');
+        });
+
+        it('fails but never solves the puzzle', () => {
+            assert.strictEqual(getParallelNodeResult({ move: 'a2' }), null);
+            assert.strictEqual(getParallelNodeResult({ move: 'a1', result: 'failed' }), 'failed');
+            assert.strictEqual(getParallelNodeResult({ move: 'a1', result: 'solved' }), null);
+        });
+
+        it('identifies parallel sequence root', () => {
+            assert.ok(isParallelRoot(exchange()));
+            assert.ok(!isParallelRoot({ move: 'a1' }));
+            assert.ok(!isParallelRoot({ else: 'a1' }));
+        });
+
+        it('validates puzzle with parallel sequences', () => {
+            assert.deepStrictEqual(errorCodes({ parallel: [exchange()], children: mainSequence() }), [], 'on root');
+
+            const tree: PuzzleNode = { children: mainSequence() };
+            const b3 = ((tree.children![0] as PuzzleNode).children![0] as PuzzleNode);
+
+            b3.parallel = [exchange(), { children: [{ move: 'e3', result: 'failed' }] }];
+
+            assert.deepStrictEqual(errorCodes(tree), [], 'after computer move, with failing move');
+        });
+
+        it('ignores parallel sequences to find solution', () => {
+            const tree: PuzzleNode = { parallel: [exchange()], children: mainSequence() };
+
+            assert.deepStrictEqual(findSolution(tree, noTransposition)?.map(node => node.move), ['c3', 'b3', 'b4', 'd2']);
+        });
+
+        it('rejects invalid parallel sequences', () => {
+            const c3 = (parallel: unknown): PuzzleNode[] => [{ move: 'c3', parallel: parallel as PuzzleNode[], children: [{ move: 'b3' }] }];
+
+            assert.deepStrictEqual(errorCodes({ parallel: 'a1' as never, children: mainSequence() }), ['parallel_not_list']);
+            assert.ok(isDraftBlockingError({ code: 'parallel_not_list' }));
+            assert.deepStrictEqual(errorCodes({ children: c3([exchange()]) }), ['parallel_on_computer_move']);
+            assert.deepStrictEqual(errorCodes({ children: [{ move: 'c3', result: 'solved', children: [{ move: 'b3', parallel: [exchange()] }] }] }), ['parallel_in_continuation']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{ children: [{ move: 'a1', children: [{ move: 'a2', parallel: [{ children: [{ move: 'e3', children: [{ move: 'e4' }] }] }] }] }] }], children: mainSequence() }), ['parallel_nested']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{}], children: mainSequence() }), ['empty_parallel']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{ children: [] }], children: mainSequence() }), ['empty_parallel']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{ children: [{ move: 'a1', children: [{ move: 'a2' }] }, { else: 'a3' }] }], children: mainSequence() }), ['else_in_parallel']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{ children: [{ move: 'a1', children: [{ move: 'a2', children: [{ move: 'a3', result: 'solved' }] }] }] }], children: mainSequence() }), ['solved_in_parallel']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{ children: [{ move: 'a1' }] }], children: mainSequence() }), ['parallel_missing_answer']);
+            assert.deepStrictEqual(errorCodes({ parallel: [{ message: 'x', children: [{ move: 'a1', children: [{ move: 'a2' }] }] }], children: mainSequence() }), ['unexpected_property']);
+            assert.deepStrictEqual(errorCodes({ parallel: ['a1' as never], children: mainSequence() }), ['node_not_object']);
+        });
+
+        it('locates errors in parallel sequences', () => {
+            const tree: PuzzleNode = { children: mainSequence() };
+            const b3 = ((tree.children![0] as PuzzleNode).children![0] as PuzzleNode);
+
+            b3.parallel = [exchange(), { children: [{ move: 'e3', children: [{ move: 'e4', children: [{ move: 'e5' }] }] }] }];
+
+            const errors = validatePuzzle(createPuzzle({ tree }));
+
+            assert.deepStrictEqual(errors, [{ code: 'parallel_missing_answer', path: ['c3', 'b3'], parallel: { index: 1, path: ['e3', 'e4', 'e5'] } }]);
+            assert.strictEqual(puzzleErrorToString(errors[0]), 'parallel_missing_answer after "c3 b3" in parallel 2 after "e3 e4 e5"');
+        });
+
+        it('rejects parallel sequences on a leaf, never played', () => {
+            // b3 solves the puzzle before its parallel sequence can be played
+            assert.deepStrictEqual(errorCodes({ children: [{ move: 'c3', children: [{ move: 'b3', parallel: [exchange()] }] }] }), ['parallel_on_leaf']);
+            assert.ok(!isDraftBlockingError({ code: 'parallel_on_leaf' }));
+
+            // b3 transposes to continued position, and would drop its parallel sequence
+            const transposition: PuzzleNode = {
+                children: [
+                    { move: 'c3', children: [{ move: 'b3', children: [{ move: 'd2', children: [{ move: 'b4', children: [{ move: 'd3' }] }] }] }] },
+                    { move: 'd2', children: [{ move: 'b4', children: [{ move: 'c3', children: [{ move: 'b3', parallel: [exchange()] }] }] }] },
+                ],
+            };
+
+            assert.deepStrictEqual(errorCodes(transposition), ['parallel_on_leaf']);
+        });
+
+        it('rejects parallel sequences sharing cells', () => {
+            const overlap = (tree: PuzzleNode, move: string, message: string, index = 0): void => {
+                assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree })), [{ code: 'parallel_overlap', path: [], parallel: { index, path: [] }, params: { move } }], message);
+            };
+
+            overlap({ parallel: [{ children: [{ move: 'b4', children: [{ move: 'a2' }] }] }], children: mainSequence() }, 'b4', 'main sequence move');
+            overlap({ parallel: [exchange()], children: [...mainSequence(), { else: 'a2' }] }, 'a2', 'main else answer');
+            overlap({ parallel: [exchange(), { children: [{ move: 'a3', children: [{ move: 'a1' }] }] }], children: mainSequence() }, 'a1', 'other parallel sequence', 1);
+            overlap({ parallel: [exchange()], children: [{ move: 'c3', children: [{ move: 'b3', parallel: [{ children: [{ move: 'e3', children: [{ move: 'a2' }] }] }], children: [{ move: 'b4' }] }] }] }, 'a2', 'parallel sequence nested in main sequence');
+        });
+
+        it('rejects transposition to a node having other parallel sequences', () => {
+            // c3 b3 d2 b4 is continued, d2 b4 c3 b3 transposes to it
+            const tree = (parallelOnD2: boolean): PuzzleNode => ({
+                parallel: [exchange()],
+                children: [
+                    { move: 'c3', children: [{ move: 'b3', children: [{ move: 'd2', children: [{ move: 'b4', children: [{ move: 'd3' }] }] }] }] },
+                    { move: 'd2', children: [{ move: 'b4', parallel: parallelOnD2 ? [{ children: [{ move: 'e3', children: [{ move: 'e4' }] }] }] : undefined, children: [{ move: 'c3', children: [{ move: 'b3' }] }] }] },
+                ],
+            });
+
+            assert.deepStrictEqual(errorCodes(tree(false)), [], 'same parallel sequences, declared on common ancestor');
+            assert.deepStrictEqual(
+                validatePuzzle(createPuzzle({ tree: tree(true) })),
+                [{ code: 'parallel_transposition', path: ['d2', 'b4', 'c3', 'b3'], params: { other: 'c3 b3 d2 b4' } }],
+            );
         });
     });
 });

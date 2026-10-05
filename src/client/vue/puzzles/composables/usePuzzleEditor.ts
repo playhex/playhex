@@ -4,7 +4,7 @@ import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, toRaw } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { findElseNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { filterMoveNodes, findElseNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
@@ -42,6 +42,11 @@ const cleanNode = <T extends EditorNode>(node: T): T => {
 
     if (!isElseNode(node) && node.children && node.children.length > 0) {
         clean.children = node.children.map(cleanNode);
+    }
+
+    // Keeps parallel sequences without moves, for drafts
+    if (!isElseNode(node) && node.parallel && node.parallel.length > 0) {
+        clean.parallel = node.parallel.map(cleanNode);
     }
 
     return clean as T;
@@ -176,9 +181,24 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const getParent = (path: EditorNode[]): PuzzleNode => path[path.length - 2] ?? tree.value;
 
     /**
+     * Nodes of selected path having a move: parallel sequence root is not a move.
+     */
+    const selectedMoveNodes = computed(() => filterMoveNodes(selectedPath.value));
+
+    /**
      * Color of the next move from selected node.
      */
-    const nextColor = computed<0 | 1>(() => selectedPath.value.length % 2 === 0 ? playerColor.value : computerColor.value);
+    const nextColor = computed<0 | 1>(() => selectedMoveNodes.value.length % 2 === 0 ? playerColor.value : computerColor.value);
+
+    /**
+     * Whether selected node is in a parallel sequence, or is its root.
+     */
+    const isInParallel = computed(() => selectedPath.value.some(isParallelRoot));
+
+    /**
+     * Selected node is a parallel sequence root: it has no move, nor result or message.
+     */
+    const isParallelRootSelected = computed(() => selectedPath.value.length > 0 && isParallelRoot(selectedNode.value));
 
     /**
      * Whether selected node is in a continuation: puzzle already ended at an ancestor.
@@ -200,6 +220,22 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             && node.result === undefined
             && findElseNode(node) === null
             && !transpositions.value.has(node)
+            && !isInParallel.value
+        ;
+    });
+
+    /**
+     * Parallel sequence can be declared on a main sequence player choice, out of continuation.
+     */
+    const canAddParallel = computed(() => {
+        const node = selectedNode.value;
+
+        return !isElseNode(node)
+            && nextColor.value === playerColor.value
+            && !isInContinuation.value
+            && !isInParallel.value
+            && node.result === undefined
+            && !transpositions.value.has(node)
         ;
     });
 
@@ -207,7 +243,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      * Moves of selected path, to display on board.
      * "else" node shows computer answer only, as player move can be any other move.
      */
-    const selectedMoves = computed<ColoredMove[]>(() => selectedPath.value.map((node, index) => ({
+    const selectedMoves = computed<ColoredMove[]>(() => selectedMoveNodes.value.map((node, index) => ({
         move: isElseNode(node) ? node.else : node.move!,
         color: index % 2 === 0 && !isElseNode(node) ? playerColor.value : computerColor.value,
     })));
@@ -246,7 +282,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     const selectFirstChild = (): void => {
         const node = selectedNode.value;
-        const firstChild = isElseNode(node) ? undefined : node.children?.[0];
+        const firstChild = isElseNode(node) ? undefined : node.children?.[0] ?? node.parallel?.[0];
 
         if (firstChild) {
             selectPath([...selectedPath.value, firstChild]);
@@ -261,7 +297,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
-        const siblings = getParent(selectedPath.value).children!;
+        const siblings = getSiblings();
         const sibling = siblings[siblings.indexOf(selectedNode.value) + offset];
 
         if (sibling) {
@@ -272,7 +308,14 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     /**
      * Children list of selected node parent, to reorder or delete selected node.
      */
-    const getSiblings = (): EditorNode[] => getParent(selectedPath.value).children!;
+    const getSiblings = (): EditorNode[] => {
+        const parent = getParent(selectedPath.value);
+        const node = selectedNode.value;
+
+        return !isElseNode(node) && parent.parallel?.includes(node)
+            ? parent.parallel
+            : parent.children!;
+    };
 
     const moveSelected = (offset: -1 | 1): void => {
         const siblings = getSiblings();
@@ -302,11 +345,27 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         pickingElse.value = true;
     };
 
+    /**
+     * Adds a parallel sequence on selected node, and selects it to add its moves.
+     */
+    const addParallel = (): void => {
+        const node = selectedNode.value;
+
+        if (!canAddParallel.value || isElseNode(node)) {
+            return;
+        }
+
+        node.parallel ??= [];
+        node.parallel.push({ children: [] });
+        selectPath([...selectedPath.value, node.parallel[node.parallel.length - 1]]);
+    };
+
     const removeResults = (nodes: EditorNode[] = []): void => {
         for (const node of nodes) {
             if (!isElseNode(node)) {
                 delete node.result;
                 removeResults(node.children);
+                removeResults(node.parallel);
             }
         }
     };
@@ -327,6 +386,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         } else {
             node.result = result;
             removeResults(node.children);
+            removeResults(node.parallel);
         }
     };
 
@@ -339,7 +399,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      * Selects child, or the other node reaching same position if any, as only one of them can be continued.
      */
     const selectChild = (child: PuzzleNode): void => {
-        const other = findSamePositionNode(tree.value, child);
+        // No transpositions in parallel sequences
+        const other = isInParallel.value ? null : findSamePositionNode(tree.value, child);
 
         if (other === null) {
             selectPath([...selectedPath.value, child]);
@@ -354,7 +415,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         boardError.value = null;
 
         // Click on a stone of selected path: go back to this move
-        const pathIndex = selectedMoves.value.findIndex(m => m.move === move);
+        const pathIndex = selectedPath.value.findIndex(node => (isElseNode(node) ? node.else : node.move) === move);
 
         if (pathIndex !== -1) {
             selectPath(selectedPath.value.slice(0, pathIndex + 1));
@@ -661,7 +722,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         selectParent,
         nextColor,
         isInContinuation,
+        isInParallel,
+        isParallelRootSelected,
         canAddElse,
+        canAddParallel,
+        addParallel,
         pickingElse,
         startPickingElse,
         setResult,
