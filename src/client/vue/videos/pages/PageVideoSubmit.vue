@@ -6,10 +6,9 @@ import { t } from 'i18next';
 import useAuthStore from '../../../stores/authStore.js';
 import { apiGetVideoMetadata, apiPostVideo } from '../../../apiClient.js';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
-import AppVideoLanguageSelector from '../components/AppVideoLanguageSelector.vue';
 import { videoSubmitBreadcrumb } from '../services/videoBreadcrumb.js';
 import { formatVideoDuration, parseVideoDuration } from '../../../../shared/app/videos/duration.js';
-import { isHttpUrl, VIDEO_AUTHOR_NAME_MAX_LENGTH, VIDEO_KEYWORDS_MAX_LENGTH, VIDEO_TITLE_MAX_LENGTH, VIDEO_URL_MAX_LENGTH, validateVideoInput, type VideoInput } from '../../../../shared/app/videos/videoInput.js';
+import { isHttpUrl, isValidVideoPublishedAt, maxVideoPublishedAt, VIDEO_AUTHOR_NAME_MAX_LENGTH, VIDEO_KEYWORDS_MAX_LENGTH, VIDEO_TITLE_MAX_LENGTH, VIDEO_URL_MAX_LENGTH, validateVideoInput, type VideoInput } from '../../../../shared/app/videos/videoInput.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 useHead({
@@ -33,7 +32,10 @@ const url = ref('');
 const title = ref('');
 const authorName = ref('');
 const duration = ref('');
-const languages = ref<string[]>([]);
+/**
+ * "YYYY-MM-DD" from date input, empty if unknown.
+ */
+const publishedAt = ref('');
 const keywords = ref('');
 
 const thumbnailMode = ref<'url' | 'file'>('url');
@@ -89,8 +91,8 @@ const prefill = async (): Promise<void> => {
             keywords.value = metadata.keywords;
         }
 
-        if (metadata.languages.length > 0) {
-            languages.value = metadata.languages;
+        if (metadata.publishedAt !== null) {
+            publishedAt.value = metadata.publishedAt;
         }
 
         if (metadata.thumbnailUrl !== null) {
@@ -118,7 +120,7 @@ const input = computed((): VideoInput => ({
     title: title.value.trim(),
     authorName: authorName.value.trim(),
     durationSeconds: durationSeconds.value ?? 0,
-    languages: languages.value,
+    publishedAt: publishedAt.value === '' ? null : publishedAt.value,
     keywords: keywords.value.trim(),
 }));
 
@@ -134,7 +136,7 @@ const resetForm = (): void => {
     title.value = '';
     authorName.value = '';
     duration.value = '';
-    languages.value = [];
+    publishedAt.value = '';
     keywords.value = '';
     thumbnailUrl.value = '';
     thumbnailFile.value = null;
@@ -225,12 +227,12 @@ const submit = async (): Promise<void> => {
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-8 mb-3">
+                    <div class="col-sm-6 mb-3">
                         <label for="video-author" class="form-label">{{ $t('videos.field_author') }}</label>
                         <input id="video-author" v-model="authorName" type="text" class="form-control" required :maxlength="VIDEO_AUTHOR_NAME_MAX_LENGTH" />
                     </div>
 
-                    <div class="col-sm-4 mb-3">
+                    <div class="col-6 col-sm-3 mb-3">
                         <label for="video-duration" class="form-label">{{ $t('videos.field_duration') }}</label>
                         <input
                             id="video-duration"
@@ -243,12 +245,19 @@ const submit = async (): Promise<void> => {
                             placeholder="h:mm:ss"
                         />
                     </div>
-                </div>
 
-                <fieldset class="mb-3">
-                    <legend class="form-label fs-6">{{ $t('videos.field_languages') }}</legend>
-                    <AppVideoLanguageSelector v-model="languages" />
-                </fieldset>
+                    <div class="col-6 col-sm-3 mb-3">
+                        <label for="video-published-at" class="form-label">{{ $t('videos.field_published_at') }} <small class="text-body-secondary">({{ $t('videos.optional') }})</small></label>
+                        <input
+                            id="video-published-at"
+                            v-model="publishedAt"
+                            type="date"
+                            class="form-control"
+                            :class="{ 'is-invalid': publishedAt !== '' && !isValidVideoPublishedAt(publishedAt) }"
+                            :max="maxVideoPublishedAt()"
+                        />
+                    </div>
+                </div>
 
                 <div class="mb-3">
                     <label for="video-keywords" class="form-label">{{ $t('videos.field_keywords') }} <small class="text-body-secondary">({{ $t('videos.optional') }})</small></label>

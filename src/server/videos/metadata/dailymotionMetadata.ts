@@ -1,5 +1,4 @@
-import type { VideoMetadata } from '../../../shared/app/videos/videoInput.js';
-import { toVideoLanguage } from '../../../shared/app/videos/videoLanguages.js';
+import { toVideoPublishedAt, type VideoMetadata } from '../../../shared/app/videos/videoInput.js';
 import { VideoNotFoundError } from './metadataErrors.js';
 import { toKeywords } from './toKeywords.js';
 
@@ -12,7 +11,7 @@ type DailymotionVideoResponse = {
     'thumbnail_720_url'?: string;
     'tags'?: string[];
     'description'?: string;
-    'language'?: string;
+    'created_time'?: number;
 };
 
 /**
@@ -47,7 +46,7 @@ export const parseDailymotionVideoId = (url: string): null | string => {
 export const fetchDailymotionMetadata = async (videoId: string): Promise<VideoMetadata> => {
     const url = new URL(`https://api.dailymotion.com/video/${videoId}`);
 
-    url.searchParams.set('fields', 'title,owner.screenname,duration,thumbnail_720_url,tags,description,language');
+    url.searchParams.set('fields', 'title,owner.screenname,duration,thumbnail_720_url,tags,description,created_time');
 
     const response = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });
 
@@ -60,14 +59,13 @@ export const fetchDailymotionMetadata = async (videoId: string): Promise<VideoMe
     }
 
     const video = await response.json() as DailymotionVideoResponse;
-    const language = toVideoLanguage(video.language);
 
     return {
         url: `https://www.dailymotion.com/video/${videoId}`,
         title: video.title,
         authorName: video['owner.screenname'],
         durationSeconds: video.duration,
-        languages: language === null ? [] : [language],
+        publishedAt: toVideoPublishedAt(video.created_time),
         thumbnailUrl: video.thumbnail_720_url ?? null,
         keywords: toKeywords(video.tags?.length ? video.tags : video.description),
     };

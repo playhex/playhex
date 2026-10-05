@@ -1,9 +1,9 @@
 import { youtubeVideoUrl } from '../../../shared/app/videos/youtube.js';
 import { parseIsoDuration } from '../../../shared/app/videos/duration.js';
-import { toVideoLanguage } from '../../../shared/app/videos/videoLanguages.js';
-import type { VideoMetadata } from '../../../shared/app/videos/videoInput.js';
+import { toVideoPublishedAt, type VideoMetadata } from '../../../shared/app/videos/videoInput.js';
 import { VideoNotFoundError } from './metadataErrors.js';
 import { toKeywords } from './toKeywords.js';
+import logger from '../../services/logger.js';
 
 const FETCH_TIMEOUT = 10000;
 
@@ -18,8 +18,7 @@ type YoutubeApiVideosResponse = {
             description: string;
             channelTitle: string;
             tags?: string[];
-            defaultLanguage?: string;
-            defaultAudioLanguage?: string;
+            publishedAt?: string;
             thumbnails: Partial<Record<'default' | 'medium' | 'high' | 'standard' | 'maxres', YoutubeThumbnail>>;
         };
         contentDetails: {
@@ -59,21 +58,83 @@ const fetchFromApi = async (videoId: string, apiKey: string): Promise<VideoMetad
 
     const { snippet, contentDetails } = item;
     const { thumbnails } = snippet;
-    const language = toVideoLanguage(snippet.defaultAudioLanguage ?? snippet.defaultLanguage);
 
     return {
         url: youtubeVideoUrl(videoId),
         title: snippet.title,
         authorName: snippet.channelTitle,
         durationSeconds: parseIsoDuration(contentDetails.duration),
-        languages: language === null ? [] : [language],
+        publishedAt: toVideoPublishedAt(snippet.publishedAt),
         thumbnailUrl: (thumbnails.maxres ?? thumbnails.standard ?? thumbnails.high ?? thumbnails.medium ?? thumbnails.default)?.url ?? null,
         keywords: toKeywords(snippet.tags?.length ? snippet.tags : snippet.description),
     };
 };
 
 /**
- * Without api key: no duration, language, nor keywords.
+ * Internal api used by Youtube web player, only fields we need.
+ */
+export type YoutubePlayerResponse = {
+    videoDetails?: {
+        lengthSeconds?: string;
+        keywords?: string[];
+        shortDescription?: string;
+    };
+    microformat?: {
+        playerMicroformatRenderer?: {
+            publishDate?: string;
+            uploadDate?: string;
+        };
+    };
+};
+
+type YoutubePlayerMetadata = Pick<VideoMetadata, 'durationSeconds' | 'publishedAt' | 'keywords'>;
+
+export const parseYoutubePlayerResponse = ({ videoDetails, microformat }: YoutubePlayerResponse): null | YoutubePlayerMetadata => {
+    if (!videoDetails) {
+        return null;
+    }
+
+    const durationSeconds = Number(videoDetails.lengthSeconds);
+    const microformatRenderer = microformat?.playerMicroformatRenderer;
+
+    return {
+        durationSeconds: Number.isInteger(durationSeconds) && durationSeconds > 0 ? durationSeconds : null,
+        publishedAt: toVideoPublishedAt(microformatRenderer?.publishDate ?? microformatRenderer?.uploadDate),
+        keywords: toKeywords(videoDetails.keywords?.length ? videoDetails.keywords : videoDetails.shortDescription),
+    };
+};
+
+/**
+ * Same request as Youtube web player, much lighter than crawling video page (~10KB vs 1.3MB).
+ * Best effort: this api is not documented and may change.
+ */
+const fetchFromPlayerApi = async (videoId: string): Promise<null | YoutubePlayerMetadata> => {
+    try {
+        const response = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                videoId,
+                context: { client: { clientName: 'WEB', clientVersion: '2.20250101.00.00', hl: 'en' } },
+            }),
+            signal: AbortSignal.timeout(FETCH_TIMEOUT),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Youtube player api responded with status ${response.status}`);
+        }
+
+        return parseYoutubePlayerResponse(await response.json() as YoutubePlayerResponse);
+    } catch (reason) {
+        logger.notice('Could not get youtube video infos from player api', { videoId, reason });
+
+        return null;
+    }
+};
+
+/**
+ * Without api key: title, author and thumbnail from oEmbed,
+ * duration, publication date and keywords from player api.
  */
 const fetchFromOEmbed = async (videoId: string): Promise<VideoMetadata> => {
     const url = new URL('https://www.youtube.com/oembed');
@@ -81,7 +142,10 @@ const fetchFromOEmbed = async (videoId: string): Promise<VideoMetadata> => {
     url.searchParams.set('url', youtubeVideoUrl(videoId));
     url.searchParams.set('format', 'json');
 
-    const response = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });
+    const [response, playerMetadata] = await Promise.all([
+        fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT) }),
+        fetchFromPlayerApi(videoId),
+    ]);
 
     if (response.status === 404 || response.status === 400 || response.status === 401) {
         throw new VideoNotFoundError();
@@ -97,16 +161,16 @@ const fetchFromOEmbed = async (videoId: string): Promise<VideoMetadata> => {
         url: youtubeVideoUrl(videoId),
         title: oEmbed.title,
         authorName: oEmbed.author_name,
-        durationSeconds: null,
-        languages: [],
+        durationSeconds: playerMetadata?.durationSeconds ?? null,
+        publishedAt: playerMetadata?.publishedAt ?? null,
         thumbnailUrl: oEmbed.thumbnail_url,
-        keywords: '',
+        keywords: playerMetadata?.keywords ?? '',
     };
 };
 
 /**
  * Uses Youtube Data API if YOUTUBE_API_KEY is set,
- * else fallback to oEmbed, which does not provide duration, language nor keywords.
+ * else fallback to oEmbed and player api.
  *
  * @throws {VideoNotFoundError}
  */

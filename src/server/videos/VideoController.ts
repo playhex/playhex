@@ -40,22 +40,10 @@ const mustBeAllowedToSubmit = (player: Player): void => {
  * @throws {BadRequestError}
  */
 const parseMultipartVideoInput = (body: Record<string, unknown>): VideoInput => {
-    const { url, title, authorName, durationSeconds, languages, keywords } = body;
+    const { url, title, authorName, durationSeconds, publishedAt, keywords } = body;
 
-    if (typeof url !== 'string' || typeof title !== 'string' || typeof authorName !== 'string' || typeof durationSeconds !== 'string' || typeof languages !== 'string' || (keywords !== undefined && typeof keywords !== 'string')) {
+    if (typeof url !== 'string' || typeof title !== 'string' || typeof authorName !== 'string' || typeof durationSeconds !== 'string' || (publishedAt !== undefined && typeof publishedAt !== 'string') || (keywords !== undefined && typeof keywords !== 'string')) {
         throw new BadRequestError('Missing fields');
-    }
-
-    let parsedLanguages: unknown;
-
-    try {
-        parsedLanguages = JSON.parse(languages);
-    } catch {
-        throw new BadRequestError('Invalid languages');
-    }
-
-    if (!Array.isArray(parsedLanguages) || parsedLanguages.some(language => typeof language !== 'string')) {
-        throw new BadRequestError('Invalid languages');
     }
 
     const input: VideoInput = {
@@ -63,7 +51,7 @@ const parseMultipartVideoInput = (body: Record<string, unknown>): VideoInput => 
         title: title.trim(),
         authorName: authorName.trim(),
         durationSeconds: Number(durationSeconds),
-        languages: [...new Set(parsedLanguages as string[])],
+        publishedAt: publishedAt || null,
         keywords: (keywords ?? '').trim(),
     };
 
@@ -172,7 +160,7 @@ export default class VideoController
         video.title = input.title;
         video.authorName = input.authorName;
         video.durationSeconds = input.durationSeconds;
-        video.languages = input.languages;
+        video.publishedAt = input.publishedAt === null ? null : new Date(input.publishedAt);
         video.keywords = input.keywords === '' ? null : input.keywords;
         video.thumbnailPath = thumbnailPath;
         video.submittedBy = player;

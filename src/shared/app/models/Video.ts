@@ -46,13 +46,14 @@ export default class Video
     durationSeconds: number;
 
     /**
-     * Languages in which video is accessible (spoken or subtitled),
-     * keys of availableLocales, e.g ["en", "fr"].
+     * When video has been published on its platform.
+     * Stored as UTC midnight of publication day: display it in UTC.
+     * Null if unknown, then listed last when sorting by publication date.
      */
-    @Column({ type: 'simple-array' })
+    @Column({ type: Date, nullable: true })
     @Expose({ groups: [GROUP_DEFAULT, 'video'] })
-    @Type(() => String)
-    languages: string[];
+    @Type(() => Date)
+    publishedAt: null | Date;
 
     /**
      * Not displayed, only used by search, in addition to title.

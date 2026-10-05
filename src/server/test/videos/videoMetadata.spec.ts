@@ -4,6 +4,7 @@ import { decodeHtmlEntities, parseMetaTags } from '../../videos/metadata/htmlMet
 import { toKeywords } from '../../videos/metadata/toKeywords.js';
 import { isVimeoUrl } from '../../videos/metadata/vimeoMetadata.js';
 import { parseDailymotionVideoId } from '../../videos/metadata/dailymotionMetadata.js';
+import { parseYoutubePlayerResponse } from '../../videos/metadata/youtubeMetadata.js';
 
 describe('video metadata', () => {
     it('decodes html entities', () => {
@@ -47,5 +48,26 @@ describe('video metadata', () => {
         assert.strictEqual(parseDailymotionVideoId('https://www.dailymotion.com/video/x8j7qvf'), 'x8j7qvf');
         assert.strictEqual(parseDailymotionVideoId('https://dai.ly/x8j7qvf'), 'x8j7qvf');
         assert.strictEqual(parseDailymotionVideoId('https://www.dailymotion.com/user/someone'), null);
+    });
+
+    it('parses youtube player api response', () => {
+        assert.deepStrictEqual(parseYoutubePlayerResponse({
+            videoDetails: { lengthSeconds: '213', keywords: ['hex', 'strategy'], shortDescription: 'Some description' },
+            microformat: { playerMicroformatRenderer: { publishDate: '2009-10-24T23:57:33-07:00' } },
+        }), {
+            durationSeconds: 213,
+            publishedAt: '2009-10-25',
+            keywords: 'hex, strategy',
+        });
+
+        assert.deepStrictEqual(parseYoutubePlayerResponse({
+            videoDetails: { lengthSeconds: '0', shortDescription: 'Only description' },
+        }), {
+            durationSeconds: null,
+            publishedAt: null,
+            keywords: 'Only description',
+        });
+
+        assert.strictEqual(parseYoutubePlayerResponse({}), null);
     });
 });

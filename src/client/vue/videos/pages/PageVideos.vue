@@ -8,9 +8,7 @@ import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import AppVideoCard from '../components/AppVideoCard.vue';
 import { videosBreadcrumb } from '../services/videoBreadcrumb.js';
 import { IconPlus } from '../../icons.js';
-import { filterVideos } from '../../../../shared/app/videos/videoSearch.js';
-import { toVideoLanguage } from '../../../../shared/app/videos/videoLanguages.js';
-import AppVideoLanguageFilter from '../components/AppVideoLanguageFilter.vue';
+import { filterVideos, sortVideos, type VideoSort } from '../../../../shared/app/videos/videoSearch.js';
 
 useHead({
     title: t('videos.title'),
@@ -18,50 +16,20 @@ useHead({
 
 const videos = ref<null | Video[]>(null);
 
+void (async () => {
+    videos.value = await apiGetVideos();
+})();
+
 /*
  * Filters
  */
 const search = ref('');
-const languages = ref<string[]>([]);
+const sort = ref<VideoSort>('publishedAt');
 
-/**
- * Languages of at least one video, with videos count, most frequent first.
- */
-const languageOptions = computed((): { language: string, count: number }[] => {
-    const counts = new Map<string, number>();
-
-    for (const video of videos.value ?? []) {
-        for (const language of video.languages) {
-            counts.set(language, (counts.get(language) ?? 0) + 1);
-        }
-    }
-
-    return [...counts.entries()]
-        .map(([language, count]) => ({ language, count }))
-        .sort((a, b) => b.count - a.count);
-});
-
-/**
- * Browser languages that have videos, or none (all languages) if no video in these languages.
- */
-const getDefaultLanguages = (): string[] => {
-    const availableLanguages = languageOptions.value.map(({ language }) => language);
-    const browserLanguages = (navigator.languages ?? [])
-        .map(toVideoLanguage)
-        .filter((language): language is string => language !== null && availableLanguages.includes(language));
-
-    return [...new Set(browserLanguages)];
-};
-
-void (async () => {
-    videos.value = await apiGetVideos();
-    languages.value = getDefaultLanguages();
-})();
-
-const filteredVideos = computed((): Video[] => filterVideos(videos.value ?? [], {
-    search: search.value,
-    languages: languages.value,
-}));
+const filteredVideos = computed((): Video[] => sortVideos(
+    filterVideos(videos.value ?? [], { search: search.value }),
+    sort.value,
+));
 </script>
 
 <template>
@@ -90,7 +58,10 @@ const filteredVideos = computed((): Video[] => filterVideos(videos.value ?? [], 
                 />
             </div>
             <div class="col-sm-4 col-lg-3">
-                <AppVideoLanguageFilter v-model="languages" :options="languageOptions" :total="videos.length" />
+                <select v-model="sort" class="form-select" :aria-label="$t('videos.sort_by')">
+                    <option value="publishedAt">{{ $t('videos.sort_published_at') }}</option>
+                    <option value="createdAt">{{ $t('videos.sort_created_at') }}</option>
+                </select>
             </div>
         </div>
 
@@ -105,7 +76,7 @@ const filteredVideos = computed((): Video[] => filterVideos(videos.value ?? [], 
                 :key="video.publicId"
                 class="col-12 col-sm-6 col-md-4 col-lg-3"
             >
-                <AppVideoCard :video />
+                <AppVideoCard :video :sort />
             </div>
         </div>
     </div>

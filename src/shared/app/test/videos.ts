@@ -2,8 +2,8 @@ import assert from 'assert';
 import { describe, it } from 'mocha';
 import { normalizeVideoUrl, parseYoutubeVideoId } from '../videos/youtube.js';
 import { formatVideoDuration, parseIsoDuration, parseVideoDuration } from '../videos/duration.js';
-import { toVideoLanguage, videoLanguageFlag } from '../videos/videoLanguages.js';
-import { filterVideos } from '../videos/videoSearch.js';
+import { isValidVideoPublishedAt, toVideoPublishedAt } from '../videos/videoInput.js';
+import { filterVideos, sortVideos } from '../videos/videoSearch.js';
 
 describe('videos', () => {
     it('parses youtube video id', () => {
@@ -55,38 +55,53 @@ describe('videos', () => {
         assert.strictEqual(parseVideoDuration(''), null);
     });
 
-    it('maps languages', () => {
-        assert.strictEqual(toVideoLanguage('fr'), 'fr');
-        assert.strictEqual(toVideoLanguage('en-US'), 'en');
-        assert.strictEqual(toVideoLanguage('zh'), 'zh-Hans');
-        assert.strictEqual(toVideoLanguage('zz'), null);
-        assert.strictEqual(toVideoLanguage(undefined), null);
+    it('parses publication date', () => {
+        assert.strictEqual(toVideoPublishedAt('2021-03-04T10:20:30Z'), '2021-03-04');
+        assert.strictEqual(toVideoPublishedAt('2013-01-14 15:12:39'), '2013-01-14');
+        assert.strictEqual(toVideoPublishedAt(1614853230), '2021-03-04');
+        assert.strictEqual(toVideoPublishedAt('2009-10-24T23:57:33-07:00'), '2009-10-25');
+        assert.strictEqual(toVideoPublishedAt('2009-10-25T06:57:33Z'), '2009-10-25');
+        assert.strictEqual(toVideoPublishedAt('Sat, 24 Oct 2009 12:00:00 GMT'), '2009-10-24');
+        assert.strictEqual(toVideoPublishedAt('2021-13-45'), null);
+        assert.strictEqual(toVideoPublishedAt('2021-02-30'), null);
+        assert.strictEqual(toVideoPublishedAt('not a date'), null);
+        assert.strictEqual(toVideoPublishedAt(undefined), null);
 
-        assert.strictEqual(videoLanguageFlag('fr'), '🇫🇷');
+        assert.strictEqual(isValidVideoPublishedAt('2021-03-04'), true);
+        assert.strictEqual(isValidVideoPublishedAt('2021-13-04'), false);
+        assert.strictEqual(isValidVideoPublishedAt('2021-02-30'), false);
+        assert.strictEqual(isValidVideoPublishedAt('1969-12-31'), false);
+        assert.strictEqual(isValidVideoPublishedAt('04/03/2021'), false);
+        assert.strictEqual(isValidVideoPublishedAt('2999-01-01'), false);
     });
 });
 
 describe('videos search', () => {
     const videos = [
-        { title: 'Initiation au Hex', authorName: 'Jean Dupont', keywords: 'débutant tutoriel règles', languages: ['fr'] },
-        { title: 'Hex strategy: ladders', authorName: 'HexMaster', keywords: null, languages: ['en'] },
-        { title: 'Bridges and templates', authorName: 'Someone', keywords: 'edge template beginner', languages: ['en', 'fr'] },
-        { title: 'Apertura', authorName: 'Mario', keywords: null, languages: ['it'] },
+        { title: 'Initiation au Hex', authorName: 'Jean Dupont', keywords: 'débutant tutoriel règles' },
+        { title: 'Hex strategy: ladders', authorName: 'HexMaster', keywords: null },
+        { title: 'Bridges and templates', authorName: 'Someone', keywords: 'edge template beginner' },
+        { title: 'Apertura', authorName: 'Mario', keywords: null },
     ];
 
     it('searches in title, author and keywords, case and accent insensitive', () => {
-        assert.deepStrictEqual(filterVideos(videos, { search: 'DEBUTANT', languages: [] }), [videos[0]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: 'ladder', languages: [] }), [videos[1]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: 'dupont', languages: [] }), [videos[0]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: 'hexmaster ladders', languages: [] }), [videos[1]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: 'template beginner', languages: [] }), [videos[2]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: 'template débutant', languages: [] }), []);
-        assert.strictEqual(filterVideos(videos, { search: '  ', languages: [] }).length, 4);
+        assert.deepStrictEqual(filterVideos(videos, { search: 'DEBUTANT' }), [videos[0]]);
+        assert.deepStrictEqual(filterVideos(videos, { search: 'ladder' }), [videos[1]]);
+        assert.deepStrictEqual(filterVideos(videos, { search: 'dupont' }), [videos[0]]);
+        assert.deepStrictEqual(filterVideos(videos, { search: 'hexmaster ladders' }), [videos[1]]);
+        assert.deepStrictEqual(filterVideos(videos, { search: 'template beginner' }), [videos[2]]);
+        assert.deepStrictEqual(filterVideos(videos, { search: 'template débutant' }), []);
+        assert.strictEqual(filterVideos(videos, { search: '  ' }).length, 4);
     });
 
-    it('filters by languages', () => {
-        assert.deepStrictEqual(filterVideos(videos, { search: '', languages: ['fr'] }), [videos[0], videos[2]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: '', languages: ['fr', 'it'] }), [videos[0], videos[2], videos[3]]);
-        assert.deepStrictEqual(filterVideos(videos, { search: 'hex', languages: ['en'] }), [videos[1]]);
+    it('sorts by publication date, or added date', () => {
+        const a = { publishedAt: new Date('2020-01-01'), createdAt: new Date('2026-01-03') };
+        const b = { publishedAt: null, createdAt: new Date('2026-01-01') };
+        const c = { publishedAt: new Date('2024-01-01'), createdAt: new Date('2026-01-02') };
+
+        const d = { publishedAt: null, createdAt: new Date('2026-01-04') };
+
+        assert.deepStrictEqual(sortVideos([a, b, c, d], 'publishedAt'), [c, a, d, b]);
+        assert.deepStrictEqual(sortVideos([a, b, c, d], 'createdAt'), [d, a, c, b]);
     });
 });

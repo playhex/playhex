@@ -12,6 +12,7 @@ export default class VideoRepository
 
     /**
      * Accepted videos, most recently added first.
+     * Client sorts them by publication or added date.
      */
     async findAcceptedForList(): Promise<Video[]>
     {

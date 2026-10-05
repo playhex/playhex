@@ -1,4 +1,4 @@
-import type { VideoMetadata } from '../../../shared/app/videos/videoInput.js';
+import { toVideoPublishedAt, type VideoMetadata } from '../../../shared/app/videos/videoInput.js';
 import { VideoNotFoundError } from './metadataErrors.js';
 import { toKeywords } from './toKeywords.js';
 
@@ -9,6 +9,7 @@ type VimeoOEmbedResponse = {
     author_name: string;
     description?: string;
     duration?: number;
+    upload_date?: string;
     thumbnail_url?: string;
 };
 
@@ -23,7 +24,7 @@ export const isVimeoUrl = (url: string): boolean => {
 };
 
 /**
- * Vimeo oEmbed provides everything but language. Keywords from description.
+ * Vimeo oEmbed provides everything. Keywords from description.
  *
  * @throws {VideoNotFoundError}
  */
@@ -49,7 +50,7 @@ export const fetchVimeoMetadata = async (videoUrl: string): Promise<VideoMetadat
         title: oEmbed.title,
         authorName: oEmbed.author_name,
         durationSeconds: oEmbed.duration ?? null,
-        languages: [],
+        publishedAt: toVideoPublishedAt(oEmbed.upload_date),
         // remove size suffix to get larger image, e.g "https://i.vimeocdn.com/video/xxx-d_295x166"
         thumbnailUrl: oEmbed.thumbnail_url?.replace(/-d_\d+x\d+/, '-d_640x360') ?? null,
         keywords: toKeywords(oEmbed.description),

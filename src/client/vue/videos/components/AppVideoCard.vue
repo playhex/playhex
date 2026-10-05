@@ -1,13 +1,38 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { formatDistanceToNowStrict, intlFormat } from 'date-fns';
 import { autoLocale } from '../../../../shared/app/i18n/index.js';
 import { Video } from '../../../../shared/app/models/index.js';
 import { formatVideoDuration } from '../../../../shared/app/videos/duration.js';
-import AppVideoLanguages from './AppVideoLanguages.vue';
+import type { VideoSort } from '../../../../shared/app/videos/videoSearch.js';
 
-defineProps<{
+const props = defineProps<{
     video: Video;
+
+    /**
+     * Which date to display: publication date, or when it was added to PlayHex.
+     */
+    sort: VideoSort;
 }>();
+
+const displayedDate = computed(() => {
+    const { publishedAt, createdAt } = props.video;
+
+    if (props.sort === 'publishedAt' && publishedAt !== null) {
+        return {
+            date: publishedAt,
+            labelKey: 'videos.published_ago',
+            // publication day stored as UTC midnight, would be previous day in western timezones
+            title: intlFormat(publishedAt, { dateStyle: 'long', timeZone: 'UTC' }, { locale: autoLocale() }),
+        };
+    }
+
+    return {
+        date: createdAt,
+        labelKey: 'videos.added_ago',
+        title: intlFormat(createdAt, { dateStyle: 'long' }, { locale: autoLocale() }),
+    };
+});
 </script>
 
 <template>
@@ -29,9 +54,11 @@ defineProps<{
             <p class="text-body-secondary text-truncate mb-0">{{ video.authorName }}</p>
         </div>
 
-        <div class="card-footer small d-flex flex-wrap justify-content-between column-gap-2 text-body-secondary">
-            <AppVideoLanguages :languages="video.languages" />
-            <span class="text-nowrap" :title="intlFormat(video.createdAt, { dateStyle: 'long' }, { locale: autoLocale() })">{{ $t('videos.added_ago', { date: formatDistanceToNowStrict(video.createdAt, { addSuffix: true }) }) }}</span>
+        <div class="card-footer small text-body-secondary">
+            <span
+                class="text-nowrap"
+                :title="displayedDate.title"
+            >{{ $t(displayedDate.labelKey, { date: formatDistanceToNowStrict(displayedDate.date, { addSuffix: true }) }) }}</span>
         </div>
     </a>
 </template>

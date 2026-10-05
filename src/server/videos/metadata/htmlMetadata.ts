@@ -1,6 +1,5 @@
-import type { VideoMetadata } from '../../../shared/app/videos/videoInput.js';
+import { toVideoPublishedAt, type VideoMetadata } from '../../../shared/app/videos/videoInput.js';
 import { parseIsoDuration } from '../../../shared/app/videos/duration.js';
-import { toVideoLanguage } from '../../../shared/app/videos/videoLanguages.js';
 import { safeFetch, SafeFetchError } from '../safeFetch.js';
 import { VideoMetadataUnavailableError, VideoNotFoundError } from './metadataErrors.js';
 import { toKeywords } from './toKeywords.js';
@@ -115,14 +114,13 @@ export const fetchHtmlMetadata = async (url: string): Promise<VideoMetadata> => 
     const html = response.body.toString('utf8');
     const metas = parseMetaTags(html);
     const meta = (...keys: string[]): undefined | string => keys.map(key => metas.get(key)).find(value => value);
-    const language = toVideoLanguage(meta('og:locale')?.replace('_', '-'));
 
     return {
         url,
         title: meta('og:title', 'twitter:title', 'name') ?? parseTitleTag(html) ?? '',
         authorName: notUrl(meta('author', 'article:author', 'twitter:creator')) ?? '',
         durationSeconds: parseDuration(meta('video:duration', 'og:video:duration', 'duration')),
-        languages: language === null ? [] : [language],
+        publishedAt: toVideoPublishedAt(meta('article:published_time', 'video:release_date', 'uploaddate', 'datepublished', 'date')),
         thumbnailUrl: meta('og:image:secure_url', 'og:image', 'og:image:url', 'twitter:image', 'thumbnailurl') ?? null,
         keywords: toKeywords(meta('keywords', 'news_keywords') ?? meta('og:description', 'description', 'twitter:description')),
     };

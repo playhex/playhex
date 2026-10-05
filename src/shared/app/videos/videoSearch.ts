@@ -11,7 +11,6 @@ type SearchableVideo = {
     title: string;
     authorName: string;
     keywords: null | string;
-    languages: string[];
 };
 
 export type VideoFilters = {
@@ -20,22 +19,12 @@ export type VideoFilters = {
      * Every word must be found.
      */
     search: string;
-
-    /**
-     * Only videos available in at least one of these languages.
-     * Empty for all.
-     */
-    languages: string[];
 };
 
-export const filterVideos = <T extends SearchableVideo>(videos: T[], { search, languages }: VideoFilters): T[] => {
+export const filterVideos = <T extends SearchableVideo>(videos: T[], { search }: VideoFilters): T[] => {
     const words = normalizeSearchText(search).split(/\s+/).filter(word => word !== '');
 
     return videos.filter(video => {
-        if (languages.length > 0 && !video.languages.some(language => languages.includes(language))) {
-            return false;
-        }
-
         if (words.length === 0) {
             return true;
         }
@@ -45,3 +34,28 @@ export const filterVideos = <T extends SearchableVideo>(videos: T[], { search, l
         return words.every(word => haystack.includes(word));
     });
 };
+
+export type VideoSort = 'publishedAt' | 'createdAt';
+
+type SortableVideo = {
+    publishedAt: null | Date;
+    createdAt: Date;
+};
+
+/**
+ * @returns New array, most recent first.
+ *          When sorting by publication date, videos with unknown publication date
+ *          come last, by date added.
+ */
+export const sortVideos = <T extends SortableVideo>(videos: T[], sort: VideoSort): T[] => [...videos]
+    .sort((a, b) => {
+        if (sort === 'publishedAt' && (a.publishedAt === null) !== (b.publishedAt === null)) {
+            return a.publishedAt === null ? 1 : -1;
+        }
+
+        const dateA = (sort === 'publishedAt' ? a.publishedAt : null) ?? a.createdAt;
+        const dateB = (sort === 'publishedAt' ? b.publishedAt : null) ?? b.createdAt;
+
+        return dateB.getTime() - dateA.getTime();
+    })
+;
