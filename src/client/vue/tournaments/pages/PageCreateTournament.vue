@@ -9,6 +9,7 @@ import { useHead } from '@unhead/vue';
 import AppTournamentForm from '../components/AppTournamentForm.vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import useToastsStore from '../../../stores/toastsStore.js';
+import { apiErrorMessage, isContentRestrictedError } from '../../../services/apiErrorMessage.js';
 
 const tournament = ref(createTournamentDefaultsCreate());
 
@@ -62,6 +63,11 @@ const createTournament = async (): Promise<void> => {
                 window.scrollTo(0, 0);
                 return;
             }
+        }
+
+        if (isContentRestrictedError(e)) {
+            useToastsStore().addToast(apiErrorMessage(e), { level: 'danger' });
+            return;
         }
 
         useToastsStore().addToast(

@@ -17,6 +17,7 @@ import AppPuzzleNextLink from './AppPuzzleNextLink.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import { puzzleBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import useAuthStore from '../../../stores/authStore.js';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 const props = defineProps<{
     puzzle: Puzzle;
@@ -68,7 +69,7 @@ const publish = async (): Promise<void> => {
     try {
         published.value = (await apiPublishPuzzle(props.puzzle.publicId)).published;
     } catch (e) {
-        publishError.value = e instanceof Error ? e.message : String(e);
+        publishError.value = apiErrorMessage(e);
     } finally {
         publishing.value = false;
     }

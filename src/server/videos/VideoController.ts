@@ -13,6 +13,7 @@ import VideoThumbnailService, { InvalidThumbnailError } from './VideoThumbnailSe
 import VideoMetadataService from './metadata/VideoMetadataService.js';
 import { VideoMetadataUnavailableError, VideoNotFoundError } from './metadata/metadataErrors.js';
 import logger from '../services/logger.js';
+import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 
 /**
  * Prevent a player to flood moderation queue.
@@ -83,6 +84,7 @@ export default class VideoController
         private videoRepository: VideoRepository,
         private videoThumbnailService: VideoThumbnailService,
         private videoMetadataService: VideoMetadataService,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
     ) {}
 
     @Get('/api/videos')
@@ -100,6 +102,7 @@ export default class VideoController
         @Body({ required: true }) { url }: { url: string },
     ): Promise<VideoMetadata> {
         mustBeAllowedToSubmit(player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
 
         if (typeof url !== 'string' || !isHttpUrl(url.trim())) {
             throw new BadRequestError('Invalid url');
@@ -131,6 +134,7 @@ export default class VideoController
         @Req() req: Request,
     ) {
         mustBeAllowedToSubmit(player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
 
         const body = (req.body ?? {}) as Record<string, unknown>;
         const input = parseMultipartVideoInput(body);

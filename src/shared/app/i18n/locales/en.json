@@ -548,6 +548,7 @@
     },
     "tournament_create": "Create a tournament",
     "tournament_slug_duplicate": "A tournament with the same url name already exists",
+    "content_restricted": "You are not allowed to post content at this time, due to a moderation action.",
     "tournament_format": {
         "single-elimination": "Single elimination",
         "double-elimination": "Double elimination",
@@ -907,6 +908,7 @@
         "title": "Moderation notice",
         "warning_only": "This is a warning.",
         "chat_block_until": "Your chat access has been restricted until {{date}}.",
+        "any_content_block_until": "You cannot post any content (avatar, puzzles, videos, tournaments...) until {{date}}.",
         "reason": "Reason",
         "details": "Details",
         "related_messages": "Related messages",
@@ -918,7 +920,8 @@
     "moderation_reason": {
         "avatar_inappropriate": "Inappropriate avatar",
         "chat_insults": "Insults or inappropriate behavior in chat",
-        "nickname_inappropriate": "Inappropriate nickname"
+        "nickname_inappropriate": "Inappropriate nickname",
+        "content_inappropriate": "Inappropriate content"
     },
     "player_wins_by": {
         "default": "{player} wins!",

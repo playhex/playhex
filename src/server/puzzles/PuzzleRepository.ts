@@ -238,6 +238,33 @@ export default class PuzzleRepository
     }
 
     /**
+     * Last created or updated puzzles, drafts included as they are accessible by their link,
+     * with tree, author and collection. Most recently updated first.
+     */
+    async findLastUpdatedForModeration(limit = 100): Promise<Puzzle[]>
+    {
+        return await this.puzzleRepository.find({
+            relations: { author: true, collection: true },
+            order: { updatedAt: 'DESC', id: 'DESC' },
+            take: limit,
+        });
+    }
+
+    /**
+     * Puts back a puzzle as draft, without changing its updatedAt date.
+     * Also marks its collection as updated, if any and puzzle was visible in it.
+     */
+    async unpublish(puzzle: Puzzle): Promise<void>
+    {
+        await this.puzzleRepository.manager.transaction(async manager => {
+            await touchCollections(manager, puzzle.collection && puzzle.published ? [puzzle.collection] : []);
+            await manager.update(Puzzle, { id: puzzle.id }, { published: false });
+        });
+
+        puzzle.published = false;
+    }
+
+    /**
      * Also marks its collection as updated, if any and puzzle was visible in it.
      */
     async remove(puzzle: Puzzle): Promise<void>

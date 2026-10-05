@@ -34,6 +34,26 @@ export default class VideoRepository
         });
     }
 
+    /**
+     * Last submitted videos, accepted, refused or pending, most recent first, with submitter.
+     */
+    async findLastForModeration(limit = 100): Promise<Video[]>
+    {
+        return await this.videoRepository.find({
+            relations: { submittedBy: true },
+            order: { createdAt: 'DESC' },
+            take: limit,
+        });
+    }
+
+    async findByPublicId(publicId: string): Promise<null | Video>
+    {
+        return await this.videoRepository.findOne({
+            where: { publicId },
+            relations: { submittedBy: true },
+        });
+    }
+
     async save(video: Video): Promise<Video>
     {
         return await this.videoRepository.save(video);

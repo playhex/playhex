@@ -10,6 +10,7 @@ import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isDuplicateError } from '../../../repositories/typeormUtils.js';
 import TournamentSeriesRepository from '../../../repositories/TournamentSeriesRepository.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
+import PlayerModerationActionRepository from '../../../repositories/PlayerModerationActionRepository.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
 import TournamentStore from '../../../store/TournamentStore.js';
 import { TournamentSeriesAutoCreate } from '../../../services/tournament-series-auto-create/TournamentSeriesAutoCreate.js';
@@ -25,6 +26,7 @@ export default class TournamentSeriesController
         private playerRepository: PlayerRepository,
         private tournamentStore: TournamentStore,
         private tournamentSeriesAutoCreate: TournamentSeriesAutoCreate,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
     ) {}
 
     @Get('/api/tournament-series')
@@ -66,6 +68,8 @@ export default class TournamentSeriesController
             transform: { groups: ['tournamentSeries:create'] },
         }) input: TournamentSeries,
     ) {
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(host);
+
         const tournamentSeries = createTournamentSeriesFromCreateInput(input);
 
         tournamentSeries.host = host;
@@ -96,6 +100,7 @@ export default class TournamentSeriesController
         }
 
         mustBeTournamentSeriesHostOrAdmin(tournamentSeries, player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
 
         tournamentSeries.title = edited.title;
         tournamentSeries.slug = edited.slug ? slugifyTournamentName(edited.slug) : slugifyTournamentName(edited.title);

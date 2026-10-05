@@ -39,9 +39,7 @@ export default class PlayerAvatarController
             throw new HttpError(403, 'Guests cannot upload avatars');
         }
 
-        if (await this.playerModerationActionRepository.isCurrentlyAvatarRestricted(publicId)) {
-            throw new HttpError(403, 'You are not allowed to upload an avatar at this time');
-        }
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
 
         const file = req.file;
 

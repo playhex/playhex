@@ -8,6 +8,7 @@ import PuzzleCollectionRepository from './PuzzleCollectionRepository.js';
 import PuzzleRepository from './PuzzleRepository.js';
 import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor } from './puzzleGuards.js';
+import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 
 /**
  * Copies input to collection, then checks it.
@@ -35,6 +36,7 @@ export default class PuzzleCollectionController
     constructor(
         private puzzleCollectionRepository: PuzzleCollectionRepository,
         private puzzleRepository: PuzzleRepository,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
     ) {}
 
     /**
@@ -87,6 +89,8 @@ export default class PuzzleCollectionController
         @AuthenticatedPlayer() player: Player,
         @Body({ required: true }) input: PuzzleCollectionInput,
     ) {
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
+
         const collection = new PuzzleCollection();
 
         collection.publicId = uuidv4();
@@ -108,6 +112,7 @@ export default class PuzzleCollectionController
         const collection = await this.getCollectionOrFail(publicId);
 
         mustBeCollectionAuthor(collection, player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
         applyCollectionInput(collection, input);
 
         await this.puzzleCollectionRepository.save(collection);
@@ -129,6 +134,7 @@ export default class PuzzleCollectionController
         const collection = await this.getCollectionOrFail(publicId);
 
         mustBeCollectionAuthor(collection, player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
 
         if (!Array.isArray(puzzlePublicIds) || puzzlePublicIds.some(id => typeof id !== 'string')) {
             throw new BadRequestError('puzzlePublicIds must be a list of strings');

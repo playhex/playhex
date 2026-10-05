@@ -20,12 +20,20 @@ watch(loggedInPlayer, async player => {
     moderationActions.value = await apiGetPlayerModerationActions(true);
 }, { immediate: true });
 
+/**
+ * Whether this action still restricts something: chat, or posting any content.
+ */
+const isActive = (action: PlayerModerationAction): boolean =>
+    (!!action.chatBlockedUntil && isFuture(action.chatBlockedUntil))
+    || (!!action.anyContentBlockedUntil && isFuture(action.anyContentBlockedUntil))
+;
+
 const activeModerationActions = computed(() => {
     if (moderationActions.value === null) {
         return [];
     }
 
-    return moderationActions.value.filter(a => a.chatBlockedUntil && isFuture(a.chatBlockedUntil));
+    return moderationActions.value.filter(isActive);
 });
 
 const pastModerationActions = computed(() => {
@@ -33,7 +41,7 @@ const pastModerationActions = computed(() => {
         return [];
     }
 
-    return moderationActions.value.filter(a => !a.chatBlockedUntil || !isFuture(a.chatBlockedUntil));
+    return moderationActions.value.filter(a => !isActive(a));
 });
 </script>
 
@@ -55,7 +63,10 @@ const pastModerationActions = computed(() => {
                         class="list-group-item list-group-item-warning"
                     >
                         <div class="d-flex justify-content-between align-items-baseline">
-                            <strong>Chat restricted until {{ format(action.chatBlockedUntil!, 'PPP') }}</strong>
+                            <div>
+                                <strong v-if="action.chatBlockedUntil && isFuture(action.chatBlockedUntil)" class="d-block">Chat restricted until {{ format(action.chatBlockedUntil, 'PPP') }}</strong>
+                                <strong v-if="action.anyContentBlockedUntil && isFuture(action.anyContentBlockedUntil)" class="d-block">Posting content restricted until {{ format(action.anyContentBlockedUntil, 'PPP') }}</strong>
+                            </div>
                             <small class="text-secondary">{{ format(action.createdAt, 'PPP') }}</small>
                         </div>
                         <div v-if="action.reason" class="mt-1">
@@ -99,7 +110,7 @@ const pastModerationActions = computed(() => {
                                 aria-expanded="false"
                                 :aria-controls="'past-action-' + action.publicId"
                             >
-                                <span class="me-auto">{{ action.chatBlockedUntil ? 'Chat restriction' : 'Warning' }}</span>
+                                <span class="me-auto">{{ action.chatBlockedUntil ? 'Chat restriction' : (action.anyContentBlockedUntil ? 'Content restriction' : 'Warning') }}</span>
                                 <small class="text-secondary me-3">{{ format(action.createdAt, 'PPP') }}</small>
                             </button>
                         </h2>

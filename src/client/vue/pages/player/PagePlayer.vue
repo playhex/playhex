@@ -37,6 +37,7 @@ import useToastsStore from '../../../stores/toastsStore.js';
 import { defineOverlay } from '@overlastic/vue';
 import AppAvatarCropOverlay from '../../components/overlay/AppAvatarCropOverlay.vue';
 import AppFlagSelectorOverlay from '../../components/overlay/AppFlagSelectorOverlay.vue';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 const { slug } = useRoute().params;
 
@@ -363,7 +364,7 @@ const onAvatarFileSelected = async (event: Event) => {
             throw e;
         }
 
-        useToastsStore().addToast(e.message, { level: 'danger' });
+        useToastsStore().addToast(apiErrorMessage(e), { level: 'danger' });
     }
 };
 

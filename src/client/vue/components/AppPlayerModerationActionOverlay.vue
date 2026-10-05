@@ -39,12 +39,17 @@ onMounted(() => updateHasMoreBelow());
 
                 <div ref="modalBody" class="modal-body" @scroll="updateHasMoreBelow">
                     <div class="wrapper">
-                        <p v-if="action.chatBlockedUntil === null" class="lead text-warning">
+                        <p v-if="!action.chatBlockedUntil && !action.anyContentBlockedUntil" class="lead text-warning">
                             {{ $t('moderation_action_overlay.warning_only') }}
                         </p>
-                        <p v-else class="lead text-danger">
+                        <p v-if="action.chatBlockedUntil" class="lead text-danger">
                             {{ $t('moderation_action_overlay.chat_block_until', {
                                 date: format(action.chatBlockedUntil, 'PPP'),
+                            }) }}
+                        </p>
+                        <p v-if="action.anyContentBlockedUntil" class="lead text-danger">
+                            {{ $t('moderation_action_overlay.any_content_block_until', {
+                                date: format(action.anyContentBlockedUntil, 'PPP'),
                             }) }}
                         </p>
 

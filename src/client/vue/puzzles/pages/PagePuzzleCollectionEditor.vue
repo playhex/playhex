@@ -11,6 +11,7 @@ import useAuthStore from '../../../stores/authStore.js';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import { puzzleCollectionEditorBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import { IconSave2, IconTrash } from '../../icons.js';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 /*
  * Create a collection (/puzzles/collections/new),
@@ -75,7 +76,7 @@ const withSaving = async (callback: () => Promise<void>): Promise<void> => {
     try {
         await callback();
     } catch (e) {
-        saveError.value = e instanceof Error ? e.message : String(e);
+        saveError.value = apiErrorMessage(e);
     } finally {
         saving.value = false;
     }

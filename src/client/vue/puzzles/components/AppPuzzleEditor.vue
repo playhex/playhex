@@ -11,6 +11,7 @@ import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconPlus, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 const props = defineProps<{
     /**
@@ -148,7 +149,7 @@ const withSaving = async (callback: () => Promise<void>): Promise<void> => {
     try {
         await callback();
     } catch (e) {
-        saveError.value = e instanceof Error ? e.message : String(e);
+        saveError.value = apiErrorMessage(e);
     } finally {
         saving.value = false;
     }

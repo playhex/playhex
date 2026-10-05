@@ -9,8 +9,7 @@ import Player from './Player.js';
  * External link to a video about Hex (youtube or other).
  * Videos are not hosted, nor embedded.
  *
- * Moderation is done directly in database, i.e:
- *      UPDATE video SET accepted = true, moderatedAt = NOW() WHERE id = ...;
+ * Moderated from moderation tool, see AdminModerationController.
  */
 @Entity()
 @Index(keysOf<Video>()('accepted', 'createdAt'))

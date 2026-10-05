@@ -55,13 +55,15 @@ export default class PlayerModerationAction
     chatBlockedUntil: null | Date;
 
     /**
-     * If defined, player cannot upload a new avatar until this date.
+     * If defined, player cannot post any content (text or image) until this date:
+     * upload an avatar, create or edit puzzles, puzzle collections, videos, tournaments, tournament series...
      * Their current avatar is also removed when this is set.
+     * Chat is restricted separately, see chatBlockedUntil.
      */
     @Column({ type: Date, nullable: true })
     @Type(() => Date)
     @Expose({ groups: [GROUP_DEFAULT, 'player_moderation_action'] })
-    avatarBlockedUntil: null | Date;
+    anyContentBlockedUntil: null | Date;
 
     /**
      * If set, the player's nickname has been moderated renamed as part of this action.

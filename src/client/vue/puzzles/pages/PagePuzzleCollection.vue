@@ -15,6 +15,7 @@ import AppPseudo from '../../components/AppPseudo.vue';
 import { puzzleCollectionBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import { getPuzzleTitle } from '../services/puzzleTitle.js';
 import { IconArrowDown, IconArrowUp, IconPencilSquare, IconPlayFill, IconPlus, IconXLg } from '../../icons.js';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 const { publicId } = useRoute().params;
 
@@ -116,7 +117,7 @@ const savePuzzles = async (newPuzzles: Puzzle[], puzzlesChanged: boolean): Promi
 
         return true;
     } catch (e) {
-        saveError.value = e instanceof Error ? e.message : String(e);
+        saveError.value = apiErrorMessage(e);
 
         return false;
     } finally {

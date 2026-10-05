@@ -17,6 +17,7 @@ import ConfirmationOverlay from '../../components/overlay/ConfirmationOverlay.vu
 import { tournamentSeriesBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import { useTournamentSeriesFromUrl } from '../composables/tournamentSeriesFromUrl.js';
 import useToastsStore from '../../../stores/toastsStore.js';
+import { apiErrorMessage, isContentRestrictedError } from '../../../services/apiErrorMessage.js';
 
 const {
     slug,
@@ -113,6 +114,11 @@ const editTournamentSeries = async (): Promise<void> => {
         if (e instanceof DomainHttpError && e.type === 'tournament_series_slug_duplicate') {
             useToastsStore().addToast(t('tournament_series_slug_duplicate'), { level: 'danger' });
             window.scrollTo(0, 0);
+            return;
+        }
+
+        if (isContentRestrictedError(e)) {
+            useToastsStore().addToast(apiErrorMessage(e), { level: 'danger' });
             return;
         }
 

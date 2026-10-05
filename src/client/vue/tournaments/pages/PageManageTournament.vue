@@ -17,6 +17,7 @@ import { useRouter } from 'vue-router';
 import AppPlayerSelectMultiple from '../components/AppPlayerSelectMultiple.vue';
 import ConfirmationOverlay from '../../components/overlay/ConfirmationOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
+import { apiErrorMessage, isContentRestrictedError } from '../../../services/apiErrorMessage.js';
 
 const {
     tournament,
@@ -131,6 +132,11 @@ const editTournament = async () => {
                 window.scrollTo(0, 0);
                 return;
             }
+        }
+
+        if (isContentRestrictedError(e)) {
+            useToastsStore().addToast(apiErrorMessage(e), { level: 'danger' });
+            return;
         }
 
         useToastsStore().addToast(

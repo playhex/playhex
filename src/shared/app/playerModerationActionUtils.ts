@@ -17,7 +17,7 @@ export class PostPlayerModerationAction
 
     @IsOptional()
     @IsDate()
-    avatarBlockedUntil?: Date;
+    anyContentBlockedUntil?: Date;
 
     /**
      * publicIds of chat messages,

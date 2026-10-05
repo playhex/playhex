@@ -10,6 +10,7 @@ import AppVideoLanguageSelector from '../components/AppVideoLanguageSelector.vue
 import { videoSubmitBreadcrumb } from '../services/videoBreadcrumb.js';
 import { formatVideoDuration, parseVideoDuration } from '../../../../shared/app/videos/duration.js';
 import { isHttpUrl, VIDEO_AUTHOR_NAME_MAX_LENGTH, VIDEO_KEYWORDS_MAX_LENGTH, VIDEO_TITLE_MAX_LENGTH, VIDEO_URL_MAX_LENGTH, validateVideoInput, type VideoInput } from '../../../../shared/app/videos/videoInput.js';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 useHead({
     title: t('videos.submit'),
@@ -97,7 +98,7 @@ const prefill = async (): Promise<void> => {
             thumbnailUrl.value = metadata.thumbnailUrl;
         }
     } catch (e) {
-        prefillError.value = e instanceof Error ? e.message : String(e);
+        prefillError.value = apiErrorMessage(e);
     } finally {
         prefilling.value = false;
     }
@@ -164,7 +165,7 @@ const submit = async (): Promise<void> => {
         resetForm();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e) {
-        submitError.value = e instanceof Error ? e.message : String(e);
+        submitError.value = apiErrorMessage(e);
     } finally {
         submitting.value = false;
     }

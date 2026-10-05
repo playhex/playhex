@@ -10,6 +10,7 @@ import { instanceToPlain } from '../../../../shared/app/class-transformer-custom
 import { AccountRequiredTournamentError, GamePlayerNotFoundTournamentError, NotEnoughParticipantsToStartTournamentError, PlayerIsBannedTournamentError, TooDeepResetError, TournamentError } from '../../../tournaments/TournamentError.js';
 import logger from '../../../services/logger.js';
 import TournamentRepository from '../../../repositories/TournamentRepository.js';
+import PlayerModerationActionRepository from '../../../repositories/PlayerModerationActionRepository.js';
 import TournamentSeriesRepository from '../../../repositories/TournamentSeriesRepository.js';
 import { TournamentListItemDto } from '../../../../shared/app/models/TournamentListItemDto.js';
 import { TournamentBanManager } from '../../../tournaments/services/TournamentBanManager.js';
@@ -24,6 +25,7 @@ export default class TournamentController
         private tournamentSeriesRepository: TournamentSeriesRepository,
         private playerRepository: PlayerRepository,
         private tournamentBanManager: TournamentBanManager,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
     ) {}
 
     /**
@@ -72,6 +74,8 @@ export default class TournamentController
             transform: { groups: ['tournament:create'] },
         }) tournament: Tournament,
     ) {
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(organizer);
+
         let series: null | TournamentSeries = null;
 
         if (tournament.seriesPublicId) {
@@ -114,6 +118,7 @@ export default class TournamentController
         }
 
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
 
         try {
             return await activeTournament.editTournament(edited);

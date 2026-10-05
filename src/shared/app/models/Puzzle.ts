@@ -144,4 +144,13 @@ export default class Puzzle
     @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
     @Type(() => Date)
     createdAt: Date;
+    /**
+     * Last time author changed puzzle content (title, description, tree...) or published it.
+     * Used by moderation to review puzzles again when they changed.
+     * Not updated when puzzle only moves in a collection, nor when unpublished by moderation.
+     */
+    @Column({ type: Date, default: () => 'current_timestamp()' })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    @Type(() => Date)
+    updatedAt: Date;
 }

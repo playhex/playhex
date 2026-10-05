@@ -11,6 +11,7 @@ import AppTournamentSeriesForm from '../components/AppTournamentSeriesForm.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import { tournamentSeriesListBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import useToastsStore from '../../../stores/toastsStore.js';
+import { apiErrorMessage, isContentRestrictedError } from '../../../services/apiErrorMessage.js';
 
 const tournamentSeries = ref(createTournamentSeriesDefaultsCreate());
 
@@ -45,6 +46,11 @@ const createTournamentSeries = async (): Promise<void> => {
         if (e instanceof DomainHttpError && e.type === 'tournament_series_slug_duplicate') {
             useToastsStore().addToast(t('tournament_series_slug_duplicate'), { level: 'danger' });
             window.scrollTo(0, 0);
+            return;
+        }
+
+        if (isContentRestrictedError(e)) {
+            useToastsStore().addToast(apiErrorMessage(e), { level: 'danger' });
             return;
         }
 

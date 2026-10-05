@@ -12,8 +12,11 @@ import type AbstractChatMessage from '../../../../shared/app/models/AbstractChat
 import ChannelChatMessageRepository from '../../../repositories/ChannelChatMessageRepository.js';
 import PlayerIpService from '../../../services/PlayerIpService.js';
 import BannedIpService from '../../../services/BannedIpService.js';
-import { IsDateString, IsOptional } from 'class-validator';
+import { IsBoolean, IsDateString, IsOptional } from 'class-validator';
 import ModerationSettingRepository from '../../../repositories/ModerationSettingRepository.js';
+import VideoRepository from '../../../videos/VideoRepository.js';
+import PuzzleRepository from '../../../puzzles/PuzzleRepository.js';
+import { serializePuzzleData } from '../../../puzzles/puzzleSerializer.js';
 
 type MessageFromAnySource =
     { message: AbstractChatMessage, source: 'game', data: Game }
@@ -23,7 +26,7 @@ type MessageFromAnySource =
 /**
  * Tabs of the moderation interface which can be marked as seen.
  */
-const SEEN_TABS = ['messages', 'players', 'avatars'] as const;
+const SEEN_TABS = ['messages', 'players', 'avatars', 'videos', 'puzzles'] as const;
 
 type SeenTab = typeof SEEN_TABS[number];
 
@@ -44,6 +47,15 @@ class PostSeenInput
     date?: string;
 }
 
+class PostModerateVideoInput
+{
+    /**
+     * true to list video, false to refuse it.
+     */
+    @IsBoolean()
+    accepted: boolean;
+}
+
 @JsonController()
 @Service()
 @Authorized(ROLE_MODERATOR)
@@ -59,6 +71,8 @@ export default class AdminModerationController
         private playerIpService: PlayerIpService,
         private bannedIpService: BannedIpService,
         private moderationSettingRepository: ModerationSettingRepository,
+        private videoRepository: VideoRepository,
+        private puzzleRepository: PuzzleRepository,
     ) {}
 
     /**
@@ -232,6 +246,70 @@ export default class AdminModerationController
         const players = await this.playerRepository.getLastAvatarUploads(100);
 
         return instanceToPlain(players, { groups: [GROUP_DEFAULT, 'moderation'] });
+    }
+
+    /**
+     * Last submitted videos, pending, accepted or refused.
+     */
+    @Get('/api/admin/moderation/videos')
+    async getLastVideos()
+    {
+        const videos = await this.videoRepository.findLastForModeration(100);
+
+        return instanceToPlain(videos, { groups: [GROUP_DEFAULT, 'video', 'moderation'] });
+    }
+
+    /**
+     * Accept (list it) or refuse a video.
+     */
+    @Post('/api/admin/moderation/videos/:publicId/moderate')
+    async postModerateVideo(
+        @Param('publicId') publicId: string,
+        @Body() { accepted }: PostModerateVideoInput,
+    ) {
+        if (typeof accepted !== 'boolean') {
+            throw new BadRequestError('Expected "accepted" to be a boolean');
+        }
+
+        const video = await this.videoRepository.findByPublicId(publicId);
+
+        if (video === null) {
+            throw new NotFoundError(`Video "${publicId}" not found`);
+        }
+
+        video.accepted = accepted;
+        video.moderatedAt = new Date();
+
+        await this.videoRepository.save(video);
+
+        return instanceToPlain(video, { groups: [GROUP_DEFAULT, 'video', 'moderation'] });
+    }
+
+    /**
+     * Last created or updated puzzles, drafts included, with their whole tree to review all messages.
+     */
+    @Get('/api/admin/moderation/puzzles')
+    async getLastPuzzles()
+    {
+        return serializePuzzleData(await this.puzzleRepository.findLastUpdatedForModeration(100));
+    }
+
+    /**
+     * Puts back a puzzle as draft: no longer listed, but author can still edit and publish it again.
+     */
+    @Post('/api/admin/moderation/puzzles/:publicId/unpublish')
+    async postUnpublishPuzzle(
+        @Param('publicId') publicId: string,
+    ) {
+        const puzzle = await this.puzzleRepository.findPuzzleByPublicId(publicId);
+
+        if (puzzle === null) {
+            throw new NotFoundError(`Puzzle "${publicId}" not found`);
+        }
+
+        await this.puzzleRepository.unpublish(puzzle);
+
+        return { publicId, published: false };
     }
 
     @Delete('/api/admin/moderation/chat-messages/:publicId')

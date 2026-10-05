@@ -2,6 +2,7 @@ import { Inject, Service } from 'typedi';
 import { IsNull, MoreThan, Repository } from 'typeorm';
 import { Player, PlayerModerationAction } from '../../shared/app/models/index.js';
 import { PostPlayerModerationAction } from '../../shared/app/playerModerationActionUtils.js';
+import { DomainHttpError } from '../../shared/app/DomainHttpError.js';
 
 export { PostPlayerModerationAction };
 
@@ -95,11 +96,24 @@ export default class PlayerModerationActionRepository
         });
     }
 
-    async isCurrentlyAvatarRestricted(playerPublicId: string): Promise<boolean>
+    /**
+     * Whether player is currently not allowed to post any content (avatar, puzzles, videos, tournaments...)
+     */
+    async isCurrentlyContentRestricted(playerPublicId: string): Promise<boolean>
     {
         return await this.playerModerationActionRepository.existsBy({
             player: { publicId: playerPublicId },
-            avatarBlockedUntil: MoreThan(new Date()),
+            anyContentBlockedUntil: MoreThan(new Date()),
         });
+    }
+
+    /**
+     * @throws {DomainHttpError} If player is currently not allowed to post any content
+     */
+    async mustNotBeContentRestricted(player: Player): Promise<void>
+    {
+        if (await this.isCurrentlyContentRestricted(player.publicId)) {
+            throw new DomainHttpError(403, 'content_restricted', 'You are not allowed to post content at this time');
+        }
     }
 }

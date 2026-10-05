@@ -11,6 +11,7 @@ import PuzzleRepository from './PuzzleRepository.js';
 import PuzzleCollectionRepository from './PuzzleCollectionRepository.js';
 import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor, mustBePuzzleAuthor } from './puzzleGuards.js';
+import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 
 /**
  * Publishes or unpublishes puzzle.
@@ -77,6 +78,7 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     puzzle.playerColor = input.playerColor;
     puzzle.tree = input.tree;
     setPublished(puzzle, input.published === true);
+    puzzle.updatedAt = new Date();
     mustBeSavable(puzzle);
 };
 
@@ -93,6 +95,7 @@ export default class PuzzleController
         private puzzleRepository: PuzzleRepository,
         private puzzleCollectionRepository: PuzzleCollectionRepository,
         private gameStore: GameStore,
+        private playerModerationActionRepository: PlayerModerationActionRepository,
     ) {}
 
     /**
@@ -192,6 +195,8 @@ export default class PuzzleController
         @AuthenticatedPlayer() player: Player,
         @Body(BODY_OPTIONS) input: PuzzleInput,
     ) {
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
+
         const puzzle = new Puzzle();
 
         puzzle.publicId = uuidv4();
@@ -235,8 +240,10 @@ export default class PuzzleController
         const puzzle = await this.getPuzzleOrFail(publicId);
 
         mustBePuzzleAuthor(puzzle, player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
         const previous: PuzzleCollectionState = { collection: puzzle.collection, published: puzzle.published };
         setPublished(puzzle, true);
+        puzzle.updatedAt = new Date();
         mustBeSavable(puzzle);
 
         await this.puzzleRepository.save(puzzle, collectionsVisiblyUpdated(puzzle, previous));
@@ -253,6 +260,7 @@ export default class PuzzleController
         const puzzle = await this.getPuzzleOrFail(publicId);
 
         mustBePuzzleAuthor(puzzle, player);
+        await this.playerModerationActionRepository.mustNotBeContentRestricted(player);
         const previous: PuzzleCollectionState = { collection: puzzle.collection, published: puzzle.published };
         applyPuzzleInput(puzzle, input);
         await this.applyCollectionInput(puzzle, player, input);

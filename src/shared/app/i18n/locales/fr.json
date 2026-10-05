@@ -314,6 +314,7 @@
     },
     "tournament_create": "Créer un tournoi",
     "tournament_slug_duplicate": "Un tournoi avec le même nom d'url existe déjà",
+    "content_restricted": "Vous ne pouvez pas publier de contenu pour le moment, suite à une action de modération.",
     "tournament_format": {
         "single-elimination": "Élimination directe",
         "double-elimination": "Double élimination",
@@ -896,6 +897,7 @@
         "title": "Avis de modération",
         "warning_only": "Ceci est un avertissement.",
         "chat_block_until": "Votre accès au chat est restreint jusqu'au {{date}}.",
+        "any_content_block_until": "Vous ne pouvez plus publier de contenu (avatar, puzzles, vidéos, tournois...) jusqu'au {{date}}.",
         "reason": "Raison",
         "details": "Détails",
         "related_messages": "Messages concernés",
@@ -907,7 +909,8 @@
     "moderation_reason": {
         "chat_insults": "Insultes ou comportement inapproprié dans le chat",
         "avatar_inappropriate": "Avatar inapproprié",
-        "nickname_inappropriate": "Pseudo inapproprié"
+        "nickname_inappropriate": "Pseudo inapproprié",
+        "content_inappropriate": "Contenu inapproprié"
     },
     "allow_exploration": "Autoriser l’exploration",
     "allow_exploration_help": "Permet d’essayer des variantes en jouant les deux couleurs avant de soumettre un coup. Si désactivé, les coups conditionnels sont également désactivés.",

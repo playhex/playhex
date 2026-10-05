@@ -18,6 +18,7 @@ const MODERATION_REASONS: Record<string, string> = {
     'moderation_reason.chat_insults': 'Insults or inappropriate behavior in chat',
     'moderation_reason.avatar_inappropriate': 'Inappropriate avatar image',
     'moderation_reason.nickname_inappropriate': 'Inappropriate nickname',
+    'moderation_reason.content_inappropriate': 'Inappropriate content',
 };
 
 @Service()
@@ -65,7 +66,7 @@ export default class ModerationService
         action.reason = post.reason ?? null;
         action.reasonDetails = post.reasonDetails ?? null;
         action.chatBlockedUntil = post.chatBlockedUntil ?? null;
-        action.avatarBlockedUntil = post.avatarBlockedUntil ?? null;
+        action.anyContentBlockedUntil = post.anyContentBlockedUntil ?? null;
         action.nicknameModerated = post.moderateNickname ?? null;
         action.ipBannedUntil = post.ipBannedUntil ?? null;
         action.acknowledgedAt = null;
@@ -92,7 +93,8 @@ export default class ModerationService
             await this.banPlayerIps(player, action);
         }
 
-        if (action.avatarBlockedUntil) {
+        // Player cannot post any content, so also remove their current avatar
+        if (action.anyContentBlockedUntil) {
             await this.playerAvatarService.deleteAvatar(player.avatarPath, player.avatarThumbnailPath).catch(reason => {
                 logger.notice('Error while deleting moderated avatar', { reason });
             });
