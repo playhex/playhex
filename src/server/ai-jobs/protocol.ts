@@ -178,6 +178,21 @@ export type AnalyzeMoveOutput = {
     bestMoves: MoveAndValue[];
 };
 
+export type AnalyzeGameInput = {
+    size: number;
+
+    /**
+     * All moves of the game, like "f6 g7 d4", or "g5 swap-pieces g4 pass".
+     */
+    movesHistory: string;
+};
+
+/**
+ * Analyze of each move of the game, in moves order.
+ * Swap move, as second move, is not analyzed: it is deduced from third move analyze.
+ */
+export type AnalyzeGameOutput = AnalyzeMoveOutput[];
+
 export type AnalyzePositionInput = {
     color: 'black' | 'white';
     size: number;
@@ -223,10 +238,12 @@ type AiJobTypeDefinitions = {
     'katahex-intuition-analyze-position': { input: AnalyzePositionInput, output: AnalyzePositionOutput };
 
     /**
-     * Analyze of a move of a game, from raw neural network output.
-     * A game analyze is split in one job per move.
+     * Analyze of all moves of a game, from raw neural network output.
+     * Worker evaluates all positions of the game in batches.
+     * whiteWin of played move is set only for last move (else it is the whiteWin before next move),
+     * whiteWin of best move is set when it is not the played move.
      */
-    'katahex-intuition-analyze-move': { input: AnalyzeMoveInput, output: AnalyzeMoveOutput };
+    'katahex-intuition-analyze-game': { input: AnalyzeGameInput, output: AnalyzeGameOutput };
 
     /**
      * Same as katahex-intuition-analyze-position, with tree search.
@@ -235,7 +252,7 @@ type AiJobTypeDefinitions = {
     'katahex-mcts-analyze-position': { input: MctsAnalyzePositionInput, output: AnalyzePositionOutput };
 
     /**
-     * Same as katahex-intuition-analyze-move, with tree search.
+     * Analyze of a single move of a game, with tree search.
      * whiteWin of played move and all best moves are always set.
      */
     'katahex-mcts-analyze-move': { input: MctsAnalyzeMoveInput, output: AnalyzeMoveOutput };
@@ -256,7 +273,7 @@ export const AI_JOB_TYPES = [
     'davies',
     'katahex-intuition-analyze-position',
     'katahex-mcts-analyze-position',
-    'katahex-intuition-analyze-move',
+    'katahex-intuition-analyze-game',
     'katahex-mcts-analyze-move',
 ] as const satisfies readonly AiJobType[];
 

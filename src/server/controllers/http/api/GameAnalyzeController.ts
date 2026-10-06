@@ -81,7 +81,7 @@ export default class GameAnalyzeController
             return gameAnalyze;
         }
 
-        if (!this.aiJobService.isJobTypeAvailable('katahex-intuition-analyze-move')) {
+        if (!this.aiJobService.isJobTypeAvailable('katahex-intuition-analyze-game')) {
             throw new HttpError(503, 'No AI worker can analyze games right now');
         }
 
@@ -99,11 +99,7 @@ export default class GameAnalyzeController
         this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
 
         (async () => {
-            gameAnalyze.analyze = await this.aiJobService.analyzeGame(analyzeGameRequest, partialAnalyze => {
-                // Partial analyze only sent to players, persisted once finished
-                gameAnalyze.analyze = partialAnalyze;
-                this.io.to(Rooms.game(publicId)).emit('analyze', publicId, gameAnalyze);
-            });
+            gameAnalyze.analyze = await this.aiJobService.analyzeGame(analyzeGameRequest);
             gameAnalyze.endedAt = new Date();
 
             await this.gameAnalyzeRepository.persist(publicId, gameAnalyze);

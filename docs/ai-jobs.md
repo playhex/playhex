@@ -22,7 +22,7 @@ flowchart LR
         q4["davies"]
         q5["katahex-intuition-analyze-position"]
         q7["katahex-mcts-analyze-position"]
-        q6["katahex-intuition-analyze-move"]
+        q6["katahex-intuition-analyze-game"]
         q8["katahex-mcts-analyze-move"]
     end
 
@@ -62,7 +62,7 @@ flowchart LR
 | `mohex`, `maxGames`               | `mohex`                              | `MohexMoveInput`               | `mohex`       | `playhex/worker-mohex`   |
 | `davies`, `level`                 | `davies`                             | `DaviesMoveInput`              | `davies`      | `playhex/worker-davies`  |
 | (Hexplorer, intuition)            | `katahex-intuition-analyze-position` | `AnalyzePositionInput`         | `katahex`     | `playhex/worker-katahex` |
-| (Game analyze, one job per move)  | `katahex-intuition-analyze-move`     | `AnalyzeMoveInput`             | `katahex`     | `playhex/worker-katahex` |
+| (Game analyze)                    | `katahex-intuition-analyze-game`     | `AnalyzeGameInput`             | `katahex`     | `playhex/worker-katahex` |
 | (Hexplorer, MCTS)                 | `katahex-mcts-analyze-position`      | `MctsAnalyzePositionInput`     | `katahex`     | `playhex/worker-katahex` |
 | (Deep analyze of a single move)   | `katahex-mcts-analyze-move`          | `MctsAnalyzeMoveInput`         | `katahex`     | `playhex/worker-katahex` |
 | `random`                          | none, computed by server             |                                |               |                          |
@@ -71,7 +71,7 @@ flowchart LR
 - **Job type**: kind of task, and name of its queue (`AI_JOB_TYPES` in protocol). Determines the engine.
   Bot to job type: `getBotJobType()` in `botTasks.ts`.
 - **Task**: `{ type: <job type>, data: <input> }`, what is sent to the worker.
-- **Job**: a task in a queue, with a `jobId`, `meta` (i.e `analyzeId` for game analyzes) and `expiresAt`.
+- **Job**: a task in a queue, with a `jobId`, `meta` and `expiresAt`.
 - **Worker**: a process pulling jobs. Identified by `workerId` (random uuid on start), authenticated by a key (`PlayerAiWorkerKey`).
   A key can be used by multiple workers. Processes default job types of its engine, or the ones listed in `AI_JOB_TYPES` env var.
 - **Opt-in job types**: `katahex-mcts-*` (`OPT_IN_AI_JOB_TYPES` in protocol), require more computing power.
@@ -143,17 +143,19 @@ used to know which AIs and Hexplorer engines are available (`/api/ai-availabilit
 
 ```mermaid
 flowchart LR
-    game["Game, N moves"] -- "splitToAnalyzeMoveInputs()" --> jobs["N jobs<br>katahex-intuition-analyze-move<br>meta: analyzeId"]
-    jobs --> workers["katahex workers,<br>in parallel"]
-    workers -- "each result" --> progress["consolidateGameAnalyze()<br>emit websocket 'analyze' (partial)"]
-    progress -- "all moves done" --> db["GameAnalyze saved in database"]
+    game["Game, N moves"] --> job["1 job<br>katahex-intuition-analyze-game"]
+    job --> worker["katahex worker"]
+    worker -- "N move analyzes" --> consolidate["consolidateGameAnalyze()"]
+    consolidate --> db["GameAnalyze saved in database<br>emit websocket 'analyze'"]
 ```
 
-Partial results are kept in memory only: if server restarts, the analyze is marked as errored and can be requested again.
+The worker evaluates all positions of the game in one batched call to katahex (`kata-raw-nn-batch`),
+then positions after best moves that were not played in a second batched call.
+It returns one analyze per move, in the order of `splitToAnalyzeMoveInputs()` (swap move excluded, deduced from third move).
 
-Moves not taken by a worker within 1h fail (null in analyze).
-10 minutes later, the analyze ends anyway with moves analyzed so far,
-in case a move job is still waiting in queue with no worker left to take it.
+The pending analyze is kept in memory only: if server restarts, the analyze is marked as errored and can be requested again.
+
+If no worker processed the game analyze within 70 minutes, the analyze fails.
 
 ## Deep analyze of a move
 

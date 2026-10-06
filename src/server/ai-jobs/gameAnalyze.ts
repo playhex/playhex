@@ -1,15 +1,8 @@
 import { isSpecialHexMove, mirrorMove, type Move } from '@playhex/move-notation';
 import type { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
-import type { AnalyzeMoveInput, AnalyzeMoveOutput, MoveAndValue } from './protocol.js';
+import type { AnalyzeGameInput, AnalyzeMoveInput, AnalyzeMoveOutput, MoveAndValue } from './protocol.js';
 
-export type AnalyzeGameRequest = {
-    size: number;
-
-    /**
-     * Like "f6 g7 d4", or "g5 swap-pieces g4 pass".
-     */
-    movesHistory: string;
-};
+export type AnalyzeGameRequest = AnalyzeGameInput;
 
 export const hasSwapMove = ({ movesHistory }: AnalyzeGameRequest): boolean =>
     movesHistory.split(' ')[1] === 'swap-pieces'
@@ -29,7 +22,7 @@ const toAnalyzeMoveInput = (size: number, moves: string[], moveIndex: number): A
 });
 
 /**
- * Split a game to analyze in one task per move, to parallelize them.
+ * Moves of a game to analyze, i.e expected moves in a game analyze result.
  * Swap move is not analyzed, it is deduced from third move analyze, see addSwapMoveAnalyze().
  */
 export const splitToAnalyzeMoveInputs = ({ size, movesHistory }: AnalyzeGameRequest): AnalyzeMoveInput[] => {

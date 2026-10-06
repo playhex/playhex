@@ -12,7 +12,7 @@ describe('protocol', () => {
         assert.deepStrictEqual(getEngineDefaultAiJobTypes('katahex'), [
             'katahex-intuition-move',
             'katahex-intuition-analyze-position',
-            'katahex-intuition-analyze-move',
+            'katahex-intuition-analyze-game',
         ]);
 
         assert.ok(getEngineAiJobTypes('katahex').includes('katahex-mcts-move'));

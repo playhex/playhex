@@ -9,7 +9,7 @@ import type { AiTask } from '../../ai-jobs/protocol.js';
 
 const LOCK_MS = 600;
 
-const ANALYZE_MOVE = 'katahex-intuition-analyze-move';
+const ANALYZE_MOVE = 'katahex-mcts-analyze-move';
 const KATAHEX_MOVE = 'katahex-intuition-move';
 
 const task = (moveIndex = 0): AiTask => ({
@@ -21,6 +21,7 @@ const task = (moveIndex = 0): AiTask => ({
         isLastMoveOfGame: false,
         movesHistory: '',
         size: 11,
+        maxPlayouts: 10,
     },
 });
 

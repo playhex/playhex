@@ -1,6 +1,7 @@
 import { isMoveValid, isSpecialHexMove, parseMove } from '@playhex/move-notation';
 import { EngineGame } from '../../../shared/game-engine/index.js';
-import type { AiTask, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, GameInput, MoveAndValue, MoveOutput } from '../protocol.js';
+import { splitToAnalyzeMoveInputs } from '../gameAnalyze.js';
+import type { AiTask, AnalyzeGameInput, AnalyzeGameOutput, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, GameInput, MoveAndValue, MoveOutput } from '../protocol.js';
 
 /**
  * Results come from remote workers, which may be buggy or malicious.
@@ -107,6 +108,18 @@ const validateAnalyzeMove = (input: AnalyzeMoveInput, result: unknown): AnalyzeM
     return result as AnalyzeMoveOutput;
 };
 
+/**
+ * Worker must return analyze of each move of the game, in same order as splitToAnalyzeMoveInputs().
+ */
+const validateAnalyzeGame = (input: AnalyzeGameInput, result: unknown): AnalyzeGameOutput => {
+    const moveInputs = splitToAnalyzeMoveInputs(input);
+
+    assert(Array.isArray(result), 'Result must be an array');
+    assert(result.length === moveInputs.length, `Result must contain ${moveInputs.length} analyzed moves, got ${result.length}`);
+
+    return moveInputs.map((moveInput, i) => validateAnalyzeMove(moveInput, result[i]));
+};
+
 const validateAnalyzePosition = (input: AnalyzePositionInput, result: unknown): AnalyzePositionOutput => {
     assert(isObject(result), 'Result must be an object');
     assert(isWinRate(result.whiteWin), 'whiteWin must be a number in [0, 1]');
@@ -132,9 +145,11 @@ export const validateAiResult = (task: AiTask, result: unknown): unknown => {
         case 'davies':
             return validateMove(task.data.game, result);
 
-        case 'katahex-intuition-analyze-move':
         case 'katahex-mcts-analyze-move':
             return validateAnalyzeMove(task.data, result);
+
+        case 'katahex-intuition-analyze-game':
+            return validateAnalyzeGame(task.data, result);
 
         case 'katahex-intuition-analyze-position':
         case 'katahex-mcts-analyze-position':

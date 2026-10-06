@@ -87,7 +87,7 @@ services:
             # hex server runs on host, not in docker
             HEX_URL: http://host.docker.internal:${PORT:-3000}
             AI_WORKER_KEY: "XXX"
-            AI_JOB_TYPES: "katahex-intuition-move,katahex-mcts-move,katahex-intuition-analyze-position,katahex-mcts-analyze-position,katahex-intuition-analyze-move,katahex-mcts-analyze-move"
+            AI_JOB_TYPES: "katahex-intuition-move,katahex-mcts-move,katahex-intuition-analyze-position,katahex-mcts-analyze-position,katahex-intuition-analyze-game,katahex-mcts-analyze-move"
         extra_hosts:
             - "host.docker.internal:host-gateway"
         restart: unless-stopped
