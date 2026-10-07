@@ -35,7 +35,7 @@ hexProgram
             label: 'Katahex 400',
             description: 'max 400 simulations',
             order: 31,
-            boardsizeMin: 2,
+            boardsizeMin: 5,
             boardsizeMax: 32,
             pseudo: 'Katahex 400',
             slug: 'katahex-400',
