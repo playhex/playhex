@@ -11,7 +11,8 @@ import AppLocalDisplayModeSelect from './AppLocalDisplayModeSelect.vue';
 import AppLocalGameExport from './AppLocalGameExport.vue';
 import { localBoardDisplay } from '../services/localBoardDisplay.js';
 import { EngineGame } from '../../../../shared/game-engine/index.js';
-import { IconAlphabet, IconArrowDownUp, IconArrowLeft, IconArrowClockwise, IconRewind } from '../../icons.js';
+import { LocalPlayerActions, Seat } from '../models/Local1v1Game.js';
+import { IconAlphabet, IconArrowCounterclockwise, IconArrowDownUp, IconArrowLeft, IconArrowClockwise, IconFlag, IconRewind } from '../../icons.js';
 
 /**
  * Options for next game, edited from this menu.
@@ -40,6 +41,22 @@ const props = defineProps({
     },
 
     /**
+     * Players actions, top player first.
+     */
+    players: {
+        type: Array as PropType<LocalPlayerActions[]>,
+        required: true,
+    },
+
+    /**
+     * Game is finished, show rematch button.
+     */
+    canRematch: {
+        type: Boolean,
+        default: false,
+    },
+
+    /**
      * Current board orientation, used for HexWorld and Hexplorer links.
      */
     orientation: {
@@ -55,6 +72,10 @@ const emit = defineEmits<{
     restart: [];
     toggleCoords: [];
     simulation: [];
+    undo: [seat: Seat];
+    pass: [seat: Seat];
+    resign: [seat: Seat];
+    rematch: [];
 }>();
 
 const tabletopModel = computed({
@@ -104,7 +125,30 @@ onUnmounted(() => document.removeEventListener('fullscreenchange', refreshFullsc
             <button type="button" class="btn-close" @click="emit('close')"></button>
         </div>
         <div class="offcanvas-body">
-            <div class="mb-4">
+            <div v-if="canRematch" class="d-grid mb-3">
+                <button type="button" class="btn btn-success" @click="emit('rematch')">{{ $t('rematch.label') }}</button>
+            </div>
+
+            <div v-for="player in players" :key="player.seat" class="mb-3">
+                <h6 class="player-name">
+                    <span class="stone" :class="0 === player.playerIndex ? 'bg-danger' : 'bg-primary'"></span>
+                    <span class="text-truncate">{{ player.name }}</span>
+                </h6>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-warning" :disabled="!player.canUndo" @click="emit('undo', player.seat)">
+                        <IconArrowCounterclockwise /> {{ $t('undo.undo_move') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary" :disabled="!player.canPass" @click="emit('pass', player.seat)">
+                        {{ $t('pass') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" :disabled="!player.canResign" @click="emit('resign', player.seat)">
+                        <IconFlag /> {{ $t('resign') }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="border-top pt-3 mb-4">
                 <AppLocalDisplayModeSelect v-model="tabletopModel" class="mb-3" />
 
                 <div v-if="fullscreenAvailable" class="form-check form-switch">
@@ -206,6 +250,18 @@ onUnmounted(() => document.removeEventListener('fullscreenchange', refreshFullsc
 <style lang="stylus" scoped>
 .local-1v1-menu
     visibility visible
+
+.player-name
+    display flex
+    align-items center
+    gap 0.5em
+    font-weight bold
+
+.stone
+    flex-shrink 0
+    width 1em
+    height 1em
+    border-radius 50%
 
 .local-choice-card
     display flex

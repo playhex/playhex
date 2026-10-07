@@ -13,13 +13,14 @@ import AppLocalPlayerBar from '../components/AppLocalPlayerBar.vue';
 import AppLocal1v1Menu from '../components/AppLocal1v1Menu.vue';
 import AppLocalSimulationControls from '../components/AppLocalSimulationControls.vue';
 import { bindLocalBoardDisplay, toggleLocalCoords } from '../services/localBoardDisplay.js';
-import { Local1v1Game, Seat } from '../models/Local1v1Game.js';
+import { Local1v1Game, LocalPlayerActions, Seat } from '../models/Local1v1Game.js';
 import { Local1v1GameOptions } from '../models/Local1v1GameOptions.js';
 import { offlineGamesStorage } from '../services/OfflineGamesStorage.js';
 import { listenLocalGameSounds, playLocalGameSound } from '../services/localGameSounds.js';
 import { LocalClock } from '../services/LocalClock.js';
 import useAppLayoutStore from '../../../stores/appLayoutStore.js';
-import { IconList, IconPlayFill } from '../../icons.js';
+import { useGameViewOrientation } from '../../composables/useGameViewOrientation.js';
+import { IconArrowCounterclockwise, IconList, IconPlayFill } from '../../icons.js';
 
 useHead({
     title: t('local_play.with_friend'),
@@ -67,6 +68,56 @@ const pseudosByColor = (local: Local1v1Game): [string, string] => [
 const defaultNames = (): [string, string] => offlineGamesStorage.getLastLocal1v1Names()
     ?? [t('local_play.player_n', { n: 1 }), t('local_play.player_n', { n: 2 })]
 ;
+
+/*
+ * Players names and chronos over board corners
+ */
+const orientation = useGameViewOrientation(gameView);
+
+/**
+ * Orientations where red sides are on left and bottom,
+ * same as AppBoard.
+ */
+const RED_BOTTOM_ORIENTATIONS = [0, 1, 6, 7];
+const BLUE_BOTTOM_ORIENTATIONS = [3, 4, 9, 10];
+
+type BarLayout = {
+    corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+    alignRight: boolean;
+    bottom: boolean;
+};
+
+/**
+ * Red on left, blue on right, on top or bottom depending on board orientation.
+ * In tabletop mode, each player has their name in a bottom corner from their point of view,
+ * the one not covered by board.
+ */
+const barLayout = (seat: Seat): BarLayout => {
+    if (tabletop.value) {
+        // Board is symmetric: if bottom right corner is free, top left is free too
+        const right = BLUE_BOTTOM_ORIENTATIONS.includes(orientation.value ?? -1);
+
+        // Flipped player has same layout, in opposite corner
+        return {
+            corner: seat === 0
+                ? (right ? 'bottom-right' : 'bottom-left')
+                : (right ? 'top-left' : 'top-right'),
+            alignRight: right,
+            bottom: true,
+        };
+    }
+
+    const color = colorOfSeat(seat);
+    const bottom = (color === 0 ? RED_BOTTOM_ORIENTATIONS : BLUE_BOTTOM_ORIENTATIONS)
+        .includes(orientation.value ?? -1)
+    ;
+
+    return {
+        corner: `${bottom ? 'bottom' : 'top'}-${color === 0 ? 'left' : 'right'}`,
+        alignRight: color === 1,
+        bottom,
+    };
+};
 
 /*
  * Header is hidden in tabletop mode
@@ -300,6 +351,8 @@ const rematch = (): void => {
         return;
     }
 
+    closeMenu();
+
     // Game lost on time but not finished on board: keep it in history anyway
     if (game.value && !game.value.isEnded() && localGame.value.timeoutLoser !== null) {
         addToHistory(localGame.value, game.value);
@@ -393,10 +446,10 @@ const clockState = computed(() => clock.value?.values.value?.state ?? null);
 const isPaused = computed(() => clockState.value === 'paused');
 
 const menuOpen = ref(false);
-let resumeOnMenuClose = false;
+const resumeOnMenuClose = ref(false);
 
 const openMenu = (): void => {
-    resumeOnMenuClose = clock.value?.isRunning() ?? false;
+    resumeOnMenuClose.value = clock.value?.isRunning() ?? false;
     clock.value?.pause();
     menuOpen.value = true;
 };
@@ -404,12 +457,20 @@ const openMenu = (): void => {
 const closeMenu = (): void => {
     menuOpen.value = false;
 
-    if (resumeOnMenuClose) {
+    if (resumeOnMenuClose.value) {
         clock.value?.resume();
     }
 
-    resumeOnMenuClose = false;
+    resumeOnMenuClose.value = false;
 };
+
+/**
+ * Players actions are not allowed while game is paused,
+ * except when paused only because menu is open: menu closes and clock resumes before action.
+ */
+const actionsBlocked = computed((): boolean => simulating.value
+    || (isPaused.value && !(menuOpen.value && resumeOnMenuClose.value)),
+);
 
 const resume = (): void => clock.value?.resume();
 
@@ -436,7 +497,7 @@ onUnmounted(() => {
 });
 
 /*
- * Player bars: pass, undo, chrono
+ * Player actions from menu: pass, undo, resign, rematch
  */
 const timeValueOfSeat = (seat: Seat) => clock.value?.values.value?.players[colorOfSeat(seat)].totalRemainingTime ?? null;
 
@@ -449,7 +510,7 @@ const isCurrentSeat = (seat: Seat): boolean => {
     ;
 };
 
-const canPass = (seat: Seat): boolean => isCurrentSeat(seat) && !isPaused.value && !simulating.value;
+const canPass = (seat: Seat): boolean => isCurrentSeat(seat) && !actionsBlocked.value;
 
 const canRematch = computed((): boolean => {
     void gameVersion.value;
@@ -469,13 +530,15 @@ const canResign = computed((): boolean => {
         return false;
     }
 
-    return game.value !== null && !game.value.isEnded() && !isPaused.value && !simulating.value;
+    return game.value !== null && !game.value.isEnded() && !actionsBlocked.value;
 });
 
 const resign = async (seat: Seat): Promise<void> => {
     if (!game.value || !canResign.value) {
         return;
     }
+
+    closeMenu();
 
     try {
         await confirmationOverlay({
@@ -490,7 +553,7 @@ const resign = async (seat: Seat): Promise<void> => {
         return;
     }
 
-    if (!game.value.isEnded()) {
+    if (!game.value.isEnded() && canResign.value) {
         game.value.resign(colorOfSeat(seat), new Date());
     }
 };
@@ -501,7 +564,7 @@ const resign = async (seat: Seat): Promise<void> => {
 const canUndo = (seat: Seat): boolean => {
     void gameVersion.value;
 
-    if (!game.value || game.value.isEnded() || isPaused.value || simulating.value) {
+    if (!game.value || game.value.isEnded() || actionsBlocked.value) {
         return false;
     }
 
@@ -510,11 +573,16 @@ const canUndo = (seat: Seat): boolean => {
     return movesCount > 0 && (movesCount - 1) % 2 === colorOfSeat(seat);
 };
 
+/**
+ * Actions are triggered from menu: close it first to resume clock,
+ * so that clock is pushed normally.
+ */
 const pass = (seat: Seat): void => {
     if (!game.value || !canPass(seat)) {
         return;
     }
 
+    closeMenu();
     game.value.pass(colorOfSeat(seat));
 };
 
@@ -523,8 +591,43 @@ const undo = (seat: Seat): void => {
         return;
     }
 
+    closeMenu();
     game.value.undoMove();
 };
+
+/**
+ * Seat of the player who can take back last move, if any.
+ */
+const takebackSeat = computed((): null | Seat => ([0, 1] as const).find(seat => canUndo(seat)) ?? null);
+
+/**
+ * Shortcut to take back last move, without opening menu.
+ */
+const takeback = (): void => {
+    if (takebackSeat.value !== null) {
+        undo(takebackSeat.value);
+    }
+};
+
+/**
+ * Players as displayed on screen, top one first.
+ */
+const playersActions = computed((): LocalPlayerActions[] => {
+    const local = localGame.value;
+
+    if (!local) {
+        return [];
+    }
+
+    return ([1, 0] as const).map(seat => ({
+        seat,
+        name: local.seats[seat],
+        playerIndex: colorOfSeat(seat),
+        canUndo: canUndo(seat),
+        canPass: canPass(seat),
+        canResign: canResign.value,
+    }));
+});
 
 /**
  * Winner on time, when game continues after a player timed out.
@@ -546,28 +649,26 @@ init();
 
 <template>
     <div v-if="localGame" class="local-1v1 bg-body" :class="{ tabletop }">
-        <AppLocalPlayerBar
-            v-model:name="localGame.seats[1]"
-            :playerIndex="colorOfSeat(1)"
-            :isCurrent="isCurrentSeat(1)"
-            :flipped="tabletop"
-            :timeValue="timeValueOfSeat(1)"
-            :canPass="canPass(1)"
-            :canUndo="canUndo(1)"
-            :canResign
-            @pass="pass(1)"
-            @undo="undo(1)"
-            :canRematch
-            @resign="resign(1)"
-            @rematch="rematch"
-        />
-
         <div class="board-area">
             <AppGameView
                 v-if="gameView"
                 :key="reload"
                 :gameView
                 class="board"
+            />
+
+            <AppLocalPlayerBar
+                v-for="seat in ([1, 0] as const)"
+                :key="seat"
+                v-model:name="localGame.seats[seat]"
+                :playerIndex="colorOfSeat(seat)"
+                :isCurrent="isCurrentSeat(seat)"
+                :flipped="tabletop && 1 === seat"
+                :alignRight="barLayout(seat).alignRight"
+                :bottom="barLayout(seat).bottom"
+                :timeValue="timeValueOfSeat(seat)"
+                class="player-bar"
+                :class="barLayout(seat).corner"
             />
 
             <template v-if="timeoutWinnerName">
@@ -599,21 +700,6 @@ init();
             @close="exitSimulation"
         />
 
-        <AppLocalPlayerBar
-            v-model:name="localGame.seats[0]"
-            :playerIndex="colorOfSeat(0)"
-            :isCurrent="isCurrentSeat(0)"
-            :timeValue="timeValueOfSeat(0)"
-            :canPass="canPass(0)"
-            :canUndo="canUndo(0)"
-            :canResign
-            @pass="pass(0)"
-            @undo="undo(0)"
-            :canRematch
-            @resign="resign(0)"
-            @rematch="rematch"
-        />
-
         <button
             type="button"
             class="menu-bubble btn btn-primary"
@@ -621,14 +707,29 @@ init();
             @click="openMenu"
         ><IconList /></button>
 
+        <button
+            v-if="takebackSeat !== null"
+            type="button"
+            class="takeback-bubble btn btn-warning"
+            :title="$t('undo.undo_move')"
+            :aria-label="$t('undo.undo_move')"
+            @click="takeback"
+        ><IconArrowCounterclockwise /></button>
+
         <AppLocal1v1Menu
             v-if="menuOpen && game"
             v-model:nextGameOptions="nextGameOptions"
             :tabletop
             :game
             :pseudos="pseudosByColor(localGame)"
+            :players="playersActions"
+            :canRematch
             :orientation="gameView?.getOrientation()"
             @close="closeMenu"
+            @pass="pass"
+            @undo="undo"
+            @resign="resign"
+            @rematch="rematch"
             @setTabletop="setTabletop"
             @swapColors="swapColors"
             @restart="restart"
@@ -659,6 +760,26 @@ init();
         position absolute
         inset 0
 
+.player-bar
+    position absolute
+    max-width 45%
+
+    &.top-left
+        top 0
+        left 0
+
+    &.top-right
+        top 0
+        right 0
+
+    &.bottom-left
+        bottom 0
+        left 0
+
+    &.bottom-right
+        bottom 0
+        right 0
+
 .timeout-banner
     position absolute
     left 50%
@@ -684,22 +805,33 @@ init();
     align-items center
     background rgba(0, 0, 0, 0.35)
 
-.menu-bubble
+.menu-bubble, .takeback-bubble
     // Round bubble slightly out of the screen
     position fixed
-    right -1.25rem
-    // First quarter from top, to not overlap board
-    top 25%
     transform translateY(-50%)
-    width 3.5rem
-    height 3.5rem
     border-radius 50%
-    padding 0 1.25rem 0 0
-    font-size 1.25rem
     box-shadow 0 0 0.5rem rgba(0, 0, 0, 0.3)
     opacity 0.8
     z-index 10
 
     &:hover, &:focus
         opacity 1
+
+.menu-bubble
+    right -1.25rem
+    // First quarter from top, to not overlap board
+    top 25%
+    width 3.5rem
+    height 3.5rem
+    padding 0 1.25rem 0 0
+    font-size 1.25rem
+
+.takeback-bubble
+    right -1rem
+    // Just below menu bubble
+    top calc(25% + 1.75rem + 0.5rem + 1.375rem)
+    width 2.75rem
+    height 2.75rem
+    padding 0 1rem 0 0
+    font-size 1rem
 </style>

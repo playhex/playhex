@@ -6,6 +6,18 @@ import { Local1v1GameOptions } from './Local1v1GameOptions.js';
 export type Seat = 0 | 1;
 
 /**
+ * Actions a player can currently do, displayed in menu.
+ */
+export type LocalPlayerActions = {
+    seat: Seat;
+    name: string;
+    playerIndex: PlayerIndex;
+    canUndo: boolean;
+    canPass: boolean;
+    canResign: boolean;
+};
+
+/**
  * A local game between two humans on the same device.
  */
 export class Local1v1Game

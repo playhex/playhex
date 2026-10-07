@@ -3,7 +3,7 @@ import { nextTick, onUnmounted, PropType, ref, watchEffect } from 'vue';
 import { TimeValue, timeValueToMilliseconds } from '../../../../shared/time-control/TimeValue.js';
 import { msToTime } from '../../../../shared/app/timeControlUtils.js';
 import { PlayerIndex } from '../../../../shared/game-engine/index.js';
-import { IconArrowCounterclockwise, IconFlag, IconPencilSquare } from '../../icons.js';
+import { IconPencilSquare } from '../../icons.js';
 
 /**
  * Player name, editable in place.
@@ -38,43 +38,29 @@ const props = defineProps({
     },
 
     /**
+     * Align content to the right, for a player displayed in a right corner.
+     */
+    alignRight: {
+        type: Boolean,
+        default: false,
+    },
+
+    /**
+     * Name below chrono, for a player displayed in a bottom corner.
+     */
+    bottom: {
+        type: Boolean,
+        default: false,
+    },
+
+    /**
      * Remaining time of this player, or null if no time control.
      */
     timeValue: {
         type: [Date, Number] as PropType<null | TimeValue>,
         default: null,
     },
-
-    canPass: {
-        type: Boolean,
-        default: false,
-    },
-
-    canUndo: {
-        type: Boolean,
-        default: false,
-    },
-
-    canResign: {
-        type: Boolean,
-        default: false,
-    },
-
-    /**
-     * Game is finished, show rematch button.
-     */
-    canRematch: {
-        type: Boolean,
-        default: false,
-    },
 });
-
-const emit = defineEmits<{
-    pass: [];
-    undo: [];
-    resign: [];
-    rematch: [];
-}>();
 
 /*
  * In place name edition
@@ -138,7 +124,7 @@ onUnmounted(() => clearInterval(chronoThread));
 </script>
 
 <template>
-    <div class="local-player-bar" :class="{ flipped }">
+    <div class="local-player-bar" :class="{ flipped, 'align-right': alignRight, bottom }">
         <div class="player">
             <span class="stone" :class="0 === playerIndex ? 'bg-danger' : 'bg-primary'"></span>
 
@@ -162,22 +148,6 @@ onUnmounted(() => clearInterval(chronoThread));
             >{{ name }} <IconPencilSquare class="edit-icon" /></button>
         </div>
 
-        <div class="actions">
-            <button v-if="canUndo" type="button" class="btn btn-sm btn-warning" :title="$t('undo.undo_move')" @click="emit('undo')">
-                <IconArrowCounterclockwise /><span class="hide-sm">{{ ' ' + $t('undo.undo_move') }}</span>
-            </button>
-            <button v-if="canPass" type="button" class="btn btn-sm btn-primary" @click="emit('pass')">{{ $t('pass') }}</button>
-            <button
-                v-if="canResign"
-                type="button"
-                class="btn btn-sm btn-outline-danger"
-                :title="$t('resign')"
-                :aria-label="$t('resign')"
-                @click="emit('resign')"
-            ><IconFlag /></button>
-            <button v-if="canRematch" type="button" class="btn btn-sm btn-success" @click="emit('rematch')">{{ $t('rematch.label') }}</button>
-        </div>
-
         <span
             v-if="chrono"
             class="chrono"
@@ -188,13 +158,23 @@ onUnmounted(() => clearInterval(chronoThread));
 
 <style lang="stylus" scoped>
 .local-player-bar
-    // Actions centered, player on the left, chrono on the right
-    display grid
-    grid-template-columns 1fr auto 1fr
-    align-items center
-    gap 0.5em
-    height 3rem
-    padding 0 0.75em
+    // Displayed over a board corner: name, then chrono
+    display flex
+    flex-direction column
+    align-items flex-start
+    gap 0.25em
+    max-width 100%
+    padding 0.5em 0.75em
+    background-color unquote('rgba(var(--bs-body-bg-rgb), 0.5)')
+
+    &.align-right
+        align-items flex-end
+
+        .player
+            flex-direction row-reverse
+
+    &.bottom
+        flex-direction column-reverse
 
     &.flipped
         transform rotate(180deg)
@@ -204,6 +184,7 @@ onUnmounted(() => clearInterval(chronoThread));
     align-items center
     gap 0.5em
     min-width 0
+    max-width 100%
 
 .stone
     flex-shrink 0
@@ -229,18 +210,8 @@ onUnmounted(() => clearInterval(chronoThread));
     max-width 12em
 
 .chrono
-    grid-column 3
-    justify-self end
+    flex-shrink 0
     font-family monospace
-    font-size 1.5em
+    font-size 1.75em
     line-height 1
-
-.actions
-    grid-column 2
-    display flex
-    gap 0.5em
-
-.hide-sm
-    @media (max-width: 575px)
-        display none
 </style>
