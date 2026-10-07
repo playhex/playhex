@@ -65,7 +65,7 @@ export default class SearchGamesParameters
 
     @IsNumber()
     @IsOptional()
-    @Min(0)
+    @Min(1)
     @Max(50)
     paginationPageSize?: number;
 
