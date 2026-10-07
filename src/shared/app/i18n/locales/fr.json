@@ -112,6 +112,7 @@
     "no_players_online": "Aucun joueur en ligne",
     "nav_games": "Parties",
     "nav_community": "Communauté",
+    "nav_tools": "Outils",
     "nav_lobby": "Lobby",
     "nav_observe": "Observer",
     "nav_archives": "Archives",
@@ -1148,6 +1149,13 @@
         "sort_by": "Trier par",
         "sort_published_at": "Date de publication",
         "sort_created_at": "Date d'ajout"
+    },
+    "swap_maps": {
+        "title": "Cartes de swap",
+        "explain": "Pour chaque case, la couleur indique si le premier coup de {red} y est fort ou faible. Si {red} ouvre dans une case rouge, {blue} devrait swapper. Si {red} ouvre dans une case bleue, {blue} ne devrait pas swapper. Les ouvertures équilibrées sont près de la frontière, là où les cases sont moins opaques.",
+        "board_size": "Taille du plateau : {{size}}×{{size}}",
+        "red_winrate": "Taux de victoire de {red} sans swap : {winrate}",
+        "credits": "Calculé avec KataHex, 1000 playouts par case."
     },
     "hexplorer": {
         "title": "Hexplorer",

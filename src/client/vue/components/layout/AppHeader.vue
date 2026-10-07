@@ -84,6 +84,8 @@ const routeName = computed<null | string>(() => {
     return name;
 });
 
+const toolsRouteNames = ['hexplorer', 'swap-maps', 'offline-lobby', 'statistics', 'tutorial'];
+
 /*
  * Tutorial
  */
@@ -198,20 +200,63 @@ const {
 
                         <li class="nav-item">
                             <router-link
-                                :to="{ name: 'hexplorer' }"
-                                :class="{ active: routeName?.startsWith('hexplorer') }"
-                                class="nav-link"
-                                @click="closeOffcanvas"
-                            >{{ $t('hexplorer.title') }}</router-link>
-                        </li>
-
-                        <li class="nav-item">
-                            <router-link
                                 :to="{ name: 'puzzles' }"
                                 :class="{ active: routeName?.startsWith('puzzle') }"
                                 class="nav-link"
                                 @click="closeOffcanvas"
                             >{{ $t('puzzles.list_title') }}</router-link>
+                        </li>
+
+                        <li class="nav-item has-submenu">
+                            <router-link
+                                :to="{ name: 'hexplorer' }"
+                                :class="{ active: routeName !== null && toolsRouteNames.includes(routeName) }"
+                                class="nav-link"
+                                @click="closeOffcanvas(); leaveFocus()"
+                            >{{ $t('nav_tools') }}</router-link>
+
+                            <ul class="nav-submenu">
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'hexplorer' }"
+                                        :class="{ active: routeName?.startsWith('hexplorer') }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('hexplorer.title') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'swap-maps' }"
+                                        :class="{ active: routeName === 'swap-maps' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('swap_maps.title') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'offline-lobby' }"
+                                        :class="{ active: routeName === 'offline-lobby' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('play_offline') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'statistics' }"
+                                        :class="{ active: routeName === 'statistics' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('statistics.title') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'tutorial' }"
+                                        :class="{ active: routeName === 'tutorial' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('tutorial.label') }}</router-link>
+                                </li>
+                            </ul>
                         </li>
 
                         <li class="nav-item has-submenu">

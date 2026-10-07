@@ -201,6 +201,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./pages/PageExternalGamesArchive.vue'),
     },
     {
+        name: 'swap-maps',
+        path: '/swap-maps',
+        component: () => import('./pages/PageSwapMaps.vue'),
+    },
+    {
         name: 'statistics',
         path: '/statistics',
         component: () => import('./pages/PageStatistics.vue'),

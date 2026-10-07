@@ -351,6 +351,7 @@
     "no_players_online": "No players online",
     "nav_games": "Games",
     "nav_community": "Community",
+    "nav_tools": "Tools",
     "nav_lobby": "Lobby",
     "nav_observe": "Observe",
     "nav_archives": "Archives",
@@ -1163,6 +1164,13 @@
         "sort_by": "Sort by",
         "sort_published_at": "Publication date",
         "sort_created_at": "Date added"
+    },
+    "swap_maps": {
+        "title": "Swap maps",
+        "explain": "For each cell, color shows whether {red}'s first move there is strong or weak. If {red} opens in a red cell, {blue} should swap. If {red} opens in a blue cell, {blue} should not swap. Fair opening moves are near the boundary, where cells are less opaque.",
+        "board_size": "Board size: {{size}}×{{size}}",
+        "red_winrate": "{red} win rate without swap: {winrate}",
+        "credits": "Computed with KataHex, 1000 playouts per cell."
     },
     "hexplorer": {
         "title": "Hexplorer",
