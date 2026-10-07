@@ -4,7 +4,7 @@ import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, toRaw } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { filterMoveNodes, findElseNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { filterMoveNodes, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
@@ -629,6 +629,23 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     const draftErrors = computed(() => errors.value.filter(isDraftBlockingError));
 
+    /**
+     * Errors by tree node, to highlight nodes and show their errors.
+     */
+    const nodeErrors = computed(() => {
+        const map = new Map<EditorNode, PuzzleError[]>();
+
+        for (const error of errors.value) {
+            const node = findErrorNode(tree.value, error);
+
+            if (node !== null) {
+                map.set(node, [...map.get(node) ?? [], error]);
+            }
+        }
+
+        return map;
+    });
+
     /*
      * Keyboard: rewind source game in position step, navigate tree in tree step
      */
@@ -726,6 +743,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
         errors,
         draftErrors,
+        nodeErrors,
         toInput,
     };
 };

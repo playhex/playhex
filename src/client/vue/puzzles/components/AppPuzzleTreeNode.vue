@@ -5,10 +5,12 @@
  * connected by straight lines.
  * A transposition leaf is followed by a dashed line and an arrow to the node it continues from.
  * Parallel sequences are branches after children, with a dashed line and a "‖" root.
+ * A result (solved or failed) is shown as a round node after the node ending puzzle.
  * Compact mode (zoomed out) shows smaller hexagons without coordinates.
  */
 import { computed } from 'vue';
-import { filterMoveNodes, isElseNode, isParallelRoot, type PuzzleElseNode, type PuzzleNode, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { filterMoveNodes, isElseNode, isParallelRoot, type PuzzleElseNode, type PuzzleError, type PuzzleNode, type PuzzleResult, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { translatePuzzleErrorMessage } from '../services/puzzleErrorMessage.js';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
 import { IconArrowReturnRight, IconChatRightText, IconCheck, IconPencilSquare, IconXLg } from '../../icons.js';
 
@@ -29,6 +31,11 @@ const props = defineProps<{
      * Transposition by leaf, see findTranspositions().
      */
     transpositions: Map<PuzzleNode, Transposition>;
+
+    /**
+     * Validation errors by node: highlighted, and shown on hover.
+     */
+    nodeErrors: Map<EditorNode, PuzzleError[]>;
 
     /**
      * Zoomed out: smaller nodes, coordinates only shown on hover.
@@ -73,6 +80,19 @@ const branches = computed<Branch[]>(() => isElseNode(props.node) ? [] : [
  */
 const label = (text: string): string => props.compact ? '' : text;
 
+const errors = computed(() => props.nodeErrors.get(props.node) ?? []);
+
+/**
+ * Node title, followed by its errors.
+ */
+const title = (text?: string): undefined | string => {
+    const lines = [text, ...errors.value.map(translatePuzzleErrorMessage)].filter(line => line);
+
+    return lines.length > 0 ? lines.join('\n') : undefined;
+};
+
+const result = computed<null | PuzzleResult>(() => isElseNode(props.node) ? 'failed' : props.node.result ?? null);
+
 const transposition = computed(() => isElseNode(props.node) ? null : props.transpositions.get(props.node) ?? null);
 </script>
 
@@ -83,8 +103,8 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             <button
                 type="button"
                 class="tree-node-button"
-                :class="{ 'tree-node-current': node === selectedNode }"
-                :title="$t('puzzles.editor.else')"
+                :class="{ 'tree-node-current': node === selectedNode, 'tree-node-error': errors.length > 0 }"
+                :title="title($t('puzzles.editor.else'))"
                 @click="emit('select', path)"
             >
                 <AppConditionalMoveButton :label="label('*')" :playerIndex class="else-node" />
@@ -95,13 +115,11 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             <button
                 type="button"
                 class="tree-node-button"
-                :class="{ 'tree-node-current': node === selectedNode }"
-                :title="`${$t('puzzles.editor.else')} → ${node.else}`"
+                :class="{ 'tree-node-current': node === selectedNode, 'tree-node-error': errors.length > 0 }"
+                :title="title(`${$t('puzzles.editor.else')} → ${node.else}`)"
                 @click="emit('select', path)"
             >
                 <AppConditionalMoveButton :label="label(node.else)" :playerIndex="computerColor" />
-
-                <IconXLg class="node-badge result-badge text-bg-danger" />
                 <IconChatRightText v-if="node.message" class="node-badge message-badge" />
             </button>
         </template>
@@ -110,17 +128,31 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             v-else
             type="button"
             class="tree-node-button"
-            :class="{ 'tree-node-current': node === selectedNode }"
-            :title="isRoot ? $t('puzzles.editor.initial_position') : isParallelRootNode ? $t('puzzles.editor.parallel') : compact ? node.move : undefined"
+            :class="{ 'tree-node-current': node === selectedNode, 'tree-node-error': errors.length > 0 }"
+            :title="title(isRoot ? $t('puzzles.editor.initial_position') : isParallelRootNode ? $t('puzzles.editor.parallel') : compact ? node.move : undefined)"
             @click="emit('select', path)"
         >
             <AppConditionalMoveButton :label="label(isParallelRootNode ? '‖' : node.move ?? '')" :playerIndex :class="{ 'root-node': isRoot, 'parallel-root': isParallelRootNode }" />
             <IconPencilSquare v-if="isRoot && !compact" class="root-icon" />
 
-            <IconCheck v-if="node.result === 'solved'" class="node-badge result-badge text-bg-success" />
-            <IconXLg v-else-if="node.result === 'failed'" class="node-badge result-badge text-bg-danger" />
             <IconChatRightText v-if="node.message" class="node-badge message-badge" />
         </button>
+
+        <!-- Result: puzzle ends here, "else" node is always failed -->
+        <template v-if="result">
+            <div class="tree-stem"></div>
+
+            <button
+                type="button"
+                class="result-node"
+                :class="result === 'solved' ? 'text-bg-success' : 'text-bg-danger'"
+                :title="result === 'solved' ? $t('puzzles.editor.result_solved') : $t('puzzles.editor.result_failed')"
+                @click="emit('select', path)"
+            >
+                <IconCheck v-if="result === 'solved'" />
+                <IconXLg v-else />
+            </button>
+        </template>
 
         <!-- Transposition: continues from another node -->
         <template v-if="transposition">
@@ -145,6 +177,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                 :selectedNode
                 :playerColor
                 :transpositions
+                :nodeErrors
                 :compact
                 @select="p => emit('select', p)"
             />
@@ -161,6 +194,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                         :selectedNode
                         :playerColor
                         :transpositions
+                        :nodeErrors
                         :compact
                         @select="p => emit('select', p)"
                     />
@@ -189,6 +223,10 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
     &.tree-node-current
         outline 2px solid var(--bs-body-color)
         outline-offset 2px
+
+    // Inside current node outline, so both are visible
+    &.tree-node-error
+        box-shadow 0 0 0 2px var(--bs-danger)
 
     :deep(div.hexagons)
         height 1.5rem
@@ -221,16 +259,25 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
     font-size 0.55rem
     pointer-events none
 
-.result-badge
-    top -0.2rem
-    right -0.3rem
-    border-radius 50%
-    padding 0.05rem
-
 .message-badge
     bottom -0.1rem
     right -0.3rem
     color var(--bs-body-color)
+
+.result-node
+    position relative
+    z-index 1 // stay above the connector lines
+    display flex
+    align-items center
+    justify-content center
+    flex-shrink 0
+    width 1.3rem
+    height 1.3rem
+    padding 0
+    border none
+    border-radius 50%
+    font-size 0.8rem
+    cursor pointer
 
 .tree-stem
     height 2px
@@ -308,6 +355,11 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
 
     .node-badge
         font-size 0.4rem
+
+    .result-node
+        width 0.75rem
+        height 0.75rem
+        font-size 0.5rem
 
     .tree-stem
         width 0.15rem

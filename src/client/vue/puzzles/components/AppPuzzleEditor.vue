@@ -74,6 +74,7 @@ const {
     transpositionNotice,
     errors,
     draftErrors,
+    nodeErrors,
     redStones,
     blueStones,
     disabledCells,
@@ -390,6 +391,7 @@ const deletePuzzle = async (): Promise<void> => {
                                 :selectedNode
                                 :playerColor
                                 :transpositions
+                                :nodeErrors
                                 :compact="expertMode && treeZoomedOut"
                                 @select="selectPath"
                             />

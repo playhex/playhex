@@ -567,6 +567,12 @@ export type PuzzleError = {
      */
     parallel?: PuzzleErrorParallel;
 
+    /**
+     * Set when error is on a child of node at this location: its index in `children`.
+     * Used for child moves (e.g. occupied cell, set twice) and "else" nodes, which have no own path.
+     */
+    child?: number;
+
     params?: Record<string, string | number>;
 };
 
@@ -609,6 +615,32 @@ export const normalizePuzzleText = (value?: null | string): null | string =>
 ;
 
 /**
+ * Tree node where this error is, to highlight it.
+ *
+ * @returns Null when error is not in tree, or its node cannot be found (e.g. not an object)
+ */
+export const findErrorNode = (tree: PuzzleNode, { path, parallel, child }: PuzzleError): null | PuzzleNode | PuzzleElseNode => {
+    if (path === undefined) {
+        return null;
+    }
+
+    const followMoves = (node: null | PuzzleNode, moves: Move[]): null | PuzzleNode =>
+        moves.reduce<null | PuzzleNode>((current, move) => current && findChild(current, move), node);
+
+    let node = followMoves(tree, path);
+
+    if (node !== null && parallel !== undefined) {
+        node = followMoves(node.parallel?.[parallel.index] ?? null, parallel.path);
+    }
+
+    if (node === null || child === undefined) {
+        return node;
+    }
+
+    return node.children?.[child] ?? null;
+};
+
+/**
  * Not translated, for server side error messages.
  */
 export const puzzleErrorToString = ({ code, path, parallel, params }: PuzzleError): string =>
@@ -640,6 +672,7 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     type Location = {
         path: Move[];
         parallel?: PuzzleErrorParallel;
+        child?: number;
     };
 
     /**
@@ -733,7 +766,7 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     }
 
     if (puzzle.redStones.length + puzzle.blueStones.length === 0) {
-        errors.push({ code: 'empty_position' });
+        errors.push({ code: 'empty_position', path: [] });
     }
 
     if (puzzle.lastMove != null && checkMove(puzzle.lastMove)) {
@@ -745,11 +778,11 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     }
 
     if (puzzle.tree.move !== undefined) {
-        errors.push({ code: 'root_has_move' });
+        errors.push({ code: 'root_has_move', path: [] });
     }
 
     if (puzzle.tree.result !== undefined) {
-        errors.push({ code: 'root_has_result' });
+        errors.push({ code: 'root_has_result', path: [] });
     }
 
     let nodesCount = 0;
@@ -936,50 +969,52 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
                 return;
             }
 
+            const childErrorLocation: Location = { ...location, child: index };
+
             if ('else' in child) {
                 if (isPlayerMove) {
-                    addError('else_as_computer_answer', location);
+                    addError('else_as_computer_answer', childErrorLocation);
                 }
 
                 if (childrenEnded) {
-                    addError('else_in_continuation', location);
+                    addError('else_in_continuation', childErrorLocation);
                 }
 
                 // Would also catch main sequence moves
                 if (location.parallel !== undefined) {
-                    addError('else_in_parallel', location);
+                    addError('else_in_parallel', childErrorLocation);
                 }
 
                 if (index !== children.length - 1) {
-                    addError('else_not_last', location);
+                    addError('else_not_last', childErrorLocation);
                 }
 
-                checkKeys(child, ELSE_NODE_KEYS, location);
-                checkMessage(child, location);
+                checkKeys(child, ELSE_NODE_KEYS, childErrorLocation);
+                checkMessage(child, childErrorLocation);
 
                 if (child.result !== undefined && child.result !== 'failed') {
-                    addError('else_always_failed', location);
+                    addError('else_always_failed', childErrorLocation);
                 }
 
                 // Can be same cell as an expected move: free when else applies, as player played elsewhere
-                if (checkMove(child.else, location) && occupied.has(child.else)) {
-                    addError('occupied', location, { move: child.else });
+                if (checkMove(child.else, childErrorLocation) && occupied.has(child.else)) {
+                    addError('occupied', childErrorLocation, { move: child.else });
                 }
 
                 return;
             }
 
-            if (!checkMove(child.move, location)) {
+            if (!checkMove(child.move, childErrorLocation)) {
                 return;
             }
 
             if (occupied.has(child.move)) {
-                addError('occupied', location, { move: child.move });
+                addError('occupied', childErrorLocation, { move: child.move });
                 return;
             }
 
             if (seen.has(child.move)) {
-                addError('set_twice', location, { move: child.move });
+                addError('set_twice', childErrorLocation, { move: child.move });
             }
 
             seen.add(child.move);

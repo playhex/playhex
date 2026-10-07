@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getNodeResult, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getNodeResult, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -129,8 +129,8 @@ describe('puzzleTree', () => {
 
     it('rejects stones and moves on disabled cells', () => {
         assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['a5'] })), [{ code: 'set_twice', params: { move: 'a5' } }], 'initial stone');
-        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['b3'] })), [{ code: 'occupied', path: ['c3'], params: { move: 'b3' } }], 'tree move');
-        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['d4'] })), [{ code: 'occupied', path: [], params: { move: 'd4' } }], 'else answer');
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['b3'] })), [{ code: 'occupied', path: ['c3'], child: 0, params: { move: 'b3' } }], 'tree move');
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['d4'] })), [{ code: 'occupied', path: [], child: 2, params: { move: 'd4' } }], 'else answer');
         assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: ['f6'] })), [{ code: 'outside_board', params: { move: 'f6' } }], 'outside board');
         assert.deepStrictEqual(validatePuzzle(createPuzzle({ disabledCells: 'e5' as never })), [{ code: 'invalid_stones' }], 'not a list');
     });
@@ -142,7 +142,7 @@ describe('puzzleTree', () => {
         assert.strictEqual(validatePuzzle(createPuzzle({ redStones: ['c3'] })).length, 1, 'move on occupied cell');
         assert.deepStrictEqual(validatePuzzle(createPuzzle({
             tree: { children: [{ move: 'c3', children: [{ move: 'c3' }] }] },
-        })), [{ code: 'occupied', path: ['c3'], params: { move: 'c3' } }], 'error with path');
+        })), [{ code: 'occupied', path: ['c3'], child: 0, params: { move: 'c3' } }], 'error with path');
         assert.strictEqual(validatePuzzle(createPuzzle({ lastMove: 'a1' })).length, 1, 'last move not an initial stone');
         assert.strictEqual(validatePuzzle(createPuzzle({ lastMove: 'a5' })).length, 1, 'last move of player color');
         assert.strictEqual(validatePuzzle(createPuzzle({ lastMove: 'e1', playerColor: 1 })).length, 1, 'last move of player color, blue');
@@ -197,7 +197,7 @@ describe('puzzleTree', () => {
     });
 
     it('rejects empty puzzles', () => {
-        assert.deepStrictEqual(validatePuzzle(createPuzzle({ redStones: [], blueStones: [] })), [{ code: 'empty_position' }]);
+        assert.deepStrictEqual(validatePuzzle(createPuzzle({ redStones: [], blueStones: [] })), [{ code: 'empty_position', path: [] }]);
         assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: {} })), [{ code: 'empty_tree' }]);
         assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { message: 'Red to play', children: [] } })), [{ code: 'empty_tree' }]);
     });
@@ -216,6 +216,28 @@ describe('puzzleTree', () => {
         assert.strictEqual(puzzleErrorToString({ code: 'empty_tree' }), 'empty_tree');
         assert.strictEqual(puzzleErrorToString({ code: 'occupied', path: ['c3'], params: { move: 'c3' } }), 'occupied after "c3" {"move":"c3"}');
         assert.strictEqual(puzzleErrorToString({ code: 'node_not_object', path: [] }), 'node_not_object after "root"');
+    });
+
+    it('finds error node', () => {
+        const parallelTree: PuzzleNode = {
+            children: [{ move: 'c3', children: [{ move: 'b3' }] }],
+            parallel: [{ children: [{ move: 'a1', children: [{ move: 'a2' }] }] }],
+        };
+
+        assert.strictEqual(findErrorNode(tree, { code: 'invalid_player_color' }), null, 'not in tree');
+        assert.strictEqual(findErrorNode(tree, { code: 'no_solution', path: [] }), tree, 'root');
+        assert.strictEqual(findErrorNode(tree, { code: 'occupied', path: ['c3'], child: 0 }), findChild(tree, 'c3')!.children![0], 'child move');
+        assert.strictEqual(findErrorNode(tree, { code: 'occupied', path: [], child: 2 }), findElseNode(tree), 'else node');
+        assert.strictEqual(findErrorNode(tree, { code: 'occupied', path: ['e5'] }), null, 'not found');
+        assert.strictEqual(findErrorNode(parallelTree, { code: 'empty_parallel', path: [], parallel: { index: 0, path: [] } }), parallelTree.parallel![0], 'parallel root');
+        assert.strictEqual(findErrorNode(parallelTree, { code: 'occupied', path: [], parallel: { index: 0, path: ['a1'] }, child: 0 }), findChild(parallelTree.parallel![0], 'a1')!.children![0], 'in parallel');
+
+        // Every error of a validated puzzle is found back in tree
+        const invalidTree: PuzzleNode = { children: [{ move: 'c3', children: [{ move: 'a5' }, { move: 'b3' }] }, { else: 'b5' }] };
+
+        for (const error of validatePuzzle(createPuzzle({ tree: invalidTree }))) {
+            assert.notStrictEqual(findErrorNode(invalidTree, error), null, error.code);
+        }
     });
 
     it('rejects invalid else nodes', () => {
