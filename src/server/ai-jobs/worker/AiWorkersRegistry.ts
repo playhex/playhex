@@ -1,11 +1,18 @@
 import { Service } from 'typedi';
-import type { AiJobType } from '../protocol.js';
+import { LOCK_MS, LONG_POLL_MS, type AiJobType } from '../protocol.js';
 
 /**
- * A worker not seen since this duration is considered offline.
- * Workers are seen at least every LONG_POLL_MS when idle, every HEARTBEAT_MS when processing.
+ * An idle worker not seen since this duration is considered offline.
+ * Idle workers are seen each time they request next job, at least every LONG_POLL_MS,
+ * plus a margin for the worker to send a new request.
  */
-const ONLINE_TIMEOUT_MS = 60_000;
+const IDLE_ONLINE_TIMEOUT_MS = LONG_POLL_MS + 5_000;
+
+/**
+ * A worker processing a job is considered offline when it stops sending heartbeats,
+ * at the same time its job is given to another worker.
+ */
+const BUSY_ONLINE_TIMEOUT_MS = LOCK_MS;
 
 export type AiWorkerState = {
     workerId: string;
@@ -59,13 +66,23 @@ export default class AiWorkersRegistry
         }
     }
 
+    /**
+     * Worker disconnected: closed its connection while waiting for a job, or stopped.
+     */
+    remove(keyId: number, workerId: string): void
+    {
+        this.workers.delete(`${keyId}:${workerId}`);
+    }
+
     getOnlineWorkers(type?: AiJobType): AiWorkerState[]
     {
-        const limit = Date.now() - ONLINE_TIMEOUT_MS;
+        const now = Date.now();
         const online: AiWorkerState[] = [];
 
         for (const [mapKey, worker] of this.workers) {
-            if (worker.lastSeenAt.getTime() < limit) {
+            const timeoutMs = worker.jobId === null ? IDLE_ONLINE_TIMEOUT_MS : BUSY_ONLINE_TIMEOUT_MS;
+
+            if (worker.lastSeenAt.getTime() < now - timeoutMs) {
                 this.workers.delete(mapKey);
                 continue;
             }

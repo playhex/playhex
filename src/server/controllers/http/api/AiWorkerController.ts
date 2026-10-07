@@ -118,9 +118,17 @@ export default class AiWorkerController
 
         this.aiWorkersRegistry.seen(playerAiWorkerKey.id!, workerId, types, null);
 
-        // Stop waiting for a job if worker disconnects
+        // Stop waiting for a job if worker disconnects, and consider it offline now.
+        // "close" is also emitted after response is sent, ignore it in this case.
         const abortController = new AbortController();
-        response.on('close', () => abortController.abort());
+        response.on('close', () => {
+            if (response.writableFinished) {
+                return;
+            }
+
+            abortController.abort();
+            this.aiWorkersRegistry.remove(playerAiWorkerKey.id!, workerId);
+        });
 
         const reserved = await this.aiJobService.queue.reserve(types, {
             waitMs: LONG_POLL_MS,
@@ -228,5 +236,22 @@ export default class AiWorkerController
         await this.withJobToken(() => this.aiJobService.queue.fail(jobId, token, error, retryable));
 
         logger.notice('AI job failed by worker', { jobId, keyId: playerAiWorkerKey.id, workerId, error, retryable });
+    }
+
+    /**
+     * Worker is stopping, consider it offline now instead of waiting for it to time out.
+     */
+    @Post('/api/ai-workers/disconnect')
+    @OnUndefined(204)
+    async disconnect(
+        @Req() request: Request,
+        @Body() body: unknown,
+    ): Promise<void> {
+        const playerAiWorkerKey = await this.authenticate(request);
+        const workerId = requireString(body, 'workerId');
+
+        this.aiWorkersRegistry.remove(playerAiWorkerKey.id!, workerId);
+
+        logger.info('AI worker disconnected', { keyId: playerAiWorkerKey.id, workerId });
     }
 }

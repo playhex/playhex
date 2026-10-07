@@ -12,6 +12,7 @@
  *  POST /api/ai-workers/jobs/:jobId/heartbeat  { workerId, token }                    => 204 | 409 job not owned anymore
  *  POST /api/ai-workers/jobs/:jobId/result     { workerId, token, result }            => 204 | 409 | 400 invalid result
  *  POST /api/ai-workers/jobs/:jobId/fail       { workerId, token, error, retryable }  => 204 | 409
+ *  POST /api/ai-workers/disconnect             { workerId }                           => 204
  *
  *  401: invalid or revoked key, worker should stop.
  *
@@ -33,19 +34,22 @@ export const isEngine = (engine: unknown): engine is Engine =>
 /**
  * While processing a job, worker must send a heartbeat at this interval.
  */
-export const HEARTBEAT_MS = 10_000;
+export const HEARTBEAT_MS = 5_000;
 
 /**
  * Each heartbeat extends job lock for this duration.
- * If worker stops sending heartbeats, job is given to another worker after lock expires.
+ * If worker stops sending heartbeats, job is given to another worker after lock expires,
+ * and worker is considered offline.
+ * Tolerates 2 missed heartbeats.
  */
-export const LOCK_MS = 30_000;
+export const LOCK_MS = 3 * HEARTBEAT_MS;
 
 /**
  * How long a worker request to get next job is held when there is no job,
  * before responding 204. Worker then directly sends a new request.
+ * An idle worker not requesting again soon after is considered offline.
  */
-export const LONG_POLL_MS = 25_000;
+export const LONG_POLL_MS = 15_000;
 
 /*
  * Tasks

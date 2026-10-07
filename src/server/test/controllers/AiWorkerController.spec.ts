@@ -129,4 +129,45 @@ describe('AiWorkerController', () => {
 
         await assert.rejects(moving, AiJobError);
     });
+
+    it('considers worker offline as soon as it closes connection while waiting for a job', async () => {
+        const response = createResponse();
+        const waiting = controller.next(createRequest(), response, { types: ['mohex'], workerId: 'w1' });
+        await setImmediate();
+
+        assert.strictEqual(aiJobService.isJobTypeAvailable('mohex'), true);
+
+        response.emit('close');
+
+        assert.strictEqual(await waiting, undefined);
+        assert.strictEqual(aiJobService.isJobTypeAvailable('mohex'), false);
+    });
+
+    it('keeps worker online when connection closes after job has been sent', async () => {
+        const moving = aiJobService.calculateMove({ type: 'katahex-intuition-move', data: { game } });
+        await setImmediate();
+
+        const response = createResponse();
+        const job = await controller.next(createRequest(), response, { types: ['katahex-intuition-move'], workerId: 'w1' }) as ReservedJob;
+
+        Object.assign(response, { writableFinished: true });
+        response.emit('close');
+
+        assert.strictEqual(aiWorkersRegistry.getOnlineWorkers('katahex-intuition-move')[0]?.jobId, job.jobId);
+
+        await controller.result(createRequest(), job.jobId, { workerId: 'w1', token: job.token, result: 'g7' });
+        assert.strictEqual(await moving, 'g7');
+    });
+
+    it('considers worker offline when it disconnects', async () => {
+        const { moving, job } = await submitAndTakeMove();
+
+        await controller.result(createRequest(), job.jobId, { workerId: 'w1', token: job.token, result: 'g7' });
+        assert.strictEqual(await moving, 'g7');
+        assert.strictEqual(aiJobService.isJobTypeAvailable('katahex-intuition-move'), true);
+
+        await controller.disconnect(createRequest(), { workerId: 'w1' });
+
+        assert.strictEqual(aiJobService.isJobTypeAvailable('katahex-intuition-move'), false);
+    });
 });
