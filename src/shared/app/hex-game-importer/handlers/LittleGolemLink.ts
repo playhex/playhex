@@ -2,6 +2,7 @@ import { ImportUserError } from '../errors.js';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';
 import { ImportedGame } from '../types.js';
 import { LittleGolemSGF } from './LittleGolemSGF.js';
+import LittleGolemClient, { LittleGolemFetchError, littleGolemClient as sharedLittleGolemClient } from '../../little-golem/LittleGolemClient.js';
 
 const SOURCE_PATTERN = /littlegolem\.net\/jsp\/game\/game\.jsp\?gid=(\d+)/i;
 
@@ -13,6 +14,10 @@ const SOURCE_PATTERN = /littlegolem\.net\/jsp\/game\/game\.jsp\?gid=(\d+)/i;
  */
 export class LittleGolemLink implements ImporterHandlerInterface
 {
+    constructor(
+        private littleGolemClient: LittleGolemClient = sharedLittleGolemClient,
+    ) {}
+
     supports(source: string): boolean
     {
         return this.parseGameId(source) !== null;
@@ -23,11 +28,11 @@ export class LittleGolemLink implements ImporterHandlerInterface
         return true; // Little Golem does not allow CORS
     }
 
-    private parseGameId(source: string): null | string
+    private parseGameId(source: string): null | number
     {
         const match = source.trim().match(SOURCE_PATTERN);
 
-        return match ? match[1] : null;
+        return match ? parseInt(match[1], 10) : null;
     }
 
     async import(source: string): Promise<ImportedGame>
@@ -38,14 +43,17 @@ export class LittleGolemLink implements ImporterHandlerInterface
             throw new Error('Could not extract game id from Little Golem url');
         }
 
-        const url = `https://littlegolem.net/servlet/sgf/${gameId}/game${gameId}.hsgf`;
-        const response = await fetch(url);
+        let hsgf: string;
 
-        if (!response.ok) {
-            throw new ImportUserError('Could not download Little Golem game');
+        try {
+            hsgf = await this.littleGolemClient.fetchGameHsgf(gameId);
+        } catch (e) {
+            if (e instanceof LittleGolemFetchError) {
+                throw new ImportUserError('Could not download Little Golem game');
+            }
+
+            throw e;
         }
-
-        const hsgf = await response.text();
 
         return new LittleGolemSGF().import(hsgf);
     }
