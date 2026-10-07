@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { defineOverlay } from '@overlastic/vue';
@@ -13,9 +13,10 @@ import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconSave2, IconSendFill, IconShuffle, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconLightbulb, IconRobot, IconSave2, IconSendFill, IconShuffle, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
+import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
 
 const props = defineProps<{
     /**
@@ -79,6 +80,10 @@ const {
     blueStones,
     disabledCells,
     toInput,
+    analyzer,
+    setAnalyzer,
+    analysisLoading,
+    analysisError,
 } = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null);
 
 const gameViewElement = useTemplateRef('game-view-element');
@@ -163,6 +168,31 @@ const setExpertMode = async (enabled: boolean): Promise<void> => {
  * Expert mode only.
  */
 const treeZoomedOut = ref(false);
+
+/*
+ * AI eval, expert mode only
+ */
+
+const analyzers = createKatahexAnalyzers();
+
+/**
+ * Index of selected engine in analyzers, -1 for none.
+ */
+const selectedAnalyzerIndex = computed({
+    get: () => analyzers.findIndex(a => a === analyzer.value),
+    set: index => setAnalyzer(analyzers[index] ?? null),
+});
+
+const { isAnalyzerAvailable } = useAnalysisEngines(analysisError);
+
+const isAnalyzerUnavailable = computed(() => analysisError.value === 'engine_unavailable'
+    || (analyzer.value !== null && !isAnalyzerAvailable(analyzer.value)));
+
+watch(expertMode, enabled => {
+    if (!enabled) {
+        setAnalyzer(null);
+    }
+});
 
 const changeElseAnswer = (): void => {
     selectParent();
@@ -382,6 +412,34 @@ const deletePuzzle = async (): Promise<void> => {
                     <div v-if="pickingElse" class="alert alert-warning py-2">{{ $t('puzzles.editor.pick_else_answer') }}</div>
                     <div v-if="'only_one_answer' === boardError" class="alert alert-warning py-2">{{ $t('puzzles.editor.only_one_answer') }}</div>
                     <div v-if="transpositionNotice" class="alert alert-info py-2"><IconArrowReturnRight /> {{ $t('puzzles.editor.transposition_notice', { moves: transpositionNotice.join(' ') }) }}</div>
+
+                    <!-- AI eval -->
+                    <div v-if="expertMode" class="mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label small text-nowrap mb-0" for="puzzle-ai-eval"><IconRobot /> {{ $t('puzzles.editor.ai_eval') }}</label>
+                            <select
+                                id="puzzle-ai-eval"
+                                class="form-select form-select-sm"
+                                v-model.number="selectedAnalyzerIndex"
+                            >
+                                <option :value="-1">{{ $t('puzzles.editor.ai_eval_none') }}</option>
+                                <option
+                                    v-for="(a, index) in analyzers"
+                                    :key="a.getName()"
+                                    :value="index"
+                                    :disabled="!isAnalyzerAvailable(a)"
+                                >{{ a.getName() }}</option>
+                            </select>
+                            <span v-if="analysisLoading" class="spinner-border spinner-border-sm flex-shrink-0" aria-hidden="true"></span>
+                        </div>
+                        <div class="form-text">{{ $t('puzzles.editor.ai_eval_help') }}</div>
+
+                        <div v-if="analyzer && isAnalyzerUnavailable" class="mt-1">
+                            <p class="text-warning small mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.engine_unavailable') }}</p>
+                            <router-link :to="{ name: 'spawn-worker' }" class="small" target="_blank">{{ $t('workers.see_how_to_spawn_a_worker') }}</router-link>
+                        </div>
+                        <p v-else-if="analysisError === 'failed'" class="text-danger small mt-1 mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.analysis_failed') }}</p>
+                    </div>
 
                     <div class="position-relative mb-3">
                         <div class="move-tree-wrapper bg-body">

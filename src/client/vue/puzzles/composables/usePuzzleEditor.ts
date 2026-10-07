@@ -1,12 +1,14 @@
-import { GameMarksFacade, GameView } from '@playhex/pixi-board';
+import { GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
-import type { Move } from '@playhex/move-notation';
-import { computed, onUnmounted, ref, toRaw } from 'vue';
+import { coordsToMove, type Move } from '@playhex/move-notation';
+import { computed, onUnmounted, ref, shallowRef, toRaw } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { filterMoveNodes, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createParallelsFinder, filterMoveNodes, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
+import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
+import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 
 export type EditorStep = 'position' | 'tree' | 'publish';
 
@@ -18,6 +20,9 @@ export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move';
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
 const DEFAULT_BOARDSIZE = 11;
+
+const PLANNED_MOVES_GROUP = 'planned_moves';
+const AI_EVAL_COLOR = 0x22bb55;
 
 /**
  * Copy of the tree without vue proxies, empty messages and undefined values,
@@ -118,12 +123,16 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     // GameView must not be a vue ref, see GameView.ts
     let gameView: GameView;
     let gameMarksFacade: GameMarksFacade;
+    let policyOverlayFacade: PolicyOverlayFacade;
     let playerSettingsFacade: PlayerSettingsFacade;
     let mountedElement: null | HTMLElement = null;
 
     const createGameView = (): void => {
         gameView = new GameView(boardsize.value);
         gameMarksFacade = new GameMarksFacade(gameView);
+        policyOverlayFacade = new PolicyOverlayFacade(gameView);
+        // Not player colors, to not be confused with stones
+        policyOverlayFacade.setMarkerColor(AI_EVAL_COLOR);
         playerSettingsFacade = new PlayerSettingsFacade(gameView);
 
         gameView.on('hexClicked', move => onHexClicked(move));
@@ -594,7 +603,160 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         } else {
             gameMarksFacade.markLastMove(markedMove);
         }
+
+        drawPlannedMoves();
+        void updateAnalysis();
     }
+
+    /*
+     * Planned moves: next moves already in tree, shown as letters (A, B, C...).
+     * With AI eval, engine moves without letter are viable moves missing in tree.
+     */
+
+    /**
+     * Engine used to analyze player choices, null for no analysis.
+     */
+    const analyzer = shallowRef<null | AnalyzerInterface>(null);
+    const analysisLoading = ref(false);
+    const analysisError = ref<null | 'engine_unavailable' | 'failed'>(null);
+
+    /**
+     * Next moves from selected node that are already in tree.
+     * "else" node is not planned: a viable move falling into it is what we want to spot.
+     */
+    const getPlannedMoves = (): Set<Move> => {
+        const node = selectedTransposition.value?.target ?? selectedNode.value;
+        const planned = new Set<Move>();
+
+        if (isElseNode(node)) {
+            return planned;
+        }
+
+        const addChildrenMoves = (parent: PuzzleNode): void => {
+            for (const child of parent.children ?? []) {
+                if (!isElseNode(child) && child.move) {
+                    planned.add(child.move);
+                }
+            }
+        };
+
+        addChildrenMoves(node);
+
+        // Parallel sequences can be started on player turn, from any main sequence node of their subtree
+        if (nextColor.value === playerColor.value && !isInParallel.value) {
+            for (const parallelRoot of createParallelsFinder(tree.value)(node)) {
+                addChildrenMoves(parallelRoot);
+            }
+        }
+
+        return planned;
+    };
+
+    const drawPlannedMoves = (): void => {
+        gameView.removeEntitiesGroup(PLANNED_MOVES_GROUP);
+
+        if (step.value !== 'tree') {
+            return;
+        }
+
+        let index = 0;
+
+        for (const move of getPlannedMoves()) {
+            const letter = String.fromCharCode('A'.charCodeAt(0) + index++);
+
+            gameView.addEntity(new TextMark(letter).setCoords(move), PLANNED_MOVES_GROUP);
+        }
+    };
+
+    /*
+     * AI eval: shows where engine would play
+     */
+
+    /**
+     * Whether selected position can be analyzed, for player or computer move, also after puzzle ended.
+     * Not on "else" node, as player move to reach it is unknown.
+     */
+    const shouldAnalyze = (): boolean => {
+        // Transposition continues from its target
+        const node = selectedTransposition.value?.target ?? selectedNode.value;
+
+        return step.value === 'tree'
+            && !isElseNode(node)
+        ;
+    };
+
+    // Incremented on every analysis, so a slow request can detect a newer one started and discard its result
+    let analysisRequestId = 0;
+
+    const updateAnalysis = async (): Promise<void> => {
+        policyOverlayFacade.clear();
+
+        const requestId = ++analysisRequestId;
+        const currentAnalyzer = analyzer.value;
+
+        analysisError.value = null;
+
+        if (currentAnalyzer === null || !shouldAnalyze()) {
+            analysisLoading.value = false;
+            return;
+        }
+
+        const red = [...redStones.value];
+        const blue = [...blueStones.value];
+
+        for (const { move, color } of selectedMoves.value) {
+            (color === 0 ? red : blue).push(move);
+        }
+
+        const color = nextColor.value === 0 ? 'black' : 'white';
+        const disabled = new Set(disabledCells.value);
+
+        analysisLoading.value = true;
+
+        let policy: undefined | number[][];
+
+        try {
+            ({ policy } = await currentAnalyzer.analyzePosition({ size: boardsize.value, color, black: red, white: blue }));
+        } catch (e) {
+            if (requestId !== analysisRequestId) {
+                return;
+            }
+
+            analysisLoading.value = false;
+
+            if (e instanceof AnalysisEngineUnavailableError) {
+                analysisError.value = 'engine_unavailable';
+                return;
+            }
+
+            analysisError.value = 'failed';
+
+            // eslint-disable-next-line no-console
+            console.error('Error while analyzing position', e);
+            return;
+        }
+
+        if (requestId !== analysisRequestId) {
+            return;
+        }
+
+        analysisLoading.value = false;
+
+        if (policy) {
+            policyOverlayFacade.apply(policy, color, (row, col) => !disabled.has(coordsToMove({ row, col })));
+        }
+    };
+
+    const setAnalyzer = (newAnalyzer: null | AnalyzerInterface): void => {
+        if (newAnalyzer === analyzer.value) {
+            return;
+        }
+
+        analyzer.value?.persistCache?.();
+        analyzer.value = newAnalyzer;
+        void updateAnalysis();
+    };
+
 
     /*
      * Save
@@ -694,6 +856,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     }
 
     onUnmounted(() => {
+        analyzer.value?.persistCache?.();
         destroyGameView();
     });
 
@@ -745,5 +908,10 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         draftErrors,
         nodeErrors,
         toInput,
+
+        analyzer,
+        setAnalyzer,
+        analysisLoading,
+        analysisError,
     };
 };

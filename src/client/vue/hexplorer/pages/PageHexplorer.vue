@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useIntervalFn, whenever } from '@vueuse/core';
-import { computed, ref, useTemplateRef, watch } from 'vue';
+import { whenever } from '@vueuse/core';
+import { computed, ref, useTemplateRef } from 'vue';
 import { defineOverlay } from '@overlastic/vue';
 import { t } from 'i18next';
 import { PlaceStoneTool } from '../tools/PlaceStoneTool';
@@ -48,11 +48,8 @@ import MoveTree from '../components/MoveTree.vue';
 import ImportFormatsHelpOverlay from '../overlays/ImportFormatsHelpOverlay.vue';
 import { PlaceMarkTool } from '../tools/PlaceMarkTool.js';
 import { NoopAnalyzer } from '../analyzers/NoopAnalyzer';
-import { KatahexAnalyzer } from '../analyzers/KatahexAnalyzer.js';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
-import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
-import type { AiAvailabilityData } from '../../../../shared/app/Types.js';
-import { apiGetAiAvailability } from '../../../apiClient.js';
+import { createKatahexAnalyzers, useAnalysisEngines } from '../composables/useAnalysisEngines.js';
 
 useHead({
     title: t('hexplorer.title'),
@@ -60,8 +57,7 @@ useHead({
 
 // Available analysis engines, selectable in the sidebar. First one is the default.
 const analyzers: AnalyzerInterface[] = [
-    new KatahexAnalyzer('katahex-intuition', 'Katahex Intuition', 'analysisCache'),
-    new KatahexAnalyzer('katahex-mcts', `Katahex MCTS ${MCTS_PLAYOUTS}`, 'analysisCacheMcts'),
+    ...createKatahexAnalyzers(),
     new NoopAnalyzer(),
 ];
 
@@ -116,37 +112,7 @@ const selectedAnalyzerName = computed({
     },
 });
 
-/*
- * Engines availability: an engine without online worker cannot be selected.
- * Refreshed periodically to enable engines when a worker comes online.
- */
-const aiAvailability = ref<null | AiAvailabilityData>(null);
-
-const refreshEnginesStatus = async (): Promise<void> => {
-    try {
-        aiAvailability.value = await apiGetAiAvailability();
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Could not get analysis engines status', e);
-    }
-};
-
-useIntervalFn(refreshEnginesStatus, 30_000, { immediateCallback: true });
-
-// Server may know engine is unavailable before next refresh
-watch(analysisError, error => {
-    if (error === 'engine_unavailable') {
-        void refreshEnginesStatus();
-    }
-});
-
-const isAnalyzerAvailable = (analyzer: AnalyzerInterface): boolean => {
-    if (!(analyzer instanceof KatahexAnalyzer) || aiAvailability.value === null) {
-        return true;
-    }
-
-    return aiAvailability.value.availableAnalysisEngines.includes(analyzer.engine);
-};
+const { isAnalyzerAvailable } = useAnalysisEngines(analysisError);
 
 const isCurrentAnalyzerUnavailable = computed(() => analysisError.value === 'engine_unavailable'
     || (currentAnalyzer.value !== null && !isAnalyzerAvailable(currentAnalyzer.value)));

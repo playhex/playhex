@@ -54,6 +54,8 @@ class PolicyStarMark extends BoardEntity
     }
 }
 
+type CellFilter = (row: number, col: number) => boolean;
+
 /**
  * Displays policy marks (hexagon markers) on top of board cells,
  * showing where the analyzer suggests to play.
@@ -62,6 +64,7 @@ export class PolicyOverlayFacade
 {
     private showNumbers = false;
     private showBestMark = false;
+    private markerColor: null | number = null;
 
     private overlays: Graphics[][];
     private numberMarks: PolicyNumberMark[][];
@@ -69,6 +72,7 @@ export class PolicyOverlayFacade
 
     private lastPolicy: number[][] | null = null;
     private lastColor: 'black' | 'white' | null = null;
+    private lastIsCellShown: CellFilter | undefined = undefined;
 
     private readonly starsGroup: string;
     private readonly numbersGroup: string;
@@ -141,10 +145,18 @@ export class PolicyOverlayFacade
         this.showBestMark = showBestMark;
     }
 
+    /**
+     * Color of policy marks, or null to use color of player to move.
+     */
+    setMarkerColor(markerColor: null | number): void
+    {
+        this.markerColor = markerColor;
+    }
+
     reapply(): void
     {
         if (this.lastPolicy && this.lastColor) {
-            this.apply(this.lastPolicy, this.lastColor);
+            this.apply(this.lastPolicy, this.lastColor, this.lastIsCellShown);
         }
     }
 
@@ -152,6 +164,7 @@ export class PolicyOverlayFacade
     {
         this.lastPolicy = null;
         this.lastColor = null;
+        this.lastIsCellShown = undefined;
 
         for (const row of this.overlays) {
             for (const g of row) {
@@ -172,12 +185,17 @@ export class PolicyOverlayFacade
         }
     }
 
-    apply(policy: number[][], color: 'black' | 'white'): void
+    /**
+     * @param isCellShown Hides marks of cells it returns false for.
+     *                    Opacity stays relative to the whole policy max, hidden cells included.
+     */
+    apply(policy: number[][], color: 'black' | 'white', isCellShown?: CellFilter): void
     {
         this.lastPolicy = policy;
         this.lastColor = color;
+        this.lastIsCellShown = isCellShown;
 
-        const markerColor = color === 'black' ? 0xee3333 : 0x3388ee;
+        const markerColor = this.markerColor ?? (color === 'black' ? 0xee3333 : 0x3388ee);
         const max = Math.max(...policy.flat());
 
         let bestRow = 0;
@@ -186,7 +204,8 @@ export class PolicyOverlayFacade
 
         for (let row = 0; row < this.gameView.getBoardsize(); ++row) {
             for (let col = 0; col < this.gameView.getBoardsize(); ++col) {
-                const val = policy[row][col];
+                const shown = isCellShown?.(row, col) ?? true;
+                const val = shown ? policy[row][col] : 0;
 
                 if (val > bestVal) {
                     bestVal = val;
@@ -201,7 +220,7 @@ export class PolicyOverlayFacade
                 g.alpha = max > 0 ? val / max : 0;
 
                 const numMark = this.numberMarks[row][col];
-                if (this.showNumbers && val >= max / 2) {
+                if (this.showNumbers && val > 0 && val >= max / 2) {
                     numMark.setText(`${Math.round(val * 100)}%`);
                     numMark.show();
                 } else {
