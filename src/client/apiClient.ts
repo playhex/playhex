@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -10,6 +10,7 @@ import { RatingCategory } from '../shared/app/ratingUtils.js';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
 import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
+import type SearchExternalGamesParameters from '../shared/app/SearchExternalGamesParameters.js';
 import { isValidationError, AppValidationError } from '../shared/app/ValidationError.js';
 import { ActiveTournamentsFilters } from '../shared/app/tournamentUtils.js';
 import { ConditionalMovesStruct } from '@playhex/conditional-moves';
@@ -217,6 +218,108 @@ export const getGames = async (searchGamesParameters: SearchGamesParameters = {}
         results: games,
         count: parse(response.headers.get('Content-Range') ?? '')?.size ?? null,
     };
+};
+
+/**
+ * Games played outside PlayHex, latest imported first.
+ */
+export const getExternalGames = async (params: SearchExternalGamesParameters = {}): Promise<{ results: ExternalGame[], count: null | number }> => {
+    const response = await fetch(`/api/external-games?${qs.stringify(params)}`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    const externalGames = (await response.json() as ExternalGame[])
+        .map(externalGame => plainToInstance(ExternalGame, externalGame))
+    ;
+
+    return {
+        results: externalGames,
+        count: parse(response.headers.get('Content-Range') ?? '')?.size ?? null,
+    };
+};
+
+/**
+ * @returns null if not found
+ */
+export const getExternalGame = async (publicId: string): Promise<null | ExternalGame> => {
+    const response = await fetch(`/api/external-games/${publicId}`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(ExternalGame, await response.json());
+};
+
+export const apiLinkLittleGolem = async (pseudo: string): Promise<{ littleGolemPlid: number, littleGolemPseudo: string }> => {
+    const response = await fetch('/api/players/me/little-golem', {
+        method: 'put',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pseudo }),
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+export const apiUnlinkLittleGolem = async (): Promise<void> => {
+    const response = await fetch('/api/players/me/little-golem', {
+        method: 'delete',
+    });
+
+    await checkResponse(response);
+};
+
+/**
+ * Import all games of linked Little Golem account, in background.
+ */
+export const apiImportLittleGolem = async (): Promise<ExternalGameImportJob> => {
+    const response = await fetch('/api/external-games/imports/little-golem', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(ExternalGameImportJob, await response.json());
+};
+
+/**
+ * Last import requested by current player, to show progress.
+ */
+export const apiGetMyLastImport = async (): Promise<null | ExternalGameImportJob> => {
+    const response = await fetch('/api/external-games/imports/me', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(ExternalGameImportJob, await response.json());
 };
 
 export const getGamesStats = async (searchGamesParameters: SearchGamesParameters = {}): Promise<{ date: Date, totalGames: number }[]> => {
@@ -510,8 +613,14 @@ export const apiGetAiAvailability = async (): Promise<AiAvailabilityData> => {
     return await response.json();
 };
 
-export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | GameAnalyze> => {
-    const response = await fetch(`/api/games/${gamePublicId}/analyze`, {
+/**
+ * Analyzes of PlayHex games are under /api/games,
+ * analyzes of external games are under /api/external-games.
+ */
+export type AnalyzeApiBase = '/api/games' | '/api/external-games';
+
+export const apiGetGameAnalyze = async (gamePublicId: string, apiBase: AnalyzeApiBase = '/api/games'): Promise<null | GameAnalyze> => {
+    const response = await fetch(`${apiBase}/${gamePublicId}/analyze`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -531,8 +640,8 @@ export const apiGetGameAnalyze = async (gamePublicId: string): Promise<null | Ga
     return plainToInstance(GameAnalyze, await response.json());
 };
 
-export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameAnalyze> => {
-    const response = await fetch(`/api/games/${gamePublicId}/analyze`, {
+export const apiRequestGameAnalyze = async (gamePublicId: string, apiBase: AnalyzeApiBase = '/api/games'): Promise<GameAnalyze> => {
+    const response = await fetch(`${apiBase}/${gamePublicId}/analyze`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -544,8 +653,8 @@ export const apiRequestGameAnalyze = async (gamePublicId: string): Promise<GameA
     return plainToInstance(GameAnalyze, await response.json());
 };
 
-export const apiRequestGameAnalyzeMoveMcts = async (gamePublicId: string, moveIndex: number): Promise<void> => {
-    const response = await fetch(`/api/games/${gamePublicId}/analyze/moves/${moveIndex}/mcts`, {
+export const apiRequestGameAnalyzeMoveMcts = async (gamePublicId: string, moveIndex: number, apiBase: AnalyzeApiBase = '/api/games'): Promise<void> => {
+    const response = await fetch(`${apiBase}/${gamePublicId}/analyze/moves/${moveIndex}/mcts`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',

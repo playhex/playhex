@@ -128,6 +128,24 @@ const aiWorkerNextJobLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Linking a Little Golem account searches the player on Little Golem.
+ */
+const linkExternalAccountLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.link_external_account',
+    points: 10,
+    duration: 600,
+});
+
+/**
+ * Import of all games of a player crawls an external site for a long time.
+ */
+const importExternalGamesLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.import_external_games',
+    points: 3,
+    duration: 3600,
+});
+
+/**
  * Error thrown from rate limiter
  */
 export class RateLimiterError extends Error {}
@@ -236,4 +254,12 @@ export const rateLimiterConsumeAnalyzeMoveMcts = async (playerPublicId: string) 
 
 export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {
     await consume(aiWorkerNextJobLimiter, String(aiWorkerKeyId));
+};
+
+export const rateLimiterConsumeLinkExternalAccount = async (playerPublicId: string) => {
+    await consume(linkExternalAccountLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeImportExternalGames = async (playerPublicId: string) => {
+    await consume(importExternalGamesLimiter, playerPublicId);
 };

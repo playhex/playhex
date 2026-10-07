@@ -1,5 +1,4 @@
 import { computed, Ref, watch } from 'vue';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
 
 /**
  * Pagination helper.
@@ -11,7 +10,7 @@ import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js'
  * @param defaultPageSize Page size, used when paginationPageSize is let empty
  */
 export const useSearchGamesPagination = (
-    searchGamesParameters: Ref<SearchGamesParameters>,
+    searchGamesParameters: Ref<{ paginationPage?: number, paginationPageSize?: number }>,
     totalResults: Ref<null | number>,
     defaultPageSize: number,
 ) => {

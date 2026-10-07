@@ -4,6 +4,9 @@ import Channel from './Channel.js';
 import ChannelChatMessage from './ChannelChatMessage.js';
 import ChatMessage from './ChatMessage.js';
 import ConditionalMoves from './ConditionalMoves.js';
+import ExternalGame from './ExternalGame.js';
+import ExternalGameAnalyze from './ExternalGameAnalyze.js';
+import ExternalGameImportJob from './ExternalGameImportJob.js';
 import GameAnalyze from './GameAnalyze.js';
 import Game from './Game.js';
 import GameChatSubscription from './GameChatSubscription.js';
@@ -58,6 +61,9 @@ export {
     ChannelChatMessage,
     ChatMessage,
     ConditionalMoves,
+    ExternalGame,
+    ExternalGameAnalyze,
+    ExternalGameImportJob,
     GameAnalyze,
     GameChatSubscription,
     GameOptions,
@@ -112,6 +118,9 @@ export const entities = {
     ChannelChatMessage,
     ChatMessage,
     ConditionalMoves,
+    ExternalGame,
+    ExternalGameAnalyze,
+    ExternalGameImportJob,
     GameAnalyze,
     GameChatSubscription,
     GameOptions,

@@ -1,0 +1,1152 @@
+
+
+
+
+
+
+
+	
+		
+
+			
+				
+				<!DOCTYPE html>
+				<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+				<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+				<!--[if !IE]><!-->
+				<html lang="en" class="no-js">
+				<!--<![endif]-->
+				<!-- BEGIN HEAD -->
+
+				<head>
+					<meta charset="utf-8" />
+					<title>Little Golem</title>
+					<meta http-equiv="X-UA-Compatible" content="IE=edge">
+					<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+					<meta content="Turn based board games" name="description" />
+					<meta content="Richard Malaschitz" name="author" />
+
+
+
+					<!-- BEGIN GLOBAL MANDATORY STYLES -->
+					<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all"
+						rel="stylesheet" type="text/css" />
+					<link href="../../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet"
+						type="text/css" />
+					<link href="../../assets/global/plugins/simple-line-icons/simple-line-icons.min.css"
+						rel="stylesheet" type="text/css" />
+					<link href="../../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"
+						type="text/css" />
+					<link href="../../assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet"
+						type="text/css" />
+					<link href="../../assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css"
+						rel="stylesheet" type="text/css" />
+					<link href="../../assets/global/plugins/bootstrap-markdown/css/bootstrap-markdown.min.css"
+						rel="stylesheet" type="text/css" />
+
+					<!-- END GLOBAL MANDATORY STYLES -->
+					<!-- BEGIN PAGE LEVEL PLUGIN STYLES -->
+					<!-- END PAGE LEVEL PLUGIN STYLES -->
+					<!-- BEGIN PAGE STYLES -->
+					<link href="../../assets/pages/css/tasks.css" rel="stylesheet" type="text/css" />
+					<!-- END PAGE STYLES -->
+					<!-- BEGIN THEME STYLES -->
+					<link href="../../assets/global/css/components.min.css" rel="stylesheet" id="style_components"
+						type="text/css" />
+					<link href="../../assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
+					<link href="../../assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css" />
+					<link href="../../assets/layouts/layout/css/themes/default.min.css" rel="stylesheet" type="text/css"
+						id="style_color" />
+					<link href="../../assets/layouts/layout/css/custom.css" rel="stylesheet" type="text/css" />
+					<!-- END THEME STYLES -->
+					<link rel="stylesheet" type="text/css"
+						href="../../assets/global/plugins/bootstrap-summernote/summernote.css">
+					<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+					<link rel="icon" href="/favicon.ico" type="image/x-icon">
+										
+				</head>
+				<!-- END HEAD -->
+				<!-- BEGIN BODY -->
+				<!-- DOC: Apply "page-header-fixed-mobile" and "page-footer-fixed-mobile" class to body element to force fixed header or footer in mobile devices -->
+				<!-- DOC: Apply "page-sidebar-closed" class to the body and "page-sidebar-menu-closed" class to the sidebar menu element to hide the sidebar by default -->
+				<!-- DOC: Apply "page-sidebar-hide" class to the body to make the sidebar completely hidden on toggle -->
+				<!-- DOC: Apply "page-sidebar-closed-hide-logo" class to the body element to make the logo hidden on sidebar toggle -->
+				<!-- DOC: Apply "page-sidebar-hide" class to body element to completely hide the sidebar on sidebar toggle -->
+				<!-- DOC: Apply "page-sidebar-fixed" class to have fixed sidebar -->
+				<!-- DOC: Apply "page-footer-fixed" class to the body element to have fixed footer -->
+				<!-- DOC: Apply "page-sidebar-reversed" class to put the sidebar on the right side -->
+				<!-- DOC: Apply "page-full-width" class to the body element to have full width page without the sidebar menu -->
+				
+					<body class="page-header-fixed page-sidebar-closed-hide-logo page-sidebar-closed" onload="document.getElementById('chatinput').blur();">
+				
+				
+					<!-- BEGIN HEADER -->
+					<div class="page-header navbar navbar-fixed-top">
+						<!-- BEGIN HEADER INNER -->
+						<div class="page-header-inner">
+							<!-- BEGIN LOGO -->
+							<div class="page-logo">
+								<a href="/index.jsp">
+									<img src="../../include/logo.png" alt="logo" class="logo-default" />
+								</a>
+								<div class="menu-toggler sidebar-toggler hide">
+									<!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+								</div>
+							</div>
+							<!-- END LOGO -->
+							<!-- BEGIN RESPONSIVE MENU TOGGLER -->
+							<a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse"
+								data-target=".navbar-collapse">
+							</a>
+							<!-- END RESPONSIVE MENU TOGGLER -->
+							<!-- BEGIN TOP NAVIGATION MENU -->
+							<div class="top-menu">
+								<ul class="nav navbar-nav pull-right">
+
+									<!-- BEGIN INBOX DROPDOWN -->
+									<li class="dropdown dropdown-extended dropdown-inbox" id="header_inbox_bar">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<i class="fa fa-envelope"></i>
+											
+										</a>
+										<ul class="dropdown-menu">
+											<li>
+												<p>
+													You have 0 new messages
+												</p>
+											</li>
+											<li>
+												<ul class="dropdown-menu-list scroller" style="height: 250px;">
+													
+												</ul>
+											</li>
+											<li class="external">
+												<a href="../../jsp/message/">
+													See all messages <i class="m-icon-swapright"></i>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<!-- END INBOX DROPDOWN -->
+									<!-- BEGIN TODO DROPDOWN -->
+									<li class="dropdown dropdown-extended dropdown-inbox" id="header_games" 
+										hx-swap="innerHTML" hx-get="../../include/action_games.jsp" hx-trigger="every 120s" >
+										
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<i class="fa fa-cubes"></i>
+											
+										</a>
+										<ul class="dropdown-menu extended tasks">
+											<li>
+												<p>
+													You have 0 games on move.
+												</p>
+											</li>
+											<li>
+												<ul class="dropdown-menu-list scroller" style="height: 250px;">
+													
+												</ul>
+											</li>
+											<li class="external">
+												<a href="../../jsp/game/index.jsp">
+													See all games <i class="m-icon-swapright"></i>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<!-- END TODO DROPDOWN -->
+									<!-- BEGIN INV DROPDOWN -->
+									<li class="dropdown dropdown-extended dropdown-inbox" id="header_task_bar">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<i class="fa fa-list"></i>
+											
+										</a>
+										<ul class="dropdown-menu extended tasks">
+											<li>
+												<p>
+													You have 0 invitations to game.
+												</p>
+											</li>
+											<li class="external">
+												<a href="../../jsp/invitation/index.jsp">
+													See all invitations <i class="m-icon-swapright"></i>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<!-- END INV DROPDOWN -->
+									<!-- BEGIN USER LOGIN DROPDOWN -->
+									<li class="dropdown dropdown-user">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<img alt="" class="img-circle"
+												src="https://api.littlegolem.net//avatar/0/29" />
+											<span class="username">
+												----
+											</span>
+											<i class="fa fa-angle-down"></i>
+										</a>
+										
+												<ul class="dropdown-menu">
+													<li>
+														<a
+															href="https://www.facebook.com/dialog/oauth?scope=public_profile,email&state=login&client_id=957692934314961&redirect_uri=https://www.littlegolem.net/servlet/facebook">
+															<i class="fa fa-facebook"></i> Facebook Login </a>
+													</li>
+													<li>
+														<a href="../../jsp/login/">
+															<i class="fa fa-key"></i> Login </a>
+													</li>
+													<li>
+														<a href="../../jsp/login/forgotten.jsp">
+															<i class="fa fa-key"></i> Forgotten password </a>
+													</li>
+													<li class="divider">
+													</li>
+													<li>
+														<a
+															href="https://www.facebook.com/dialog/oauth?scope=public_profile,email&state=register&client_id=957692934314961&redirect_uri=https://www.littlegolem.net/servlet/facebook">
+															<i class="fa fa-facebook"></i> Facebook Registration </a>
+													</li>
+
+													<li>
+														<a href="../../jsp/login/signup.jsp">
+															<i class="fa fa-key"></i> Registration </a>
+													</li>
+												</ul>
+												
+									</li>
+									<!-- END USER LOGIN DROPDOWN -->
+								</ul>
+							</div>
+							<!-- END TOP NAVIGATION MENU -->
+						</div>
+						<!-- END HEADER INNER -->
+					</div>
+					<!-- END HEADER -->
+					<div class="clearfix">
+					</div>
+					<!-- BEGIN CONTAINER -->
+					<div class="page-container">
+						<!-- BEGIN SIDEBAR -->
+						<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+						<!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+						<div class="page-sidebar navbar-collapse collapse">
+							<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+							<!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+							<div class="page-sidebar navbar-collapse collapse">
+								<!-- BEGIN SIDEBAR MENU -->
+								<!-- DOC: Apply "page-sidebar-menu-light" class right after "page-sidebar-menu" to enable light sidebar menu style(without borders) -->
+								<!-- DOC: Apply "page-sidebar-menu-hover-submenu" class right after "page-sidebar-menu" to enable hoverable(hover vs accordion) sub menu mode -->
+								<!-- DOC: Apply "page-sidebar-menu-closed" class right after "page-sidebar-menu" to collapse("page-sidebar-closed" class must be applied to the body element) the sidebar sub menu mode -->
+								<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+								<!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
+								<!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+								<ul class="page-sidebar-menu  page-sidebar-menu-closed"
+									data-keep-expanded="false" data-auto-scroll="true" data-auto-speed="200"
+									style="padding-top: 20px">
+									<!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
+									<li class="sidebar-toggler-wrapper">
+										<!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+										<div class="sidebar-toggler">
+										</div>
+										<!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+									</li>
+									<li class="nav-item start ">
+										<a href="/index.jsp">
+											<i class="fa fa-home"></i>
+											<span class="title"> HOME </span>
+										</a>
+									</li>
+									<li class="nav-item active">
+										<a href="../../jsp/game/index.jsp" class="nav-link">
+											<i class="fa fa-tasks"></i>
+											<span class="title">
+												My Games </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/tournament/index.jsp" class="nav-link">
+											<i class="fa fa-sitemap"></i>
+											<span class="title">
+												Tournaments </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+									<li class="nav-item ">
+										<a href="javascript:;" class="nav-link nav-toggle">
+											<i class="fa fa-users"></i>
+											<span class="title">
+												Forum </span>
+											
+												<span class="arrow">
+												</span>
+										</a>
+										<ul class="sub-menu">
+											
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=1"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	2H
+																</span>
+																
+
+																	General forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=5"
+															class="nav-link">
+
+															
+
+																	Polyomino forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=8"
+															class="nav-link">
+
+															
+
+																	XiangQi
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=10"
+															class="nav-link">
+
+															
+
+																	Chess forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=15"
+															class="nav-link">
+
+															
+
+																	Slither forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=20"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	5D
+																</span>
+																
+
+																	Go forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=25"
+															class="nav-link">
+
+															
+
+																	Word games
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=27"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	26H
+																</span>
+																
+
+																	Other games
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=30"
+															class="nav-link">
+
+															
+
+																	TZAAR, DVONN, LYNGK
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=35"
+															class="nav-link">
+
+															
+
+																	Tumbleweed
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=40"
+															class="nav-link">
+
+															
+
+																	Reversi forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=50"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	2D
+																</span>
+																
+
+																	Hex, Havannah
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=55"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	3D
+																</span>
+																
+
+																	TWIXT PP
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=60"
+															class="nav-link">
+
+															
+
+																	Amazons forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=70"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	8H
+																</span>
+																
+
+																	Gomoku, Connect6
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=80"
+															class="nav-link">
+
+															
+
+																	4ir forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=100"
+															class="nav-link">
+
+															
+
+																	StreetSoccer
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=110"
+															class="nav-link">
+
+															
+
+																	Dots and Boxes
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=120"
+															class="nav-link">
+
+															
+
+																	Breakthrough
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=130"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	18H
+																</span>
+																
+
+																	LOA forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=140"
+															class="nav-link">
+
+															
+
+																	Einstein forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=150"
+															class="nav-link">
+
+															
+
+																	Morelli
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=160"
+															class="nav-link">
+
+															
+
+																	Catchup
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=200"
+															class="nav-link">
+
+															
+
+																	Game of Empathy
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=300"
+															class="nav-link">
+
+															
+
+																	Draughts, Checkers
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=400"
+															class="nav-link">
+
+															
+
+																	Fendo
+														</a>
+													</li>
+													
+										</ul>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/wroom/index.jsp" class="nav-link">
+											<i class="fa fa-calendar-o"></i>
+											<span class="title">
+												Waiting Room </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/games/" class="nav-link">
+											<i class="fa fa-cubes"></i>
+											<span class="title">
+												Games </span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="javascript:;" class="nav-link nav-toggle">
+											<i class="fa fa-envelope"></i>
+											<span class="title">
+												Messages </span>
+
+											<span class="arrow open">
+											</span>
+										</a>
+										<ul class="sub-menu">
+											<li class="nav-item">
+												<a href="../../jsp/message/" class="nav-link">
+													Inbox </a>
+											</li>
+											<li class="nav-item">
+												<a href="../../jsp/message/new.jsp" class="nav-link">
+													New Message </a>
+											</li>
+											<li class="nav-item">
+												<a href="../../jsp/message/sent.jsp" class="nav-link">
+													Outbox </a>
+											</li>
+											<li class="nav-item">
+												<a href="../../jsp/invitation/index.jsp">
+													Invitations
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="nav-item ">
+										<a href="../../jsp/info/player_list.jsp" class="nav-link">
+											<i class="fa fa-users"></i>
+											<span class="title">
+												Players </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="https://docs.littlegolem.net/" class="nav-link">
+											<i class="fa fa-question-circle"></i>
+											<span class="title">
+												FAQ </span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/info/m2.jsp" class="nav-link">
+											<i class="fa fa-money"></i>
+											<span class="title">
+												Membership </span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/egame/index.jsp" class="nav-link">
+											<i class="fa fa-heart-o"></i>
+											<span class="title">
+												Game Of Empathy </span>
+										</a>
+									</li>
+									
+									<li class="nav-item ">
+										<a href="../../jsp/bots/index.jsp" class="nav-link">
+											<i class="fa fa-terminal"></i>
+											<span class="title">
+												BOTS </span>
+										</a>
+									</li>
+
+								</ul>
+								<!-- END SIDEBAR MENU -->
+							</div>
+						</div>
+						<!-- END SIDEBAR -->
+
+						<!-- BEGIN CONTENT -->
+						<div class="page-content-wrapper">
+							<div class="page-content">
+								<!-- BEGIN PAGE HEADER-->
+								
+
+
+
+<!-- BEGIN PAGE HEADER-->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="page-title" id="gametitle">
+			Hex-Size 13
+			:: #2264369
+			<small>(game finished)</small>
+		</h3>
+	</div>
+	<div class="col-md-4">
+		<div class="row pull-right">
+			
+			<a href="game.jsp?gid=2264369&nmove=0" class="btn blue"><i class="fa fa-fast-backward"></i></a>
+			<a href="game.jsp?gid=2264369&nmove=-1" class="btn blue"><i
+					class="fa fa-backward"></i></a> <a href="game.jsp?gid=2264369&nmove=1"
+				class="btn blue"><i class="fa fa-forward"></i></a> <a href="game.jsp?gid=2264369"
+				class="btn blue"><i class="fa fa-fast-forward"></i></a>
+		</div>
+	</div>
+</div>
+
+<div class="row" >
+	<div class="col-xs-12 col-sm-11 col-md-9 col-lg-7" >
+
+		<div class="row">
+			<div class="col-md-12">
+				
+<svg viewbox="0 0 660 397" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><filter id="dropshadow"><feGaussianBlur in="SourceAlpha" stdDeviation="3"/><feOffset dx="2" dy="2"/><feComponentTransfer><feFuncA type="linear" slope="0.2"/></feComponentTransfer><feMerge> <feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><pattern id="Pattern" x="4" y="4" width="4" height="4" patternUnits="userSpaceOnUse">><rect width='4' height='4' fill='#ffffff'/><circle cx="2" cy="2" r="0.5" fill="#000000" /></pattern><pattern id="Pattern2" x="10" y="10" width="5" height="5" patternUnits="userSpaceOnUse"><rect width='5' height='5' fill='#9e9e9e'/><path d='M0 5L5 0ZM6 4L4 6ZM-1 1L1 -1Z' stroke='#888' stroke-width='1'/></pattern>
+<polygon points="15.00,4.02 225.00,367.75 435.00,4.02 645.00,367.75" style="fill:#FFFFFF;stroke:black;stroke-width:1"></polygon>
+<polygon points="15.00,4.02 435.00,4.02 225.00,367.75 645.00,367.75" style="fill:#303030;stroke:black;stroke-width:1"></polygon>
+<polygon points="60.00,30.00 240.00,341.77 600.00,341.77 420.00,30.00" style="fill:black;stroke:black;stroke-width:1"></polygon>
+<polygon points="60.00,47.40 75.07,38.70 75.07,21.30 60.00,12.60 44.93,21.30 44.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="75.00,73.38 90.07,64.68 90.07,47.28 75.00,38.58 59.93,47.28 59.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="90.00,99.36 105.07,90.66 105.07,73.26 90.00,64.56 74.93,73.26 74.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="105.00,125.34 120.07,116.64 120.07,99.24 105.00,90.54 89.93,99.24 89.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="120.00,151.32 135.07,142.62 135.07,125.22 120.00,116.52 104.93,125.22 104.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="135.00,177.30 150.07,168.60 150.07,151.20 135.00,142.50 119.93,151.20 119.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="150.00,203.28 165.07,194.58 165.07,177.18 150.00,168.48 134.93,177.18 134.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="165.00,229.27 180.07,220.57 180.07,203.17 165.00,194.47 149.93,203.17 149.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="180.00,255.25 195.07,246.55 195.07,229.15 180.00,220.45 164.93,229.15 164.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="195.00,281.23 210.07,272.53 210.07,255.13 195.00,246.43 179.93,255.13 179.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="210.00,307.21 225.07,298.51 225.07,281.11 210.00,272.41 194.93,281.11 194.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="225.00,333.19 240.07,324.49 240.07,307.09 225.00,298.39 209.93,307.09 209.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,359.17 255.07,350.47 255.07,333.07 240.00,324.37 224.93,333.07 224.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="90.00,47.40 105.07,38.70 105.07,21.30 90.00,12.60 74.93,21.30 74.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="105.00,73.38 120.07,64.68 120.07,47.28 105.00,38.58 89.93,47.28 89.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="120.00,99.36 135.07,90.66 135.07,73.26 120.00,64.56 104.93,73.26 104.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="135.00,125.34 150.07,116.64 150.07,99.24 135.00,90.54 119.93,99.24 119.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="150.00,151.32 165.07,142.62 165.07,125.22 150.00,116.52 134.93,125.22 134.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="165.00,177.30 180.07,168.60 180.07,151.20 165.00,142.50 149.93,151.20 149.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="180.00,203.28 195.07,194.58 195.07,177.18 180.00,168.48 164.93,177.18 164.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="195.00,229.27 210.07,220.57 210.07,203.17 195.00,194.47 179.93,203.17 179.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="210.00,255.25 225.07,246.55 225.07,229.15 210.00,220.45 194.93,229.15 194.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="225.00,281.23 240.07,272.53 240.07,255.13 225.00,246.43 209.93,255.13 209.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,307.21 255.07,298.51 255.07,281.11 240.00,272.41 224.93,281.11 224.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="255.00,333.19 270.07,324.49 270.07,307.09 255.00,298.39 239.93,307.09 239.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,359.17 285.07,350.47 285.07,333.07 270.00,324.37 254.93,333.07 254.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="120.00,47.40 135.07,38.70 135.07,21.30 120.00,12.60 104.93,21.30 104.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="135.00,73.38 150.07,64.68 150.07,47.28 135.00,38.58 119.93,47.28 119.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="150.00,99.36 165.07,90.66 165.07,73.26 150.00,64.56 134.93,73.26 134.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="165.00,125.34 180.07,116.64 180.07,99.24 165.00,90.54 149.93,99.24 149.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="180.00,151.32 195.07,142.62 195.07,125.22 180.00,116.52 164.93,125.22 164.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="195.00,177.30 210.07,168.60 210.07,151.20 195.00,142.50 179.93,151.20 179.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="210.00,203.28 225.07,194.58 225.07,177.18 210.00,168.48 194.93,177.18 194.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="225.00,229.27 240.07,220.57 240.07,203.17 225.00,194.47 209.93,203.17 209.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,255.25 255.07,246.55 255.07,229.15 240.00,220.45 224.93,229.15 224.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="255.00,281.23 270.07,272.53 270.07,255.13 255.00,246.43 239.93,255.13 239.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,307.21 285.07,298.51 285.07,281.11 270.00,272.41 254.93,281.11 254.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="285.00,333.19 300.07,324.49 300.07,307.09 285.00,298.39 269.93,307.09 269.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,359.17 315.07,350.47 315.07,333.07 300.00,324.37 284.93,333.07 284.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="150.00,47.40 165.07,38.70 165.07,21.30 150.00,12.60 134.93,21.30 134.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="165.00,73.38 180.07,64.68 180.07,47.28 165.00,38.58 149.93,47.28 149.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="180.00,99.36 195.07,90.66 195.07,73.26 180.00,64.56 164.93,73.26 164.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="195.00,125.34 210.07,116.64 210.07,99.24 195.00,90.54 179.93,99.24 179.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="210.00,151.32 225.07,142.62 225.07,125.22 210.00,116.52 194.93,125.22 194.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="225.00,177.30 240.07,168.60 240.07,151.20 225.00,142.50 209.93,151.20 209.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,203.28 255.07,194.58 255.07,177.18 240.00,168.48 224.93,177.18 224.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="255.00,229.27 270.07,220.57 270.07,203.17 255.00,194.47 239.93,203.17 239.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,255.25 285.07,246.55 285.07,229.15 270.00,220.45 254.93,229.15 254.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="285.00,281.23 300.07,272.53 300.07,255.13 285.00,246.43 269.93,255.13 269.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,307.21 315.07,298.51 315.07,281.11 300.00,272.41 284.93,281.11 284.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="315.00,333.19 330.07,324.49 330.07,307.09 315.00,298.39 299.93,307.09 299.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,359.17 345.07,350.47 345.07,333.07 330.00,324.37 314.93,333.07 314.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="180.00,47.40 195.07,38.70 195.07,21.30 180.00,12.60 164.93,21.30 164.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="195.00,73.38 210.07,64.68 210.07,47.28 195.00,38.58 179.93,47.28 179.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="210.00,99.36 225.07,90.66 225.07,73.26 210.00,64.56 194.93,73.26 194.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="225.00,125.34 240.07,116.64 240.07,99.24 225.00,90.54 209.93,99.24 209.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,151.32 255.07,142.62 255.07,125.22 240.00,116.52 224.93,125.22 224.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="255.00,177.30 270.07,168.60 270.07,151.20 255.00,142.50 239.93,151.20 239.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,203.28 285.07,194.58 285.07,177.18 270.00,168.48 254.93,177.18 254.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="285.00,229.27 300.07,220.57 300.07,203.17 285.00,194.47 269.93,203.17 269.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,255.25 315.07,246.55 315.07,229.15 300.00,220.45 284.93,229.15 284.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="315.00,281.23 330.07,272.53 330.07,255.13 315.00,246.43 299.93,255.13 299.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,307.21 345.07,298.51 345.07,281.11 330.00,272.41 314.93,281.11 314.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="345.00,333.19 360.07,324.49 360.07,307.09 345.00,298.39 329.93,307.09 329.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,359.17 375.07,350.47 375.07,333.07 360.00,324.37 344.93,333.07 344.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="210.00,47.40 225.07,38.70 225.07,21.30 210.00,12.60 194.93,21.30 194.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="225.00,73.38 240.07,64.68 240.07,47.28 225.00,38.58 209.93,47.28 209.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,99.36 255.07,90.66 255.07,73.26 240.00,64.56 224.93,73.26 224.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="255.00,125.34 270.07,116.64 270.07,99.24 255.00,90.54 239.93,99.24 239.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,151.32 285.07,142.62 285.07,125.22 270.00,116.52 254.93,125.22 254.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="285.00,177.30 300.07,168.60 300.07,151.20 285.00,142.50 269.93,151.20 269.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,203.28 315.07,194.58 315.07,177.18 300.00,168.48 284.93,177.18 284.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="315.00,229.27 330.07,220.57 330.07,203.17 315.00,194.47 299.93,203.17 299.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,255.25 345.07,246.55 345.07,229.15 330.00,220.45 314.93,229.15 314.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="345.00,281.23 360.07,272.53 360.07,255.13 345.00,246.43 329.93,255.13 329.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,307.21 375.07,298.51 375.07,281.11 360.00,272.41 344.93,281.11 344.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="375.00,333.19 390.07,324.49 390.07,307.09 375.00,298.39 359.93,307.09 359.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,359.17 405.07,350.47 405.07,333.07 390.00,324.37 374.93,333.07 374.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="240.00,47.40 255.07,38.70 255.07,21.30 240.00,12.60 224.93,21.30 224.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="255.00,73.38 270.07,64.68 270.07,47.28 255.00,38.58 239.93,47.28 239.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,99.36 285.07,90.66 285.07,73.26 270.00,64.56 254.93,73.26 254.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="285.00,125.34 300.07,116.64 300.07,99.24 285.00,90.54 269.93,99.24 269.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,151.32 315.07,142.62 315.07,125.22 300.00,116.52 284.93,125.22 284.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="315.00,177.30 330.07,168.60 330.07,151.20 315.00,142.50 299.93,151.20 299.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,203.28 345.07,194.58 345.07,177.18 330.00,168.48 314.93,177.18 314.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="345.00,229.27 360.07,220.57 360.07,203.17 345.00,194.47 329.93,203.17 329.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,255.25 375.07,246.55 375.07,229.15 360.00,220.45 344.93,229.15 344.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="375.00,281.23 390.07,272.53 390.07,255.13 375.00,246.43 359.93,255.13 359.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,307.21 405.07,298.51 405.07,281.11 390.00,272.41 374.93,281.11 374.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="405.00,333.19 420.07,324.49 420.07,307.09 405.00,298.39 389.93,307.09 389.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,359.17 435.07,350.47 435.07,333.07 420.00,324.37 404.93,333.07 404.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="270.00,47.40 285.07,38.70 285.07,21.30 270.00,12.60 254.93,21.30 254.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="285.00,73.38 300.07,64.68 300.07,47.28 285.00,38.58 269.93,47.28 269.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,99.36 315.07,90.66 315.07,73.26 300.00,64.56 284.93,73.26 284.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="315.00,125.34 330.07,116.64 330.07,99.24 315.00,90.54 299.93,99.24 299.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,151.32 345.07,142.62 345.07,125.22 330.00,116.52 314.93,125.22 314.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="345.00,177.30 360.07,168.60 360.07,151.20 345.00,142.50 329.93,151.20 329.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,203.28 375.07,194.58 375.07,177.18 360.00,168.48 344.93,177.18 344.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="375.00,229.27 390.07,220.57 390.07,203.17 375.00,194.47 359.93,203.17 359.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,255.25 405.07,246.55 405.07,229.15 390.00,220.45 374.93,229.15 374.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="405.00,281.23 420.07,272.53 420.07,255.13 405.00,246.43 389.93,255.13 389.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,307.21 435.07,298.51 435.07,281.11 420.00,272.41 404.93,281.11 404.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="435.00,333.19 450.07,324.49 450.07,307.09 435.00,298.39 419.93,307.09 419.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="450.00,359.17 465.07,350.47 465.07,333.07 450.00,324.37 434.93,333.07 434.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="300.00,47.40 315.07,38.70 315.07,21.30 300.00,12.60 284.93,21.30 284.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="315.00,73.38 330.07,64.68 330.07,47.28 315.00,38.58 299.93,47.28 299.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,99.36 345.07,90.66 345.07,73.26 330.00,64.56 314.93,73.26 314.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="345.00,125.34 360.07,116.64 360.07,99.24 345.00,90.54 329.93,99.24 329.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,151.32 375.07,142.62 375.07,125.22 360.00,116.52 344.93,125.22 344.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="375.00,177.30 390.07,168.60 390.07,151.20 375.00,142.50 359.93,151.20 359.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,203.28 405.07,194.58 405.07,177.18 390.00,168.48 374.93,177.18 374.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="405.00,229.27 420.07,220.57 420.07,203.17 405.00,194.47 389.93,203.17 389.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,255.25 435.07,246.55 435.07,229.15 420.00,220.45 404.93,229.15 404.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="435.00,281.23 450.07,272.53 450.07,255.13 435.00,246.43 419.93,255.13 419.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="450.00,307.21 465.07,298.51 465.07,281.11 450.00,272.41 434.93,281.11 434.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="465.00,333.19 480.07,324.49 480.07,307.09 465.00,298.39 449.93,307.09 449.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="480.00,359.17 495.07,350.47 495.07,333.07 480.00,324.37 464.93,333.07 464.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="330.00,47.40 345.07,38.70 345.07,21.30 330.00,12.60 314.93,21.30 314.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="345.00,73.38 360.07,64.68 360.07,47.28 345.00,38.58 329.93,47.28 329.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,99.36 375.07,90.66 375.07,73.26 360.00,64.56 344.93,73.26 344.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="375.00,125.34 390.07,116.64 390.07,99.24 375.00,90.54 359.93,99.24 359.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,151.32 405.07,142.62 405.07,125.22 390.00,116.52 374.93,125.22 374.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="405.00,177.30 420.07,168.60 420.07,151.20 405.00,142.50 389.93,151.20 389.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,203.28 435.07,194.58 435.07,177.18 420.00,168.48 404.93,177.18 404.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="435.00,229.27 450.07,220.57 450.07,203.17 435.00,194.47 419.93,203.17 419.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="450.00,255.25 465.07,246.55 465.07,229.15 450.00,220.45 434.93,229.15 434.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="465.00,281.23 480.07,272.53 480.07,255.13 465.00,246.43 449.93,255.13 449.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="480.00,307.21 495.07,298.51 495.07,281.11 480.00,272.41 464.93,281.11 464.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="495.00,333.19 510.07,324.49 510.07,307.09 495.00,298.39 479.93,307.09 479.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="510.00,359.17 525.07,350.47 525.07,333.07 510.00,324.37 494.93,333.07 494.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="360.00,47.40 375.07,38.70 375.07,21.30 360.00,12.60 344.93,21.30 344.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="375.00,73.38 390.07,64.68 390.07,47.28 375.00,38.58 359.93,47.28 359.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,99.36 405.07,90.66 405.07,73.26 390.00,64.56 374.93,73.26 374.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="405.00,125.34 420.07,116.64 420.07,99.24 405.00,90.54 389.93,99.24 389.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,151.32 435.07,142.62 435.07,125.22 420.00,116.52 404.93,125.22 404.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="435.00,177.30 450.07,168.60 450.07,151.20 435.00,142.50 419.93,151.20 419.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="450.00,203.28 465.07,194.58 465.07,177.18 450.00,168.48 434.93,177.18 434.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="465.00,229.27 480.07,220.57 480.07,203.17 465.00,194.47 449.93,203.17 449.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="480.00,255.25 495.07,246.55 495.07,229.15 480.00,220.45 464.93,229.15 464.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="495.00,281.23 510.07,272.53 510.07,255.13 495.00,246.43 479.93,255.13 479.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="510.00,307.21 525.07,298.51 525.07,281.11 510.00,272.41 494.93,281.11 494.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="525.00,333.19 540.07,324.49 540.07,307.09 525.00,298.39 509.93,307.09 509.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="540.00,359.17 555.07,350.47 555.07,333.07 540.00,324.37 524.93,333.07 524.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="390.00,47.40 405.07,38.70 405.07,21.30 390.00,12.60 374.93,21.30 374.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="405.00,73.38 420.07,64.68 420.07,47.28 405.00,38.58 389.93,47.28 389.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,99.36 435.07,90.66 435.07,73.26 420.00,64.56 404.93,73.26 404.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="435.00,125.34 450.07,116.64 450.07,99.24 435.00,90.54 419.93,99.24 419.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="450.00,151.32 465.07,142.62 465.07,125.22 450.00,116.52 434.93,125.22 434.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="465.00,177.30 480.07,168.60 480.07,151.20 465.00,142.50 449.93,151.20 449.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="480.00,203.28 495.07,194.58 495.07,177.18 480.00,168.48 464.93,177.18 464.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="495.00,229.27 510.07,220.57 510.07,203.17 495.00,194.47 479.93,203.17 479.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="510.00,255.25 525.07,246.55 525.07,229.15 510.00,220.45 494.93,229.15 494.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="525.00,281.23 540.07,272.53 540.07,255.13 525.00,246.43 509.93,255.13 509.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="540.00,307.21 555.07,298.51 555.07,281.11 540.00,272.41 524.93,281.11 524.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="555.00,333.19 570.07,324.49 570.07,307.09 555.00,298.39 539.93,307.09 539.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="570.00,359.17 585.07,350.47 585.07,333.07 570.00,324.37 554.93,333.07 554.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="420.00,47.40 435.07,38.70 435.07,21.30 420.00,12.60 404.93,21.30 404.93,38.70 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="435.00,73.38 450.07,64.68 450.07,47.28 435.00,38.58 419.93,47.28 419.93,64.68 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="450.00,99.36 465.07,90.66 465.07,73.26 450.00,64.56 434.93,73.26 434.93,90.66 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="465.00,125.34 480.07,116.64 480.07,99.24 465.00,90.54 449.93,99.24 449.93,116.64 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="480.00,151.32 495.07,142.62 495.07,125.22 480.00,116.52 464.93,125.22 464.93,142.62 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="495.00,177.30 510.07,168.60 510.07,151.20 495.00,142.50 479.93,151.20 479.93,168.60 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="510.00,203.28 525.07,194.58 525.07,177.18 510.00,168.48 494.93,177.18 494.93,194.58 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="525.00,229.27 540.07,220.57 540.07,203.17 525.00,194.47 509.93,203.17 509.93,220.57 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="540.00,255.25 555.07,246.55 555.07,229.15 540.00,220.45 524.93,229.15 524.93,246.55 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="555.00,281.23 570.07,272.53 570.07,255.13 555.00,246.43 539.93,255.13 539.93,272.53 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="570.00,307.21 585.07,298.51 585.07,281.11 570.00,272.41 554.93,281.11 554.93,298.51 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="585.00,333.19 600.07,324.49 600.07,307.09 585.00,298.39 569.93,307.09 569.93,324.49 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<polygon points="600.00,359.17 615.07,350.47 615.07,333.07 600.00,324.37 584.93,333.07 584.93,350.47 " fill="#FFCF79" style="stroke:black;stroke-width:1.0"></polygon>
+<text x="240.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">A</text>
+<text x="15.0" y="40.0" style="fill:black;font-size: 20px;font-family:Arial"> 1</text>
+<text x="270.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">B</text>
+<text x="30.0" y="65.98076" style="fill:black;font-size: 20px;font-family:Arial"> 2</text>
+<text x="300.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">C</text>
+<text x="45.0" y="91.961525" style="fill:black;font-size: 20px;font-family:Arial"> 3</text>
+<text x="330.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">D</text>
+<text x="60.0" y="117.94228" style="fill:black;font-size: 20px;font-family:Arial"> 4</text>
+<text x="360.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">E</text>
+<text x="75.0" y="143.92305" style="fill:black;font-size: 20px;font-family:Arial"> 5</text>
+<text x="390.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">F</text>
+<text x="90.0" y="169.90381" style="fill:black;font-size: 20px;font-family:Arial"> 6</text>
+<text x="420.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">G</text>
+<text x="105.0" y="195.88457" style="fill:black;font-size: 20px;font-family:Arial"> 7</text>
+<text x="450.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">H</text>
+<text x="120.0" y="221.86533" style="fill:black;font-size: 20px;font-family:Arial"> 8</text>
+<text x="480.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">I</text>
+<text x="135.0" y="247.8461" style="fill:black;font-size: 20px;font-family:Arial"> 9</text>
+<text x="510.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">J</text>
+<text x="139.28572" y="273.82684" style="fill:black;font-size: 20px;font-family:Arial">10</text>
+<text x="540.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">K</text>
+<text x="154.28572" y="299.80762" style="fill:black;font-size: 20px;font-family:Arial">11</text>
+<text x="570.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">L</text>
+<text x="169.28572" y="325.7884" style="fill:black;font-size: 20px;font-family:Arial">12</text>
+<text x="600.0" y="393.73065" style="fill:black;font-size: 20px;font-family:Arial">M</text>
+<text x="184.28572" y="351.76913" style="fill:black;font-size: 20px;font-family:Arial">13</text></svg>
+			</div>
+		</div>
+
+		<div class="row" >
+			<div class="col-md-12">
+				<br>
+				
+				<!--buttons-->
+				
+
+			
+
+			</div>
+		</div>
+
+		
+							</div>
+
+							<div class="col-xs-12 col-sm-7 col-md-5 col-lg-5" >
+								<div class="row">
+									
+									<tr>
+										<td colspan='2'><a
+												href='https://minortriad.com/cgi-bin/lgt.cgi?lgnr=2264369&ref=lgt'>
+												Analyze game on minortriad.com</a>
+											<br>
+											<a href='https://www.trmph.com/hex/game/lg-2264369'>
+												Analyze game on trmph.com</a>
+
+										</td>
+									</tr>
+			
+			</div>
+
+								
+								<div class="row">
+
+								
+
+									<div class="portlet box yellow">
+										<div class="portlet-title">
+											<div class="caption">
+												<i class="fa fa-user"></i>Player -
+												Black</div>
+										</div>
+										<div class="portlet-body">
+											<div class="row">
+												<div class="col-xs-3 col-md-3">
+													<img src="https://api.littlegolem.net//avatar/44438/60" />
+												</div>
+												<div class="col-xs-6 col-md-6">
+													<a
+														href='/jsp/info/player.jsp?plid=44438'>nytope</a>
+													<br> <img src="/ng/images/source/banner/FR.gif">
+													France
+													<br>
+													<span title='5. kyu'/>1870.9</span>
+													<span style='font-weight:bold; color: red'>-27.6</span>
+												</div>
+												
+												<div class="col-xs-2 col-md-2">
+													<span class="label-info"
+														style='font-size: 40px;'>&nbsp;0&nbsp;
+													</span>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="portlet box yellow">
+										<div class="portlet-title">
+											<div class="caption">
+												<i class="fa fa-user"></i>Player -
+												White</div>
+										</div>
+										<div class="portlet-body">
+											<div class="row">
+												<div class="col-xs-3 col-md-3">
+													<img src="https://api.littlegolem.net//avatar/12365/60" />
+												</div>
+												<div class="col-xs-6 col-md-6">
+													<a
+														href='/jsp/info/player.jsp?plid=12365'>Thoddy</a>
+													<br> <img src="/ng/images/source/banner/DE.gif">
+
+													Germany
+													<br>
+													<span title='13. kyu'/>1519.5</span>
+													<span style='font-weight:bold; color: green'>+27.6</span>
+												</div>
+												
+												<div class="col-xs-2 col-md-2">
+													<span class="label-info"
+														style='font-size: 40px;'>&nbsp;2&nbsp;
+													</span>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="portlet box green-haze">
+										<div class="portlet-title">
+											<div class="caption">
+												<i class="fa fa-info-circle"></i>INFO
+											</div>
+										</div>
+										<div class="portlet-body">
+											
+											Start time:
+											2021-08-28 23:33
+											<br>Finish time:
+											2021-08-28 23:33
+											<br>Tournament: <a
+												href="../tournament/tournament.jsp?trnid=hex.DEFAULT.mc.2019.dec.2.1">hex.DEFAULT.mc.2019.dec.2.1</a>
+											
+											
+
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="portlet solid green-haze">
+										<div class="portlet-title">
+											<div class="caption">
+												<i class="fa fa-info-circle"></i>Moves
+											</div>
+											<div class="actions">
+												
+												<a href="/servlet/sgf/2264369/game2264369.hsgf"
+													class="btn yellow"><i class="fa fa-file-code-o"></i> TXT</a>
+											</div>
+										</div>
+										<div class="portlet-body">
+											
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="clearfix">
+										
+										
+										<div class="col-md-5">
+											<a href="/jsp/game/game.jsp?gid=2264369&graphics=change"
+												class="btn green-haze"> <i class="fa fa-paint-brush"></i>
+												Design scheme
+											</a>
+										</div>
+										
+										<div class="col-md-5">
+										<a href="/jsp/game/game.jsp?gid=2264369&rating=change"
+												class="btn green-haze"> <i class="fa fa-paint-brush"></i>
+												Rating/Rank
+											</a></div>
+									</div>
+								</div>
+
+
+
+								
+
+							</div>
+						</div>
+									<!-- END PAGE CONTENT-->
+		</div>
+	</div>
+	<!-- END CONTENT -->
+</div>
+<!-- END CONTAINER -->
+<!-- BEGIN FOOTER -->
+<div class="page-footer">
+	<div class="page-footer-inner">
+		<a href='/jsp/message/webmaster.jsp'><i class="fa fa-envelope"></i> Contact</a>
+		&nbsp;&nbsp;
+		<a href='https://docs.littlegolem.net/'><i class="fa fa-book"></i> Documentations</a>
+		&nbsp;&nbsp; 
+		<a href='https://www.reddit.com/r/LittleGolem/'><i class="fa fa-reddit"></i> Reddit</a>
+		&nbsp;&nbsp; 
+		2002-2022 &copy;LittleGolem &nbsp;&nbsp;&nbsp;--6--&nbsp;&nbsp;&nbsp;
+		 
+		
+		
+	</div>
+	<div class="page-footer-tools">
+		<span class="go-top">
+		<i class="fa fa-angle-up"></i>
+		</span>
+	</div>
+</div>
+<!-- END FOOTER -->
+<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+<!-- BEGIN CORE PLUGINS -->
+<!--[if lt IE 9]>
+<script src="../../assets/global/plugins/respond.min.js"></script>
+<script src="../../assets/global/plugins/excanvas.min.js"></script> 
+<![endif]-->
+
+<script src="../../assets/htmx.min.js" defer></script>
+
+<script src="../../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/js.cookie.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/jquery.blockui.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/uniform/jquery.uniform.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
+<!-- END CORE PLUGINS -->
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+<!-- END PAGE LEVEL PLUGINS -->
+
+<!-- BEGIN THEME GLOBAL SCRIPTS -->
+<script src="../../assets/global/scripts/app.min.js" type="text/javascript"></script>
+<!-- END THEME GLOBAL SCRIPTS -->
+<!-- BEGIN THEME LAYOUT SCRIPTS -->
+<script src="../../assets/layouts/layout/scripts/layout.min.js" type="text/javascript"></script>
+<script src="../../assets/layouts/layout/scripts/demo.min.js" type="text/javascript"></script>
+<script src="../../assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
+<!-- END THEME LAYOUT SCRIPTS -->
+<script src="../../assets/global/plugins/bootstrap-markdown/js/bootstrap-markdown.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap-markdown/lib/markdown.js" type="text/javascript"></script>
+
+<script>
+  
+  jQuery(document).ready(function() {    
+     $('[data-toggle="tooltip"]').tooltip();      
+   });
+  
+   </script>
+</body>
+<!-- END BODY -->
+</html>

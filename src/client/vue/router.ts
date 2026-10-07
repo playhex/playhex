@@ -21,6 +21,14 @@ const routes: RouteRecordRaw[] = [
                 },
             },
             {
+                name: 'external-game',
+                path: '/external-games/:externalGameId',
+                component: () => import('./pages/PageExternalGame.vue'),
+                meta: {
+                    displayFooter: false,
+                },
+            },
+            {
                 name: 'player',
                 path: '/@:slug(.{1,32})', // Regex to avoid matching players public ids
                 component: () => import('./pages/player/PagePlayer.vue'),
@@ -186,6 +194,11 @@ const routes: RouteRecordRaw[] = [
         name: 'games-archive',
         path: '/games-archive',
         component: () => import('./pages/PageGamesArchive.vue'),
+    },
+    {
+        name: 'external-games-archive',
+        path: '/external-games-archive',
+        component: () => import('./pages/PageExternalGamesArchive.vue'),
     },
     {
         name: 'statistics',

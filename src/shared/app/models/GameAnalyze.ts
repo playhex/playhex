@@ -48,7 +48,7 @@ export type GameAnalyzeData = ({
     mcts?: GameAnalyzeMoveMcts;
 } | null)[];
 
-export const hasGameAnalyzeErrored = (gameAnalyze: GameAnalyze): boolean =>
+export const hasGameAnalyzeErrored = (gameAnalyze: Pick<GameAnalyze, 'analyze' | 'endedAt'>): boolean =>
     gameAnalyze.endedAt !== null && gameAnalyze.analyze === null
 ;
 

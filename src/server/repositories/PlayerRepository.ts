@@ -341,6 +341,22 @@ export default class PlayerRepository
         Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { countryFlag });
     }
 
+    /**
+     * Link or unlink (null) a Little Golem account.
+     */
+    async updateLittleGolemAccount(publicId: string, littleGolemPlid: null | number, littleGolemPseudo: null | string): Promise<void>
+    {
+        await this.playerRepository.createQueryBuilder('player')
+            .update()
+            .where('publicId = :publicId', { publicId })
+            .set({ littleGolemPlid, littleGolemPseudo })
+            .execute()
+        ;
+
+        // Update player instance kept in memory
+        Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { littleGolemPlid, littleGolemPseudo });
+    }
+
     async shadowBan(publicId: string): Promise<number | undefined>
     {
         const { affected } = await this.playerRepository.createQueryBuilder('player')

@@ -3,7 +3,7 @@ import useSocketStore from './socketStore.js';
 import useToastsStore from './toastsStore.js';
 import { GameAnalyze } from '../../shared/app/models/index.js';
 import { Ref, reactive, ref } from 'vue';
-import { apiGetGameAnalyze, apiRequestGameAnalyze, apiRequestGameAnalyzeMoveMcts } from '../apiClient.js';
+import { type AnalyzeApiBase, apiGetGameAnalyze, apiRequestGameAnalyze, apiRequestGameAnalyzeMoveMcts } from '../apiClient.js';
 import { t } from 'i18next';
 
 /**
@@ -14,6 +14,25 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
     const { socket } = useSocketStore();
 
     const gameAnalyzes: { [gamePublicId: string]: Ref<null | GameAnalyze> } = {};
+
+    /**
+     * Ids of external games (not played on PlayHex),
+     * which analyzes are fetched from another endpoint.
+     */
+    const externalGameIds = new Set<string>();
+
+    const apiBase = (gamePublicId: string): AnalyzeApiBase => externalGameIds.has(gamePublicId)
+        ? '/api/external-games'
+        : '/api/games'
+    ;
+
+    /**
+     * Must be called before loading analyze of an external game.
+     * Analyze updates are received in Rooms.externalGame() room, which must be joined.
+     */
+    const registerExternalGame = (externalGamePublicId: string): void => {
+        externalGameIds.add(externalGamePublicId);
+    };
 
     /**
      * Get an initial ref to a game analyze that will update automatically.
@@ -47,8 +66,8 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
         void (async () => {
             try {
                 gameAnalyze.value = request
-                    ? await apiRequestGameAnalyze(gamePublicId)
-                    : await apiGetGameAnalyze(gamePublicId)
+                    ? await apiRequestGameAnalyze(gamePublicId, apiBase(gamePublicId))
+                    : await apiGetGameAnalyze(gamePublicId, apiBase(gamePublicId))
                 ;
             } catch (e) {
                 if (!request) {
@@ -85,7 +104,7 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
         pendingMctsMoveAnalyzes.add(key);
 
         try {
-            await apiRequestGameAnalyzeMoveMcts(gamePublicId, moveIndex);
+            await apiRequestGameAnalyzeMoveMcts(gamePublicId, moveIndex, apiBase(gamePublicId));
         } catch {
             pendingMctsMoveAnalyzes.delete(key);
             useToastsStore().addToast(t('game_analysis.deep_analysis_failed'), { level: 'danger' });
@@ -116,7 +135,7 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
 
         for (const gameId of gameIds) {
             void (async () => {
-                const gameAnalyze = await apiGetGameAnalyze(gameId);
+                const gameAnalyze = await apiGetGameAnalyze(gameId, apiBase(gameId));
 
                 if (gameAnalyzes[gameId] && gameAnalyze !== null) {
                     gameAnalyzes[gameId].value = gameAnalyze;
@@ -132,6 +151,7 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
     });
 
     return {
+        registerExternalGame,
         getAnalyze,
         loadAnalyze,
         isMctsMoveAnalyzePending,

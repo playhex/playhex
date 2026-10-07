@@ -1,0 +1,927 @@
+	
+	
+	
+		
+
+			
+				
+				<!DOCTYPE html>
+				<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+				<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+				<!--[if !IE]><!-->
+				<html lang="en" class="no-js">
+				<!--<![endif]-->
+				<!-- BEGIN HEAD -->
+
+				<head>
+					<meta charset="utf-8" />
+					<title>Little Golem</title>
+					<meta http-equiv="X-UA-Compatible" content="IE=edge">
+					<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+					<meta content="Turn based board games" name="description" />
+					<meta content="Richard Malaschitz" name="author" />
+
+
+
+					<!-- BEGIN GLOBAL MANDATORY STYLES -->
+					<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all"
+						rel="stylesheet" type="text/css" />
+					<link href="../../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet"
+						type="text/css" />
+					<link href="../../assets/global/plugins/simple-line-icons/simple-line-icons.min.css"
+						rel="stylesheet" type="text/css" />
+					<link href="../../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"
+						type="text/css" />
+					<link href="../../assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet"
+						type="text/css" />
+					<link href="../../assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css"
+						rel="stylesheet" type="text/css" />
+					<link href="../../assets/global/plugins/bootstrap-markdown/css/bootstrap-markdown.min.css"
+						rel="stylesheet" type="text/css" />
+
+					<!-- END GLOBAL MANDATORY STYLES -->
+					<!-- BEGIN PAGE LEVEL PLUGIN STYLES -->
+					<!-- END PAGE LEVEL PLUGIN STYLES -->
+					<!-- BEGIN PAGE STYLES -->
+					<link href="../../assets/pages/css/tasks.css" rel="stylesheet" type="text/css" />
+					<!-- END PAGE STYLES -->
+					<!-- BEGIN THEME STYLES -->
+					<link href="../../assets/global/css/components.min.css" rel="stylesheet" id="style_components"
+						type="text/css" />
+					<link href="../../assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
+					<link href="../../assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css" />
+					<link href="../../assets/layouts/layout/css/themes/default.min.css" rel="stylesheet" type="text/css"
+						id="style_color" />
+					<link href="../../assets/layouts/layout/css/custom.css" rel="stylesheet" type="text/css" />
+					<!-- END THEME STYLES -->
+					<link rel="stylesheet" type="text/css"
+						href="../../assets/global/plugins/bootstrap-summernote/summernote.css">
+					<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+					<link rel="icon" href="/favicon.ico" type="image/x-icon">
+										
+				</head>
+				<!-- END HEAD -->
+				<!-- BEGIN BODY -->
+				<!-- DOC: Apply "page-header-fixed-mobile" and "page-footer-fixed-mobile" class to body element to force fixed header or footer in mobile devices -->
+				<!-- DOC: Apply "page-sidebar-closed" class to the body and "page-sidebar-menu-closed" class to the sidebar menu element to hide the sidebar by default -->
+				<!-- DOC: Apply "page-sidebar-hide" class to the body to make the sidebar completely hidden on toggle -->
+				<!-- DOC: Apply "page-sidebar-closed-hide-logo" class to the body element to make the logo hidden on sidebar toggle -->
+				<!-- DOC: Apply "page-sidebar-hide" class to body element to completely hide the sidebar on sidebar toggle -->
+				<!-- DOC: Apply "page-sidebar-fixed" class to have fixed sidebar -->
+				<!-- DOC: Apply "page-footer-fixed" class to the body element to have fixed footer -->
+				<!-- DOC: Apply "page-sidebar-reversed" class to put the sidebar on the right side -->
+				<!-- DOC: Apply "page-full-width" class to the body element to have full width page without the sidebar menu -->
+				
+					<body class="page-header-fixed">
+				
+				
+					<!-- BEGIN HEADER -->
+					<div class="page-header navbar navbar-fixed-top">
+						<!-- BEGIN HEADER INNER -->
+						<div class="page-header-inner">
+							<!-- BEGIN LOGO -->
+							<div class="page-logo">
+								<a href="/index.jsp">
+									<img src="../../include/logo.png" alt="logo" class="logo-default" />
+								</a>
+								<div class="menu-toggler sidebar-toggler hide">
+									<!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+								</div>
+							</div>
+							<!-- END LOGO -->
+							<!-- BEGIN RESPONSIVE MENU TOGGLER -->
+							<a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse"
+								data-target=".navbar-collapse">
+							</a>
+							<!-- END RESPONSIVE MENU TOGGLER -->
+							<!-- BEGIN TOP NAVIGATION MENU -->
+							<div class="top-menu">
+								<ul class="nav navbar-nav pull-right">
+
+									<!-- BEGIN INBOX DROPDOWN -->
+									<li class="dropdown dropdown-extended dropdown-inbox" id="header_inbox_bar">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<i class="fa fa-envelope"></i>
+											
+										</a>
+										<ul class="dropdown-menu">
+											<li>
+												<p>
+													You have 0 new messages
+												</p>
+											</li>
+											<li>
+												<ul class="dropdown-menu-list scroller" style="height: 250px;">
+													
+												</ul>
+											</li>
+											<li class="external">
+												<a href="../../jsp/message/">
+													See all messages <i class="m-icon-swapright"></i>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<!-- END INBOX DROPDOWN -->
+									<!-- BEGIN TODO DROPDOWN -->
+									<li class="dropdown dropdown-extended dropdown-inbox" id="header_games" 
+										hx-swap="innerHTML" hx-get="../../include/action_games.jsp" hx-trigger="every 120s" >
+										
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<i class="fa fa-cubes"></i>
+											
+										</a>
+										<ul class="dropdown-menu extended tasks">
+											<li>
+												<p>
+													You have 0 games on move.
+												</p>
+											</li>
+											<li>
+												<ul class="dropdown-menu-list scroller" style="height: 250px;">
+													
+												</ul>
+											</li>
+											<li class="external">
+												<a href="../../jsp/game/index.jsp">
+													See all games <i class="m-icon-swapright"></i>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<!-- END TODO DROPDOWN -->
+									<!-- BEGIN INV DROPDOWN -->
+									<li class="dropdown dropdown-extended dropdown-inbox" id="header_task_bar">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<i class="fa fa-list"></i>
+											
+										</a>
+										<ul class="dropdown-menu extended tasks">
+											<li>
+												<p>
+													You have 0 invitations to game.
+												</p>
+											</li>
+											<li class="external">
+												<a href="../../jsp/invitation/index.jsp">
+													See all invitations <i class="m-icon-swapright"></i>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<!-- END INV DROPDOWN -->
+									<!-- BEGIN USER LOGIN DROPDOWN -->
+									<li class="dropdown dropdown-user">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+											data-close-others="true">
+											<img alt="" class="img-circle"
+												src="https://api.littlegolem.net//avatar/0/29" />
+											<span class="username">
+												----
+											</span>
+											<i class="fa fa-angle-down"></i>
+										</a>
+										
+												<ul class="dropdown-menu">
+													<li>
+														<a
+															href="https://www.facebook.com/dialog/oauth?scope=public_profile,email&state=login&client_id=957692934314961&redirect_uri=https://www.littlegolem.net/servlet/facebook">
+															<i class="fa fa-facebook"></i> Facebook Login </a>
+													</li>
+													<li>
+														<a href="../../jsp/login/">
+															<i class="fa fa-key"></i> Login </a>
+													</li>
+													<li>
+														<a href="../../jsp/login/forgotten.jsp">
+															<i class="fa fa-key"></i> Forgotten password </a>
+													</li>
+													<li class="divider">
+													</li>
+													<li>
+														<a
+															href="https://www.facebook.com/dialog/oauth?scope=public_profile,email&state=register&client_id=957692934314961&redirect_uri=https://www.littlegolem.net/servlet/facebook">
+															<i class="fa fa-facebook"></i> Facebook Registration </a>
+													</li>
+
+													<li>
+														<a href="../../jsp/login/signup.jsp">
+															<i class="fa fa-key"></i> Registration </a>
+													</li>
+												</ul>
+												
+									</li>
+									<!-- END USER LOGIN DROPDOWN -->
+								</ul>
+							</div>
+							<!-- END TOP NAVIGATION MENU -->
+						</div>
+						<!-- END HEADER INNER -->
+					</div>
+					<!-- END HEADER -->
+					<div class="clearfix">
+					</div>
+					<!-- BEGIN CONTAINER -->
+					<div class="page-container">
+						<!-- BEGIN SIDEBAR -->
+						<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+						<!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+						<div class="page-sidebar navbar-collapse collapse">
+							<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+							<!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+							<div class="page-sidebar navbar-collapse collapse">
+								<!-- BEGIN SIDEBAR MENU -->
+								<!-- DOC: Apply "page-sidebar-menu-light" class right after "page-sidebar-menu" to enable light sidebar menu style(without borders) -->
+								<!-- DOC: Apply "page-sidebar-menu-hover-submenu" class right after "page-sidebar-menu" to enable hoverable(hover vs accordion) sub menu mode -->
+								<!-- DOC: Apply "page-sidebar-menu-closed" class right after "page-sidebar-menu" to collapse("page-sidebar-closed" class must be applied to the body element) the sidebar sub menu mode -->
+								<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+								<!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
+								<!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+								<ul class="page-sidebar-menu "
+									data-keep-expanded="false" data-auto-scroll="true" data-auto-speed="200"
+									style="padding-top: 20px">
+									<!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
+									<li class="sidebar-toggler-wrapper">
+										<!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+										<div class="sidebar-toggler">
+										</div>
+										<!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+									</li>
+									<li class="nav-item start ">
+										<a href="/index.jsp">
+											<i class="fa fa-home"></i>
+											<span class="title"> HOME </span>
+										</a>
+									</li>
+									<li class="nav-item ">
+										<a href="../../jsp/game/index.jsp" class="nav-link">
+											<i class="fa fa-tasks"></i>
+											<span class="title">
+												My Games </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/tournament/index.jsp" class="nav-link">
+											<i class="fa fa-sitemap"></i>
+											<span class="title">
+												Tournaments </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+									<li class="nav-item ">
+										<a href="javascript:;" class="nav-link nav-toggle">
+											<i class="fa fa-users"></i>
+											<span class="title">
+												Forum </span>
+											
+												<span class="arrow">
+												</span>
+										</a>
+										<ul class="sub-menu">
+											
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=1"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	2H
+																</span>
+																
+
+																	General forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=5"
+															class="nav-link">
+
+															
+
+																	Polyomino forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=8"
+															class="nav-link">
+
+															
+
+																	XiangQi
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=10"
+															class="nav-link">
+
+															
+
+																	Chess forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=15"
+															class="nav-link">
+
+															
+
+																	Slither forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=20"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	5D
+																</span>
+																
+
+																	Go forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=25"
+															class="nav-link">
+
+															
+
+																	Word games
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=27"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	26H
+																</span>
+																
+
+																	Other games
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=30"
+															class="nav-link">
+
+															
+
+																	TZAAR, DVONN, LYNGK
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=35"
+															class="nav-link">
+
+															
+
+																	Tumbleweed
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=40"
+															class="nav-link">
+
+															
+
+																	Reversi forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=50"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	2D
+																</span>
+																
+
+																	Hex, Havannah
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=55"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	3D
+																</span>
+																
+
+																	TWIXT PP
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=60"
+															class="nav-link">
+
+															
+
+																	Amazons forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=70"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	8H
+																</span>
+																
+
+																	Gomoku, Connect6
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=80"
+															class="nav-link">
+
+															
+
+																	4ir forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=100"
+															class="nav-link">
+
+															
+
+																	StreetSoccer
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=110"
+															class="nav-link">
+
+															
+
+																	Dots and Boxes
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=120"
+															class="nav-link">
+
+															
+
+																	Breakthrough
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=130"
+															class="nav-link">
+
+															
+																<span class="badge badge-roundless badge-success">
+																	18H
+																</span>
+																
+
+																	LOA forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=140"
+															class="nav-link">
+
+															
+
+																	Einstein forum
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=150"
+															class="nav-link">
+
+															
+
+																	Morelli
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=160"
+															class="nav-link">
+
+															
+
+																	Catchup
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=200"
+															class="nav-link">
+
+															
+
+																	Game of Empathy
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=300"
+															class="nav-link">
+
+															
+
+																	Draughts, Checkers
+														</a>
+													</li>
+													
+													<li class="nav-item ">
+														<a href="../../jsp/forum/forum2.jsp?forum=400"
+															class="nav-link">
+
+															
+
+																	Fendo
+														</a>
+													</li>
+													
+										</ul>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/wroom/index.jsp" class="nav-link">
+											<i class="fa fa-calendar-o"></i>
+											<span class="title">
+												Waiting Room </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/games/" class="nav-link">
+											<i class="fa fa-cubes"></i>
+											<span class="title">
+												Games </span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="javascript:;" class="nav-link nav-toggle">
+											<i class="fa fa-envelope"></i>
+											<span class="title">
+												Messages </span>
+
+											<span class="arrow open">
+											</span>
+										</a>
+										<ul class="sub-menu">
+											<li class="nav-item">
+												<a href="../../jsp/message/" class="nav-link">
+													Inbox </a>
+											</li>
+											<li class="nav-item">
+												<a href="../../jsp/message/new.jsp" class="nav-link">
+													New Message </a>
+											</li>
+											<li class="nav-item">
+												<a href="../../jsp/message/sent.jsp" class="nav-link">
+													Outbox </a>
+											</li>
+											<li class="nav-item">
+												<a href="../../jsp/invitation/index.jsp">
+													Invitations
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="nav-item active">
+										<a href="../../jsp/info/player_list.jsp" class="nav-link">
+											<i class="fa fa-users"></i>
+											<span class="title">
+												Players </span>
+											<span class="title">
+											</span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="https://docs.littlegolem.net/" class="nav-link">
+											<i class="fa fa-question-circle"></i>
+											<span class="title">
+												FAQ </span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/info/m2.jsp" class="nav-link">
+											<i class="fa fa-money"></i>
+											<span class="title">
+												Membership </span>
+										</a>
+									</li>
+
+									<li class="nav-item ">
+										<a href="../../jsp/egame/index.jsp" class="nav-link">
+											<i class="fa fa-heart-o"></i>
+											<span class="title">
+												Game Of Empathy </span>
+										</a>
+									</li>
+									
+									<li class="nav-item ">
+										<a href="../../jsp/bots/index.jsp" class="nav-link">
+											<i class="fa fa-terminal"></i>
+											<span class="title">
+												BOTS </span>
+										</a>
+									</li>
+
+								</ul>
+								<!-- END SIDEBAR MENU -->
+							</div>
+						</div>
+						<!-- END SIDEBAR -->
+
+						<!-- BEGIN CONTENT -->
+						<div class="page-content-wrapper">
+							<div class="page-content">
+								<!-- BEGIN PAGE HEADER-->
+								
+
+<!-- show player detail -->
+
+
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="portlet box green">
+			<div class="portlet-title">
+				<div class="caption">
+					<i class="fa fa-sitemap"></i>Player #44438
+				</div>
+				<div class="actions">
+					<a href="../invitation/new.jsp?pl2=44438" class="btn yellow-casablanca btn-sm"><i class="fa fa-pencil"></i> Invite </a>
+					<a href="../message/new.jsp?plto=44438" class="btn yellow-casablanca btn-sm"><i class="fa fa-send"></i> Send message </a>
+				</div>
+			</div>
+			<div class="portlet-body">
+				<div class="row">
+					<div class="col-md-3">
+						<span class="photo">
+							<img src="https://api.littlegolem.net//avatar/44438/200" alt=""/>
+						</span>
+					</div>
+					<div class="col-md-9">
+						<div class="table">
+							<table >
+								<tr>
+									<td style="padding: 5px;"><b>Name:</b></td>
+									<td style="padding: 5px;">nytope</td>
+								</tr>
+								<tr>
+									<td style="padding: 5px;"><b>Registered:<b></td>
+									<td style="padding: 5px;">2017-01-21</td>
+								</tr>
+								<tr>
+									<td style="padding: 5px;"><b>Lastconnect:</b></td>
+									<td style="padding: 5px;">2021-06-06 03:19</td>
+								</tr>						
+								
+							        <tr>
+										<td style="padding: 5px;"><b>Address:</b></td>
+										<td style="padding: 5px;"><img src="/ng/images/source/banner/FR.gif" border="0" >
+											&nbsp;
+											France
+										</td>
+									</tr>	
+										
+										
+										<tr>
+											<td style="padding: 5px;"><b>Info:</b></td>
+											<td style="padding: 5px;">Hex player from BGA. I also play Hex on playOK.</td>
+						        			</tr>	
+										
+									<tr>
+						            	<td style="padding: 5px;"><b><a href='m2.jsp'>Membership:</a></b></td>
+										<td style="padding: 5px;"><b><font color='red'>Not a member</font></b></td>
+                                    </tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br>
+<div class="portlet box yellow-casablanca"><div class="portlet-title"><div class="caption"><i class="fa fa-cogs"></i>Player's statistics</div><div class="tools"><a href="javascript:;" class="collapse"></a><a href="javascript:;" class="remove"></a></div></div><div class="portlet-body">
+        <table cellpadding='2' cellspacing='1' border='0' width='100%' align='center' bordercolor='white'>
+        <tr bgcolor='#FFFF97' align='center'>
+            <td width='150'><b>Game</b></td>
+            <td width='150'><b>Variant</b></td>
+            <td width='60'><b>Rating</b></td>
+            <td width='60'><b>Rank</b></td>
+            <td><b>Games</b></td>
+            <td><b>Championship level</b></td>
+            <td><b>Ladder position</b></td>            
+            <td><b>Won/Lost/Drawn/InProgress</b></td>
+            <td><b>Tournaments</b></td>
+            <!--<td><b>My score</b></td>-->
+        </tr>
+
+	            <tr align='right' bgcolor='#FFFFD5'>
+	                <td align='left'>EinStein würfelt nicht!</td>
+	                <td align='left'>7-points match</td>
+	                <td align='center'>
+	                	1500.0                	
+	                </td>
+	                <td>
+	                	<span title='1500.0'/>20. kyu</span>                	
+	                </td>
+	                <td nowrap><a href='player_game_list.jsp?gtid=einstein&plid=44438'>1 games</a></td>
+	                <td align='center'>-</td>
+	                <td align='center'>-</td>
+	                <td>+1-0=0~0</td>
+	                <td align='right'><a href="player_trn_list.jsp?gtid=einstein&plid=44438">0 tournaments</a></td>
+	                
+	             </tr>
+             
+
+	            <tr align='right' bgcolor='#FFFFD5'>
+	                <td align='left'>Hex</td>
+	                <td align='left'>Size 13</td>
+	                <td align='center'>
+	                	1870.91                	
+	                </td>
+	                <td>
+	                	<span title='1870.9'/>5. kyu</span>                	
+	                </td>
+	                <td nowrap><a href='player_game_list.jsp?gtid=hex&plid=44438'>271 games</a></td>
+	                <td align='center'>-</td>
+	                <td align='center'>-</td>
+	                <td>+143-128=0~0</td>
+	                <td align='right'><a href="player_trn_list.jsp?gtid=hex&plid=44438">82 tournaments</a></td>
+	                
+	             </tr>
+             
+
+	            <tr align='right' bgcolor='#FFFFD5'>
+	                <td align='left'>Hex</td>
+	                <td align='left'>Size 11</td>
+	                <td align='center'>
+	                	1755.77                	
+	                </td>
+	                <td>
+	                	<span title='1755.8'/>9. kyu</span>                	
+	                </td>
+	                <td nowrap><a href='player_game_list.jsp?gtid=hex&plid=44438'>305 games</a></td>
+	                <td align='center'>-</td>
+	                <td align='center'>-</td>
+	                <td>+162-143=0~0</td>
+	                <td align='right'><a href="player_trn_list.jsp?gtid=hex&plid=44438">93 tournaments</a></td>
+	                
+	             </tr>
+             
+
+	            <tr align='right' bgcolor='#FFFFD5'>
+	                <td align='left'>Hex</td>
+	                <td align='left'>Size 15</td>
+	                <td align='center'>
+	                	1498.09                	
+	                </td>
+	                <td>
+	                	<span title='1498.1'/>17. kyu</span>                	
+	                </td>
+	                <td nowrap><a href='player_game_list.jsp?gtid=hex&plid=44438'>14 games</a></td>
+	                <td align='center'>-</td>
+	                <td align='center'>-</td>
+	                <td>+8-6=0~0</td>
+	                <td align='right'><a href="player_trn_list.jsp?gtid=hex&plid=44438">1 tournaments</a></td>
+	                
+	             </tr>
+             
+
+	            <tr align='right' bgcolor='#FFFFD5'>
+	                <td align='left'>Hex</td>
+	                <td align='left'>Size 19</td>
+	                <td align='center'>
+	                	1859.22                	
+	                </td>
+	                <td>
+	                	<span title='1859.2'/>12. kyu</span>                	
+	                </td>
+	                <td nowrap><a href='player_game_list.jsp?gtid=hex&plid=44438'>58 games</a></td>
+	                <td align='center'>-</td>
+	                <td align='center'>-</td>
+	                <td>+40-18=0~0</td>
+	                <td align='right'><a href="player_trn_list.jsp?gtid=hex&plid=44438">12 tournaments</a></td>
+	                
+	             </tr>
+             
+
+        </table>
+</div></div>
+
+
+    <a href='blacklist.jsp?add=44438'>Add to blacklist</a>
+
+			<!-- END PAGE CONTENT-->
+		</div>
+	</div>
+	<!-- END CONTENT -->
+</div>
+<!-- END CONTAINER -->
+<!-- BEGIN FOOTER -->
+<div class="page-footer">
+	<div class="page-footer-inner">
+		<a href='/jsp/message/webmaster.jsp'><i class="fa fa-envelope"></i> Contact</a>
+		&nbsp;&nbsp;
+		<a href='https://docs.littlegolem.net/'><i class="fa fa-book"></i> Documentations</a>
+		&nbsp;&nbsp; 
+		<a href='https://www.reddit.com/r/LittleGolem/'><i class="fa fa-reddit"></i> Reddit</a>
+		&nbsp;&nbsp; 
+		2002-2022 &copy;LittleGolem &nbsp;&nbsp;&nbsp;--1259--&nbsp;&nbsp;&nbsp;
+		 
+		
+		
+	</div>
+	<div class="page-footer-tools">
+		<span class="go-top">
+		<i class="fa fa-angle-up"></i>
+		</span>
+	</div>
+</div>
+<!-- END FOOTER -->
+<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+<!-- BEGIN CORE PLUGINS -->
+<!--[if lt IE 9]>
+<script src="../../assets/global/plugins/respond.min.js"></script>
+<script src="../../assets/global/plugins/excanvas.min.js"></script> 
+<![endif]-->
+
+<script src="../../assets/htmx.min.js" defer></script>
+
+<script src="../../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/js.cookie.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/jquery.blockui.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/uniform/jquery.uniform.min.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
+<!-- END CORE PLUGINS -->
+<!-- BEGIN PAGE LEVEL PLUGINS -->
+<!-- END PAGE LEVEL PLUGINS -->
+
+<!-- BEGIN THEME GLOBAL SCRIPTS -->
+<script src="../../assets/global/scripts/app.min.js" type="text/javascript"></script>
+<!-- END THEME GLOBAL SCRIPTS -->
+<!-- BEGIN THEME LAYOUT SCRIPTS -->
+<script src="../../assets/layouts/layout/scripts/layout.min.js" type="text/javascript"></script>
+<script src="../../assets/layouts/layout/scripts/demo.min.js" type="text/javascript"></script>
+<script src="../../assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
+<!-- END THEME LAYOUT SCRIPTS -->
+<script src="../../assets/global/plugins/bootstrap-markdown/js/bootstrap-markdown.js" type="text/javascript"></script>
+<script src="../../assets/global/plugins/bootstrap-markdown/lib/markdown.js" type="text/javascript"></script>
+
+<script>
+  
+  jQuery(document).ready(function() {    
+     $('[data-toggle="tooltip"]').tooltip();      
+   });
+  
+   </script>
+</body>
+<!-- END BODY -->
+</html>

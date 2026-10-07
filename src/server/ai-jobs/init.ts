@@ -5,6 +5,7 @@ import AiWorkersRegistry from './worker/AiWorkersRegistry.js';
 import { AI_JOB_TYPES } from './protocol.js';
 import { isMonitoringEnabled, sendAiQueuePoint } from '../services/metrics.js';
 import GameAnalyzeRepository from '../repositories/GameAnalyzeRepository.js';
+import ExternalGameRepository from '../external-games/ExternalGameRepository.js';
 import { AppDataSource } from '../data-source.js';
 import logger from '../services/logger.js';
 
@@ -42,5 +43,11 @@ export const initAiJobs = async (): Promise<void> => {
 
     if (failedCount > 0) {
         logger.notice(`${failedCount} game analyzes were processing before restart, marked as errored.`);
+    }
+
+    const failedExternalCount = await Container.get(ExternalGameRepository).failUnfinishedAnalyzes();
+
+    if (failedExternalCount > 0) {
+        logger.notice(`${failedExternalCount} external game analyzes were processing before restart, marked as errored.`);
     }
 };

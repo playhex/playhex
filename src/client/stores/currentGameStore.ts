@@ -31,6 +31,8 @@ import useLobbyStore from './lobbyStore.js';
 import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
 import { defineOverlay } from '@overlastic/vue';
 import GameFinishedOverlay from '../vue/components/overlay/GameFinishedOverlay.vue';
+import type ExternalGame from '../../shared/app/models/ExternalGame.js';
+import { externalGameToGame } from '../../shared/app/externalGameUtils.js';
 import useGameChatSubscriptionsStore from './gameChatSubscriptionsStore.js';
 
 /**
@@ -148,6 +150,47 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             game.value = null;
             currentGamePublicId.value = null;
             spectators.value = [];
+        });
+    };
+
+    /**
+     * Load an external game (played outside PlayHex), read only:
+     * no socket game room, players are only names.
+     * Allows replaying, simulating, analyzing it like a PlayHex ended game.
+     * Should be called sychronously inside a component, like useGame().
+     */
+    const useExternalGame = (externalGame: ExternalGame) => {
+        currentGamePublicId.value = externalGame.publicId;
+
+        const loadedGame = externalGameToGame(externalGame);
+
+        game.value = loadedGame;
+        engineGame.value = EngineGame.fromData(toEngineGameData(loadedGame));
+        gameView.value = new GameView(loadedGame.boardsize);
+        playerSettingsFacade.value = new PlayerSettingsFacade(gameView.value);
+        playingGameFacade.value = new PlayingGameFacade(
+            gameView.value,
+            engineGame.value.getAllowSwap(),
+            engineGame.value.getMovesHistory().map(moveTimestamped => moveTimestamped.move),
+        );
+
+        listenHexClick();
+        listenModel(playingGameFacade.value, engineGame.value);
+
+        onBeforeUnmount(() => {
+            disableCurrentUIMode();
+            removeConfirmMove();
+            simulatePlayingGameFacade.value?.destroy();
+            simulatePlayingGameFacade.value = null;
+            playerSettingsFacade.value?.destroy();
+            playerSettingsFacade.value = null;
+            playingGameFacade.value?.destroy();
+            playingGameFacade.value = null;
+            gameView.value?.destroy();
+            gameView.value = null;
+            engineGame.value = null;
+            game.value = null;
+            currentGamePublicId.value = null;
         });
     };
 
@@ -1304,6 +1347,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         simulatePlayingGameFacade,
 
         useGame,
+        useExternalGame,
 
         askUndo,
         answerUndo,

@@ -10,7 +10,7 @@ import { PlayerIndex } from '../time-control/TimeControl.js';
 import { ByoYomiTimeControl } from '../time-control/time-controls/ByoYomiTimeControl.js';
 import { getTimestampedMoves } from './gameUtils.js';
 
-const baseSGF: SGF = {
+export const baseSGF: SGF = {
     FF: 4,
     CA: 'UTF-8',
     AP: 'PlayHex:0.0.0',

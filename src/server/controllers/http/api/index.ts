@@ -41,6 +41,8 @@ import LadderController from '../../../ladder/LadderController.js';
 import PuzzleController from '../../../puzzles/PuzzleController.js';
 import PuzzleCollectionController from '../../../puzzles/PuzzleCollectionController.js';
 import VideoController from '../../../videos/VideoController.js';
+import ExternalGameController from '../../../external-games/ExternalGameController.js';
+import ExternalGameImportController from '../../../external-games/ExternalGameImportController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -93,6 +95,8 @@ export const registerApi = (app: Express) => {
             PuzzleController,
             PuzzleCollectionController,
             VideoController,
+            ExternalGameImportController,
+            ExternalGameController,
             ChatController,
             ChannelController,
             PlayerController,

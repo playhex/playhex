@@ -42,6 +42,11 @@ export default class Rooms
     static readonly game = (gameId: string) => `games/${gameId}`;
 
     /**
+     * External game page, to receive analyze updates.
+     */
+    static readonly externalGame = (externalGameId: string) => `external-games/${externalGameId}`;
+
+    /**
      * Channel for a specific player.
      */
     static readonly player = (playerId: string) => `players/${playerId}`;

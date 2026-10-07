@@ -354,6 +354,7 @@
     "nav_lobby": "Lobby",
     "nav_observe": "Observe",
     "nav_archives": "Archives",
+    "nav_archives_external": "External archives",
     "logging_in": "logging in…",
     "update": "Update",
     "tournaments": "Tournaments",
@@ -1437,5 +1438,44 @@
         "engine": "AI engine",
         "copy_command": "Copy command",
         "manage_worker": "How to stop, update, or see logs of a worker"
+    },
+    "external_games": {
+        "game": "External game",
+        "not_found": "This game does not exist.",
+        "archive_title": "External games archive",
+        "archive_description": "Games played outside PlayHex, imported from other platforms, or transcribed by hand.",
+        "source": "Source",
+        "event": "Event",
+        "ratings": "Ratings on source (at import time)",
+        "external_id": "Id",
+        "imported": "Imported",
+        "imported_by": "Imported by",
+        "updated": "Updated",
+        "open": "Open",
+        "played_on": "Played on {source}",
+        "playhex_games": "PlayHex",
+        "little_golem_games": "Games on Little Golem",
+        "accounts": {
+            "title": "Accounts on other platforms",
+            "description": "Link your accounts to import games you played elsewhere, and show them on your profile."
+        },
+        "little_golem": {
+            "title": "Little Golem",
+            "not_linked": "not linked",
+            "link_description": "Enter your Little Golem pseudo. If it is not found, paste your Little Golem profile link.",
+            "pseudo": "Little Golem pseudo or profile link",
+            "link": "Link",
+            "linked_to": "Linked to Little Golem account:",
+            "unlink": "Unlink",
+            "import": "Import my Little Golem games"
+        },
+        "import": {
+            "pending": "Import will start soon…",
+            "listing": "Searching games on Little Golem…",
+            "running": "Importing…",
+            "done": "Import finished.",
+            "failed": "Import failed.",
+            "progress": "{{imported}} imported, {{skipped}} already imported, {{failed}} failed, {{notFinished}} not finished, out of {{total}} games."
+        }
     }
 }

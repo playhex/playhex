@@ -29,12 +29,22 @@ const props = defineProps({
         required: false,
         default: null,
     },
+
+    /**
+     * Show only players names, not linked to PlayHex profiles.
+     * Used for external games.
+     */
+    plainNames: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const {
     players,
     timeControlOptions,
     timeControlValues,
+    plainNames,
 } = toRefs(props);
 
 const {
@@ -163,7 +173,8 @@ onUnmounted(() => {
         <div v-if="engineGame" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
                 <p v-if="players">
-                    <template v-if="players[0]">
+                    <span v-if="players[0] && plainNames" class="nickname text-danger">{{ players[0].pseudo }}</span>
+                    <template v-else-if="players[0]">
                         <AppPlayerAvatar v-if="players[0].avatarThumbnailPath ?? players[0].avatarPath" :player="players[0]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo
                             flag
@@ -187,7 +198,8 @@ onUnmounted(() => {
             <div class="player player-b">
                 <p v-if="players">
                     <span v-if="engineGame.getWinner() === 1"><IconTrophyFill class="text-warning" />&nbsp;</span>
-                    <template v-if="players[1]">
+                    <span v-if="players[1] && plainNames" class="nickname text-primary">{{ players[1].pseudo }}</span>
+                    <template v-else-if="players[1]">
                         <AppPlayerAvatar v-if="players[1].avatarThumbnailPath ?? players[1].avatarPath" :player="players[1]" thumbnail onlineStatus class="board-avatar me-1" />
                         <AppPseudo
                             flag

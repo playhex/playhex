@@ -137,7 +137,7 @@ const {
                         <li class="nav-item has-submenu">
                             <router-link
                                 :to="{ name: 'home' }"
-                                :class="{ active: routeName === 'home' || routeName === 'playing-games' || routeName === 'games-archive' }"
+                                :class="{ active: routeName === 'home' || routeName === 'playing-games' || routeName === 'games-archive' || routeName === 'external-games-archive' }"
                                 class="nav-link"
                                 @click="closeOffcanvas(); leaveFocus()"
                             >{{ $t('nav_games') }}</router-link>
@@ -166,6 +166,14 @@ const {
                                         class="nav-link"
                                         @click="closeOffcanvas(); leaveFocus()"
                                     >{{ $t('nav_archives') }}</router-link>
+                                </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'external-games-archive' }"
+                                        :class="{ active: routeName === 'external-games-archive' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('nav_archives_external') }}</router-link>
                                 </li>
                             </ul>
                         </li>

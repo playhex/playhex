@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
 import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
-import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames } from '../../../apiClient.js';
+import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
@@ -38,6 +38,9 @@ import { defineOverlay } from '@overlastic/vue';
 import AppAvatarCropOverlay from '../../components/overlay/AppAvatarCropOverlay.vue';
 import AppFlagSelectorOverlay from '../../components/overlay/AppFlagSelectorOverlay.vue';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
+import AppPlayerExternalGames from '../../components/external-games/AppPlayerExternalGames.vue';
+import AppExternalAccounts from '../../components/external-games/AppExternalAccounts.vue';
+import { littleGolemPlayerExternalId } from '../../../../shared/app/little-golem/littleGolemUtils.js';
 
 const { slug } = useRoute().params;
 
@@ -274,11 +277,53 @@ const showOurGames = () => {
     ];
 
     searchGamesParameters.value.paginationPage = 0;
+    gamesHistoryTab.value = 'playhex';
 
     gamesHistoryHeading.value?.scrollIntoView({ behavior: 'smooth' });
 };
 
 const gamesHistoryHeading = useTemplateRef<HTMLElement>('gamesHistoryHeading');
+
+/*
+ * Games played on Little Golem, if player linked a Little Golem account
+ */
+/**
+ * On my profile, to link my accounts on other platforms.
+ * On other profiles, only if player linked some accounts.
+ */
+const canEditExternalAccounts = computed<boolean>(() => player.value !== null && isMe(player.value) && !player.value.isGuest);
+const showExternalAccounts = computed<boolean>(() => canEditExternalAccounts.value || !!player.value?.littleGolemPlid);
+
+const gamesHistoryTab = ref<'playhex' | 'little_golem'>('playhex');
+const littleGolemGamesCount = ref<null | number>(null);
+
+const littleGolemExternalPlayerId = computed<null | string>(() => player.value?.littleGolemPlid
+    ? littleGolemPlayerExternalId(player.value.littleGolemPlid)
+    : null,
+);
+
+const refreshLittleGolemGamesCount = async () => {
+    if (littleGolemExternalPlayerId.value === null) {
+        littleGolemGamesCount.value = null;
+        gamesHistoryTab.value = 'playhex';
+        return;
+    }
+
+    const { count } = await getExternalGames({ externalPlayerId: littleGolemExternalPlayerId.value, paginationPageSize: 1 });
+
+    littleGolemGamesCount.value = count;
+};
+
+watch(littleGolemExternalPlayerId, () => void refreshLittleGolemGamesCount(), { immediate: true });
+
+const littleGolemAccountChanged = (littleGolemPlid: null | number, littleGolemPseudo: null | string): void => {
+    if (player.value === null) {
+        return;
+    }
+
+    player.value.littleGolemPlid = littleGolemPlid;
+    player.value.littleGolemPseudo = littleGolemPseudo;
+};
 
 const playerCurrentRatings = ref<null | Partial<Record<RatingCategory, Rating>>>(null);
 
@@ -519,7 +564,19 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
             @challenge="challenge"
         />
 
-        <AppPlayerStats v-if="playerStats" :playerStats />
+        <div class="row">
+            <div :class="showExternalAccounts ? 'col-lg-8' : 'col-12'">
+                <AppPlayerStats v-if="playerStats" :playerStats />
+            </div>
+            <div v-if="player && showExternalAccounts" class="col-lg-4 mb-3">
+                <AppExternalAccounts
+                    :player
+                    :editable="canEditExternalAccounts"
+                    @updated="refreshLittleGolemGamesCount()"
+                    @littleGolemAccountChanged="littleGolemAccountChanged"
+                />
+            </div>
+        </div>
 
         <p v-if="player && !isMe(player) && isChatRestricted" class="mt-3 text-danger">
             <IconX /> This player's chat is currently restricted.
@@ -620,71 +677,94 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
         <h3 ref="gamesHistoryHeading">{{ $t('player_game_history') }}</h3>
 
-        <AppSearchGamesParameters :searchGamesParameters />
+        <ul v-if="littleGolemExternalPlayerId" class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link" :class="{ active: gamesHistoryTab === 'playhex' }" href="#" @click.prevent="gamesHistoryTab = 'playhex'">
+                    <img src="/images/logo-transparent.svg" alt="" class="site-logo">
+                    {{ $t('external_games.playhex_games') }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" :class="{ active: gamesHistoryTab === 'little_golem' }" href="#" @click.prevent="gamesHistoryTab = 'little_golem'">
+                    <img src="/images/external/little-golem.png" alt="" class="site-logo">
+                    {{ $t('external_games.little_golem_games') }}
+                    <template v-if="null !== littleGolemGamesCount">({{ littleGolemGamesCount }})</template>
+                </a>
+            </li>
+        </ul>
 
-        <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
-        <p v-else>…</p>
+        <AppPlayerExternalGames
+            v-if="littleGolemExternalPlayerId && gamesHistoryTab === 'little_golem'"
+            :externalPlayerId="littleGolemExternalPlayerId"
+        />
 
-        <div class="card">
-            <div class="card-header d-flex align-items-center gap-2">
-                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+        <template v-else>
+            <AppSearchGamesParameters :searchGamesParameters />
+
+            <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
+            <p v-else>…</p>
+
+            <div class="card">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+                    <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+                    <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+                </div>
+
+                <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
+                    <table class="table text-nowrap mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col">{{ $t('game.outcome') }}</th>
+                                <th scope="col">{{ $t('game.opponent') }}</th>
+                                <th scope="col">{{ $t('game.size') }}</th>
+                                <th scope="col">{{ $t('game.time_control') }}</th>
+                                <th scope="col">{{ $t('game.rules') }}</th>
+                                <th scope="col">{{ $t('game.finished') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="player">
+                            <tr
+                                v-for="game in gamesHistory"
+                                :key="game.publicId"
+                            >
+                                <td class="ps-0">
+                                    <router-link
+                                        :to="{ name: 'online-game', params: { gameId: game.publicId } }"
+                                        class="btn btn-sm btn-link"
+                                    >{{ $t('game.review') }}</router-link>
+                                </td>
+                                <td>
+                                    <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
+                                </td>
+
+                                <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
+                                <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
+                                <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
+
+                                <td v-if="game.gameToPlayers.length < 2">-</td>
+                                <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
+
+                                <td>{{ game.boardsize }}</td>
+                                <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                                <td><AppGameRulesSummary :gameOptions="game" /></td>
+                                <td>{{
+                                    game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
+                                }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
+                    <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
+                    <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
+                    <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+                </div>
             </div>
-
-            <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
-                <table class="table text-nowrap mb-0">
-                    <thead>
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                            <th scope="col">{{ $t('game.outcome') }}</th>
-                            <th scope="col">{{ $t('game.opponent') }}</th>
-                            <th scope="col">{{ $t('game.size') }}</th>
-                            <th scope="col">{{ $t('game.time_control') }}</th>
-                            <th scope="col">{{ $t('game.rules') }}</th>
-                            <th scope="col">{{ $t('game.finished') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody v-if="player">
-                        <tr
-                            v-for="game in gamesHistory"
-                            :key="game.publicId"
-                        >
-                            <td class="ps-0">
-                                <router-link
-                                    :to="{ name: 'online-game', params: { gameId: game.publicId } }"
-                                    class="btn btn-sm btn-link"
-                                >{{ $t('game.review') }}</router-link>
-                            </td>
-                            <td>
-                                <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
-                            </td>
-
-                            <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
-                            <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
-                            <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
-
-                            <td v-if="game.gameToPlayers.length < 2">-</td>
-                            <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
-
-                            <td>{{ game.boardsize }}</td>
-                            <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
-                            <td><AppGameRulesSummary :gameOptions="game" /></td>
-                            <td>{{
-                                game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
-                            }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
-                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
-            </div>
-        </div>
+        </template>
     </div>
 
     <div v-else class="container">
@@ -693,6 +773,11 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 </template>
 
 <style lang="stylus" scoped>
+.site-logo
+    width 1em
+    height 1em
+    vertical-align -0.125em
+
 .icon
     font-size 8em
     width 1em

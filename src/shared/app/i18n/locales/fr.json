@@ -115,6 +115,7 @@
     "nav_lobby": "Lobby",
     "nav_observe": "Observer",
     "nav_archives": "Archives",
+    "nav_archives_external": "Archives externes",
     "tournament_not_found": "Tournoi introuvable",
     "logging_in": "connexion…",
     "tournaments": "Tournois",
@@ -1450,5 +1451,44 @@
         "engine": "Moteur IA",
         "copy_command": "Copier la commande",
         "manage_worker": "Comment arrêter, mettre à jour, ou voir les logs d'un worker"
+    },
+    "external_games": {
+        "game": "Partie externe",
+        "not_found": "Cette partie n'existe pas.",
+        "archive_title": "Archives des parties externes",
+        "archive_description": "Parties jouées en dehors de PlayHex, importées depuis d'autres plateformes, ou retranscrites à la main.",
+        "source": "Source",
+        "event": "Événement",
+        "ratings": "Classements sur la source (lors de l'import)",
+        "external_id": "Id",
+        "imported": "Importée",
+        "imported_by": "Importée par",
+        "updated": "Mise à jour",
+        "open": "Ouvrir",
+        "played_on": "Jouée sur {source}",
+        "playhex_games": "PlayHex",
+        "little_golem_games": "Parties sur Little Golem",
+        "accounts": {
+            "title": "Comptes sur d'autres plateformes",
+            "description": "Liez vos comptes pour importer les parties que vous avez jouées ailleurs, et les afficher sur votre profil."
+        },
+        "little_golem": {
+            "title": "Little Golem",
+            "not_linked": "non lié",
+            "link_description": "Entrez votre pseudo Little Golem. S'il n'est pas trouvé, collez le lien de votre profil Little Golem.",
+            "pseudo": "Pseudo ou lien du profil Little Golem",
+            "link": "Lier",
+            "linked_to": "Lié au compte Little Golem :",
+            "unlink": "Délier",
+            "import": "Importer mes parties Little Golem"
+        },
+        "import": {
+            "pending": "L'import va bientôt commencer…",
+            "listing": "Recherche des parties sur Little Golem…",
+            "running": "Import en cours…",
+            "done": "Import terminé.",
+            "failed": "L'import a échoué.",
+            "progress": "{{imported}} importées, {{skipped}} déjà importées, {{failed}} en erreur, {{notFinished}} non terminées, sur {{total}} parties."
+        }
     }
 }
