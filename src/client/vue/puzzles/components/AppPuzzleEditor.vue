@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { defineOverlay } from '@overlastic/vue';
 import { useWindowFocus, whenever } from '@vueuse/core';
 import { t } from 'i18next';
 import { Game, Puzzle, PuzzleCollection } from '../../../../shared/app/models/index.js';
@@ -10,8 +12,10 @@ import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowDown, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconPlus, IconSave2, IconSendFill, IconTrash } from '../../icons.js';
+import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconHexagonFill, IconLightbulb, IconSave2, IconSendFill, IconShuffle, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
+import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 
 const props = defineProps<{
     /**
@@ -62,7 +66,6 @@ const {
     pickingElse,
     startPickingElse,
     setResult,
-    moveSelected,
     deleteSelected,
     boardError,
     transpositions,
@@ -125,6 +128,40 @@ const applyBoardsize = async (): Promise<void> => {
 
     await setBoardsize(newBoardsize.value);
 };
+
+/*
+ * Simple / expert mode
+ */
+
+const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
+
+/**
+ * Expert mode shows advanced features: "else" node, parallel sequences, tree zoom.
+ * Simple mode by default, saved on this device.
+ */
+const expertMode = computed(() => localSettings.value.puzzleEditorExpertMode ?? false);
+
+const openExpertModeOverlay = defineOverlay(PuzzleEditorExpertModeOverlay);
+
+const setExpertMode = async (enabled: boolean): Promise<void> => {
+    localSettings.value.puzzleEditorExpertMode = enabled;
+
+    if (!enabled) {
+        return;
+    }
+
+    try {
+        await openExpertModeOverlay();
+    } catch {
+        // dismissed
+    }
+};
+
+/**
+ * Smaller tree, without coordinates, to see the whole structure of large trees.
+ * Expert mode only.
+ */
+const treeZoomedOut = ref(false);
 
 const changeElseAnswer = (): void => {
     selectParent();
@@ -226,7 +263,21 @@ const deletePuzzle = async (): Promise<void> => {
 
         <div v-if="sidebarOpen" class="puzzle-sidebar col-sm-6 col-lg-5 col-xl-4 d-flex flex-column h-100 border-start bg-body-tertiary">
             <div class="flex-grow-1 overflow-auto p-3">
-                <router-link :to="{ name: 'puzzles-mine' }" class="d-inline-block small mb-2">{{ $t('puzzles.my_puzzles') }}</router-link>
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                    <router-link :to="{ name: 'puzzles-mine' }" class="small">{{ $t('puzzles.my_puzzles') }}</router-link>
+
+                    <div class="form-check form-switch small mb-0">
+                        <input
+                            id="puzzle-expert-mode"
+                            class="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            :checked="expertMode"
+                            @change="e => setExpertMode((e.target as HTMLInputElement).checked)"
+                        >
+                        <label class="form-check-label" for="puzzle-expert-mode">{{ $t('puzzles.editor.expert_mode') }}</label>
+                    </div>
+                </div>
 
                 <h1 class="h4 d-flex align-items-center gap-2">
                     {{ puzzle ? $t('puzzles.editor.edit_title') : $t('puzzles.editor.create_title') }}
@@ -331,15 +382,30 @@ const deletePuzzle = async (): Promise<void> => {
                     <div v-if="'only_one_answer' === boardError" class="alert alert-warning py-2">{{ $t('puzzles.editor.only_one_answer') }}</div>
                     <div v-if="transpositionNotice" class="alert alert-info py-2"><IconArrowReturnRight /> {{ $t('puzzles.editor.transposition_notice', { moves: transpositionNotice.join(' ') }) }}</div>
 
-                    <div class="move-tree-wrapper bg-body mb-3">
-                        <AppPuzzleTreeNode
-                            :node="tree"
-                            :path="[]"
-                            :selectedNode
-                            :playerColor
-                            :transpositions
-                            @select="selectPath"
-                        />
+                    <div class="position-relative mb-3">
+                        <div class="move-tree-wrapper bg-body">
+                            <AppPuzzleTreeNode
+                                :node="tree"
+                                :path="[]"
+                                :selectedNode
+                                :playerColor
+                                :transpositions
+                                :compact="expertMode && treeZoomedOut"
+                                @select="selectPath"
+                            />
+                        </div>
+
+                        <button
+                            v-if="expertMode"
+                            type="button"
+                            class="tree-zoom-button btn btn-sm btn-outline-secondary bg-body"
+                            :aria-label="treeZoomedOut ? $t('puzzles.editor.zoom_in') : $t('puzzles.editor.zoom_out')"
+                            :title="treeZoomedOut ? $t('puzzles.editor.zoom_in') : $t('puzzles.editor.zoom_out')"
+                            @click="treeZoomedOut = !treeZoomedOut"
+                        >
+                            <IconZoomIn v-if="treeZoomedOut" />
+                            <IconZoomOut v-else />
+                        </button>
                     </div>
 
                     <!-- Selected node -->
@@ -370,15 +436,11 @@ const deletePuzzle = async (): Promise<void> => {
                             </div>
 
                             <div class="d-flex flex-wrap gap-1">
-                                <button v-if="canAddElse" class="btn btn-sm btn-outline-warning" @click="startPickingElse()">{{ $t('puzzles.editor.add_else') }}</button>
-                                <button v-if="canAddParallel" class="btn btn-sm btn-outline-secondary" :title="$t('puzzles.editor.parallel_help')" @click="addParallel()"><IconPlus /> {{ $t('puzzles.editor.add_parallel') }}</button>
-                                <button v-if="isElseNode(selectedNode)" class="btn btn-sm btn-outline-warning" @click="changeElseAnswer()">{{ $t('puzzles.editor.change_else_answer') }}</button>
+                                <button v-if="expertMode && canAddElse" class="btn btn-sm btn-outline-warning" @click="startPickingElse()"><IconAsterisk /> {{ $t('puzzles.editor.add_else') }}</button>
+                                <button v-if="expertMode && canAddParallel" class="btn btn-sm btn-outline-secondary" :title="$t('puzzles.editor.parallel_help')" @click="addParallel()"><IconShuffle /> {{ $t('puzzles.editor.add_parallel') }}</button>
+                                <button v-if="isElseNode(selectedNode)" class="btn btn-sm btn-outline-warning" @click="changeElseAnswer()"><IconAsterisk /> {{ $t('puzzles.editor.change_else_answer') }}</button>
 
-                                <template v-if="selectedPath.length > 0">
-                                    <button v-if="!isElseNode(selectedNode)" class="btn btn-sm btn-outline-secondary" @click="moveSelected(-1)" :aria-label="$t('puzzles.editor.move_up')" :title="$t('puzzles.editor.move_up')"><IconArrowUp /></button>
-                                    <button v-if="!isElseNode(selectedNode)" class="btn btn-sm btn-outline-secondary" @click="moveSelected(1)" :aria-label="$t('puzzles.editor.move_down')" :title="$t('puzzles.editor.move_down')"><IconArrowDown /></button>
-                                    <button class="btn btn-sm btn-outline-danger" @click="deleteSelected()"><IconTrash /> {{ $t('puzzles.editor.delete_node') }}</button>
-                                </template>
+                                <button v-if="selectedPath.length > 0" class="btn btn-sm btn-outline-danger" @click="deleteSelected()"><IconTrash /> {{ $t('puzzles.editor.delete_node') }}</button>
                             </div>
 
                             <div v-if="!isParallelRootSelected" class="mt-2">
@@ -493,4 +555,10 @@ const deletePuzzle = async (): Promise<void> => {
     border 1px solid var(--bs-border-color)
     border-radius var(--bs-border-radius)
     padding 0.5rem
+
+.tree-zoom-button
+    position absolute
+    top 0.25rem
+    right 0.25rem
+    z-index 2
 </style>

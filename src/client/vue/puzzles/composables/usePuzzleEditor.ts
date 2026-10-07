@@ -306,7 +306,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     };
 
     /**
-     * Children list of selected node parent, to reorder or delete selected node.
+     * Children list of selected node parent, to navigate or delete selected node.
      */
     const getSiblings = (): EditorNode[] => {
         const parent = getParent(selectedPath.value);
@@ -315,19 +315,6 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         return !isElseNode(node) && parent.parallel?.includes(node)
             ? parent.parallel
             : parent.children!;
-    };
-
-    const moveSelected = (offset: -1 | 1): void => {
-        const siblings = getSiblings();
-        const index = siblings.indexOf(selectedNode.value);
-        const target = index + offset;
-
-        // "else" node stays last
-        if (target < 0 || target >= siblings.length || isElseNode(siblings[target]) || isElseNode(siblings[index])) {
-            return;
-        }
-
-        [siblings[index], siblings[target]] = [siblings[target], siblings[index]];
     };
 
     const deleteSelected = (): void => {
@@ -730,7 +717,6 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         pickingElse,
         startPickingElse,
         setResult,
-        moveSelected,
         deleteSelected,
         boardError,
         transpositions,

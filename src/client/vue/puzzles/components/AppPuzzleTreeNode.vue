@@ -5,6 +5,7 @@
  * connected by straight lines.
  * A transposition leaf is followed by a dashed line and an arrow to the node it continues from.
  * Parallel sequences are branches after children, with a dashed line and a "‖" root.
+ * Compact mode (zoomed out) shows smaller hexagons without coordinates.
  */
 import { computed } from 'vue';
 import { filterMoveNodes, isElseNode, isParallelRoot, type PuzzleElseNode, type PuzzleNode, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
@@ -28,6 +29,11 @@ const props = defineProps<{
      * Transposition by leaf, see findTranspositions().
      */
     transpositions: Map<PuzzleNode, Transposition>;
+
+    /**
+     * Zoomed out: smaller nodes, coordinates only shown on hover.
+     */
+    compact: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -62,11 +68,16 @@ const branches = computed<Branch[]>(() => isElseNode(props.node) ? [] : [
     ...(props.node.parallel ?? []).map(node => ({ node, parallel: true })),
 ]);
 
+/**
+ * No label in compact mode, too small to be read.
+ */
+const label = (text: string): string => props.compact ? '' : text;
+
 const transposition = computed(() => isElseNode(props.node) ? null : props.transpositions.get(props.node) ?? null);
 </script>
 
 <template>
-    <div class="tree-node">
+    <div class="tree-node" :class="{ compact }">
         <!-- "else" node: any other player move, then computer answer, both select the "else" node -->
         <template v-if="isElseNode(node)">
             <button
@@ -76,7 +87,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                 :title="$t('puzzles.editor.else')"
                 @click="emit('select', path)"
             >
-                <AppConditionalMoveButton label="*" :playerIndex class="else-node" />
+                <AppConditionalMoveButton :label="label('*')" :playerIndex class="else-node" />
             </button>
 
             <div class="tree-stem"></div>
@@ -88,7 +99,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                 :title="`${$t('puzzles.editor.else')} → ${node.else}`"
                 @click="emit('select', path)"
             >
-                <AppConditionalMoveButton :label="node.else" :playerIndex="computerColor" />
+                <AppConditionalMoveButton :label="label(node.else)" :playerIndex="computerColor" />
 
                 <IconXLg class="node-badge result-badge text-bg-danger" />
                 <IconChatRightText v-if="node.message" class="node-badge message-badge" />
@@ -100,11 +111,11 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             type="button"
             class="tree-node-button"
             :class="{ 'tree-node-current': node === selectedNode }"
-            :title="isRoot ? $t('puzzles.editor.initial_position') : isParallelRootNode ? $t('puzzles.editor.parallel') : undefined"
+            :title="isRoot ? $t('puzzles.editor.initial_position') : isParallelRootNode ? $t('puzzles.editor.parallel') : compact ? node.move : undefined"
             @click="emit('select', path)"
         >
-            <AppConditionalMoveButton :label="isParallelRootNode ? '‖' : node.move ?? ''" :playerIndex :class="{ 'root-node': isRoot, 'parallel-root': isParallelRootNode }" />
-            <IconPencilSquare v-if="isRoot" class="root-icon" />
+            <AppConditionalMoveButton :label="label(isParallelRootNode ? '‖' : node.move ?? '')" :playerIndex :class="{ 'root-node': isRoot, 'parallel-root': isParallelRootNode }" />
+            <IconPencilSquare v-if="isRoot && !compact" class="root-icon" />
 
             <IconCheck v-if="node.result === 'solved'" class="node-badge result-badge text-bg-success" />
             <IconXLg v-else-if="node.result === 'failed'" class="node-badge result-badge text-bg-danger" />
@@ -134,6 +145,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                 :selectedNode
                 :playerColor
                 :transpositions
+                :compact
                 @select="p => emit('select', p)"
             />
         </template>
@@ -149,6 +161,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                         :selectedNode
                         :playerColor
                         :transpositions
+                        :compact
                         @select="p => emit('select', p)"
                     />
                 </div>
@@ -279,4 +292,32 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
         height 0
         background none
         border-top 2px dashed var(--bs-border-color)
+
+// Zoomed out
+.compact
+    .tree-node-button
+        &.tree-node-current
+            outline-offset 1px
+
+        :deep(div.hexagons)
+            height 0.85rem
+            width 0.95rem
+
+            &::before
+                font-size 0.95rem
+
+    .node-badge
+        font-size 0.4rem
+
+    .tree-stem
+        width 0.15rem
+
+    .transposition-stem
+        width 0.3rem
+
+    .tree-child
+        padding 0.05rem 0
+
+        &::after
+            width 0.15rem
 </style>

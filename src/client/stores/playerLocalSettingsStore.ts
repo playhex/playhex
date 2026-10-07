@@ -56,6 +56,14 @@ export class LocalSettings
      */
     @Expose()
     mutedGameChats: string[] = [];
+
+    /**
+     * Puzzle editor shows advanced features ("else" node, parallel sequences, tree zoom).
+     *
+     * undefined defaults to false (simple mode).
+     */
+    @Expose()
+    puzzleEditorExpertMode?: boolean;
 }
 
 const loadLocalSettings = (): LocalSettings => {
