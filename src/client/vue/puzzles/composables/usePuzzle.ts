@@ -97,6 +97,12 @@ export const usePuzzle = (puzzle: Puzzle) => {
         result: null | PuzzleResult;
 
         /**
+         * Node of the move that ended the puzzle,
+         * null if not ended or ended by leaving the tree.
+         */
+        resultNode: PlayedMove['node'];
+
+        /**
          * Current main sequence node, null if moves left the tree.
          */
         node: null | PuzzleNode;
@@ -112,27 +118,39 @@ export const usePuzzle = (puzzle: Puzzle) => {
      */
     const replay = (playedMoves: PlayedMove[]): TreeState => {
         let result: null | PuzzleResult = null;
+        let resultNode: PlayedMove['node'] = null;
         let node: null | PuzzleNode = puzzle.tree;
         const parallels = new Map<PuzzleNode, PuzzleNode>();
 
         for (const playedMove of playedMoves) {
             if (playedMove.parallel !== null) {
                 parallels.set(playedMove.parallel, playedMove.node);
-                result ??= getParallelNodeResult(playedMove.node);
+
+                if (result === null && (result = getParallelNodeResult(playedMove.node)) !== null) {
+                    resultNode = playedMove.node;
+                }
+
                 continue;
             }
 
             if (playedMove.node === null || isElseNode(playedMove.node)) {
-                result ??= 'failed';
+                if (result === null) {
+                    result = 'failed';
+                    resultNode = playedMove.node;
+                }
+
                 node = null;
                 continue;
             }
 
             node = resolve(playedMove.node);
-            result ??= getNodeResult(node);
+
+            if (result === null && (result = getNodeResult(node)) !== null) {
+                resultNode = playedMove.node;
+            }
         }
 
-        return { result, node, parallels };
+        return { result, resultNode, node, parallels };
     };
 
     const treeState = computed(() => replay(path.value));
@@ -153,8 +171,21 @@ export const usePuzzle = (puzzle: Puzzle) => {
     const ended = computed(() => treeState.value.result !== null);
 
     /**
+     * Message of a reached node.
+     * Transposition shows target message, unless it has its own.
+     */
+    const getNodeMessage = (node: PlayedMove['node']): undefined | null | string =>
+        node === null || isElseNode(node) ? node?.message : node.message || resolve(node).message;
+
+    /**
+     * Message of the node that ended the puzzle, to show with the result instead of "solved" / "failed".
+     */
+    const resultMessage = computed<null | string>(() => getNodeMessage(treeState.value.resultNode) || null);
+
+    /**
      * Messages of nodes reached by last player move and computer answer,
      * or root message at start.
+     * Without ending node message, already shown in resultMessage.
      */
     const messages = computed<string[]>(() => {
         if (path.value.length === 0) {
@@ -169,8 +200,8 @@ export const usePuzzle = (puzzle: Puzzle) => {
 
         // Set to show "else" node message once, it is on both player move and computer answer
         return [...new Set(path.value.slice(lastPlayerMoveIndex).map(({ node }) => node))]
-            // Transposition shows target message, unless it has its own
-            .map(node => node === null || isElseNode(node) ? node?.message : node.message || resolve(node).message)
+            .filter(node => node !== treeState.value.resultNode)
+            .map(getNodeMessage)
             .filter((message): message is string => !!message)
         ;
     });
@@ -364,6 +395,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         ended,
         nextColor,
         messages,
+        resultMessage,
         canUndo: computed(() => path.value.length > 0),
         canHint: computed(() => hasSolution && !computerThinking.value && status.value !== 'solved'),
         undo,

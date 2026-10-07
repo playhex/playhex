@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { whenever } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
@@ -29,6 +29,7 @@ const {
     ended,
     nextColor,
     messages,
+    resultMessage,
     canUndo,
     canHint,
     undo,
@@ -45,6 +46,18 @@ whenever(gameViewElement, async element => {
 });
 
 const sidebarOpen = ref(true);
+
+/**
+ * Messages over the board (sidebar closed) dismissed by click,
+ * shown again when messages or status change (move played, undo...).
+ */
+const dismissedBoardMessages = ref(new Set<string>());
+
+watch([messages, resultMessage, status], () => dismissedBoardMessages.value = new Set());
+
+const dismissBoardMessage = (key: string): void => {
+    dismissedBoardMessages.value.add(key);
+};
 
 const hexplorerAnalysis = puzzleToHexplorerAnalysis(props.puzzle);
 
@@ -102,7 +115,34 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 <template>
     <div class="puzzle-layout row g-0 flex-nowrap position-relative bg-body">
         <div class="col d-flex flex-column h-100 overflow-hidden">
-            <div ref="game-view-element" class="flex-grow-1 overflow-hidden"></div>
+            <div class="flex-grow-1 position-relative overflow-hidden">
+                <div ref="game-view-element" class="position-absolute top-0 start-0 w-100 h-100"></div>
+
+                <!-- Already in sidebar when open, needed when closed (i.e on mobile, sidebar over the board). Over the board to not resize it -->
+                <div v-if="!sidebarOpen" class="puzzle-board-messages position-absolute bottom-0 start-0 end-0 px-2 pb-1 small">
+                    <template v-for="(message, index) in messages" :key="index">
+                        <div
+                            v-if="!dismissedBoardMessages.has(`message-${index}`)"
+                            class="alert alert-info pre-line py-1 px-2 mb-1"
+                            role="button"
+                            @click="dismissBoardMessage(`message-${index}`)"
+                        >{{ message }}</div>
+                    </template>
+
+                    <div
+                        v-if="'solved' === status && !dismissedBoardMessages.has('status')"
+                        class="py-1 px-2 mb-1 rounded fw-bold text-bg-success"
+                        role="button"
+                        @click="dismissBoardMessage('status')"
+                    ><IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.solved') }}</span></div>
+                    <div
+                        v-else-if="'failed' === status && !dismissedBoardMessages.has('status')"
+                        class="py-1 px-2 mb-1 rounded fw-bold text-bg-danger"
+                        role="button"
+                        @click="dismissBoardMessage('status')"
+                    ><IconXLg /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.failed') }}</span></div>
+                </div>
+            </div>
 
             <div class="d-flex flex-wrap justify-content-center align-items-center gap-1 position-relative py-1 px-5">
                 <div class="btn-group">
@@ -110,13 +150,17 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         @click="restart()"
                         class="btn btn-outline-warning"
                         :disabled="!canUndo"
-                    ><IconRepeat /> {{ $t('puzzles.restart') }}</button>
+                        :title="$t('puzzles.restart')"
+                        :aria-label="$t('puzzles.restart')"
+                    ><IconRepeat /> <span class="d-none d-lg-inline">{{ $t('puzzles.restart') }}</span></button>
 
                     <button
                         @click="undo()"
                         class="btn btn-outline-primary"
                         :disabled="!canUndo"
-                    ><IconArrowLeft /> {{ $t('undo.undo_move') }}</button>
+                        :title="$t('undo.undo_move')"
+                        :aria-label="$t('undo.undo_move')"
+                    ><IconArrowLeft /> <span class="d-none d-lg-inline">{{ $t('undo.undo_move') }}</span></button>
                 </div>
 
                 <!-- Already in sidebar when open -->
@@ -201,8 +245,8 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
                 <div v-for="(message, index) in messages" :key="index" class="alert alert-info pre-line">{{ message }}</div>
 
-                <div v-if="'solved' === status" class="p-3 mb-3 rounded fw-bold text-bg-success"><IconCheck /> {{ $t('puzzles.solved') }}</div>
-                <div v-else-if="'failed' === status" class="p-3 mb-3 rounded fw-bold text-bg-danger"><IconXLg /> {{ $t('puzzles.failed') }}</div>
+                <div v-if="'solved' === status" class="p-3 mb-3 rounded fw-bold text-bg-success"><IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.solved') }}</span></div>
+                <div v-else-if="'failed' === status" class="p-3 mb-3 rounded fw-bold text-bg-danger"><IconXLg /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.failed') }}</span></div>
 
                 <p v-if="ended" class="text-body-secondary">
                     {{ $t('puzzles.free_play') }}
@@ -275,6 +319,13 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
 .pre-line
     white-space pre-line
+
+// Let clicks pass through to the board around messages
+.puzzle-board-messages
+    pointer-events none
+
+    > *
+        pointer-events auto
 
 // One line in narrow sidebar: collection name is truncated
 .puzzle-breadcrumb :deep(.breadcrumb)
