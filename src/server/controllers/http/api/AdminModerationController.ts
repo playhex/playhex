@@ -26,7 +26,7 @@ type MessageFromAnySource =
 /**
  * Tabs of the moderation interface which can be marked as seen.
  */
-const SEEN_TABS = ['messages', 'players', 'avatars', 'videos', 'puzzles'] as const;
+const SEEN_TABS = ['messages', 'players', 'avatars', 'videos', 'puzzles', 'automatic-actions'] as const;
 
 type SeenTab = typeof SEEN_TABS[number];
 
@@ -238,6 +238,33 @@ export default class AdminModerationController
         const actions = await this.playerModerationActionRepository.getLastActions(100);
 
         return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action', 'moderation'] });
+    }
+
+    /**
+     * Last moderation actions taken automatically by the server (e.g forbidden words in chat),
+     * so moderators can review them.
+     */
+    @Get('/api/admin/moderation/automatic-actions')
+    async getLastAutomaticModerationActions()
+    {
+        const actions = await this.playerModerationActionRepository.getLastActions(100, true);
+
+        return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action', 'moderation'] });
+    }
+
+    /**
+     * Cancels an automatic moderation action, in case of false positive:
+     * player is no longer restricted, and their chat message is restored.
+     */
+    @Delete('/api/admin/moderation/automatic-actions/:publicId')
+    async deleteAutomaticModerationAction(
+        @Param('publicId') publicId: string,
+    ) {
+        if (!await this.moderationService.cancelAutomaticAction(publicId)) {
+            throw new NotFoundError(`Automatic moderation action "${publicId}" not found`);
+        }
+
+        return { publicId, canceled: true };
     }
 
     @Get('/api/admin/moderation/avatar-uploads')

@@ -871,4 +871,24 @@ export default class GameStore
 
         return deleted;
     }
+
+    /**
+     * Cancels moderateDeleteChatMessages(), e.g when moderation was a false positive.
+     */
+    restoreModeratedChatMessages(publicIds: string[]): number
+    {
+        const publicIdSet = new Set(publicIds);
+        let restored = 0;
+
+        for (const key in this.activeGames) {
+            for (const chatMessage of this.activeGames[key].getGame().chatMessages) {
+                if (publicIdSet.has(chatMessage.publicId)) {
+                    chatMessage.deletedByModeration = false;
+                    ++restored;
+                }
+            }
+        }
+
+        return restored;
+    }
 }

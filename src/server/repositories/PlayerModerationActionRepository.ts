@@ -69,9 +69,13 @@ export default class PlayerModerationActionRepository
         });
     }
 
-    async getLastActions(limit = 100): Promise<PlayerModerationAction[]>
+    /**
+     * @param onlyAutomatic If true, only returns actions taken automatically by the server.
+     */
+    async getLastActions(limit = 100, onlyAutomatic = false): Promise<PlayerModerationAction[]>
     {
         return await this.playerModerationActionRepository.find({
+            where: onlyAutomatic ? { automatic: true } : undefined,
             relations: {
                 player: true,
                 relatedChatMessages: {

@@ -46,6 +46,21 @@ export default class ChannelChatMessageRepository
         return affected ?? 0;
     }
 
+    /**
+     * Cancels moderateDeleteChatMessages(), e.g when moderation was a false positive.
+     */
+    async restoreModeratedChatMessages(publicIds: string[]): Promise<number>
+    {
+        const { affected } = await this.channelChatMessageRepository.createQueryBuilder()
+            .update()
+            .where({ publicId: In(publicIds) })
+            .set({ deletedByModeration: false })
+            .execute()
+        ;
+
+        return affected ?? 0;
+    }
+
     async getLastMessagesForModeration(since: Date): Promise<ChannelChatMessage[]>
     {
         return await this.channelChatMessageRepository.find({

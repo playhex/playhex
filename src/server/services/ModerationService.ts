@@ -51,6 +51,47 @@ export default class ModerationService
         };
     }
 
+    async restoreModeratedChatMessages(publicIds: string[]): Promise<void>
+    {
+        this.gameStore.restoreModeratedChatMessages(publicIds);
+        await this.chatMessageRepository.restoreModeratedChatMessages(publicIds);
+        await this.channelChatMessageRepository.restoreModeratedChatMessages(publicIds);
+    }
+
+    /**
+     * Cancels an automatic moderation action, when it was a false positive:
+     * removes the action, so player is no longer restricted,
+     * and restores the chat messages that originated it.
+     *
+     * Deleted avatar cannot be restored.
+     *
+     * @returns false if there is no automatic action with this publicId
+     */
+    async cancelAutomaticAction(publicId: string): Promise<boolean>
+    {
+        const action = await this.playerModerationActionRepository.findOne({
+            where: { publicId, automatic: true },
+            relations: { relatedChatMessages: true, relatedChannelChatMessages: true },
+        });
+
+        if (action === null) {
+            return false;
+        }
+
+        const chatMessagePublicIds = [
+            ...action.relatedChatMessages.map(m => m.publicId),
+            ...action.relatedChannelChatMessages.map(m => m.publicId),
+        ];
+
+        if (chatMessagePublicIds.length > 0) {
+            await this.restoreModeratedChatMessages(chatMessagePublicIds);
+        }
+
+        await this.playerModerationActionRepository.remove(action);
+
+        return true;
+    }
+
     /**
      * @param automatic Whether this action is taken automatically by the server, not by a moderator.
      */
