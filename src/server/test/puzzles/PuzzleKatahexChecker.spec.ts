@@ -144,6 +144,19 @@ describe('PuzzleKatahexChecker', () => {
         assert.deepStrictEqual(warnings, []);
     });
 
+    it('does not warn on plausible move starting a parallel sequence', async () => {
+        const tree = createTree();
+        tree.parallel = [{ children: [{ move: 'e5', children: [{ move: 'd5' }] }] }];
+
+        const katahex = {
+            winrates: { ...baseWinrates, e5: 0.95, 'b3 c3 e5': 0.95 },
+            policies: { '': { c3: 0.6, e5: 0.4 }, 'b3 c3': { b4: 0.6, e5: 0.4 } },
+        };
+
+        // Also playable from descendants
+        assert.deepStrictEqual(await check(createPuzzle({ tree }), katahex), []);
+    });
+
     it('warns on winning move rejected', async () => {
         const warnings = await check(createPuzzle(), {
             winrates: { ...baseWinrates, e5: 0.95, a1: 0.9 },

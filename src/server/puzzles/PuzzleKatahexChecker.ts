@@ -1,7 +1,7 @@
 import { coordsToMove, type Move } from '@playhex/move-notation';
 import Board from '../../shared/game-engine/Board.js';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
-import { createNodeResolver, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
 import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleKatahexWarning, type PuzzleKatahexWarningCode } from '../../shared/app/puzzles/puzzleKatahexCheck.js';
 
 /**
@@ -71,7 +71,8 @@ const createLimiter = (concurrency: number) => {
  * Checks puzzle tree with katahex. Puzzle must be valid, see validatePuzzle().
  *
  * Only checks main sequence, until puzzle ends: continuations, transposition leaves
- * and parallel sequences are ignored. Disabled cells are never considered as candidate moves.
+ * and parallel sequences are ignored, but parallel sequences first moves are not reported as uncovered.
+ * Disabled cells are never considered as candidate moves.
  *
  * @returns Warnings in tree order, empty if katahex agrees with tree.
  *
@@ -81,6 +82,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const { boardsize, playerColor, tree } = puzzle;
     const disabledCells = new Set(puzzle.disabledCells ?? []);
     const resolve: NodeResolver = createNodeResolver(tree);
+    const findParallels = createParallelsFinder(tree);
     const limit = createLimiter(options.concurrency ?? 4);
 
     const analyzes = new Map<string, Promise<AnalysisOutput>>();
@@ -249,6 +251,9 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const checkPlayerChoice = async (node: PuzzleNode, path: Move[], position: Position): Promise<PuzzleKatahexWarning[]> => {
         const children = node.children ?? [];
         const childMoves = new Set(children.flatMap(child => isElseNode(child) || !child.move ? [] : [child.move]));
+
+        // Parallel sequences first moves are accepted moves too, not to be reported as uncovered
+        const parallelMoves = new Set(findParallels(node).flatMap(root => (root.children ?? []).flatMap(child => isElseNode(child) || !child.move ? [] : [child.move])));
         const elseNode = findElseNode(node);
         const hasElse = elseNode !== null;
 
@@ -313,7 +318,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         const candidates = await candidateMoves(position);
         const plausiblePolicy = (candidates[0]?.policy ?? 0) * KATAHEX_PLAUSIBLE_POLICY_RATIO;
         const uncoveredMoves = candidates
-            .filter(candidate => !childMoves.has(candidate.move))
+            .filter(candidate => !childMoves.has(candidate.move) && !parallelMoves.has(candidate.move))
         ;
 
         const plausibleMoves = uncoveredMoves
