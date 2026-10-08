@@ -26,7 +26,6 @@ const exampleMessage0 = Object.assign(new ChatMessage(), {
     createdAt: new Date(new Date().getTime() - 60000 * 15),
     player: examplePlayer,
     game: { publicId: '00000000-0000-0000-0000-000000000042' },
-    shadowDeleted: false,
     deletedByModeration: true,
 });
 
@@ -36,7 +35,6 @@ const exampleMessage1 = Object.assign(new ChatMessage(), {
     createdAt: new Date(new Date().getTime() - 60000 * 16),
     player: examplePlayer,
     game: { publicId: '00000000-0000-0000-0000-000000000042' },
-    shadowDeleted: false,
     deletedByModeration: true,
 });
 
@@ -160,15 +158,6 @@ const currentExample = ref<null | PlayerModerationAction>(null);
     <p>
         Messages that are fully deleted by moderation are replaced with
         <em>Message deleted by moderation</em>.
-    </p>
-
-    <h2>Shadow deletion</h2>
-
-    <p>
-        Some messages may be <em>shadow-deleted</em> by a moderator.
-        A shadow-deleted message is hidden from everyone except its author,
-        who still sees it as if it were normal.
-        This allows moderators to remove inappropriate content discreetly.
     </p>
 
     <AppPlayerModerationActionOverlay

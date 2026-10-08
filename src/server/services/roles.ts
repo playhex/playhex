@@ -2,7 +2,7 @@ import { HttpError } from 'routing-controllers';
 import { rateLimiterConsumeFailedApiKey } from './rate-limiters.js';
 
 /**
- * Can do operations from AdminController (maintenance, debug, cancel game manually, shadow ban...)
+ * Can do operations from AdminController (maintenance, debug, cancel game manually...)
  */
 export const ROLE_ADMIN = 'ADMIN';
 

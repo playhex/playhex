@@ -10,7 +10,6 @@ import { cloneGameOptions } from '../../shared/app/models/GameOptions.js';
 import { AppDataSource } from '../data-source.js';
 import RatingRepository from '../repositories/RatingRepository.js';
 import { isDuplicateError } from '../repositories/typeormUtils.js';
-import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
 import { createGame, CreateGameParams } from '../../shared/app/models/Game.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
@@ -789,11 +788,6 @@ export default class GameStore
             await rateLimiterConsumeChatMessage(chatMessage.player.publicId);
         }
 
-        // shadow delete chat message if player is shadow banned for chat messages
-        if (chatMessage.player?.shadowBanned && !whitelistedChatMessage[chatMessage.content]) {
-            chatMessage.shadowDeleted = true;
-        }
-
         const gameServer = this.activeGames[publicId];
 
         // Game is in memory, push chat message
@@ -845,8 +839,8 @@ export default class GameStore
      */
     private async autoSubscribeChatMessageAuthor(game: Game, chatMessage: ChatMessage): Promise<void>
     {
-        // System message, or message hidden to others: nothing to subscribe to
-        if (chatMessage.player === null || chatMessage.shadowDeleted) {
+        // System message: nothing to subscribe to
+        if (chatMessage.player === null) {
             return;
         }
 
@@ -876,29 +870,5 @@ export default class GameStore
         }
 
         return deleted;
-    }
-
-    /**
-     * Shadow delete player chat messages in active games
-     */
-    shadowDeletePlayerChatMessages(playerPublicId: string): number
-    {
-        let shadowDeleted = 0;
-
-        for (const key in this.activeGames) {
-            const activeGame = this.activeGames[key];
-
-            for (const chatMessage of activeGame.getGame().chatMessages) {
-                if (chatMessage.player?.publicId === playerPublicId
-                    && !whitelistedChatMessage[chatMessage.content]
-                    && !chatMessage.shadowDeleted
-                ) {
-                    chatMessage.shadowDeleted = true;
-                    ++shadowDeleted;
-                }
-            }
-        }
-
-        return shadowDeleted;
     }
 }

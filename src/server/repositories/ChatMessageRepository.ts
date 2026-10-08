@@ -1,7 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { In, IsNull, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
-import { ChatMessage, Player } from '../../shared/app/models/index.js';
-import { whitelistedChatMessage } from '../../shared/app/whitelistedChatMessages.js';
+import { ChatMessage } from '../../shared/app/models/index.js';
 
 @Service()
 export default class ChatMessageRepository
@@ -17,22 +16,6 @@ export default class ChatMessageRepository
             where: { publicId: In(publicIds) },
             relations: { player: true },
         });
-    }
-
-    async shadowDeletePlayerMessages(player: Player)
-    {
-        const { affected } = await this.chatMessageRepository.createQueryBuilder()
-            .update()
-            .where('playerId = :playerId', { playerId: player.id })
-            .andWhere('content not in (:whitelisted)', { whitelisted: Object.keys(whitelistedChatMessage) })
-            .andWhere('not shadowDeleted')
-            .set({
-                shadowDeleted: true,
-            })
-            .execute()
-        ;
-
-        return affected;
     }
 
     async getLastChatMessagesForModeration(since: Date): Promise<ChatMessage[]>

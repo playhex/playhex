@@ -14,7 +14,7 @@ const createPlayer = (): Player => {
     player.isBot = false;
     player.createdAt = new Date();
     player.countryFlag = '🇫🇷';
-    player.shadowBanned = true;
+    player.registeredAt = new Date();
 
     const rating = new Rating();
 
@@ -46,7 +46,7 @@ describe('lobby serialization', () => {
         assert.strictEqual(serialized.host?.currentRating?.rating, 1789, 'host rating');
         assert.strictEqual(serialized.host?.countryFlag, '🇫🇷', 'host flag');
         assert.strictEqual(serialized.gameToPlayers[0].player.currentRating?.rating, 1789, 'player rating');
-        assert.strictEqual(serialized.gameToPlayers[0].player.shadowBanned, undefined, 'no leak of non lobby fields');
+        assert.strictEqual(serialized.gameToPlayers[0].player.registeredAt, undefined, 'no leak of non lobby fields');
 
         // Through socket wire format
         const received = denormalize(normalize(serialized)) as Game;

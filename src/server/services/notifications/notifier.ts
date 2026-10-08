@@ -33,8 +33,6 @@ type NotifiableEvents = {
 
     /**
      * Chat message received on a game.
-     *
-     * Be careful to not emit event for shadow deleted chat messages.
      */
     chatMessage: (game: Game, chatMessage: ChatMessage) => void;
 

@@ -292,9 +292,6 @@ export default class PlayerRepository
         }
     }
 
-    /**
-     * @returns Number of players shadow deleted (0 or 1)
-     */
     async getLastRegisteredPlayers(limit: number): Promise<Player[]>
     {
         return await this.playerRepository.find({
@@ -339,20 +336,6 @@ export default class PlayerRepository
 
         // Update player instance kept in memory, i.e in games already created
         Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { countryFlag });
-    }
-
-    async shadowBan(publicId: string): Promise<number | undefined>
-    {
-        const { affected } = await this.playerRepository.createQueryBuilder('player')
-            .update()
-            .where('publicId = :publicId', { publicId })
-            .set({
-                shadowBanned: true,
-            })
-            .execute()
-        ;
-
-        return affected;
     }
 
     async moderateNickname(player: Player): Promise<void>

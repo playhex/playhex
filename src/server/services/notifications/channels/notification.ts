@@ -42,8 +42,8 @@ notifier.on('chatMessage', async (game, chatMessage) => {
         return;
     }
 
-    // No notification for shadow deleted or moderated chat messages
-    if (chatMessage.shadowDeleted || chatMessage.deletedByModeration) {
+    // No notification for moderated chat messages
+    if (chatMessage.deletedByModeration) {
         return;
     }
 

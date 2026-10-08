@@ -28,7 +28,6 @@ import useServerDateStore from './serverDateStore.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
 import useLobbyStore from './lobbyStore.js';
-import { checkShadowDeleted } from '../../shared/app/chatUtils.js';
 import { defineOverlay } from '@overlastic/vue';
 import GameFinishedOverlay from '../vue/components/overlay/GameFinishedOverlay.vue';
 import type ExternalGame from '../../shared/app/models/ExternalGame.js';
@@ -107,7 +106,6 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         const unlisten = listenSocketMessages(gamePublicId, gameInitialData => {
             game.value = cloneGame(gameInitialData);
-            removeShadowDeletedMessages(game.value);
             engineGame.value = EngineGame.fromData(toEngineGameData(game.value));
             gameView.value = new GameView(game.value.boardsize);
             playerSettingsFacade.value = new PlayerSettingsFacade(gameView.value);
@@ -404,10 +402,6 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         on('chat', (gameId: string, chatMessage: ChatMessage) => {
             if (gameId !== gamePublicId || !game.value) {
-                return;
-            }
-
-            if (!checkShadowDeleted(chatMessage, useAuthStore().loggedInPlayer)) {
                 return;
             }
 
@@ -1024,22 +1018,6 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         chatInput.value += move + ' ';
-    };
-
-    /**
-     * On init, remove shadow banned chat messages
-     */
-    const removeShadowDeletedMessages = (game: Game): void => {
-        // Append '#unban' to the url and refresh to see shadow banned chat messages
-        if (window.location.hash === '#unban') {
-            return;
-        }
-
-        const { loggedInPlayer } = useAuthStore();
-
-        game.chatMessages = game.chatMessages
-            .filter(chatMessage => checkShadowDeleted(chatMessage, loggedInPlayer))
-        ;
     };
 
     /*

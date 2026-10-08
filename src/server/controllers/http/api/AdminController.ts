@@ -6,7 +6,6 @@ import { Authorized, Body, Delete, Get, HttpError, JsonController, NotFoundError
 import type { Request } from 'express';
 import { Player, Tournament, GameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
-import ChatMessageRepository from '../../../repositories/ChatMessageRepository.js';
 import { PushNotificationSender } from '../../../services/PushNotificationsSender.js';
 import { PushPayload } from '../../../../shared/app/PushPayload.js';
 import TournamentStore from '../../../store/TournamentStore.js';
@@ -38,7 +37,6 @@ export default class AdminController
         private gameStore: GameStore,
         private tournamentStore: TournamentStore,
         private playerRepository: PlayerRepository,
-        private chatMessageRepository: ChatMessageRepository,
         private pushNotificationSender: PushNotificationSender,
         private gameStaleEvaluator: GameStaleEvaluator,
         private autoCancelStaleGames: AutoCancelStaleGames,
@@ -132,27 +130,6 @@ export default class AdminController
         gameServer.playerJoin(ai1, true);
 
         return gameServer.getGame();
-    }
-
-    @Post('/api/admin/players/:publicId/shadow-ban')
-    async shadowBanPlayer(
-        @Param('publicId') publicId: string,
-    ) {
-        const player = await this.playerRepository.getPlayer(publicId);
-
-        if (player === null) {
-            throw new NotFoundError(`Player "${publicId}" not found`);
-        }
-
-        const playerShadowBanned = await this.playerRepository.shadowBan(publicId);
-        const shadowDeletedChatMessagesInActiveGames = this.gameStore.shadowDeletePlayerChatMessages(publicId);
-        const shadowDeletedChatMessagesInPersistedGames = await this.chatMessageRepository.shadowDeletePlayerMessages(player);
-
-        return {
-            playerShadowBanned,
-            shadowDeletedChatMessagesInActiveGames,
-            shadowDeletedChatMessagesInPersistedGames,
-        };
     }
 
     @Post('/api/admin/players/:publicId/push-notification')

@@ -85,15 +85,6 @@ export default class Player
     @Type(() => Rating)
     currentRating?: Rating;
 
-    /**
-     * Whether this player is shadow banned:
-     * - can send chat messages, but only visible to himself.
-    *       All chat messages posted while being shadow banned
-     *      are marked as shadow deleted.
-     */
-    @Column({ default: false })
-    shadowBanned?: boolean;
-
     @Column({ type: String, nullable: true, default: null })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     avatarPath?: null | string;
