@@ -2,7 +2,6 @@ import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
-import { addLegacyAliases } from '../../services/legacyPayloadAliases.js';
 
 @Service()
 export default class GameWebsocketController implements WebsocketControllerInterface
@@ -52,6 +51,6 @@ export default class GameWebsocketController implements WebsocketControllerInter
         const gameId = room.match(/games\/(.+)/)?.[1];
         if (gameId == null) return;
         const game = await this.gameStore.getActiveOrArchivedGame(gameId);
-        socket.emit('gameUpdate', gameId, addLegacyAliases(game));
+        socket.emit('gameUpdate', gameId, game);
     }
 }

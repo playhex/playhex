@@ -15,7 +15,6 @@ import { videoThumbnailsPath } from '../../videos/VideoThumbnailService.js';
 import { ipBanMiddleware } from '../../services/security/ipBanMiddleware.js';
 import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../../services/rate-limiters.js';
 import { TranslatableHttpError } from '../../../shared/app/TranslatableHttpError.js';
-import { legacyAliasesMiddleware } from '../../services/legacyPayloadAliases.js';
 
 export const registerHttpControllers = async (app: Express, httpServer: http.Server): Promise<void> => {
     app.use(ipBanMiddleware);
@@ -25,7 +24,6 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use('/video-thumbnails', express.static(videoThumbnailsPath));
     // Bootstrap CSS (LTR + RTL builds) served as plain files, referenced directly in the page <head>.
     app.use('/statics/bootstrap-css', express.static(path.join(process.cwd(), 'node_modules', 'bootstrap', 'dist', 'css')));
-    app.use(legacyAliasesMiddleware); // TODO remove with the HostedGame -> Game backward compatibility shim
     registerApi(app);
     app.use(await staticsRouter(httpServer));
     app.use(pwaRouter());

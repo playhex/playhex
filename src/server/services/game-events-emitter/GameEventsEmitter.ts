@@ -2,7 +2,6 @@ import { Container, Service } from 'typedi';
 import { Game, Player, ChatMessage, Rating } from '../../../shared/app/models/index.js';
 import { HexServer } from '../../server.js';
 import Rooms from '../../../shared/app/Rooms.js';
-import { addLegacyAliases } from '../legacyPayloadAliases.js';
 import { isBotGame, isChallengeGame } from '../../../shared/app/gameUtils.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
@@ -67,11 +66,11 @@ export class GameEventsEmitter
     {
         io().to([
             ...lobbyRooms(game),
-        ]).emit('lobbyGameCreated', addLegacyAliases(instanceToInstance(game, { groups: ['lobby'] })));
+        ]).emit('lobbyGameCreated', instanceToInstance(game, { groups: ['lobby'] }));
 
         io().to([
             ...gamePlayersRooms(game),
-        ]).emit('gameCreated', addLegacyAliases(instanceToInstance(game)));
+        ]).emit('gameCreated', instanceToInstance(game));
     }
 
     emitGameJoined(game: Game, player: Player): void
@@ -85,7 +84,7 @@ export class GameEventsEmitter
 
     emitGameStarted(game: Game): void
     {
-        const gameSerialized = addLegacyAliases(instanceToInstance(game));
+        const gameSerialized = instanceToInstance(game);
 
         io().to([
             ...startedGameLobbyRooms(game),
@@ -162,7 +161,7 @@ export class GameEventsEmitter
 
         io().to([
             ...startedGameLobbyRooms(game),
-        ]).emit('lobbyGameEnded', addLegacyAliases(instanceToInstance(game)));
+        ]).emit('lobbyGameEnded', instanceToInstance(game));
     }
 
     emitGameCanceled(game: Game, canceledAt: { date: Date }): void
@@ -193,7 +192,7 @@ export class GameEventsEmitter
 
         io().to([
             Rooms.player(game.opponentPublicId),
-        ]).emit('gameChallengeCreated', addLegacyAliases(instanceToInstance(game)));
+        ]).emit('gameChallengeCreated', instanceToInstance(game));
     }
 
     emitRematchAvailable(game: Game, rematchPublicId: string): void

@@ -4,7 +4,6 @@ import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
-import { addLegacyAliases } from '../../services/legacyPayloadAliases.js';
 
 @Service()
 export default class LobbyWebsocketController implements WebsocketControllerInterface
@@ -34,6 +33,6 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
         }
 
         const games = this.gameStore.getWaiting1v1GamesData();
-        socket.emit('lobbyUpdate', addLegacyAliases(games.map(game => instanceToInstance(game, { groups: ['lobby'] }))));
+        socket.emit('lobbyUpdate', games.map(game => instanceToInstance(game, { groups: ['lobby'] })));
     }
 }

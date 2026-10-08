@@ -3,7 +3,6 @@ import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
 import GameStore from '../../store/GameStore.js';
 import { GameSpectators } from '../../services/GameSpectators.js';
-import { addLegacyAliases } from '../../services/legacyPayloadAliases.js';
 
 @Service()
 export default class ThumbnailGameWebsocketController implements WebsocketControllerInterface
@@ -19,7 +18,7 @@ export default class ThumbnailGameWebsocketController implements WebsocketContro
             const game = await this.gameStore.getActiveOrArchivedGame(gameId);
             const spectatorsCount = this.gameSpectators.getSpectatorPlayers(gameId).length;
 
-            answer(addLegacyAliases(game), spectatorsCount);
+            answer(game, spectatorsCount);
         });
     }
 }
