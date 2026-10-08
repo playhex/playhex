@@ -4,13 +4,13 @@ import type { PuzzleError } from '../../../../shared/app/puzzles/puzzleTree.js';
 /**
  * Translated validation error, without tree node, e.g. when shown on the node itself.
  */
-export const translatePuzzleErrorMessage = ({ code, params }: PuzzleError): string =>
+export const translatePuzzleErrorMessage = ({ code, params }: PuzzleError<string>): string =>
     t(`puzzles.errors.${code}`, params);
 
 /**
  * Translated validation error, prefixed with tree node when error is in tree.
  */
-export const translatePuzzleError = (error: PuzzleError): string => {
+export const translatePuzzleError = (error: PuzzleError<string>): string => {
     const { path, parallel } = error;
     const message = translatePuzzleErrorMessage(error);
 

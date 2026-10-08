@@ -13,10 +13,11 @@ import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconLightbulb, IconRobot, IconSave2, IconSendFill, IconShuffle, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconLightbulb, IconRobot, IconSave2, IconSendFill, IconShuffle, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
+import type { AnalysisEngine } from '../../../../shared/app/hexplorer.js';
 
 const props = defineProps<{
     /**
@@ -76,6 +77,11 @@ const {
     errors,
     draftErrors,
     nodeErrors,
+    selectErrorNode,
+    katahexCheck,
+    katahexCheckError,
+    katahexChecking,
+    runKatahexCheck,
     redStones,
     blueStones,
     disabledCells,
@@ -193,6 +199,17 @@ watch(expertMode, enabled => {
         setAnalyzer(null);
     }
 });
+
+/*
+ * Katahex check, in publish tab
+ */
+
+const katahexCheckEngine = ref<AnalysisEngine>('katahex-intuition');
+
+const katahexCheckProgress = computed(() => katahexCheck.value === null || katahexCheck.value.total === 0
+    ? 0
+    : Math.round(100 * katahexCheck.value.done / katahexCheck.value.total),
+);
 
 const changeElseAnswer = (): void => {
     selectParent();
@@ -544,6 +561,61 @@ const deletePuzzle = async (): Promise<void> => {
                         <ul class="mb-0 ps-3">
                             <li v-for="(error, index) in errors" :key="index">{{ translatePuzzleError(error) }}</li>
                         </ul>
+                    </div>
+
+                    <!-- Katahex check -->
+                    <div class="mb-3">
+                        <p class="form-text mt-0 mb-2"><IconInfoCircle /> {{ $t('puzzles.editor.katahex_check_realistic') }}</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <select
+                                v-model="katahexCheckEngine"
+                                class="form-select form-select-sm w-auto"
+                                :aria-label="$t('puzzles.editor.ai_eval')"
+                                :disabled="katahexChecking"
+                            >
+                                <option
+                                    v-for="a in analyzers"
+                                    :key="a.engine"
+                                    :value="a.engine"
+                                    :disabled="!isAnalyzerAvailable(a)"
+                                >{{ a.getName() }}</option>
+                            </select>
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm text-nowrap"
+                                :disabled="errors.length > 0 || katahexChecking"
+                                @click="runKatahexCheck(katahexCheckEngine)"
+                            ><IconRobot /> {{ $t('puzzles.editor.katahex_check') }}</button>
+                            <span v-if="katahexChecking" class="spinner-border spinner-border-sm flex-shrink-0" aria-hidden="true"></span>
+                        </div>
+                        <div class="form-text">{{ $t('puzzles.editor.katahex_check_help') }}</div>
+
+                        <div v-if="katahexChecking && katahexCheck" class="mt-2">
+                            <div class="progress" role="progressbar" :aria-valuenow="katahexCheckProgress" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" :style="{ width: katahexCheckProgress + '%' }"></div>
+                            </div>
+                            <p class="small text-body-secondary mb-0">{{ $t('puzzles.editor.katahex_check_progress', { done: katahexCheck.done, total: katahexCheck.total }) }}</p>
+                        </div>
+
+                        <p v-if="katahexCheckError" class="text-danger small mt-2 mb-0"><IconExclamationTriangle /> {{ katahexCheckError }}</p>
+
+                        <template v-else-if="katahexCheck?.status === 'done'">
+                            <p v-if="katahexCheck.warnings.length === 0" class="text-success small mt-2 mb-0">{{ $t('puzzles.editor.katahex_check_ok') }}</p>
+                            <div v-else class="small text-warning-emphasis mt-2">
+                                <p class="mb-1"><IconExclamationTriangle /> {{ $t('puzzles.editor.katahex_check_warnings') }}</p>
+                                <ul class="mb-0 ps-3">
+                                    <li v-for="(warning, index) in katahexCheck.warnings" :key="index">
+                                        <a
+                                            v-if="warning.path !== undefined"
+                                            href="#"
+                                            class="link-warning"
+                                            @click.prevent="selectErrorNode(warning)"
+                                        >{{ translatePuzzleError(warning) }}</a>
+                                        <template v-else>{{ translatePuzzleError(warning) }}</template>
+                                    </li>
+                                </ul>
+                            </div>
+                        </template>
                     </div>
 
                     <button

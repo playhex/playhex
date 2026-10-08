@@ -23,6 +23,7 @@ import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } fr
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
+import type { PuzzleKatahexCheckInput, PuzzleKatahexCheckState } from '../shared/app/puzzles/puzzleKatahexCheck.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 
@@ -1519,6 +1520,25 @@ export const apiPostPuzzle = async (input: PuzzleInput): Promise<Puzzle> => {
     await checkResponse(response);
 
     return plainToInstance(Puzzle, await response.json());
+};
+
+/**
+ * Starts katahex check of puzzle, or returns its current state.
+ * Send same input again to poll until check is done.
+ */
+export const apiPuzzleKatahexCheck = async (input: PuzzleKatahexCheckInput): Promise<PuzzleKatahexCheckState> => {
+    const response = await fetch('/api/puzzles/katahex-check', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
 };
 
 export const apiPutPuzzle = async (publicId: string, input: PuzzleInput): Promise<Puzzle> => {

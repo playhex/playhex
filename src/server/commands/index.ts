@@ -18,6 +18,7 @@ import './generateStatsCommand.js';
 import './tournamentSubscribePlayersCommand.js';
 import './ladderJoinPlayersCommand.js';
 import '../puzzles/createPuzzleCommand.js';
+import '../puzzles/validatePuzzleCommand.js';
 import './findSimilarGamesCommand.js';
 import './aiJobsCommands.js';
 

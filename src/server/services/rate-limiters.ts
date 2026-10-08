@@ -111,6 +111,16 @@ const analyzePositionMctsLimiter = new RateLimiterMemory({
 /**
  * Limit game analyze moves deep analyzes (tree search), by player.
  */
+/**
+ * Limit puzzle katahex checks started by a player.
+ * Only new checks count, polling a running check or a cached one does not.
+ */
+const puzzleKatahexCheckLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.puzzle_katahex_check',
+    points: 20,
+    duration: 600,
+});
+
 const analyzeMoveMctsLimiter = new RateLimiterMemory({
     keyPrefix: 'rate_limiter.analyze_move_mcts',
     points: 30,
@@ -250,6 +260,10 @@ export const rateLimiterConsumeAnalyzePositionMcts = async (ip: string | undefin
 
 export const rateLimiterConsumeAnalyzeMoveMcts = async (playerPublicId: string) => {
     await consume(analyzeMoveMctsLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumePuzzleKatahexCheck = async (playerPublicId: string) => {
+    await consume(puzzleKatahexCheckLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {

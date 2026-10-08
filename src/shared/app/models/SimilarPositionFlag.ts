@@ -14,6 +14,11 @@ export type SimilarPositionFlagContext =
      * Position reached in a game against a bot
      */
     | 'bot_game'
+
+    /**
+     * Puzzle initial position submitted to katahex check
+     */
+    | 'puzzle_check'
 ;
 
 /**

@@ -1,14 +1,17 @@
 import { GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
 import { coordsToMove, type Move } from '@playhex/move-notation';
-import { computed, onUnmounted, ref, shallowRef, toRaw } from 'vue';
+import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { createParallelsFinder, filterMoveNodes, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
-import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
+import { AnalysisEngineUnavailableError, type AnalysisEngine } from '../../../../shared/app/hexplorer.js';
+import type { PuzzleKatahexCheckState } from '../../../../shared/app/puzzles/puzzleKatahexCheck.js';
+import { apiPuzzleKatahexCheck } from '../../../apiClient.js';
+import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 export type EditorStep = 'position' | 'tree' | 'publish';
 
@@ -22,6 +25,7 @@ type EditorNode = PuzzleNode | PuzzleElseNode;
 const DEFAULT_BOARDSIZE = 11;
 
 const PLANNED_MOVES_GROUP = 'planned_moves';
+const KATAHEX_CHECK_POLL_INTERVAL_MS = 2000;
 const AI_EVAL_COLOR = 0x22bb55;
 
 /**
@@ -808,6 +812,126 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         return map;
     });
 
+    /**
+     * Selects tree node where this error is, in tree step.
+     * Does nothing if error is not in tree, or in a parallel sequence.
+     */
+    const selectErrorNode = (error: PuzzleError<string>): void => {
+        if (error.path === undefined || error.parallel !== undefined) {
+            return;
+        }
+
+        const path: EditorNode[] = [];
+        let node: PuzzleNode = tree.value;
+
+        for (const move of error.path) {
+            const child = findChild(node, move);
+
+            if (child === null) {
+                return;
+            }
+
+            path.push(child);
+            node = child;
+        }
+
+        const child = error.child === undefined ? undefined : node.children?.[error.child];
+
+        if (child !== undefined) {
+            path.push(child);
+        }
+
+        setStep('tree');
+        selectPath(path);
+    };
+
+    /*
+     * Katahex check: warnings on tree logic, not blocking publishing
+     */
+
+    const toDefinition = (): PuzzleDefinition => {
+        const { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, tree } = toInput(published);
+
+        return { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, tree };
+    };
+
+    /**
+     * Changes when position or tree changes, to invalidate katahex check results.
+     */
+    const katahexCheckKey = computed(() => {
+        const { boardsize, redStones, blueStones, disabledCells, playerColor, tree } = toDefinition();
+
+        return JSON.stringify(
+            { boardsize, redStones, blueStones, disabledCells, playerColor, tree },
+            (key, value: unknown) => key === 'message' ? undefined : value,
+        );
+    });
+
+    const katahexCheck = ref<null | PuzzleKatahexCheckState>(null);
+    const katahexCheckError = ref<null | string>(null);
+    const katahexChecking = ref(false);
+
+    /**
+     * Incremented to stop polling a previous check.
+     */
+    let katahexCheckRun = 0;
+
+    const resetKatahexCheck = (): void => {
+        ++katahexCheckRun;
+        katahexCheck.value = null;
+        katahexCheckError.value = null;
+        katahexChecking.value = false;
+    };
+
+    watch(katahexCheckKey, resetKatahexCheck);
+
+    /**
+     * Runs katahex check on server, polls until done.
+     * Fast when run again, as analyzes are cached on server.
+     */
+    const runKatahexCheck = async (engine: AnalysisEngine): Promise<void> => {
+        resetKatahexCheck();
+
+        const run = katahexCheckRun;
+        const input = { puzzle: toDefinition(), engine };
+
+        katahexChecking.value = true;
+
+        try {
+            for (;;) {
+                const state = await apiPuzzleKatahexCheck(input);
+
+                if (run !== katahexCheckRun) {
+                    return;
+                }
+
+                katahexCheck.value = state;
+
+                if (state.status !== 'running') {
+                    break;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, KATAHEX_CHECK_POLL_INTERVAL_MS));
+
+                if (run !== katahexCheckRun) {
+                    return;
+                }
+            }
+
+            if (katahexCheck.value?.status === 'failed') {
+                katahexCheckError.value = katahexCheck.value.error ?? null;
+            }
+        } catch (e) {
+            if (run === katahexCheckRun) {
+                katahexCheckError.value = apiErrorMessage(e);
+            }
+        } finally {
+            if (run === katahexCheckRun) {
+                katahexChecking.value = false;
+            }
+        }
+    };
+
     /*
      * Keyboard: rewind source game in position step, navigate tree in tree step
      */
@@ -856,6 +980,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     }
 
     onUnmounted(() => {
+        // Stop polling katahex check
+        ++katahexCheckRun;
         analyzer.value?.persistCache?.();
         destroyGameView();
     });
@@ -907,7 +1033,13 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         errors,
         draftErrors,
         nodeErrors,
+        selectErrorNode,
         toInput,
+
+        katahexCheck,
+        katahexCheckError,
+        katahexChecking,
+        runKatahexCheck,
 
         analyzer,
         setAnalyzer,

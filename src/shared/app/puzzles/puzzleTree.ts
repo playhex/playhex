@@ -552,8 +552,8 @@ export type PuzzleErrorParallel = {
  * Validation error, as a code to translate on client side,
  * see "puzzles.errors" translations.
  */
-export type PuzzleError = {
-    code: PuzzleErrorCode;
+export type PuzzleError<Code extends string = PuzzleErrorCode> = {
+    code: Code;
 
     /**
      * Main sequence moves played to reach the tree node where the error is, empty for root.
@@ -619,7 +619,7 @@ export const normalizePuzzleText = (value?: null | string): null | string =>
  *
  * @returns Null when error is not in tree, or its node cannot be found (e.g. not an object)
  */
-export const findErrorNode = (tree: PuzzleNode, { path, parallel, child }: PuzzleError): null | PuzzleNode | PuzzleElseNode => {
+export const findErrorNode = (tree: PuzzleNode, { path, parallel, child }: PuzzleError<string>): null | PuzzleNode | PuzzleElseNode => {
     if (path === undefined) {
         return null;
     }
@@ -643,7 +643,7 @@ export const findErrorNode = (tree: PuzzleNode, { path, parallel, child }: Puzzl
 /**
  * Not translated, for server side error messages.
  */
-export const puzzleErrorToString = ({ code, path, parallel, params }: PuzzleError): string =>
+export const puzzleErrorToString = ({ code, path, parallel, params }: PuzzleError<string>): string =>
     [
         code,
         path === undefined ? null : `after "${path.join(' ') || 'root'}"`,

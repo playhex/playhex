@@ -1,4 +1,5 @@
-import { BadRequestError, Body, Delete, Get, HttpError, JsonController, NotFoundError, OnUndefined, Param, Post, Put } from 'routing-controllers';
+import { Authorized, BadRequestError, Body, Delete, Get, HttpError, JsonController, NotFoundError, OnUndefined, Param, Post, Put, Req } from 'routing-controllers';
+import type { Request } from 'express';
 import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
@@ -12,6 +13,14 @@ import PuzzleCollectionRepository from './PuzzleCollectionRepository.js';
 import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor, mustBePuzzleAuthor } from './puzzleGuards.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
+import { ANALYSIS_ENGINES, type AnalysisEngine } from '../../shared/app/hexplorer.js';
+import type { PuzzleKatahexCheckInput, PuzzleKatahexCheckState } from '../../shared/app/puzzles/puzzleKatahexCheck.js';
+import PuzzleKatahexCheckService, { getPuzzleKatahexCheckKey } from './PuzzleKatahexCheckService.js';
+import { SimilarPlayingPositionChecker } from '../services/anti-cheat/SimilarPlayingPositionChecker.js';
+import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../services/anti-cheat/SimilarPositionDetectedError.js';
+import { InvalidPositionError } from '../../shared/position-comparator/position-comparator.js';
+import { rateLimiterConsumePuzzleKatahexCheck } from '../services/rate-limiters.js';
+import { ROLE_ADMIN } from '../services/roles.js';
 
 /**
  * Publishes or unpublishes puzzle.
@@ -96,7 +105,47 @@ export default class PuzzleController
         private puzzleCollectionRepository: PuzzleCollectionRepository,
         private gameStore: GameStore,
         private playerModerationActionRepository: PlayerModerationActionRepository,
+        private puzzleKatahexCheckService: PuzzleKatahexCheckService,
+        private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
     ) {}
+
+    /**
+     * Returns current check state, or starts it.
+     * Client polls by sending same input again until check is done.
+     *
+     * @param beforeStart Called only when a new check is started
+     *
+     * @throws {BadRequestError} If puzzle is not valid
+     * @throws {HttpError} 503 if engine is not available
+     */
+    private async katahexCheck(input: PuzzleKatahexCheckInput, beforeStart: (engine: AnalysisEngine) => Promise<void>): Promise<PuzzleKatahexCheckState>
+    {
+        const engine = input.engine ?? 'katahex-intuition';
+
+        if (!ANALYSIS_ENGINES.includes(engine)) {
+            throw new BadRequestError(`Invalid engine "${String(engine)}"`);
+        }
+
+        const errors = validatePuzzle(input.puzzle);
+
+        if (errors.length > 0) {
+            throw new BadRequestError(`Invalid puzzle: ${errors.map(puzzleErrorToString).join(', ')}`);
+        }
+
+        const state = this.puzzleKatahexCheckService.getState(getPuzzleKatahexCheckKey(input.puzzle, engine));
+
+        if (state !== null) {
+            return state;
+        }
+
+        if (!this.puzzleKatahexCheckService.isEngineAvailable(engine)) {
+            throw new HttpError(503, 'No AI worker can analyze positions right now');
+        }
+
+        await beforeStart(engine);
+
+        return this.puzzleKatahexCheckService.start(input.puzzle, engine);
+    }
 
     /**
      * Moves puzzle to input collection, at the end, if collection changed.
@@ -268,6 +317,55 @@ export default class PuzzleController
         await this.puzzleRepository.save(puzzle, collectionsVisiblyUpdated(puzzle, previous));
 
         return serializePuzzleData(puzzle);
+    }
+
+    /**
+     * Checks puzzle tree with katahex, see PuzzleKatahexChecker.
+     * Puzzle is sent, not saved, to check it while editing.
+     */
+    @Post('/api/puzzles/katahex-check')
+    async postKatahexCheck(
+        @AuthenticatedPlayer() player: Player,
+        @Body(BODY_OPTIONS) input: PuzzleKatahexCheckInput,
+        @Req() request: Request,
+    ): Promise<PuzzleKatahexCheckState> {
+        return await this.katahexCheck(input, async () => {
+            const { boardsize, redStones, blueStones } = input.puzzle;
+
+            // Prevent getting katahex help on a playing game position, like Hexplorer
+            try {
+                this.similarPlayingPositionChecker.checkPosition({ boardsize, black: redStones, white: blueStones });
+            } catch (e) {
+                if (e instanceof InvalidPositionError) {
+                    throw new BadRequestError(e.message);
+                }
+
+                if (e instanceof SimilarPositionDetectedError) {
+                    void this.similarPlayingPositionChecker.flag(e, {
+                        context: 'puzzle_check',
+                        playerPublicId: player.publicId,
+                        ip: request.ip ?? null,
+                    });
+
+                    throw similarPositionDetectedToTranslatableHttpError(e);
+                }
+
+                throw e;
+            }
+
+            await rateLimiterConsumePuzzleKatahexCheck(player.publicId);
+        });
+    }
+
+    /**
+     * Same as postKatahexCheck(), for admin, used by command "puzzle-validate".
+     */
+    @Authorized(ROLE_ADMIN)
+    @Post('/api/admin/puzzles/katahex-check')
+    async postAdminKatahexCheck(
+        @Body(BODY_OPTIONS) input: PuzzleKatahexCheckInput,
+    ): Promise<PuzzleKatahexCheckState> {
+        return await this.katahexCheck(input, async () => {});
     }
 
     @Delete('/api/puzzles/:publicId')
