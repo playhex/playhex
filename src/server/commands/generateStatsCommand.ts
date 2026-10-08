@@ -343,7 +343,16 @@ type CommonStats = {
         pvpOnly: BlundersStats;
         allGames: BlundersStats;
     };
+
+    /**
+     * Monthly active players: distinct players who ended at least one game
+     * (of MIN_MOVES_COUNT moves or more) in the month, by game end date.
+     * Games against bots count too, so not affected by the "include bot games" toggle.
+     */
+    monthlyActivePlayers: MonthlyActivePlayers;
 };
+
+type MonthlyActivePlayers = { month: string, count: number }[];
 
 /**
  * Only a small part of the games are analyzed, so blunders are counted on these analyzes
@@ -470,6 +479,26 @@ const computeBlundersStats = async (): Promise<CommonStats['blunders']> => {
     };
 };
 
+const computeMonthlyActivePlayers = async (): Promise<MonthlyActivePlayers> => {
+    const rows: { month: string, distinct_players: string | number }[] = await AppDataSource.query(`
+        SELECT
+            DATE_FORMAT(g.endedAt, '%Y-%m') AS month,
+            COUNT(DISTINCT gtp.playerId) AS distinct_players
+        FROM game g
+        JOIN game_to_player gtp ON gtp.gameId = g.id
+        WHERE g.state = 'ended'
+        AND g.endedAt IS NOT NULL
+        AND LENGTH(g.moves) - LENGTH(REPLACE(g.moves, ' ', '')) + 1 >= ?
+        GROUP BY DATE_FORMAT(g.endedAt, '%Y-%m')
+        ORDER BY month
+    `, [MIN_MOVES_COUNT]);
+
+    return rows.map(({ month, distinct_players }) => ({
+        month,
+        count: Number(distinct_players),
+    }));
+};
+
 const computeCommonStats = async (): Promise<CommonStats> => {
     // Grouping by countryFlag in SQL is unreliable: default collations can consider
     // visually/codepoint-close flag emojis as equal. Count in JS instead (exact string equality).
@@ -535,6 +564,7 @@ const computeCommonStats = async (): Promise<CommonStats> => {
     }
 
     const blunders = await computeBlundersStats();
+    const monthlyActivePlayers = await computeMonthlyActivePlayers();
 
     return {
         generatedAt: new Date().toISOString(),
@@ -543,6 +573,7 @@ const computeCommonStats = async (): Promise<CommonStats> => {
         shadingPatternCounts,
         ratingDistribution,
         blunders,
+        monthlyActivePlayers,
     };
 };
 

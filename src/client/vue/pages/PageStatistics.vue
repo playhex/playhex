@@ -65,7 +65,10 @@ type CommonStats = {
         pvpOnly: BlundersStats;
         allGames: BlundersStats;
     };
+    monthlyActivePlayers: MonthlyActivePlayers;
 };
+
+type MonthlyActivePlayers = { month: string, count: number }[];
 
 type BlundersStats = {
     sampleMovesCount: number;
@@ -75,6 +78,7 @@ type BlundersStats = {
 };
 
 const RATING_MAX_DEVIATION = 250;
+const MIN_MOVES_COUNT = 4;
 
 type Period = 'last-7-days' | 'last-28-days' | 'last-365-days' | 'overall';
 
@@ -154,6 +158,92 @@ const displayedBlunders = computed<null | BlundersStats>(() => {
         : commonStats.value.blunders.pvpOnly
     ;
 });
+
+const displayedMonthlyActivePlayers = computed<MonthlyActivePlayers>(() => {
+    if (!commonStats.value || typeof commonStats.value === 'string') {
+        return [];
+    }
+
+    return commonStats.value.monthlyActivePlayers;
+});
+
+/**
+ * Average of the last 3 full months, current month (when stats were generated) excluded.
+ */
+const averageMonthlyActivePlayers = computed<null | number>(() => {
+    if (!commonStats.value || typeof commonStats.value === 'string') {
+        return null;
+    }
+
+    const currentMonth = commonStats.value.generatedAt.slice(0, 7);
+    const lastFullMonths = displayedMonthlyActivePlayers.value
+        .filter(({ month }) => month < currentMonth)
+        .slice(-3)
+    ;
+
+    if (lastFullMonths.length === 0) {
+        return null;
+    }
+
+    return Math.round(lastFullMonths.reduce((sum, { count }) => sum + count, 0) / lastFullMonths.length);
+});
+
+/**
+ * Y axis ticks, with a round step (1, 2 or 5 times a power of 10) giving about 4 intervals.
+ * Last tick is the top of the chart.
+ */
+const monthlyActivePlayersTicks = computed<number[]>(() => {
+    const max = Math.max(0, ...displayedMonthlyActivePlayers.value.map(({ count }) => count));
+
+    if (max === 0) {
+        return [0];
+    }
+
+    const rawStep = max / 4;
+    const power = 10 ** Math.floor(Math.log10(rawStep));
+    const step = [1, 2, 5, 10].find(factor => factor * power >= rawStep)! * power;
+    const ticks: number[] = [];
+
+    for (let tick = 0; tick < max + step; tick += step) {
+        ticks.push(tick);
+    }
+
+    return ticks;
+});
+
+/**
+ * Show a label every 1, 2, 3, 6 or 12 months so that labels don't overlap
+ * (about 12 labels max), aligned on January.
+ */
+const monthlyActivePlayersLabelStep = computed<number>(() => {
+    const monthsCount = displayedMonthlyActivePlayers.value.length;
+
+    return [1, 2, 3, 6, 12].find(step => monthsCount / step <= 12) ?? 12;
+});
+
+const monthLabel = (month: string): null | { month: string, year: string } => {
+    const [year, monthNumber] = month.split('-').map(Number);
+
+    if ((monthNumber - 1) % monthlyActivePlayersLabelStep.value !== 0) {
+        return null;
+    }
+
+    return {
+        month: new Date(year, monthNumber - 1).toLocaleDateString(i18next.resolvedLanguage, { month: 'short' }),
+        year: String(year),
+    };
+};
+
+const monthlyActivePlayersTopTick = computed<number>(() => {
+    return monthlyActivePlayersTicks.value[monthlyActivePlayersTicks.value.length - 1];
+});
+
+/**
+ * Position of a count on the y axis, in percent of the chart height.
+ */
+const monthlyActivePlayersPercent = (count: number): number => {
+    return monthlyActivePlayersTopTick.value === 0 ? 0 : 100 * count / monthlyActivePlayersTopTick.value;
+};
 
 const percent = (count: number, total: number): number => {
     return total === 0 ? 0 : 100 * count / total;
@@ -340,27 +430,27 @@ const ratingBarHeight = (count: number): string => {
                 <div class="col">
                     <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small">{{ $t('statistics.total_games') }}</div>
-                        <div class="fs-4">{{ formatCount(displayedStats.count) }}</div>
+                        <div class="fs-3">{{ formatCount(displayedStats.count) }}</div>
                     </div>
                 </div>
                 <div v-if="undefined !== displayedStats.meetsCount" class="col">
                     <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small"><IconPeopleFill class="me-1" />{{ $t('statistics.distinct_player_pairs_met') }}</div>
-                        <div class="fs-4">{{ formatCount(displayedStats.meetsCount) }}</div>
+                        <div class="fs-3">{{ formatCount(displayedStats.meetsCount) }}</div>
                         <div class="form-text mb-0">{{ $t('statistics.distinct_player_pairs_met_help') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small"><IconStopwatch class="me-1" />{{ $t('statistics.live_play_time') }}</div>
-                        <div class="fs-4">{{ $t('statistics.hours', { hours: formatHours(displayedStats.livePlayTimeMs) }) }}</div>
+                        <div class="fs-3">{{ $t('statistics.hours', { hours: formatHours(displayedStats.livePlayTimeMs) }) }}</div>
                         <div class="form-text mb-0">{{ $t('statistics.live_play_time_help') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="border rounded p-3 text-center h-100">
                         <div class="text-secondary small">{{ $t('statistics.swap_rate') }}</div>
-                        <div class="fs-4">{{ formatCount(displayedStats.swapCount) }}</div>
+                        <div class="fs-3">{{ formatCount(displayedStats.swapCount) }}</div>
                         <div class="text-secondary small">{{ formatPercent(displayedStats.swapCount, displayedStats.swapRuleEnabledCount) }}</div>
                         <div class="form-text mb-0">{{ $t('statistics.swap_rate_help') }}</div>
                     </div>
@@ -464,6 +554,59 @@ const ratingBarHeight = (count: number): string => {
                     <span class="badge text-bg-secondary rounded-pill">{{ displayedStats.outcomeCounts.forfeit }} ({{ formatPercent(displayedStats.outcomeCounts.forfeit, displayedStats.count) }})</span>
                 </li>
             </ul>
+
+            <h2 v-if="displayedMonthlyActivePlayers.length > 0" class="h4"><IconPeopleFill class="me-2" />{{ $t('statistics.monthly_active_players') }}</h2>
+
+            <div v-if="displayedMonthlyActivePlayers.length > 0" class="row g-3 mb-4">
+                <div class="col-md-9">
+                    <div class="d-flex">
+                        <div class="text-secondary me-1">
+                            <div class="position-relative mau-plot">
+                                <!-- invisible widest label, gives its width to the y axis -->
+                                <div class="rating-label invisible">{{ formatCount(monthlyActivePlayersTopTick) }}</div>
+                                <div
+                                    v-for="tick in monthlyActivePlayersTicks"
+                                    :key="tick"
+                                    class="rating-label position-absolute end-0 translate-middle-y"
+                                    :style="{ top: `${100 - monthlyActivePlayersPercent(tick)}%` }"
+                                >{{ formatCount(tick) }}</div>
+                            </div>
+                        </div>
+                        <div class="flex-fill">
+                            <div class="position-relative d-flex align-items-end gap-1 border-start border-bottom mau-plot">
+                                <div
+                                    v-for="tick in monthlyActivePlayersTicks"
+                                    :key="tick"
+                                    class="position-absolute start-0 end-0 border-top"
+                                    :style="{ top: `${100 - monthlyActivePlayersPercent(tick)}%` }"
+                                ></div>
+                                <div
+                                    v-for="{ month, count } in displayedMonthlyActivePlayers"
+                                    :key="month"
+                                    class="rating-bar flex-fill position-relative"
+                                    :style="{ height: `${monthlyActivePlayersPercent(count)}%` }"
+                                    :title="`${month}: ${formatCount(count)}`"
+                                ></div>
+                            </div>
+                            <div class="d-flex gap-1 text-secondary mau-x-axis">
+                                <div v-for="{ month } in displayedMonthlyActivePlayers" :key="month" class="flex-fill position-relative">
+                                    <div v-if="monthLabel(month)" class="rating-label position-absolute start-50 translate-middle-x text-center lh-sm">
+                                        {{ monthLabel(month)!.month }}<br>{{ monthLabel(month)!.year }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text">{{ $t('statistics.monthly_active_players_help', { minMoves: MIN_MOVES_COUNT }) }}</div>
+                </div>
+                <div v-if="null !== averageMonthlyActivePlayers" class="col-md-3">
+                    <div class="border rounded p-3 text-center h-100 d-flex flex-column justify-content-center">
+                        <div class="text-secondary small"><IconPeopleFill class="me-1" />{{ $t('statistics.monthly_active_players') }}</div>
+                        <div class="fs-3">{{ formatCount(averageMonthlyActivePlayers) }}</div>
+                        <div class="form-text mb-0">{{ $t('statistics.monthly_active_players_average_help') }}</div>
+                    </div>
+                </div>
+            </div>
 
             <h2 class="h4"><IconClockHistory class="me-2" />{{ $t('statistics.activity') }}</h2>
 
@@ -592,20 +735,20 @@ const ratingBarHeight = (count: number): string => {
                             <div class="col">
                                 <div class="border rounded p-3 text-center h-100">
                                     <div class="text-secondary small">{{ $t('statistics.total') }}</div>
-                                    <div class="fs-4">{{ formatCount(displayedStats.totalStonesPlaced) }}</div>
+                                    <div class="fs-3">{{ formatCount(displayedStats.totalStonesPlaced) }}</div>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="border rounded p-3 text-center h-100">
                                     <div class="text-secondary small"><IconPersonFill class="me-1" />{{ $t('statistics.by_humans') }}</div>
-                                    <div class="fs-4">{{ formatCount(displayedStats.stonesPlacedByHuman) }}</div>
+                                    <div class="fs-3">{{ formatCount(displayedStats.stonesPlacedByHuman) }}</div>
                                     <div class="text-secondary small">{{ formatPercent(displayedStats.stonesPlacedByHuman, displayedStats.totalStonesPlaced) }}</div>
                                 </div>
                             </div>
                             <div v-if="undefined !== displayedStats.stonesPlacedByBot" class="col">
                                 <div class="border rounded p-3 text-center h-100">
                                     <div class="text-secondary small"><IconRobot class="me-1" />{{ $t('statistics.by_bots') }}</div>
-                                    <div class="fs-4">{{ formatCount(displayedStats.stonesPlacedByBot) }}</div>
+                                    <div class="fs-3">{{ formatCount(displayedStats.stonesPlacedByBot) }}</div>
                                     <div class="text-secondary small">{{ formatPercent(displayedStats.stonesPlacedByBot, displayedStats.totalStonesPlaced) }}</div>
                                 </div>
                             </div>
@@ -720,8 +863,15 @@ const ratingBarHeight = (count: number): string => {
 .rating-bar
     width 100%
     min-height 2px
-    background-color unquote('rgba(var(--bs-primary-rgb), 0.6)')
+    // same color as a 0.6 alpha primary, but opaque so that the grid lines behind don't show through
+    background unquote('linear-gradient(rgba(var(--bs-primary-rgb), 0.6), rgba(var(--bs-primary-rgb), 0.6)), var(--bs-body-bg)')
     border-radius 2px 2px 0 0
+
+.mau-plot
+    height 10em
+
+.mau-x-axis
+    height 2em
 
 .rating-label
     font-size 0.65em
