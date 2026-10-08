@@ -487,7 +487,6 @@
     "tutorial": {
         "label": "Обучение",
         "are_you_new_to_hex": "Вы новичок в Hex?",
-        "learn_hex_in_1_minute": "Научитесь играть в Hex за 1 минуту",
         "hex_is_simple_and_has_two_rules": "Hex — простая игра, но сложная в освоении. В ней <strong>всего 2 правила</strong>.",
         "rule_1_connect_your_sides": "Правило 1: соедините свои стороны",
         "to_win_you_must_connect_with_path": "Чтобы победить, вы должны <strong>соединить свои стороны</strong> полностью непрерывным путём.",
@@ -517,7 +516,6 @@
         "swap_map_credits": "Автор: hzy, источник: zhihu.com",
         "congrats_you_know_play_hex": "Поздравляем! Теперь вы знаете, как играть в Hex!",
         "what_to_do_next": "Что делать дальше",
-        "play_vs_ai_desc": "Сыграйте полноценную партию против простого ИИ",
         "play_vs_ai_button": "Играть против ИИ",
         "do_some_puzzle_desc": "Изучите тактические и стратегические основы, решая головоломки по Hex",
         "do_some_puzzle_credits": "автор — Matthew Seymour",

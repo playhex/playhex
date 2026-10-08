@@ -336,7 +336,6 @@
     "tutorial": {
         "label": "教程",
         "are_you_new_to_hex": "你是 Hex 新手吗？",
-        "learn_hex_in_1_minute": "1 分钟学会玩 Hex",
         "hex_is_simple_and_has_two_rules": "Hex 是一款简单但难以精通的游戏。它<strong>只有 2 条规则</strong>。",
         "rule_1_connect_your_sides": "规则 1：连接你的两边",
         "to_win_you_must_connect_with_path": "要获胜，你必须用一条完全连通的路径<strong>连接你的两边</strong>。",
@@ -366,7 +365,6 @@
         "swap_map_credits": "作者：hzy，来源：zhihu.com",
         "congrats_you_know_play_hex": "恭喜！你现在已经知道如何玩 Hex 了！",
         "what_to_do_next": "接下来做什么",
-        "play_vs_ai_desc": "与一个简单难度的 AI 对手完整地玩一局",
         "play_vs_ai_button": "与 AI 对战",
         "do_some_puzzle_desc": "通过解决一些 Hex 谜题来学习战术和战略基础",
         "do_some_puzzle_credits": "作者：Matthew Seymour",

@@ -542,7 +542,6 @@
     "tutorial": {
         "label": "Bemutató",
         "are_you_new_to_hex": "Új vagy a Hexben?",
-        "learn_hex_in_1_minute": "Tanulj meg Hexet játszani 1 perc alatt",
         "hex_is_simple_and_has_two_rules": "A Hex egyszerű játék, de nehéz elsajátítani. Csak <strong>2 szabálya van</strong>.",
         "rule_1_connect_your_sides": "1. szabály: Kösd össze az oldalaidat",
         "to_win_you_must_connect_with_path": "A győzelemhez <strong>össze kell kötnöd az oldalaidat</strong> egy teljesen összefüggő úttal.",
@@ -572,7 +571,6 @@
         "swap_map_credits": "Szerző: hzy, forrás: zhihu.com",
         "congrats_you_know_play_hex": "Gratulálok! Most már tudod, hogyan kell Hexet játszani!",
         "what_to_do_next": "Mit tegyél most",
-        "play_vs_ai_desc": "Játssz egy teljes játékot egy könnyű AI ellenféllel",
         "play_vs_ai_button": "Játék AI ellen",
         "do_some_puzzle_desc": "Tanulj taktikai és stratégiai alapokat Hex rejtvények megoldásával",
         "do_some_puzzle_credits": "Matthew Seymour-tól",

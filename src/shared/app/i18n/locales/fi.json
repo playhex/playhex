@@ -532,7 +532,6 @@
     "tutorial": {
         "label": "Ohje",
         "are_you_new_to_hex": "Oletko uusi Hexissä?",
-        "learn_hex_in_1_minute": "Opi pelaamaan Hexiä 1 minuutissa",
         "hex_is_simple_and_has_two_rules": "Hex on yksinkertainen peli, mutta vaikea hallita. Siinä on <strong>vain 2 sääntöä</strong>.",
         "rule_1_connect_your_sides": "Sääntö 1: Yhdistä sivusi",
         "to_win_you_must_connect_with_path": "Voittaaksesi sinun täytyy <strong>yhdistää sivusi</strong> täysin yhtenäisellä polulla.",
@@ -562,7 +561,6 @@
         "swap_map_credits": "Tekijä: hzy, lähde: zhihu.com",
         "congrats_you_know_play_hex": "Onnittelut! Nyt tiedät kuinka pelata Hexiä!",
         "what_to_do_next": "Mitä tehdä seuraavaksi",
-        "play_vs_ai_desc": "Pelaa kokonainen peli helppoa tekoälyvastustajaa vastaan",
         "play_vs_ai_button": "Pelaa tekoälyä vastaan",
         "do_some_puzzle_desc": "Opi taktisia ja strategisia perusteita ratkaisemalla Hex-pulmia",
         "do_some_puzzle_credits": "tekijä Matthew Seymour",

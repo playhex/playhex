@@ -593,7 +593,6 @@
     "tutorial": {
         "label": "பயிற்சி",
         "are_you_new_to_hex": "Hex-க்கு புதியவரா?",
-        "learn_hex_in_1_minute": "1 நிமிடத்தில் Hex விளையாட கற்றுக்கொள்ளுங்கள்",
         "hex_is_simple_and_has_two_rules": "Hex ஒரு எளிய விளையாட்டு, ஆனால் தேர்ச்சி பெற கடினம். இதற்கு <strong>2 விதிகள் மட்டுமே</strong> உள்ளன.",
         "rule_1_connect_your_sides": "விதி 1: உங்கள் பக்கங்களை இணைக்கவும்",
         "to_win_you_must_connect_with_path": "வெற்றிபெற, நீங்கள் முழுமையாக இணைக்கப்பட்ட பாதையுடன் <strong>உங்கள் பக்கங்களை இணைக்க வேண்டும்</strong>.",
@@ -623,7 +622,6 @@
         "swap_map_credits": "ஆசிரியர்: hzy, ஆதாரம்: zhihu.com",
         "congrats_you_know_play_hex": "வாழ்த்துக்கள்! இப்போது நீங்கள் Hex எவ்வாறு விளையாடுவது என்று தெரியும்!",
         "what_to_do_next": "அடுத்து என்ன செய்வது",
-        "play_vs_ai_desc": "எளிய AI எதிரிக்கு எதிராக முழு விளையாட்டை விளையாடுங்கள்",
         "play_vs_ai_button": "AI-க்கு எதிராக விளையாடு",
         "do_some_puzzle_desc": "சில Hex புதிர்களை தீர்ப்பதன் மூலம் தந்திரோபாய மற்றும் மூலோபாய அடிப்படைகளை கற்றுக்கொள்ளுங்கள்",
         "do_some_puzzle_credits": "Matthew Seymour-ஆல்",

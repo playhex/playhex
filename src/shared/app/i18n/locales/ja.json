@@ -340,7 +340,6 @@
     "tutorial": {
         "label": "チュートリアル",
         "are_you_new_to_hex": "Hexは初めてですか？",
-        "learn_hex_in_1_minute": "1分でHexの遊び方を学ぼう",
         "hex_is_simple_and_has_two_rules": "Hexはシンプルなゲームですが、極めるのは簡単ではありません。<strong>ルールはたった2つ</strong>です。",
         "rule_1_connect_your_sides": "ルール1：自分の辺をつなぐ",
         "to_win_you_must_connect_with_path": "勝つには、<strong>自分の辺同士を完全につながった道で結ぶ</strong>必要があります。",
@@ -370,7 +369,6 @@
         "swap_map_credits": "作者：hzy、出典：zhihu.com",
         "congrats_you_know_play_hex": "おめでとう！これでHexの遊び方が分かりました！",
         "what_to_do_next": "次に何をしますか",
-        "play_vs_ai_desc": "簡単なAI相手に、フルゲームをプレイしてみましょう",
         "play_vs_ai_button": "AIと対戦",
         "do_some_puzzle_desc": "Hexのパズルを解いて、戦術と戦略の基礎を学びましょう",
         "do_some_puzzle_credits": "Matthew Seymour 作",

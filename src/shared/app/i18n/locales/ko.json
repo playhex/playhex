@@ -578,7 +578,6 @@
     "tutorial": {
         "label": "튜토리얼",
         "are_you_new_to_hex": "Hex가 처음이신가요?",
-        "learn_hex_in_1_minute": "1분 만에 Hex 배우기",
         "hex_is_simple_and_has_two_rules": "Hex는 간단하지만 마스터하기 어려운 게임입니다. <strong>단 2가지 규칙</strong>만 있습니다.",
         "rule_1_connect_your_sides": "규칙 1: 양 끝을 연결하세요",
         "to_win_you_must_connect_with_path": "이기려면 완전히 연결된 경로로 <strong>양 끝을 연결</strong>해야 합니다.",
@@ -608,7 +607,6 @@
         "swap_map_credits": "작성자: hzy, 출처: zhihu.com",
         "congrats_you_know_play_hex": "축하합니다! 이제 Hex 플레이 방법을 알고 있습니다!",
         "what_to_do_next": "다음에 할 일",
-        "play_vs_ai_desc": "쉬운 AI 상대와 완전한 게임을 플레이하세요",
         "play_vs_ai_button": "AI와 플레이",
         "do_some_puzzle_desc": "Hex 퍼즐을 풀어 전술과 전략적 기초를 배우세요",
         "do_some_puzzle_credits": "Matthew Seymour 제작",

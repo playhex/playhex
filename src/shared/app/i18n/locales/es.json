@@ -444,7 +444,6 @@
     "tutorial": {
         "label": "Tutorial",
         "are_you_new_to_hex": "¿Eres nuevo en Hex?",
-        "learn_hex_in_1_minute": "Aprende a jugar Hex en 1 minuto",
         "hex_is_simple_and_has_two_rules": "Hex es un juego simple, pero difícil de dominar. Tiene <strong>solo 2 reglas</strong>.",
         "rule_1_connect_your_sides": "Regla 1: Conecta tus lados",
         "to_win_you_must_connect_with_path": "Para ganar, debes <strong>conectar tus lados</strong> con un camino completamente conectado.",
@@ -474,7 +473,6 @@
         "swap_map_credits": "Autor: hzy, fuente: zhihu.com",
         "congrats_you_know_play_hex": "¡Felicidades! ¡Ahora ya sabes cómo jugar Hex!",
         "what_to_do_next": "Qué hacer a continuación",
-        "play_vs_ai_desc": "Juega una partida completa contra un oponente IA fácil",
         "play_vs_ai_button": "Jugar contra la IA",
         "do_some_puzzle_desc": "Aprende fundamentos tácticos y estratégicos resolviendo algunos rompecabezas de Hex",
         "do_some_puzzle_credits": "por Matthew Seymour",

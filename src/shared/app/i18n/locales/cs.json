@@ -550,7 +550,6 @@
     "tutorial": {
         "label": "Tutoriál",
         "are_you_new_to_hex": "Jste nový ve hře Hex?",
-        "learn_hex_in_1_minute": "Naučte se hrát Hex za 1 minutu",
         "hex_is_simple_and_has_two_rules": "Hex je jednoduchá hra, ale těžké ji zvládnout. Má <strong>jen 2 pravidla</strong>.",
         "rule_1_connect_your_sides": "Pravidlo 1: Spojte své strany",
         "to_win_you_must_connect_with_path": "Abyste vyhráli, musíte <strong>spojit své strany</strong> souvislou cestou.",
@@ -580,7 +579,6 @@
         "swap_map_credits": "Autor: hzy, zdroj: zhihu.com",
         "congrats_you_know_play_hex": "Gratulujeme! Teď už víte, jak hrát Hex!",
         "what_to_do_next": "Co dál",
-        "play_vs_ai_desc": "Zahrajte si celou hru proti snadné AI",
         "play_vs_ai_button": "Hrát vs AI",
         "do_some_puzzle_desc": "Naučte se taktické a strategické základy řešením hexových hádanek",
         "do_some_puzzle_credits": "od Matthew Seymour",

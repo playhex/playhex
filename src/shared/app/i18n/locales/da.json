@@ -570,7 +570,6 @@
     "tutorial": {
         "label": "Tutorial",
         "are_you_new_to_hex": "Er du ny i Hex?",
-        "learn_hex_in_1_minute": "Lær at spille Hex på 1 minut",
         "hex_is_simple_and_has_two_rules": "Hex er et simpelt spil, men svært at mestre. Det har <strong>kun 2 regler</strong>.",
         "rule_1_connect_your_sides": "Regel 1: Forbind dine sider",
         "to_win_you_must_connect_with_path": "For at vinde skal du <strong>forbinde dine sider</strong> med en fuldt sammenhængende sti.",
@@ -600,7 +599,6 @@
         "swap_map_credits": "Forfatter: hzy, kilde: zhihu.com",
         "congrats_you_know_play_hex": "Tillykke! Du ved nu, hvordan man spiller Hex!",
         "what_to_do_next": "Hvad gør jeg nu",
-        "play_vs_ai_desc": "Spil et helt spil mod en let AI-modstander",
         "play_vs_ai_button": "Spil mod AI",
         "do_some_puzzle_desc": "Lær taktiske og strategiske grundprincipper ved at løse Hex-opgaver",
         "do_some_puzzle_credits": "af Matthew Seymour",

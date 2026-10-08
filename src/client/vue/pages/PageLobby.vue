@@ -33,6 +33,7 @@ import { useSocketRoom } from '../composables/useSocketRoom.js';
 import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
+import AppTutorialCard from '../components/AppTutorialCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
 useHead({
@@ -138,6 +139,8 @@ for (const locale of getPlayerLocales()) {
 
         <div class="row">
             <div class="col-md-8">
+
+                <AppTutorialCard />
 
                 <!-- My turn to play -->
                 <section v-if="mySortedGames && mySortedGames.length > 0" class="mb-4">

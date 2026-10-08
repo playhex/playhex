@@ -480,7 +480,6 @@
     "tutorial": {
         "label": "Tutorial",
         "are_you_new_to_hex": "Apakah Anda baru mengenal Hex?",
-        "learn_hex_in_1_minute": "Pelajari cara bermain Hex dalam 1 menit",
         "hex_is_simple_and_has_two_rules": "Hex adalah permainan sederhana, tetapi sulit dikuasai. Permainan ini hanya memiliki <strong>2 aturan</strong>.",
         "rule_1_connect_your_sides": "Aturan 1: Hubungkan Sisi Anda",
         "to_win_you_must_connect_with_path": "Untuk menang, Anda harus <strong>menghubungkan sisi Anda</strong> dengan jalur yang terhubung penuh.",
@@ -510,7 +509,6 @@
         "swap_map_credits": "Penulis: hzy, sumber: zhihu.com",
         "congrats_you_know_play_hex": "Selamat! Kini Anda tahu cara bermain Hex!",
         "what_to_do_next": "Apa yang harus dilakukan selanjutnya",
-        "play_vs_ai_desc": "Mainkan permainan lengkap melawan lawan AI yang mudah",
         "play_vs_ai_button": "Mainkan vs AI",
         "do_some_puzzle_desc": "Pelajari dasar-dasar taktik dan strategi dengan menyelesaikan beberapa teka-teki Hex",
         "do_some_puzzle_credits": "oleh Matthew Seymour",

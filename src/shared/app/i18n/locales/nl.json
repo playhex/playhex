@@ -551,7 +551,6 @@
     "tutorial": {
         "label": "Tutorial",
         "are_you_new_to_hex": "Ben je nieuw bij Hex?",
-        "learn_hex_in_1_minute": "Leer Hex spelen in 1 minuut",
         "hex_is_simple_and_has_two_rules": "Hex is een eenvoudig spel, maar moeilijk te beheersen. Het heeft <strong>slechts 2 regels</strong>.",
         "rule_1_connect_your_sides": "Regel 1: Verbind je zijden",
         "to_win_you_must_connect_with_path": "Om te winnen moet je <strong>je zijden verbinden</strong> met een volledig verbonden pad.",
@@ -581,7 +580,6 @@
         "swap_map_credits": "Auteur: hzy, bron: zhihu.com",
         "congrats_you_know_play_hex": "Gefeliciteerd! Je weet nu hoe je Hex speelt!",
         "what_to_do_next": "Wat nu te doen",
-        "play_vs_ai_desc": "Speel een volledig spel tegen een makkelijke AI-tegenstander",
         "play_vs_ai_button": "Speel tegen AI",
         "do_some_puzzle_desc": "Leer tactische en strategische basisprincipes door enkele Hex-puzzels op te lossen",
         "do_some_puzzle_credits": "door Matthew Seymour",

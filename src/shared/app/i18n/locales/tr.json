@@ -404,7 +404,6 @@
     "tutorial": {
         "label": "Öğretici",
         "are_you_new_to_hex": "Hex'e yeni misin?",
-        "learn_hex_in_1_minute": "Hex oynamayı 1 dakikada öğren",
         "hex_is_simple_and_has_two_rules": "Hex basit bir oyundur, ancak ustalaşması zordur. <strong>Yalnızca 2 kuralı</strong> vardır.",
         "rule_1_connect_your_sides": "Kural 1: Kenarlarını Bağla",
         "to_win_you_must_connect_with_path": "Kazanmak için, kenarlarını <strong>kesintisiz bir yol</strong> ile bağlamalısın.",
@@ -434,7 +433,6 @@
         "swap_map_credits": "Yazar: hzy, kaynak: zhihu.com",
         "congrats_you_know_play_hex": "Tebrikler! Artık Hex nasıl oynanır biliyorsun!",
         "what_to_do_next": "Sırada ne var",
-        "play_vs_ai_desc": "Kolay bir yapay zekâ rakibine karşı tam bir oyun oyna",
         "play_vs_ai_button": "Yapay zekâya karşı oyna",
         "do_some_puzzle_desc": "Bazı Hex bulmacalarını çözerek taktiksel ve stratejik temelleri öğren",
         "do_some_puzzle_credits": "Matthew Seymour tarafından",

@@ -373,7 +373,6 @@
     "tutorial": {
         "label": "Handledningen",
         "are_you_new_to_hex": "Är du ny på Hex?",
-        "learn_hex_in_1_minute": "Lär dig spela Hex på 1 minut",
         "hex_is_simple_and_has_two_rules": "Hex är ett enkelt spel, men svårt att bemästra. Det har <strong>bara 2 regler</strong>.",
         "rule_1_connect_your_sides": "Regel 1: Koppla ihop dina sidor",
         "to_win_you_must_connect_with_path": "För att vinna måste du <strong>koppla ihop dina sidor</strong> med en helt sammanhängande väg.",
@@ -403,7 +402,6 @@
         "swap_map_credits": "Författare: hzy, källa: zhihu.com",
         "congrats_you_know_play_hex": "Grattis! Nu kan du spela Hex!",
         "what_to_do_next": "Vad ska du göra härnäst",
-        "play_vs_ai_desc": "Spela ett komplett parti mot en enkel AI-motståndare",
         "play_vs_ai_button": "Spela mot AI",
         "do_some_puzzle_desc": "Lär dig taktiska och strategiska grunder genom att lösa några Hex-pussel",
         "do_some_puzzle_credits": "av Matthew Seymour",

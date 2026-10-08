@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
-import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 import { allShadingPatterns, type ShadingPatternType } from '@playhex/shading-patterns';
 
 export enum MoveSettings {
@@ -143,4 +143,18 @@ export default class PlayerSettings
     @IsBoolean()
     @Column({ default: true })
     showTutorial: boolean = true;
+
+    /**
+     * Ids of tutorial steps completed by player (see tutorialSteps.ts).
+     * Null or undefined if player has not completed any step yet.
+     * No default value: a patch without this field must not reset progress.
+     */
+    @Expose()
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(32)
+    @IsString({ each: true })
+    @MaxLength(32, { each: true })
+    @Column({ type: 'json', nullable: true })
+    tutorialCompletedSteps?: null | string[];
 }

@@ -369,9 +369,52 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
-        name: 'tutorial',
         path: '/tutorial',
-        component: () => import('./pages/PageTutorial.vue'),
+        component: () => import('./pages/tutorial/LayoutTutorial.vue'),
+        children: [
+            {
+                // Redirects to the step to continue
+                name: 'tutorial',
+                path: '',
+                component: () => import('./pages/tutorial/PageTutorialIndex.vue'),
+            },
+            {
+                name: 'tutorial-rules',
+                path: 'rules',
+                component: () => import('./pages/tutorial/steps/StepRules.vue'),
+            },
+            {
+                name: 'tutorial-swap',
+                path: 'swap',
+                component: () => import('./pages/tutorial/steps/StepSwap.vue'),
+            },
+            ...([1, 4, 7, 10] as const).map(level => ({
+                name: `tutorial-davies-${level}`,
+                path: `davies-${level}`,
+                component: () => import('./pages/tutorial/steps/StepBot.vue'),
+                props: { level },
+            })),
+            {
+                name: 'tutorial-bridge',
+                path: 'bridge',
+                component: () => import('./pages/tutorial/steps/StepBridge.vue'),
+            },
+            {
+                name: 'tutorial-block',
+                path: 'block',
+                component: () => import('./pages/tutorial/steps/StepBlock.vue'),
+            },
+            {
+                name: 'tutorial-ziggurat',
+                path: 'ziggurat',
+                component: () => import('./pages/tutorial/steps/StepZiggurat.vue'),
+            },
+            {
+                name: 'tutorial-next',
+                path: 'next',
+                component: () => import('./pages/tutorial/steps/StepNext.vue'),
+            },
+        ],
     },
     {
         name: 'offline-lobby',

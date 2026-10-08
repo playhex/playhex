@@ -84,12 +84,16 @@ const routeName = computed<null | string>(() => {
     return name;
 });
 
-const toolsRouteNames = ['hexplorer', 'swap-maps', 'offline-lobby', 'statistics', 'tutorial'];
+const toolsRouteNames = ['hexplorer', 'swap-maps', 'offline-lobby', 'statistics'];
+
+const isToolsRoute = computed<boolean>(() => routeName.value !== null
+    && (toolsRouteNames.includes(routeName.value) || routeName.value.startsWith('tutorial')),
+);
 
 /*
  * Tutorial
  */
-const { shouldDisplayLink } = useTutorialControls();
+const { shouldDisplayLink, completedCount, totalCount } = useTutorialControls();
 
 /*
  * server and client versions check
@@ -210,7 +214,7 @@ const {
                         <li class="nav-item has-submenu">
                             <router-link
                                 :to="{ name: 'hexplorer' }"
-                                :class="{ active: routeName !== null && toolsRouteNames.includes(routeName) }"
+                                :class="{ active: isToolsRoute }"
                                 class="nav-link"
                                 @click="closeOffcanvas(); leaveFocus()"
                             >{{ $t('nav_tools') }}</router-link>
@@ -251,7 +255,7 @@ const {
                                 <li>
                                     <router-link
                                         :to="{ name: 'tutorial' }"
-                                        :class="{ active: routeName === 'tutorial' }"
+                                        :class="{ active: routeName?.startsWith('tutorial') }"
                                         class="nav-link"
                                         @click="closeOffcanvas(); leaveFocus()"
                                     >{{ $t('tutorial.label') }}</router-link>
@@ -295,6 +299,7 @@ const {
                 >
                     <IconRocketTakeOff />
                     <span class="d-none d-sm-inline">&nbsp;{{ $t('tutorial.label') }}</span>
+                    <span v-if="completedCount > 0" class="d-none d-sm-inline">&nbsp;{{ completedCount }}/{{ totalCount }}</span>
                 </router-link>
 
                 <!-- update app if versions mismatch -->

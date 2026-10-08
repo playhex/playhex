@@ -578,7 +578,6 @@
     "tutorial": {
         "label": "الدرس التعليمي",
         "are_you_new_to_hex": "هل أنت جديد على الهيكس؟",
-        "learn_hex_in_1_minute": "تعلّم لعب الهيكس في دقيقة واحدة",
         "hex_is_simple_and_has_two_rules": "الهيكس لعبة بسيطة، لكن يصعب إتقانها. لها <strong>قاعدتان فقط</strong>.",
         "rule_1_connect_your_sides": "القاعدة 1: اربط جانبيك",
         "to_win_you_must_connect_with_path": "للفوز، يجب أن <strong>تربط جانبيك</strong> بمسار متصل بالكامل.",
@@ -608,7 +607,6 @@
         "swap_map_credits": "المؤلف: hzy، المصدر: zhihu.com",
         "congrats_you_know_play_hex": "تهانينا! أنت الآن تعرف كيف تلعب الهيكس!",
         "what_to_do_next": "ماذا تفعل بعد ذلك",
-        "play_vs_ai_desc": "العب لعبة كاملة ضد خصم ذكاء اصطناعي سهل",
         "play_vs_ai_button": "العب ضد الذكاء الاصطناعي",
         "do_some_puzzle_desc": "تعلّم الأساسيات التكتيكية والاستراتيجية بحل بعض ألغاز الهيكس",
         "do_some_puzzle_credits": "بواسطة Matthew Seymour",
