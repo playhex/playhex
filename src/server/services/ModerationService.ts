@@ -51,7 +51,10 @@ export default class ModerationService
         };
     }
 
-    async createAndSaveAction(post: PostPlayerModerationAction): Promise<PlayerModerationAction>
+    /**
+     * @param automatic Whether this action is taken automatically by the server, not by a moderator.
+     */
+    async createAndSaveAction(post: PostPlayerModerationAction, automatic = false): Promise<PlayerModerationAction>
     {
         const player = await this.playerRepository.findOneBy({ publicId: post.playerPublicId });
 
@@ -69,6 +72,7 @@ export default class ModerationService
         action.anyContentBlockedUntil = post.anyContentBlockedUntil ?? null;
         action.nicknameModerated = post.moderateNickname ?? null;
         action.ipBannedUntil = post.ipBannedUntil ?? null;
+        action.automatic = automatic;
         action.acknowledgedAt = null;
         action.createdAt = new Date();
         action.relatedChatMessages = [];

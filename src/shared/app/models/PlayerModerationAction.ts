@@ -84,6 +84,15 @@ export default class PlayerModerationAction
     ipBannedUntil: null | Date;
 
     /**
+     * Whether this action has been taken automatically by the server
+     * (e.g forbidden word posted in chat), and not by a moderator.
+     * Only exposed to moderators: player must not know it was automatic.
+     */
+    @Column({ default: false })
+    @Expose({ groups: ['moderation'] })
+    automatic: boolean;
+
+    /**
      * Player has view this action and clicked "ok"
      */
     @Column({ type: Date, nullable: true })

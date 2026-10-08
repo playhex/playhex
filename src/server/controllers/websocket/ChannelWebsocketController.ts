@@ -9,6 +9,7 @@ import logger from '../../services/logger.js';
 import ChannelChatMessageRepository from '../../repositories/ChannelChatMessageRepository.js';
 import { ChannelNotFoundError, ChannelsService } from '../../services/ChannelsService.js';
 import PlayerModerationActionRepository from '../../repositories/PlayerModerationActionRepository.js';
+import AutoModerationService from '../../services/AutoModerationService.js';
 import { RateLimitReachedError, errorToRateLimitReachedErrorPayload, rateLimiterConsumeChannelSlowMode, rateLimiterConsumeChatMessage } from '../../services/rate-limiters.js';
 
 const CHANNEL_ROOM_PREFIX = 'channels/';
@@ -21,6 +22,7 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private channelsService: ChannelsService,
         private playerModerationActionRepository: PlayerModerationActionRepository,
+        private autoModerationService: AutoModerationService,
     ) {}
 
     onConnection(socket: HexSocket): void
@@ -111,6 +113,8 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
             answer();
 
             await this.channelChatMessageRepository.save(message);
+
+            await this.autoModerationService.moderateChatMessage(player, content, message.publicId);
         });
     }
 

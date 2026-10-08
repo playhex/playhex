@@ -159,7 +159,7 @@ export default class AdminModerationController
 
         const actions = await this.playerModerationActionRepository.findActionsForPlayer(player, true);
 
-        return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action'] });
+        return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action', 'moderation'] });
     }
 
     @Get('/api/admin/moderation/banned-ips')
@@ -237,7 +237,7 @@ export default class AdminModerationController
     {
         const actions = await this.playerModerationActionRepository.getLastActions(100);
 
-        return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action'] });
+        return instanceToPlain(actions, { groups: [GROUP_DEFAULT, 'player_moderation_action', 'moderation'] });
     }
 
     @Get('/api/admin/moderation/avatar-uploads')
