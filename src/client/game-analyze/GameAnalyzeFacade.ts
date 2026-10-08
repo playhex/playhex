@@ -36,12 +36,32 @@ export const preferMctsAnalyze = (moveAnalyze: undefined | GameAnalyzeData[numbe
 };
 
 /**
+ * Best moves with a policy above this ratio of the max policy are displayed too.
+ */
+const SIMILAR_POLICY_RATIO = 0.8;
+
+/**
+ * Max number of best moves marks that can be displayed at once.
+ */
+const MAX_BEST_MOVE_MARKS = 4;
+
+/**
+ * Best moves with a policy close to the best one (max policy among best moves).
+ * First best move is always included.
+ */
+export const getSimilarBestMoves = (bestMoves: MoveAndValue[]): MoveAndValue[] => {
+    const maxValue = Math.max(...bestMoves.map(bestMove => bestMove.value));
+
+    return bestMoves.filter((bestMove, i) => i === 0 || bestMove.value > maxValue * SIMILAR_POLICY_RATIO);
+};
+
+/**
  * Facade for showing analysis marks on a game view.
- * Displays best move and played move marks, and navigates to the analyzed position.
+ * Displays best moves and played move marks, and navigates to the analyzed position.
  */
 export class GameAnalyzeFacade
 {
-    private bestMoveMark = new BestMoveMark();
+    private bestMoveMarks: BestMoveMark[] = Array.from({ length: MAX_BEST_MOVE_MARKS }, () => new BestMoveMark());
     private playedMoveMark = new PlayedMoveMark();
     private currentlyFaded: null | Move = null;
     private selectedMoveIndex: null | number = null;
@@ -52,9 +72,12 @@ export class GameAnalyzeFacade
         private showPositionAt: (index: number) => void,
     ) {
         this.playedMoveMark.hide();
-        this.bestMoveMark.hide();
         gameView.addEntity(this.playedMoveMark, 'analyze');
-        gameView.addEntity(this.bestMoveMark, 'analyze');
+
+        for (const bestMoveMark of this.bestMoveMarks) {
+            bestMoveMark.hide();
+            gameView.addEntity(bestMoveMark, 'analyze');
+        }
     }
 
     getGameView(): GameView
@@ -88,11 +111,18 @@ export class GameAnalyzeFacade
 
         this.showPositionAt(move.moveIndex);
 
-        // Place best move
-        if (validateMove(move.bestMoves[0].move)) {
-            this.bestMoveMark.setCoords(parseMove(move.bestMoves[0].move));
-            this.bestMoveMark.show();
-        }
+        // Place best moves, and other moves with similar policy
+        getSimilarBestMoves(move.bestMoves)
+            .slice(0, MAX_BEST_MOVE_MARKS)
+            .forEach(({ move: bestMove }, i) => {
+                if (!validateMove(bestMove)) {
+                    return;
+                }
+
+                this.bestMoveMarks[i].setCoords(parseMove(bestMove));
+                this.bestMoveMarks[i].show();
+            })
+        ;
 
         // Place played move and eval color
         if (!validateMove(move.move.move)) {
@@ -144,7 +174,10 @@ export class GameAnalyzeFacade
 
     hideCurrentAnalysisMarks(): void
     {
-        this.bestMoveMark.hide();
+        for (const bestMoveMark of this.bestMoveMarks) {
+            bestMoveMark.hide();
+        }
+
         this.playedMoveMark.hide();
         this.removeFadedPlayedMove();
     }
