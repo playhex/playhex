@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { In, IsNull, Repository } from 'typeorm';
-import { ExternalGame, ExternalGameAnalyze, ExternalGameImportJob, Player } from '../../shared/app/models/index.js';
+import { ExternalGame, ExternalGameAnalyze, ExternalGameImportJob, Player, PlayerLittleGolemAccount } from '../../shared/app/models/index.js';
 import type SearchExternalGamesParameters from '../../shared/app/SearchExternalGamesParameters.js';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -17,7 +17,46 @@ export default class ExternalGameRepository
 
         @Inject('Repository<ExternalGameImportJob>')
         private externalGameImportJobRepository: Repository<ExternalGameImportJob>,
+
+        @Inject('Repository<PlayerLittleGolemAccount>')
+        private playerLittleGolemAccountRepository: Repository<PlayerLittleGolemAccount>,
     ) {}
+
+    async findLittleGolemAccount(player: Player): Promise<null | PlayerLittleGolemAccount>
+    {
+        if (!player.id) {
+            return null;
+        }
+
+        return await this.playerLittleGolemAccountRepository.findOneBy({ playerId: player.id });
+    }
+
+    /**
+     * Link a Little Golem account, replacing the one already linked if any.
+     */
+    async saveLittleGolemAccount(player: Player, plid: number, pseudo: string): Promise<PlayerLittleGolemAccount>
+    {
+        if (!player.id) {
+            throw new Error('Player has no id');
+        }
+
+        const account = new PlayerLittleGolemAccount();
+
+        account.playerId = player.id;
+        account.plid = plid;
+        account.pseudo = pseudo;
+
+        return await this.playerLittleGolemAccountRepository.save(account);
+    }
+
+    async deleteLittleGolemAccount(player: Player): Promise<void>
+    {
+        if (!player.id) {
+            return;
+        }
+
+        await this.playerLittleGolemAccountRepository.delete({ playerId: player.id });
+    }
 
     async findByPublicId(publicId: string): Promise<null | ExternalGame>
     {

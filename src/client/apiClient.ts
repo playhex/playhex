@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -263,7 +263,27 @@ export const getExternalGame = async (publicId: string): Promise<null | External
     return plainToInstance(ExternalGame, await response.json());
 };
 
-export const apiLinkLittleGolem = async (pseudo: string): Promise<{ littleGolemPlid: number, littleGolemPseudo: string }> => {
+/**
+ * @returns null if player has not linked a Little Golem account
+ */
+export const apiGetPlayerLittleGolemAccount = async (playerPublicId: string): Promise<null | PlayerLittleGolemAccount> => {
+    const response = await fetch(`/api/players/${playerPublicId}/little-golem`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    return plainToInstance(PlayerLittleGolemAccount, await response.json());
+};
+
+export const apiLinkLittleGolem = async (pseudo: string): Promise<PlayerLittleGolemAccount> => {
     const response = await fetch('/api/players/me/little-golem', {
         method: 'put',
         headers: {
@@ -275,7 +295,7 @@ export const apiLinkLittleGolem = async (pseudo: string): Promise<{ littleGolemP
 
     await checkResponse(response);
 
-    return await response.json();
+    return plainToInstance(PlayerLittleGolemAccount, await response.json());
 };
 
 export const apiUnlinkLittleGolem = async (): Promise<void> => {

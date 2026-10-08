@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, computed, onUnmounted, ref, toRefs, watch } from 'vue';
-import { ExternalGameImportJob, Player } from '../../../../shared/app/models/index.js';
+import { ExternalGameImportJob, PlayerLittleGolemAccount } from '../../../../shared/app/models/index.js';
 import { littleGolemPlayerUrl } from '../../../../shared/app/little-golem/littleGolemUtils.js';
 import { apiGetMyLastImport, apiImportLittleGolem, apiLinkLittleGolem, apiUnlinkLittleGolem } from '../../../apiClient.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
@@ -12,15 +12,15 @@ import { IconCaretDownFill, IconCaretRight } from '../../icons.js';
 
 const props = defineProps({
     /**
-     * Must be me.
+     * My linked account, null if not linked.
      */
-    player: {
-        type: Object as PropType<Player>,
-        required: true,
+    littleGolemAccount: {
+        type: Object as PropType<null | PlayerLittleGolemAccount>,
+        default: null,
     },
 });
 
-const { player } = toRefs(props);
+const { littleGolemAccount } = toRefs(props);
 
 const emits = defineEmits<{
     /**
@@ -29,9 +29,9 @@ const emits = defineEmits<{
     updated: [];
 
     /**
-     * Account linked, or unlinked (null), parent must update player.
+     * Account linked, or unlinked (null), parent must update it.
      */
-    accountChanged: [littleGolemPlid: null | number, littleGolemPseudo: null | string];
+    accountChanged: [littleGolemAccount: null | PlayerLittleGolemAccount];
 }>();
 
 /**
@@ -48,10 +48,10 @@ const linkAccount = async () => {
     loading.value = true;
 
     try {
-        const { littleGolemPlid, littleGolemPseudo } = await apiLinkLittleGolem(pseudoInput.value);
+        const account = await apiLinkLittleGolem(pseudoInput.value);
 
         pseudoInput.value = '';
-        emits('accountChanged', littleGolemPlid, littleGolemPseudo);
+        emits('accountChanged', account);
     } catch (e) {
         error.value = apiErrorMessage(e);
     } finally {
@@ -65,7 +65,7 @@ const unlinkAccount = async () => {
     try {
         await apiUnlinkLittleGolem();
 
-        emits('accountChanged', null, null);
+        emits('accountChanged', null);
     } catch (e) {
         error.value = apiErrorMessage(e);
     }
@@ -161,7 +161,7 @@ const startImport = async () => {
     }
 };
 
-watch(() => player.value.littleGolemPlid, plid => {
+watch(() => littleGolemAccount.value?.plid, plid => {
     if (plid) {
         void refreshImportJob();
     }
@@ -184,7 +184,7 @@ onUnmounted(() => {
             <img src="/images/external/little-golem.png" alt="" class="site-logo me-2">
             <span class="fw-semibold">{{ $t('external_games.little_golem.title') }}</span>
             <small class="text-body-secondary ms-2">
-                <template v-if="player.littleGolemPlid">{{ player.littleGolemPseudo ?? player.littleGolemPlid }}</template>
+                <template v-if="littleGolemAccount">{{ littleGolemAccount.pseudo }}</template>
                 <template v-else>{{ $t('external_games.little_golem.not_linked') }}</template>
             </small>
             <component :is="expanded ? IconCaretDownFill : IconCaretRight" class="ms-auto text-body-secondary" />
@@ -192,7 +192,7 @@ onUnmounted(() => {
 
         <div v-if="expanded" class="pt-3">
             <!-- Not linked -->
-            <form v-if="!player.littleGolemPlid" class="row g-2 align-items-center" @submit.prevent="linkAccount()">
+            <form v-if="!littleGolemAccount" class="row g-2 align-items-center" @submit.prevent="linkAccount()">
                 <div class="col-12">
                     <p class="mb-1"><small>{{ $t('external_games.little_golem.link_description') }}</small></p>
                 </div>
@@ -218,7 +218,7 @@ onUnmounted(() => {
                 <p class="mb-2">
                     <small>
                         {{ $t('external_games.little_golem.linked_to') }}
-                        <a :href="littleGolemPlayerUrl(player.littleGolemPlid)" target="_blank" rel="noopener">{{ player.littleGolemPseudo ?? player.littleGolemPlid }}</a>
+                        <a :href="littleGolemPlayerUrl(littleGolemAccount.plid)" target="_blank" rel="noopener">{{ littleGolemAccount.pseudo }}</a>
                     </small>
                     <button type="button" class="btn btn-sm btn-link text-secondary" @click="unlinkAccount()">{{ $t('external_games.little_golem.unlink') }}</button>
                 </p>

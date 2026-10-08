@@ -1,9 +1,9 @@
-import { Body, Delete, Get, HttpError, JsonController, NotFoundError, OnUndefined, Post, Put } from 'routing-controllers';
+import { Body, Delete, Get, HttpError, JsonController, NotFoundError, OnUndefined, Param, Post, Put } from 'routing-controllers';
 import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { IsString, MaxLength, MinLength } from 'class-validator';
 import { Expose } from '../../shared/app/class-transformer-custom.js';
-import { ExternalGameImportJob, Player } from '../../shared/app/models/index.js';
+import { ExternalGameImportJob, Player, PlayerLittleGolemAccount } from '../../shared/app/models/index.js';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
 import PlayerRepository from '../repositories/PlayerRepository.js';
 import { rateLimiterConsumeImportExternalGames, rateLimiterConsumeLinkExternalAccount } from '../services/rate-limiters.js';
@@ -49,6 +49,23 @@ export default class ExternalGameImportController
     ) {}
 
     /**
+     * Little Golem account linked by a player, if any.
+     */
+    @Get('/api/players/:publicId/little-golem')
+    @OnUndefined(204)
+    async getLittleGolemAccount(
+        @Param('publicId') publicId: string,
+    ): Promise<undefined | PlayerLittleGolemAccount> {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (player === null) {
+            throw new NotFoundError('Player not found');
+        }
+
+        return await this.externalGameRepository.findLittleGolemAccount(player) ?? undefined;
+    }
+
+    /**
      * Not verified: any player can link any Little Golem account,
      * and a same Little Golem account can be linked to many players.
      */
@@ -56,7 +73,7 @@ export default class ExternalGameImportController
     async linkLittleGolem(
         @AuthenticatedPlayer() player: Player,
         @Body() { pseudo }: LinkLittleGolemBody,
-    ): Promise<{ littleGolemPlid: number, littleGolemPseudo: string }> {
+    ): Promise<PlayerLittleGolemAccount> {
         mustNotBeGuest(player);
 
         await rateLimiterConsumeLinkExternalAccount(player.publicId);
@@ -77,12 +94,7 @@ export default class ExternalGameImportController
             throw new NotFoundError('Little Golem player not found. Only recently active players can be found by pseudo, paste your Little Golem profile link instead.');
         }
 
-        await this.playerRepository.updateLittleGolemAccount(player.publicId, littleGolemPlayer.plid, littleGolemPlayer.pseudo);
-
-        return {
-            littleGolemPlid: littleGolemPlayer.plid,
-            littleGolemPseudo: littleGolemPlayer.pseudo,
-        };
+        return await this.externalGameRepository.saveLittleGolemAccount(player, littleGolemPlayer.plid, littleGolemPlayer.pseudo);
     }
 
     /**
@@ -116,7 +128,7 @@ export default class ExternalGameImportController
     async unlinkLittleGolem(
         @AuthenticatedPlayer() player: Player,
     ): Promise<void> {
-        await this.playerRepository.updateLittleGolemAccount(player.publicId, null, null);
+        await this.externalGameRepository.deleteLittleGolemAccount(player);
     }
 
     /**
@@ -133,7 +145,9 @@ export default class ExternalGameImportController
             throw new HttpError(503, 'Games import is disabled');
         }
 
-        if (!player.littleGolemPlid) {
+        const littleGolemAccount = await this.externalGameRepository.findLittleGolemAccount(player);
+
+        if (littleGolemAccount === null) {
             throw new HttpError(400, 'Link a Little Golem account first');
         }
 
@@ -150,7 +164,7 @@ export default class ExternalGameImportController
         job.publicId = uuidv4();
         job.requestedBy = player;
         job.source = 'LG';
-        job.externalPlayerId = String(player.littleGolemPlid);
+        job.externalPlayerId = String(littleGolemAccount.plid);
         job.status = 'pending';
 
         await this.externalGameRepository.saveImportJob(job);

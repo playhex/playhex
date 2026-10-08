@@ -33,6 +33,7 @@ import PlayerNotification from './PlayerNotification.js';
 import PlayerAiWorkerKey from './PlayerAiWorkerKey.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
 import PlayerIp from './PlayerIp.js';
+import PlayerLittleGolemAccount from './PlayerLittleGolemAccount.js';
 import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
@@ -86,6 +87,7 @@ export {
     PlayerAccountPassword,
     PlayerFavoriteTimeControl,
     PlayerIp,
+    PlayerLittleGolemAccount,
     PlayerModerationAction,
     PlayerNotification,
     PlayerSettings,
@@ -141,6 +143,7 @@ export const entities = {
     PlayerAccountPassword,
     PlayerFavoriteTimeControl,
     PlayerIp,
+    PlayerLittleGolemAccount,
     PlayerModerationAction,
     PlayerNotification,
     PlayerAiWorkerKey,

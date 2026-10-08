@@ -109,20 +109,4 @@ export default class Player
     @Column({ type: String, nullable: true, default: null, length: 8 })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })
     countryFlag?: null | string;
-
-    /**
-     * Little Golem player id, if player linked its Little Golem account.
-     * Used to show games played on Little Golem on profile page.
-     * Not verified, and not unique: a Little Golem account can be claimed by many players.
-     */
-    @Column({ type: 'int', nullable: true, default: null })
-    @Expose()
-    littleGolemPlid?: null | number;
-
-    /**
-     * Little Golem pseudo, at the time of linking.
-     */
-    @Column({ type: String, length: 64, nullable: true, default: null })
-    @Expose()
-    littleGolemPseudo?: null | string;
 }

@@ -2,8 +2,8 @@
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
-import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
-import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames } from '../../../apiClient.js';
+import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerLittleGolemAccount, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
+import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames, apiGetPlayerLittleGolemAccount } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
@@ -292,13 +292,30 @@ const gamesHistoryHeading = useTemplateRef<HTMLElement>('gamesHistoryHeading');
  * On other profiles, only if player linked some accounts.
  */
 const canEditExternalAccounts = computed<boolean>(() => player.value !== null && isMe(player.value) && !player.value.isGuest);
-const showExternalAccounts = computed<boolean>(() => canEditExternalAccounts.value || !!player.value?.littleGolemPlid);
+const showExternalAccounts = computed<boolean>(() => canEditExternalAccounts.value || littleGolemAccount.value !== null);
 
 const gamesHistoryTab = ref<'playhex' | 'little_golem'>('playhex');
 const littleGolemGamesCount = ref<null | number>(null);
 
-const littleGolemExternalPlayerId = computed<null | string>(() => player.value?.littleGolemPlid
-    ? littleGolemPlayerExternalId(player.value.littleGolemPlid)
+const littleGolemAccount = ref<null | PlayerLittleGolemAccount>(null);
+
+watch(() => player.value?.publicId, async publicId => {
+    littleGolemAccount.value = null;
+
+    if (!publicId) {
+        return;
+    }
+
+    const account = await apiGetPlayerLittleGolemAccount(publicId);
+
+    // Ignore response if player changed meanwhile
+    if (player.value?.publicId === publicId) {
+        littleGolemAccount.value = account;
+    }
+}, { immediate: true });
+
+const littleGolemExternalPlayerId = computed<null | string>(() => littleGolemAccount.value
+    ? littleGolemPlayerExternalId(littleGolemAccount.value.plid)
     : null,
 );
 
@@ -316,13 +333,8 @@ const refreshLittleGolemGamesCount = async () => {
 
 watch(littleGolemExternalPlayerId, () => void refreshLittleGolemGamesCount(), { immediate: true });
 
-const littleGolemAccountChanged = (littleGolemPlid: null | number, littleGolemPseudo: null | string): void => {
-    if (player.value === null) {
-        return;
-    }
-
-    player.value.littleGolemPlid = littleGolemPlid;
-    player.value.littleGolemPseudo = littleGolemPseudo;
+const littleGolemAccountChanged = (account: null | PlayerLittleGolemAccount): void => {
+    littleGolemAccount.value = account;
 };
 
 const playerCurrentRatings = ref<null | Partial<Record<RatingCategory, Rating>>>(null);
@@ -570,7 +582,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
             </div>
             <div v-if="player && showExternalAccounts" class="col-lg-4 mb-3">
                 <AppExternalAccounts
-                    :player
+                    :littleGolemAccount
                     :editable="canEditExternalAccounts"
                     @updated="refreshLittleGolemGamesCount()"
                     @littleGolemAccountChanged="littleGolemAccountChanged"
