@@ -1,5 +1,5 @@
 import { AIConfig, GameOptions, Player } from '../../shared/app/models/index.js';
-import { calcRandomMove } from '../../shared/game-engine/index.js';
+import { calcRandomMove, EngineGame } from '../../shared/game-engine/index.js';
 import { Container } from 'typedi';
 import RemoteApiPlayer from './RemoteApiPlayer.js';
 import logger from './logger.js';
@@ -9,6 +9,7 @@ import type { HexMove } from '@playhex/move-notation';
 import { MIN_BOT_LEVEL_CHECKED, SimilarPlayingPositionChecker } from './anti-cheat/SimilarPlayingPositionChecker.js';
 import AiJobService from '../ai-jobs/AiJobService.js';
 import { getBotJobType } from '../ai-jobs/botTasks.js';
+import { pickFairFirstMove, shouldSwap } from '../../shared/swap-maps/swapDecision.js';
 
 export class FindAIError extends Error {}
 
@@ -95,6 +96,40 @@ const waitTimeBeforeRandomMove = (aiConfig: { wait?: number }): number => {
     return 0;
 };
 
+/**
+ * Opening logic shared by all AIs when swap is allowed, from swap maps:
+ * - first move: play a fair move
+ * - second move: swap or not, depending on first move strength
+ *
+ * Falls back to engine when there is no swap map for this board size.
+ *
+ * @returns Either the move to play directly,
+ *          or allowSwap to send to engine (false to prevent engine from swapping by itself, undefined to keep game rule).
+ */
+const decideOpening = (engineGame: EngineGame): { move: HexMove } | { allowSwap?: boolean } => {
+    if (engineGame.getAllowSwap() && engineGame.getMovesHistory().length === 0) {
+        const fairMove = pickFairFirstMove(engineGame.getSize());
+
+        if (fairMove !== null) {
+            return { move: fairMove };
+        }
+    }
+
+    if (engineGame.canSwapNow()) {
+        const swap = shouldSwap(engineGame.getSize(), engineGame.getFirstMove()!.move);
+
+        if (swap === true) {
+            return { move: 'swap-pieces' };
+        }
+
+        if (swap === false) {
+            return { allowSwap: false };
+        }
+    }
+
+    return {};
+};
+
 export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): Promise<null | HexMove> => {
     const { isBot } = player;
     let { aiConfig } = player;
@@ -133,7 +168,13 @@ export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): 
 
     // Moves computed by AI workers
     if (getBotJobType(aiConfig.engine, aiConfig.config) !== null) {
-        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config);
+        const opening = decideOpening(engineGame);
+
+        if ('move' in opening) {
+            return opening.move;
+        }
+
+        return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config, opening.allowSwap);
     }
 
     switch (aiConfig.engine) {

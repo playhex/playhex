@@ -31,7 +31,10 @@ export default class RemoteApiPlayer
         return remainingTimeMs > 0 ? remainingTimeMs : undefined;
     }
 
-    private async fetchMove(engine: string, game: EngineGame, config: { [key: string]: unknown }, remainingTimeMs?: number): Promise<HexMove>
+    /**
+     * @param allowSwap Override game swap rule, i.e to prevent engine from swapping.
+     */
+    private async fetchMove(engine: string, game: EngineGame, config: { [key: string]: unknown }, remainingTimeMs?: number, allowSwap = game.getAllowSwap()): Promise<HexMove>
     {
         let moveString: null | string = null;
 
@@ -40,7 +43,7 @@ export default class RemoteApiPlayer
                 size: game.getSize(),
                 movesHistory: game.getMovesHistoryAsString(),
                 currentPlayer: game.getCurrentPlayerIndex() === 0 ? 'black' : 'white',
-                swapRule: game.getAllowSwap(),
+                swapRule: allowSwap,
             });
 
             if (task === null) {
@@ -64,7 +67,10 @@ export default class RemoteApiPlayer
         }
     }
 
-    async makeMove(engine: string, gameServer: GameServer, config: { maxGames?: number, maxPlayouts?: number }): Promise<null | HexMove>
+    /**
+     * @param allowSwap Override game swap rule, i.e to prevent engine from swapping.
+     */
+    async makeMove(engine: string, gameServer: GameServer, config: { maxGames?: number, maxPlayouts?: number }, allowSwap?: boolean): Promise<null | HexMove>
     {
         const engineGame = gameServer.getEngineGame();
 
@@ -80,7 +86,7 @@ export default class RemoteApiPlayer
         });
 
         try {
-            const move = await this.fetchMove(engine, engineGame, config, this.getRemainingTimeMs(gameServer));
+            const move = await this.fetchMove(engine, engineGame, config, this.getRemainingTimeMs(gameServer), allowSwap);
             measure.finished();
             return move;
         } catch (e) {
