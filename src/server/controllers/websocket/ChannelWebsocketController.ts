@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexServer, HexSocket } from '../../server.js';
+import { getSocketPlayerAllowedToWrite } from '../../oauth/oauthSocket.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { Channel, ChannelChatMessage } from '../../../shared/app/models/index.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
@@ -28,7 +29,7 @@ export default class ChannelWebsocketController implements WebsocketControllerIn
     onConnection(socket: HexSocket): void
     {
         socket.on('sendChannelChat', async (channelName, content, answer) => {
-            const { player } = socket.data;
+            const player = getSocketPlayerAllowedToWrite(socket);
 
             if (player === null) {
                 answer({ reason: 'server_error' });

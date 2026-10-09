@@ -1,0 +1,11 @@
+# Applications current player authorized. Requires session authentication (not usable with an OAuth token).
+
+GET /api/oauth/connected-applications
+
+###
+
+# Revoke all access of an application to current player account.
+
+@clientId=my-client-id
+
+DELETE /api/oauth/connected-applications/{{ clientId }}

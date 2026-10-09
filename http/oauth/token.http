@@ -1,0 +1,14 @@
+# Authorization code flow, step 2: exchange code for access token (and refresh token if offline_access).
+# Confidential clients authenticate with Basic auth (client_id:client_secret),
+# public clients send client_id and code_verifier instead.
+
+@clientId=my-client-id
+@clientSecret=my-client-secret
+@redirectUri=http://localhost:9999/callback
+@code=xxx
+
+POST /oidc/token
+Authorization: Basic {{ clientId }}:{{ clientSecret }}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&code={{ code }}&redirect_uri={{ redirectUri }}&code_verifier=dBjftJeZ4CVP-mJ92K9uLLtpvmz2JH2r4WbmQdfjqVg

@@ -1,0 +1,14 @@
+# Call the api on behalf of a player with an access token.
+# "read" scope: GET routes, "write" scope: all routes, except security ones (login, password, admin...).
+
+@accessToken=xxx
+
+GET /api/auth/me
+Authorization: Bearer {{ accessToken }}
+
+###
+
+# Player public id (and pseudo, slug with "read" scope).
+
+GET /oidc/me
+Authorization: Bearer {{ accessToken }}

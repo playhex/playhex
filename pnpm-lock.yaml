@@ -167,6 +167,9 @@ importers:
       mysql2:
         specifier: ^3.24.4
         version: 3.24.4(@types/node@26.6.2)
+      oidc-provider:
+        specifier: ^9.12.2
+        version: 9.12.2
       parse-duration:
         specifier: ^2.1.9
         version: 2.1.9
@@ -217,7 +220,7 @@ importers:
         version: 2.1.0
       tournament-organizer:
         specifier: git+https://github.com/playhex/tournament-organizer.git#main
-        version: git+https://git@github.com:playhex/tournament-organizer.git#d254501ab9bd99dcb612fe04433d2a6e331a3bb2
+        version: https://codeload.github.com/playhex/tournament-organizer/tar.gz/d254501ab9bd99dcb612fe04433d2a6e331a3bb2
       typedi:
         specifier: ^0.10.0
         version: 0.10.0
@@ -315,6 +318,9 @@ importers:
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
+      '@types/oidc-provider':
+        specifier: ^9.12.1
+        version: 9.12.1
       '@types/qs':
         specifier: ^6.15.1
         version: 6.15.1
@@ -1644,6 +1650,9 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
+  '@types/accepts@1.3.7':
+    resolution: {integrity: sha512-Pay9fq2lM2wXPWbteBsRAGiWH2hig4ZE2asK+mm7kUzlxRTfL961rj89I6zV/E3PcIkDqyuBEcMxFT7rccugeQ==}
+
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
 
@@ -1652,6 +1661,12 @@ packages:
 
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
+
+  '@types/content-disposition@0.5.9':
+    resolution: {integrity: sha512-8uYXI3Gw35MhiVYhG3s295oihrxRyytcRHjSjqnqZVDDy/xcGBRny7+Xj1Wgfhv5QzRtN2hB2dVRBUX9XW3UcQ==}
+
+  '@types/cookies@0.9.2':
+    resolution: {integrity: sha512-1AvkDdZM2dbyFybL4fxpuNCaWyv//0AwsuUk2DWeXyM1/5ZKm6W3z6mQi24RZ4l2ucY+bkSHzbDVpySqPGuV8A==}
 
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
@@ -1686,11 +1701,23 @@ packages:
   '@types/hammerjs@2.0.46':
     resolution: {integrity: sha512-ynRvcq6wvqexJ9brDMS4BnBLzmr0e14d6ZJTEShTBWKymQiHwlAyGu0ZPEFI2Fh1U53F7tN9ufClWM5KvqkKOw==}
 
+  '@types/http-assert@1.5.6':
+    resolution: {integrity: sha512-TTEwmtjgVbYAzZYWyeHPrrtWnfVkm8tQkP8P21uQifPgMRgjrow3XDEYqucuC8SKZJT7pUnhU/JymvjggxO9vw==}
+
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@types/keygrip@1.0.6':
+    resolution: {integrity: sha512-lZuNAY9xeJt7Bx4t4dx0rYCDqGPW8RXhQZK1td7d4H6E9zYbLoOtjBvfwdTKpsyxQI/2jv+armjX/RW+ZNpXOQ==}
+
+  '@types/koa-compose@3.2.9':
+    resolution: {integrity: sha512-BroAZ9FTvPiCy0Pi8tjD1OfJ7bgU1gQf0eR6e1Vm+JJATy9eKOG3hQMFtMciMawiSOVnLMdmUOC46s7HBhSTsA==}
+
+  '@types/koa@3.0.3':
+    resolution: {integrity: sha512-TdtNEJ7sYSrFQcVuS2ySsVqnq5EyE3oJbnfFJvkC9UtGP4Kpem5KE7r+ivHIbIAQAofSqnlB5D3vkfYO69TQpg==}
 
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
@@ -1712,6 +1739,9 @@ packages:
 
   '@types/node@26.6.2':
     resolution: {integrity: sha512-X1P21scMv4zGKLYqjdGjaKa7COa0RKVYYZZN/NfvLQ1JegxFhdhpZG/Lyn8AXx6CDUavKAd11v6BvfpkDByK8g==}
+
+  '@types/oidc-provider@9.12.1':
+    resolution: {integrity: sha512-qRJksCw0I+VloInJxMV/4L4gLL5Qrws9Np9+rW+MZeBKauEz5WqKO99OVCpnj4LKB/o1+utkHoQq1c3GBhuE5g==}
 
   '@types/pngjs@6.0.5':
     resolution: {integrity: sha512-0k5eKfrA83JOZPppLtS2C7OUtyNAl2wKNxfyYl9Q5g9lPkgBl/9hNyAu6HuEH2J4XmIv2znEpkDd0SaZVxW6iQ==}
@@ -3413,6 +3443,9 @@ packages:
     resolution: {integrity: sha512-2mD929bUVKUhOLQQEVhlf6EZ0Mlo0DeRb5MO7cViR9AXLtBauuccEtB1py9Ocxpo/P7ucnh442iY/iOwrh3IQw==}
     engines: {node: '>= 20'}
 
+  jose@6.2.12:
+    resolution: {integrity: sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==}
+
   js-binary-schema-parser@2.0.3:
     resolution: {integrity: sha512-xezGJmOb4lk/M1ZZLTR/jaBHQ4gG/lqQnJqdIv4721DMggsa1bDVlHXNeHYogaIEHD9vCRv0fcL4hMA+Coarkg==}
 
@@ -3860,6 +3893,9 @@ packages:
   obug@2.2.1:
     resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
     engines: {node: '>=12.20.0'}
+
+  oidc-provider@9.12.2:
+    resolution: {integrity: sha512-UaqeVpeijTocxVbDowPqPKloGjb49bxRSzHfChyI86teR+6xxoiI1V5jv8CHL2AIUmA2rg0xTZcYaC9GguympA==}
 
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -4551,8 +4587,8 @@ packages:
     resolution: {integrity: sha512-FVDYdxtnj0G6Qm/DhNPSb8Ju59ULcup3tuJxkFb5K8Bv2pUXILbf0xZWU8PX8Ov19OXljbUyveOFwRMwkXzO+A==}
     engines: {node: '>=16'}
 
-  tournament-organizer@git+https://git@github.com:playhex/tournament-organizer.git#d254501ab9bd99dcb612fe04433d2a6e331a3bb2:
-    resolution: {commit: d254501ab9bd99dcb612fe04433d2a6e331a3bb2, repo: git@github.com:playhex/tournament-organizer.git, type: git}
+  tournament-organizer@https://codeload.github.com/playhex/tournament-organizer/tar.gz/d254501ab9bd99dcb612fe04433d2a6e331a3bb2:
+    resolution: {tarball: https://codeload.github.com/playhex/tournament-organizer/tar.gz/d254501ab9bd99dcb612fe04433d2a6e331a3bb2}
     version: 3.9.1
     engines: {node: '>=14.16'}
 
@@ -6088,6 +6124,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
+  '@types/accepts@1.3.7':
+    dependencies:
+      '@types/node': 26.6.2
+
   '@types/bcryptjs@2.4.6': {}
 
   '@types/body-parser@1.19.6':
@@ -6097,6 +6137,15 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
+      '@types/node': 26.6.2
+
+  '@types/content-disposition@0.5.9': {}
+
+  '@types/cookies@0.9.2':
+    dependencies:
+      '@types/connect': 3.4.38
+      '@types/express': 5.0.6
+      '@types/keygrip': 1.0.6
       '@types/node': 26.6.2
 
   '@types/cors@2.8.19':
@@ -6134,9 +6183,28 @@ snapshots:
 
   '@types/hammerjs@2.0.46': {}
 
+  '@types/http-assert@1.5.6': {}
+
   '@types/http-errors@2.0.5': {}
 
   '@types/json-schema@7.0.15': {}
+
+  '@types/keygrip@1.0.6': {}
+
+  '@types/koa-compose@3.2.9':
+    dependencies:
+      '@types/koa': 3.0.3
+
+  '@types/koa@3.0.3':
+    dependencies:
+      '@types/accepts': 1.3.7
+      '@types/content-disposition': 0.5.9
+      '@types/cookies': 0.9.2
+      '@types/http-assert': 1.5.6
+      '@types/http-errors': 2.0.5
+      '@types/keygrip': 1.0.6
+      '@types/koa-compose': 3.2.9
+      '@types/node': 26.6.2
 
   '@types/linkify-it@5.0.0': {}
 
@@ -6160,6 +6228,12 @@ snapshots:
   '@types/node@26.6.2':
     dependencies:
       undici-types: 8.9.0
+
+  '@types/oidc-provider@9.12.1':
+    dependencies:
+      '@types/keygrip': 1.0.6
+      '@types/koa': 3.0.3
+      '@types/node': 26.6.2
 
   '@types/pngjs@6.0.5':
     dependencies:
@@ -7007,8 +7081,7 @@ snapshots:
       safe-buffer: 5.2.1
     optional: true
 
-  content-disposition@1.0.1:
-    optional: true
+  content-disposition@1.0.1: {}
 
   content-disposition@1.1.0: {}
 
@@ -7032,7 +7105,6 @@ snapshots:
     dependencies:
       depd: 2.0.0
       keygrip: 1.1.0
-    optional: true
 
   copy-anything@4.1.1: {}
 
@@ -7145,8 +7217,7 @@ snapshots:
 
   dedent@1.7.2: {}
 
-  deep-equal@1.0.1:
-    optional: true
+  deep-equal@1.0.1: {}
 
   deep-is@0.1.4: {}
 
@@ -7161,18 +7232,15 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
-  delegates@1.0.0:
-    optional: true
+  delegates@1.0.0: {}
 
   denque@2.1.0: {}
 
-  depd@1.1.2:
-    optional: true
+  depd@1.1.2: {}
 
   depd@2.0.0: {}
 
-  destroy@1.2.0:
-    optional: true
+  destroy@1.2.0: {}
 
   detect-libc@2.1.2: {}
 
@@ -7639,8 +7707,7 @@ snapshots:
 
   forwarded@0.2.0: {}
 
-  fresh@0.5.2:
-    optional: true
+  fresh@0.5.2: {}
 
   fresh@2.0.0: {}
 
@@ -7777,7 +7844,6 @@ snapshots:
     dependencies:
       deep-equal: 1.0.1
       http-errors: 1.8.1
-    optional: true
 
   http-errors@1.8.1:
     dependencies:
@@ -7786,7 +7852,6 @@ snapshots:
       setprototypeof: 1.2.0
       statuses: 1.5.0
       toidentifier: 1.0.1
-    optional: true
 
   http-errors@2.0.1:
     dependencies:
@@ -7963,6 +8028,8 @@ snapshots:
       '@hapi/topo': 6.0.2
       '@standard-schema/spec': 1.1.0
 
+  jose@6.2.12: {}
+
   js-binary-schema-parser@2.0.3: {}
 
   js-tokens@4.0.0: {}
@@ -8023,7 +8090,6 @@ snapshots:
   keygrip@1.1.0:
     dependencies:
       tsscmp: 1.0.6
-    optional: true
 
   keyv@5.6.0:
     dependencies:
@@ -8036,8 +8102,7 @@ snapshots:
       type-is: 1.6.18
     optional: true
 
-  koa-compose@4.1.0:
-    optional: true
+  koa-compose@4.1.0: {}
 
   koa@3.2.1:
     dependencies:
@@ -8059,7 +8124,6 @@ snapshots:
       statuses: 2.0.2
       type-is: 2.1.0
       vary: 1.1.2
-    optional: true
 
   kuler@2.0.0: {}
 
@@ -8408,6 +8472,14 @@ snapshots:
   object-inspect@1.13.4: {}
 
   obug@2.2.1: {}
+
+  oidc-provider@9.12.2:
+    dependencies:
+      debug: 4.4.3(supports-color@8.1.1)
+      jose: 6.2.12
+      koa: 3.2.1
+    transitivePeerDependencies:
+      - supports-color
 
   on-finished@2.4.1:
     dependencies:
@@ -9052,8 +9124,7 @@ snapshots:
 
   standard-as-callback@2.1.0: {}
 
-  statuses@1.5.0:
-    optional: true
+  statuses@1.5.0: {}
 
   statuses@2.0.2: {}
 
@@ -9181,7 +9252,7 @@ snapshots:
     dependencies:
       tldts: 6.1.86
 
-  tournament-organizer@git+https://git@github.com:playhex/tournament-organizer.git#d254501ab9bd99dcb612fe04433d2a6e331a3bb2:
+  tournament-organizer@https://codeload.github.com/playhex/tournament-organizer/tar.gz/d254501ab9bd99dcb612fe04433d2a6e331a3bb2:
     dependencies:
       edmonds-blossom-fixed: 1.0.1
       randomstring: 1.3.1
@@ -9232,8 +9303,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsscmp@1.0.6:
-    optional: true
+  tsscmp@1.0.6: {}
 
   tunnel-agent@0.6.0:
     dependencies:

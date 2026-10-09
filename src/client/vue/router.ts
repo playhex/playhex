@@ -231,6 +231,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./pages/player/PageSettings.vue'),
     },
     {
+        // Player authorizes a third-party application, see src/server/oauth/
+        name: 'oauth-interaction',
+        path: '/oauth/interaction/:uid',
+        component: () => import('./pages/oauth/PageOAuthInteraction.vue'),
+    },
+    {
         path: '/',
         component: () => import('./pages/content/LayoutContent.vue'),
         children: [

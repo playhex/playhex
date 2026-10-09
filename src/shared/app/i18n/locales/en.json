@@ -64,7 +64,8 @@
             "game": "Game",
             "board": "Board",
             "notifications": "Notifications",
-            "ai_workers": "AI workers"
+            "ai_workers": "AI workers",
+            "connected_applications": "Connected applications"
         },
         "audio": "Audio",
         "moderation": "Moderation"
@@ -1634,5 +1635,38 @@
             "failed": "Import failed.",
             "progress": "{{imported}} imported, {{skipped}} already imported, {{failed}} failed, {{notFinished}} not finished, out of {{total}} games."
         }
+    },
+    "oauth": {
+        "wants_access": "This application wants to access your PlayHex account:",
+        "by_author": "by {{author}}",
+        "use_another_account": "Use another account",
+        "revoke_anytime": "You can revoke this access at any time in your settings.",
+        "authorize": "Authorize",
+        "deny": "Deny",
+        "error_expired": "This authorization request has expired. Go back to the application and try again.",
+        "error_unknown": "An error occurred while processing this authorization request.",
+        "connected_applications_description": "Third-party applications you allowed to access your account.",
+        "authorized_at": "Authorized on {{date}}",
+        "revoke": "Revoke",
+        "revoke_confirm": "Revoke access of \"{{name}}\" to your account?",
+        "scope": {
+            "openid": {
+                "title": "Know who you are",
+                "description": "Your public player id."
+            },
+            "read": {
+                "title": "Read your data",
+                "description": "Your profile, games, ratings, settings... read only."
+            },
+            "write": {
+                "title": "Act on your behalf",
+                "description": "Create and join games, play moves, chat, change settings... Never your password."
+            },
+            "offline_access": {
+                "title": "Stay connected",
+                "description": "Keep access while you are not using the application."
+            }
+        },
+        "check_device_code": "Make sure this code matches the one displayed on your device:"
     }
 }

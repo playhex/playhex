@@ -26,6 +26,7 @@ import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
+import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
 
 /**
  * @throws {DomainHttpError}
@@ -1766,4 +1767,56 @@ export const apiPostVideo = async (input: VideoInput, thumbnail: { file: File } 
     await checkResponse(response);
 
     return plainToInstance(Video, await response.json());
+};
+
+export const apiGetOAuthInteraction = async (uid: string): Promise<OAuthInteractionDetails> => {
+    const response = await fetch(`/oauth/interaction/${encodeURIComponent(uid)}/details`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+/**
+ * @returns Url to redirect player to, to continue OAuth flow
+ */
+export const apiPostOAuthInteraction = async (uid: string, action: 'confirm' | 'abort'): Promise<string> => {
+    const response = await fetch(`/oauth/interaction/${encodeURIComponent(uid)}/${action}`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as { redirectTo: string }).redirectTo;
+};
+
+export const apiGetOAuthConnectedApplications = async (): Promise<OAuthConnectedApplication[]> => {
+    const response = await fetch('/api/oauth/connected-applications', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as OAuthConnectedApplication[])
+        .map(application => ({ ...application, authorizedAt: new Date(application.authorizedAt) }))
+    ;
+};
+
+export const apiRevokeOAuthConnectedApplication = async (clientId: string): Promise<void> => {
+    const response = await fetch(`/api/oauth/connected-applications/${encodeURIComponent(clientId)}`, {
+        method: 'delete',
+    });
+
+    await checkResponse(response);
 };

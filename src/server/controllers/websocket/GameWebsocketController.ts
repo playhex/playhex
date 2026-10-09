@@ -2,6 +2,7 @@ import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
+import { getSocketPlayerAllowedToWrite } from '../../oauth/oauthSocket.js';
 
 @Service()
 export default class GameWebsocketController implements WebsocketControllerInterface
@@ -13,7 +14,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
     onConnection(socket: HexSocket): void
     {
         socket.on('move', (gameId, move, answer) => {
-            const { player } = socket.data;
+            const player = getSocketPlayerAllowedToWrite(socket);
 
             if (player === null) {
                 answer('Player not found');
@@ -24,7 +25,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
         });
 
         socket.on('premove', (gameId, premove, answer) => {
-            const { player } = socket.data;
+            const player = getSocketPlayerAllowedToWrite(socket);
 
             if (player === null) {
                 answer('Player not found');
@@ -35,7 +36,7 @@ export default class GameWebsocketController implements WebsocketControllerInter
         });
 
         socket.on('cancelPremove', (gameId, answer) => {
-            const { player } = socket.data;
+            const player = getSocketPlayerAllowedToWrite(socket);
 
             if (player === null) {
                 answer('Player not found');

@@ -1,0 +1,9 @@
+# Authorization code flow, step 1: open this url in player browser.
+# Player is redirected to /oauth/interaction/xxx to authorize the application,
+# then back to redirect_uri with ?code=xxx
+# Public clients (no secret) must send code_challenge (PKCE, S256).
+
+@clientId=my-client-id
+@redirectUri=http://localhost:9999/callback
+
+GET /oidc/auth?client_id={{ clientId }}&response_type=code&redirect_uri={{ redirectUri }}&scope=openid%20read%20write%20offline_access&prompt=consent&state=random-state&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256

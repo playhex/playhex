@@ -5,6 +5,9 @@ import { Container } from 'typedi';
 import PlayerRepository from '../../repositories/PlayerRepository.js';
 import BannedIpService from '../BannedIpService.js';
 import { getClientIp } from './getClientIp.js';
+import logger from '../logger.js';
+import { resolveOAuthAccess } from '../../oauth/oauthAccess.js';
+import { canRead } from '../../oauth/oauthApiPolicy.js';
 
 const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     // Makes express and socketio aware of session in cookie
@@ -30,18 +33,47 @@ const addSessionMiddlewares = (app: Express, io: HexServer): void => {
     const playerRepository = Container.get(PlayerRepository);
 
     io.use(async (socket, next) => {
-        const { playerId } = socket.request.session;
+        try {
+            socket.data.oauthScopes = null;
 
-        // socket not authenticated
-        if (!playerId) {
-            socket.data.player = null;
+            // Third-party application connecting with an OAuth access token: io(url, { auth: { token } })
+            const token: unknown = socket.handshake.auth?.token;
+
+            if (typeof token === 'string' && token !== '') {
+                const oauthAccess = await resolveOAuthAccess(token);
+
+                if (oauthAccess === null) {
+                    next(new Error('invalid_token'));
+                    return;
+                }
+
+                if (!canRead(oauthAccess.scopes)) {
+                    next(new Error('insufficient_scope'));
+                    return;
+                }
+
+                socket.data.player = oauthAccess.player;
+                socket.data.oauthScopes = oauthAccess.scopes;
+                next();
+                return;
+            }
+
+            const { playerId } = socket.request.session;
+
+            // socket not authenticated
+            if (!playerId) {
+                socket.data.player = null;
+                next();
+                return;
+            }
+
+            socket.data.player = await playerRepository.getPlayer(playerId);
+
             next();
-            return;
+        } catch (e) {
+            logger.error('Could not authenticate socket', { errorMessage: (e as Error)?.message });
+            next(new Error('server_error'));
         }
-
-        socket.data.player = await playerRepository.getPlayer(playerId);
-
-        next();
     });
 };
 

@@ -1,0 +1,21 @@
+# Device flow, for applications without browser (CLI, bots).
+# 1. Request a device code. Display user_code and verification_uri to the player.
+
+@clientId=my-client-id
+
+POST /oidc/device/auth
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{ clientId }}&scope=openid%20read%20write
+
+###
+
+# 2. Poll every `interval` seconds until player authorized the application.
+# Returns "authorization_pending" error until then.
+
+@deviceCode=xxx
+
+POST /oidc/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:device_code&device_code={{ deviceCode }}&client_id={{ clientId }}

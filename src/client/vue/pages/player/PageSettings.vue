@@ -5,7 +5,8 @@ import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
-import { apiGetPlayerAiWorkerKeys, apiPostPushTest, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
+import { apiGetOAuthConnectedApplications, apiGetPlayerAiWorkerKeys, apiPostPushTest, apiRevokeOAuthConnectedApplication, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
+import type { OAuthConnectedApplication } from '../../../../shared/app/oauth.js';
 import { watch, Ref, ref, computed, onMounted, onBeforeUnmount, onUnmounted, nextTick } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
@@ -277,7 +278,7 @@ const formatThemeReleaseDate = (releaseDate: string): string => intlFormat(
 /*
  * Panels
  */
-type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications' | 'ai_workers';
+type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications' | 'ai_workers' | 'connected_applications';
 
 /*
  * AI worker keys, only a few players have one: panel is hidden if player has none.
@@ -297,6 +298,38 @@ watch(loggedInPlayer, async player => {
     }
 }, { immediate: true });
 
+/*
+ * Third-party applications player authorized through OAuth: panel is hidden if player has none.
+ */
+const connectedApplications = ref<OAuthConnectedApplication[]>([]);
+
+watch(loggedInPlayer, async player => {
+    try {
+        connectedApplications.value = player
+            ? await apiGetOAuthConnectedApplications()
+            : [];
+    } catch (e) {
+        connectedApplications.value = [];
+
+        // eslint-disable-next-line no-console
+        console.error('Could not load connected applications', e);
+    }
+}, { immediate: true });
+
+const revokeConnectedApplication = async (application: OAuthConnectedApplication): Promise<void> => {
+    if (!confirm(t('oauth.revoke_confirm', { name: application.name }))) {
+        return;
+    }
+
+    await apiRevokeOAuthConnectedApplication(application.clientId);
+
+    connectedApplications.value = connectedApplications.value.filter(a => a.clientId !== application.clientId);
+
+    if (connectedApplications.value.length === 0 && currentPanel.value === 'connected_applications') {
+        currentPanel.value = 'interface';
+    }
+};
+
 const panels = computed((): Panel[] => [
     'interface',
     'account',
@@ -304,6 +337,7 @@ const panels = computed((): Panel[] => [
     'board',
     'notifications',
     ...(aiWorkerKeys.value.length > 0 ? ['ai_workers' as const] : []),
+    ...(connectedApplications.value.length > 0 ? ['connected_applications' as const] : []),
 ]);
 
 /*
@@ -363,6 +397,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'shading-pattern': 'board',
     'push-notifications': 'notifications',
     'ai-worker-keys': 'ai_workers',
+    'connected-applications': 'connected_applications',
 };
 
 const currentPanel = ref<Panel>('interface');
@@ -919,6 +954,38 @@ const {
                     </section>
                 </div>
 
+                <!-- Connected applications (OAuth) -->
+                <div v-show="'connected_applications' === currentPanel">
+                    <section id="connected-applications">
+                        <h3>{{ $t('player_settings.panel.connected_applications') }}</h3>
+
+                        <p>{{ $t('oauth.connected_applications_description') }}</p>
+
+                        <div v-for="application in connectedApplications" :key="application.clientId" class="card mb-3">
+                            <div class="card-body d-flex gap-3 align-items-start">
+                                <img :src="application.logoUri" :alt="application.name" class="oauth-logo rounded">
+
+                                <div class="flex-grow-1">
+                                    <h4 class="card-title mt-0 mb-1">{{ application.name }}</h4>
+                                    <p class="text-secondary small mb-1">
+                                        {{ $t('oauth.by_author', { author: application.author }) }}
+                                        <template v-if="application.websiteUri">
+                                            ·
+                                            <a :href="application.websiteUri" target="_blank" rel="noopener noreferrer nofollow">{{ application.websiteUri }}</a>
+                                        </template>
+                                    </p>
+                                    <p class="small mb-1">
+                                        <span v-for="scope in application.scopes.filter(s => s !== 'openid')" :key="scope" class="badge text-bg-secondary me-1">{{ $t(`oauth.scope.${scope}.title`) }}</span>
+                                    </p>
+                                    <p class="text-secondary small mb-0">{{ $t('oauth.authorized_at', { date: application.authorizedAt.toLocaleDateString(autoLocale()) }) }}</p>
+                                </div>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger" @click="revokeConnectedApplication(application)">{{ $t('oauth.revoke') }}</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
             </div>
         </div>
     </div>
@@ -931,6 +998,11 @@ h3
 h4
     margin 1em 0 0.5em 0
     font-size 1.1rem
+
+.oauth-logo
+    width 48px
+    height 48px
+    object-fit contain
 
 .board-container
     width 400px

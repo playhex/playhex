@@ -25,6 +25,8 @@ import LadderEvent from './LadderEvent.js';
 import LadderPlayer from './LadderPlayer.js';
 import LadderReign from './LadderReign.js';
 import ModerationSetting from './ModerationSetting.js';
+import OAuthClient from './OAuthClient.js';
+import OAuthPayload from './OAuthPayload.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
 import PlayerAccountPassword from './PlayerAccountPassword.js';
@@ -81,6 +83,8 @@ export {
     LadderReign,
     ModerationSetting,
     MoveSettings,
+    OAuthClient,
+    OAuthPayload,
     OnlinePlayers,
     OnlinePlayer,
     Player,
@@ -138,6 +142,8 @@ export const entities = {
     LadderPlayer,
     LadderReign,
     ModerationSetting,
+    OAuthClient,
+    OAuthPayload,
     OnlinePlayers,
     Player,
     PlayerAccountPassword,

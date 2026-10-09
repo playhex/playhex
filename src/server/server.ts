@@ -5,6 +5,12 @@ import { Service } from 'typedi';
 
 interface SocketData {
     player: null | Player;
+
+    /**
+     * Set when socket is authenticated with an OAuth access token (third-party application),
+     * null when authenticated with session cookie.
+     */
+    oauthScopes: null | Set<string>;
 }
 
 @Service()

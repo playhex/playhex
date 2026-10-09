@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { getSafeRedirect } from '../../../services/safeRedirect.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { Ref, ref } from 'vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
@@ -19,6 +20,10 @@ const passwordValidation: Ref<InputValidation> = ref(null);
 const globalError: Ref<null | string> = ref(null);
 
 const router = useRouter();
+const route = useRoute();
+
+// e.g /login?redirect=/oauth/interaction/xxx to go back to OAuth authorization page
+const redirect = getSafeRedirect(route.query.redirect);
 
 const onSubmit = async () => {
     pseudoValidation.value = null;
@@ -28,7 +33,7 @@ const onSubmit = async () => {
     try {
         await useAuthStore().login(pseudo.value, password.value);
 
-        void router.push({ name: 'home' });
+        void router.push(redirect ?? { name: 'home' });
     } catch (e) {
         if (!(e instanceof DomainHttpError)) {
             throw e;
@@ -87,7 +92,7 @@ const onSubmit = async () => {
                 <div class="mt-4 text-center">
                     <i18next :translation="$t('no_account_sign_up_instead')">
                         <template #signUp>
-                            <router-link :to="{ name: 'signup' }">{{ $t('no_account_sign_up_instead_link_label') }}</router-link>
+                            <router-link :to="{ name: 'signup', query: redirect ? { redirect } : {} }">{{ $t('no_account_sign_up_instead_link_label') }}</router-link>
                         </template>
                     </i18next>
                 </div>

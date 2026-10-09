@@ -48,7 +48,8 @@
             "game": "Partie",
             "board": "Plateau",
             "notifications": "Notifications",
-            "ai_workers": "Workers IA"
+            "ai_workers": "Workers IA",
+            "connected_applications": "Applications connectées"
         },
         "audio": "Audio",
         "moderation": "Modération"
@@ -1647,5 +1648,38 @@
             "failed": "L'import a échoué.",
             "progress": "{{imported}} importées, {{skipped}} déjà importées, {{failed}} en erreur, {{notFinished}} non terminées, sur {{total}} parties."
         }
+    },
+    "oauth": {
+        "wants_access": "Cette application souhaite accéder à votre compte PlayHex :",
+        "by_author": "par {{author}}",
+        "use_another_account": "Utiliser un autre compte",
+        "revoke_anytime": "Vous pouvez révoquer cet accès à tout moment dans vos paramètres.",
+        "authorize": "Autoriser",
+        "deny": "Refuser",
+        "error_expired": "Cette demande d’autorisation a expiré. Retournez sur l’application et réessayez.",
+        "error_unknown": "Une erreur est survenue lors du traitement de cette demande d’autorisation.",
+        "connected_applications_description": "Applications tierces que vous avez autorisées à accéder à votre compte.",
+        "authorized_at": "Autorisée le {{date}}",
+        "revoke": "Révoquer",
+        "revoke_confirm": "Révoquer l’accès de « {{name}} » à votre compte ?",
+        "scope": {
+            "openid": {
+                "title": "Savoir qui vous êtes",
+                "description": "Votre identifiant public de joueur."
+            },
+            "read": {
+                "title": "Lire vos données",
+                "description": "Votre profil, vos parties, votre classement, vos paramètres... en lecture seule."
+            },
+            "write": {
+                "title": "Agir en votre nom",
+                "description": "Créer et rejoindre des parties, jouer des coups, discuter, modifier vos paramètres... Jamais votre mot de passe."
+            },
+            "offline_access": {
+                "title": "Rester connectée",
+                "description": "Garder l’accès même quand vous n’utilisez pas l’application."
+            }
+        },
+        "check_device_code": "Vérifiez que ce code correspond à celui affiché sur votre appareil :"
     }
 }

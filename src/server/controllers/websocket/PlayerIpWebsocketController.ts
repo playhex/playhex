@@ -13,9 +13,14 @@ export default class PlayerIpWebsocketController implements WebsocketControllerI
 
     onConnection(socket: HexSocket): void
     {
-        const { player } = socket.data;
+        const { player, oauthScopes } = socket.data;
 
         if (!player) {
+            return;
+        }
+
+        // Ip of a third-party application server, not the player one
+        if (oauthScopes !== null) {
             return;
         }
 

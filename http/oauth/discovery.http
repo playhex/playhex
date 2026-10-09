@@ -1,0 +1,3 @@
+# OpenID Connect discovery document: lists all OAuth endpoints, scopes, supported flows.
+
+GET /oidc/.well-known/openid-configuration

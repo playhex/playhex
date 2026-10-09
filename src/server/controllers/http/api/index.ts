@@ -43,6 +43,7 @@ import PuzzleCollectionController from '../../../puzzles/PuzzleCollectionControl
 import VideoController from '../../../videos/VideoController.js';
 import ExternalGameController from '../../../external-games/ExternalGameController.js';
 import ExternalGameImportController from '../../../external-games/ExternalGameImportController.js';
+import OAuthController from '../../../oauth/OAuthController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -60,7 +61,14 @@ export const registerApi = (app: Express) => {
             undefinedResultCode: 204,
         },
         currentUserChecker: async (action): Promise<null | Player> => {
-            const { playerId } = action.request.session;
+            const request = action.request as Request;
+
+            // Third-party application acting on behalf of a player, see oauthApiMiddleware
+            if (request.oauth) {
+                return request.oauth.player;
+            }
+
+            const { playerId } = request.session;
 
             if (!playerId) {
                 return null;
@@ -118,6 +126,7 @@ export const registerApi = (app: Express) => {
             ChangelogController,
             HexplorerController,
             HexGameImporterController,
+            OAuthController,
         ],
     });
 

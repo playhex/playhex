@@ -2,6 +2,7 @@ import GameStore from '../../store/GameStore.js';
 import { Service } from 'typedi';
 import { WebsocketControllerInterface } from './index.js';
 import { HexSocket } from '../../server.js';
+import { getSocketPlayerAllowedToWrite } from '../../oauth/oauthSocket.js';
 import { ChatMessage } from '../../../shared/app/models/index.js';
 import { plainToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { validateOrReject } from 'class-validator';
@@ -18,7 +19,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
     onConnection(socket: HexSocket): void
     {
         socket.on('sendChat', async (gameId, content, answer) => {
-            const { player } = socket.data;
+            const player = getSocketPlayerAllowedToWrite(socket);
 
             if (player === null) {
                 answer({ reason: 'server_error' });

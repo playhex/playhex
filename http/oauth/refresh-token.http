@@ -1,0 +1,11 @@
+# Get a new access token. Refresh token may be rotated (always for public clients): if response contains a new one, use it.
+
+@clientId=my-client-id
+@clientSecret=my-client-secret
+@refreshToken=xxx
+
+POST /oidc/token
+Authorization: Basic {{ clientId }}:{{ clientSecret }}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token={{ refreshToken }}
